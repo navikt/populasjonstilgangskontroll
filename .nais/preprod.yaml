@@ -4,7 +4,7 @@ kind: Application
 metadata:
   labels:
     team: tilgangsmaskin
-  name: geografisktilgangskontroll
+  name: geografisk-tilgangskontroll
   namespace: tilgangsmaskin
 spec:
   ingresses:

@@ -1,0 +1,21 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+
+metadata:
+  labels:
+    team: tilgangsmaskin
+  name: geografisktilgangskontroll
+  namespace: tilgangsmaskin
+spec:
+  ingresses:
+    - https://geografisktilgangskontroll.preprod.nav.cloud.nais.io
+  image: {{image}}
+  port: 8080
+  ttl: 3h
+  replicas:
+    max: 1
+    min: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 32Mi

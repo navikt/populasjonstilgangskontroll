@@ -1,2 +1,2 @@
-# Geografisk-tilgangskontroll
-Backendsystem for å tilby geografisk tilgangskontroll.
+# Populasjonstilgangskontroll
+Backendsystem for å tilby tilgangskontroll basert på populøasjon.

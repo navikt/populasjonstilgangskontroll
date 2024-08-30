@@ -4,14 +4,13 @@ kind: Application
 metadata:
   labels:
     team: tilgangsmaskin
-  name: geografisk-tilgangskontroll
+  name: populasjonstilgangskontroll
   namespace: tilgangsmaskin
 spec:
   ingresses:
-    - https://geografisktilgangskontroll.prod.nav.cloud.nais.io
+    - https://populasjonstilgangskontroll.prod.nav.cloud.nais.io
   image: {{image}}
   port: 8080
-  ttl: 3h
   replicas:
     max: 1
     min: 1

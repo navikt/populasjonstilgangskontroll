@@ -8,6 +8,15 @@ metadata:
   namespace: tilgangsmaskin
 spec:
   image: {{image}}
+  prometheus:
+    enabled: true
+    path: /internal/prometheus
+  readiness:
+    path: /internal/health/readiness
+    initialDelay: 22
+  liveness:
+    path: /internal/health/liveness
+    initialDelay: 22
   port: 8080
   replicas:
     max: 1
@@ -16,3 +25,17 @@ spec:
     requests:
       cpu: 50m
       memory: 32Mi
+  azure:
+    application:
+      enabled: true
+      claims:
+        extra:
+          - azp_name
+  secureLogs:
+    enabled: true
+  accessPolicy:
+    inbound:
+      rules:
+
+    outbound:
+      rules:

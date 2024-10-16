@@ -12,9 +12,33 @@ class Tilgangskontroll {
 
 
     @PostMapping("sjekkTilgang")
-    fun sjekkTilgang(brukerIdent: String): String {
+    fun sjekkTilgang(brukerIdent: String): TilgangsResponse{
         val harTilgang = tilgangsService.validerTilgang(brukerIdent)
 
-        return harTilgang.toString()
+        return harTilgang.let {
+            TilgangsResponse(
+                brukerIdent = brukerIdent,
+                navIdent = "12345678911",
+                ansatt_har_tilgang = it,
+                begrunnelse = "Begrunnelse",
+                begrunnbelse_kode = "BegrunnelseKode",
+                kan_overstyres = true
+            )
+        }
     }
+
+    @PostMapping("sjekkTilgangBulk")
+    fun sjekkTilgangBulk(brukerIdenter: List<String> ): () -> List<TilgangsResponse> {
+        return { tilgangsService.validerTilgangBulk(brukerIdenter) }
+    }
+
 }
+
+data class TilgangsResponse(
+    val brukerIdent: String,
+    val navIdent: String,
+    val ansatt_har_tilgang: Boolean,
+    val begrunnelse: String,
+    val begrunnbelse_kode: String,
+    val kan_overstyres: Boolean
+)

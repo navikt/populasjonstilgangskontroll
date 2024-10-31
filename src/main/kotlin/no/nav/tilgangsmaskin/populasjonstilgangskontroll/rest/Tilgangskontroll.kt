@@ -12,33 +12,47 @@ class Tilgangskontroll {
 
 
     @PostMapping("sjekkTilgang")
-    fun sjekkTilgang(brukerIdent: String): TilgangsResponse{
-        val harTilgang = tilgangsService.validerTilgang(brukerIdent)
+    fun sjekkTilgang(bruker_ident: String): TilgangsResponse{
+        val nav_ident = "N999999" // Hent fra token
+        val har_tilgang = tilgangsService.validerTilgang(bruker_ident, nav_ident)
 
-        return harTilgang.let {
-            TilgangsResponse(
-                brukerIdent = brukerIdent,
-                navIdent = "12345678911",
-                ansatt_har_tilgang = it,
-                begrunnelse = "Begrunnelse",
-                begrunnbelse_kode = "BegrunnelseKode",
-                kan_overstyres = true
-            )
+        return har_tilgang.let {
+            if (it) {
+                TilgangsResponse(
+                    bruker_ident = bruker_ident,
+                    nav_ident = "N999999",
+                    ansatt_har_tilgang = it,
+
+
+                )
+            } else {
+                TilgangsResponse(
+                    bruker_ident = bruker_ident,
+                    nav_ident = "N999999",
+                    ansatt_har_tilgang = it,
+                    begrunnelse = Begrunnelse(begrunnelse= "Begrunnelse", begrunnelse_kode = "", kan_overstyres = false) //optional
+                )
+            }
         }
     }
 
     @PostMapping("sjekkTilgangBulk")
     fun sjekkTilgangBulk(brukerIdenter: List<String> ): () -> List<TilgangsResponse> {
-        return { tilgangsService.validerTilgangBulk(brukerIdenter) }
+        val navIdent = "N999999" // Hent fra token
+        return { tilgangsService.validerTilgangBulk(brukerIdenter, navIdent) }
     }
 
 }
 
 data class TilgangsResponse(
-    val brukerIdent: String,
-    val navIdent: String,
+    val bruker_ident: String,
+    val nav_ident: String,
     val ansatt_har_tilgang: Boolean,
+    val begrunnelse: Begrunnelse? = null,
+
+)
+data class Begrunnelse(
     val begrunnelse: String,
-    val begrunnbelse_kode: String,
+    val begrunnelse_kode: String,
     val kan_overstyres: Boolean
 )

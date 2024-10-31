@@ -2,9 +2,10 @@ val javaVersion = JavaLanguageVersion.of(21)
 val springdocVersion = "2.5.0"
 val tokenSupportVersion = "4.1.7"
 val springCloudVersion = "4.1.2"
-
+val commonVersion = "3.2024.05.23_05.46-2b29fa343e8e"
 val mockkVersion = "1.13.11"
 val testcontainerVersion = "1.19.0"
+val okhVersion = "4.12.0"
 
 group = "no.nav.populasjonstrilgangskontroll"
 version = "1.0.0"
@@ -57,14 +58,17 @@ dependencies {
 
     // Logging
     implementation("net.logstash.logback:logstash-logback-encoder:7.4")
-
     implementation("io.micrometer:micrometer-registry-prometheus")
 
+    //httpclient
+    implementation("com.squareup.okhttp3:okhttp:$okhVersion")
+
+    //Rest
+    implementation("no.nav.common:rest:$commonVersion")
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock:$springCloudVersion")
-
     testImplementation("io.mockk:mockk:$mockkVersion")
 
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")

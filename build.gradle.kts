@@ -63,6 +63,9 @@ dependencies {
     //httpclient
     implementation("com.squareup.okhttp3:okhttp:$okhVersion")
 
+    //Token
+    implementation("no.nav.common:token-client:$commonVersion")
+
     //Rest
     implementation("no.nav.common:rest:$commonVersion")
 

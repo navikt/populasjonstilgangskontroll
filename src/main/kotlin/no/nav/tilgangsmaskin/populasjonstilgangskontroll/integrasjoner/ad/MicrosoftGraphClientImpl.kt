@@ -21,9 +21,9 @@ class  MicrosoftGraphClientImpl(
         val requestData = HentAdGrupperForNavAnsatt.Request(true)
         val request = Request.Builder()
             .url("$baseUrl/v1.0/users/$navAnsattAzureId/getMemberGroups")
-            .post(toJsonString(requestData).toJsonRequestBody()) // sett opp spørring med å flitere vekk alle grupper som ikkje har 0000-GA- i navnet
+            .post(toJsonString(requestData).toJsonRequestBody()) // TODO sett opp spørring med å flitere vekk alle grupper som ikkje har 0000-GA- i navnet
             .authorization(tokenProvider)
-            .build()
+            .build() //TODO bygge støtte for paginering
 
         return client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {

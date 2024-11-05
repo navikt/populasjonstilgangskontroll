@@ -9,21 +9,17 @@ import org.springframework.stereotype.Service
 class TilgangsService {
 
     fun validerTilgang(brukerIdent: String, navIdent: String): Boolean {
-        validereNavIdent(navIdent) //forventer navident på  (A-Z)(1-9)(0-9){5}
+        validereGyldigFnr(brukerIdent)
         return if (brukerIdent == "12345678911") {
             true
         } else false
     }
 
-    private fun validereNavIdent(navIdent: String) {
-        fun checkNavIdent(navIdent: String): Boolean {
-            val regex = Regex("^[A-Z]{1}[0-9]{6}\$")
-            return regex.matches(navIdent)
+    private fun validereGyldigFnr(fnr: String) { //støtter kun 11 siffer
+        if (fnr.length != 11) {
+            throw IllegalArgumentException("Fødselsnummer må være 11 siffer")
         }
-        fun checkIfEntraId(navIdent: String): Boolean {
-            val regex = Regex("^[A-Z]{1}[0-9]{6}\$")
-            return regex.matches(navIdent)
-        }
+
     }
 
     fun validerTilgangBulk(brukerIdenter: List<String>, navIdent: String): List<TilgangsResponse> {

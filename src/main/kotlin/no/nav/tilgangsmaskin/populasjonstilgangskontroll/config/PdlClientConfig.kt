@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.config
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean

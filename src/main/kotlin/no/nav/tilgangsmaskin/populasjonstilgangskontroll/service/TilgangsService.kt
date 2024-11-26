@@ -5,12 +5,12 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopp
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest.Begrunnelse
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest.TilgangsResponse
 import org.springframework.stereotype.Service
+import org.springframework.web.reactive.function.client.WebClient
 
 
 @Service
-class TilgangsService(private val pdlGraphClient: PdlGraphClient) {
-
-
+class TilgangsService(pdlGraphClient: PdlGraphClient) {
+    val pdlGraphClient = pdlGraphClient
 
     fun validerTilgang(brukerIdent: String, navIdent: String): Boolean {
         validereGyldigFnr(brukerIdent)

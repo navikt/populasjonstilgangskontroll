@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll
 
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.PdlGraphClient
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangsService
 import org.junit.jupiter.api.Test
 import org.assertj.core.api.Assertions.assertThat
@@ -7,7 +8,11 @@ import org.assertj.core.api.Assertions.assertThat
 
 
 class TilgangskontrollTest() {
-    val tilgangsService= TilgangsService()
+    val tilgangsService= TilgangsService(mocckPdlClient())
+
+    private fun mocckPdlClient(): PdlGraphClient {
+        TODO("Not yet implemented")
+    }
 
     @Test
     fun `Tilgang til applikasjonPolulasjonen er ok`() {

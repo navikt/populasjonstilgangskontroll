@@ -1,15 +1,20 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.service
 
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.PdlGraphClient
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.PdlGraphResponse
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest.Begrunnelse
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest.TilgangsResponse
 import org.springframework.stereotype.Service
 
 
 @Service
-class TilgangsService {
+class TilgangsService(private val pdlGraphClient: PdlGraphClient) {
+
+
 
     fun validerTilgang(brukerIdent: String, navIdent: String): Boolean {
         validereGyldigFnr(brukerIdent)
+        hentPersonFraPdl(brukerIdent)
         return if (brukerIdent == "12345678911") {
             true
         } else false
@@ -26,4 +31,12 @@ class TilgangsService {
         return brukerIdenter.map { TilgangsResponse(it, "12345678911", validerTilgang(it, navIdent), Begrunnelse("begrunnelse", "begrunnelse_kode", false)
             ) }
     }
+
+
+
+    private fun hentPersonFraPdl(brukerIdent: String): PdlGraphResponse {
+       return pdlGraphClient.hentPerson(brukerIdent)
+    }
+
+
 }

@@ -1,0 +1,55 @@
+query($ident: ID!){
+    hentPerson(ident: $ident) {
+        adressebeskyttelse{
+            gradering
+        },
+        navn{fornavn,mellomnavn,etternavn},
+        bostedsadresse(historikk: false) {
+            coAdressenavn,
+            ukjentBosted {
+                bostedskommune
+            },
+            vegadresse {
+                husnummer
+                husbokstav
+                bruksenhetsnummer
+                adressenavn
+                kommunenummer
+                tilleggsnavn
+                postnummer
+            }
+        },
+        kontaktadresse(historikk: false) {
+            coAdressenavn
+            postboksadresse {
+                postbokseier
+                postboks
+                postnummer
+                poststed
+            },
+            utenlandskAdresse {
+                adressenavnNummer
+                bygningEtasjeLeilighet
+                postboksNummerNavn
+                postkode
+                bySted
+                regionDistriktOmraade
+                landkode
+            },
+            vegadresse {
+                husnummer
+                husbokstav
+                bruksenhetsnummer
+                adressenavn
+                kommunenummer
+                tilleggsnavn
+                postnummer
+            }
+        },
+        folkeregisteridentifikator(historikk: false){
+            identifikasjonsnummer
+            type
+            status
+        }
+    }
+}

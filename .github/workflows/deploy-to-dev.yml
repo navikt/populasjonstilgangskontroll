@@ -4,10 +4,13 @@ on:
     branches:
       - main
 jobs:
-  build_and_deploy:
-    name: Build, push and deploy
-    runs-on: ubuntu-latest
-    uses: navikt/populasjonstilgangskontroll/.github/workflows/java-docker-build-push.yml@main
+  build-and-deploy:
+    name: "Bygger app og deployer til dev-gcp"
+    uses: navikt/populasjonstilgangskontroll/.github/workflows/java-build-and-deploy.yml@main
+    secrets: inherit
     permissions:
-      contents: write
       id-token: write
+    with:
+      cluster: "dev-gcp"
+      manifest: ".nais/preprod.yaml"
+      skip-checks: ${{ github.event.inputs.skip-checks == true }}

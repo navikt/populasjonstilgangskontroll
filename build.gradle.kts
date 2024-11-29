@@ -1,9 +1,9 @@
 val javaVersion = JavaLanguageVersion.of(21)
-val springdocVersion = "2.5.0"
-val tokenSupportVersion = "5.0.11"
-val springCloudVersion = "4.1.2"
-val commonVersion = "3.2024.05.23_05.46-2b29fa343e8e"
-val mockkVersion = "1.13.11"
+val springdocVersion = "2.7.0"
+val tokenSupportVersion = "5.0.13"
+val springCloudVersion = "4.1.5"
+val commonVersion = "3.2024.11.26_16.35-432a29107830"
+val mockkVersion = "1.13.13"
 val testcontainerVersion = "1.19.0"
 val okhVersion = "4.12.0"
 val tokenValidationVersion = "1.3.0"
@@ -15,15 +15,15 @@ version = "1.0.0"
 plugins {
     application
 
-    kotlin("jvm") version "1.9.24"
+    kotlin("jvm") version "2.1.0"
     id("com.diffplug.spotless") version "6.25.0"
     id("com.github.ben-manes.versions") version "0.51.0"
 
-    id("org.springframework.boot") version "3.3.0"
-    id("io.spring.dependency-management") version "1.1.5"
-    kotlin("plugin.spring") version "1.9.24"
+    id("org.springframework.boot") version "3.4.0"
+    id("io.spring.dependency-management") version "1.1.6"
+    kotlin("plugin.spring") version "2.1.0"
 
-    id("org.cyclonedx.bom") version "1.8.2"
+    id("org.cyclonedx.bom") version "1.10.0"
 }
 
 repositories {
@@ -60,7 +60,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     // Logging
-    implementation("net.logstash.logback:logstash-logback-encoder:7.4")
+    implementation("net.logstash.logback:logstash-logback-encoder:8.0")
     implementation("io.micrometer:micrometer-registry-prometheus")
 
     //httpclient

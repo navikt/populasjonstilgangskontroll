@@ -4,13 +4,76 @@ on:
     branches:
       - main
 jobs:
-  build-and-deploy:
-    name: "Bygger app og deployer til dev-gcp"
-    uses: navikt/populasjonstilgangskontroll/.github/workflows/java-build-and-deploy.yml@main
-    secrets: inherit
+  build:
+    name: Build
     permissions:
+      contents: read
       id-token: write
-    with:
-      cluster: "dev-gcp"
-      manifest: ".nais/preprod.yaml"
-      skip-checks: ${{ github.event.inputs.skip-checks == true }}
+    outputs:
+      image: ${{ steps.docker-build-push.outputs.image }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Install Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+
+      - name: Test and build
+        run: ./gradlew test bootJar
+        env:
+          ORG_GRADLE_PROJECT_githubUser: x-access-token
+          ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push Docker image
+        uses: nais/docker-build-push@v0
+        id: docker-build-push
+        with:
+          team: tilgangsmaskin # required
+          tag: ${{ github.sha }} # optional
+          push_image: true # optional, default true
+          dockerfile: Dockerfile # optional, default Dockerfile
+          docker_context: . # optional, default .
+          image_suffix: # optional, default empty
+          cache_from: type=gha # optional, default type=gha
+          cache_to: type=gha,mode=max # optional, default type=gha,mode=max
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required, but is defined as an organization secret
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required, but is defined as an organization variable
+          build_args: |
+            VERSION=${CI}
+
+      
+
+  deploy_to_dev:
+    name: Deploy
+    needs: build
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout code
+
+      - name: Deploy to dev
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          TEAM: tilgangsmaskin
+          CLUSTER: dev-gcp
+          VARS: ./.nais/dev.yaml
+          RESOURCE: ./.nais/preprod.yaml
+          VAR: image=${{ needs.build.outputs.image }}
+          IMAGE: ${{ needs.build.outputs.image }}
+
+

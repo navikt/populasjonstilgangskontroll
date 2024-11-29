@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build and push image and SBOM to OCI registry
-        uses: navikt/populasjonstilgangskontroll/.github/workflows/java-docker-build-push.yml
+        uses: navikt/populasjonstilgangskontroll/.github/workflows/java-docker-build-push.yml@main
         id: docker-build-push
         with:
           team: tilgangsmaskin

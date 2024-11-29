@@ -1,0 +1,90 @@
+name: Bygg og deploy app til angitt miljø
+
+# ------------------------------------------------------------
+# Denne workflowen sjekker bygger en Java-applikasjon, pusher docker-image til GAR og
+# deployerer det hele til et spesifisert cluster, ut i fra et gitt tilhørende Nais-manifest.
+#
+# Det er påkrevd at kallende GitHub Actions-jobb setter følgende rettigheter:
+#
+# permissions:
+#  contents: write         # Kreves av nais/login
+#  id-token: write         # Kreves for å skrive sårbarhetsanalyse-rapport
+#  security-events: write  # Kreves for å pushe resultat av sårbarhetsanalyse til Github Security
+
+# ------------------------------------------------------------
+
+
+on:
+  workflow_call:
+    inputs:
+      cluster:
+        description: 'Cluster det skal deployes til'
+        required: true
+        type: string
+      manifest:
+        description: 'Sti til Nais-manifestet'
+        required: true
+        type: string
+      skip-checks:
+        description: "Hopp over testing og linting"
+        type: boolean
+        required: false
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Bygg, test og push docker-image
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Sett opp JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Sett opp Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Test og bygg app
+        # if: ${{ github.event.inputs.skip-checks == 'false' }}
+        run: ./gradlew test bootJar
+
+      #- name: Bygg app uten å kjøre testing eller linting
+      #  if: ${{ github.event.inputs.skip-checks == 'true' }}
+      #  run: ./gradlew bootJar
+
+      - name: Push image til GAR
+        uses: nais/docker-build-push@v0
+        id: docker-push
+        with:
+          team: tilgangsmaskin
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          byosbom: build/reports/application.cdx.json
+    outputs:
+      image: ${{ steps.docker-push.outputs.image }}
+
+  deploy:
+    name: Deploy til ${{ inputs.cluster }}
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: ${{ inputs.cluster }}
+          RESOURCE: ${{ inputs.manifest }}
+          IMAGE: ${{ needs.build.outputs.image }}
+

@@ -1,13 +1,12 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.MicrosoftGraphClientImpl
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.testutils.MockHttpServer
 import okhttp3.mockwebserver.MockResponse
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import java.util.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.testutils.MockHttpServer
-import no.nav.security.mock.*
 
 class MicrosoftGraphClientTest {
     companion object {
@@ -39,13 +38,17 @@ class MicrosoftGraphClientTest {
             response = MockResponse()
                 .setBody(
                     """
-						{
-							"@odata.context": "https://graph.microsoft.com/v1.0/${"$"}metadata#Collection(Edm.String)",
-							"value": [
-								"$adGroupAzureId"
-							]
-						}
-					""".trimIndent()
+					{
+						"@odata.context": "https://graph.microsoft.com/v1.0/${"$"}metadata#directoryObjects(id,displayName)",
+						"value": [
+							{
+								"@odata.type": "#microsoft.graph.group",
+								"id": "$adGroupAzureId",
+								"name": "Test"
+							}
+						]
+					}
+				""".trimIndent()
                 )
         )
 

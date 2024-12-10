@@ -36,7 +36,10 @@ spec:
   accessPolicy:
     inbound:
       rules:
+        - application: gosys-q1
+          namespace: isa
 
     outbound:
       rules:
-
+        - application: skjermede-personer-pip
+          namespace: nom

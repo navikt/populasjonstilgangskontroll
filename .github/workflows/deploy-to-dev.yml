@@ -71,7 +71,7 @@ jobs:
         env:
           TEAM: tilgangsmaskin
           CLUSTER: dev-gcp
-          VARS: ./.nais/dev.yaml
+          VARS: ./.nais/preprod.yaml
           RESOURCE: ./.nais/preprod.yaml
           VAR: image=${{ needs.build.outputs.image }}
           IMAGE: ${{ needs.build.outputs.image }}

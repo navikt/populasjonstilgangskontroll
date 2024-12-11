@@ -95,7 +95,7 @@ kotlin {
 }
 
 application {
-    mainClass.set("no.nav.populasjonstilgangskontroll.App")
+    mainClass.set("no.nav.tilgangsmaskin.populasjonstilgangskontroll.App")
 }
 
 if (project.hasProperty("skipLint")) {

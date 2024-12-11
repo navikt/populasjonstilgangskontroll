@@ -52,6 +52,7 @@ jobs:
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required, but is defined as an organization variable
           build_args: |
             VERSION=${CI}
+  
 
       
 
@@ -72,8 +73,7 @@ jobs:
           TEAM: tilgangsmaskin
           CLUSTER: dev-gcp
           RESOURCE: ./.nais/preprod.yaml
-          VAR: image=${{ steps.docker-build-push.outputs.image }}
-          TELEMETRY: ${{ steps.docker-build-push.outputs.telemetry }}
+          IMAGE: ${{ needs.build.outputs.image }}
           DEPLOY_SERVER: deploy.nav.cloud.nais.io:443
 
 

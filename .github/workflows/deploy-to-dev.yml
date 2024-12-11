@@ -71,9 +71,8 @@ jobs:
         env:
           TEAM: tilgangsmaskin
           CLUSTER: dev-gcp
-          VARS: ./.nais/preprod.yaml
           RESOURCE: ./.nais/preprod.yaml
-          VAR: image=${{ needs.build.outputs.image }}
+          VAR: image=${{ steps.docker-build-push.outputs.image }}
           IMAGE: ${{ needs.build.outputs.image }}
 
 

@@ -19,15 +19,15 @@ class Tilgangskontroll {
             tokenUtil = TokenUtil(
                 clientConfigurationProperties = ClientConfigurationProperties(
                     registration = TODO()
-                ), 
+                ),
                 oAuth2AccessTokenService = OAuth2AccessTokenService(
                     tokenResolver = TODO(),
                     onBehalfOfTokenClient = TODO(),
                     clientCredentialsTokenClient = TODO(),
-                    tokenExchangeClient = TODO(),
+                    tokenExchangeClient = TODO(), //truleg ikkje behov for
                     clientCredentialsGrantCache = TODO(),
                     exchangeGrantCache = TODO(),
-                    onBehalfOfGrantCache = TODO()
+                    onBehalfOfGrantCache = TODO() //truleg ikkje behov for
                 )
             )
         )

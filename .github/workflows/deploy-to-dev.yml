@@ -73,6 +73,7 @@ jobs:
           CLUSTER: dev-gcp
           RESOURCE: ./.nais/preprod.yaml
           VAR: image=${{ steps.docker-build-push.outputs.image }}
-          IMAGE: ${{ needs.build.outputs.image }}
+          TELEMETRY: ${{ steps.docker-build-push.outputs.telemetry }}
+          DEPLOY_SERVER: deploy.nav.cloud.nais.io:443
 
 

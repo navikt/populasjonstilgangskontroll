@@ -22,7 +22,7 @@ spec:
     max: 1
     min: 1
   resources:
-    Limits:
+    limits:
       memory: 1024Mi
     requests:
       cpu: 50m

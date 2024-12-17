@@ -8,21 +8,18 @@ import org.springframework.web.reactive.function.client.WebClient
 @Configuration
 class PdlClientConfiguration(private val webClientBuilder: WebClient.Builder) {
 
-    @Value("\${PDL_BASE_URL}")
+    @Value("\${pdl_base.url}")
     private lateinit var pdlUrl: String
 
     @Value("\${SERVICE_USER_USERNAME}")
     private lateinit var username: String
 
-    @Value("\${PDL_APIKEY}")
-    private lateinit var apiKey: String
 
     @Bean
     fun pdlWebClient(): WebClient {
         return webClientBuilder
             .baseUrl(pdlUrl)
             .defaultHeader("Nav-Consumer-Id", username)
-            .defaultHeader("x-nav-apiKey", apiKey)
             .build()
     }
 }

@@ -1,9 +1,9 @@
 val javaVersion = JavaLanguageVersion.of(21)
-val springdocVersion = "2.8.1"
+val springdocVersion = "2.8.3"
 val tokenSupportVersion = "5.0.14"
 val springCloudVersion = "4.2.0"
-val commonVersion = "3.2024.11.26_16.35-432a29107830"
-val mockkVersion = "1.13.14"
+val commonVersion = "3.2025.01.14_14.19-79b3041cae56"
+val mockkVersion = "1.13.16"
 val testcontainerVersion = "1.19.0"
 val okhVersion = "4.12.0"
 val tokenValidationVersion = "1.3.0"
@@ -16,7 +16,7 @@ plugins {
     application
 
     kotlin("jvm") version "2.1.0"
-    id("com.diffplug.spotless") version "7.0.0"
+    id("com.diffplug.spotless") version "7.0.2"
     id("com.github.ben-manes.versions") version "0.51.0"
 
     id("org.springframework.boot") version "3.4.1"

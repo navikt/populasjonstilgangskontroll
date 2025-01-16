@@ -1,41 +1,31 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest
 
-import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
+import no.nav.security.token.support.client.core.ClientProperties
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
+import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.PdlGraphClient
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangsService
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenUtil
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.reactive.function.client.WebClient
 
+@ProtectedWithClaims(issuer = "azuread")
 @RestController
 @RequestMapping("/api/v1")
 class Tilgangskontroll {
     val tilgangsService = TilgangsService(
         pdlGraphClient = PdlGraphClient(
-            webClient = WebClient.create(),
-            tokenUtil = TokenUtil(
-                clientConfigurationProperties = ClientConfigurationProperties(
-                    registration = TODO()
-                ),
-                oAuth2AccessTokenService = OAuth2AccessTokenService(
-                    tokenResolver = TODO(),
-                    onBehalfOfTokenClient = TODO(),
-                    clientCredentialsTokenClient = TODO(),
-                    tokenExchangeClient = TODO(), //truleg ikkje behov for
-                    clientCredentialsGrantCache = TODO(),
-                    exchangeGrantCache = TODO(),
-                    onBehalfOfGrantCache = TODO() //truleg ikkje behov for
-                )
-            )
+            webClient = WebClient.builder().build()
+
+
         )
     )
 
 
     @PostMapping("sjekkTilgang")
     fun sjekkTilgang(bruker_ident: String): TilgangsResponse{
+        //valider token.
         val nav_ident = "N999999" // Hent fra token
         val har_tilgang = tilgangsService.validerTilgang(bruker_ident, nav_ident)
 

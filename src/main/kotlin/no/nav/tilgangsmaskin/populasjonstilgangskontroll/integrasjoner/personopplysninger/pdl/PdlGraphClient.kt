@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl
 
+import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Norsk_Ident
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenUtil
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -10,8 +10,9 @@ import org.springframework.web.reactive.function.client.bodyToMono
 
 @Component
 class PdlGraphClient(
-    private val webClient: WebClient,
-    private val tokenUtil: TokenUtil) {
+    private val webClient: WebClient)
+    //private val clientConfigurationProperties: ClientConfigurationProperties)
+     {
 
 
     fun hentPerson(norskIdent: Norsk_Ident):PdlGraphResponse {
@@ -20,7 +21,7 @@ class PdlGraphClient(
         runCatching {
 
                 results = webClient.post()
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithPdlScope()}")
+                    //.header(HttpHeaders.AUTHORIZATION, "Bearer ${clientConfigurationProperties.registration}")  //TODO sette opp rett bearer
                     .header(HttpHeaders.CONTENT_TYPE, "application/json")
                     .header("behandlingsnummer", "B897") // Behandlingsnummer: B897 Hjemmel for å hente personopplysninger
                     .bodyValue(hentPersonQuery(norskIdent))

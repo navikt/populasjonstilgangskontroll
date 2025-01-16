@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopp
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest.Begrunnelse
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest.TilgangsResponse
 import org.springframework.stereotype.Service
-import org.springframework.web.reactive.function.client.WebClient
+
 
 
 @Service

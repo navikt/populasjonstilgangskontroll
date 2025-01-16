@@ -73,6 +73,8 @@ dependencies {
     implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
     implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
     //implementation("no.nav.security:token-validation-jwt:$tokenValidationVersion")
+    implementation("com.github.kittinunf.fuel:fuel:2.3.1")
+    implementation("com.github.kittinunf.fuel:fuel-jackson:2.3.1")
 
     //Rest
     implementation("no.nav.common:rest:$commonVersion")

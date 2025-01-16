@@ -6,7 +6,7 @@ import io.mockk.mockk
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.PdlGraphClient
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.PdlGraphResponse
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangsService
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenUtil
+//import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenUtil
 import org.junit.jupiter.api.Test
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.BeforeEach
 
 internal class TilgangskontrollTest() {
     val pdlGraphClient = mockk<PdlGraphClient>()
-    private val tokenUtil= mockk<TokenUtil>()
+   // private val tokenUtil= mockk<TokenUtil>()
     val tilgangsService= TilgangsService(pdlGraphClient)
 
 
@@ -23,7 +23,7 @@ internal class TilgangskontrollTest() {
     internal fun setUp() {
         clearAllMocks()
         every { pdlGraphClient.hentPerson(any()) } returns createFullPdlPersonResponse()
-        every { tokenUtil.getAppAccessTokenWithPdlScope() } returns createtokenUtilsMock()
+      //  every { tokenUtil.getAppAccessTokenWithPdlScope() } returns createtokenUtilsMock()
     }
 
         @Test

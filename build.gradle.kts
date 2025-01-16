@@ -8,6 +8,7 @@ val testcontainerVersion = "1.19.0"
 val okhVersion = "4.12.0"
 val tokenValidationVersion = "1.3.0"
 val oidcSupportVersion = "0.2.18"
+val mockOAuth2ServerVersion = "2.1.10"
 
 group = "no.nav.populasjonstrilgangskontroll"
 version = "1.0.0"
@@ -83,7 +84,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock:$springCloudVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
-
+    testImplementation("no.nav.security:mock-oauth2-server:$mockOAuth2ServerVersion")
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
 }
 

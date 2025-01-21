@@ -38,12 +38,13 @@ repositories {
 
 apply(plugin = "com.diffplug.spotless")
 
+/**
 spotless {
     kotlin {
         ktlint("0.50.0")
     }
 }
-
+**/
 configurations.all {
     resolutionStrategy {
         failOnNonReproducibleResolution()

@@ -139,7 +139,7 @@ tasks {
         manifest {
             archiveFileName = "app.jar"
             attributes(
-                'Main-Class': 'com.example.Main'
+                'Main-Class': 'no.nav.tilgangsmaskin.populasjonstilgangskontroll.AppKt'
             )
         }
     }

@@ -9,8 +9,6 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    outputs:
-      image: ${{ steps.docker-build-push.outputs.image }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -36,22 +34,22 @@ jobs:
           ORG_GRADLE_PROJECT_githubUser: x-access-token
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & push Docker image
+      - name: build artifact
+        run: ./gradlew bootJar
+
+      - name: Build & push Docker GAR
         uses: nais/docker-build-push@v0
         id: docker-build-push
+        env:
+          ACTIONS_RUNTIME_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
         with:
           team: tilgangsmaskin # required
           tag: ${{ github.sha }} # optional
-          push_image: true # optional, default true
-          dockerfile: Dockerfile # optional, default Dockerfile
-          docker_context: . # optional, default .
-          image_suffix: # optional, default empty
-          cache_from: type=gha # optional, default type=gha
           cache_to: type=gha,mode=max # optional, default type=gha,mode=max
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required, but is defined as an organization secret
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required, but is defined as an organization variable
-          build_args: |
-            VERSION=${CI}
+    outputs:
+      image: "${{ steps.docker-build-push.outputs.image }}"
   
 
       

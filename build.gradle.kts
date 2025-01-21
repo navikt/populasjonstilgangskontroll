@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+
 val javaVersion = JavaLanguageVersion.of(21)
 val springdocVersion = "2.8.3"
 val tokenSupportVersion = "5.0.14"
@@ -10,21 +12,19 @@ val tokenValidationVersion = "1.3.0"
 val oidcSupportVersion = "0.2.18"
 val mockOAuth2ServerVersion = "2.1.10"
 
-group = "no.nav.populasjonstrilgangskontroll"
-version = "1.0.0"
+group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
+version = "1.0.1"
 
 plugins {
-    application
-
     kotlin("jvm") version "2.1.0"
     id("com.diffplug.spotless") version "7.0.2"
     id("com.github.ben-manes.versions") version "0.51.0"
-
     id("org.springframework.boot") version "3.4.1"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.spring") version "2.1.0"
-
     id("org.cyclonedx.bom") version "1.10.0"
+    // Apply the application plugin to add support for building a CLI application in Java.
+    application
 }
 
 repositories {
@@ -51,6 +51,8 @@ configurations.all {
 }
 
 dependencies {
+    // Align versions of all Kotlin components
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -80,6 +82,9 @@ dependencies {
     //Rest
     implementation("no.nav.common:rest:$commonVersion")
 
+    // audit log
+    implementation("com.papertrailapp:logback-syslog4j:1.0.0")
+
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock:$springCloudVersion")
@@ -89,26 +94,76 @@ dependencies {
 }
 
 
-kotlin {
-    jvmToolchain(javaVersion.asInt())
-
-    compilerOptions {
-        freeCompilerArgs.add("-Xjsr305=strict")
-    }
-}
-
 application {
     mainClass.set("no.nav.tilgangsmaskin.populasjonstilgangskontroll.AppKt")
+}
+/**
+tasks.withType<Jar> {
+    // Otherwise you'll get a "No main manifest attribute" error
+    manifest {
+        attributes["Main-Class"] = "no.nav.tilgangsmaskin.populasjonstilgangskontroll.AppKt"
+    }
+
+
+    // To avoid the duplicate handling strategy error
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+}
+**/
+/**
+tasks {
+    shadowJar {
+        mergeServiceFiles()
+        manifest {
+            attributes(Pair("Main-Class", "no.nav.tilgangsmaskin.populasjonstilgangskontroll.AppKt"))
+        }
+    }
+}
+**/
+/**
+tasks.withType<Jar>().configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes(mapOf("Main-Class" to application.mainClass.get()))
+    }
+    from(
+        configurations.runtimeClasspath.get().map {
+            if (it.isDirectory) it else zipTree(it)
+        },
+    )
+}
+**/
+/**
+tasks {
+    bootJar {
+        manifest {
+            archiveFileName = "app.jar"
+            attributes(
+                'Main-Class': 'no.nav.tilgangsmaskin.populasjonstilgangskontroll.AppKt'
+            )
+        }
+    }
+}
+springBoot {
+    mainClass = 'no.nav.histark.Application'
+    archivesBaseName = 'app'
+}
+
+**/
+tasks.withType<BootJar> {
+    archiveFileName = "app.jar"
 }
 
 if (project.hasProperty("skipLint")) {
     gradle.startParameter.excludedTaskNames += "spotlessKotlinCheck"
 }
 
-tasks.test {
-    useJUnitPlatform()
-}
+tasks.test { useJUnitPlatform() }
 
-tasks.bootJar {
-    archiveFileName.set("app.jar")
+kotlin {
+jvmToolchain(21)
+
+compilerOptions {
+freeCompilerArgs.add("-Xjsr305=strict")
+    }
 }

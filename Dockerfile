@@ -1,6 +1,8 @@
-FROM cgr.dev/chainguard/jre:latest
-ENV LANG='nb_NO.UTF-8' LANGUAGE='nb_NO:nb' LC_ALL='nb:NO.UTF-8' TZ="Europe/Oslo"
-COPY build/libs/populasjonstilgangskontroll-1.0.0-plain.jar /app/app.jar
+FROM gcr.io/distroless/java21
 WORKDIR /app
-CMD ["-jar", "app.jar"]
-
+COPY build/libs/*.jar app.jar
+ENV LANG='nb_NO.UTF-8' LANGUAGE='nb_NO:nb' LC_ALL='nb:NO.UTF-8' TZ="Europe/Oslo"
+ENV JDK_JAVA_OPTIONS="-XX:MaxRAMPercentage=75"
+EXPOSE 8080
+USER nonroot
+CMD [ "app.jar" ]

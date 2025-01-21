@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+
 val javaVersion = JavaLanguageVersion.of(21)
 val springdocVersion = "2.8.3"
 val tokenSupportVersion = "5.0.14"
@@ -17,9 +19,6 @@ plugins {
     kotlin("jvm") version "2.1.0"
     id("com.diffplug.spotless") version "7.0.2"
     id("com.github.ben-manes.versions") version "0.51.0"
-    // For å bygge fatjar
-    id("com.gradleup.shadow") version "8.3.5"
-
     id("org.springframework.boot") version "3.4.1"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.spring") version "2.1.0"
@@ -134,6 +133,7 @@ tasks.withType<Jar>().configureEach {
     )
 }
 **/
+/**
 tasks {
     bootJar {
         manifest {
@@ -149,6 +149,10 @@ springBoot {
     archivesBaseName = 'app'
 }
 
+**/
+tasks.withType<BootJar> {
+    archiveFileName = "app.jar"
+}
 
 if (project.hasProperty("skipLint")) {
     gradle.startParameter.excludedTaskNames += "spotlessKotlinCheck"

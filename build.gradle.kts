@@ -22,7 +22,7 @@ plugins {
     id("org.springframework.boot") version "3.4.1"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.spring") version "2.1.0"
-    id("org.cyclonedx.bom") version "1.10.0"
+    id("org.cyclonedx.bom") version "2.0.0"
     // Apply the application plugin to add support for building a CLI application in Java.
     application
 }

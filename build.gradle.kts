@@ -53,8 +53,9 @@ configurations.all {
 
 dependencies {
     // Align versions of all Kotlin components
+
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
-    // Spring
+    implementation("org.springframework.boot:spring-boot-starter-graphql")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -62,11 +63,10 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springdoc:springdoc-openapi-starter-common:$springdocVersion")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
-
-    // Logging
+    implementation("io.swagger.core.v3:swagger-annotations:2.2.26")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
     implementation("net.logstash.logback:logstash-logback-encoder:8.0")
     implementation("io.micrometer:micrometer-registry-prometheus")
-
     //httpclient
     implementation("com.squareup.okhttp3:okhttp:$okhVersion")
 

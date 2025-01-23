@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.service
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.PdlGraphClient
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.PdlGraphResponse
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.ny.PDLRestClientAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest.Begrunnelse
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest.TilgangsResponse
 import org.springframework.stereotype.Service
@@ -9,8 +8,7 @@ import org.springframework.stereotype.Service
 
 
 @Service
-class TilgangsService(pdlGraphClient: PdlGraphClient) {
-    val pdlGraphClient = pdlGraphClient
+class TilgangsService(pdlGraphClient: PDLRestClientAdapter) {
 
     fun validerTilgang(brukerIdent: String, navIdent: String): Boolean {
         validereGyldigFnr(brukerIdent)
@@ -34,8 +32,9 @@ class TilgangsService(pdlGraphClient: PdlGraphClient) {
 
 
 
-    private fun hentPersonFraPdl(brukerIdent: String): PdlGraphResponse {
-       return pdlGraphClient.hentPerson(brukerIdent)
+    private fun hentPersonFraPdl(brukerIdent: String): String {
+      // return pdlGraphClient.hentPerson(brukerIdent)
+        return "hello"
     }
 
 

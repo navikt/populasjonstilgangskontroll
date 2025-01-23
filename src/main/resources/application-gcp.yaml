@@ -1,0 +1,20 @@
+no.nav.security.jwt:
+  issuer:
+     azuread:
+        discoveryurl: ${azure.app.well.known.url}
+        accepted_audience: ${azure.app.client.id}
+  client:
+    registration:
+      onbehalfof:
+        token-endpoint-url: https://login.microsoftonline.com/${AZURE_APP_TENANT_ID}/oauth2/v2.0/token
+        grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
+        scope: https://graph.microsoft.com/.default
+        authentication:
+          client-id: ${azure.app.client.id}
+          client-jwk: ${azure.app.client.jwk}
+          client-auth-method: private_key_jwt
+
+springdoc:
+    swagger-ui:
+      csrf:
+        enabled: true

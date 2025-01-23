@@ -10,10 +10,10 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 open class MicrosoftGraphClientConfig {
 
-    @Value("\${microsoft_graph.url}")
+    @Value("\${microsoft.graph.uri}")
     lateinit var baseUrl: String
 
-    @Value("\${microsoft_graph.scope}")
+    @Value("\${microsoft.graph.scope}")
     lateinit var scope: String
 
 

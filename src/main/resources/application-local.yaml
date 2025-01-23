@@ -19,5 +19,5 @@ pdl:
 
 microsoft:
     graph:
-      uri: https://graph.microsoft.com/v1.0
+      url: https://graph.microsoft.com/v1.0
       scope: https://graph.microsoft.com/.default

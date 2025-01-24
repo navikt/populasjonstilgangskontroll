@@ -3,5 +3,5 @@ skjermet:
       url=todo
       scope=todo scope
 
-  pdl:
-    base-uri: https://pdl-api.dev-fss-pub.nais.io/graphql
+pdl:
+  base-uri: https://pdl-api.dev-fss-pub.nais.io/graphql

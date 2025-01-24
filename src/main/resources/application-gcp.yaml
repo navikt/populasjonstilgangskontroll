@@ -5,7 +5,7 @@ no.nav.security.jwt:
         accepted_audience: ${azure.app.client.id}
   client:
     registration:
-      onbehalfof:
+      pdl:
         token-endpoint-url: ${azure.openid.config.token.endpoint}
         grant-type: client_credentials
         scope: https://graph.microsoft.com/.default

@@ -12,12 +12,12 @@ spec:
   image: {{image}}
   prometheus:
     enabled: true
-    path: /internal/prometheus
+    path: /monitoring/prometheus
   readiness:
-    path: /internal/health/readiness
+    path: /monitoring/health/readiness
     initialDelay: 22
   liveness:
-    path: /internal/health/liveness
+    path: /monitoring/health/liveness
     initialDelay: 22
   port: 8080
   replicas:

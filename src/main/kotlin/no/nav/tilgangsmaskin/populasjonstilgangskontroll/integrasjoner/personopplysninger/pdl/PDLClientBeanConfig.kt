@@ -42,6 +42,6 @@ class PDLClientBeanConfig {
 
     @Bean
     fun restClientCustomizer() = RestClientCustomizer {
-       // it.requestFactory(HttpComponentsClientHttpRequestFactory())
+      //it.requestFactory(HttpComponentsClientHttpRequestFactory())
     }
 }

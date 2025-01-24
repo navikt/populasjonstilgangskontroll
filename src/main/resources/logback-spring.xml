@@ -17,6 +17,7 @@
         <logger name="secure" level="debug" additivity="false">
             <appender-ref ref="stdout"/>
         </logger>
+        <logger name="no.nav.security" level="trace"/>
         <logger name="no.nav.tilgangsmaskion" level="trace"/>
     </springProfile>
 

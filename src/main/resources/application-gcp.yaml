@@ -1,3 +1,26 @@
+management:
+  httpexchanges:
+    recording:
+      enabled: true
+  health:
+    ping:
+      enabled: false
+    diskspace:
+      enabled: false
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+    env:
+      show-values: always
+    configprops:
+      show-values: always
+  endpoints:
+    web:
+      base-path: /monitoring
+      exposure:
+        include: '*'
+
 no.nav.security.jwt:
   issuer:
      azuread:

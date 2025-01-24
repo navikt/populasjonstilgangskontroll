@@ -43,6 +43,9 @@ data class Begrunnelse(
     val begrunnelse_kode: String,
     val kan_overstyres: Boolean
 )
+
+
+
 @UnprotectedRestController(value = ["/dev"])
 @ConditionalOnNotProd
 class DevController(val service : PDLService)

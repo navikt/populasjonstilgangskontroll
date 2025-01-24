@@ -14,8 +14,7 @@ no.nav.security.jwt:
           client-jwk: ${azure.app.client.jwk}
           client-auth-method: private_key_jwt
 
-pdl:
-  base-uri: https://pdl-api.dev-fss-pub.nais.io/graphql
+
 
 microsoft:
     graph:

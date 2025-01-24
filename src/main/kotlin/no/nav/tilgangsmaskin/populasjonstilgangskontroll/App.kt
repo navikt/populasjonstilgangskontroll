@@ -18,11 +18,8 @@ import org.springframework.boot.runApplication
 @EnableJwtTokenValidation(ignore = ["org.springdoc", "org.springframework"])
 class App
 
-@Value("\${azure.app.client.jwk}")
-lateinit var azureAppClientJwk: String
 fun main(args: Array<String>) {
     runApplication<App>(*args) {
-        getLogger(App::class.java).info("Azure app client jwk: $azureAppClientJwk")
         setAdditionalProfiles(*profiler)
     }
 }

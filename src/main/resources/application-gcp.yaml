@@ -24,7 +24,7 @@ management:
 no.nav.security.jwt:
   issuer:
      azuread:
-        discovery-kurl: ${azure.app.well.known.url}
+        discovery-url: ${azure.app.well.known.url}
         accepted_audience: ${azure.app.client.id}
   client:
     registration:

@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll
 
+import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
+import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.AbstractRestClientAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Cluster.Companion.profiler
 import org.slf4j.Logger
@@ -12,7 +14,8 @@ import org.springframework.boot.runApplication
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
-
+@EnableOAuth2Client(cacheEnabled = true)
+@EnableJwtTokenValidation(ignore = ["org.springdoc", "org.springframework"])
 class App
 
 @Value("\${azure.app.client.jwk}")

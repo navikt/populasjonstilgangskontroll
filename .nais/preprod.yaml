@@ -48,7 +48,8 @@ spec:
       rules:
         - application: skjermede-personer-pip
           namespace: nom
-
+      external:
+        - host: pdl-api.dev-fss-pub.nais.io
   env:
     - name: MICROSOFT_GRAPH_SCOPE
       value: https://graph.microsoft.com/.default

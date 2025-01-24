@@ -65,6 +65,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:8.0")
     implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("no.nav.boot:boot-conditionals:5.1.3")
     //httpclient
     implementation("com.squareup.okhttp3:okhttp:$okhVersion")
 

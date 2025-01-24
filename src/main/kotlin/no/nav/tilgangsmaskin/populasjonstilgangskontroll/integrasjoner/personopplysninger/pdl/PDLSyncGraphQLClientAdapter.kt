@@ -1,10 +1,8 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.ny
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl
 
 import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableException.NotFoundException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.AbstractGraphQLAdapter
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.ny.PDLConfig.Companion.PDL
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.Person
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Cluster.Companion.isProd
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.graphql.client.GraphQlClient
@@ -15,10 +13,10 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 @Component
-class PDLRestClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQlClient,
-                           @Qualifier(PDL) restClient: RestClient,
-                           private val handler: ErrorHandler,
-                           cfg: PDLConfig) : AbstractGraphQLAdapter(restClient, cfg) {
+class PDLGraphQLClientAdapter(@Qualifier(PDLConfig.Companion.PDL) private val graphQlClient: GraphQlClient,
+                              @Qualifier(PDLConfig.Companion.PDL) restClient: RestClient,
+                              private val handler: ErrorHandler,
+                              cfg: PDLConfig) : AbstractGraphQLAdapter(restClient, cfg) {
 
     override fun ping(): Map<String, String> {
         restClient
@@ -35,6 +33,7 @@ class PDLRestClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQlCli
         with(fnr) {
             query<Person>(graphQlClient, PERSON_QUERY, mapOf(IDENT to verdi))?.let {
               //  pdlPersonTilPerson(it, this)
+                it // TODO
             } ?: throw NotFoundException(baseUri, "Fant ikke $fnr")
         }
 
@@ -49,6 +48,14 @@ class PDLRestClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQlCli
 
 @JvmInline
 value class Fødselsnummer(@get:JsonValue val verdi: String) {
+
+    enum class Type { DNR, FNR, TENOR }
+
+    fun type() = when (verdi[0]) {
+        '8', '9' -> Type.TENOR
+        '4', '5' -> Type.DNR
+        else -> Type.FNR
+    }
 
     init {
         require(verdi.length == 11) { "Fødselsnummer $verdi er ikke 11 siffer" }

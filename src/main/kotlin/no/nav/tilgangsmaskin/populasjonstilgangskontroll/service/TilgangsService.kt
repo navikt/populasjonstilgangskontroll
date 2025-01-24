@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.service
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.ny.PDLRestClientAdapter
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.PDLGraphQLClientAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest.Begrunnelse
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest.TilgangsResponse
 import org.springframework.stereotype.Service
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 
 
 @Service
-class TilgangsService(pdlGraphClient: PDLRestClientAdapter) {
+class TilgangsService(pdlGraphClient: PDLGraphQLClientAdapter) {
 
     fun validerTilgang(brukerIdent: String, navIdent: String): Boolean {
         validereGyldigFnr(brukerIdent)

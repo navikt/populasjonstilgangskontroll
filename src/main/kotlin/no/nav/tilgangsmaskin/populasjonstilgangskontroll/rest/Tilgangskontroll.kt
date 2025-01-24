@@ -1,14 +1,19 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest
 
 
-import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.boot.conditionals.ConditionalOnDev
+import no.nav.boot.conditionals.ConditionalOnDevOrLocal
+import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.security.token.support.spring.ProtectedRestController
+import no.nav.security.token.support.spring.UnprotectedRestController
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.Fødselsnummer
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.PDLService
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangsService
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
 
-@ProtectedWithClaims(issuer = "azuread")
-@RestController
+@ProtectedRestController(value = ["/api/v1"], issuer = "azuread", claimMap = [])
 @RequestMapping("/api/v1")
 class Tilgangskontroll(val service : TilgangsService) {
 
@@ -38,3 +43,10 @@ data class Begrunnelse(
     val begrunnelse_kode: String,
     val kan_overstyres: Boolean
 )
+@UnprotectedRestController(value = ["/dev"])
+@ConditionalOnNotProd
+class DevController(val service : PDLService)
+{
+    @GetMapping("pdl")
+    fun hentPerson(fnr: Fødselsnummer) = service.hentPerson(fnr)
+}

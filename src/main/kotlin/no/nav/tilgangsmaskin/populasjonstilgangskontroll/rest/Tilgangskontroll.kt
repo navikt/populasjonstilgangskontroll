@@ -1,8 +1,5 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest
 
-
-import no.nav.boot.conditionals.ConditionalOnDev
-import no.nav.boot.conditionals.ConditionalOnDevOrLocal
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.security.token.support.spring.UnprotectedRestController
@@ -11,10 +8,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopp
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangsService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
 
 @ProtectedRestController(value = ["/api/v1"], issuer = "azuread", claimMap = [])
-@RequestMapping("/api/v1")
 class Tilgangskontroll(val service : TilgangsService) {
 
     @PostMapping("sjekkTilgang")

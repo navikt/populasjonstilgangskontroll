@@ -25,7 +25,6 @@ query($ident: ID!){
                 postbokseier
                 postboks
                 postnummer
-                poststed
             },
             utenlandskAdresse {
                 adressenavnNummer

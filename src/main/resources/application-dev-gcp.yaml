@@ -5,3 +5,5 @@ skjermet:
 
 pdl:
   base-uri: https://pdl-api.dev-fss-pub.nais.io/graphql
+skjerming:
+  base-url: https://skjermede-personer.dev-fss-pub.nais.io

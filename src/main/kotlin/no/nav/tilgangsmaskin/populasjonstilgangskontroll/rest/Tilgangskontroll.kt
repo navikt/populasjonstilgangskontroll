@@ -5,6 +5,7 @@ import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.PDLService
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangsService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -43,8 +44,12 @@ data class Begrunnelse(
 
 @UnprotectedRestController(value = ["/dev"])
 @ConditionalOnNotProd
-class DevController(val service : PDLService)
+class DevController(val service : PDLService, val skjermingRestClientAdapter: SkjermingRestClientAdapter)
 {
     @GetMapping("pdl")
     fun hentPerson(fnr: Fødselsnummer) = service.hentPerson(fnr)
+
+    @GetMapping("skjermet")
+    fun hentSkjermet(fnr: Fødselsnummer) = skjermingRestClientAdapter.skjermetPerson(fnr)
+
 }

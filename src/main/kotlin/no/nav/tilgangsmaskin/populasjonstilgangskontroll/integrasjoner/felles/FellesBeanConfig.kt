@@ -10,7 +10,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 @Configuration
 class FellesBeanConfig {
 
-    @Bean
+    //@Bean
     fun restClientCustomizer(properties: ClientConfigurationProperties, service: OAuth2AccessTokenService) = RestClientCustomizer {
       it.requestFactory(HttpComponentsClientHttpRequestFactory())
     }

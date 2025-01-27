@@ -3,3 +3,5 @@ pdl:
 skjerming:
   scope: api://dev-gcp.nom.skjermede-personer-pip/.default
   base-uri: http://skjermede-personer-pip.nom
+graph:
+  base-uri: https://www.todo.no

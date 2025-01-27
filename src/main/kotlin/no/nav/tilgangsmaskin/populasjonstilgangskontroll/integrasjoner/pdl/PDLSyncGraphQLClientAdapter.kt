@@ -35,7 +35,8 @@ class PDLGraphQLClientAdapter(@Qualifier(PDLConfig.Companion.PDL) private val gr
 
     companion object {
         private val IDENT = "ident"
-        private val PERSON_QUERY = "query-person" to "hentPerson"
+        private val PERSON_QUERY = "query-pe!gc" +
+                "rson" to "hentPerson"
     }
 }
 

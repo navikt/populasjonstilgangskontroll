@@ -7,7 +7,7 @@ import org.springframework.web.util.UriBuilder
 import java.net.URI
 
 @ConfigurationProperties(SKJERMING)
-class SkjermingConfig(baseUri: URI = DEFAULT_URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, SKJERMING, enabled) {
+class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, SKJERMING, enabled) {
 
     fun skjermetUri(b: UriBuilder) = b.path(DEFAULT_SKJERMING_PATH).build()
 
@@ -16,7 +16,6 @@ class SkjermingConfig(baseUri: URI = DEFAULT_URI, pingPath: String = DEFAULT_PIN
     companion object {
         const val SKJERMING = "skjerming"
         const val IDENT = "personident"
-        private val DEFAULT_URI = URI.create("http://skjermede-personer-pip.nom")
         private const val DEFAULT_PING_PATH = "internal/health/liveness"
         private const val DEFAULT_SKJERMING_PATH = "skjermet"
     }

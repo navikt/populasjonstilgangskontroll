@@ -2,3 +2,4 @@ pdl:
   base-uri: https://pdl-api.dev-fss-pub.nais.io/graphql
 skjerming:
   scope: api://dev-gcp.nom.skjermede-personer-pip/.default
+  base-uri: http://skjermede-personer-pip.nom

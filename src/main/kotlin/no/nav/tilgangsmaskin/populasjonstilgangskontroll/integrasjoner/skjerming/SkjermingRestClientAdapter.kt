@@ -19,7 +19,7 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
             .post()
             .uri(cf::skjermetUri)
             .accept(APPLICATION_JSON)
-            .body { mapOf(IDENT to ident) }
+            .body(mapOf(IDENT to ident))
             .retrieve()
             .onStatus(HttpStatusCode::is2xxSuccessful) { _, _ ->
                 log.trace("Skjermet oppslag mot {} OK", cf::skjermetUri)

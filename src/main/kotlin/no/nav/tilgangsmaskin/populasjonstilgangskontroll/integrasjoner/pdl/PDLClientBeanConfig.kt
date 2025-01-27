@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
+import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractPingableHealthIndicator
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.LoggingGraphQLInterceptor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLConfig.Companion.BEHANDLINGSNUMMER
@@ -18,9 +19,10 @@ class PDLClientBeanConfig {
 
     @Bean
     @Qualifier(PDL)
-    fun pdlRestClient(b: Builder,cfg: PDLConfig) =
+    fun pdlRestClient(b: Builder,cfg: PDLConfig, oAuth2ClientRequestInterceptor: OAuth2ClientRequestInterceptor) =
         b.requestInterceptors {
             it.add(headerAddingRequestInterceptor(BEHANDLINGSNUMMER) { cfg.behandlingsNummer })
+            it.addFirst (oAuth2ClientRequestInterceptor)
         }.build()
 
     @Bean

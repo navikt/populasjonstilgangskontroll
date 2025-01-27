@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming
 
+import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractPingableHealthIndicator
 import org.springframework.beans.factory.annotation.Qualifier
@@ -13,8 +14,10 @@ class SkjermingClientBeanConfig {
 
     @Bean
     @Qualifier(SKJERMING)
-    fun skjermingRestClient(b: RestClient.Builder, cfg: SkjermingConfig) =
-        b.baseUrl(cfg.baseUri).build()
+    fun skjermingRestClient(b: RestClient.Builder, cfg: SkjermingConfig, oAuth2ClientRequestInterceptor: OAuth2ClientRequestInterceptor) =
+        b.baseUrl(cfg.baseUri)
+            .requestInterceptors { it.addFirst(oAuth2ClientRequestInterceptor)
+            }.build()
 
     @Bean
     fun skjermingHealthIndicator(a: SkjermingRestClientAdapter) = object : AbstractPingableHealthIndicator(a) {}

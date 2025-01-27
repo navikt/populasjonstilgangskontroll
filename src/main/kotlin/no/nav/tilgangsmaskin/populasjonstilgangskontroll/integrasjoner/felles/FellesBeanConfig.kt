@@ -10,11 +10,14 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class FellesBeanConfig {
 
-    @Bean
+    //@Bean
     fun restClientCustomizer(properties: ClientConfigurationProperties, service: OAuth2AccessTokenService) = RestClientCustomizer {
-        it.requestInterceptors {
-            it.addFirst(OAuth2ClientRequestInterceptor(properties, service))
-        }
+    //    it.requestInterceptors {
+    //        it.addFirst(OAuth2ClientRequestInterceptor(properties, service))
+    //    }
       //it.requestFactory(HttpComponentsClientHttpRequestFactory())
     }
+
+    @Bean
+    fun oAuth2ClientRequestInterceptor(properties: ClientConfigurationProperties, service: OAuth2AccessTokenService) = OAuth2ClientRequestInterceptor(properties, service)
 }

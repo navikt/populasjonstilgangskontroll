@@ -1,9 +1,4 @@
-skjermet:
-  person:
-      url=todo
-      scope=todo scope
-
 pdl:
   base-uri: https://pdl-api.dev-fss-pub.nais.io/graphql
 skjerming:
-  base-url: https://skjermede-personer-pip.intern.dev.nav.no
+  scope: api://dev-gcp.nom.skjermede-personer-pip/.default

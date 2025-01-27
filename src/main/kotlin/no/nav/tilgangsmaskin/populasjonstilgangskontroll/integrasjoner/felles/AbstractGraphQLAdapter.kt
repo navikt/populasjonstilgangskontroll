@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.RecoverableException

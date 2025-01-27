@@ -1,8 +1,7 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
 import com.fasterxml.jackson.annotation.JsonValue
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableException.NotFoundException
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.AbstractGraphQLAdapter
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractGraphQLAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Cluster.Companion.isProd
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.graphql.client.GraphQlClient
@@ -29,13 +28,7 @@ class PDLGraphQLClientAdapter(@Qualifier(PDLConfig.Companion.PDL) private val gr
         return emptyMap()
     }
 
-    fun person(fnr: Fødselsnummer) =
-        with(fnr) {
-            query<Person>(graphQlClient, PERSON_QUERY, mapOf(IDENT to verdi))?.let {
-              //  pdlPersonTilPerson(it, this)
-                it // TODO
-            } ?: throw NotFoundException(baseUri, "Fant ikke $fnr")
-        }
+    fun person(ident: String) = query<Person>(graphQlClient, PERSON_QUERY, mapOf(IDENT to ident))
 
     override fun toString() =
         "${javaClass.simpleName} [restClient=$restClient,graphQlClient=$graphQlClient, cfg=$cfg]"

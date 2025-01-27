@@ -3,9 +3,9 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.security.token.support.spring.UnprotectedRestController
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.Fødselsnummer
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl.PDLService
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingRestClientAdapter
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.Fødselsnummer
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PersonTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangsService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -40,16 +40,14 @@ data class Begrunnelse(
     val kan_overstyres: Boolean
 )
 
-
-
 @UnprotectedRestController(value = ["/dev"])
 @ConditionalOnNotProd
-class DevController(val service : PDLService, val skjermingRestClientAdapter: SkjermingRestClientAdapter)
+class DevController(val pdl : PersonTjeneste, val skjerming: SkjermingTjeneste)
 {
     @GetMapping("pdl")
-    fun hentPerson(fnr: Fødselsnummer) = service.hentPerson(fnr)
+    fun hentPerson(fnr: Fødselsnummer) = pdl.hentPerson(fnr)
 
     @GetMapping("skjermet")
-    fun hentSkjermet(fnr: Fødselsnummer) = skjermingRestClientAdapter.skjermetPerson(fnr)
+    fun erSkjermet(fnr: Fødselsnummer) = skjerming.erSkjermet(fnr)
 
 }

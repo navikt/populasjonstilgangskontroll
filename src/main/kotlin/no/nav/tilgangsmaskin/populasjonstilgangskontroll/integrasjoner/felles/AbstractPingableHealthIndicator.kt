@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
 import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator

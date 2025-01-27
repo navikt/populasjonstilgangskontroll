@@ -31,8 +31,7 @@ internal enum class Cluster(private val clusterName: String) {
 
     companion object {
 
-        private val cluster = getenv(NAIS_CLUSTER_NAME) ?: LOCAL
-        val current = entries.firstOrNull { it.clusterName == cluster } ?: LOCAL_CLUSTER
+        val current = (getenv(NAIS_CLUSTER_NAME) ?: LOCAL).let { Cluster.valueOf(it) }
         val isProd = current == PROD_GCP_CLUSTER
         val isDev = current == DEV_GCP_CLUSTER
         val isNais = isProd || isDev

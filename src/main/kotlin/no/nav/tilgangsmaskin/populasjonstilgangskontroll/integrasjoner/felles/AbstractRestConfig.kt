@@ -1,10 +1,9 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.AbstractRestClientAdapter.Companion.uri
 import java.net.URI
 
 abstract class AbstractRestConfig(val baseUri: URI, val pingPath: String, val name: String = baseUri.host, val isEnabled: Boolean)  {
 
-    val pingEndpoint = uri(baseUri, pingPath)
+    val pingEndpoint = AbstractRestClientAdapter.Companion.uri(baseUri, pingPath)
     override fun toString() = "name=$name, pingPath=$pingPath,enabled=$isEnabled,baseUri=$baseUri"
 }

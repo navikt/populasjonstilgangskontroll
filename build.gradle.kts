@@ -7,7 +7,6 @@ val springCloudVersion = "4.2.0"
 val commonVersion = "3.2025.01.14_14.19-79b3041cae56"
 val mockkVersion = "1.13.16"
 val testcontainerVersion = "1.19.0"
-val okhVersion = "4.12.0"
 val tokenValidationVersion = "1.3.0"
 val oidcSupportVersion = "0.2.18"
 val mockOAuth2ServerVersion = "2.1.10"
@@ -66,9 +65,6 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:8.0")
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("no.nav.boot:boot-conditionals:5.1.3")
-    //httpclient
-    implementation("com.squareup.okhttp3:okhttp:$okhVersion")
-
 
     //Token
     implementation("no.nav.common:token-client:$commonVersion")

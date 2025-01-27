@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.MicrosoftGraphClientImpl
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.MSRestClientAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.testutils.MockHttpServer
 import okhttp3.mockwebserver.MockResponse
 import org.junit.jupiter.api.AfterEach
@@ -26,7 +26,7 @@ class MicrosoftGraphClientTest {
 
     @Test
     fun `hentAdGrupperForNavAnsatt - skal lage riktig request og parse respons`() {
-        val client = MicrosoftGraphClientImpl(
+        val client = MSRestClientAdapter(
             baseUrl = mockServer.serverUrl(),
             tokenProvider = { "TOKEN" },
         )

@@ -48,11 +48,9 @@ open class RecoverableException(status: HttpStatusCode,
 private fun problemDetail(status: HttpStatusCode,
                           detail: String?,
                           uri: URI,
-                          stackTrace: String? = null,
-                          validationErrors: List<String>? = emptyList()) =
+                          stackTrace: String? = null) =
     forStatusAndDetail(status, detail).apply {
         title = resolve(status.value())?.reasonPhrase ?: "$status"
         setProperty("uri", uri)
-        validationErrors?.isNotEmpty().let { setProperty("validationErrors", validationErrors) }
         stackTrace?.let { setProperty("stackTrace", it) }
     }

@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.personopplysninger.pdl
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
 import java.time.LocalDate
 

@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
@@ -44,12 +44,11 @@ abstract class AbstractRestClientAdapter(
         fun uri(base : URI, path : String, queryParams : HttpHeaders? = null) = builder(base, path, queryParams).build().toUri()
         private fun builder(base : URI, path : String, queryParams : HttpHeaders?) = UriComponentsBuilder.fromUri(base).pathSegment(path).queryParams(queryParams)
 
-        private fun headerAddingRequestInterceptor(key: String, supplier: () -> String) =
+        fun headerAddingRequestInterceptor(key: String, supplier: () -> String) =
             ClientHttpRequestInterceptor { req, b, next ->
                 req.headers.add(key, supplier())
                 next.execute(req, b)
             }
-        fun behandlingRequestInterceptor() = headerAddingRequestInterceptor(BEHANDLINGSNUMMER) { BID }
 
         private object CallIdGenerator {
             fun create() = "${UUID.randomUUID()}"
@@ -59,8 +58,6 @@ abstract class AbstractRestClientAdapter(
             ClientHttpRequestInterceptor { req, b, next ->
                 with(req.headers) {
                     mapOf(
-                        NAV_CONSUMER_ID to consumerId(defaultConsumerId),
-                        NAV_CONSUMER_ID2 to consumerId(defaultConsumerId),
                         NAV_CALL_ID to callId(),
                         NAV_CALL_ID1 to callId(),
                         NAV_CALL_ID2 to callId(),
@@ -70,10 +67,6 @@ abstract class AbstractRestClientAdapter(
                 next.execute(req, b)
             }
 
-        private const val BEHANDLINGSNUMMER = "behandlingsnummer"
-        private const val BID = "B897"
-        private const val NAV_CONSUMER_ID = "Nav-Consumer-Id"
-        private const val NAV_CONSUMER_ID2 = "consumerId"
         private const val NAV_CALL_ID = "Nav-CallId"
         private const val NAV_CALL_ID1 = "Nav-Call-Id"
         private const val NAV_CALL_ID2 = "callId"
@@ -84,10 +77,6 @@ abstract class AbstractRestClientAdapter(
                 toMDC(NAV_CALL_ID, it)
         }
 
-        private fun consumerId(defaultValue: String): String = MDC.get(NAV_CONSUMER_ID) ?: run {
-            toMDC(NAV_CONSUMER_ID, defaultValue)
-            defaultValue
-        }
 
         private fun toMDC(key: String, value: String?, defaultValue: String? = null) =
             MDC.put(key, value ?: defaultValue)

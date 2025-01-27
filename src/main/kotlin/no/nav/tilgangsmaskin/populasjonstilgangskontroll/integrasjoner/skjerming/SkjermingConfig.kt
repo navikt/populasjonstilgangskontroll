@@ -1,19 +1,23 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.AbstractRestConfig
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig.Companion.SKJERMING
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.web.util.UriBuilder
 import java.net.URI
 
-@ConfigurationProperties(SkjermingConfig.Companion.SKJERMING)
-class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, SKJERMING, enabled) {
+@ConfigurationProperties(SKJERMING)
+class SkjermingConfig(baseUri: URI = DEFAULT_URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, SKJERMING, enabled) {
 
-    fun skjermetUri(b: UriBuilder) = b.path("skjermet").build()
+    fun skjermetUri(b: UriBuilder) = b.path(DEFAULT_SKJERMING_PATH).build()
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
         const val SKJERMING = "skjerming"
-        private const val DEFAULT_PING_PATH = ""
+        const val IDENT = "personident"
+        private val DEFAULT_URI = URI.create("http://skjermede-personer-pip.nom")
+        private const val DEFAULT_PING_PATH = "internal/health/liveness"
+        private const val DEFAULT_SKJERMING_PATH = "skjermet"
     }
 }

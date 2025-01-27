@@ -22,10 +22,10 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
             .body { mapOf(IDENT to ident) }
             .retrieve()
             .onStatus(HttpStatusCode::is2xxSuccessful) { _, _ ->
-                log.trace("skjermet oppslag mot {} OK", cf::skjermetUri)
+                log.trace("Skjermet oppslag mot {} OK", cf::skjermetUri)
             }
             .onStatus(HttpStatusCode::isError) { _, _ ->
-                throw RuntimeException("skjermet oppslag mot ${cf::skjermetUri} feilet")
+                throw RuntimeException("Skjermet oppslag mot ${cf::skjermetUri} feilet")
             }
             .body<Boolean>() ?: throw RuntimeException("Ingen respons fra skjermet oppslag mot ${cf::skjermetUri}")
     }

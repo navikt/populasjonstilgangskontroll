@@ -16,7 +16,7 @@ class SkjermingClientBeanConfig {
     @Qualifier(SKJERMING)
     fun skjermingRestClient(b: RestClient.Builder, cfg: SkjermingConfig, oAuth2ClientRequestInterceptor: OAuth2ClientRequestInterceptor) =
         b.baseUrl(cfg.baseUri)
-            .requestInterceptors { it.add(oAuth2ClientRequestInterceptor)
+            .requestInterceptors { it.addFirst(oAuth2ClientRequestInterceptor)
             }.build()
 
     @Bean

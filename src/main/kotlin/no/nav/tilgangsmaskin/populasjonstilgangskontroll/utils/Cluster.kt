@@ -5,6 +5,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.DEV_GCP
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.GCP
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.LOCAL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.NAIS_CLUSTER_NAME
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.NAIS_CLUSTER_TYPE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.PROD
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.PROD_GCP
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
@@ -21,6 +22,7 @@ internal object Constants {
     internal  const val DEV_GCP = "${DEV}-${GCP}"
     internal const val PROD_GCP = "${PROD}-${GCP}"
     internal const val NAIS_CLUSTER_NAME = "NAIS_CLUSTER_NAME"
+    internal const val NAIS_CLUSTER_TYPE = "NAIS_CLUSTER_TYPE"
 }
 
 internal enum class Cluster(private val clusterName: String) {
@@ -33,15 +35,15 @@ internal enum class Cluster(private val clusterName: String) {
 
         val current = (getenv(NAIS_CLUSTER_NAME) ?: LOCAL).let { e -> entries.first { it.clusterName == e } }
         val isProd = current == PROD_GCP_CLUSTER
-        val isDev = current == DEV_GCP_CLUSTER
+        val isDevOrLocal = !isProd
         val profiler =
             when (current) {
                 TEST_CLUSTER, LOCAL_CLUSTER ->
                     arrayOf(current.clusterName).also {
                         setProperty(NAIS_CLUSTER_NAME, current.clusterName)
                     }
-                DEV_GCP_CLUSTER -> arrayOf(DEV, DEV_GCP, GCP)
-                PROD_GCP_CLUSTER -> arrayOf(PROD, PROD_GCP, GCP)
+                DEV_GCP_CLUSTER -> arrayOf(DEV, DEV_GCP, GCP).also { setProperty(NAIS_CLUSTER_TYPE, DEV) }
+                PROD_GCP_CLUSTER -> arrayOf(PROD, PROD_GCP, GCP).also { setProperty(NAIS_CLUSTER_TYPE, PROD) }
             }
     }
 }

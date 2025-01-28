@@ -38,11 +38,11 @@ springdoc:
 
 
 pdl:
-  scope: "api://${env}-fss.pdl.pdl-api/.default"
+  scope: "api://${nais.cluster.type}-fss.pdl.pdl-api/.default"
   base-uri: "https://${pdl}/graphql"
 skjerming:
   base-uri: "http://skjermede-personer-pip.nom"
-  scope: "api://${env}-gcp.nom.skjermede-personer-pip/.default"
+  scope: "api://${nais.cluster.type}-gcp.nom.skjermede-personer-pip/.default"
 graph:
   base-uri: https://www.todo.no
-  scope: api://${env}-gcp.todo/.default
+  scope: api://${nais.cluster.type}-gcp.todo/.default

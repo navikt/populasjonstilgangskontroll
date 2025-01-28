@@ -52,8 +52,6 @@ spec:
         - host: {{pdl}}
 
   env:
-    - name: ENV
-      value: {{env}}
     - name: PDL
       value: {{pdl}}
 

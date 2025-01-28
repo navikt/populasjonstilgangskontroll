@@ -17,8 +17,7 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val
 
     fun hentUUIDforNavIdent(navIdent: String) :Any {
         return restClient.get()
-            //.uri(uri(baseUri, "/v1.0/users/\$filter=onPremisesSamAccountName eq $navIdent" ))
-            .uri(uri(baseUri, "/v1.0/users/\$select=id\$filter=onPremisesSamAccountName eq '$navIdent' \$count=true" ))
+            .uri(navIdent, cf::azureUriUser )
             .accept(APPLICATION_JSON)
             .retrieve()
             .onStatus(HttpStatusCode::is2xxSuccessful) { _, _ ->

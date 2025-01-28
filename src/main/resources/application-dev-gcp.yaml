@@ -1,8 +1,8 @@
 pdl:
-  scope: "api://${dev}-fss.pdl.pdl-api/.default"
+  scope: "api://${env}-fss.pdl.pdl-api/.default"
   base-uri: "https://${pdl}/graphql"
 skjerming:
   base-uri: "http://skjermede-personer-pip.nom"
-  scope: "api://${dev}-gcp.nom.skjermede-personer-pip/.default"
+  scope: "api://${env}-gcp.nom.skjermede-personer-pip/.default"
 graph:
   base-uri: https://www.todo.no

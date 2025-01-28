@@ -54,4 +54,6 @@ spec:
   env:
     - name: ENV
       value: {{env}}
+    - name: PDL
+      value: {{pdl}}
 

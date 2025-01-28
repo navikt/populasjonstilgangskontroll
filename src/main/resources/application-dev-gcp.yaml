@@ -1,7 +1,8 @@
 pdl:
-  base-uri: https://pdl-api.dev-fss-pub.nais.io/graphql
+  scope: "api://${dev}-fss.pdl.pdl-api/.default"
+  base-uri: "https://${pdl}"
 skjerming:
-  scope: api://dev-gcp.nom.skjermede-personer-pip/.default
-  base-uri: http://skjermede-personer-pip.nom
+  base-uri: "http://skjermede-personer-pip.nom"
+  scope: "api://${dev}-gcp.nom.skjermede-personer-pip/.default"
 graph:
   base-uri: https://www.todo.no

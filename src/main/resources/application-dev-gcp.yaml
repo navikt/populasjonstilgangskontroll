@@ -1,8 +1,16 @@
-pdl:
-  scope: "api://${env}-fss.pdl.pdl-api/.default"
-  base-uri: "https://${pdl}/graphql"
-skjerming:
-  base-uri: "http://skjermede-personer-pip.nom"
-  scope: "api://${env}-gcp.nom.skjermede-personer-pip/.default"
-graph:
-  base-uri: https://www.todo.no
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    env:
+        show-values: always
+    configprops:
+        show-values: always
+    health:
+      show-details: always
+      show-components: always
+  httpexchanges:
+    recording:
+      enabled: true

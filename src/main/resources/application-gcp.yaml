@@ -1,25 +1,12 @@
 management:
-  httpexchanges:
-    recording:
-      enabled: true
   health:
     ping:
       enabled: false
     diskspace:
       enabled: false
-  endpoint:
-    health:
-      show-details: always
-      show-components: always
-    env:
-      show-values: always
-    configprops:
-      show-values: always
   endpoints:
     web:
       base-path: /monitoring
-      exposure:
-        include: '*'
 
 no.nav.security.jwt:
   issuer:
@@ -48,3 +35,14 @@ springdoc:
     swagger-ui:
       csrf:
         enabled: true
+
+
+pdl:
+  scope: "api://${env}-fss.pdl.pdl-api/.default"
+  base-uri: "https://${pdl}/graphql"
+skjerming:
+  base-uri: "http://skjermede-personer-pip.nom"
+  scope: "api://${env}-gcp.nom.skjermede-personer-pip/.default"
+graph:
+  base-uri: https://www.todo.no
+  scope: api://${env}-gcp.todo/.default

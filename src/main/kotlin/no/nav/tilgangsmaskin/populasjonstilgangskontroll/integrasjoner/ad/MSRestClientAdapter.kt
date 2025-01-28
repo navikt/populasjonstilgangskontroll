@@ -30,7 +30,7 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val
     fun hentGrupperForNavIdent(ansattId: UUID): List<AdGruppe> {
 
         return restClient.post()
-            .uri(uri(baseUri, "/v1.0/users/$ansattId/getMemberGroups"))
+            .uri(uri(baseUri, "/users/$ansattId/getMemberGroups"))
             .accept(APPLICATION_JSON)
             .body(HentAdGrupperForNavAnsatt.Request(true))
             .retrieve()

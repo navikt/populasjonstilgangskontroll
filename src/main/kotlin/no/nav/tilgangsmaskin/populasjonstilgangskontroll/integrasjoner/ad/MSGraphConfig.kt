@@ -31,12 +31,13 @@ class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled:
 
     fun azureUriUser( navIdent: String, b: UriBuilder) =
         b.path(USERS_PATH)
-            .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
+            .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_USER)
         .queryParam(PARAM_NAME_FILTER, "onPremisesSamAccountName eq '$navIdent'")
         .queryParam(PARAM_NAME_COUNT, "true")
         .build().also {
                 log.trace("URI er: {}", it)
             }
+
 
     /**
     fun azureUriGroups(azureID: UUID, b: UriBuilder) =

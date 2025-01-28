@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - main
+env:
+  IMAGE: europe-north1-docker.pkg.dev/${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}/tilgangsmaskin/${{ github.event.repository.name }}
 jobs:
   build:
     name: build

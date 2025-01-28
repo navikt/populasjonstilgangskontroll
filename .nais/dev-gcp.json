@@ -2,5 +2,5 @@
   "tenant": "trygdeetaten.no",
   "ingress": "https://tilgangsmaskin.intern.dev.nav.no",
   "env": "dev",
-  "pdl": "https://pdl-api.dev-fss-pub.nais.io/graphql"
+  "pdl": "pdl-api.dev-fss-pub.nais.io"
 }

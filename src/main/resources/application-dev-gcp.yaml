@@ -1,6 +1,6 @@
 pdl:
   scope: "api://${dev}-fss.pdl.pdl-api/.default"
-  base-uri: "https://${pdl}"
+  base-uri: "https://${pdl}/graphql"
 skjerming:
   base-uri: "http://skjermede-personer-pip.nom"
   scope: "api://${dev}-gcp.nom.skjermede-personer-pip/.default"

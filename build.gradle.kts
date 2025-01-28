@@ -1,7 +1,7 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 val javaVersion = JavaLanguageVersion.of(21)
-val springdocVersion = "2.8.3"
+val springdocVersion = "2.8.4"
 val tokenSupportVersion = "5.0.16"
 val springCloudVersion = "4.2.0"
 val commonVersion = "3.2025.01.14_14.19-79b3041cae56"
@@ -15,12 +15,12 @@ group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
 version = "1.0.1"
 
 plugins {
-    kotlin("jvm") version "2.1.0"
+    kotlin("jvm") version "2.1.10"
     id("com.diffplug.spotless") version "7.0.2"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("org.springframework.boot") version "3.4.2"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("plugin.spring") version "2.1.0"
+    kotlin("plugin.spring") version "2.1.10"
     id("org.cyclonedx.bom") version "2.0.0"
     id("com.google.cloud.tools.jib") version "3.4.4"
 

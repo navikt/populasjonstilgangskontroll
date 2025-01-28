@@ -1,18 +1,33 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad
 
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.MSGraphConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestClientAdapter
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.web.client.RestClient
 import java.util.UUID
 import org.springframework.web.client.body
 import org.springframework.http.HttpStatusCode
+import org.springframework.stereotype.Component
 
 
-
-class  MSRestClientAdapter(restClient: RestClient, private val cf: MSGraphConfig
+@Component
+class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val cf: MSGraphConfig
 ):AbstractRestClientAdapter(restClient,cf) {
 
-     fun hentAdGrupperForNavAnsatt(ansattId: UUID): List<AdGruppe> {
+    fun hentUUIDforNavIdent(navIdent: String) :Any {
+        return restClient.get()
+            .uri(uri(baseUri, "/v1.0/users/\$filter=onPremisesSamAccountName eq '$navIdent'"))
+            .accept(APPLICATION_JSON)
+            .retrieve()
+            .onStatus(HttpStatusCode::is2xxSuccessful) { _, _ ->
+                log.trace("MS Graph ${pingEndpoint()} OK")
+            }.body<Any>() ?: throw RuntimeException("Klarte ikke å hente UUID for navIdent") //
+
+    }
+
+
+    fun hentGrupperForNavIdent(ansattId: UUID): List<AdGruppe> {
 
         return restClient.post()
             .uri(uri(baseUri, "/v1.0/users/$ansattId/getMemberGroups"))
@@ -21,7 +36,7 @@ class  MSRestClientAdapter(restClient: RestClient, private val cf: MSGraphConfig
             .retrieve()
             .onStatus(HttpStatusCode::is2xxSuccessful) { _, _ ->
                 log.trace("MS Graph ${pingEndpoint()} OK")
-            }.body<HentAdGrupperForNavAnsatt.Response>()?.value?.map { (id,name) -> AdGruppe(id, name) } ?: emptyList()
+            }.body<HentAdGrupperForNavAnsatt.Response>()?.value?.map { (id,name) -> AdGruppe(id, name) } ?: emptyList() //TODO bygge støtte for paginering siden det er kun 100 grupper som returneres
          /*
         val requestData = HentAdGrupperForNavAnsatt.Request(true)
         val request = Request.Builder()
@@ -46,6 +61,16 @@ class  MSRestClientAdapter(restClient: RestClient, private val cf: MSGraphConfig
     }
 
 }
+
+object HentUUIDForNavIdent {
+    data class Request(
+        val securityEnabledOnly: Boolean
+    )
+    data class Response(val value: UUID) {
+    }
+
+}
+
 object HentAdGrupperForNavAnsatt {
 
     data class Request(

@@ -3,12 +3,15 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.security.token.support.spring.UnprotectedRestController
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PersonTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangsService
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.MSRestClientAdapter
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import java.util.UUID
 
 @ProtectedRestController(value = ["/api/v1"], issuer = "azuread", claimMap = [])
 class Tilgangskontroll(val service : TilgangsService) {
@@ -42,12 +45,18 @@ data class Begrunnelse(
 
 @UnprotectedRestController(value = ["/dev"])
 @ConditionalOnNotProd
-class DevController(val pdl : PersonTjeneste, val skjerming: SkjermingTjeneste)
+class DevController(val pdl : PersonTjeneste, val skjerming: SkjermingTjeneste, val ansatt: AnsattTjeneste )
 {
     @GetMapping("pdl")
     fun hentPerson(fnr: Fødselsnummer) = pdl.hentPerson(fnr)
 
     @GetMapping("skjermet")
     fun erSkjermet(fnr: Fødselsnummer) = skjerming.erSkjermet(fnr)
+
+    @GetMapping("ansatt")
+    fun hentAnsatt(nav_ident: String) = ansatt.ansattAzureId(nav_ident)
+
+    @GetMapping("ansatttilganger")
+    fun hentAnsattTilganger(azureId : UUID) = ansatt.ansattTilganger(azureId)
 
 }

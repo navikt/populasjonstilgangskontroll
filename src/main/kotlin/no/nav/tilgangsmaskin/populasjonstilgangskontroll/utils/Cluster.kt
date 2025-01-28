@@ -42,8 +42,8 @@ internal enum class Cluster(private val clusterName: String) {
                     arrayOf(current.clusterName).also {
                         setProperty(NAIS_CLUSTER_NAME, current.clusterName)
                     }
-                DEV_GCP_CLUSTER -> arrayOf(DEV, DEV_GCP, GCP).also { setProperty(NAIS_CLUSTER_TYPE, DEV) }
-                PROD_GCP_CLUSTER -> arrayOf(PROD, PROD_GCP, GCP).also { setProperty(NAIS_CLUSTER_TYPE, PROD) }
+                DEV_GCP_CLUSTER -> arrayOf(DEV, DEV_GCP, GCP)
+                PROD_GCP_CLUSTER -> arrayOf(PROD, PROD_GCP, GCP)
             }
     }
 }

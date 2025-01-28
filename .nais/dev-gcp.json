@@ -1,5 +1,5 @@
 {
   "tenant": "trygdeetaten.no",
-  "ingress": https://tilgangsmaskin.intern.dev.nav.no,
+  "ingress": "https://tilgangsmaskin.intern.dev.nav.no",
   "env": "dev"
 }

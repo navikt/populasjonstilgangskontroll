@@ -51,7 +51,7 @@ spec:
       external:
         - host: pdl-api.dev-fss-pub.nais.io
 
-    env:
-      -   name: ENV
-          value: {{env}}
+  env:
+    - name: ENV
+      value: {{env}}
 

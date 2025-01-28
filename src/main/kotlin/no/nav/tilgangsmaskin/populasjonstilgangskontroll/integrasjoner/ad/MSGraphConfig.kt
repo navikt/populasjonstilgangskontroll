@@ -5,7 +5,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.Ab
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.web.util.UriBuilder
 import java.net.URI
-import java.util.UUID
 
 @ConfigurationProperties(GRAPH)
 class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
@@ -27,10 +26,12 @@ class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled:
     protected
     val PARAM_VALUE_SELECT_GROUPS: String = "id"
 
+
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     fun azureUriUser( navIdent: String, b: UriBuilder) =
         b.path(USERS_PATH)
+
             .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_USER)
         .queryParam(PARAM_NAME_FILTER, "onPremisesSamAccountName eq '$navIdent'")
         .queryParam(PARAM_NAME_COUNT, "true")

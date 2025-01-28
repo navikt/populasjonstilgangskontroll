@@ -15,11 +15,17 @@ import org.springframework.stereotype.Component
 class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val cf: MSGraphConfig
 ):AbstractRestClientAdapter(restClient,cf) {
 
+    protected
+    val HEADER_CONSISTENCY_LEVEL: String = "ConsistencyLevel"
+    protected
+    val EVENTUAL: String = "eventual"
+
     fun hentUUIDforNavIdent(navIdent: String) :Any {
         return restClient.get()
             .uri {
                 cf.azureUriUser(navIdent,it)
             }
+            .header(HEADER_CONSISTENCY_LEVEL, EVENTUAL)
             .accept(APPLICATION_JSON)
             .retrieve()
             .onStatus(HttpStatusCode::is2xxSuccessful) { _, _ ->

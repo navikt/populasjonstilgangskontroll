@@ -12,7 +12,7 @@ class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled:
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
-    fun azureUriUser(b: UriBuilder, navIdent: String) =
+    fun userURI(b: UriBuilder, navIdent: String) =
         b.path(USERS_PATH)
             .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_USER)
             .queryParam(PARAM_NAME_FILTER, "onPremisesSamAccountName eq '$navIdent'")

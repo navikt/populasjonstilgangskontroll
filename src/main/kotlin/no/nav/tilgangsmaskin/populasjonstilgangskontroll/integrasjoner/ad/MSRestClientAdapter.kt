@@ -15,9 +15,7 @@ import org.springframework.stereotype.Component
 class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val cf: MSGraphConfig): AbstractRestClientAdapter(restClient,cf) {
 
     fun hentUUIDforNavIdent(ident: String) = restClient.get()
-        .uri {
-            cf.azureUriUser(it, ident)
-        }
+        .uri { cf.userURI(it, ident) }
         .accept(APPLICATION_JSON)
         .retrieve()
         .onStatus(HttpStatusCode::isError, errorHandler::handle)
@@ -31,7 +29,6 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
             .body<List<AdGruppe>>() ?: emptyList()
-
 }
 
 @JvmInline

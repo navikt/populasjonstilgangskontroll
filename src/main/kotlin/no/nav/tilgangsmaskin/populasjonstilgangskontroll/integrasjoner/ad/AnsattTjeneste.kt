@@ -15,4 +15,3 @@ class AnsattTjeneste(private val adapter: MSRestClientAdapter) {
     fun ansattTilganger(azureIdent: UUID) = adapter.hentGrupperForNavIdent(azureIdent)
 }
 
-data class AdGruppe(val id: UUID, val name: String)

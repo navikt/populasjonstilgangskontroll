@@ -5,7 +5,7 @@
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
     <springProfile name="dev">
-        <logger name="no.nav.security" level="trace"/>
+        <logger name="no.nav.security" level="info"/>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
     </springProfile>
     <springProfile name="local | test">

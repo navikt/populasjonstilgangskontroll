@@ -8,6 +8,11 @@ management:
     web:
       base-path: /monitoring
 
+spring:
+  cache:
+    cache-names: pdl, skjerming
+    caffeine:
+      spec: initialCapacity=500,maximumSize=100,expireAfterAccess=30s
 no.nav.security.jwt:
   issuer:
      azuread:

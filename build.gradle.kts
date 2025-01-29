@@ -56,29 +56,21 @@ dependencies {
     // Align versions of all Kotlin components
 
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
+    implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-graphql")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:8.0")
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("no.nav.boot:boot-conditionals:5.1.3")
-
-    //Token
-    implementation("no.nav.common:token-client:$commonVersion")
+    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
     implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
     implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
-    //implementation("no.nav.security:token-validation-jwt:$tokenValidationVersion")
-    implementation("com.github.kittinunf.fuel:fuel:2.3.1")
-    implementation("com.github.kittinunf.fuel:fuel-jackson:2.3.1")
-
-    //Rest
-    implementation("no.nav.common:rest:$commonVersion")
 
     // audit log
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")

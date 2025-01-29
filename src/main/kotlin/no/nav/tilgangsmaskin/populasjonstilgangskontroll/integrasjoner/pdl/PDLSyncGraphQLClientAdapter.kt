@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
 import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractGraphQLAdapter
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.GraphQLErrorHandler
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLConfig.Companion.PDL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Cluster.Companion.isProd
 import org.springframework.beans.factory.annotation.Qualifier
@@ -16,8 +17,9 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 @Component
 class PDLGraphQLClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQlClient,
                               @Qualifier(PDL) restClient: RestClient,
-                              cfg: PDLConfig, errorHandler: ErrorHandler
-) : AbstractGraphQLAdapter(restClient, cfg, errorHandler) {
+                              graphQlErrorHandler: GraphQLErrorHandler,
+                              errorHandler: ErrorHandler,
+                              cfg: PDLConfig) : AbstractGraphQLAdapter(restClient, cfg,errorHandler,graphQlErrorHandler) {
 
     override fun ping(): Map<String, String> {
         restClient

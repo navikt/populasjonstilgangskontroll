@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors
 
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.GraphQLErrorHandler
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus.*
@@ -14,7 +15,12 @@ import java.net.URI
 
 @Component
 @Primary
-class DefaultErrorHandler : ErrorHandler {
+class DefaultGraphQlErrorHandler : GraphQLErrorHandler
+
+
+@Component
+@Primary
+class DefaultRestErrorHandler : ErrorHandler {
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
         throw when (val code = res.statusCode) {
             BAD_REQUEST, NOT_FOUND -> IrrecoverableException(code, req.uri)

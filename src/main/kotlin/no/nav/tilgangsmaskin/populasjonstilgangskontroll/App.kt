@@ -6,10 +6,12 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Cluster.Companion
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
+import org.springframework.cache.annotation.EnableCaching
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
 @EnableOAuth2Client(cacheEnabled = true)
+@EnableCaching
 @EnableJwtTokenValidation(ignore = ["org.springdoc", "org.springframework"])
 class App
 

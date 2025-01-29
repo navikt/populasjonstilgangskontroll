@@ -16,7 +16,7 @@ spring:
   cache:
     cache-names: pdl, skjerming, graph,
     caffeine:
-      spec: initialCapacity=500,maximumSize=100,expireAfterAccess=30s
+      spec: initialCapacity=500,maximumSize=100,expireAfterAccess=30s,recordStats
 no.nav.security.jwt:
   issuer:
      azuread:

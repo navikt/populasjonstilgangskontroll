@@ -4,19 +4,16 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableExc
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.RecoverableException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.graphql.ResponseError
-import org.springframework.graphql.client.ClientGraphQlRequest
 import org.springframework.graphql.client.FieldAccessException
 import org.springframework.graphql.client.GraphQlClient
 import org.springframework.graphql.client.GraphQlTransportException
-import org.springframework.graphql.client.SyncGraphQlClientInterceptor
-import org.springframework.graphql.client.SyncGraphQlClientInterceptor.Chain
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.web.client.RestClient
 import java.net.URI
 import java.util.Locale.getDefault
 
-abstract class AbstractGraphQLAdapter(client: RestClient, cfg: AbstractRestConfig, protected val errorHandler: GraphQLErrorHandler = object : GraphQLErrorHandler {}) : AbstractRestClientAdapter(client, cfg) {
+abstract class AbstractGraphQLAdapter(client: RestClient, cfg: AbstractRestConfig, protected val graphQlErrorHandler: GraphQLErrorHandler = object : GraphQLErrorHandler {}) : AbstractRestClientAdapter(client, cfg) {
 
     protected inline fun <reified T> query(graphQL: GraphQlClient, query: Pair<String, String>, vars: Map<String, String>) =
         runCatching {
@@ -28,7 +25,7 @@ abstract class AbstractGraphQLAdapter(client: RestClient, cfg: AbstractRestConfi
                 .toEntity(T::class.java)
         }.getOrElse {
             log.warn("Feil ved oppslag av {}", T::class.java.simpleName, it)
-            errorHandler.handle(cfg.baseUri, it)
+            graphQlErrorHandler.handle(cfg.baseUri, it)
         }
 }
 
@@ -57,15 +54,5 @@ interface GraphQLErrorHandler {
         private fun String.tilStatus() = HttpStatus.valueOf(this.uppercase(getDefault()))
 
     }
-}
-
-class LoggingGraphQLInterceptor : SyncGraphQlClientInterceptor {
-
-    private val log = getLogger(LoggingGraphQLInterceptor::class.java)
-
-    override fun intercept(req: ClientGraphQlRequest, chain: Chain) =
-        chain.next(req).also {
-            log.trace("Eksekverer {} med variabler {}", req.document, req.variables)
-        }
 }
 

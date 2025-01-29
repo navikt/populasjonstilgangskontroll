@@ -1,21 +1,27 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.DefaultErrorHandler
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.RecoverableException
 import org.slf4j.LoggerFactory.getLogger
-import org.slf4j.MDC
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.TEXT_PLAIN
 import org.springframework.http.client.ClientHttpRequestInterceptor
+import org.springframework.http.client.ClientHttpResponse
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
-import java.util.*
 
 abstract class AbstractRestClientAdapter(
     protected val restClient: RestClient, protected val cfg: AbstractRestConfig,
-    private val pingClient: RestClient = restClient
+    private val pingClient: RestClient = restClient,
+    protected val errorHandler: ErrorHandler = DefaultErrorHandler(),
 ) : Pingable {
+
 
     override fun ping(): Map<String, String> {
         if (isEnabled()) {
@@ -24,9 +30,7 @@ abstract class AbstractRestClientAdapter(
                 .uri(pingEndpoint())
                 .accept(APPLICATION_JSON, TEXT_PLAIN)
                 .retrieve()
-                .onStatus(HttpStatusCode::is2xxSuccessful) { _, _ ->
-                    log.trace("Ping ${pingEndpoint()} OK")
-                }
+                .onStatus(HttpStatusCode::isError, errorHandler::handle)
             return emptyMap()
         } else return emptyMap()
     }
@@ -50,37 +54,6 @@ abstract class AbstractRestClientAdapter(
                 next.execute(req, b)
             }
 
-
-            private object CallIdGenerator {
-            fun create() = "${UUID.randomUUID()}"
-        }
-
-        fun correlatingRequestInterceptor(defaultConsumerId: String) =
-            ClientHttpRequestInterceptor { req, b, next ->
-                with(req.headers) {
-                    mapOf(
-                        NAV_CALL_ID to callId(),
-                        NAV_CALL_ID1 to callId(),
-                        NAV_CALL_ID2 to callId(),
-                        NAV_CALL_ID3 to callId()
-                    ).forEach { (key, value) -> add(key, value) }
-                }
-                next.execute(req, b)
-            }
-
-        private const val NAV_CALL_ID = "Nav-CallId"
-        private const val NAV_CALL_ID1 = "Nav-Call-Id"
-        private const val NAV_CALL_ID2 = "callId"
-        private const val NAV_CALL_ID3 = "X-Correlation-ID"
-
-        private fun callId() = MDC.get(NAV_CALL_ID) ?:
-            CallIdGenerator.create().also {
-                toMDC(NAV_CALL_ID, it)
-        }
-
-
-        private fun toMDC(key: String, value: String?, defaultValue: String? = null) =
-            MDC.put(key, value ?: defaultValue)
     }
 }
 interface Pingable {

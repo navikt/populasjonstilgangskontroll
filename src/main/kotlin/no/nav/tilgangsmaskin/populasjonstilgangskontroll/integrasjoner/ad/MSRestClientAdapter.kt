@@ -20,9 +20,8 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val
         }
         .accept(APPLICATION_JSON)
         .retrieve()
-        .onStatus(HttpStatusCode::is2xxSuccessful) { _, _ ->
-            log.trace("MS Graph uuid oppslag OK")
-        }.body<Any>() ?: throw RuntimeException("Klarte ikke å hente UUID for navIdent $ident") //
+        .onStatus(HttpStatusCode::isError, errorHandler::handle)
+        .body<Any>() ?: throw RuntimeException("Klarte ikke å hente UUID for navIdent $ident") //
 
     fun hentGrupperForNavIdent(ansattId: UUID) =
         restClient.post()
@@ -30,9 +29,9 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val
             .accept(APPLICATION_JSON)
             .body(Request())
             .retrieve()
-            .onStatus(HttpStatusCode::is2xxSuccessful) { _, _ ->
-                log.trace("MS Graph grupper OK")
-            }.body<List<AdGruppe>>() ?: emptyList()
+            .onStatus(HttpStatusCode::isError, errorHandler::handle)
+            .body<List<AdGruppe>>() ?: emptyList()
+
 }
 
 @JvmInline

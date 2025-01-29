@@ -5,6 +5,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.Ab
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Cluster.Companion.isProd
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.graphql.client.GraphQlClient
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.TEXT_PLAIN
 import org.springframework.stereotype.Component
@@ -14,7 +15,6 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 @Component
 class PDLGraphQLClientAdapter(@Qualifier(PDLConfig.Companion.PDL) private val graphQlClient: GraphQlClient,
                               @Qualifier(PDLConfig.Companion.PDL) restClient: RestClient,
-                              private val handler: ErrorHandler,
                               cfg: PDLConfig) : AbstractGraphQLAdapter(restClient, cfg) {
 
     override fun ping(): Map<String, String> {
@@ -23,7 +23,7 @@ class PDLGraphQLClientAdapter(@Qualifier(PDLConfig.Companion.PDL) private val gr
             .uri(baseUri)
             .accept(APPLICATION_JSON, TEXT_PLAIN)
             .retrieve()
-            .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
+            .onStatus(HttpStatusCode::isError, errorHandler::handle)
             .toBodilessEntity()
         return emptyMap()
     }

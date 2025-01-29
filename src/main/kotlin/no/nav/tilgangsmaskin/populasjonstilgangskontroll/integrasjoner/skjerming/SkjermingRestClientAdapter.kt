@@ -24,9 +24,7 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
             .onStatus(HttpStatusCode::is2xxSuccessful) { _, _ ->
                 log.trace("Skjermet oppslag mot {} OK", cf::skjermetUri)
             }
-            .onStatus(HttpStatusCode::isError) { req, res ->
-                throw RuntimeException("Skjermet oppslag mot ${req.uri} feilet ${res.statusCode} ${res.statusText} ${res.body}")
-            }
+            .onStatus(HttpStatusCode::isError, errorHandler::handle)
             .body<Any>() ?: throw RuntimeException("Ingen respons fra skjermet oppslag mot ${cf::skjermetUri}")
     }
 

@@ -31,5 +31,4 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val
             .body<List<AdGruppe>>() ?: emptyList()
 }
 
-@JvmInline
-private value class Request(val securityEnabledOnly: Boolean = true)
+private data class Request(val securityEnabledOnly: Boolean = true)

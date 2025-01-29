@@ -5,6 +5,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.Ab
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.web.util.UriBuilder
 import java.net.URI
+import java.util.UUID
 
 @ConfigurationProperties(GRAPH)
 class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
@@ -17,6 +18,10 @@ class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled:
             .queryParam(PARAM_NAME_FILTER, "onPremisesSamAccountName eq '$navIdent'")
             .queryParam(PARAM_NAME_COUNT, "true")
             .build()
+
+    fun grupperURI(b: UriBuilder, ansattId: UUID) =
+        b.path( USERS_PATH)
+            .build("$ansattId")
 
 
     /**
@@ -31,6 +36,7 @@ class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled:
         val HEADER_CONSISTENCY_LEVEL = "ConsistencyLevel" to "eventual"
         const val GRAPH = "graph"
         private const val USERS_PATH: String = "/users"
+        private const val GRUPPER_PATH = "$USERS_PATH/{id}/getMemberGroups"
         private const val ME_PATH: String = "/me"
         private const val MEMBER_OF_PATH: String = "/memberOf"
         private const val PARAM_NAME_SELECT: String = "\$select"

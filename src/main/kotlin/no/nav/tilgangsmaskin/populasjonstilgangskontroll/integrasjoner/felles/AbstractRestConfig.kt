@@ -8,8 +8,6 @@ abstract class AbstractRestConfig(val baseUri: URI, val pingPath: String, val na
 
     protected val log = LoggerFactory.getLogger(javaClass)
 
-    val pingEndpoint = uri(baseUri, pingPath).also {
-        log.trace("Ping endpoint: {}", it)
-    }
+    val pingEndpoint = uri(baseUri, pingPath)
     override fun toString() = "name=$name, pingPath=$pingPath,enabled=$isEnabled,baseUri=$baseUri"
 }

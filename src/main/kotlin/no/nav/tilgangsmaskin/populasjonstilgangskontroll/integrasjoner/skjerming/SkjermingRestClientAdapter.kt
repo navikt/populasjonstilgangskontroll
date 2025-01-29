@@ -11,9 +11,10 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 
 import org.springframework.http.HttpStatusCode
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 @Component
-class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, private val cf : SkjermingConfig): AbstractRestClientAdapter(restClient, cf) {
+class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, private val cf : SkjermingConfig, errorHandler: ErrorHandler): AbstractRestClientAdapter(restClient, cf,errorHandler = errorHandler) {
     fun skjermetPerson(ident: String) =
         restClient
             .post()

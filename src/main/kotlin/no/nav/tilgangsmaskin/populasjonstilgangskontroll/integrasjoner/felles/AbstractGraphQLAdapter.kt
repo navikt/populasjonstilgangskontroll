@@ -10,10 +10,11 @@ import org.springframework.graphql.client.GraphQlTransportException
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import java.net.URI
 import java.util.Locale.getDefault
 
-abstract class AbstractGraphQLAdapter(client: RestClient, cfg: AbstractRestConfig, protected val graphQlErrorHandler: GraphQLErrorHandler = object : GraphQLErrorHandler {}) : AbstractRestClientAdapter(client, cfg) {
+abstract class AbstractGraphQLAdapter(client: RestClient, cfg: AbstractRestConfig, errorHandler: ErrorHandler,protected val graphQlErrorHandler: GraphQLErrorHandler = object : GraphQLErrorHandler {}) : AbstractRestClientAdapter(client, cfg,errorHandler=errorHandler) {
 
     protected inline fun <reified T> query(graphQL: GraphQlClient, query: Pair<String, String>, vars: Map<String, String>) =
         runCatching {

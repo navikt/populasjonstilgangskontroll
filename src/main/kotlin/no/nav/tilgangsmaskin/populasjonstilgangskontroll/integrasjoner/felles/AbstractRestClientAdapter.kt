@@ -1,16 +1,11 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.DefaultErrorHandler
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableException
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.RecoverableException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.TEXT_PLAIN
 import org.springframework.http.client.ClientHttpRequestInterceptor
-import org.springframework.http.client.ClientHttpResponse
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.util.UriComponentsBuilder
@@ -19,7 +14,7 @@ import java.net.URI
 abstract class AbstractRestClientAdapter(
     protected val restClient: RestClient, protected val cfg: AbstractRestConfig,
     private val pingClient: RestClient = restClient,
-    protected val errorHandler: ErrorHandler = DefaultErrorHandler(),
+    protected val errorHandler: ErrorHandler,
 ) : Pingable {
 
 

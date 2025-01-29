@@ -9,11 +9,10 @@ import java.util.UUID
 import org.springframework.web.client.body
 import org.springframework.http.HttpStatusCode
 import org.springframework.stereotype.Component
-
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 @Component
-class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val cf: MSGraphConfig): AbstractRestClientAdapter(restClient,cf) {
-
+class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val cf: MSGraphConfig, errorHandler: ErrorHandler): AbstractRestClientAdapter(restClient,cf,errorHandler = errorHandler) {
     fun hentUUIDforNavIdent(ident: String) = restClient.get()
         .uri { cf.userURI(it, ident) }
         .accept(APPLICATION_JSON)

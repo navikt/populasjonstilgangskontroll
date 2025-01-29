@@ -14,9 +14,10 @@ import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 
 abstract class AbstractRestClientAdapter(
-    protected val restClient: RestClient, protected val cfg: AbstractRestConfig,
-    private val pingClient: RestClient = restClient,
+    protected val restClient: RestClient,
+    protected val cfg: AbstractRestConfig,
     protected val errorHandler: ErrorHandler,
+    private val pingClient: RestClient = restClient,
 ) : Pingable {
 
 
@@ -56,11 +57,4 @@ abstract class AbstractRestClientAdapter(
             }
 
     }
-}
-interface Pingable {
-
-    fun ping() : Map<String, String>
-    fun pingEndpoint() : String
-    fun name() : String = javaClass.simpleName
-    fun isEnabled() : Boolean = true
 }

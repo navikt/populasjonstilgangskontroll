@@ -12,7 +12,8 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 @Component
-class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val cf: MSGraphConfig, errorHandler: ErrorHandler): AbstractRestClientAdapter(restClient,cf,errorHandler = errorHandler) {
+class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val cf: MSGraphConfig, errorHandler: ErrorHandler): AbstractRestClientAdapter(
+    restClient,cf, errorHandler) {
     fun hentUUIDforNavIdent(ident: String) = restClient.get()
         .uri { cf.userURI(it, ident) }
         .accept(APPLICATION_JSON)

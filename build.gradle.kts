@@ -4,10 +4,7 @@ val javaVersion = JavaLanguageVersion.of(21)
 val springdocVersion = "2.8.4"
 val tokenSupportVersion = "5.0.16"
 val springCloudVersion = "4.2.0"
-val commonVersion = "3.2025.01.14_14.19-79b3041cae56"
 val mockkVersion = "1.13.16"
-val testcontainerVersion = "1.19.0"
-val tokenValidationVersion = "1.3.0"
 val oidcSupportVersion = "0.2.18"
 val mockOAuth2ServerVersion = "2.1.10"
 
@@ -39,13 +36,6 @@ repositories {
 
 apply(plugin = "com.diffplug.spotless")
 
-/**
-spotless {
-    kotlin {
-        ktlint("0.50.0")
-    }
-}
-**/
 configurations.all {
     resolutionStrategy {
         failOnNonReproducibleResolution()
@@ -57,6 +47,8 @@ dependencies {
 
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.springframework:spring-aspects")
+    implementation("org.springframework.retry:spring-retry")
     implementation("org.springframework.boot:spring-boot-starter-graphql")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -71,8 +63,6 @@ dependencies {
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
     implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
     implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
-
-    // audit log
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")
 
     // Test
@@ -88,57 +78,6 @@ dependencies {
 application {
     mainClass.set("no.nav.tilgangsmaskin.populasjonstilgangskontroll.AppKt")
 }
-/**
-tasks.withType<Jar> {
-    // Otherwise you'll get a "No main manifest attribute" error
-    manifest {
-        attributes["Main-Class"] = "no.nav.tilgangsmaskin.populasjonstilgangskontroll.AppKt"
-    }
-
-
-    // To avoid the duplicate handling strategy error
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-}
-**/
-/**
-tasks {
-    shadowJar {
-        mergeServiceFiles()
-        manifest {
-            attributes(Pair("Main-Class", "no.nav.tilgangsmaskin.populasjonstilgangskontroll.AppKt"))
-        }
-    }
-}
-**/
-/**
-tasks.withType<Jar>().configureEach {
-
-    }
-    from(
-        configurations.runtimeClasspath.get().map {
-            if (it.isDirectory) it else zipTree(it)
-        },
-    )
-}
-**/
-/**
-tasks {
-    bootJar {
-        manifest {
-            archiveFileName = "app.jar"
-            attributes(
-                'Main-Class': 'no.nav.tilgangsmaskin.populasjonstilgangskontroll.AppKt'
-            )
-        }
-    }
-}
-springBoot {
-    mainClass = 'no.nav.histark.Application'
-    archivesBaseName = 'app'
-}
-
-**/
 tasks.withType<BootJar> {
     archiveFileName = "app.jar"
 }

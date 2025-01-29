@@ -22,10 +22,8 @@ class DefaultGraphQlErrorHandler : GraphQLErrorHandler
 @Primary
 class DefaultRestErrorHandler : ErrorHandler {
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
-        throw when (val code = res.statusCode) {
-            BAD_REQUEST, NOT_FOUND -> IrrecoverableException(code, req.uri)
-            else -> RecoverableException(code, req.uri)
-        }
+        if (res.statusCode.is4xxClientError) IrrecoverableException(res.statusCode, req.uri)
+        else throw RecoverableException(res.statusCode, req.uri) // TODO: Håndter 5xx feil bedre
     }
 }
 

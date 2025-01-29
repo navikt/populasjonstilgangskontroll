@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad
 
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AdGruppeIder
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.MSGraphConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier

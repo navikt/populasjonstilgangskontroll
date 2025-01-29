@@ -9,6 +9,8 @@ management:
       base-path: /monitoring
 
 spring:
+  jackson:
+    default-property-inclusion: non_null
   cache:
     cache-names: pdl, skjerming, graph,
     caffeine:

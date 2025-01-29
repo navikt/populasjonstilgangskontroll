@@ -22,7 +22,7 @@ class DefaultGraphQlErrorHandler : GraphQLErrorHandler
 @Primary
 class DefaultRestErrorHandler : ErrorHandler {
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
-        if (res.statusCode.is4xxClientError) IrrecoverableException(res.statusCode, req.uri)
+        if (res.statusCode.is4xxClientError) throw IrrecoverableException(res.statusCode, req.uri)
         else throw RecoverableException(res.statusCode, req.uri) // TODO: Håndter 5xx feil bedre
     }
 }

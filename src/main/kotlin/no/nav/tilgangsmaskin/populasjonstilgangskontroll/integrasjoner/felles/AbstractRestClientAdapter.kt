@@ -44,13 +44,14 @@ abstract class AbstractRestClientAdapter(
         fun uri(base : URI, path : String, queryParams : HttpHeaders? = null) = builder(base, path, queryParams).build().toUri()
         private fun builder(base : URI, path : String, queryParams : HttpHeaders?) = UriComponentsBuilder.fromUri(base).pathSegment(path).queryParams(queryParams)
 
-        fun headerAddingRequestInterceptor(key: String, supplier: () -> String) =
+        fun headerAddingRequestInterceptor(vararg verdier : Pair<String, String>) =
             ClientHttpRequestInterceptor { req, b, next ->
-                req.headers.add(key, supplier())
+                verdier.forEach { (key, value) -> req.headers.add(key, value) }
                 next.execute(req, b)
             }
 
-        private object CallIdGenerator {
+
+            private object CallIdGenerator {
             fun create() = "${UUID.randomUUID()}"
         }
 

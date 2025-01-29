@@ -9,6 +9,9 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.Perso
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangsService
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.MSRestClientAdapter
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.NavId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLConfig.Companion.PDL
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig.Companion.SKJERMING
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import java.util.UUID
@@ -47,16 +50,16 @@ data class Begrunnelse(
 @ConditionalOnNotProd
 class DevController(val pdl : PersonTjeneste, val skjerming: SkjermingTjeneste, val ansatt: AnsattTjeneste )
 {
-    @GetMapping("pdl")
+    @GetMapping(PDL)
     fun hentPerson(fnr: Fødselsnummer) = pdl.hentPerson(fnr)
 
-    @GetMapping("skjermet")
+    @GetMapping(SKJERMING)
     fun erSkjermet(fnr: Fødselsnummer) = skjerming.erSkjermet(fnr)
 
     @GetMapping("ansatt")
-    fun hentAnsatt(nav_ident: String) = ansatt.ansattAzureId(nav_ident)
+    fun hentAnsatt(ident: NavId) = ansatt.ansattAzureId(ident)
 
-    @GetMapping("ansatttilganger")
+    @GetMapping("ansattilganger")
     fun hentAnsattTilganger(azureId : UUID) = ansatt.ansattTilganger(azureId)
 
 }

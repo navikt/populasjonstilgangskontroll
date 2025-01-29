@@ -15,10 +15,10 @@ spec:
     path: /monitoring/prometheus
   readiness:
     path: /monitoring/health/readiness
-    initialDelay: 22
+    initialDelay: 30
   liveness:
     path: /monitoring/health/liveness
-    initialDelay: 22
+    initialDelay: 30
   port: 8080
   replicas:
     max: 1
@@ -39,11 +39,6 @@ spec:
   secureLogs:
     enabled: true
   accessPolicy:
-    inbound:
-      rules:
-        - application: gosys-q1
-          namespace: isa
-
     outbound:
       rules:
         - application: skjermede-personer-pip

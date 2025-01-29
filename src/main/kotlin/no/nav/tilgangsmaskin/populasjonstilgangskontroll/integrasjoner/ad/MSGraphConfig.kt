@@ -9,35 +9,14 @@ import java.net.URI
 @ConfigurationProperties(GRAPH)
 class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
 
-    protected
-    val USERS_PATH: String = "/users"
-    protected
-    val ME_PATH: String = "/me"
-    protected
-    val MEMBER_OF_PATH: String = "/memberOf"
-    protected
-    val PARAM_NAME_SELECT: String = "\$select"
-    protected
-    val PARAM_NAME_FILTER: String = "\$filter"
-    protected
-    val PARAM_NAME_COUNT: String = "\$count"
-    protected
-    val PARAM_VALUE_SELECT_USER: String = "id,onPremisesSamAccountName,displayName,givenName,surname,streetAddress"
-    protected
-    val PARAM_VALUE_SELECT_GROUPS: String = "id"
-
-
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
-    fun azureUriUser( navIdent: String, b: UriBuilder) =
+    fun azureUriUser(b: UriBuilder, navIdent: String) =
         b.path(USERS_PATH)
-
             .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_USER)
-        .queryParam(PARAM_NAME_FILTER, "onPremisesSamAccountName eq '$navIdent'")
-        .queryParam(PARAM_NAME_COUNT, "true")
-        .build().also {
-                log.trace("URI er: {}", it)
-            }
+            .queryParam(PARAM_NAME_FILTER, "onPremisesSamAccountName eq '$navIdent'")
+            .queryParam(PARAM_NAME_COUNT, "true")
+            .build()
 
 
     /**
@@ -49,7 +28,16 @@ class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled:
     **/
 
     companion object {
+        val HEADER_CONSISTENCY_LEVEL = "ConsistencyLevel" to "eventual"
         const val GRAPH = "graph"
+        private const val USERS_PATH: String = "/users"
+        private const val ME_PATH: String = "/me"
+        private const val MEMBER_OF_PATH: String = "/memberOf"
+        private const val PARAM_NAME_SELECT: String = "\$select"
+        private const val PARAM_NAME_FILTER: String = "\$filter"
+        private const val PARAM_NAME_COUNT: String = "\$count"
+        private const val PARAM_VALUE_SELECT_USER: String = "id,onPremisesSamAccountName,displayName,givenName,surname,streetAddress"
+        private const val PARAM_VALUE_SELECT_GROUPS: String = "id"
         private const val DEFAULT_PING_PATH = ""
     }
 }

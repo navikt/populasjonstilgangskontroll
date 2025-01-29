@@ -28,20 +28,12 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val
         restClient.post()
             .uri(uri(baseUri, "/users/$ansattId/getMemberGroups"))
             .accept(APPLICATION_JSON)
-            .body(HentAdGrupperForNavAnsatt.Request(true))
+            .body(Request())
             .retrieve()
             .onStatus(HttpStatusCode::is2xxSuccessful) { _, _ ->
                 log.trace("MS Graph grupper OK")
             }.body<List<AdGruppe>>() ?: emptyList()
 }
 
-
-object HentAdGrupperForNavAnsatt {
-
-    data class Request(
-        val securityEnabledOnly: Boolean
-    )
-
-}
-
-
+@JvmInline
+private value class Request(val securityEnabledOnly: Boolean = true)

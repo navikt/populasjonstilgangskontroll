@@ -28,6 +28,7 @@ class PDLGraphQLClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQl
             .accept(APPLICATION_JSON, TEXT_PLAIN)
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
+            .onStatus(HttpStatusCode::is2xxSuccessful, ::successHandler)
             .toBodilessEntity()
         return emptyMap()
     }

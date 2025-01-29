@@ -2,10 +2,12 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.TEXT_PLAIN
 import org.springframework.http.client.ClientHttpRequestInterceptor
+import org.springframework.http.client.ClientHttpResponse
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.util.UriComponentsBuilder
@@ -17,6 +19,9 @@ abstract class AbstractRestClientAdapter(
     protected val errorHandler: ErrorHandler,
 ) : Pingable {
 
+
+    protected fun successHandler(req: HttpRequest, res: ClientHttpResponse ) =
+        log.trace("Oppslag mot {} OK", req.uri)
 
     override fun ping(): Map<String, String> {
         if (isEnabled()) {

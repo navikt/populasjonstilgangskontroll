@@ -10,7 +10,7 @@ management:
 
 spring:
   cache:
-    cache-names: pdl, skjerming
+    cache-names: pdl, skjerming, graph,
     caffeine:
       spec: initialCapacity=500,maximumSize=100,expireAfterAccess=30s
 no.nav.security.jwt:

@@ -16,7 +16,8 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 @Component
 class PDLGraphQLClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQlClient,
                               @Qualifier(PDL) restClient: RestClient,
-                              cfg: PDLConfig) : AbstractGraphQLAdapter(restClient, cfg) {
+                              cfg: PDLConfig, errorHandler: ErrorHandler
+) : AbstractGraphQLAdapter(restClient, cfg, errorHandler) {
 
     override fun ping(): Map<String, String> {
         restClient

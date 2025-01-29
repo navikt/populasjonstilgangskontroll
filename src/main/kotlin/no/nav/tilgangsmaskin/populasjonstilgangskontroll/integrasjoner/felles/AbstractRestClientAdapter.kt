@@ -30,6 +30,7 @@ abstract class AbstractRestClientAdapter(
                 .uri(pingEndpoint())
                 .accept(APPLICATION_JSON, TEXT_PLAIN)
                 .retrieve()
+                .onStatus(HttpStatusCode::is2xxSuccessful, ::successHandler)
                 .onStatus(HttpStatusCode::isError, errorHandler::handle)
             return emptyMap()
         } else return emptyMap()

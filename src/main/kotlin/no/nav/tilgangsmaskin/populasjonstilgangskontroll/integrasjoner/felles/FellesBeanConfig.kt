@@ -10,8 +10,7 @@ import org.springframework.context.annotation.Configuration
 class FellesBeanConfig {
 
     @Bean
-    fun caffeine() =Caffeine.newBuilder().recordStats()
-    }
+    fun caffeine() = Caffeine.newBuilder().recordStats()
     @Bean
     fun oAuth2ClientRequestInterceptor(properties: ClientConfigurationProperties, service: OAuth2AccessTokenService) = OAuth2ClientRequestInterceptor(properties, service)
 }

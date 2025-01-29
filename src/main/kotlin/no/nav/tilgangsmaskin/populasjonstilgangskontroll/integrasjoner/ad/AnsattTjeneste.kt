@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.MSGraphConfig.Companion.GRAPH
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
@@ -21,4 +22,7 @@ value class NavId(val verdi: String) {
         require(verdi.first().isUpperCase()) { "Ugyldig første tegn i ident: $verdi, må være stor bokstav" }
     }
 }
-data class AdGruppe(val id: UUID, val name: String)
+data class AdGruppeIder(
+    @JsonProperty("@odata.context") val context: String,
+    val value: List<String>
+)

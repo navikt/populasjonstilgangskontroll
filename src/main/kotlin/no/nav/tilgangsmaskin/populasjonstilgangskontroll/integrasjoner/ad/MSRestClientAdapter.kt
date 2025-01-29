@@ -30,7 +30,7 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val
             .retrieve()
             .onStatus(HttpStatusCode::is2xxSuccessful, ::successHandler)
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
-            .body<List<AdGruppe>>() ?: emptyList()
+            .body<AdGruppeIder>() ?: emptyList<String>()
 }
 
 private data class Request(val securityEnabledOnly: Boolean = true)

@@ -1,5 +1,7 @@
 management:
   health:
+    ssl:
+      enabled: false
     ping:
       enabled: false
     diskspace:
@@ -14,9 +16,9 @@ spring:
   jackson:
     default-property-inclusion: non_null
   cache:
-    cache-names: pdl, skjerming, graph,
+    cache-names: pdl, skjerming, graph
     caffeine:
-      spec: initialCapacity=500,maximumSize=100,expireAfterAccess=30s,recordStats
+      spec: initialCapacity=500,maximumSize=100,expireAfterAccess=30s
 no.nav.security.jwt:
   issuer:
      azuread:

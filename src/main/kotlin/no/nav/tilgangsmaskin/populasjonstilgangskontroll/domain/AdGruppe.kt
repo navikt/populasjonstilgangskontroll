@@ -5,5 +5,4 @@ import java.util.UUID
 
 data class AdGruppeIder(
     @JsonProperty("@odata.context") val context: String,
-                    val value: List<String>
-)
+    val value: List<UUID> = emptyList())

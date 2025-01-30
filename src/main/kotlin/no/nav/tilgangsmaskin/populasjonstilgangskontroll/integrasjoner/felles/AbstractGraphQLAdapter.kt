@@ -16,6 +16,8 @@ import java.util.Locale.getDefault
 
 abstract class AbstractGraphQLAdapter(client: RestClient, cfg: AbstractRestConfig, errorHandler: ErrorHandler,protected val graphQlErrorHandler: GraphQLErrorHandler) : AbstractRestClientAdapter(client, cfg, errorHandler) {
 
+    protected val log = getLogger(AbstractGraphQLAdapter::class.java)
+
     protected inline fun <reified T> query(graphQL: GraphQlClient, query: Pair<String, String>, vars: Map<String, String>) =
         runCatching {
             graphQL
@@ -39,7 +41,7 @@ interface GraphQLErrorHandler {
         }
 
     companion object {
-        val LOG = getLogger(GraphQLErrorHandler::class.java)
+        private val log = getLogger(GraphQLErrorHandler::class.java)
         fun FieldAccessException.oversett(uri: URI) = response.errors.oversett(message, uri)
 
         private fun List<ResponseError>.oversett(message: String?, uri: URI) = oversett(
@@ -47,7 +49,7 @@ interface GraphQLErrorHandler {
             message ?: "Ukjent feil",
             uri)
             .also {
-                LOG.warn("GraphQL oppslag returnerte $size feil, oversatte $message til ${it.javaClass.simpleName}",
+                log.warn("GraphQL oppslag returnerte $size feil, oversatte $message til ${it.javaClass.simpleName}",
                     this)
             }
 

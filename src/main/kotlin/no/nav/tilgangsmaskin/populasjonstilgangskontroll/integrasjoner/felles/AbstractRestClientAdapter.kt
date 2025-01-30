@@ -41,7 +41,7 @@ abstract class AbstractRestClientAdapter(
            // .onStatus(HttpStatusCode::isError, errorHandler::handle)
           //  .onStatus(HttpStatusCode::is2xxSuccessful, ::successHandler)
         return emptyMap<String,String>().also {
-            log.trace("Ping mot {} OK", pingEndpoint())
+            log.trace("PING mot {} OK", pingEndpoint())
         }
     }
 

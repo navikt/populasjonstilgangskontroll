@@ -37,9 +37,7 @@ abstract class AbstractRestClientAdapter(
                     errorHandler.handle(req, res)
                 }
             }
-        return emptyMap<String,String>().also {
-            log.trace("PING mot {} OK", pingEndpoint())
-        }
+        return emptyMap<String,String>()
     }
 
     override fun name() = cfg.name

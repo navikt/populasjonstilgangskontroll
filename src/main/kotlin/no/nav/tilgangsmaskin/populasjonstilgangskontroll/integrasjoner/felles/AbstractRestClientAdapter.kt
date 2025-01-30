@@ -23,7 +23,7 @@ abstract class AbstractRestClientAdapter(
     protected val log = getLogger(AbstractRestClientAdapter::class.java)
 
     protected fun successHandler(req: HttpRequest, res: ClientHttpResponse ) =
-        log.trace("Oppslag mot {} response {}", req.uri, res.statusCode)
+        log.trace("Metode {} mot {} fikk response {}", req.method, req.uri, res.statusCode)
 
     override fun ping(): Map<String, String> {
         pingClient

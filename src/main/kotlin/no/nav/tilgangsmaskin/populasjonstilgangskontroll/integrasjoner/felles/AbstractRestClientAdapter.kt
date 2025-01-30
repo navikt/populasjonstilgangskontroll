@@ -4,7 +4,6 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.ClientHttpResponse

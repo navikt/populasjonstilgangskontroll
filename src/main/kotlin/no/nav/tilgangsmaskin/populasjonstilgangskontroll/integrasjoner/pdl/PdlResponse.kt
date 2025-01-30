@@ -2,9 +2,6 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
 import java.time.LocalDate
 
-data class PdlGraphResponse(val data: HentPerson?, val  errors: List<PdlError>?)
-
-data class HentPerson(val hentPerson: Person?)
 data class Person(
     val adressebeskyttelse: List<Adressebeskyttelse>,
     val navn: List<Navn>,

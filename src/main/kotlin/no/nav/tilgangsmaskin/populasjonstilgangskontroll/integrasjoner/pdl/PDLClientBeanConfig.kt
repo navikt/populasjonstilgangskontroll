@@ -19,7 +19,7 @@ class PDLClientBeanConfig {
 
     @Bean
     @Qualifier(PDL)
-    fun pdlRestClient(b: Builder,cfg: PDLConfig, oAuth2ClientRequestInterceptor: OAuth2ClientRequestInterceptor) =
+    fun pdlRestClient(b: Builder, oAuth2ClientRequestInterceptor: OAuth2ClientRequestInterceptor) =
         b.requestInterceptors {
             it.add(headerAddingRequestInterceptor(BEHANDLINGSNUMMER))
             it.addFirst(oAuth2ClientRequestInterceptor)

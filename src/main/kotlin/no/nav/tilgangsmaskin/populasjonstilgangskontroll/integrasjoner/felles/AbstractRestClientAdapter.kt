@@ -25,16 +25,14 @@ abstract class AbstractRestClientAdapter(
         log.trace("Oppslag mot {} OK", req.uri)
 
     override fun ping(): Map<String, String> {
-        if (isEnabled()) {
-            pingClient
-                .get()
-                .uri(pingEndpoint())
-                .accept(APPLICATION_JSON, TEXT_PLAIN)
-                .retrieve()
-                .onStatus(HttpStatusCode::is2xxSuccessful, ::successHandler)
-                .onStatus(HttpStatusCode::isError, errorHandler::handle)
-            return emptyMap()
-        } else return emptyMap()
+        pingClient
+            .get()
+            .uri(pingEndpoint())
+            .accept(APPLICATION_JSON, TEXT_PLAIN)
+            .retrieve()
+            .onStatus(HttpStatusCode::is2xxSuccessful, ::successHandler)
+            .onStatus(HttpStatusCode::isError, errorHandler::handle)
+        return emptyMap()
     }
 
     override fun name() = cfg.name
@@ -45,7 +43,7 @@ abstract class AbstractRestClientAdapter(
     override fun toString() = "webClient=$restClient, cfg=$cfg, pingClient=$pingClient, baseUri=$baseUri"
 
     companion object {
-        val log = getLogger(AbstractRestClientAdapter::class.java)
+        protected val log = getLogger(AbstractRestClientAdapter::class.java)
 
         fun uri(base : URI, path : String, queryParams : HttpHeaders? = null) = builder(base, path, queryParams).build().toUri()
         private fun builder(base : URI, path : String, queryParams : HttpHeaders?) = UriComponentsBuilder.fromUri(base).pathSegment(path).queryParams(queryParams)

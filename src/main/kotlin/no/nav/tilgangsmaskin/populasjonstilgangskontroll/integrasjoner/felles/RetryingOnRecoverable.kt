@@ -6,10 +6,14 @@ import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
 import java.lang.annotation.Inherited
 import kotlin.reflect.KClass
+import kotlin.annotation.AnnotationTarget.FUNCTION
+import kotlin.annotation.AnnotationTarget.CLASS
+import kotlin.annotation.AnnotationRetention.RUNTIME
 
-@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.RUNTIME)
+@Target(FUNCTION, CLASS)
+@Retention(RUNTIME)
 @Inherited
+@MustBeDocumented
 @Retryable
 annotation class RetryingOnRecoverable(
     @get:AliasFor(annotation = Retryable::class) val value: Array<KClass<out Throwable>> = [RecoverableException::class],

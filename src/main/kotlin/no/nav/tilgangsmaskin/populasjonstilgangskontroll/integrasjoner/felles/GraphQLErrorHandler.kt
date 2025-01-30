@@ -7,6 +7,7 @@ import org.springframework.graphql.ResponseError
 import org.springframework.graphql.client.FieldAccessException
 import org.springframework.graphql.client.GraphQlTransportException
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.*
 import java.net.URI
 import java.util.Locale
 import kotlin.jvm.javaClass
@@ -15,9 +16,9 @@ interface GraphQLErrorHandler {
     fun handle(uri: URI, e: Throwable): Nothing =
         when (e) {
             is FieldAccessException -> throw e.oversett(uri)
-            is GraphQlTransportException -> throw RecoverableException(HttpStatus.INTERNAL_SERVER_ERROR,
+            is GraphQlTransportException -> throw RecoverableException(INTERNAL_SERVER_ERROR,
                 uri, e.message ?: "Transport feil", e)
-            else -> throw IrrecoverableException(HttpStatus.INTERNAL_SERVER_ERROR, uri, e.message, cause = e)
+            else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, uri, e.message, e)
         }
 
     companion object {
@@ -25,7 +26,7 @@ interface GraphQLErrorHandler {
         fun FieldAccessException.oversett(uri: URI) = response.errors.oversett(message, uri)
 
         private fun List<ResponseError>.oversett(message: String?, uri: URI) = oversett(
-            firstOrNull()?.extensions?.get("code")?.toString() ?: HttpStatus.INTERNAL_SERVER_ERROR.name,
+            firstOrNull()?.extensions?.get("code")?.toString() ?: INTERNAL_SERVER_ERROR.name,
             message ?: "Ukjent feil", uri)
             .also {
                 log.warn("GraphQL oppslag returnerte $size feil, oversatte $message til ${it.javaClass.simpleName}", this)

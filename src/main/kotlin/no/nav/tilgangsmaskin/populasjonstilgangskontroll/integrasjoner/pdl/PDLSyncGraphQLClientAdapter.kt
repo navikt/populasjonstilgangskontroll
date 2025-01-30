@@ -31,13 +31,14 @@ class PDLGraphQLClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQl
         return emptyMap()
     }
 
-    fun person(ident: String) = query<Person>(graphQlClient, PERSON_QUERY, mapOf(IDENT to ident))
+    fun person(ident: String) = query<Person>(graphQlClient, PERSON_QUERY, ident(ident))
 
     override fun toString() =
         "${javaClass.simpleName} [restClient=$restClient,graphQlClient=$graphQlClient, cfg=$cfg]"
 
     companion object {
-        private val IDENT = "ident"
+        private fun ident(ident: String) = mapOf(IDENT to ident)
+        private const val IDENT = "ident"
         private val PERSON_QUERY = "query-person" to "hentPerson"
     }
 }

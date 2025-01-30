@@ -15,9 +15,7 @@ import java.net.URI
 import java.util.Locale.getDefault
 
 abstract class AbstractGraphQLAdapter(client: RestClient, cfg: AbstractRestConfig, errorHandler: ErrorHandler,protected val graphQlErrorHandler: GraphQLErrorHandler) : AbstractRestClientAdapter(client, cfg, errorHandler) {
-
-    protected val log = getLogger(AbstractGraphQLAdapter::class.java)
-
+    
     protected inline fun <reified T> query(graphQL: GraphQlClient, query: Pair<String, String>, vars: Map<String, String>) =
         runCatching {
             graphQL

@@ -5,7 +5,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.http.MediaType.TEXT_PLAIN
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.web.client.RestClient
@@ -20,19 +19,22 @@ abstract class AbstractRestClientAdapter(
     private val pingClient: RestClient = restClient,
 ) : Pingable {
 
+    protected val log = getLogger(AbstractRestClientAdapter::class.java)
 
     protected fun successHandler(req: HttpRequest, res: ClientHttpResponse ) =
-        log.trace("Oppslag mot {} OK", req.uri)
+        log.trace("Oppslag mot {} response {}", req.uri, res.statusCode)
 
     override fun ping(): Map<String, String> {
         pingClient
             .get()
             .uri(pingEndpoint())
-            .accept(APPLICATION_JSON, TEXT_PLAIN)
+            .accept(APPLICATION_JSON)
             .retrieve()
             .onStatus(HttpStatusCode::is2xxSuccessful, ::successHandler)
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
-        return emptyMap()
+        return emptyMap<String,String>().also {
+            log.trace("Ping mot {} OK", pingEndpoint())
+        }
     }
 
     override fun name() = cfg.name
@@ -43,7 +45,6 @@ abstract class AbstractRestClientAdapter(
     override fun toString() = "webClient=$restClient, cfg=$cfg, pingClient=$pingClient, baseUri=$baseUri"
 
     companion object {
-        protected val log = getLogger(AbstractRestClientAdapter::class.java)
 
         fun uri(base : URI, path : String, queryParams : HttpHeaders? = null) = builder(base, path, queryParams).build().toUri()
         private fun builder(base : URI, path : String, queryParams : HttpHeaders?) = UriComponentsBuilder.fromUri(base).pathSegment(path).queryParams(queryParams)

@@ -11,7 +11,7 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.RUNTIME)
 @Inherited
 @Retryable
-annotation class RetryableOnRecoverableException(
+annotation class RetryingOnRecoverable(
     @get:AliasFor(annotation = Retryable::class) val value: Array<KClass<out Throwable>> = [RecoverableException::class],
     @get:AliasFor(annotation = Retryable::class) val maxAttempts: Int = 3,
     @get:AliasFor(annotation = Retryable::class) val backoff: Backoff = Backoff(delay = 1000)

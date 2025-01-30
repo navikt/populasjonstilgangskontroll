@@ -30,16 +30,13 @@ abstract class AbstractRestClientAdapter(
             .get()
             .uri(pingEndpoint())
             .accept(APPLICATION_JSON)
-            .exchange { request, response ->
-                if (response.statusCode == HttpStatus.OK) {
-                    log.trace("OK PING")
+            .exchange { req, res ->
+                if (res.statusCode == HttpStatus.OK) {
+                    successHandler(req, res)
                 } else {
-                    errorHandler.handle(request, response)
+                    errorHandler.handle(req, res)
                 }
             }
-           // .retrieve()
-           // .onStatus(HttpStatusCode::isError, errorHandler::handle)
-          //  .onStatus(HttpStatusCode::is2xxSuccessful, ::successHandler)
         return emptyMap<String,String>().also {
             log.trace("PING mot {} OK", pingEndpoint())
         }

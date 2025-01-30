@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
 
 import com.fasterxml.jackson.annotation.JsonValue
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Cluster
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Cluster.Companion.isProd
 
 @JvmInline
 value class Fødselsnummer(@get:JsonValue val verdi: String) {
@@ -16,7 +16,7 @@ value class Fødselsnummer(@get:JsonValue val verdi: String) {
 
     init {
         require(verdi.length == 11) { "Fødselsnummer $verdi er ikke 11 siffer" }
-        if (Cluster.Companion.isProd) {
+        if (isProd) {
             require(mod11(W1, verdi) == verdi[9] - '0') { "Første kontrollsiffer $verdi[9] ikke validert" }
             require(mod11(W2, verdi) == verdi[10] - '0') { "Andre kontrollsiffer $verdi[10] ikke validert" }
         }

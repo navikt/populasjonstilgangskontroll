@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpRequest
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.client.ClientHttpRequestInterceptor
@@ -29,9 +30,16 @@ abstract class AbstractRestClientAdapter(
             .get()
             .uri(pingEndpoint())
             .accept(APPLICATION_JSON)
-            .retrieve()
-            .onStatus(HttpStatusCode::isError, errorHandler::handle)
-            .onStatus(HttpStatusCode::is2xxSuccessful, ::successHandler)
+            .exchange { request, response ->
+                if (response.statusCode == HttpStatus.OK) {
+                    log.trace("OK PING")
+                } else {
+                    errorHandler.handle(request, response)
+                }
+            }
+           // .retrieve()
+           // .onStatus(HttpStatusCode::isError, errorHandler::handle)
+          //  .onStatus(HttpStatusCode::is2xxSuccessful, ::successHandler)
         return emptyMap<String,String>().also {
             log.trace("Ping mot {} OK", pingEndpoint())
         }

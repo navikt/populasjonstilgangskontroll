@@ -22,6 +22,7 @@ class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled:
     fun grupperURI(b: UriBuilder, ansattId: UUID) =
         b.path( GRUPPER_PATH)
             .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
+            .queryParam(PARAM_NAME_TOP, "500") //maks størrelse på svar før paginering må aktiveres
             .build("$ansattId")
 
     companion object {

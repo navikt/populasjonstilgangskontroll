@@ -10,7 +10,7 @@ import java.net.URI
 class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, SKJERMING, enabled) {
 
     fun skjermetUri(b: UriBuilder) = b.path(DEFAULT_SKJERMING_PATH).build().also {
-        log.trace("Skjermet URI: $it")
+        log.trace("Skjermet URI: {}", it)
     }
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"

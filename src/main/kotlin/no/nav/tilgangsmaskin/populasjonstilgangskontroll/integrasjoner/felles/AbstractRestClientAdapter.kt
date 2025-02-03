@@ -40,9 +40,6 @@ abstract class AbstractRestClientAdapter(
 
     companion object {
 
-        fun uri(base : URI, path : String, queryParams : HttpHeaders? = null) = builder(base, path, queryParams).build().toUri()
-        private fun builder(base : URI, path : String, queryParams : HttpHeaders?) = UriComponentsBuilder.fromUri(base).pathSegment(path).queryParams(queryParams)
-
         fun headerAddingRequestInterceptor(vararg verdier : Pair<String, String>) =
             ClientHttpRequestInterceptor { req, b, next ->
                 verdier.forEach { (key, value) -> req.headers.add(key, value) }

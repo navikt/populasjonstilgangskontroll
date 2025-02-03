@@ -3,15 +3,12 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.MSGraphConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.web.util.DefaultUriBuilderFactory
 import org.springframework.web.util.UriBuilder
 import java.net.URI
 import java.util.UUID
 
 @ConfigurationProperties(GRAPH)
 class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
-
-    private val builder = DefaultUriBuilderFactory("$baseUri").builder()
 
     fun userURI( navIdent: String) = userURI(builder, navIdent)
 

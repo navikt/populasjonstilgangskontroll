@@ -10,8 +10,9 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 @Component
-class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val cf: MSGraphConfig, errorHandler: ErrorHandler): AbstractRestClientAdapter(
-    restClient,cf, errorHandler) {
+class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
+                           private val cf: MSGraphConfig,
+                           errorHandler: ErrorHandler): AbstractRestClientAdapter(restClient,cf, errorHandler) {
 
     fun uuidForIdent(ident: String) = get<Any>(cf.userURI(ident))
 

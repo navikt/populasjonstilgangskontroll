@@ -20,7 +20,7 @@ abstract class AbstractRestClientAdapter(
 ) : Pingable {
 
     protected val log = getLogger(AbstractRestClientAdapter::class.java)
-    override fun ping(): Map<String, String> = get<Map<String, String>>(cfg.pingEndpoint,restClient)
+    override fun ping(): Map<String, String> = get<Map<String, String>>(cfg.pingEndpoint,pingClient)
 
     protected inline fun <reified T> get(uri: URI,client: RestClient = restClient) =
         client.get()

@@ -4,13 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.UUID
 import java.net.URI
 
-data class AnsattSineEntraGrupper(
+data class EntraGrupper(
     @JsonProperty("@odata.context") val context: String,
     @JsonProperty("@odata.nextLink") val next: URI? = null,
-
-    val value: List<AdGrupper> = emptyList()
+    val value: List<EntraGruppeInfo> = emptyList()
 )
-data class AdGrupper(
+data class EntraGruppeInfo(
     @JsonProperty("@odata.type") val odataType: String,
     val id: UUID,
     val displayName: String

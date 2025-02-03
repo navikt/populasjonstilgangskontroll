@@ -25,10 +25,9 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val
             .body<Any>() ?: throw RuntimeException("Klarte ikke å hente UUID for navIdent $ident") //
 
     fun hentGrupperForNavIdent(ansattId: UUID) =
-        restClient.post()
+        restClient.get()
             .uri { cf.grupperURI(it,ansattId) }
             .accept(APPLICATION_JSON)
-            .body(Request())
             .retrieve()
             .onStatus(HttpStatusCode::is2xxSuccessful, ::successHandler)
             .onStatus(HttpStatusCode::isError, errorHandler::handle)

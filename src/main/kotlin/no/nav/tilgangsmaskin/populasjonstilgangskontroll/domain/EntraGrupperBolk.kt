@@ -11,8 +11,4 @@ data class EntraGrupperBolk(
     val value: List<EntraGruppe> = emptyList())   {
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class EntraGruppe(val id: UUID, val displayName: String)
-    companion object {
-         val TOM_BOLK  = EntraGrupperBolk()
-    }
-
 }

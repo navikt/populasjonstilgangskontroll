@@ -7,7 +7,6 @@ import java.net.URI
 abstract class AbstractRestConfig(val baseUri: URI, val pingPath: String, val name: String = baseUri.host, val isEnabled: Boolean)  {
 
     protected val builder = DefaultUriBuilderFactory("$baseUri").builder()
-
     protected val log = LoggerFactory.getLogger(javaClass)
 
     val pingEndpoint =   builder.path(pingPath).build()

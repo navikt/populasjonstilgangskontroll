@@ -31,7 +31,7 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val
             .retrieve()
             .onStatus(HttpStatusCode::is2xxSuccessful, ::successHandler)
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
-            .body<AnsattSineEntraGrupper>() ?: AnsattSineEntraGrupper("no ctx")
+            .body<Any>() ?: AnsattSineEntraGrupper("no ctx")
 }
 
 private data class Request(val securityEnabledOnly: Boolean = true)

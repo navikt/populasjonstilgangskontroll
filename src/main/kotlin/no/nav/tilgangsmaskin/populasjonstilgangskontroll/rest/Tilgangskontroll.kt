@@ -53,6 +53,9 @@ class DevController(val pdl : PersonTjeneste, val skjerming: SkjermingTjeneste, 
     @GetMapping(PDL)
     fun hentPerson(fnr: Fødselsnummer) = pdl.hentPerson(fnr)
 
+    @GetMapping("$PDL/gt")
+    fun gt(fnr: Fødselsnummer) = pdl.gt(fnr)
+
     @GetMapping(SKJERMING)
     fun erSkjermet(fnr: Fødselsnummer) = skjerming.erSkjermet(fnr)
 

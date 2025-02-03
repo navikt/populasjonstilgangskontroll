@@ -45,3 +45,10 @@ value class Fødselsnummer(@get:JsonValue val verdi: String) {
     override fun toString() = "${javaClass.simpleName} [fnr=${verdi.partialMask()}]"
 
 }
+@JvmInline
+value class NavId(val verdi: String) {
+    init {
+        require(verdi.length == 7) { "Ugyldig lengde på ident: $verdi" }
+        require(verdi.first().isUpperCase()) { "Ugyldig første tegn i ident: $verdi, må være stor bokstav" }
+    }
+}

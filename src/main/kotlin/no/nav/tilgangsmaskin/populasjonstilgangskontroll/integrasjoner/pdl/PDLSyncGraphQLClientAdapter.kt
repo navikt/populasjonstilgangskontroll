@@ -31,6 +31,8 @@ class PDLGraphQLClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQl
         return emptyMap()
     }
 
+    fun gt(ident: String) = query<Any>(graphQlClient, GT_QUERY, ident(ident))
+
     fun person(ident: String) = query<Person>(graphQlClient, PERSON_QUERY, ident(ident))
 
     override fun toString() =
@@ -40,6 +42,8 @@ class PDLGraphQLClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQl
         private fun ident(ident: String) = mapOf(IDENT to ident)
         private const val IDENT = "ident"
         private val PERSON_QUERY = "query-person" to "hentPerson"
+        private val GT_QUERY = "query-gt" to "hentGeografiskTilknytning"
+
     }
 }
 

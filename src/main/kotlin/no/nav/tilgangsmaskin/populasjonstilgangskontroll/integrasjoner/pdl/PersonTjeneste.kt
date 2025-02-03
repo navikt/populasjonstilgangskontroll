@@ -11,4 +11,5 @@ import org.springframework.stereotype.Service
 @RetryingOnRecoverable
 class PersonTjeneste(private val adapter: PDLGraphQLClientAdapter) {
     fun hentPerson(fnr: Fødselsnummer) = adapter.person(fnr.verdi)
+    fun gt(fnr: Fødselsnummer) = adapter.gt(fnr.verdi)
 }

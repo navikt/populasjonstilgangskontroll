@@ -32,14 +32,14 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
             .body<EntraGrupperBolk>() ?: EntraGrupperBolk()
-             val l = bolk.value.toMutableList()
-             log.info("Grupper for ansatt $ansattId: $l")
+             val grupper = bolk.value.toMutableList()
+             log.info("Grupper for ansatt $ansattId: $grupper")
              while (bolk.next != null) {
                  bolk = neste(bolk.next)
-                 l.addAll(bolk.value)
-                 log.info("page Grupper for ansatt $ansattId: $l")
+                 grupper += bolk.value
+                 log.info("${grupper.size} page for ansatt $ansattId: $grupper")
              }
-             return l
+             return grupper
     }
 
     private fun neste(uri:URI): EntraGrupperBolk {

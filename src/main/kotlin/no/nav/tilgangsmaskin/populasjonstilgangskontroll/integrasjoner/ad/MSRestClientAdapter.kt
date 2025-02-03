@@ -21,16 +21,6 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val
 
     fun uuidForIdent(ident: String) = get<Any>(cf.userURI(ident))
 
-    private fun grupperForUUIDOld(ansattId: UUID): List<EntraGruppe> {
-        var bolk = get<EntraGrupperBolk>(cf.grupperURI(ansattId))
-        val grupper = bolk.value.toMutableList()
-        while (bolk.next != null) {
-            bolk = get<EntraGrupperBolk>(bolk.next)
-            grupper += bolk.value
-        }
-        return grupper
-    }
-
     fun grupperForUUID(ansattId: UUID) =
         generateSequence(get<EntraGrupperBolk>(cf.grupperURI(ansattId))) {
             it.next?.let {

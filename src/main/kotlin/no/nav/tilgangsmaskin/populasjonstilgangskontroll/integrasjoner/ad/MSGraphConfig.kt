@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.MSGraphConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.web.util.DefaultUriBuilderFactory
 import org.springframework.web.util.UriBuilder
 import java.net.URI
 import java.util.UUID
@@ -12,14 +13,18 @@ class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled:
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
-    fun userURI(b: UriBuilder, navIdent: String) =
+    fun userURI( navIdent: String) =userURI(DefaultUriBuilderFactory(baseUri.toString()).builder(), navIdent)
+
+    private fun userURI(b: UriBuilder, navIdent: String) =
         b.path(USERS_PATH)
             .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_USER)
             .queryParam(PARAM_NAME_FILTER, "onPremisesSamAccountName eq '$navIdent'")
             .queryParam(PARAM_NAME_COUNT, "true")
             .build()
 
-    fun grupperURI(b: UriBuilder, ansattId: UUID) =
+    fun grupperURI(ansattId: UUID) = grupperURI(DefaultUriBuilderFactory(baseUri.toString()).builder(), ansattId)
+
+    private fun grupperURI(b: UriBuilder, ansattId: UUID) =
         b.path( GRUPPER_PATH)
             .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
             .queryParam(PARAM_NAME_TOP, "5")

@@ -22,7 +22,7 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val
             .retrieve()
             .onStatus(HttpStatusCode::is2xxSuccessful, ::successHandler)
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
-            .body<EntraGrupper>() ?: throw RuntimeException("Klarte ikke å hente UUID for navIdent $ident") //
+            .body<Any>() ?: throw RuntimeException("Klarte ikke å hente UUID for navIdent $ident") //
 
     fun hentGrupperForNavIdent(ansattId: UUID) =
         restClient.get()
@@ -31,7 +31,7 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val
             .retrieve()
             .onStatus(HttpStatusCode::is2xxSuccessful, ::successHandler)
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
-            .body<Any>() ?: EntraGrupper("no ctx")
+            .body<EntraGrupper>() ?: EntraGrupper("no ctx")
 }
 
 private data class Request(val securityEnabledOnly: Boolean = true)

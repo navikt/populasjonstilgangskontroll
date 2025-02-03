@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AdGruppeIder
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattSineEntraGrupper
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.MSGraphConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
@@ -31,7 +31,7 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val
             .retrieve()
             .onStatus(HttpStatusCode::is2xxSuccessful, ::successHandler)
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
-            .body<AdGruppeIder>() ?: AdGruppeIder("no ctx")
+            .body<AnsattSineEntraGrupper>() ?: AnsattSineEntraGrupper("no ctx")
 }
 
 private data class Request(val securityEnabledOnly: Boolean = true)

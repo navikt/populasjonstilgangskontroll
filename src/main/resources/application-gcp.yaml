@@ -64,4 +64,4 @@ skjerming:
   scope: "api://${nais.cluster.type}-gcp.nom.skjermede-personer-pip/.default"
 graph:
   scope: https://graph.microsoft.com/.default
-  base-uri: https://graph.microsoft.com/v1.0
+  base-uri: https://graph.microsoft.com/v1.0/

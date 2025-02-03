@@ -35,7 +35,7 @@ class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled:
         private const val PARAM_VALUE_SELECT_USER: String =
             "id,onPremisesSamAccountName,displayName,givenName,surname,streetAddress"
         private const val PARAM_VALUE_SELECT_GROUPS: String = "id,displayName"
-        private const val DEFAULT_PING_PATH = "organization"
+        private const val DEFAULT_PING_PATH = "/organization"
         private const val PARAM_NAME_TOP = "\$top"
     }
 }

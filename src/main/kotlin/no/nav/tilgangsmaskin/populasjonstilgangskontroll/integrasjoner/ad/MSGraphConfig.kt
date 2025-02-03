@@ -21,6 +21,7 @@ class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled:
 
     fun grupperURI(b: UriBuilder, ansattId: UUID) =
         b.path( GRUPPER_PATH)
+            .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
             .build("$ansattId")
 
     companion object {
@@ -34,7 +35,7 @@ class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled:
         private const val PARAM_NAME_FILTER: String = "\$filter"
         private const val PARAM_NAME_COUNT: String = "\$count"
         private const val PARAM_VALUE_SELECT_USER: String = "id,onPremisesSamAccountName,displayName,givenName,surname,streetAddress"
-        private const val PARAM_VALUE_SELECT_GROUPS: String = "id"
+        private const val PARAM_VALUE_SELECT_GROUPS: String = "id, displayName"
         private const val DEFAULT_PING_PATH = "organization"
         private const val PARAM_NAME_TOP = "\$top"
     }

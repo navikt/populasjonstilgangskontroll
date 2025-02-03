@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.MSGraphConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.web.util.UriBuilder
 import java.net.URI
 import java.util.UUID
 
@@ -11,13 +10,13 @@ import java.util.UUID
 class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) :
     AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
 
-    fun userURI(navIdent: String) = builder.path(USERS_PATH)
+    fun userURI(navIdent: String) = builder().path(USERS_PATH)
         .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_USER)
         .queryParam(PARAM_NAME_FILTER, "onPremisesSamAccountName eq '$navIdent'")
         .queryParam(PARAM_NAME_COUNT, "true")
         .build()
 
-    fun grupperURI(ansattId: UUID) = builder.path(GRUPPER_PATH)
+    fun grupperURI(ansattId: UUID) = builder().path(GRUPPER_PATH)
         .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
         .queryParam(PARAM_NAME_TOP, "5")
         .build("$ansattId")

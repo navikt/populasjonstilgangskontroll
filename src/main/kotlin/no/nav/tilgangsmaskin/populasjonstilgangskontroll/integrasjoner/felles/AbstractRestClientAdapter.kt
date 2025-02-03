@@ -9,7 +9,6 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
-import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 
 abstract class AbstractRestClientAdapter(

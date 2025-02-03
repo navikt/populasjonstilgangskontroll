@@ -31,7 +31,7 @@ class PDLGraphQLClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQl
         return emptyMap()
     }
 
-    fun gt(ident: String) = query<Any>(graphQlClient, GT_QUERY, ident(ident))
+    fun gt(ident: String) = query<GTRespons>(graphQlClient, GT_QUERY, ident(ident))
 
     fun person(ident: String) = query<Person>(graphQlClient, PERSON_QUERY, ident(ident))
 

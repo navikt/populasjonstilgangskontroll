@@ -46,6 +46,7 @@ dependencies {
     // Align versions of all Kotlin components
 
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
+    implementation("com.neovisionaries:nv-i18n:1.28")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework:spring-aspects")
     implementation("org.springframework.retry:spring-retry")

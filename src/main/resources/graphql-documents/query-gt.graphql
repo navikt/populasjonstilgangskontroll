@@ -4,6 +4,5 @@ query($ident: ID!){
             gtKommune
             gtBydel
             gtLand
-            regel
     }
 }

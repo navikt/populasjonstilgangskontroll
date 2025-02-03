@@ -1,12 +1,12 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpRequest
-import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.client.ClientHttpRequestInterceptor
-import org.springframework.http.client.ClientHttpResponse
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.util.UriComponentsBuilder
@@ -20,24 +20,16 @@ abstract class AbstractRestClientAdapter(
 ) : Pingable {
 
     protected val log = getLogger(AbstractRestClientAdapter::class.java)
+    override fun ping(): Map<String, String> = get<Map<String, String>>(cfg.pingEndpoint,restClient)
 
-    protected fun successHandler(req: HttpRequest, res: ClientHttpResponse ) =
-        log.trace("Metode {} mot {} fikk response {}", req.method, req.uri, res.statusCode)
-
-    override fun ping(): Map<String, String> {
-        pingClient
-            .get()
-            .uri(pingEndpoint())
+    protected inline fun <reified T> get(uri: URI,client: RestClient = restClient) =
+        client.get()
+            .uri(uri)
             .accept(APPLICATION_JSON)
-            .exchange { req, res ->
-                if (res.statusCode == HttpStatus.OK) {
-                    successHandler(req, res)
-                } else {
-                    errorHandler.handle(req, res)
-                }
-            }
-        return emptyMap<String,String>()
-    }
+            .retrieve()
+            .onStatus(HttpStatusCode::isError, errorHandler::handle)
+            .body(T::class.java) ?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, uri)
+
 
     override fun name() = cfg.name
     protected val baseUri = cfg.baseUri

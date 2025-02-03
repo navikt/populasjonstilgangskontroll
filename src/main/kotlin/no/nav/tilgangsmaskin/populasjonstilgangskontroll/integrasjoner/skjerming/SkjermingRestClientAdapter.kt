@@ -22,7 +22,6 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
             .accept(APPLICATION_JSON)
             .body(mapOf(IDENT to ident))
             .retrieve()
-            .onStatus(HttpStatusCode::is2xxSuccessful, ::successHandler)
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
             .body<Any>() ?: throw RuntimeException("Ingen respons fra skjermet oppslag mot ${cf::skjermetUri}")
     }

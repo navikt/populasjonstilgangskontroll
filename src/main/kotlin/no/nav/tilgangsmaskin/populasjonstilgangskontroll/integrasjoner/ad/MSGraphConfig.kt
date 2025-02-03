@@ -11,9 +11,9 @@ import java.util.UUID
 @ConfigurationProperties(GRAPH)
 class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
 
-    override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
+    private val builder = DefaultUriBuilderFactory("$baseUri").builder()
 
-    fun userURI( navIdent: String) =userURI(DefaultUriBuilderFactory(baseUri.toString()).builder(), navIdent)
+    fun userURI( navIdent: String) = userURI(builder, navIdent)
 
     private fun userURI(b: UriBuilder, navIdent: String) =
         b.path(USERS_PATH)
@@ -22,7 +22,7 @@ class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled:
             .queryParam(PARAM_NAME_COUNT, "true")
             .build()
 
-    fun grupperURI(ansattId: UUID) = grupperURI(DefaultUriBuilderFactory(baseUri.toString()).builder(), ansattId)
+    fun grupperURI(ansattId: UUID) = grupperURI(builder, ansattId)
 
     private fun grupperURI(b: UriBuilder, ansattId: UUID) =
         b.path( GRUPPER_PATH)
@@ -30,13 +30,13 @@ class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled:
             .queryParam(PARAM_NAME_TOP, "5")
             .build("$ansattId")
 
+    override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
+
     companion object {
         val HEADER_CONSISTENCY_LEVEL = "ConsistencyLevel" to "eventual"
         const val GRAPH = "graph"
         private const val USERS_PATH: String = "/users"
         private const val GRUPPER_PATH = "/users/{ansattId}/memberOf"
-        private const val ME_PATH: String = "/me"
-        private const val MEMBER_OF_PATH: String = "/memberOf"
         private const val PARAM_NAME_SELECT: String = "\$select"
         private const val PARAM_NAME_FILTER: String = "\$filter"
         private const val PARAM_NAME_COUNT: String = "\$count"

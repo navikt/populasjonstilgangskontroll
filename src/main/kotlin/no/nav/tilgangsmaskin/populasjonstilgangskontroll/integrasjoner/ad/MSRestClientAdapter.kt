@@ -11,6 +11,7 @@ import org.springframework.web.client.body
 import org.springframework.http.HttpStatusCode
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
+import java.net.URI
 
 @Component
 class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val cf: MSGraphConfig, errorHandler: ErrorHandler): AbstractRestClientAdapter(
@@ -20,18 +21,32 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, private val
             .uri { cf.userURI(it, ident) }
             .accept(APPLICATION_JSON)
             .retrieve()
-            .onStatus(HttpStatusCode::is2xxSuccessful, ::successHandler)
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
             .body<Any>() ?: throw RuntimeException("Klarte ikke å hente UUID for navIdent $ident") //
 
-    fun hentGrupperForNavIdent(ansattId: UUID) =
-        restClient.get()
+    fun grupperForNavIdent(ansattId: UUID) {
+        var grupper = restClient.get()
             .uri { cf.grupperURI(it,ansattId) }
             .accept(APPLICATION_JSON)
             .retrieve()
-            .onStatus(HttpStatusCode::is2xxSuccessful, ::successHandler)
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
             .body<EntraGrupper>() ?: EntraGrupper()
-}
+             val l = grupper.value.toMutableList()
+             log.info("Grupper for ansatt $ansattId: $l")
+             while (grupper.next != null) {
+                 grupper = neste(grupper.next)
+                 l.addAll(grupper.value)
+                 log.info("page Grupper for ansatt $ansattId: $l")
 
-private data class Request(val securityEnabledOnly: Boolean = true)
+             }
+    }
+
+    private fun neste(uri:URI): EntraGrupper {
+        return restClient.get()
+            .uri(uri)
+            .accept(APPLICATION_JSON)
+            .retrieve()
+            .onStatus(HttpStatusCode::isError, errorHandler::handle)
+            .body<EntraGrupper>() ?: EntraGrupper()
+    }
+}

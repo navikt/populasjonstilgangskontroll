@@ -12,6 +12,6 @@ class AnsattTjeneste(private val adapter: MSRestClientAdapter) {
 
     fun ansattAzureId(ident: NavId) = adapter.hentUUIDforNavIdent(ident.verdi)
 
-    fun ansattTilganger(azureIdent: UUID) = adapter.hentGrupperForNavIdent(azureIdent)
+    fun ansattTilganger(azureIdent: UUID) = adapter.grupperForNavIdent(azureIdent)
 }
 

@@ -6,6 +6,7 @@ import org.springframework.boot.actuate.info.Info.Builder
 import org.springframework.core.SpringVersion
 import org.springframework.boot.SpringBootVersion
 import org.springframework.stereotype.Component
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter

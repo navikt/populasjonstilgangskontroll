@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Cluster.Companion.isProd
 
 @JvmInline
-value class Fødselsnummer(@get:JsonValue val verdi: String) {
+value class Fødselsnummer(@JsonValue val verdi: String) {
 
     enum class Type { DNR, FNR, TENOR }
 
@@ -49,7 +49,7 @@ value class Fødselsnummer(@get:JsonValue val verdi: String) {
 
 }
 @JvmInline
-value class NavId(val verdi: String) {
+value class NavId(@JsonValue val verdi: String) {
     init {
         with(verdi) {
             require(length == 7) { "Ugyldig lengde $length for $this, forventet 7" }

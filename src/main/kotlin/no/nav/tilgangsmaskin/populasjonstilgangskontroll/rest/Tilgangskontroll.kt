@@ -27,7 +27,7 @@ class Tilgangskontroll(val service : TilgangsTjeneste) {
 class DevController(val pdl : PersonTjeneste, val skjerming: SkjermingTjeneste, val ansatt: AnsattTjeneste, val tjeneste: TilgangsTjeneste)
 {
     @GetMapping(PDL)
-    fun hentPerson(fnr: Fødselsnummer) = pdl.hentPerson(fnr)
+    fun hentPerson(fnr: Fødselsnummer) = pdl.kandidat(fnr)
 
     @GetMapping("$PDL/gt")
     fun gt(fnr: Fødselsnummer) = pdl.gt(fnr)

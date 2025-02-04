@@ -10,5 +10,5 @@ data class EntraGrupperBolk(
     @JsonProperty("@odata.nextLink") val next: URI? = null,
     val value: List<EntraGruppe> = emptyList())   {
     @JsonIgnoreProperties(ignoreUnknown = true)
-    data class EntraGruppe(val id: UUID, val displayName: String)
+    data class EntraGruppe(val id: UUID, val gruppeNavn: String)
 }

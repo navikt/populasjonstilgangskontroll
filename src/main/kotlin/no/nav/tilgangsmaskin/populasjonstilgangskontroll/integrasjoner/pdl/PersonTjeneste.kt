@@ -10,6 +10,6 @@ import org.springframework.stereotype.Service
 @Cacheable(PDL)
 @RetryingOnRecoverable
 class PersonTjeneste(private val adapter: PDLGraphQLClientAdapter) {
-    fun hentPerson(fnr: Fødselsnummer) = adapter.person(fnr.verdi)
+    fun kandidat(fnr: Fødselsnummer) = adapter.person(fnr.verdi)
     fun gt(fnr: Fødselsnummer) = adapter.gt(fnr.verdi)
 }

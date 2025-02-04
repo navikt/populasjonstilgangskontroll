@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractGraphQLAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.GraphQLErrorHandler
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLConfig.Companion.PDL
@@ -32,8 +33,9 @@ class PDLGraphQLClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQl
 
     fun gt(ident: String) = query<GTRespons>(graphQlClient, GT_QUERY, ident(ident))
 
-    fun person(ident: String) = query<Person>(graphQlClient, PERSON_QUERY, ident(ident))
+    fun person(ident: String) = query<Person>(graphQlClient, PERSON_QUERY, ident(ident)).mapToKandidat(ident)
 
+    fun Person.mapToKandidat(fnr: String) = PersonMapper.mapToKandidat(Fødselsnummer(fnr), this)
     override fun toString() =
         "${javaClass.simpleName} [restClient=$restClient,graphQlClient=$graphQlClient, cfg=$cfg]"
 

@@ -10,6 +10,12 @@ import java.util.*
 @Cacheable(GRAPH)
 class AnsattTjeneste(private val adapter: MSRestClientAdapter) {
 
+    fun saksbehandler(ident: NavId) : Saksbehandler {
+        val uuid = adapter.uuidForIdent(ident.verdi)
+        val tilganger = adapter.grupperForUUID(uuid)
+        return Saksbehandler(ident, uuid,tilganger)
+    }
+
     fun ansattAzureId(ident: NavId) = adapter.uuidForIdent(ident.verdi)
 
     fun ansattTilganger(azureIdent: UUID) = adapter.grupperForUUID(azureIdent)

@@ -13,7 +13,7 @@ abstract class AbstractGraphQLAdapter(client: RestClient, cfg: AbstractRestConfi
                 .variables(vars)
                 .executeSync()
                 .field(query.second)
-                .toEntity(T::class.java)
+                .toEntity(T::class.java) ?: throw IllegalStateException("Fant ikke feltet ${query.second} i responsen") // TODO bedre exception
         }.getOrElse {
             log.warn("Feil ved oppslag av {}", T::class.java.simpleName, it)
             graphQlErrorHandler.handle(cfg.baseUri, it)

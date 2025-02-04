@@ -27,11 +27,7 @@ value class Fødselsnummer(@JsonValue val verdi: String) {
 
     companion object {
 
-        private fun String.partialMask(mask: Char = '*'): String {
-            val start = length.div(2)
-            return replaceRange(start + 1, length, mask.toString().repeat(length - start - 1))
-        }
-
+        private fun String.partialMask()= replaceRange(length - 5, length, "*****")
         private val W1 = intArrayOf(2, 5, 4, 9, 8, 1, 6, 7, 3)
         private val W2 = intArrayOf(2, 3, 4, 5, 6, 7, 2, 3, 4, 5)
 

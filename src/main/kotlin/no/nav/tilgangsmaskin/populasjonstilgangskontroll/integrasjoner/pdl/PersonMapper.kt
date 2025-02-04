@@ -7,8 +7,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.FortroligeGrupp
 object PersonMapper {
     fun mapToKandidat(fnr: Fødselsnummer,person: Person): Kandidat {
         val beskyttelse = when {
-            person.adressebeskyttelse.any { it.gradering == STRENGT_FORTROLIG  }-> FortroligeGrupper.STRENGT_FORTROLIG
-            person.adressebeskyttelse.any { it.gradering == STRENGT_FORTROLIG_UTLAND  }-> FortroligeGrupper.STRENGT_FORTROLIG_UTLAND
+            person.adressebeskyttelse.any { it.gradering in listOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND) } -> FortroligeGrupper.STRENGT_FORTROLIG
             person.adressebeskyttelse.any { it.gradering == FORTROLIG } -> FortroligeGrupper.FORTROLIG
             else -> null
         }

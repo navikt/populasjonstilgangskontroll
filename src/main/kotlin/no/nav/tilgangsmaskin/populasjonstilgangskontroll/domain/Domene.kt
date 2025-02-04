@@ -27,7 +27,6 @@ value class Fødselsnummer(@JsonValue val verdi: String) {
 
     companion object {
 
-        private fun String.partialMask()= replaceRange(length - 5, length, "*****")
         private val W1 = intArrayOf(2, 5, 4, 9, 8, 1, 6, 7, 3)
         private val W2 = intArrayOf(2, 3, 4, 5, 6, 7, 2, 3, 4, 5)
 
@@ -41,7 +40,8 @@ value class Fødselsnummer(@JsonValue val verdi: String) {
             }
     }
 
-    override fun toString() = "${javaClass.simpleName} [fnr=${verdi.partialMask()}]"
+    override fun toString() =
+        "${javaClass.simpleName} [fnr=${verdi.replaceRange(verdi.length - 5, verdi.length, "*****")}]"
 
 }
 @JvmInline

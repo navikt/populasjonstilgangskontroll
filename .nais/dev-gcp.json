@@ -1,5 +1,4 @@
 {
-  "tenant": "trygdeetaten.no",
   "ingress": "https://tilgangsmaskin.intern.dev.nav.no",
   "pdl": "pdl-api.dev-fss-pub.nais.io",
   "nais": {

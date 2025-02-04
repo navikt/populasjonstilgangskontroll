@@ -21,5 +21,7 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
             it.next?.let {
                 get<EntraGrupperBolk>(it)
             }
-        }.flatMap { it.value }.toList()
+        }.flatMap {
+            it.value
+        }.toList()
    }

@@ -23,6 +23,26 @@ class DefaultTilgangsTjeneste(private val pdl: PersonTjeneste, private val entra
         if (fortrolig utland %% !GA - STRENGT_FORTROLIG_ADRESSE) avslå
         if (skjerming && !GA-EGNE_ANSATTE) avslå
     }*/
+        /**
+        Prioritert utslagskriterier:
+        Harde regler:
+         Kode 6: Strengt fortrolig adresse
+         Kode 19: trengt fortrolig adresse utland
+         Kode 7 : Fortrolig adresse
+         Egen ansatt: Skjerming
+        Familie: (mangler datasettene for dette)
+        Verge: (ikkje implementert og mangler datasettene for dette)
+        Oppslag på egen person :(mangler datasettene for dette) (hovuddel vil håndters via skjerming, men avskjermede ansatte dekkes ikkje av skjerming)
+
+        Overstyrbare regler:
+         Geogrfisk tilgang: (Mangler datasettene for dette)
+
+
+
+
+        **/
+
+
         return TilgangsRespons(kandidat, saksbehandler,true, null)
     }
     fun avslå(saksbehandler: NavId, kandidat: Fødselsnummer) =

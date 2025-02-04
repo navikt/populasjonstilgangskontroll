@@ -16,7 +16,7 @@ class DefaultTilgangsTjeneste(private val pdl: PersonTjeneste, private val entra
         val saksbehandler = entra.saksbehandler(saksbehandlerId)
 
         if (kandidat.erStrengtFortrolig && !saksbehandler.kanBehandleStrengtFortrolig)
-            return respons(saksbehandler.ident,kandidat.ident,false)
+            return respons(saksbehandlerId,kandidatId,false)
 
       /*  if (fortrolig && !FORTROLIG_ADRESSE) avslå
         if (fortrolig utland %% !GA - STRENGT_FORTROLIG_ADRESSE) avslå

@@ -28,7 +28,6 @@ abstract class AbstractRestClientAdapter(
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
             .body(T::class.java) ?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, uri)
 
-
     protected inline fun <reified T> post(uri: URI, body: Any) =
         restClient
             .post()

@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableException
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -29,6 +28,16 @@ abstract class AbstractRestClientAdapter(
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
             .body(T::class.java) ?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, uri)
 
+
+    protected inline fun <reified T> post(uri: URI, body: Any) =
+        restClient
+            .post()
+            .uri(uri)
+            .accept(APPLICATION_JSON)
+            .body(body)
+            .retrieve()
+            .onStatus(HttpStatusCode::isError, errorHandler::handle)
+            .body(T::class.java) ?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, uri)
 
     override fun name() = cfg.name
     protected val baseUri = cfg.baseUri

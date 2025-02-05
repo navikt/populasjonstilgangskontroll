@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 @Service
 class DefaultTilgangsTjeneste(private val pdl: PersonTjeneste, private val entra: AnsattTjeneste, private val skjerming: SkjermingTjeneste) : TilgangsTjeneste{
     override fun harTilgang(saksbehandlerId: NavId, kandidatId: Fødselsnummer): TilgangsRespons {
-
+/*
         val kandidat = pdl.kandidat(kandidatId)
         val saksbehandler = entra.saksbehandler(saksbehandlerId)
 
@@ -35,8 +35,8 @@ class DefaultTilgangsTjeneste(private val pdl: PersonTjeneste, private val entra
         Overstyrbare regler:
         Geogrfisk tilgang: (Mangler datasettene for dette)
          **/
-
-        return respons(saksbehandler.ident,kandidat.ident,true)
+*/
+        return respons(saksbehandlerId,kandidatId,true)
 
     }
     fun respons(saksbehandler: NavId, kandidat: Fødselsnummer, tilgang: Boolean) =

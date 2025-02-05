@@ -11,12 +11,12 @@ import java.util.*
 class AnsattTjeneste(private val adapter: MSRestClientAdapter) {
 
     fun saksbehandler(ident: NavId) : Saksbehandler {
-       // val uuid = adapter.uuidForIdent(ident.verdi)
-        //val tilganger = adapter.grupperForUUID(uuid)
-        return Saksbehandler(ident, UUID.randomUUID(),emptyList())
+        val attributter = adapter.attributterForIdent(ident.verdi)
+        val tilganger = adapter.grupperForUUID(attributter.id)
+        return Saksbehandler(ident, attributter.id ,tilganger)
     }
 
-    fun ansattAzureId(ident: NavId) = adapter.uuidForIdent(ident.verdi)
+    fun ansattAzureId(ident: NavId) = adapter.attributterForIdent(ident.verdi)
 
     fun ansattTilganger(azureIdent: UUID) = adapter.grupperForUUID(azureIdent)
 }

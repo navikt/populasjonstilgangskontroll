@@ -15,7 +15,7 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
                            private val cf: MSGraphConfig,
                            errorHandler: ErrorHandler): AbstractRestClientAdapter(restClient,cf, errorHandler) {
 
-    fun uuidForIdent(ident: String) = get<MSGraphSaksbehandlerResponse>(cf.userURI(ident))
+    fun attributterForIdent(ident: String) = get<MSGraphSaksbehandlerResponse>(cf.userURI(ident)).attributter.first()
 
     fun grupperForUUID(ansattId: UUID) =
         generateSequence(get<EntraGrupperBolk>(cf.grupperURI(ansattId))) {

@@ -21,6 +21,6 @@ data class MSGraphSaksbehandlerResponse(@JsonProperty("value") val attributter: 
         val displayName: String,
         val givenName: String,
         val surname: String,
-        val streetAddress: String
+        val streetAddress: Enhetsnummer
     )
 }

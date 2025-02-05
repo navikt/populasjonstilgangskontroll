@@ -15,7 +15,7 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
                            private val cf: MSGraphConfig,
                            errorHandler: ErrorHandler): AbstractRestClientAdapter(restClient,cf, errorHandler) {
 
-    fun attributterForIdent(ident: String) = get<MSGraphSaksbehandlerResponse>(cf.userURI(ident)).attributter.first()
+    fun attributterForIdent(ident: String) = get<MSGraphSaksbehandlerResponse>(cf.userURI(ident)).mapTo()
 
     fun grupperForUUID(ansattId: UUID) =
         generateSequence(get<EntraGrupperBolk>(cf.grupperURI(ansattId))) {
@@ -25,4 +25,7 @@ class  MSRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
         }.flatMap {
             it.value
         }.toList()
-   }
+
+    private fun MSGraphSaksbehandlerResponse.mapTo() = EntraReeponsMapper.mapAttributter(attributter.first())
+
+}

@@ -44,6 +44,17 @@ value class Fødselsnummer(@JsonValue val verdi: String) {
         "${javaClass.simpleName} [fnr=${verdi.replaceRange(verdi.length - 5, verdi.length, "*****")}]"
 
 }
+
+@JvmInline
+value class Enhetsnummer(@JsonValue val verdi: String) {
+    init {
+        with(verdi) {
+            require(length == 4) { "Ugyldig lengde $length for $this, forventet 9" }
+            require(all { it.isDigit()}) { "Ugyldig(e) tegn i $this, forventet kun tall" }
+        }
+    }
+
+}
 @JvmInline
 value class NavId(@JsonValue val verdi: String) {
     init {

@@ -12,8 +12,8 @@ class AnsattTjeneste(private val adapter: MSRestClientAdapter) {
 
     fun saksbehandler(ident: NavId) : Saksbehandler {
         val attributter = adapter.attributterForIdent(ident.verdi)
-        val tilganger = adapter.grupperForUUID(attributter.id)
-        return Saksbehandler(ident, attributter.id ,tilganger)
+        val grupper = adapter.grupperForUUID(attributter.id)
+        return Saksbehandler(attributter,grupper)
     }
 
     fun ansattAzureId(ident: NavId) = adapter.attributterForIdent(ident.verdi)

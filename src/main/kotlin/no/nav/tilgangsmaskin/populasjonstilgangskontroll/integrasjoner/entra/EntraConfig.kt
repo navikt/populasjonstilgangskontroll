@@ -18,6 +18,7 @@ class EntraConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: B
 
     fun grupperURI(ansattId: UUID) = builder().path(GRUPPER_PATH)
         .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
+        .queryParam(PARAM_NAME_COUNT, "true")
         .queryParam(PARAM_NAME_TOP, "5")
         .build("$ansattId")
 

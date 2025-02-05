@@ -12,3 +12,15 @@ data class EntraGrupperBolk(
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class EntraGruppe(val id: UUID, val gruppeNavn: String)
 }
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class MSGraphSaksbehandlerResponse(@JsonProperty("value") val attributter: List<MSGraphSaksbehandlerAttributter>)  {
+    data class MSGraphSaksbehandlerAttributter(
+        val id: UUID,
+        val onPremisesSamAccountName: NavId,
+        val displayName: String,
+        val givenName: String,
+        val surname: String,
+        val streetAddress: String
+    )
+}

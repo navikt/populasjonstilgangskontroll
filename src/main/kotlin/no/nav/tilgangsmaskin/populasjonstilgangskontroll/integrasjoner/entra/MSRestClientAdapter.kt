@@ -1,8 +1,8 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.EntraGrupperBolk
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.MSGraphSaksbehandlerResponse
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.MSGraphConfig.Companion.GRAPH
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.MSGraphConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.web.client.RestClient

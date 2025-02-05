@@ -1,7 +1,7 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.MSGraphSaksbehandlerResponse.MSGraphSaksbehandlerAttributter
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.Saksbehandler.SaksbehandlerAttributter
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.Saksbehandler.SaksbehandlerAttributter
 
 object EntraReeponsMapper {
         fun mapAttributter(respons: MSGraphSaksbehandlerAttributter)=

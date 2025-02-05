@@ -1,6 +1,6 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.MSGraphConfig.Companion.GRAPH
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.MSGraphConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI

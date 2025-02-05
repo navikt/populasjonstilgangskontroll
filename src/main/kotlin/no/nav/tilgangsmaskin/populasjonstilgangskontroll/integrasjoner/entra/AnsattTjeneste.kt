@@ -1,7 +1,7 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.MSGraphConfig.Companion.GRAPH
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.MSGraphConfig.Companion.GRAPH
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import java.util.*

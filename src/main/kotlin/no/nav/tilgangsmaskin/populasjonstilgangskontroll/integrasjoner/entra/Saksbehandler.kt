@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Enhetsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.EntraGrupperBolk.EntraGruppe

@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.security.token.support.spring.UnprotectedRestController
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.AnsattTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PersonTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste

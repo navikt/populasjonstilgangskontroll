@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.service
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.ad.AnsattTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PersonTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangsRespons.Begrunnelse

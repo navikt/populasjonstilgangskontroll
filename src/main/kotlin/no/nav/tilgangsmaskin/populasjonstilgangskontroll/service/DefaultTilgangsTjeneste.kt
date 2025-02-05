@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.service
 
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.FortroligGruppe.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.AnsattTjeneste
@@ -15,9 +16,11 @@ class DefaultTilgangsTjeneste(private val pdl: PersonTjeneste, private val entra
         val kandidat = pdl.kandidat(kandidatId)
         val saksbehandler = entra.saksbehandler(saksbehandlerId)
 
-        if (kandidat.erStrengtFortrolig && !saksbehandler.kanBehandle(FortroligeGrupper.STRENGT_FORTROLIG))  {
+        if (kandidat.krevergGruppe(STRENGT_FORTROLIG) && !saksbehandler.kanBehandle(STRENGT_FORTROLIG))  {
             return respons(saksbehandlerId,kandidatId,false)
         }
+
+
         return respons(saksbehandlerId,kandidatId,true)
 
       /*  if (fortrolig && !FORTROLIG_ADRESSE) avslå

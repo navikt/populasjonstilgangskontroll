@@ -9,7 +9,7 @@ import java.util.*
 
 @Service
 @Cacheable(GRAPH)
-class AnsattTjeneste(private val adapter: MSRestClientAdapter) {
+class EntraTjeneste(private val adapter: MSRestClientAdapter) {
 
     fun saksbehandler(ident: NavId) : Saksbehandler {
         val attributter = adapter.attributterForIdent(ident.verdi)

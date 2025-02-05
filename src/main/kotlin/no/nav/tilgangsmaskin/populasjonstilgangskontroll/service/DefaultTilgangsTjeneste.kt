@@ -3,20 +3,18 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.service
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.FortroligGruppe.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.AnsattTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PersonTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangsRespons.Begrunnelse
 import org.springframework.stereotype.Service
 
 @Service
-class DefaultTilgangsTjeneste(private val pdl: PersonTjeneste, private val entra: AnsattTjeneste, private val skjerming: SkjermingTjeneste) : TilgangsTjeneste{
+class DefaultTilgangsTjeneste(private val kandidatTjeneste: KandidatTjeneste, private val saksbehandlerTjeneste: SaksbehandlerTjeneste, private val skjerming: SkjermingTjeneste) : TilgangsTjeneste{
     override fun harTilgang(saksbehandlerId: NavId, kandidatId: Fødselsnummer): TilgangsRespons {
 
-        val kandidat = pdl.kandidat(kandidatId)
-        val saksbehandler = entra.saksbehandler(saksbehandlerId)
+        val kandidat = kandidatTjeneste.kandidat(kandidatId)
+        val saksbehandler = saksbehandlerTjeneste.saksbehandler(saksbehandlerId)
 
-        if (kandidat.krevergGruppe(STRENGT_FORTROLIG) && !saksbehandler.kanBehandle(STRENGT_FORTROLIG))  {
+        if (kandidat.kreverGruppe(STRENGT_FORTROLIG) && !saksbehandler.kanBehandle(STRENGT_FORTROLIG))  {
             return respons(saksbehandlerId,kandidatId,false)
         }
 

@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.security.token.support.spring.UnprotectedRestController
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.AnsattTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PersonTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
@@ -24,7 +24,7 @@ class Tilgangskontroll(val service : TilgangsTjeneste) {
 
 @UnprotectedRestController(value = ["/$DEV"])
 @ConditionalOnNotProd
-class DevController(val pdl : PersonTjeneste, val skjerming: SkjermingTjeneste, val ansatt: AnsattTjeneste, val tjeneste: TilgangsTjeneste)
+class DevController(val pdl : PersonTjeneste, val skjerming: SkjermingTjeneste, val ansatt: EntraTjeneste, val tjeneste: TilgangsTjeneste)
 {
     @GetMapping(PDL)
     fun hentPerson(fnr: Fødselsnummer) = pdl.kandidat(fnr)

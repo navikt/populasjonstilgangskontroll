@@ -1,13 +1,13 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.MSGraphConfig.Companion.GRAPH
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
 import java.util.UUID
 
 @ConfigurationProperties(GRAPH)
-class MSGraphConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) :
+class EntraConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) :
     AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
 
     fun userURI(navIdent: String) = builder().path(USERS_PATH)

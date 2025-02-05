@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
 
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGrupperBolk
 import java.util.UUID
 
 class Saksbehandler(val  attributter: SaksbehandlerAttributter, val gruoper: List<EntraGrupperBolk.EntraGruppe>) {

@@ -18,7 +18,7 @@ plugins {
     id("org.springframework.boot") version "3.4.2"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.spring") version "2.1.10"
-    id("org.cyclonedx.bom") version "2.0.0"
+    id("org.cyclonedx.bom") version "2.1.0"
     id("com.google.cloud.tools.jib") version "3.4.4"
 
     // Apply the application plugin to add support for building a CLI application in Java.
@@ -46,7 +46,7 @@ dependencies {
     // Align versions of all Kotlin components
 
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
-    implementation("com.neovisionaries:nv-i18n:1.28")
+    implementation("com.neovisionaries:nv-i18n:1.29")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework:spring-aspects")
     implementation("org.springframework.retry:spring-retry")

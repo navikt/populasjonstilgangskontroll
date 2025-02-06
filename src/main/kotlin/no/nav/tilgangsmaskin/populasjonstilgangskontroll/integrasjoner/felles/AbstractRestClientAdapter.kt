@@ -26,7 +26,7 @@ abstract class AbstractRestClientAdapter(
             .accept(APPLICATION_JSON)
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
-            .body(T::class.java) ?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, uri)
+            .body(T::class.java) ?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, uri = uri)
 
     protected inline fun <reified T> post(uri: URI, body: Any) =
         restClient
@@ -36,7 +36,7 @@ abstract class AbstractRestClientAdapter(
             .body(body)
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
-            .body(T::class.java) ?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, uri)
+            .body(T::class.java) ?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, uri = uri)
 
     override fun name() = cfg.name
     protected val baseUri = cfg.baseUri

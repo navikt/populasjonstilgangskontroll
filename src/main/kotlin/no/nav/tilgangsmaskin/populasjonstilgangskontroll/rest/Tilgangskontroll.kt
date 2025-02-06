@@ -1,13 +1,16 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest
 
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangsTjeneste
+import org.springframework.context.annotation.Configuration
 import org.springframework.web.bind.annotation.GetMapping
 
+@Configuration
 @SecurityScheme(
     bearerFormat = "JWT",
     name = "bearer-key",
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping
 class Tilgangskontroll(val service : TilgangsTjeneste, val ansatt: EntraTjeneste,) {
 
     @GetMapping("ansatt")
+    @SecurityRequirement(name = "Bearer Authentication")
     fun hentAnsatt(ident: NavId) = ansatt.ansattAzureId(ident)
 }
 

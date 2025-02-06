@@ -1,4 +1,4 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
 
-class Navn {
+data class Navn(val fornavn: String, val etternavn: String) {
 }

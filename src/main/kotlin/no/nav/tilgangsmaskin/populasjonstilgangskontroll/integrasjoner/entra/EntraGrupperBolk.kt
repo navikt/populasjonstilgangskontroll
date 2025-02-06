@@ -7,7 +7,4 @@ import com.fasterxml.jackson.annotation.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.EntraGruppe
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class EntraGrupperBolk(
-    @JsonProperty("@odata.nextLink") val next: URI? = null,
-    val value: List<EntraGruppe> = emptyList())   {
-}
+data class EntraGrupperBolk(@JsonProperty("@odata.nextLink") val next: URI? = null, val value: List<EntraGruppe> = emptyList())

@@ -10,7 +10,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.Perso
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangsTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.DEV
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -36,6 +35,6 @@ class DevController(val pdl : PersonTjeneste, val skjerming: SkjermingTjeneste, 
     fun hentAnsattTilganger(azureId : UUID) = ansatt.ansattTilganger(azureId)
 
     @GetMapping("tilgang")
-    fun sjekkTilgang(@RequestParam saksbehandler: NavId, @RequestParam kandidat: Fødselsnummer) = tjeneste.harTilgang(saksbehandler, kandidat)
+    fun sjekkTilgang(@RequestParam saksbehandler: NavId, @RequestParam kandidat: Fødselsnummer) = tjeneste.sjekkTilgang(saksbehandler, kandidat)
 
 }

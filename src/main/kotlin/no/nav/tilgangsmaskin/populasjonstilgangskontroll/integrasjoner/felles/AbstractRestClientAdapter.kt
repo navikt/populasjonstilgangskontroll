@@ -13,15 +13,14 @@ import java.net.URI
 abstract class AbstractRestClientAdapter(
     protected val restClient: RestClient,
     protected val cfg: AbstractRestConfig,
-    protected val errorHandler: ErrorHandler,
-    private val pingClient: RestClient = restClient,
+    protected val errorHandler: ErrorHandler
 ) : Pingable {
 
     protected val log = getLogger(AbstractRestClientAdapter::class.java)
-    override fun ping(): Map<String, String> = get<Map<String, String>>(cfg.pingEndpoint,pingClient)
+    override fun ping(): Map<String, String> = get<Map<String, String>>(cfg.pingEndpoint)
 
-    protected inline fun <reified T> get(uri: URI,client: RestClient = restClient) =
-        client.get()
+    protected inline fun <reified T> get(uri: URI) =
+        restClient.get()
             .uri(uri)
             .accept(APPLICATION_JSON)
             .retrieve()
@@ -43,7 +42,7 @@ abstract class AbstractRestClientAdapter(
 
     override fun pingEndpoint() = "${cfg.pingEndpoint}"
     override fun isEnabled() = cfg.isEnabled
-    override fun toString() = "webClient=$restClient, cfg=$cfg, pingClient=$pingClient, baseUri=$baseUri"
+    override fun toString() = "webClient=$restClient, cfg=$cfg, baseUri=$baseUri"
 
     companion object {
 

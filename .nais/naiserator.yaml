@@ -45,6 +45,12 @@ spec:
           namespace: nom
       external:
         - host: {{pdl}}
+    inbound:
+      rules:
+        - application: ida
+          namespace: traktor
+          cluster: prod-fss
+
 
   env:
     - name: NAIS_CLUSTER_TYPE

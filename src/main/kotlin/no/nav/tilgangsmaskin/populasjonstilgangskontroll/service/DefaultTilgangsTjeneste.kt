@@ -3,8 +3,10 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.service
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.FortroligGruppe.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangsRespons.Begrunnelse
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.stereotype.Service
 
 @Service
@@ -15,11 +17,10 @@ class DefaultTilgangsTjeneste(private val kandidatTjeneste: KandidatTjeneste, pr
         val saksbehandler = saksbehandlerTjeneste.saksbehandler(saksbehandlerId)
 
         if (kandidat.kreverGruppe(STRENGT_FORTROLIG) && !saksbehandler.kanBehandle(STRENGT_FORTROLIG))  {
-            return respons(saksbehandlerId,kandidatId,false)
+             throw IrrecoverableException(FORBIDDEN, "Tilgang nektet, saksbehandler har ikke tilgang til ${STRENGT_FORTROLIG.gruppeNavn}", mapOf("kandidat" to kandidatId.verdi, "saksbehandler" to saksbehandler.attributter.id))
         }
 
-
-        return respons(saksbehandlerId,kandidatId,true)
+        return tillat(saksbehandlerId,kandidatId)
 
       /*  if (fortrolig && !FORTROLIG_ADRESSE) avslå
         if (fortrolig utland %% !GA - STRENGT_FORTROLIG_ADRESSE) avslå
@@ -39,15 +40,9 @@ class DefaultTilgangsTjeneste(private val kandidatTjeneste: KandidatTjeneste, pr
         Geogrfisk tilgang: (Mangler datasettene for dette)
          **/
 
-        return respons(saksbehandlerId,kandidatId,true)
 
     }
-    fun respons(saksbehandler: NavId, kandidat: Fødselsnummer, tilgang: Boolean) =
-        if (!tilgang) {
-            TilgangsRespons(kandidat, saksbehandler, tilgang, Begrunnelse("Begrunnelse", "42", false))
-        }
-        else   {
-            TilgangsRespons(kandidat, saksbehandler, tilgang)
-        }
+    fun tillat(saksbehandler: NavId, kandidat: Fødselsnummer) =
+            TilgangsRespons(kandidat, saksbehandler, true)
 }
 

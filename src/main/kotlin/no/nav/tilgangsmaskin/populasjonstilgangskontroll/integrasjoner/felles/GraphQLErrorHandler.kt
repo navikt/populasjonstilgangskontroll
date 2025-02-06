@@ -17,9 +17,8 @@ interface GraphQLErrorHandler {
     fun handle(uri: URI, e: Throwable): Nothing =
         when (e) {
             is FieldAccessException ->  throw e.oversett(uri)
-            is GraphQlTransportException ->  throw RecoverableException(INTERNAL_SERVER_ERROR,
-                uri, e.message ?: "Transport feil", e)
-            else ->  throw IrrecoverableException(INTERNAL_SERVER_ERROR, uri, e.message, e)
+            is GraphQlTransportException ->  throw RecoverableException(INTERNAL_SERVER_ERROR,e.message,uri,e)
+            else ->  throw IrrecoverableException(INTERNAL_SERVER_ERROR,  e.message ,uri, e)
         }
 
     companion object {
@@ -33,7 +32,7 @@ interface GraphQLErrorHandler {
                 log.warn("GraphQL oppslag returnerte $size feil, oversatte $message til ${it.javaClass.simpleName}", this)
             }
 
-        fun oversett(kode: String, msg: String, uri: URI) = IrrecoverableException(kode.tilStatus(), uri, msg)
+        fun oversett(kode: String, msg: String, uri: URI) = IrrecoverableException(kode.tilStatus(), msg,uri)
         private fun String.tilStatus() = HttpStatus.valueOf(this.uppercase(Locale.getDefault()))
 
     }

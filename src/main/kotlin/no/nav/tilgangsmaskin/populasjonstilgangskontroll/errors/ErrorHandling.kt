@@ -22,39 +22,28 @@ class DefaultGraphQlErrorHandler : GraphQLErrorHandler
 @Primary
 class DefaultRestErrorHandler : ErrorHandler {
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
-        if (res.statusCode.is4xxClientError) throw IrrecoverableException(res.statusCode, req.uri)
-        else throw RecoverableException(res.statusCode, req.uri) // TODO: Håndter 5xx feil bedre
+        if (res.statusCode.is4xxClientError) throw IrrecoverableException(res.statusCode, uri = req.uri)
+        else throw RecoverableException(res.statusCode, uri = req.uri) // TODO: Håndter 5xx feil bedre
     }
 }
 
-open class IrrecoverableException(status: HttpStatusCode,
-                                  uri: URI,
-                                  detail: String? = null,
-                                  cause: Throwable? = null,
-                                  stackTrace: String? = null) :
-    ErrorResponseException(status, problemDetail(status, detail, uri, stackTrace), cause) {
-
-    class NotFoundException(uri: URI,
-                            detail: String? = NOT_FOUND.reasonPhrase,
-                            cause: Throwable? = null,
-                            stackTrace: String? = null) :
-        IrrecoverableException(NOT_FOUND, uri, detail, cause, stackTrace)
-
-    override fun toString() = "IrrecoverableException(status=${statusCode}, detail=$body"
+open class IrrecoverableException(status: HttpStatusCode, detail: String? = "Fikk respons $status", extras: Map<String,Any> = emptyMap(), cause: Throwable? = null) :
+    ErrorResponseException(status, problemDetail(status, detail, extras), cause)  {
+    constructor(status: HttpStatusCode, detail: String? = "Fikk respons $status", uri: URI? = null, cause: Throwable? = null) : this(status, detail, uri.toMap(), cause)
 }
 
-open class RecoverableException(status: HttpStatusCode,
-                                uri: URI,
-                                detail: String? = "Fikk respons $status",
-                                cause: Throwable? = null) :
-    ErrorResponseException(status, problemDetail(status, detail, uri), cause)
+open class RecoverableException(status: HttpStatusCode, detail: String? = "Fikk respons $status", extras: Map<String,Any> = emptyMap(), cause: Throwable? = null) :
+    ErrorResponseException(status, problemDetail(status, detail, extras), cause)  {
+    constructor(status: HttpStatusCode, detail: String? = "Fikk respons $status", uri: URI? = null,cause: Throwable? = null) : this(status, detail, uri.toMap(), cause)
+
+}
 
 private fun problemDetail(status: HttpStatusCode,
                           detail: String?,
-                          uri: URI,
-                          stackTrace: String? = null) =
+                          extras: Map<String,Any> = emptyMap()) =
     forStatusAndDetail(status, detail).apply {
         title = resolve(status.value())?.reasonPhrase ?: "$status"
-        setProperty("uri", uri)
-        stackTrace?.let { setProperty("stackTrace", it) }
+        extras.forEach { (key, value) -> setProperty(key,value) }
     }
+
+private fun URI?.toMap() =this?.let { mapOf("uri" to it) } ?: emptyMap()

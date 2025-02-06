@@ -16,11 +16,13 @@ import java.time.format.DateTimeFormatter
 class StartupInfoContributor(private val ctx : ConfigurableApplicationContext) : InfoContributor {
 
     override fun contribute(builder : Builder) {
-        builder.withDetail("extra-info", mapOf("Startup time" to ctx.startupDate.local(),
-            "Client ID" to ctx.environment.getProperty("azure.app.client.id"),
-            "Name" to ctx.environment.getProperty("spring.application.name"),
-            "Spring Boot version" to SpringBootVersion.getVersion(),
-            "Spring Framework version" to SpringVersion.getVersion()))
+        with(ctx)    {
+            builder.withDetail("extra-info", mapOf("Startup time" to startupDate.local(),
+                "Client ID" to environment.getProperty("azure.app.client.id"),
+                "Name" to environment.getProperty("spring.application.name"),
+                "Spring Boot version" to SpringBootVersion.getVersion(),
+                "Spring Framework version" to SpringVersion.getVersion()))
+        }
     }
 
     private fun Long.local(fmt : String = "yyyy-MM-dd HH:mm:ss") = LocalDateTime.ofInstant(Instant.ofEpochMilli(this),

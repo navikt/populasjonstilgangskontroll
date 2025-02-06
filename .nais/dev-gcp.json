@@ -1,5 +1,5 @@
 {
-  "ingress": "https://tilgangsmaskin.intern.dev.nav.no",
+  "ingress": "https://tilgangsmaskin.ansatt.dev.nav.no",
   "pdl": "pdl-api.dev-fss-pub.nais.io",
   "nais": {
     "cluster": {

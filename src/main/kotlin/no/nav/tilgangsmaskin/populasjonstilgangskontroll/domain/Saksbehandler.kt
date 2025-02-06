@@ -7,4 +7,7 @@ class Saksbehandler(val  attributter: SaksbehandlerAttributter, val gruoper: Lis
     data class SaksbehandlerAttributter(val id: UUID, val navId: NavId, val fornavn: String, val etternavn: String, val enhetsNummer: Enhetsnummer)
 
     fun kanBehandle(gruppe: FortroligGruppe) =  gruoper.any { it.displayName == gruppe.gruppeNavn }
+
+    override fun toString() = "${javaClass.simpleName} [attributter=$attributter,gruoper=$gruoper]"
+
 }

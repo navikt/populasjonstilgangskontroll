@@ -4,4 +4,5 @@ class Kandidat(val ident: Fødselsnummer, private val beskyttelse: FortroligGrup
 
     fun  kreverGruppe(gruppe: FortroligGruppe) = gruppe == beskyttelse
 
+    override fun toString() = "${javaClass.simpleName} [ident=$ident,beskyttelse=$beskyttelse]"
 }

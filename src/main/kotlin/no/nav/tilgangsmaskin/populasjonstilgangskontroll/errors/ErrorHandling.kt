@@ -29,12 +29,18 @@ class DefaultRestErrorHandler : ErrorHandler {
 
 open class IrrecoverableException(status: HttpStatusCode, detail: String? = "Fikk respons $status", extras: Map<String,Any> = emptyMap(), cause: Throwable? = null) :
     ErrorResponseException(status, problemDetail(status, detail, extras), cause)  {
-    constructor(status: HttpStatusCode, detail: String? = "Fikk respons $status", uri: URI? = null, cause: Throwable? = null) : this(status, detail, uri.toMap(), cause)
+    constructor(status: HttpStatusCode,
+                uri: URI? = null,
+                detail: String? = "Fikk respons $status",
+                cause: Throwable? = null) : this(status, detail, uri.toMap(), cause)
 }
 
 open class RecoverableException(status: HttpStatusCode, detail: String? = "Fikk respons $status", extras: Map<String,Any> = emptyMap(), cause: Throwable? = null) :
     ErrorResponseException(status, problemDetail(status, detail, extras), cause)  {
-    constructor(status: HttpStatusCode, detail: String? = "Fikk respons $status", uri: URI? = null,cause: Throwable? = null) : this(status, detail, uri.toMap(), cause)
+    constructor(status: HttpStatusCode,
+                uri: URI? = null,
+                detail: String? = "Fikk respons $status",
+                cause: Throwable? = null) : this(status, detail, uri.toMap(), cause)
 
 }
 

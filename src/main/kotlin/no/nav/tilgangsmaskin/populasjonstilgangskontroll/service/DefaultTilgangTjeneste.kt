@@ -2,21 +2,23 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.service
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.FortroligGruppe.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Kandidat
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Saksbehandler
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.stereotype.Service
 
 @Service
-class DefaultTilgangsTjeneste(private val kandidatTjeneste: KandidatTjeneste, private val saksbehandlerTjeneste: SaksbehandlerTjeneste, private val skjerming: SkjermingTjeneste) : TilgangsTjeneste{
+class DefaultTilgangTjeneste(private val kandidatTjeneste: KandidatTjeneste, private val saksbehandlerTjeneste: SaksbehandlerTjeneste, private val skjerming: SkjermingTjeneste) : TilgangsTjeneste{
     override fun harTilgang(saksbehandlerId: NavId, kandidatId: Fødselsnummer): TilgangsRespons {
 
         val kandidat = kandidatTjeneste.kandidat(kandidatId)
         val saksbehandler = saksbehandlerTjeneste.saksbehandler(saksbehandlerId)
 
         if (kandidat.kreverGruppe(STRENGT_FORTROLIG) && !saksbehandler.kanBehandle(STRENGT_FORTROLIG))  {
-             throw IrrecoverableException(FORBIDDEN, "Tilgang nektet, saksbehandler har ikke tilgang til ${STRENGT_FORTROLIG.gruppeNavn}", mapOf("kandidat" to kandidatId.verdi, "saksbehandler" to saksbehandler.attributter.id))
+             throw TilgangException("Saksbehandler har ikke tilgang til ${STRENGT_FORTROLIG.gruppeNavn}",kandidat,saksbehandler)
         }
 
         return tillat(saksbehandlerId,kandidatId)
@@ -45,3 +47,4 @@ class DefaultTilgangsTjeneste(private val kandidatTjeneste: KandidatTjeneste, pr
             TilgangsRespons(kandidat, saksbehandler, true)
 }
 
+class TilgangException(melding: String, kandidat:  Kandidat, saksbehandler: Saksbehandler) : IrrecoverableException(FORBIDDEN, "Tilgang nektet: " + melding,mapOf("kandidat" to kandidat.ident.verdi, "saksbehandler" to saksbehandler.attributter.navId.verdi))

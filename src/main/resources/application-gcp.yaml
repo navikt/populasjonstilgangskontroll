@@ -52,6 +52,10 @@ no.nav.security.jwt:
           client-auth-method: private_key_jwt
 springdoc:
     swagger-ui:
+      oauth:
+        use-pkce-with-authorization-code-grant: true
+        client-id: ${AZURE_APP_CLIENT_ID}
+        scope-separator: ","
       csrf:
         enabled: true
 

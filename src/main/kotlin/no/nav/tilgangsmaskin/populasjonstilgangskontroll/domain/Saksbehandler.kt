@@ -1,13 +1,12 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGrupperBolk
 import java.util.UUID
 
-class Saksbehandler(val  attributter: SaksbehandlerAttributter, val gruoper: List<EntraGrupperBolk.EntraGruppe>) {
+class Saksbehandler(val  attributter: SaksbehandlerAttributter, val grupper: List<EntraGruppe>) {
     data class SaksbehandlerAttributter(val id: UUID, val navId: NavId, val fornavn: String, val etternavn: String, val enhetsNummer: Enhetsnummer)
 
-    fun kanBehandle(gruppe: FortroligGruppe) =  gruoper.any { it.displayName == gruppe.gruppeNavn }
+    fun kanBehandle(gruppe: FortroligGruppe) =  grupper.any { it.displayName == gruppe.gruppeNavn }
 
-    override fun toString() = "${javaClass.simpleName} [attributter=$attributter,gruoper=$gruoper]"
+    override fun toString() = "${javaClass.simpleName} [attributter=$attributter,grupper=$grupper]"
 
 }

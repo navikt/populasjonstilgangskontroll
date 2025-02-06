@@ -17,7 +17,7 @@ class StartupInfoContributor(private val ctx : ConfigurableApplicationContext) :
 
     override fun contribute(builder : Builder) {
         builder.withDetail("extra-info", mapOf("Startup time" to ctx.startupDate.local(),
-            "Client ID" to ctx to ctx.environment.getProperty("azure.app.client.id"),
+            "Client ID" to ctx.environment.getProperty("azure.app.client.id"),
             "Name" to ctx.environment.getProperty("spring.application.name"),
             "Spring Boot version" to SpringBootVersion.getVersion(),
             "Spring Framework version" to SpringVersion.getVersion()))

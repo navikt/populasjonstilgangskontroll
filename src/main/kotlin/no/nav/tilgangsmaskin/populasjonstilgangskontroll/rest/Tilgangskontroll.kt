@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping
 @Configuration
 @SecurityScheme(
     bearerFormat = "JWT",
-    name = "bearer-key",
+    name = "bearerAuth",
     scheme = "bearer",
     type = SecuritySchemeType.HTTP,
 )
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping
 class Tilgangskontroll(val service : TilgangsTjeneste, val ansatt: EntraTjeneste,) {
 
     @GetMapping("ansatt")
-    @SecurityRequirement(name = "Bearer Authentication")
+    @SecurityRequirement(name = "bearerAuth")
     fun hentAnsatt(ident: NavId) = ansatt.ansattAzureId(ident)
 }
 

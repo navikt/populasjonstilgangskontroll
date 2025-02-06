@@ -43,6 +43,11 @@ class DefaultTilgangsTjeneste(private val kandidatTjeneste: KandidatTjeneste, pr
 
     }
     fun respons(saksbehandler: NavId, kandidat: Fødselsnummer, tilgang: Boolean) =
-        TilgangsRespons(kandidat, saksbehandler, tilgang, Begrunnelse("Begrunnelse", "42", false))
+        if (!tilgang) {
+            TilgangsRespons(kandidat, saksbehandler, tilgang, Begrunnelse("Begrunnelse", "42", false))
+        }
+        else   {
+            TilgangsRespons(kandidat, saksbehandler, tilgang)
+        }
 }
 

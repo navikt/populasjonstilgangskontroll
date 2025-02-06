@@ -20,7 +20,9 @@ class DefaultTilgangTjeneste(private val kandidatTjeneste: KandidatTjeneste, pri
         if (kandidat.kreverGruppe(STRENGT_FORTROLIG) && !saksbehandler.kanBehandle(STRENGT_FORTROLIG)) {
             throw TilgangException("Saksbehandler har ikke tilgang til ${STRENGT_FORTROLIG.gruppeNavn}",
                 kandidat,
-                saksbehandler)
+                saksbehandler,
+                "42",
+                false)
         }
 
 
@@ -45,5 +47,9 @@ class DefaultTilgangTjeneste(private val kandidatTjeneste: KandidatTjeneste, pri
     }
 }
 
-class TilgangException(melding: String, kandidat:  Kandidat, saksbehandler: Saksbehandler) : IrrecoverableException(FORBIDDEN,
-    "Tilgang nektet: $melding",mapOf("kandidat" to kandidat.ident.verdi, "saksbehandler" to saksbehandler.attributter.navId.verdi))
+class TilgangException(melding: String, kandidat:  Kandidat, saksbehandler: Saksbehandler, kode: String, overstyrbar: Boolean) : IrrecoverableException(FORBIDDEN,
+    "Tilgang nektet: $melding",mapOf(
+        "kandidat" to kandidat.ident.verdi,
+        "saksbehandler" to saksbehandler.attributter.navId.verdi,
+        "kode" to kode,
+        "overstyrbar" to overstyrbar))

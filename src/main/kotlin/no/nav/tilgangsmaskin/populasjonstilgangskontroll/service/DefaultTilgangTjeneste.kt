@@ -7,11 +7,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class DefaultTilgangTjeneste(private val regelMotor: RegelMotor,private val kandidatTjeneste: KandidatTjeneste, private val saksbehandlerTjeneste: SaksbehandlerTjeneste, private val skjerming: SkjermingTjeneste) : TilgangTjeneste{
-    override fun sjekkTilgang(saksbehandlerId: NavId, kandidatId: Fødselsnummer) {
+    override fun sjekkTilgang(saksbehandlerId: NavId, kandidatId: Fødselsnummer) =
 
-        val kandidat = kandidatTjeneste.kandidat(kandidatId)
-        val saksbehandler = saksbehandlerTjeneste.saksbehandler(saksbehandlerId)
-        regelMotor.vurderTilgang(kandidat, saksbehandler)
+        regelMotor.vurderTilgang(kandidatTjeneste.kandidat(kandidatId), saksbehandlerTjeneste.saksbehandler(saksbehandlerId))
 
 
         /*  if (fortrolig && !FORTROLIG_ADRESSE) avslå
@@ -32,6 +30,5 @@ class DefaultTilgangTjeneste(private val regelMotor: RegelMotor,private val kand
         Geogrfisk tilgang: (Mangler datasettene for dette)
          **/
 
-    }
 }
 

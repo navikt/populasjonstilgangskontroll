@@ -31,7 +31,7 @@ class Tilgangskontroll(val service : TilgangTjeneste, val ansatt: EntraTjeneste,
     @SecurityRequirement(name="bearerAuth")
     // TODO Gjør om til POST
     fun validerTilgang(kandidatIdent: Fødselsnummer) :Unit {
-        val saksbehandlerNavIdent = tokenUtil.getNavIdentFromToken()
+        val saksbehandlerNavIdent = tokenUtil.navIdentFromToken
         return  service.sjekkTilgang(saksbehandlerNavIdent, kandidatIdent);
 
     }
@@ -41,9 +41,9 @@ class Tilgangskontroll(val service : TilgangTjeneste, val ansatt: EntraTjeneste,
 @Component
 // TODO bedre feilhåndtering, bruk konstanter for oid  og pid
 class TokenUtil(private val contextHolder: TokenValidationContextHolder){
-    fun getSubject() = claimSet().getStringClaim("pid")
-    fun getIdentFromToken() = claimSet().let { UUID.fromString(it.getStringClaim("oid")) }
-    fun getNavIdentFromToken() = claimSet().getStringClaim("NAVident")?.let { NavId(it) } ?: throw RuntimeException("NAVident claim not found in token")
+    val subject get()  = claimSet().getStringClaim("pid")
+    val  identFromToken get()  = claimSet().let { UUID.fromString(it.getStringClaim("oid")) }
+    val navIdentFromToken get()  = claimSet().getStringClaim("NAVident")?.let { NavId(it) } ?: throw RuntimeException("NAVident claim not found in token")
     private fun claimSet() = contextHolder.getTokenValidationContext().getClaims(AAD_ISSUER)
 
     companion object {

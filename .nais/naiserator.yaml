@@ -38,9 +38,9 @@ spec:
           - "NAVident"
           - "azp_name"
         groups:
-          - id:{{fortrolig}}
-          - id:{{strengt}}
-          - id:{{egenansatt}}
+          - id: '{{fortrolig}}'
+          - id: '{{strengt}}'
+          - id: '{{egenansatt}}'
   secureLogs:
     enabled: true
   accessPolicy:

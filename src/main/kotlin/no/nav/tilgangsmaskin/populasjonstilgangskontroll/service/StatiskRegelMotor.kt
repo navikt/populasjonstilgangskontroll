@@ -29,12 +29,12 @@ class StatiskRegelMotor : RegelMotor{
     companion object {
         private val kode67 : RegelPredikat = { k, s ->
             if (s.kanBehandle(STRENGT_FORTROLIG)) {
-                k.kreverGruppe(STRENGT_FORTROLIG) || k.beskyttelse == null
+                k.kreverGruppe(STRENGT_FORTROLIG) || k.erUbeskyttet
             }
             else if (s.kanBehandle(FORTROLIG)) {
-                k.kreverGruppe(FORTROLIG) || k.beskyttelse == null
+                k.kreverGruppe(FORTROLIG) || k.erUbeskyttet
             } else {
-                k.beskyttelse == null
+                k.erUbeskyttet
             }
         }
         private val regler = listOf(

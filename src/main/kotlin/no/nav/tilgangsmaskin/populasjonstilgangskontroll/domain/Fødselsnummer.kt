@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
 
 import com.fasterxml.jackson.annotation.JsonValue
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Cluster
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Cluster.Companion.isProd
 
 @JvmInline
 value class Fødselsnummer(@JsonValue val verdi: String) {
@@ -18,7 +18,7 @@ value class Fødselsnummer(@JsonValue val verdi: String) {
         with(verdi) {
             require(length == 11) { "Ugyldig lengde  $length for $this, forventet 11" }
             require(all { it.isDigit()}) { "Ugyldig(e) tegn i $this, forventet kun tall" }
-            if (Cluster.Companion.isProd) {
+            if (isProd) {
                 require(mod11(W1, this) == this[9] - '0') { "Første kontrollsiffer $this[9] ikke validert" }
                 require(mod11(W2, this) == this[10] - '0') { "Andre kontrollsiffer $this[10] ikke validert" }
             }

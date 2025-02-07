@@ -3,6 +3,6 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.service
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 
-interface TilgangsTjeneste {
+interface TilgangTjeneste {
    fun sjekkTilgang(sakebehandler: NavId, kandidat: Fødselsnummer)
 }

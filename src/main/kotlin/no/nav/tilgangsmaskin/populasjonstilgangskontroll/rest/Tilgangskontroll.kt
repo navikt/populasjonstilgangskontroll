@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangsTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangTjeneste
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.bind.annotation.GetMapping
 
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping
     type = SecuritySchemeType.HTTP,
 )
 @ProtectedRestController(value = ["/api/v1"], issuer = "azuread", claimMap = [])
-class Tilgangskontroll(val service : TilgangsTjeneste, val ansatt: EntraTjeneste,) {
+class Tilgangskontroll(val service : TilgangTjeneste, val ansatt: EntraTjeneste,) {
 
     @GetMapping("ansatt")
     @SecurityRequirement(name = "bearerAuth")

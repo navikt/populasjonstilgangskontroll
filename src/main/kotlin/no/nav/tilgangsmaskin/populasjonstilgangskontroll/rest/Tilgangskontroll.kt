@@ -10,7 +10,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangTjeneste
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.bind.annotation.GetMapping
 
-@Configuration
+//@Configuration
 @SecurityScheme(
     bearerFormat = "JWT",
     name = "bearerAuth",

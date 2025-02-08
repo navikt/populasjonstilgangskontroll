@@ -13,13 +13,13 @@ class EntraTjeneste(private val adapter: EntraClientAdapter) {
 
 
     fun saksbehandler(ident: NavId) : Saksbehandler {
-        val attributter = adapter.attributterForIdent(ident.verdi)
-        val grupper = adapter.grupperForUUID(attributter.id)
-        return Saksbehandler(attributter, grupper)
+        val attributter = adapter.attributter(ident.verdi)
+        val grupper = adapter.grupper(attributter.id)
+        return Saksbehandler(attributter, *grupper)
     }
 
-    fun ansattAzureId(ident: NavId) = adapter.attributterForIdent(ident.verdi)
+    fun ansattAzureId(ident: NavId) = adapter.attributter(ident.verdi)
 
-    fun ansattTilganger(azureIdent: UUID) = adapter.grupperForUUID(azureIdent)
+    fun ansattTilganger(azureIdent: UUID) = adapter.grupper(azureIdent)
 }
 

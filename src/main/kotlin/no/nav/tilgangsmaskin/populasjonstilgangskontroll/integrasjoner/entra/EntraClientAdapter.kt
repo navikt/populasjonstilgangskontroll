@@ -13,16 +13,16 @@ class  EntraClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
                           private val cf: EntraConfig,
                           errorHandler: ErrorHandler): AbstractRestClientAdapter(restClient,cf, errorHandler) {
 
-    fun attributterForIdent(ident: String) = get<EntraSaksbehandlerResponse>(cf.userURI(ident)).mapTo()
+    fun attributter(ident: String) = get<EntraSaksbehandlerResponse>(cf.userURI(ident)).mapTo()
 
-    fun grupperForUUID(ansattId: UUID) =
+    fun grupper(ansattId: UUID) =
         generateSequence(get<EntraGrupperBolk>(cf.grupperURI(ansattId))) {
             it.next?.let {
                 get<EntraGrupperBolk>(it)
             }
         }.flatMap {
             it.value
-        }.toList()
+        }.toList().toTypedArray()
 
     private fun EntraSaksbehandlerResponse.mapTo() = EntraResponsMapper.mapAttributter(attributter.first())
 

@@ -62,4 +62,10 @@ spec:
       value: {{nais.cluster.type}}
     - name: PDL
       value: {{pdl}}
+    - name: GRUPPE_STRENGT
+      value: '{{strengt}}'
+    - name: GRUPPE_FORTROLIG
+      value: '{{fortrolig}}'
+    - name: GRUPPE_EGENANSATT
+      value: '{{egenansatt}}'
 

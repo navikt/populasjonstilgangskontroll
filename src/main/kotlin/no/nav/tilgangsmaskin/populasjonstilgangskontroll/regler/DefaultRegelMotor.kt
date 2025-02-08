@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 
 @Component
 
-class DefaultRegelMotor(vararg private val regler: Regel) : RegelMotor {
+class DefaultRegelMotor(private vararg val regler: Regel) : RegelMotor {
 
     override fun vurderTilgang(k: Kandidat, s: Saksbehandler) =
         regler.sortedWith(AnnotationAwareOrderComparator.INSTANCE).forEach {

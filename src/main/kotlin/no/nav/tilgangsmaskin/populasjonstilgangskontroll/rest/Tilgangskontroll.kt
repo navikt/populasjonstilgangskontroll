@@ -33,10 +33,10 @@ class Tilgangskontroll(val service : TilgangTjeneste, val ansatt: EntraTjeneste,
     @GetMapping("tilgang")
     @SecurityRequirement(name="bearerAuth")
     // TODO Gjør om til POST
-    fun validerTilgang(kandidatIdent: Fødselsnummer) {
+    fun validerTilgang(kandidatId: Fødselsnummer) {
         tokenUtil.all.forEach { (k,v) -> log.info("$k->$v") }
-        val saksbehandlerNavIdent = tokenUtil.navIdentFromToken
-        service.sjekkTilgang(saksbehandlerNavIdent, kandidatIdent);
+        val id = tokenUtil.navIdentFromToken
+        service.sjekkTilgang(id, kandidatId);
     }
 
 

@@ -20,24 +20,54 @@ import java.util.UUID
 class TestRegler {
 
     @Test
-    @DisplayName("Test at kode 7 kandidat bare kan behandles av kode 7 saksbehandler")
-    fun kode7kandidat() {
+    @DisplayName("Test at kode 7 kandidat ikke kan behandles av kode 6 saksbehandler")
+    fun kode7kandidatIkkeKode6() {
         assertThrows<TilgangException> { MOTOR.vurderTilgang(KODE7KANDIDAT, KODE6SB) }
+    }
+
+    @Test
+    @DisplayName("Test at kode 7 kandidat ikke kan behandles av vanlig saksbehandler")
+    fun kode7kandidatIkkeVanlig() {
         assertThrows<TilgangException> { MOTOR.vurderTilgang(KODE7KANDIDAT, VANLIGSB) }
+    }
+
+    @Test
+    @DisplayName("Test at kode 7 kandidat kan behandles av kode 7 saksbehandler")
+    fun kode7kandidatKode7() {
         MOTOR.vurderTilgang(KODE7KANDIDAT, KODE7SB)
     }
     @Test
-    @DisplayName("Test at kode 6 kandidat bare kan behandles av kode 6 saksbehandler")
-    fun kode6kandidat() {
-       assertThrows<TilgangException> { MOTOR.vurderTilgang(KODE6KANDIDAT, KODE7SB) }
-       assertThrows<TilgangException> { MOTOR.vurderTilgang(KODE6KANDIDAT, VANLIGSB) }
+    @DisplayName("Test at kode 6 kandidat ikke kan behandles av kode 7 saksbehandler")
+    fun kode6kandidatIkkeKode7() {
+        assertThrows<TilgangException> { MOTOR.vurderTilgang(KODE6KANDIDAT, KODE7SB) }
+    }
+
+    @Test
+    @DisplayName("Test at kode 6 kandidat ikke kan behandles av vanlig saksbehandler")
+    fun kode6kandidatIkkeVanlig() {
+        assertThrows<TilgangException> { MOTOR.vurderTilgang(KODE6KANDIDAT, VANLIGSB) }
+    }
+
+    @Test
+    @DisplayName("Test at kode 6 kandidat kan behandles av kode 6 saksbehandler")
+    fun kode6kandidatKode6() {
         MOTOR.vurderTilgang(KODE6KANDIDAT, KODE6SB)
     }
     @Test
-    @DisplayName("Test at ubeskyttet kandidat kan behandles av kode 6, 7 eller vanlig saksbehandler")
-    fun vanligKandidat() {
+    @DisplayName("Test at ubeskyttet kandidat kan behandles av kode 6 saksbehandler")
+    fun vanligKandidatKode6() {
         MOTOR.vurderTilgang(VANLIGKANDIDAT, KODE6SB)
+    }
+
+    @Test
+    @DisplayName("Test at ubeskyttet kandidat kan behandles av kode 7 saksbehandler")
+    fun vanligKandidatKode7() {
         MOTOR.vurderTilgang(VANLIGKANDIDAT, KODE7SB)
+    }
+
+    @Test
+    @DisplayName("Test at ubeskyttet kandidat kan behandles av vanlig saksbehandler")
+    fun vanligKandidatVanlig() {
         MOTOR.vurderTilgang(VANLIGKANDIDAT, VANLIGSB)
     }
 

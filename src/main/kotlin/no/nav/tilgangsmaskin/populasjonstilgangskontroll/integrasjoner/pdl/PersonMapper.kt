@@ -10,7 +10,7 @@ object PersonMapper {
         val beskyttelse = when {
             person.adressebeskyttelse.any { it.gradering in listOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND) } -> FortroligGruppe.STRENGT_FORTROLIG
             person.adressebeskyttelse.any { it.gradering == FORTROLIG } -> FortroligGruppe.FORTROLIG
-            else -> FortroligGruppe.INGEN
+            else -> null
         }
         return Kandidat(fnr, beskyttelse)
     }

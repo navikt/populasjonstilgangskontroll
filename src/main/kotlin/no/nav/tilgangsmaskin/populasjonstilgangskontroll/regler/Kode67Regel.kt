@@ -15,7 +15,7 @@ class Kode67Regel : Regel {
 
 
     override fun test(k: Kandidat, s: Saksbehandler) =
-        when  {
+        when {
             k.kreverGruppe(FORTROLIG) -> s.kanBehandle(FORTROLIG)
             k.kreverGruppe(STRENGT_FORTROLIG) -> s.kanBehandle(STRENGT_FORTROLIG)
             else -> true

@@ -12,6 +12,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangTjeneste
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.GetMapping
 import java.util.*
+import com.nimbusds.jwt.JWTClaimNames
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest.TokenUtil.Companion.AAD_ISSUER
 import org.slf4j.LoggerFactory.getLogger
 
@@ -44,6 +45,7 @@ class Tilgangskontroll(val service : TilgangTjeneste, val ansatt: EntraTjeneste,
 @Component
 // TODO bedre feilhåndtering, bruk konstanter for oid  og pid
 class TokenUtil(private val contextHolder: TokenValidationContextHolder){
+
     val all get() = claimSet().allClaims
     val subject get()  = claimSet().getStringClaim("pid")
     val  identFromToken get()  = claimSet().let { UUID.fromString(it.getStringClaim("oid")) }

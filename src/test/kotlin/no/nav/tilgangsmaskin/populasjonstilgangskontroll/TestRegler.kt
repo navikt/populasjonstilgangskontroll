@@ -49,8 +49,8 @@ class TestRegler {
         private val KODE6KANDIDAT = Kandidat(FNR, STRENGT_FORTROLIG)
         private val KODE7KANDIDAT = Kandidat(FNR, FORTROLIG)
         private val VANLIGKANDIDAT = Kandidat(FNR, INGEN)
-        private val KODE6SB = Saksbehandler(ATTRS, listOf(EntraGruppe(UUID.randomUUID(), STRENGT_FORTROLIG.gruppeNavn)))
-        private val KODE7SB = Saksbehandler(ATTRS, listOf(EntraGruppe(UUID.randomUUID(), FORTROLIG.gruppeNavn)))
+        private val KODE6SB = Saksbehandler(ATTRS, listOf(EntraGruppe(STRENGT_FORTROLIG.gruppeId, STRENGT_FORTROLIG.gruppeNavn)))
+        private val KODE7SB = Saksbehandler(ATTRS, listOf(EntraGruppe(FORTROLIG.gruppeId, FORTROLIG.gruppeNavn)))
         private val VANLIGSB = Saksbehandler(ATTRS, listOf(EntraGruppe(UUID.randomUUID(), "annen gruppe")))
 
 

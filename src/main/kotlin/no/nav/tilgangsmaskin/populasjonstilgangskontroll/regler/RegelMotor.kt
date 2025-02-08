@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.service
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Kandidat
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Saksbehandler

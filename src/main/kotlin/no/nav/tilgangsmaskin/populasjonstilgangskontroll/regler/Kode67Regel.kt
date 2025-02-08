@@ -1,13 +1,19 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.service
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.FortroligGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.FortroligGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Kandidat
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Saksbehandler
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.Regel.RegelForklaring
 import org.slf4j.LoggerFactory.getLogger
-import java.util.function.BiPredicate
+import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
+import org.springframework.core.annotation.Order
+import org.springframework.stereotype.Component
 
-object Kode67Regel : BiPredicate<Kandidat, Saksbehandler> {
+@Component
+@Order(HIGHEST_PRECEDENCE)
+
+class Kode67Regel : Regel {
     private val log = getLogger(Kode67Regel::class.java)
 
     override fun test(k: Kandidat, s: Saksbehandler): Boolean {
@@ -26,4 +32,7 @@ object Kode67Regel : BiPredicate<Kandidat, Saksbehandler> {
             }
         }
     }
+
+    override val forklaring: RegelForklaring
+        get() = RegelForklaring("Beskyttelsesregler","Saksbehandler har ikke tilgang", "67")
 }

@@ -9,7 +9,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLCo
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PersonTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TilgangTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.DEV
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam

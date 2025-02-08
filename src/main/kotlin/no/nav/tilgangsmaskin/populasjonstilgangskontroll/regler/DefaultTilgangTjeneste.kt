@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.service
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
@@ -10,12 +10,6 @@ class DefaultTilgangTjeneste(private val regelMotor: RegelMotor,private val kand
     override fun sjekkTilgang(saksbehandlerId: NavId, kandidatId: Fødselsnummer) =
 
         regelMotor.vurderTilgang(kandidatTjeneste.kandidat(kandidatId), saksbehandlerTjeneste.saksbehandler(saksbehandlerId))
-
-
-        /*  if (fortrolig && !FORTROLIG_ADRESSE) avslå
-        if (fortrolig utland %% !GA - STRENGT_FORTROLIG_ADRESSE) avslå
-        if (skjerming && !GA-EGNE_ANSATTE) avslå
-    }*/
         /**
         Prioritert utslagskriterier:
         Harde regler:

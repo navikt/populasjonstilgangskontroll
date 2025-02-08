@@ -8,8 +8,10 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Kandidat
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Saksbehandler
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Saksbehandler.SaksbehandlerAttributter
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.StatiskRegelMotor
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.DummyRegel
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.Kode67Regel
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.DefaultRegelMotor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TilgangException
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -32,7 +34,7 @@ class TestRegler {
         MOTOR.vurderTilgang(KODE6KANDIDAT, KODE6SB)
     }
     @Test
-    @DisplayName("Test at ubeskytett kandidat kan behandles av kode 6, 7 eller vanlig saksbehandler")
+    @DisplayName("Test at ubeskyttet kandidat kan behandles av kode 6, 7 eller vanlig saksbehandler")
     fun vanligKandidat() {
         MOTOR.vurderTilgang(VANLIGKANDIDAT, KODE6SB)
         MOTOR.vurderTilgang(VANLIGKANDIDAT, KODE7SB)
@@ -45,7 +47,7 @@ class TestRegler {
         private val NAVID = NavId("Z999999")
         private val ATTRS = SaksbehandlerAttributter(UUID.randomUUID(),NAVID,"En","Saksbehandler", ENHET)
         private val FNR = Fødselsnummer("11111111111")
-        private val MOTOR = StatiskRegelMotor()
+        private val MOTOR = DefaultRegelMotor(Kode67Regel(), DummyRegel())
         private val KODE6KANDIDAT = Kandidat(FNR, STRENGT_FORTROLIG)
         private val KODE7KANDIDAT = Kandidat(FNR, FORTROLIG)
         private val VANLIGKANDIDAT = Kandidat(FNR, INGEN)

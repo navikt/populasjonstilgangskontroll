@@ -8,11 +8,10 @@ import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.service.TilgangTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TilgangTjeneste
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.GetMapping
 import java.util.*
-import com.nimbusds.jwt.JWTClaimNames
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest.TokenUtil.Companion.AAD_ISSUER
 import org.slf4j.LoggerFactory.getLogger
 

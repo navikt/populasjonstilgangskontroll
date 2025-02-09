@@ -9,7 +9,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Saksbehandler
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Saksbehandler.SaksbehandlerAttributter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.DummyRegel
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.DefaultRegelMotor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelMotor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.StrengtFortroligRegel
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.FortroligRegel
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TilgangException
@@ -78,7 +78,7 @@ class TestRegler {
         private val NAVID = NavId("Z999999")
         private val ATTRS = SaksbehandlerAttributter(UUID.randomUUID(),NAVID,"En","Saksbehandler", ENHET)
         private val FNR = Fødselsnummer("11111111111")
-        private val MOTOR = DefaultRegelMotor(StrengtFortroligRegel(), FortroligRegel(),DummyRegel())
+        private val MOTOR = RegelMotor(StrengtFortroligRegel(), FortroligRegel(),DummyRegel())
         private val KODE6KANDIDAT = Kandidat(FNR, STRENGT_FORTROLIG)
         private val KODE7KANDIDAT = Kandidat(FNR, FORTROLIG)
         private val VANLIGKANDIDAT = Kandidat(FNR)

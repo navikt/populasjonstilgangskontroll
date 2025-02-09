@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming
 import org.springframework.stereotype.Service
 
 @Service
-class DefaultTilgangTjeneste(private val regelMotor: RegelMotor,private val kandidatTjeneste: KandidatTjeneste, private val saksbehandlerTjeneste: SaksbehandlerTjeneste, private val skjerming: SkjermingTjeneste) : TilgangTjeneste{
+class DefaultRegelTjeneste(private val regelMotor: RegelMotor, private val kandidatTjeneste: KandidatTjeneste, private val saksbehandlerTjeneste: SaksbehandlerTjeneste, private val skjerming: SkjermingTjeneste) : TilgangTjeneste{
     override fun sjekkTilgang(saksbehandlerId: NavId, kandidatId: Fødselsnummer) =
 
         regelMotor.vurderTilgang(kandidatTjeneste.kandidat(kandidatId), saksbehandlerTjeneste.saksbehandler(saksbehandlerId))

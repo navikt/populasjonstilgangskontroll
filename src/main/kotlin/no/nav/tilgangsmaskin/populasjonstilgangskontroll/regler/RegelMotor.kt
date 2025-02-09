@@ -11,7 +11,7 @@ class RegelMotor(private vararg val regler: Regel)  {
      fun vurderTilgang(k: Kandidat, s: Saksbehandler) =
         regler.sortedWith(INSTANCE).forEach {
             if (!it.test(k, s)) {
-                throw TilgangException(k.ident, s.navId, it.forklaring)
+                throw RegelException(k.ident, s.navId, it.forklaring)
             }
         }
     }

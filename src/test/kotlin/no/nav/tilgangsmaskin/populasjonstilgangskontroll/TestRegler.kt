@@ -12,7 +12,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.DummyRegel
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelMotor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.StrengtFortroligRegel
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.FortroligRegel
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TilgangException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -23,13 +23,13 @@ class TestRegler {
     @Test
     @DisplayName("Test at kode 7 kandidat ikke kan behandles av kode 6 saksbehandler")
     fun kode7kandidatIkkeKode6() {
-        assertThrows<TilgangException> { MOTOR.vurderTilgang(KODE7KANDIDAT, KODE6SB) }
+        assertThrows<RegelException> { MOTOR.vurderTilgang(KODE7KANDIDAT, KODE6SB) }
     }
 
     @Test
     @DisplayName("Test at kode 7 kandidat ikke kan behandles av vanlig saksbehandler")
     fun kode7kandidatIkkeVanlig() {
-        assertThrows<TilgangException> { MOTOR.vurderTilgang(KODE7KANDIDAT, VANLIGSB) }
+        assertThrows<RegelException> { MOTOR.vurderTilgang(KODE7KANDIDAT, VANLIGSB) }
     }
 
     @Test
@@ -40,13 +40,13 @@ class TestRegler {
     @Test
     @DisplayName("Test at kode 6 kandidat ikke kan behandles av kode 7 saksbehandler")
     fun kode6kandidatIkkeKode7() {
-        assertThrows<TilgangException> { MOTOR.vurderTilgang(KODE6KANDIDAT, KODE7SB) }
+        assertThrows<RegelException> { MOTOR.vurderTilgang(KODE6KANDIDAT, KODE7SB) }
     }
 
     @Test
     @DisplayName("Test at kode 6 kandidat ikke kan behandles av vanlig saksbehandler")
     fun kode6kandidatIkkeVanlig() {
-        assertThrows<TilgangException> { MOTOR.vurderTilgang(KODE6KANDIDAT, VANLIGSB) }
+        assertThrows<RegelException> { MOTOR.vurderTilgang(KODE6KANDIDAT, VANLIGSB) }
     }
 
     @Test

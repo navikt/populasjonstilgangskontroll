@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
+import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import org.slf4j.LoggerFactory
 import org.springframework.graphql.client.ClientGraphQlRequest
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor
@@ -10,6 +11,6 @@ class LoggingGraphQLInterceptor : SyncGraphQlClientInterceptor {
 
     override fun intercept(req: ClientGraphQlRequest, chain: SyncGraphQlClientInterceptor.Chain) =
         chain.next(req).also {
-            log.trace("Eksekverer {} med variabler {}", req.document, req.variables)
+            log.trace(CONFIDENTIAL,"Eksekverer {} med variabler {}", req.document, req.variables)
         }
 }

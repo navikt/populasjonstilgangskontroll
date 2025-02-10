@@ -22,7 +22,7 @@ interface GraphQLErrorHandler {
 
     companion object {
         private val log = LoggerFactory.getLogger(GraphQLErrorHandler::class.java)
-        fun FieldAccessException.oversett(uri: URI) = response.errors.oversett(message, uri)
+        private fun FieldAccessException.oversett(uri: URI) = response.errors.oversett(message, uri)
 
         private fun List<ResponseError>.oversett(message: String?, uri: URI) = oversett(
             firstOrNull()?.extensions?.get("code")?.toString() ?: INTERNAL_SERVER_ERROR.name,
@@ -31,7 +31,7 @@ interface GraphQLErrorHandler {
                 log.warn("GraphQL oppslag returnerte $size feil, oversatte $message til ${it.javaClass.simpleName}", this)
             }
 
-        fun oversett(kode: String, msg: String, uri: URI) = IrrecoverableException(kode.tilStatus(), uri, msg)
+        private fun oversett(kode: String, msg: String, uri: URI) = IrrecoverableException(kode.tilStatus(), uri, msg)
         private fun String.tilStatus() = HttpStatus.valueOf(this.uppercase(Locale.getDefault()))
 
     }

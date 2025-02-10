@@ -24,6 +24,4 @@ class EntraClientBeanConfig {
 
     @Bean
     fun graphHealthIndicator(a: EntraClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
-
-
 }

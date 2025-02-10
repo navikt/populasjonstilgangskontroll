@@ -13,9 +13,9 @@ class  EntraClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
                           private val cf: EntraConfig,
                           errorHandler: ErrorHandler): AbstractRestClientAdapter(restClient,cf, errorHandler) {
 
-    fun attributter(ident: String) = get<EntraSaksbehandlerResponse>(cf.userURI(ident)).mapTo()
+    fun attributter(ident: String) = get<EntraSaksbehandlerResponse>(cf.userURI(ident)).tilAttributter()
 
-    fun grupper(ansattId: UUID) =
+    fun grupper(ansattId: String) =
         generateSequence(get<EntraGrupperBolk>(cf.grupperURI(ansattId))) {
             it.next?.let {
                 get<EntraGrupperBolk>(it)
@@ -24,6 +24,6 @@ class  EntraClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
             it.value
         }.toList().toTypedArray()
 
-    private fun EntraSaksbehandlerResponse.mapTo() = EntraResponsMapper.mapAttributter(attributter.first())
+    private fun EntraSaksbehandlerResponse.tilAttributter() = EntraResponsMapper.mapAttributter(attributter.first())
 
 }

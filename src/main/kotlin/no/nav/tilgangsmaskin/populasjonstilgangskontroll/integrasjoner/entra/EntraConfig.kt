@@ -16,11 +16,11 @@ class EntraConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: B
         .queryParam(PARAM_NAME_COUNT, "true")
         .build()
 
-    fun grupperURI(ansattId: UUID) = builder().path(GRUPPER_PATH)
+    fun grupperURI(ansattId: String) = builder().path(GRUPPER_PATH)
         .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
         .queryParam(PARAM_NAME_COUNT, "true")
-        .queryParam(PARAM_NAME_TOP, "5")
-        .build("$ansattId")
+        .queryParam(PARAM_NAME_TOP, "50")
+        .build(ansattId)
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 

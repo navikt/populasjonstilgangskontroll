@@ -19,6 +19,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(Exception::class)
     fun catchAll(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
+
     private fun createProblem(e: Exception, req: NativeWebRequest, status: HttpStatus) =
         status(status)
             .headers(HttpHeaders().apply { contentType = APPLICATION_PROBLEM_JSON })

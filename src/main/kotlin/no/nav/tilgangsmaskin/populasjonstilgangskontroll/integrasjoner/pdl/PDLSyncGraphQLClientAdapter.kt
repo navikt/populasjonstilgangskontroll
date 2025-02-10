@@ -20,15 +20,13 @@ class PDLGraphQLClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQl
                               errorHandler: ErrorHandler,
                               cfg: PDLConfig) : AbstractGraphQLAdapter(restClient, cfg,errorHandler,graphQlErrorHandler) {
 
-    override fun ping(): Map<String, String> {
-        restClient
+    override fun ping()  {
+         restClient
             .options()
             .uri(baseUri)
             .accept(APPLICATION_JSON, TEXT_PLAIN)
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
-            .toBodilessEntity()
-        return emptyMap()
     }
 
     fun gt(ident: String) = query<GTRespons>(graphQlClient, GT_QUERY, ident(ident))

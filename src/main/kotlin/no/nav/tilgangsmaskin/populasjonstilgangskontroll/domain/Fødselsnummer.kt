@@ -17,7 +17,7 @@ value class Fødselsnummer(@JsonValue val verdi: String) {
     init {
         with(verdi) {
             require(length == 11) { "Ugyldig lengde  $length for $this, forventet 11" }
-            require(all { it.isDigit()}) { "Ugyldig(e) tegn i $this, forventet kun tall" }
+            require(all { it.isDigit()}) { "Ugyldig(e) tegn i $this, forventet kun 11 tall" }
             if (isProd) {
                 require(mod11(W1, this) == this[9] - '0') { "Første kontrollsiffer $this[9] ikke validert" }
                 require(mod11(W2, this) == this[10] - '0') { "Andre kontrollsiffer $this[10] ikke validert" }

@@ -7,14 +7,14 @@ abstract class AbstractPingableHealthIndicator(private val pingable: Pingable) :
 
     override fun health() =
         runCatching {
-            up(pingable.ping())
+            pingable.ping()
+            up()
         }.getOrElse(::down)
 
-    private fun up(status: Map<String, String>) = with(pingable) {
+    private fun up() = with(pingable) {
         if (isEnabled()) {
             Health.up()
                 .withDetail("endpoint", pingEndpoint())
-                //.withDetails(status)
                 .build()
         } else {
             Health.up()

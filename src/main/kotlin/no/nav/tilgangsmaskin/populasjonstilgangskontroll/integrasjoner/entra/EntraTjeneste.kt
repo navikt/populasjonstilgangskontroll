@@ -11,11 +11,10 @@ import java.util.*
 @Cacheable(GRAPH)
 class EntraTjeneste(private val adapter: EntraClientAdapter) {
 
-
     fun saksbehandler(ident: NavId) : Saksbehandler {
         val attributter = adapter.attributter(ident.verdi)
         val grupper = adapter.grupper(attributter.id)
-        return Saksbehandler(attributter, *grupper)
+        return Saksbehandler(attributter,*grupper)
     }
 
     fun ansattAzureId(ident: NavId) = adapter.attributter(ident.verdi)

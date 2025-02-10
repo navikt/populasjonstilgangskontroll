@@ -10,6 +10,7 @@ class RegelMotor(private vararg val regler: Regel)  {
 
      fun vurderTilgang(k: Kandidat, s: Saksbehandler) =
         regler.sortedWith(INSTANCE).forEach {
+            println("Executing rule: ${it.forklaring.navn}")
             if (!it.test(k, s)) {
                 throw RegelException(k.ident, s.navId, it.forklaring)
             }

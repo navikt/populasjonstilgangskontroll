@@ -94,6 +94,32 @@ class TestRegler {
         assertThrows<RegelException> { MOTOR.vurderTilgang(ANSATTKANDIDAT, VANLIGSB) }
     }
 
+    @Test
+    @DisplayName("Test at egen ansatt kandidat med kode 6 ikke kan behandles av egen ansatt saksbehandler")
+    fun egenAnsattErOgsåKode6() {
+        assertThrows<RegelException> { MOTOR.vurderTilgang(ANSATTKODE6KANDIDAT, EGENSB) }
+    }
+    @Test
+    @DisplayName("Test at egen ansatt kandidat med kode 7 ikke kan behandles av egen ansatt saksbehandler")
+    fun egenAnsattErOgsåKode7() {
+        assertThrows<RegelException> { MOTOR.vurderTilgang(ANSATTKODE7KANDIDAT, EGENSB) }
+    }
+    @Test
+    @DisplayName("Test at egen ansatt kandidat med kode 7 kan behandles av kode 7 saksbehandler som også har ansatt gruppe")
+    fun egenAnsattKode7SB() {
+        MOTOR.vurderTilgang(ANSATTKODE7KANDIDAT, KODE7OGEGENSB)
+    }
+    @Test
+    @DisplayName("Test at egen ansatt kandidat med kode 6 kan behandles av kode 6 saksbehandler som også gar hgeb ansatt gruppe")
+    fun egenAnsattKode6OK() {
+        MOTOR.vurderTilgang(ANSATTKODE6KANDIDAT, KODE6OGEGENSB)
+    }
+    @Test
+    @DisplayName("Test at egen ansatt kandidat med kode 6 ikke kan behandles av kode 7 saksbehandler")
+    fun egenAnsattKode6SB() {
+        assertThrows<RegelException> {MOTOR.vurderTilgang(ANSATTKODE6KANDIDAT, KODE7SB) }
+    }
+
 
     companion object {
         private val STRENGT_FORTROLIG_ID = UUID.randomUUID()
@@ -105,12 +131,17 @@ class TestRegler {
         private val NAVID = NavId("Z999999")
         private val ATTRS = SaksbehandlerAttributter(UUID.randomUUID(),NAVID,"En","Saksbehandler", ENHET)
         private val FNR = Fødselsnummer("11111111111")
-        private val MOTOR = RegelMotor(StrengtFortroligRegel(STRENGT_FORTROLIG_ID), FortroligRegel(FORTROLIG_ID),EgenAnsattRegel(EGENANSATT_ID))
-        private val KODE6KANDIDAT = Kandidat(FNR, STRENGT_FORTROLIG)
-        private val KODE7KANDIDAT = Kandidat(FNR, FORTROLIG)
-        private val VANLIGKANDIDAT = Kandidat(FNR, INGEN)
-        private val ANSATTKANDIDAT = Kandidat(FNR, INGEN)
+        private val MOTOR = RegelMotor(/*StrengtFortroligRegel(STRENGT_FORTROLIG_ID), FortroligRegel(FORTROLIG_ID),*/EgenAnsattRegel(EGENANSATT_ID))
+        private val KODE6KANDIDAT = Kandidat(FNR, listOf(STRENGT_FORTROLIG))
+        private val KODE7KANDIDAT = Kandidat(FNR, listOf(FORTROLIG))
+        private val VANLIGKANDIDAT = Kandidat(FNR, listOf(INGEN))
+        private val ANSATTKANDIDAT = Kandidat(FNR, listOf(EGEN))
+        private val ANSATTKODE6KANDIDAT = Kandidat(FNR, listOf(EGEN, STRENGT_FORTROLIG))
+        private val ANSATTKODE7KANDIDAT = Kandidat(FNR, listOf(EGEN, FORTROLIG))
 
+
+        private val KODE7OGEGENSB = Saksbehandler(ATTRS, EntraGruppe(FORTROLIG_ID, "fortrolig gruppe"), EntraGruppe(EGENANSATT_ID, "egen gruppe"))
+        private val KODE6OGEGENSB = Saksbehandler(ATTRS, EntraGruppe(STRENGT_FORTROLIG_ID, "strengt fortrolig gruppe"), EntraGruppe(EGENANSATT_ID, "egen gruppe"))
         private val KODE6SB = Saksbehandler(ATTRS, EntraGruppe(STRENGT_FORTROLIG_ID, "strengt fortrolig gruppe"))
         private val KODE7SB = Saksbehandler(ATTRS, EntraGruppe(FORTROLIG_ID, "fortrolig gruppe"))
         private val EGENSB = Saksbehandler(ATTRS, EntraGruppe(EGENANSATT_ID, "egen ansatt gruppe"))

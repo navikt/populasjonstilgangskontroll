@@ -1,3 +1,3 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
-enum class GlobalGruppe { STRENGT_FORTROLIG, FORTROLIG, INGEN }
+enum class GlobalGruppe { STRENGT_FORTROLIG, FORTROLIG, EGEN,INGEN }

@@ -126,21 +126,26 @@ class TestRegler {
         private val NAVID = NavId("Z999999")
         private val ATTRS = SaksbehandlerAttributter(randomUUID(),NAVID,"En","Saksbehandler", ENHET)
         private val FNR = Fødselsnummer("11111111111")
+
         private val KODE6KANDIDAT = Kandidat(FNR, STRENGT_FORTROLIG)
         private val KODE7KANDIDAT = Kandidat(FNR, FORTROLIG)
         private val VANLIGKANDIDAT = Kandidat(FNR)
         private val ANSATTKANDIDAT = Kandidat(FNR, EGEN)
         private val ANSATTKODE6KANDIDAT = Kandidat(FNR, EGEN, STRENGT_FORTROLIG)
         private val ANSATTKODE7KANDIDAT = Kandidat(FNR, EGEN, FORTROLIG)
+
+        private val STRENGT_FORTROLIG_GRUPPE = EntraGruppe(randomUUID(), "strengt fortrolig gruppe")
         private val FORTROLIG_GRUPPE = EntraGruppe(randomUUID(), "fortrolig gruppe")
         private val EGEN_GRUPPE = EntraGruppe(randomUUID(), "egen gruppe")
-        private val STRENGT_FORTROLIG_GRUPPE = EntraGruppe(randomUUID(), "strengt fortrolig gruppe")
+        private val ANNENGRUPPE = EntraGruppe(randomUUID(), "annen gruppe")
+
         private val KODE7OGEGENSB = Saksbehandler(ATTRS, FORTROLIG_GRUPPE, EGEN_GRUPPE)
         private val KODE6OGEGENSB = Saksbehandler(ATTRS, STRENGT_FORTROLIG_GRUPPE, EGEN_GRUPPE)
         private val KODE6SB = Saksbehandler(ATTRS, STRENGT_FORTROLIG_GRUPPE)
         private val KODE7SB = Saksbehandler(ATTRS, FORTROLIG_GRUPPE)
         private val EGENSB = Saksbehandler(ATTRS, EGEN_GRUPPE)
-        private val VANLIGSB = Saksbehandler(ATTRS, EntraGruppe(randomUUID(), "annen gruppe"))
+        private val VANLIGSB = Saksbehandler(ATTRS, ANNENGRUPPE)
+
         private val MOTOR = RegelMotor(StrengtFortroligRegel(STRENGT_FORTROLIG_GRUPPE.id), FortroligRegel(FORTROLIG_GRUPPE.id),EgenAnsattRegel(EGEN_GRUPPE.id))
 
     }

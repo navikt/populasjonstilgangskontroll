@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Kandidat
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Saksbehandler
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Saksbehandler.SaksbehandlerAttributter
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.DummyRegel
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.EgenAnsattRegel
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelMotor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.StrengtFortroligRegel
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.FortroligRegel
@@ -72,21 +72,48 @@ class TestRegler {
         MOTOR.vurderTilgang(VANLIGKANDIDAT, VANLIGSB)
     }
 
+    @Test
+    @DisplayName("Test at egen ansatt kandidat kan behandles av egen ansatt saksbehandler")
+    fun egenAnsattOK() {
+        MOTOR.vurderTilgang(ANSATTKANDIDAT, EGENSB)
+    }
+
+    @Test
+    @DisplayName("Test at egen ansatt kandidat ikke kan behandles av kode7 saksbehandler")
+    fun egenAnsattKode7() {
+        assertThrows<RegelException> { MOTOR.vurderTilgang(ANSATTKANDIDAT, KODE7SB) }
+    }
+    @Test
+    @DisplayName("Test at egen ansatt kandidat ikke kan behandles av kode6 saksbehandler")
+    fun egenAnsattKode6() {
+        assertThrows<RegelException> { MOTOR.vurderTilgang(ANSATTKANDIDAT, KODE6SB) }
+    }
+    @Test
+    @DisplayName("Test at egen ansatt kandidat ikke kan behandles av vanlig saksbehandler")
+    fun egenAnsattVanlig() {
+        assertThrows<RegelException> { MOTOR.vurderTilgang(ANSATTKANDIDAT, VANLIGSB) }
+    }
+
 
     companion object {
         private val STRENGT_FORTROLIG_ID = UUID.randomUUID()
         private val FORTROLIG_ID = UUID.randomUUID()
+        private val EGENANSATT_ID = UUID.randomUUID()
+
 
         private val ENHET = Enhetsnummer("4242")
         private val NAVID = NavId("Z999999")
         private val ATTRS = SaksbehandlerAttributter(UUID.randomUUID(),NAVID,"En","Saksbehandler", ENHET)
         private val FNR = Fødselsnummer("11111111111")
-        private val MOTOR = RegelMotor(StrengtFortroligRegel(STRENGT_FORTROLIG_ID), FortroligRegel(FORTROLIG_ID),DummyRegel())
+        private val MOTOR = RegelMotor(StrengtFortroligRegel(STRENGT_FORTROLIG_ID), FortroligRegel(FORTROLIG_ID),EgenAnsattRegel(EGENANSATT_ID))
         private val KODE6KANDIDAT = Kandidat(FNR, STRENGT_FORTROLIG)
         private val KODE7KANDIDAT = Kandidat(FNR, FORTROLIG)
         private val VANLIGKANDIDAT = Kandidat(FNR, INGEN)
+        private val ANSATTKANDIDAT = Kandidat(FNR, INGEN)
+
         private val KODE6SB = Saksbehandler(ATTRS, EntraGruppe(STRENGT_FORTROLIG_ID, "strengt fortrolig gruppe"))
         private val KODE7SB = Saksbehandler(ATTRS, EntraGruppe(FORTROLIG_ID, "fortrolig gruppe"))
+        private val EGENSB = Saksbehandler(ATTRS, EntraGruppe(EGENANSATT_ID, "egen ansatt gruppe"))
         private val VANLIGSB = Saksbehandler(ATTRS, EntraGruppe(UUID.randomUUID(), "annen gruppe"))
     }
 }

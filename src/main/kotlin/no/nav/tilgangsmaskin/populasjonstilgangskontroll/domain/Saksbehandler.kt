@@ -8,6 +8,6 @@ class Saksbehandler(val  attributter: SaksbehandlerAttributter,vararg val gruppe
     val navId = attributter.navId
     fun kanBehandle(id: UUID) = grupper.any { it.id == id }
 
-    override fun toString() = "${javaClass.simpleName} [attributter=$attributter,grupper=$grupper]"
+    override fun toString() = "${javaClass.simpleName} [attributter=$attributter,grupper=${grupper.contentToString()}]"
 
 }

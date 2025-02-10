@@ -19,6 +19,7 @@ class KandidatTjeneste(private val pdl: PersonTjeneste) {
 }
 @Service
 class SaksbehandlerTjeneste(private val entra: EntraTjeneste) {  // kan slå opp mer her senere
+
     private val log = getLogger(SaksbehandlerTjeneste::class.java)
 
     fun saksbehandler(navId: NavId) = entra.saksbehandler(navId).also {

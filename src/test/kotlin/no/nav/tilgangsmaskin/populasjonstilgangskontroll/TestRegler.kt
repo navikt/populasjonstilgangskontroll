@@ -16,7 +16,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.util.UUID
+import java.util.UUID.randomUUID
 
 class TestRegler {
 
@@ -122,14 +122,14 @@ class TestRegler {
 
 
     companion object {
-        private val STRENGT_FORTROLIG_ID = UUID.randomUUID()
-        private val FORTROLIG_ID = UUID.randomUUID()
-        private val EGENANSATT_ID = UUID.randomUUID()
+        private val STRENGT_FORTROLIG_ID = randomUUID()
+        private val FORTROLIG_ID = randomUUID()
+        private val EGENANSATT_ID = randomUUID()
 
 
         private val ENHET = Enhetsnummer("4242")
         private val NAVID = NavId("Z999999")
-        private val ATTRS = SaksbehandlerAttributter(UUID.randomUUID(),NAVID,"En","Saksbehandler", ENHET)
+        private val ATTRS = SaksbehandlerAttributter(randomUUID(),NAVID,"En","Saksbehandler", ENHET)
         private val FNR = Fødselsnummer("11111111111")
         private val MOTOR = RegelMotor(StrengtFortroligRegel(STRENGT_FORTROLIG_ID), FortroligRegel(FORTROLIG_ID),EgenAnsattRegel(EGENANSATT_ID))
         private val KODE6KANDIDAT = Kandidat(FNR, STRENGT_FORTROLIG)
@@ -140,14 +140,12 @@ class TestRegler {
         private val ANSATTKODE7KANDIDAT = Kandidat(FNR, EGEN, FORTROLIG)
         private val FORTROLIG_GRUPPE = EntraGruppe(FORTROLIG_ID, "fortrolig gruppe")
         private val EGEN_GRUPPE = EntraGruppe(EGENANSATT_ID, "egen gruppe")
-       private val STRENGT_FORTROLIG_GRUPPE = EntraGruppe(STRENGT_FORTROLIG_ID, "strengt fortrolig gruppe")
-
-
+        private val STRENGT_FORTROLIG_GRUPPE = EntraGruppe(STRENGT_FORTROLIG_ID, "strengt fortrolig gruppe")
         private val KODE7OGEGENSB = Saksbehandler(ATTRS, FORTROLIG_GRUPPE, EGEN_GRUPPE)
         private val KODE6OGEGENSB = Saksbehandler(ATTRS, STRENGT_FORTROLIG_GRUPPE, EGEN_GRUPPE)
         private val KODE6SB = Saksbehandler(ATTRS, STRENGT_FORTROLIG_GRUPPE)
         private val KODE7SB = Saksbehandler(ATTRS, FORTROLIG_GRUPPE)
         private val EGENSB = Saksbehandler(ATTRS, EGEN_GRUPPE)
-        private val VANLIGSB = Saksbehandler(ATTRS, EntraGruppe(UUID.randomUUID(), "annen gruppe"))
+        private val VANLIGSB = Saksbehandler(ATTRS, EntraGruppe(randomUUID(), "annen gruppe"))
     }
 }

@@ -17,7 +17,7 @@ object KandidatMapper {
             if  (person.adressebeskyttelse.any { it.gradering in listOf(AdressebeskyttelseGradering.FORTROLIG,
                     AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND) })  add(GlobalGruppe.FORTROLIG)
             if (skjermet) add(GlobalGruppe.EGEN)
-        }
-        return Kandidat(fnr, beskyttelse).also { log.trace(EnvUtil.CONFIDENTIAL, "Mappet person {} til kandidat {}", person, it) }
+        }.toTypedArray()
+        return Kandidat(fnr, *beskyttelse).also { log.trace(EnvUtil.CONFIDENTIAL, "Mappet person {} til kandidat {}", person, it) }
     }
 }

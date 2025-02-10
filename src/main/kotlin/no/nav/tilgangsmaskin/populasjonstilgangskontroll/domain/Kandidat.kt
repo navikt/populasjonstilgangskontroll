@@ -2,8 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe
 
-data class Kandidat(val ident: Fødselsnummer,
-                    private val beskyttelse: List<GlobalGruppe>) {
+class Kandidat(val ident: Fødselsnummer, vararg private val beskyttelse: GlobalGruppe) {
 
     fun  kreverGruppe(gruppe: GlobalGruppe) = beskyttelse.contains(gruppe)
     override fun toString() = "${javaClass.simpleName} [ident=$ident, beskyttelse=$beskyttelse]"

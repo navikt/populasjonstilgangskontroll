@@ -84,7 +84,7 @@ class TestRegler {
         private val MOTOR = RegelMotor(StrengtFortroligRegel(STRENGT_FORTROLIG_ID), FortroligRegel(FORTROLIG_ID),DummyRegel())
         private val KODE6KANDIDAT = Kandidat(FNR, STRENGT_FORTROLIG)
         private val KODE7KANDIDAT = Kandidat(FNR, FORTROLIG)
-        private val VANLIGKANDIDAT = Kandidat(FNR)
+        private val VANLIGKANDIDAT = Kandidat(FNR, INGEN)
         private val KODE6SB = Saksbehandler(ATTRS, EntraGruppe(STRENGT_FORTROLIG_ID, "strengt fortrolig gruppe"))
         private val KODE7SB = Saksbehandler(ATTRS, EntraGruppe(FORTROLIG_ID, "fortrolig gruppe"))
         private val VANLIGSB = Saksbehandler(ATTRS, EntraGruppe(UUID.randomUUID(), "annen gruppe"))

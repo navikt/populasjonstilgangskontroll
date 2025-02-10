@@ -7,8 +7,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.Regel.RegelForkl
 import org.springframework.http.HttpStatus.FORBIDDEN
 
 class RegelException(kandidatId: Fødselsnummer, saksbehandlerId: NavId, forklaring: RegelForklaring) : IrrecoverableException(
-    FORBIDDEN,
-    "Tilgang nektet: ${forklaring.navn}",mapOf(
+    FORBIDDEN, String.format(forklaring.feilmelding,saksbehandlerId.verdi, kandidatId),mapOf(
         "kandidat" to kandidatId.verdi,
         "saksbehandler" to saksbehandlerId.verdi,
         "kode" to forklaring.kode,

@@ -13,7 +13,7 @@ import java.util.UUID
 @Component
 @Order(HIGHEST_PRECEDENCE)
 class StrengtFortroligRegel(@Value("\${gruppe.strengt}") private val id: UUID): Regel {
-    override val forklaring = RegelForklaring("Kode 6","Saksbehandler har ikke tilgang til kode 6", "6")
+    override val forklaring = RegelForklaring("Kode 6","Saksbehandler %s kan ikke behandle %s", "6")
     override fun test(k: Kandidat, s: Saksbehandler) =
         if (k.kreverGruppe(STRENGT_FORTROLIG)) {
             s.kanBehandle(id)

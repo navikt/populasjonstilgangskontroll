@@ -12,6 +12,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenUtil
 import org.springframework.web.bind.annotation.GetMapping
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenUtil.Companion.AAD_ISSUER
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 
 @SecurityScheme(
     bearerFormat = "JWT",
@@ -28,10 +30,10 @@ class Tilgangskontroll(val service : RegelTjeneste, val ansatt: EntraTjeneste, p
     @SecurityRequirement(name = "bearerAuth")
     fun hentAnsatt(ident: NavId) = ansatt.ansattAzureId(ident)
 
-    @GetMapping("tilgang")
+    @PostMapping("tilgang")
     @SecurityRequirement(name="bearerAuth")
-    // TODO Gjør om til POST
-    fun validerTilgang(kandidatId: Fødselsnummer) {
+    fun validerTilgang(@RequestBody kandidatId: Fødselsnummer)
+    {
         tokenUtil.all.forEach { (k,v) -> log.info("$k->$v") }
         val id = tokenUtil.navIdentFromToken
         service.sjekkTilgang(id, kandidatId);

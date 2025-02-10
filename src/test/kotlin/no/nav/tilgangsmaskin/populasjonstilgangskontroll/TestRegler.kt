@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Enhetsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.EntraGruppe
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.FortroligGruppe.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Kandidat
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
@@ -74,18 +74,19 @@ class TestRegler {
 
 
     companion object {
+        private val STRENGT_FORTROLIG_ID = UUID.randomUUID()
+        private val FORTROLIG_ID = UUID.randomUUID()
+
         private val ENHET = Enhetsnummer("4242")
         private val NAVID = NavId("Z999999")
         private val ATTRS = SaksbehandlerAttributter(UUID.randomUUID(),NAVID,"En","Saksbehandler", ENHET)
         private val FNR = Fødselsnummer("11111111111")
-        private val MOTOR = RegelMotor(StrengtFortroligRegel(), FortroligRegel(),DummyRegel())
+        private val MOTOR = RegelMotor(StrengtFortroligRegel(STRENGT_FORTROLIG_ID), FortroligRegel(FORTROLIG_ID),DummyRegel())
         private val KODE6KANDIDAT = Kandidat(FNR, STRENGT_FORTROLIG)
         private val KODE7KANDIDAT = Kandidat(FNR, FORTROLIG)
         private val VANLIGKANDIDAT = Kandidat(FNR)
-        private val KODE6SB = Saksbehandler(ATTRS, EntraGruppe(STRENGT_FORTROLIG.gruppeId, STRENGT_FORTROLIG.gruppeNavn))
-        private val KODE7SB = Saksbehandler(ATTRS, EntraGruppe(FORTROLIG.gruppeId, FORTROLIG.gruppeNavn))
+        private val KODE6SB = Saksbehandler(ATTRS, EntraGruppe(STRENGT_FORTROLIG_ID, "strengt fortrolig gruppe"))
+        private val KODE7SB = Saksbehandler(ATTRS, EntraGruppe(FORTROLIG_ID, "fortrolig gruppe"))
         private val VANLIGSB = Saksbehandler(ATTRS, EntraGruppe(UUID.randomUUID(), "annen gruppe"))
-
-
     }
 }

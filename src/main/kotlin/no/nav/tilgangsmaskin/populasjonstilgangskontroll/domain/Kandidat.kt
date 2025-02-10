@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
 
-class Kandidat(val ident: Fødselsnummer, private val beskyttelse: FortroligGruppe? = null) {
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe
 
-    fun  kreverGruppe(gruppe: FortroligGruppe) = gruppe == beskyttelse
-    val erUbeskyttet = beskyttelse == null
+class Kandidat(val ident: Fødselsnummer, private val beskyttelse: GlobalGruppe? = null) {
 
+    fun  kreverGruppe(gruppe: GlobalGruppe) = gruppe == beskyttelse
     override fun toString() = "${javaClass.simpleName} [ident=$ident,beskyttelse=$beskyttelse]"
 }

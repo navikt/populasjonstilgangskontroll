@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Kandidat
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Saksbehandler
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.Regel.RegelForklaring
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.Regel.RegelBeskrivelse
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
@@ -15,5 +15,5 @@ class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Re
     override fun test(k: Kandidat, s: Saksbehandler) = if (k.kreverGruppe(GlobalGruppe.EGEN))  {
         s.kanBehandle(id)
     } else true
-    override val forklaring = RegelForklaring("Egen ansatt","Saksbehandler %s kan ikke behandle egen ansatt %s", "007")
+    override val beskrivelse = RegelBeskrivelse("Egen ansatt", "007")
 }

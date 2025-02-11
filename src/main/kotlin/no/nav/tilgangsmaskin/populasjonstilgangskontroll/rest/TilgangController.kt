@@ -17,14 +17,14 @@ import org.springframework.web.bind.annotation.RequestBody
 @SecurityScheme(bearerFormat = "JWT", name = "bearerAuth", scheme = "bearer", type = HTTP )
 @ProtectedRestController(value = ["/api/v1"], issuer = AAD_ISSUER, claimMap = [])
 @SecurityRequirement(name = "bearerAuth")
-class TilgangController(val service : RegelTjeneste, val ansatt: EntraTjeneste, private val token: TokenAccessor) {
+class TilgangController(val regler : RegelTjeneste, val ansatt: EntraTjeneste, private val token: TokenAccessor) {
 
 
     @GetMapping("ansatt")
     fun hentAnsatt(navId: NavId) = ansatt.ansattAzureId(navId)
 
     @PostMapping("tilgang")
-    fun validerTilgang(@RequestBody kandidatId: Fødselsnummer) = service.sjekkTilgang(token.navIdent, kandidatId);
+    fun validerTilgang(@RequestBody kandidatId: Fødselsnummer) = regler.sjekkTilgang(token.navIdent, kandidatId);
 
 }
 

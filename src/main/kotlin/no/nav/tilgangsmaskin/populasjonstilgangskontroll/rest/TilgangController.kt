@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest
 
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType.HTTP
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import no.nav.security.token.support.spring.ProtectedRestController
@@ -8,10 +8,9 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenUtil
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor
 import org.springframework.web.bind.annotation.GetMapping
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenUtil.Companion.AAD_ISSUER
-import org.slf4j.LoggerFactory.getLogger
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor.Companion.AAD_ISSUER
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
@@ -19,26 +18,19 @@ import org.springframework.web.bind.annotation.RequestBody
     bearerFormat = "JWT",
     name = "bearerAuth",
     scheme = "bearer",
-    type = SecuritySchemeType.HTTP,
+    type = HTTP,
 )
 @ProtectedRestController(value = ["/api/v1"], issuer = AAD_ISSUER, claimMap = [])
-class Tilgangskontroll(val service : RegelTjeneste, val ansatt: EntraTjeneste, private val tokenUtil: TokenUtil) {
+class TilgangController(val service : RegelTjeneste, val ansatt: EntraTjeneste, private val token: TokenAccessor) {
 
-    private val log = getLogger(Tilgangskontroll::class.java)
 
     @GetMapping("ansatt")
     @SecurityRequirement(name = "bearerAuth")
-    fun hentAnsatt(ident: NavId) = ansatt.ansattAzureId(ident)
+    fun hentAnsatt(navId: NavId) = ansatt.ansattAzureId(navId)
 
     @PostMapping("tilgang")
     @SecurityRequirement(name="bearerAuth")
-    fun validerTilgang(@RequestBody kandidatId: Fødselsnummer)
-    {
-        tokenUtil.all.forEach { (k,v) -> log.info("$k->$v") }
-        val id = tokenUtil.navIdentFromToken
-        service.sjekkTilgang(id, kandidatId);
-    }
-
+    fun validerTilgang(@RequestBody kandidatId: Fødselsnummer) = service.sjekkTilgang(token.navIdent, kandidatId);
 
 }
 

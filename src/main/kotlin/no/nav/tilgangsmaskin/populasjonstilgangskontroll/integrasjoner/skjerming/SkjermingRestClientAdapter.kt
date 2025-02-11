@@ -10,7 +10,9 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 @Component
 class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, private val cf : SkjermingConfig, errorHandler: ErrorHandler): AbstractRestClientAdapter(restClient, cf, errorHandler) {
+
     fun skjermetPerson(ident: String) = post<Boolean>(cf.skjermetUri(), mapOf(IDENT to ident))
+    
 }
 
 

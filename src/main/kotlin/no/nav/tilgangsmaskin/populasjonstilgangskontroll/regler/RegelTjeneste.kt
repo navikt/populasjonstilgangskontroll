@@ -5,9 +5,9 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 import org.springframework.stereotype.Service
 
 @Service
-class DefaultRegelTjeneste(private val regelMotor: RegelMotor, private val kandidatTjeneste: KandidatTjeneste, private val saksbehandlerTjeneste: SaksbehandlerTjeneste) : RegelTjeneste {
+class RegelTjeneste(private val regelMotor: RegelMotor, private val kandidatTjeneste: KandidatTjeneste, private val saksbehandlerTjeneste: SaksbehandlerTjeneste)  {
 
-    override fun sjekkTilgang(saksbehandlerId: NavId, kandidatId: Fødselsnummer) =
+    fun sjekkTilgang(saksbehandlerId: NavId, kandidatId: Fødselsnummer) =
         regelMotor.vurderTilgang(kandidatTjeneste.kandidat(kandidatId), saksbehandlerTjeneste.saksbehandler(saksbehandlerId))
         /**
         Prioritert utslagskriterier:

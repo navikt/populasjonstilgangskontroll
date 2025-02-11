@@ -17,7 +17,7 @@ import java.util.UUID
 
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
-class DevController(val pdl : PersonTjeneste, val skjerming: SkjermingTjeneste, val ansatt: EntraTjeneste, val tjeneste: RegelTjeneste)
+class DevTilgangController(val pdl : PersonTjeneste, val skjerming: SkjermingTjeneste, val ansatt: EntraTjeneste, val regler: RegelTjeneste)
 {
     @GetMapping(PDLConfig.Companion.PDL)
     fun hentPerson(fnr: Fødselsnummer) = pdl.kandidat(fnr)
@@ -35,6 +35,6 @@ class DevController(val pdl : PersonTjeneste, val skjerming: SkjermingTjeneste, 
     fun hentAnsattTilganger(azureId : UUID) = ansatt.ansattTilganger(azureId)
 
     @GetMapping("tilgang")
-    fun sjekkTilgang(@RequestParam saksbehandler: NavId, @RequestParam kandidat: Fødselsnummer) = tjeneste.sjekkTilgang(saksbehandler, kandidat)
+    fun sjekkTilgang(@RequestParam saksbehandler: NavId, @RequestParam kandidat: Fødselsnummer) = regler.sjekkTilgang(saksbehandler, kandidat)
 
 }

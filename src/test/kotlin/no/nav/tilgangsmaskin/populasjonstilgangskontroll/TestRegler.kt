@@ -126,7 +126,7 @@ class TestRegler {
     companion object {
         private val ENHET = Enhetsnummer("4242")
         private val NAVID = NavId("Z999999")
-        private val ATTRS = SaksbehandlerAttributter(randomUUID(),NAVID,"En","Saksbehandler", ENHET)
+        private val ATTRS = SaksbehandlerAttributter(randomUUID(),NAVID,Navn("En","Saksbehandler"), ENHET)
         private val FNR = Fødselsnummer("11111111111")
         private val NAVN = Navn("Ola", "Nordmann")
 

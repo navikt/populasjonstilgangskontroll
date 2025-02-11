@@ -4,11 +4,9 @@ import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLConfig.Companion.PDL
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PersonTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig.Companion.SKJERMING
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.KandidatTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.DEV
 import org.springframework.web.bind.annotation.GetMapping
@@ -17,24 +15,18 @@ import java.util.UUID
 
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
-class DevTilgangController(val pdl : PersonTjeneste, val skjerming: SkjermingTjeneste, val ansatt: EntraTjeneste, val regler: RegelTjeneste)
+class DevTilgangController(val kandidat : KandidatTjeneste, val ansatt: EntraTjeneste, val regler: RegelTjeneste)
 {
-    @GetMapping(PDL)
-    fun hentPerson(fnr: Fødselsnummer) = pdl.kandidat(fnr)
+    @GetMapping("kandidat")
+    fun kandidat(fnr: Fødselsnummer) = kandidat.kandidat(fnr)
 
-    @GetMapping("${PDL}/gt")
-    fun gt(fnr: Fødselsnummer) = pdl.gt(fnr)
-
-    @GetMapping(SKJERMING)
-    fun erSkjermet(fnr: Fødselsnummer) = skjerming.erSkjermet(fnr)
-
-    @GetMapping("ansatt")
+    @GetMapping("$GRAPH/ansatt")
     fun hentAnsatt(ident: NavId) = ansatt.ansattAzureId(ident)
 
-    @GetMapping("ansattilganger")
+    @GetMapping("$GRAPH/tilganger")
     fun hentAnsattTilganger(azureId : UUID) = ansatt.ansattTilganger(azureId)
 
-    @GetMapping("tilgang")
+    @GetMapping("regler")
     fun sjekkTilgang(@RequestParam saksbehandler: NavId, @RequestParam kandidat: Fødselsnummer) = regler.sjekkTilgang(saksbehandler, kandidat)
 
 }

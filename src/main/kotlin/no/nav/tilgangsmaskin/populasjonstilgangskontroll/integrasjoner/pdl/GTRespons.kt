@@ -1,7 +1,5 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
-import com.neovisionaries.i18n.CountryCode.getByAlpha3Code
-
 data class GTRespons(
     val gtType: GTType,
     val gtKommune: GTKommune?,

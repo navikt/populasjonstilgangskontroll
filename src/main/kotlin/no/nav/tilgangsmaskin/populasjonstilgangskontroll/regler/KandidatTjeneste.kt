@@ -18,15 +18,10 @@ class KandidatTjeneste(private val pdl: PDLGraphQLClientAdapter, val egenAnsatt:
      fun kandidat(fnr: Fødselsnummer) : Kandidat {
          return runBlocking {
              val pdlDeferred = async { pdl.person(fnr.verdi) }
+             val gtDeferred = async { pdl.gt(fnr.verdi) }
              val skjermingDeferred = async { egenAnsatt.skjermetPerson(fnr.verdi) }
-             KandidatMapper.mapToKandidat(fnr,pdlDeferred.await(), skjermingDeferred.await())
+             KandidatMapper.mapToKandidat(fnr,pdlDeferred.await(), gtDeferred.await(), skjermingDeferred.await())
          }
-/*
-        val person =  pdl.person(fnr.verdi)
-        val skjermet = egenAnsatt.skjermetPerson(fnr.verdi)
-        return KandidatMapper.mapToKandidat(fnr,person, skjermet).also {
-            log.info(CONFIDENTIAL,"Kandidat: $it")
-        }*/
     } // kan slå opp mer her senere
 }
 @Service

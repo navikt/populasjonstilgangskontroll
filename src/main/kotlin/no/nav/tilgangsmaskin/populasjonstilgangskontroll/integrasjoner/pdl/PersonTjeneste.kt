@@ -13,6 +13,6 @@ import org.springframework.stereotype.Service
 @RetryingOnRecoverable
 @ConditionalOnNotProd
 class PersonTjeneste(private val adapter: PDLGraphQLClientAdapter) {
-    fun kandidat(fnr: Fødselsnummer) = adapter.person(fnr.verdi).let { KandidatMapper.mapToKandidat(fnr,it,false) }
+    fun kandidat(fnr: Fødselsnummer) = adapter.person(fnr.verdi).let { KandidatMapper.mapToKandidat(fnr,it,adapter.gt(fnr.verdi),false) }
     fun gt(fnr: Fødselsnummer) = adapter.gt(fnr.verdi)
 }

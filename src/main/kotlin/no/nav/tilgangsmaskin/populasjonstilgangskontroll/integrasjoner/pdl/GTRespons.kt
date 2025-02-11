@@ -6,20 +6,18 @@ data class GTRespons(
     val gtType: GTType,
     val gtKommune: GTKommune?,
     val gtBydel: GTBydel?,
-    val gtLand: GTLand? = null
-)
+    val gtLand: GTLand? = null)
 {
     enum class GTType { BYDEL, KOMMUNE, UDEFINERT, UTLAND }
 
     @JvmInline
-    value class GTKommune(val value: String)
+    value class GTKommune(val verdi: String)
 
     @JvmInline
-    value class GTBydel(val value: String)
+    value class GTBydel(val verdi: String)
 
-    data class GTLand(private val alpha3: String) {
-        val gtLand = getByAlpha3Code(alpha3)
-    }
+    @JvmInline
+    value  class GTLand(val verdi: String)
 }
 
 

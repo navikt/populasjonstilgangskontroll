@@ -1,9 +1,18 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
+import com.neovisionaries.i18n.CountryCode
 import no.nav.boot.conditionals.EnvUtil
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Kandidat
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.Bydel
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.BydelTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.Companion.UDEFINERTTILKNYTNING
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.Kommune
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.KommuneTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.GTRespons
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.GTRespons.GTType.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.Person
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.Person.Adressebeskyttelse.AdressebeskyttelseGradering
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
@@ -19,6 +28,13 @@ object KandidatMapper {
                     AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND) })  add(FORTROLIG)
             if (erSkjermet) add(EGEN)
         }.toTypedArray().let {
-             Kandidat(fnr, gt, *it).also { log.trace(EnvUtil.CONFIDENTIAL, "Mappet person {} til kandidat {}", person, it) }
+             Kandidat(fnr, mapTilknytning(gt), *it).also { log.trace(EnvUtil.CONFIDENTIAL, "Mappet person {} til kandidat {}", person, it) }
         }
+
+    private fun mapTilknytning(respons: GTRespons): GEOTilknytning = when (respons.gtType) {
+        UTLAND ->  respons.gtLand?.let {  UtenlandskTilknytning(CountryCode.getByAlpha3Code(it.verdi)) } ?: throw IllegalStateException("Utenlandsk tilknytning uten landkode")
+        KOMMUNE -> respons.gtKommune?.let {KommuneTilknytning(Kommune(it.verdi))} ?: throw IllegalStateException("Kommunal tilknytning uten kommunekode")
+        BYDEL ->  respons.gtBydel?.let {  BydelTilknytning(Bydel(it.verdi))}  ?: throw IllegalStateException("Bydelstilknytning uten bydelskode")
+        UDEFINERT -> UDEFINERTTILKNYTNING
+    }
 }

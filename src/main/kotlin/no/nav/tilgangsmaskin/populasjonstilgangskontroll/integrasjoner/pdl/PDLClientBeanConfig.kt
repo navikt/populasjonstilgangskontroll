@@ -33,5 +33,5 @@ class PDLClientBeanConfig {
             .build()
 
     @Bean
-    fun pdlHealthIndicator(a: PDLGraphQLClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
+    fun pdlHealthIndicator(a: PDLSyncGraphQLClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
 }

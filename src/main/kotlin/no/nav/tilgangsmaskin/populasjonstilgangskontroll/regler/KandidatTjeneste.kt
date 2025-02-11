@@ -7,13 +7,13 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Kandidat
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLGraphQLClientAdapter
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingRestClientAdapter
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 
 @Service
-class KandidatTjeneste(private val pdl: PDLGraphQLClientAdapter, val egenAnsatt: SkjermingRestClientAdapter) {
+class KandidatTjeneste(private val pdl: PDLSyncGraphQLClientAdapter, val egenAnsatt: SkjermingRestClientAdapter) {
 
      fun kandidat(fnr: Fødselsnummer) : Kandidat {
          return runBlocking {

@@ -20,5 +20,7 @@ class EntraTjeneste(private val adapter: EntraClientAdapter) {
     fun ansattAzureId(ident: NavId) = adapter.attributter(ident.verdi)
 
     fun ansattTilganger(azureIdent: UUID) = adapter.grupper("$azureIdent")
+    override fun toString() = "${javaClass.simpleName} [adapter=$adapter]"
+
 }
 

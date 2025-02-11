@@ -55,17 +55,15 @@ spec:
         - application: ida
           namespace: traktor
           cluster: prod-fss
-
-
   env:
     - name: NAIS_CLUSTER_TYPE
       value: {{nais.cluster.type}}
     - name: PDL
       value: {{pdl}}
     - name: GRUPPE_STRENGT
-      value: '{{strengt}}'
+      value: '{{grupper.strengt}}'
     - name: GRUPPE_FORTROLIG
-      value: '{{fortrolig}}'
+      value: '{{grupper.fortrolig}}'
     - name: GRUPPE_EGENANSATT
-      value: '{{egenansatt}}'
+      value: '{{grupper.egenansatt}}'
 

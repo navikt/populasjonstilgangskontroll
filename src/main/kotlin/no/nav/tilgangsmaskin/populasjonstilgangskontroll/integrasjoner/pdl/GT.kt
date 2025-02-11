@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
-data class GTRespons(
+data class GT(
     val gtType: GTType,
     val gtKommune: GTKommune?,
     val gtBydel: GTBydel?,

@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
 import com.neovisionaries.i18n.CountryCode
+import com.neovisionaries.i18n.CountryCode.getByAlpha3Code
 import no.nav.boot.conditionals.EnvUtil
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Kandidat
@@ -11,8 +12,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.C
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.Kommune
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.UtenlandskTilknytning
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.GTRespons
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.GTRespons.GTType.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.GT
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.GT.GTType.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.Person
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.Person.Adressebeskyttelse.AdressebeskyttelseGradering
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
@@ -20,7 +21,7 @@ import org.slf4j.LoggerFactory
 
 object KandidatMapper {
     private val log = LoggerFactory.getLogger(javaClass)
-    fun mapToKandidat(fnr: Fødselsnummer, person: Person, gt: GTRespons, erSkjermet: Boolean) =
+    fun mapToKandidat(fnr: Fødselsnummer, person: Person, gt: GT, erSkjermet: Boolean) =
         mutableListOf<GlobalGruppe>().apply {
             if  (person.adressebeskyttelse.any { it.gradering in listOf(AdressebeskyttelseGradering.STRENGT_FORTROLIG,
                 AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND) })  add(STRENGT_FORTROLIG)
@@ -31,8 +32,8 @@ object KandidatMapper {
              Kandidat(fnr, mapTilknytning(gt), *it).also { log.trace(EnvUtil.CONFIDENTIAL, "Mappet person {} til kandidat {}", person, it) }
         }
 
-    private fun mapTilknytning(respons: GTRespons): GEOTilknytning = when (respons.gtType) {
-        UTLAND ->  respons.gtLand?.let {  UtenlandskTilknytning(CountryCode.getByAlpha3Code(it.verdi)) } ?: throw IllegalStateException("Utenlandsk tilknytning uten landkode")
+    private fun mapTilknytning(respons: GT): GEOTilknytning = when (respons.gtType) {
+        UTLAND ->  respons.gtLand?.let {  UtenlandskTilknytning(getByAlpha3Code(it.verdi)) } ?: throw IllegalStateException("Utenlandsk tilknytning uten landkode")
         KOMMUNE -> respons.gtKommune?.let {KommuneTilknytning(Kommune(it.verdi))} ?: throw IllegalStateException("Kommunal tilknytning uten kommunekode")
         BYDEL ->  respons.gtBydel?.let {  BydelTilknytning(Bydel(it.verdi))}  ?: throw IllegalStateException("Bydelstilknytning uten bydelskode")
         UDEFINERT -> UDEFINERTTILKNYTNING

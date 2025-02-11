@@ -15,18 +15,16 @@ sealed class GEOTilknytning(val type: Type) {
     }
 
     @JvmInline
-    value class Bydel(val verdi: String?)  {
+    value class Bydel(val verdi: String)  {
         init {
-            verdi?.let {
-                require(it.length == 6) { "Ugyldig lengde ${it.length} for $it, forventet 6" }
-                require(verdi.all { it.isDigit() }) { "Ugyldig(e) tegn i $verdi, forventet kun 6 tall" }
-            }
+            require(verdi.length == 6) { "Ugyldig lengde ${verdi.length} for $verdi, forventet 6" }
+            require(verdi.all { it.isDigit() }) { "Ugyldig(e) tegn i $verdi, forventet kun 6 tall" }
         }
     }
     data class KommuneTilknytning(val kommune: Kommune) : GEOTilknytning(KOMMUNE)
     data class BydelTilknytning(val bydel: Bydel) : GEOTilknytning(BYDEL)
-    class UdefinertTilknytning : GEOTilknytning(UDEFINERT)
     data class UtenlandskTilknytning(val land: CountryCode) : GEOTilknytning(UTLAND)
+    class UdefinertTilknytning : GEOTilknytning(UDEFINERT)
 
     companion object  {
        val UDEFINERTTILKNYTNING = UdefinertTilknytning()

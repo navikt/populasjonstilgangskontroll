@@ -12,6 +12,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.C
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.Kommune
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.UtenlandskTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Navn
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.GT
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.GT.GTType.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.Person
@@ -29,8 +30,14 @@ object KandidatMapper {
                     AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND) })  add(FORTROLIG)
             if (erSkjermet) add(EGEN)
         }.toTypedArray().let {
-             Kandidat(fnr, mapTilknytning(gt), *it).also { log.trace(EnvUtil.CONFIDENTIAL, "Mappet person {} til kandidat {}", person, it) }
+             Kandidat(fnr, mapNavn(person.navn),mapTilknytning(gt), *it).also { log.trace(EnvUtil.CONFIDENTIAL, "Mappet person {} til kandidat {}", person, it) }
         }
+
+    private fun mapNavn(navn: List<Person.Navn>): Navn {
+         navn.first().let {
+            return Navn(it.fornavn, it.etternavn)
+        }
+    }
 
     private fun mapTilknytning(respons: GT): GEOTilknytning = when (respons.gtType) {
         UTLAND ->  respons.gtLand?.let {  UtenlandskTilknytning(getByAlpha3Code(it.verdi)) } ?: throw IllegalStateException("Utenlandsk tilknytning uten landkode")

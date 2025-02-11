@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Saksbehandler
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Saksbehandler.SaksbehandlerAttributter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.Companion.UDEFINERTTILKNYTNING
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Navn
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.EgenAnsattRegel
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelMotor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.StrengtFortroligRegel
@@ -127,14 +128,15 @@ class TestRegler {
         private val NAVID = NavId("Z999999")
         private val ATTRS = SaksbehandlerAttributter(randomUUID(),NAVID,"En","Saksbehandler", ENHET)
         private val FNR = Fødselsnummer("11111111111")
+        private val NAVN = Navn("Ola", "Nordmann")
 
 
-        private val KODE6KANDIDAT = Kandidat(FNR, UDEFINERTTILKNYTNING,STRENGT_FORTROLIG)
-        private val KODE7KANDIDAT = Kandidat(FNR, UDEFINERTTILKNYTNING,FORTROLIG)
-        private val VANLIGKANDIDAT = Kandidat(FNR,UDEFINERTTILKNYTNING)
-        private val ANSATTKANDIDAT = Kandidat(FNR, UDEFINERTTILKNYTNING,EGEN)
-        private val ANSATTKODE6KANDIDAT = Kandidat(FNR, UDEFINERTTILKNYTNING,EGEN, STRENGT_FORTROLIG)
-        private val ANSATTKODE7KANDIDAT = Kandidat(FNR, UDEFINERTTILKNYTNING,EGEN, FORTROLIG)
+        private val KODE6KANDIDAT = Kandidat(FNR, NAVN,UDEFINERTTILKNYTNING,STRENGT_FORTROLIG)
+        private val KODE7KANDIDAT = Kandidat(FNR, NAVN,UDEFINERTTILKNYTNING,FORTROLIG)
+        private val VANLIGKANDIDAT = Kandidat(FNR,NAVN,UDEFINERTTILKNYTNING)
+        private val ANSATTKANDIDAT = Kandidat(FNR, NAVN,UDEFINERTTILKNYTNING,EGEN)
+        private val ANSATTKODE6KANDIDAT = Kandidat(FNR, NAVN,UDEFINERTTILKNYTNING,EGEN, STRENGT_FORTROLIG)
+        private val ANSATTKODE7KANDIDAT = Kandidat(FNR, NAVN,UDEFINERTTILKNYTNING,EGEN, FORTROLIG)
 
         private val STRENGT_FORTROLIG_GRUPPE = EntraGruppe(randomUUID(), "strengt fortrolig gruppe")
         private val FORTROLIG_GRUPPE = EntraGruppe(randomUUID(), "fortrolig gruppe")

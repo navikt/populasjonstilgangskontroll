@@ -26,4 +26,6 @@ class  EntraClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
 
     private fun EntraSaksbehandlerResponse.tilAttributter() = EntraResponsMapper.mapAttributter(attributter.first())
 
+    override fun toString() = "${javaClass.simpleName} [client=$restClient, config=$cf, errorHandler=$errorHandler]"
+
 }

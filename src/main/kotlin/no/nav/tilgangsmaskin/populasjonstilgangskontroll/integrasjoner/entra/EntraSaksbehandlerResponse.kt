@@ -1,10 +1,11 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Enhetsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 
 @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-data class EntraSaksbehandlerResponse(@com.fasterxml.jackson.annotation.JsonProperty("value") val attributter: List<MSGraphSaksbehandlerAttributter>)  {
+data class EntraSaksbehandlerResponse(@JsonProperty("value") val attributter: List<MSGraphSaksbehandlerAttributter>)  {
     data class MSGraphSaksbehandlerAttributter(
         val id: java.util.UUID,
         val onPremisesSamAccountName: NavId,

@@ -9,20 +9,25 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLGr
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingRestClientAdapter
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 
 @Service
 class KandidatTjeneste(private val pdl: PDLGraphQLClientAdapter, val egenAnsatt: SkjermingRestClientAdapter) {
 
-    private val log = getLogger(KandidatTjeneste::class.java)
-
-    fun kandidat(fnr: Fødselsnummer) : Kandidat {
+     fun kandidat(fnr: Fødselsnummer) : Kandidat {
+         return runBlocking {
+             val pdlDeferred = async { pdl.person(fnr.verdi) }
+             val skjermingDeferred = async { egenAnsatt.skjermetPerson(fnr.verdi) }
+             KandidatMapper.mapToKandidat(fnr,pdlDeferred.await(), skjermingDeferred.await())
+         }
+/*
         val person =  pdl.person(fnr.verdi)
         val skjermet = egenAnsatt.skjermetPerson(fnr.verdi)
         return KandidatMapper.mapToKandidat(fnr,person, skjermet).also {
             log.info(CONFIDENTIAL,"Kandidat: $it")
-        }
-    }// kan slå opp mer her senere
-
+        }*/
+    } // kan slå opp mer her senere
 }
 @Service
 class SaksbehandlerTjeneste(private val entra: EntraTjeneste) {  // kan slå opp mer her senere

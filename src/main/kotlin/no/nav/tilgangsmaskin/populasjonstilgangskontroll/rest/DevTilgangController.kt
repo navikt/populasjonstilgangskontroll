@@ -5,9 +5,9 @@ import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLConfig
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLConfig.Companion.PDL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PersonTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.DEV
@@ -19,13 +19,13 @@ import java.util.UUID
 @ConditionalOnNotProd
 class DevTilgangController(val pdl : PersonTjeneste, val skjerming: SkjermingTjeneste, val ansatt: EntraTjeneste, val regler: RegelTjeneste)
 {
-    @GetMapping(PDLConfig.Companion.PDL)
+    @GetMapping(PDL)
     fun hentPerson(fnr: Fødselsnummer) = pdl.kandidat(fnr)
 
-    @GetMapping("${PDLConfig.Companion.PDL}/gt")
+    @GetMapping("${PDL}/gt")
     fun gt(fnr: Fødselsnummer) = pdl.gt(fnr)
 
-    @GetMapping(SkjermingConfig.Companion.SKJERMING)
+    @GetMapping(SKJERMING)
     fun erSkjermet(fnr: Fødselsnummer) = skjerming.erSkjermet(fnr)
 
     @GetMapping("ansatt")

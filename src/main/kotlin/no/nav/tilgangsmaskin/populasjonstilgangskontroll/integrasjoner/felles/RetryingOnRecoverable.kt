@@ -5,10 +5,10 @@ import org.springframework.core.annotation.AliasFor
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
 import java.lang.annotation.Inherited
-import kotlin.reflect.KClass
-import kotlin.annotation.AnnotationTarget.FUNCTION
-import kotlin.annotation.AnnotationTarget.CLASS
 import kotlin.annotation.AnnotationRetention.RUNTIME
+import kotlin.annotation.AnnotationTarget.CLASS
+import kotlin.annotation.AnnotationTarget.FUNCTION
+import kotlin.reflect.KClass
 
 @Target(FUNCTION, CLASS)
 @Retention(RUNTIME)

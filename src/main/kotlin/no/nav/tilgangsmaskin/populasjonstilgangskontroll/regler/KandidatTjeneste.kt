@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Kandidat
@@ -9,8 +11,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLGr
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingRestClientAdapter
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
 
 @Service
 class KandidatTjeneste(private val pdl: PDLGraphQLClientAdapter, val egenAnsatt: SkjermingRestClientAdapter) {

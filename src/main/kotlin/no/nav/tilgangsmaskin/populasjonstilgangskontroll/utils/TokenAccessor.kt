@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 import org.springframework.stereotype.Component
-import java.util.UUID
+import java.util.*
 
 @Component
 class TokenAccessor(private val contextHolder: TokenValidationContextHolder){

@@ -7,10 +7,9 @@ import org.springframework.graphql.ResponseError
 import org.springframework.graphql.client.FieldAccessException
 import org.springframework.graphql.client.GraphQlTransportException
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import java.net.URI
-import java.util.Locale
-import kotlin.jvm.javaClass
+import java.util.*
 
 interface GraphQLErrorHandler {
     fun handle(uri: URI, e: Throwable): Nothing =

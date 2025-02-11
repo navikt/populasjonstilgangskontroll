@@ -1,11 +1,10 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils
 
-import org.springframework.boot.actuate.info.InfoContributor
-import org.springframework.context.ApplicationContext
-import org.springframework.boot.actuate.info.Info.Builder
-import org.springframework.core.SpringVersion
 import org.springframework.boot.SpringBootVersion
+import org.springframework.boot.actuate.info.Info.Builder
+import org.springframework.boot.actuate.info.InfoContributor
 import org.springframework.context.ConfigurableApplicationContext
+import org.springframework.core.SpringVersion
 import org.springframework.stereotype.Component
 import java.time.Instant
 import java.time.LocalDateTime

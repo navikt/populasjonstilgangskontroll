@@ -1,9 +1,10 @@
 
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra
 
-import java.net.URI
-import com.fasterxml.jackson.annotation.*
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.EntraGruppe
+import java.net.URI
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class EntraGrupperBolk(@JsonProperty("@odata.nextLink") val next: URI? = null, val value: List<EntraGruppe> = emptyList())

@@ -10,6 +10,5 @@ value class Enhetsnummer(@JsonValue val verdi: String) {
             require(all { it.isDigit()}) { "Ugyldig(e) tegn i $this, forventet kun 4 tall" }
         }
     }
-
 }
 

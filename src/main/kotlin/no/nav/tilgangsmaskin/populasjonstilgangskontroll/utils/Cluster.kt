@@ -8,8 +8,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.NAIS_CL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.PROD
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.PROD_GCP
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
-import java.lang.System.*
-import kotlin.also
+import java.lang.System.getenv
+import java.lang.System.setProperty
 
 internal enum class Cluster(private val clusterName: String) {
     TEST_CLUSTER(TEST),

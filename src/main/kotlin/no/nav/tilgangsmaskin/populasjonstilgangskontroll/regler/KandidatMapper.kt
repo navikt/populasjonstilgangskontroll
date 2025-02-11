@@ -1,12 +1,12 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
 import no.nav.boot.conditionals.EnvUtil
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Kandidat
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.GTRespons
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.Person
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.Person.Adressebeskyttelse.AdressebeskyttelseGradering
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
 import org.slf4j.LoggerFactory
 
 object KandidatMapper {

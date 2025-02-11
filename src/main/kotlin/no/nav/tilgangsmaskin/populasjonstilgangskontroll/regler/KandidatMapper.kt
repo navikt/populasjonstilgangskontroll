@@ -35,7 +35,7 @@ object KandidatMapper {
 
     private fun mapNavn(navn: List<Person.Navn>): Navn {
          navn.first().let {
-            return Navn(it.fornavn, it.etternavn)
+            return Navn(it.fornavn, it.etternavn, it.mellomnavn)
         }
     }
 

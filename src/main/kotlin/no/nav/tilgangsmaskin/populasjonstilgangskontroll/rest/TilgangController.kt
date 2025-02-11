@@ -14,22 +14,16 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor.Com
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
-@SecurityScheme(
-    bearerFormat = "JWT",
-    name = "bearerAuth",
-    scheme = "bearer",
-    type = HTTP,
-)
+@SecurityScheme(bearerFormat = "JWT", name = "bearerAuth", scheme = "bearer", type = HTTP )
 @ProtectedRestController(value = ["/api/v1"], issuer = AAD_ISSUER, claimMap = [])
+@SecurityRequirement(name = "bearerAuth")
 class TilgangController(val service : RegelTjeneste, val ansatt: EntraTjeneste, private val token: TokenAccessor) {
 
 
     @GetMapping("ansatt")
-    @SecurityRequirement(name = "bearerAuth")
     fun hentAnsatt(navId: NavId) = ansatt.ansattAzureId(navId)
 
     @PostMapping("tilgang")
-    @SecurityRequirement(name="bearerAuth")
     fun validerTilgang(@RequestBody kandidatId: Fødselsnummer) = service.sjekkTilgang(token.navIdent, kandidatId);
 
 }

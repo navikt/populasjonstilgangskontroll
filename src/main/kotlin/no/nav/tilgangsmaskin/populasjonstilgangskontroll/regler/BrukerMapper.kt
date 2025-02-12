@@ -26,14 +26,15 @@ object BrukerMapper {
             if  (person.adressebeskyttelse.any { it.gradering in listOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND) })   {
                 add(STRENGT_FORTROLIG_GRUPPE)
             }
-            if  (person.adressebeskyttelse.any { it.gradering == FORTROLIG})   {
-                add(FORTROLIG_GRUPPE)
-            }
+            else
+                if  (person.adressebeskyttelse.any { it.gradering == FORTROLIG})   {
+                    add(FORTROLIG_GRUPPE)
+                }
             if (erSkjermet)  {
                 add(EGEN_GRUPPE)
             }
         }.toTypedArray().let {
-             Bruker(fnr, mapNavn(person.navn),mapTilknytning(gt), *it).also { log.trace(CONFIDENTIAL, "Mappet person {} til kandidat {}", person, it) }
+            Bruker(fnr, mapNavn(person.navn),mapTilknytning(gt), *it).also { log.trace(CONFIDENTIAL, "Mappet person {} til kandidat {}", person, it) }
         }
 
     private fun mapNavn(navn: List<PDLPerson.Navn>): Navn {

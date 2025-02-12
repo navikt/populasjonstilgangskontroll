@@ -9,7 +9,7 @@ interface Regel: BiPredicate<Bruker, Ansatt> {
     data class RegelBeskrivelse(val kortNavn: String,
                                 val kode: AvvisningBegrunnelse,
                                 val overstyrbar: Boolean = false) {
-        
-    val begrunnelseAnsatt =  "Ansatt %s kan ikke behandle bruker %s grunnet %s"
+
+    val begrunnelseAnsatt =  "Ansatt %s kan ikke behandle bruker %s. %s"
     }
 }

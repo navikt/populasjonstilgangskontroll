@@ -9,6 +9,6 @@ class RegelException(brukerId: Fødselsnummer, ansattId: NavId, regel: Regel) : 
     FORBIDDEN,null,mapOf(
         "brukerIdent" to brukerId.verdi,
         "navIdent" to ansattId.verdi,
-        "begrunnelseKode" to regel.beskrivelse.kortNavn,
+        "begrunnelseKode" to regel.beskrivelse.begrunnelse,
         "begrunnelseAnsatt" to regel.beskrivelse.begrunnelseAnsatt.format(ansattId.verdi, brukerId.verdi, regel.beskrivelse.begrunnelse.årsak),
         "kanOverstyres" to regel.beskrivelse.overstyrbar))

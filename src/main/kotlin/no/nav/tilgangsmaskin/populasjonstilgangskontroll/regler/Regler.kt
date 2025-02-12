@@ -13,9 +13,10 @@ import org.springframework.stereotype.Component
 import java.util.UUID
 
 abstract class AbstraktRegel(private val gruppe: GlobalGruppe, private val id: UUID, private val kode: String): Regel {
-    override fun test(k: Kandidat, s: Saksbehandler) = if (k.kreverGruppe(gruppe))  {
-        s.kanBehandle(id)
-    } else true
+    override fun test(k: Kandidat, s: Saksbehandler) =
+        if (k.kreverGruppe(gruppe))  {
+            s.kanBehandle(id)
+        } else true
 
     override val beskrivelse = RegelBeskrivelse(javaClass.simpleName.replace(Regex("([A-Z][a-z]*)$"), "").trim(), kode)
 }

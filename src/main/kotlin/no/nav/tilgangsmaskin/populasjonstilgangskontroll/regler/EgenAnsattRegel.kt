@@ -1,8 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Kandidat
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Saksbehandler
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.Regel.RegelBeskrivelse
+import  no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.EGEN_GRUPPE
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
 import org.springframework.core.annotation.Order
@@ -11,9 +9,5 @@ import java.util.*
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 2)
-class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Regel {
-    override fun test(k: Kandidat, s: Saksbehandler) = if (k.kreverGruppe(GlobalGruppe.EGEN_GRUPPE))  {
-        s.kanBehandle(id)
-    } else true
-    override val beskrivelse = RegelBeskrivelse("Egen ansatt", "007")
-}
+class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : AbstraktRegel(EGEN_GRUPPE, id, "007")
+

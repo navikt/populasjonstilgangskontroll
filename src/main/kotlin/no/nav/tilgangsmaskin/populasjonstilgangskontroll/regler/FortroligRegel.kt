@@ -12,11 +12,4 @@ import java.util.*
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 1)
-class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID): Regel {
-    override val beskrivelse = RegelBeskrivelse("Kode 7", "7")
-    override fun test(k: Kandidat, s: Saksbehandler) =
-        if (k.kreverGruppe(FORTROLIG_GRUPPE)) {
-            s.kanBehandle(id)
-        }
-        else true
-}
+class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID): AbstraktRegel(FORTROLIG_GRUPPE, id, "7")

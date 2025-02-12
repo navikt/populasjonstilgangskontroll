@@ -19,7 +19,6 @@
             <appender-ref ref="stdout"/>
         </logger>
         <logger name="no.nav.security" level="trace"/>
-        <logger name="no.nav.tilgangsmaskin" level="trace"/>
     </springProfile>
 
     <springProfile name="prod">

@@ -67,6 +67,8 @@ dependencies {
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")
 
     // Test
+
+    testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock:$springCloudVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
@@ -87,7 +89,10 @@ if (project.hasProperty("skipLint")) {
     gradle.startParameter.excludedTaskNames += "spotlessKotlinCheck"
 }
 
-tasks.test { useJUnitPlatform() }
+tasks.test {
+    jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
+    useJUnitPlatform()
+}
 
 kotlin {
 jvmToolchain(21)

@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Kandidat
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Saksbehandler
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Saksbehandler.SaksbehandlerAttributter
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.Companion.UDEFINERTTILKNYTNING
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.Companion.UDEFINERT_GEO_TILKNYTNING
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Navn
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.EgenAnsattRegel
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelMotor
@@ -131,26 +131,27 @@ class TestRegler {
         private val NAVN = Navn("Ola", "Nordmann")
 
 
-        private val KODE6KANDIDAT = Kandidat(FNR, NAVN,UDEFINERTTILKNYTNING,STRENGT_FORTROLIG)
-        private val KODE7KANDIDAT = Kandidat(FNR, NAVN,UDEFINERTTILKNYTNING,FORTROLIG)
-        private val VANLIGKANDIDAT = Kandidat(FNR,NAVN,UDEFINERTTILKNYTNING)
-        private val ANSATTKANDIDAT = Kandidat(FNR, NAVN,UDEFINERTTILKNYTNING,EGEN)
-        private val ANSATTKODE6KANDIDAT = Kandidat(FNR, NAVN,UDEFINERTTILKNYTNING,EGEN, STRENGT_FORTROLIG)
-        private val ANSATTKODE7KANDIDAT = Kandidat(FNR, NAVN,UDEFINERTTILKNYTNING,EGEN, FORTROLIG)
+        private val KODE6KANDIDAT = Kandidat(FNR, NAVN,UDEFINERT_GEO_TILKNYTNING, STRENGT_FORTROLIG_GRUPPE)
+        private val KODE7KANDIDAT = Kandidat(FNR, NAVN,UDEFINERT_GEO_TILKNYTNING, FORTROLIG_GRUPPE)
+        private val VANLIGKANDIDAT = Kandidat(FNR,NAVN,UDEFINERT_GEO_TILKNYTNING)
+        private val ANSATTKANDIDAT = Kandidat(FNR, NAVN,UDEFINERT_GEO_TILKNYTNING, EGEN_GRUPPE)
+        private val ANSATTKODE6KANDIDAT = Kandidat(FNR, NAVN,UDEFINERT_GEO_TILKNYTNING, EGEN_GRUPPE, STRENGT_FORTROLIG_GRUPPE)
+        private val ANSATTKODE7KANDIDAT = Kandidat(FNR, NAVN,UDEFINERT_GEO_TILKNYTNING, EGEN_GRUPPE, FORTROLIG_GRUPPE)
 
-        private val STRENGT_FORTROLIG_GRUPPE = EntraGruppe(randomUUID(), "strengt fortrolig gruppe")
-        private val FORTROLIG_GRUPPE = EntraGruppe(randomUUID(), "fortrolig gruppe")
-        private val EGEN_GRUPPE = EntraGruppe(randomUUID(), "egen gruppe")
-        private val ANNENGRUPPE = EntraGruppe(randomUUID(), "annen gruppe")
+        private val STRENGT_FORTROLIG_ENTRA_GRUPPE = EntraGruppe(randomUUID(), "strengt fortrolig gruppe")
+        private val FORTROLIG_ENTRA_GRUPPE = EntraGruppe(randomUUID(), "fortrolig gruppe")
+        private val EGEN_ENTRA_GRUPPE = EntraGruppe(randomUUID(), "egen gruppe")
+        private val ANNEN_ENTRA_GRUPPE = EntraGruppe(randomUUID(), "annen gruppe")
 
-        private val KODE7OGEGENSB = Saksbehandler(ATTRS, FORTROLIG_GRUPPE, EGEN_GRUPPE)
-        private val KODE6OGEGENSB = Saksbehandler(ATTRS, STRENGT_FORTROLIG_GRUPPE, EGEN_GRUPPE)
-        private val KODE6SB = Saksbehandler(ATTRS, STRENGT_FORTROLIG_GRUPPE)
-        private val KODE7SB = Saksbehandler(ATTRS, FORTROLIG_GRUPPE)
-        private val EGENSB = Saksbehandler(ATTRS, EGEN_GRUPPE)
-        private val VANLIGSB = Saksbehandler(ATTRS, ANNENGRUPPE)
+        private val KODE7OGEGENSB = Saksbehandler(ATTRS, FORTROLIG_ENTRA_GRUPPE, EGEN_ENTRA_GRUPPE)
+        private val KODE6OGEGENSB = Saksbehandler(ATTRS, STRENGT_FORTROLIG_ENTRA_GRUPPE, EGEN_ENTRA_GRUPPE)
+        private val KODE6SB = Saksbehandler(ATTRS, STRENGT_FORTROLIG_ENTRA_GRUPPE)
+        private val KODE7SB = Saksbehandler(ATTRS, FORTROLIG_ENTRA_GRUPPE)
+        private val EGENSB = Saksbehandler(ATTRS, EGEN_ENTRA_GRUPPE)
+        private val VANLIGSB = Saksbehandler(ATTRS, ANNEN_ENTRA_GRUPPE)
 
-        private val MOTOR = RegelMotor(StrengtFortroligRegel(STRENGT_FORTROLIG_GRUPPE.id), FortroligRegel(FORTROLIG_GRUPPE.id),EgenAnsattRegel(EGEN_GRUPPE.id))
+        private val MOTOR = RegelMotor(StrengtFortroligRegel(STRENGT_FORTROLIG_ENTRA_GRUPPE.id), FortroligRegel(
+            FORTROLIG_ENTRA_GRUPPE.id),EgenAnsattRegel(EGEN_ENTRA_GRUPPE.id))
 
     }
 }

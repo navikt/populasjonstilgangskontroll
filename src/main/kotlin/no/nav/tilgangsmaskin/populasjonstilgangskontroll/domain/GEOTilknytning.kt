@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
 
 import com.neovisionaries.i18n.CountryCode
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.Type.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.requires
 
 sealed class GEOTilknytning(val type: Type) {
     enum class Type { BYDEL, KOMMUNE, UDEFINERT, UTLAND }
@@ -9,16 +10,14 @@ sealed class GEOTilknytning(val type: Type) {
     @JvmInline
     value class Kommune(val verdi: String)  {
         init {
-            require(verdi.length == 4) { "Ugyldig lengde ${verdi.length} for $verdi, forventet 4" }
-            require(verdi.all { it.isDigit() }) { "Ugyldig(e) tegn i $verdi, forventet kun 4 tall" }
+            requires(verdi,4)
         }
     }
 
     @JvmInline
     value class Bydel(val verdi: String)  {
         init {
-            require(verdi.length == 6) { "Ugyldig lengde ${verdi.length} for $verdi, forventet 6" }
-            require(verdi.all { it.isDigit() }) { "Ugyldig(e) tegn i $verdi, forventet kun 6 tall" }
+           requires(verdi,6)
         }
     }
     data class KommuneTilknytning(val kommune: Kommune) : GEOTilknytning(KOMMUNE)
@@ -27,6 +26,7 @@ sealed class GEOTilknytning(val type: Type) {
     class UdefinertTilknytning : GEOTilknytning(UDEFINERT)
 
     companion object  {
-       val UDEFINERTTILKNYTNING = UdefinertTilknytning()
+       val UDEFINERT_GEO_TILKNYTNING = UdefinertTilknytning()
     }
 }
+

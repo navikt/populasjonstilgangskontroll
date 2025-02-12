@@ -12,7 +12,7 @@ import java.util.*
 @Component
 @Order(HIGHEST_PRECEDENCE + 2)
 class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Regel {
-    override fun test(k: Kandidat, s: Saksbehandler) = if (k.kreverGruppe(GlobalGruppe.EGEN))  {
+    override fun test(k: Kandidat, s: Saksbehandler) = if (k.kreverGruppe(GlobalGruppe.EGEN_GRUPPE))  {
         s.kanBehandle(id)
     } else true
     override val beskrivelse = RegelBeskrivelse("Egen ansatt", "007")

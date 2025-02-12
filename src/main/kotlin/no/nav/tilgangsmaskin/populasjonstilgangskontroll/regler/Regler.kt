@@ -12,13 +12,13 @@ import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 import java.util.UUID
 
-abstract class AbstraktRegel(private val gruppe: GlobalGruppe, private val id: UUID, kode: String): Regel {
+abstract class AbstraktRegel(private val gruppe: GlobalGruppe, private val id: UUID, kode: String, overstyrbar: Boolean = false): Regel {
     override fun test(k: Kandidat, s: Saksbehandler) =
         if (k.kreverGruppe(gruppe))  {
             s.kanBehandle(id)
         } else true
 
-    override val beskrivelse = RegelBeskrivelse(javaClass.simpleName.replace(Regex("([A-Z][a-z]*)$"), "").trim(), kode)
+    override val beskrivelse = RegelBeskrivelse(javaClass.simpleName.replace(Regex("([A-Z][a-z]*)$"), "").trim(), kode, overstyrbar = overstyrbar)
 }
 
 @Component
@@ -28,6 +28,7 @@ class StrengtFortroligRegel(@Value("\${gruppe.strengt}") private val id: UUID) :
 @Component
 @Order(HIGHEST_PRECEDENCE + 1)
 class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID): AbstraktRegel(FORTROLIG_GRUPPE, id, "7")
+
 @Component
 @Order(HIGHEST_PRECEDENCE + 2)
 class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : AbstraktRegel(EGEN_GRUPPE, id, "42")

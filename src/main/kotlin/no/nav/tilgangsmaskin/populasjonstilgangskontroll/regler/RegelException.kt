@@ -7,9 +7,9 @@ import org.springframework.http.HttpStatus.FORBIDDEN
 import java.lang.String.format
 
 class RegelException(brukerId: Fødselsnummer, ansattId: NavId, regel: Regel) : IrrecoverableException(
-    FORBIDDEN, format(regel.beskrivelse.feilmelding,ansattId.verdi, brukerId.verdi),mapOf(
+    FORBIDDEN,null,mapOf(
         "brukerIdent" to brukerId.verdi,
         "navIdent" to ansattId.verdi,
-        "begrunnelsesKode" to regel.beskrivelse.kode,
-        "navn" to regel.beskrivelse.navn,
+        "begrunnelseKode" to regel.beskrivelse.kode,
+        "begrunnelseAnsatt" to regel.beskrivelse.begrunnelseAnsatt.format(ansattId.verdi, brukerId.verdi, regel.beskrivelse.kode.årsak),
         "kanOverstyres" to regel.beskrivelse.overstyrbar))

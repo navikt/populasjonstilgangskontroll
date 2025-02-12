@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component
 class RegelMotor(private vararg val regler: Regel)  {
     private val log = LoggerFactory.getLogger(javaClass)
 
-     fun vurderTilgang(k: Bruker, s: Ansatt) =
+     fun vurderTilgang(bruker: Bruker, ansatt:  Ansatt) =
         regler.sortedWith(INSTANCE).forEach {
-            log.info(CONFIDENTIAL,"Eksekverer regel: ${it.beskrivelse.navn}")
-            if (!it.test(k, s)) {
-                throw RegelException(k.ident, s.navId, it)
+            log.info(CONFIDENTIAL,"Eksekverer regel: ${it.beskrivelse.kortNavn}")
+            if (!it.test(bruker, ansatt)) {
+                throw RegelException(bruker.ident, ansatt.navId, it)
             }
         }
     }

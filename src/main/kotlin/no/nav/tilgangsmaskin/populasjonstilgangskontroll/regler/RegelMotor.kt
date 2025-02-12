@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Kandidat
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Saksbehandler
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import org.slf4j.LoggerFactory
 import org.springframework.core.annotation.AnnotationAwareOrderComparator.INSTANCE
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 class RegelMotor(private vararg val regler: Regel)  {
     private val log = LoggerFactory.getLogger(javaClass)
 
-     fun vurderTilgang(k: Kandidat, s: Saksbehandler) =
+     fun vurderTilgang(k: Bruker, s: Ansatt) =
         regler.sortedWith(INSTANCE).forEach {
             log.info(CONFIDENTIAL,"Eksekverer regel: ${it.beskrivelse.navn}")
             if (!it.test(k, s)) {

@@ -5,9 +5,9 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 import org.springframework.stereotype.Service
 
 @Service
-class RegelTjeneste(private val motor: RegelMotor, private val kandidatTjeneste: KandidatTjeneste, private val saksbehandlerTjeneste: SaksbehandlerTjeneste)  {
+class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: BrukerTjeneste, private val ansattTjeneste: AnsattTjeneste)  {
 
     fun sjekkTilgang(saksbehandlerId: NavId, kandidatId: Fødselsnummer) =
-        motor.vurderTilgang(kandidatTjeneste.kandidat(kandidatId), saksbehandlerTjeneste.saksbehandler(saksbehandlerId))
+        motor.vurderTilgang(brukerTjeneste.bruker(kandidatId), ansattTjeneste.ansatt(saksbehandlerId))
 }
 

@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Saksbehandler
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraConfig.Companion.GRAPH
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
@@ -11,10 +11,10 @@ import java.util.*
 @Cacheable(GRAPH)
 class EntraTjeneste(private val adapter: EntraClientAdapter) {
 
-    fun saksbehandler(ident: NavId) : Saksbehandler {
+    fun ansatt(ident: NavId) : Ansatt {
         val attributter = adapter.attributter(ident.verdi)
         val grupper = adapter.grupper("${attributter.id}")
-        return Saksbehandler(attributter,*grupper)
+        return Ansatt(attributter,*grupper)
     }
 
     fun ansattAzureId(ident: NavId) = adapter.attributter(ident.verdi)

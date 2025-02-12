@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
-class SaksbehandlerTjeneste(private val entra: EntraTjeneste) {  // kan slå opp mer her senere
+class AnsattTjeneste(private val entra: EntraTjeneste) {  // kan slå opp mer her senere
 
-    private val log = LoggerFactory.getLogger(SaksbehandlerTjeneste::class.java)
+    private val log = LoggerFactory.getLogger(AnsattTjeneste::class.java)
 
-    fun saksbehandler(navId: NavId) = entra.saksbehandler(navId).also {
-        log.trace(CONFIDENTIAL, "Saksbehandler: {}", it)
+    fun ansatt(navId: NavId) = entra.ansatt(navId).also {
+        log.trace(CONFIDENTIAL, "Ansatt: {}", it)
     }
 }

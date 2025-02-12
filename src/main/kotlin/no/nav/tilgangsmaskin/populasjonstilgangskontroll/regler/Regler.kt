@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Kandidat
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Saksbehandler
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.EGEN_GRUPPE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.FORTROLIG_GRUPPE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.STRENGT_FORTROLIG_GRUPPE
@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component
 import java.util.UUID
 
 abstract class AbstraktRegel(private val gruppe: GlobalGruppe, private val id: UUID, kode: String, overstyrbar: Boolean = false): Regel {
-    override fun test(k: Kandidat, s: Saksbehandler) =
-        if (k.kreverGruppe(gruppe))  {
+    override fun test(bruker: Bruker, s: Ansatt) =
+        if (bruker.kreverGruppe(gruppe))  {
             s.kanBehandle(id)
         } else true
 

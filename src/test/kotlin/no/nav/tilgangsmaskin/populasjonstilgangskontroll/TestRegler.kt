@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Enhetsnummer
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.EntraGruppe
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker

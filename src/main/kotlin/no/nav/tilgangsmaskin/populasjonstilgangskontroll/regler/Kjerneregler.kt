@@ -12,7 +12,7 @@ import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 import java.util.UUID
 
-abstract class AbstraktRegel(private val gruppe: GlobalGruppe, private val id: UUID, kode: String, overstyrbar: Boolean = false): Regel {
+abstract class KjerneRegel(private val gruppe: GlobalGruppe, private val id: UUID, kode: String, overstyrbar: Boolean = false): Regel {
     override fun test(bruker: Bruker, s: Ansatt) =
         if (bruker.kreverGruppe(gruppe))  {
             s.kanBehandle(id)
@@ -23,13 +23,13 @@ abstract class AbstraktRegel(private val gruppe: GlobalGruppe, private val id: U
 
 @Component
 @Order(HIGHEST_PRECEDENCE)
-class StrengtFortroligRegel(@Value("\${gruppe.strengt}") private val id: UUID) : AbstraktRegel(STRENGT_FORTROLIG_GRUPPE, id, "6")
+class StrengtFortroligRegel(@Value("\${gruppe.strengt}") private val id: UUID) : KjerneRegel(STRENGT_FORTROLIG_GRUPPE, id, "6")
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 1)
-class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID): AbstraktRegel(FORTROLIG_GRUPPE, id, "7")
+class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID): KjerneRegel(FORTROLIG_GRUPPE, id, "7")
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 2)
-class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : AbstraktRegel(EGEN_GRUPPE, id, "42")
+class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : KjerneRegel(EGEN_GRUPPE, id, "42")
 

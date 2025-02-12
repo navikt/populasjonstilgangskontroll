@@ -28,9 +28,9 @@ class PDLSyncGraphQLClientAdapter(@Qualifier(PDL) private val graphQlClient: Gra
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
     }
 
-    fun gt(ident: String) = query<GT>(graphQlClient, GT_QUERY, ident(ident))
+    fun gt(ident: String) = query<PDLGeo>(graphQlClient, GT_QUERY, ident(ident))
 
-    fun person(ident: String) = query<Person>(graphQlClient, PERSON_QUERY, ident(ident))
+    fun person(ident: String) = query<PDLPerson>(graphQlClient, PERSON_QUERY, ident(ident))
     override fun toString() =
         "${javaClass.simpleName} [restClient=$restClient,graphQlClient=$graphQlClient, cfg=$cfg]"
 

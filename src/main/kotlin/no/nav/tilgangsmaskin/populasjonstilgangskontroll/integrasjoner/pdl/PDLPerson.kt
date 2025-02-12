@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
 import java.time.LocalDate
 
-data class Person(val adressebeskyttelse: List<Adressebeskyttelse>, val navn: List<Navn>, val bostedsadresse: List<Bostedsadresse>, val folkeregisteridentifikator: List<Folkeregisteridentifikator>)  {
+data class PDLPerson(val adressebeskyttelse: List<Adressebeskyttelse>, val navn: List<Navn>, val bostedsadresse: List<Bostedsadresse>, val folkeregisteridentifikator: List<Folkeregisteridentifikator>)  {
     data class Folkeregisteridentifikator(val identifikasjonsnummer: String, val type: String)
     data class Adressebeskyttelse(val gradering: AdressebeskyttelseGradering)  {
         enum class AdressebeskyttelseGradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG, UGRADERT}

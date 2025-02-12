@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
 
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import java.util.*
 
 class Ansatt(val  attributter: AnsattAttributter, vararg val grupper: EntraGruppe) {

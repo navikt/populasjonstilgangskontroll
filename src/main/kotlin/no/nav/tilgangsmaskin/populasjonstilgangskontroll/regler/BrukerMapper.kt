@@ -12,16 +12,16 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.K
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Navn
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.GT
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.GT.GTType.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.Person
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.Person.Adressebeskyttelse.AdressebeskyttelseGradering.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLGeo
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLGeo.GTType.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLPerson
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLPerson.Adressebeskyttelse.AdressebeskyttelseGradering.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
 import org.slf4j.LoggerFactory
 
 object BrukerMapper {
     private val log = LoggerFactory.getLogger(javaClass)
-    fun mapToBruker(fnr: Fødselsnummer, person: Person, gt: GT, erSkjermet: Boolean) =
+    fun mapToBruker(fnr: Fødselsnummer, person: PDLPerson, gt: PDLGeo, erSkjermet: Boolean) =
         mutableListOf<GlobalGruppe>().apply {
             if  (person.adressebeskyttelse.any { it.gradering in listOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND) })   {
                 add(STRENGT_FORTROLIG_GRUPPE)
@@ -36,13 +36,13 @@ object BrukerMapper {
              Bruker(fnr, mapNavn(person.navn),mapTilknytning(gt), *it).also { log.trace(CONFIDENTIAL, "Mappet person {} til kandidat {}", person, it) }
         }
 
-    private fun mapNavn(navn: List<Person.Navn>): Navn {
+    private fun mapNavn(navn: List<PDLPerson.Navn>): Navn {
          navn.first().let {
             return Navn(it.fornavn, it.etternavn, it.mellomnavn)
         }
     }
 
-    private fun mapTilknytning(respons: GT): GEOTilknytning = when (respons.gtType) {
+    private fun mapTilknytning(respons: PDLGeo): GEOTilknytning = when (respons.gtType) {
         UTLAND ->  respons.gtLand?.let {  UtenlandskTilknytning(getByAlpha3Code(it.verdi)) } ?: throw IllegalStateException("Utenlandsk tilknytning uten landkode")
         KOMMUNE -> respons.gtKommune?.let {KommuneTilknytning(Kommune(it.verdi))} ?: throw IllegalStateException("Kommunal tilknytning uten kommunekode")
         BYDEL ->  respons.gtBydel?.let {  BydelTilknytning(Bydel(it.verdi))}  ?: throw IllegalStateException("Bydelstilknytning uten bydelskode")

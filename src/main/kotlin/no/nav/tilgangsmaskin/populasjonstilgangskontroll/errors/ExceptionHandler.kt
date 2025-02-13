@@ -24,5 +24,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         status(status)
             .headers(HttpHeaders().apply { contentType = APPLICATION_PROBLEM_JSON })
             .body(createProblemDetail(e, status, e.message ?: e.javaClass.simpleName, null, null, req).apply {
-            }.also { log.error("OOPS $req $it ${status.reasonPhrase}: ${e.message}", e) })
+            }.also {
+                log.error("OOPS $req $it ${status.reasonPhrase}: ${e.message}", e)
+            })
 }

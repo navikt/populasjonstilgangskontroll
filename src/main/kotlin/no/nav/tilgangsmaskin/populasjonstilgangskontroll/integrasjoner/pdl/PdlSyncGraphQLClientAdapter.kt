@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractGraphQLAdapter
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractSyncGraphQLAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.GraphQLErrorHandler
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlConfig.Companion.PDL
 import org.springframework.beans.factory.annotation.Qualifier
@@ -17,7 +17,7 @@ class PdlSyncGraphQLClientAdapter(@Qualifier(PDL) private val graphQlClient: Gra
                                   @Qualifier(PDL) restClient: RestClient,
                                   graphQlErrorHandler: GraphQLErrorHandler,
                                   errorHandler: ErrorHandler,
-                                  cfg: PdlConfig) : AbstractGraphQLAdapter(restClient, cfg,errorHandler,graphQlErrorHandler) {
+                                  cfg: PdlConfig) : AbstractSyncGraphQLAdapter(restClient, cfg,errorHandler,graphQlErrorHandler) {
 
     override fun ping()  {
          restClient

@@ -4,13 +4,13 @@ import com.neovisionaries.i18n.CountryCode.getByAlpha3Code
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.Bydel
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.BydelTilknytning
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.Companion.UdefinertGeoTilknytning
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.Kommune
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.KommuneTilknytning
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GEOTilknytning.UtenlandskTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Bydel
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.BydelTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Companion.UdefinertGeoTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Kommune
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.KommuneTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Navn
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLGeo
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLGeo.GTType.*
@@ -43,7 +43,7 @@ object BrukerMapper {
         }
     }
 
-    private fun mapTilknytning(respons: PDLGeo): GEOTilknytning = when (respons.gtType) {
+    private fun mapTilknytning(respons: PDLGeo): GeoTilknytning = when (respons.gtType) {
         UTLAND ->  respons.gtLand?.let {  UtenlandskTilknytning(getByAlpha3Code(it.verdi)) } ?: throw IllegalStateException("Utenlandsk tilknytning uten landkode")
         KOMMUNE -> respons.gtKommune?.let {KommuneTilknytning(Kommune(it.verdi))} ?: throw IllegalStateException("Kommunal tilknytning uten kommunekode")
         BYDEL ->  respons.gtBydel?.let {  BydelTilknytning(Bydel(it.verdi))}  ?: throw IllegalStateException("Bydelstilknytning uten bydelskode")

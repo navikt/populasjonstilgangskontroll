@@ -38,9 +38,10 @@ Geogrfisk tilgang: (Flyt for gGEO-tilgang spesifisert under
  *
  * Ansatt har gruppe GE_GEO-NASJONAL
  * Bruker har ikke registert GT --> Ansatte med GEO_Udefinert skal ha tilgang til personer uten GT/Udefnert GT
+ * Bruker har GT = landskode --> Sjekk mot ansattes gruper -GEO-Utland
  * Brukers GT stemmer med en av Ansattes liste over ENHET-GT _
  * Brukers oppfølgingskontornr stemmer med en av Ansattes liste over ENHET-KONTORNR _(datasett må komme fra POAO (sansynligbvis)) team OBO
- *Bruker har GT = landskode --> Sjekk mot ansattes gruper -GEO-Utland
+ *
  *
  * Avvik på tilganger som må dekkes:
  * Bruker har kun kommunetilhørighet i GT, mens kommunene har bydelsoppdeling --> Diskusjon om ansatte i kommunene Oslo(0301, Bergen(4601), Trondheim(5001) og Stavanger(1103) skal ha tilgang til kommunenummeret i tilleggg til bydelen

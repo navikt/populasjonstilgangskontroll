@@ -26,7 +26,7 @@ sealed class GEOTilknytning(val type: Type) {
     class UdefinertTilknytning : GEOTilknytning(UDEFINERT)
 
     companion object  {
-       val UDEFINERT_GEO_TILKNYTNING = UdefinertTilknytning()
+       val UdefinertGeoTilknytning = UdefinertTilknytning()
     }
 }
 

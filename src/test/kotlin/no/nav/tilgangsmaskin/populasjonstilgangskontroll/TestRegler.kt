@@ -25,137 +25,136 @@ class TestRegler {
     @Test
     @DisplayName("Test at kode 7 bruker ikke kan behandles av kode 6 ansatt")
     fun kode7BrukerkkeKode6() {
-        assertThrows<RegelException> { MOTOR.vurderTilgang(Kode7Bruker, Kode6Ansatt) }.regel == FortroligRegel
+        assertThrows<RegelException> { motor.vurderTilgang(kode7Bruker, kode6Ansatt) }.regel == fortroligRegel
     }
 
     @Test
     @DisplayName("Test at kode 7 bruker ikke kan behandles av vanlig ansatt")
     fun kode7BrukerIkkeVanlig() {
-        assertThrows<RegelException> { MOTOR.vurderTilgang(Kode7Bruker, VanligAnsatt) }.regel == FortroligRegel
+        assertThrows<RegelException> { motor.vurderTilgang(kode7Bruker, vanligAnsatt) }.regel == fortroligRegel
     }
 
     @Test
     @DisplayName("Test at kode 7 bruker kan behandles av kode 7 ansatt")
     fun kode7BrukerKode7() {
-        MOTOR.vurderTilgang(Kode7Bruker, Kode7Ansatt)
+        motor.vurderTilgang(kode7Bruker, kode7Ansatt)
     }
     @Test
     @DisplayName("Test at kode 6 bruker ikke kan behandles av kode 7 ansatt")
     fun kode6BrukerIkkeKode7() {
-        assertThrows<RegelException> { MOTOR.vurderTilgang(Kode6Bruker, Kode7Ansatt) }.regel == StrengtFortroligRegel
+        assertThrows<RegelException> { motor.vurderTilgang(kode6Bruker, kode7Ansatt) }.regel == strengtFortroligRegel
     }
 
     @Test
     @DisplayName("Test at kode 6 bruker ikke kan behandles av vanlig ansatt")
     fun kode6BrukerIkkeVanlig() {
-        assertThrows<RegelException> { MOTOR.vurderTilgang(Kode6Bruker, VanligAnsatt) }.regel == StrengtFortroligRegel
+        assertThrows<RegelException> { motor.vurderTilgang(kode6Bruker, vanligAnsatt) }.regel == strengtFortroligRegel
     }
 
     @Test
     @DisplayName("Test at kode 6 bruker kan behandles av kode 6 ansatt")
     fun kode6BrukerKode6() {
-        MOTOR.vurderTilgang(Kode6Bruker, Kode6Ansatt)
+        motor.vurderTilgang(kode6Bruker, kode6Ansatt)
     }
     @Test
     @DisplayName("Test at vanlig bruker kan behandles av kode 6 ansatt")
     fun vanligBrukertKode6() {
-        MOTOR.vurderTilgang(VanligBruker, Kode6Ansatt)
+        motor.vurderTilgang(vanligBruker, kode6Ansatt)
     }
 
     @Test
     @DisplayName("Test at vanlig bruker kan behandles av kode 7 ansatt")
     fun vanligBrukerKode7() {
-        MOTOR.vurderTilgang(VanligBruker, Kode7Ansatt)
+        motor.vurderTilgang(vanligBruker, kode7Ansatt)
     }
 
     @Test
     @DisplayName("Test at vanlig bruker kan behandles av vanlig ansatt")
     fun vanligBrukerVanlig() {
-        MOTOR.vurderTilgang(VanligBruker, VanligAnsatt)
+        motor.vurderTilgang(vanligBruker, vanligAnsatt)
     }
 
     @Test
     @DisplayName("Test at egen ansatt bruker kan behandles av egen ansatt ansatt")
     fun egenAnsattOK() {
-        MOTOR.vurderTilgang(AnsattBruker, EgenAnsatt)
+        motor.vurderTilgang(ansattBruker, egenAnsatt)
     }
 
     @Test
     @DisplayName("Test at egen ansatt bruker ikke kan behandles av kode7 ansatt")
     fun egenAnsattKode7() {
-        assertThrows<RegelException> { MOTOR.vurderTilgang(AnsattBruker, Kode7Ansatt) }.regel == FortroligRegel
+        assertThrows<RegelException> { motor.vurderTilgang(ansattBruker, kode7Ansatt) }.regel == fortroligRegel
     }
     @Test
     @DisplayName("Test at egen ansatt bruker ikke kan behandles av kode6 ansatt")
     fun egenAnsattKode6() {
-        assertThrows<RegelException> { MOTOR.vurderTilgang(AnsattBruker, Kode6Ansatt) }.regel == StrengtFortroligRegel
+        assertThrows<RegelException> { motor.vurderTilgang(ansattBruker, kode6Ansatt) }.regel == strengtFortroligRegel
     }
     @Test
     @DisplayName("Test at egen ansatt bruker ikke kan behandles av vanlig ansatt")
     fun egenAnsattVanlig() {
-        assertThrows<RegelException> { MOTOR.vurderTilgang(AnsattBruker, VanligAnsatt) }.regel == EgenAnsattRegel
+        assertThrows<RegelException> { motor.vurderTilgang(ansattBruker, vanligAnsatt) }.regel == egenAnsattRegel
     }
 
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 6 ikke kan behandles av egen ansatt")
     fun egenAnsattErOgsåKode6() {
-        assertThrows<RegelException> { MOTOR.vurderTilgang(AnsattKode6Bruker, EgenAnsatt) }.regel == StrengtFortroligRegel
+        assertThrows<RegelException> { motor.vurderTilgang(ansattKode6Bruker, egenAnsatt) }.regel == strengtFortroligRegel
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 7 ikke kan behandles av egen ansatt")
     fun egenAnsattErOgsåKode7() {
-        assertThrows<RegelException> { MOTOR.vurderTilgang(AnsattKode7Bruker, EgenAnsatt) }.regel == FortroligRegel
+        assertThrows<RegelException> { motor.vurderTilgang(ansattKode7Bruker, egenAnsatt) }.regel == fortroligRegel
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 7 kan behandles av kode 7 ansatt som også har ansatt gruppe")
     fun egenAnsattKode7SB() {
-        MOTOR.vurderTilgang(AnsattKode7Bruker, Kode7OgEgenAnsatt)
+        motor.vurderTilgang(ansattKode7Bruker, kode7EgenAnsatt)
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 6 kan behandles av kode 6 ansatt som også gar har ansatt gruppe")
     fun egenAnsattKode6OK() {
-        MOTOR.vurderTilgang(AnsattKode6Bruker, Kode6OgEgenAnsatt)
+        motor.vurderTilgang(ansattKode6Bruker, kode6EgenAnsatt)
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 6 ikke kan behandles av kode 7 ansatt")
     fun egenAnsattKode6SB() {
-        assertThrows<RegelException> {MOTOR.vurderTilgang(AnsattKode6Bruker, Kode7Ansatt) }.regel == StrengtFortroligRegel
+        assertThrows<RegelException> {motor.vurderTilgang(ansattKode6Bruker, kode7Ansatt) }.regel == strengtFortroligRegel
     }
 
 
     companion object {
-        private val ENHET = Enhetsnummer("4242")
-        private val NAVID = NavId("Z999999")
-        private val Attributter = AnsattAttributter(randomUUID(),NAVID, Navn("En","Saksbehandler"), ENHET)
-        private val Fnr = Fødselsnummer("11111111111")
-        private val Navn = Navn("Ola", "Nordmann")
+        private val enhet = Enhetsnummer("4242")
+        private val navid = NavId("Z999999")
+        private val attributter = AnsattAttributter(randomUUID(),navid, Navn("En","Saksbehandler"), enhet)
+        private val fnr = Fødselsnummer("11111111111")
+        private val navn = Navn("Ola", "Nordmann")
 
 
-        private val Kode6Bruker = Bruker(Fnr, Navn,UdefinertGeoTilknytning, STRENGT_FORTROLIG_GRUPPE)
-        private val Kode7Bruker = Bruker(Fnr, Navn,UdefinertGeoTilknytning, FORTROLIG_GRUPPE)
-        private val VanligBruker = Bruker(Fnr,Navn,UdefinertGeoTilknytning)
-        private val AnsattBruker = Bruker(Fnr, Navn,UdefinertGeoTilknytning, EGEN_GRUPPE)
-        private val AnsattKode6Bruker = Bruker(Fnr, Navn,UdefinertGeoTilknytning, EGEN_GRUPPE, STRENGT_FORTROLIG_GRUPPE)
-        private val AnsattKode7Bruker = Bruker(Fnr, Navn,UdefinertGeoTilknytning, EGEN_GRUPPE, FORTROLIG_GRUPPE)
+        private val kode6Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, STRENGT_FORTROLIG_GRUPPE)
+        private val kode7Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, FORTROLIG_GRUPPE)
+        private val vanligBruker = Bruker(fnr,navn,UdefinertGeoTilknytning)
+        private val ansattBruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_GRUPPE)
+        private val ansattKode6Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_GRUPPE, STRENGT_FORTROLIG_GRUPPE)
+        private val ansattKode7Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_GRUPPE, FORTROLIG_GRUPPE)
 
-        private val StrengtFortroligEntraGruppe = EntraGruppe(randomUUID(), "strengt fortrolig gruppe")
-        private val FortroligEntraGruppe = EntraGruppe(randomUUID(), "fortrolig gruppe")
-        private val EgenAnsattEntraGruppe = EntraGruppe(randomUUID(), "egen gruppe")
-        private val AnnenEntraGruppe = EntraGruppe(randomUUID(), "annen gruppe")
+        private val strengtFortroligEntraGruppe = EntraGruppe(randomUUID(), "strengt fortrolig gruppe")
+        private val fortroligEntraGruppe = EntraGruppe(randomUUID(), "fortrolig gruppe")
+        private val egenAnsattEntraGruppe = EntraGruppe(randomUUID(), "egen gruppe")
+        private val annenEntraGruppe = EntraGruppe(randomUUID(), "annen gruppe")
 
-        private val Kode7OgEgenAnsatt = Ansatt(Attributter, FortroligEntraGruppe, EgenAnsattEntraGruppe)
-        private val Kode6OgEgenAnsatt = Ansatt(Attributter, StrengtFortroligEntraGruppe, EgenAnsattEntraGruppe)
-        private val Kode6Ansatt = Ansatt(Attributter, StrengtFortroligEntraGruppe)
-        private val Kode7Ansatt = Ansatt(Attributter, FortroligEntraGruppe)
-        private val EgenAnsatt = Ansatt(Attributter, EgenAnsattEntraGruppe)
-        private val VanligAnsatt = Ansatt(Attributter, AnnenEntraGruppe)
+        private val kode7EgenAnsatt = Ansatt(attributter, fortroligEntraGruppe, egenAnsattEntraGruppe)
+        private val kode6EgenAnsatt = Ansatt(attributter, strengtFortroligEntraGruppe, egenAnsattEntraGruppe)
+        private val kode6Ansatt = Ansatt(attributter, strengtFortroligEntraGruppe)
+        private val kode7Ansatt = Ansatt(attributter, fortroligEntraGruppe)
+        private val egenAnsatt = Ansatt(attributter, egenAnsattEntraGruppe)
+        private val vanligAnsatt = Ansatt(attributter, annenEntraGruppe)
 
-        private val StrengtFortroligRegel = StrengtFortroligRegel(StrengtFortroligEntraGruppe.id)
-        private val FortroligRegel = FortroligRegel(FortroligEntraGruppe.id)
-        private val EgenAnsattRegel = EgenAnsattRegel(EgenAnsattEntraGruppe.id)
+        private val strengtFortroligRegel = StrengtFortroligRegel(strengtFortroligEntraGruppe.id)
+        private val fortroligRegel = FortroligRegel(fortroligEntraGruppe.id)
+        private val egenAnsattRegel = EgenAnsattRegel(egenAnsattEntraGruppe.id)
 
-
-        private val MOTOR = RegelMotor(StrengtFortroligRegel,FortroligRegel, EgenAnsattRegel)
+        private val motor = RegelMotor(strengtFortroligRegel,fortroligRegel, egenAnsattRegel)
 
     }
 }

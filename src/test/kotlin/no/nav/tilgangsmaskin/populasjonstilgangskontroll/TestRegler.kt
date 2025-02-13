@@ -24,101 +24,101 @@ class TestRegler {
 
     @Test
     @DisplayName("Test at kode 7 bruker ikke kan behandles av kode 6 ansatt")
-    fun kode7BrukerkkeKode6() {
+    fun kode7BrukerKode6Ansatt() {
         assertThrows<RegelException> { motor.vurderTilgang(kode7Bruker, kode6Ansatt) }.regel == fortroligRegel
     }
 
     @Test
     @DisplayName("Test at kode 7 bruker ikke kan behandles av vanlig ansatt")
-    fun kode7BrukerIkkeVanlig() {
+    fun kode7BrukerVanligAnsatt() {
         assertThrows<RegelException> { motor.vurderTilgang(kode7Bruker, vanligAnsatt) }.regel == fortroligRegel
     }
 
     @Test
     @DisplayName("Test at kode 7 bruker kan behandles av kode 7 ansatt")
-    fun kode7BrukerKode7() {
+    fun kode7brukerKode7Ansatt() {
         motor.vurderTilgang(kode7Bruker, kode7Ansatt)
     }
     @Test
     @DisplayName("Test at kode 6 bruker ikke kan behandles av kode 7 ansatt")
-    fun kode6BrukerIkkeKode7() {
+    fun kode6BrukerKode7Ansatt() {
         assertThrows<RegelException> { motor.vurderTilgang(kode6Bruker, kode7Ansatt) }.regel == strengtFortroligRegel
     }
 
     @Test
     @DisplayName("Test at kode 6 bruker ikke kan behandles av vanlig ansatt")
-    fun kode6BrukerIkkeVanlig() {
+    fun kode6BrukerVanligAnsatt() {
         assertThrows<RegelException> { motor.vurderTilgang(kode6Bruker, vanligAnsatt) }.regel == strengtFortroligRegel
     }
 
     @Test
     @DisplayName("Test at kode 6 bruker kan behandles av kode 6 ansatt")
-    fun kode6BrukerKode6() {
+    fun kode6BrukerKode6Ansatt() {
         motor.vurderTilgang(kode6Bruker, kode6Ansatt)
     }
     @Test
     @DisplayName("Test at vanlig bruker kan behandles av kode 6 ansatt")
-    fun vanligBrukertKode6() {
+    fun vanligBrukertKode6Ansatt() {
         motor.vurderTilgang(vanligBruker, kode6Ansatt)
     }
 
     @Test
     @DisplayName("Test at vanlig bruker kan behandles av kode 7 ansatt")
-    fun vanligBrukerKode7() {
+    fun vanligBrukerKode7Ansatt() {
         motor.vurderTilgang(vanligBruker, kode7Ansatt)
     }
 
     @Test
     @DisplayName("Test at vanlig bruker kan behandles av vanlig ansatt")
-    fun vanligBrukerVanlig() {
+    fun vanligBrukerVanligAnsatt() {
         motor.vurderTilgang(vanligBruker, vanligAnsatt)
     }
 
     @Test
     @DisplayName("Test at egen ansatt bruker kan behandles av egen ansatt ansatt")
-    fun egenAnsattOK() {
+    fun egenAnsattBrukerEgenAnsatt() {
         motor.vurderTilgang(ansattBruker, egenAnsatt)
     }
 
     @Test
     @DisplayName("Test at egen ansatt bruker ikke kan behandles av kode7 ansatt")
-    fun egenAnsattKode7() {
+    fun ansattBrukerKode7ansatt() {
         assertThrows<RegelException> { motor.vurderTilgang(ansattBruker, kode7Ansatt) }.regel == fortroligRegel
     }
     @Test
     @DisplayName("Test at egen ansatt bruker ikke kan behandles av kode6 ansatt")
-    fun egenAnsattKode6() {
+    fun ansattBrukerKode6Ansatt() {
         assertThrows<RegelException> { motor.vurderTilgang(ansattBruker, kode6Ansatt) }.regel == strengtFortroligRegel
     }
     @Test
     @DisplayName("Test at egen ansatt bruker ikke kan behandles av vanlig ansatt")
-    fun egenAnsattVanlig() {
+    fun ansattBrukerVanligAnsatt() {
         assertThrows<RegelException> { motor.vurderTilgang(ansattBruker, vanligAnsatt) }.regel == egenAnsattRegel
     }
 
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 6 ikke kan behandles av egen ansatt")
-    fun egenAnsattErOgsåKode6() {
+    fun ansattKode6BrukerEgenAnsatt() {
         assertThrows<RegelException> { motor.vurderTilgang(ansattKode6Bruker, egenAnsatt) }.regel == strengtFortroligRegel
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 7 ikke kan behandles av egen ansatt")
-    fun egenAnsattErOgsåKode7() {
+    fun ansattKode7BrukerEgenAnsatt() {
         assertThrows<RegelException> { motor.vurderTilgang(ansattKode7Bruker, egenAnsatt) }.regel == fortroligRegel
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 7 kan behandles av kode 7 ansatt som også har ansatt gruppe")
-    fun egenAnsattKode7SB() {
+    fun egenAnsattBrukerKode7Ansatt() {
         motor.vurderTilgang(ansattKode7Bruker, kode7EgenAnsatt)
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 6 kan behandles av kode 6 ansatt som også gar har ansatt gruppe")
-    fun egenAnsattKode6OK() {
+    fun ansattKode6BrukerKode6Ansatt() {
         motor.vurderTilgang(ansattKode6Bruker, kode6EgenAnsatt)
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 6 ikke kan behandles av kode 7 ansatt")
-    fun egenAnsattKode6SB() {
+    fun ansattKode6BrukerKode7Ansatt() {
         assertThrows<RegelException> {motor.vurderTilgang(ansattKode6Bruker, kode7Ansatt) }.regel == strengtFortroligRegel
     }
 

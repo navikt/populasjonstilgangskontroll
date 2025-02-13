@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractGraphQLAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.GraphQLErrorHandler
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLConfig.Companion.PDL
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlConfig.Companion.PDL
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.graphql.client.GraphQlClient
 import org.springframework.http.HttpStatusCode
@@ -13,11 +13,11 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 @Component
-class PDLSyncGraphQLClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQlClient,
+class PdlSyncGraphQLClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQlClient,
                                   @Qualifier(PDL) restClient: RestClient,
                                   graphQlErrorHandler: GraphQLErrorHandler,
                                   errorHandler: ErrorHandler,
-                                  cfg: PDLConfig) : AbstractGraphQLAdapter(restClient, cfg,errorHandler,graphQlErrorHandler) {
+                                  cfg: PdlConfig) : AbstractGraphQLAdapter(restClient, cfg,errorHandler,graphQlErrorHandler) {
 
     override fun ping()  {
          restClient
@@ -28,9 +28,9 @@ class PDLSyncGraphQLClientAdapter(@Qualifier(PDL) private val graphQlClient: Gra
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
     }
 
-    fun gt(ident: String) = query<PDLGeo>(graphQlClient, GT_QUERY, ident(ident))
+    fun gt(ident: String) = query<PdlGeoTilknytning>(graphQlClient, GT_QUERY, ident(ident))
 
-    fun person(ident: String) = query<PDLPerson>(graphQlClient, PERSON_QUERY, ident(ident))
+    fun person(ident: String) = query<PdlPerson>(graphQlClient, PERSON_QUERY, ident(ident))
     override fun toString() =
         "${javaClass.simpleName} [restClient=$restClient,graphQlClient=$graphQlClient, cfg=$cfg]"
 

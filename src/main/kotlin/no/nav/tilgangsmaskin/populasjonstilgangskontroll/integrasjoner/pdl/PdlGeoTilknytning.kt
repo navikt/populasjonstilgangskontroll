@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
-data class PDLGeo(val gtType: GTType, val gtKommune: GTKommune?, val gtBydel: GTBydel?, val gtLand: GTLand? = null)  {
+data class PdlGeoTilknytning(val gtType: GTType, val gtKommune: GTKommune?, val gtBydel: GTBydel?, val gtLand: GTLand? = null)  {
     enum class GTType { BYDEL, KOMMUNE, UDEFINERT, UTLAND }
 
     @JvmInline

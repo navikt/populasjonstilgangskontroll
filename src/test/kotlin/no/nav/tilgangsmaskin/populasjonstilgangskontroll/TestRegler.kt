@@ -134,9 +134,9 @@ class TestRegler {
         private val kode6Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, STRENGT_FORTROLIG_GRUPPE)
         private val kode7Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, FORTROLIG_GRUPPE)
         private val vanligBruker = Bruker(fnr,navn,UdefinertGeoTilknytning)
-        private val ansattBruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_GRUPPE)
-        private val ansattKode6Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_GRUPPE, STRENGT_FORTROLIG_GRUPPE)
-        private val ansattKode7Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_GRUPPE, FORTROLIG_GRUPPE)
+        private val ansattBruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE)
+        private val ansattKode6Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, STRENGT_FORTROLIG_GRUPPE)
+        private val ansattKode7Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, FORTROLIG_GRUPPE)
 
         private val strengtFortroligEntraGruppe = EntraGruppe(randomUUID(), "strengt fortrolig gruppe")
         private val fortroligEntraGruppe = EntraGruppe(randomUUID(), "fortrolig gruppe")

@@ -4,8 +4,8 @@ import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractPingableHealthIndicator
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestClientAdapter.Companion.headerAddingRequestInterceptor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.LoggingGraphQLInterceptor
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLConfig.Companion.BEHANDLINGSNUMMER
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLConfig.Companion.PDL
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlConfig.Companion.BEHANDLINGSNUMMER
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlConfig.Companion.PDL
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -14,7 +14,7 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
 
 @Configuration
-class PDLClientBeanConfig {
+class PdlClientBeanConfig {
 
     @Bean
     @Qualifier(PDL)
@@ -26,12 +26,12 @@ class PDLClientBeanConfig {
 
     @Bean
     @Qualifier(PDL)
-    fun syncPdlGraphQLClient(@Qualifier(PDL) client: RestClient, cfg: PDLConfig) =
+    fun syncPdlGraphQLClient(@Qualifier(PDL) client: RestClient, cfg: PdlConfig) =
         HttpSyncGraphQlClient.builder(client)
             .url(cfg.baseUri)
             .interceptor(LoggingGraphQLInterceptor())
             .build()
 
     @Bean
-    fun pdlHealthIndicator(a: PDLSyncGraphQLClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
+    fun pdlHealthIndicator(a: PdlSyncGraphQLClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
 }

@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AvvisningBegrunn
 enum class GlobalGruppe(val begrunnelse: AvvisningBegrunnelse) {
     STRENGT_FORTROLIG_GRUPPE(AVVIST_STRENGT_FORTROLIG_ADRESSE),
     FORTROLIG_GRUPPE(AVVIST_FORTROLIG_ADRESSE),
-    EGEN_GRUPPE(AVVIST_SKJERMING)
+    EGEN_ANSATT_GRUPPE(AVVIST_SKJERMING)
 }
 
 enum class AvvisningBegrunnelse(val årsak: String) {

@@ -1,10 +1,10 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
 
-import org.junit.jupiter.api.Test
 import com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.NAIS_CLUSTER_NAME
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.PROD_GCP
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class FødselsnummerTest {

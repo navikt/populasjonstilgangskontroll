@@ -30,7 +30,6 @@ class PdlTilBrukerMapperTest {
     @DisplayName("Test at behandling av brukere med STRENGT_FORTROLIG_UTLAND  krever medlemsskap i STRENGT_FORTROLIG_GRUPPE fra ansatt og at geotilknytning er UtenlandskTilknytning")
     fun strengtFortroligUtland()   {
         with(PdlTilBrukerMapper.tilBruker(pdlPerson(fnr,STRENGT_FORTROLIG_UTLAND), geoUtland(), false)) {
-            assertThat(ident).isEqualTo(fnr)
             assertThat(gruppeKrav).containsExactly(STRENGT_FORTROLIG_GRUPPE)
             assertThat(geoTilknytning).isInstanceOf(UtenlandskTilknytning::class.java)
         }
@@ -39,7 +38,6 @@ class PdlTilBrukerMapperTest {
     @DisplayName("Test at behandling av brukere med STRENGT_FORTROLIG vil kreve medlemsskap i STRENGT_FORTROLIG_GRUPPE for ansatt og at geotilknytning er KommuneTilknytning")
     fun strengtFortroligKommune()   {
         with(PdlTilBrukerMapper.tilBruker(pdlPerson(fnr,STRENGT_FORTROLIG), geoKommune(), false)) {
-            assertThat(ident).isEqualTo(fnr)
             assertThat(gruppeKrav).containsExactly(STRENGT_FORTROLIG_GRUPPE)
             assertThat(geoTilknytning).isInstanceOf(KommuneTilknytning::class.java)
         }

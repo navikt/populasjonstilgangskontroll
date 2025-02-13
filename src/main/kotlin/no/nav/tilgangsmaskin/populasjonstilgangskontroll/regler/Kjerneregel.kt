@@ -13,13 +13,13 @@ import org.springframework.stereotype.Component
 import java.util.UUID
 
 
-abstract class KjerneRegel(private val gruppe: GlobalGruppe, private val id: UUID, kortNavn: String, overstyrbar: Boolean = false): Regel {
+abstract class KjerneRegel(private val gruppe: GlobalGruppe, private val id: UUID, kortNavn: String): Regel {
     override fun test(bruker: Bruker, s: Ansatt) =
         if (bruker.kreverGruppe(gruppe))  {
             s.kanBehandle(id)
         } else true
 
-    override val beskrivelse = RegelBeskrivelse(kortNavn, gruppe.begrunnelse,overstyrbar)
+    override val beskrivelse = RegelBeskrivelse(kortNavn, gruppe.begrunnelse,false)
 }
 
 @Component

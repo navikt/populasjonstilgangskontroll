@@ -8,8 +8,8 @@ metadata:
   namespace: tilgangsmaskin
 spec:
   ingresses:
-     - "https://tilgangsmaskin.ansatt.dev.nav.no"
-     - "https://tilgangsmaskin.intern.dev.nav.no"
+     - {{ingressIntern}}
+     - {{ingressAnsatt}}
   image: {{image}}
   prometheus:
     enabled: true

@@ -17,5 +17,3 @@ data class PdlPerson(val adressebeskyttelse: List<Adressebeskyttelse>, val navn:
         }
     }
 }
-
-

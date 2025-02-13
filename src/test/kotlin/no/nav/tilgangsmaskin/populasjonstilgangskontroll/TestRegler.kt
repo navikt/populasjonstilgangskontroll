@@ -10,6 +10,18 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt.AnsattAttributter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Companion.UdefinertGeoTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Navn
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning.GTLand
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning.GTType
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson.Adressebeskyttelse
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson.Adressebeskyttelse.AdressebeskyttelseGradering
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson.Bostedsadresse
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson.Bostedsadresse.UkjentBosted
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson.Bostedsadresse.VegAdresse
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson.Bostedsadresse.VegAdresse.Koordinater
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson.Folkeregisteridentifikator
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlTilBrukerMapper
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.EgenAnsattRegel
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelMotor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.StrengtFortroligRegel
@@ -122,7 +134,6 @@ class TestRegler {
         assertThrows<RegelException> {motor.vurderTilgang(ansattKode6Bruker, kode7Ansatt) }.regel == strengtFortroligRegel
     }
 
-
     companion object {
         private val enhet = Enhetsnummer("4242")
         private val navid = NavId("Z999999")
@@ -158,3 +169,4 @@ class TestRegler {
 
     }
 }
+

@@ -13,6 +13,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson.Bostedsadresse.VegAdresse.Koordinater
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson.Folkeregisteridentifikator
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import kotlin.test.assertEquals
@@ -22,7 +23,8 @@ class PdlTilBrukerMapperTest {
     private val fnr = Fødselsnummer("11111111111")
 
     @Test
-    fun utland()   {
+    @DisplayName("Test at STRENGT_FORTROLIG_UTLAND fra Pdl krever medlemsskap i  STRENGT_FORTROLIG_GRUPPE")
+    fun strengtFortroligUtland()   {
         with(PdlTilBrukerMapper.tilBruker(pdlPerson(fnr,STRENGT_FORTROLIG_UTLAND), geoUtland(), false)) {
             assertEquals(ident, fnr)
             assertEquals(gruppeKrav.single(), STRENGT_FORTROLIG_GRUPPE)

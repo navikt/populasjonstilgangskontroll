@@ -8,7 +8,8 @@ metadata:
   namespace: tilgangsmaskin
 spec:
   ingresses:
-     - {{ingress}}
+     - {{ingressIntern}}
+     - {{ingeressAnsatt}}
   image: {{image}}
   prometheus:
     enabled: true

@@ -1,5 +1,6 @@
 {
-  "ingress": "https://tilgangsmaskin.ansatt.dev.nav.no",
+  "ingressAnsatt": "https://tilgangsmaskin.ansatt.dev.nav.no",
+  "ingressIntern": "https://tilgangsmaskin.intern.dev.nav.no",
   "pdl": "pdl-api.dev-fss-pub.nais.io",
   "grupper": {
     "fortrolig":"ea930b6b-9397-44d9-b9e6-f4cf527a632a" ,

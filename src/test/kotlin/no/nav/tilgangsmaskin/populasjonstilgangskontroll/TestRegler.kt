@@ -112,6 +112,11 @@ class TestRegler {
     fun ansattKode6BrukerKode7Ansatt() {
         assertThrows<RegelException> {motor.vurderTilgang(ansattKode6Bruker, kode7Ansatt) }.regel == strengtFortroligRegel
     }
+    @Test
+    @DisplayName("Test at ansatt med manglende geografisk tilknytning ikke kan behandle bruker med geografisk tilknytning")
+    fun ansattMedManglendeGeografiskTilknytning() {
+       // assertThrows<RegelException> { motor.vurderTilgang(ansattBruker, vanligAnsatt) }.regel == geografiskRegel //TODO implementer geografisk regel
+    }
 
     companion object {
         private val enhet = Enhetsnummer("4242")

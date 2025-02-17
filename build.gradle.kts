@@ -1,7 +1,7 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 val javaVersion = JavaLanguageVersion.of(21)
-val springdocVersion = "2.8.4"
+val springdocVersion = "2.8.5"
 val tokenSupportVersion = "5.0.16"
 val springCloudVersion = "4.2.0"
 val mockkVersion = "1.13.16"
@@ -12,7 +12,7 @@ group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
 version = "1.0.1"
 
 plugins {
-    kotlin("jvm") version "1.9.25"
+    kotlin("jvm") version "2.1.10"
     id("com.diffplug.spotless") version "7.0.2"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("org.springframework.boot") version "3.4.2"
@@ -45,7 +45,7 @@ configurations.all {
 dependencies {
     // Align versions of all Kotlin components
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
     implementation("com.neovisionaries:nv-i18n:1.29")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework:spring-aspects")

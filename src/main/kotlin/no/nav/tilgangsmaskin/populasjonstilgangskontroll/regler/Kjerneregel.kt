@@ -84,6 +84,28 @@ class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) 
     override val beskrivelse = RegelBeskrivelse("Person bosatt ukjent bosted", AVVIST_PERSON_UKJENT, true)
 }
 
+@Component
+@Order(HIGHEST_PRECEDENCE + 6)
+class GeoNorgeTilgang(@Value("\${gruppe.nasjonal") private val id: UUID)  :  Regel {
+    override fun test(bruker: Bruker, ansatt: Ansatt) : Boolean {
+        if (ansatt.kanBehandle(id))
+            return true
+
+        if (bruker.geoTilknytning is KommuneTilknytning) {
+            val nummer = bruker.geoTilknytning.kommune.verdi
+            val ok = ansatt.grupper.map { it.displayName }.any { it.endsWith("GEO_$nummer") }
+            return ok
+        }
+        if (bruker.geoTilknytning is BydelTilknytning) {
+        val nummer = bruker.geoTilknytning.bydel.verdi
+        val ok = ansatt.grupper.map { it.displayName }.any { it.endsWith("GEO_$nummer") }
+         return ok
+        }
+        return true
+}
+
+    override val beskrivelse = RegelBeskrivelse("Geografisk tilknytning", AVVIST_GEOGRAFISK, false)
+}
 
 /**
  * Kjerneregel matcher for nasjonal, men får problemer med hirekarki

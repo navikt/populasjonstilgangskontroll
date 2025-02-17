@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.UUID.randomUUID
+import kotlin.test.assertEquals
 
 class TestRegler {
 
@@ -76,7 +77,7 @@ class TestRegler {
     @Test
     @DisplayName("Test at egen ansatt bruker ikke kan behandles av kode7 ansatt")
     fun ansattBrukerKode7ansatt() {
-        assertThrows<RegelException> { motor.vurderTilgang(ansattBruker, kode7Ansatt) }.regel == fortroligRegel
+        assertEquals(egenAnsattRegel, assertThrows<RegelException> { motor.vurderTilgang(ansattBruker, kode7Ansatt) }.regel)
     }
     @Test
     @DisplayName("Test at egen ansatt bruker ikke kan behandles av kode6 ansatt")

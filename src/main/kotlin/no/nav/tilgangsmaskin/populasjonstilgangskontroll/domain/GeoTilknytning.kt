@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.T
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.requires
 
 sealed class GeoTilknytning(val type: Type) {
-    enum class Type { BYDEL, KOMMUNE, UDEFINERT, UTLAND }
+    enum class Type { BYDEL, KOMMUNE, UDEFINERT, UTLAND, UKJENT_BOSTED }
 
     @JvmInline
     value class Kommune(val verdi: String)  {
@@ -22,6 +22,7 @@ sealed class GeoTilknytning(val type: Type) {
     }
     data class KommuneTilknytning(val kommune: Kommune) : GeoTilknytning(KOMMUNE)
     data class BydelTilknytning(val bydel: Bydel) : GeoTilknytning(BYDEL)
+    class UkjentBosted() : GeoTilknytning(UKJENT_BOSTED)
     data class UtenlandskTilknytning(val land: CountryCode) : GeoTilknytning(UTLAND)
     class UdefinertTilknytning : GeoTilknytning(UDEFINERT)
 

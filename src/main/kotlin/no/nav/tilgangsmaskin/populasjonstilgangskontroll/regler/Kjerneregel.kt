@@ -66,7 +66,7 @@ class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Kj
 @Order(HIGHEST_PRECEDENCE + 4)
 class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland") private val id: UUID) : Regel {
     override fun test(bruker: Bruker, ansatt: Ansatt) =
-        if (bruker.geoTilknytning is UtenlandskTilknytning && bruker.geoTilknytning.land != null) {
+        if (bruker.geoTilknytning is UtenlandskTilknytning) {
             ansatt.kanBehandle(id)
         } else true
 
@@ -77,7 +77,7 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland") private val id: UUID) :
 @Order(HIGHEST_PRECEDENCE + 5)
 class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) : Regel {
     override fun test(bruker: Bruker, ansatt: Ansatt) =
-        if (bruker.geoTilknytning is UtenlandskTilknytning && bruker.geoTilknytning.land == null) {
+        if (bruker.geoTilknytning is UkjentBosted) {
             ansatt.kanBehandle(id)
         } else true
 

@@ -153,7 +153,7 @@ class TestRegler {
         private val ansattBruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE)
         private val ansattKode6Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, STRENGT_FORTROLIG_GRUPPE)
         private val ansattKode7Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, FORTROLIG_GRUPPE)
-        private val udefinertGeoBruker = Bruker(fnr, navn,UtenlandskTilknytning(), UDEFINERT_GEO_GRUPPE)
+        private val udefinertGeoBruker = Bruker(fnr, navn,UtenlandskTilknytning(null), UDEFINERT_GEO_GRUPPE)
         private val geoUtlandBruker = Bruker(fnr, navn, UtenlandskTilknytning(SE), GEO_PERSON_UTLAND_GRUPPE)
 
 

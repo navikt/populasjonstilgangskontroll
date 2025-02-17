@@ -86,7 +86,7 @@ class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) 
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 6)
-class GeoNorgeTilgang(@Value("\${gruppe.nasjonal") private val id: UUID)  :  Regel {
+class GeoNorgeTilgang(@Value("\${gruppe.nasjonal}") private val id: UUID)  :  Regel {
     override fun test(bruker: Bruker, ansatt: Ansatt) : Boolean {
         if (ansatt.kanBehandle(id))
             return true
@@ -104,7 +104,7 @@ class GeoNorgeTilgang(@Value("\${gruppe.nasjonal") private val id: UUID)  :  Reg
         return true
 }
 
-    override val beskrivelse = RegelBeskrivelse("Geografisk tilknytning", AVVIST_GEOGRAFISK, false)
+    override val beskrivelse = RegelBeskrivelse("Geografisk tilknytning", AVVIST_GEOGRAFISK, true)
 }
 
 /**

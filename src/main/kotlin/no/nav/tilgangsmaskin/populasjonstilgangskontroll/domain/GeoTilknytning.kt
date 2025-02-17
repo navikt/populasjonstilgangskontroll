@@ -22,7 +22,7 @@ sealed class GeoTilknytning(val type: Type) {
     }
     data class KommuneTilknytning(val kommune: Kommune) : GeoTilknytning(KOMMUNE)
     data class BydelTilknytning(val bydel: Bydel) : GeoTilknytning(BYDEL)
-    data class UtenlandskTilknytning(val land: CountryCode? = null) : GeoTilknytning(UTLAND)
+    data class UtenlandskTilknytning(val land: CountryCode) : GeoTilknytning(UTLAND)
     class UdefinertTilknytning : GeoTilknytning(UDEFINERT)
 
     companion object  {

@@ -2,6 +2,8 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AvvisningBegrunnelse.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.Regel.RegelBeskrivelse
 import org.springframework.beans.factory.annotation.Value
@@ -61,8 +63,27 @@ class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Kj
 
 
 @Component
-@Order(HIGHEST_PRECEDENCE + 3)
-class UdefinertGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) : KjerneRegel(UDEFINERT_GEO_GRUPPE, id, "Udefinert Geotilgang")
+@Order(HIGHEST_PRECEDENCE + 4)
+class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland") private val id: UUID) : Regel {
+    override fun test(bruker: Bruker, ansatt: Ansatt) =
+        if (bruker.geoTilknytning is UtenlandskTilknytning && bruker.geoTilknytning.land != null) {
+            ansatt.kanBehandle(id)
+        } else true
+
+    override val beskrivelse = RegelBeskrivelse("Person bosatt utland", AVVIST_PERSON_UTLAND, true)
+}
+
+@Component
+@Order(HIGHEST_PRECEDENCE + 5)
+class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) : Regel {
+    override fun test(bruker: Bruker, ansatt: Ansatt) =
+        if (bruker.geoTilknytning is UtenlandskTilknytning && bruker.geoTilknytning.land == null) {
+            ansatt.kanBehandle(id)
+        } else true
+
+    override val beskrivelse = RegelBeskrivelse("Person bosatt ukjent bosted", AVVIST_PERSON_UKJENT, true)
+}
+
 
 /**
  * Kjerneregel matcher for nasjonal, men får problemer med hirekarki

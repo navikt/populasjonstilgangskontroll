@@ -1,7 +1,10 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll
 
+import com.neovisionaries.i18n.CountryCode
+import com.neovisionaries.i18n.CountryCode.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt.AnsattAttributter
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Companion.UdefinertGeoTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.*
@@ -124,6 +127,17 @@ class TestRegler {
         assertThrows<RegelException> {motor.vurderTilgang(udefinertGeoBruker, vanligAnsatt)}
     }
 
+    @Test
+    @DisplayName("Test at ansatt med tilgang utland  kan behandle bruker med geografisk utland")
+    fun geoUtlandGruppe() {
+        motor.vurderTilgang(geoUtlandBruker, geoUtlandAnsatt)
+    }
+
+    @Test
+    @DisplayName("Test at ansatt uten tilgang utland ikke kan behandle bruker med geografisk utland")
+    fun geoUtlandGruppeUtenSammeRolle() {
+        assertThrows<RegelException> {motor.vurderTilgang(geoUtlandBruker, vanligAnsatt)  }
+    }
 
     companion object {
         private val enhet = Enhetsnummer("4242")
@@ -139,12 +153,15 @@ class TestRegler {
         private val ansattBruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE)
         private val ansattKode6Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, STRENGT_FORTROLIG_GRUPPE)
         private val ansattKode7Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, FORTROLIG_GRUPPE)
-        private val udefinertGeoBruker = Bruker(fnr, navn,UdefinertGeoTilknytning, UDEFINERT_GEO_GRUPPE)
+        private val udefinertGeoBruker = Bruker(fnr, navn,UtenlandskTilknytning(), UDEFINERT_GEO_GRUPPE)
+        private val geoUtlandBruker = Bruker(fnr, navn, UtenlandskTilknytning(SE), GEO_PERSON_UTLAND_GRUPPE)
+
 
         private val strengtFortroligEntraGruppe = EntraGruppe(randomUUID(), "strengt fortrolig gruppe")
         private val fortroligEntraGruppe = EntraGruppe(randomUUID(), "fortrolig gruppe")
         private val egenAnsattEntraGruppe = EntraGruppe(randomUUID(), "egen gruppe")
         private val annenEntraGruppe = EntraGruppe(randomUUID(), "annen gruppe")
+        private val geoUtlandEntraGruppe = EntraGruppe(randomUUID(), "geo utland gruppe")
         private val udefinertGruppe = EntraGruppe(randomUUID(), "udefinert geo gruppe")
 
         private val kode7EgenAnsatt = Ansatt(attributter, fortroligEntraGruppe, egenAnsattEntraGruppe)
@@ -153,14 +170,16 @@ class TestRegler {
         private val kode7Ansatt = Ansatt(attributter, fortroligEntraGruppe)
         private val egenAnsatt = Ansatt(attributter, egenAnsattEntraGruppe)
         private val vanligAnsatt = Ansatt(attributter, annenEntraGruppe)
+        private val geoUtlandAnsatt = Ansatt(attributter, geoUtlandEntraGruppe)
         private val udefinertGeoAnsatt = Ansatt(attributter, udefinertGruppe)
 
         private val strengtFortroligRegel = StrengtFortroligRegel(strengtFortroligEntraGruppe.id)
         private val fortroligRegel = FortroligRegel(fortroligEntraGruppe.id)
         private val egenAnsattRegel = EgenAnsattRegel(egenAnsattEntraGruppe.id)
-        private val udefinertGeoRegel = UdefinertGeoRegel(udefinertGruppe.id)
+        private val udefinertGeoRegel = UkjentBostedGeoRegel(udefinertGruppe.id)
+        private val geoUtlandRegel = UtlandUdefinertGeoRegel(geoUtlandEntraGruppe.id)
 
-        private val motor = RegelMotor(strengtFortroligRegel,fortroligRegel, egenAnsattRegel, udefinertGeoRegel)
+        private val motor = RegelMotor(strengtFortroligRegel,fortroligRegel, egenAnsattRegel, udefinertGeoRegel, geoUtlandRegel)
 
     }
 }

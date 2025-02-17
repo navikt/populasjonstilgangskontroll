@@ -64,7 +64,7 @@ class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Kj
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 4)
-class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland") private val id: UUID) : Regel {
+class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) : Regel {
     override fun test(bruker: Bruker, ansatt: Ansatt) =
         if (bruker.geoTilknytning is UtenlandskTilknytning) {
             ansatt.kanBehandle(id)

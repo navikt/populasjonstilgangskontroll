@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll
 
-import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.CountryCode.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt.AnsattAttributter
@@ -118,13 +117,13 @@ class TestRegler {
     @Test
     @DisplayName("Test at ansatt med manglende geografisk tilknytning kan behandle bruker med geografisk tilknytning")
     fun brukerMedManglendeGeografiskTilknytningAnsattMedSamme() {
-        motor.vurderTilgang(udefinertGeoBruker, udefinertGeoAnsatt)
+        motor.vurderTilgang(ukjentBostedBruker, udefinertGeoAnsatt)
     }
 
     @Test
     @DisplayName("Test at ansatt uten manglende geografisk tilknytning ikke kan behandle bruker med geografisk tilknytning")
     fun brukerMedManglendeGeografiskTilknytningAnsattUtenSammeRole() {
-        assertThrows<RegelException> {motor.vurderTilgang(udefinertGeoBruker, vanligAnsatt)}
+        assertThrows<RegelException> {motor.vurderTilgang(ukjentBostedBruker, vanligAnsatt)}
     }
 
     @Test
@@ -153,7 +152,7 @@ class TestRegler {
         private val ansattBruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE)
         private val ansattKode6Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, STRENGT_FORTROLIG_GRUPPE)
         private val ansattKode7Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, FORTROLIG_GRUPPE)
-        private val udefinertGeoBruker = Bruker(fnr, navn,UtenlandskTilknytning(null), UDEFINERT_GEO_GRUPPE)
+        private val ukjentBostedBruker = Bruker(fnr, navn,UkjentBosted(), UDEFINERT_GEO_GRUPPE)
         private val geoUtlandBruker = Bruker(fnr, navn, UtenlandskTilknytning(SE), GEO_PERSON_UTLAND_GRUPPE)
 
 

@@ -67,4 +67,7 @@ spec:
       value: '{{grupper.fortrolig}}'
     - name: GRUPPE_EGENANSATT
       value: '{{grupper.egenansatt}}'
-
+    - name: GRUPPE_UDEFINERT
+      value: '{{grupper.udefinert}}'
+    - name: GRUPPE_NASJONAL
+      value: '{{grupper.nasjonal}}'

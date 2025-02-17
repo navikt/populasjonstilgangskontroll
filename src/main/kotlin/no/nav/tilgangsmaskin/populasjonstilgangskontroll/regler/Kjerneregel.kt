@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.Regel.RegelBeskrivelse
 import org.springframework.beans.factory.annotation.Value
@@ -20,7 +19,8 @@ abstract class KjerneRegel(private val gruppe: GlobalGruppe, private val id: UUI
     override val beskrivelse = RegelBeskrivelse(kortNavn, gruppe.begrunnelse,false)
 }
 /*
-abstract class GeografiskKjerneRegel(private val gruppe: GlobalGruppe, private val roller: List<EntraGruppe>): Regel {
+@Component
+class GeografiskKjerneRegel(): Regel {
     override fun test(bruker: Bruker, s: Ansatt) =
         if (bruker.geoTilknytning == null) { // Sjekke om bruker har geografisk tilknytning eller satt til udefinert
             return s.kanBehandle(ADRolleUdefinert)
@@ -44,6 +44,7 @@ abstract class GeografiskKjerneRegel(private val gruppe: GlobalGruppe, private v
 
     override val beskrivelse = RegelBeskrivelse(kortNavn, gruppe.begrunnelse,false)
 }
+
 */
 
 @Component
@@ -58,11 +59,11 @@ class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID): Kjern
 @Order(HIGHEST_PRECEDENCE + 2)
 class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : KjerneRegel(EGEN_ANSATT_GRUPPE, id,"Egen ansatt")
 
-/*
+
 @Component
 @Order(HIGHEST_PRECEDENCE + 3)
-class GeografiskRegel(@Value("\${gruppe.geografisk}") private val id: UUID) : GeografiskKjerneRegel(GEOGRAFISK_GRUPPE, id, "Geografisk tilgang")
-*/
+class UdefinertGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) : KjerneRegel(UDEFINERT_GEO_GRUPPE, id, "Udefinert Geotilgang")
+
 /**
  * Kjerneregel matcher for nasjonal, men får problemer med hirekarki
  *

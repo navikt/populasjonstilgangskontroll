@@ -113,10 +113,17 @@ class TestRegler {
         assertThrows<RegelException> {motor.vurderTilgang(ansattKode6Bruker, kode7Ansatt) }.regel == strengtFortroligRegel
     }
     @Test
-    @DisplayName("Test at ansatt med manglende geografisk tilknytning ikke kan behandle bruker med geografisk tilknytning")
-    fun ansattMedManglendeGeografiskTilknytning() {
-       // assertThrows<RegelException> { motor.vurderTilgang(ansattBruker, vanligAnsatt) }.regel == geografiskRegel //TODO implementer geografisk regel
+    @DisplayName("Test at ansatt med manglende geografisk tilknytning kan behandle bruker med geografisk tilknytning")
+    fun brukerMedManglendeGeografiskTilknytningAnsattMedSamme() {
+        motor.vurderTilgang(udefinertGeoBruker, udefinertGeoAnsatt)
     }
+
+    @Test
+    @DisplayName("Test at ansatt uten manglende geografisk tilknytning ikke kan behandle bruker med geografisk tilknytning")
+    fun brukerMedManglendeGeografiskTilknytningAnsattUtenSammeRole() {
+        assertThrows<RegelException> {motor.vurderTilgang(udefinertGeoBruker, vanligAnsatt)}
+    }
+
 
     companion object {
         private val enhet = Enhetsnummer("4242")
@@ -132,11 +139,13 @@ class TestRegler {
         private val ansattBruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE)
         private val ansattKode6Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, STRENGT_FORTROLIG_GRUPPE)
         private val ansattKode7Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, FORTROLIG_GRUPPE)
+        private val udefinertGeoBruker = Bruker(fnr, navn,UdefinertGeoTilknytning, UDEFINERT_GEO_GRUPPE)
 
         private val strengtFortroligEntraGruppe = EntraGruppe(randomUUID(), "strengt fortrolig gruppe")
         private val fortroligEntraGruppe = EntraGruppe(randomUUID(), "fortrolig gruppe")
         private val egenAnsattEntraGruppe = EntraGruppe(randomUUID(), "egen gruppe")
         private val annenEntraGruppe = EntraGruppe(randomUUID(), "annen gruppe")
+        private val udefinertGruppe = EntraGruppe(randomUUID(), "udefinert geo gruppe")
 
         private val kode7EgenAnsatt = Ansatt(attributter, fortroligEntraGruppe, egenAnsattEntraGruppe)
         private val kode6EgenAnsatt = Ansatt(attributter, strengtFortroligEntraGruppe, egenAnsattEntraGruppe)
@@ -144,12 +153,14 @@ class TestRegler {
         private val kode7Ansatt = Ansatt(attributter, fortroligEntraGruppe)
         private val egenAnsatt = Ansatt(attributter, egenAnsattEntraGruppe)
         private val vanligAnsatt = Ansatt(attributter, annenEntraGruppe)
+        private val udefinertGeoAnsatt = Ansatt(attributter, udefinertGruppe)
 
         private val strengtFortroligRegel = StrengtFortroligRegel(strengtFortroligEntraGruppe.id)
         private val fortroligRegel = FortroligRegel(fortroligEntraGruppe.id)
         private val egenAnsattRegel = EgenAnsattRegel(egenAnsattEntraGruppe.id)
+        private val udefinertGeoRegel = UdefinertGeoRegel(udefinertGruppe.id)
 
-        private val motor = RegelMotor(strengtFortroligRegel,fortroligRegel, egenAnsattRegel)
+        private val motor = RegelMotor(strengtFortroligRegel,fortroligRegel, egenAnsattRegel, udefinertGeoRegel)
 
     }
 }

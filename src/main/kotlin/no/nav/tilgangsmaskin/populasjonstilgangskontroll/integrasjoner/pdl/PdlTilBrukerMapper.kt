@@ -51,7 +51,7 @@ object PdlTilBrukerMapper {
     private fun tilGeoTilknytning(geo: PdlGeoTilknytning): GeoTilknytning =
         when (geo.gtType) {
             UTLAND ->  geo.gtLand?.let {
-                UtenlandskTilknytning(getByAlpha3Code(it.verdi)) } ?: throw IllegalStateException("Utenlandsk tilknytning uten landkode")
+                UtenlandskTilknytning(getByAlpha3Code(it.verdi)) } ?: UtenlandskTilknytning()
             KOMMUNE -> geo.gtKommune?.let {
                 KommuneTilknytning(Kommune(it.verdi))
             } ?: throw IllegalStateException("Kommunal tilknytning uten kommunekode")

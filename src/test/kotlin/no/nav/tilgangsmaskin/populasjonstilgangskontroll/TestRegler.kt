@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.UUID.randomUUID
 import kotlin.test.assertEquals
+import org.assertj.core.api.Assertions.assertThat
 
 class TestRegler {
 
@@ -20,12 +21,15 @@ class TestRegler {
     @DisplayName("Test at kode 7 bruker ikke kan behandles av kode 6 ansatt")
     fun kode7BrukerKode6Ansatt() {
         assertThrows<RegelException> { motor.vurderTilgang(kode7Bruker, kode6Ansatt) }.regel == fortroligRegel
+        assertThat(fortroligRegel.test(kode7Bruker, kode6Ansatt)).isFalse()
     }
 
     @Test
     @DisplayName("Test at kode 7 bruker ikke kan behandles av vanlig ansatt")
     fun kode7BrukerVanligAnsatt() {
         assertThrows<RegelException> { motor.vurderTilgang(kode7Bruker, vanligAnsatt) }.regel == fortroligRegel
+        assertThat(fortroligRegel.test(kode7Bruker, vanligAnsatt)).isFalse()
+
     }
 
     @Test
@@ -37,12 +41,14 @@ class TestRegler {
     @DisplayName("Test at kode 6 bruker ikke kan behandles av kode 7 ansatt")
     fun kode6BrukerKode7Ansatt() {
         assertThrows<RegelException> { motor.vurderTilgang(kode6Bruker, kode7Ansatt) }.regel == strengtFortroligRegel
+        assertThat(strengtFortroligRegel.test(kode6Bruker, kode7Ansatt)).isFalse()
     }
 
     @Test
     @DisplayName("Test at kode 6 bruker ikke kan behandles av vanlig ansatt")
     fun kode6BrukerVanligAnsatt() {
         assertThrows<RegelException> { motor.vurderTilgang(kode6Bruker, vanligAnsatt) }.regel == strengtFortroligRegel
+        assertThat(strengtFortroligRegel.test(kode6Bruker, vanligAnsatt)).isFalse()
     }
 
     @Test
@@ -78,27 +84,33 @@ class TestRegler {
     @DisplayName("Test at egen ansatt bruker ikke kan behandles av kode7 ansatt")
     fun ansattBrukerKode7ansatt() {
         assertEquals(egenAnsattRegel, assertThrows<RegelException> { motor.vurderTilgang(ansattBruker, kode7Ansatt) }.regel)
+        assertThat(egenAnsattRegel.test(ansattBruker, kode7Ansatt)).isFalse()
     }
     @Test
     @DisplayName("Test at egen ansatt bruker ikke kan behandles av kode6 ansatt")
     fun ansattBrukerKode6Ansatt() {
         assertEquals(egenAnsattRegel,assertThrows<RegelException> { motor.vurderTilgang(ansattBruker, kode6Ansatt) }.regel)
+        assertThat(egenAnsattRegel.test(ansattBruker, kode6Ansatt)).isFalse()
     }
     @Test
     @DisplayName("Test at egen ansatt bruker ikke kan behandles av vanlig ansatt")
     fun ansattBrukerVanligAnsatt() {
         assertEquals(egenAnsattRegel,assertThrows<RegelException> { motor.vurderTilgang(ansattBruker, vanligAnsatt) }.regel)
+        assertThat(egenAnsattRegel.test(ansattBruker, vanligAnsatt)).isFalse()
     }
 
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 6 ikke kan behandles av egen ansatt")
     fun ansattKode6BrukerEgenAnsatt() {
         assertEquals(strengtFortroligRegel,assertThrows<RegelException> { motor.vurderTilgang(ansattKode6Bruker, egenAnsatt) }.regel)
+        assertThat(strengtFortroligRegel.test(ansattKode6Bruker, egenAnsatt)).isFalse()
+
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 7 ikke kan behandles av egen ansatt")
     fun ansattKode7BrukerEgenAnsatt() {
         assertEquals(fortroligRegel,assertThrows<RegelException> { motor.vurderTilgang(ansattKode7Bruker, egenAnsatt) }.regel)
+        assertThat(fortroligRegel.test(ansattKode7Bruker, egenAnsatt)).isFalse()
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 7 kan behandles av kode 7 ansatt som også har ansatt gruppe")
@@ -114,6 +126,7 @@ class TestRegler {
     @DisplayName("Test at egen ansatt bruker med kode 6 ikke kan behandles av kode 7 ansatt")
     fun ansattKode6BrukerKode7Ansatt() {
         assertEquals(strengtFortroligRegel,assertThrows<RegelException> {motor.vurderTilgang(ansattKode6Bruker, kode7Ansatt) }.regel)
+        assertThat(strengtFortroligRegel.test(ansattKode6Bruker, kode7Ansatt)).isFalse()
     }
     @Test
     @DisplayName("Test at ansatt med manglende geografisk tilknytning kan behandle bruker med geografisk tilknytning")
@@ -125,6 +138,7 @@ class TestRegler {
     @DisplayName("Test at ansatt uten manglende geografisk tilknytning rolle ikke kan behandle bruker med geografisk tilknytning")
     fun brukerMedManglendeGeografiskTilknytningAnsattUtenSammeRole() {
         assertEquals(ukjentBostedGeoRegel,assertThrows<RegelException> {motor.vurderTilgang(ukjentBostedBruker, vanligAnsatt)}.regel)
+        assertThat(ukjentBostedGeoRegel.test(ukjentBostedBruker, vanligAnsatt)).isFalse()
     }
 
     @Test
@@ -137,7 +151,10 @@ class TestRegler {
     @DisplayName("Test at ansatt uten tilgang utland ikke kan behandle bruker med geografisk utland")
     fun geoUtlandGruppeUtenSammeRolle() {
         assertEquals(geoUtlandRegel,assertThrows<RegelException> {motor.vurderTilgang(geoUtlandBruker, vanligAnsatt)  }.regel)
+        assertThat(geoUtlandRegel.test(geoUtlandBruker, vanligAnsatt)).isFalse()
     }
+
+
 
     companion object {
         private val enhet = Enhetsnummer("4242")

@@ -20,34 +20,6 @@ abstract class KjerneRegel(private val gruppe: GlobalGruppe, private val id: UUI
 
     override val beskrivelse = RegelBeskrivelse(kortNavn, gruppe.begrunnelse,false)
 }
-/*
-@Component
-class GeografiskKjerneRegel(): Regel {
-    override fun test(bruker: Bruker, s: Ansatt) =
-        if (bruker.geoTilknytning == null) { // Sjekke om bruker har geografisk tilknytning eller satt til udefinert
-            return s.kanBehandle(ADRolleUdefinert)
-        }
-         if(brukersGeografiskTilknytningErUtland()) // Validere at GT er string med 3 bokstaver
-    {
-       return s.kanBehandle(Utland)
-    }
-
-        if (s.harNasjonalTilgang(NasajonalTilgang)) {
-            return true // har ansatt nasjonal tilgang skal vi ikke sjekke geografisk tilknytning når utlandet er sjekket
-        }
-        if(bruker.harGeografiskTilknytning()) {
-           return  s.kanBehandle(bruker.geoTilknytning)
-        }
-    if(bruker.harOppfølgingskontor()
-    {
-       return s.kanBehandle(Kontornøkkel) // må hentes it fra ad-gruppenes navn og ikke fra id GEO_XXXX
-    }
-
-
-    override val beskrivelse = RegelBeskrivelse(kortNavn, gruppe.begrunnelse,false)
-}
-
-*/
 
 @Component
 @Order(HIGHEST_PRECEDENCE)
@@ -63,7 +35,7 @@ class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Kj
 
 
 @Component
-@Order(HIGHEST_PRECEDENCE + 4)
+@Order(HIGHEST_PRECEDENCE + 3)
 class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) : Regel {
     override fun test(bruker: Bruker, ansatt: Ansatt) =
         if (bruker.geoTilknytning is UtenlandskTilknytning) {
@@ -74,7 +46,7 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
 }
 
 @Component
-@Order(HIGHEST_PRECEDENCE + 5)
+@Order(HIGHEST_PRECEDENCE + 4)
 class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) : Regel {
     override fun test(bruker: Bruker, ansatt: Ansatt) =
         if (bruker.geoTilknytning is UkjentBosted) {
@@ -85,33 +57,16 @@ class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) 
 }
 
 @Component
-@Order(HIGHEST_PRECEDENCE + 6)
-class GeoNorgeTilgang(@Value("\${gruppe.nasjonal}") private val id: UUID)  :  Regel {
-    override fun test(bruker: Bruker, ansatt: Ansatt) : Boolean {
-        if (ansatt.kanBehandle(id))
-            return true
-
-        if (bruker.geoTilknytning is KommuneTilknytning) {
-            val nummer = bruker.geoTilknytning.kommune.verdi
-            val ok = ansatt.grupper.map { it.displayName }.any { it.endsWith("GEO_$nummer") }
-            return ok
-        }
-        if (bruker.geoTilknytning is BydelTilknytning) {
-        val nummer = bruker.geoTilknytning.bydel.verdi
-        val ok = ansatt.grupper.map { it.displayName }.any { it.endsWith("GEO_$nummer") }
-         return ok
-        }
-        return true
-}
+@Order(HIGHEST_PRECEDENCE + 5)
+class GeoNorgeTilgang(@Value("\${gruppe.nasjonal}") private val id: UUID) : Regel {
+    override fun test(bruker: Bruker, ansatt: Ansatt) =
+        ansatt.kanBehandle(id) || ansatt.grupper.any { it.displayName.endsWith("GEO_${
+            when (bruker.geoTilknytning) {
+                is KommuneTilknytning -> bruker.geoTilknytning.kommune.verdi
+                is BydelTilknytning -> bruker.geoTilknytning.bydel.verdi
+                else -> return true
+            }
+        }") }
 
     override val beskrivelse = RegelBeskrivelse("Geografisk tilknytning", AVVIST_GEOGRAFISK, true)
 }
-
-/**
- * Kjerneregel matcher for nasjonal, men får problemer med hirekarki
- *
- * Om Nasjonal blir avvist så skal det sjekkes om det er en geografisk tilknytning *
- * Om geografisk tilknytning avvises så skal det sjekkes om det er en tilknytning på oppfølgingskontor
- * om oppfølgingskontor avvises så skal det tilgangen avvises
-
-*/

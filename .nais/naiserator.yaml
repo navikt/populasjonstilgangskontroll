@@ -12,7 +12,7 @@ spec:
       - type: {{db.type}}
         tier: {{db.tier}}
         databases:
-          - name: {{db.naame}}
+          - name: {{db.name}}
             envVarPrefix: DB
   ingresses:
      - {{ingress.intern}}

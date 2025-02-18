@@ -7,12 +7,13 @@ metadata:
   name: populasjonstilgangskontroll
   namespace: tilgangsmaskin
 spec:
-  sqlInstances:
-    - type: {{db.type}}
-      tier: {{db.tier}}
-      databases:
-        - name: {{db.navn}}
-          envVarPrefix: DB
+  gcp:
+    sqlInstances:
+      - type: {{db.type}}
+        tier: {{db.tier}}
+        databases:
+          - name: {{db.navn}}
+            envVarPrefix: DB
   ingresses:
      - {{ingress.intern}}
      - {{ingress.ansatt}}

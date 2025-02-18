@@ -14,6 +14,7 @@ import org.junit.jupiter.api.assertThrows
 import java.util.UUID.randomUUID
 import kotlin.test.assertEquals
 import org.assertj.core.api.Assertions.assertThat
+import kotlin.math.E
 
 class TestRegler {
 
@@ -154,6 +155,25 @@ class TestRegler {
         assertThat(geoUtlandRegel.test(geoUtlandBruker, vanligAnsatt)).isFalse()
     }
 
+    @Test
+    @DisplayName("Test at ansatt med nasjonal tilgang kan behandle vanlig bruker")
+    fun geoNorgeNasjonal() {
+        motor.vurderTilgang(vanligBruker, nasjonalAnsatt)
+    }
+
+    @Test
+    @DisplayName("Test at ansatt med geo tilgang kan behandle vanlig bruker med samme GT")
+    fun geoEnhetLik() {
+        motor.vurderTilgang(enhetBruker, enhetAnsatt)
+    }
+
+    @Test
+    @DisplayName("Test at ansatt med annen geo tilgang enn brukers ikke kan behandle denne")
+    fun geoEnhetForskjellig() {
+        assertEquals(geoNorgeRegel,assertThrows<RegelException> {motor.vurderTilgang(enhetBruker1, enhetAnsatt)  }.regel)
+        assertThat(geoNorgeRegel.test(enhetBruker1, enhetAnsatt)).isFalse()
+    }
+
 
 
     companion object {
@@ -172,14 +192,19 @@ class TestRegler {
         private val ansattKode7Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, FORTROLIG_GRUPPE)
         private val ukjentBostedBruker = Bruker(fnr, navn,UkjentBosted(), UDEFINERT_GEO_GRUPPE)
         private val geoUtlandBruker = Bruker(fnr, navn, UtenlandskTilknytning(SE), GEO_PERSON_UTLAND_GRUPPE)
+        private val enhetBruker = Bruker(fnr, navn, KommuneTilknytning(Kommune(enhet.verdi)))
+        private val enhetBruker1 = Bruker(fnr, navn, KommuneTilknytning(Kommune("4321")))
 
 
-        private val strengtFortroligEntraGruppe = EntraGruppe(randomUUID(), "strengt fortrolig gruppe")
-        private val fortroligEntraGruppe = EntraGruppe(randomUUID(), "fortrolig gruppe")
+
+        private val strengtFortroligEntraGruppe = EntraGruppe(randomUUID(), "Strengt fortrolig gruppe")
+        private val fortroligEntraGruppe = EntraGruppe(randomUUID(), "Fortrolig gruppe")
         private val egenAnsattEntraGruppe = EntraGruppe(randomUUID(), "egen gruppe")
-        private val annenEntraGruppe = EntraGruppe(randomUUID(), "annen gruppe")
-        private val geoUtlandEntraGruppe = EntraGruppe(randomUUID(), "geo utland gruppe")
-        private val udefinertGruppe = EntraGruppe(randomUUID(), "udefinert geo gruppe")
+        private val annenEntraGruppe = EntraGruppe(randomUUID(), "Annen gruppe")
+        private val geoUtlandEntraGruppe = EntraGruppe(randomUUID(), "Geo utland gruppe")
+        private val udefinertGruppe = EntraGruppe(randomUUID(), "Udefinert geo gruppe")
+        private val nasjonalGruppe = EntraGruppe(randomUUID(), "Nsjonal gruppe")
+        private val enhetGruppe = EntraGruppe(randomUUID(), "XXX_GEO_${enhet.verdi}")
 
         private val kode7EgenAnsatt = Ansatt(attributter, fortroligEntraGruppe, egenAnsattEntraGruppe)
         private val kode6EgenAnsatt = Ansatt(attributter, strengtFortroligEntraGruppe, egenAnsattEntraGruppe)
@@ -189,14 +214,17 @@ class TestRegler {
         private val vanligAnsatt = Ansatt(attributter, annenEntraGruppe)
         private val geoUtlandAnsatt = Ansatt(attributter, geoUtlandEntraGruppe)
         private val udefinertGeoAnsatt = Ansatt(attributter, udefinertGruppe)
+        private val nasjonalAnsatt = Ansatt(attributter, nasjonalGruppe)
+        private val enhetAnsatt = Ansatt(attributter, enhetGruppe)
 
         private val strengtFortroligRegel = StrengtFortroligRegel(strengtFortroligEntraGruppe.id)
         private val fortroligRegel = FortroligRegel(fortroligEntraGruppe.id)
         private val egenAnsattRegel = EgenAnsattRegel(egenAnsattEntraGruppe.id)
         private val ukjentBostedGeoRegel = UkjentBostedGeoRegel(udefinertGruppe.id)
         private val geoUtlandRegel = UtlandUdefinertGeoRegel(geoUtlandEntraGruppe.id)
+        private val geoNorgeRegel = GeoNorgeRegel(nasjonalGruppe.id)
 
-        private val motor = RegelMotor(strengtFortroligRegel,fortroligRegel, egenAnsattRegel, ukjentBostedGeoRegel, geoUtlandRegel)
+        private val motor = RegelMotor(strengtFortroligRegel,fortroligRegel, egenAnsattRegel, ukjentBostedGeoRegel, geoUtlandRegel, geoNorgeRegel)
 
     }
 }

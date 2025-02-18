@@ -58,7 +58,7 @@ class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) 
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 5)
-class GeoNorgeTilgang(@Value("\${gruppe.nasjonal}") private val id: UUID) : Regel {
+class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) : Regel {
     override fun test(bruker: Bruker, ansatt: Ansatt) =
         ansatt.kanBehandle(id) || ansatt.grupper.any { it.displayName.endsWith("GEO_${
             when (bruker.geoTilknytning) {
@@ -69,4 +69,5 @@ class GeoNorgeTilgang(@Value("\${gruppe.nasjonal}") private val id: UUID) : Rege
         }") }
 
     override val beskrivelse = RegelBeskrivelse("Geografisk tilknytning", AVVIST_GEOGRAFISK, true)
+
 }

@@ -71,3 +71,5 @@ spec:
       value: '{{grupper.udefinert}}'
     - name: GRUPPE_NASJONAL
       value: '{{grupper.nasjonal}}'
+    - name: GRUPPE_UTLAND
+      value: '{{grupper.utland}}'

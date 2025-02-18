@@ -8,8 +8,6 @@ enum class GlobalGruppe(val begrunnelse: AvvisningBegrunnelse) {
     EGEN_ANSATT_GRUPPE(AVVIST_SKJERMING),
     UDEFINERT_GEO_GRUPPE(AVVIST_GEOGRAFISK),
     GEO_PERSON_UTLAND_GRUPPE(AVVIST_PERSON_UTLAND),
-    GEO_PERSON_UKJENT_GRUPPE(AVVIST_PERSON_UKJENT)
-
 }
 
 enum class AvvisningBegrunnelse(val årsak: String) {

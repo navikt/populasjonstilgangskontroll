@@ -8,27 +8,27 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.C
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.UUID.randomUUID
 import kotlin.test.assertEquals
-import org.assertj.core.api.Assertions.assertThat
-import kotlin.math.E
 
 class TestRegler {
 
     @Test
     @DisplayName("Test at kode 7 bruker ikke kan behandles av kode 6 ansatt")
     fun kode7BrukerKode6Ansatt() {
-        assertThrows<RegelException> { motor.vurderTilgang(kode7Bruker, kode6Ansatt) }.regel == fortroligRegel
+        assertEquals(fortroligRegel,assertThrows<RegelException> { motor.vurderTilgang(kode7Bruker, kode6Ansatt) }.regel)
         assertThat(fortroligRegel.test(kode7Bruker, kode6Ansatt)).isFalse()
     }
 
     @Test
     @DisplayName("Test at kode 7 bruker ikke kan behandles av vanlig ansatt")
     fun kode7BrukerVanligAnsatt() {
-        assertThrows<RegelException> { motor.vurderTilgang(kode7Bruker, vanligAnsatt) }.regel == fortroligRegel
+        assertEquals(fortroligRegel,assertThrows<RegelException> { motor.vurderTilgang(kode7Bruker, vanligAnsatt) }.regel)
         assertThat(fortroligRegel.test(kode7Bruker, vanligAnsatt)).isFalse()
 
     }
@@ -36,49 +36,49 @@ class TestRegler {
     @Test
     @DisplayName("Test at kode 7 bruker kan behandles av kode 7 ansatt")
     fun kode7brukerKode7Ansatt() {
-        motor.vurderTilgang(kode7Bruker, kode7Ansatt)
+        assertThatCode({ motor.vurderTilgang(kode7Bruker, kode7Ansatt) }).doesNotThrowAnyException()
     }
     @Test
     @DisplayName("Test at kode 6 bruker ikke kan behandles av kode 7 ansatt")
     fun kode6BrukerKode7Ansatt() {
-        assertThrows<RegelException> { motor.vurderTilgang(kode6Bruker, kode7Ansatt) }.regel == strengtFortroligRegel
+        assertEquals(strengtFortroligRegel,assertThrows<RegelException> { motor.vurderTilgang(kode6Bruker, kode7Ansatt) }.regel)
         assertThat(strengtFortroligRegel.test(kode6Bruker, kode7Ansatt)).isFalse()
     }
 
     @Test
     @DisplayName("Test at kode 6 bruker ikke kan behandles av vanlig ansatt")
     fun kode6BrukerVanligAnsatt() {
-        assertThrows<RegelException> { motor.vurderTilgang(kode6Bruker, vanligAnsatt) }.regel == strengtFortroligRegel
+        assertEquals(strengtFortroligRegel,assertThrows<RegelException> { motor.vurderTilgang(kode6Bruker, vanligAnsatt) }.regel)
         assertThat(strengtFortroligRegel.test(kode6Bruker, vanligAnsatt)).isFalse()
     }
 
     @Test
     @DisplayName("Test at kode 6 bruker kan behandles av kode 6 ansatt")
     fun kode6BrukerKode6Ansatt() {
-        motor.vurderTilgang(kode6Bruker, kode6Ansatt)
+        assertThatCode({ motor.vurderTilgang(kode6Bruker, kode6Ansatt) }).doesNotThrowAnyException()
     }
     @Test
     @DisplayName("Test at vanlig bruker kan behandles av kode 6 ansatt")
     fun vanligBrukertKode6Ansatt() {
-        motor.vurderTilgang(vanligBruker, kode6Ansatt)
+        assertThatCode({ motor.vurderTilgang(vanligBruker, kode6Ansatt) }).doesNotThrowAnyException()
     }
 
     @Test
     @DisplayName("Test at vanlig bruker kan behandles av kode 7 ansatt")
     fun vanligBrukerKode7Ansatt() {
-        motor.vurderTilgang(vanligBruker, kode7Ansatt)
+        assertThatCode({ motor.vurderTilgang(vanligBruker, kode7Ansatt) }).doesNotThrowAnyException()
     }
 
     @Test
     @DisplayName("Test at vanlig bruker kan behandles av vanlig ansatt")
     fun vanligBrukerVanligAnsatt() {
-        motor.vurderTilgang(vanligBruker, vanligAnsatt)
+        assertThatCode({ motor.vurderTilgang(vanligBruker, vanligAnsatt) }).doesNotThrowAnyException()
     }
 
     @Test
     @DisplayName("Test at egen ansatt bruker kan behandles av egen ansatt ansatt")
     fun egenAnsattBrukerEgenAnsatt() {
-        motor.vurderTilgang(ansattBruker, egenAnsatt)
+        assertThatCode({ motor.vurderTilgang(ansattBruker, egenAnsatt) }).doesNotThrowAnyException()
     }
 
     @Test
@@ -116,12 +116,12 @@ class TestRegler {
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 7 kan behandles av kode 7 ansatt som også har ansatt gruppe")
     fun egenAnsattBrukerKode7Ansatt() {
-        motor.vurderTilgang(ansattKode7Bruker, kode7EgenAnsatt)
+        assertThatCode({ motor.vurderTilgang(ansattKode7Bruker, kode7EgenAnsatt) }).doesNotThrowAnyException()
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 6 kan behandles av kode 6 ansatt som også gar har ansatt gruppe")
     fun ansattKode6BrukerKode6Ansatt() {
-        motor.vurderTilgang(ansattKode6Bruker, kode6EgenAnsatt)
+        assertThatCode({ motor.vurderTilgang(ansattKode6Bruker, kode6EgenAnsatt) }).doesNotThrowAnyException()
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 6 ikke kan behandles av kode 7 ansatt")
@@ -132,7 +132,7 @@ class TestRegler {
     @Test
     @DisplayName("Test at ansatt med manglende geografisk tilknytning kan behandle bruker med geografisk tilknytning")
     fun brukerMedManglendeGeografiskTilknytningAnsattMedSamme() {
-        motor.vurderTilgang(ukjentBostedBruker, udefinertGeoAnsatt)
+        assertThatCode({ motor.vurderTilgang(ukjentBostedBruker, udefinertGeoAnsatt) }).doesNotThrowAnyException()
     }
 
     @Test
@@ -145,7 +145,7 @@ class TestRegler {
     @Test
     @DisplayName("Test at ansatt med tilgang utland  kan behandle bruker med geografisk utland")
     fun geoUtlandGruppe() {
-        motor.vurderTilgang(geoUtlandBruker, geoUtlandAnsatt)
+        assertThatCode({ motor.vurderTilgang(geoUtlandBruker, geoUtlandAnsatt) }).doesNotThrowAnyException()
     }
 
     @Test
@@ -158,13 +158,13 @@ class TestRegler {
     @Test
     @DisplayName("Test at ansatt med nasjonal tilgang kan behandle vanlig bruker")
     fun geoNorgeNasjonal() {
-        motor.vurderTilgang(vanligBruker, nasjonalAnsatt)
+        assertThatCode({ motor.vurderTilgang(vanligBruker, nasjonalAnsatt) }).doesNotThrowAnyException()
     }
 
     @Test
     @DisplayName("Test at ansatt med geo tilgang kan behandle vanlig bruker med samme GT")
     fun geoEnhetLik() {
-        motor.vurderTilgang(enhetBruker, enhetAnsatt)
+        assertThatCode({ motor.vurderTilgang(enhetBruker, enhetAnsatt) }).doesNotThrowAnyException()
     }
 
     @Test
@@ -185,8 +185,8 @@ class TestRegler {
 
 
         private val kode6Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, STRENGT_FORTROLIG_GRUPPE)
-        private val kode7Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, FORTROLIG_GRUPPE)
-        private val vanligBruker = Bruker(fnr,navn,UdefinertGeoTilknytning)
+        val kode7Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, FORTROLIG_GRUPPE)
+        val vanligBruker = Bruker(fnr,navn,UdefinertGeoTilknytning)
         private val ansattBruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE)
         private val ansattKode6Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, STRENGT_FORTROLIG_GRUPPE)
         private val ansattKode7Bruker = Bruker(fnr, navn,UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, FORTROLIG_GRUPPE)
@@ -211,7 +211,7 @@ class TestRegler {
         private val kode6Ansatt = Ansatt(attributter, strengtFortroligEntraGruppe)
         private val kode7Ansatt = Ansatt(attributter, fortroligEntraGruppe)
         private val egenAnsatt = Ansatt(attributter, egenAnsattEntraGruppe)
-        private val vanligAnsatt = Ansatt(attributter, annenEntraGruppe)
+        val vanligAnsatt = Ansatt(attributter, annenEntraGruppe)
         private val geoUtlandAnsatt = Ansatt(attributter, geoUtlandEntraGruppe)
         private val udefinertGeoAnsatt = Ansatt(attributter, udefinertGruppe)
         private val nasjonalAnsatt = Ansatt(attributter, nasjonalGruppe)
@@ -224,8 +224,10 @@ class TestRegler {
         private val geoUtlandRegel = UtlandUdefinertGeoRegel(geoUtlandEntraGruppe.id)
         private val geoNorgeRegel = GeoNorgeRegel(nasjonalGruppe.id)
 
-        private val motor = RegelMotor(strengtFortroligRegel,fortroligRegel, egenAnsattRegel, ukjentBostedGeoRegel, geoUtlandRegel, geoNorgeRegel)
+        val motor = RegelMotor(strengtFortroligRegel,fortroligRegel, egenAnsattRegel, ukjentBostedGeoRegel, geoUtlandRegel, geoNorgeRegel)
 
     }
+
+
 }
 

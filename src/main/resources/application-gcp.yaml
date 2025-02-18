@@ -12,7 +12,7 @@ management:
 
 spring:
   datasource:
-    url: jdbc:postgresql://${db.host}:${db.port}/${db.database}
+    url: ${db.jdbc.url}
     username: ${db.username}
     password: ${db.password}
     hikari:

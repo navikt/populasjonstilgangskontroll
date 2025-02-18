@@ -82,23 +82,23 @@ class TestRegler {
     @Test
     @DisplayName("Test at egen ansatt bruker ikke kan behandles av kode6 ansatt")
     fun ansattBrukerKode6Ansatt() {
-        assertThrows<RegelException> { motor.vurderTilgang(ansattBruker, kode6Ansatt) }.regel == strengtFortroligRegel
+        assertEquals(egenAnsattRegel,assertThrows<RegelException> { motor.vurderTilgang(ansattBruker, kode6Ansatt) }.regel)
     }
     @Test
     @DisplayName("Test at egen ansatt bruker ikke kan behandles av vanlig ansatt")
     fun ansattBrukerVanligAnsatt() {
-        assertThrows<RegelException> { motor.vurderTilgang(ansattBruker, vanligAnsatt) }.regel == egenAnsattRegel
+        assertEquals(egenAnsattRegel,assertThrows<RegelException> { motor.vurderTilgang(ansattBruker, vanligAnsatt) }.regel)
     }
 
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 6 ikke kan behandles av egen ansatt")
     fun ansattKode6BrukerEgenAnsatt() {
-        assertThrows<RegelException> { motor.vurderTilgang(ansattKode6Bruker, egenAnsatt) }.regel == strengtFortroligRegel
+        assertEquals(strengtFortroligRegel,assertThrows<RegelException> { motor.vurderTilgang(ansattKode6Bruker, egenAnsatt) }.regel)
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 7 ikke kan behandles av egen ansatt")
     fun ansattKode7BrukerEgenAnsatt() {
-        assertThrows<RegelException> { motor.vurderTilgang(ansattKode7Bruker, egenAnsatt) }.regel == fortroligRegel
+        assertEquals(fortroligRegel,assertThrows<RegelException> { motor.vurderTilgang(ansattKode7Bruker, egenAnsatt) }.regel)
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 7 kan behandles av kode 7 ansatt som også har ansatt gruppe")
@@ -113,7 +113,7 @@ class TestRegler {
     @Test
     @DisplayName("Test at egen ansatt bruker med kode 6 ikke kan behandles av kode 7 ansatt")
     fun ansattKode6BrukerKode7Ansatt() {
-        assertThrows<RegelException> {motor.vurderTilgang(ansattKode6Bruker, kode7Ansatt) }.regel == strengtFortroligRegel
+        assertEquals(strengtFortroligRegel,assertThrows<RegelException> {motor.vurderTilgang(ansattKode6Bruker, kode7Ansatt) }.regel)
     }
     @Test
     @DisplayName("Test at ansatt med manglende geografisk tilknytning kan behandle bruker med geografisk tilknytning")
@@ -122,9 +122,9 @@ class TestRegler {
     }
 
     @Test
-    @DisplayName("Test at ansatt uten manglende geografisk tilknytning ikke kan behandle bruker med geografisk tilknytning")
+    @DisplayName("Test at ansatt uten manglende geografisk tilknytning rolle ikke kan behandle bruker med geografisk tilknytning")
     fun brukerMedManglendeGeografiskTilknytningAnsattUtenSammeRole() {
-        assertThrows<RegelException> {motor.vurderTilgang(ukjentBostedBruker, vanligAnsatt)}
+        assertEquals(ukjentBostedGeoRegel,assertThrows<RegelException> {motor.vurderTilgang(ukjentBostedBruker, vanligAnsatt)}.regel)
     }
 
     @Test
@@ -136,7 +136,7 @@ class TestRegler {
     @Test
     @DisplayName("Test at ansatt uten tilgang utland ikke kan behandle bruker med geografisk utland")
     fun geoUtlandGruppeUtenSammeRolle() {
-        assertThrows<RegelException> {motor.vurderTilgang(geoUtlandBruker, vanligAnsatt)  }
+        assertEquals(geoUtlandRegel,assertThrows<RegelException> {motor.vurderTilgang(geoUtlandBruker, vanligAnsatt)  }.regel)
     }
 
     companion object {
@@ -176,10 +176,10 @@ class TestRegler {
         private val strengtFortroligRegel = StrengtFortroligRegel(strengtFortroligEntraGruppe.id)
         private val fortroligRegel = FortroligRegel(fortroligEntraGruppe.id)
         private val egenAnsattRegel = EgenAnsattRegel(egenAnsattEntraGruppe.id)
-        private val udefinertGeoRegel = UkjentBostedGeoRegel(udefinertGruppe.id)
+        private val ukjentBostedGeoRegel = UkjentBostedGeoRegel(udefinertGruppe.id)
         private val geoUtlandRegel = UtlandUdefinertGeoRegel(geoUtlandEntraGruppe.id)
 
-        private val motor = RegelMotor(strengtFortroligRegel,fortroligRegel, egenAnsattRegel, udefinertGeoRegel, geoUtlandRegel)
+        private val motor = RegelMotor(strengtFortroligRegel,fortroligRegel, egenAnsattRegel, ukjentBostedGeoRegel, geoUtlandRegel)
 
     }
 }

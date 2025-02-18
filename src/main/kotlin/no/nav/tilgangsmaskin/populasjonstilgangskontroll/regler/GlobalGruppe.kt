@@ -11,10 +11,10 @@ enum class GlobalGruppe(val begrunnelse: AvvisningBegrunnelse) {
 }
 
 enum class AvvisningBegrunnelse(val årsak: String) {
-    AVVIST_STRENGT_FORTROLIG_ADRESSE("Mangler tilgang til streng fortrolig adresse"),
-    AVVIST_STRENGT_FORTROLIG_UTLAND("Mangler tilgang til streng fortrolig adresse utland"),
-    AVVIST_FORTROLIG_ADRESSE("Mangler tilgang til streng fortrolig adresse"),
-    AVVIST_SKJERMING("Mangler tilgng til skjermet person"),
+    AVVIST_STRENGT_FORTROLIG_ADRESSE("Mangler tilgang til strengt fortrolig adresse"),
+    AVVIST_STRENGT_FORTROLIG_UTLAND("Mangler tilgang til strengt fortrolig adresse utland"),
+    AVVIST_FORTROLIG_ADRESSE("Mangler tilgang til fortrolig adresse"),
+    AVVIST_SKJERMING("Mangler tilgang til skjermet person"),
     AVVIST_GEOGRAFISK("Mangler tilgang til brukers geografiske adresse"),
     AVVIST_EGNE_DATA("TODO"),
     AVVIST_EGEN_FAMILIE("TODO"),

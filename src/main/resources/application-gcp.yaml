@@ -11,6 +11,13 @@ management:
       base-path: /monitoring
 
 spring:
+  datasource:
+    url: jdbc:postgresql://${db.host}:${db.port}/${db.database}
+    username: ${db.username}
+    password: ${db.password}
+    hikari:
+      connection-test-query: SELECT 1
+      maximum-pool-size: 2
   main:
     banner-mode: off
   jackson:

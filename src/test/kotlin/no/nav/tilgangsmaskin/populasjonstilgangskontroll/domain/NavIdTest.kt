@@ -13,7 +13,7 @@ class NavIdTest {
     }
 
     @Test
-    @DisplayName("NavId med ygyldig lengde skal kaste IllegalArgumentException")
+    @DisplayName("NavId med ugyldig lengde skal kaste IllegalArgumentException")
     fun lengde() {
         assertThrows<IllegalArgumentException> { NavId("A12345") }
     }

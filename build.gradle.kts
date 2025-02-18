@@ -5,7 +5,6 @@ val springdocVersion = "2.8.4"
 val tokenSupportVersion = "5.0.16"
 val springCloudVersion = "4.2.0"
 val mockkVersion = "1.13.16"
-val oidcSupportVersion = "0.2.18"
 val mockOAuth2ServerVersion = "2.1.10"
 
 group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
@@ -62,11 +61,11 @@ dependencies {
     implementation("no.nav.boot:boot-conditionals:5.1.3")
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
-    implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
     implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")
-
-    // Test
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.postgresql:postgresql")
 
     testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
     testImplementation("org.springframework.boot:spring-boot-starter-test")

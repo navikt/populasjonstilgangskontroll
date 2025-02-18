@@ -1,6 +1,8 @@
 {
-  "ingressAnsatt": "https://tilgangsmaskin.ansatt.dev.nav.no",
-  "ingressIntern": "https://tilgangsmaskin.intern.dev.nav.no",
+  "ingress": {
+    "intern": "https://tilgangsmaskin.intern.dev.nav.no",
+    "ansatt": "https://tilgangsmaskin.ansatt.dev.nav.no"
+  },
   "pdl": "pdl-api.dev-fss-pub.nais.io",
   "grupper": {
     "fortrolig":"ea930b6b-9397-44d9-b9e6-f4cf527a632a" ,
@@ -9,6 +11,11 @@
     "udefinert":"35d9d1ac-7fcb-4a22-9155-e0d1e57898a8",
     "nasjonal":"c7107487-310d-4c06-83e0-cf5395dc3be3",
     "utland":"de62a4bf-957b-4cde-acdb-6d8bcbf821a0"
+  },
+  "db": {
+    "type": "POSTGRES_16",
+    "tier": "db-f1-micro",
+    "navn:": "tilgangsmaskin"
   },
   "nais": {
     "cluster": {

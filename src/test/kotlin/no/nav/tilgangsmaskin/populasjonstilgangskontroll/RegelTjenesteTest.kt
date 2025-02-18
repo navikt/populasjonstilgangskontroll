@@ -5,10 +5,10 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestRegler.Companion.vanligAnsatt
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestRegler.Companion.vanligBruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestRegler.Companion.kode7Bruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestRegler.Companion.motor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.RegelMotorTest.Companion.vanligAnsatt
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.RegelMotorTest.Companion.vanligBruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.RegelMotorTest.Companion.kode7Bruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.RegelMotorTest.Companion.motor
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.BrukerTjeneste

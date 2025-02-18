@@ -16,7 +16,7 @@ import org.junit.jupiter.api.assertThrows
 import java.util.UUID.randomUUID
 import kotlin.test.assertEquals
 
-class TestRegler {
+class RegelMotorTest {
 
     @Test
     @DisplayName("Test at kode 7 bruker ikke kan behandles av kode 6 ansatt")

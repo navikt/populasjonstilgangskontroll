@@ -66,7 +66,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.flywaydb:flyway-core")
     implementation("org.postgresql:postgresql")
-
+    implementation("org.flywaydb:flyway-database-postgresql")
     testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock:$springCloudVersion")

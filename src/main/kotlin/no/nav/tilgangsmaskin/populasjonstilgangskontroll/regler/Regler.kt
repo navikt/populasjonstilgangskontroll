@@ -57,9 +57,9 @@ class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) : Regel 
                 is BydelTilknytning -> bruker.geoTilknytning.bydel.verdi
                 else -> return true
             }
-        }") }
+        }")
+        }
 
     override val beskrivelse = RegelBeskrivelse("Geografisk tilknytning", AVVIST_GEOGRAFISK, true)
 
 }
-

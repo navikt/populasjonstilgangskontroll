@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 class RegelMotor(private vararg val regler: Regel)  {
     private val log = LoggerFactory.getLogger(javaClass)
 
-     fun vurderTilgang(bruker: Bruker, ansatt:  Ansatt) =
+     fun eksekver(bruker: Bruker, ansatt:  Ansatt) =
         regler.sortedWith(INSTANCE).forEach {
             log.info(CONFIDENTIAL,"Eksekverer regel: ${it.beskrivelse.kortNavn} for ansatt ${ansatt.navId.verdi} og bruker ${bruker.ident.mask()}")
             if (!it.test(bruker, ansatt)) {

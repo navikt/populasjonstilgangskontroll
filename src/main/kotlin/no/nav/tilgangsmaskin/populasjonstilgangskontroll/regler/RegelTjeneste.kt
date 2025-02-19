@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service
 class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: BrukerTjeneste, private val ansattTjeneste: AnsattTjeneste, private val errorHandler: RegelExceptionHandler)  {
 
 
-    fun sjekkTilgang(saksbehandlerId: NavId, brukerId: Fødselsnummer) =
+    fun sjekkTilgang(ansattId: NavId, brukerId: Fødselsnummer) =
         runCatching {
-            motor.vurderTilgang(brukerTjeneste.bruker(brukerId), ansattTjeneste.ansatt(saksbehandlerId))
+            motor.eksekver(brukerTjeneste.bruker(brukerId), ansattTjeneste.ansatt(ansattId))
         }.getOrElse {
-            errorHandler.håndter(saksbehandlerId, brukerId, it)
+            errorHandler.håndter(ansattId, brukerId, it)
         }
 }
 

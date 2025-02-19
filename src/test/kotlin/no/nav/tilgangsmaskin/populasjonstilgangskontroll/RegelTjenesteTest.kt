@@ -38,54 +38,51 @@ class RegelTjenesteTest {
     @MockK
     private lateinit var ansatt: AnsattTjeneste
     @MockK
-    private lateinit var midlertidig: OverstyringTjeneste
+    private lateinit var overstyring: OverstyringTjeneste
 
     private lateinit var regel: RegelTjeneste
 
     private lateinit var errorHandler: RegelExceptionHandler
 
-
     @BeforeTest
     fun before() {
-        errorHandler = RegelExceptionHandler(midlertidig)
+        errorHandler = RegelExceptionHandler(overstyring)
         regel = RegelTjeneste(motor, bruker, ansatt,errorHandler)
+        every { ansatt.ansatt(vanligAnsatt.navId) } returns vanligAnsatt
     }
     @Test
-    @DisplayName("Test at sjekk av midlertidig tilgang ikke gjøres om det ikke kastes en exception fra en regel")
+    @DisplayName("Verifiser at sjekk av overstyring ikke gjøres en regel som ikke er overstyrbar avslår tilgabg")
     fun testIngenMidlertidigSjekk() {
-        every { ansatt.ansatt(vanligAnsatt.navId) } returns vanligAnsatt
         every { bruker.bruker(vanligBruker.ident) } returns vanligBruker
         assertThatCode { regel.sjekkTilgang(vanligAnsatt.navId, vanligBruker.ident) }.doesNotThrowAnyException()
         verify {
             ansatt.ansatt(vanligAnsatt.navId)
             bruker.bruker(vanligBruker.ident)
-            midlertidig wasNot Called
+            overstyring wasNot Called
         }
     }
     @Test
-    @DisplayName("Test at sjekk om midlertidig tilgang er gitt gjøres om det kastes en exception fra en regel som er overstyrbar, om det er gitt midlertidig tilgang er sjekken OK")
+    @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang gis om overstyring er gjort")
     fun testMidlertidigGitt() {
-        every { ansatt.ansatt(vanligAnsatt.navId) } returns vanligAnsatt
         every { bruker.bruker(geoUtlandBruker.ident) } returns geoUtlandBruker
-        every { midlertidig.harOverstyrtTilgang(vanligAnsatt.navId, geoUtlandBruker.ident) } returns true
+        every { overstyring.harOverstyrtTilgang(vanligAnsatt.navId, geoUtlandBruker.ident) } returns true
         assertThatCode {regel.sjekkTilgang(vanligAnsatt.navId, geoUtlandBruker.ident) }.doesNotThrowAnyException()
         verify {
             ansatt.ansatt(vanligAnsatt.navId)
             bruker.bruker(geoUtlandBruker.ident)
-            midlertidig.harOverstyrtTilgang(vanligAnsatt.navId, geoUtlandBruker.ident)
+            overstyring.harOverstyrtTilgang(vanligAnsatt.navId, geoUtlandBruker.ident)
         }
     }
     @Test
-    @DisplayName("Test at sjekk om midlertidig tilgang er gitt gjøres om det kastes en exception fra en regel som er overstyrbar, om det ikke er gitt midlertidig tilgang jastes feilen videre")
+    @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang ikke gis om overstyring ikke er gjort")
     fun testMidlertidigIkkeGitt() {
-        every { ansatt.ansatt(vanligAnsatt.navId) } returns vanligAnsatt
         every { bruker.bruker(geoUtlandBruker.ident) } returns geoUtlandBruker
-        every { midlertidig.harOverstyrtTilgang(vanligAnsatt.navId, geoUtlandBruker.ident) } returns false
+        every { overstyring.harOverstyrtTilgang(vanligAnsatt.navId, geoUtlandBruker.ident) } returns false
         assertThrows<RegelException> {regel.sjekkTilgang(vanligAnsatt.navId, geoUtlandBruker.ident) }
         verify {
             ansatt.ansatt(vanligAnsatt.navId)
             bruker.bruker(geoUtlandBruker.ident)
-            midlertidig.harOverstyrtTilgang(vanligAnsatt.navId, geoUtlandBruker.ident)
+            overstyring.harOverstyrtTilgang(vanligAnsatt.navId, geoUtlandBruker.ident)
         }
     }
 
@@ -97,7 +94,7 @@ class RegelTjenesteTest {
             errorHandler.håndter(navid, fnr, RegelException(fnr,navid, regel))
         }
         verify {
-            midlertidig wasNot Called
+            overstyring wasNot Called
         }
     }
 

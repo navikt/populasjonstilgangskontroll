@@ -12,8 +12,11 @@ import org.springframework.stereotype.Component
 class RegelMotor(private vararg val regler: Regel)  {
     private val log = LoggerFactory.getLogger(javaClass)
 
-     fun eksekver(bruker: Bruker, ansatt:  Ansatt) =
-        regler.sortedWith(INSTANCE).forEach {
+    fun eksekverAlleRegler(bruker: Bruker, ansatt:  Ansatt) = eksekver(bruker, ansatt, regler.toList())
+    fun eksekverKjerneregler(bruker: Bruker, ansatt: Ansatt) = eksekver(bruker, ansatt,regler.filter { it is KjerneRegel })
+
+    private fun eksekver(bruker: Bruker, ansatt: Ansatt, regler: List<Regel>)
+        = regler.sortedWith(INSTANCE).forEach {
             log.info(CONFIDENTIAL,"Eksekverer regel: ${it.beskrivelse.kortNavn} for ansatt ${ansatt.navId.verdi} og bruker ${bruker.ident.mask()}")
             if (!it.test(bruker, ansatt)) {
                 throw RegelException(bruker.ident, ansatt.navId, it).also {
@@ -21,7 +24,8 @@ class RegelMotor(private vararg val regler: Regel)  {
                 }
             }
         }
-    }
+}
+
 
 /** Flyt for GEO-sjekk
  * (Kan overstyres av system)

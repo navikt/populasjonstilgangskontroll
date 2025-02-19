@@ -54,7 +54,7 @@ class RegelTjenesteTest {
     @DisplayName("Verifiser at sjekk av overstyring ikke gjøres en regel som ikke er overstyrbar avslår tilgabg")
     fun testIngenOverstyringSjekk() {
         every { bruker.bruker(vanligBruker.ident) } returns vanligBruker
-        assertThatCode { regel.sjekkTilgang(vanligAnsatt.navId, vanligBruker.ident) }.doesNotThrowAnyException()
+        assertThatCode { regel.alleRegler(vanligAnsatt.navId, vanligBruker.ident) }.doesNotThrowAnyException()
         verify {
             ansatt.ansatt(vanligAnsatt.navId)
             bruker.bruker(vanligBruker.ident)
@@ -66,7 +66,7 @@ class RegelTjenesteTest {
     fun overstyringOK() {
         every { bruker.bruker(geoUtlandBruker.ident) } returns geoUtlandBruker
         every { overstyring.harOverstyrtTilgang(vanligAnsatt.navId, geoUtlandBruker.ident) } returns true
-        assertThatCode {regel.sjekkTilgang(vanligAnsatt.navId, geoUtlandBruker.ident) }.doesNotThrowAnyException()
+        assertThatCode {regel.alleRegler(vanligAnsatt.navId, geoUtlandBruker.ident) }.doesNotThrowAnyException()
         verify {
             ansatt.ansatt(vanligAnsatt.navId)
             bruker.bruker(geoUtlandBruker.ident)
@@ -78,7 +78,7 @@ class RegelTjenesteTest {
     fun ikkeOverstyrt() {
         every { bruker.bruker(geoUtlandBruker.ident) } returns geoUtlandBruker
         every { overstyring.harOverstyrtTilgang(vanligAnsatt.navId, geoUtlandBruker.ident) } returns false
-        assertThrows<RegelException> {regel.sjekkTilgang(vanligAnsatt.navId, geoUtlandBruker.ident) }
+        assertThrows<RegelException> {regel.alleRegler(vanligAnsatt.navId, geoUtlandBruker.ident) }
         verify {
             ansatt.ansatt(vanligAnsatt.navId)
             bruker.bruker(geoUtlandBruker.ident)

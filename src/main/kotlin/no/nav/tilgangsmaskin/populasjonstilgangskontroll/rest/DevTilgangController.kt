@@ -22,6 +22,9 @@ class DevTilgangController(val bruker : BrukerTjeneste, private val ansatt: Ansa
     fun ansatt(navId: NavId) = ansatt.ansatt(navId)
 
     @GetMapping("regler")
-    fun sjekkTilgang(@RequestParam ansattId: NavId, @RequestParam brukerId: Fødselsnummer) = regler.sjekkTilgang(ansattId, brukerId)
+    fun sjekkTilgang(@RequestParam ansattId: NavId, @RequestParam brukerId: Fødselsnummer) = regler.alleRegler(ansattId, brukerId)
+
+    @GetMapping("kjerneregler")
+    fun kjerneregler(@RequestParam ansattId: NavId, @RequestParam brukerId: Fødselsnummer) = regler.kjerneregler(ansattId, brukerId)
 
 }

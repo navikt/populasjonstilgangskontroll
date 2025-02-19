@@ -15,8 +15,9 @@ spec:
           - name: {{db.name}}
             envVarPrefix: DB
   ingresses:
-     - {{ingress.intern}}
-     - {{ingress.ansatt}}
+    {{#each ingresses as |ingress|}}
+        - {{ingress}}
+    {{/each}}
   image: {{image}}
   prometheus:
     enabled: true
@@ -60,10 +61,10 @@ spec:
         - host: {{pdl}}
     inbound:
       rules:
-       {{#each inn}}
-          - application: "{{this.application}}",
-            namespace: "{{this.namespace}}",
-            cluster: "{{this.cluster}}"
+       {{#each inn as |app|}}
+          - application: "{{app.application}}",
+            namespace: "{{app.namespace}}",
+            cluster: "{{app.cluster}}"
        {{/each}}
   env:
     - name: NAIS_CLUSTER_TYPE

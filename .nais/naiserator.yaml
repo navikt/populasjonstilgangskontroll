@@ -62,9 +62,9 @@ spec:
     inbound:
       rules:
        {{#each inbound as |app|}}
-        - application: "{{app.name}}",
-          namespace: "{{app.namespace}}",
-          cluster: "{{app.cluster}}"
+        - application: '{{app.name}}'
+          namespace: '{{app.namespace}}'
+          cluster: '{{app.cluster}}'
        {{/each}}
   env:
     - name: NAIS_CLUSTER_TYPE

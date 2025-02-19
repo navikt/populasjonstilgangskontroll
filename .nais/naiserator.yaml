@@ -19,6 +19,10 @@ spec:
         - {{ingress}}
     {{/each}}
   image: {{image}}
+  observability:
+    autoInstrumentation:
+        enabled: true
+        runtime: java
   prometheus:
     enabled: true
     path: /monitoring/prometheus

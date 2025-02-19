@@ -60,7 +60,7 @@ spec:
         - host: {{pdl}}
     inbound:
       rules:
-       {{#each inbound}}
+       {{#each inn}}
           - application: "{{this.application}}",
             namespace: "{{this.namespace}}",
             cluster: "{{this.cluster}}"

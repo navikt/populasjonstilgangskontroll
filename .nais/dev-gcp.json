@@ -17,7 +17,7 @@
     "tier": "db-f1-micro",
     "name": "tilgangsmaskin"
   },
-  "inbound" : [
+  "inn" : [
        {
           "name": "gosys-q1",
           "namespace": "isa",

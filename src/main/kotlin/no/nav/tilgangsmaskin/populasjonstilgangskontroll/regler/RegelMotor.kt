@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
 import org.slf4j.LoggerFactory
 import org.springframework.core.annotation.AnnotationAwareOrderComparator.INSTANCE
 import org.springframework.stereotype.Component
@@ -13,25 +14,14 @@ class RegelMotor(private vararg val regler: Regel)  {
 
      fun vurderTilgang(bruker: Bruker, ansatt:  Ansatt) =
         regler.sortedWith(INSTANCE).forEach {
-            log.info(CONFIDENTIAL,"Eksekverer regel: ${it.beskrivelse.kortNavn}")
+            log.info(CONFIDENTIAL,"Eksekverer regel: ${it.beskrivelse.kortNavn} for ansatt ${ansatt.navId.verdi} og bruker ${bruker.ident.mask()}")
             if (!it.test(bruker, ansatt)) {
-                throw RegelException(bruker.ident, ansatt.navId, it)
+                throw RegelException(bruker.ident, ansatt.navId, it).also {
+                    log.warn(CONFIDENTIAL,"Tilgang avvist av regel '${it.regel.beskrivelse.kortNavn}'")
+                }
             }
         }
     }
-/**
-Prioritert utslagskriterier:
-Harde regler:
-Kode 6: Strengt fortrolig adresse
-Kode 19: trengt fortrolig adresse utland
-Kode 7 : Fortrolig adresse
-Egen ansatt: Skjerming
-Familie: (mangler datasettene for dette)
-Verge: (ikkje implementert og mangler datasettene for dette)
-Oppslag på egen person :(mangler datasettene for dette) (hovuddel vil håndters via skjerming, men avskjermede ansatte dekkes ikkje av skjerming)
-Overstyrbare regler:
-Geogrfisk tilgang: (Flyt for gGEO-tilgang spesifisert under
- **/
 
 /** Flyt for GEO-sjekk
  * (Kan overstyres av system)

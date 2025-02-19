@@ -12,15 +12,6 @@ import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 import java.util.*
 
-abstract class KjerneRegel(private val gruppe: GlobalGruppe, private val id: UUID, kortNavn: String): Regel {
-    override fun test(bruker: Bruker, s: Ansatt) =
-        if (bruker.kreverGruppe(gruppe))  {
-            s.kanBehandle(id)
-        } else true
-
-    override val beskrivelse = RegelBeskrivelse(kortNavn, gruppe.begrunnelse,false)
-}
-
 @Component
 @Order(HIGHEST_PRECEDENCE)
 class StrengtFortroligRegel(@Value("\${gruppe.strengt}") private val id: UUID) : KjerneRegel(STRENGT_FORTROLIG_GRUPPE, id, "Kode 6")
@@ -71,3 +62,4 @@ class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) : Regel 
     override val beskrivelse = RegelBeskrivelse("Geografisk tilknytning", AVVIST_GEOGRAFISK, true)
 
 }
+

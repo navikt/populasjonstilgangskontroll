@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam
 
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
-class DevTilgangController(val bruker : BrukerTjeneste, private val ansatt: AnsattTjeneste, val regler: RegelTjeneste)
+class DevTilgangController(private val bruker : BrukerTjeneste, private val ansatt: AnsattTjeneste, private val regler: RegelTjeneste)
 {
     @GetMapping("bruker")
     fun bruker(fnr: Fødselsnummer) = bruker.bruker(fnr)
@@ -22,7 +22,7 @@ class DevTilgangController(val bruker : BrukerTjeneste, private val ansatt: Ansa
     fun ansatt(navId: NavId) = ansatt.ansatt(navId)
 
     @GetMapping("regler")
-    fun sjekkTilgang(@RequestParam ansattId: NavId, @RequestParam brukerId: Fødselsnummer) = regler.alleRegler(ansattId, brukerId)
+    fun alleRegler(@RequestParam ansattId: NavId, @RequestParam brukerId: Fødselsnummer) = regler.alleRegler(ansattId, brukerId)
 
     @GetMapping("kjerneregler")
     fun kjerneregler(@RequestParam ansattId: NavId, @RequestParam brukerId: Fødselsnummer) = regler.kjerneregler(ansattId, brukerId)

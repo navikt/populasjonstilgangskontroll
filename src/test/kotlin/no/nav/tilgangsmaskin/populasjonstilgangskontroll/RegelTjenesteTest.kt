@@ -63,7 +63,7 @@ class RegelTjenesteTest {
     }
     @Test
     @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang gis om overstyring er gjort")
-    fun testMidlertidigGitt() {
+    fun overstyringOK() {
         every { bruker.bruker(geoUtlandBruker.ident) } returns geoUtlandBruker
         every { overstyring.harOverstyrtTilgang(vanligAnsatt.navId, geoUtlandBruker.ident) } returns true
         assertThatCode {regel.sjekkTilgang(vanligAnsatt.navId, geoUtlandBruker.ident) }.doesNotThrowAnyException()
@@ -75,7 +75,7 @@ class RegelTjenesteTest {
     }
     @Test
     @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang ikke gis om overstyring ikke er gjort")
-    fun testMidlertidigIkkeGitt() {
+    fun ikkeOverstyrt() {
         every { bruker.bruker(geoUtlandBruker.ident) } returns geoUtlandBruker
         every { overstyring.harOverstyrtTilgang(vanligAnsatt.navId, geoUtlandBruker.ident) } returns false
         assertThrows<RegelException> {regel.sjekkTilgang(vanligAnsatt.navId, geoUtlandBruker.ident) }

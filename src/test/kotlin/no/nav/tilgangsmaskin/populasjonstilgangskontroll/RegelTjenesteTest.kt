@@ -52,7 +52,7 @@ class RegelTjenesteTest {
     }
     @Test
     @DisplayName("Verifiser at sjekk av overstyring ikke gjøres en regel som ikke er overstyrbar avslår tilgabg")
-    fun testIngenMidlertidigSjekk() {
+    fun testIngenOverstyringSjekk() {
         every { bruker.bruker(vanligBruker.ident) } returns vanligBruker
         assertThatCode { regel.sjekkTilgang(vanligAnsatt.navId, vanligBruker.ident) }.doesNotThrowAnyException()
         verify {

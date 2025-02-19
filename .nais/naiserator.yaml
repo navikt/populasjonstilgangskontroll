@@ -62,7 +62,7 @@ spec:
     inbound:
       rules:
        {{#each inn as |app|}}
-          - application: "{{app.application}}",
+          - application: "{{app.name}}",
             namespace: "{{app.namespace}}",
             cluster: "{{app.cluster}}"
        {{/each}}

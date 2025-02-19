@@ -24,7 +24,9 @@ class TilgangController(val regler : RegelTjeneste, val ansatt: EntraTjeneste, p
     fun hentAnsatt(navId: NavId) = ansatt.ansattAzureId(navId)
 
     @PostMapping("tilgang")
-    fun validerTilgang(@RequestBody kandidatId: Fødselsnummer) = regler.alleRegler(token.navIdent, kandidatId);
+    fun sjekkTilgang(@RequestBody brukerId: Fødselsnummer) = regler.alleRegler(token.navIdent, brukerId);
 
+    @PostMapping("kjerneregler")
+    fun kjerneregler(@RequestBody brukerId: Fødselsnummer) = regler.kjerneregler(token.navIdent, brukerId);
 }
 

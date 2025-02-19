@@ -61,10 +61,10 @@ spec:
         - host: {{pdl}}
     inbound:
       rules:
-       {{#each inn}}
-        - application: "{{this.name}}",
-          namespace: "{{this.namespace}}",
-          cluster: "{{this.cluster}}"
+       {{#each inn as |app|}}
+        - application: '{{app.name}}',
+          namespace: '{{app.namespace}}',
+          cluster: '{{app.cluster}}'
        {{/each}}
   env:
     - name: NAIS_CLUSTER_TYPE

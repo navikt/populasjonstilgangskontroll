@@ -10,11 +10,11 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: B
 
     fun alleRegler(ansattId: NavId, brukerId: Fødselsnummer) =
         runCatching {
-            motor.eksekverAlleRegler(brukerTjeneste.bruker(brukerId), ansattTjeneste.ansatt(ansattId))
+            motor.alleRegler(brukerTjeneste.bruker(brukerId), ansattTjeneste.ansatt(ansattId))
         }.getOrElse {
             errorHandler.håndter(ansattId, brukerId, it)
         }
 
-    fun kjerneregler(ansattId: NavId, brukerId: Fødselsnummer) = motor.eksekverKjerneregler(brukerTjeneste.bruker(brukerId), ansattTjeneste.ansatt(ansattId))
+    fun kjerneregler(ansattId: NavId, brukerId: Fødselsnummer) = motor.kjerneregler(brukerTjeneste.bruker(brukerId), ansattTjeneste.ansatt(ansattId))
 }
 

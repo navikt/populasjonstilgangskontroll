@@ -17,6 +17,23 @@
     "tier": "db-f1-micro",
     "name": "tilgangsmaskin"
   },
+  "inbound" : [
+       {
+          "name": "gosys-q1",
+          "namespace": "isa",
+          "cluster": "dev-fss"
+       },
+       {
+          "name": "gosys-q2",
+          "namespace": "isa",
+          "cluster": "dev-fss"
+       },
+       {
+         "name": "ida",
+         "namespace": "traktor",
+         "cluster": "prod-fss"
+       }
+  ],
   "nais": {
     "cluster": {
       "type": "dev"

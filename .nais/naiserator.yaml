@@ -60,9 +60,11 @@ spec:
         - host: {{pdl}}
     inbound:
       rules:
-        - application: ida
-          namespace: traktor
-          cluster: prod-fss
+       {{#each inbound}}
+          - application: "{{this.application}}",
+            namespace: "{{this.namespace}}",
+            cluster: "{{this.cluster}}"
+       {{/each}}
   env:
     - name: NAIS_CLUSTER_TYPE
       value: {{nais.cluster.type}}

@@ -33,7 +33,7 @@ object TestData {
     internal val enhet = Enhetsnummer("4242")
     internal val navid = NavId("Z999999")
     internal val attributter = AnsattAttributter(randomUUID(),navid, Navn("En","Saksbehandler"), enhet)
-    internal val fnr = Fødselsnummer("11111111111")
+    internal val fnr = Fødselsnummer("08526835671")
     internal val navn = Navn("Ola", "Nordmann")
 
 

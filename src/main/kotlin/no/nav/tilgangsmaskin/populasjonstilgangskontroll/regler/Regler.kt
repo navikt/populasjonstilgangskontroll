@@ -33,7 +33,7 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
             ansatt.kanBehandle(id)
         } else true
 
-    override val beskrivelse = RegelBeskrivelse("Person bosatt utland", AVVIST_PERSON_UTLAND, true)
+    override val beskrivelse = RegelBeskrivelse("Person bosatt utland", AVVIST_PERSON_UTLAND)
 }
 
 @Component
@@ -44,7 +44,7 @@ class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) 
             ansatt.kanBehandle(id)
         } else true
 
-    override val beskrivelse = RegelBeskrivelse("Person bosatt ukjent bosted", AVVIST_PERSON_UKJENT, true)
+    override val beskrivelse = RegelBeskrivelse("Person bosatt ukjent bosted", AVVIST_PERSON_UKJENT)
 }
 
 @Component
@@ -60,6 +60,6 @@ class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) : Regel 
         }")
         }
 
-    override val beskrivelse = RegelBeskrivelse("Geografisk tilknytning", AVVIST_GEOGRAFISK, true)
+    override val beskrivelse = RegelBeskrivelse("Geografisk tilknytning", AVVIST_GEOGRAFISK)
 
 }

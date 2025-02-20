@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component
 class RegelMotor(private vararg val regler: Regel)  {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    fun alleRegler(bruker: Bruker, ansatt:  Ansatt) = eksekver(bruker, ansatt, regler.toList())
-    fun kjerneregler(bruker: Bruker, ansatt: Ansatt) = eksekver(bruker, ansatt,regler.filter { it is KjerneRegel })
+    fun alleRegler(ansatt: Ansatt, bruker: Bruker) = eksekver(ansatt, bruker, regler.toList())
+    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = eksekver(ansatt, bruker, regler.filter { it is KjerneRegel })
 
-    private fun eksekver(bruker: Bruker, ansatt: Ansatt, regler: List<Regel>) =
+    private fun eksekver(ansatt: Ansatt, bruker: Bruker, regler: List<Regel>) =
         regler.sortedWith(INSTANCE).forEach {
             log.info(CONFIDENTIAL,"Eksekverer regel: ${it.beskrivelse.kortNavn} for ansatt '${ansatt.navId.verdi}' og bruker '${bruker.ident.mask()}'")
             if (!it.test(bruker, ansatt)) {

@@ -31,7 +31,7 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     fun kjerneregler(@RequestParam ansattId: NavId, @RequestParam brukerId: Fødselsnummer) = regler.kjerneregler(ansattId, brukerId)
 
     @PostMapping("overstyr/{ansattId}/{brukerId}")
-    fun overstyr(@PathVariable ansattId: NavId, @PathVariable brukerId: Fødselsnummer) = overstyringTjeneste.overstyr(ansattId, brukerId)
+    fun overstyr(@PathVariable ansattId: NavId, @PathVariable brukerId: Fødselsnummer) = overstyringTjeneste.overstyr(ansattId,brukerId)
 
     @GetMapping("sjekkoverstyring")
     fun sjekkOverstyring(@RequestParam ansattId: NavId, @RequestParam brukerId: Fødselsnummer) = overstyringTjeneste.nyesteOverstyring(ansattId, brukerId)

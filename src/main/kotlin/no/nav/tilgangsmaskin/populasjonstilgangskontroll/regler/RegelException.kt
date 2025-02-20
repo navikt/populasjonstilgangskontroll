@@ -11,4 +11,4 @@ class RegelException(brukerId: Fødselsnummer, ansattId: NavId, val regel: Regel
         "navIdent" to ansattId.verdi,
         "begrunnelseKode" to regel.beskrivelse.begrunnelse,
         "begrunnelseAnsatt" to regel.beskrivelse.begrunnelseAnsatt.format(ansattId.verdi, brukerId.verdi, regel.beskrivelse.begrunnelse.årsak),
-        "kanOverstyres" to regel.beskrivelse.overstyrbar))
+        "kanOverstyres" to regel.erOverstyrbar))

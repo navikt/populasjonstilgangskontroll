@@ -11,6 +11,7 @@ group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
 version = "1.0.1"
 
 plugins {
+    id("org.jetbrains.kotlin.plugin.allopen") version "1.9.22"
     kotlin("jvm") version "1.9.25"
     id("com.diffplug.spotless") version "7.0.2"
     id("com.github.ben-manes.versions") version "0.52.0"
@@ -23,6 +24,10 @@ plugins {
 
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+}
+
+allOpen {
+    annotation("jakarta.persistence.Entity")
 }
 
 repositories {

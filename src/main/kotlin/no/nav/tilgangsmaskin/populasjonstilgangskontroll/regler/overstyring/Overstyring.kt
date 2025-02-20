@@ -14,10 +14,10 @@ import java.time.Instant
 @Entity
 @EntityListeners(LoggingEntityListener::class, AuditingEntityListener::class)
 class Overstyring {
-    @Column(name = "navid", length = 7)
+    @Column(length = 7)
     var navid: String? = null
 
-    @Column(name = "fnr", length = 11)
+    @Column(length = 11)
     var fnr: String? = null
 
     @CreatedDate
@@ -27,4 +27,6 @@ class Overstyring {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     val id : Long = 0
+
+    var expires: Instant? = null
 }

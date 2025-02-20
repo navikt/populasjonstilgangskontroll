@@ -33,4 +33,6 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     @PostMapping("overstyr/{ansattId}/{brukerId}")
     fun overstyr(@PathVariable ansattId: NavId, @PathVariable brukerId: Fødselsnummer) = overstyringTjeneste.overstyr(ansattId, brukerId)
 
+    @GetMapping("sjekkoverstyring")
+    fun sjekkOverstyring(@RequestParam ansattId: NavId, @RequestParam brukerId: Fødselsnummer) = overstyringTjeneste.harOverstyrtTilgang(ansattId, brukerId)
 }

@@ -23,7 +23,7 @@ spring:
   jackson:
     default-property-inclusion: non_null
   cache:
-    cache-names: pdl, skjerming, graph
+    cache-names: pdl, skjerming, graph. overstyring
     caffeine:
       spec: initialCapacity=500,maximumSize=100,expireAfterAccess=30s
 no.nav.security.jwt:

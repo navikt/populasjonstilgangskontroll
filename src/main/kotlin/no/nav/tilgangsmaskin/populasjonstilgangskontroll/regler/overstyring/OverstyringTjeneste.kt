@@ -4,11 +4,14 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelMotor
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.cache.annotation.CachePut
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component
 import java.time.Instant
 import kotlin.time.Duration
@@ -16,10 +19,15 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.toJavaDuration
 
 @Component
+@Cacheable("overstyring")
 class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker: BrukerTjeneste,private val adapter: JPAOverstyringAdapter, private val motor: RegelMotor) {
 
     private val log = getLogger(OverstyringTjeneste::class.java)
 
+    //@CachePut("overstyring")
+    fun refresh(ansattId: NavId, brukerId: Fødselsnummer, varighet: Duration)  {
+
+    }
     fun erOverstyrt(id: NavId, fødselsnummer: Fødselsnummer) =
        nyesteOverstyring(id, fødselsnummer) != null
 
@@ -30,6 +38,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
          runCatching {
                 motor.alleRegler(ansatt.ansatt(ansattId), bruker.bruker(brukerId))
                 adapter.lagre(ansattId.verdi, brukerId.verdi, varighet)
+                refresh(ansattId, brukerId, varighet)
             }.getOrElse {
                 when (it) {
                     is RegelException -> {

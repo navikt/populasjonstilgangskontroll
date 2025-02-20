@@ -2,7 +2,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 val javaVersion = JavaLanguageVersion.of(21)
 val springdocVersion = "2.8.5"
-val tokenSupportVersion = "5.0.16"
+val tokenSupportVersion = "5.0.17"
 val springCloudVersion = "4.2.0"
 val mockkVersion = "1.13.16"
 val mockOAuth2ServerVersion = "2.1.10"
@@ -11,15 +11,15 @@ group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
 version = "1.0.1"
 
 plugins {
-    id("org.jetbrains.kotlin.plugin.allopen") version "1.9.22"
-    kotlin("jvm") version "1.9.25"
+    id("org.jetbrains.kotlin.plugin.allopen") version "2.1.10"
+    kotlin("jvm") version "2.1.10"
     id("com.diffplug.spotless") version "7.0.2"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("org.springframework.boot") version "3.4.2"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.spring") version "2.1.10"
     id("org.cyclonedx.bom") version "2.1.0"
-    kotlin("plugin.jpa") version "1.9.25"
+    kotlin("plugin.jpa") version "2.1.10"
     id("com.google.cloud.tools.jib") version "3.4.4"
 
     // Apply the application plugin to add support for building a CLI application in Java.
@@ -50,7 +50,7 @@ configurations.all {
 dependencies {
     // Align versions of all Kotlin components
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
     implementation("com.neovisionaries:nv-i18n:1.29")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework:spring-aspects")

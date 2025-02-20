@@ -29,9 +29,10 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
 
     fun erOverstyrt(id: NavId, brukerId: Fødselsnummer) =
         nyesteOverstyring(id, brukerId)?.let {
-            val isOverstyrt = it.expires?.isAfter(Instant.now()) == true
+            val now = Instant.now()
+            val isOverstyrt = it.expires?.isAfter(now) == true
             if (!isOverstyrt) {
-                val utgått = java.time.Duration.between(Instant.now(), it.expires).toKotlinDuration().format()
+                val utgått = java.time.Duration.between(it.expires,now).toKotlinDuration().format()
                 log.warn("Overstyring har gått ut på tid for $utgått siden for id=${id.verdi} and brukerId=${brukerId.mask()}")
             }
             isOverstyrt

@@ -18,10 +18,10 @@ object ObjectUtil {
         val seconds = inWholeSeconds % 60
 
         return buildString {
-            if (days > 0) append("${days} dager ")
-            if (hours > 0) append("${hours} timer ")
-            if (minutes > 0) append("${minutes} minutter ")
-            if (seconds > 0) append("${seconds} sekunder")
+            if (days > 0) append("$days ${if (days == 1L) "dag" else "dager"} ")
+            if (hours > 0) append("$hours ${if (hours == 1L) "time" else "timer"} ")
+            if (minutes > 0) append("$minutes ${if (minutes == 1L) "minutt" else "minutter"} ")
+            if (seconds > 0) append("$seconds ${if (seconds == 1L) "sekund" else "sekunder"}")
         }.trim()
     }
 }

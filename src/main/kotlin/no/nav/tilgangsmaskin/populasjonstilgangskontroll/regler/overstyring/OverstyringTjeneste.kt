@@ -24,15 +24,14 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
 
     private val log = getLogger(OverstyringTjeneste::class.java)
 
-    //@CachePut("overstyring")
+    @CachePut("overstyring")
     fun refresh(ansattId: NavId, brukerId: Fødselsnummer, varighet: Duration)  {
-
     }
-    fun erOverstyrt(id: NavId, fødselsnummer: Fødselsnummer) =
-       nyesteOverstyring(id, fødselsnummer) != null
+    fun erOverstyrt(id: NavId, brukerId: Fødselsnummer) =
+       nyesteOverstyring(id, brukerId) != null
 
-    fun nyesteOverstyring(id: NavId, fødselsnummer: Fødselsnummer) =
-        adapter.nyesteOverstyring(id.verdi, fødselsnummer.verdi)
+    fun nyesteOverstyring(id: NavId, brukerId: Fødselsnummer) =
+        adapter.nyesteOverstyring(id.verdi, brukerId.verdi)
 
     fun overstyr(ansattId: NavId, brukerId: Fødselsnummer, varighet: Duration = 5.minutes) =
          runCatching {
@@ -52,7 +51,8 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
                             }
                         }
                     }
-                    else -> throw it
+                    else -> throw it.also {
+                        log.error("Ukjent feil ved forsøk på overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.verdi}'", it)
                 }
          }
 }

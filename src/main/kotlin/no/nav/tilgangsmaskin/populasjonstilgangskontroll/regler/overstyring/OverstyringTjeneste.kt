@@ -48,8 +48,9 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
                             log.info("${it.regel.beskrivelse.kortNavn} er overstyrbar, gir tilgang til ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                             adapter.lagre(ansattId.verdi, brukerId.verdi, varighet).also {
                                 log.info("Overstyring for '${ansattId.verdi}' og ${brukerId.mask()} lagret")
-                                refresh(ansattId, brukerId, varighet)
-                                log.info("Overstyring for '${ansattId.verdi}' og ${brukerId.mask()} oppdatert i cache")
+                                refresh(ansattId, brukerId, varighet).also {
+                                    log.info("Overstyring for '${ansattId.verdi}' og ${brukerId.mask()} oppdatert i cache")
+                                }
                             }
                         }
                         else {

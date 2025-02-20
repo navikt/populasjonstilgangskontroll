@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelMotor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.Overstyring.Companion.OVERSTYRING
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
 import org.slf4j.LoggerFactory.getLogger
@@ -19,7 +20,7 @@ import kotlin.time.Duration.Companion.minutes
 
 @Component
 @Cacheable(OVERSTYRING)
-class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker: BrukerTjeneste, private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor) {
+class OverstyringTjeneste(private val adapter: OverstyringJPAAdapter, private val motor: RegelTjeneste) {
 
     private val log = getLogger(OverstyringTjeneste::class.java)
 
@@ -32,18 +33,21 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
 
     fun overstyr(ansattId: NavId, brukerId: Fødselsnummer, varighet: Duration = 5.minutes) : Any =
          runCatching {
-                motor.alleRegler(ansatt.ansatt(ansattId), bruker.bruker(brukerId))
+                log.info("Kjører alle reglene for eventuell overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
+                motor.alleRegler(ansattId, brukerId)
                 adapter.lagre(ansattId.verdi, brukerId.verdi, varighet).also {
                     refresh(ansattId, brukerId, varighet)
                 }
             }.getOrElse {
                 when (it) {
                     is RegelException -> {
+                        log.info("Regelkjøring feilet, sjekker om overstyring er mulig for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                         if (it.regel.erOverstyrbar) {
                             log.info("${it.regel.beskrivelse.kortNavn} er overstyrbar, gir tilgang til ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                             adapter.lagre(ansattId.verdi, brukerId.verdi, varighet).also {
                                 log.info("Overstyring for '${it.navid}' og ${brukerId.mask()} lagret")
                                 refresh(ansattId, brukerId, varighet)
+                                log.info("Overstyring for '${it.navid}' og ${brukerId.mask()} oppdatert i cache")
                             }
                         }
                         else {

@@ -15,5 +15,5 @@ class OverstyringJPAAdapter(private val repository: OverstyringRepository)  {
             expires =  Instant.now().plus(varighet.toJavaDuration())
         })
 
-    fun nyesteOverstyring(navid: String, fnr: String) = repository.findByNavidAndFnrOrderByCreatedDesc(navid, fnr)?.firstOrNull()
+    fun nyesteOverstyring(ansattId: String, brukerId: String) = repository.findByNavidAndFnrOrderByCreatedDesc(ansattId, brukerId)?.firstOrNull()
 }

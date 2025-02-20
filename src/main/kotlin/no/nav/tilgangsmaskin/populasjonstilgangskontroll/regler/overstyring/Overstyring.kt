@@ -29,4 +29,8 @@ class Overstyring {
     val id : Long = 0
 
     var expires: Instant? = null
+
+    companion object {
+        const val OVERSTYRING = "overstyring"
+    }
 }

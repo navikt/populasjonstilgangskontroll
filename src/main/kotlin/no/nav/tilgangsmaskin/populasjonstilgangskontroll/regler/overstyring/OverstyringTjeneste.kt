@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelMotor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.Overstyring.Companion.OVERSTYRING
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component
@@ -42,6 +43,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
                             log.info("${it.regel.beskrivelse.kortNavn} er overstyrbar, gir tilgang til ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                             adapter.lagre(ansattId.verdi, brukerId.verdi, varighet).also {
                                 log.info("Overstyring for '${it.navid}' og ${brukerId.mask()} lagret")
+                                refresh(ansattId, brukerId, varighet)
                             }
                         }
                         else {

@@ -2,16 +2,26 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import org.hibernate.annotations.JdbcTypeCode
-import org.hibernate.type.SqlTypes
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType.IDENTITY
+import jakarta.persistence.Id
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedDate
+import java.time.Instant
 
 @Entity
-class Overstyring : IdentifiableTimestampedBaseEntity() {
-    @JdbcTypeCode(SqlTypes.VARCHAR)
+class Overstyring {
     @Column(name = "navid", length = 7)
     var navid: String? = null
 
-    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(name = "fnr", length = 11)
     var fnr: String? = null
+
+    @CreatedDate
+    var created : Instant? = null
+    @LastModifiedDate
+    var updated : Instant? = null
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
+    val id : Long = 0
 }

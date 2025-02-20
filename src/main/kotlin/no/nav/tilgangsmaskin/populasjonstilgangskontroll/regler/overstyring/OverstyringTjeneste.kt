@@ -20,7 +20,7 @@ import kotlin.time.Duration.Companion.minutes
 
 @Component
 @Cacheable(OVERSTYRING)
-class OverstyringTjeneste(private val adapter: OverstyringJPAAdapter, private val motor: RegelTjeneste) {
+class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker: BrukerTjeneste,private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor) {
 
     private val log = getLogger(OverstyringTjeneste::class.java)
 
@@ -34,9 +34,11 @@ class OverstyringTjeneste(private val adapter: OverstyringJPAAdapter, private va
     fun overstyr(ansattId: NavId, brukerId: Fødselsnummer, varighet: Duration = 5.minutes) : Any =
          runCatching {
                 log.info("Kjører alle reglene for eventuell overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
-                motor.alleRegler(ansattId, brukerId)
+                motor.alleRegler(ansatt.ansatt(ansattId), bruker.bruker(brukerId))
                 adapter.lagre(ansattId.verdi, brukerId.verdi, varighet).also {
-                    refresh(ansattId, brukerId, varighet)
+                    refresh(ansattId, brukerId, varighet).also {
+                        log.info("Overstyring for '${ansattId.verdi}' og ${brukerId.mask()} oppdatert i cache")
+                    }
                 }
             }.getOrElse {
                 when (it) {
@@ -45,9 +47,9 @@ class OverstyringTjeneste(private val adapter: OverstyringJPAAdapter, private va
                         if (it.regel.erOverstyrbar) {
                             log.info("${it.regel.beskrivelse.kortNavn} er overstyrbar, gir tilgang til ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                             adapter.lagre(ansattId.verdi, brukerId.verdi, varighet).also {
-                                log.info("Overstyring for '${it.navid}' og ${brukerId.mask()} lagret")
+                                log.info("Overstyring for '${ansattId.verdi}' og ${brukerId.mask()} lagret")
                                 refresh(ansattId, brukerId, varighet)
-                                log.info("Overstyring for '${it.navid}' og ${brukerId.mask()} oppdatert i cache")
+                                log.info("Overstyring for '${ansattId.verdi}' og ${brukerId.mask()} oppdatert i cache")
                             }
                         }
                         else {

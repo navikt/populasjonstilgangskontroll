@@ -17,7 +17,7 @@ class RegelMotor(private vararg val regler: Regel)  {
 
     private fun eksekver(ansatt: Ansatt, bruker: Bruker, regler: List<Regel>) =
         regler.sortedWith(INSTANCE).forEach {
-            log.info(CONFIDENTIAL,"Eksekverer regel: ${it.beskrivelse.kortNavn} for ansatt '${ansatt.navId.verdi}' og bruker '${bruker.ident.mask()}'")
+            log.info(CONFIDENTIAL,"Eksekverer regel: '${it.beskrivelse.kortNavn}' for ansatt '${ansatt.navId.verdi}' og bruker '${bruker.ident.mask()}'")
             if (!it.test(bruker, ansatt)) {
                 throw RegelException(bruker.ident, ansatt.navId, it).also {
                     log.warn(CONFIDENTIAL,"Tilgang avvist av regel '${it.regel.beskrivelse.kortNavn}'")

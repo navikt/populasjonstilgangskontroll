@@ -6,7 +6,7 @@ import kotlin.time.Duration
 import kotlin.time.toJavaDuration
 
 @Component
-class JPAOverstyringAdapter(private val repository: OverstyringRepository)  {
+class OverstyringJPAAdapter(private val repository: OverstyringRepository)  {
 
     fun lagre(ansattId: String, brukerId: String, varighet: Duration) =
         repository.save(Overstyring().apply {

@@ -12,19 +12,19 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component
+import java.time.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 @Component
 @Cacheable(OVERSTYRING)
-class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker: BrukerTjeneste,private val adapter: JPAOverstyringAdapter, private val motor: RegelMotor) {
+class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker: BrukerTjeneste, private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor) {
 
     private val log = getLogger(OverstyringTjeneste::class.java)
 
-    @CachePut(OVERSTYRING)
-    private fun refresh(ansattId: NavId, brukerId: Fødselsnummer, varighet: Duration) : Any = Unit
+
     fun erOverstyrt(id: NavId, brukerId: Fødselsnummer) =
-       nyesteOverstyring(id, brukerId) != null
+        nyesteOverstyring(id, brukerId)?.let { it.expires?.isAfter(Instant.now())  } == true
 
     fun nyesteOverstyring(id: NavId, brukerId: Fødselsnummer) =
         adapter.nyesteOverstyring(id.verdi, brukerId.verdi)
@@ -55,5 +55,9 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
                     }
                 }
          }
+
+    @CachePut(OVERSTYRING)
+    private fun refresh(ansattId: NavId, brukerId: Fødselsnummer, varighet: Duration) : Any = Unit
+
 }
 

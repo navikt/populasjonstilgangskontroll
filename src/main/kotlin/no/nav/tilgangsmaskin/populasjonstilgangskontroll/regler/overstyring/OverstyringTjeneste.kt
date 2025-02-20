@@ -14,6 +14,9 @@ class OverstyringTjeneste(private val adapter: JPAOverstyringAdapter) {
 
     private val log = getLogger(OverstyringTjeneste::class.java)
 
+    fun erOverstyrt(id: NavId, fødselsnummer: Fødselsnummer) =
+       nyesteOverstyring(id, fødselsnummer) != null
+
     fun nyesteOverstyring(id: NavId, fødselsnummer: Fødselsnummer) =
         adapter.nyesteOverstyring(id.verdi, fødselsnummer.verdi)
 

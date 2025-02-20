@@ -17,7 +17,7 @@ class RegelExceptionHandler(private val overstyring: OverstyringTjeneste)  {
             is RegelException -> {
                 with(e.regel) {
                     if (erOverstyrbar) {
-                        if (overstyring.nyesteOverstyring(ansattId, brukerId)) {
+                        if (overstyring.erOverstyrt(ansattId, brukerId)) {
                             log.warn("Overstyrt tilgang for regel '${beskrivelse.kortNavn}' er gitt til ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                         }
                         else {

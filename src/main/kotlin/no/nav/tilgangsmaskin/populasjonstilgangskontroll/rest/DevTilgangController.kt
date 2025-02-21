@@ -12,6 +12,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.DEV
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 
 @UnprotectedRestController(value = ["/${DEV}"])
@@ -31,7 +32,7 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     fun kjerneregler(@RequestParam ansattId: NavId, @RequestParam brukerId: Fødselsnummer) = regler.kjerneregler(ansattId, brukerId)
 
     @PostMapping("overstyr/{ansattId}/{brukerId}")
-    fun overstyr(@PathVariable ansattId: NavId, @PathVariable brukerId: Fødselsnummer) = overstyringTjeneste.overstyr(ansattId,brukerId)
+    fun overstyr(@PathVariable ansattId: NavId, @PathVariable brukerId: Fødselsnummer, @RequestBody begrunnelse: String) = overstyringTjeneste.overstyr(ansattId,brukerId, begrunnelse)
 
     @GetMapping("sjekkoverstyring")
     fun sjekkOverstyring(@RequestParam ansattId: NavId, @RequestParam brukerId: Fødselsnummer) = overstyringTjeneste.nyesteOverstyring(ansattId, brukerId)

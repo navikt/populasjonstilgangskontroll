@@ -15,8 +15,6 @@ import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component
 import java.time.Instant
-import kotlin.compareTo
-import kotlin.rem
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.toKotlinDuration
@@ -42,11 +40,11 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
     fun nyesteOverstyring(id: NavId, brukerId: Fødselsnummer) =
         adapter.nyesteOverstyring(id.verdi, brukerId.verdi)
 
-    fun overstyr(ansattId: NavId, brukerId: Fødselsnummer, varighet: Duration = 5.minutes) : Any =
+    fun overstyr(ansattId: NavId, brukerId: Fødselsnummer, begrunnelse: String,varighet: Duration = 5.minutes) : Any =
          runCatching {
                 log.info("Eksekverer kjerneregler før eventuell overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                 motor.kjerneregler(ansatt.ansatt(ansattId), bruker.bruker(brukerId))
-                adapter.lagre(ansattId.verdi, brukerId.verdi, varighet)
+                adapter.lagre(ansattId.verdi, brukerId.verdi, begrunnelse, varighet)
                 refresh(ansattId, brukerId, varighet)
                 log.info("Overstyring for '${ansattId.verdi}' og ${brukerId.mask()} oppdatert i cache")
             }.getOrElse {

@@ -35,4 +35,7 @@ class Overstyring {
     companion object {
         const val OVERSTYRING = "overstyring"
     }
+
+    @Column(name = "begrunnelse")
+    var begrunnelse: String? = null
 }

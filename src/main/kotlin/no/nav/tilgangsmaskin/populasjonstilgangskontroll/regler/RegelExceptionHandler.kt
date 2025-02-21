@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
+import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringTjeneste
@@ -15,6 +16,7 @@ class RegelExceptionHandler(private val overstyring: OverstyringTjeneste)  {
     fun håndter(ansattId: NavId, brukerId: Fødselsnummer, e: Throwable) =
         when (e) {
             is RegelException -> {
+                log.info(CONFIDENTIAL,"Sjekker om regel '${e.regel.beskrivelse.kortNavn}' er overstyrt for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                 with(e.regel) {
                     if (erOverstyrbar) {
                         if (overstyring.erOverstyrt(ansattId, brukerId)) {
@@ -24,7 +26,7 @@ class RegelExceptionHandler(private val overstyring: OverstyringTjeneste)  {
                             throw e.also { log.warn("Tilgang avvist av regel '${beskrivelse.kortNavn}' for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'") }
                         }
                     } else {
-                        throw e.also { log.warn("Tilgang avvist av regel '${beskrivelse.kortNavn}' for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}', regel er ikke overstyrbar") }
+                        throw e.also { log.warn("Tilgang avvist av kjerneregel '${beskrivelse.kortNavn}' for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}', regel er ikke overstyrbar") }
                     }
                 }
             }

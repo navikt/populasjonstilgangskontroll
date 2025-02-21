@@ -34,7 +34,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
             }
         } else {
             true.also {
-                log.warn("Overstyring er gyldig i  ${nyeste.expires.diffFrom(now)} til for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
+                log.warn("Overstyring er gyldig i ${nyeste.expires.diffFrom(now)} til for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
 
             }
         }

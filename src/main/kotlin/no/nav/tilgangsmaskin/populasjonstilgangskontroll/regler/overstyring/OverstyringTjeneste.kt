@@ -29,11 +29,14 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
         val nyeste = nyesteOverstyring(ansattId, brukerId) ?: return false
         val now = Instant.now()
         return if (nyeste.expires.isBefore(now)) {
-            true.also {
+            false.also {
                 log.warn("Overstyring har gått ut på tid for ${nyeste.expires.diffFrom(now)} siden for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
             }
         } else {
-            false
+            true.also {
+                log.warn("Overstyring er gyldig i  ${nyeste.expires.diffFrom(now)} til for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
+
+            }
         }
     }
 

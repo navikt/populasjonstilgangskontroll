@@ -85,7 +85,7 @@ class RegelMotorTest {
     @Test
     @DisplayName("Test at vanlig bruker kan behandles av kode 7 ansatt")
     fun vanligBrukerKode7Ansatt() {
-        assertThatCode({ motor.alleRegler(kode7Ansatt, vanligBruker) }).doesNotThrowAnyException()
+        assertThatCode { motor.alleRegler(kode7Ansatt, vanligBruker) }.doesNotThrowAnyException()
     }
 
     @Test

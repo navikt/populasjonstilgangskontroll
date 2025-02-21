@@ -20,7 +20,7 @@
   "db-flags":{
     "pgaudit": {
       "enabled": "off",
-      "log_statement": "write"}
+      "logtype": "write"}
   },
   "inbound" : [
        {

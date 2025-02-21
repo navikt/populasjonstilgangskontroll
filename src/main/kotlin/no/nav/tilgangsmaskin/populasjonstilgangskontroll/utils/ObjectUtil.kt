@@ -25,6 +25,6 @@ object ObjectUtil {
             if (seconds > 0) append("$seconds ${if (seconds == 1L) "sekund" else "sekunder"}")
         }.trim()
     }
-    fun RegelException.withExtra(ekstra: Map<String, String>) = RegelException(brukerId, ansattId,regel,ekstra)
+    fun RegelException.withDetail(detail: String?) = RegelException(brukerId, ansattId,regel,detail)
 
 }

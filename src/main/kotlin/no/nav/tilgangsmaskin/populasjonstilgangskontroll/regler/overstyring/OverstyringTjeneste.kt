@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelMotor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.Overstyring.Companion.OVERSTYRING
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.format
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.withDetail
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.withExtra
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CachePut
@@ -51,7 +52,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
                 log.info("Overstyring for '${ansattId.verdi}' og ${brukerId.mask()} oppdatert i cache")
             }.getOrElse {
                 when (it) {
-                    is RegelException -> throw it.withExtra(mapOf("oops" to "Kjerneregel ${it.regel.beskrivelse.kortNavn} er ikke overstyrbar, kunne ikke overstyre tilgang for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'"))
+                    is RegelException -> throw it.withDetail("Kjerneregel ${it.regel.beskrivelse.kortNavn} er ikke overstyrbar, kunne ikke overstyre tilgang for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                     else -> throw it
                 }
          }

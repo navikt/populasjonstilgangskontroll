@@ -11,7 +11,7 @@ spec:
     sqlInstances:
       - flags:
           - name: cloudsql.enable_pgaudit
-            value: {{'db-flags.pgaudit.enabled'}}
+            value: "{{db-flags.pgaudit.enabled}}"
           - name: pgaudit.log
             value: {{db-flags.pgaudit.logtype}}
       - type: {{db.type}}

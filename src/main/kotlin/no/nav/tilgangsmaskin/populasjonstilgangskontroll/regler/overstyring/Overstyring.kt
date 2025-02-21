@@ -13,11 +13,10 @@ import java.time.Instant
 
 @Entity
 @EntityListeners(LoggingEntityListener::class, AuditingEntityListener::class)
-class Overstyring(@Column(length = 7, nullable = false)
-                  val navid: String) {
-
-    @Column(length = 11, nullable = false)
-    var fnr: String? = null
+class Overstyring(@Column(length = 7, nullable = false) val navid: String,
+                  @Column(length = 11, nullable = false) val fnr: String,
+                  @Column(nullable = false) val begrunnelse: String,
+                  @Column(nullable = false) val expires: Instant) {
 
     @CreatedDate
     @Column(nullable = false)
@@ -28,13 +27,8 @@ class Overstyring(@Column(length = 7, nullable = false)
     @Id
     @GeneratedValue(strategy = IDENTITY)
     val id : Long = 0
-    @Column(nullable = false)
-    var expires: Instant? = null
 
     companion object {
         const val OVERSTYRING = "overstyring"
     }
-
-    @Column(name = "begrunnelse")
-    var begrunnelse: String? = null
 }

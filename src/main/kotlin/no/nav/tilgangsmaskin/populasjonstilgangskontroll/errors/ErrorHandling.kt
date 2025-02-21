@@ -26,28 +26,31 @@ class DefaultRestErrorHandler : ErrorHandler {
     }
 }
 
-open class IrrecoverableException(status: HttpStatusCode, detail: String, extras: Map<String,Any> = emptyMap(), cause: Throwable? = null) :
-    ErrorResponseException(status, problemDetail(status, detail, extras), cause)  {
+open class IrrecoverableException(status: HttpStatusCode, detail: String, extras: Map<String,Any> = emptyMap(), title: String ?= null,cause: Throwable? = null) :
+    ErrorResponseException(status, problemDetail(status, detail, extras, title), cause)  {
     constructor(status: HttpStatusCode,
                 uri: URI? = null,
                 detail: String,
-                cause: Throwable? = null) : this(status, detail, uri.toMap(), cause)
+                title: String? = null,
+                cause: Throwable? = null) : this(status, detail, uri.toMap(), title,cause)
 }
 
-open class RecoverableException(status: HttpStatusCode, detail: String,extras: Map<String,Any> = emptyMap(), cause: Throwable? = null) :
-    ErrorResponseException(status, problemDetail(status, detail, extras), cause)  {
+open class RecoverableException(status: HttpStatusCode, detail: String,extras: Map<String,Any> = emptyMap(), title: String ?= null, cause: Throwable? = null) :
+    ErrorResponseException(status, problemDetail(status, detail, extras, title), cause)  {
     constructor(status: HttpStatusCode,
                 uri: URI? = null,
                 detail: String,
-                cause: Throwable? = null) : this(status, detail, uri.toMap(), cause)
+                title: String? = null,
+                cause: Throwable? = null) : this(status, detail, uri.toMap(), title,cause)
 
 }
 
 private fun problemDetail(status: HttpStatusCode,
                           detail: String,
-                          extras: Map<String,Any> = emptyMap()) =
+                          extras: Map<String,Any> = emptyMap(),
+                          tittel: String? = null) =
     forStatusAndDetail(status, detail).apply {
-        title = resolve(status.value())?.reasonPhrase ?: "$status"
+        title = tittel
         type = URI.create("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett")
         extras.forEach { (key, value) -> setProperty(key,value) }
     }

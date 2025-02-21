@@ -27,7 +27,7 @@ object ObjectUtil {
             if (seconds > 0) append("$seconds ${if (seconds == 1L) "sekund" else "sekunder"}")
         }.trim()
     }
-    fun RegelException.withDetail(detail: String?) = RegelException(brukerId, ansattId,regel,detail)
+    fun RegelException.withDetail(detail: String) = RegelException(brukerId, ansattId,regel,detail)
 
     fun Instant.diffFrom(from: Instant) = java.time.Duration.between(this, from).toKotlinDuration().format()
 }

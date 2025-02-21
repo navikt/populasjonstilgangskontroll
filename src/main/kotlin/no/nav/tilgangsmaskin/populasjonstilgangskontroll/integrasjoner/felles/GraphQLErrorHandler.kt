@@ -15,8 +15,8 @@ interface GraphQLErrorHandler {
     fun handle(uri: URI, e: Throwable): Nothing =
         when (e) {
             is FieldAccessException ->  throw e.oversett(uri)
-            is GraphQlTransportException ->  throw RecoverableException(INTERNAL_SERVER_ERROR, uri, e.message, e)
-            else ->  throw IrrecoverableException(INTERNAL_SERVER_ERROR, uri, e.message, e)
+            is GraphQlTransportException ->  throw RecoverableException(INTERNAL_SERVER_ERROR, uri, e.message ?: "Uventet respons", e)
+            else ->  throw IrrecoverableException(INTERNAL_SERVER_ERROR,uri,e.message?: "Uventet respons", e)
         }
 
     companion object {

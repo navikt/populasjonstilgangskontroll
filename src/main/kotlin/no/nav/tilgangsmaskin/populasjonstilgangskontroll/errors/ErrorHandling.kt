@@ -21,30 +21,30 @@ class DefaultGraphQlErrorHandler : GraphQLErrorHandler
 @Primary
 class DefaultRestErrorHandler : ErrorHandler {
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
-        if (res.statusCode.is4xxClientError) throw IrrecoverableException(res.statusCode, uri = req.uri)
-        else throw RecoverableException(res.statusCode, uri = req.uri) // TODO: Håndter 5xx feil bedre
+        if (res.statusCode.is4xxClientError) throw IrrecoverableException(res.statusCode, req.uri,res.statusText)
+        else throw RecoverableException(res.statusCode,  req.uri,res.statusText) // TODO: Håndter 5xx feil bedre
     }
 }
 
-open class IrrecoverableException(status: HttpStatusCode, detail: String? = "Fikk respons $status", extras: Map<String,Any> = emptyMap(), cause: Throwable? = null) :
+open class IrrecoverableException(status: HttpStatusCode, detail: String, extras: Map<String,Any> = emptyMap(), cause: Throwable? = null) :
     ErrorResponseException(status, problemDetail(status, detail, extras), cause)  {
     constructor(status: HttpStatusCode,
                 uri: URI? = null,
-                detail: String? = "Fikk respons $status",
+                detail: String,
                 cause: Throwable? = null) : this(status, detail, uri.toMap(), cause)
 }
 
-open class RecoverableException(status: HttpStatusCode, detail: String? = "Fikk respons $status", extras: Map<String,Any> = emptyMap(), cause: Throwable? = null) :
+open class RecoverableException(status: HttpStatusCode, detail: String,extras: Map<String,Any> = emptyMap(), cause: Throwable? = null) :
     ErrorResponseException(status, problemDetail(status, detail, extras), cause)  {
     constructor(status: HttpStatusCode,
                 uri: URI? = null,
-                detail: String? = "Fikk respons $status",
+                detail: String,
                 cause: Throwable? = null) : this(status, detail, uri.toMap(), cause)
 
 }
 
 private fun problemDetail(status: HttpStatusCode,
-                          detail: String?,
+                          detail: String,
                           extras: Map<String,Any> = emptyMap()) =
     forStatusAndDetail(status, detail).apply {
         title = resolve(status.value())?.reasonPhrase ?: "$status"

@@ -10,7 +10,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.Over
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.format
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.withDetail
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.withExtra
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable

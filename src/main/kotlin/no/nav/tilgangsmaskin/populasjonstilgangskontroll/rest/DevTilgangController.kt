@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringMetadata
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.DEV
 import org.springframework.http.ResponseEntity
@@ -33,8 +34,8 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     fun kjerneregler(@RequestParam ansattId: NavId, @RequestParam brukerId: Fødselsnummer) = regler.kjerneregler(ansattId, brukerId)
 
     @PostMapping("overstyr/{ansattId}/{brukerId}")
-    fun overstyr(@PathVariable ansattId: NavId, @PathVariable brukerId: Fødselsnummer, @RequestBody begrunnelse: String): ResponseEntity<Unit> {
-        overstyringTjeneste.overstyr(ansattId, brukerId, begrunnelse)
+    fun overstyr(@PathVariable ansattId: NavId, @PathVariable brukerId: Fødselsnummer, @RequestBody metadata: OverstyringMetadata): ResponseEntity<Unit> {
+        overstyringTjeneste.overstyr(ansattId, brukerId, metadata)
         return ResponseEntity.accepted().build()
     }
 }

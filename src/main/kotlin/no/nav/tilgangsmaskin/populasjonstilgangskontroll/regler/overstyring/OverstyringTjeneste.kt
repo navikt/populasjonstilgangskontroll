@@ -35,7 +35,6 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
         } else {
             true.also {
                 log.warn("Overstyring er gyldig i ${nyeste.expires.diffFrom(now)} til for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
-
             }
         }
     }
@@ -43,12 +42,12 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
     private fun nyesteOverstyring(ansattId: NavId, brukerId: Fødselsnummer) =
         adapter.nyesteOverstyring(ansattId.verdi, brukerId.verdi)
 
-    fun overstyr(ansattId: NavId, brukerId: Fødselsnummer, begrunnelse: String,varighet: Duration = 5.minutes)  =
+    fun overstyr(ansattId: NavId, brukerId: Fødselsnummer, metadata: OverstyringMetadata)  =
          runCatching {
                 log.info("Eksekverer kjerneregler før eventuell overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                 motor.kjerneregler(ansatt.ansatt(ansattId), bruker.bruker(brukerId))
-                adapter.lagre(ansattId.verdi, brukerId.verdi, begrunnelse, varighet)
-                refresh(ansattId, brukerId, begrunnelse, varighet)
+                adapter.lagre(ansattId.verdi, brukerId.verdi, metadata)
+                refresh(ansattId, brukerId, metadata)
                 log.info("Overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}' oppdatert i cache")
             }.getOrElse {
                 when (it) {
@@ -58,6 +57,6 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
          }
 
     @CachePut(OVERSTYRING)
-    private fun refresh(ansattId: NavId, brukerId: Fødselsnummer, begrunnelse: String, varighet: Duration)  = Unit
+    private fun refresh(ansattId: NavId, brukerId: Fødselsnummer, metadata: OverstyringMetadata)  = Unit
 }
 

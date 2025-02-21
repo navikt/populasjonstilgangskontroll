@@ -48,6 +48,7 @@ private fun problemDetail(status: HttpStatusCode,
                           extras: Map<String,Any> = emptyMap()) =
     forStatusAndDetail(status, detail).apply {
         title = resolve(status.value())?.reasonPhrase ?: "$status"
+        type = URI.create("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett")
         extras.forEach { (key, value) -> setProperty(key,value) }
     }
 

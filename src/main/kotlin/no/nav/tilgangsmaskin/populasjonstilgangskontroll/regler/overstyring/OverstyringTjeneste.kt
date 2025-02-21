@@ -55,6 +55,6 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
          }
 
     @CachePut(OVERSTYRING)
-    private fun refresh(ansattId: NavId, brukerId: Fødselsnummer, begrunnelse: String varighet: Duration)  = Unit
+    private fun refresh(ansattId: NavId, brukerId: Fødselsnummer, begrunnelse: String, varighet: Duration)  = Unit
 }
 

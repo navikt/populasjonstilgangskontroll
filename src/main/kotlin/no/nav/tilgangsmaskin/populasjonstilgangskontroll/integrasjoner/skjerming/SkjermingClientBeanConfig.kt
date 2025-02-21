@@ -6,14 +6,14 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.web.client.RestClient
+import org.springframework.web.client.RestClient.Builder
 
 @Configuration
 class SkjermingClientBeanConfig {
 
     @Bean
     @Qualifier(SKJERMING)
-    fun skjermingRestClient(b: RestClient.Builder, cfg: SkjermingConfig, oAuth2ClientRequestInterceptor: OAuth2ClientRequestInterceptor) =
+    fun skjermingRestClient(b: Builder, cfg: SkjermingConfig, oAuth2ClientRequestInterceptor: OAuth2ClientRequestInterceptor) =
         b.baseUrl(cfg.baseUri)
             .requestInterceptors { it.addFirst(oAuth2ClientRequestInterceptor)
             }.build()

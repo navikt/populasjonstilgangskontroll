@@ -25,11 +25,9 @@ object PdlTilBrukerMapper {
                 add(FORTROLIG_GRUPPE)
             }
 
-
             if (gt.gtType == UDEFINERT) {
                 add(UDEFINERT_GEO_GRUPPE)
             }
-
 
             if (erSkjermet)  {
                 add(EGEN_ANSATT_GRUPPE)

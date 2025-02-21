@@ -40,8 +40,8 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
         }
     }
 
-    private fun nyesteOverstyring(id: NavId, brukerId: Fødselsnummer) =
-        adapter.nyesteOverstyring(id.verdi, brukerId.verdi)
+    private fun nyesteOverstyring(ansattId: NavId, brukerId: Fødselsnummer) =
+        adapter.nyesteOverstyring(ansattId.verdi, brukerId.verdi)
 
     fun overstyr(ansattId: NavId, brukerId: Fødselsnummer, begrunnelse: String,varighet: Duration = 5.minutes)  =
          runCatching {

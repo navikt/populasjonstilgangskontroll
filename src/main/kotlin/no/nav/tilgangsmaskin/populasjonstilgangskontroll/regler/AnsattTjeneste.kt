@@ -11,7 +11,7 @@ class AnsattTjeneste(private val entra: EntraTjeneste) {  // kan slå opp mer he
 
     private val log = getLogger(AnsattTjeneste::class.java)
 
-    fun ansatt(navId: NavId) = entra.ansatt(navId).also {
+    fun ansatt(ansattId: NavId) = entra.ansatt(ansattId).also {
         log.trace(CONFIDENTIAL, "Ansatt: {}", it)
     }
 }

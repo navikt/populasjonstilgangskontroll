@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException
 import kotlin.time.Duration
 
 object ObjectUtil {
@@ -24,4 +25,6 @@ object ObjectUtil {
             if (seconds > 0) append("$seconds ${if (seconds == 1L) "sekund" else "sekunder"}")
         }.trim()
     }
+    fun RegelException.withExtra(ekstra: Map<String, String>) = RegelException(brukerId, ansattId,regel,ekstra)
+
 }

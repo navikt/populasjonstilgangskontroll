@@ -40,7 +40,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
     fun nyesteOverstyring(id: NavId, brukerId: Fødselsnummer) =
         adapter.nyesteOverstyring(id.verdi, brukerId.verdi)
 
-    fun overstyr(ansattId: NavId, brukerId: Fødselsnummer, begrunnelse: String,varighet: Duration = 5.minutes) : Any =
+    fun overstyr(ansattId: NavId, brukerId: Fødselsnummer, begrunnelse: String,varighet: Duration = 5.minutes)  =
          runCatching {
                 log.info("Eksekverer kjerneregler før eventuell overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                 motor.kjerneregler(ansatt.ansatt(ansattId), bruker.bruker(brukerId))
@@ -55,8 +55,6 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
          }
 
     @CachePut(OVERSTYRING)
-    private fun refresh(ansattId: NavId, brukerId: Fødselsnummer, varighet: Duration) : Any = Unit
-
-
+    private fun refresh(ansattId: NavId, brukerId: Fødselsnummer, varighet: Duration)  = Unit
 }
 

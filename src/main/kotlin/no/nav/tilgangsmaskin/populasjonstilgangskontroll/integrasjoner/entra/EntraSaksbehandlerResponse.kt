@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Enhetsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
 

@@ -43,31 +43,16 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
 
     fun overstyr(ansattId: NavId, brukerId: Fødselsnummer, varighet: Duration = 5.minutes) : Any =
          runCatching {
-                log.info("Kjører alle reglene for eventuell overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
-                motor.alleRegler(ansatt.ansatt(ansattId), bruker.bruker(brukerId))
-                adapter.lagre(ansattId.verdi, brukerId.verdi, varighet).also {
-                    refresh(ansattId, brukerId, varighet).also {
-                        log.info("Overstyring for '${ansattId.verdi}' og ${brukerId.mask()} oppdatert i cache")
-                    }
-                }
+                log.info("Eksekverer kjerneregler før eventuell overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
+                motor.kjerneregler(ansatt.ansatt(ansattId), bruker.bruker(brukerId))
+                adapter.lagre(ansattId.verdi, brukerId.verdi, varighet)
+                refresh(ansattId, brukerId, varighet)
+                log.info("Overstyring for '${ansattId.verdi}' og ${brukerId.mask()} oppdatert i cache")
             }.getOrElse {
                 when (it) {
                     is RegelException -> {
-                        log.info("Regelkjøring feilet, sjekker om overstyring av regel '${it.regel.beskrivelse.kortNavn}' er mulig for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
-                        if (it.regel.erOverstyrbar) {
-                            log.info("${it.regel.beskrivelse.kortNavn} er overstyrbar, gir tilgang til ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
-                            adapter.lagre(ansattId.verdi, brukerId.verdi, varighet).also {
-                                log.info("Overstyring for '${ansattId.verdi}' og ${brukerId.mask()} lagret")
-                                refresh(ansattId, brukerId, varighet).also {
-                                    log.info("Overstyring for '${ansattId.verdi}' og ${brukerId.mask()} oppdatert i cache")
-                                }
-                            }
-                        }
-                        else {
-                            throw it.also {
-                                log.error("${it.regel.beskrivelse.kortNavn} er ikke overstyrbar, kunne ikke overstyre tilgang for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'", it)
-                            }
-                        }
+                        log.error("Kjerneregel ${it.regel.beskrivelse.kortNavn} er ikke overstyrbar, kunne ikke overstyre tilgang for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'", it)
+                        throw it
                     }
                     else -> throw it.also {
                         log.error("Ukjent feil ved forsøk på overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'", it)

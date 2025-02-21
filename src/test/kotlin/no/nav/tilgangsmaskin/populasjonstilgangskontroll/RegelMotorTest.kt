@@ -28,23 +28,15 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestData.ukjentBostedGe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestData.vanligAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestData.vanligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.format
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.time.Instant
 import kotlin.test.assertEquals
-import kotlin.time.toKotlinDuration
 
 class RegelMotorTest {
 
-    @Test
-    fun jall() {
-        val p = java.time.Duration.between(Instant.now().minusSeconds(60),Instant.now()).toKotlinDuration().format()
-        println("XXXX " + p)
-    }
 
     @Test
     @DisplayName("Test at kode 7 bruker ikke kan behandles av kode 6 ansatt")

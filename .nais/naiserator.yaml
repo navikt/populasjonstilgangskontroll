@@ -9,10 +9,10 @@ metadata:
 spec:
   gcp:
     sqlInstances:
-        type: {{db.type}}
+      - type: {{db.type}}
         tier: {{db.tier}}
         databases:
-          name: {{db.name}}
+        - name: {{db.name}}
           envVarPrefix: DB
         flags:
          - name: cloudsql.enable_pgaudit

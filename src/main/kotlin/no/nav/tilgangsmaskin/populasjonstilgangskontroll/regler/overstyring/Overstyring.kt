@@ -13,9 +13,8 @@ import java.time.Instant
 
 @Entity
 @EntityListeners(LoggingEntityListener::class, AuditingEntityListener::class)
-class Overstyring {
-    @Column(length = 7, nullable = false)
-    var navid: String? = null
+class Overstyring(@Column(length = 7, nullable = false)
+                  val navid: String) {
 
     @Column(length = 11, nullable = false)
     var fnr: String? = null

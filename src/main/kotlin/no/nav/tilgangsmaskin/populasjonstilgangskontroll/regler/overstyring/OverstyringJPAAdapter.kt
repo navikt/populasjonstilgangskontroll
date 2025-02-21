@@ -9,8 +9,8 @@ import kotlin.time.toJavaDuration
 class OverstyringJPAAdapter(private val repository: OverstyringRepository)  {
 
     fun lagre(ansattId: String, brukerId: String, varighet: Duration) =
-        repository.save(Overstyring().apply {
-            navid = ansattId
+        repository.save(Overstyring(ansattId).apply {
+//navid = ansattId
             fnr = brukerId
             expires =  Instant.now().plus(varighet.toJavaDuration())
         })

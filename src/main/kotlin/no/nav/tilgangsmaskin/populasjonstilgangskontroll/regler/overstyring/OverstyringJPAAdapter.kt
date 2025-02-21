@@ -9,7 +9,7 @@ import kotlin.time.toJavaDuration
 class OverstyringJPAAdapter(private val repository: OverstyringRepository)  {
 
     fun lagre(ansattId: String, brukerId: String, begrunnelse: String, varighet: Duration) =
-        repository.save(Overstyring(ansattId, brukerId,begrunnelse,Instant.now().plus(varighet.toJavaDuration())))
+        repository.save(OverstyringEntity(ansattId, brukerId,begrunnelse,Instant.now().plus(varighet.toJavaDuration())))
 
     fun nyesteOverstyring(ansattId: String, brukerId: String) = repository.findByNavidAndFnrOrderByCreatedDesc(ansattId, brukerId)?.firstOrNull()
 }

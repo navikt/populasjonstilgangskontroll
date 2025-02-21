@@ -37,7 +37,4 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
         overstyringTjeneste.overstyr(ansattId, brukerId, begrunnelse)
         return ResponseEntity.accepted().build()
     }
-    
-    @GetMapping("sjekkoverstyring")
-    fun sjekkOverstyring(@RequestParam ansattId: NavId, @RequestParam brukerId: Fødselsnummer) = overstyringTjeneste.nyesteOverstyring(ansattId, brukerId)
 }

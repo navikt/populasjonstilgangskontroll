@@ -2,7 +2,9 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException
+import java.time.Instant
 import kotlin.time.Duration
+import kotlin.time.toKotlinDuration
 
 object ObjectUtil {
     fun requires(verdi: String,len: Int): Unit {
@@ -12,7 +14,7 @@ object ObjectUtil {
 
     fun Fødselsnummer.mask() = verdi.replaceRange(6,11, "*****")
 
-    fun Duration.format(): String {
+    private fun Duration.format(): String {
         val days = inWholeDays
         val hours = inWholeHours % 24
         val minutes = inWholeMinutes % 60
@@ -27,4 +29,5 @@ object ObjectUtil {
     }
     fun RegelException.withDetail(detail: String?) = RegelException(brukerId, ansattId,regel,detail)
 
+    fun Instant.diffFrom(from: Instant) = java.time.Duration.between(this, from).toKotlinDuration().format()
 }

@@ -6,8 +6,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelMotor
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.Overstyring.Companion.OVERSTYRING
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.format
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringEntity.Companion.OVERSTYRING
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.diffFrom
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.withDetail
 import org.slf4j.LoggerFactory.getLogger
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component
 import java.time.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.toKotlinDuration
 
 @Component
 @Cacheable(OVERSTYRING)
@@ -26,18 +25,19 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
     private val log = getLogger(OverstyringTjeneste::class.java)
 
 
-    fun erOverstyrt(ansattId: NavId, brukerId: Fødselsnummer) =
-        nyesteOverstyring(ansattId, brukerId)?.let {
-            val now = Instant.now()
-            val isOverstyrt = it.expires?.isAfter(now) == true
-            if (!isOverstyrt) {
-                val utgått = java.time.Duration.between(it.expires,now).toKotlinDuration().format()
-                log.warn("Overstyring har gått ut på tid for $utgått siden for id=${ansattId.verdi} and brukerId=${brukerId.mask()}")
+    fun erOverstyrt(ansattId: NavId, brukerId: Fødselsnummer): Boolean {
+        val nyeste = nyesteOverstyring(ansattId, brukerId) ?: return false
+        val now = Instant.now()
+        return if (nyeste.expires.isBefore(now)) {
+            true.also {
+                log.warn("Overstyring har gått ut på tid for ${nyeste.expires.diffFrom(now)} siden for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
             }
-            isOverstyrt
-        } == true
+        } else {
+            false
+        }
+    }
 
-    fun nyesteOverstyring(id: NavId, brukerId: Fødselsnummer) =
+    private fun nyesteOverstyring(id: NavId, brukerId: Fødselsnummer) =
         adapter.nyesteOverstyring(id.verdi, brukerId.verdi)
 
     fun overstyr(ansattId: NavId, brukerId: Fødselsnummer, begrunnelse: String,varighet: Duration = 5.minutes)  =
@@ -45,8 +45,8 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
                 log.info("Eksekverer kjerneregler før eventuell overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                 motor.kjerneregler(ansatt.ansatt(ansattId), bruker.bruker(brukerId))
                 adapter.lagre(ansattId.verdi, brukerId.verdi, begrunnelse, varighet)
-                refresh(ansattId, brukerId, varighet)
-                log.info("Overstyring for '${ansattId.verdi}' og ${brukerId.mask()} oppdatert i cache")
+                refresh(ansattId, brukerId, begrunnelse, varighet)
+                log.info("Overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}' oppdatert i cache")
             }.getOrElse {
                 when (it) {
                     is RegelException -> throw it.withDetail("Kjerneregel ${it.regel.beskrivelse.kortNavn} er ikke overstyrbar, kunne ikke overstyre tilgang for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
@@ -55,6 +55,6 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
          }
 
     @CachePut(OVERSTYRING)
-    private fun refresh(ansattId: NavId, brukerId: Fødselsnummer, varighet: Duration)  = Unit
+    private fun refresh(ansattId: NavId, brukerId: Fødselsnummer, begrunnelse: String varighet: Duration)  = Unit
 }
 

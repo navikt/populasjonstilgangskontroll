@@ -17,6 +17,11 @@
     "tier": "db-f1-micro",
     "name": "tilgangsmaskin"
   },
+  "db-flags":{
+    "pgaudit": {
+      "enabled": "off",
+      "log_statement": "write"}
+  },
   "inbound" : [
        {
           "name": "gosys-q1",

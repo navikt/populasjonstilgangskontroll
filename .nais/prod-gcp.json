@@ -16,6 +16,11 @@
     "tier": "db-custom-1-3840",
     "name": "tilgangsmaskin"
   },
+  "db-flags":{
+    "pgaudit": {
+      "enabled": "on",
+      "log_statement": "write"}
+  },
   "inbound" : [
     {
       "name": "gosys",

@@ -1,5 +1,11 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
+import io.mockk.called
+import io.mockk.verify
+import io.mockk.verifyCount
+import io.mockk.verifyOrder
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.ansattBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.ansattKode6Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.ansattKode7Bruker
@@ -21,6 +27,13 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.kode7Br
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.kode7EgenAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.motor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.nasjonalAnsatt
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.spiesMotor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.spyEgenAnsattRegel
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.spyFortroligRegel
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.spyGeoNorgeRegel
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.spyGeoUtlandRegel
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.spyStrengtFortroligRegel
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.spyUkjentBostedGeoRegel
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.strengtFortroligRegel
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.udefinertGeoAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.ukjentBostedBruker
@@ -46,6 +59,19 @@ class RegelMotorTest {
                 motor.alleRegler(kode6Ansatt, kode7Bruker)
             }.regel)
         assertThat(fortroligRegel.test(kode7Bruker, kode6Ansatt)).isFalse()
+        assertThrows<RegelException> {
+            spiesMotor.alleRegler(kode6Ansatt, kode7Bruker)
+        }
+        verifyOrder {
+            spyStrengtFortroligRegel.test(kode7Bruker, kode6Ansatt)
+            spyFortroligRegel.test(kode7Bruker, kode6Ansatt)
+        }
+        verify {
+            spyEgenAnsattRegel wasNot called
+            spyGeoUtlandRegel wasNot called
+            spyUkjentBostedGeoRegel wasNot called
+            spyGeoNorgeRegel wasNot called
+        }
     }
 
     @Test
@@ -115,7 +141,7 @@ class RegelMotorTest {
     @Test
     @DisplayName("Test at egen ansatt bruker ikke kan behandles av kode7 ansatt")
     fun ansattBrukerKode7ansatt() {
-        assertEquals(TestData.egenAnsattRegel,
+        assertEquals(egenAnsattRegel,
             assertThrows<RegelException> {
                 motor.alleRegler(kode7Ansatt,
                     ansattBruker)

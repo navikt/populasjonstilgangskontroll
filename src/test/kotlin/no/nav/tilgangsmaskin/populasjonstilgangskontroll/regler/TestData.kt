@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
 import com.neovisionaries.i18n.CountryCode
+import io.mockk.spyk
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Enhetsnummer
@@ -67,12 +68,26 @@ object TestData {
     internal val enhetAnsatt = Ansatt(attributter, enhetGruppe)
 
     internal val strengtFortroligRegel = StrengtFortroligRegel(strengtFortroligEntraGruppe.id)
-    internal val fortroligRegel = FortroligRegel(fortroligEntraGruppe.id)
-    internal val egenAnsattRegel = EgenAnsattRegel(egenAnsattEntraGruppe.id)
-    internal val ukjentBostedGeoRegel = UkjentBostedGeoRegel(udefinertGruppe.id)
-    internal val geoUtlandRegel = UtlandUdefinertGeoRegel(geoUtlandEntraGruppe.id)
-    internal val geoNorgeRegel = GeoNorgeRegel(nasjonalGruppe.id)
+    internal val spyStrengtFortroligRegel = spyk(strengtFortroligRegel)
 
+    internal val fortroligRegel = FortroligRegel(fortroligEntraGruppe.id)
+    internal val spyFortroligRegel = spyk(fortroligRegel)
+
+    internal val egenAnsattRegel = EgenAnsattRegel(egenAnsattEntraGruppe.id)
+    internal val spyEgenAnsattRegel= spyk(egenAnsattRegel)
+
+    internal val ukjentBostedGeoRegel = UkjentBostedGeoRegel(udefinertGruppe.id)
+    internal val spyUkjentBostedGeoRegel= spyk(ukjentBostedGeoRegel)
+
+    internal val geoUtlandRegel = UtlandUdefinertGeoRegel(geoUtlandEntraGruppe.id)
+    internal val spyGeoUtlandRegel= spyk(geoUtlandRegel)
+
+    internal val geoNorgeRegel = GeoNorgeRegel(nasjonalGruppe.id)
+    internal val spyGeoNorgeRegel= spyk(geoNorgeRegel)
+
+    private val allSpies = listOf(spyStrengtFortroligRegel, spyFortroligRegel, spyEgenAnsattRegel, spyUkjentBostedGeoRegel, spyGeoUtlandRegel, spyGeoNorgeRegel).toTypedArray()
+
+    internal val spiesMotor = RegelMotor(*allSpies)
     internal val motor = RegelMotor(strengtFortroligRegel,fortroligRegel, egenAnsattRegel, ukjentBostedGeoRegel, geoUtlandRegel, geoNorgeRegel)
 
 }

@@ -29,5 +29,5 @@ object ObjectUtil {
     }
     fun RegelException.withDetail(detail: String) = RegelException(brukerId, ansattId,regel,detail)
 
-    fun Instant.diffFrom(from: Instant) = java.time.Duration.between(this, from).toKotlinDuration().format()
+    fun Instant.diffFrom(from: Instant) = java.time.Duration.between(from, this).toKotlinDuration().format()
 }

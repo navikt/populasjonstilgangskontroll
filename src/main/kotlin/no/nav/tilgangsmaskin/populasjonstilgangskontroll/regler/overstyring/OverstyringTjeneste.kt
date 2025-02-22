@@ -14,23 +14,23 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
 
 @Component
 @Cacheable(OVERSTYRING)
+@Transactional
 class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker: BrukerTjeneste,private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor) {
 
     private val log = getLogger(OverstyringTjeneste::class.java)
 
 
     fun erOverstyrt(ansattId: NavId, brukerId: Fødselsnummer): Boolean {
-        val nyeste = nyesteOverstyring(ansattId, brukerId) ?: return false
+        val nyeste = adapter.finnNyeste(ansattId.verdi, brukerId.verdi) ?: return false
         val now = Instant.now()
         return if (nyeste.expires.isBefore(now)) {
             false.also {
-                log.warn("Overstyring har gått ut på tid for ${nyeste.expires.diffFrom(now)} siden for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
+                log.warn("Overstyring har gått ut på tid for ${now.diffFrom(nyeste.expires)} siden for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
             }
         } else {
             true.also {
@@ -38,9 +38,6 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
             }
         }
     }
-
-    private fun nyesteOverstyring(ansattId: NavId, brukerId: Fødselsnummer) =
-        adapter.nyesteOverstyring(ansattId.verdi, brukerId.verdi)
 
     fun overstyr(ansattId: NavId, brukerId: Fødselsnummer, metadata: OverstyringMetadata)  =
          runCatching {

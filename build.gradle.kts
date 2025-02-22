@@ -81,6 +81,7 @@ dependencies {
     testImplementation("no.nav.security:mock-oauth2-server:$mockOAuth2ServerVersion")
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation(kotlin("test"))
+    testImplementation("com.h2database:h2")
 }
 
 

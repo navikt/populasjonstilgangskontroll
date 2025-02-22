@@ -5,13 +5,10 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.egenAnsattRegel
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.fnr
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.fortroligRegel
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.brukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.geoUtlandBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.motor
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.navid
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.strengtFortroligRegel
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.ansattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringTjeneste
@@ -23,7 +20,6 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
-import java.util.stream.Stream
 
 @ExtendWith(MockKExtension::class)
 class RegelTjenesteTest {
@@ -85,7 +81,7 @@ class RegelTjenesteTest {
     @DisplayName("Test at exception kastet av en av kjernereglene kastes videre av error handler uten å sjekke midlertidig tilgang")
     fun ikkeOverstyrbar(regel: Regel)    {
         assertThrows<RegelException> {
-            errorHandler.håndter(navid, fnr, RegelException(fnr, navid, regel))
+            errorHandler.håndter(ansattId, brukerId, RegelException(brukerId, ansattId, regel))
         }
         verify {
             overstyring wasNot Called

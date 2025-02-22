@@ -26,7 +26,9 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
 
 
     fun erOverstyrt(ansattId: NavId, brukerId: Fødselsnummer): Boolean {
-        val nyeste = adapter.finnNyeste(ansattId.verdi, brukerId.verdi) ?: return false
+        val nyeste = adapter.finnNyeste(ansattId.verdi, brukerId.verdi) ?: return false.also {
+            log.trace("Ingen overstyring funnet for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
+        }
         val now = Instant.now()
         return if (nyeste.expires.isBefore(now)) {
             false.also {
@@ -34,7 +36,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
             }
         } else {
             true.also {
-                log.warn("Overstyring er gyldig i ${nyeste.expires.diffFrom(now)} til for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
+                log.trace("Overstyring er gyldig i ${nyeste.expires.diffFrom(now)} til for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
             }
         }
     }

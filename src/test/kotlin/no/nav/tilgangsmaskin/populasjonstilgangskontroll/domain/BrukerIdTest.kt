@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-class FødselsnummerTest {
+class BrukerIdTest {
 
     @Test
     @DisplayName("Gyldig Fødselsnummer skal opprettes uten problemer")

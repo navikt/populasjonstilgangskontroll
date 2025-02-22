@@ -9,14 +9,17 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator.INSTAN
 import org.springframework.stereotype.Component
 
 @Component
-class RegelMotor(private vararg val regler: Regel)  {
+class RegelMotor(vararg inputRegler: Regel)  {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    fun alleRegler(ansatt: Ansatt, bruker: Bruker) = eksekver(ansatt, bruker, regler.toList())
-    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = eksekver(ansatt, bruker, regler.filter { it is KjerneRegel })
+    val regler = inputRegler.sortedWith(INSTANCE)
+    val kjerneregler = regler.filter { it is KjerneRegel }
+
+    fun alleRegler(ansatt: Ansatt, bruker: Bruker) = eksekver(ansatt, bruker, regler)
+    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = eksekver(ansatt, bruker, kjerneregler)
 
     private fun eksekver(ansatt: Ansatt, bruker: Bruker, regler: List<Regel>) =
-        regler.sortedWith(INSTANCE).forEach {
+        regler.forEach {
             log.info(CONFIDENTIAL,"Eksekverer regel: '${it.beskrivelse.kortNavn}' for ansatt '${ansatt.navId.verdi}' og bruker '${bruker.ident.mask()}'")
             if (!it.test(bruker, ansatt)) {
                 throw RegelException(bruker.ident, ansatt.navId, it).also {

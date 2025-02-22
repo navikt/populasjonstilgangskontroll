@@ -9,6 +9,6 @@ class RegelException(val brukerId: Fødselsnummer, val ansattId: NavId, val rege
     FORBIDDEN, detail,mapOf(
         "brukerIdent" to brukerId.verdi,
         "navIdent" to ansattId.verdi,
-        //"begrunnelseKode" to regel.beskrivelse.begrunnelse,
+        "begrunnelseKode" to regel.beskrivelse.begrunnelse,
        // "begrunnelseAnsatt" to detail,
         "kanOverstyres" to regel.erOverstyrbar))

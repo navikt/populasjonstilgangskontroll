@@ -64,7 +64,7 @@ internal class OverstyringTest {
     }
     @Test
     @DisplayName("Test overstyring, intet db innslag")
-    fun testOverstyringIntetDBInnslag() {
+    fun testOverstyringUtenDBInnslag() {
         every { bruker.bruker(ukjentBostedBruker.ident) } returns ukjentBostedBruker
         assertFalse(overstyring.erOverstyrt(vanligAnsatt.navId, ukjentBostedBruker.ident))
     }

@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelTjeneste
@@ -25,16 +25,16 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     fun bruker(fnr: Fødselsnummer) = bruker.bruker(fnr)
 
     @GetMapping("ansatt")
-    fun ansatt(navId: NavId) = ansatt.ansatt(navId)
+    fun ansatt(ansattId: AnsattId) = ansatt.ansatt(ansattId)
 
     @GetMapping("regler")
-    fun alleRegler(@RequestParam ansattId: NavId, @RequestParam brukerId: Fødselsnummer) = regler.alleRegler(ansattId, brukerId)
+    fun alleRegler(@RequestParam ansattId: AnsattId, @RequestParam brukerId: Fødselsnummer) = regler.alleRegler(ansattId, brukerId)
 
     @GetMapping("kjerneregler")
-    fun kjerneregler(@RequestParam ansattId: NavId, @RequestParam brukerId: Fødselsnummer) = regler.kjerneregler(ansattId, brukerId)
+    fun kjerneregler(@RequestParam ansattId: AnsattId, @RequestParam brukerId: Fødselsnummer) = regler.kjerneregler(ansattId, brukerId)
 
     @PostMapping("overstyr/{ansattId}/{brukerId}")
-    fun overstyr(@PathVariable ansattId: NavId, @PathVariable brukerId: Fødselsnummer, @RequestBody metadata: OverstyringMetadata): ResponseEntity<Unit> {
+    fun overstyr(@PathVariable ansattId: AnsattId, @PathVariable brukerId: Fødselsnummer, @RequestBody metadata: OverstyringMetadata): ResponseEntity<Unit> {
         overstyringTjeneste.overstyr(ansattId, brukerId, metadata)
         return ResponseEntity.accepted().build()
     }

@@ -12,7 +12,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.K
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.UtenlandskTilknytning
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Navn
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
@@ -21,7 +21,7 @@ import java.util.UUID
 object TestData {
 
     internal val enhet = Enhetsnummer("4242")
-    internal val ansattId = NavId("Z999999")
+    internal val ansattId = AnsattId("Z999999")
     internal val attributter = AnsattAttributter(UUID.randomUUID(), ansattId, Navn("En", "Saksbehandler"), enhet)
     internal val brukerId = Fødselsnummer("08526835671")
     internal val navn = Navn("Ola", "Nordmann")

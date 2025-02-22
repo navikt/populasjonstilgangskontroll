@@ -5,12 +5,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor.Companion.AAD_ISSUER
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
@@ -20,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody
 class TilgangController(private val regler : RegelTjeneste, private val token: TokenAccessor) {
 
     @PostMapping("tilgang")
-    fun alleRegler(@RequestBody brukerId: Fødselsnummer) = regler.alleRegler(token.navIdent, brukerId);
+    fun alleRegler(@RequestBody brukerId: Fødselsnummer) = regler.alleRegler(token.ansattId, brukerId);
 
     @PostMapping("kjerneregler")
-    fun kjerneregler(@RequestBody brukerId: Fødselsnummer) = regler.kjerneregler(token.navIdent, brukerId);
+    fun kjerneregler(@RequestBody brukerId: Fødselsnummer) = regler.kjerneregler(token.ansattId, brukerId);
 }
 

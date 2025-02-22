@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException
@@ -25,7 +25,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
     private val log = getLogger(OverstyringTjeneste::class.java)
 
 
-    fun erOverstyrt(ansattId: NavId, brukerId: Fødselsnummer): Boolean {
+    fun erOverstyrt(ansattId: AnsattId, brukerId: Fødselsnummer): Boolean {
         val nyeste = adapter.finnNyeste(ansattId.verdi, brukerId.verdi) ?: return false.also {
             log.trace("Ingen overstyring funnet for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
         }
@@ -41,7 +41,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
         }
     }
 
-    fun overstyr(ansattId: NavId, brukerId: Fødselsnummer, metadata: OverstyringMetadata)  =
+    fun overstyr(ansattId: AnsattId, brukerId: Fødselsnummer, metadata: OverstyringMetadata)  =
          runCatching {
                 log.info("Eksekverer kjerneregler før eventuell overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                 motor.kjerneregler(ansatt.ansatt(ansattId), bruker.bruker(brukerId))
@@ -56,6 +56,6 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
          }
 
     @CachePut(OVERSTYRING)
-    private fun refresh(ansattId: NavId, brukerId: Fødselsnummer, metadata: OverstyringMetadata)  = Unit
+    private fun refresh(ansattId: AnsattId, brukerId: Fødselsnummer, metadata: OverstyringMetadata)  = Unit
 }
 

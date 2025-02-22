@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
 import com.fasterxml.jackson.annotation.JsonValue
 
 @JvmInline
-value class NavId(@JsonValue val verdi: String) {
+value class AnsattId(@JsonValue val verdi: String) {
     init {
         with(verdi) {
             require(length == 7) { "Ugyldig lengde $length for $this, forventet 7" }

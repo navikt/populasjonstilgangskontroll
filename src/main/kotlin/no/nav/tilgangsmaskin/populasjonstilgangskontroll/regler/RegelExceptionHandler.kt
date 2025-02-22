@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.NavId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
 import org.slf4j.LoggerFactory.getLogger
@@ -13,7 +13,7 @@ class RegelExceptionHandler(private val overstyring: OverstyringTjeneste)  {
 
     private val log = getLogger(RegelExceptionHandler::class.java)
 
-    fun håndter(ansattId: NavId, brukerId: Fødselsnummer, e: Throwable) =
+    fun håndter(ansattId: AnsattId, brukerId: Fødselsnummer, e: Throwable) =
         when (e) {
             is RegelException -> {
                 log.info(CONFIDENTIAL,"Sjekker om regel '${e.regel.beskrivelse.kortNavn}' er overstyrt for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")

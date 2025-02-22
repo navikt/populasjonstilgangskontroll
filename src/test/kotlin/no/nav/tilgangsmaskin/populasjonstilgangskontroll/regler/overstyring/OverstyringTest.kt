@@ -55,7 +55,7 @@ internal class OverstyringTest {
     }
     @Test
     @DisplayName("Test utgått overstyring")
-    fun testOverstyring() {
+    fun testOverstyringUtgått() {
         every { bruker.bruker(vanligBruker.ident) } returns vanligBruker
         overstyring.overstyr(vanligAnsatt.navId, vanligBruker.ident, OverstyringMetadata("nyest", LocalDate.now().minusDays(1)))
         assertFalse(overstyring.erOverstyrt(vanligAnsatt.navId, vanligBruker.ident))

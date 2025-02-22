@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 import com.neovisionaries.i18n.CountryCode.getByAlpha3Code
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Companion.UdefinertGeoTilknytning
@@ -39,7 +39,7 @@ object PdlTilBrukerMapper {
         }
 
     private fun tilFødselsnummer(ident: List<PdlPerson.Folkeregisteridentifikator>) =
-        Fødselsnummer(ident.first().identifikasjonsnummer)
+        BrukerId(ident.first().identifikasjonsnummer)
 
     private fun tilNavn(navn: List<PdlPerson.Navn>) =
         with(navn.first()) {

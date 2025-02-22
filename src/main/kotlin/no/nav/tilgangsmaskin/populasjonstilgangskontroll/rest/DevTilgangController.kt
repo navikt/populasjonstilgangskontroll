@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest
 
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.BrukerTjeneste
@@ -22,19 +22,19 @@ import org.springframework.web.bind.annotation.RequestParam
 class DevTilgangController(private val bruker : BrukerTjeneste, private val ansatt: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyringTjeneste: OverstyringTjeneste)
 {
     @GetMapping("bruker")
-    fun bruker(fnr: Fødselsnummer) = bruker.bruker(fnr)
+    fun bruker(fnr: BrukerId) = bruker.bruker(fnr)
 
     @GetMapping("ansatt")
     fun ansatt(ansattId: AnsattId) = ansatt.ansatt(ansattId)
 
     @GetMapping("regler")
-    fun alleRegler(@RequestParam ansattId: AnsattId, @RequestParam brukerId: Fødselsnummer) = regler.alleRegler(ansattId, brukerId)
+    fun alleRegler(@RequestParam ansattId: AnsattId, @RequestParam brukerId: BrukerId) = regler.alleRegler(ansattId, brukerId)
 
     @GetMapping("kjerneregler")
-    fun kjerneregler(@RequestParam ansattId: AnsattId, @RequestParam brukerId: Fødselsnummer) = regler.kjerneregler(ansattId, brukerId)
+    fun kjerneregler(@RequestParam ansattId: AnsattId, @RequestParam brukerId: BrukerId) = regler.kjerneregler(ansattId, brukerId)
 
     @PostMapping("overstyr/{ansattId}/{brukerId}")
-    fun overstyr(@PathVariable ansattId: AnsattId, @PathVariable brukerId: Fødselsnummer, @RequestBody metadata: OverstyringMetadata): ResponseEntity<Unit> {
+    fun overstyr(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId, @RequestBody metadata: OverstyringMetadata): ResponseEntity<Unit> {
         overstyringTjeneste.overstyr(ansattId, brukerId, metadata)
         return ResponseEntity.accepted().build()
     }

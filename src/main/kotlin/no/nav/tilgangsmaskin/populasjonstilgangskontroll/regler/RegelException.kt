@@ -1,11 +1,11 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableException
 import org.springframework.http.HttpStatus.FORBIDDEN
 
-class RegelException(val brukerId: Fødselsnummer, val ansattId: AnsattId, val regel: Regel, detail: String = regel.beskrivelse.begrunnelseAnsatt.format(ansattId.verdi, brukerId.verdi, regel.beskrivelse.begrunnelse.årsak)) : IrrecoverableException(
+class RegelException(val brukerId: BrukerId, val ansattId: AnsattId, val regel: Regel, detail: String = regel.beskrivelse.begrunnelseAnsatt.format(ansattId.verdi, brukerId.verdi, regel.beskrivelse.begrunnelse.årsak)) : IrrecoverableException(
     FORBIDDEN, detail,mapOf(
         "brukerIdent" to brukerId.verdi,
         "navIdent" to ansattId.verdi,

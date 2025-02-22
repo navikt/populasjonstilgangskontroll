@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt.AnsattAttributter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Enhetsnummer
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Companion.UdefinertGeoTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Kommune
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.KommuneTilknytning
@@ -23,7 +23,7 @@ object TestData {
     internal val enhet = Enhetsnummer("4242")
     internal val ansattId = AnsattId("Z999999")
     internal val attributter = AnsattAttributter(UUID.randomUUID(), ansattId, Navn("En", "Saksbehandler"), enhet)
-    internal val brukerId = Fødselsnummer("08526835671")
+    internal val brukerId = BrukerId("08526835671")
     internal val navn = Navn("Ola", "Nordmann")
 
     internal val kode6Bruker = Bruker(brukerId, navn, UdefinertGeoTilknytning, STRENGT_FORTROLIG_GRUPPE)

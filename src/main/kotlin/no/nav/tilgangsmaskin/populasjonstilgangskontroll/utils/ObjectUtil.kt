@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Fødselsnummer
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException
 import java.time.Instant
 import kotlin.time.Duration
@@ -12,7 +12,7 @@ object ObjectUtil {
         require(verdi.all { it.isDigit() }) { "Ugyldig(e) tegn i $verdi, forventet kun $len tall" }
     }
 
-    fun Fødselsnummer.mask() = verdi.replaceRange(6,11, "*****")
+    fun BrukerId.mask() = verdi.replaceRange(6,11, "*****")
 
     private fun Duration.format(): String {
         val days = inWholeDays

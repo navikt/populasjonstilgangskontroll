@@ -20,19 +20,19 @@ import java.time.Instant
 @Component
 @Cacheable(OVERSTYRING)
 @Transactional
-class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker: BrukerTjeneste,private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor) {
+class OverstyringTjeneste(private val ansattTjeneste: AnsattTjeneste, private val brukerTjeneste: BrukerTjeneste,private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor) {
 
     private val log = getLogger(OverstyringTjeneste::class.java)
 
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId): Boolean {
-        val nyeste = adapter.gjeldendeOverstyringGyldighetDato(ansattId.verdi, brukerId.verdi)
-        return if (nyeste != null) {
+        val gjeldendeDato = adapter.gjeldendeOverstyringGyldighetDato(ansattId.verdi, brukerId.verdi)
+        return if (gjeldendeDato != null) {
             val now = Instant.now()
-            if (nyeste.isBefore(now)) {
-                log.warn("Overstyring har gått ut på tid for ${now.diffFrom(nyeste)} siden for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
+            if (gjeldendeDato.isBefore(now)) {
+                log.warn("Overstyring har gått ut på tid for ${now.diffFrom(gjeldendeDato)} siden for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                 false
             } else {
-                log.trace("Overstyring er gyldig i ${nyeste.diffFrom(now)} til for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
+                log.trace("Overstyring er gyldig i ${gjeldendeDato.diffFrom(now)} til for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                 true
             }
         } else {
@@ -44,7 +44,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
     fun overstyr(ansattId: AnsattId, brukerId: BrukerId, metadata: OverstyringMetadata)  =
          runCatching {
                 log.info("Sjekker kjerneregler før eventuell overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
-                motor.kjerneregler(ansatt.ansatt(ansattId), bruker.bruker(brukerId))
+                motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.bruker(brukerId))
                 adapter.overstyr(ansattId.verdi, brukerId.verdi, metadata)
                 refresh(ansattId, brukerId, metadata)
                 log.info("Overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}' oppdatert i cache")

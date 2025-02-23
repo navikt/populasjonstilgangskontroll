@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
-class RegelExceptionHandler(private val overstyring: OverstyringTjeneste)  {
+class TilgangAvvistHandler(private val overstyring: OverstyringTjeneste)  {
 
-    private val log = getLogger(RegelExceptionHandler::class.java)
+    private val log = getLogger(TilgangAvvistHandler::class.java)
 
     fun håndter(ansattId: AnsattId, brukerId: BrukerId, e: Throwable) =
         when (e) {

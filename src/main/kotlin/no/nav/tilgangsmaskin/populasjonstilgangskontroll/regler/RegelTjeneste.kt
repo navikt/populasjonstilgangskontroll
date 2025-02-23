@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import org.springframework.stereotype.Service
 
 @Service
-class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: BrukerTjeneste, private val ansattTjeneste: AnsattTjeneste, private val errorHandler: RegelExceptionHandler)  {
+class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: BrukerTjeneste, private val ansattTjeneste: AnsattTjeneste, private val errorHandler: TilgangAvvistHandler)  {
 
 
     fun alleRegler(ansattId: AnsattId, brukerId: BrukerId) =

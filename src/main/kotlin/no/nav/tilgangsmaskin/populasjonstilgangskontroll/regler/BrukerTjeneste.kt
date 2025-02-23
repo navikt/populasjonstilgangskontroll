@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service
 @Service
 class BrukerTjeneste(private val pdlAdapter: PdlSyncGraphQLClientAdapter, val egenAnsatt: SkjermingRestClientAdapter) {
 
+    /* TODO Her må vi etterhvert slå opp skjerming først, og så hente bruker og eventuelle releasjoner om skjerming er satt  etterpå */
     fun bruker(brukerId: BrukerId) =
         runBlocking {
             val pdl = async { pdlAdapter.person(brukerId.verdi) }

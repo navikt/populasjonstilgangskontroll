@@ -54,7 +54,7 @@ class RegelMotorTest {
             assertThrows<RegelException> {
                 motor.alleRegler(strengtFortroligAnsatt, fortroligBruker)
             }.regel)
-        assertThat(fortroligRegel.test(strengtFortroligAnsatt,fortroligBruker)).isFalse()
+        assertThat(fortroligRegel.test(strengtFortroligAnsatt,fortroligBruker)).isFalse
         assertThrows<RegelException> {
             spiesMotor.alleRegler(strengtFortroligAnsatt, fortroligBruker)
         }
@@ -77,7 +77,7 @@ class RegelMotorTest {
             assertThrows<RegelException> {
                 motor.alleRegler(vanligAnsatt, fortroligBruker)
             }.regel)
-        assertThat(fortroligRegel.test(vanligAnsatt,fortroligBruker)).isFalse()
+        assertThat(fortroligRegel.test(vanligAnsatt,fortroligBruker)).isFalse
     }
 
     @Test
@@ -92,7 +92,7 @@ class RegelMotorTest {
             assertThrows<RegelException> {
                 motor.alleRegler(fortroligAnsatt, strengtFortroligBruker)
             }.regel)
-        assertThat(strengtFortroligRegel.test(fortroligAnsatt,strengtFortroligBruker)).isFalse()
+        assertThat(strengtFortroligRegel.test(fortroligAnsatt,strengtFortroligBruker)).isFalse
     }
 
     @Test
@@ -102,7 +102,7 @@ class RegelMotorTest {
             assertThrows<RegelException> {
                 motor.alleRegler(vanligAnsatt, strengtFortroligBruker)
             }.regel)
-        assertThat(strengtFortroligRegel.test(vanligAnsatt,strengtFortroligBruker)).isFalse()
+        assertThat(strengtFortroligRegel.test(vanligAnsatt,strengtFortroligBruker)).isFalse
     }
 
     @Test
@@ -142,7 +142,7 @@ class RegelMotorTest {
                 motor.alleRegler(fortroligAnsatt,
                     ansattBruker)
             }.regel)
-        assertThat(egenAnsattRegel.test(fortroligAnsatt,ansattBruker)).isFalse()
+        assertThat(egenAnsattRegel.test(fortroligAnsatt,ansattBruker)).isFalse
     }
     @Test
     @DisplayName("Test at egen ansatt bruker *ikke* kan behandles av ansatt med medlemsskap i strengt fortrolig gruppe")
@@ -151,7 +151,7 @@ class RegelMotorTest {
             assertThrows<RegelException> {
                 motor.alleRegler(strengtFortroligAnsatt, ansattBruker)
             }.regel)
-        assertThat(egenAnsattRegel.test(strengtFortroligAnsatt,ansattBruker)).isFalse()
+        assertThat(egenAnsattRegel.test(strengtFortroligAnsatt,ansattBruker)).isFalse
     }
     @Test
     @DisplayName("Test at egen ansatt bruker *ikke* kan behandles av vanlig ansatt")
@@ -160,7 +160,7 @@ class RegelMotorTest {
             assertThrows<RegelException> {
                 motor.alleRegler(vanligAnsatt, ansattBruker)
             }.regel)
-        assertThat(egenAnsattRegel.test(vanligAnsatt,ansattBruker)).isFalse()
+        assertThat(egenAnsattRegel.test(vanligAnsatt,ansattBruker)).isFalse
     }
 
     @Test
@@ -169,7 +169,7 @@ class RegelMotorTest {
         assertEquals(strengtFortroligRegel, assertThrows<RegelException> {
             motor.alleRegler(egenAnsatt, egenAnsattStrengtFortroligBruker)
         }.regel)
-        assertThat(strengtFortroligRegel.test(egenAnsatt,egenAnsattStrengtFortroligBruker)).isFalse()
+        assertThat(strengtFortroligRegel.test(egenAnsatt,egenAnsattStrengtFortroligBruker)).isFalse
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med fortrolig beskyttelse ikke kan behandles av ansatt med medlemsskap i egen gruppe ansatt")
@@ -178,7 +178,7 @@ class RegelMotorTest {
             assertThrows<RegelException> {
                 motor.alleRegler(egenAnsatt, egenAnsattFortroligBruker)
             }.regel)
-        assertThat(fortroligRegel.test(egenAnsatt,egenAnsattFortroligBruker)).isFalse()
+        assertThat(fortroligRegel.test(egenAnsatt,egenAnsattFortroligBruker)).isFalse
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med fortrolig beskyttelse kan behandles av ansatt med medlemsskap i egen ansatt gruppe som også har medlemsskap i fortrolig gruppe")
@@ -196,7 +196,7 @@ class RegelMotorTest {
         assertEquals(strengtFortroligRegel, assertThrows<RegelException> {
             motor.alleRegler(fortroligAnsatt, egenAnsattStrengtFortroligBruker)
         }.regel)
-        assertThat(strengtFortroligRegel.test(fortroligAnsatt,egenAnsattStrengtFortroligBruker)).isFalse()
+        assertThat(strengtFortroligRegel.test(fortroligAnsatt,egenAnsattStrengtFortroligBruker)).isFalse
     }
     @Test
     @DisplayName("Test at ansatt med manglende geografisk tilknytning kan behandle bruker med geografisk tilknytning")
@@ -210,7 +210,7 @@ class RegelMotorTest {
         assertEquals(ukjentBostedGeoRegel, assertThrows<RegelException> {
             motor.alleRegler(vanligAnsatt, ukjentBostedBruker)
         }.regel)
-        assertThat(ukjentBostedGeoRegel.test(vanligAnsatt,ukjentBostedBruker)).isFalse()
+        assertThat(ukjentBostedGeoRegel.test(vanligAnsatt,ukjentBostedBruker)).isFalse
     }
 
     @Test
@@ -226,7 +226,7 @@ class RegelMotorTest {
             assertThrows<RegelException> {
                 motor.alleRegler(vanligAnsatt, geoUtlandBruker)
             }.regel)
-        assertThat(geoUtlandRegel.test(vanligAnsatt,geoUtlandBruker)).isFalse()
+        assertThat(geoUtlandRegel.test(vanligAnsatt,geoUtlandBruker)).isFalse
     }
 
     @Test
@@ -248,7 +248,7 @@ class RegelMotorTest {
             assertThrows<RegelException> {
                 motor.alleRegler(enhetAnsatt, annenEnhetBruker)
             }.regel)
-        assertThat(geoNorgeRegel.test(enhetAnsatt,annenEnhetBruker)).isFalse()
+        assertThat(geoNorgeRegel.test(enhetAnsatt,annenEnhetBruker)).isFalse
     }
 
     @Test

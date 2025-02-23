@@ -11,8 +11,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.ukjentB
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,9 +31,9 @@ import kotlin.test.Test
 internal class OverstyringTest {
 
     @MockK
-    lateinit var ansatt: AnsattTjeneste
+    lateinit var ansattTjeneste: AnsattTjeneste
     @MockK
-    lateinit var bruker: BrukerTjeneste
+    lateinit var brukerTjeneste: BrukerTjeneste
     @Autowired
     lateinit var repo: OverstyringRepository
 
@@ -42,30 +41,30 @@ internal class OverstyringTest {
 
     @BeforeTest
     fun setup() {
-        every { ansatt.ansatt(vanligAnsatt.navId) } returns vanligAnsatt
-        overstyring = OverstyringTjeneste(ansatt, bruker, OverstyringJPAAdapter(repo), motor)
+        every { ansattTjeneste.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
+        overstyring = OverstyringTjeneste(ansattTjeneste, brukerTjeneste, OverstyringJPAAdapter(repo), motor)
     }
 
     @Test
     @DisplayName("Test gyldig overstyring")
     fun testOverstyringGyldig() {
-        every { bruker.bruker(vanligBruker.ident) } returns vanligBruker
-        overstyring.overstyr(vanligAnsatt.navId, vanligBruker.ident, OverstyringMetadata("gammel", LocalDate.now().minusDays(1)))
-        overstyring.overstyr(vanligAnsatt.navId, vanligBruker.ident, OverstyringMetadata("ny", LocalDate.now().plusDays(1)))
-        assertTrue(overstyring.erOverstyrt(vanligAnsatt.navId, vanligBruker.ident))
+        every { brukerTjeneste.bruker(vanligBruker.brukerId) } returns vanligBruker
+        overstyring.overstyr(vanligAnsatt.ansattId, vanligBruker.brukerId, OverstyringMetadata("gammel", LocalDate.now().minusDays(1)))
+        overstyring.overstyr(vanligAnsatt.ansattId, vanligBruker.brukerId, OverstyringMetadata("ny", LocalDate.now().plusDays(1)))
+        assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, vanligBruker.brukerId)).isTrue
     }
     @Test
     @DisplayName("Test utgått overstyring")
     fun testOverstyringUtgått() {
-        every { bruker.bruker(vanligBruker.ident) } returns vanligBruker
-        overstyring.overstyr(vanligAnsatt.navId, vanligBruker.ident, OverstyringMetadata("ny", LocalDate.now().minusDays(1)))
-        assertFalse(overstyring.erOverstyrt(vanligAnsatt.navId, vanligBruker.ident))
+        every { brukerTjeneste.bruker(vanligBruker.brukerId) } returns vanligBruker
+        overstyring.overstyr(vanligAnsatt.ansattId, vanligBruker.brukerId, OverstyringMetadata("ny", LocalDate.now().minusDays(1)))
+        assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, vanligBruker.brukerId)).isFalse
 
     }
     @Test
     @DisplayName("Test overstyring, intet db innslag")
     fun testOverstyringUtenDBInnslag() {
-        every { bruker.bruker(ukjentBostedBruker.ident) } returns ukjentBostedBruker
-        assertFalse(overstyring.erOverstyrt(vanligAnsatt.navId, ukjentBostedBruker.ident))
+        every { brukerTjeneste.bruker(ukjentBostedBruker.brukerId) } returns ukjentBostedBruker
+        assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, ukjentBostedBruker.brukerId)).isFalse
     }
 }

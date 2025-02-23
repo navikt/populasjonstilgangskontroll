@@ -32,56 +32,56 @@ class RegelTjenesteTest {
 
     private lateinit var regel: RegelTjeneste
 
-    private lateinit var errorHandler: RegelExceptionHandler
+    private lateinit var avvistHandler: TilgangAvvistHandler
 
     @BeforeEach
     fun before() {
-        errorHandler = RegelExceptionHandler(overstyring)
-        regel = RegelTjeneste(motor, bruker, ansatt,errorHandler)
-        every { ansatt.ansatt(vanligAnsatt.navId) } returns vanligAnsatt
+        avvistHandler = TilgangAvvistHandler(overstyring)
+        regel = RegelTjeneste(motor, bruker, ansatt,avvistHandler)
+        every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
     }
     @Test
     @DisplayName("Verifiser at sjekk av overstyring ikke gjøres en regel som ikke er overstyrbar avslår tilgabg")
     fun testIngenOverstyringSjekk() {
-        every { bruker.bruker(vanligBruker.ident) } returns vanligBruker
-        assertThatCode { regel.alleRegler(vanligAnsatt.navId, vanligBruker.ident) }.doesNotThrowAnyException()
+        every { bruker.bruker(vanligBruker.brukerId) } returns vanligBruker
+        assertThatCode { regel.alleRegler(vanligAnsatt.ansattId, vanligBruker.brukerId) }.doesNotThrowAnyException()
         verify {
-            ansatt.ansatt(vanligAnsatt.navId)
-            bruker.bruker(vanligBruker.ident)
+            ansatt.ansatt(vanligAnsatt.ansattId)
+            bruker.bruker(vanligBruker.brukerId)
             overstyring wasNot Called
         }
     }
     @Test
     @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang gis om overstyring er gjort")
     fun overstyringOK() {
-        every { bruker.bruker(geoUtlandBruker.ident) } returns geoUtlandBruker
-        every { overstyring.erOverstyrt(vanligAnsatt.navId, geoUtlandBruker.ident) } returns true
-        assertThatCode { regel.alleRegler(vanligAnsatt.navId, geoUtlandBruker.ident) }.doesNotThrowAnyException()
+        every { bruker.bruker(geoUtlandBruker.brukerId) } returns geoUtlandBruker
+        every { overstyring.erOverstyrt(vanligAnsatt.ansattId, geoUtlandBruker.brukerId) } returns true
+        assertThatCode { regel.alleRegler(vanligAnsatt.ansattId, geoUtlandBruker.brukerId) }.doesNotThrowAnyException()
         verify {
-            ansatt.ansatt(vanligAnsatt.navId)
-            bruker.bruker(geoUtlandBruker.ident)
-            overstyring.erOverstyrt(vanligAnsatt.navId, geoUtlandBruker.ident)
+            ansatt.ansatt(vanligAnsatt.ansattId)
+            bruker.bruker(geoUtlandBruker.brukerId)
+            overstyring.erOverstyrt(vanligAnsatt.ansattId, geoUtlandBruker.brukerId)
         }
     }
     @Test
     @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang ikke gis om overstyring ikke er gjort")
     fun ikkeOverstyrt() {
-        every { bruker.bruker(geoUtlandBruker.ident) } returns geoUtlandBruker
-        every { overstyring.erOverstyrt(vanligAnsatt.navId, geoUtlandBruker.ident) } returns false
-        assertThrows<RegelException> { regel.alleRegler(vanligAnsatt.navId, geoUtlandBruker.ident) }
+        every { bruker.bruker(geoUtlandBruker.brukerId) } returns geoUtlandBruker
+        every { overstyring.erOverstyrt(vanligAnsatt.ansattId, geoUtlandBruker.brukerId) } returns false
+        assertThrows<RegelException> { regel.alleRegler(vanligAnsatt.ansattId, geoUtlandBruker.brukerId) }
         verify {
-            ansatt.ansatt(vanligAnsatt.navId)
-            bruker.bruker(geoUtlandBruker.ident)
-            overstyring.erOverstyrt(vanligAnsatt.navId, geoUtlandBruker.ident)
+            ansatt.ansatt(vanligAnsatt.ansattId)
+            bruker.bruker(geoUtlandBruker.brukerId)
+            overstyring.erOverstyrt(vanligAnsatt.ansattId, geoUtlandBruker.brukerId)
         }
     }
 
     @ParameterizedTest
     @MethodSource("kjerneregelProvider")
-    @DisplayName("Test at exception kastet av en av kjernereglene kastes videre av error handler uten å sjekke midlertidig tilgang")
+    @DisplayName("Test at tilgang avvist av en av kjernereglene ikke fører til sjekk av midlertidig tilgang")
     fun ikkeOverstyrbar(regel: Regel)    {
         assertThrows<RegelException> {
-            errorHandler.håndter(ansattId, brukerId, RegelException(brukerId, ansattId, regel))
+            avvistHandler.håndter(ansattId, brukerId, RegelException(brukerId, ansattId, regel))
         }
         verify {
             overstyring wasNot Called

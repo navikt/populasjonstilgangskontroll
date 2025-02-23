@@ -15,21 +15,20 @@ class TilgangAvvistHandler(private val overstyring: OverstyringTjeneste)  {
 
     fun håndter(ansattId: AnsattId, brukerId: BrukerId, e: Throwable) =
         when (e) {
-            is RegelException -> {
-                log.info(CONFIDENTIAL,"Sjekker om regel '${e.regel.beskrivelse.kortNavn}' er overstyrt for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
+            is RegelException ->
                 with(e.regel) {
+                    log.trace("Sjekker om regler er overstyrt for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                     if (erOverstyrbar) {
                         if (overstyring.erOverstyrt(ansattId, brukerId)) {
-                            log.warn("Overstyrt tilgang for regel '${beskrivelse.kortNavn}' er gitt til ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
+                            log.warn("Overstyrt tilgang er gitt til ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                         }
                         else {
-                            throw e.also { log.warn("Tilgang avvist av regel '${beskrivelse.kortNavn}' for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'") }
+                            throw e.also { log.warn("Ingen overstyring, tilgang avvist av regel '${beskrivelse.kortNavn}' for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}' består") }
                         }
                     } else {
-                        throw e.also { log.warn("Tilgang avvist av kjerneregel '${beskrivelse.kortNavn}' for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}', regel er ikke overstyrbar") }
+                        throw e.also { log.trace("Tilgang avvist av kjerneregel '${beskrivelse.kortNavn}' for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}', avvisining består") }
                     }
                 }
-            }
             else -> throw e.also { log.error("Ukjent feil ved tilgangskontroll for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'", it) }
         }
 }

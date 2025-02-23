@@ -1,19 +1,18 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring
 
-import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
-import org.slf4j.LoggerFactory.getLogger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
-class TilgangAvvistHandler(private val overstyring: OverstyringTjeneste)  {
+class OverstyringSjekker(private val overstyring: OverstyringTjeneste)  {
 
-    private val log = getLogger(TilgangAvvistHandler::class.java)
+    private val log = LoggerFactory.getLogger(OverstyringSjekker::class.java)
 
-    fun håndter(ansattId: AnsattId, brukerId: BrukerId, e: Throwable) =
+    fun sjekk(ansattId: AnsattId, brukerId: BrukerId, e: Throwable) =
         when (e) {
             is RegelException ->
                 with(e.regel) {

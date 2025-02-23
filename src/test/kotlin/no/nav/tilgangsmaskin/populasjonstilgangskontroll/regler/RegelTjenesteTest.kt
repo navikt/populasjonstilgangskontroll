@@ -11,6 +11,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.motor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.ansattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligBruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringSjekker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringTjeneste
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.BeforeEach
@@ -32,11 +33,11 @@ class RegelTjenesteTest {
 
     private lateinit var regel: RegelTjeneste
 
-    private lateinit var avvistHandler: TilgangAvvistHandler
+    private lateinit var avvistHandler: OverstyringSjekker
 
     @BeforeEach
     fun before() {
-        avvistHandler = TilgangAvvistHandler(overstyring)
+        avvistHandler = OverstyringSjekker(overstyring)
         regel = RegelTjeneste(motor, bruker, ansatt,avvistHandler)
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
     }
@@ -81,7 +82,7 @@ class RegelTjenesteTest {
     @DisplayName("Test at tilgang avvist av en av kjernereglene ikke fører til sjekk av midlertidig tilgang")
     fun ikkeOverstyrbar(regel: Regel)    {
         assertThrows<RegelException> {
-            avvistHandler.håndter(ansattId, brukerId, RegelException(brukerId, ansattId, regel))
+            avvistHandler.sjekk(ansattId, brukerId, RegelException(brukerId, ansattId, regel))
         }
         verify {
             overstyring wasNot Called

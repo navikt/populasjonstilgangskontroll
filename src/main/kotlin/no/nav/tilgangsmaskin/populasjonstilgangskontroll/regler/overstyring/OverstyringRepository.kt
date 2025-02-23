@@ -7,5 +7,5 @@ import org.springframework.data.repository.query.Param
 interface OverstyringRepository : JpaRepository<OverstyringEntity, Long> {
 
     @Query("SELECT o FROM overstyring o WHERE o.navid = :ansattId AND o.fnr = :brukerId ORDER BY o.created DESC limit 1")
-    fun findLatest(@Param("ansattId") ansattId: String, @Param("brukerId") brukerId: String): OverstyringEntity?
+    fun finnGjeldendeOverstyring(@Param("ansattId") ansattId: String, @Param("brukerId") brukerId: String): OverstyringEntity?
 }

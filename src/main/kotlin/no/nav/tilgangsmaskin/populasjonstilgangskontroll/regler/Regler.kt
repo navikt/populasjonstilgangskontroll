@@ -28,7 +28,7 @@ class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Kj
 @Component
 @Order(HIGHEST_PRECEDENCE + 3)
 class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) : Regel {
-    override fun test(bruker: Bruker, ansatt: Ansatt) =
+    override fun test(ansatt: Ansatt,bruker: Bruker) =
         if (bruker.geoTilknytning is UtenlandskTilknytning) {
             ansatt.kanBehandle(id)
         } else true
@@ -39,7 +39,7 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
 @Component
 @Order(HIGHEST_PRECEDENCE + 4)
 class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) : Regel {
-    override fun test(bruker: Bruker, ansatt: Ansatt) =
+    override fun test(ansatt: Ansatt,bruker: Bruker) =
         if (bruker.geoTilknytning is UkjentBosted) {
             ansatt.kanBehandle(id)
         } else true
@@ -50,7 +50,7 @@ class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) 
 @Component
 @Order(HIGHEST_PRECEDENCE + 5)
 class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) : Regel {
-    override fun test(bruker: Bruker, ansatt: Ansatt) =
+    override fun test(ansatt: Ansatt,bruker: Bruker) =
         ansatt.kanBehandle(id) || ansatt.grupper.any { it.displayName.endsWith("GEO_${
             when (bruker.geoTilknytning) {
                 is KommuneTilknytning -> bruker.geoTilknytning.kommune.verdi

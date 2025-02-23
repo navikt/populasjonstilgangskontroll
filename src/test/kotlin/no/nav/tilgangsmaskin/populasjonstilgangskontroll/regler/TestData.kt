@@ -26,16 +26,16 @@ object TestData {
     internal val brukerId = BrukerId("08526835671")
     internal val navn = Navn("Ola", "Nordmann")
 
-    internal val kode6Bruker = Bruker(brukerId, navn, UdefinertGeoTilknytning, STRENGT_FORTROLIG_GRUPPE)
-    internal val kode7Bruker = Bruker(brukerId, navn, UdefinertGeoTilknytning, FORTROLIG_GRUPPE)
+    internal val strengtFortroligBruker = Bruker(brukerId, navn, UdefinertGeoTilknytning, STRENGT_FORTROLIG_GRUPPE)
+    internal val fortroligBruker = Bruker(brukerId, navn, UdefinertGeoTilknytning, FORTROLIG_GRUPPE)
     internal val vanligBruker = Bruker(brukerId, navn, UdefinertGeoTilknytning)
     internal val ansattBruker = Bruker(brukerId, navn, UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE)
-    internal val ansattKode6Bruker = Bruker(brukerId, navn, UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, STRENGT_FORTROLIG_GRUPPE)
-    internal val ansattKode7Bruker = Bruker(brukerId, navn, UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, FORTROLIG_GRUPPE)
+    internal val egenAnsattStrengtFortroligBruker = Bruker(brukerId, navn, UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, STRENGT_FORTROLIG_GRUPPE)
+    internal val egenAnsattFortroligBruker = Bruker(brukerId, navn, UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, FORTROLIG_GRUPPE)
     internal val ukjentBostedBruker = Bruker(brukerId, navn, UkjentBosted(), UDEFINERT_GEO_GRUPPE)
     internal val geoUtlandBruker = Bruker(brukerId, navn, UtenlandskTilknytning(SE), GEO_PERSON_UTLAND_GRUPPE)
     internal val enhetBruker = Bruker(brukerId, navn, KommuneTilknytning(Kommune(enhet.verdi)))
-    internal val enhetBruker1 = Bruker(brukerId, navn, KommuneTilknytning(Kommune("4321")))
+    internal val annenEnhetBruker = Bruker(brukerId, navn, KommuneTilknytning(Kommune("4321")))
 
 
 
@@ -48,10 +48,10 @@ object TestData {
     internal val nasjonalGruppe = EntraGruppe(UUID.randomUUID(), "Nsjonal gruppe")
     internal val enhetGruppe = EntraGruppe(UUID.randomUUID(), "XXX_GEO_${enhet.verdi}")
 
-    internal val kode7EgenAnsatt = Ansatt(attributter, fortroligEntraGruppe, egenAnsattEntraGruppe)
-    internal val kode6EgenAnsatt = Ansatt(attributter, strengtFortroligEntraGruppe, egenAnsattEntraGruppe)
-    internal val kode6Ansatt = Ansatt(attributter, strengtFortroligEntraGruppe)
-    internal val kode7Ansatt = Ansatt(attributter, fortroligEntraGruppe)
+    internal val egenAnsattFortroligAnsatt = Ansatt(attributter, fortroligEntraGruppe, egenAnsattEntraGruppe)
+    internal val egenAnsattStrengtFortroligAnsatt = Ansatt(attributter, strengtFortroligEntraGruppe, egenAnsattEntraGruppe)
+    internal val strengtFortroligAnsatt = Ansatt(attributter, strengtFortroligEntraGruppe)
+    internal val fortroligAnsatt = Ansatt(attributter, fortroligEntraGruppe)
     internal val egenAnsatt = Ansatt(attributter, egenAnsattEntraGruppe)
     internal val vanligAnsatt = Ansatt(attributter, annenEntraGruppe)
     internal val geoUtlandAnsatt = Ansatt(attributter, geoUtlandEntraGruppe)

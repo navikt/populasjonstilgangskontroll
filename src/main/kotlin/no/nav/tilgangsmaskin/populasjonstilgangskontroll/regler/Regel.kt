@@ -4,7 +4,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
 import java.util.function.BiPredicate
 
-interface Regel: BiPredicate<Bruker, Ansatt> {
+interface Regel: BiPredicate<Ansatt,Bruker> {
     val beskrivelse: RegelBeskrivelse
     val erOverstyrbar get() = this !is KjerneRegel
     data class RegelBeskrivelse(val kortNavn: String,

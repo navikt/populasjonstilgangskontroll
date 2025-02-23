@@ -6,9 +6,9 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.Regel.RegelBeskr
 import java.util.UUID
 
 abstract class KjerneRegel(private val gruppe: GlobalGruppe, private val id: UUID, kortNavn: String): Regel {
-    override fun test(bruker: Bruker, s: Ansatt) =
+    override fun test(ansatt: Ansatt,bruker: Bruker) =
         if (bruker.kreverGlobalGruppe(gruppe))  {
-            s.kanBehandle(id)
+            ansatt.kanBehandle(id)
         } else true
 
     override val beskrivelse = RegelBeskrivelse(kortNavn, gruppe.begrunnelse)

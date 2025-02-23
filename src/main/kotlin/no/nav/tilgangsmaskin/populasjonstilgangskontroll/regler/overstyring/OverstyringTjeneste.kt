@@ -24,6 +24,7 @@ class OverstyringTjeneste(private val ansattTjeneste: AnsattTjeneste, private va
 
     private val log = getLogger(OverstyringTjeneste::class.java)
 
+    @Transactional(readOnly = true)
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId): Boolean {
         val gjeldendeDato = adapter.gjeldendeOverstyringGyldighetDato(ansattId.verdi, brukerId.verdi)
         return if (gjeldendeDato != null) {

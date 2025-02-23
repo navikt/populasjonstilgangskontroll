@@ -25,7 +25,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
     private val log = getLogger(OverstyringTjeneste::class.java)
 
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId): Boolean {
-        val nyeste = adapter.finnGjeldendeOverstyringDato(ansattId.verdi, brukerId.verdi)
+        val nyeste = adapter.gjeldendeOverstyringGyldighetDato(ansattId.verdi, brukerId.verdi)
         return if (nyeste != null) {
             val now = Instant.now()
             if (nyeste.isBefore(now)) {

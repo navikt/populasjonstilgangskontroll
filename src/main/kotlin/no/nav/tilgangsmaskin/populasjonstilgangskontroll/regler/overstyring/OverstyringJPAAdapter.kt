@@ -9,5 +9,5 @@ class OverstyringJPAAdapter(private val repository: OverstyringRepository)  {
     fun overstyr(ansattId: String, brukerId: String, metadata: OverstyringMetadata) =
         repository.save(OverstyringEntity(ansattId, brukerId,metadata.begrunnelse,metadata.varighet.atStartOfDay(ZoneId.systemDefault()).toInstant()))
 
-    fun finnGjeldendeOverstyringDato(ansattId: String, brukerId: String) = repository.finnGjeldendeOverstyring(ansattId, brukerId)?.expires
+    fun gjeldendeOverstyringGyldighetDato(ansattId: String, brukerId: String) = repository.finnGjeldendeOverstyring(ansattId, brukerId)?.expires
 }

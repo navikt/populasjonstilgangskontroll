@@ -7,13 +7,14 @@ import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.ProblemDetail.forStatus
 import org.springframework.web.ErrorResponseException
 
-class RegelException(val brukerId: BrukerId, val  ansattId: AnsattId, val regel: Regel, messaageCode: String = DETAIL_MESSAGE_CODE, arguments: Array<String> = arrayOf(ansattId.verdi, brukerId.verdi,regel.metadata.begrunnelse.årsak)): ErrorResponseException(FORBIDDEN,  forStatus(FORBIDDEN).apply {
-    title = "${regel.metadata.begrunnelse}"
-    type = regel.metadata.uri
-    properties = mapOf(
-        "brukerIdent" to brukerId.verdi,
-        "navIdent" to ansattId.verdi,
-        "kanOverstyres" to regel.erOverstyrbar)
-}, null,messaageCode,arguments)
-
-
+class RegelException(val brukerId: BrukerId, val  ansattId: AnsattId, val regel: Regel, messageCode: String = DETAIL_MESSAGE_CODE, arguments: Array<String> = arrayOf(ansattId.verdi, brukerId.verdi,regel.metadata.begrunnelse.årsak)) :
+    ErrorResponseException(FORBIDDEN,  forStatus(FORBIDDEN).apply {
+        title = "${regel.metadata.begrunnelse}"
+        type = regel.metadata.uri
+        properties = mapOf(
+            "brukerIdent" to brukerId.verdi,
+            "navIdent" to ansattId.verdi,
+            "kanOverstyres" to regel.erOverstyrbar)
+    }, null,messageCode,arguments) {
+    constructor(e: RegelException, messageCode: String, arguments: Array<String>) : this(e.brukerId, e.ansattId, e.regel, messageCode, arguments)
+}

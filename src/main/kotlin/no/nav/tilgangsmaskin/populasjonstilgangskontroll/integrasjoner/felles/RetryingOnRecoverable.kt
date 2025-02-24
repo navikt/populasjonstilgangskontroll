@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.RecoverableException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.RecoverableRestException
 import org.springframework.core.annotation.AliasFor
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
@@ -16,7 +16,7 @@ import kotlin.reflect.KClass
 @MustBeDocumented
 @Retryable
 annotation class RetryingOnRecoverable(
-    @get:AliasFor(annotation = Retryable::class) val value: Array<KClass<out Throwable>> = [RecoverableException::class],
+    @get:AliasFor(annotation = Retryable::class) val value: Array<KClass<out Throwable>> = [RecoverableRestException::class],
     @get:AliasFor(annotation = Retryable::class) val maxAttempts: Int = 3,
     @get:AliasFor(annotation = Retryable::class) val backoff: Backoff = Backoff(delay = 1000)
 )

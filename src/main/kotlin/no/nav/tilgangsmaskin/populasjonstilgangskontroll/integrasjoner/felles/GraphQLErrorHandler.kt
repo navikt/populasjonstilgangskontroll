@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableException
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.RecoverableException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableRestException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.RecoverableRestException
 import org.slf4j.LoggerFactory
 import org.springframework.graphql.ResponseError
 import org.springframework.graphql.client.FieldAccessException
@@ -15,8 +15,11 @@ interface GraphQLErrorHandler {
     fun handle(uri: URI, e: Throwable): Nothing =
         when (e) {
             is FieldAccessException ->  throw e.oversett(uri)
-            is GraphQlTransportException ->  throw RecoverableException(INTERNAL_SERVER_ERROR, uri, e.message ?: "Uventet respons",cause = e)
-            else ->  throw IrrecoverableException(INTERNAL_SERVER_ERROR,uri,e.message?: "Uventet respons", cause = e)
+            is GraphQlTransportException ->  throw RecoverableRestException(INTERNAL_SERVER_ERROR,
+                uri,
+                e.message ?: "Uventet respons",
+                e)
+            else ->  throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri, e.message?: "Uventet respons", e)
         }
 
     companion object {
@@ -30,7 +33,7 @@ interface GraphQLErrorHandler {
                 log.warn("GraphQL oppslag returnerte $size feil, oversatte $message til ${it.javaClass.simpleName}", this)
             }
 
-        private fun oversett(kode: String, msg: String, uri: URI) = IrrecoverableException(kode.tilStatus(), uri, msg)
+        private fun oversett(kode: String, msg: String, uri: URI) = IrrecoverableRestException(kode.tilStatus(), uri, msg)
         private fun String.tilStatus() = HttpStatus.valueOf(this.uppercase(Locale.getDefault()))
 
     }

@@ -11,5 +11,5 @@ abstract class KjerneRegel(private val gruppe: GlobalGruppe, private val id: UUI
             ansatt.kanBehandle(id)
         } else true
 
-    override val beskrivelse = RegelBeskrivelse(kortNavn, gruppe.begrunnelse)
+    override val metadata = RegelBeskrivelse(kortNavn, gruppe.begrunnelse)
 }

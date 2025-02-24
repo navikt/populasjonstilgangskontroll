@@ -20,10 +20,10 @@ class RegelMotor(vararg inputRegler: Regel)  {
 
     private fun eksekver(ansatt: Ansatt, bruker: Bruker, regler: List<Regel>) =
         regler.forEach {
-            log.info(CONFIDENTIAL,"Eksekverer regel: '${it.beskrivelse.kortNavn}' for ansatt '${ansatt.ansattId.verdi}' og bruker '${bruker.brukerId.mask()}'")
+            log.info(CONFIDENTIAL,"Eksekverer regel: '${it.metadata.kortNavn}' for ansatt '${ansatt.ansattId.verdi}' og bruker '${bruker.brukerId.mask()}'")
             if (!it.test(ansatt,bruker)) {
                 throw RegelException(bruker.brukerId, ansatt.ansattId, it).also {
-                    log.warn(CONFIDENTIAL,"Tilgang avvist av regel '${it.regel.beskrivelse.kortNavn}'")
+                    log.warn(CONFIDENTIAL,"Tilgang avvist av regel '${it.regel.metadata.kortNavn}'")
                 }
             }
         }

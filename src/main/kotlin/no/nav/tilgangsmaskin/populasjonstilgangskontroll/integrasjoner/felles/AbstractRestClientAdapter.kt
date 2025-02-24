@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableRestException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatusCode
@@ -25,7 +25,7 @@ abstract class AbstractRestClientAdapter(
             .accept(APPLICATION_JSON)
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
-            .body(T::class.java) ?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, uri,"Uventet respons")
+            .body(T::class.java) ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
 
     protected inline fun <reified T> post(uri: URI, body: Any) =
         restClient
@@ -35,7 +35,7 @@ abstract class AbstractRestClientAdapter(
             .body(body)
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
-            .body(T::class.java) ?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, uri,"Uventet respons")
+            .body(T::class.java) ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
 
     override fun name() = cfg.name
     protected val baseUri = cfg.baseUri
@@ -51,6 +51,5 @@ abstract class AbstractRestClientAdapter(
                 verdier.forEach { (key, value) -> req.headers.add(key, value) }
                 next.execute(req, b)
             }
-
     }
 }

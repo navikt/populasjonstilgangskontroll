@@ -11,6 +11,9 @@ management:
       base-path: /monitoring
 
 spring:
+  mvc:
+    problemdetails:
+      enabled: true
   datasource:
     url: ${db.jdbc.url}
     username: ${db.username}

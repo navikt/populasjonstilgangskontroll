@@ -10,11 +10,10 @@ import org.springframework.web.ErrorResponseException
 class RegelException(val brukerId: BrukerId,val  ansattId: AnsattId, val regel: Regel): ErrorResponseException(FORBIDDEN,  forStatus(FORBIDDEN).apply {
     title = "${regel.metadata.begrunnelse}"
     type = regel.metadata.uri
-   // detail = detaljer
     properties = mapOf(
         "brukerIdent" to brukerId.verdi,
         "navIdent" to ansattId.verdi,
         "kanOverstyres" to regel.erOverstyrbar)
-}, null,DETAIL_MESSAGE_CODE,arrayOf(ansattId.verdi, brukerId.verdi,regel.metadata.begrunnelse.årsak))
+}, null,null,arrayOf(ansattId.verdi, brukerId.verdi,regel.metadata.begrunnelse.årsak))
 
 

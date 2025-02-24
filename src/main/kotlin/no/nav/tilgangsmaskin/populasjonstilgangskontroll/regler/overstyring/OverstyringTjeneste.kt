@@ -50,7 +50,7 @@ class OverstyringTjeneste(private val ansattTjeneste: AnsattTjeneste, private va
                 log.info("Overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}' oppdatert i cache")
             }.getOrElse {
                 when (it) {
-                    is RegelException ->  throw RegelException(it.brukerId,it.ansattId,it.regel,"Kjerneregel ${it.regel.metadata.kortNavn} er ikke overstyrbar, kunne ikke overstyre tilgang for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
+                    is RegelException ->  throw it //RegelException(it.brukerId,it.ansattId,it.regel,"Kjerneregel ${it.regel.metadata.kortNavn} er ikke overstyrbar, kunne ikke overstyre tilgang for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                     else -> throw it
                 }
          }

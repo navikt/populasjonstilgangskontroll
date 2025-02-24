@@ -13,5 +13,10 @@ interface Regel: BiPredicate<Ansatt,Bruker> {
 
         val uri =  URI.create("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett")
         val detail =  "Ansatt {0} kan ikke behandle bruker {1}. {2}"
+
+
+    }
+    companion object    {
+        const val DETAIL_MESSAGE_CODE: String = "problemDetail.no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException.detail"
     }
 }

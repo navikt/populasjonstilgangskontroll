@@ -15,6 +15,6 @@ class RegelException(val brukerId: BrukerId,val  ansattId: AnsattId, val regel: 
         "brukerIdent" to brukerId.verdi,
         "navIdent" to ansattId.verdi,
         "kanOverstyres" to regel.erOverstyrbar)
-}, null,DETAIL_MESSAGE_CODE,arrayOf(brukerId.verdi, ansattId.verdi, regel.metadata.begrunnelse.årsak))
+}, null,DETAIL_MESSAGE_CODE,arrayOf(ansattId.verdi, brukerId.verdi,regel.metadata.begrunnelse.årsak))
 
 

@@ -2,15 +2,16 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
+import java.net.URI
 import java.util.function.BiPredicate
 
 interface Regel: BiPredicate<Ansatt,Bruker> {
-    val beskrivelse: RegelBeskrivelse
+    val metadata: RegelBeskrivelse
     val erOverstyrbar get() = this !is KjerneRegel
     data class RegelBeskrivelse(val kortNavn: String,
                                 val begrunnelse: AvvisningBegrunnelse) {
 
-
-    val begrunnelseAnsatt =  "Ansatt %s kan ikke behandle bruker %s. %s"
+        val uri =  URI.create("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett")
+        val detail =  "Ansatt {0} kan ikke behandle bruker {1}. {2}"
     }
 }

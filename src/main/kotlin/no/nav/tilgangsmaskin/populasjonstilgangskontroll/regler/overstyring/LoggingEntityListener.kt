@@ -12,25 +12,25 @@ import org.slf4j.LoggerFactory
 class LoggingEntityListener {
 
     @PrePersist
-    private fun lagrer(entity : Any) = log.trace("Lagrer {} i DB", entity)
+    private fun lagrer(entity : Any) = log.trace("Lagrer {} i DB", entity.javaClass.simpleName)
 
     @PreUpdate
-    private fun oppdaterer(entity : Any) = log.trace("Oppdaterer {} i DB", entity)
+    private fun oppdaterer(entity : Any) = log.trace("Oppdaterer {} i DB", entity.javaClass.simpleName)
 
     @PreRemove
-    private fun fjerner(entity : Any) = log.trace("Fjerner {} fra DB", entity)
+    private fun fjerner(entity : Any) = log.trace("Fjerner {} fra DB", entity.javaClass.simpleName)
 
     @PostPersist
-    private fun lagret(entity : Any) = log.trace("Lagret {} i DB", entity)
+    private fun lagret(entity : Any) = log.trace("Lagret {} i DB", entity.javaClass.simpleName)
 
     @PostUpdate
-    private fun oppdatert(entity : Any) = log.trace("Oppdaterte {} i DB", entity)
+    private fun oppdatert(entity : Any) = log.trace("Oppdaterte {} i DB", entity.javaClass.simpleName)
 
     @PostRemove
-    private fun fjernet(entity : Any) = log.trace("Fjernet {} fra DB", entity)
+    private fun fjernet(entity : Any) = log.trace("Fjernet {} fra DB", entity.javaClass.simpleName)
 
     @PostLoad
-    private fun lest(entity : Any) = log.trace("Leste {} fra DB", entity)
+    private fun lest(entity : Any) = log.trace("Leste {} fra DB", entity.javaClass.simpleName)
 
     companion object {
 

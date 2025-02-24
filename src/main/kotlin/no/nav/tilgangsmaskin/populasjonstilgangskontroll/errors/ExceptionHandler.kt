@@ -17,9 +17,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 class ExceptionHandler : ResponseEntityExceptionHandler() {
     private val log = getLogger(javaClass)
 
-    @ExceptionHandler(RegelException::class)
-    fun regelException(e: RegelException, req: NativeWebRequest) =e.body
-
     @ExceptionHandler(Exception::class)
     fun catchAll(e: Exception, req: NativeWebRequest) = problem(e, req, BAD_REQUEST)
 

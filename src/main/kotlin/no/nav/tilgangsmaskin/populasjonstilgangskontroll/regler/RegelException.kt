@@ -12,7 +12,7 @@ class RegelException(val brukerId: BrukerId, val  ansattId: AnsattId, val regel:
     ErrorResponseException(FORBIDDEN,  forStatus(FORBIDDEN).apply {
         title = "${regel.metadata.begrunnelse}"
         type = regel.metadata.uri
-        instance = URI.create("${ansattId.verdi}/${brukerId.verdi}")
+      //  instance = URI.create("${ansattId.verdi}/${brukerId.verdi}")
         properties = mapOf(
             "brukerIdent" to brukerId.verdi,
             "navIdent" to ansattId.verdi,

@@ -1,11 +1,13 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
+import graphql.com.google.common.base.Objects
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableRestException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.client.ClientHttpRequestInterceptor
+import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import java.net.URI
@@ -19,18 +21,20 @@ abstract class AbstractRestClientAdapter(
     protected val log = getLogger(AbstractRestClientAdapter::class.java)
     override fun ping() = get<Unit>(cfg.pingEndpoint)
 
-    protected inline fun <reified T> get(uri: URI) =
+    protected inline fun <reified T> get(uri: URI, headers: Map<String, String> = emptyMap()) =
         restClient.get()
             .uri(uri)
             .accept(APPLICATION_JSON)
+            .headers { it.setAll(headers) }
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
             .body(T::class.java) ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
 
-    protected inline fun <reified T> post(uri: URI, body: Any) =
+    protected inline fun <reified T> post(uri: URI, body: Any,headers: Map<String, String> = emptyMap()) =
         restClient
             .post()
             .uri(uri)
+            .headers { it.setAll(headers) }
             .accept(APPLICATION_JSON)
             .body(body)
             .retrieve()

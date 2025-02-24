@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.Ab
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.LoggingGraphQLInterceptor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlConfig.Companion.PDL
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipConfig.Companion.PDLPIP
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -21,6 +22,13 @@ class PdlClientBeanConfig {
     fun pdlRestClient(b: Builder, oAuth2ClientRequestInterceptor: OAuth2ClientRequestInterceptor) =
         b.requestInterceptors {
             it.add(headerAddingRequestInterceptor(BEHANDLINGSNUMMER))
+            it.addFirst(oAuth2ClientRequestInterceptor)
+        }.build()
+
+    @Bean
+    @Qualifier(PDLPIP)
+    fun pdlPipRestClient(b: Builder, oAuth2ClientRequestInterceptor: OAuth2ClientRequestInterceptor) =
+        b.requestInterceptors {
             it.addFirst(oAuth2ClientRequestInterceptor)
         }.build()
 

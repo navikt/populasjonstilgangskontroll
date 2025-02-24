@@ -24,6 +24,9 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     @GetMapping("bruker")
     fun bruker(fnr: BrukerId) = bruker.bruker(fnr)
 
+    @GetMapping("pip")
+    fun pipbruker(fnr: BrukerId) = bruker.pipBruker(fnr)
+
     @GetMapping("ansatt")
     fun ansatt(ansattId: AnsattId) = ansatt.ansatt(ansattId)
 

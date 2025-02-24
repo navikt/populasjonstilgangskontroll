@@ -15,7 +15,7 @@ class PdlPipConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, val perso
 
     companion object {
         const val PDLPIP = "pdlpip"
-        private const val DEFAULT_PING_PATH = ""
+        private const val DEFAULT_PING_PATH = "/internal/health/liveness"
         private val DEFAULT_PERSON_PATH = "/api/v1/person"
     }
 }

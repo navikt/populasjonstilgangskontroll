@@ -12,8 +12,6 @@ interface Regel: BiPredicate<Ansatt,Bruker> {
                                 val begrunnelse: AvvisningBegrunnelse) {
 
         val uri =  URI.create("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett")
-        val detail =  "Ansatt {0} kan ikke behandle bruker {1}. {2}"
-
 
     }
     companion object    {

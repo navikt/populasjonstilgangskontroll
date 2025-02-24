@@ -22,7 +22,7 @@ class OverstyringEntity(@Column(length = 7, nullable = false) val navid: String,
                         @Column(length = 11, nullable = false) val fnr: String,
                         @Column(nullable = false) val begrunnelse: String,
                         @Column(nullable = false) val expires: Instant,
-                        @CreatedDate @Column(nullable = false) val created: Instant? = null,
+                        @CreatedDate @Column(nullable = false) var created: Instant? = null,
                         @LastModifiedDate @Column(nullable = false) var updated: Instant? = null) {
 
     @Id

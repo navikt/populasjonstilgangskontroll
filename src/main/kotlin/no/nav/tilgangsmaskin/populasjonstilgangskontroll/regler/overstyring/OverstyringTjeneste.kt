@@ -4,6 +4,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.BrukerTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.Regel.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelMotor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringEntity.Companion.OVERSTYRING
@@ -50,7 +51,7 @@ class OverstyringTjeneste(private val ansattTjeneste: AnsattTjeneste, private va
                 log.info("Overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}' oppdatert i cache")
             }.getOrElse {
                 when (it) {
-                    is RegelException ->  throw it //RegelException(it.brukerId,it.ansattId,it.regel,"Kjerneregel ${it.regel.metadata.kortNavn} er ikke overstyrbar, kunne ikke overstyre tilgang for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
+                    is RegelException ->  throw RegelException(it.brukerId,it.ansattId,it.regel,OVERSTYRING_MESSAGE_CODE,arrayOf(it.regel.metadata.kortNavn,ansattId.verdi,brukerId.verdi))
                     else -> throw it
                 }
          }

@@ -16,5 +16,7 @@ interface Regel: BiPredicate<Ansatt,Bruker> {
     }
     companion object    {
         const val DETAIL_MESSAGE_CODE: String = "problemDetail.no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException.detail"
+        const val OVERSTYRING_MESSAGE_CODE: String = "problemDetail.no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException.kjerneregler"
+
     }
 }

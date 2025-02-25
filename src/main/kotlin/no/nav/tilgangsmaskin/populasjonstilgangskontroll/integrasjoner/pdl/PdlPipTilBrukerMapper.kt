@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory
 object PdlPipTilBrukerMapper {
     private val log = LoggerFactory.getLogger(javaClass)
     fun tilBruker(person: Map<BrukerId,PdlPipRespons>, erSkjermet: Boolean): Bruker {
-        log.info("Mapper person {} to Bruker", person)
+        log.info("Mapper person {} to Bruker {}", person,person.entries.size)
         return person.entries.single().let { (brukerId, metdata) ->
              tilBruker(brukerId,metdata,erSkjermet)
         }

@@ -3,7 +3,7 @@
     "https://tilgangsmaskin.intern.nav.no"
   ],
   "pdl": "pdl-api.prod-fss-pub.nais.io",
-  "pdlpip": "pdl-pip-api.intern.nav.no",
+  "pdlpip": "pdl-pip-api.prod-fss-pub.nais.io",
   "grupper": {
     "fortrolig":"9ec6487d-f37a-4aad-a027-cd221c1ac32b" ,
     "strengt": "ad7b87a6-9180-467c-affc-20a566b0fec0",

@@ -4,8 +4,7 @@
     "https://tilgangsmaskin.ansatt.dev.nav.no"
   ],
   "pdl": "pdl-api.dev-fss-pub.nais.io",
-  "pdlpip": "pdl-pip-api.intern.dev.nav.no",
-
+  "pdlpip": "pdl-pip-api.dev-fss-pub.nais.io",
   "grupper": {
     "fortrolig":"ea930b6b-9397-44d9-b9e6-f4cf527a632a" ,
     "strengt": "5ef775f2-61f8-4283-bf3d-8d03f428aa14",

@@ -33,6 +33,7 @@ object PdlTilBrukerMapper {
                 add(EGEN_ANSATT_GRUPPE)
             }
         }.toTypedArray().let {
+            
             Bruker(tilFødselsnummer(person.folkeregisteridentifikator), tilNavn(person.navn), tilGeoTilknytning(gt), *it).also {
                 log.trace(CONFIDENTIAL, "Mappet person {} til kandidat {}", person, it)
             }

@@ -22,4 +22,5 @@ class BrukerTjeneste(private val pdlAdapter: PdlSyncGraphQLClientAdapter, val pi
         }
 
     fun pipBruker(brukerId: BrukerId) = pipRestClientAdapter.person(brukerId.verdi)
+    fun bolk(brukerIds: List<BrukerId>) = pipRestClientAdapter.bolk(brukerIds.map { it.verdi })
 }

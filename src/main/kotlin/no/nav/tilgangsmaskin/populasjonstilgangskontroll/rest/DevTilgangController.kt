@@ -24,6 +24,9 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     @GetMapping("bruker")
     fun bruker(fnr: BrukerId) = bruker.bruker(fnr)
 
+    @PostMapping("brukere")
+    fun brukere(@RequestBody brukerIds: List<BrukerId>) = bruker.bolk(brukerIds)
+
     @GetMapping("pip")
     fun pipbruker(fnr: BrukerId) = bruker.pipBruker(fnr)
 

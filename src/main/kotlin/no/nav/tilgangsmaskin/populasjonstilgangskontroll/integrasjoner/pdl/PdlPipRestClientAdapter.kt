@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestClientAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipConfig.Companion.PDLPIP
@@ -17,6 +18,7 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 class PdlPipRestClientAdapter(@Qualifier(PDLPIP) restClient: RestClient, private val cf : PdlPipConfig, errorHandler: ErrorHandler): AbstractRestClientAdapter(restClient, cf, errorHandler) {
 
     fun person(brukerId: String) = get<Map<String,Object>>(cf.personURI(), mapOf("ident" to brukerId))
+    fun bolk(brukerIds: List<String>) = post<List<Map<String,Object>>>(cf.personBolkURI(), brukerIds)
 }
 
 

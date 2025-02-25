@@ -2,11 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestClientAdapter
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipConfig.Companion.PDLPIP
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig.Companion.IDENT
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig.Companion.SKJERMING
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component
@@ -17,7 +13,7 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 @Cacheable(PDLPIP)
 class PdlPipRestClientAdapter(@Qualifier(PDLPIP) restClient: RestClient, private val cf : PdlPipConfig, errorHandler: ErrorHandler): AbstractRestClientAdapter(restClient, cf, errorHandler) {
 
-    fun person(brukerId: String) = get<Map<String,Any>>(cf.personURI(), mapOf("ident" to brukerId))
+    fun person(brukerId: String) = get<Map<BrukerId, PdlPipRespons>>(cf.personURI(), mapOf("ident" to brukerId))
     fun bolk(brukerIds: List<String>) = post<Any>(cf.personBolkURI(), brukerIds)
 }
 

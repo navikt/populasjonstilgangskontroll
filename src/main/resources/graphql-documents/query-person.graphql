@@ -3,7 +3,6 @@ query($ident: ID!){
         adressebeskyttelse{
             gradering
         },
-        navn{fornavn,mellomnavn,etternavn},
         bostedsadresse(historikk: false) {
             coAdressenavn,
             ukjentBosted {

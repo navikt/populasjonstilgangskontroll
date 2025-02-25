@@ -24,18 +24,17 @@ object TestData {
     internal val ansattId = AnsattId("Z999999")
     internal val attributter = AnsattAttributter(UUID.randomUUID(), ansattId, Navn("En", "Saksbehandler"), enhet)
     internal val brukerId = BrukerId("08526835671")
-    internal val navn = Navn("Ola", "Nordmann")
 
-    internal val strengtFortroligBruker = Bruker(brukerId, navn, UdefinertGeoTilknytning, STRENGT_FORTROLIG_GRUPPE)
-    internal val fortroligBruker = Bruker(brukerId, navn, UdefinertGeoTilknytning, FORTROLIG_GRUPPE)
-    internal val vanligBruker = Bruker(brukerId, navn, UdefinertGeoTilknytning)
-    internal val ansattBruker = Bruker(brukerId, navn, UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE)
-    internal val egenAnsattStrengtFortroligBruker = Bruker(brukerId, navn, UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, STRENGT_FORTROLIG_GRUPPE)
-    internal val egenAnsattFortroligBruker = Bruker(brukerId, navn, UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, FORTROLIG_GRUPPE)
-    internal val ukjentBostedBruker = Bruker(brukerId, navn, UkjentBosted(), UDEFINERT_GEO_GRUPPE)
-    internal val geoUtlandBruker = Bruker(brukerId, navn, UtenlandskTilknytning(SE), GEO_PERSON_UTLAND_GRUPPE)
-    internal val enhetBruker = Bruker(brukerId, navn, KommuneTilknytning(Kommune(enhet.verdi)))
-    internal val annenEnhetBruker = Bruker(brukerId, navn, KommuneTilknytning(Kommune("4321")))
+    internal val strengtFortroligBruker = Bruker(brukerId, UdefinertGeoTilknytning, STRENGT_FORTROLIG_GRUPPE)
+    internal val fortroligBruker = Bruker(brukerId, UdefinertGeoTilknytning, FORTROLIG_GRUPPE)
+    internal val vanligBruker = Bruker(brukerId, UdefinertGeoTilknytning)
+    internal val ansattBruker = Bruker(brukerId, UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE)
+    internal val egenAnsattStrengtFortroligBruker = Bruker(brukerId, UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, STRENGT_FORTROLIG_GRUPPE)
+    internal val egenAnsattFortroligBruker = Bruker(brukerId, UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, FORTROLIG_GRUPPE)
+    internal val ukjentBostedBruker = Bruker(brukerId, UkjentBosted(), UDEFINERT_GEO_GRUPPE)
+    internal val geoUtlandBruker = Bruker(brukerId, UtenlandskTilknytning(SE), GEO_PERSON_UTLAND_GRUPPE)
+    internal val enhetBruker = Bruker(brukerId, KommuneTilknytning(Kommune(enhet.verdi)))
+    internal val annenEnhetBruker = Bruker(brukerId, KommuneTilknytning(Kommune("4321")))
 
 
 

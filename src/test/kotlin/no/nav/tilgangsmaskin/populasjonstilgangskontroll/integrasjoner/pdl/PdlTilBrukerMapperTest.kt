@@ -66,7 +66,6 @@ class PdlTilBrukerMapperTest {
         val adressebeskyttelse = gradering?.let{
             listOf(Adressebeskyttelse(gradering))
         }?: emptyList()
-        val navn = listOf(PdlPerson.Navn("Ola", "Mellomnavn", "Nordmann"))
-        return PdlPerson(adressebeskyttelse, navn, emptyList(), listOf(Folkeregisteridentifikator(brukerId.verdi, "FNR")))
+        return PdlPerson(adressebeskyttelse, emptyList(), listOf(Folkeregisteridentifikator(brukerId.verdi, "FNR")))
     }
 }

@@ -13,6 +13,9 @@ import org.slf4j.LoggerFactory
 object PdlPipTilBrukerMapper {
     private val log = LoggerFactory.getLogger(javaClass)
     fun tilBruker(person: Map<BrukerId,PdlPipRespons>, erSkjermet: Boolean): Bruker {
+        person.entries.forEach { (brukerId, respons) ->
+            log.info("Mapper respons {} for Bruker {}", respons,brukerId)
+        }
         log.info("Mapper person {} to Bruker {}", person,person.entries.size)
         return person.entries.single().let { (brukerId, metdata) ->
              tilBruker(brukerId,metdata,erSkjermet)

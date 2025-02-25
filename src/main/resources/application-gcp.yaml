@@ -86,8 +86,8 @@ pdl:
   scope: "api://${nais.cluster.type}-fss.pdl.pdl-api/.default"
   base-uri: "https://${pdl}/graphql"
 pdlpip:
-    scope:    "${nais.cluster.type}-fss:pdl:pdl-pip-api"
-  base-uri: "https://${pdlpip}"
+    scope: "${nais.cluster.type}-fss:pdl:pdl-pip-api"
+    base-uri: "https://${pdlpip}"
 skjerming:
   base-uri: "http://skjermede-personer-pip.nom"
   scope: "api://${nais.cluster.type}-gcp.nom.skjermede-personer-pip/.default"

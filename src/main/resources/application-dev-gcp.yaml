@@ -8,9 +8,6 @@ management:
         show-values: always
     configprops:
         show-values: always
-    health:
-      show-details: always
-      show-components: always
   httpexchanges:
     recording:
       enabled: true

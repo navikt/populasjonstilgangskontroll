@@ -1,13 +1,8 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
-import com.neovisionaries.i18n.CountryCode.getByAlpha3Code
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Companion.UdefinertGeoTilknytning
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Navn
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning.GTType.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson.Adressebeskyttelse.AdressebeskyttelseGradering.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlTilBrukerMapper.tilGeoTilknytning
@@ -17,10 +12,12 @@ import org.slf4j.LoggerFactory
 
 object PdlPipTilBrukerMapper {
     private val log = LoggerFactory.getLogger(javaClass)
-    fun tilBruker(person: Map<BrukerId,PdlPipRespons>, erSkjermet: Boolean) =
-         person.entries.single().let { (brukerId, metdata) ->
+    fun tilBruker(person: Map<BrukerId,PdlPipRespons>, erSkjermet: Boolean): Bruker {
+        log.info("Mapper person {} to Bruker", person)
+        return person.entries.single().let { (brukerId, metdata) ->
              tilBruker(brukerId,metdata,erSkjermet)
         }
+    }
 
     private fun tilBruker(brukerId: BrukerId, respons: PdlPipRespons, erSkjermet: Boolean): Bruker {
         return mutableListOf<GlobalGruppe>().apply {

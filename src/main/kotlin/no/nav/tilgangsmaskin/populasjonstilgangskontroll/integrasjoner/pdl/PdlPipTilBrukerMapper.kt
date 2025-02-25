@@ -16,8 +16,8 @@ object PdlPipTilBrukerMapper {
         person.entries.forEach { (brukerId, respons) ->
             log.info("Mapper respons {} for Bruker {}", respons,brukerId)
         }
-       // log.info("Mapper person {} to Bruker {}", person,person.entries.size)
-        return person.entries.single().let { (brukerId, metdata) ->
+        log.info("Mapper person {} to Bruker {}", person,person.entries.size)
+        return person.entries.first().let { (brukerId, metdata) ->
              tilBruker(brukerId,metdata,erSkjermet)
         }
     }

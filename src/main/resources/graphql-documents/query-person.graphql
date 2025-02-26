@@ -3,47 +3,6 @@ query($ident: ID!){
         adressebeskyttelse{
             gradering
         },
-        bostedsadresse(historikk: false) {
-            coAdressenavn,
-            ukjentBosted {
-                bostedskommune
-            },
-            vegadresse {
-                husnummer
-                husbokstav
-                bruksenhetsnummer
-                adressenavn
-                kommunenummer
-                tilleggsnavn
-                postnummer
-            }
-        },
-        kontaktadresse(historikk: false) {
-            coAdressenavn
-            postboksadresse {
-                postbokseier
-                postboks
-                postnummer
-            },
-            utenlandskAdresse {
-                adressenavnNummer
-                bygningEtasjeLeilighet
-                postboksNummerNavn
-                postkode
-                bySted
-                regionDistriktOmraade
-                landkode
-            },
-            vegadresse {
-                husnummer
-                husbokstav
-                bruksenhetsnummer
-                adressenavn
-                kommunenummer
-                tilleggsnavn
-                postnummer
-            }
-        },
         folkeregisteridentifikator(historikk: false){
             identifikasjonsnummer
             type

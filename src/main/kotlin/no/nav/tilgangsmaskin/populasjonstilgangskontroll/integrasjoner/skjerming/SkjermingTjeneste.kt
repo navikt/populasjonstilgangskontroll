@@ -2,16 +2,12 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjermin
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.RecoverableRestException
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.RetryingOnRecoverable
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.RetryingOnRecoverableCacheableService
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig.Companion.SKJERMING
 import org.slf4j.LoggerFactory
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.retry.annotation.Recover
-import org.springframework.stereotype.Service
 
-@Service
-@RetryingOnRecoverable
-@Cacheable(SKJERMING)
+@RetryingOnRecoverableCacheableService(cache = SKJERMING)
 class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
 
     private val log = LoggerFactory.getLogger(SkjermingTjeneste::class.java)

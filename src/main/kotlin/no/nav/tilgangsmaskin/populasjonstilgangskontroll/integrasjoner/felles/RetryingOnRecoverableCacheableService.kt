@@ -1,9 +1,11 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.RecoverableRestException
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.core.annotation.AliasFor
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
+import org.springframework.stereotype.Service
 import java.lang.annotation.Inherited
 import kotlin.annotation.AnnotationRetention.RUNTIME
 import kotlin.annotation.AnnotationTarget.CLASS
@@ -15,8 +17,11 @@ import kotlin.reflect.KClass
 @Inherited
 @MustBeDocumented
 @Retryable
-annotation class RetryingOnRecoverable(
+@Service
+@Cacheable("todo")
+annotation class RetryingOnRecoverableCacheableService(
     @get:AliasFor(annotation = Retryable::class) val value: Array<KClass<out Throwable>> = [RecoverableRestException::class],
     @get:AliasFor(annotation = Retryable::class) val maxAttempts: Int = 3,
+    @get:AliasFor(annotation = Cacheable::class) val cache: String,
     @get:AliasFor(annotation = Retryable::class) val backoff: Backoff = Backoff(delay = 1000)
 )

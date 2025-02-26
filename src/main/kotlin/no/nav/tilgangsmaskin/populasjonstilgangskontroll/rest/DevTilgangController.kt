@@ -22,13 +22,13 @@ import org.springframework.web.bind.annotation.RequestParam
 class DevTilgangController(private val bruker : BrukerTjeneste, private val ansatt: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyringTjeneste: OverstyringTjeneste)
 {
     @GetMapping("bruker")
-    fun bruker(fnr: BrukerId) = bruker.brukerOld(fnr)
+    fun bruker(fnr: BrukerId) = bruker.bruker(fnr)
 
     @PostMapping("brukere")
     fun brukere(@RequestBody brukerIds: List<BrukerId>) = bruker.bolk(brukerIds)
 
     @GetMapping("pip")
-    fun pipbruker(fnr: BrukerId) = bruker.bruker(fnr)
+    fun pipbruker(fnr: BrukerId) = bruker.brukerPip(fnr)
 
     @GetMapping("ansatt")
     fun ansatt(ansattId: AnsattId) = ansatt.ansatt(ansattId)

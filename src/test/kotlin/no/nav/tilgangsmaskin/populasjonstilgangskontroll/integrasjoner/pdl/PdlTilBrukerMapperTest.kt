@@ -66,6 +66,6 @@ class PdlTilBrukerMapperTest {
         val adressebeskyttelse = gradering?.let{
             listOf(Adressebeskyttelse(gradering))
         }?: emptyList()
-        return PdlPerson(adressebeskyttelse, emptyList(), listOf(Folkeregisteridentifikator(brukerId.verdi, "FNR")))
+        return PdlPerson(adressebeskyttelse,  listOf(Folkeregisteridentifikator(brukerId.verdi, "FNR")))
     }
 }

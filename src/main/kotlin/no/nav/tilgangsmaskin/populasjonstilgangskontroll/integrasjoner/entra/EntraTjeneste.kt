@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.RetryingOnRecoverableCacheableService
 
-@RetryingOnRecoverableCacheableService(cache = GRAPH)
+@RetryingOnRecoverableCacheableService(cacheNames = [GRAPH])
 class EntraTjeneste(private val adapter: EntraClientAdapter) {
 
     fun ansatt(ident: AnsattId) : Ansatt {

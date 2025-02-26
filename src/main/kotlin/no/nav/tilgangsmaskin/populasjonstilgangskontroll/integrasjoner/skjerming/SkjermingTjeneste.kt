@@ -6,8 +6,9 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.Re
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig.Companion.SKJERMING
 import org.slf4j.LoggerFactory
 import org.springframework.retry.annotation.Recover
+import kotlin.arrayOf
 
-@RetryingOnRecoverableCacheableService(cache = SKJERMING)
+@RetryingOnRecoverableCacheableService(cacheNames = [SKJERMING])
 class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
 
     private val log = LoggerFactory.getLogger(SkjermingTjeneste::class.java)

@@ -14,7 +14,7 @@
   },
   "db": {
     "type": "POSTGRES_17",
-    "tier": "db-f1-micro",
+    "tier": "db-g1-small",
     "name": "tilgangsmaskin"
   },
   "db-flags":{

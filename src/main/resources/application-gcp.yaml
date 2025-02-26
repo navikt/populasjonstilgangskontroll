@@ -1,8 +1,4 @@
 management:
-  endpoint:
-    health:
-      show-details: always
-      show-components: always
   health:
     ssl:
       enabled: false
@@ -80,7 +76,6 @@ springdoc:
           client-id: ${azure.app.client.id}
       csrf:
         enabled: true
-
 
 pdl:
   scope: "api://${nais.cluster.type}-fss.pdl.pdl-pip-api/.default"

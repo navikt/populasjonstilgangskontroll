@@ -79,7 +79,7 @@ springdoc:
         enabled: true
 
 pdl:
-  scope: "api://${nais.cluster.type}-fss.pdl.pdl-pip-api/.default"
+  scope: "api://${nais.cluster.type}-fss.pdl.pdl-api/.default"
   base-uri: "https://${pdl}/graphql"
 pdlpip:
     scope: "api://${nais.cluster.type}-fss.pdl.pdl-pip-api/.default"

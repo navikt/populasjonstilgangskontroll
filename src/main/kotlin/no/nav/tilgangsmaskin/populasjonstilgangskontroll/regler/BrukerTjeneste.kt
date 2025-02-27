@@ -6,16 +6,19 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlTilBrukerMapper
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
 class BrukerTjeneste(private val pdlTjeneste: PDLTjeneste,val egenAnsatt: SkjermingTjeneste) {
 
+    private val log = LoggerFactory.getLogger(BrukerTjeneste::class.java)
+
     fun bruker(brukerId: BrukerId) =
         runBlocking {
-            val skjermet = egenAnsatt.erSkjermet(brukerId)
-            val pdl = pdlTjeneste.person(brukerId)
-            val gt = pdlTjeneste.gt(brukerId)
+            val skjermet = egenAnsatt.erSkjermet(brukerId).also { log.info("Skjermet $it") }
+            val pdl = pdlTjeneste.person(brukerId).also { log.info("Person $it") }
+            val gt = pdlTjeneste.gt(brukerId).also { log.info("GT $it") }
             PdlTilBrukerMapper.tilBruker(pdl, gt, skjermet)
         }
 

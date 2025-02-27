@@ -34,7 +34,7 @@ interface GraphQLErrorHandler {
             }
 
         private fun oversett(kode: String, msg: String, uri: URI) = IrrecoverableRestException(kode.tilStatus(), uri, msg)
-        private fun String.tilStatus() = HttpStatus.valueOf(this.uppercase(Locale.getDefault()))
+        private fun String.tilStatus() =  if (this.uppercase() == "UNAUTHENTICATED") HttpStatus.UNAUTHORIZED else  HttpStatus.valueOf(this.uppercase(Locale.getDefault()))
 
     }
 }

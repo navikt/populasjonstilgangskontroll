@@ -26,10 +26,10 @@ import kotlin.test.Test
 @ExtendWith(MockKExtension::class)
 @EnableRetry
 @ActiveProfiles(TEST)
-@SpringBootTest
+@SpringBootTest(classes = [SkjermingRetryListener::class])
 internal class SkjermingRetryTest {
 
-    val uri =  URI.create("https://www.vg.no")
+    private val uri =  URI.create("https://www.vg.no")
 
     @MockkBean
     lateinit var adapter: SkjermingRestClientAdapter

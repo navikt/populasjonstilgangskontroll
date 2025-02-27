@@ -23,7 +23,9 @@ class BrukerTjeneste(private val pdlTjeneste: PDLTjeneste,val egenAnsatt: Skjerm
     fun brukerPip(brukerId: BrukerId)  =
         runBlocking {
             val skjermet = egenAnsatt.erSkjermet(brukerId)
-            PdlPipTilBrukerMapper.tilBruker(pdlTjeneste.personPip(brukerId), skjermet)
+           // PdlPipTilBrukerMapper.tilBruker(
+                pdlTjeneste.personPip(brukerId)
+           //     , skjermet)
         }
 
     fun bolk(brukerIds: List<BrukerId>) = pdlTjeneste.bolk(brukerIds)

@@ -12,7 +12,7 @@ import org.springframework.retry.annotation.EnableRetry
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
-@EnableOAuth2Client
+@EnableOAuth2Client(cacheEnabled = true)
 @EnableCaching
 @EnableRetry
 @EnableJpaAuditing

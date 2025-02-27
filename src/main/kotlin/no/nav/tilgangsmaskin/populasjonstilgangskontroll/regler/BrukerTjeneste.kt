@@ -4,7 +4,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipTilBrukerMapper
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlTilBrukerMapper
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
 import org.springframework.stereotype.Service
@@ -15,9 +14,9 @@ class BrukerTjeneste(private val pdlTjeneste: PDLTjeneste,val egenAnsatt: Skjerm
     fun bruker(brukerId: BrukerId) =
         runBlocking {
             val skjermet = egenAnsatt.erSkjermet(brukerId)
-            val pdl = async { pdlTjeneste.person(brukerId) }
-            val gt = async { pdlTjeneste.gt(brukerId) }
-            PdlTilBrukerMapper.tilBruker(pdl.await(), gt.await(), skjermet)
+            val pdl = pdlTjeneste.person(brukerId)
+            val gt = pdlTjeneste.gt(brukerId)
+            PdlTilBrukerMapper.tilBruker(pdl, gt, skjermet)
         }
 
     fun brukerPip(brukerId: BrukerId)  =

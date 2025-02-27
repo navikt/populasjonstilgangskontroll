@@ -5,7 +5,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.Ab
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.LocalOAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig.Companion.SKJERMING
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.cglib.core.Local
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.RestClient.Builder

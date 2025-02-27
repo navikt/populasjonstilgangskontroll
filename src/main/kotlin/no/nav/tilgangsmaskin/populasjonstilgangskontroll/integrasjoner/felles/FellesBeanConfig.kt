@@ -47,7 +47,7 @@ class LocalOAuth2ClientRequestInterceptor(private val properties: ClientConfigur
     override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
         log.trace("Intercepting request to {}", req.uri)
         matcher.findProperties(properties, req.uri)?.let {
-            log.trace("Found properties for uri {}", req.uri)
+            log.trace("Found properties for uri {} med scope  {}", req.uri, it.scope)
             service.getAccessToken(it).access_token?.let {
                     token -> req.headers.setBearerAuth(token)
                 log.trace(CONFIDENTIAL, "Finished setting access token  {} in authorization header OK for uri {}", token,req.uri)

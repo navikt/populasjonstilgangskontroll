@@ -8,7 +8,7 @@ import org.springframework.retry.ExhaustedRetryException
 import org.springframework.retry.annotation.Recover
 import kotlin.arrayOf
 
-@RetryingOnRecoverableCacheableService(cacheNames = [SKJERMING], listeners = ["skjermingRetryListener"])
+@RetryingOnRecoverableCacheableService(cacheNames = [SKJERMING])
 class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
 
     fun erSkjermet(brukerId: BrukerId)  =  adapter.erSkjermet(brukerId.verdi)

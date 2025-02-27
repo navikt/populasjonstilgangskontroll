@@ -6,6 +6,7 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableRestException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.RecoverableRestException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.FellesRetryListener
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.brukerId
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
@@ -26,7 +27,7 @@ import kotlin.test.Test
 @ExtendWith(MockKExtension::class)
 @EnableRetry
 @ActiveProfiles(TEST)
-@SpringBootTest(classes = [SkjermingRetryListener::class])
+@SpringBootTest(classes = [FellesRetryListener::class])
 internal class SkjermingRetryTest {
 
     private val uri =  URI.create("https://www.vg.no")

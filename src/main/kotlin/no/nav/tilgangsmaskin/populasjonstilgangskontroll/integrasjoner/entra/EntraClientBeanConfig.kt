@@ -5,7 +5,9 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.Ent
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraConfig.Companion.HEADER_CONSISTENCY_LEVEL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractPingableHealthIndicator
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestClientAdapter.Companion.headerAddingRequestInterceptor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.LocalOAuth2ClientRequestInterceptor
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.cglib.core.Local
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.RestClient
@@ -15,7 +17,7 @@ class EntraClientBeanConfig {
 
     @Bean
     @Qualifier(GRAPH)
-    fun graphRestClient(b: RestClient.Builder, cfg: EntraConfig, oAuth2ClientRequestInterceptor: OAuth2ClientRequestInterceptor) =
+    fun graphRestClient(b: RestClient.Builder, cfg: EntraConfig, oAuth2ClientRequestInterceptor: LocalOAuth2ClientRequestInterceptor) =
         b.baseUrl(cfg.baseUri)
             .requestInterceptors {
                 it.addFirst(oAuth2ClientRequestInterceptor)

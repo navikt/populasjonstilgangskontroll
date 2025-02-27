@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractPingableHealthIndicator
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestClientAdapter.Companion.headerAddingRequestInterceptor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.LocalOAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.LoggingGraphQLInterceptor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlConfig.Companion.PDL
@@ -19,7 +20,7 @@ class PdlClientBeanConfig {
 
     @Bean
     @Qualifier(PDL)
-    fun pdlRestClient(b: Builder, oAuth2ClientRequestInterceptor: OAuth2ClientRequestInterceptor) =
+    fun pdlRestClient(b: Builder, oAuth2ClientRequestInterceptor: LocalOAuth2ClientRequestInterceptor) =
         b.requestInterceptors {
             it.add(headerAddingRequestInterceptor(BEHANDLINGSNUMMER))
             it.addFirst(oAuth2ClientRequestInterceptor)
@@ -27,7 +28,7 @@ class PdlClientBeanConfig {
 
     @Bean
     @Qualifier(PDLPIP)
-    fun pdlPipRestClient(b: Builder, oAuth2ClientRequestInterceptor: OAuth2ClientRequestInterceptor) =
+    fun pdlPipRestClient(b: Builder, oAuth2ClientRequestInterceptor: LocalOAuth2ClientRequestInterceptor) =
         b.requestInterceptors {
             it.addFirst(oAuth2ClientRequestInterceptor)
         }.build()

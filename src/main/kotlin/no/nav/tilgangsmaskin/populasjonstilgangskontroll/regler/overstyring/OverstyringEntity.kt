@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType.IDENTITY
 import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
+import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
@@ -32,4 +33,8 @@ class OverstyringEntity(@Column(length = 7, nullable = false) val navid: String,
     companion object {
         const val OVERSTYRING = "overstyring"
     }
+
+    @Column(name = "oppretter", length = 7)
+    @CreatedBy
+    var oppretter: String? = null
 }

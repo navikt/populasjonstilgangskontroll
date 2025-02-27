@@ -4,16 +4,16 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
+import no.nav.security.token.support.client.spring.oauth2.ClientConfigurationPropertiesMatcher
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
-import org.springframework.retry.RetryCallback
-import org.springframework.retry.RetryContext
-import org.springframework.retry.RetryContext.NAME
-import org.springframework.retry.RetryListener
-import kotlin.reflect.full.declaredFunctions
+import org.springframework.http.HttpRequest
+import org.springframework.http.client.ClientHttpRequestExecution
+import org.springframework.http.client.ClientHttpRequestInterceptor
+import org.springframework.http.client.ClientHttpResponse
 
 @Configuration
 class FellesBeanConfig {
@@ -34,32 +34,27 @@ class FellesBeanConfig {
         .removalListener { key: Any?, value: Any?, cause -> log.trace(CONFIDENTIAL,"Cache removal key={}, value={}, cause={}", key, value, cause)
     }.build<Any, Any>()
     @Bean
-    fun oAuth2ClientRequestInterceptor(properties: ClientConfigurationProperties, service: OAuth2AccessTokenService) = OAuth2ClientRequestInterceptor(properties, service)
+    fun oAuth2ClientRequestInterceptor(properties: ClientConfigurationProperties, service: OAuth2AccessTokenService) = LocalOAuth2ClientRequestInterceptor(properties, service)
 }
 
-class FellesRetryListener: RetryListener {
+class LocalOAuth2ClientRequestInterceptor(private val properties: ClientConfigurationProperties,
+                                     private val service: OAuth2AccessTokenService,
+                                     private val matcher: ClientConfigurationPropertiesMatcher =  object : ClientConfigurationPropertiesMatcher {}) : ClientHttpRequestInterceptor {
 
-    private val log = LoggerFactory.getLogger(FellesRetryListener::class.java)
-    override fun <T : Any, E : Throwable> onSuccess(context: RetryContext, callback: RetryCallback<T, E>, result: T) {
-        if (context.retryCount > 0)  {
-            log.info("Eksekvering av '${methodFrom(context)}' var vellykket på forsøk ${context.retryCount + 1}")
-        }
-    }
-    override fun <T : Any, E : Throwable> onError(context: RetryContext, callback: RetryCallback<T, E>, e: Throwable) {
-        log.warn("Eksekvering av '${methodFrom(context)}' feilet på forsøk ${context.retryCount} ", context.lastThrowable)
-    }
+    private val log = LoggerFactory.getLogger(OAuth2ClientRequestInterceptor::class.java)
 
-    companion object    {
-        private fun methodFrom(ctx: RetryContext) : String {
-            val name = ctx.getAttribute(NAME) as String
-            return runCatching {
-                val method = name.substringAfterLast('.').substringBefore('-')
-                val kClass = Class.forName( name.substringBeforeLast('.')).kotlin
-                return  kClass.declaredFunctions.firstOrNull{ it.name == method }?.name?.let { kClass.simpleName +'#' + it } ?: name
-            }.getOrElse {
-                name
+
+    override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
+        log.trace("Intercepting request to {}", req.uri)
+        matcher.findProperties(properties, req.uri)?.let {
+            log.trace("Found properties for uri {}", req.uri)
+            service.getAccessToken(it).access_token?.let {
+                    token -> req.headers.setBearerAuth(token)
+                log.trace(CONFIDENTIAL, "Finished setting access token  {} in authorization header OK for uri {}", token,req.uri)
             }
         }
-        const val FELLES_RETRY_LISTENER = "fellesRetryListener"
+        return execution.execute(req, body)
     }
+    override fun toString() = "${javaClass.simpleName}  [properties=$properties, service=$service, matcher=$matcher]"
+
 }

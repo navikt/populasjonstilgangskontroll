@@ -11,7 +11,9 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.retry.RetryCallback
 import org.springframework.retry.RetryContext
+import org.springframework.retry.RetryContext.NAME
 import org.springframework.retry.RetryListener
+import kotlin.reflect.full.declaredFunctions
 
 @Configuration
 class FellesBeanConfig {
@@ -38,14 +40,26 @@ class FellesBeanConfig {
 class FellesRetryListener: RetryListener {
 
     private val log = LoggerFactory.getLogger(FellesRetryListener::class.java)
-    override fun <T : Any?, E : Throwable?> onSuccess(context: RetryContext, callback: RetryCallback<T, E>, result: T) {
-        log.info("Retry success på forsøk ${context.retryCount}")
+    override fun <T : Any, E : Throwable> onSuccess(context: RetryContext, callback: RetryCallback<T, E>, result: T) {
+        if (context.retryCount > 0)  {
+            log.info("Eksekvering av '${methodFrom(context)}' var vellykket på forsøk ${context.retryCount + 1}")
+        }
     }
-    override fun <T : Any?, E : Throwable?> onError(context: RetryContext, callback: RetryCallback<T, E>, e: Throwable) {
-        log.info("Retry feilet på forsøk ${context.retryCount}")
+    override fun <T : Any, E : Throwable> onError(context: RetryContext, callback: RetryCallback<T, E>, e: Throwable) {
+        log.warn("Eksekvering av '${methodFrom(context)}' feilet på forsøk ${context.retryCount} ", context.lastThrowable)
     }
 
     companion object    {
+        private fun methodFrom(ctx: RetryContext) : String {
+            val name = ctx.getAttribute(NAME) as String
+            return runCatching {
+                val method = name.substringAfterLast('.').substringBefore('-')
+                val kClass = Class.forName( name.substringBeforeLast('.')).kotlin
+                return  kClass.declaredFunctions.firstOrNull{ it.name == method }?.name?.let { kClass.simpleName +'#' + it } ?: name
+            }.getOrElse {
+                name
+            }
+        }
         const val FELLES_RETRY_LISTENER = "fellesRetryListener"
     }
 }

@@ -15,7 +15,7 @@ class BrukerTjeneste(private val pdlTjeneste: PDLTjeneste,val egenAnsatt: Skjerm
     private val log = LoggerFactory.getLogger(BrukerTjeneste::class.java)
 
     fun bruker(brukerId: BrukerId) =
-        runBlocking {
+        run {
             val skjermet = egenAnsatt.erSkjermet(brukerId).also { log.info("Skjermet $it") }
             val pdl = pdlTjeneste.person(brukerId).also { log.info("Person $it") }
             val gt = pdlTjeneste.gt(brukerId).also { log.info("GT $it") }

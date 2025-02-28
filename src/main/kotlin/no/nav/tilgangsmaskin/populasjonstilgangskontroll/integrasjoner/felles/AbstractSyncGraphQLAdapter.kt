@@ -6,11 +6,11 @@ import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
-abstract class AbstractSyncGraphQLAdapter(client: RestClient, cf: AbstractRestConfig, errorHandler: ErrorHandler, protected val graphQlErrorHandler: GraphQLErrorHandler) : AbstractRestClientAdapter(client, cf, errorHandler) {
+abstract class AbstractSyncGraphQLAdapter(protected val graphQlClient: GraphQlClient, client: RestClient, cf: AbstractRestConfig, errorHandler: ErrorHandler, protected val graphQlErrorHandler: GraphQLErrorHandler) : AbstractRestClientAdapter(client, cf, errorHandler) {
 
-    protected inline fun <reified T> query(graphQL: GraphQlClient, query: Pair<String, String>, vars: Map<String, String>) =
+    protected inline fun <reified T> query(query: Pair<String, String>, vars: Map<String, String>) =
         runCatching {
-            graphQL
+            graphQlClient
                 .documentName(query.first)
                 .variables(vars)
                 .executeSync()

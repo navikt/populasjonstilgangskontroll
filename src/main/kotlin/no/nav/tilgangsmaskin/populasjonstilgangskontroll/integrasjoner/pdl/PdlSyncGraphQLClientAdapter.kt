@@ -13,11 +13,11 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 @Component
-class PdlSyncGraphQLClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQlClient,
+class PdlSyncGraphQLClientAdapter(@Qualifier(PDL) graphQlClient: GraphQlClient,
                                   @Qualifier(PDL) restClient: RestClient,
                                   graphQlErrorHandler: GraphQLErrorHandler,
                                   errorHandler: ErrorHandler,
-                                  cfg: PdlConfig) : AbstractSyncGraphQLAdapter(restClient, cfg,errorHandler,graphQlErrorHandler) {
+                                  cfg: PdlConfig) : AbstractSyncGraphQLAdapter(graphQlClient,restClient, cfg,errorHandler,graphQlErrorHandler) {
 
     override fun ping()  {
          restClient
@@ -28,9 +28,9 @@ class PdlSyncGraphQLClientAdapter(@Qualifier(PDL) private val graphQlClient: Gra
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
     }
 
-    fun gt(ident: String) = query<PdlGeoTilknytning>(graphQlClient, GT_QUERY, ident(ident))
+    fun gt(ident: String) = query<PdlGeoTilknytning>(GT_QUERY, ident(ident))
 
-    fun person(ident: String) = query<PdlPerson>(graphQlClient, PERSON_QUERY, ident(ident))
+    fun person(ident: String) = query<PdlPerson>(PERSON_QUERY, ident(ident))
     override fun toString() =
         "${javaClass.simpleName} [restClient=$restClient,graphQlClient=$graphQlClient, cfg=$cfg]"
 

@@ -3,9 +3,11 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.RetryingOnRecoverableCacheableService
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlConfig.Companion.PDL
+import org.springframework.stereotype.Service
 import kotlin.arrayOf
 
 //@RetryingOnRecoverableCacheableService(cacheNames = [PDL])
+@Service
 class PDLTjeneste(private val pdlAdapter: PdlSyncGraphQLClientAdapter, private val pipAdapter: PdlPipRestClientAdapter) {
 
     fun person(brukerId: BrukerId) = pdlAdapter.person(brukerId.verdi)

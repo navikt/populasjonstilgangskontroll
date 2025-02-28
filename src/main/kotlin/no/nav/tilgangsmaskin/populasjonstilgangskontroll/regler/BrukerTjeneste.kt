@@ -4,6 +4,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlTilBrukerMapper
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
 import org.slf4j.LoggerFactory
@@ -19,6 +21,7 @@ class BrukerTjeneste(private val pdlTjeneste: PDLTjeneste,val egenAnsatt: Skjerm
             val skjermet = egenAnsatt.erSkjermet(brukerId).also { log.info("Skjermet $it") }
             val pdl = pdlTjeneste.person(brukerId).also { log.info("Person $it") }
             val gt = pdlTjeneste.gt(brukerId).also { log.info("GT $it") }
+            a(pdl,gt)
             PdlTilBrukerMapper.tilBruker(pdl, gt, skjermet)
         }
 
@@ -29,6 +32,8 @@ class BrukerTjeneste(private val pdlTjeneste: PDLTjeneste,val egenAnsatt: Skjerm
                 pdlTjeneste.personPip(brukerId)
            //     , skjermet)
         }
+
+    fun a(pdl: PdlPerson,  geo: PdlGeoTilknytning) = Unit
 
     fun bolk(brukerIds: List<BrukerId>) = pdlTjeneste.bolk(brukerIds)
 }

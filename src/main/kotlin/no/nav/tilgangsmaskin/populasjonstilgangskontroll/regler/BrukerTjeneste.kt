@@ -21,7 +21,6 @@ class BrukerTjeneste(private val pdlTjeneste: PDLTjeneste,val egenAnsatt: Skjerm
             val skjermet = egenAnsatt.erSkjermet(brukerId).also { log.info("Skjermet $it") }
             val pdl = pdlTjeneste.person(brukerId).also { log.info("Person $it") }
             val gt = pdlTjeneste.gt(brukerId).also { log.info("GT $it") }
-            a(pdl,gt)
             PdlTilBrukerMapper.tilBruker(pdl, gt, skjermet)
         }
 
@@ -33,7 +32,6 @@ class BrukerTjeneste(private val pdlTjeneste: PDLTjeneste,val egenAnsatt: Skjerm
            //     , skjermet)
         }
 
-    fun a(pdl: PdlPerson,  geo: PdlGeoTilknytning) = Unit
 
     fun bolk(brukerIds: List<BrukerId>) = pdlTjeneste.bolk(brukerIds)
 }

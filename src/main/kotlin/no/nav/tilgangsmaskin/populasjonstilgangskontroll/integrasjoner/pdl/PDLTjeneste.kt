@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.Re
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlConfig.Companion.PDL
 import kotlin.arrayOf
 
-@RetryingOnRecoverableCacheableService(cacheNames = [PDL])
+//@RetryingOnRecoverableCacheableService(cacheNames = [PDL])
 class PDLTjeneste(private val pdlAdapter: PdlSyncGraphQLClientAdapter, private val pipAdapter: PdlPipRestClientAdapter) {
 
     fun person(brukerId: BrukerId) = pdlAdapter.person(brukerId.verdi)

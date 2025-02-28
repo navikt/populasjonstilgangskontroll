@@ -7,6 +7,8 @@ import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import no.nav.security.token.support.client.spring.oauth2.ClientConfigurationPropertiesMatcher
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import org.slf4j.LoggerFactory
+import org.springframework.cache.annotation.CachingConfigurer
+import org.springframework.cache.interceptor.KeyGenerator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
@@ -14,9 +16,11 @@ import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.ClientHttpResponse
+import java.lang.reflect.Method
+import kotlin.toString
 
 @Configuration
-class FellesBeanConfig {
+class FellesBeanConfig : CachingConfigurer {
 
     private val log = LoggerFactory.getLogger(FellesBeanConfig::class.java)
 
@@ -34,27 +38,15 @@ class FellesBeanConfig {
         .removalListener { key: Any?, value: Any?, cause -> log.trace(CONFIDENTIAL,"Cache removal key={}, value={}, cause={}", key, value, cause)
     }.build<Any, Any>()
     @Bean
-    fun oAuth2ClientRequestInterceptor(properties: ClientConfigurationProperties, service: OAuth2AccessTokenService) = LocalOAuth2ClientRequestInterceptor(properties, service)
-}
-
-class LocalOAuth2ClientRequestInterceptor(private val properties: ClientConfigurationProperties,
-                                     private val service: OAuth2AccessTokenService,
-                                     private val matcher: ClientConfigurationPropertiesMatcher =  object : ClientConfigurationPropertiesMatcher {}) : ClientHttpRequestInterceptor {
-
-    private val log = LoggerFactory.getLogger(OAuth2ClientRequestInterceptor::class.java)
+    fun oAuth2ClientRequestInterceptor(properties: ClientConfigurationProperties, service: OAuth2AccessTokenService) = OAuth2ClientRequestInterceptor(properties, service)
 
 
-    override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
-        log.trace("Intercepting request to {}", req.uri)
-        matcher.findProperties(properties, req.uri)?.let {
-            log.trace("Found properties for uri {} med scope  {}", req.uri, it.scope)
-            service.getAccessToken(it).access_token?.let {
-                    token -> req.headers.setBearerAuth(token)
-                log.trace(CONFIDENTIAL, "Finished setting access token  {} in authorization header OK for uri {}", token,req.uri)
-            }
+    override fun keyGenerator() = KeyGenerator { target, method, params ->
+        buildString {
+            append(target::class)
+            append(method.name)
+            params.forEach { append(it) }
         }
-        return execution.execute(req, body)
     }
-    override fun toString() = "${javaClass.simpleName}  [properties=$properties, service=$service, matcher=$matcher]"
-
 }
+

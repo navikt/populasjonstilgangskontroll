@@ -5,8 +5,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.Re
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlConfig.Companion.PDL
 import org.springframework.stereotype.Service
 
-//@RetryingOnRecoverableCacheableService(cacheNames = [PDL])
-@Service
+@RetryingOnRecoverableCacheableService(cacheNames = [PDL])
+//@Service
 class PDLTjeneste(private val pdlAdapter: PdlSyncGraphQLClientAdapter, private val pipAdapter: PdlPipRestClientAdapter) {
 
     fun person(brukerId: BrukerId)  = pdlAdapter.person(brukerId.verdi)

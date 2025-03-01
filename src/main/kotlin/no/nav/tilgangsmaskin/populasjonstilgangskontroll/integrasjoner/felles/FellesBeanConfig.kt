@@ -7,17 +7,13 @@ import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import no.nav.security.token.support.client.spring.oauth2.ClientConfigurationPropertiesMatcher
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import org.slf4j.LoggerFactory
+import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.CachingConfigurer
+import org.springframework.cache.caffeine.CaffeineCacheManager
 import org.springframework.cache.interceptor.KeyGenerator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
-import org.springframework.http.HttpRequest
-import org.springframework.http.client.ClientHttpRequestExecution
-import org.springframework.http.client.ClientHttpRequestInterceptor
-import org.springframework.http.client.ClientHttpResponse
-import java.lang.reflect.Method
-import kotlin.toString
 
 @Configuration
 class FellesBeanConfig : CachingConfigurer {
@@ -33,11 +29,6 @@ class FellesBeanConfig : CachingConfigurer {
     fun fellesRetryListener() = FellesRetryListener()
 
     @Bean
-    fun caffeine() = Caffeine.newBuilder()
-        .recordStats()
-        .removalListener { key: Any?, value: Any?, cause -> log.trace(CONFIDENTIAL,"Cache removal key={}, value={}, cause={}", key, value, cause)
-    }.build<Any, Any>()
-    @Bean
     fun oAuth2ClientRequestInterceptor(properties: ClientConfigurationProperties, service: OAuth2AccessTokenService) = OAuth2ClientRequestInterceptor(properties, service)
 
 
@@ -48,5 +39,13 @@ class FellesBeanConfig : CachingConfigurer {
             params.forEach { append(it) }
         }
     }
+
+    override fun cacheManager()   =
+        CaffeineCacheManager().apply {
+            this.setCaffeine(Caffeine.newBuilder()
+                .recordStats()
+                .removalListener {
+                    key, value, cause -> log.trace(CONFIDENTIAL,"Cache removal key={}, value={}, cause={}", key, value, cause) })
+        }
 }
 

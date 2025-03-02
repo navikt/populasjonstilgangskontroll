@@ -48,8 +48,5 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
 
 
     @PostMapping("bulk/{ansattId}/")
-    fun bulk(@PathVariable ansattId: AnsattId,@RequestBody vararg specs: RegelSpec): ResponseEntity<Unit> {
-       regler.bulkRegler(ansattId,*specs)
-        return ResponseEntity.accepted().build()
-    }
+    fun bulk(@PathVariable ansattId: AnsattId,@RequestBody vararg specs: RegelSpec) = regler.bulkRegler(ansattId, *specs)
 }

@@ -5,7 +5,6 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelSpec.RegelType.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.geoUtlandBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.motor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.ansattId
@@ -97,11 +96,11 @@ class RegelTjenesteTest {
         every { bruker.bruker(strengtFortroligBruker.brukerId) } returns strengtFortroligBruker
         every { bruker.bruker(vanligBruker.brukerId) } returns vanligBruker
         assertThrows<BulkRegelException> {
-            regel.bulkRegler(vanligAnsatt.ansattId, RegelSpec(strengtFortroligBruker.brukerId, KJERNE), RegelSpec(vanligBruker.brukerId, KJERNE))
+            regel.bulkRegler(vanligAnsatt.ansattId, RegelSpec(strengtFortroligBruker.brukerId, RegelType.KJERNE), RegelSpec(vanligBruker.brukerId, RegelType.KJERNE))
         }
     }
     companion object {
         @JvmStatic
-        fun kjerneregelProvider() = motor.kjerneregler.stream()
+        fun kjerneregelProvider() = motor.kjerneRegelSett.regler.stream()
     }
 }

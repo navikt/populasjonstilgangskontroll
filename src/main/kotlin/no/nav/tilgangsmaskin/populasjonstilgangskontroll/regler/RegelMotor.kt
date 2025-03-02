@@ -1,9 +1,8 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
-
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelType.*
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelSpec.RegelType.*
 import org.slf4j.LoggerFactory
 import org.springframework.core.annotation.AnnotationAwareOrderComparator.INSTANCE
 import org.springframework.stereotype.Component
@@ -12,11 +11,11 @@ import org.springframework.stereotype.Component
 class RegelMotor(vararg regler: Regel)  {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    val kjerneregler = RegelSett(KJERNE,regler.sortedWith(INSTANCE).filterIsInstance<KjerneRegel>())
-    val alleRegler = RegelSett(ALLE,regler.sortedWith(INSTANCE))
+    val kjerneRegelSett = RegelSett(KJERNE,regler.sortedWith(INSTANCE).filterIsInstance<KjerneRegel>())
+    val komplettRegelSett = RegelSett(KOMPLETT,regler.sortedWith(INSTANCE))
 
-    fun alleRegler(ansatt: Ansatt, bruker: Bruker) = eksekver(ansatt, bruker, alleRegler)
-    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = eksekver(ansatt, bruker, kjerneregler)
+    fun alleRegler(ansatt: Ansatt, bruker: Bruker) = eksekver(ansatt, bruker, komplettRegelSett)
+    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = eksekver(ansatt, bruker, kjerneRegelSett)
 
     private fun eksekver(ansatt: Ansatt, bruker: Bruker, regelsett: RegelSett) {
         log.trace("Eksekverer regelett {} for ansatt '{}' og bruker '{}'", regelsett.type, ansatt.ansattId, bruker.brukerId)

@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.BrukerTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelSpec
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringMetadata
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringTjeneste
@@ -42,6 +43,13 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     @PostMapping("overstyr/{ansattId}/{brukerId}")
     fun overstyr(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId, @RequestBody metadata: OverstyringMetadata): ResponseEntity<Unit> {
         overstyringTjeneste.overstyr(ansattId, brukerId, metadata)
+        return ResponseEntity.accepted().build()
+    }
+
+
+    @PostMapping("bulk/{ansattId}/")
+    fun bulk(@PathVariable ansattId: AnsattId,@RequestBody vararg specs: RegelSpec): ResponseEntity<Unit> {
+       regler.bulkRegler(ansattId,*specs)
         return ResponseEntity.accepted().build()
     }
 }

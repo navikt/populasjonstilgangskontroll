@@ -5,12 +5,14 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.brukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelSpec.RegelType.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.geoUtlandBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.motor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.ansattId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.strengtFortroligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligBruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligBrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringSjekker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringTjeneste
 import org.assertj.core.api.Assertions.assertThatCode
@@ -65,7 +67,7 @@ class RegelTjenesteTest {
         }
     }
     @Test
-    @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang ikke gis om overstyring ikke er gjort")
+    @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang,og at tilgang ikke gis om overstyring ikke er gjort")
     fun ikkeOverstyrt() {
         every { bruker.bruker(geoUtlandBruker.brukerId) } returns geoUtlandBruker
         every { overstyring.erOverstyrt(vanligAnsatt.ansattId, geoUtlandBruker.brukerId) } returns false
@@ -82,13 +84,22 @@ class RegelTjenesteTest {
     @DisplayName("Test at tilgang avvist av en av kjernereglene ikke fører til sjekk av midlertidig tilgang")
     fun ikkeOverstyrbar(regel: Regel)    {
         assertThrows<RegelException> {
-            avvistHandler.sjekk(ansattId, brukerId, RegelException(brukerId, ansattId, regel))
+            avvistHandler.sjekk(ansattId, vanligBrukerId, RegelException(vanligBrukerId, ansattId, regel))
         }
         verify {
             overstyring wasNot Called
         }
     }
 
+    @Test
+    fun bulk() {
+        every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
+        every { bruker.bruker(strengtFortroligBruker.brukerId) } returns strengtFortroligBruker
+        every { bruker.bruker(vanligBruker.brukerId) } returns vanligBruker
+        assertThrows<BulkRegelException> {
+            regel.bulkRegler(vanligAnsatt.ansattId, RegelSpec(strengtFortroligBruker.brukerId, KJERNE), RegelSpec(vanligBruker.brukerId, KJERNE))
+        }
+    }
     companion object {
         @JvmStatic
         fun kjerneregelProvider() = motor.kjerneregler.stream()

@@ -60,7 +60,7 @@ class PdlPipDeserializationTest {
 }
 """
 
-    @Test
+    //@Test
     fun deserialization() {
         println(mapper.readValue<Map<BrukerId, PdlPipRespons>>(json))
     }

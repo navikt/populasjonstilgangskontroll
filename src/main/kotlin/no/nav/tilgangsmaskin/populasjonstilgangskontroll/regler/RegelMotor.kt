@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
 import org.slf4j.LoggerFactory
 import org.springframework.core.annotation.AnnotationAwareOrderComparator.INSTANCE
 import org.springframework.stereotype.Component
@@ -12,20 +11,23 @@ import org.springframework.stereotype.Component
 class RegelMotor(vararg inputRegler: Regel)  {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    val regler = inputRegler.sortedWith(INSTANCE)
-    val kjerneregler = regler.filter { it is KjerneRegel }
 
-    fun alleRegler(ansatt: Ansatt, bruker: Bruker) = eksekver(ansatt, bruker, regler)
+    val kjerneregler = inputRegler.sortedWith(INSTANCE).filterIsInstance<KjerneRegel>()
+    val alleRegler = inputRegler.sortedWith(INSTANCE)
+
+    fun alleRegler(ansatt: Ansatt, bruker: Bruker) = eksekver(ansatt, bruker, alleRegler)
     fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = eksekver(ansatt, bruker, kjerneregler)
 
     private fun eksekver(ansatt: Ansatt, bruker: Bruker, regler: List<Regel>) =
         regler.forEach {
-            log.info(CONFIDENTIAL,"Eksekverer regel: '${it.metadata.kortNavn}' for ansatt '${ansatt.ansattId.verdi}' og bruker '${bruker.brukerId.mask()}'")
+            log.info(CONFIDENTIAL,"Eksekverer regel: '${it.metadata.kortNavn}' for ansatt '${ansatt.ansattId}' og bruker '${bruker.brukerId}'")
             if (!it.test(ansatt,bruker)) {
                 throw RegelException(bruker.brukerId, ansatt.ansattId, it).also {
-                    log.warn(CONFIDENTIAL,"Tilgang avvist av regel '${it.regel.metadata.kortNavn}'")
+                    log.warn("Tilgang avvist av regel '${it.regel.metadata.kortNavn}'")
                 }
             }
+        }.also {
+            log.info("Alle regler OK for ansatt '${ansatt.ansattId}' og bruker '${bruker.brukerId}'")
         }
 }
 

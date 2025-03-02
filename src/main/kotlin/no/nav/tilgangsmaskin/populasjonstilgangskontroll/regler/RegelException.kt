@@ -20,3 +20,13 @@ class RegelException(val brukerId: BrukerId, val  ansattId: AnsattId, val regel:
     }, null,messageCode,arguments) {
     constructor(e: RegelException, messageCode: String, arguments: Array<String>) : this(e.brukerId, e.ansattId, e.regel, messageCode, arguments)
 }
+class BulkRegelException(val exceptions: List<RegelException>) : ErrorResponseException(FORBIDDEN, forStatus(FORBIDDEN).apply {
+    title = "Feil ved kjøring av bulk regler"
+    type = URI.create("https://tilgangsmaskin.nav.no/bulk")
+    instance = URI.create("bulk")
+    properties = mapOf(
+        "antallFeil" to exceptions.size,
+        "feil" to exceptions.map { it.message }
+    )
+}, null, DETAIL_MESSAGE_CODE, arrayOf(exceptions.size.toString())) {
+}

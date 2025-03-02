@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component
 class RegelMotor(vararg inputRegler: Regel)  {
     private val log = LoggerFactory.getLogger(javaClass)
 
-
     val kjerneregler = inputRegler.sortedWith(INSTANCE).filterIsInstance<KjerneRegel>()
     val alleRegler = inputRegler.sortedWith(INSTANCE)
 

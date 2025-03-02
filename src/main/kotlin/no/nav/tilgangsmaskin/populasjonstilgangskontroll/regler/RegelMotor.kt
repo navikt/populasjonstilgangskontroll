@@ -17,8 +17,9 @@ class RegelMotor(vararg inputRegler: Regel)  {
     fun alleRegler(ansatt: Ansatt, bruker: Bruker) = eksekver(ansatt, bruker, alleRegler)
     fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = eksekver(ansatt, bruker, kjerneregler)
 
-    private fun eksekver(ansatt: Ansatt, bruker: Bruker, regler: List<Regel>) =
-        regler.forEach {
+    private fun eksekver(ansatt: Ansatt, bruker: Bruker, regler: List<Regel>) {
+       log.trace("Eksekverer regelett for ansatt '${ansatt.ansattId}' og bruker '${bruker.brukerId}'")
+       regler.forEach {
             log.info(CONFIDENTIAL,"Eksekverer regel: '${it.metadata.kortNavn}' for ansatt '${ansatt.ansattId}' og bruker '${bruker.brukerId}'")
             if (!it.test(ansatt,bruker)) {
                 throw RegelException(bruker.brukerId, ansatt.ansattId, it).also {
@@ -26,8 +27,9 @@ class RegelMotor(vararg inputRegler: Regel)  {
                 }
             }
         }.also {
-            log.info("Alle regler OK for ansatt '${ansatt.ansattId}' og bruker '${bruker.brukerId}'")
+            log.info("Regelsett OK for ansatt '${ansatt.ansattId}' og bruker '${bruker.brukerId}'")
         }
+    }
 }
 
 

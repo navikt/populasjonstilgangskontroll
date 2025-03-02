@@ -254,7 +254,7 @@ class RegelMotorTest {
     @Test
     @DisplayName("Sjekk at reglene er sorterte")
     fun sortert() {
-        assertThat(motor.alleRegler).containsExactly(strengtFortroligRegel, fortroligRegel, egenAnsattRegel, geoUtlandRegel,ukjentBostedGeoRegel, geoNorgeRegel)
-        assertThat(motor.kjerneregler).containsExactly(strengtFortroligRegel, fortroligRegel, egenAnsattRegel)
+        assertThat(motor.alleRegler.regler).containsExactly(strengtFortroligRegel, fortroligRegel, egenAnsattRegel, geoUtlandRegel,ukjentBostedGeoRegel, geoNorgeRegel)
+        assertThat(motor.kjerneregler.regler).containsExactly(strengtFortroligRegel, fortroligRegel, egenAnsattRegel)
     }
 }

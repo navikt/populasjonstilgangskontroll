@@ -11,26 +11,33 @@ import org.springframework.stereotype.Component
 class RegelMotor(vararg regler: Regel)  {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    val kjerneRegelSett = RegelSett(KJERNE,regler.sortedWith(INSTANCE).filterIsInstance<KjerneRegel>())
-    val komplettRegelSett = RegelSett(KOMPLETT,regler.sortedWith(INSTANCE))
+    val kjerneRegelSett = RegelSett(KJERNE to regler.sortedWith(INSTANCE).filterIsInstance<KjerneRegel>())
+    val komplettRegelSett = RegelSett(KOMPLETT to regler.sortedWith(INSTANCE))
 
-    fun alleRegler(ansatt: Ansatt, bruker: Bruker) = eksekver(ansatt, bruker, komplettRegelSett)
-    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = eksekver(ansatt, bruker, kjerneRegelSett)
+    fun alleRegler(ansatt: Ansatt, bruker: Bruker) = sjekk(ansatt, bruker, komplettRegelSett)
+    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = sjekk(ansatt, bruker, kjerneRegelSett)
 
-    private fun eksekver(ansatt: Ansatt, bruker: Bruker, regelsett: RegelSett) {
-        log.trace("Eksekverer regelett {} for ansatt '{}' og bruker '{}'", regelsett.type, ansatt.ansattId, bruker.brukerId)
-        regelsett.regler.forEach {
-            log.info(CONFIDENTIAL,"Eksekverer regel: '${it.metadata.kortNavn}' for ansatt '${ansatt.ansattId}' og bruker '${bruker.brukerId}'")
-            if (!it.test(ansatt,bruker)) {
-                throw RegelException(bruker.brukerId, ansatt.ansattId, it).also {
-                    log.warn("Tilgang avvist av regel '${it.regel.metadata.kortNavn}'")
+    fun sjekk(ansatt: Ansatt, bruker: Bruker, type: RegelType) =
+        sjekk(ansatt, bruker, type.regelSett())
+
+    private fun sjekk(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) =
+        with(regelSett) {
+            regler.forEachIndexed { index, it ->
+                log.info(CONFIDENTIAL,"[$index] Sjekker regel: '${it.metadata.kortNavn}' fra ${type.tekst} for '${ansatt.ansattId.verdi}' og '${bruker.brukerId.verdi}'")
+                if (!it.test(ansatt,bruker)) {
+                    throw RegelException(bruker.brukerId, ansatt.ansattId, it).also {
+                        log.warn("Tilgang avvist av regel ${index.plus(1)} ('${it.regel.metadata.kortNavn} (${it.body.title}')")
+                    }
                 }
+            }.also {
+                log.info("${regler.size} ${type.tekst} OK for '${ansatt.ansattId.verdi}' og '${bruker.brukerId.verdi}'")
             }
-        }.also {
-            log.info("Regelsett ${regelsett.type
-            } OK for ansatt '${ansatt.ansattId}' og bruker '${bruker.brukerId}'")
-        }
     }
+    private fun RegelType.regelSett() =
+        when(this) {
+            KJERNE -> kjerneRegelSett
+            KOMPLETT -> komplettRegelSett
+        }
 }
 
 

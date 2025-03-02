@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelType.KOMPLETT
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringSjekker
@@ -23,22 +22,17 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: B
         motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.bruker(brukerId))
 
     fun bulkRegler(ansattId: AnsattId, vararg specs: RegelSpec) {
-        log.trace("Eksekverer ${specs.size} regler for ansatt $ansattId")
-        val (komplett,kjerne) = specs.partition { it.type == KOMPLETT }
+        log.info("Sjekker regler for ${ansattId.verdi} og ${specs.size} brukere ${specs.map { it.brukerId.verdi }}")
         val ansatt = ansattTjeneste.ansatt(ansattId)
-        val exceptions = mutableListOf<RegelException>()
-        log.trace("Eksekverer ${kjerne.size} kjerneregler for ansatt $ansattId")
-        kjerne.forEach { eksekver({ motor.kjerneregler(ansatt, brukerTjeneste.bruker(it.brukerId)) }, exceptions) }.also { log.trace("Antall feil etter kjerneregler er ${exceptions.size}") }
-        log.trace("Eksekverer ${komplett.size} komplette regler for ansatt $ansattId")
-        komplett.forEach { eksekver({ motor.alleRegler(ansatt, brukerTjeneste.bruker(it.brukerId)) }, exceptions) }.also { log.trace("Antall feil etter alle regler er ${exceptions.size}") }
-        if (exceptions.isNotEmpty()) throw BulkRegelException(exceptions).also {
-            log.trace("Det er ${exceptions.size} feil i bulk-regler for ansatt $ansattId")
+        val avvisninger = mutableListOf<RegelException>()
+        specs.forEachIndexed { index, spec ->
+            runCatching {
+               log.info("[$index] Sjekker ${spec.type.tekst} for '${ansattId.verdi}' og '${spec.brukerId.verdi}'")
+                motor.sjekk(ansatt, brukerTjeneste.bruker(spec.brukerId), spec.type)
+            }.getOrElse {e -> if (e is RegelException) avvisninger.add(e) else throw e }
         }
-    }
-
-    private fun <T> eksekver(block: () -> T, exceptions: MutableList<RegelException>) {
-        runCatching { block() }.getOrElse {
-            if (it is RegelException) exceptions.add(it) else throw it
+        if (avvisninger.isNotEmpty()) throw BulkRegelException(avvisninger).also {
+            log.info("Det er ${avvisninger.size} avvisning(er) i regler for ${ansattId.verdi}->${avvisninger.map { it.brukerId.verdi to it.body.title }}")
         }
     }
 }

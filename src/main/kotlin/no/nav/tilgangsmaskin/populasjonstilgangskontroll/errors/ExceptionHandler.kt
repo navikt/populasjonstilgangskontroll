@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
 import org.springframework.http.ProblemDetail
+import org.springframework.http.ProblemDetail.*
 import org.springframework.http.ResponseEntity.status
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -23,21 +24,21 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
             .headers(HttpHeaders().apply { contentType = APPLICATION_PROBLEM_JSON })
             .body<ProblemDetail>(bulkDetail(e))
 
-    fun bulkDetail(e: BulkRegelException) = ProblemDetail.forStatus(FORBIDDEN).apply {
+    fun bulkDetail(e: BulkRegelException) = forStatus(FORBIDDEN).apply {
         title = e.message
         type = TYPE_URI
-
         properties = mapOf(
             "navIdent" to e.ansattId.verdi,
             "avvisninger" to e.exceptions.size,
-            "detaljer" to e.exceptions.map { properties(it) }
+            "detaljer" to e.exceptions.map { ::props }
         )
     }
 
-    fun properties(e: RegelException) = mapOf(
-        "årsak" to e.regel.metadata.begrunnelse,
-        "brukerIdent" to e.brukerId.verdi,
-        "kanOverstyres" to e.regel.erOverstyrbar)
+    fun props(e: RegelException) =
+        with(e) {
+            mapOf(
+                "årsak" to regel.metadata.begrunnelse,
+                "brukerIdent" to brukerId.verdi,
+                "kanOverstyres" to regel.erOverstyrbar)
+        }
 }
-
-

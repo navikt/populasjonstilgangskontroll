@@ -12,50 +12,49 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.Over
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.DEV
 import org.springframework.http.ResponseEntity
+import org.springframework.http.ResponseEntity.*
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestParam
 
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
 class DevTilgangController(private val bruker : BrukerTjeneste, private val ansatt: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyringTjeneste: OverstyringTjeneste)
 {
-    @GetMapping("bruker")
-    fun bruker(fnr: BrukerId) = bruker.bruker(fnr)
+    @GetMapping("bruker/{brukerId}")
+    fun bruker(@PathVariable brukerId: BrukerId) = bruker.bruker(brukerId)
 
-    @PostMapping("brukere")
+    @PostMapping("bolk")
     fun brukere(@RequestBody brukerIds: List<BrukerId>) = bruker.bolk(brukerIds)
 
-    @GetMapping("pip")
-    fun pipbruker(fnr: BrukerId) = bruker.brukerPip(fnr)
+    @GetMapping("pip/{brukerId}")
+    fun pipbruker(@PathVariable brukerId: BrukerId) = bruker.brukerPip(brukerId)
 
-    @GetMapping("ansatt")
-    fun ansatt(ansattId: AnsattId) = ansatt.ansatt(ansattId)
+    @GetMapping("ansatt/{ansattId}")
+    fun ansatt(@PathVariable ansattId: AnsattId) = ansatt.ansatt(ansattId)
 
-    @GetMapping("komplett")
-    fun kompletteRegler(@RequestParam ansattId: AnsattId, @RequestParam brukerId: BrukerId) : ResponseEntity<Unit> {
+    @GetMapping("komplett/{ansattId}/{brukerId}")
+    fun kompletteRegler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) : ResponseEntity<Unit> {
         regler.kompletteRegler(ansattId, brukerId)
-        return ResponseEntity.noContent().build()
+        return noContent().build()
     }
 
-    @GetMapping("kjerne")
-    fun kjerneregler(@RequestParam ansattId: AnsattId, @RequestParam brukerId: BrukerId) : ResponseEntity<Unit> {
+    @GetMapping("kjerne/{ansattId}//{brukerId}")
+    fun kjerneregler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) : ResponseEntity<Unit> {
         regler.kjerneregler(ansattId, brukerId)
-        return ResponseEntity.noContent().build()
+        return noContent().build()
     }
 
     @PostMapping("overstyr/{ansattId}")
     fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody data: OverstyringData): ResponseEntity<Unit> {
         overstyringTjeneste.overstyr(ansattId, data)
-        return ResponseEntity.accepted().build()
+        return accepted().build()
     }
-
 
     @PostMapping("bulk/{ansattId}/")
     fun bulk(@PathVariable ansattId: AnsattId,@RequestBody vararg specs: RegelSpec): ResponseEntity<Unit> {
         regler.bulkRegler(ansattId, *specs)
-        return ResponseEntity.noContent().build()
+        return noContent().build()
     }
 }

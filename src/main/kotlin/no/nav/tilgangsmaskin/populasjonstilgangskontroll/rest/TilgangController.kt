@@ -12,10 +12,11 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.Over
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor.Companion.AAD_ISSUER
 import org.springframework.http.ResponseEntity
+import org.springframework.http.ResponseEntity.*
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
-@SecurityScheme(bearerFormat = "JWT", name = "bearerAuth", scheme = "bearer", type = HTTP )
+@SecurityScheme(bearerFormat = "JWT", name = "bearerAuth", scheme = "bearer", type = HTTP)
 @ProtectedRestController(value = ["/api/v1"], issuer = AAD_ISSUER, claimMap = [])
 @SecurityRequirement(name = "bearerAuth")
 class TilgangController(private val regler : RegelTjeneste, private val overstyringTjeneste: OverstyringTjeneste,private val token: TokenAccessor) {
@@ -23,25 +24,24 @@ class TilgangController(private val regler : RegelTjeneste, private val overstyr
     @PostMapping("komplett")
     fun kompletteRegler(@RequestBody brukerId: BrukerId) : ResponseEntity<Unit> {
         regler.kompletteRegler(token.ansattId, brukerId)
-        return ResponseEntity.noContent().build()
-
+        return noContent().build()
     }
 
     @PostMapping("kjerne")
     fun kjerneregler(@RequestBody brukerId: BrukerId) : ResponseEntity<Unit> {
         regler.kjerneregler(token.ansattId, brukerId)
-        return ResponseEntity.noContent().build()
+        return noContent().build()
     }
 
     @PostMapping("overstyr")
     fun overstyr(@RequestBody data: OverstyringData): ResponseEntity<Unit> {
         overstyringTjeneste.overstyr(token.ansattId,data)
-        return ResponseEntity.accepted().build()
+        return accepted().build()
     }
     @PostMapping("bulk")
     fun bulk(@RequestBody vararg specs: RegelSpec) : ResponseEntity<Unit> {
         regler.bulkRegler(token.ansattId, *specs)
-        return ResponseEntity.noContent().build()
+        return noContent().build()
     }
 }
 

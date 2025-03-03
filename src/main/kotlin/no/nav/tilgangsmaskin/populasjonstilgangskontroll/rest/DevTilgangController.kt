@@ -11,12 +11,12 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.DEV
-import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.*
+import org.springframework.http.HttpStatus.*
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.ResponseStatus
 
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
@@ -25,33 +25,24 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     @GetMapping("bruker/{brukerId}")
     fun bruker(@PathVariable brukerId: BrukerId) = bruker.bruker(brukerId)
 
-    //@GetMapping("pip/{brukerId}")
-   // fun pipbruker(@PathVariable brukerId: BrukerId) = bruker.brukerPip(brukerId)
-
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatt.ansatt(ansattId)
 
     @GetMapping("komplett/{ansattId}/{brukerId}")
-    fun kompletteRegler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) : ResponseEntity<Unit> {
-        regler.kompletteRegler(ansattId, brukerId)
-        return noContent().build()
-    }
+    @ResponseStatus(NO_CONTENT)
+    fun kompletteRegler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) = regler.kompletteRegler(ansattId, brukerId)
 
     @GetMapping("kjerne/{ansattId}//{brukerId}")
-    fun kjerneregler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) : ResponseEntity<Unit> {
-        regler.kjerneregler(ansattId, brukerId)
-        return noContent().build()
-    }
+    @ResponseStatus(NO_CONTENT)
+    fun kjerneregler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId)  = regler.kjerneregler(ansattId, brukerId)
+
 
     @PostMapping("overstyr/{ansattId}")
-    fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody data: OverstyringData): ResponseEntity<Unit> {
-        overstyringTjeneste.overstyr(ansattId, data)
-        return accepted().build()
-    }
+    @ResponseStatus(ACCEPTED)
+    fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody data: OverstyringData) = overstyringTjeneste.overstyr(ansattId, data)
 
     @PostMapping("bulk/{ansattId}/")
-    fun bulk(@PathVariable ansattId: AnsattId,@RequestBody vararg specs: RegelSpec): ResponseEntity<Unit> {
-        regler.bulkRegler(ansattId, *specs)
-        return noContent().build()
-    }
+    @ResponseStatus(NO_CONTENT)
+    fun bulk(@PathVariable ansattId: AnsattId,@RequestBody vararg specs: RegelSpec) = regler.bulkRegler(ansattId, *specs)
+
 }

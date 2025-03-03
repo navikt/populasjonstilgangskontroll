@@ -11,10 +11,11 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.Over
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor.Companion.AAD_ISSUER
-import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.*
+import org.springframework.http.HttpStatus.ACCEPTED
+import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.ResponseStatus
 
 @SecurityScheme(bearerFormat = "JWT", name = "bearerAuth", scheme = "bearer", type = HTTP)
 @ProtectedRestController(value = ["/api/v1"], issuer = AAD_ISSUER, claimMap = [])
@@ -22,26 +23,20 @@ import org.springframework.web.bind.annotation.RequestBody
 class TilgangController(private val regler : RegelTjeneste, private val overstyringTjeneste: OverstyringTjeneste,private val token: TokenAccessor) {
 
     @PostMapping("komplett")
-    fun kompletteRegler(@RequestBody brukerId: BrukerId) : ResponseEntity<Unit> {
-        regler.kompletteRegler(token.ansattId, brukerId)
-        return noContent().build()
-    }
+    @ResponseStatus(NO_CONTENT)
+    fun kompletteRegler(@RequestBody brukerId: BrukerId)  = regler.kompletteRegler(token.ansattId, brukerId)
 
     @PostMapping("kjerne")
-    fun kjerneregler(@RequestBody brukerId: BrukerId) : ResponseEntity<Unit> {
-        regler.kjerneregler(token.ansattId, brukerId)
-        return noContent().build()
-    }
+    @ResponseStatus(NO_CONTENT)
+    fun kjerneregler(@RequestBody brukerId: BrukerId) = regler.kjerneregler(token.ansattId, brukerId)
 
     @PostMapping("overstyr")
-    fun overstyr(@RequestBody data: OverstyringData): ResponseEntity<Unit> {
-        overstyringTjeneste.overstyr(token.ansattId,data)
-        return accepted().build()
-    }
+    @ResponseStatus(ACCEPTED)
+    fun overstyr(@RequestBody data: OverstyringData) = overstyringTjeneste.overstyr(token.ansattId,data)
+
     @PostMapping("bulk")
-    fun bulk(@RequestBody vararg specs: RegelSpec) : ResponseEntity<Unit> {
-        regler.bulkRegler(token.ansattId, *specs)
-        return noContent().build()
-    }
+    @ResponseStatus(NO_CONTENT)
+    fun bulk(@RequestBody vararg specs: RegelSpec) = regler.bulkRegler(token.ansattId, *specs)
+
 }
 

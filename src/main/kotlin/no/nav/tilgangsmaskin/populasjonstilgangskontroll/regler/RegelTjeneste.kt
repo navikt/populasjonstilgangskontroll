@@ -32,7 +32,7 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: B
             }.getOrElse {e -> if (e is RegelException) avvisninger.add(e) else throw e }
         }
         if (avvisninger.isNotEmpty()) throw BulkRegelException(ansattId,avvisninger).also {
-            log.info("${specs.size - avvisninger.size} identer er godtatt, ${avvisninger.size} er avvist  for ${ansattId.verdi}->${avvisninger.map { it.brukerId.verdi to it.body.title }}")
+            log.info("${specs.size - avvisninger.size} identer er godtatt, ${avvisninger.size} er avvist for ${ansattId.verdi}->${avvisninger.map { it.brukerId.verdi to it.body.title }}")
         }
         else {
             log.info("Alle ${specs.size} identer er OK for ${ansattId.verdi}")

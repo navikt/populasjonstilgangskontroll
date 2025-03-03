@@ -6,13 +6,13 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelSpec
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringMetadata
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor.Companion.AAD_ISSUER
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
@@ -27,10 +27,15 @@ class TilgangController(private val regler : RegelTjeneste, private val overstyr
     @PostMapping("kjerneregler")
     fun kjerneregler(@RequestBody brukerId: BrukerId) = regler.kjerneregler(token.ansattId, brukerId)
 
-    @PostMapping("overstyr/{ansattId}/{brukerId}")
-    fun overstyr(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId, @RequestBody metadata: OverstyringMetadata): ResponseEntity<Unit> {
-        overstyringTjeneste.overstyr(ansattId, brukerId, metadata)
+    @PostMapping("overstyr")
+    fun overstyr(@RequestBody data: OverstyringData): ResponseEntity<Unit> {
+        overstyringTjeneste.overstyr(token.ansattId,data)
         return ResponseEntity.accepted().build()
+    }
+    @PostMapping("bulk")
+    fun bulk(@RequestBody vararg specs: RegelSpec) : ResponseEntity<Unit> {
+        regler.bulkRegler(token.ansattId, *specs)
+        return ResponseEntity.noContent().build()
     }
 }
 

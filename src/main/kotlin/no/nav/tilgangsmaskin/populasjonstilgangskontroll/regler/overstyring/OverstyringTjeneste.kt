@@ -42,21 +42,21 @@ class OverstyringTjeneste(private val ansattTjeneste: AnsattTjeneste, private va
         }
     }
 
-    fun overstyr(ansattId: AnsattId, brukerId: BrukerId, metadata: OverstyringMetadata)  =
+    fun overstyr(ansattId: AnsattId,data: OverstyringData)  =
          runCatching {
-                log.info("Sjekker kjerneregler før eventuell overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
-                motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.bruker(brukerId))
-                adapter.overstyr(ansattId.verdi, brukerId.verdi, metadata)
-                refresh(ansattId, brukerId, metadata)
-                log.info("Overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}' oppdatert i cache")
+                log.info("Sjekker kjerneregler før eventuell overstyring for ansatt '${ansattId.verdi}' og bruker '${data.brukerId.mask()}'")
+                motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.bruker(data.brukerId))
+                adapter.overstyr(ansattId.verdi, data)
+                refresh(ansattId,data)
+                log.info("Overstyring for ansatt '${ansattId.verdi}' og bruker '${data.brukerId.mask()}' oppdatert i cache")
             }.getOrElse {
                 when (it) {
-                    is RegelException ->  throw RegelException(it,OVERSTYRING_MESSAGE_CODE,arrayOf(it.regel.metadata.kortNavn,ansattId.verdi,brukerId.verdi))
+                    is RegelException ->  throw RegelException(it,OVERSTYRING_MESSAGE_CODE,arrayOf(it.regel.metadata.kortNavn,ansattId.verdi,data.brukerId.verdi))
                     else -> throw it
                 }
          }
 
     @CachePut(OVERSTYRING)
-    private fun refresh(ansattId: AnsattId, brukerId: BrukerId, metadata: OverstyringMetadata)  = Unit
+    private fun refresh(ansattId: AnsattId, data: OverstyringData)  = Unit
 }
 

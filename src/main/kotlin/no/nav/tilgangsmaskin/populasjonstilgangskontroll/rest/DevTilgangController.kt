@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelSpec
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringMetadata
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.DEV
 import org.springframework.http.ResponseEntity
@@ -40,13 +40,16 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     @GetMapping("kjerneregler")
     fun kjerneregler(@RequestParam ansattId: AnsattId, @RequestParam brukerId: BrukerId) = regler.kjerneregler(ansattId, brukerId)
 
-    @PostMapping("overstyr/{ansattId}/{brukerId}")
-    fun overstyr(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId, @RequestBody metadata: OverstyringMetadata): ResponseEntity<Unit> {
-        overstyringTjeneste.overstyr(ansattId, brukerId, metadata)
+    @PostMapping("overstyr/{ansattId}")
+    fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody data: OverstyringData): ResponseEntity<Unit> {
+        overstyringTjeneste.overstyr(ansattId, data)
         return ResponseEntity.accepted().build()
     }
 
 
     @PostMapping("bulk/{ansattId}/")
-    fun bulk(@PathVariable ansattId: AnsattId,@RequestBody vararg specs: RegelSpec) = regler.bulkRegler(ansattId, *specs)
+    fun bulk(@PathVariable ansattId: AnsattId,@RequestBody vararg specs: RegelSpec): ResponseEntity<Unit> {
+        regler.bulkRegler(ansattId, *specs)
+        return ResponseEntity.noContent().build()
+    }
 }

@@ -49,15 +49,15 @@ internal class OverstyringTest {
     @DisplayName("Test gyldig overstyring")
     fun testOverstyringGyldig() {
         every { brukerTjeneste.bruker(vanligBruker.brukerId) } returns vanligBruker
-        overstyring.overstyr(vanligAnsatt.ansattId, vanligBruker.brukerId, OverstyringMetadata("gammel", LocalDate.now().minusDays(1)))
-        overstyring.overstyr(vanligAnsatt.ansattId, vanligBruker.brukerId, OverstyringMetadata("ny", LocalDate.now().plusDays(1)))
+        overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData("gammel", LocalDate.now().minusDays(1),vanligBruker.brukerId))
+        overstyring.overstyr(vanligAnsatt.ansattId,  OverstyringData("ny", LocalDate.now().plusDays(1),vanligBruker.brukerId,))
         assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, vanligBruker.brukerId)).isTrue
     }
     @Test
     @DisplayName("Test utgått overstyring")
     fun testOverstyringUtgått() {
         every { brukerTjeneste.bruker(vanligBruker.brukerId) } returns vanligBruker
-        overstyring.overstyr(vanligAnsatt.ansattId, vanligBruker.brukerId, OverstyringMetadata("ny", LocalDate.now().minusDays(1)))
+        overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData("ny", LocalDate.now().minusDays(1),vanligBruker.brukerId))
         assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, vanligBruker.brukerId)).isFalse
 
     }

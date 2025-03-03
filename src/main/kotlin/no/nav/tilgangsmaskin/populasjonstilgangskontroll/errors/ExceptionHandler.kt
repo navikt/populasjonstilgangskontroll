@@ -25,10 +25,10 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
 
     private fun problem(e: BulkRegelException, req: NativeWebRequest) : ProblemDetail{
         return ProblemDetail.forStatus(FORBIDDEN).apply {
-            title  = e.message
+            title  = e.body.title
             properties = mapOf(
                 "navIdent" to e.ansattId.verdi,
-                "antallFeil" to e.exceptions.size,
+                "avvisninger" to e.exceptions.size,
                 "detaljer" to e.exceptions.map {properties(it)}
             )
         }

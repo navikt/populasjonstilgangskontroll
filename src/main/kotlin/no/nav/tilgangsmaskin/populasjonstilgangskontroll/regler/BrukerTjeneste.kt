@@ -17,7 +17,7 @@ class BrukerTjeneste(private val pdlTjeneste: PDLTjeneste,val egenAnsatt: Skjerm
 
     private val log = LoggerFactory.getLogger(BrukerTjeneste::class.java)
 
-    fun bruker(brukerId: BrukerId) =
+    fun brukerGammel(brukerId: BrukerId) =
         run {
             val skjermet = egenAnsatt.erSkjermet(brukerId).also { log.info("Skjermet $it") }
             val pdl = pdlTjeneste.person(brukerId).also { log.info("Person $it") }
@@ -25,7 +25,7 @@ class BrukerTjeneste(private val pdlTjeneste: PDLTjeneste,val egenAnsatt: Skjerm
             PdlTilBrukerMapper.tilBruker(pdl, gt, skjermet)
         }
 
-    fun brukerPip(brukerId: BrukerId)  =
+    fun bruker(brukerId: BrukerId)  =
         run {
             val skjermet = egenAnsatt.erSkjermet(brukerId)
             PdlPipTilBrukerMapper.tilBruker(brukerId, pdlTjeneste.personPip(brukerId), skjermet)

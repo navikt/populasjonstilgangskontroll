@@ -25,8 +25,8 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     @GetMapping("bruker/{brukerId}")
     fun bruker(@PathVariable brukerId: BrukerId) = bruker.bruker(brukerId)
 
-    @GetMapping("pip/{brukerId}")
-    fun pipbruker(@PathVariable brukerId: BrukerId) = bruker.brukerPip(brukerId)
+    //@GetMapping("pip/{brukerId}")
+   // fun pipbruker(@PathVariable brukerId: BrukerId) = bruker.brukerPip(brukerId)
 
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatt.ansatt(ansattId)

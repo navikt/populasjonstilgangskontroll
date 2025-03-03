@@ -17,52 +17,54 @@ class PdlPipDeserializationTest {
     lateinit var mapper: ObjectMapper
 
     val json = """
-        {
-  "10108000398": {
-    "aktoerId": "1000096233942",
-    "person": {
-      "adressebeskyttelse": [],
-      "foedsel": [
-        {
-          "foedselsdato": "1980-10-10"
-        }
-      ],
-      "doedsfall": [],
-      "familierelasjoner": [
-        {
-          "relatertPersonsIdent": "26014401260"
-        },
-        {
-          "relatertPersonsIdent": "08074401156"
-        }
-      ]
-    },
-    "identer": {
-      "identer": [
-        {
-          "ident": "1000096233942",
-          "historisk": false,
-          "gruppe": "AKTORID"
-        },
-        {
-          "ident": "10108000398",
-          "historisk": false,
-          "gruppe": "FOLKEREGISTERIDENT"
-        }
-      ]
-    },
-    "geografiskTilknytning": {
-      "gtType": "BYDEL",
-      "gtBydel": "460108",
-      "regel": "3"
-    }
+ {
+  "aktoerId": "1000096233942",
+  "person": {
+    "adressebeskyttelse": [],
+    "foedsel": [
+      {
+        "foedselsdato": "1980-10-10"
+      }
+    ],
+    "doedsfall": [],
+    "familierelasjoner": [
+      {
+        "relatertPersonsIdent": "26014401260",
+        "relatertPersonsRolle": "MOR",
+        "minRolleForPerson": "BARN"
+      },
+      {
+        "relatertPersonsIdent": "08074401156",
+        "relatertPersonsRolle": "FAR",
+        "minRolleForPerson": "BARN"
+      }
+    ]
+  },
+  "identer": {
+    "identer": [
+      {
+        "ident": "1000096233942",
+        "historisk": false,
+        "gruppe": "AKTORID"
+      },
+      {
+        "ident": "10108000398",
+        "historisk": false,
+        "gruppe": "FOLKEREGISTERIDENT"
+      }
+    ]
+  },
+  "geografiskTilknytning": {
+    "gtType": "BYDEL",
+    "gtBydel": "460108",
+    "regel": "3"
   }
 }
 """
 
-    //@Test
+    @Test
     fun deserialization() {
-        println(mapper.readValue<Map<BrukerId, PdlPipRespons>>(json))
+        println(mapper.readValue<PdlPipRespons>(json))
     }
 
 }

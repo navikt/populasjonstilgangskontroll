@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
 import com.neovisionaries.i18n.CountryCode.getByAlpha3Code
-import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Companion.UdefinertGeoTilknytning
@@ -32,10 +32,7 @@ object PdlTilBrukerMapper {
                 add(EGEN_ANSATT_GRUPPE)
             }
         }.toTypedArray().let {
-
-            Bruker(tilFødselsnummer(person.folkeregisteridentifikator),tilGeoTilknytning(gt), *it).also {
-                log.trace(CONFIDENTIAL, "Mappet person {} til kandidat {}", person, it)
-            }
+            Bruker(tilFødselsnummer(person.folkeregisteridentifikator), tilGeoTilknytning(gt),  Familie.INGEN,*it)
         }
 
     private fun tilFødselsnummer(ident: List<PdlPerson.Folkeregisteridentifikator>) =

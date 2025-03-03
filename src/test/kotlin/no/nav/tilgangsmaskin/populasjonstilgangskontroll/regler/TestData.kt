@@ -13,6 +13,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.K
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Navn
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
@@ -35,16 +36,23 @@ object TestData {
     internal val annenEnhetBrukerId = BrukerId("08526835679")
 
 
-    internal val strengtFortroligBruker = Bruker(strengtFortroligBrukerId, UdefinertGeoTilknytning, STRENGT_FORTROLIG_GRUPPE)
-    internal val fortroligBruker = Bruker(fortroligBrukerId, UdefinertGeoTilknytning, FORTROLIG_GRUPPE)
-    internal val vanligBruker = Bruker(vanligBrukerId, UdefinertGeoTilknytning)
-    internal val ansattBruker = Bruker(ansattBrukerId, UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE)
-    internal val egenAnsattStrengtFortroligBruker = Bruker(egenAnsattStrengtFortroligBrukerId, UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, STRENGT_FORTROLIG_GRUPPE)
-    internal val egenAnsattFortroligBruker = Bruker(egenAnsattFortroligBrukerId, UdefinertGeoTilknytning, EGEN_ANSATT_GRUPPE, FORTROLIG_GRUPPE)
-    internal val ukjentBostedBruker = Bruker(ukjentBostedBrukerId, UkjentBosted(), UDEFINERT_GEO_GRUPPE)
-    internal val geoUtlandBruker = Bruker(geoUtlandBrukerId, UtenlandskTilknytning(SE), GEO_PERSON_UTLAND_GRUPPE)
-    internal val enhetBruker = Bruker(enhetBrukerId, KommuneTilknytning(Kommune(enhet.verdi)))
-    internal val annenEnhetBruker = Bruker(annenEnhetBrukerId, KommuneTilknytning(Kommune("4321")))
+    internal val strengtFortroligBruker = Bruker(strengtFortroligBrukerId, UdefinertGeoTilknytning, Familie.INGEN,STRENGT_FORTROLIG_GRUPPE)
+    internal val fortroligBruker = Bruker(fortroligBrukerId, UdefinertGeoTilknytning,  Familie.INGEN,FORTROLIG_GRUPPE)
+    internal val vanligBruker = Bruker(vanligBrukerId, UdefinertGeoTilknytning, Familie.INGEN)
+    internal val ansattBruker = Bruker(ansattBrukerId, UdefinertGeoTilknytning,  Familie.INGEN,EGEN_ANSATT_GRUPPE)
+    internal val egenAnsattStrengtFortroligBruker = Bruker(egenAnsattStrengtFortroligBrukerId,
+        UdefinertGeoTilknytning, Familie.INGEN,
+        STRENGT_FORTROLIG_GRUPPE,
+        EGEN_ANSATT_GRUPPE)
+    internal val egenAnsattFortroligBruker = Bruker(egenAnsattFortroligBrukerId,
+        UdefinertGeoTilknytning,
+        Familie.INGEN,
+        FORTROLIG_GRUPPE,
+        EGEN_ANSATT_GRUPPE)
+    internal val ukjentBostedBruker = Bruker(ukjentBostedBrukerId, UkjentBosted(),  Familie.INGEN,UDEFINERT_GEO_GRUPPE)
+    internal val geoUtlandBruker = Bruker(geoUtlandBrukerId, UtenlandskTilknytning(SE),  Familie.INGEN,GEO_PERSON_UTLAND_GRUPPE)
+    internal val enhetBruker = Bruker(enhetBrukerId, KommuneTilknytning(Kommune(enhet.verdi)), )
+    internal val annenEnhetBruker = Bruker(annenEnhetBrukerId, KommuneTilknytning(Kommune("4321")), )
 
 
 

@@ -12,17 +12,7 @@ import org.slf4j.LoggerFactory
 
 object PdlPipTilBrukerMapper {
     private val log = LoggerFactory.getLogger(javaClass)
-    fun tilBruker(person: Map<String,PdlPipRespons>, erSkjermet: Boolean): Bruker {
-        person.entries.forEach { (brukerId, respons) ->
-            log.info("Mapper respons {} for Bruker {}", respons,brukerId)
-        }
-        log.info("Mapper person {} to Bruker {}", person,person.entries.size)
-        return person.entries.first().let { (brukerId, metdata) ->
-             tilBruker(BrukerId(brukerId),metdata,erSkjermet)
-        }
-    }
-
-    private fun tilBruker(brukerId: BrukerId, respons: PdlPipRespons, erSkjermet: Boolean): Bruker {
+     fun tilBruker(brukerId: BrukerId, respons: PdlPipRespons, erSkjermet: Boolean): Bruker {
         return mutableListOf<GlobalGruppe>().apply {
             if  (respons.person.adressebeskyttelse.any { it in listOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND) }) {
                 add(STRENGT_FORTROLIG_GRUPPE)
@@ -40,7 +30,7 @@ object PdlPipTilBrukerMapper {
         }.toTypedArray().let {
 
             Bruker(brukerId,tilGeoTilknytning(respons.geografiskTilknytning), *it).also {
-                log.trace(CONFIDENTIAL, "Mappet person {} til kandidat {}", respons, it)
+                log.info(CONFIDENTIAL, "Mappet person {} til bruker {}", respons, it)
             }
         }
     }

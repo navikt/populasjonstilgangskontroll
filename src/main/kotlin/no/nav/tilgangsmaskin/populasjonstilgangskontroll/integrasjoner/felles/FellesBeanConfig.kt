@@ -16,7 +16,6 @@ import org.springframework.cache.interceptor.KeyGenerator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 
 @Configuration
 class FellesBeanConfig : CachingConfigurer {
@@ -24,7 +23,7 @@ class FellesBeanConfig : CachingConfigurer {
     private val log = LoggerFactory.getLogger(FellesBeanConfig::class.java)
 
     @Bean
-    fun jsonCustomizer() = Jackson2ObjectMapperBuilderCustomizer {it.mixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java) }
+    fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer {it.mixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java) }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private interface IgnoreUnknownMixin

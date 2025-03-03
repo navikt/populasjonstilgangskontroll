@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning.GTType.UDEFINERT
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.AdressebeskyttelseGradering.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.Familierelasjon
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.Familierelasjon.FamilieRelasjonRolle.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlTilBrukerMapper.tilGeoTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe
@@ -31,12 +32,15 @@ object PdlPipTilBrukerMapper {
             }
         }.toTypedArray().let {
 
-            Bruker(brukerId,tilGeoTilknytning(respons.geografiskTilknytning), tilFamilie(respons.person.familierelasjoner),*it).also {
+            Bruker(brukerId,
+                tilGeoTilknytning(respons.geografiskTilknytning),
+                tilFamilie(respons.person.familierelasjoner),
+                *it).also {
                 log.info(CONFIDENTIAL, "Mappet person {} til bruker {}", respons, it)
             }
         }
     }
-    private fun tilFamilie(relasjoner: List<PdlPipRespons.PdlPipPerson.Familierelasjon>) =
+    private fun tilFamilie(relasjoner: List<Familierelasjon>) =
         with(relasjoner) {
             Familie(
                 find { it.relatertPersonsRolle == MOR }?.relatertPersonsIdent,

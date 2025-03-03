@@ -11,9 +11,9 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: B
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    fun alleRegler(ansattId: AnsattId, brukerId: BrukerId) =
+    fun kompletteRegler(ansattId: AnsattId, brukerId: BrukerId) =
         runCatching {
-            motor.alleRegler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.bruker(brukerId))
+            motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.bruker(brukerId))
         }.getOrElse {
             overstyringSjekker.sjekk(ansattId, brukerId, it)
         }

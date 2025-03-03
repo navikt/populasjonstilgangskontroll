@@ -16,7 +16,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.Over
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelType.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.fortroligBruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.geoNorgeRegel
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -50,7 +49,7 @@ class RegelTjenesteTest {
     @DisplayName("Verifiser at sjekk av overstyring ikke gjøres en regel som ikke er overstyrbar avslår tilgabg")
     fun testIngenOverstyringSjekk() {
         every { bruker.bruker(vanligBruker.brukerId) } returns vanligBruker
-        assertThatCode { regel.alleRegler(vanligAnsatt.ansattId, vanligBruker.brukerId) }.doesNotThrowAnyException()
+        assertThatCode { regel.kompletteRegler(vanligAnsatt.ansattId, vanligBruker.brukerId) }.doesNotThrowAnyException()
         verify {
             ansatt.ansatt(vanligAnsatt.ansattId)
             bruker.bruker(vanligBruker.brukerId)
@@ -62,7 +61,7 @@ class RegelTjenesteTest {
     fun overstyringOK() {
         every { bruker.bruker(geoUtlandBruker.brukerId) } returns geoUtlandBruker
         every { overstyring.erOverstyrt(vanligAnsatt.ansattId, geoUtlandBruker.brukerId) } returns true
-        assertThatCode { regel.alleRegler(vanligAnsatt.ansattId, geoUtlandBruker.brukerId) }.doesNotThrowAnyException()
+        assertThatCode { regel.kompletteRegler(vanligAnsatt.ansattId, geoUtlandBruker.brukerId) }.doesNotThrowAnyException()
         verify {
             ansatt.ansatt(vanligAnsatt.ansattId)
             bruker.bruker(geoUtlandBruker.brukerId)
@@ -74,7 +73,7 @@ class RegelTjenesteTest {
     fun ikkeOverstyrt() {
         every { bruker.bruker(geoUtlandBruker.brukerId) } returns geoUtlandBruker
         every { overstyring.erOverstyrt(vanligAnsatt.ansattId, geoUtlandBruker.brukerId) } returns false
-        assertThrows<RegelException> { regel.alleRegler(vanligAnsatt.ansattId, geoUtlandBruker.brukerId) }
+        assertThrows<RegelException> { regel.kompletteRegler(vanligAnsatt.ansattId, geoUtlandBruker.brukerId) }
         verify {
             ansatt.ansatt(vanligAnsatt.ansattId)
             bruker.bruker(geoUtlandBruker.brukerId)

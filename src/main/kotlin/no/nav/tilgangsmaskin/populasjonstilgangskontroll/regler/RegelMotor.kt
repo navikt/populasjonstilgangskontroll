@@ -14,7 +14,7 @@ class RegelMotor(vararg regler: Regel)  {
     val kjerneRegelSett = RegelSett(KJERNE to regler.sortedWith(INSTANCE).filterIsInstance<KjerneRegel>())
     val komplettRegelSett = RegelSett(KOMPLETT to regler.sortedWith(INSTANCE))
 
-    fun alleRegler(ansatt: Ansatt, bruker: Bruker) = sjekk(ansatt, bruker, komplettRegelSett)
+    fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = sjekk(ansatt, bruker, komplettRegelSett)
     fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = sjekk(ansatt, bruker, kjerneRegelSett)
 
     fun sjekk(ansatt: Ansatt, bruker: Bruker, type: RegelType) =
@@ -30,7 +30,7 @@ class RegelMotor(vararg regler: Regel)  {
                     }
                 }
             }.also {
-                log.info("${regler.size} ${type.tekst} OK for '${ansatt.ansattId.verdi}' og '${bruker.brukerId.verdi}'")
+                log.info("${regler.size} ${type.tekst} Tilgang OK for '${ansatt.ansattId.verdi}' og '${bruker.brukerId.verdi}'")
             }
     }
     private fun RegelType.regelSett() =

@@ -52,11 +52,11 @@ class RegelMotorTest {
     fun fortroligBrukerStrengtFortroligAnsattAvvises() {
         assertEquals(fortroligRegel,
             assertThrows<RegelException> {
-                motor.alleRegler(strengtFortroligAnsatt, fortroligBruker)
+                motor.kompletteRegler(strengtFortroligAnsatt, fortroligBruker)
             }.regel)
         assertThat(fortroligRegel.test(strengtFortroligAnsatt,fortroligBruker)).isFalse
         assertThrows<RegelException> {
-            spiesMotor.alleRegler(strengtFortroligAnsatt, fortroligBruker)
+            spiesMotor.kompletteRegler(strengtFortroligAnsatt, fortroligBruker)
         }
         verifyOrder {
             spyStrengtFortroligRegel.test(strengtFortroligAnsatt,fortroligBruker)
@@ -75,7 +75,7 @@ class RegelMotorTest {
     fun fortroligBrukerVanligAnsattAvvises() {
         assertEquals(fortroligRegel,
             assertThrows<RegelException> {
-                motor.alleRegler(vanligAnsatt, fortroligBruker)
+                motor.kompletteRegler(vanligAnsatt, fortroligBruker)
             }.regel)
         assertThat(fortroligRegel.test(vanligAnsatt,fortroligBruker)).isFalse
     }
@@ -83,14 +83,14 @@ class RegelMotorTest {
     @Test
     @DisplayName("Test at bruker med fortrolig beskyttelse *kan* behandles av ansatt med medlemsskap i fortrolig gruppe")
     fun fortroligBrukerFortroligAnsattOK() {
-        assertThatCode { motor.alleRegler(fortroligAnsatt, fortroligBruker) }.doesNotThrowAnyException()
+        assertThatCode { motor.kompletteRegler(fortroligAnsatt, fortroligBruker) }.doesNotThrowAnyException()
     }
     @Test
     @DisplayName("Test at bruker med strengt fortrolig beskyttelse *ikke* kan behandles av ansatt med medlemsskap i fortrolig gruppe")
     fun strengtFortroligBrukerFortroligAnsattAvvises() {
         assertEquals(strengtFortroligRegel,
             assertThrows<RegelException> {
-                motor.alleRegler(fortroligAnsatt, strengtFortroligBruker)
+                motor.kompletteRegler(fortroligAnsatt, strengtFortroligBruker)
             }.regel)
         assertThat(strengtFortroligRegel.test(fortroligAnsatt,strengtFortroligBruker)).isFalse
     }
@@ -100,7 +100,7 @@ class RegelMotorTest {
     fun strengtFortroligBrukerVanligAnsattAvvises() {
         assertEquals(strengtFortroligRegel,
             assertThrows<RegelException> {
-                motor.alleRegler(vanligAnsatt, strengtFortroligBruker)
+                motor.kompletteRegler(vanligAnsatt, strengtFortroligBruker)
             }.regel)
         assertThat(strengtFortroligRegel.test(vanligAnsatt,strengtFortroligBruker)).isFalse
     }
@@ -108,30 +108,30 @@ class RegelMotorTest {
     @Test
     @DisplayName("Test at bruker med strengt fortrolig beskyttelse *kan* behandles av ansatt med medlemsskap i strengt fortrolig gruppe")
     fun strengtFortroligBrukerStrengtFortroligAnsattOK() {
-        assertThatCode { motor.alleRegler(strengtFortroligAnsatt, strengtFortroligBruker) }.doesNotThrowAnyException()
+        assertThatCode { motor.kompletteRegler(strengtFortroligAnsatt, strengtFortroligBruker) }.doesNotThrowAnyException()
     }
     @Test
     @DisplayName("Test at vanlig bruker *kan* behandles av ansatt med medlemsskap i strengt fortrolig gruppe")
     fun vanligBrukertStrengtFortroligAnsattOK() {
-        assertThatCode { motor.alleRegler(strengtFortroligAnsatt, vanligBruker) }.doesNotThrowAnyException()
+        assertThatCode { motor.kompletteRegler(strengtFortroligAnsatt, vanligBruker) }.doesNotThrowAnyException()
     }
 
     @Test
     @DisplayName("Test at vanlig bruker *kan* behandles av ansatt med medlemsskap i fortrolig grupe")
     fun vanligBrukerFortroligAnsattOK() {
-        assertThatCode { motor.alleRegler(fortroligAnsatt, vanligBruker) }.doesNotThrowAnyException()
+        assertThatCode { motor.kompletteRegler(fortroligAnsatt, vanligBruker) }.doesNotThrowAnyException()
     }
 
     @Test
     @DisplayName("Test at vanlig bruker *kan* behandles av vanlig ansatt")
     fun vanligBrukerVanligAnsattOK() {
-        assertThatCode { motor.alleRegler(vanligAnsatt, vanligBruker) }.doesNotThrowAnyException()
+        assertThatCode { motor.kompletteRegler(vanligAnsatt, vanligBruker) }.doesNotThrowAnyException()
     }
 
     @Test
     @DisplayName("Test at egen ansatt bruker *kan* behandles av ansatt med medlemsskap i egen ansatt gruppe")
     fun egenAnsattBrukerEgenAnsattOK() {
-        assertThatCode { motor.alleRegler(egenAnsatt, ansattBruker) }.doesNotThrowAnyException()
+        assertThatCode { motor.kompletteRegler(egenAnsatt, ansattBruker) }.doesNotThrowAnyException()
     }
 
     @Test
@@ -139,7 +139,7 @@ class RegelMotorTest {
     fun egenAnsattBrukerFortroligAnsattAvvises() {
         assertEquals(egenAnsattRegel,
             assertThrows<RegelException> {
-                motor.alleRegler(fortroligAnsatt,
+                motor.kompletteRegler(fortroligAnsatt,
                     ansattBruker)
             }.regel)
         assertThat(egenAnsattRegel.test(fortroligAnsatt,ansattBruker)).isFalse
@@ -149,7 +149,7 @@ class RegelMotorTest {
     fun egenAnsattBrukerStrengtFortroligAnsattAvvises() {
         assertEquals(egenAnsattRegel,
             assertThrows<RegelException> {
-                motor.alleRegler(strengtFortroligAnsatt, ansattBruker)
+                motor.kompletteRegler(strengtFortroligAnsatt, ansattBruker)
             }.regel)
         assertThat(egenAnsattRegel.test(strengtFortroligAnsatt,ansattBruker)).isFalse
     }
@@ -158,7 +158,7 @@ class RegelMotorTest {
     fun ansattBrukerVanligAnsattAvvises() {
         assertEquals(egenAnsattRegel,
             assertThrows<RegelException> {
-                motor.alleRegler(vanligAnsatt, ansattBruker)
+                motor.kompletteRegler(vanligAnsatt, ansattBruker)
             }.regel)
         assertThat(egenAnsattRegel.test(vanligAnsatt,ansattBruker)).isFalse
     }
@@ -167,7 +167,7 @@ class RegelMotorTest {
     @DisplayName("Test at egen ansatt bruker med strengt fortrolig beskyttelse *ikke* kan behandles av ansatt med medlemsskap kun i egen ansatt gruppe")
     fun egenAnsattStrengtFortroligBrukerEgenAnsattAvvises() {
         assertEquals(strengtFortroligRegel, assertThrows<RegelException> {
-            motor.alleRegler(egenAnsatt, egenAnsattStrengtFortroligBruker)
+            motor.kompletteRegler(egenAnsatt, egenAnsattStrengtFortroligBruker)
         }.regel)
         assertThat(strengtFortroligRegel.test(egenAnsatt,egenAnsattStrengtFortroligBruker)).isFalse
     }
@@ -176,39 +176,39 @@ class RegelMotorTest {
     fun egenAnsattFortroligBrukerEgenAnsattAvvises() {
         assertEquals(fortroligRegel,
             assertThrows<RegelException> {
-                motor.alleRegler(egenAnsatt, egenAnsattFortroligBruker)
+                motor.kompletteRegler(egenAnsatt, egenAnsattFortroligBruker)
             }.regel)
         assertThat(fortroligRegel.test(egenAnsatt,egenAnsattFortroligBruker)).isFalse
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med fortrolig beskyttelse kan behandles av ansatt med medlemsskap i egen ansatt gruppe som også har medlemsskap i fortrolig gruppe")
     fun egenAnsattFortroligBrukerEgenAnsattFortroligAnsattOK() {
-        assertThatCode { motor.alleRegler(egenAnsattFortroligAnsatt, egenAnsattFortroligBruker) }.doesNotThrowAnyException()
+        assertThatCode { motor.kompletteRegler(egenAnsattFortroligAnsatt, egenAnsattFortroligBruker) }.doesNotThrowAnyException()
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med strengt fortrolig beskyttelse kan behandles av ansatt i egen ansatt gruppe som også har strengt fortrolig gruppe")
     fun egenAnsattStrengtFortroligBrukerEgenAnsattStrengtFortroligAnsattOK() {
-        assertThatCode { motor.alleRegler(egenAnsattStrengtFortroligAnsatt, egenAnsattStrengtFortroligBruker) }.doesNotThrowAnyException()
+        assertThatCode { motor.kompletteRegler(egenAnsattStrengtFortroligAnsatt, egenAnsattStrengtFortroligBruker) }.doesNotThrowAnyException()
     }
     @Test
     @DisplayName("Test at egen ansatt bruker med strengt fortrolig beskyttelse  ikke kan behandles av ansatt med medlemsskap i egen ansatt gruppe")
     fun egenAnsattStrengtFortroligBrukerFortroligAnsattAvvises() {
         assertEquals(strengtFortroligRegel, assertThrows<RegelException> {
-            motor.alleRegler(fortroligAnsatt, egenAnsattStrengtFortroligBruker)
+            motor.kompletteRegler(fortroligAnsatt, egenAnsattStrengtFortroligBruker)
         }.regel)
         assertThat(strengtFortroligRegel.test(fortroligAnsatt,egenAnsattStrengtFortroligBruker)).isFalse
     }
     @Test
     @DisplayName("Test at ansatt med manglende geografisk tilknytning kan behandle bruker med geografisk tilknytning")
     fun brukerMedManglendeGeografiskTilknytningAnsattMedSammeRolleOK() {
-        assertThatCode { motor.alleRegler(udefinertGeoAnsatt, ukjentBostedBruker) }.doesNotThrowAnyException()
+        assertThatCode { motor.kompletteRegler(udefinertGeoAnsatt, ukjentBostedBruker) }.doesNotThrowAnyException()
     }
 
     @Test
     @DisplayName("Test at ansatt uten manglende geografisk tilknytning rolle ikke kan behandle bruker med geografisk tilknytning")
     fun brukerMedManglendeGeografiskTilknytningAnsattUtenSammeRoleOK() {
         assertEquals(ukjentBostedGeoRegel, assertThrows<RegelException> {
-            motor.alleRegler(vanligAnsatt, ukjentBostedBruker)
+            motor.kompletteRegler(vanligAnsatt, ukjentBostedBruker)
         }.regel)
         assertThat(ukjentBostedGeoRegel.test(vanligAnsatt,ukjentBostedBruker)).isFalse
     }
@@ -216,7 +216,7 @@ class RegelMotorTest {
     @Test
     @DisplayName("Test at ansatt med tilgang utland kan behandle bruker med geografisk utland")
     fun geoUtlandGruppeOK() {
-        assertThatCode { motor.alleRegler(geoUtlandAnsatt, geoUtlandBruker) }.doesNotThrowAnyException()
+        assertThatCode { motor.kompletteRegler(geoUtlandAnsatt, geoUtlandBruker) }.doesNotThrowAnyException()
     }
 
     @Test
@@ -224,7 +224,7 @@ class RegelMotorTest {
     fun geoUtlandGruppeUtenSammeRolle() {
         assertEquals(geoUtlandRegel,
             assertThrows<RegelException> {
-                motor.alleRegler(vanligAnsatt, geoUtlandBruker)
+                motor.kompletteRegler(vanligAnsatt, geoUtlandBruker)
             }.regel)
         assertThat(geoUtlandRegel.test(vanligAnsatt,geoUtlandBruker)).isFalse
     }
@@ -232,13 +232,13 @@ class RegelMotorTest {
     @Test
     @DisplayName("Test at ansatt med nasjonal tilgang kan behandle vanlig bruker")
     fun geoNorgeNasjonal() {
-        assertThatCode { motor.alleRegler(nasjonalAnsatt, vanligBruker) }.doesNotThrowAnyException()
+        assertThatCode { motor.kompletteRegler(nasjonalAnsatt, vanligBruker) }.doesNotThrowAnyException()
     }
 
     @Test
     @DisplayName("Test at ansatt med geo tilgang kan behandle vanlig bruker med samme GT")
     fun geoEnhetLik() {
-        assertThatCode { motor.alleRegler(enhetAnsatt, enhetBruker) }.doesNotThrowAnyException()
+        assertThatCode { motor.kompletteRegler(enhetAnsatt, enhetBruker) }.doesNotThrowAnyException()
     }
 
     @Test
@@ -246,7 +246,7 @@ class RegelMotorTest {
     fun geoEnhetForskjelligAvvises() {
         assertEquals(geoNorgeRegel,
             assertThrows<RegelException> {
-                motor.alleRegler(enhetAnsatt, annenEnhetBruker)
+                motor.kompletteRegler(enhetAnsatt, annenEnhetBruker)
             }.regel)
         assertThat(geoNorgeRegel.test(enhetAnsatt,annenEnhetBruker)).isFalse
     }

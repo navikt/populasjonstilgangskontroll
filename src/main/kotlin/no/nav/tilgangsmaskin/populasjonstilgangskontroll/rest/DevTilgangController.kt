@@ -34,11 +34,17 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     @GetMapping("ansatt")
     fun ansatt(ansattId: AnsattId) = ansatt.ansatt(ansattId)
 
-    @GetMapping("regler")
-    fun alleRegler(@RequestParam ansattId: AnsattId, @RequestParam brukerId: BrukerId) = regler.alleRegler(ansattId, brukerId)
+    @GetMapping("komplett")
+    fun kompletteRegler(@RequestParam ansattId: AnsattId, @RequestParam brukerId: BrukerId) : ResponseEntity<Unit> {
+        regler.kompletteRegler(ansattId, brukerId)
+        return ResponseEntity.noContent().build()
+    }
 
-    @GetMapping("kjerneregler")
-    fun kjerneregler(@RequestParam ansattId: AnsattId, @RequestParam brukerId: BrukerId) = regler.kjerneregler(ansattId, brukerId)
+    @GetMapping("kjerne")
+    fun kjerneregler(@RequestParam ansattId: AnsattId, @RequestParam brukerId: BrukerId) : ResponseEntity<Unit> {
+        regler.kjerneregler(ansattId, brukerId)
+        return ResponseEntity.noContent().build()
+    }
 
     @PostMapping("overstyr/{ansattId}")
     fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody data: OverstyringData): ResponseEntity<Unit> {

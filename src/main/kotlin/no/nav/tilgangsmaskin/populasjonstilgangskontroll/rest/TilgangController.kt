@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeType.HTTP
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import no.nav.security.token.support.spring.ProtectedRestController
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelSpec
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelTjeneste
@@ -21,11 +20,18 @@ import org.springframework.web.bind.annotation.RequestBody
 @SecurityRequirement(name = "bearerAuth")
 class TilgangController(private val regler : RegelTjeneste, private val overstyringTjeneste: OverstyringTjeneste,private val token: TokenAccessor) {
 
-    @PostMapping("tilgang")
-    fun alleRegler(@RequestBody brukerId: BrukerId) = regler.alleRegler(token.ansattId, brukerId)
+    @PostMapping("komplett")
+    fun kompletteRegler(@RequestBody brukerId: BrukerId) : ResponseEntity<Unit> {
+        regler.kompletteRegler(token.ansattId, brukerId)
+        return ResponseEntity.noContent().build()
 
-    @PostMapping("kjerneregler")
-    fun kjerneregler(@RequestBody brukerId: BrukerId) = regler.kjerneregler(token.ansattId, brukerId)
+    }
+
+    @PostMapping("kjerne")
+    fun kjerneregler(@RequestBody brukerId: BrukerId) : ResponseEntity<Unit> {
+        regler.kjerneregler(token.ansattId, brukerId)
+        return ResponseEntity.noContent().build()
+    }
 
     @PostMapping("overstyr")
     fun overstyr(@RequestBody data: OverstyringData): ResponseEntity<Unit> {

@@ -5,6 +5,16 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Cluster.Companion
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.requires
 
+
+@JvmInline
+value class AktørId(val aktoerId: String){
+    init {
+        with(aktoerId) {
+            requires(this,13)
+        }
+    }
+}
+
 @JvmInline
 value class BrukerId(@JsonValue val verdi: String) {
 
@@ -18,7 +28,7 @@ value class BrukerId(@JsonValue val verdi: String) {
 
     init {
         with(verdi) {
-            requires(verdi,11)
+            requires(this,11)
             if (isProd) {
                 require(mod11(W1, this) == this[9] - '0') { "Første kontrollsiffer $this[9] ikke validert" }
                 require(mod11(W2, this) == this[10] - '0') { "Andre kontrollsiffer $this[10] ikke validert" }

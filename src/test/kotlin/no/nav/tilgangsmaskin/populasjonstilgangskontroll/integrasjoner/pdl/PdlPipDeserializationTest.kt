@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestApp
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.json.JsonTest
@@ -8,6 +9,7 @@ import org.springframework.test.context.ContextConfiguration
 import kotlin.test.Test
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.Person.Foedsel
 
 @JsonTest
 @ContextConfiguration(classes= [TestApp::class])
@@ -64,7 +66,17 @@ class PdlPipDeserializationTest {
 
     @Test
     fun deserialization() {
-        println(mapper.readValue<PdlPipRespons>(json))
+        val f = """
+    [
+      {
+        "foedselsdato": "1980-10-10"
+      }
+    ]
+    """
+
+        val foedselList: List<Foedsel> = mapper.readValue(f)
+        println(foedselList)
+            println(mapper.readValue<PdlPipRespons>(json))
     }
 
 }

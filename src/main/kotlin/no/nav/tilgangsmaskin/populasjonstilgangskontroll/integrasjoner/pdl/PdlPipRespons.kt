@@ -15,10 +15,9 @@ data class PdlPipRespons(val aktoerId: AktørId, val person: Person, val identer
 
         enum class AdressebeskyttelseGradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG}
 
-        @JvmInline
-        value class Foedsel(val foedselsdato: String)
-        @JvmInline
-        value class Doedsfall(val doedsdato: String)
+        //@JvmInline
+        data class Foedsel(val foedselsdato: String)
+        data class Doedsfall(val doedsdato: String)
         data class Familierelasjon(val relatertPersonsIdent: BrukerId? = null, val relatertPersonsRolle: FamilieRelasjonRolle? = null, val minRolleForPerson: FamilieRelasjonRolle? = null) {
             enum class FamilieRelasjonRolle  {MOR,FAR,BARN}
         }

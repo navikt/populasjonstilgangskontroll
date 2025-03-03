@@ -4,9 +4,9 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AktørId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import java.time.LocalDate
 
-data class PdlPipRespons(val aktoerId: AktørId, val person: Person, val identer: Identer, val geografiskTilknytning: PdlGeoTilknytning)  {
+data class PdlPipRespons(val aktoerId: AktørId, val person: PdlPipPerson, val identer: Identer, val geografiskTilknytning: PdlGeoTilknytning)  {
 
-    data class Person(
+    data class PdlPipPerson(
         val adressebeskyttelse: List<AdressebeskyttelseGradering> = emptyList(),
         val foedsel: List<Fødsel> = emptyList(),
         val doedsfall: List<Dødsfall> = emptyList(),

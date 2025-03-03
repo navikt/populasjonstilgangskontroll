@@ -7,7 +7,7 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest
 import org.springframework.test.context.ContextConfiguration
 import kotlin.test.Test
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.Person.Fødsel
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.Fødsel
 
 @JsonTest
 @ContextConfiguration(classes= [TestApp::class])

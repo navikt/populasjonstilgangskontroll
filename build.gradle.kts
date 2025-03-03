@@ -50,7 +50,7 @@ configurations.all {
 dependencies {
     // Align versions of all Kotlin components
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
     implementation("com.neovisionaries:nv-i18n:1.29")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework:spring-aspects")

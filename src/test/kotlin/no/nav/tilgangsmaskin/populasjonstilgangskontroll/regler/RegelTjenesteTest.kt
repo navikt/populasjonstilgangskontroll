@@ -14,6 +14,9 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligB
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligBrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringSjekker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelType.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.fortroligBruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.geoNorgeRegel
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -22,6 +25,7 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import kotlin.test.assertEquals
 
 @ExtendWith(MockKExtension::class)
 class RegelTjenesteTest {
@@ -94,10 +98,11 @@ class RegelTjenesteTest {
     fun bulk() {
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
         every { bruker.bruker(strengtFortroligBruker.brukerId) } returns strengtFortroligBruker
+        every { bruker.bruker(fortroligBruker.brukerId) } returns fortroligBruker
         every { bruker.bruker(vanligBruker.brukerId) } returns vanligBruker
-        assertThrows<BulkRegelException> {
-            regel.bulkRegler(vanligAnsatt.ansattId, RegelSpec(strengtFortroligBruker.brukerId, RegelType.KJERNE), RegelSpec(vanligBruker.brukerId, RegelType.KJERNE))
-        }
+        assertEquals(assertThrows<BulkRegelException> {
+            regel.bulkRegler(vanligAnsatt.ansattId, RegelSpec(strengtFortroligBruker.brukerId, KJERNE), RegelSpec(fortroligBruker.brukerId, KJERNE))
+        }.exceptions.size, 2)
     }
     companion object {
         @JvmStatic

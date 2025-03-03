@@ -31,7 +31,7 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: B
                 motor.sjekk(ansatt, brukerTjeneste.bruker(spec.brukerId), spec.type)
             }.getOrElse {e -> if (e is RegelException) avvisninger.add(e) else throw e }
         }
-        if (avvisninger.isNotEmpty()) throw BulkRegelException(avvisninger).also {
+        if (avvisninger.isNotEmpty()) throw BulkRegelException(ansattId,avvisninger).also {
             log.info("Det er ${avvisninger.size} avvisning(er) i regler for ${ansattId.verdi}->${avvisninger.map { it.brukerId.verdi to it.body.title }}")
         }
     }

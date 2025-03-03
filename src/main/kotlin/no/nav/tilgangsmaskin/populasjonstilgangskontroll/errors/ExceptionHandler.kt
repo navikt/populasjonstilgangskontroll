@@ -6,8 +6,9 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
+import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity.status
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -20,13 +21,26 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     private val log = getLogger(javaClass)
 
     @ExceptionHandler(BulkRegelException::class)
-    fun bulk(e: BulkRegelException, req: NativeWebRequest) = problem(e, req, BAD_REQUEST)
+    fun bulk(e: BulkRegelException, req: NativeWebRequest) = problem(e, req)
 
-    private fun problem(e: Exception, req: NativeWebRequest, status: HttpStatus) =
-        status(status)
+    private fun problem(e: BulkRegelException, req: NativeWebRequest) : ProblemDetail{
+        return ProblemDetail.forStatus(FORBIDDEN).apply {
+            title  = e.message
+            properties = mapOf(
+                "navIdent" to e.ansattId.verdi,
+                "antallFeil" to e.exceptions.size,
+                "detaljer" to e.exceptions.map {properties(it)}
+            )
+        }
+        status(FORBIDDEN)
             .headers(HttpHeaders().apply { contentType = APPLICATION_PROBLEM_JSON })
-            .body(createProblemDetail(e, status, e.message ?: e.javaClass.simpleName, null, null, req).apply {
-            }.also {
-                log.error("OOPS $req $it ${status.reasonPhrase}: ${e.message}", e)
+            .body(problem(e, req).apply {
             })
+    }
+}
+fun properties(e: RegelException) : Map<String, Any> {
+    return mapOf(
+        "kode" to e.regel.metadata.begrunnelse,
+        "brukerIdent" to e.brukerId.verdi,
+        "kanOverstyres" to e.regel.erOverstyrbar)
 }

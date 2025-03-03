@@ -7,10 +7,10 @@ import java.time.LocalDate
 data class PdlPipRespons(val aktoerId: AktørId, val person: Person, val identer: Identer, val geografiskTilknytning: PdlGeoTilknytning)
 
 data class Person(
-    val adressebeskyttelse: List<Adressebeskyttelse>,
-    val foedsel: List<Foedsel>,
-    val doedsfall: List<Doedsfall>,
-    val familierelasjoner: List<Familierelasjon>
+    val adressebeskyttelse: List<Adressebeskyttelse> = emptyList(),
+    val foedsel: List<Foedsel> = emptyList(),
+    val doedsfall: List<Doedsfall> = emptyList(),
+    val familierelasjoner: List<Familierelasjon> = emptyList()
 )
 
 data class Foedsel(
@@ -23,9 +23,9 @@ data class Doedsfall(val doedsdato: String
 value class AktørId(val aktoerId: String)
 
 data class Familierelasjon(
-    val relatertPersonsIdent: String,
-    val relatertPersonsRolle: String,
-    val minRolleForPerson: String
+    val relatertPersonsIdent: String? = null,
+    val relatertPersonsRolle: String? = null,
+    val minRolleForPerson: String? = null
 )
 data class Identer(
     val identer: List<Ident>

@@ -25,6 +25,8 @@ spring:
   main:
     banner-mode: off
   jackson:
+    deserialization:
+      fail-on-unknown-properties: true
     default-property-inclusion: non_null
   cache:
     cache-names: pdl, skjerming, graph, overstyring, pdlpip

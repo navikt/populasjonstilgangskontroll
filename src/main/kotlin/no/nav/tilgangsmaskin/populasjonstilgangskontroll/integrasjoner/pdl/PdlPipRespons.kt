@@ -2,22 +2,20 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AktørId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson.Adressebeskyttelse
 import java.time.LocalDate
 
 data class PdlPipRespons(val aktoerId: AktørId, val person: Person, val identer: Identer, val geografiskTilknytning: PdlGeoTilknytning)  {
 
     data class Person(
-        val adressebeskyttelse: List<Adressebeskyttelse> = emptyList(),
-        val foedsel: List<Foedsel> = emptyList(),
-        val doedsfall: List<Doedsfall> = emptyList(),
+        val adressebeskyttelse: List<AdressebeskyttelseGradering> = emptyList(),
+        val foedsel: List<Fødsel> = emptyList(),
+        val doedsfall: List<Dødsfall> = emptyList(),
         val familierelasjoner: List<Familierelasjon> = emptyList())  {
 
         enum class AdressebeskyttelseGradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG}
 
-        //@JvmInline
-        data class Foedsel(val foedselsdato: LocalDate)
-        data class Doedsfall(val doedsdato: LocalDate)
+        data class Fødsel(val foedselsdato: LocalDate)
+        data class Dødsfall(val doedsdato: LocalDate)
         data class Familierelasjon(val relatertPersonsIdent: BrukerId? = null, val relatertPersonsRolle: FamilieRelasjonRolle? = null, val minRolleForPerson: FamilieRelasjonRolle? = null) {
             enum class FamilieRelasjonRolle  {MOR,FAR,BARN}
         }
@@ -27,11 +25,6 @@ data class PdlPipRespons(val aktoerId: AktørId, val person: Person, val identer
             enum class IdentGruppe { AKTORID, FOLKEREGISTERIDENT }
         }
     }
-    data class GeografiskTilknytning(
-        val gtType: String,
-        val gtBydel: String,
-        val regel: String
-    )
 }
 
 

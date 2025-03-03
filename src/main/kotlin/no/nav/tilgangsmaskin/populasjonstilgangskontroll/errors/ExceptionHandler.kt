@@ -1,14 +1,13 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.BulkRegelException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.Regel.Companion.TYPE_URI
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
 import org.springframework.http.ProblemDetail
-import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.status
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -26,6 +25,8 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
 
     fun bulkDetail(e: BulkRegelException) = ProblemDetail.forStatus(FORBIDDEN).apply {
         title = e.message
+        type = TYPE_URI
+
         properties = mapOf(
             "navIdent" to e.ansattId.verdi,
             "avvisninger" to e.exceptions.size,

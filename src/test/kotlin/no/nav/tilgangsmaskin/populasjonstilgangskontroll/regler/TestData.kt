@@ -4,6 +4,7 @@ import com.neovisionaries.i18n.CountryCode.SE
 import io.mockk.spyk
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt.AnsattAttributter
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt.AnsattAttributter.Navn
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Enhetsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
@@ -14,7 +15,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.U
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Navn
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
 import java.util.UUID

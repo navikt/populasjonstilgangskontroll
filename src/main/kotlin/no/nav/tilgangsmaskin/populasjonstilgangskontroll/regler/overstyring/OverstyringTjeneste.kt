@@ -57,6 +57,8 @@ class OverstyringTjeneste(private val ansattTjeneste: AnsattTjeneste, private va
          }
 
     @CachePut(OVERSTYRING)
-    private fun refresh(ansattId: AnsattId, data: OverstyringData)  = Unit
+    private fun refresh(ansattId: AnsattId, data: OverstyringData)  = Unit.also {
+        log.info("Refresh cache overstyring for ansatt '${ansattId.verdi}' og bruker '${data.brukerId.mask()}'")
+    }
 }
 

@@ -7,11 +7,13 @@ import java.time.LocalDate
 data class PdlPipRespons(val aktoerId: AktørId, val person: PdlPipPerson, val identer: Identer, val geografiskTilknytning: PdlGeoTilknytning)  {
 
     data class PdlPipPerson(
-        val adressebeskyttelse: List<AdressebeskyttelseGradering> = emptyList(),
+        val adressebeskyttelse: List<Gradering> = emptyList(),
         val foedsel: List<Fødsel> = emptyList(),
         val doedsfall: List<Dødsfall> = emptyList(),
         val familierelasjoner: List<Familierelasjon> = emptyList())  {
 
+        @JvmInline
+        value class Gradering(val gradering: AdressebeskyttelseGradering)
         enum class AdressebeskyttelseGradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG}
 
         data class Fødsel(val foedselsdato: LocalDate)

@@ -17,10 +17,10 @@ object PdlPipTilBrukerMapper {
     private val log = LoggerFactory.getLogger(javaClass)
      fun tilBruker(brukerId: BrukerId, respons: PdlPipRespons, erSkjermet: Boolean): Bruker {
         return mutableListOf<GlobalGruppe>().apply {
-            if  (respons.person.adressebeskyttelse.any { it in listOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND) }) {
+            if  (respons.person.adressebeskyttelse.any { it.gradering in listOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND) }) {
                 add(STRENGT_FORTROLIG_GRUPPE)
             }
-            else if (respons.person.adressebeskyttelse.any { it == FORTROLIG })   {
+            else if (respons.person.adressebeskyttelse.any { it.gradering == FORTROLIG })   {
                 add(FORTROLIG_GRUPPE)
             }
             if ( respons.geografiskTilknytning.gtType == UDEFINERT) {

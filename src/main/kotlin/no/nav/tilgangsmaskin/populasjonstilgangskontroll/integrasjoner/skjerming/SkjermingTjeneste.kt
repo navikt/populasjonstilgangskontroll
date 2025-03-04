@@ -4,6 +4,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.RecoverableRestException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.RetryingOnRecoverableCacheableService
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig.Companion.SKJERMING
+import org.springframework.core.NestedExceptionUtils
 import org.springframework.retry.ExhaustedRetryException
 import org.springframework.retry.annotation.Recover
 import kotlin.arrayOf
@@ -17,7 +18,7 @@ class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
     fun fallback(e: Throwable, brukerId: BrukerId) =
         when (e) {
             is RecoverableRestException -> true
-            is ExhaustedRetryException -> throw e.cause ?: e
+            is ExhaustedRetryException -> throw NestedExceptionUtils.getMostSpecificCause(e)
             else -> throw e
     }
 }

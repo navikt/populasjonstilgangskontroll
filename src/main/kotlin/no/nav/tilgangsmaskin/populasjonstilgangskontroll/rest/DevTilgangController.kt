@@ -4,6 +4,7 @@ import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRestClientAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelSpec
@@ -20,8 +21,11 @@ import org.springframework.web.bind.annotation.ResponseStatus
 
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
-class DevTilgangController(private val bruker : BrukerTjeneste, private val ansatt: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyringTjeneste: OverstyringTjeneste)
+class DevTilgangController(private val bruker : BrukerTjeneste, private val ansatt: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyringTjeneste: OverstyringTjeneste, private val raw: PdlPipRestClientAdapter)
 {
+    @GetMapping("raw/{brukerId}")
+    fun raw(@PathVariable brukerId: BrukerId) = raw.raw(brukerId.verdi)
+
     @GetMapping("bruker/{brukerId}")
     fun bruker(@PathVariable brukerId: BrukerId) = bruker.bruker(brukerId)
 
@@ -35,7 +39,6 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     @GetMapping("kjerne/{ansattId}//{brukerId}")
     @ResponseStatus(NO_CONTENT)
     fun kjerneregler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId)  = regler.kjerneregler(ansattId, brukerId)
-
 
     @PostMapping("overstyr/{ansattId}")
     @ResponseStatus(ACCEPTED)

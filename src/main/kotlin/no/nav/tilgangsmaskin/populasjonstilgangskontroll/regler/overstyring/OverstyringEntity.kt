@@ -22,21 +22,31 @@ import java.time.Instant
 class OverstyringEntity(@Column(length = 7, nullable = false) val navid: String,
                         @Column(length = 11, nullable = false) val fnr: String,
                         @Column(nullable = false) val begrunnelse: String,
-                        @Column(nullable = false) val expires: Instant,
-                        @CreatedDate @Column(nullable = false) var created: Instant? = null,
-                        @LastModifiedDate @Column(nullable = false) var updated: Instant? = null) {
+                        @Column(nullable = false) val expires: Instant) {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     val id : Long = 0
 
-    companion object {
-        const val OVERSTYRING = "overstyring"
-    }
+    @CreatedDate
+    @Column(nullable = false)
+    var created: Instant? = null
+
+    @LastModifiedDate
+    @Column(nullable = false)
+    var updated: Instant? = null
 
     @Column(name = "oppretter", length = 7)
     @CreatedBy
     var oppretter: String? = null
+
+    @Column(name = "system", length = 50)
+    @CreatedBySystem
+    var system: String? = null
+
+    companion object {
+        const val OVERSTYRING = "overstyring"
+    }
 }
 
 

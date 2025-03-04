@@ -43,11 +43,11 @@ class OverstyringEntityListener(private val token: TokenAccessor) {
 
         private val log = LoggerFactory.getLogger(OverstyringEntityListener::class.java)
     }
-    fun setCreatedBySystem(target: Any) {
-        target::class.java.declaredFields.forEach { field ->
-            if (field.isAnnotationPresent(CreatedBySystem::class.java)) {
-                field.isAccessible = true
-                field.set(target, token.system)
+    fun setCreatedBySystem(target: OverstyringEntity) {
+        target::class.java.declaredFields.forEach {
+            if (it.isAnnotationPresent(CreatedBySystem::class.java)) {
+                it.isAccessible = true
+                it.set(target, token.system)
             }
         }
     }

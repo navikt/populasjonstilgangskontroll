@@ -31,6 +31,5 @@ abstract class AbstractPingableHealthIndicator(private val pingable: Pingable) :
             .build()
     }
 
-
     override fun toString() = "${javaClass.simpleName} [pingable=$pingable]"
 }

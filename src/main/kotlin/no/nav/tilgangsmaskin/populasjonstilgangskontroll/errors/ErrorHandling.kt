@@ -1,6 +1,8 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.GraphQLErrorHandler
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.LoggingGraphQLInterceptor
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus
@@ -19,9 +21,15 @@ class DefaultGraphQlErrorHandler : GraphQLErrorHandler
 @Component
 @Primary
 class DefaultRestErrorHandler : ErrorHandler {
+    private val log = LoggerFactory.getLogger(DefaultRestErrorHandler::class.java)
+
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
-        if (res.statusCode.is4xxClientError) throw IrrecoverableRestException(res.statusCode, req.uri, res.statusText)
-        else throw RecoverableRestException(res.statusCode, req.uri, res.statusText)
+        if (res.statusCode.is4xxClientError) throw IrrecoverableRestException(res.statusCode, req.uri, res.statusText).also {
+            log.warn("Irrecoverable etter ${res.statusCode.value()} fra ${req.uri}")
+        }
+        else throw RecoverableRestException(res.statusCode, req.uri, res.statusText).also {
+            log.warn("Reecoverable etter ${res.statusCode.value()} fra ${req.uri}")
+        }
     }
 }
 

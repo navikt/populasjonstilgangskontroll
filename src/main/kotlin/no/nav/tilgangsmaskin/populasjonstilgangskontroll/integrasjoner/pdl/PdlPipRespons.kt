@@ -12,8 +12,9 @@ data class PdlPipRespons(val aktoerId: AktørId, val person: PdlPipPerson, val i
         val doedsfall: List<Dødsfall> = emptyList(),
         val familierelasjoner: List<Familierelasjon> = emptyList())  {
 
-        data class Gradering(val gradering: AdressebeskyttelseGradering)
-        enum class AdressebeskyttelseGradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG}
+        data class Gradering(val gradering: AdressebeskyttelseGradering)  {
+            enum class AdressebeskyttelseGradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG}
+        }
 
         data class Fødsel(val foedselsdato: LocalDate)
         data class Dødsfall(val doedsdato: LocalDate)

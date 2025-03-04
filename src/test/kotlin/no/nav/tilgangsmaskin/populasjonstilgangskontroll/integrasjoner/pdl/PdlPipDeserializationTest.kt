@@ -20,7 +20,11 @@ class PdlPipDeserializationTest {
  {
   "aktoerId": "1000096233942",
   "person": {
-    "adressebeskyttelse": [],
+     "adressebeskyttelse": [
+      {
+        "gradering": "STRENGT_FORTROLIG"
+      }
+    ],
     "foedsel": [
       {
         "foedselsdato": "1980-10-10"
@@ -64,17 +68,7 @@ class PdlPipDeserializationTest {
 
     @Test
     fun deserialization() {
-        val f = """
-    [
-      {
-        "foedselsdato": "1980-10-10"
-      }
-    ]
-    """
-
-        val foedselList: List<Fødsel> = mapper.readValue(f)
-        println(foedselList)
-            println(mapper.readValue<PdlPipRespons>(json))
+         println(mapper.readValue<PdlPipRespons>(json))
     }
 
 }

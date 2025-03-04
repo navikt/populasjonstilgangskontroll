@@ -9,6 +9,7 @@ import java.util.*
 class TokenAccessor(private val contextHolder: TokenValidationContextHolder){
 
     val allClaims get() = claimSet().allClaims
+    val system = claimSet().getStringClaim("azp_name") ?: "N/A"
     val subject get()  = claimSet().getStringClaim("pid")
     val  identFromToken get()  = claimSet().let { UUID.fromString(it.getStringClaim("oid")) }
     val ansattId get()  = claimSet().getStringClaim("NAVident")?.let { AnsattId(it) } ?: throw RuntimeException("NAVident claim not found in token")

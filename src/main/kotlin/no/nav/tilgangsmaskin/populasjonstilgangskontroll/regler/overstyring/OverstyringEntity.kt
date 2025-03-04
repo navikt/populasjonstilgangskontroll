@@ -18,7 +18,7 @@ import java.time.Instant
 @Table(indexes = [
     Index(name = "idx_overstyringentity_navid", columnList = "navid, fnr")
 ])
-@EntityListeners(LoggingEntityListener::class, AuditingEntityListener::class)
+@EntityListeners(OverstyringEntityListener::class, AuditingEntityListener::class)
 class OverstyringEntity(@Column(length = 7, nullable = false) val navid: String,
                         @Column(length = 11, nullable = false) val fnr: String,
                         @Column(nullable = false) val begrunnelse: String,
@@ -38,3 +38,8 @@ class OverstyringEntity(@Column(length = 7, nullable = false) val navid: String,
     @CreatedBy
     var oppretter: String? = null
 }
+
+
+@Target(AnnotationTarget.FIELD)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class CreatedBySystem

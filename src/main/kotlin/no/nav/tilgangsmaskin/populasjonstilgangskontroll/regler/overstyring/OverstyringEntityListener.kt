@@ -12,13 +12,17 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
-class LoggingEntityListener(private val token: TokenAccessor) {
+class OverstyringEntityListener(private val token: TokenAccessor) {
 
     @PrePersist
-    private fun lagrer(entity : OverstyringEntity) = log.trace("Lagrer {} i DB", entity.javaClass.simpleName)
+    private fun lagrer(entity : OverstyringEntity) =  setCreatedBySystem(entity).also {
+        log.trace("Lagrer {} i DB", entity.javaClass.simpleName)
+    }
 
     @PreUpdate
-    private fun oppdaterer(entity : OverstyringEntity) = log.trace("Oppdaterer {} i DB", entity.javaClass.simpleName)
+    private fun oppdaterer(entity : OverstyringEntity) = setCreatedBySystem(entity).also {
+        log.trace("Oppdaterer {} i DB", entity.javaClass.simpleName)
+    }
 
     @PreRemove
     private fun fjerner(entity : OverstyringEntity) = log.trace("Fjerner {} fra DB", entity.javaClass.simpleName)
@@ -37,6 +41,14 @@ class LoggingEntityListener(private val token: TokenAccessor) {
 
     companion object {
 
-        private val log = LoggerFactory.getLogger(LoggingEntityListener::class.java)
+        private val log = LoggerFactory.getLogger(OverstyringEntityListener::class.java)
+    }
+    fun setCreatedBySystem(target: Any) {
+        target::class.java.declaredFields.forEach { field ->
+            if (field.isAnnotationPresent(CreatedBySystem::class.java)) {
+                field.isAccessible = true
+                field.set(target, token.system)
+            }
+        }
     }
 }

@@ -11,10 +11,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson.Adressebeskyttelse.AdressebeskyttelseGradering.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
-import org.slf4j.LoggerFactory
 
 object PdlTilBrukerMapper {
-    private val log = LoggerFactory.getLogger(javaClass)
     fun tilBruker(person: PdlPerson, gt: PdlGeoTilknytning, erSkjermet: Boolean) =
         mutableListOf<GlobalGruppe>().apply {
             if  (person.adressebeskyttelse.any { it.gradering in listOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND) }) {
@@ -32,10 +30,10 @@ object PdlTilBrukerMapper {
                 add(EGEN_ANSATT_GRUPPE)
             }
         }.toTypedArray().let {
-            Bruker(tilFødselsnummer(person.folkeregisteridentifikator), tilGeoTilknytning(gt),  Familie.INGEN,*it)
+            Bruker(tilBrukerId(person.folkeregisteridentifikator), tilGeoTilknytning(gt),  Familie.INGEN,*it)
         }
 
-    private fun tilFødselsnummer(ident: List<PdlPerson.Folkeregisteridentifikator>) =
+    private fun tilBrukerId(ident: List<PdlPerson.Folkeregisteridentifikator>) =
         BrukerId(ident.first().identifikasjonsnummer)
 
     fun tilGeoTilknytning(geo: PdlGeoTilknytning): GeoTilknytning =

@@ -1,13 +1,13 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
+import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AvvisningBegrunnelse.AVVIST_EGNE_DATA
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelAvvisningsTekster.AVVIST_EGNE_DATA
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.EGEN_ANSATT_GRUPPE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.FORTROLIG_GRUPPE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.Regel.RegelBeskrivelse
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.Ordered
 import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
@@ -24,8 +24,7 @@ class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID): Globa
 @Order(HIGHEST_PRECEDENCE + 2)
 class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : GlobaleGrupperRegel(EGEN_ANSATT_GRUPPE, id,"Egen ansatt")
 
-//@Component
-//@ConditionalOnNotProd
+@ConditionalOnNotProd
 @Order(HIGHEST_PRECEDENCE + 3)
 class EgneDataRegel : KjerneRegel {
     override fun test(ansatt: Ansatt, bruker: Bruker) = bruker.brukerId != ansatt.fnr

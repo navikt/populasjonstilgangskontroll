@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AvvisningBegrunnelse.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelAvvisningsTekster.*
 
-enum class GlobalGruppe(val begrunnelse: AvvisningBegrunnelse) {
+enum class GlobalGruppe(val begrunnelse: RegelAvvisningsTekster) {
     STRENGT_FORTROLIG_GRUPPE(AVVIST_STRENGT_FORTROLIG_ADRESSE),
     FORTROLIG_GRUPPE(AVVIST_FORTROLIG_ADRESSE),
     EGEN_ANSATT_GRUPPE(AVVIST_SKJERMING),
@@ -10,7 +10,7 @@ enum class GlobalGruppe(val begrunnelse: AvvisningBegrunnelse) {
     GEO_PERSON_UTLAND_GRUPPE(AVVIST_PERSON_UTLAND),
 }
 
-enum class AvvisningBegrunnelse(val årsak: String) {
+enum class RegelAvvisningsTekster(val årsak: String) {
     AVVIST_STRENGT_FORTROLIG_ADRESSE("Mangler tilgang til strengt fortrolig adresse"),
     AVVIST_STRENGT_FORTROLIG_UTLAND("Mangler tilgang til strengt fortrolig adresse utland"),
     AVVIST_FORTROLIG_ADRESSE("Mangler tilgang til fortrolig adresse"),

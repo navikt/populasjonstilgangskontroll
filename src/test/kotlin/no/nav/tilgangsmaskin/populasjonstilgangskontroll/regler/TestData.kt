@@ -18,7 +18,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
 import java.util.UUID
-import kotlin.math.E
 
 object TestData {
 

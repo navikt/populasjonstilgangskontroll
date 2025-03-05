@@ -12,7 +12,7 @@ class RegelMotor(vararg regler: Regel)  {
     private val log = LoggerFactory.getLogger(javaClass)
 
     val kjerneRegelSett = RegelSett(KJERNE to regler.filterIsInstance<KjerneRegel>().sortedWith(INSTANCE))
-    val komplettRegelSett = RegelSett(KOMPLETT to kjerneRegelSett.regler + regler.filterNot { it is KjerneRegel}.sortedWith(INSTANCE))
+    val komplettRegelSett = RegelSett(KOMPLETT to regler.sortedWith(INSTANCE))
 
     fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = sjekk(ansatt, bruker, KOMPLETT)
     fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = sjekk(ansatt, bruker, KJERNE)

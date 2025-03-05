@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 import org.springframework.stereotype.Component
 
 @Component
-class AnsattJPAAdapter(private val repository: AnsattRepository) {
+class NomJPAAdapter(private val repository: NomRepository) {
 
     fun fnrForAnsatt(navId: String) = repository.findByNavid(navId)?.fnr
 }

@@ -11,22 +11,22 @@ import org.springframework.stereotype.Component
 class RegelMotor(vararg regler: Regel)  {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    val kjerneRegelSett = RegelSett(KJERNE to regler.sortedWith(INSTANCE).filterIsInstance<KjerneRegel>())
-    val komplettRegelSett = RegelSett(KOMPLETT to regler.sortedWith(INSTANCE))
+    val kjerneRegelSett = RegelSett(KJERNE to regler.filterIsInstance<KjerneRegel>().sortedWith(INSTANCE))
+    val komplettRegelSett = RegelSett(KOMPLETT to kjerneRegelSett.regler + regler.filterNot { it is KjerneRegel}.sortedWith(INSTANCE))
 
-    fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = sjekk(ansatt, bruker, komplettRegelSett)
-    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = sjekk(ansatt, bruker, kjerneRegelSett)
+    fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = sjekk(ansatt, bruker, KOMPLETT)
+    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = sjekk(ansatt, bruker, KJERNE)
 
     fun sjekk(ansatt: Ansatt, bruker: Bruker, type: RegelType) =
         sjekk(ansatt, bruker, type.regelSett())
 
     private fun sjekk(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) =
         with(regelSett) {
-            regler.forEachIndexed { index, it ->
-                log.info(CONFIDENTIAL,"[$index] Sjekker regel: '${it.metadata.kortNavn}' fra ${type.tekst} for '${ansatt.ansattId.verdi}' og '${bruker.brukerId.verdi}'")
-                if (!it.test(ansatt,bruker)) {
-                    throw RegelException(bruker.brukerId, ansatt.ansattId, it).also {
-                        log.warn("Tilgang avvist av regel ${index.plus(1)} ('${it.regel.metadata.kortNavn} (${it.body.title}')")
+            regler.forEachIndexed { index, regel ->
+                log.info(CONFIDENTIAL,"[$index] Sjekker regel: '${regel.metadata.kortNavn}' fra regelsett '$tekst' for '${ansatt.ansattId.verdi}' og '${bruker.brukerId.verdi}'")
+                if (!regel.test(ansatt,bruker)) {
+                    throw RegelException(bruker.brukerId, ansatt.ansattId, regel).also {
+                        log.warn("Tilgang avvist av regel ${index.plus(1)} (${regel.metadata.kortNavn}) i regelsett '${tekst}' (${regel.metadata.begrunnelse.årsak})")
                     }
                 }
             }.also {

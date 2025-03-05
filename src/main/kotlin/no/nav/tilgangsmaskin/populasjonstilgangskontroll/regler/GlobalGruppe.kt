@@ -16,7 +16,7 @@ enum class AvvisningBegrunnelse(val årsak: String) {
     AVVIST_FORTROLIG_ADRESSE("Mangler tilgang til fortrolig adresse"),
     AVVIST_SKJERMING("Mangler tilgang til skjermet person"),
     AVVIST_GEOGRAFISK("Mangler tilgang til brukers geografiske adresse"),
-    AVVIST_EGNE_DATA("TODO"),
+    AVVIST_EGNE_DATA("Kan ikke slå opp egne data"),
     AVVIST_EGEN_FAMILIE("TODO"),
     AVVIST_VERGE("TODO"),
     AVVIST_PERSON_UTLAND("Mangler tilgang til person i utlandet"),

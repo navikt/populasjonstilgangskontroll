@@ -22,6 +22,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.egenAns
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.fortroligAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.fortroligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.egenAnsattFortroligAnsatt
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.egneDataRegel
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.motor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.nasjonalAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.spiesMotor
@@ -254,7 +255,7 @@ class RegelMotorTest {
     @Test
     @DisplayName("Sjekk at reglene er sorterte")
     fun sortert() {
-        assertThat(motor.komplettRegelSett.regler).containsExactly(strengtFortroligRegel, fortroligRegel, egenAnsattRegel, geoUtlandRegel,ukjentBostedGeoRegel, geoNorgeRegel)
-        assertThat(motor.kjerneRegelSett.regler).containsExactly(strengtFortroligRegel, fortroligRegel, egenAnsattRegel)
+        assertThat(motor.komplettRegelSett.regler).containsExactly(strengtFortroligRegel, fortroligRegel, egenAnsattRegel, /*egneDataRegel,*/geoUtlandRegel,ukjentBostedGeoRegel, geoNorgeRegel)
+        assertThat(motor.kjerneRegelSett.regler).containsExactly(strengtFortroligRegel, fortroligRegel, egenAnsattRegel,/* egneDataRegel*/)
     }
 }

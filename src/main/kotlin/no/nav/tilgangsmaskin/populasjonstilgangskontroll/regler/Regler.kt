@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
+import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.*
@@ -14,15 +15,15 @@ import java.util.*
 
 @Component
 @Order(HIGHEST_PRECEDENCE)
-class StrengtFortroligRegel(@Value("\${gruppe.strengt}") private val id: UUID) : KjerneRegel(STRENGT_FORTROLIG_GRUPPE, id, "Kode 6")
+class StrengtFortroligRegel(@Value("\${gruppe.strengt}") private val id: UUID) : GlobaleGrupperRegel(STRENGT_FORTROLIG_GRUPPE, id, "Kode 6")
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 1)
-class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID): KjerneRegel(FORTROLIG_GRUPPE, id, "Kode 7")
+class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID): GlobaleGrupperRegel(FORTROLIG_GRUPPE, id, "Kode 7")
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 2)
-class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : KjerneRegel(EGEN_ANSATT_GRUPPE, id,"Egen ansatt")
+class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : GlobaleGrupperRegel(EGEN_ANSATT_GRUPPE, id,"Egen ansatt")
 
 
 @Component
@@ -61,5 +62,12 @@ class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) : Regel 
         }
 
     override val metadata = RegelBeskrivelse("Geografisk tilknytning", AVVIST_GEOGRAFISK)
+}
 
+//@Component
+//@ConditionalOnNotProd
+@Order(HIGHEST_PRECEDENCE + 6)
+class EgneDataRegel : KjerneRegel {
+    override fun test(ansatt: Ansatt, bruker: Bruker) = bruker.brukerId != ansatt.fnr
+    override val metadata = RegelBeskrivelse("Egne data", AVVIST_EGNE_DATA)
 }

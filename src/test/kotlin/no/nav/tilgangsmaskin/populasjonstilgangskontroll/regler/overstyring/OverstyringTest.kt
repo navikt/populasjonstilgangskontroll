@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring
 
+import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -11,6 +12,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.ukjentB
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.extension.ExtendWith
@@ -30,6 +32,8 @@ import kotlin.test.Test
 @ActiveProfiles(TEST)
 internal class OverstyringTest {
 
+    @MockkBean
+    lateinit var accessor: TokenAccessor
     @MockK
     lateinit var ansattTjeneste: AnsattTjeneste
     @MockK
@@ -41,6 +45,7 @@ internal class OverstyringTest {
 
     @BeforeTest
     fun setup() {
+        every { accessor.system } returns "test"
         every { ansattTjeneste.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
         overstyring = OverstyringTjeneste(ansattTjeneste, brukerTjeneste, OverstyringJPAAdapter(repo), motor)
     }

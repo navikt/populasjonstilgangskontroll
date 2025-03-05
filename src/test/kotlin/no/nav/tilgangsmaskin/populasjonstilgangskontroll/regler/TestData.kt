@@ -18,6 +18,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
 import java.util.UUID
+import kotlin.math.E
 
 object TestData {
 
@@ -65,16 +66,16 @@ object TestData {
     internal val nasjonalGruppe = EntraGruppe(UUID.randomUUID(), "Nsjonal gruppe")
     internal val enhetGruppe = EntraGruppe(UUID.randomUUID(), "XXX_GEO_${enhet.verdi}")
 
-    internal val egenAnsattFortroligAnsatt = Ansatt(attributter, fortroligEntraGruppe, egenAnsattEntraGruppe)
-    internal val egenAnsattStrengtFortroligAnsatt = Ansatt(attributter, strengtFortroligEntraGruppe, egenAnsattEntraGruppe)
-    internal val strengtFortroligAnsatt = Ansatt(attributter, strengtFortroligEntraGruppe)
-    internal val fortroligAnsatt = Ansatt(attributter, fortroligEntraGruppe)
-    internal val egenAnsatt = Ansatt(attributter, egenAnsattEntraGruppe)
-    internal val vanligAnsatt = Ansatt(attributter, annenEntraGruppe)
-    internal val geoUtlandAnsatt = Ansatt(attributter, geoUtlandEntraGruppe)
-    internal val udefinertGeoAnsatt = Ansatt(attributter, udefinertGruppe)
-    internal val nasjonalAnsatt = Ansatt(attributter, nasjonalGruppe)
-    internal val enhetAnsatt = Ansatt(attributter, enhetGruppe)
+    internal val egenAnsattFortroligAnsatt = Ansatt(ansattBruker.brukerId,attributter, fortroligEntraGruppe, egenAnsattEntraGruppe)
+    internal val egenAnsattStrengtFortroligAnsatt = Ansatt(ansattBruker.brukerId,attributter, strengtFortroligEntraGruppe, egenAnsattEntraGruppe)
+    internal val strengtFortroligAnsatt = Ansatt(ansattBruker.brukerId,attributter, strengtFortroligEntraGruppe)
+    internal val fortroligAnsatt = Ansatt(ansattBruker.brukerId,attributter, fortroligEntraGruppe)
+    internal val egenAnsatt = Ansatt(ansattBruker.brukerId,attributter, egenAnsattEntraGruppe)
+    internal val vanligAnsatt = Ansatt(ansattBruker.brukerId,attributter, annenEntraGruppe)
+    internal val geoUtlandAnsatt = Ansatt(ansattBruker.brukerId,attributter, geoUtlandEntraGruppe)
+    internal val udefinertGeoAnsatt = Ansatt(ansattBruker.brukerId,attributter, udefinertGruppe)
+    internal val nasjonalAnsatt = Ansatt(ansattBruker.brukerId,attributter, nasjonalGruppe)
+    internal val enhetAnsatt = Ansatt(ansattBruker.brukerId,attributter, enhetGruppe)
 
     internal val strengtFortroligRegel = StrengtFortroligRegel(strengtFortroligEntraGruppe.id)
     internal val spyStrengtFortroligRegel = spyk(strengtFortroligRegel)
@@ -94,9 +95,13 @@ object TestData {
     internal val geoNorgeRegel = GeoNorgeRegel(nasjonalGruppe.id)
     internal val spyGeoNorgeRegel= spyk(geoNorgeRegel)
 
-    private val allSpies = listOf(spyStrengtFortroligRegel, spyFortroligRegel, spyEgenAnsattRegel, spyUkjentBostedGeoRegel, spyGeoUtlandRegel, spyGeoNorgeRegel).toTypedArray()
+    internal val egneDataRegel = EgneDataRegel()
+    internal val spyEgneDataRegel= spyk(egneDataRegel)
+
+
+    private val allSpies = listOf(spyStrengtFortroligRegel, spyFortroligRegel, spyEgenAnsattRegel,/*spyEgneDataRegel,*/ spyUkjentBostedGeoRegel, spyGeoUtlandRegel, spyGeoNorgeRegel).toTypedArray()
 
     internal val spiesMotor = RegelMotor(*allSpies)
-    internal val motor = RegelMotor(strengtFortroligRegel,fortroligRegel, egenAnsattRegel, ukjentBostedGeoRegel, geoUtlandRegel, geoNorgeRegel)
+    internal val motor = RegelMotor(strengtFortroligRegel,fortroligRegel, egenAnsattRegel,/* egneDataRegel*/ukjentBostedGeoRegel, geoUtlandRegel, geoNorgeRegel)
 
 }

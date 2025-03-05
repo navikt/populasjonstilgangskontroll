@@ -21,7 +21,7 @@ class  EntraClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
             }
         }.flatMap {
             it.value
-        }.toList().toTypedArray()
+        }.toList()
 
     private fun EntraSaksbehandlerResponse.tilAttributter() = EntraResponsMapper.mapAttributter(attributter.first())
 

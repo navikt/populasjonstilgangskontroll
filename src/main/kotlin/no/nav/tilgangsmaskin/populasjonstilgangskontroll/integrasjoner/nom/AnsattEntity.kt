@@ -21,7 +21,7 @@ import java.time.Instant
 ])
 @EntityListeners(AuditingEntityListener::class)
 class AnsattEntity(@Column(length = 7, nullable = false) val navid: String,
-                        @Column(length = 11, nullable = false) val brukerid: String,
+                        @Column(length = 11, nullable = false) val fnr: String,
                         @Column(nullable = true) val gyldigtil: Instant)  {
     @Id
     @GeneratedValue(strategy = IDENTITY)

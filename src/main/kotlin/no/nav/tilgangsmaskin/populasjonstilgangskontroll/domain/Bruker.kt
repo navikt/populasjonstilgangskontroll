@@ -23,7 +23,7 @@ class Bruker(val brukerId: BrukerId,
 value class AktørId(val aktoerId: String){
     init {
         with(aktoerId) {
-            ObjectUtil.requires(this, 13)
+            ObjectUtil.requireDigits(this, 13)
         }
     }
 }
@@ -41,7 +41,7 @@ value class BrukerId(@JsonValue val verdi: String) {
 
     init {
         with(verdi) {
-            ObjectUtil.requires(this, 11)
+            ObjectUtil.requireDigits(this, 11)
             if (Cluster.Companion.isProd) {
                 require(mod11(W1, this) == this[9] - '0') { "Første kontrollsiffer $this[9] ikke validert" }
                 require(mod11(W2, this) == this[10] - '0') { "Andre kontrollsiffer $this[10] ikke validert" }
@@ -81,14 +81,14 @@ sealed class GeoTilknytning(val type: Type) {
     @JvmInline
     value class Kommune(val verdi: String)  {
         init {
-            ObjectUtil.requires(verdi, 4)
+            ObjectUtil.requireDigits(verdi, 4)
         }
     }
 
     @JvmInline
     value class Bydel(val verdi: String)  {
         init {
-            ObjectUtil.requires(verdi, 6)
+            ObjectUtil.requireDigits(verdi, 6)
         }
     }
     data class KommuneTilknytning(val kommune: Kommune) : GeoTilknytning(Type.KOMMUNE)

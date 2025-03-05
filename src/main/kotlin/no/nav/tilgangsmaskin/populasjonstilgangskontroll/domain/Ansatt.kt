@@ -28,6 +28,6 @@ value class AnsattId(@JsonValue val verdi: String) {
 @JvmInline
 value class Enhetsnummer(@JsonValue val verdi: String) {
     init {
-        ObjectUtil.requires(verdi, 4)
+        ObjectUtil.requireDigits(verdi, 4)
     }
 }

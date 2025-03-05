@@ -1,13 +1,12 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException
 import java.time.Instant
 import kotlin.time.Duration
 import kotlin.time.toKotlinDuration
 
 object ObjectUtil {
-    fun requires(verdi: String,len: Int): Unit {
+    fun requireDigits(verdi: String, len: Int): Unit {
         require(verdi.length == len){ "Ugyldig lengde ${verdi.length} for $verdi, forventet $len" }
         require(verdi.all { it.isDigit() }) { "Ugyldig(e) tegn i $verdi, forventet kun $len tall" }
     }

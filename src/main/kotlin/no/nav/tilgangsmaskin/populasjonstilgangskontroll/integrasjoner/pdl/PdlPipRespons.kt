@@ -31,6 +31,8 @@ data class PdlPipRespons(val aktoerId: AktørId, val person: PdlPipPerson, val i
     }
 }
 
+data class PdlPipBrukerRespons(val respons: Map<String, PdlPipRespons>)
+
 
 
 

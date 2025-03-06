@@ -11,10 +11,10 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.Re
 class EntraTjeneste(private val adapter: EntraClientAdapter) {
 
     fun ansatt(ident: AnsattId)=
-        runBlocking {
-            val attributter = async { adapter.attributter(ident.verdi) }
-            val grupper = async { adapter.grupper(ident.verdi) }
-             EntraResponse(attributter.await(), grupper.await())
+        run {
+            val attributter =  adapter.attributter(ident.verdi)
+            val grupper = adapter.grupper(ident.verdi)
+            EntraResponse(attributter, grupper)
         }
     override fun toString() = "${javaClass.simpleName} [adapter=$adapter]"
 }

@@ -11,7 +11,7 @@ group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
 version = "1.0.1"
 
 plugins {
-    id("org.jetbrains.kotlin.plugin.allopen") version "1.9.22"
+    id("org.jetbrains.kotlin.plugin.allopen") version "1.9.25"
     kotlin("jvm") version "1.9.25"
     id("com.diffplug.spotless") version "7.0.2"
     id("com.github.ben-manes.versions") version "0.52.0"

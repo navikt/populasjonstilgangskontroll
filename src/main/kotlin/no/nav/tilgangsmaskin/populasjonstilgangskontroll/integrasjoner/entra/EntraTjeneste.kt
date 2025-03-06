@@ -13,8 +13,8 @@ class EntraTjeneste(private val adapter: EntraClientAdapter) {
     fun ansatt(ident: AnsattId)=
         run {
             val attributter =  adapter.attributter(ident.verdi)
-            val grupper = adapter.grupper(ident.verdi)
-            EntraResponse(attributter, grupper)
+            val grupper = adapter.grupper("${attributter.id}")
+             EntraResponse(attributter, grupper)
         }
     override fun toString() = "${javaClass.simpleName} [adapter=$adapter]"
 }

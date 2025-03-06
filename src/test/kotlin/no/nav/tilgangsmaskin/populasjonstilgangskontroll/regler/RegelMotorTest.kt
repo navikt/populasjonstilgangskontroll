@@ -3,6 +3,8 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 import io.mockk.called
 import io.mockk.verify
 import io.mockk.verifyOrder
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.annenAnsattBruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.annenEgenAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.ansattBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.egenAnsattStrengtFortroligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.egenAnsattFortroligBruker
@@ -72,6 +74,16 @@ class RegelMotorTest {
     }
 
     @Test
+    @DisplayName("Test at saksbehandler ikke kan slå opp egne dara")
+    fun egneDataAvvises() {
+        assertEquals(egneDataRegel,
+            assertThrows<RegelException> {
+                motor.kompletteRegler(egenAnsatt, ansattBruker)
+            }.regel)
+        assertThat(egneDataRegel.test(vanligAnsatt,ansattBruker)).isFalse
+    }
+
+    @Test
     @DisplayName("Test at bruker med fortrolig beskyttelse *ikke* kan behandles av vanlig ansatt")
     fun fortroligBrukerVanligAnsattAvvises() {
         assertEquals(fortroligRegel,
@@ -132,7 +144,7 @@ class RegelMotorTest {
     @Test
     @DisplayName("Test at egen ansatt bruker *kan* behandles av ansatt med medlemsskap i egen ansatt gruppe")
     fun egenAnsattBrukerEgenAnsattOK() {
-        assertThatCode { motor.kompletteRegler(egenAnsatt, ansattBruker) }.doesNotThrowAnyException()
+        assertThatCode { motor.kompletteRegler(egenAnsatt, annenAnsattBruker) }.doesNotThrowAnyException()
     }
 
     @Test
@@ -255,7 +267,7 @@ class RegelMotorTest {
     @Test
     @DisplayName("Sjekk at reglene er sorterte")
     fun sortert() {
-        assertThat(motor.komplettRegelSett.regler).containsExactly(strengtFortroligRegel, fortroligRegel, egenAnsattRegel, /*egneDataRegel,*/geoUtlandRegel,ukjentBostedGeoRegel, geoNorgeRegel)
-        assertThat(motor.kjerneRegelSett.regler).containsExactly(strengtFortroligRegel, fortroligRegel, egenAnsattRegel,/* egneDataRegel*/)
+        assertThat(motor.komplettRegelSett.regler).containsExactly(strengtFortroligRegel, fortroligRegel, egenAnsattRegel, egneDataRegel,geoUtlandRegel,ukjentBostedGeoRegel, geoNorgeRegel)
+        assertThat(motor.kjerneRegelSett.regler).containsExactly(strengtFortroligRegel, fortroligRegel, egenAnsattRegel, egneDataRegel)
     }
 }

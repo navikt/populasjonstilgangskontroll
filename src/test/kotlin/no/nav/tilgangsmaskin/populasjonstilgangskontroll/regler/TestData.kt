@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.U
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie.Companion.INGEN
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
 import java.util.UUID
@@ -27,6 +28,7 @@ object TestData {
     internal val vanligBrukerId = BrukerId("08526835670")
     internal val strengtFortroligBrukerId = BrukerId("08526835671")
     internal val fortroligBrukerId = BrukerId("08526835672")
+    internal val annenAnsattBrukerId = BrukerId("08526835644")
     internal val ansattBrukerId = BrukerId("08526835673")
     internal val egenAnsattStrengtFortroligBrukerId = BrukerId("08526835674")
     internal val egenAnsattFortroligBrukerId = BrukerId("08526835675")
@@ -36,21 +38,15 @@ object TestData {
     internal val annenEnhetBrukerId = BrukerId("08526835679")
 
 
-    internal val strengtFortroligBruker = Bruker(strengtFortroligBrukerId, UdefinertGeoTilknytning, Familie.INGEN,STRENGT_FORTROLIG_GRUPPE)
-    internal val fortroligBruker = Bruker(fortroligBrukerId, UdefinertGeoTilknytning,  Familie.INGEN,FORTROLIG_GRUPPE)
-    internal val vanligBruker = Bruker(vanligBrukerId, UdefinertGeoTilknytning, Familie.INGEN)
-    internal val ansattBruker = Bruker(ansattBrukerId, UdefinertGeoTilknytning,  Familie.INGEN,EGEN_ANSATT_GRUPPE)
-    internal val egenAnsattStrengtFortroligBruker = Bruker(egenAnsattStrengtFortroligBrukerId,
-        UdefinertGeoTilknytning, Familie.INGEN,
-        STRENGT_FORTROLIG_GRUPPE,
-        EGEN_ANSATT_GRUPPE)
-    internal val egenAnsattFortroligBruker = Bruker(egenAnsattFortroligBrukerId,
-        UdefinertGeoTilknytning,
-        Familie.INGEN,
-        FORTROLIG_GRUPPE,
-        EGEN_ANSATT_GRUPPE)
-    internal val ukjentBostedBruker = Bruker(ukjentBostedBrukerId, UkjentBosted(),  Familie.INGEN,UDEFINERT_GEO_GRUPPE)
-    internal val geoUtlandBruker = Bruker(geoUtlandBrukerId, UtenlandskTilknytning(SE),  Familie.INGEN,GEO_PERSON_UTLAND_GRUPPE)
+    internal val strengtFortroligBruker = Bruker(strengtFortroligBrukerId, UdefinertGeoTilknytning, INGEN,STRENGT_FORTROLIG_GRUPPE)
+    internal val fortroligBruker = Bruker(fortroligBrukerId, UdefinertGeoTilknytning, INGEN,FORTROLIG_GRUPPE)
+    internal val vanligBruker = Bruker(vanligBrukerId, UdefinertGeoTilknytning, INGEN)
+    internal val annenAnsattBruker = Bruker(annenAnsattBrukerId, UdefinertGeoTilknytning,  INGEN,EGEN_ANSATT_GRUPPE)
+    internal val ansattBruker = Bruker(ansattBrukerId, UdefinertGeoTilknytning,  INGEN,EGEN_ANSATT_GRUPPE)
+    internal val egenAnsattStrengtFortroligBruker = Bruker(egenAnsattStrengtFortroligBrukerId, UdefinertGeoTilknytning, INGEN,STRENGT_FORTROLIG_GRUPPE, EGEN_ANSATT_GRUPPE)
+    internal val egenAnsattFortroligBruker = Bruker(egenAnsattFortroligBrukerId, UdefinertGeoTilknytning, INGEN, FORTROLIG_GRUPPE, EGEN_ANSATT_GRUPPE)
+    internal val ukjentBostedBruker = Bruker(ukjentBostedBrukerId, UkjentBosted(), INGEN,UDEFINERT_GEO_GRUPPE)
+    internal val geoUtlandBruker = Bruker(geoUtlandBrukerId, UtenlandskTilknytning(SE), INGEN,GEO_PERSON_UTLAND_GRUPPE)
     internal val enhetBruker = Bruker(enhetBrukerId, KommuneTilknytning(Kommune(enhet.verdi)), )
     internal val annenEnhetBruker = Bruker(annenEnhetBrukerId, KommuneTilknytning(Kommune("4321")), )
 
@@ -70,6 +66,8 @@ object TestData {
     internal val strengtFortroligAnsatt = Ansatt(ansattBruker.brukerId,attributter, strengtFortroligEntraGruppe)
     internal val fortroligAnsatt = Ansatt(ansattBruker.brukerId,attributter, fortroligEntraGruppe)
     internal val egenAnsatt = Ansatt(ansattBruker.brukerId,attributter, egenAnsattEntraGruppe)
+    internal val annenEgenAnsatt = Ansatt(annenAnsattBruker.brukerId,attributter, egenAnsattEntraGruppe)
+
     internal val vanligAnsatt = Ansatt(ansattBruker.brukerId,attributter, annenEntraGruppe)
     internal val geoUtlandAnsatt = Ansatt(ansattBruker.brukerId,attributter, geoUtlandEntraGruppe)
     internal val udefinertGeoAnsatt = Ansatt(ansattBruker.brukerId,attributter, udefinertGruppe)
@@ -98,9 +96,9 @@ object TestData {
     internal val spyEgneDataRegel= spyk(egneDataRegel)
 
 
-    private val allSpies = listOf(spyStrengtFortroligRegel, spyFortroligRegel, spyEgenAnsattRegel,/*spyEgneDataRegel,*/ spyUkjentBostedGeoRegel, spyGeoUtlandRegel, spyGeoNorgeRegel).toTypedArray()
+    private val allSpies = listOf(spyStrengtFortroligRegel, spyFortroligRegel, spyEgenAnsattRegel,spyEgneDataRegel, spyUkjentBostedGeoRegel, spyGeoUtlandRegel, spyGeoNorgeRegel).toTypedArray()
 
     internal val spiesMotor = RegelMotor(*allSpies)
-    internal val motor = RegelMotor(strengtFortroligRegel,fortroligRegel, egenAnsattRegel,/* egneDataRegel*/ukjentBostedGeoRegel, geoUtlandRegel, geoNorgeRegel)
+    internal val motor = RegelMotor(strengtFortroligRegel,fortroligRegel, egenAnsattRegel,egneDataRegel,ukjentBostedGeoRegel, geoUtlandRegel, geoNorgeRegel)
 
 }

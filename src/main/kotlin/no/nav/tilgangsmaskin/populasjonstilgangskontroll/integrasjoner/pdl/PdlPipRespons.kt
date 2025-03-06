@@ -1,11 +1,13 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AktørId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import java.time.LocalDate
 
 data class PdlPipRespons(val aktoerId: AktørId, val person: PdlPipPerson, val identer: Identer, val geografiskTilknytning: PdlGeoTilknytning)  {
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     data class PdlPipPerson(
         val adressebeskyttelse: List<Gradering> = emptyList(),
         val foedsel: List<Fødsel> = emptyList(),

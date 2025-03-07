@@ -1,13 +1,17 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil
 import java.util.*
 
 class Ansatt(val bruker: Bruker? = null,  private val attributter: AnsattAttributter, vararg val grupper: EntraGruppe) {
+    @JsonIgnore
     val ansattId = attributter.ansattId
+    @JsonIgnore
     val fnr = bruker?.brukerId
+    @JsonIgnore
     val familieMedlemmer = bruker?.familie?.familieMedlemmer ?: emptyList()
 
     fun kanBehandle(id: UUID) = grupper.any { it.id == id }

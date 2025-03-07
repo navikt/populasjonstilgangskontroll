@@ -13,6 +13,6 @@ class PDLTjeneste(private val pdlAdapter: PdlSyncGraphQLClientAdapter, private v
 
     fun personPip(brukerId: BrukerId) = pipAdapter.person(brukerId.verdi)
 
-    fun personPipBulk(brukerIds: ArrayList<BrukerId>) = pipAdapter.personBulk(ArrayList(brukerIds.map { it.verdi }))
+    fun personPipBulk(brukerIds: List<BrukerId>) = pipAdapter.personBulk(brukerIds.map { it.verdi })
 
 }

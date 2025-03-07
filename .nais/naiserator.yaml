@@ -41,11 +41,12 @@ spec:
   replicas:
     max: 4
     min: 2
+    cpuThresholdPercentage: 60
   resources:
     limits:
       memory: 2048Mi
     requests:
-      cpu: 100m
+      cpu: 200m
       memory: 1024Mi
   azure:
     application:

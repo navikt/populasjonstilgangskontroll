@@ -27,11 +27,9 @@ class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Gl
 @ConditionalOnNotProd
 @Order(HIGHEST_PRECEDENCE + 3)
 class EgneDataRegel : KjerneRegel {
-    override fun test(ansatt: Ansatt, bruker: Bruker) = bruker.brukerId != ansatt.fnr
+    override fun test(ansatt: Ansatt, bruker: Bruker) = bruker.brukerId != ansatt.bruker?.brukerId
     override val metadata = RegelBeskrivelse("Egne data", AVVIST_EGNE_DATA)
 }
-
-
 
 abstract class GlobaleGrupperRegel(private val gruppe: GlobalGruppe, private val id: UUID, kortNavn: String): KjerneRegel {
     override fun test(ansatt: Ansatt,bruker: Bruker) =

@@ -13,7 +13,7 @@ class AnsattTjeneste(private val entra: EntraTjeneste, private val nom: NomTjene
     fun ansatt(ansattId: AnsattId) : Ansatt {
         val entraData = entra.ansatt(ansattId)
         val fnr = nom.fnrForAnsatt(ansattId)
-        val  ansattBruker = pdl.bruker(fnr)
+        val  ansattBruker = fnr?.let { pdl.bruker(fnr) }
         return Ansatt(ansattBruker, entraData.attributter,*entraData.grupper.toTypedArray())
     }
 }

@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.Ent
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil
 import java.util.*
 
-class Ansatt(val bruker: Bruker,  private val attributter: AnsattAttributter, vararg val grupper: EntraGruppe) {
+class Ansatt(val bruker: Bruker? = null,  private val attributter: AnsattAttributter, vararg val grupper: EntraGruppe) {
     val ansattId = attributter.ansattId
     fun kanBehandle(id: UUID) = grupper.any { it.id == id }
     data class AnsattAttributter(val id: UUID, val ansattId: AnsattId, val navn: Navn, val enhetsNummer: Enhetsnummer)  {

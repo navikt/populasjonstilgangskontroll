@@ -24,13 +24,17 @@ class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID): Globa
 @Order(HIGHEST_PRECEDENCE + 2)
 class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : GlobaleGrupperRegel(EGEN_ANSATT_GRUPPE, id,"Egen ansatt")
 
-@ConditionalOnNotProd
 @Order(HIGHEST_PRECEDENCE + 3)
 class EgneDataRegel : KjerneRegel {
     override fun test(ansatt: Ansatt, bruker: Bruker) = bruker.brukerId != ansatt.bruker?.brukerId
     override val metadata = RegelBeskrivelse("Egne data", AVVIST_EGNE_DATA)
 }
 
+@Order(HIGHEST_PRECEDENCE + 4)
+class EgenFamilieRegel : KjerneRegel {
+    override fun test(ansatt: Ansatt, bruker: Bruker) = bruker.familieMedlemmer.any { it == bruker.brukerId }
+    override val metadata = RegelBeskrivelse("Egen familie", AVVIST_EGEN_FAMILIE)
+}
 abstract class GlobaleGrupperRegel(private val gruppe: GlobalGruppe, private val id: UUID, kortNavn: String): KjerneRegel {
     override fun test(ansatt: Ansatt,bruker: Bruker) =
         if (bruker.kreverGlobalGruppe(gruppe))  {

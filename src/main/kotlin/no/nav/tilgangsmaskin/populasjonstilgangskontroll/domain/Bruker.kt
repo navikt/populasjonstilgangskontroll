@@ -14,6 +14,9 @@ class Bruker(val brukerId: BrukerId,
              val familie: Familie = INGEN,
              vararg val gruppeKrav: GlobalGruppe) {
 
+    @JsonIgnore
+    val familieMedlemmer = familie.familieMedlemmer
+
     fun  kreverGlobalGruppe(gruppe: GlobalGruppe) = gruppe in gruppeKrav
 
 

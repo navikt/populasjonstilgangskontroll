@@ -40,11 +40,10 @@ object PdlPipTilBrukerMapper {
             }
         }
     }
-    private fun tilFamilie(relasjoner: List<PdlPipFamilierelasjon>) =
-        with(relasjoner) {
-            Familie(
-                filter { it.relatertPersonsRolle != BARN }.mapNotNull { it.relatertPersonsIdent },
-                filter { it.relatertPersonsRolle == BARN }.mapNotNull { it.relatertPersonsIdent }
-            )
-        }
+    private fun tilFamilie(relasjoner: List<PdlPipFamilierelasjon>) : Familie {
+        val (foreldre, barn) = relasjoner
+            .mapNotNull { it.relatertPersonsIdent?.let { ident -> it.relatertPersonsRolle to ident } }.partition { it.first != BARN }
+        return Familie(foreldre.map { it.second }, barn.map { it.second }
+        )
+    }
 }

@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AktørId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson
 import java.time.LocalDate
 
 data class PdlPipRespons(val aktoerId: AktørId, val person: PdlPipPerson, val identer: Identer, val geografiskTilknytning: PdlGeoTilknytning)  {
@@ -31,7 +32,7 @@ data class PdlPipRespons(val aktoerId: AktørId, val person: PdlPipPerson, val i
     }
 }
 
-data class PdlPipBrukerRespons(val respons: Map<String, PdlPipRespons>)
+data class PdlPipBulkRespons(val respons: Map<String, PdlPipPerson>)
 
 
 

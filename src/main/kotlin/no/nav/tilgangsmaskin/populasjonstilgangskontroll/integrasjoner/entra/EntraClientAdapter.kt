@@ -12,7 +12,7 @@ class  EntraClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
                           private val cf: EntraConfig,
                           errorHandler: ErrorHandler): AbstractRestClientAdapter(restClient,cf, errorHandler) {
 
-    fun attributter(ansattId: String) = get<EntraSaksbehandlerResponse>(cf.userURI(ansattId)).tilAttributter()
+    fun attributter(ansattId: String) = get<EntraSaksbehandlerResponse>(cf.userURI(ansattId))
 
     fun grupper(ansattId: String) =
         generateSequence(get<EntraGrupperBolk>(cf.grupperURI(ansattId))) {
@@ -23,7 +23,6 @@ class  EntraClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
             it.value
         }.toList()
 
-    private fun EntraSaksbehandlerResponse.tilAttributter() = EntraResponsMapper.mapAttributter(attributter.first())
 
     override fun toString() = "${javaClass.simpleName} [client=$restClient, config=$cf, errorHandler=$errorHandler]"
 

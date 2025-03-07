@@ -7,5 +7,5 @@ import org.springframework.stereotype.Service
 @Service
 class NomTjeneste(private val adapter: NomJPAAdapter) {
 
-    fun fnrForAnsatt(ansattId: AnsattId) = adapter.fnrForAnsatt(ansattId.verdi)?.let { BrukerId(it) }
+    fun fnrForAnsatt(ansattId: AnsattId) = BrukerId(adapter.fnrForAnsatt(ansattId.verdi))
 }

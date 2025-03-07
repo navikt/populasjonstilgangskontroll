@@ -5,5 +5,5 @@ import org.springframework.stereotype.Component
 @Component
 class NomJPAAdapter(private val repository: NomRepository) {
 
-    fun fnrForAnsatt(navId: String) = repository.findByNavid(navId)?.fnr
+    fun fnrForAnsatt(navId: String) = repository.findByNavid(navId).fnr
 }

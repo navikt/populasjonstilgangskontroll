@@ -12,12 +12,14 @@ class EntraTjeneste(private val adapter: EntraClientAdapter) {
 
     fun ansatt(ident: AnsattId)=
         run {
-            val attributter =  adapter.attributter(ident.verdi)
+            val attributter =  adapter.attributter(ident.verdi).attributter.first()
             val grupper = adapter.grupper("${attributter.id}")
-             EntraResponse(attributter, grupper)
+             EntraResponse(attributter.tilAttributter(), grupper)
         }
     override fun toString() = "${javaClass.simpleName} [adapter=$adapter]"
 }
+
+private fun EntraSaksbehandlerResponse.MSGraphSaksbehandlerAttributter.tilAttributter() = EntraResponsMapper.mapAttributter(this)
 
 data class EntraResponse(val attributter: Ansatt.AnsattAttributter, val grupper: List<EntraGruppe>)
 

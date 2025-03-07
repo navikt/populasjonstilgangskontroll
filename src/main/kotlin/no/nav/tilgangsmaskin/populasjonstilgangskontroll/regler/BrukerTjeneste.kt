@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipTilBrukerMapper
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlTilBrukerMapper
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -13,20 +12,12 @@ class BrukerTjeneste(private val pdlTjeneste: PDLTjeneste,val egenAnsatt: Skjerm
 
     private val log = LoggerFactory.getLogger(BrukerTjeneste::class.java)
 
-    fun brukerGammel(brukerId: BrukerId) =
-        run {
-            val skjermet = egenAnsatt.erSkjermet(brukerId).also { log.info("Skjermet $it") }
-            val pdl = pdlTjeneste.person(brukerId).also { log.info("Person $it") }
-            val gt = pdlTjeneste.gt(brukerId).also { log.info("GT $it") }
-            PdlTilBrukerMapper.tilBruker(pdl, gt, skjermet)
-        }
-
     fun brukerBulk(brukerIds: List<BrukerId>) = pdlTjeneste.personPipBulk(brukerIds)
 
     fun bruker(brukerId: BrukerId)  =
         run {
             val skjermet = egenAnsatt.erSkjermet(brukerId)
-            val pip = pdlTjeneste.personPip(brukerId)
+            val pip = pdlTjeneste.person(brukerId)
             PdlPipTilBrukerMapper.tilBruker(brukerId, pip, skjermet)
         }
 }

@@ -6,7 +6,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus.FORBIDDEN
-import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ProblemDetail.*
@@ -28,7 +27,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
             .body<ProblemDetail>(bulkDetail(e))
 
     @ExceptionHandler(Throwable::class)
-    fun catchAll(e: Throwable) =   logger.error(e.message, e) }
+    fun catchAll(e: Throwable) = logger.error(e.message, e)
 
     fun bulkDetail(e: BulkRegelException) = forStatus(FORBIDDEN).apply {
         title = e.message

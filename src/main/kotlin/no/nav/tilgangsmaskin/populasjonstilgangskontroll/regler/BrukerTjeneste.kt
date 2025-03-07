@@ -1,11 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipTilBrukerMapper
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlTilBrukerMapper
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
@@ -30,6 +26,7 @@ class BrukerTjeneste(private val pdlTjeneste: PDLTjeneste,val egenAnsatt: Skjerm
     fun bruker(brukerId: BrukerId)  =
         run {
             val skjermet = egenAnsatt.erSkjermet(brukerId)
-            PdlPipTilBrukerMapper.tilBruker(brukerId, pdlTjeneste.personPip(brukerId), skjermet)
+            val pip = pdlTjeneste.personPip(brukerId)
+            PdlPipTilBrukerMapper.tilBruker(brukerId, pip, skjermet)
         }
 }

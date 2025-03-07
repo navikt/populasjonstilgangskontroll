@@ -5,9 +5,9 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning.GTType.UDEFINERT
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.Gradering.AdressebeskyttelseGradering.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.Familierelasjon
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.Familierelasjon.FamilieRelasjonRolle.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipAdressebeskyttelse.PdlPipAdressebeskyttelseGradering.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipFamilierelasjon
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipFamilierelasjon.PdlPipFamilieRelasjonRolle.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlTilBrukerMapper.tilGeoTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
@@ -40,11 +40,10 @@ object PdlPipTilBrukerMapper {
             }
         }
     }
-    private fun tilFamilie(relasjoner: List<Familierelasjon>) =
+    private fun tilFamilie(relasjoner: List<PdlPipFamilierelasjon>) =
         with(relasjoner) {
             Familie(
-                find { it.relatertPersonsRolle == MOR }?.relatertPersonsIdent,
-                find { it.relatertPersonsRolle == FAR }?.relatertPersonsIdent,
+                filter { it.relatertPersonsRolle != BARN }.mapNotNull { it.relatertPersonsIdent },
                 filter { it.relatertPersonsRolle == BARN }.mapNotNull { it.relatertPersonsIdent }
             )
         }

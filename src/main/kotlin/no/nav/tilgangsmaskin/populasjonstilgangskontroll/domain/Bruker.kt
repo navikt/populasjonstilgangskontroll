@@ -69,7 +69,7 @@ value class BrukerId(@JsonValue val verdi: String) {
 
 }
 
-data class Familie(val mor: BrukerId? = null, val far: BrukerId? = null, val barn: List<BrukerId> = emptyList()) {
+data class Familie(val foreldre: List<BrukerId> = emptyList(), val barn: List<BrukerId> = emptyList()) {
     companion object {
         val INGEN = Familie()
     }

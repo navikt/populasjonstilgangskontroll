@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.neovisionaries.i18n.CountryCode.SE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.KommuneTilknytning
@@ -12,14 +14,20 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson.Adressebeskyttelse.AdressebeskyttelseGradering
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson.Adressebeskyttelse.AdressebeskyttelseGradering.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson.Folkeregisteridentifikator
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipAdressebeskyttelse
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipAdressebeskyttelse.PdlPipAdressebeskyttelseGradering
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import com.fasterxml.jackson.module.kotlin.readValue
+
 
 class PdlTilBrukerMapperTest {
 
-    private val brukerId = BrukerId("08526835671")
+    private val brukerId = TestData.vanligBruker.brukerId
 
     @Test
     @DisplayName("Test at behandling av brukere med STRENGT_FORTROLIG_UTLAND  krever medlemsskap i STRENGT_FORTROLIG_GRUPPE fra ansatt og at geotilknytning er UtenlandskTilknytning")
@@ -64,8 +72,77 @@ class PdlTilBrukerMapperTest {
 
     fun pdlPerson(brukerId: BrukerId, gradering: AdressebeskyttelseGradering? = null) : PdlPerson {
         val adressebeskyttelse = gradering?.let{
-            listOf(Adressebeskyttelse(gradering))
+            listOf(Adressebeskyttelse(it))
         }?: emptyList()
         return PdlPerson(adressebeskyttelse,  listOf(Folkeregisteridentifikator(brukerId.verdi, "FNR")))
+    }
+
+    fun pdlPipPerson(gradering: PdlPipAdressebeskyttelseGradering? = null) : PdlPipPerson {
+        val adressebeskyttelse = gradering?.let {
+             listOf(PdlPipAdressebeskyttelse(it))
+         }?: emptyList()
+        return PdlPipPerson(adressebeskyttelse)
+    }
+
+    @Test
+    fun jall() {
+        val json = """
+            {
+              "12345678901": {
+                "person": {
+                  "adressebeskyttelse": [],
+                  "foedsel": [
+                    {
+                      "foedselsdato": "1998-05-09"
+                    }
+                  ],
+                  "doedsfall": [
+                    {
+                      "doedsdato": "2020-04-22"
+                    }
+                  ],
+                  "familierelasjoner": [
+                    {
+                      "relatertPersonsIdent": "03087021016",
+                      "relatertPersonsRolle": "FAR",
+                      "minRolleForPerson": "BARN"
+                    },
+                    {
+                      "relatertPersonsIdent": "07309574189",
+                      "relatertPersonsRolle": "MOR",
+                      "minRolleForPerson": "BARN"
+                    }
+                  ]
+                },
+                "identer": {
+                  "identer": [
+                    {
+                      "ident": "2052090676205",
+                      "historisk": false,
+                      "gruppe": "AKTORID"
+                    },
+                    {
+                      "ident": "12345678901",
+                      "historisk": false,
+                      "gruppe": "FOLKEREGISTERIDENT"
+                    }
+                  ]
+                },
+                "geografiskTilknytning": {
+                  "gtType": "KOMMUNE",
+                  "gtKommune": "4644",
+                  "gtBydel": null,
+                  "gtLand": null,
+                  "regel": "18"
+                }
+              },
+              "10111111111": null
+            }
+        """.trimIndent()
+
+        val deser = jacksonObjectMapper().registerModule(JavaTimeModule()).readValue<Map<String, PdlPipRespons>>(json)
+        deser.entries.forEach {
+         //   println(PdlPipTilBrukerMapper.tilBruker(BrukerId(it.key), it.value, false))
+        }
     }
 }

@@ -7,7 +7,7 @@ import java.util.Optional
 
 
 @Component
-class AzureAdTokenAuditingAware(private val accessor: TokenAccessor): AuditorAware<String> {
+class OverstyringAzureAdTokenAuditorAware(private val accessor: TokenAccessor): AuditorAware<String> {
     override fun getCurrentAuditor() =
         runCatching {
             accessor.ansattId.let {  Optional.of(it.verdi) }

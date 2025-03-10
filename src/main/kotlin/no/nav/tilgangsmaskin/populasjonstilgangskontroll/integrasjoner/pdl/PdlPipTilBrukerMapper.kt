@@ -4,6 +4,8 @@ import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie.FamilieMedlem
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.FamilieRelasjon
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning.GTType.UDEFINERT
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipAdressebeskyttelse.PdlPipAdressebeskyttelseGradering.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipFamilierelasjon
@@ -43,7 +45,18 @@ object PdlPipTilBrukerMapper {
     private fun tilFamilie(relasjoner: List<PdlPipFamilierelasjon>) : Familie {
         val (foreldre, barn) = relasjoner
             .mapNotNull { it.relatertPersonsIdent?.let { ident -> it.relatertPersonsRolle to ident } }.partition { it.first != BARN }
-        return Familie(foreldre.map { it.second }, barn.map { it.second }
-        )
+        return Familie(
+            foreldre.map { FamilieMedlem(it.second, tilRelasjon(it.first)) },
+            barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) })
     }
+
+    private fun tilRelasjon(relasjon: PdlPipFamilierelasjon.PdlPipFamilieRelasjonRolle?) =
+        when(relasjon) {
+            MOR ->  FamilieRelasjon.MOR
+            FAR ->  FamilieRelasjon.FAR
+            MEDMOR ->  FamilieRelasjon.MEDMOR
+            MEDFAR ->  FamilieRelasjon.MEDFAR
+            BARN ->  FamilieRelasjon.BARN
+            else -> throw IllegalArgumentException("Ukjent relasjon $relasjon")
+        }
 }

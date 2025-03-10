@@ -73,12 +73,13 @@ value class BrukerId(@JsonValue val verdi: String) {
 
 }
 
-data class Familie(val foreldre: List<BrukerId> = emptyList(), val barn: List<BrukerId> = emptyList()) {
+data class Familie(val foreldre: List<FamilieMedlem> = emptyList(), val barn: List<FamilieMedlem> = emptyList()) {
    @JsonIgnore
    val familieMedlemmer = foreldre + barn
     companion object {
         val INGEN = Familie()
     }
+    data class FamilieMedlem(val brukerId: BrukerId, val relasjon: FamilieRelasjon)
 }
 
 sealed class GeoTilknytning(val type: Type) {
@@ -99,7 +100,7 @@ sealed class GeoTilknytning(val type: Type) {
     }
     data class KommuneTilknytning(val kommune: Kommune) : GeoTilknytning(Type.KOMMUNE)
     data class BydelTilknytning(val bydel: Bydel) : GeoTilknytning(Type.BYDEL)
-    class UkjentBosted() : GeoTilknytning(Type.UKJENT_BOSTED)
+    class UkjentBosted : GeoTilknytning(Type.UKJENT_BOSTED)
     data class UtenlandskTilknytning(val land: CountryCode) : GeoTilknytning(Type.UTLAND)
     class UdefinertTilknytning : GeoTilknytning(Type.UDEFINERT)
 

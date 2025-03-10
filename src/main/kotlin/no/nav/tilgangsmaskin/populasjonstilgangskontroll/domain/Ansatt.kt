@@ -12,7 +12,7 @@ class Ansatt(val bruker: Bruker? = null,  private val attributter: AnsattAttribu
     @JsonIgnore
     val fnr = bruker?.brukerId
     @JsonIgnore
-    val familieMedlemmer = bruker?.familie?.familieMedlemmer ?: emptyList()
+    val familieMedlemmer = bruker?.familieMedlemmer?.map { it.brukerId } ?: emptyList()
 
     fun kanBehandle(id: UUID) = grupper.any { it.id == id }
     data class AnsattAttributter(val id: UUID, val ansattId: AnsattId, val navn: Navn, val enhetsNummer: Enhetsnummer)  {

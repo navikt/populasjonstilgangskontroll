@@ -23,7 +23,7 @@ class RegelMotor(vararg regler: Regel)  {
     private fun sjekk(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) =
         with(regelSett) {
             regler.forEachIndexed { index, regel ->
-                log.info(CONFIDENTIAL,"[$index] Sjekker regel: '${regel.metadata.kortNavn}' fra regelsett '$tekst' for '${ansatt.ansattId.verdi}/${ansatt.bruker?.brukerId?.verdi}'og '${bruker.brukerId.verdi}'")
+                log.info(CONFIDENTIAL,"[${index.plus(1)}] Sjekker regel: '${regel.metadata.kortNavn}' fra regelsett '$tekst' for '${ansatt.ansattId.verdi}/${ansatt.bruker?.brukerId?.verdi}'og '${bruker.brukerId.verdi}'")
                 if (!regel.test(ansatt,bruker)) {
                     throw RegelException(bruker.brukerId, ansatt.ansattId, regel).also {
                         log.warn("Tilgang avvist av regel ${index.plus(1)} (${regel.metadata.kortNavn}) i regelsett '${tekst}' (${regel.metadata.begrunnelse.årsak})")

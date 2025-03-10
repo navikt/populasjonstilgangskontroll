@@ -2,19 +2,14 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
 import com.neovisionaries.i18n.CountryCode.SE
 import io.mockk.spyk
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt.AnsattAttributter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt.AnsattAttributter.Navn
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Enhetsnummer
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Companion.UdefinertGeoTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Kommune
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.UtenlandskTilknytning
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie.Companion.INGEN
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
@@ -41,7 +36,7 @@ object TestData {
     internal val strengtFortroligBruker = Bruker(strengtFortroligBrukerId, UdefinertGeoTilknytning, INGEN,STRENGT_FORTROLIG_GRUPPE)
     internal val fortroligBruker = Bruker(fortroligBrukerId, UdefinertGeoTilknytning, INGEN,FORTROLIG_GRUPPE)
     internal val vanligBruker = Bruker(vanligBrukerId, UdefinertGeoTilknytning, INGEN)
-    internal val annenAnsattBruker = Bruker(annenAnsattBrukerId, UdefinertGeoTilknytning,  INGEN,EGEN_ANSATT_GRUPPE)
+    internal val annenAnsattBruker = Bruker(annenAnsattBrukerId, UdefinertGeoTilknytning,  Familie(barn = listOf(Familie.FamilieMedlem(vanligBrukerId, FamilieRelasjon.BARN))),EGEN_ANSATT_GRUPPE)
     internal val ansattBruker = Bruker(ansattBrukerId, UdefinertGeoTilknytning,  INGEN,EGEN_ANSATT_GRUPPE)
     internal val egenAnsattStrengtFortroligBruker = Bruker(egenAnsattStrengtFortroligBrukerId, UdefinertGeoTilknytning, INGEN,STRENGT_FORTROLIG_GRUPPE, EGEN_ANSATT_GRUPPE)
     internal val egenAnsattFortroligBruker = Bruker(egenAnsattFortroligBrukerId, UdefinertGeoTilknytning, INGEN, FORTROLIG_GRUPPE, EGEN_ANSATT_GRUPPE)
@@ -67,6 +62,7 @@ object TestData {
     internal val fortroligAnsatt = Ansatt(ansattBruker,attributter, fortroligEntraGruppe)
     internal val egenAnsatt = Ansatt(ansattBruker,attributter, egenAnsattEntraGruppe)
     internal val annenEgenAnsatt = Ansatt(annenAnsattBruker,attributter, egenAnsattEntraGruppe)
+    internal val egenAnsattMedFamilie = Ansatt(annenAnsattBruker,attributter, annenEntraGruppe)
 
     internal val vanligAnsatt = Ansatt(ansattBruker,attributter, annenEntraGruppe)
     internal val geoUtlandAnsatt = Ansatt(ansattBruker,attributter, geoUtlandEntraGruppe)
@@ -95,10 +91,12 @@ object TestData {
     internal val egneDataRegel = EgneDataRegel()
     internal val spyEgneDataRegel= spyk(egneDataRegel)
 
+    internal val egenFamilieRegel = EgenFamilieRegel()
+    internal val spyEgenFamilieRegel= spyk(egenFamilieRegel)
 
-    private val allSpies = listOf(spyStrengtFortroligRegel, spyFortroligRegel, spyEgenAnsattRegel,spyEgneDataRegel, spyUkjentBostedGeoRegel, spyGeoUtlandRegel, spyGeoNorgeRegel).toTypedArray()
+    private val allSpies = listOf(spyStrengtFortroligRegel, spyFortroligRegel, spyEgenAnsattRegel,spyEgneDataRegel, egenFamilieRegel, spyUkjentBostedGeoRegel, spyGeoUtlandRegel, spyGeoNorgeRegel).toTypedArray()
 
     internal val spiesMotor = RegelMotor(*allSpies)
-    internal val motor = RegelMotor(strengtFortroligRegel,fortroligRegel, egenAnsattRegel,egneDataRegel,ukjentBostedGeoRegel, geoUtlandRegel, geoNorgeRegel)
+    internal val motor = RegelMotor(strengtFortroligRegel,fortroligRegel, egenAnsattRegel,egneDataRegel,egenFamilieRegel,ukjentBostedGeoRegel, geoUtlandRegel, geoNorgeRegel)
 
 }

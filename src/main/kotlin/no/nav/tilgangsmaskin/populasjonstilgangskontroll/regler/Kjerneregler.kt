@@ -31,7 +31,10 @@ class EgneDataRegel : KjerneRegel {
 
 @Order(HIGHEST_PRECEDENCE + 4)
 class EgenFamilieRegel : KjerneRegel {
-    override fun test(ansatt: Ansatt, bruker: Bruker) = ansatt.familieMedlemmer.any { it == bruker.brukerId }
+    override fun test(ansatt: Ansatt, bruker: Bruker) =
+        bruker.brukerId !in ansatt.familieMedlemmer
+
+
     override val metadata = RegelBeskrivelse("Egen familie", AVVIST_EGEN_FAMILIE)
 }
 abstract class GlobaleGrupperRegel(private val gruppe: GlobalGruppe, private val id: UUID, kortNavn: String): KjerneRegel {

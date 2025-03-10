@@ -24,6 +24,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.egenAns
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.fortroligAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.fortroligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.egenAnsattFortroligAnsatt
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.egenAnsattMedFamilie
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.egenFamilieRegel
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.egneDataRegel
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.motor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.nasjonalAnsatt
@@ -74,7 +76,18 @@ class RegelMotorTest {
     }
 
     @Test
-    @DisplayName("Test at saksbehandler ikke kan slå opp egne dara")
+    @DisplayName("Test at saksbehandler ikke kan behandle egen familie")
+    fun egenFamilieAvvises() {
+        assertEquals(
+            egenFamilieRegel,
+            assertThrows<RegelException> {
+                motor.kompletteRegler(egenAnsattMedFamilie, vanligBruker)
+            }.regel)
+        assertThat(egenFamilieRegel.test(egenAnsattMedFamilie, vanligBruker)).isFalse
+    }
+
+    @Test
+    @DisplayName("Test at saksbehandler ikke kan behandle seg selv")
     fun egneDataAvvises() {
         assertEquals(egneDataRegel,
             assertThrows<RegelException> {
@@ -267,7 +280,7 @@ class RegelMotorTest {
     @Test
     @DisplayName("Sjekk at reglene er sorterte")
     fun sortert() {
-        assertThat(motor.komplettRegelSett.regler).containsExactly(strengtFortroligRegel, fortroligRegel, egenAnsattRegel, egneDataRegel,geoUtlandRegel,ukjentBostedGeoRegel, geoNorgeRegel)
-        assertThat(motor.kjerneRegelSett.regler).containsExactly(strengtFortroligRegel, fortroligRegel, egenAnsattRegel, egneDataRegel)
+        assertThat(motor.komplettRegelSett.regler).containsExactly(strengtFortroligRegel, fortroligRegel, egenAnsattRegel, egneDataRegel,egenFamilieRegel,geoUtlandRegel,ukjentBostedGeoRegel, geoNorgeRegel)
+        assertThat(motor.kjerneRegelSett.regler).containsExactly(strengtFortroligRegel, fortroligRegel, egenAnsattRegel, egneDataRegel, egenFamilieRegel)
     }
 }

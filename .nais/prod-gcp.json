@@ -42,7 +42,7 @@
   "cpu": {
     "min": "300m"
   },
-  "replicas": {
+  "replica": {
     "min": 2,
     "max": 4
   }

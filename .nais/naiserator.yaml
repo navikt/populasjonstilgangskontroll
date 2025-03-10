@@ -43,7 +43,7 @@ spec:
     min: {{replica.min}}
   resources:
     limits:
-      memory: '{{mem.limit}}'
+      memory: '{{mem.max}}'
     requests:
       cpu: '{{cpu.min}}'
       memory: '{{mem.min}}'

@@ -22,15 +22,16 @@ class RegelMotor(vararg regler: Regel)  {
 
     private fun sjekk(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) =
         with(regelSett) {
+            log.info("Sjekker ${type.tekst} for '${ansatt.ansattId.verdi}' og '${bruker.brukerId.verdi}'")
             regler.forEachIndexed { index, regel ->
-                log.info(CONFIDENTIAL,"[${index.plus(1)}] Sjekker regel: '${regel.metadata.kortNavn}' fra regelsett '$tekst' for '${ansatt.ansattId.verdi}/${ansatt.bruker?.brukerId?.verdi}'og '${bruker.brukerId.verdi}'")
+                log.info(CONFIDENTIAL,"[${index.plus(1)}/${regelSett.size}] Sjekker regel: '${regel.metadata.kortNavn}' fra regelsett '$tekst' for '${ansatt.ansattId.verdi}/${ansatt.bruker?.brukerId?.verdi}'og '${bruker.brukerId.verdi}'")
                 if (!regel.test(ansatt,bruker)) {
                     throw RegelException(bruker.brukerId, ansatt.ansattId, regel).also {
-                        log.warn("Tilgang avvist av regel ${index.plus(1)} (${regel.metadata.kortNavn}) i regelsett '${tekst}' (${regel.metadata.begrunnelse.årsak})")
+                        log.warn("[${index.plus(1)}/${regelSett.size}] Tilgang avvist av regel '${regel.metadata.kortNavn}' i regelsett '${tekst}' (${regel.metadata.begrunnelse.årsak})")
                     }
                 }
             }.also {
-                log.info("${regler.size} ${type.tekst} Tilgang OK for '${ansatt.ansattId.verdi}' og '${bruker.brukerId.verdi}'")
+                log.info("${type.tekst} ga tilgang OK for '${ansatt.ansattId.verdi}' og '${bruker.brukerId.verdi}'")
             }
     }
     private fun RegelType.regelSett() =

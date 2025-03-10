@@ -27,7 +27,7 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: B
         val avvisninger = mutableListOf<RegelException>()
         specs.forEachIndexed { index, spec ->
             runCatching {
-               log.info("[$index] Sjekker ${spec.type.tekst} for '${ansattId.verdi}' og '${spec.brukerId.verdi}'")
+               log.info("[${index.plus(1)}] Sjekker ${spec.type.tekst} for '${ansattId.verdi}' og '${spec.brukerId.verdi}'")
                 motor.sjekk(ansatt, brukerTjeneste.bruker(spec.brukerId), spec.type)
             }.getOrElse {e -> if (e is RegelException) avvisninger.add(e) else throw e }
         }

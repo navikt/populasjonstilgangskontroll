@@ -22,12 +22,12 @@ class OverstyringSjekker(private val overstyring: OverstyringTjeneste)  {
                             log.warn("Overstyrt tilgang er gitt til ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                         }
                         else {
-                            throw e.also { log.warn("Ingen overstyring, tilgang avvist av regel '${metadata.kortNavn}' for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}' består") }
+                            throw e.also { log.warn("Ingen overstyring, tilgang avvist av regel '${metadata.kortNavn}' for '${ansattId.verdi}' '${brukerId.mask()}' består") }
                         }
                     } else {
-                        throw e.also { log.trace("Tilgang avvist av kjerneregel '${metadata.kortNavn}' for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}', avvisining består") }
+                        throw e.also { log.trace("Tilgang avvist av kjerneregel '${metadata.kortNavn}' for '${ansattId.verdi}' og '${brukerId.mask()}', avvisining består") }
                     }
                 }
-            else -> throw e.also { log.error("Ukjent feil ved tilgangskontroll for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'", it) }
+            else -> throw e.also { log.error("Ukjent feil ved tilgangskontroll for '${ansattId.verdi}' og '${brukerId.mask()}'", it) }
         }
 }

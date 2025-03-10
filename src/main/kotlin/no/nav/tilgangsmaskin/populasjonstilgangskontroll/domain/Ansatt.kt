@@ -6,9 +6,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.Ent
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil
 import java.util.*
 
-class Ansatt(val bruker: Bruker? = null,  private val attributter: AnsattAttributter, vararg val grupper: EntraGruppe) {
-    @JsonIgnore
-    val ansattId = attributter.ansattId
+class Ansatt(val bruker: Bruker? = null,  val ansattId: AnsattId, private val attributter: AnsattAttributter? = null, vararg val grupper: EntraGruppe) {
+
     @JsonIgnore
     val fnr = bruker?.brukerId
     @JsonIgnore

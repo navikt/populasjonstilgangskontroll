@@ -39,15 +39,14 @@ spec:
     initialDelay: 30
   port: 8080
   replicas:
-    max: 4
-    min: 2
-    cpuThresholdPercentage: 60
+    max: '{{replica.max}'
+    min: '{{replica.min}}'
   resources:
     limits:
-      memory: 2048Mi
+      memory: '{{mem.limit}}'
     requests:
-      cpu: 200m
-      memory: 1024Mi
+      cpu: '{{cpu.min}}'
+      memory: '{{mem.min}}'
   azure:
     application:
       enabled: true

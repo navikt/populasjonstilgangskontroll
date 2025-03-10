@@ -34,5 +34,16 @@
     "cluster": {
       "type": "prod"
     }
+  },
+  "mem": {
+    "min": "1Gi",
+    "max": "2Gi"
+  },
+  "cpu": {
+    "min": "300m"
+  },
+  "replicas": {
+    "min": 2,
+    "max": 4
   }
 }

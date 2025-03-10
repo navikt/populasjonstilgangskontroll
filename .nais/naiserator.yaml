@@ -39,7 +39,7 @@ spec:
     initialDelay: 30
   port: 8080
   replicas:
-    max: '{{replica.max}'
+    max: '{{replica.max}}'
     min: '{{replica.min}}'
   resources:
     limits:

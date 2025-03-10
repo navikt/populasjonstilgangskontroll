@@ -45,21 +45,21 @@
       "type": "dev"
     }
   },
-  "mem": [
+  "mem":
     {
       "min": "512Mi",
       "max": "1Gi"
     }
-  ],
-  "cpu": [
+  ,
+  "cpu":
     {
       "min": "200m"
     }
-  ],
-  "replicas": [
+  ,
+  "replicas":
     {
       "min": 1,
       "max": 3
     }
-  ]
+
 }

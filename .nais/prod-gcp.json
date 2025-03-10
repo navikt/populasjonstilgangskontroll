@@ -5,51 +5,45 @@
   "pdl": "pdl-api.prod-fss-pub.nais.io",
   "pdlpip": "pdl-pip-api.prod-fss-pub.nais.io",
   "grupper": {
-    "fortrolig":"9ec6487d-f37a-4aad-a027-cd221c1ac32b" ,
+    "fortrolig": "9ec6487d-f37a-4aad-a027-cd221c1ac32b",
     "strengt": "ad7b87a6-9180-467c-affc-20a566b0fec0",
-    "egenansatt":"e750ceb5-b70b-4d94-b4fa-9d22467b786b",
-    "udefinert":"8804ac77-50c7-4339-822f-d509e551e82e",
-    "nasjonal":"ebdddf06-dc5b-45ef-9dad-850894b935f9",
-    "utland":"bb308252-d600-4e5c-bc53-bbd2bb8a29ba"
+    "egenansatt": "e750ceb5-b70b-4d94-b4fa-9d22467b786b",
+    "udefinert": "8804ac77-50c7-4339-822f-d509e551e82e",
+    "nasjonal": "ebdddf06-dc5b-45ef-9dad-850894b935f9",
+    "utland": "bb308252-d600-4e5c-bc53-bbd2bb8a29ba"
   },
   "db": {
     "type": "POSTGRES_17",
     "tier": "db-g1-small",
     "name": "tilgangsmaskin"
   },
-  "db-flags":{
+  "db-flags": {
     "pgaudit": {
       "enabled": "on",
-      "logtype": "write"}
+      "logtype": "write"
+    }
   },
-  "inbound" : [
+  "inbound": [
     {
       "name": "gosys",
       "namespace": "isa",
       "cluster": "prod-fss"
     }
-
   ],
   "nais": {
     "cluster": {
       "type": "prod"
     }
   },
-  "mem": [
-    {
-      "min": "1Gi",
-      "max": "2Gi"
-    }
-  ],
-  "cpu": [
-    {
+  "mem": {
+    "min": "1Gi",
+    "max": "2Gi"
+  },
+  "cpu": {
     "min": "300m"
-    }
-  ],
-  "replicas": [
-    {
-      "min": 2,
-      "max": 4
-    }
-  ]
+  },
+  "replicas": {
+    "min": 2,
+    "max": 4
+  }
 }

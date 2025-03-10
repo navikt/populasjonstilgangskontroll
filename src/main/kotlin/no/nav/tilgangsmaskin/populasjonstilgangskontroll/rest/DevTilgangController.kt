@@ -37,7 +37,7 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     @ResponseStatus(NO_CONTENT)
     fun kompletteRegler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) = regler.kompletteRegler(ansattId, brukerId)
 
-    @GetMapping("kjerne/{ansattId}//{brukerId}")
+    @GetMapping("kjerne/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)
     fun kjerneregler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId)  = regler.kjerneregler(ansattId, brukerId)
 

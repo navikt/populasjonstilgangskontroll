@@ -4,7 +4,6 @@ import io.mockk.called
 import io.mockk.verify
 import io.mockk.verifyOrder
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.annenAnsattBruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.annenEgenAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.ansattBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.egenAnsattStrengtFortroligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.egenAnsattFortroligBruker

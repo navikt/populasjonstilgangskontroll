@@ -6,15 +6,20 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.Ent
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.requireDigits
 import java.util.*
 
-class Ansatt(val bruker: Bruker? = null,  val ansattId: AnsattId, val oid: UUID, vararg val grupper: EntraGruppe) {
+class Ansatt(val bruker: Bruker? = null,  identifikatorer: AnsattIdentifikatorer, val grupper: List<EntraGruppe>) {
+
 
     @JsonIgnore
-    val fnr = bruker?.brukerId
+    val fnr = identifikatorer.fnr
+    @JsonIgnore
+    val oid = identifikatorer.oid
+    @JsonIgnore
+    val ansattId = identifikatorer.ansattId
     @JsonIgnore
     val familieMedlemmer = bruker?.familieMedlemmer?.map { it.brukerId } ?: emptyList()
 
     fun kanBehandle(id: UUID) = grupper.any { it.id == id }
-    override fun toString() = "${javaClass.simpleName} [oid=$oid,grupper=${grupper.contentToString()}]"
+    override fun toString() = "${javaClass.simpleName} [oid=$oid,grupper=$grupper]"
 }
 
 @JvmInline
@@ -27,6 +32,8 @@ value class AnsattId(@JsonValue val verdi: String) {
         }
     }
 }
+
+data class AnsattIdentifikatorer(val ansattId: AnsattId, val oid: UUID, val fnr: BrukerId? = null)
 
 @JvmInline
 value class Enhetsnummer(@JsonValue val verdi: String) {

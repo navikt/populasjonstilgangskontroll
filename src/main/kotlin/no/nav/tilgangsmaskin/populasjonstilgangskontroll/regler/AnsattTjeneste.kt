@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattIdentifikatorer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomTjeneste
 import org.slf4j.LoggerFactory
@@ -16,7 +17,7 @@ class AnsattTjeneste(private val entra: EntraTjeneste, private val nom: NomTjene
         val entraData = entra.ansatt(ansattId)
         val fnr = nom.fnrForAnsatt(ansattId)
         val  ansattBruker = fnr?.let { pdl.bruker(it) }
-        return Ansatt(ansattBruker, ansattId,entraData.oid,*entraData.grupper.toTypedArray()).also {
+        return Ansatt(ansattBruker, AnsattIdentifikatorer(ansattId,entraData.oid,fnr),entraData.grupper).also {
             log.info("Ansatt er $it")
         }
     }

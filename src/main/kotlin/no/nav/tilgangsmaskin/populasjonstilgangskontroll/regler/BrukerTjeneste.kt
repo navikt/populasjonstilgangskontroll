@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipTilBrukerMapper
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipTilBrukerMapper.tilBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -18,6 +19,6 @@ class BrukerTjeneste(private val pdlTjeneste: PDLTjeneste,val egenAnsatt: Skjerm
         run {
             val skjermet = egenAnsatt.erSkjermet(brukerId)
             val pip = pdlTjeneste.person(brukerId)
-            PdlPipTilBrukerMapper.tilBruker(brukerId, pip, skjermet)
+            tilBruker(brukerId, pip, skjermet)
         }
 }

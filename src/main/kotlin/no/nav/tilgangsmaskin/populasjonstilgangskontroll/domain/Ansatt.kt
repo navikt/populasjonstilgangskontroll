@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.requireDigits
 import java.util.*
 
 class Ansatt(val bruker: Bruker? = null,  val ansattId: AnsattId, private val attributter: AnsattAttributter? = null, vararg val grupper: EntraGruppe) {
@@ -25,8 +26,8 @@ value class AnsattId(@JsonValue val verdi: String) {
     init {
         with(verdi) {
             require(length == 7) { "Ugyldig lengde $length for $this, forventet 7" }
-            require(first().isUpperCase()) { "Ugyldig første tegn ${first()} for $verdi, må være stor bokstav" }
-            require(drop(1).all { it.isDigit() }) { "Ugyldig(e) tegn i $this, forventet kun 6 tall etter første bokstav" }
+            require(first().isUpperCase()) { "Ugyldig første tegn ${first()} for $this, må være stor bokstav" }
+            requireDigits(this.substring(1), 6)
         }
     }
 }
@@ -34,6 +35,6 @@ value class AnsattId(@JsonValue val verdi: String) {
 @JvmInline
 value class Enhetsnummer(@JsonValue val verdi: String) {
     init {
-        ObjectUtil.requireDigits(verdi, 4)
+        requireDigits(verdi, 4)
     }
 }

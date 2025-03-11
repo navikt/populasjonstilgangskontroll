@@ -15,7 +15,7 @@ class Ansatt(val bruker: Bruker? = null,  val ansattId: AnsattId, val attributte
     val familieMedlemmer = bruker?.familieMedlemmer?.map { it.brukerId } ?: emptyList()
 
     fun kanBehandle(id: UUID) = grupper.any { it.id == id }
-    data class AnsattAttributter(val id: UUID, val ansattId: AnsattId, val enhetsNummer: Enhetsnummer)
+    data class AnsattAttributter(val id: UUID, val ansattId: AnsattId)
     override fun toString() = "${javaClass.simpleName} [attributter=$attributter,grupper=${grupper.contentToString()}]"
 }
 

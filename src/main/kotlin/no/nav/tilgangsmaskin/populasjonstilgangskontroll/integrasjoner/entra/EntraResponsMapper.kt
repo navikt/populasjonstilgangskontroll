@@ -6,6 +6,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.Ent
 object EntraResponsMapper {
         fun mapAttributter(respons: MSGraphSaksbehandlerAttributter)=
             with(respons) {
-              AnsattAttributter(id, onPremisesSamAccountName,  streetAddress)
+              AnsattAttributter(id, onPremisesSamAccountName)
             }
        }

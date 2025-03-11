@@ -50,7 +50,7 @@ class FellesBeanConfig : CachingConfigurer {
 
     @Bean
     @ConditionalOnNotProd
-    fun traceRepository(): HttpExchangeRepository = InMemoryHttpExchangeRepository()
+    fun traceRepository() = InMemoryHttpExchangeRepository()
 
     @Bean
     @ConditionalOnNotProd

@@ -36,8 +36,8 @@ object PdlTilBrukerMapper {
     private fun tilBrukerId(ident: List<PdlPerson.Folkeregisteridentifikator>) =
         BrukerId(ident.first().identifikasjonsnummer)
 
-    fun tilGeoTilknytning(geo: PdlGeoTilknytning): GeoTilknytning =
-        when (geo.gtType) {
+    fun tilGeoTilknytning(geo: PdlGeoTilknytning?): GeoTilknytning =
+        when (geo?.gtType) {
             UTLAND ->  geo.gtLand?.let {
                 UtenlandskTilknytning(getByAlpha3Code(it.verdi)) } ?: UkjentBosted()
             KOMMUNE -> geo.gtKommune?.let {
@@ -46,6 +46,6 @@ object PdlTilBrukerMapper {
             BYDEL ->  geo.gtBydel?.let {
                 BydelTilknytning(Bydel(it.verdi))
             }  ?: throw IllegalStateException("Bydelstilknytning uten bydelskode")
-            UDEFINERT -> UdefinertGeoTilknytning
+            else -> UdefinertGeoTilknytning
         }
 }

@@ -16,25 +16,23 @@ class EntraTjeneste(private val adapter: EntraClientAdapter, private val accesso
         run {
             oid()?.let {
                 log.trace("Henter gruppemedlemsskap via oid '{}' fra token", it)
-                EntraResponse(adapter.grupper("$it"), it)
+                EntraResponse(it, adapter.grupper("$it"))
             } ?: run {
                 log.info("Henter gruppemedlemsskap via navident '$ident'")
-                val attributter = adapter.idForIdent(ident.verdi).oids.first().also {
-                    log.info("Attributter er {}", it)
+                val oid = adapter.idForIdent(ident.verdi).oids.single().id.also {
+                    log.info("oid er {}", it)
                 }
-                val grupper = adapter.grupper(attributter.id.toString()).also {
+                val grupper = adapter.grupper("$oid").also {
                     log.info("Grupper er {}", it)
                 }
-                EntraResponse(grupper, attributter.id)
+                EntraResponse(oid, grupper)
             }
         }
 
-    private fun oid() = runCatching {
-        accessor.identFromToken
-    }.getOrNull()
+    private fun oid() = runCatching { accessor.identFromToken }.getOrNull()
 
     override fun toString() = "${javaClass.simpleName} [adapter=$adapter]"
 }
 
-data class EntraResponse(val grupper: List<EntraGruppe>,val oid: UUID)
+data class EntraResponse(val oid: UUID, val grupper: List<EntraGruppe>)
 

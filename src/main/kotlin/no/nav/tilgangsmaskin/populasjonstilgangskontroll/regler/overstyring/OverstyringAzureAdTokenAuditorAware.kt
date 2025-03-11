@@ -1,13 +1,13 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
 import org.springframework.data.domain.AuditorAware
 import org.springframework.stereotype.Component
 import java.util.Optional
 
 
 @Component
-class OverstyringAzureAdTokenAuditorAware(private val accessor: TokenAccessor): AuditorAware<String> {
+class OverstyringAzureAdTokenAuditorAware(private val accessor: TokenClaimsAccessor): AuditorAware<String> {
     override fun getCurrentAuditor() =
         runCatching {
             accessor.ansattId.let {  Optional.of(it.verdi) }

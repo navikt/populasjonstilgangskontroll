@@ -12,7 +12,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.ukjentB
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.extension.ExtendWith
@@ -33,7 +33,7 @@ import kotlin.test.Test
 internal class OverstyringTest {
 
     @MockkBean
-    lateinit var accessor: TokenAccessor
+    lateinit var accessor: TokenClaimsAccessor
     @MockK
     lateinit var ansattTjeneste: AnsattTjeneste
     @MockK

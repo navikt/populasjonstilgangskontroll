@@ -9,8 +9,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelSpec
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor.Companion.AAD_ISSUER
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor.Companion.AAD_ISSUER
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.web.bind.annotation.PostMapping
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 @SecurityScheme(bearerFormat = "JWT", name = "bearerAuth", scheme = "bearer", type = HTTP)
 @ProtectedRestController(value = ["/api/v1"], issuer = AAD_ISSUER, claimMap = [])
 @SecurityRequirement(name = "bearerAuth")
-class TilgangController(private val regler : RegelTjeneste, private val overstyringTjeneste: OverstyringTjeneste,private val token: TokenAccessor) {
+class TilgangController(private val regler : RegelTjeneste, private val overstyringTjeneste: OverstyringTjeneste,private val token: TokenClaimsAccessor) {
 
     @PostMapping("komplett")
     @ResponseStatus(NO_CONTENT)

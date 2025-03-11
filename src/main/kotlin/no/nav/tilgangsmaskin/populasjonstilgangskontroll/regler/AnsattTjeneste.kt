@@ -4,7 +4,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor
 import org.springframework.stereotype.Service
 
 @Service

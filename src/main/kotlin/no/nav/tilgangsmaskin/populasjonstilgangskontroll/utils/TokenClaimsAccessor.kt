@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class TokenAccessor(private val contextHolder: TokenValidationContextHolder){
+class TokenClaimsAccessor(private val contextHolder: TokenValidationContextHolder){
 
     val system get() = runCatching {
         claimSet().getStringClaim("azp_name")

@@ -3,14 +3,12 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraConfig.Companion.GRAPH
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.FellesRetryListener
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.RetryingOnRecoverableCacheableService
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
 import org.slf4j.LoggerFactory
-import java.util.UUID
 
 @RetryingOnRecoverableCacheableService(cacheNames = [GRAPH])
-class EntraTjeneste(private val adapter: EntraClientAdapter, private val accessor: TokenAccessor) {
+class EntraTjeneste(private val adapter: EntraClientAdapter, private val accessor: TokenClaimsAccessor) {
 
     private val log = LoggerFactory.getLogger(EntraTjeneste::class.java)
 
@@ -26,6 +24,7 @@ class EntraTjeneste(private val adapter: EntraClientAdapter, private val accesso
                 EntraResponse(grupper, attributter.tilAttributter())
             }
         }
+
     private fun oid() = runCatching {
         accessor.identFromToken
     }.getOrNull()

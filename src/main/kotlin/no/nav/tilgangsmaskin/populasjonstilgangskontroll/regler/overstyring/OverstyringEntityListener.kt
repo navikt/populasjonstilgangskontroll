@@ -7,12 +7,12 @@ import jakarta.persistence.PostUpdate
 import jakarta.persistence.PrePersist
 import jakarta.persistence.PreRemove
 import jakarta.persistence.PreUpdate
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenAccessor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
-class OverstyringEntityListener(private val token: TokenAccessor) {
+class OverstyringEntityListener(private val token: TokenClaimsAccessor) {
 
     @PrePersist
     private fun lagrer(entity : OverstyringEntity) =  setCreatedBySystem(entity).also {

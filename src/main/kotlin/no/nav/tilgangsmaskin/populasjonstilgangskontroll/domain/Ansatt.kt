@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.Ent
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.requireDigits
 import java.util.*
 
-class Ansatt(val bruker: Bruker? = null,  identifikatorer: AnsattIdentifikatorer, val grupper: List<EntraGruppe>) {
+class Ansatt(val bruker: Bruker? = null,  val identifikatorer: AnsattIdentifikatorer, val grupper: List<EntraGruppe>) {
 
 
     @JsonIgnore

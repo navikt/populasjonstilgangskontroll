@@ -22,6 +22,7 @@ class EntraConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: B
         .build(ansattId)
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
+    
 
     companion object {
         val HEADER_CONSISTENCY_LEVEL = "ConsistencyLevel" to "eventual"

@@ -1,3 +1,9 @@
+logging:
+  level:
+    mvc: trace
+spring:
+  mvc:
+    log-request-details: true
 management:
   endpoint:
     env:

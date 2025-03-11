@@ -28,9 +28,8 @@ class PdlSyncGraphQLClientAdapter(@Qualifier(PDL) graphQlClient: GraphQlClient,
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
     }
 
-    fun gt(ident: String) = query<PdlGeoTilknytning>(GT_QUERY, ident(ident))
-
     fun person(ident: String) = query<PdlPerson>(PERSON_QUERY, ident(ident))
+
     override fun toString() =
         "${javaClass.simpleName} [restClient=$restClient,graphQlClient=$graphQlClient, cfg=$cfg]"
 

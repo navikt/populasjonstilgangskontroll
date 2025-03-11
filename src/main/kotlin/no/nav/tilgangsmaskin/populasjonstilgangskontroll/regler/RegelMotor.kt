@@ -14,8 +14,8 @@ class RegelMotor(vararg regler: Regel)  {
     val kjerneRegelSett = RegelSett(KJERNE to regler.filterIsInstance<KjerneRegel>().sortedWith(INSTANCE))
     val komplettRegelSett = RegelSett(KOMPLETT to regler.sortedWith(INSTANCE))
 
-    fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = sjekk(ansatt, bruker, KOMPLETT)
-    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = sjekk(ansatt, bruker, KJERNE)
+    fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = sjekk(ansatt, bruker, komplettRegelSett)
+    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = sjekk(ansatt, bruker, kjerneRegelSett)
 
     fun sjekk(ansatt: Ansatt, bruker: Bruker, type: RegelType) =
         sjekk(ansatt, bruker, type.regelSett())
@@ -24,10 +24,10 @@ class RegelMotor(vararg regler: Regel)  {
         with(regelSett) {
             log.info("Sjekker ${type.tekst} for '${ansatt.ansattId.verdi}' og '${bruker.brukerId.verdi}'")
             regler.forEachIndexed { index, regel ->
-                log.info(CONFIDENTIAL,"[${index.plus(1)}/${regelSett.size}] Sjekker regel: '${regel.metadata.kortNavn}' fra regelsett '$tekst' for '${ansatt.ansattId.verdi}/${ansatt.bruker?.brukerId?.verdi}'og '${bruker.brukerId.verdi}'")
+                log.info(CONFIDENTIAL,"[${index.plus(1)}/${regelSett.size}] Sjekker regel: '${regel.metadata.kortNavn}' fra '$tekst' for '${ansatt.ansattId.verdi}/${ansatt.bruker?.brukerId?.verdi}'og '${bruker.brukerId.verdi}'")
                 if (!regel.test(ansatt,bruker)) {
                     throw RegelException(bruker.brukerId, ansatt.ansattId, regel).also {
-                        log.warn("[${index.plus(1)}/${regelSett.size}] Tilgang avvist av regel '${regel.metadata.kortNavn}' i regelsett '${tekst}' (${regel.metadata.begrunnelse.årsak})")
+                        log.warn("[${index.plus(1)}/${regelSett.size}] Tilgang avvist av regel '${regel.metadata.kortNavn}' i '$tekst' (${regel.metadata.begrunnelse.årsak})")
                     }
                 }
             }.also {

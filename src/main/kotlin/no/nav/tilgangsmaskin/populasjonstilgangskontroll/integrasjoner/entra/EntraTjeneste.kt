@@ -15,13 +15,19 @@ class EntraTjeneste(private val adapter: EntraClientAdapter, private val accesso
     fun ansatt(ident: AnsattId) =
         run {
             oid()?.let {
-                log.info("Henter gruppemedlemsskap via oid fra token '$it'")
+                log.trace("Henter gruppemedlemsskap via oid '{}' fra token", it)
                 EntraResponse(adapter.grupper("$it"))
             } ?: run {
                 log.info("Henter gruppemedlemsskap via navident '$ident'")
-                val attributter = adapter.attributter(ident.verdi).attributter.first()
-                val grupper = adapter.grupper(attributter.id.toString())
-                EntraResponse(grupper, attributter.tilAttributter())
+                val attributter = adapter.attributter(ident.verdi).attributter.first().also {
+                    log.info("Attributter er {}", it)
+                }
+                val grupper = adapter.grupper(attributter.id.toString()).also {
+                    log.info("Grupper er {}", it)
+                }
+                EntraResponse(grupper, attributter.tilAttributter()).also {
+                    log.info("Respons er $it")
+                }
             }
         }
 

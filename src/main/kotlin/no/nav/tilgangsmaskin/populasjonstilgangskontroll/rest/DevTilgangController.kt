@@ -45,7 +45,7 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     @ResponseStatus(ACCEPTED)
     fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody data: OverstyringData) = overstyringTjeneste.overstyr(ansattId, data)
 
-    @PostMapping("bulk/{ansattId}/")
+    @PostMapping("bulk/{ansattId}")
     @ResponseStatus(NO_CONTENT)
     fun bulk(@PathVariable ansattId: AnsattId,@RequestBody vararg specs: RegelSpec) = regler.bulkRegler(ansattId, *specs)
 

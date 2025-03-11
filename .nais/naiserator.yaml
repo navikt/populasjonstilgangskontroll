@@ -55,10 +55,6 @@ spec:
         extra:
           - "NAVident"
           - "azp_name"
-        groups:
-          - id: '{{grupper.fortrolig}}'
-          - id: '{{grupper.strengt}}'
-          - id: '{{grupper.egenansatt}}'
   secureLogs:
     enabled: true
   accessPolicy:

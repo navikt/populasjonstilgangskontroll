@@ -25,7 +25,7 @@ object PdlPipTilBrukerMapper {
             else if (respons.person.adressebeskyttelse.any { it.gradering == FORTROLIG })   {
                 add(FORTROLIG_GRUPPE)
             }
-            if ( respons.geografiskTilknytning.gtType == UDEFINERT) {
+            if ( respons.geografiskTilknytning?.gtType == UDEFINERT || respons.geografiskTilknytning == null) {
                 add(UDEFINERT_GEO_GRUPPE)
             }
 

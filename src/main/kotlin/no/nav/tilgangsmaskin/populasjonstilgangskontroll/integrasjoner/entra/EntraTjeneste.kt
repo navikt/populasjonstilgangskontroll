@@ -1,11 +1,11 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.RetryingOnRecoverableCacheableService
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
 import org.slf4j.LoggerFactory
+import java.util.*
 
 @RetryingOnRecoverableCacheableService(cacheNames = [GRAPH])
 class EntraTjeneste(private val adapter: EntraClientAdapter, private val accessor: TokenClaimsAccessor) {
@@ -16,16 +16,16 @@ class EntraTjeneste(private val adapter: EntraClientAdapter, private val accesso
         run {
             oid()?.let {
                 log.trace("Henter gruppemedlemsskap via oid '{}' fra token", it)
-                EntraResponse(adapter.grupper("$it"))
+                EntraResponse(adapter.grupper("$it"), it)
             } ?: run {
                 log.info("Henter gruppemedlemsskap via navident '$ident'")
-                val attributter = adapter.attributter(ident.verdi).attributter.first().also {
+                val attributter = adapter.idForIdent(ident.verdi).attributter.first().also {
                     log.info("Attributter er {}", it)
                 }
                 val grupper = adapter.grupper(attributter.id.toString()).also {
                     log.info("Grupper er {}", it)
                 }
-                EntraResponse(grupper, attributter.tilAttributter()).also {
+                EntraResponse(grupper, attributter.id).also {
                     log.info("Respons er $it")
                 }
             }
@@ -38,9 +38,5 @@ class EntraTjeneste(private val adapter: EntraClientAdapter, private val accesso
     override fun toString() = "${javaClass.simpleName} [adapter=$adapter]"
 }
 
-
-
-private fun EntraSaksbehandlerResponse.MSGraphSaksbehandlerAttributter.tilAttributter() = EntraResponsMapper.mapAttributter(this)
-
-data class EntraResponse(val grupper: List<EntraGruppe>,val attributter: Ansatt.AnsattAttributter? = null)
+data class EntraResponse(val grupper: List<EntraGruppe>,val oid: UUID)
 

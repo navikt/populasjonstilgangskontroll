@@ -12,7 +12,7 @@ class  EntraClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
                           private val cf: EntraConfig,
                           errorHandler: ErrorHandler): AbstractRestClientAdapter(restClient,cf, errorHandler) {
 
-    fun attributter(ansattId: String) = get<EntraSaksbehandlerResponse>(cf.userURI(ansattId))
+    fun idForIdent(ansattId: String) = get<EntraSaksbehandlerResponse>(cf.userURI(ansattId))
 
     fun grupper(ansattId: String) =
         generateSequence(get<EntraGrupperBolk>(cf.grupperURI(ansattId))) {

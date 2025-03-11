@@ -3,11 +3,10 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.requireDigits
 import java.util.*
 
-class Ansatt(val bruker: Bruker? = null,  val ansattId: AnsattId, val attributter: AnsattAttributter? = null, vararg val grupper: EntraGruppe) {
+class Ansatt(val bruker: Bruker? = null,  val ansattId: AnsattId, val oid: UUID, vararg val grupper: EntraGruppe) {
 
     @JsonIgnore
     val fnr = bruker?.brukerId
@@ -15,8 +14,7 @@ class Ansatt(val bruker: Bruker? = null,  val ansattId: AnsattId, val attributte
     val familieMedlemmer = bruker?.familieMedlemmer?.map { it.brukerId } ?: emptyList()
 
     fun kanBehandle(id: UUID) = grupper.any { it.id == id }
-    data class AnsattAttributter(val id: UUID)
-    override fun toString() = "${javaClass.simpleName} [attributter=$attributter,grupper=${grupper.contentToString()}]"
+    override fun toString() = "${javaClass.simpleName} [oid=$oid,grupper=${grupper.contentToString()}]"
 }
 
 @JvmInline

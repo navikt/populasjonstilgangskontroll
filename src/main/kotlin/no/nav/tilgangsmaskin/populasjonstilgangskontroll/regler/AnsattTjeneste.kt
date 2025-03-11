@@ -16,7 +16,7 @@ class AnsattTjeneste(private val entra: EntraTjeneste, private val nom: NomTjene
         val entraData = entra.ansatt(ansattId)
         val fnr = nom.fnrForAnsatt(ansattId)
         val  ansattBruker = fnr?.let { pdl.bruker(it) }
-        return Ansatt(ansattBruker, ansattId,entraData.attributter,*entraData.grupper.toTypedArray()).also {
+        return Ansatt(ansattBruker, ansattId,entraData.oid,*entraData.grupper.toTypedArray()).also {
             log.info("Ansatt er $it")
         }
     }

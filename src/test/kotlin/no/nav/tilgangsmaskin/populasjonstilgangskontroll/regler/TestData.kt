@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
 import com.neovisionaries.i18n.CountryCode.SE
 import io.mockk.spyk
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt.AnsattAttributter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Companion.UdefinertGeoTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Kommune
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.KommuneTilknytning
@@ -18,7 +17,6 @@ object TestData {
 
     internal val enhet = Enhetsnummer("4242")
     internal val ansattId = AnsattId("Z999999")
-    internal val attributter = AnsattAttributter(UUID.randomUUID(), ansattId)
     internal val vanligBrukerId = BrukerId("08526835670")
     internal val strengtFortroligBrukerId = BrukerId("08526835671")
     internal val fortroligBrukerId = BrukerId("08526835672")
@@ -30,6 +28,8 @@ object TestData {
     internal val geoUtlandBrukerId = BrukerId("08526835677")
     internal val enhetBrukerId = BrukerId("08526835678")
     internal val annenEnhetBrukerId = BrukerId("08526835679")
+
+    internal val oid = UUID.randomUUID()
 
 
     internal val strengtFortroligBruker = Bruker(strengtFortroligBrukerId, UdefinertGeoTilknytning, INGEN,STRENGT_FORTROLIG_GRUPPE)
@@ -55,19 +55,19 @@ object TestData {
     internal val nasjonalGruppe = EntraGruppe(UUID.randomUUID(), "Nsjonal gruppe")
     internal val enhetGruppe = EntraGruppe(UUID.randomUUID(), "XXX_GEO_${enhet.verdi}")
 
-    internal val egenAnsattFortroligAnsatt = Ansatt(ansattBruker,ansattId,attributter, fortroligEntraGruppe, egenAnsattEntraGruppe)
-    internal val egenAnsattStrengtFortroligAnsatt = Ansatt(ansattBruker,ansattId,attributter, strengtFortroligEntraGruppe, egenAnsattEntraGruppe)
-    internal val strengtFortroligAnsatt = Ansatt(ansattBruker,ansattId,attributter, strengtFortroligEntraGruppe)
-    internal val fortroligAnsatt = Ansatt(ansattBruker,ansattId,attributter, fortroligEntraGruppe)
-    internal val egenAnsatt = Ansatt(ansattBruker,ansattId,attributter, egenAnsattEntraGruppe)
-    internal val annenEgenAnsatt = Ansatt(annenAnsattBruker,ansattId,attributter, egenAnsattEntraGruppe)
-    internal val egenAnsattMedFamilie = Ansatt(annenAnsattBruker,ansattId,attributter, annenEntraGruppe)
+    internal val egenAnsattFortroligAnsatt = Ansatt(ansattBruker,ansattId,oid, fortroligEntraGruppe, egenAnsattEntraGruppe)
+    internal val egenAnsattStrengtFortroligAnsatt = Ansatt(ansattBruker,ansattId,oid, strengtFortroligEntraGruppe, egenAnsattEntraGruppe)
+    internal val strengtFortroligAnsatt = Ansatt(ansattBruker,ansattId,oid, strengtFortroligEntraGruppe)
+    internal val fortroligAnsatt = Ansatt(ansattBruker,ansattId,oid, fortroligEntraGruppe)
+    internal val egenAnsatt = Ansatt(ansattBruker,ansattId,oid, egenAnsattEntraGruppe)
+    internal val annenEgenAnsatt = Ansatt(annenAnsattBruker,ansattId,oid, egenAnsattEntraGruppe)
+    internal val egenAnsattMedFamilie = Ansatt(annenAnsattBruker,ansattId,oid, annenEntraGruppe)
 
-    internal val vanligAnsatt = Ansatt(ansattBruker,ansattId,attributter, annenEntraGruppe)
-    internal val geoUtlandAnsatt = Ansatt(ansattBruker,ansattId,attributter, geoUtlandEntraGruppe)
-    internal val udefinertGeoAnsatt = Ansatt(ansattBruker,ansattId,attributter, udefinertGruppe)
-    internal val nasjonalAnsatt = Ansatt(ansattBruker,ansattId,attributter, nasjonalGruppe)
-    internal val enhetAnsatt = Ansatt(ansattBruker,ansattId,attributter, enhetGruppe)
+    internal val vanligAnsatt = Ansatt(ansattBruker,ansattId,oid, annenEntraGruppe)
+    internal val geoUtlandAnsatt = Ansatt(ansattBruker,ansattId,oid, geoUtlandEntraGruppe)
+    internal val udefinertGeoAnsatt = Ansatt(ansattBruker,ansattId,oid, udefinertGruppe)
+    internal val nasjonalAnsatt = Ansatt(ansattBruker,ansattId,oid, nasjonalGruppe)
+    internal val enhetAnsatt = Ansatt(ansattBruker,ansattId,oid, enhetGruppe)
 
     internal val strengtFortroligRegel = StrengtFortroligRegel(strengtFortroligEntraGruppe.id)
     internal val spyStrengtFortroligRegel = spyk(strengtFortroligRegel)

@@ -7,6 +7,5 @@ import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class EntraSaksbehandlerResponse(@JsonProperty("value") val attributter: List<MSGraphSaksbehandlerAttributter>)  {
-    data class MSGraphSaksbehandlerAttributter(
-        val id: UUID)
+    data class MSGraphSaksbehandlerAttributter(val id: UUID)
 }

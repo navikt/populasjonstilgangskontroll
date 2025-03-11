@@ -18,7 +18,7 @@ object TestData {
 
     internal val enhet = Enhetsnummer("4242")
     internal val ansattId = AnsattId("Z999999")
-    internal val attributter = AnsattAttributter(UUID.randomUUID(), ansattId, enhet)
+    internal val attributter = AnsattAttributter(UUID.randomUUID(), ansattId)
     internal val vanligBrukerId = BrukerId("08526835670")
     internal val strengtFortroligBrukerId = BrukerId("08526835671")
     internal val fortroligBrukerId = BrukerId("08526835672")

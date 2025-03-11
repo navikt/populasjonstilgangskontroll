@@ -36,7 +36,7 @@ class TilgangController(private val regler : RegelTjeneste, private val overstyr
 
     @PostMapping("bulk")
     @ResponseStatus(NO_CONTENT)
-    fun bulk(@RequestBody vararg specs: RegelSpec) = regler.bulkRegler(token.ansattId, *specs)
+    fun bulk(@RequestBody  specs: List<RegelSpec>) = regler.bulkRegler(token.ansattId, specs)
 
 }
 

@@ -21,7 +21,7 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: B
     fun kjerneregler(ansattId: AnsattId, brukerId: BrukerId) =
         motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.bruker(brukerId))
 
-    fun bulkRegler(ansattId: AnsattId, vararg specs: RegelSpec) {
+    fun bulkRegler(ansattId: AnsattId, specs: List<RegelSpec>) {
         log.info("Sjekker regler for ${ansattId.verdi} og ${specs.size} brukere ${specs.map { it.brukerId.verdi }}")
         val ansatt = ansattTjeneste.ansatt(ansattId)
         val avvisninger = mutableListOf<RegelException>()

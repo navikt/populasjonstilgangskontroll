@@ -5,7 +5,6 @@ import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomJPAAdapter
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRestClientAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelSpec
@@ -22,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
-class DevTilgangController(private val bruker : BrukerTjeneste, private val ansatt: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyringTjeneste: OverstyringTjeneste, private val nom: NomJPAAdapter) {
+class DevTilgangController(private val bruker : BrukerTjeneste, private val ansatt: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyring: OverstyringTjeneste, private val nom: NomJPAAdapter) {
 
     @GetMapping("bruker/{brukerId}")
     fun bruker(@PathVariable brukerId: BrukerId) = bruker.bruker(brukerId)
@@ -43,11 +42,11 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
 
     @PostMapping("overstyr/{ansattId}")
     @ResponseStatus(ACCEPTED)
-    fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody data: OverstyringData) = overstyringTjeneste.overstyr(ansattId, data)
+    fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody data: OverstyringData) = overstyring.overstyr(ansattId, data)
 
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(NO_CONTENT)
-    fun bulk(@PathVariable ansattId: AnsattId,@RequestBody vararg specs: RegelSpec) = regler.bulkRegler(ansattId, *specs)
+    fun bulk(@PathVariable ansattId: AnsattId,@RequestBody  specs: List<RegelSpec>) = regler.bulkRegler(ansattId, specs)
 
     @PostMapping("brukerbulk")
     fun brukerBulk(@RequestBody brukerIds: List<BrukerId>) = bruker.brukerBulk(brukerIds)

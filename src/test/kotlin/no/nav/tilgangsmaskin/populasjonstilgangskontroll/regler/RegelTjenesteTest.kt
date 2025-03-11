@@ -100,7 +100,7 @@ class RegelTjenesteTest {
         every { bruker.bruker(fortroligBruker.brukerId) } returns fortroligBruker
         every { bruker.bruker(vanligBruker.brukerId) } returns vanligBruker
         assertEquals(assertThrows<BulkRegelException> {
-            regel.bulkRegler(vanligAnsatt.ansattId, RegelSpec(strengtFortroligBruker.brukerId, KJERNE), RegelSpec(fortroligBruker.brukerId, KJERNE))
+            regel.bulkRegler(vanligAnsatt.ansattId, listOf(RegelSpec(strengtFortroligBruker.brukerId, KJERNE), RegelSpec(fortroligBruker.brukerId, KJERNE)))
         }.exceptions.size, 2)
     }
     companion object {

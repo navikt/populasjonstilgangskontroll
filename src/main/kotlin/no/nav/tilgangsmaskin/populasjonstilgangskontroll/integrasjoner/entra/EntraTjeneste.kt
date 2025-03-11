@@ -25,7 +25,7 @@ class EntraTjeneste(private val adapter: EntraClientAdapter, private val accesso
                 val grupper = adapter.grupper(attributter.id.toString()).also {
                     log.info("Grupper er {}", it)
                 }
-                EntraResponse(grupper, attributter.tilAttributter()).also {
+                EntraResponse(grupper, attributter.tilAttributter(ident)).also {
                     log.info("Respons er $it")
                 }
             }
@@ -40,7 +40,7 @@ class EntraTjeneste(private val adapter: EntraClientAdapter, private val accesso
 
 
 
-private fun EntraSaksbehandlerResponse.MSGraphSaksbehandlerAttributter.tilAttributter() = EntraResponsMapper.mapAttributter(this)
+private fun EntraSaksbehandlerResponse.MSGraphSaksbehandlerAttributter.tilAttributter(ident: AnsattId) = EntraResponsMapper.mapAttributter(this, ident)
 
 data class EntraResponse(val grupper: List<EntraGruppe>,val attributter: Ansatt.AnsattAttributter? = null)
 

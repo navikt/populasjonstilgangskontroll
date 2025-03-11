@@ -15,7 +15,7 @@ data class PdlPipRespons(val aktoerId: AktørId,val person: PdlPipPerson, val id
         val familierelasjoner: List<PdlPipFamilierelasjon> = emptyList())  {
 
         data class PdlPipAdressebeskyttelse(val gradering: PdlPipAdressebeskyttelseGradering)  {
-            enum class PdlPipAdressebeskyttelseGradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG}
+            enum class PdlPipAdressebeskyttelseGradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG,UGRADERT}
         }
 
         data class PdlPipFødsel(val foedselsdato: LocalDate)

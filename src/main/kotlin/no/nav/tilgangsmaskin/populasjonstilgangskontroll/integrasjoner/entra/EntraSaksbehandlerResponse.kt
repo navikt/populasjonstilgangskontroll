@@ -10,8 +10,6 @@ data class EntraSaksbehandlerResponse(@JsonProperty("value") val attributter: Li
         val id: java.util.UUID,
         val onPremisesSamAccountName: AnsattId,
         val displayName: String,
-        val givenName: String,
-        val surname: String,
         val streetAddress: Enhetsnummer
     )
 }

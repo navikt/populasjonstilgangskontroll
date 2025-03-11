@@ -4,7 +4,6 @@ import com.neovisionaries.i18n.CountryCode.SE
 import io.mockk.spyk
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt.AnsattAttributter
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt.AnsattAttributter.Navn
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Companion.UdefinertGeoTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Kommune
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.KommuneTilknytning
@@ -19,7 +18,7 @@ object TestData {
 
     internal val enhet = Enhetsnummer("4242")
     internal val ansattId = AnsattId("Z999999")
-    internal val attributter = AnsattAttributter(UUID.randomUUID(), ansattId, Navn("En", "Saksbehandler"), enhet)
+    internal val attributter = AnsattAttributter(UUID.randomUUID(), ansattId, enhet)
     internal val vanligBrukerId = BrukerId("08526835670")
     internal val strengtFortroligBrukerId = BrukerId("08526835671")
     internal val fortroligBrukerId = BrukerId("08526835672")

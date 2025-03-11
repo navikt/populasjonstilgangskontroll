@@ -19,15 +19,13 @@ class EntraTjeneste(private val adapter: EntraClientAdapter, private val accesso
                 EntraResponse(adapter.grupper("$it"), it)
             } ?: run {
                 log.info("Henter gruppemedlemsskap via navident '$ident'")
-                val attributter = adapter.idForIdent(ident.verdi).attributter.first().also {
+                val attributter = adapter.idForIdent(ident.verdi).oids.first().also {
                     log.info("Attributter er {}", it)
                 }
                 val grupper = adapter.grupper(attributter.id.toString()).also {
                     log.info("Grupper er {}", it)
                 }
-                EntraResponse(grupper, attributter.id).also {
-                    log.info("Respons er $it")
-                }
+                EntraResponse(grupper, attributter.id)
             }
         }
 

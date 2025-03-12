@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.AnsattTjenes
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelException
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.RegelMotor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelMotor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringEntity.Companion.OVERSTYRING
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.diffFrom
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask

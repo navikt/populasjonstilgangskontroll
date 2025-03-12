@@ -7,7 +7,7 @@ import io.mockk.junit5.MockKExtension
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestApp
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.BrukerTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.RegelMotor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelMotor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.ukjentBostedBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligBruker

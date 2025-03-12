@@ -1,8 +1,7 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelType.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.*
 import org.slf4j.LoggerFactory
 import org.springframework.core.annotation.AnnotationAwareOrderComparator.INSTANCE
 import org.springframework.stereotype.Component

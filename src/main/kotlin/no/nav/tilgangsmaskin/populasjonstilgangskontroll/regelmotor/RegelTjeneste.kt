@@ -5,6 +5,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringSjekker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.BulkRegelException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelMotor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSpec
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service

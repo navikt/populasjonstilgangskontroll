@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.RegelMotor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestApp
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.annenAnsattBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.ansattBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.egenAnsattStrengtFortroligBruker
@@ -48,7 +48,7 @@ import org.springframework.test.context.TestPropertySource
     "gruppe.udefinert=35d9d1ac-7fcb-4a22-9155-e0d1e57898a8",
     "gruppe.fortrolig=ea930b6b-9397-44d9-b9e6-f4cf527a632a",
     "gruppe.egenansatt=dbe4ad45-320b-4e9a-aaa1-73cca4ee124d"])
-@ContextConfiguration(classes = [RegelMotor::class])
+@ContextConfiguration(classes = [TestApp::class])
 class RegelMotorTest {
 
     @Autowired

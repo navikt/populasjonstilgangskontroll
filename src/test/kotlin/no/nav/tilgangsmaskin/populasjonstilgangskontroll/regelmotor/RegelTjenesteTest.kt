@@ -5,6 +5,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestApp
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.geoUtlandBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.strengtFortroligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligAnsatt
@@ -39,7 +40,7 @@ import kotlin.test.assertEquals
     "gruppe.udefinert=35d9d1ac-7fcb-4a22-9155-e0d1e57898a8",
     "gruppe.fortrolig=ea930b6b-9397-44d9-b9e6-f4cf527a632a",
     "gruppe.egenansatt=dbe4ad45-320b-4e9a-aaa1-73cca4ee124d"])
-@ContextConfiguration(classes = [RegelMotor::class])
+@ContextConfiguration(classes = [TestApp::class])
 @ExtendWith(MockKExtension::class)
 class RegelTjenesteTest {
 
@@ -54,12 +55,12 @@ class RegelTjenesteTest {
 
     private lateinit var regel: RegelTjeneste
 
-    private lateinit var avvistHandler: OverstyringSjekker
+    private lateinit var sjekker: OverstyringSjekker
 
     @BeforeEach
     fun before() {
-        avvistHandler = OverstyringSjekker(overstyring)
-        regel = RegelTjeneste(motor, bruker, ansatt,avvistHandler)
+        sjekker = OverstyringSjekker(overstyring)
+        regel = RegelTjeneste(motor, bruker, ansatt,sjekker)
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
     }
     @Test

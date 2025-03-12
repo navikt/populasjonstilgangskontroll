@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 @SecurityScheme(bearerFormat = "JWT", name = "bearerAuth", scheme = "bearer", type = HTTP)
 @ProtectedRestController(value = ["/api/v1"], issuer = AAD_ISSUER, claimMap = [])
 @SecurityRequirement(name = "bearerAuth")
-class TilgangController(private val regler : RegelTjeneste, private val overstyringTjeneste: OverstyringTjeneste,private val token: TokenClaimsAccessor) {
+class TilgangController(private val regler : RegelTjeneste, private val overstyring: OverstyringTjeneste,private val token: TokenClaimsAccessor) {
 
     @PostMapping("komplett")
     @ResponseStatus(NO_CONTENT)
@@ -32,7 +32,7 @@ class TilgangController(private val regler : RegelTjeneste, private val overstyr
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)
-    fun overstyr(@RequestBody data: OverstyringData) = overstyringTjeneste.overstyr(token.ansattId,data)
+    fun overstyr(@RequestBody data: OverstyringData) = overstyring.overstyr(token.ansattId,data)
 
     @PostMapping("bulk")
     @ResponseStatus(NO_CONTENT)

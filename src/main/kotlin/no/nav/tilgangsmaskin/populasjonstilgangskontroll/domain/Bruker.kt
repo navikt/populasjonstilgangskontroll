@@ -4,31 +4,32 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonValue
 import com.neovisionaries.i18n.CountryCode
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie.Companion.INGEN
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Cluster
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Type.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Cluster.Companion.isProd
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.requireDigits
 
-class Bruker(val brukerId: BrukerId,
-             val geoTilknytning: GeoTilknytning,
-             val familie: Familie = INGEN,
-             vararg val gruppeKrav: GlobalGruppe
-) {
+class Bruker(
+    val brukerId: BrukerId,
+    val geoTilknytning: GeoTilknytning,
+    val gruppeKrav: List<GlobalGruppe> = emptyList(),
+    val familie: Familie = INGEN,
+    val identifikatorer: List<Identifikator> = emptyList()) {
 
     @JsonIgnore
     val familieMedlemmer = familie.familieMedlemmer
 
-    fun  kreverGlobalGruppe(gruppe: GlobalGruppe) = gruppe in gruppeKrav
+    fun kreverGlobalGruppe(gruppe: GlobalGruppe) = gruppe in gruppeKrav
 
-
-    override fun toString() = "${javaClass.simpleName} [ident=$brukerId, geoTilknytning=$geoTilknytning,  gruppeKrav=${gruppeKrav.contentToString()}]"
+    override fun toString() = "${javaClass.simpleName} [ident=$brukerId, geoTilknytning=$geoTilknytning,  gruppeKrav=$gruppeKrav]"
 }
 
+data class Identifikator(val id: BrukerId, val historisk: Boolean)
+
 @JvmInline
-value class AktørId(val aktoerId: String){
+value class AktørId(val verdi: String){
     init {
-        with(aktoerId) {
-            ObjectUtil.requireDigits(this, 13)
-        }
+        requireDigits(verdi, 13)
     }
 }
 
@@ -45,8 +46,8 @@ value class BrukerId(@JsonValue val verdi: String) {
 
     init {
         with(verdi) {
-            ObjectUtil.requireDigits(this, 11)
-            if (Cluster.Companion.isProd) {
+            requireDigits(this, 11)
+            if (isProd) {
                 require(mod11(W1, this) == this[9] - '0') { "Første kontrollsiffer $this[9] ikke validert" }
                 require(mod11(W2, this) == this[10] - '0') { "Andre kontrollsiffer $this[10] ikke validert" }
             }
@@ -88,21 +89,21 @@ sealed class GeoTilknytning(val type: Type) {
     @JvmInline
     value class Kommune(val verdi: String)  {
         init {
-            ObjectUtil.requireDigits(verdi, 4)
+            requireDigits(verdi, 4)
         }
     }
 
     @JvmInline
     value class Bydel(val verdi: String)  {
         init {
-            ObjectUtil.requireDigits(verdi, 6)
+            requireDigits(verdi, 6)
         }
     }
-    data class KommuneTilknytning(val kommune: Kommune) : GeoTilknytning(Type.KOMMUNE)
-    data class BydelTilknytning(val bydel: Bydel) : GeoTilknytning(Type.BYDEL)
-    class UkjentBosted : GeoTilknytning(Type.UKJENT_BOSTED)
-    data class UtenlandskTilknytning(val land: CountryCode) : GeoTilknytning(Type.UTLAND)
-    class UdefinertTilknytning : GeoTilknytning(Type.UDEFINERT)
+    data class KommuneTilknytning(val kommune: Kommune) : GeoTilknytning(KOMMUNE)
+    data class BydelTilknytning(val bydel: Bydel) : GeoTilknytning(BYDEL)
+    class UkjentBosted : GeoTilknytning(UKJENT_BOSTED)
+    data class UtenlandskTilknytning(val land: CountryCode) : GeoTilknytning(UTLAND)
+    class UdefinertTilknytning : GeoTilknytning(UDEFINERT)
 
     companion object  {
        val UdefinertGeoTilknytning = UdefinertTilknytning()

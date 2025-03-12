@@ -29,8 +29,8 @@ object PdlTilBrukerMapper {
             if (erSkjermet)  {
                 add(EGEN_ANSATT_GRUPPE)
             }
-        }.toTypedArray().let {
-            Bruker(tilBrukerId(person.folkeregisteridentifikator), tilGeoTilknytning(gt),  Familie.INGEN,*it)
+        }.let {
+            Bruker(tilBrukerId(person.folkeregisteridentifikator), tilGeoTilknytning(gt), it)
         }
 
     private fun tilBrukerId(ident: List<PdlPerson.Folkeregisteridentifikator>) =

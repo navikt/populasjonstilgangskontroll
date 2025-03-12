@@ -7,25 +7,25 @@ import org.junit.jupiter.api.assertThrows
 
 class NavIdTest {
     @Test
-    @DisplayName("Ugyldig NavId OK")
+    @DisplayName("Gyldig ansattId OK")
     fun validNavId() {
         assertEquals("A123456", AnsattId("A123456").verdi)
     }
 
     @Test
-    @DisplayName("NavId med ugyldig lengde skal kaste IllegalArgumentException")
+    @DisplayName("ansattId med ugyldig lengde skal kaste IllegalArgumentException")
     fun lengde() {
         assertThrows<IllegalArgumentException> { AnsattId("A12345") }
     }
 
     @Test
-    @DisplayName("NavId uten stor bokstav først skal kaste IllegalArgumentException")
-    fun ikkeStprBokstav() {
-        assertThrows<IllegalArgumentException> { AnsattId("a123456") }
+    @DisplayName("ansattId uten bokstav først skal kaste IllegalArgumentException")
+    fun ikkeBokstav() {
+        assertThrows<IllegalArgumentException> { AnsattId("&123456") }
     }
 
     @Test
-    @DisplayName("NavId uten 6 tall etter første bokstav skal kaste IllegalArgumentException")
+    @DisplayName("ansattId uten 6 tall etter første bokstav skal kaste IllegalArgumentException")
     fun ikke6tall() {
         assertThrows<IllegalArgumentException> { AnsattId("A12345a") }
     }

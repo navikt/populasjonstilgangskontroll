@@ -27,7 +27,7 @@ value class AnsattId(@JsonValue val verdi: String) {
     init {
         with(verdi) {
             require(length == 7) { "Ugyldig lengde $length for $this, forventet 7" }
-            require(first().isUpperCase()) { "Ugyldig første tegn ${first()} i $this, må være stor bokstav" }
+            require(first().isLetter()) { "Ugyldig første tegn ${first()} i $this, må være stor bokstav" }
             requireDigits(substring(1), 6)
         }
     }

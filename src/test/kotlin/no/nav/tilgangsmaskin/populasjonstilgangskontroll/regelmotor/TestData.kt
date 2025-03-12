@@ -1,17 +1,14 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor
 
 import com.neovisionaries.i18n.CountryCode.SE
-import io.mockk.spyk
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Companion.UdefinertGeoTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Kommune
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.UtenlandskTilknytning
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie.Companion.INGEN
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GlobalGruppe.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.*
 import java.util.UUID
 
 object TestData {
@@ -32,16 +29,16 @@ object TestData {
 
     internal val oid = UUID.randomUUID()
     
-    internal val strengtFortroligBruker = Bruker(strengtFortroligBrukerId, UdefinertGeoTilknytning, INGEN,STRENGT_FORTROLIG_GRUPPE)
-    internal val fortroligBruker = Bruker(fortroligBrukerId, UdefinertGeoTilknytning, INGEN,FORTROLIG_GRUPPE)
-    internal val vanligBruker = Bruker(vanligBrukerId, UdefinertGeoTilknytning, INGEN)
-    internal val annenAnsattBruker = Bruker(annenAnsattBrukerId, UdefinertGeoTilknytning,  Familie(barn = listOf(Familie.FamilieMedlem(vanligBrukerId, FamilieRelasjon.BARN))),EGEN_ANSATT_GRUPPE)
-    internal val ansattBruker = Bruker(ansattBrukerId, UdefinertGeoTilknytning,  INGEN,EGEN_ANSATT_GRUPPE)
-    internal val egenAnsattStrengtFortroligBruker = Bruker(egenAnsattStrengtFortroligBrukerId, UdefinertGeoTilknytning, INGEN,STRENGT_FORTROLIG_GRUPPE, EGEN_ANSATT_GRUPPE)
-    internal val egenAnsattFortroligBruker = Bruker(egenAnsattFortroligBrukerId, UdefinertGeoTilknytning, INGEN, FORTROLIG_GRUPPE, EGEN_ANSATT_GRUPPE)
-    internal val ukjentBostedBruker = Bruker(ukjentBostedBrukerId, UkjentBosted(), INGEN,UDEFINERT_GEO_GRUPPE)
-    internal val geoUtlandBruker = Bruker(geoUtlandBrukerId, UtenlandskTilknytning(SE), INGEN,GEO_PERSON_UTLAND_GRUPPE)
-    internal val enhetBruker = Bruker(enhetBrukerId, KommuneTilknytning(Kommune(enhet.verdi)), )
+    internal val strengtFortroligBruker = Bruker(strengtFortroligBrukerId, UdefinertGeoTilknytning, listOf(STRENGT_FORTROLIG_GRUPPE))
+    internal val fortroligBruker = Bruker(fortroligBrukerId, UdefinertGeoTilknytning, listOf(FORTROLIG_GRUPPE))
+    internal val vanligBruker = Bruker(vanligBrukerId, UdefinertGeoTilknytning)
+    internal val annenAnsattBruker = Bruker(annenAnsattBrukerId, UdefinertGeoTilknytning, listOf(EGEN_ANSATT_GRUPPE), Familie(barn = listOf(Familie.FamilieMedlem(vanligBrukerId, FamilieRelasjon.BARN))))
+    internal val ansattBruker = Bruker(ansattBrukerId, UdefinertGeoTilknytning, listOf(EGEN_ANSATT_GRUPPE),)
+    internal val egenAnsattStrengtFortroligBruker = Bruker(egenAnsattStrengtFortroligBrukerId, UdefinertGeoTilknytning, listOf(STRENGT_FORTROLIG_GRUPPE, EGEN_ANSATT_GRUPPE),)
+    internal val egenAnsattFortroligBruker = Bruker(egenAnsattFortroligBrukerId, UdefinertGeoTilknytning, listOf(FORTROLIG_GRUPPE, EGEN_ANSATT_GRUPPE),)
+    internal val ukjentBostedBruker = Bruker(ukjentBostedBrukerId, UkjentBosted(), listOf(UDEFINERT_GEO_GRUPPE),)
+    internal val geoUtlandBruker = Bruker(geoUtlandBrukerId, UtenlandskTilknytning(SE), listOf(GEO_PERSON_UTLAND_GRUPPE),)
+    internal val enhetBruker = Bruker(enhetBrukerId, KommuneTilknytning(Kommune(enhet.verdi)))
     internal val annenEnhetBruker = Bruker(annenEnhetBrukerId, KommuneTilknytning(Kommune("4321")), )
 
 

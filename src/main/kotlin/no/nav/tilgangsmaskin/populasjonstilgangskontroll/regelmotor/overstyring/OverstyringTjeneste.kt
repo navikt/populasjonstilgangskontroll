@@ -20,7 +20,7 @@ import java.time.Instant
 @Component
 @Cacheable(OVERSTYRING)
 @Transactional
-class OverstyringTjeneste(private val ansattTjeneste: AnsattTjeneste, private val brukerTjeneste: BrukerTjeneste,private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor) {
+class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker: BrukerTjeneste, private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor) {
 
     private val log = getLogger(OverstyringTjeneste::class.java)
 
@@ -45,7 +45,7 @@ class OverstyringTjeneste(private val ansattTjeneste: AnsattTjeneste, private va
     fun overstyr(ansattId: AnsattId,data: OverstyringData)  =
          runCatching {
                 log.info("Sjekker kjerneregler før eventuell overstyring for ansatt '${ansattId.verdi}' og bruker '${data.brukerId.mask()}'")
-                motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.bruker(data.brukerId))
+                motor.kjerneregler(ansatt.ansatt(ansattId), bruker.bruker(data.brukerId))
                 adapter.overstyr(ansattId.verdi, data)
                 refresh(ansattId,data)
                 log.info("Overstyring for ansatt '${ansattId.verdi}' og bruker '${data.brukerId.mask()}' oppdatert i cache")

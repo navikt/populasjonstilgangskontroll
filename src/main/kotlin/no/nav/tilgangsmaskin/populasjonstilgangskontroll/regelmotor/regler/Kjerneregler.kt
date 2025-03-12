@@ -25,12 +25,14 @@ class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID): Globa
 class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : GlobaleGrupperRegel(EGEN_ANSATT_GRUPPE, id,"Egen ansatt")
 
 @Order(HIGHEST_PRECEDENCE + 3)
+@Component
 class EgneDataRegel : KjerneRegel {
     override fun test(ansatt: Ansatt, bruker: Bruker) = bruker.brukerId != ansatt.bruker?.brukerId
     override val metadata = RegelBeskrivelse("Egne data", AVVIST_EGNE_DATA)
 }
 
 @Order(HIGHEST_PRECEDENCE + 4)
+@Component
 class EgenFamilieRegel : KjerneRegel {
     override fun test(ansatt: Ansatt, bruker: Bruker) =
         bruker.brukerId !in ansatt.familieMedlemmer

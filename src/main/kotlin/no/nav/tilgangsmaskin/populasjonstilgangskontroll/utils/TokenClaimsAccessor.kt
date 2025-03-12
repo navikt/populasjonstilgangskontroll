@@ -11,7 +11,7 @@ class TokenClaimsAccessor(private val contextHolder: TokenValidationContextHolde
     val system get() = runCatching {
         claimSet().getStringClaim("azp_name")
     }.getOrElse { "N/A" }
-    val  identFromToken get()  = claimSet().let { UUID.fromString(it.getStringClaim("oid")) }
+    val  oidFraToken get()  = claimSet().let { UUID.fromString(it.getStringClaim("oid")) }
     val ansattId get()  = claimSet().getStringClaim("NAVident")?.let { AnsattId(it) } ?: throw RuntimeException("NAVident claim not found in token")
     private fun claimSet() = contextHolder.getTokenValidationContext().getClaims(AAD_ISSUER)
 

@@ -14,17 +14,15 @@ class Bruker(
     val geoTilknytning: GeoTilknytning,
     val gruppeKrav: List<GlobalGruppe> = emptyList(),
     val familie: Familie = INGEN,
-    val identifikatorer: List<Identifikator> = emptyList()) {
+    val historiskeIdentifikatorer: List<BrukerId> = emptyList()) {
 
     @JsonIgnore
     val familieMedlemmer = familie.familieMedlemmer
 
     fun kreverGlobalGruppe(gruppe: GlobalGruppe) = gruppe in gruppeKrav
 
-    override fun toString() = "${javaClass.simpleName} [ident=$brukerId, geoTilknytning=$geoTilknytning,  gruppeKrav=$gruppeKrav]"
+    override fun toString() = "${javaClass.simpleName} [ident=$brukerId, geoTilknytning=$geoTilknytning,  gruppeKrav=$gruppeKrav,identifikatorer=$historiskeIdentifikatorer]"
 }
-
-data class Identifikator(val id: BrukerId, val historisk: Boolean)
 
 @JvmInline
 value class AktørId(val verdi: String){

@@ -30,7 +30,7 @@ object PdlPipTilBrukerMapper {
             }
         }.let {
             with(respons) {
-                Bruker(brukerId, tilGeoTilknytning(geografiskTilknytning), it, tilFamilie(person.familierelasjoner), tilIdenter(identer)).also { bruker ->
+                Bruker(brukerId, tilGeoTilknytning(geografiskTilknytning), it, tilFamilie(person.familierelasjoner), tilHistoriskeBrukerIds(identer)).also { bruker ->
                     log.info("Mappet person {} til bruker {}", it, bruker)
                 }
             }
@@ -44,7 +44,10 @@ object PdlPipTilBrukerMapper {
             barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) })
     }
 
-    private fun tilIdenter(identer: PdlPipRespons.PdlPipIdenter) = identer.identer.filter { it.gruppe == FOLKEREGISTERIDENT }.map { Identifikator(BrukerId(it.ident), it.historisk) }
+    private fun tilHistoriskeBrukerIds(identer: PdlPipRespons.PdlPipIdenter) = identer.identer
+        .filter { it.gruppe == FOLKEREGISTERIDENT }
+        .filter { it.historisk }
+        .map { (BrukerId(it.ident)) }
 
     private fun tilRelasjon(relasjon: PdlPipFamilierelasjon.PdlPipFamilieRelasjonRolle?) =
         when(relasjon) {

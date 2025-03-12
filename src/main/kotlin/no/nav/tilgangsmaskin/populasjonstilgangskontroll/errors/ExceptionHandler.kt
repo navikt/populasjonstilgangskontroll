@@ -1,9 +1,8 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestClientAdapter
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.BulkRegelException
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.Regel.Companion.TYPE_URI
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.BulkRegelException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.Companion.TYPE_URI
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpHeaders

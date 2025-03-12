@@ -9,8 +9,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Companion.UdefinertGeoTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning.GTType.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPerson.Adressebeskyttelse.AdressebeskyttelseGradering.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GlobalGruppe
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GlobalGruppe.*
 
 object PdlTilBrukerMapper {
     fun tilBruker(person: PdlPerson, gt: PdlGeoTilknytning, erSkjermet: Boolean) =

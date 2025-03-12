@@ -7,8 +7,7 @@ import io.mockk.verify
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableRestException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.RecoverableRestException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.FellesRetryListener
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligBruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligBrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligBruker
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
 import org.assertj.core.api.Assertions.assertThat

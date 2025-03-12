@@ -11,8 +11,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPi
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipFamilierelasjon
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipFamilierelasjon.PdlPipFamilieRelasjonRolle.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlTilBrukerMapper.tilGeoTilknytning
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GlobalGruppe
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GlobalGruppe.*
 import org.slf4j.LoggerFactory
 
 object PdlPipTilBrukerMapper {

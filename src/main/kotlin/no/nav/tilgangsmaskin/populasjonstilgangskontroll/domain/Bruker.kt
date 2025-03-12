@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonValue
 import com.neovisionaries.i18n.CountryCode
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie.Companion.INGEN
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Cluster
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
@@ -12,7 +11,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
 class Bruker(val brukerId: BrukerId,
              val geoTilknytning: GeoTilknytning,
              val familie: Familie = INGEN,
-             vararg val gruppeKrav: GlobalGruppe) {
+             vararg val gruppeKrav: GlobalGruppe
+) {
 
     @JsonIgnore
     val familieMedlemmer = familie.familieMedlemmer

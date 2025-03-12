@@ -17,8 +17,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipAdressebeskyttelse
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipAdressebeskyttelse.PdlPipAdressebeskyttelseGradering
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GlobalGruppe.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test

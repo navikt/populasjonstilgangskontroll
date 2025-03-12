@@ -5,10 +5,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelSpec
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringData
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSpec
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.RegelTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringData
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor.Companion.AAD_ISSUER
 import org.springframework.http.HttpStatus.ACCEPTED

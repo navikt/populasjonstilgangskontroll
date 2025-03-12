@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
 
 data class RegelSett(val spec: Pair<RegelType, List<Regel>>) {

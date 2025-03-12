@@ -1,13 +1,13 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AnsattTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.BrukerTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.Regel.Companion.OVERSTYRING_MESSAGE_CODE
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelMotor
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring.OverstyringEntity.Companion.OVERSTYRING
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.AnsattTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.BrukerTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.Companion.OVERSTYRING_MESSAGE_CODE
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.RegelMotor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringEntity.Companion.OVERSTYRING
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.diffFrom
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
 import org.slf4j.LoggerFactory.getLogger

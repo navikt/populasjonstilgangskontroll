@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import java.time.LocalDate

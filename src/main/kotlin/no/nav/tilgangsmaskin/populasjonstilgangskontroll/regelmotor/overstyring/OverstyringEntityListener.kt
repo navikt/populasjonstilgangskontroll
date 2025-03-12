@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 
 import jakarta.persistence.PostLoad
 import jakarta.persistence.PostPersist

@@ -1,16 +1,16 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestApp
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.AnsattTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.BrukerTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.motor
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.ukjentBostedBruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligAnsatt
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.TestData.vanligBruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.AnsattTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.BrukerTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.motor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.ukjentBostedBruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligAnsatt
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
 import org.assertj.core.api.Assertions.assertThat
@@ -26,7 +26,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @DataJpaTest(showSql = true)
-@ContextConfiguration(classes= [TestApp::class])
+@ContextConfiguration(classes = [TestApp::class])
 @ExtendWith(MockKExtension::class)
 @EnableJpaAuditing
 @ActiveProfiles(TEST)

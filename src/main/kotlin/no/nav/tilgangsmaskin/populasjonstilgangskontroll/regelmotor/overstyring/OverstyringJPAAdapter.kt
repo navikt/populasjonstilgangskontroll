@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.overstyring
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 
 import org.springframework.stereotype.Component
 import java.time.ZoneId.systemDefault

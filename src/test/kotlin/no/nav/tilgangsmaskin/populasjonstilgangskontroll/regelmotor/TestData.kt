@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor
 
 import com.neovisionaries.i18n.CountryCode.SE
 import io.mockk.spyk
@@ -10,7 +10,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.U
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie.Companion.INGEN
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.GlobalGruppe.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GlobalGruppe.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.*
 import java.util.UUID
 
 object TestData {

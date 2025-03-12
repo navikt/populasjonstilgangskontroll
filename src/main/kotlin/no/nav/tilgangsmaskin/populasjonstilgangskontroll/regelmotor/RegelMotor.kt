@@ -1,8 +1,8 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelType.*
-import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelType.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.*
 import org.slf4j.LoggerFactory
 import org.springframework.core.annotation.AnnotationAwareOrderComparator.INSTANCE
 import org.springframework.stereotype.Component
@@ -24,7 +24,7 @@ class RegelMotor(vararg regler: Regel)  {
         with(regelSett) {
             log.info("Sjekker ${type.tekst} for '${ansatt.ansattId.verdi}' og '${bruker.brukerId.verdi}'")
             regler.forEachIndexed { index, regel ->
-                log.info(CONFIDENTIAL,"[${index.plus(1)}/${regelSett.size}] Sjekker regel: '${regel.metadata.kortNavn}' fra '$tekst' for '${ansatt.ansattId.verdi}/${ansatt.bruker?.brukerId?.verdi}'og '${bruker.brukerId.verdi}'")
+                log.info("[${index.plus(1)}/${regelSett.size}] Sjekker regel: '${regel.metadata.kortNavn}' fra '$tekst' for '${ansatt.ansattId.verdi}/${ansatt.bruker?.brukerId?.verdi}'og '${bruker.brukerId.verdi}'")
                 if (!regel.test(ansatt,bruker)) {
                     throw RegelException(bruker.brukerId, ansatt.ansattId, regel).also {
                         log.warn("[${index.plus(1)}/${regelSett.size}] Tilgang avvist av regel '${regel.metadata.kortNavn}' i '$tekst' (${regel.metadata.begrunnelse.årsak})")
@@ -40,20 +40,3 @@ class RegelMotor(vararg regler: Regel)  {
             KOMPLETT -> komplettRegelSett
         }
 }
-
-
-/** Flyt for GEO-sjekk
- * (Kan overstyres av system)
- *
- * Ansatt har gruppe GE_GEO-NASJONAL
- * Bruker har ikke registert GT --> Ansatte med GEO_Udefinert skal ha tilgang til personer uten GT/Udefnert GT
- * Bruker har GT = landskode --> Sjekk mot ansattes gruper -GEO-Utland
- * Brukers GT stemmer med en av Ansattes liste over ENHET-GT _
- * Brukers oppfølgingskontornr stemmer med en av Ansattes liste over ENHET-KONTORNR _(datasett må komme fra POAO (sansynligbvis)) team OBO
- *
- *
- * Avvik på tilganger som må dekkes:
- * Bruker har kun kommunetilhørighet i GT, mens kommunene har bydelsoppdeling --> Diskusjon om ansatte i kommunene Oslo(0301, Bergen(4601), Trondheim(5001) og Stavanger(1103) skal ha tilgang til kommunenummeret i tilleggg til bydelen
- *
- *
- */

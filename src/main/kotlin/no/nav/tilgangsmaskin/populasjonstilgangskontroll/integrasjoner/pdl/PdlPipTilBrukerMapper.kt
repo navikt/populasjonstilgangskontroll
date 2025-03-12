@@ -28,9 +28,11 @@ object PdlPipTilBrukerMapper {
             if (erSkjermet)  {
                 add(EGEN_ANSATT_GRUPPE)
             }
-        }.toList().let {
-            Bruker(brukerId, tilGeoTilknytning(respons.geografiskTilknytning), it, tilFamilie(respons.person.familierelasjoner), tilIdenter(respons.identer)).also {
-                log.info("Mappet person {} til bruker {}", respons, it)
+        }.let {
+            with(respons) {
+                Bruker(brukerId, tilGeoTilknytning(geografiskTilknytning), it, tilFamilie(person.familierelasjoner), tilIdenter(identer)).also { bruker ->
+                    log.info("Mappet person {} til bruker {}", it, bruker)
+                }
             }
         }
     }

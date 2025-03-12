@@ -18,8 +18,8 @@ class  EntraClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
     fun oidFraEntra(ansattId: String) = get<EntraSaksbehandlerRespons>(cf.userURI(ansattId)).oids.single().id
 
     fun grupper(ansattId: String) =
-        generateSequence(get<EntraGrupperBolk>(cf.grupperURI(ansattId))) {
-            it.next?.let {
+        generateSequence(get<EntraGrupperBolk>(cf.grupperURI(ansattId))) { bolk ->
+            bolk.next?.let {
                 get<EntraGrupperBolk>(it)
             }
         }.flatMap {

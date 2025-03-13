@@ -17,7 +17,7 @@
         <logger name="secure" level="debug" additivity="false">
             <appender-ref ref="stdout"/>
         </logger>
-        <logger name="org.apache.http.wire"  level="debug"/>
+        <logger name="org.apache.hc.client5.http.wire"  level="debug"/>
         <logger name="org.hibernate.SQL" level="debug"/>
         <logger name="org.hibernate.orm.jdbc.bind" level="trace"/>
         <logger name="no.nav.security" level="trace"/>

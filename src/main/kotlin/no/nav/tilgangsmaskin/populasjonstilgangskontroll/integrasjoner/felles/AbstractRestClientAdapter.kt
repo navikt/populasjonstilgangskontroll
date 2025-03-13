@@ -21,7 +21,7 @@ abstract class AbstractRestClientAdapter(
     protected val log = getLogger(AbstractRestClientAdapter::class.java)
     override fun ping() = get<Unit>(cfg.pingEndpoint)
 
-    protected inline fun <reified T> get(uri: URI, headers: Map<String, String> = emptyMap()) =
+     protected inline fun <reified T> get(uri: URI, headers: Map<String, String> = emptyMap()) =
         restClient.get()
             .uri(uri)
             .accept(APPLICATION_JSON)

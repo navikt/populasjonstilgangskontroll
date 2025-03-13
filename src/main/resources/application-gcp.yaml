@@ -11,7 +11,27 @@ management:
       base-path: /monitoring
 
 spring:
-
+  kafka:
+    bootstrap-servers: ${kafka.brokers}
+    properties:
+      ssl:
+        endpoint:
+          identification:
+            algorithm: ''
+    security:
+      protocol: SSL
+    ssl:
+      trust-store-location: file:${kafka.truststore.path}
+      trust-store-type: JKS
+      trust-store-password: ${kafka.credstore.password}
+      key-store-location: file:${kafka.keystore.path}
+      key-store-type: PKCS12
+      key-store-password: ${kafka.credstore.password}
+    consumer:
+      group-id: ${spring.application.name}-${env}
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      
   mvc:
     problemdetails:
       enabled: true

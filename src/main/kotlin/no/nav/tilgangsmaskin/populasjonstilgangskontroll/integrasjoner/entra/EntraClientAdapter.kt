@@ -12,7 +12,7 @@ import java.util.*
 
 @Component
 class  EntraClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
-                          private val cf: EntraConfig,
+                          val cf: EntraConfig,
                           errorHandler: ErrorHandler): AbstractRestClientAdapter(restClient,cf, errorHandler) {
 
     fun oidFraEntra(ansattId: String) = get<EntraSaksbehandlerRespons>(cf.userURI(ansattId)).oids.single().id
@@ -26,12 +26,15 @@ class  EntraClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
             it.value
         }.toList()
 
+    /*
     fun grupperRaw(ansattId: String) =
         generateSequence(get<EntraGrupperBolkAny>(cf.grupperURI(ansattId))) { bolk ->
             bolk.next?.let {
                 get<EntraGrupperBolkAny>(it)
             }
         }
+
+     */
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class EntraSaksbehandlerRespons(@JsonProperty("value") val oids: List<MSGraphSaksbehandlerOids>)  {

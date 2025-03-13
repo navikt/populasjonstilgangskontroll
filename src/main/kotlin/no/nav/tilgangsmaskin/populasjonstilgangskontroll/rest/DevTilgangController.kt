@@ -4,10 +4,6 @@ import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraClientAdapter
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGrupperBolkAny
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraResponse
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.OIDResolver
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomJPAAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.BrukerTjeneste
@@ -16,7 +12,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.RegelTjenest
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.DEV
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.PROD
 import org.springframework.http.HttpStatus.*
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -57,12 +52,17 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     fun brukerBulk(@RequestBody brukerIds: List<BrukerId>) = bruker.brukerBulk(brukerIds)
 }
 
+/*
 @UnprotectedRestController(value = ["/tmp"])
-//@ConditionalOnNotProd
-class TempTilgangController(private val adapter: EntraClientAdapter, private val resolver: OIDResolver) {
+@ConditionalOnNotProd
+class TempTilgangController(private val adapter: EntraClientAdapter, private val resolver: OIDResolver, ) {
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) : Sequence<EntraGrupperBolkAny> {
         val oid = resolver.oidForAnsatt(ansattId)
         return adapter.grupperRaw(oid.toString())
     }
+
+ @JsonIgnoreProperties(ignoreUnknown = true)
+data class EntraGrupperBolkAny(@JsonProperty("@odata.nextLink") val next: URI? = null, val value: Any)
 }
+*/

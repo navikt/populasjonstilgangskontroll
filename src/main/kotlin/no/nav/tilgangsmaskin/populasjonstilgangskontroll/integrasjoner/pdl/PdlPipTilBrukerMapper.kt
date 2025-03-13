@@ -5,37 +5,38 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie.FamilieM
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning.GTType.UDEFINERT
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipAdressebeskyttelse.PdlPipAdressebeskyttelseGradering.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipFamilierelasjon
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipFamilierelasjon.PdlPipFamilieRelasjonRolle
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipFamilierelasjon.PdlPipFamilieRelasjonRolle.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlTilBrukerMapper.tilGeoTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GlobalGruppe.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipIdenter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipIdenter.PdlPipIdent.PdlPipIdentGruppe.FOLKEREGISTERIDENT
-import org.slf4j.LoggerFactory
 
 object PdlPipTilBrukerMapper {
-    private val log = LoggerFactory.getLogger(javaClass)
-     fun tilBruker(brukerId: BrukerId, respons: PdlPipRespons, erSkjermet: Boolean): Bruker {
-        return mutableListOf<GlobalGruppe>().apply {
-            if  (respons.person.adressebeskyttelse.any { it.gradering in listOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND) }) {
+
+    fun tilBruker(brukerId: BrukerId, respons: PdlPipRespons, erSkjermet: Boolean) =
+        with(respons) {
+            Bruker(brukerId, tilGeoTilknytning(geografiskTilknytning), tilBeskyttelse(respons,erSkjermet), tilFamilie(person.familierelasjoner), tilHistoriskeBrukerIds(identer))
+        }
+
+    private fun tilBeskyttelse(respons: PdlPipRespons, erSkjermet: Boolean) =
+         mutableListOf<GlobalGruppe>().apply {
+            if (respons.person.adressebeskyttelse.any {
+                    it.gradering in listOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND)
+                }) {
                 add(STRENGT_FORTROLIG_GRUPPE)
-            }
-            else if (respons.person.adressebeskyttelse.any { it.gradering == FORTROLIG })   {
+            } else if (respons.person.adressebeskyttelse.any { it.gradering == FORTROLIG }) {
                 add(FORTROLIG_GRUPPE)
             }
-            if ( respons.geografiskTilknytning?.gtType == UDEFINERT || respons.geografiskTilknytning == null) {
+            if (respons.geografiskTilknytning?.gtType == UDEFINERT || respons.geografiskTilknytning == null) {
                 add(UDEFINERT_GEO_GRUPPE)
             }
 
-            if (erSkjermet)  {
+            if (erSkjermet) {
                 add(EGEN_ANSATT_GRUPPE)
             }
-        }.let {
-            with(respons) {
-                Bruker(brukerId, tilGeoTilknytning(geografiskTilknytning), it, tilFamilie(person.familierelasjoner), tilHistoriskeBrukerIds(identer)).also { bruker ->
-                    log.info("Mappet person {} til bruker {}", it, bruker)
-                }
-            }
-        }
     }
+
     private fun tilFamilie(relasjoner: List<PdlPipFamilierelasjon>) : Familie {
         val (foreldre, barn) = relasjoner
             .mapNotNull { it.relatertPersonsIdent?.let { ident -> it.relatertPersonsRolle to ident } }.partition { it.first != BARN }
@@ -44,12 +45,12 @@ object PdlPipTilBrukerMapper {
             barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) })
     }
 
-    private fun tilHistoriskeBrukerIds(identer: PdlPipRespons.PdlPipIdenter) = identer.identer
+    private fun tilHistoriskeBrukerIds(identer: PdlPipIdenter) = identer.identer
         .filter { it.gruppe == FOLKEREGISTERIDENT }
         .filter { it.historisk }
         .map { (BrukerId(it.ident)) }
 
-    private fun tilRelasjon(relasjon: PdlPipFamilierelasjon.PdlPipFamilieRelasjonRolle?) =
+    private fun tilRelasjon(relasjon: PdlPipFamilieRelasjonRolle?) =
         when(relasjon) {
             MOR ->  FamilieRelasjon.MOR
             FAR ->  FamilieRelasjon.FAR

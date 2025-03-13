@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AktørId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import java.time.LocalDate
 
-data class PdlPipRespons(val aktoerId: AktørId, val person: PdlPipPerson, val identer: PdlPipIdenter = PdlPipIdenter(), val geografiskTilknytning: PdlGeoTilknytning? = null)  {
+data class PdlPipRespons(val person: PdlPipPerson, val identer: PdlPipIdenter = PdlPipIdenter(), val geografiskTilknytning: PdlGeoTilknytning? = null)  {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class PdlPipPerson(

@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.neovisionaries.i18n.CountryCode.SE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.UtenlandskTilknytning
@@ -17,10 +16,22 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.aktørId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestApp
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.json.JsonTest
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 
+
+@ActiveProfiles(TEST)
+@JsonTest
+@ContextConfiguration(classes = [TestApp::class])
 
 class PdlPipTilBrukerMapperTest {
+
+    @Autowired
+    lateinit var mapper: ObjectMapper
 
     private val brukerId = TestData.vanligBruker.brukerId
 
@@ -70,10 +81,10 @@ class PdlPipTilBrukerMapperTest {
         val adressebeskyttelse = gradering?.let {
              listOf(PdlPipAdressebeskyttelse(it))
          }?: emptyList()
-        return PdlPipRespons(aktørId,PdlPipPerson(adressebeskyttelse), geografiskTilknytning = geo)
+        return PdlPipRespons(PdlPipPerson(adressebeskyttelse), geografiskTilknytning = geo)
     }
 
-   // @Test
+   @Test
     fun jall() {
         val json = """
             {
@@ -120,8 +131,6 @@ class PdlPipTilBrukerMapperTest {
                 "geografiskTilknytning": {
                   "gtType": "KOMMUNE",
                   "gtKommune": "4644",
-                  "gtBydel": null,
-                  "gtLand": null,
                   "regel": "18"
                 }
               },
@@ -129,9 +138,9 @@ class PdlPipTilBrukerMapperTest {
             }
         """.trimIndent()
 
-        val deser = jacksonObjectMapper().registerModule(JavaTimeModule()).readValue<Map<String, PdlPipRespons>>(json)
+        val deser =mapper.readValue<Map<String, PdlPipRespons>>(json)
         deser.entries.forEach {
-         //   println(PdlPipTilBrukerMapper.tilBruker(BrukerId(it.key), it.value, false))
+          println(it.value)
         }
     }
 }

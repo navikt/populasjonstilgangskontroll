@@ -88,55 +88,52 @@ class PdlPipTilBrukerMapperTest {
     fun jall() {
         val json = """
             {
-              "12345678901": {
-                "person": {
-                  "adressebeskyttelse": [],
-                  "foedsel": [
-                    {
-                      "foedselsdato": "1998-05-09"
-                    }
-                  ],
-                  "doedsfall": [
-                    {
-                      "doedsdato": "2020-04-22"
-                    }
-                  ],
-                  "familierelasjoner": [
-                    {
-                      "relatertPersonsIdent": "03087021016",
-                      "relatertPersonsRolle": "FAR",
-                      "minRolleForPerson": "BARN"
-                    },
-                    {
-                      "relatertPersonsIdent": "07309574189",
-                      "relatertPersonsRolle": "MOR",
-                      "minRolleForPerson": "BARN"
-                    }
-                  ]
-                },
-                "identer": {
-                  "identer": [
-                    {
-                      "ident": "2052090676205",
-                      "historisk": false,
-                      "gruppe": "AKTORID"
-                    },
-                    {
-                      "ident": "12345678901",
-                      "historisk": false,
-                      "gruppe": "FOLKEREGISTERIDENT"
-                    }
-                  ]
-                },
-                "geografiskTilknytning": {
-                  "gtType": "KOMMUNE",
-                  "gtKommune": "4644",
-                  "regel": "18"
-                }
-              },
-              "10111111111": null
-            }
-        """.trimIndent()
+  "10108000398": {
+    "aktoerId": "1000096233942",
+    "person": {
+      "adressebeskyttelse": [],
+      "foedsel": [
+        {
+          "foedselsdato": "1980-10-10"
+        }
+      ],
+      "doedsfall": [],
+      "familierelasjoner": [
+        {
+          "relatertPersonsIdent": "26014401260",
+          "relatertPersonsRolle": "MOR",
+          "minRolleForPerson": "BARN"
+        },
+        {
+          "relatertPersonsIdent": "08074401156",
+          "relatertPersonsRolle": "FAR",
+          "minRolleForPerson": "BARN"
+        }
+      ],
+      "rettsligHandleevne": []
+    },
+    "identer": {
+      "identer": [
+        {
+          "ident": "1000096233942",
+          "historisk": false,
+          "gruppe": "AKTORID"
+        },
+        {
+          "ident": "10108000398",
+          "historisk": false,
+          "gruppe": "FOLKEREGISTERIDENT"
+        }
+      ]
+    },
+    "geografiskTilknytning": {
+      "gtType": "BYDEL",
+      "gtBydel": "460108",
+      "regel": "3"
+    }
+  }
+}
+""".trimIndent()
 
         val deser =mapper.readValue<Map<String, PdlPipRespons>>(json)
         deser.entries.forEach {

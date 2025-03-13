@@ -4,6 +4,7 @@ import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomJPAAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.BrukerTjeneste
@@ -49,7 +50,7 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     fun bulk(@PathVariable ansattId: AnsattId,@RequestBody  specs: List<RegelSpec>) = regler.bulkRegler(ansattId, specs)
 
     @PostMapping("brukerbulk")
-    fun brukerBulk(@RequestBody brukerIds: List<BrukerId>) = bruker.brukerBulk(brukerIds)
+    fun brukerBulk(@RequestBody vararg brukerIds: String) = bruker.brukerBulk(brukerIds.map { BrukerId(it) })
 }
 
 /*

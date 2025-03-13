@@ -50,7 +50,7 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     fun bulk(@PathVariable ansattId: AnsattId,@RequestBody  specs: List<RegelSpec>) = regler.bulkRegler(ansattId, specs)
 
     @PostMapping("brukerbulk")
-    fun brukerBulk(@RequestBody vararg brukerIds: String) = bruker.brukerBulk(brukerIds.map { BrukerId(it) })
+    fun brukerBulk(@RequestBody brukerIds: List<String>) = bruker.brukerBulk(brukerIds.map { BrukerId(it) })
 }
 
 /*

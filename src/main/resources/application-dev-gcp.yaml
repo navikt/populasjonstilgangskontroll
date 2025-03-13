@@ -22,4 +22,4 @@ management:
       enabled: true
 
 nom:
-  topic: org.nom.api-ressurs-state-v2
+  topic: nom.api-ressurs-state-v2

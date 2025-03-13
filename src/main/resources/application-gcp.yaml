@@ -11,6 +11,8 @@ management:
       base-path: /monitoring
 
 spring:
+  application:
+    name: populasjonstilgangskontroll
   kafka:
     bootstrap-servers: ${kafka.brokers}
     properties:

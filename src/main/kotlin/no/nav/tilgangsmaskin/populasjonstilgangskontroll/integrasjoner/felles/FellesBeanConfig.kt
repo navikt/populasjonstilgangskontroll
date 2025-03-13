@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.github.benmanes.caffeine.cache.Caffeine
-import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
@@ -13,7 +12,6 @@ import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInt
 import org.slf4j.LoggerFactory
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
-import org.springframework.boot.actuate.web.exchanges.Include
 import org.springframework.boot.actuate.web.exchanges.Include.defaultIncludes
 import org.springframework.boot.actuate.web.exchanges.servlet.HttpExchangesFilter
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
@@ -25,7 +23,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
-import org.springframework.stereotype.Component
 
 
 @Configuration

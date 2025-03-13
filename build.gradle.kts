@@ -49,7 +49,7 @@ configurations.all {
 
 dependencies {
     // Align versions of all Kotlin components
-
+    implementation("org.apache.httpcomponents.client5:httpclient5")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation("com.neovisionaries:nv-i18n:1.29")
     implementation("org.springframework.boot:spring-boot-starter-cache")

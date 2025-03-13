@@ -5,6 +5,7 @@ import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraClientAdapter
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGrupperBolkAny
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraResponse
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.OIDResolver
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomJPAAdapter
@@ -60,9 +61,8 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
 @ConditionalOnNotProd
 class TempTilgangController(private val adapter: EntraClientAdapter, private val resolver: OIDResolver) {
     @GetMapping("ansatt/{ansattId}")
-    fun ansatt(@PathVariable ansattId: AnsattId)  {
-        resolver.oidForAnsatt(ansattId).let {
-            adapter.grupperRaw("$it")
-        }
+    fun ansatt(@PathVariable ansattId: AnsattId) : Sequence<EntraGrupperBolkAny> {
+        val oid = resolver.oidForAnsatt(ansattId)
+        return adapter.grupperRaw(oid.toString())
     }
 }

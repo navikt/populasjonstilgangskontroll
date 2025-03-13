@@ -58,7 +58,7 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
 }
 
 @UnprotectedRestController(value = ["/tmp"])
-@ConditionalOnNotProd
+//@ConditionalOnNotProd
 class TempTilgangController(private val adapter: EntraClientAdapter, private val resolver: OIDResolver) {
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) : Sequence<EntraGrupperBolkAny> {

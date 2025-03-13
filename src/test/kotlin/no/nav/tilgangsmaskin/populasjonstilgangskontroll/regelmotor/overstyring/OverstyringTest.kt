@@ -11,6 +11,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.ukjentBostedBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligBruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligBrukerMedHistoriskIdent
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligHistoriskBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
 import org.assertj.core.api.Assertions.assertThat
@@ -51,6 +53,15 @@ internal class OverstyringTest {
         every { accessor.system } returns "test"
         every { ansattTjeneste.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
         overstyring = OverstyringTjeneste(ansattTjeneste, brukerTjeneste, OverstyringJPAAdapter(repo), motor)
+    }
+
+    @Test
+    @DisplayName("Test gyldig overstyring via historisk ident")
+    fun testOverstyringGyldigHistorisk() {
+        every { brukerTjeneste.bruker(vanligBrukerMedHistoriskIdent.brukerId) } returns vanligBrukerMedHistoriskIdent
+        every { brukerTjeneste.bruker(vanligHistoriskBruker.brukerId) } returns vanligHistoriskBruker
+        overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData("test", LocalDate.now().plusDays(1),vanligBrukerMedHistoriskIdent.historiskeIdentifikatorer.first()))
+        assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, vanligBrukerMedHistoriskIdent.brukerId)).isTrue
     }
 
     @Test

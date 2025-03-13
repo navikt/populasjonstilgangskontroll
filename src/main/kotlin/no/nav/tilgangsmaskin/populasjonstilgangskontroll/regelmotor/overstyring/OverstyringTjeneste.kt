@@ -26,7 +26,8 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
 
     @Transactional(readOnly = true)
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId): Boolean {
-        val gjeldendeDato = adapter.gjeldendeOverstyringGyldighetDato(ansattId.verdi, brukerId.verdi)
+        val brukerIds = bruker.bruker(brukerId).historiskeIdentifikatorer.map { it.verdi }
+        val gjeldendeDato = adapter.gjeldendeOverstyringGyldighetDato(ansattId.verdi, brukerId.verdi, brukerIds)
         return if (gjeldendeDato != null) {
             val now = Instant.now()
             if (gjeldendeDato.isBefore(now)) {

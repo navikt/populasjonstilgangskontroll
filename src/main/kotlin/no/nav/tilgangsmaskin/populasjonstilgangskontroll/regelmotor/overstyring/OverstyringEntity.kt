@@ -19,7 +19,7 @@ import java.time.Instant
     Index(name = "idx_overstyringentity_navid", columnList = "navid, fnr")
 ])
 @EntityListeners(OverstyringEntityListener::class, AuditingEntityListener::class)
-class OverstyringEntity(@Column(length = 7, nullable = false) val navid: String,
+class OverstyringEntity(@Column(length = 7, nullable = false) val nav   id: String,
                         @Column(length = 11, nullable = false) val fnr: String,
                         @Column(nullable = false) val begrunnelse: String,
                         @Column(nullable = false) val expires: Instant) {

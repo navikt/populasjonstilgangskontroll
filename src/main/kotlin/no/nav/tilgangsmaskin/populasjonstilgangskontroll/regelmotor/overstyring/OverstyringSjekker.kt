@@ -12,7 +12,7 @@ class OverstyringSjekker(private val overstyring: OverstyringTjeneste)  {
 
     private val log = LoggerFactory.getLogger(OverstyringSjekker::class.java)
 
-    fun sjekk(ansattId: AnsattId, brukerId: BrukerId, e: Throwable) =
+    fun sjekk(ansattId: AnsattId, brukerId: BrukerId, historiske: List<BrukerId>, e: Throwable) =
         when (e) {
             is RegelException ->
                 with(e.regel) {

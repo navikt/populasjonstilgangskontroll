@@ -41,6 +41,7 @@ class FellesBeanConfig : CachingConfigurer {
     fun errorMessageSource() = ReloadableResourceBundleMessageSource().apply {
             setBasename("classpath:messages")
             setDefaultEncoding("UTF-8")
+
         }
     @Bean
     fun fellesRetryListener() = FellesRetryListener()

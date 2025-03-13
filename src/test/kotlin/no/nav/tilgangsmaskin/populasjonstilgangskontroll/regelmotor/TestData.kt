@@ -29,6 +29,7 @@ object TestData {
     internal val historiskBrukerId = BrukerId("11111111111")
 
     internal val oid = UUID.randomUUID()
+    internal val aktørId = AktørId("1111111111111")
     
     internal val strengtFortroligBruker = Bruker(strengtFortroligBrukerId, UdefinertGeoTilknytning, listOf(STRENGT_FORTROLIG_GRUPPE))
     internal val fortroligBruker = Bruker(fortroligBrukerId, UdefinertGeoTilknytning, listOf(FORTROLIG_GRUPPE))

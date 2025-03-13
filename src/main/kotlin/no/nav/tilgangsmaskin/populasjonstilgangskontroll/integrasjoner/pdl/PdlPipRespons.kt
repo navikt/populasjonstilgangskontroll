@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AktørId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import java.time.LocalDate
 
-data class PdlPipRespons(val aktoerId: AktørId,val person: PdlPipPerson, val identer: PdlPipIdenter, val geografiskTilknytning: PdlGeoTilknytning? = null)  {
+data class PdlPipRespons(val aktoerId: AktørId, val person: PdlPipPerson, val identer: PdlPipIdenter = PdlPipIdenter(), val geografiskTilknytning: PdlGeoTilknytning? = null)  {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class PdlPipPerson(
@@ -24,7 +24,7 @@ data class PdlPipRespons(val aktoerId: AktørId,val person: PdlPipPerson, val id
             enum class PdlPipFamilieRelasjonRolle  {MOR,FAR,MEDMOR,MEDFAR,BARN}
         }
     }
-    data class PdlPipIdenter(val identer: List<PdlPipIdent>) {
+    data class PdlPipIdenter(val identer: List<PdlPipIdent> = emptyList()) {
         data class PdlPipIdent(val ident: String, val historisk: Boolean, val gruppe: PdlPipIdentGruppe) {
             enum class PdlPipIdentGruppe { AKTORID, FOLKEREGISTERIDENT }
         }

@@ -11,6 +11,3 @@ management:
     web:
       exposure:
         include: '*'
-  httpexchanges:
-    recording:
-      enabled: true

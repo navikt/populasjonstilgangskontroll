@@ -17,12 +17,14 @@ import org.springframework.boot.actuate.web.exchanges.Include
 import org.springframework.boot.actuate.web.exchanges.Include.defaultIncludes
 import org.springframework.boot.actuate.web.exchanges.servlet.HttpExchangesFilter
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
+import org.springframework.boot.web.client.RestClientCustomizer
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.caffeine.CaffeineCacheManager
 import org.springframework.cache.interceptor.KeyGenerator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.stereotype.Component
 
 
@@ -41,8 +43,11 @@ class FellesBeanConfig : CachingConfigurer {
     fun errorMessageSource() = ReloadableResourceBundleMessageSource().apply {
             setBasename("classpath:messages")
             setDefaultEncoding("UTF-8")
-
         }
+
+    @Bean
+    fun restClientCustomizer() = RestClientCustomizer { it.requestFactory(HttpComponentsClientHttpRequestFactory()) }
+
     @Bean
     fun fellesRetryListener() = FellesRetryListener()
 

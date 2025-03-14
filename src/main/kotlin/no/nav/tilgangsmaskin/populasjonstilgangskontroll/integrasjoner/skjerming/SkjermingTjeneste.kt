@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming
 
+import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.RecoverableRestException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.RetryingOnRecoverableCacheableService
@@ -10,6 +11,7 @@ import org.springframework.retry.annotation.Recover
 import kotlin.arrayOf
 
 @RetryingOnRecoverableCacheableService(cacheNames = [SKJERMING])
+@Timed
 class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
 
     fun erSkjermet(brukerId: BrukerId)  =  adapter.erSkjermet(brukerId.verdi)

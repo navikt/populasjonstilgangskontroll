@@ -27,14 +27,14 @@ class RegelMotor(@Qualifier(KJERNE) val kjerne: RegelSett, @Qualifier(KOMPLETT) 
         with(regelSett) {
             log.info("Sjekker ${type.beskrivelse} for '${ansatt.ansattId.verdi}' og '${bruker.brukerId.verdi}'")
             regler.forEachIndexed { index, regel ->
-                log.trace("[${index.plus(1)}/${regelSett.size}] Sjekker regel: '${regel.metadata.kortNavn}' fra '$beskrivelse' for '${ansatt.ansattId.verdi}/${ansatt.bruker?.brukerId?.verdi}'og '${bruker.brukerId.verdi}'")
+                log.trace("[${index.plus(1)}/${regelSett.size}] Sjekker regel: '${regel.metadata.kortNavn}' fra $beskrivelse for '${ansatt.ansattId.verdi}/${ansatt.bruker?.brukerId?.verdi}'og '${bruker.brukerId.verdi}'")
                 if (!regel.test(ansatt,bruker)) {
                     throw RegelException(bruker.brukerId, ansatt.ansattId, regel).also {
                         log.warn("[${index.plus(1)}/${regelSett.size}] Tilgang avvist av regel '${regel.metadata.kortNavn}' i '$beskrivelse' (${regel.metadata.begrunnelse.årsak})")
                     }
                 }
             }.also {
-                log.info("${type.beskrivelse} ga tilgang OK for '${ansatt.ansattId.verdi}' og '${bruker.brukerId.verdi}'")
+                log.info("${type.beskrivelse.replaceFirstChar { it.uppercaseChar() }} ga tilgang OK for '${ansatt.ansattId.verdi}' og '${bruker.brukerId.verdi}'")
             }
     }
     private fun RegelType.regelSett() =

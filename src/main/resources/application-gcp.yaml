@@ -33,6 +33,11 @@ spring:
       group-id: ${spring.application.name}-${nais.cluster.type}
       key-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 
   mvc:
     problemdetails:

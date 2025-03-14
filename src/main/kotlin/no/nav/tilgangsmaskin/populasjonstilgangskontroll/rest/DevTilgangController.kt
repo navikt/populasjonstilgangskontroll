@@ -4,10 +4,9 @@ import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomJPAAdapter
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.AnsattTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.BrukerTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSpec
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.RegelTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringData

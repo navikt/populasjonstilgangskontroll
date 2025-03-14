@@ -256,6 +256,6 @@ class RegelMotorTest {
     @Test
     @DisplayName("Sjekk at reglene er sorterte")
     fun sortert() {
-        assertThat(regelMotor.kjerneRegelSett.size).isEqualTo(5)
+        assertThat(regelMotor.kjerne.size).isEqualTo(5)
     }
 }

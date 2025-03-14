@@ -2,8 +2,8 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.AnsattTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.BrukerTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelMotor

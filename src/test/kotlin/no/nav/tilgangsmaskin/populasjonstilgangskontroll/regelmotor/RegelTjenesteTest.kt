@@ -6,13 +6,15 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestApp
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.geoUtlandBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.strengtFortroligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringSjekker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelType.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett.RegelType.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.fortroligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
@@ -119,7 +121,7 @@ class RegelTjenesteTest {
         every { bruker.bruker(fortroligBruker.brukerId) } returns fortroligBruker
         every { bruker.bruker(vanligBruker.brukerId) } returns vanligBruker
         assertEquals(assertThrows<BulkRegelException> {
-            regel.bulkRegler(vanligAnsatt.ansattId, listOf(RegelSpec(strengtFortroligBruker.brukerId, KJERNE), RegelSpec(fortroligBruker.brukerId, KJERNE)))
+            regel.bulkRegler(vanligAnsatt.ansattId, listOf(RegelSpec(strengtFortroligBruker.brukerId, KJERNE_REGELTYPE), RegelSpec(fortroligBruker.brukerId, KJERNE_REGELTYPE)))
         }.exceptions.size, 2)
     }
 

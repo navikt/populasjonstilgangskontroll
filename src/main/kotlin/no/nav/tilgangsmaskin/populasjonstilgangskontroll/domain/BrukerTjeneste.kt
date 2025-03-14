@@ -1,6 +1,5 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipTilBrukerMapper.tilBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste

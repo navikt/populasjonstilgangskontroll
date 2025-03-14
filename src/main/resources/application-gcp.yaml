@@ -31,8 +31,8 @@ spring:
       key-store-password: ${kafka.credstore.password}
     consumer:
       group-id: ${spring.application.name}-${nais.cluster.type}
-      key-deserializer: org.apache.kafka.common.serialization.JsonDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.JsonDeserializer
+      key-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
 
   mvc:
     problemdetails:

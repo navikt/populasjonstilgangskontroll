@@ -19,7 +19,7 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
            runCatching {
                 nom.upsert(AnsattId(hendelse.navident), BrukerId(hendelse.navident))
               }.onFailure {
-                log.error("Feil ved lagring av hendelse: {}", it.message)
+                log.error("Feil ved lagring av hendelse: {}", it.message, it)
               }.getOrNull()?.also {
                 log.info("Lagret hendelse med id: {}", it.id)
            }

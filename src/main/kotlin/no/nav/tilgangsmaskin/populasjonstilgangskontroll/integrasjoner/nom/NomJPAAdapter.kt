@@ -8,7 +8,7 @@ import java.time.ZoneId
 @Component
 class NomJPAAdapter(private val repository: NomRepository) {
 
-    fun upsert(ansattId: String, fnr: String, slutt: LocalDate? = null) = repository.save(NomEntity(fnr,ansattId, slutt?.toInstant()))
+    fun upsert(ansattId: String, fnr: String, slutt: LocalDate? = null) = repository.save(NomEntity(ansattId, fnr,slutt?.toInstant()))
     fun fnrForAnsatt(navId: String) = repository.findByNavid(navId)?.fnr
 
 

@@ -1,10 +1,12 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 
+import no.nav.boot.conditionals.ConditionalOnNotProd
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 
 @Component
+@ConditionalOnNotProd
 class NomHendelseKonsument {
 
     private val log = getLogger(NomHendelseKonsument::class.java)

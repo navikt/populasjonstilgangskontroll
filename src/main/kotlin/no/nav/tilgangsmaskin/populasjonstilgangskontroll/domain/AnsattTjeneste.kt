@@ -17,7 +17,7 @@ class AnsattTjeneste(private val entra: EntraTjeneste, private val nom: NomTjene
             val fnr =  async { nom.fnrForAnsatt(ansattId) }.await()
             val  ansattBruker = fnr?.let { pdl.bruker(it) }
             Ansatt(ansattBruker, AnsattIdentifikatorer(ansattId,entra.oid,fnr),entra.grupper).also {
-                log.info("Ansatt er $it")
+                log.trace("Ansatt er {}", it)
             }
         }
 }

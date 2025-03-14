@@ -38,6 +38,9 @@ spring:
       key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
+        auto:
+          offset:
+             reset: earliest
         spring:
           deserializer:
             key:

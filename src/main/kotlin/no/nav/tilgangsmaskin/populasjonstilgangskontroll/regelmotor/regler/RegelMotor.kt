@@ -1,4 +1,5 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
+import io.micrometer.core.annotation.Counted
 import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett.RegelType
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett.RegelType.*
@@ -15,9 +16,9 @@ import org.springframework.stereotype.Component
 class RegelMotor(@Qualifier(KJERNE) val kjerne: RegelSett, @Qualifier(KOMPLETT) private val komplett: RegelSett)  {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    @Timed
+    @Counted
     fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = sjekkRegler(ansatt, bruker, komplett)
-    @Timed
+    @Counted
     fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = sjekkRegler(ansatt, bruker, kjerne)
 
     fun sjekkRegler(ansatt: Ansatt, bruker: Bruker, type: RegelType) =

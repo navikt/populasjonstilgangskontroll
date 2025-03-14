@@ -30,7 +30,7 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatt.ansatt(ansattId)
 
     @PostMapping("ansatt/{ansattId}/{brukerId}")
-    fun nom(@PathVariable ansattId: AnsattId,@PathVariable brukerId: BrukerId) = nom.lagre(ansattId.verdi,brukerId.verdi)
+    fun nom(@PathVariable ansattId: AnsattId,@PathVariable brukerId: BrukerId) = nom.upsert(ansattId.verdi,brukerId.verdi)
 
     @GetMapping("komplett/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)

@@ -12,8 +12,8 @@ class NomHendelseKonsument {
     private val log = getLogger(NomHendelseKonsument::class.java)
     @KafkaListener(topics = ["#{'\${nom.topic}'}"])
     fun listen(hendelse : NomHendelse) {
-        if (hendelse.ansattId != null) {
+       // if (hendelse.navident != null) {
             log.info("Mottatt hendelse: $hendelse")
-        }
+       // }
     }
 }

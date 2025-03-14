@@ -37,11 +37,12 @@ spring:
       properties:
         spring:
           json:
+            value:
+              default:
+                type: no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomHendelse
             use:
               type:
                 headers: false
-            trusted:
-              packages: '*'
 
   mvc:
     problemdetails:

@@ -17,7 +17,7 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
        if (hendelse.navident != null) {
            log.info("Mottatt hendelse: {}", hendelse)
            runCatching {
-                nom.lagre(AnsattId(hendelse.navident), BrukerId(hendelse.navident))
+                nom.upsert(AnsattId(hendelse.navident), BrukerId(hendelse.navident))
               }.onFailure {
                 log.error("Feil ved lagring av hendelse: {}", it.message)
               }.getOrNull()?.also {

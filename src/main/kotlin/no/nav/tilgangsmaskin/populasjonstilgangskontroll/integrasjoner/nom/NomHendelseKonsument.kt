@@ -13,7 +13,7 @@ class NomHendelseKonsument {
     @KafkaListener(topics = ["#{'\${nom.topic}'}"])
     fun listen(hendelse : NomHendelse) {
        // if (hendelse.navident != null) {
-            log.info("Mottatt hendelse: $hendelse")
+        log.trace("Mottatt hendelse: {}", hendelse)
        // }
     }
 }

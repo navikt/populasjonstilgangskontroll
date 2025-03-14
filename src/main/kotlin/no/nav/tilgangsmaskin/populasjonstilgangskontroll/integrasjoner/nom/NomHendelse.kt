@@ -1,10 +1,17 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
-import java.time.LocalDate
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
+import java.time.Instant
 
-class NomHendelse(ansattId: AnsattId, startdato: LocalDate, sluttdato: LocalDate?, sektor: Sektor)
-
-enum class Sektor {
-    NAV_STATLIG, NAV_KOMMUNAL, EKSTERN
-}
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class NomHendelse(
+    @JsonProperty("personident")
+    val brukerId: BrukerId,
+    @JsonProperty("navident")
+    val ansattId: AnsattId,
+    val startdato: Instant,
+    val sluttdato: Instant?
+)

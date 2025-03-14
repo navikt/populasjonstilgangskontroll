@@ -114,3 +114,5 @@ skjerming:
 graph:
   scope: https://graph.microsoft.com/.default
   base-uri: https://graph.microsoft.com/v1.0/
+nom:
+  topic: org.nom.api-ressurs-state-v2

@@ -21,5 +21,4 @@ management:
     recording:
       enabled: true
 
-nom:
-  topic: org.nom.api-ressurs-state-v2
+

@@ -20,5 +20,3 @@ management:
   httpexchanges:
     recording:
       enabled: true
-
-

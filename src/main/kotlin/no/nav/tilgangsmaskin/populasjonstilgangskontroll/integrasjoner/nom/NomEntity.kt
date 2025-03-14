@@ -20,7 +20,7 @@ import java.time.Instant
 @EntityListeners(AuditingEntityListener::class)
 class NomEntity(@Column(length = 7, nullable = false) val navid: String,
                 @Column(length = 11, nullable = false) val fnr: String,
-                @Column(nullable = true) val gyldigtil: Instant)  {
+                @Column(nullable = true) val gyldigtil: Instant? = null)  {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     val id : Long = 0

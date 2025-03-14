@@ -13,6 +13,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.van
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligBrukerMedHistoriskIdent
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligHistoriskBruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelBeanConfig
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
 import org.assertj.core.api.Assertions.assertThat
@@ -28,7 +30,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @DataJpaTest(showSql = true)
-@ContextConfiguration(classes = [RegelMotor::class,TestApp::class])
+@ContextConfiguration(classes = [RegelMotor::class,RegelBeanConfig::class,TestApp::class])
 @ExtendWith(MockKExtension::class)
 @EnableJpaAuditing
 @ActiveProfiles(TEST)

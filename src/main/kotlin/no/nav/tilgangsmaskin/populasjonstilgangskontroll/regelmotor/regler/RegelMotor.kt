@@ -1,4 +1,5 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
+import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett.RegelType
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett.RegelType.*
 
@@ -20,6 +21,7 @@ class RegelMotor(@Qualifier(KJERNE) val kjerne: RegelSett, @Qualifier(KOMPLETT) 
     fun sjekkRegler(ansatt: Ansatt, bruker: Bruker, type: RegelType) =
         sjekkRegler(ansatt, bruker, type.regelSett())
 
+    @Timed
     private fun sjekkRegler(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) =
         with(regelSett) {
             log.info("Sjekker ${type.beskrivelse} for '${ansatt.ansattId.verdi}' og '${bruker.brukerId.verdi}'")

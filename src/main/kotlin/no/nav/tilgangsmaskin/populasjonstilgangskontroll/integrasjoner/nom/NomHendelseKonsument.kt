@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 
-//@Component
+@Component
 class NomHendelseKonsument {
 
     private val log = getLogger(NomHendelseKonsument::class.java)

@@ -14,10 +14,10 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
     private val log = getLogger(NomHendelseKonsument::class.java)
     @KafkaListener(topics = ["#{'\${nom.topic}'}"])
     fun listen(hendelse : NomHendelse) {
-       if (hendelse.navident != null) {
+       if (hendelse.navident != null && hendelse.personident != null) {
            log.info("Mottatt hendelse: {}", hendelse)
            runCatching {
-                nom.upsert(AnsattId(hendelse.navident), BrukerId(hendelse.navident))
+                nom.upsert(AnsattId(hendelse.navident), BrukerId(hendelse.personident))
               }.onFailure {
                 log.error("Feil ved lagring av hendelse: {}", it.message, it)
               }.getOrNull()?.also {

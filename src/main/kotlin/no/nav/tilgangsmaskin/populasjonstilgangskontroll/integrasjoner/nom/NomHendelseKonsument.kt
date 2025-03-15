@@ -23,6 +23,6 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
               }.getOrNull()?.also {
                 log.info("Lagret hendelse med id: {}", it.id)
            }
-       }
+       } else log.warn("Mottatt hendelse uten forventede felter: {}", hendelse)
     }
 }

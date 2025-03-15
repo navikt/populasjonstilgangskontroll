@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 @Timed
 class NomTjeneste(private val adapter: NomJPAAdapter) {
 
-    fun upsert(ansattId: AnsattId, fnr: BrukerId) = adapter.upsert(ansattId.verdi, fnr.verdi)
+    fun lagre(ansattId: AnsattId, fnr: BrukerId) = adapter.upsert(ansattId.verdi, fnr.verdi)
 
     @Transactional(readOnly = true)
     fun fnrForAnsatt(ansattId: AnsattId) = adapter.fnrForAnsatt(ansattId.verdi)?.let { BrukerId(it) }

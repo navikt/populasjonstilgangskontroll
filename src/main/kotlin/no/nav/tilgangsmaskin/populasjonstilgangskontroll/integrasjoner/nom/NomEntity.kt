@@ -31,4 +31,7 @@ class NomEntity(@Column(length = 7, nullable = false) val navid: String,
     @LastModifiedDate
     @Column(nullable = false)
     var updated: Instant? = null
+
+    fun copy(navid: String = this.navid, fnr: String = this.fnr, gyldigtil: Instant? = this.gyldigtil) =
+        NomEntity(navid, fnr, gyldigtil)
 }

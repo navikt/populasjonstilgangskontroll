@@ -13,11 +13,13 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 @Component
-class PdlSyncGraphQLClientAdapter(@Qualifier(PDL) graphQlClient: GraphQlClient,
-                                  @Qualifier(PDL) restClient: RestClient,
-                                  graphQlErrorHandler: GraphQLErrorHandler,
-                                  errorHandler: ErrorHandler,
-                                  cfg: PdlConfig) : AbstractSyncGraphQLAdapter(graphQlClient,restClient, cfg,errorHandler,graphQlErrorHandler) {
+class PdlSyncGraphQLClientAdapter(
+    @Qualifier(PDL) graphQlClient: GraphQlClient,
+    @Qualifier(PDL) restClient: RestClient,
+    graphQlErrorHandler: GraphQLErrorHandler,
+    cfg: PdlConfig,
+    errorHandler: ErrorHandler
+) : AbstractSyncGraphQLAdapter(graphQlClient,restClient, cfg,errorHandler,graphQlErrorHandler) {
 
     override fun ping()  {
          restClient

@@ -4,6 +4,7 @@ import io.micrometer.core.annotation.Timed
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import no.nav.boot.conditionals.ConditionalOnDev
+import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.ConditionalOnNotDev
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomTjeneste
@@ -22,7 +23,7 @@ class NomAwareAnsattTjeneste(private val entra: EntraTjeneste, private val nom: 
             val ansattFnr =  async { nom.fnrForAnsatt(ansattId) }.await()
             val ansattBruker = ansattFnr?.let { pdl.bruker(it) }
             Ansatt(ansattBruker,AnsattIdentifikatorer(ansattId, entra.oid, ansattFnr), entra.grupper).also {
-                log.trace("Ansatt er {}", it)
+                log.trace(CONFIDENTIAL,"Ansatt er {}", it)
             }
         }
 }
@@ -35,7 +36,7 @@ class NomIgnoringAnsattTjeneste(private val entra: EntraTjeneste) :  AnsattOpera
     override fun ansatt(ansattId: AnsattId)  =
         with(entra.ansatt(ansattId)) {
             Ansatt(null, AnsattIdentifikatorer(ansattId, oid), grupper).also {
-                log.trace("Ansatt er {}", it)
+                log.trace(CONFIDENTIAL,"Ansatt er {}", it)
             }
         }
 }

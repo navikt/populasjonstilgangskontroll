@@ -10,7 +10,7 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 @Component
 @Cacheable(PDLPIP)
-class PdlPipRestClientAdapter(@Qualifier(PDLPIP) restClient: RestClient, private val cf : PdlPipConfig, errorHandler: ErrorHandler): AbstractRestClientAdapter(restClient, cf, errorHandler) {
+class PdlPipRestClientAdapter(@Qualifier(PDLPIP) restClient: RestClient, private val cf : PdlPipConfig): AbstractRestClientAdapter(restClient, cf) {
     fun person(brukerId: String) = get<PdlPipRespons>(cf.personURI(), mapOf("ident" to brukerId))
 
     fun personBulk(brukerIds: List<String>) = post<Map<String, PdlPipRespons?>>(cf.personBolkURI(), brukerIds)

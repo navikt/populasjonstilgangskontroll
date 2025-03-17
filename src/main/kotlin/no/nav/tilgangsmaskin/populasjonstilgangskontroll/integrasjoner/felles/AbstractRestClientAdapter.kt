@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.DefaultRestErrorHandler
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableRestException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
@@ -13,7 +14,7 @@ import java.net.URI
 abstract class AbstractRestClientAdapter(
     protected val restClient: RestClient,
     protected val cfg: AbstractRestConfig,
-    protected val errorHandler: ErrorHandler
+    protected val errorHandler: ErrorHandler = DefaultRestErrorHandler()
 ) : Pingable {
 
     protected val log = getLogger(AbstractRestClientAdapter::class.java)

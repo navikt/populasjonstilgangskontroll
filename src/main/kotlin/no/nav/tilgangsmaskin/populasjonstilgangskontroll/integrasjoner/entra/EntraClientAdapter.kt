@@ -9,17 +9,14 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
-import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import java.util.*
 
 @Component
-class  EntraClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
-                          val cf: EntraConfig,
-                          errorHandler: ErrorHandler): AbstractRestClientAdapter(restClient,cf, errorHandler) {
+class  EntraClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: EntraConfig): AbstractRestClientAdapter(restClient,cf) {
 
     fun oidFraEntra(ansattId: String) = get<EntraSaksbehandlerRespons>(cf.userURI(ansattId)).oids.let {
         if (it.isEmpty()) {
-            throw IrrecoverableRestException(NOT_FOUND,cf.userURI(ansattId),"Fant ingen data for ansattId=$ansattId")
+            throw IrrecoverableRestException(NOT_FOUND,cf.userURI(ansattId),"Fant ingen data for ansatt $ansattId")
         }
         it.first().id
     }

@@ -14,7 +14,5 @@ class NomClientBeanConfig {
     @Bean
     @Qualifier(NOM)
     fun electorRestClient(b: RestClient.Builder, @Value("\${elector.get.url}") uri: URI) =
-        b.baseUrl(uri)
-            .requestInterceptors {
-            }.build()
+        b.baseUrl(uri).build()
 }

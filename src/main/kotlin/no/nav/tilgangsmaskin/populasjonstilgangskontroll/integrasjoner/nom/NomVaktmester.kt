@@ -36,8 +36,8 @@ class LeaderElector(private val client: LeaderElectionClientAdapter) {
 }
 @Component
 class LeaderElectionClientAdapter(@Qualifier(NOM) client: RestClient, private val cf : LeaderElectionConfig, errorHandler: ErrorHandler) : AbstractRestClientAdapter(client, cf, errorHandler) {
-    fun isLeader() {
-        get<Any>(cf.baseUri)
+    fun isLeader() : Any {
+        return get<Any>(cf.baseUri)
     }
 }
 

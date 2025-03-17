@@ -1,10 +1,8 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 
-import com.sun.jndi.toolkit.url.Uri
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestClientAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestConfig
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomConfig.Companion.NOM
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipConfig
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -14,6 +12,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import java.net.URI
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit.SECONDS
 
 
@@ -36,10 +35,10 @@ class LeaderElector(private val client: LeaderElectionClientAdapter) {
 }
 @Component
 class LeaderElectionClientAdapter(@Qualifier(NOM) client: RestClient, private val cf : LeaderElectionConfig, errorHandler: ErrorHandler) : AbstractRestClientAdapter(client, cf, errorHandler) {
-    fun isLeader() : Any {
-        return get<Any>(cf.baseUri)
+    fun isLeader() : LeaderElectionResponse {
+        return get<LeaderElectionResponse>(cf.baseUri)
     }
 }
-
+data class LeaderElectionResponse(val name: String, val last_update: LocalDateTime)
 @Component
 class LeaderElectionConfig(@Value("\${elector.get.url}")  uri: URI): AbstractRestConfig(uri,"", isEnabled =true)

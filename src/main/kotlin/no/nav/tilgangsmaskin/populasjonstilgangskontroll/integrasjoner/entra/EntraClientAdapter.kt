@@ -25,13 +25,17 @@ class  EntraClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
     }
 
     fun grupper(ansattId: String) =
-        generateSequence(get<EntraGrupperBolk>(cf.grupperURI(ansattId))) { bolk ->
+        generateSequence(get<EntraGrupperBolkNullable>(cf.grupperURI(ansattId))) { bolk ->
             bolk.next?.let {
-                get<EntraGrupperBolk>(it)
+                get<EntraGrupperBolkNullable>(it)
             }
         }.flatMap {
             it.value
-        }.toList()
+        }.toList().map {
+            EntraGruppe(it.id, it.displayName ?: "N/A")
+        }.onEach {
+            if (it.displayName == "N/A") log.error("Fant ikke displayName for gruppe ${it.id}")
+        }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class EntraSaksbehandlerRespons(@JsonProperty("value") val oids: List<MSGraphSaksbehandlerOids>)  {

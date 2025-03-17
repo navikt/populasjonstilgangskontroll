@@ -8,3 +8,6 @@ import java.net.URI
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class EntraGrupperBolk(@JsonProperty("@odata.nextLink") val next: URI? = null, val value: List<EntraGruppe> = emptyList())
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class EntraGrupperBolkNullable(@JsonProperty("@odata.nextLink") val next: URI? = null, val value: List<EntraGruppeNullable> = emptyList())
+

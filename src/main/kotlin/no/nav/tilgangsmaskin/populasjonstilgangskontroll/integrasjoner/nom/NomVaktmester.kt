@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
+import java.net.InetAddress
 import java.net.URI
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit.SECONDS
@@ -23,7 +24,8 @@ class NomVaktmester(private val nom: NomTjeneste, private val elector: LeaderEle
 
     @Scheduled(fixedRate = 60, timeUnit = SECONDS)
     fun fjern() {
-        log.info("Leader elector respons : ${elector.isLeader()}")
+        val hostname: String = InetAddress.getLocalHost().hostName
+        log.info("Leader elector respons : ${elector.isLeader().name}, hostname: $hostname")
         log.info("Vaktmester rydder opp")
         nom.ryddOpp()
     }

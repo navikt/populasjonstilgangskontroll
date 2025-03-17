@@ -3,11 +3,14 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId as AnsattFnr
 import org.springframework.stereotype.Component
 import java.time.Instant
+import java.time.Instant.*
 import java.time.LocalDate
 import java.time.ZoneId.systemDefault
 
 @Component
 class NomJPAAdapter(private val repo: NomRepository) {
+
+    fun ryddOpp() = repo.deleteByGyldigtilBefore(now())
 
     fun upsert(ansattId: String, ansattFnr: String, slutt: LocalDate? = null) =
          repo.save(repo.findByNavid(ansattId)?.apply {

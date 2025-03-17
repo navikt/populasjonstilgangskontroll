@@ -16,4 +16,6 @@ class NomTjeneste(private val adapter: NomJPAAdapter) {
 
     @Transactional(readOnly = true)
     fun fnrForAnsatt(ansattId: AnsattId) = adapter.fnrForAnsatt(ansattId.verdi)
+
+    fun ryddOpp() = adapter.ryddOpp()
 }

@@ -9,6 +9,7 @@ import org.springframework.boot.runApplication
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.retry.annotation.EnableRetry
+import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
@@ -16,6 +17,7 @@ import org.springframework.retry.annotation.EnableRetry
 @EnableCaching
 @EnableRetry
 @EnableJpaAuditing
+@EnableScheduling
 @EnableJwtTokenValidation(ignore = ["org.springdoc", "org.springframework"])
 class App
 

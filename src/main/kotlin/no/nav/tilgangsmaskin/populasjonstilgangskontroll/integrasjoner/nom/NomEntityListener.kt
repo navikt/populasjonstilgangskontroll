@@ -8,27 +8,27 @@ import org.springframework.stereotype.Component
 class NomEntityListener{
 
     @PrePersist
-    private fun lagrer(entity : NomEntityListener) = log.trace("Lagrer {} i DB", entity.javaClass.simpleName)
+    private fun lagrer(entity : NomEntity) = log.trace("Lagrer {} i DB", entity.javaClass.simpleName)
 
     @PreUpdate
-    private fun oppdaterer(entity : NomEntityListener) =  log.trace("Oppdaterer {} i DB", entity.javaClass.simpleName)
+    private fun oppdaterer(entity : NomEntity) =  log.trace("Oppdaterer {} i DB", entity.javaClass.simpleName)
 
     @PreRemove
-    private fun fjerner(entity : NomEntityListener) = log.trace("Fjerner {} fra DB", entity.javaClass.simpleName)
+    private fun fjerner(entity : NomEntity) = log.trace("Fjerner {} fra DB", entity.javaClass.simpleName)
 
     @PostPersist
-    private fun lagret(entity : NomEntityListener) = log.trace("Lagret {} i DB", entity.javaClass.simpleName)
+    private fun lagret(entity : NomEntity) = log.trace("Lagret {} i DB", entity.javaClass.simpleName)
 
     @PostUpdate
-    private fun oppdatert(entity : NomEntityListener) = log.trace("Oppdaterte {} i DB", entity.javaClass.simpleName)
+    private fun oppdatert(entity : NomEntity) = log.trace("Oppdaterte {} i DB", entity.javaClass.simpleName)
 
     @PostRemove
-    private fun fjernet(entity : NomEntityListener) = log.trace("Fjernet {} fra DB", entity.javaClass.simpleName)
+    private fun fjernet(entity : NomEntity) = log.trace("Fjernet {} fra DB", entity.javaClass.simpleName)
 
     @PostLoad
-    private fun lest(entity : NomEntityListener) = log.trace("Leste {} fra DB", entity.javaClass.simpleName)
+    private fun lest(entity : NomEntity) = log.trace("Leste {} fra DB", entity.javaClass.simpleName)
 
     companion object {
-        private val log = LoggerFactory.getLogger(NomEntityListener::class.java)
+        private val log = LoggerFactory.getLogger(NomEntity::class.java)
     }
 }

@@ -9,6 +9,6 @@ data class NomHendelse(
     val personident: String?,
     //@JsonProperty("navident")
     val navident: String?,
-    val startdato: LocalDate,
+    val startdato: LocalDate?,
     val sluttdato: LocalDate?
 )

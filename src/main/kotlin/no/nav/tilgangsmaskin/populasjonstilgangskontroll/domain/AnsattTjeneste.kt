@@ -34,7 +34,7 @@ class NomIgnoringAnsattTjeneste(private val entra: EntraTjeneste) :  AnsattOpera
     private val log = getLogger(NomIgnoringAnsattTjeneste::class.java)
     override fun ansatt(ansattId: AnsattId)  =
         with(entra.ansatt(ansattId)) {
-            Ansatt(null, AnsattIdentifikatorer(ansattId, oid, null), grupper).also {
+            Ansatt(null, AnsattIdentifikatorer(ansattId, oid), grupper).also {
                 log.trace("Ansatt er {}", it)
             }
         }

@@ -26,11 +26,13 @@ class NomVaktmester(private val nom: NomTjeneste, private val elector: LeaderEle
         if ((elector.erLeder)) {
             log.info("Vaktmester fjerner utgått informasjon")
             nom.ryddOpp().also {
-                log.info("Vaktmester fjernet $it rad(er) med utgått informasjon")
+                if (it > 0) {
+                    log.info("Vaktmester fjernet $it rad(er) med utgått informasjon")
+                }
             }
         }
         else {
-            log.info("Vaktmester er ikke leder")
+            log.trace("Vaktmester er ikke leder")
         }
     }
 }

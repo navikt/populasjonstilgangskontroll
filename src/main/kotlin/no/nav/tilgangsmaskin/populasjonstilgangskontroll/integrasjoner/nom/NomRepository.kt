@@ -8,6 +8,6 @@ interface NomRepository : JpaRepository<NomEntity, Long> {
   @Query("SELECT n.fnr FROM NomEntity n WHERE n.navid = :navId  AND n.gyldigtil IS NULL OR n.gyldigtil >= CURRENT_DATE")
   fun finnGyldigAnsattFnr(navId: String): String?
 
-  fun  deleteByGyldigtilBefore(before: Instant)
+  fun  deleteByGyldigtilBefore(before: Instant) : Int
   fun findByNavid(navId: String): NomEntity?
 }

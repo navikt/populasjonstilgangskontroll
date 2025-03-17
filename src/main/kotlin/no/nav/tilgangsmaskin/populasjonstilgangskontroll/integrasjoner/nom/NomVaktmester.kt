@@ -14,19 +14,20 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import java.net.InetAddress
 import java.net.URI
 import java.time.LocalDateTime
-import java.util.concurrent.TimeUnit.SECONDS
-
+import java.util.concurrent.TimeUnit.MINUTES
 
 @Component
 class NomVaktmester(private val nom: NomTjeneste, private val elector: LeaderElector) {
 
     private val log = getLogger(NomVaktmester::class.java)
 
-    @Scheduled(fixedRate = 60, timeUnit = SECONDS)
-    fun fjern() {
+    @Scheduled(fixedRate = 60, timeUnit = MINUTES)
+    fun ryddOpp() {
         if ((elector.erLeder)) {
-            log.info("Vaktmester fjerner gamle data")
-            nom.ryddOpp()
+            log.info("Vaktmester fjerner utgått informasjon")
+            nom.ryddOpp().also {
+                log.info("Vaktmester fjernet $it rad(er) med utgått informasjon")
+            }
         }
         else {
             log.info("Vaktmester er ikke leder")
@@ -39,9 +40,9 @@ class LeaderElector(private val client: LeaderElectionClientAdapter) {
     val erLeder get() = client.lederHostname() == InetAddress.getLocalHost().hostName
 }
 @Component
-class LeaderElectionClientAdapter(@Qualifier(NOM) client: RestClient, private val cf : LeaderElectionConfig, errorHandler: ErrorHandler) : AbstractRestClientAdapter(client, cf, errorHandler) {
-    fun lederHostname() = get<LeaderElectionResponse>(cf.baseUri).name
+class LeaderElectionClientAdapter(@Qualifier(NOM) client: RestClient, private val cf : LeaderElectorConfig, errorHandler: ErrorHandler) : AbstractRestClientAdapter(client, cf, errorHandler) {
+    fun lederHostname() = get<LeaderElectorRespons>(cf.baseUri).name
 }
-data class LeaderElectionResponse(val name: String, val last_update: LocalDateTime)
+data class LeaderElectorRespons(val name: String, val last_update: LocalDateTime)
 @Component
-class LeaderElectionConfig(@Value("\${elector.get.url}")  uri: URI): AbstractRestConfig(uri,"", isEnabled =true)
+class LeaderElectorConfig(@Value("\${elector.get.url}")  uri: URI): AbstractRestConfig(uri,"", isEnabled =true)

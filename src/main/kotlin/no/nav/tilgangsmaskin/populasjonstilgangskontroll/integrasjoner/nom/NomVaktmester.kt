@@ -24,7 +24,7 @@ class NomVaktmester(private val nom: NomTjeneste, private val elector: LeaderEle
 
     @Scheduled(fixedRate = 60, timeUnit = SECONDS)
     fun fjern() {
-        if ((elector.erLeder())) {
+        if ((elector.erLeder)) {
             log.info("Vaktmester fjerner gamle data")
             nom.ryddOpp()
         }
@@ -36,7 +36,7 @@ class NomVaktmester(private val nom: NomTjeneste, private val elector: LeaderEle
 
 @Service
 class LeaderElector(private val client: LeaderElectionClientAdapter) {
-    fun erLeder() = client.lederHostname() == InetAddress.getLocalHost().hostName
+    val erLeder get() = client.lederHostname() == InetAddress.getLocalHost().hostName
 }
 @Component
 class LeaderElectionClientAdapter(@Qualifier(NOM) client: RestClient, private val cf : LeaderElectionConfig, errorHandler: ErrorHandler) : AbstractRestClientAdapter(client, cf, errorHandler) {

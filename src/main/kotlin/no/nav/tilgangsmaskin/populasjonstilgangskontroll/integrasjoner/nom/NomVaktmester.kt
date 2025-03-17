@@ -46,3 +46,17 @@ class LeaderElectorClientAdapter(@Qualifier(NOM) client: RestClient, private val
 private data class LeaderElectorRespons(val name: String, val last_update: LocalDateTime)
 @Component
 class LeaderElectorConfig(@Value("\${elector.get.url}")  uri: URI): AbstractRestConfig(uri,"", isEnabled = true)
+
+
+/*
+@Service
+class SseService(private val webClient: WebClient.Builder) {
+
+    fun subscribeToSse(url: String): Flux<String> {
+        return webClient.build()
+            .get()
+            .uri(url)
+            .retrieve()
+            .bodyToFlux(String::class.java)
+    }
+}*/

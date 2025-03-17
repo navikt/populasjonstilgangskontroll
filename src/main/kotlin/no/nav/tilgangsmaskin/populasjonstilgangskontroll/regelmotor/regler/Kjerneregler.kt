@@ -28,7 +28,6 @@ class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Gl
 
 @Order(HIGHEST_PRECEDENCE + 3)
 @Component
-@ConditionalOnClusters([PROD_GCP, TEST, LOCAL])
 class EgneDataRegel : KjerneRegel {
     override fun test(ansatt: Ansatt, bruker: Bruker) = bruker.brukerId != ansatt.bruker?.brukerId
     override val metadata = RegelBeskrivelse("Egne data", AVVIST_EGNE_DATA)

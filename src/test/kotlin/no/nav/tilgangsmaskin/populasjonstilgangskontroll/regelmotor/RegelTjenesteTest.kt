@@ -6,7 +6,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestApp
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattOperasjoner
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.geoUtlandBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.strengtFortroligBruker
@@ -51,7 +51,7 @@ class RegelTjenesteTest {
     @MockK
     private lateinit var bruker: BrukerTjeneste
     @MockK
-    private lateinit var ansatt: AnsattTjeneste
+    private lateinit var ansatt: AnsattOperasjoner
     @MockK
     private lateinit var overstyring: OverstyringTjeneste
 

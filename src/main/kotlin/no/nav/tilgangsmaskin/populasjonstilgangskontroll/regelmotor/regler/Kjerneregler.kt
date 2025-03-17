@@ -1,11 +1,10 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
-import no.nav.boot.conditionals.Cluster.*
-import no.nav.boot.conditionals.ConditionalOnClusters
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AvvisningTekster.AVVIST_EGEN_FAMILIE
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AvvisningTekster.AVVIST_EGNE_DATA
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GlobalGruppe
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AvvisningTekster.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GlobalGruppe.EGEN_ANSATT_GRUPPE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GlobalGruppe.FORTROLIG_GRUPPE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.RegelBeskrivelse
@@ -13,7 +12,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
-import java.util.UUID
+import java.util.*
 
 @Component
 @Order(HIGHEST_PRECEDENCE)

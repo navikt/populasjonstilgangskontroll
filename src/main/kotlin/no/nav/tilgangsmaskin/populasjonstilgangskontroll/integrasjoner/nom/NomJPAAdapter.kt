@@ -1,11 +1,11 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId as AnsattFnr
 import org.springframework.stereotype.Component
 import java.time.Instant
-import java.time.Instant.*
+import java.time.Instant.now
 import java.time.LocalDate
 import java.time.ZoneId.systemDefault
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId as AnsattFnr
 
 @Component
 class NomJPAAdapter(private val repo: NomRepository) {

@@ -8,7 +8,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming
 import org.springframework.core.NestedExceptionUtils
 import org.springframework.retry.ExhaustedRetryException
 import org.springframework.retry.annotation.Recover
-import kotlin.arrayOf
 
 @RetryingOnRecoverableCacheableService(cacheNames = [SKJERMING])
 @Timed

@@ -1,12 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 
-import jakarta.persistence.PostLoad
-import jakarta.persistence.PostPersist
-import jakarta.persistence.PostRemove
-import jakarta.persistence.PostUpdate
-import jakarta.persistence.PrePersist
-import jakarta.persistence.PreRemove
-import jakarta.persistence.PreUpdate
+import jakarta.persistence.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component

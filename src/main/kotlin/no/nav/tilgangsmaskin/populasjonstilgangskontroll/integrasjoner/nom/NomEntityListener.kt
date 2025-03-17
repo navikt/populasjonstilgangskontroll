@@ -1,13 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 
-import jakarta.persistence.PostLoad
-import jakarta.persistence.PostPersist
-import jakarta.persistence.PostRemove
-import jakarta.persistence.PostUpdate
-import jakarta.persistence.PrePersist
-import jakarta.persistence.PreRemove
-import jakarta.persistence.PreUpdate
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
+import jakarta.persistence.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 

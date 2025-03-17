@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import java.time.LocalDate
 
 data class PdlPerson(val adressebeskyttelse: List<Adressebeskyttelse>, val folkeregisteridentifikator: List<Folkeregisteridentifikator>)  {
     @JsonIgnoreProperties(ignoreUnknown = true)

@@ -2,20 +2,11 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestApp
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelMotor
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.ukjentBostedBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligBruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligBrukerMedHistoriskIdent
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligHistoriskBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringEntityListener
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelBeanConfig
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
 import org.assertj.core.api.Assertions.assertThat

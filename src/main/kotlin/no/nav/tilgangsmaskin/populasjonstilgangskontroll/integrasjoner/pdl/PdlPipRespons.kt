@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AktørId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import java.time.LocalDate
 

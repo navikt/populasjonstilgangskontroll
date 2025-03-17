@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AvvisningTekster.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AvvisningTekster.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.RegelBeskrivelse
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE

@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AvvisningTekster
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
 import java.net.URI
 import java.util.function.BiPredicate
 

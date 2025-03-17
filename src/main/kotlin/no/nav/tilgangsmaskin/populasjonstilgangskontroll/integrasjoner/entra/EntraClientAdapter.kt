@@ -33,16 +33,6 @@ class  EntraClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
             it.value
         }.toList()
 
-    /*
-    fun grupperRaw(ansattId: String) =
-        generateSequence(get<EntraGrupperBolkAny>(cf.grupperURI(ansattId))) { bolk ->
-            bolk.next?.let {
-                get<EntraGrupperBolkAny>(it)
-            }
-        }
-
-     */
-
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class EntraSaksbehandlerRespons(@JsonProperty("value") val oids: List<MSGraphSaksbehandlerOids>)  {
         data class MSGraphSaksbehandlerOids(val id: UUID)

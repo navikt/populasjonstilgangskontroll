@@ -16,7 +16,7 @@ class Ansatt(val bruker: Bruker? = null,  val identifikatorer: AnsattIdentifikat
     val familieMedlemmer = bruker?.familieMedlemmer?.map { it.brukerId } ?: emptyList()
 
     fun kanBehandle(id: UUID) = grupper.any { it.id == id }
-    override fun toString() = "${javaClass.simpleName} [bruker=$bruker,,identifikatorer=$identifikatorer,grupper=$grupper]"
+    override fun toString() = "${javaClass.simpleName} [bruker=$bruker,identifikatorer=$identifikatorer,grupper=$grupper]"
 }
 
 @JvmInline

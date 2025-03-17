@@ -43,4 +43,7 @@ class RegelMotor(@Qualifier(KJERNE) val kjerne: RegelSett, @Qualifier(KOMPLETT) 
             KJERNE_REGELTYPE -> kjerne
             KOMPLETT_REGELTYPE -> komplett
         }
+
+    override fun toString() = "${javaClass.simpleName} [kjerneregler=$kjerne,kompletteregler=$komplett]"
+
 }

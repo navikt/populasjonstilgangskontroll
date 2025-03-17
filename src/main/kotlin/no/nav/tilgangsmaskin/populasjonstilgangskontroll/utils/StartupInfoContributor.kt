@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils
 
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett
 import org.springframework.boot.SpringBootVersion
 import org.springframework.boot.actuate.info.Info.Builder
 import org.springframework.boot.actuate.info.InfoContributor
@@ -12,7 +13,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Component
-class StartupInfoContributor(private val ctx : ConfigurableApplicationContext) : InfoContributor {
+class StartupInfoContributor(private val ctx : ConfigurableApplicationContext, vararg val regelsett: RegelSett) : InfoContributor {
 
     override fun contribute(builder : Builder) {
         with(ctx)    {
@@ -21,6 +22,7 @@ class StartupInfoContributor(private val ctx : ConfigurableApplicationContext) :
                 "Name" to environment.getProperty("spring.application.name"),
                 "Spring Boot version" to SpringBootVersion.getVersion(),
                 "Spring Framework version" to SpringVersion.getVersion()))
+                 regelsett.forEach { builder.withDetail(it.type.beskrivelse, it.regler.map { r -> r.javaClass.simpleName }) }
         }
     }
 

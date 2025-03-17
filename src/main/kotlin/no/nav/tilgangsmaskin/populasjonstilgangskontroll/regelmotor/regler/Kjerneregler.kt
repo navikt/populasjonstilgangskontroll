@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
+import no.nav.boot.conditionals.Cluster.*
+import no.nav.boot.conditionals.ConditionalOnClusters
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GlobalGruppe
@@ -26,6 +28,7 @@ class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Gl
 
 @Order(HIGHEST_PRECEDENCE + 3)
 @Component
+@ConditionalOnClusters([PROD_GCP, TEST, LOCAL])
 class EgneDataRegel : KjerneRegel {
     override fun test(ansatt: Ansatt, bruker: Bruker) = bruker.brukerId != ansatt.bruker?.brukerId
     override val metadata = RegelBeskrivelse("Egne data", AVVIST_EGNE_DATA)

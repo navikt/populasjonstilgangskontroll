@@ -7,7 +7,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(NOM)
 class NomConfig(val topic: String) {
 
-
     companion object {
         const val NOM = "nom"
     }

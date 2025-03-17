@@ -18,7 +18,6 @@ internal enum class Cluster(private val clusterName: String) {
     PROD_GCP_CLUSTER(PROD_GCP);
 
     companion object {
-
         private val current = (getenv(NAIS_CLUSTER_NAME) ?: LOCAL).let { e -> entries.first { it.clusterName == e } }
         val isProd = current == PROD_GCP_CLUSTER
         val profiler =

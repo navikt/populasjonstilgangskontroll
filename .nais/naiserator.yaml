@@ -7,6 +7,7 @@ metadata:
   name: populasjonstilgangskontroll
   namespace: tilgangsmaskin
 spec:
+  leaderElection: true
   kafka:
     pool: nav-{{nais.cluster.type}}
   gcp:

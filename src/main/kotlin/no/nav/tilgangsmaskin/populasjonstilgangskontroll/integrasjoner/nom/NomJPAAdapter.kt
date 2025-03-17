@@ -7,6 +7,11 @@ import java.time.ZoneId
 
 @Component
 class NomJPAAdapter(private val repo: NomRepository) {
-    fun upsert(ansattId: String, fnr: String, slutt: LocalDate? = null) = repo.save(repo.findByNavid(ansattId)?.copy(fnr = fnr, gyldigtil = slutt?.toInstant()) ?: NomEntity(ansattId, fnr, slutt?.toInstant()))
-    fun fnrForAnsatt(navId: String) = repo.findByNavid(navId)?.fnr
+
+    fun upsert(ansattId: String, fnr: String, slutt: LocalDate? = null) =
+         repo.save(repo.findByNavid(ansattId)?.apply {
+            this.fnr = fnr
+            gyldigtil = slutt?.toInstant()
+        } ?: NomEntity(ansattId, fnr, slutt?.toInstant()))
+    fun fnrForAnsatt(navId: String) = repo.finnGyldigFnr(navId)
     fun LocalDate.toInstant(): Instant = atStartOfDay(ZoneId.systemDefault()).toInstant()}

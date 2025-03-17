@@ -17,11 +17,11 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
        if (hendelse.navident != null && hendelse.personident != null) {
            log.info("Mottatt hendelse: {}", hendelse)
            runCatching {
-                nom.lagre(AnsattId(hendelse.navident), BrukerId(hendelse.personident))
+                nom.lagre(AnsattId(hendelse.navident), BrukerId(hendelse.personident), hendelse.sluttdato)
               }.onFailure {
                 log.error("Feil ved lagring av hendelse: {}", it.message, it)
               }.getOrNull()?.also {
-                log.info("Lagret hendelse med id: {}", it.id)
+                log.info("Lagret hendelse med id: {}", it)
            }
        } else log.warn("Mottatt hendelse uten forventede felter: {}", hendelse)
     }

@@ -29,7 +29,7 @@ import java.time.LocalDate
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-@DataJpaTest(showSql = true)
+@DataJpaTest
 @ContextConfiguration(classes = [RegelMotor::class,RegelBeanConfig::class,TestApp::class])
 @ExtendWith(MockKExtension::class)
 @EnableJpaAuditing

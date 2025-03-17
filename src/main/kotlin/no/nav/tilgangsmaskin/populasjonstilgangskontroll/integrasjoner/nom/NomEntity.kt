@@ -18,20 +18,22 @@ import java.time.Instant
     UniqueConstraint(name = "uc_ansattentity_navid", columnNames = ["navid"])
 ])
 @EntityListeners(AuditingEntityListener::class)
-class NomEntity(@Column(length = 7, nullable = false) val navid: String,
-                @Column(length = 11, nullable = false) val fnr: String,
-                @Column(nullable = true) val gyldigtil: Instant? = null)  {
+class NomEntity(
+    @Column(length = 7, nullable = false) val navid: String,
+    @Column(length = 11, nullable = false) var fnr: String,
+    @Column(nullable = true) var gyldigtil: Instant? = null)  {
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    val id : Long = 0
+    val id : Long? = null
     @CreatedDate
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     var created: Instant? = null
 
     @LastModifiedDate
     @Column(nullable = false)
     var updated: Instant? = null
 
-    fun copy(navid: String = this.navid, fnr: String = this.fnr, gyldigtil: Instant? = this.gyldigtil) =
+    fun copy(id: Long, navid: String = this.navid, fnr: String = this.fnr, gyldigtil: Instant? = this.gyldigtil) =
         NomEntity(navid, fnr, gyldigtil)
 }

@@ -19,9 +19,9 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
            runCatching {
                 nom.lagre(AnsattId(hendelse.navident), BrukerId(hendelse.personident), hendelse.sluttdato)
               }.onFailure {
-                log.error("Feil ved lagring av hendelse: {}", it.message, it)
+                log.error("Feil ved lagring av hendelse: {} for ${hendelse.navident}", it.message, it)
               }.getOrNull()?.also {
-                log.info("Lagret hendelse med id: {}", it)
+                log.info("Lagret hendelse med id: ${it.id} for ${hendelse.navident}")
            }
        } else log.warn("Mottatt hendelse uten forventede felter: {}", hendelse)
     }

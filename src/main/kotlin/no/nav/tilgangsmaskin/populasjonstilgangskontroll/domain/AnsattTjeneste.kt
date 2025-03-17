@@ -11,8 +11,7 @@ import org.springframework.stereotype.Service
 @Timed
 class AnsattTjeneste(private val entra: EntraTjeneste, private val nom: NomTjeneste, private val pdl: BrukerTjeneste) {
     private val log = LoggerFactory.getLogger(AnsattTjeneste::class.java)
-
-
+    
     fun ansatt(ansattId: AnsattId)  =
         runBlocking {
             val entra =  async { entra.ansatt(ansattId) }.await()

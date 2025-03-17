@@ -17,7 +17,7 @@ import java.time.Instant
 @Table(name = "ansatte",  uniqueConstraints = [
     UniqueConstraint(name = "uc_ansattentity_navid", columnNames = ["navid"])
 ])
-@EntityListeners(AuditingEntityListener::class)
+@EntityListeners(AuditingEntityListener::class, NomEntityListener::class)
 class NomEntity(
     @Column(length = 7, nullable = false) val navid: String,
     @Column(length = 11, nullable = false) var fnr: String,

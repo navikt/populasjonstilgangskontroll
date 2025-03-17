@@ -24,22 +24,23 @@ class NomVaktmester(private val nom: NomTjeneste, private val elector: LeaderEle
 
     @Scheduled(fixedRate = 60, timeUnit = SECONDS)
     fun fjern() {
-        val hostname: String = InetAddress.getLocalHost().hostName
-        log.info("Leader elector respons : ${elector.isLeader().name}, hostname: $hostname")
-        log.info("Vaktmester rydder opp")
-        nom.ryddOpp()
+        if ((elector.erLeder())) {
+            log.info("Vaktmester fjerner gamle data")
+            nom.ryddOpp()
+        }
+        else {
+            log.info("Vaktmester er ikke leder")
+        }
     }
 }
 
 @Service
 class LeaderElector(private val client: LeaderElectionClientAdapter) {
-    fun isLeader() = client.isLeader()
+    fun erLeder() = client.lederHostname() == InetAddress.getLocalHost().hostName
 }
 @Component
 class LeaderElectionClientAdapter(@Qualifier(NOM) client: RestClient, private val cf : LeaderElectionConfig, errorHandler: ErrorHandler) : AbstractRestClientAdapter(client, cf, errorHandler) {
-    fun isLeader() : LeaderElectionResponse {
-        return get<LeaderElectionResponse>(cf.baseUri)
-    }
+    fun lederHostname() = get<LeaderElectionResponse>(cf.baseUri).name
 }
 data class LeaderElectionResponse(val name: String, val last_update: LocalDateTime)
 @Component

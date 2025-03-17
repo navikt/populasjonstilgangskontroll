@@ -36,13 +36,13 @@ class NomVaktmester(private val nom: NomTjeneste, private val elector: LeaderEle
 }
 
 @Service
-class LeaderElector(private val client: LeaderElectionClientAdapter) {
+class LeaderElector(private val client: LeaderElectorClientAdapter) {
     val erLeder get() = client.lederHostname() == InetAddress.getLocalHost().hostName
 }
 @Component
-class LeaderElectionClientAdapter(@Qualifier(NOM) client: RestClient, private val cf : LeaderElectorConfig, errorHandler: ErrorHandler) : AbstractRestClientAdapter(client, cf, errorHandler) {
+class LeaderElectorClientAdapter(@Qualifier(NOM) client: RestClient, private val cf : LeaderElectorConfig, errorHandler: ErrorHandler) : AbstractRestClientAdapter(client, cf, errorHandler) {
     fun lederHostname() = get<LeaderElectorRespons>(cf.baseUri).name
 }
-data class LeaderElectorRespons(val name: String, val last_update: LocalDateTime)
+private data class LeaderElectorRespons(val name: String, val last_update: LocalDateTime)
 @Component
-class LeaderElectorConfig(@Value("\${elector.get.url}")  uri: URI): AbstractRestConfig(uri,"", isEnabled =true)
+class LeaderElectorConfig(@Value("\${elector.get.url}")  uri: URI): AbstractRestConfig(uri,"", isEnabled = true)

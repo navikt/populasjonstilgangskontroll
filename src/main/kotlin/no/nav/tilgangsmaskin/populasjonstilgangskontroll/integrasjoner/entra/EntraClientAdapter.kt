@@ -2,9 +2,11 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableRestException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
@@ -15,7 +17,12 @@ class  EntraClientAdapter(@Qualifier(GRAPH) restClient: RestClient,
                           val cf: EntraConfig,
                           errorHandler: ErrorHandler): AbstractRestClientAdapter(restClient,cf, errorHandler) {
 
-    fun oidFraEntra(ansattId: String) = get<EntraSaksbehandlerRespons>(cf.userURI(ansattId)).oids.single().id
+    fun oidFraEntra(ansattId: String) = get<EntraSaksbehandlerRespons>(cf.userURI(ansattId)).oids.let {
+        if (it.isEmpty()) {
+            throw IrrecoverableRestException(NOT_FOUND,cf.userURI(ansattId),"Fant ingen data for ansattId=$ansattId")
+        }
+        it.first().id
+    }
 
     fun grupper(ansattId: String) =
         generateSequence(get<EntraGrupperBolk>(cf.grupperURI(ansattId))) { bolk ->

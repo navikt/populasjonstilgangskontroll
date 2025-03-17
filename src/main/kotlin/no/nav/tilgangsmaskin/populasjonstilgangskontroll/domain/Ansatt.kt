@@ -5,14 +5,11 @@ import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.requireDigits
 import java.util.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId as AnsattFnr
+
 
 class Ansatt(val bruker: Bruker? = null,  val identifikatorer: AnsattIdentifikatorer, val grupper: List<EntraGruppe>) {
 
-
-    @JsonIgnore
-    val fnr = identifikatorer.fnr
-    @JsonIgnore
-    val oid = identifikatorer.oid
     @JsonIgnore
     val ansattId = identifikatorer.ansattId
     @JsonIgnore
@@ -33,7 +30,7 @@ value class AnsattId(@JsonValue val verdi: String) {
     }
 }
 
-data class AnsattIdentifikatorer(val ansattId: AnsattId, val oid: UUID, val fnr: BrukerId? = null)
+data class AnsattIdentifikatorer(val ansattId: AnsattId, val oid: UUID, val ansattFnr: AnsattFnr? = null)
 
 @JvmInline
 value class Enhetsnummer(@JsonValue val verdi: String) {

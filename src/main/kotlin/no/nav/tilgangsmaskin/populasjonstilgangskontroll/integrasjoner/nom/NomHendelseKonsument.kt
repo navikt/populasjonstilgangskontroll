@@ -8,7 +8,7 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 
 @Component
-@ConditionalOnNotProd
+//@ConditionalOnNotProd
 class NomHendelseKonsument(private val nom: NomTjeneste) {
 
     private val log = getLogger(NomHendelseKonsument::class.java)

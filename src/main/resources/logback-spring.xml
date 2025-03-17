@@ -31,6 +31,8 @@
             <Marker>CONFIDENTIAL</Marker>
             <OnMatch>DENY</OnMatch>
         </turboFilter>
+        <logger name="org.hibernate.SQL" level="debug"/>
+        <logger name="org.hibernate.orm.jdbc.bind" level="trace"/>
     </springProfile>
 
     <root level="info">

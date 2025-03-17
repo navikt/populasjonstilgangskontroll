@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
 
 import io.micrometer.core.annotation.Timed
 import kotlinx.coroutines.*
+import no.nav.boot.conditionals.Cluster.Companion.isDev
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomTjeneste
 import org.slf4j.LoggerFactory
@@ -16,9 +17,13 @@ class AnsattTjeneste(private val entra: EntraTjeneste, private val nom: NomTjene
         runBlocking {
             val entra =  async { entra.ansatt(ansattId) }.await()
             val ansattFnr =  async { nom.fnrForAnsatt(ansattId) }.await()
-            val  ansattBruker = ansattFnr?.let { pdl.bruker(it) }
-            Ansatt(ansattBruker, AnsattIdentifikatorer(ansattId,entra.oid,ansattFnr),entra.grupper).also {
+            Ansatt(ansattBruker(ansattId), AnsattIdentifikatorer(ansattId, entra.oid, ansattFnr), entra.grupper).also {
                 log.trace("Ansatt er {}", it)
             }
         }
+
+    private fun ansattBruker(ansattId: AnsattId) =
+        if (!isDev()) {
+            nom.fnrForAnsatt(ansattId)?.let { pdl.bruker(it) }
+        } else null
 }

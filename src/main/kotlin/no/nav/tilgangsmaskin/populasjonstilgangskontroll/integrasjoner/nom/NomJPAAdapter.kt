@@ -1,9 +1,10 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import org.springframework.stereotype.Component
 import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
+import java.time.ZoneId.systemDefault
 
 @Component
 class NomJPAAdapter(private val repo: NomRepository) {
@@ -13,5 +14,5 @@ class NomJPAAdapter(private val repo: NomRepository) {
             this.fnr = fnr
             gyldigtil = slutt?.toInstant()
         } ?: NomEntity(ansattId, fnr, slutt?.toInstant()))
-    fun fnrForAnsatt(navId: String) = repo.finnGyldigFnr(navId)
-    fun LocalDate.toInstant(): Instant = atStartOfDay(ZoneId.systemDefault()).toInstant()}
+    fun fnrForAnsatt(navId: String) = repo.finnGyldigFnr(navId)?.let { BrukerId(it.fnr) }
+    private fun LocalDate.toInstant(): Instant = atStartOfDay(systemDefault()).toInstant()}

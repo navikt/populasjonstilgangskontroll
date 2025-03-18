@@ -20,7 +20,7 @@ plugins {
     kotlin("plugin.spring") version "2.1.10"
     id("org.cyclonedx.bom") version "2.2.0"
     kotlin("plugin.jpa") version "1.9.25"
-    id("com.google.cloud.tools.jib") version "3.4.4"
+    id("com.google.cloud.tools.jib") version "3.4.5"
 
     // Apply the application plugin to add support for building a CLI application in Java.
     application

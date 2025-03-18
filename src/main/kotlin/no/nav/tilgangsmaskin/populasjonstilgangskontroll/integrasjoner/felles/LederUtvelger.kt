@@ -57,7 +57,7 @@ class SseSubscriber(private val sseService: SseService, @Value("\${elector.sse.u
     private final fun startSubscription() {
         val eventStream: Flux<LederUtvelgerRespons> = sseService.subscribe(uri)
         eventStream.subscribe { event ->
-            log.info("SSE Received event: $event")
+            log.info("SSE  event: $event")
             publisher.publish(event.name)
         }
     }

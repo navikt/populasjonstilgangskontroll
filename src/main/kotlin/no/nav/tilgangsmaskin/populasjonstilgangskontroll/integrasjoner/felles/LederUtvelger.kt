@@ -18,7 +18,7 @@ class LederUtvelger(private val webClient: Builder) :ApplicationListener<LeaderC
     var erLeder : Boolean = false
 
     override fun onApplicationEvent(event: LeaderChangedEvent) {
-        erLeder = event.leader == hostname
+        erLeder = event.leder == hostname
     }
 
     fun start(uri: URI) =
@@ -47,5 +47,5 @@ class LeaderChangedEventPublisher(private val publisher: ApplicationEventPublish
     fun publish(leader: String) {
         publisher.publishEvent(LeaderChangedEvent(this,leader))
     }
-    class LeaderChangedEvent(source: Any, val leader: String) : ApplicationEvent(source)
+    class LeaderChangedEvent(source: Any, val leder: String) : ApplicationEvent(source)
 }

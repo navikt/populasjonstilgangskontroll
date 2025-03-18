@@ -21,7 +21,7 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
                    nom.lagre(it.first, it.second, startdato,sluttdato)
                }
               }.onFailure {
-                log.error("Kunne ikke lagre hendelse: for $navident/${personident.mask()} ${it.message}", it)
+                log.error("Kunne ikke lagre fødselsnummer ${personident.mask()} for $navident (${it.message})", it)
               }.onSuccess {
                 log.info("Lagret fødselsnummer ${personident.mask()} for $navident OK")
            }

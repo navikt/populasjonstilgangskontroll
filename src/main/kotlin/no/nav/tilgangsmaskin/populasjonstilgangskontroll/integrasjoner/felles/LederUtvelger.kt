@@ -12,7 +12,7 @@ import java.net.URI
 import java.time.LocalDateTime
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.LeaderChangedEventPublisher.LeaderChangedEvent
 @Service
-class LederUtvelger(private val webClient: Builder) :ApplicationListener<LeaderChangedEvent> {
+class LederUtvelger(private val builder: Builder) :ApplicationListener<LeaderChangedEvent> {
 
     private val hostname = InetAddress.getLocalHost().hostName
     var erLeder : Boolean = false
@@ -22,7 +22,7 @@ class LederUtvelger(private val webClient: Builder) :ApplicationListener<LeaderC
     }
 
     fun start(uri: URI) =
-         webClient.build()
+        builder.build()
             .get()
             .uri(uri)
             .retrieve()
@@ -33,7 +33,7 @@ class LederUtvelger(private val webClient: Builder) :ApplicationListener<LeaderC
 
 
 @Component
-private class SSESubscriber(private val utvelger: LederUtvelger, @Value("\${elector.sse.url}") private val uri: URI, val publisher: LeaderChangedEventPublisher) {
+private class SSESubscriber(private val utvelger: LederUtvelger, @Value("\${elector.sse.url}") private val uri: URI, private val publisher: LeaderChangedEventPublisher) {
     init {
         utvelger.start(uri).subscribe {
             publisher.publish(it.name)

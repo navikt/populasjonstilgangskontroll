@@ -9,10 +9,7 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 
 @Component
-class NomHendelseKonsument(
-    private val nom: NomTjeneste,
-    annotationBeanConfigurerAspect: AnnotationBeanConfigurerAspect
-) {
+class NomHendelseKonsument(private val nom: NomTjeneste) {
 
     private final val annotationBeanConfigurerAspect: AnnotationBeanConfigurerAspect = TODO("initialize me")
     private val log = getLogger(NomHendelseKonsument::class.java)

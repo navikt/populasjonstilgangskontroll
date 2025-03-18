@@ -12,10 +12,11 @@ class NomJPAAdapter(private val repo: NomRepository) {
 
     fun ryddOpp() = repo.deleteByGyldigtilBefore(now())
 
-    fun upsert(ansattId: String, ansattFnr: String, slutt: LocalDate? = null) =
+    fun upsert(ansattId: String, ansattFnr: String, start: LocalDate? = null,slutt: LocalDate? = null) =
          repo.save(repo.findByNavid(ansattId)?.apply {
             this.fnr = fnr
+             startdato = start?.toInstant()
             gyldigtil = slutt?.toInstant()
-        } ?: NomEntity(ansattId, ansattFnr, slutt?.toInstant()))
+        } ?: NomEntity(ansattId, ansattFnr, start?.toInstant(),slutt?.toInstant()))
     fun fnrForAnsatt(ansattId: String) = repo.finnGyldigAnsattFnr(ansattId)?.let { AnsattFnr(it) }
     private fun LocalDate.toInstant(): Instant = atStartOfDay(systemDefault()).toInstant()}

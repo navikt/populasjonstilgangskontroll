@@ -15,6 +15,7 @@ import java.time.Instant
 class NomEntity(
     @Column(length = 7, nullable = false) val navid: String,
     @Column(length = 11, nullable = false) var fnr: String,
+    @Column(nullable = true) var startdato: Instant? = null,
     @Column(nullable = true) var gyldigtil: Instant? = null)  {
 
     @Id

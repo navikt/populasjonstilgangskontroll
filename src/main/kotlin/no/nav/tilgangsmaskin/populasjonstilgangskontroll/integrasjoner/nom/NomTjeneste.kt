@@ -12,7 +12,7 @@ import java.time.LocalDate
 @Timed
 class NomTjeneste(private val adapter: NomJPAAdapter) {
 
-    fun lagre(ansattId: AnsattId, fnr: BrukerId, sluttdato: LocalDate? = null) = adapter.upsert(ansattId.verdi, fnr.verdi, sluttdato)
+    fun lagre(ansattId: AnsattId, fnr: BrukerId, startdato: LocalDate? = null,sluttdato: LocalDate? = null) = adapter.upsert(ansattId.verdi, fnr.verdi, startdato, sluttdato)
 
     @Transactional(readOnly = true)
     fun fnrForAnsatt(ansattId: AnsattId) = adapter.fnrForAnsatt(ansattId.verdi)

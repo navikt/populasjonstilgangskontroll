@@ -17,9 +17,11 @@ class NomVaktmester(private val nom: NomTjeneste, private val lederUtvelger: Led
             log.info("Jeg er vaktmester og rydder opp")
             nom.ryddOpp().also {
                 if (it > 0) {
-                    log.info("Vaktmester fjernet $it rad(er) med utgått informasjon")
+                    log.info("Vaktmester ryddet opp $it rad(er) med utgått informasjon")
                 }
             }
+        } else {
+            log.info("Jeg er ikke vaktmester og kan ikke rydde opp")
         }
     }
 }

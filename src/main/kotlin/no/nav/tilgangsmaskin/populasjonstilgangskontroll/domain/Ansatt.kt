@@ -8,7 +8,7 @@ import java.util.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId as AnsattFnr
 
 
-class Ansatt(val bruker: Bruker? = null,  val identifikatorer: AnsattIdentifikatorer, val grupper: List<EntraGruppe>) {
+class Ansatt(val identifikatorer: AnsattIdentifikatorer, val grupper: List<EntraGruppe>, val bruker: Bruker? = null) {
 
     @JsonIgnore
     val ansattId = identifikatorer.ansattId

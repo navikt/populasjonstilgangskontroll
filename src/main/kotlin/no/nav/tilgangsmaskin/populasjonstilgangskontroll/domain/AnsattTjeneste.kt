@@ -22,7 +22,7 @@ class NomAwareAnsattTjeneste(private val entra: EntraTjeneste, private val nom: 
             val entra =  async { entra.ansatt(ansattId) }.await()
             val ansattFnr =  async { nom.fnrForAnsatt(ansattId) }.await()
             val ansattBruker = ansattFnr?.let { pdl.bruker(it) }
-            Ansatt(ansattBruker,AnsattIdentifikatorer(ansattId, entra.oid, ansattFnr), entra.grupper).also {
+            Ansatt(AnsattIdentifikatorer(ansattId, entra.oid, ansattFnr), entra.grupper, ansattBruker).also {
                 log.trace(CONFIDENTIAL,"Ansatt er {}", it)
             }
         }
@@ -35,7 +35,7 @@ class NomIgnoringAnsattTjeneste(private val entra: EntraTjeneste) :  AnsattOpera
     private val log = getLogger(NomIgnoringAnsattTjeneste::class.java)
     override fun ansatt(ansattId: AnsattId)  =
         with(entra.ansatt(ansattId)) {
-            Ansatt(null, AnsattIdentifikatorer(ansattId, oid), grupper).also {
+            Ansatt(AnsattIdentifikatorer(ansattId, oid), grupper, null).also {
                 log.trace(CONFIDENTIAL,"Ansatt er {}", it)
             }
         }

@@ -29,6 +29,4 @@ class NomEntity(
     @Column(nullable = false)
     var updated: Instant? = null
 
-    fun copy(id: Long, navid: String = this.navid, fnr: String = this.fnr, gyldigtil: Instant? = this.gyldigtil) =
-        NomEntity(navid, fnr, gyldigtil)
 }

@@ -13,7 +13,7 @@ class NomVaktmester(private val nom: NomTjeneste, private val lederUtvelger: Led
 
     @Scheduled(fixedRate = 60, timeUnit = SECONDS)
     fun ryddOpp() {
-        if ((lederUtvelger.erLeder)) {
+        if (lederUtvelger.erLeder) {
             log.info("Jeg er vaktmester og rydder opp")
             nom.ryddOpp().also {
                 if (it > 0) {

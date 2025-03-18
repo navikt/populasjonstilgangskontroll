@@ -11,7 +11,10 @@ object ObjectUtil {
         require(verdi.all { it.isDigit() }) { "Ugyldig(e) tegn i $verdi, forventet kun $len tall" }
     }
 
-    fun BrukerId.mask() = verdi.replaceRange(6,11, "*****")
+    fun BrukerId.mask() = verdi.mask()
+
+    fun String.mask() = replaceRange(6,11, "*****")
+
 
     private fun Duration.format(): String {
         val days = inWholeDays

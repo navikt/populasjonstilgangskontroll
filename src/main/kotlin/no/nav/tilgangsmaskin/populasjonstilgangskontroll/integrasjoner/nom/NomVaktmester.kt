@@ -1,13 +1,13 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.LeaderElector
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.LederUtvelger
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit.MINUTES
 
 @Component
-class NomVaktmester(private val nom: NomTjeneste, private val elector: LeaderElector) {
+class NomVaktmester(private val nom: NomTjeneste, private val elector: LederUtvelger) {
 
     private val log = getLogger(NomVaktmester::class.java)
 

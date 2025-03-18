@@ -9,13 +9,13 @@ import java.net.URI
 import java.time.LocalDateTime
 
 @Service
-class LeaderElector(private val adapter: LeaderElectorClientAdapter) {
+class LederUtvelger(private val adapter: LederUtvelgerClientAdapter) {
     val erLeder get() = adapter.leder() == InetAddress.getLocalHost().hostName
 }
 @Component
-class LeaderElectorClientAdapter(builder: Builder, cf : LeaderElectorConfig) : AbstractRestClientAdapter(builder.build(), cf) {
-    fun leder() = get<LeaderElectorRespons>(cfg.baseUri).name
+class LederUtvelgerClientAdapter(builder: Builder, cf : LederUtvelgerConfig) : AbstractRestClientAdapter(builder.build(), cf) {
+    fun leder() = get<LederUtvelgerRespons>(cfg.baseUri).name
 }
-private data class LeaderElectorRespons(val name: String, val last_update: LocalDateTime)
+private data class LederUtvelgerRespons(val name: String, val last_update: LocalDateTime)
 @Component
-class LeaderElectorConfig(@Value("\${elector.get.url}")  uri: URI): AbstractRestConfig(uri,"", isEnabled = true)
+class LederUtvelgerConfig(@Value("\${elector.get.url}")  base: URI): AbstractRestConfig(base)

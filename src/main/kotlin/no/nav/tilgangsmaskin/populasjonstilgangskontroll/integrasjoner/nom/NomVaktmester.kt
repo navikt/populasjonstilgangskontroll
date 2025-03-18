@@ -14,7 +14,7 @@ class NomVaktmester(private val nom: NomTjeneste, private val lederUtvelger: Led
     @Scheduled(fixedRate = 60, timeUnit = SECONDS)
     fun ryddOpp() {
         if ((lederUtvelger.erLeder)) {
-            log.info("Jeg er leder og rydder opp")
+            log.info("Jeg er vaktmester og rydder opp")
             nom.ryddOpp().also {
                 if (it > 0) {
                     log.info("Vaktmester fjernet $it rad(er) med utgått informasjon")

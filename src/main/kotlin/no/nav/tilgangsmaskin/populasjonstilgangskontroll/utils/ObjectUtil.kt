@@ -13,7 +13,7 @@ object ObjectUtil {
 
     fun BrukerId.mask() = verdi.mask()
 
-    fun String.mask() = replaceRange(6,11, "*****")
+    fun String.mask() = if (length == 11) replaceRange(6,11, "*****") else this
 
 
     private fun Duration.format(): String {

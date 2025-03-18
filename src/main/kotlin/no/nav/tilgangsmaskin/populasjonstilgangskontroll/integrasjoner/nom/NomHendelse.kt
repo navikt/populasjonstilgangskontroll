@@ -8,9 +8,9 @@ import java.time.LocalDate
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class NomHendelse(
     //@JsonProperty("personident")
-    val personident: BrukerId?,
+    val personident: BrukerId,
     //@JsonProperty("navident")
-    val navident: AnsattId?,
+    val navident: AnsattId,
     val startdato: LocalDate?,
     val sluttdato: LocalDate?
 )

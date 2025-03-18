@@ -18,10 +18,12 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.Le
 @Service
 class LederUtvelger(private val webClient: Builder) :ApplicationListener<LeaderChangedEvent> {
 
+    private val hostname = InetAddress.getLocalHost().hostName
+
     var erLeder : Boolean = false
 
     override fun onApplicationEvent(event: LeaderChangedEvent) {
-        erLeder = event.leader == InetAddress.getLocalHost().hostName
+        erLeder = event.leader == hostname
     }
 
     fun start(uri: URI) =

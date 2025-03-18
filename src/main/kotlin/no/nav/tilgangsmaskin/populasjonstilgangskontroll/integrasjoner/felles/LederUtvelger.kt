@@ -37,11 +37,8 @@ class LederUtvelger(private val webClient: Builder) :ApplicationListener<LeaderC
 
 
 @Component
-private class SseSubscriber(private val utvelger: LederUtvelger, @Value("\${elector.sse.url}") private val uri: URI, val publisher: LeaderChangedEventPublisher) {
+private class SSESubscriber(private val utvelger: LederUtvelger, @Value("\${elector.sse.url}") private val uri: URI, val publisher: LeaderChangedEventPublisher) {
     init {
-        start()
-    }
-    private final fun start() {
         utvelger.start(uri).subscribe {
             publisher.publish(it.name)
         }

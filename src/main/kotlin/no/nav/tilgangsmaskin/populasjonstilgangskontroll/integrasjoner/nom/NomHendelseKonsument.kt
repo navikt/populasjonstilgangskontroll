@@ -20,16 +20,11 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
                    nom.lagre(it.first, it.second, startdato,sluttdato)
                }
               }.onFailure {
-                log.error("Feil ved lagring av hendelse: {} for $navident", it.message, it)
-              }.getOrNull()?.also {
-                log.info("Lagret hendelse med id: ${it.id} for $navident")
+                log.error("Kunne ikke lagre hendelse: {} for $navident", it.message, it)
+              }.onSuccess {
+                log.info("Lagret fødselsnummer for $navident OK")
            }
         }
     }
-    private fun validate(ansattId: String, brukerId: String) =
-        runCatching {
-            Pair(AnsattId(ansattId),BrukerId(brukerId))
-        }.getOrNull().also {
-            log.warn("($ansattId/$brukerId) kunne ikke validwres")
-        }
+    private fun validate(ansattId: String, brukerId: String) = Pair(AnsattId(ansattId),BrukerId(brukerId))
 }

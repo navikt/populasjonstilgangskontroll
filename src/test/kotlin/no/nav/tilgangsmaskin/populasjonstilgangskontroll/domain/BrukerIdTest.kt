@@ -33,4 +33,9 @@ class BrukerIdTest {
     fun ikkeBareTall() {
         assertThrows<IllegalArgumentException> { BrukerId("1111111111a") }
     }
+
+    @Test
+    fun testIt()  {
+        BrukerId("03046029657")
+    }
 }

@@ -14,9 +14,9 @@ class NomJPAAdapter(private val repo: NomRepository) {
 
     fun upsert(ansattId: String, ansattFnr: String, start: LocalDate? = null,slutt: LocalDate? = null) =
          repo.save(repo.findByNavid(ansattId)?.apply {
-            this.fnr = fnr
+             this.fnr = fnr
              startdato = start?.toInstant()
-            gyldigtil = slutt?.toInstant()
+             gyldigtil = slutt?.toInstant()
         } ?: NomEntity(ansattId, ansattFnr, start?.toInstant(),slutt?.toInstant()))
     fun fnrForAnsatt(ansattId: String) = repo.finnGyldigAnsattFnr(ansattId)?.let { AnsattFnr(it) }
     private fun LocalDate.toInstant(): Instant = atStartOfDay(systemDefault()).toInstant()}

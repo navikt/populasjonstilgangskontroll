@@ -13,18 +13,16 @@ import java.time.LocalDateTime
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.LeaderChangedEventPublisher.LeaderChangedEvent
 
 
+
+
 @Service
-class LederUtvelger : ApplicationListener<LeaderChangedEvent> {
+class LederUtvelger(private val webClient: Builder) :ApplicationListener<LeaderChangedEvent> {
 
     var erLeder : Boolean = false
 
     override fun onApplicationEvent(event: LeaderChangedEvent) {
         erLeder = event.leader == InetAddress.getLocalHost().hostName
     }
-}
-
-@Service
-class SseService(private val webClient: Builder) {
 
     fun start(uri: URI) =
          webClient.build()
@@ -39,12 +37,12 @@ class SseService(private val webClient: Builder) {
 
 
 @Component
-private class SseSubscriber(private val sseService: SseService, @Value("\${elector.sse.url}") private val uri: URI, val publisher: LeaderChangedEventPublisher) {
+private class SseSubscriber(private val utvelger: LederUtvelger, @Value("\${elector.sse.url}") private val uri: URI, val publisher: LeaderChangedEventPublisher) {
     init {
         start()
     }
     private final fun start() {
-        sseService.start(uri).subscribe {
+        utvelger.start(uri).subscribe {
             publisher.publish(it.name)
         }
     }

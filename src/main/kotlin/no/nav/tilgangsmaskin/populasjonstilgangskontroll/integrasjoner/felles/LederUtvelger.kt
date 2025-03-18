@@ -20,7 +20,7 @@ class LederUtvelger(private val adapter: LederUtvelgerClientAdapter) {
 class LederUtvelgerClientAdapter(builder: Builder, cf : LederUtvelgerConfig) : AbstractRestClientAdapter(builder.build(), cf) {
     fun leder() = get<LederUtvelgerRespons>(cfg.baseUri).name
 }
-private data class LederUtvelgerRespons(val name: String, val last_update: LocalDateTime)
+data class LederUtvelgerRespons(val name: String, val last_update: LocalDateTime)
 @Component
 class LederUtvelgerConfig(@Value("\${elector.get.url}")  base: URI): AbstractRestConfig(base)
 
@@ -32,7 +32,7 @@ class SseService(private val webClient: WebClient.Builder) {
             .get()
             .uri(uri)
             .retrieve()
-            .bodyToFlux(Any::class.java)
+            .bodyToFlux(LederUtvelgerRespons::class.java)
 }
 
 
@@ -43,7 +43,7 @@ class SseSubscriber(private val sseService: SseService, @Value("\${elector.sse.u
     }
     private val log = getLogger(SseSubscriber::class.java)
     private final fun startSubscription() {
-        val eventStream: Flux<Any> = sseService.subscribe(uri)
+        val eventStream: Flux<LederUtvelgerRespons> = sseService.subscribe(uri)
         eventStream.subscribe { event ->
             log.info("SSE Received event: $event")
         }

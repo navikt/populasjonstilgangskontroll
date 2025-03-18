@@ -11,15 +11,10 @@ import java.net.InetAddress
 import java.net.URI
 import java.time.LocalDateTime
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.LeaderChangedEventPublisher.LeaderChangedEvent
-
-
-
-
 @Service
 class LederUtvelger(private val webClient: Builder) :ApplicationListener<LeaderChangedEvent> {
 
     private val hostname = InetAddress.getLocalHost().hostName
-
     var erLeder : Boolean = false
 
     override fun onApplicationEvent(event: LeaderChangedEvent) {
@@ -34,7 +29,6 @@ class LederUtvelger(private val webClient: Builder) :ApplicationListener<LeaderC
             .bodyToFlux(LederUtvelgerRespons::class.java)
 
     data class LederUtvelgerRespons(val name: String, val last_update: LocalDateTime)
-
 }
 
 
@@ -53,7 +47,5 @@ class LeaderChangedEventPublisher(private val publisher: ApplicationEventPublish
     fun publish(leader: String) {
         publisher.publishEvent(LeaderChangedEvent(this,leader))
     }
-
     class LeaderChangedEvent(source: Any, val leader: String) : ApplicationEvent(source)
 }
-

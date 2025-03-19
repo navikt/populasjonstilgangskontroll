@@ -51,7 +51,7 @@ class RegelMotor(@Qualifier(KJERNE) val kjerne: RegelSett, @Qualifier(KOMPLETT) 
 
     @Component
     @Counted
-    class RegelsettResultatHandler() {
+    class RegelsettResultatHandler {
         private val log = LoggerFactory.getLogger(javaClass)
         fun avvist(pos: String,ansattId: AnsattId, brukerId: BrukerId, regel: Regel) {
             log.warn("[#$pos] Tilgang avvist av regel '${regel.metadata.kortNavn}' (${regel.metadata.begrunnelse.årsak})")

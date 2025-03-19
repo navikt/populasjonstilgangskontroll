@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 
+import io.micrometer.core.annotation.Counted
 import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattOperasjoner
@@ -9,7 +10,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelMotor
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.diffFrom
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.diffFromNow
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.isBeforeNow
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CachePut
@@ -22,28 +24,19 @@ import java.time.Instant
 @Cacheable(OVERSTYRING)
 @Transactional
 @Timed
-class OverstyringTjeneste(private val ansatt: AnsattOperasjoner, private val bruker: BrukerTjeneste, private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor) {
+class OverstyringTjeneste(private val ansatt: AnsattOperasjoner, private val bruker: BrukerTjeneste, private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor, private val handler: OverstyringResultHandler = OverstyringResultHandler()) {
 
     private val log = getLogger(OverstyringTjeneste::class.java)
 
     @Transactional(readOnly = true)
-    fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId): Boolean {
-        val brukerIds = bruker.bruker(brukerId).historiskeIdentifikatorer.map { it.verdi }
-        val gjeldendeDato = adapter.gjeldendeOverstyringGyldighetDato(ansattId.verdi, brukerId.verdi, brukerIds)
-        return if (gjeldendeDato != null) {
-            val now = Instant.now()
-            if (gjeldendeDato.isBefore(now)) {
-                log.warn("Overstyring har gått ut på tid for ${now.diffFrom(gjeldendeDato)} siden for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
-                false
-            } else {
-                log.trace("Overstyring er gyldig i ${gjeldendeDato.diffFrom(now)} til for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
-                true
+    fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId) =
+        with(adapter.gjeldendeOverstyringGyldighetDato(ansattId.verdi, brukerId.verdi, bruker.bruker(brukerId).historiskeIdentifikatorer.map { it.verdi })) {
+            when {
+                this == null -> handler.none(ansattId, brukerId)
+                isBeforeNow() -> handler.expired(ansattId, brukerId, diffFromNow())
+                else -> handler.ok(ansattId, brukerId, diffFromNow())
             }
-        } else {
-            log.trace("Ingen overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}' ble funnet i databasen")
-            false
         }
-    }
 
     fun overstyr(ansattId: AnsattId,data: OverstyringData)  =
          runCatching {
@@ -54,7 +47,9 @@ class OverstyringTjeneste(private val ansatt: AnsattOperasjoner, private val bru
                 log.info("Overstyring for ansatt '${ansattId.verdi}' og bruker '${data.brukerId.mask()}' oppdatert i cache")
             }.getOrElse {
                 when (it) {
-                    is RegelException ->  throw RegelException(it,OVERSTYRING_MESSAGE_CODE,arrayOf(it.regel.metadata.kortNavn,ansattId.verdi,data.brukerId.verdi))
+                    is RegelException ->  throw RegelException(it,OVERSTYRING_MESSAGE_CODE,arrayOf(it.regel.metadata.kortNavn,ansattId.verdi,data.brukerId.verdi)).also {
+                        handler.avvist(ansattId,data.brukerId)
+                    }
                     else -> throw it
                 }
          }
@@ -63,5 +58,22 @@ class OverstyringTjeneste(private val ansatt: AnsattOperasjoner, private val bru
      fun refresh(ansattId: AnsattId, data: OverstyringData)  = Unit.also {
         log.info("Refresh cache overstyring for ansatt '${ansattId.verdi}' og bruker '${data.brukerId.mask()}'")
     }
+}
+
+@Component
+@Counted
+class OverstyringResultHandler {
+    private val log = getLogger(OverstyringResultHandler::class.java)
+    fun ok(ansattId: AnsattId, brukerId: BrukerId, diff: String) = true.also {
+        log.trace("Overstyring er gyldig i $diff til for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
+    }
+    fun expired(ansattId: AnsattId, brukerId: BrukerId, diff: String) = false.also {
+            log.warn("Overstyring har gått ut på tid for $diff siden for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
+        }
+    fun none(ansattId: AnsattId, brukerId: BrukerId) = false.also {
+        log.trace("Ingen overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}' ble funnet i databasen")
+    }
+    fun avvist(ansattId: AnsattId, brukerId: BrukerId) =
+        log.error("Overstyring er avvist av kjerneregler for '${ansattId.verdi}' og bruker '${brukerId.mask()})")
 }
 

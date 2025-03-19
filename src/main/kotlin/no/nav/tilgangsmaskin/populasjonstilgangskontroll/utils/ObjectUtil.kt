@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import java.time.Instant
+import java.time.Instant.now
 import kotlin.time.Duration
 import kotlin.time.toKotlinDuration
 
@@ -30,5 +31,7 @@ object ObjectUtil {
         }.trim()
     }
 
-    fun Instant.diffFrom(from: Instant) = java.time.Duration.between(from, this).toKotlinDuration().format()
+    fun Instant.isBeforeNow() = isBefore(now())
+    fun Instant.diffFromNow() = java.time.Duration.between(now(), this).toKotlinDuration().format()
+
 }

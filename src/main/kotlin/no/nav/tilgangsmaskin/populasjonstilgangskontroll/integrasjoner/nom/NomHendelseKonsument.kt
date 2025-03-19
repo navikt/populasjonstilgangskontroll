@@ -44,6 +44,6 @@ class SuccessHandler {
 class FailureHandler {
     private val log = getLogger(FailureHandler::class.java)
     fun handle(ansattId: String, brukerId: String, e: Throwable)  {
-        log.error("Kunne ikke lagre fødselsnummer ${brukerId.mask()} for $ansattId (${e.message})", e)
+        log.error("Kunne ikke lagre fødselsnummer $brukerId for $ansattId (${e.message})", e)
     }
 }

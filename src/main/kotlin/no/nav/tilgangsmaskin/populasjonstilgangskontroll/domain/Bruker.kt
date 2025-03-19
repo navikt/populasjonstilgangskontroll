@@ -14,7 +14,7 @@ class Bruker(
     val geoTilknytning: GeoTilknytning,
     val gruppeKrav: List<GlobalGruppe> = emptyList(),
     familie: Familie = INGEN,
-    val erDød: Boolean = false,
+    val erAvdød: Boolean = false,
     val historiskeIdentifikatorer: List<BrukerId> = emptyList()) {
 
     @JsonIgnore

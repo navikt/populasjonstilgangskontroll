@@ -18,7 +18,6 @@ import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import java.time.Instant
 
 @Component
 @Cacheable(OVERSTYRING)
@@ -32,9 +31,9 @@ class OverstyringTjeneste(private val ansatt: AnsattOperasjoner, private val bru
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId) =
         with(adapter.gjeldendeOverstyringGyldighetDato(ansattId.verdi, brukerId.verdi, bruker.bruker(brukerId).historiskeIdentifikatorer.map { it.verdi })) {
             when {
-                this == null -> handler.none(ansattId, brukerId)
-                isBeforeNow() -> handler.expired(ansattId, brukerId, diffFromNow())
-                else -> handler.ok(ansattId, brukerId, diffFromNow())
+                this == null -> handler.ingen(ansattId, brukerId)
+                isBeforeNow() -> handler.utgått(ansattId, brukerId, diffFromNow())
+                else -> handler.gyldig(ansattId, brukerId, diffFromNow())
             }
         }
 
@@ -64,13 +63,13 @@ class OverstyringTjeneste(private val ansatt: AnsattOperasjoner, private val bru
 @Counted
 class OverstyringResultHandler {
     private val log = getLogger(OverstyringResultHandler::class.java)
-    fun ok(ansattId: AnsattId, brukerId: BrukerId, diff: String) = true.also {
+    fun gyldig(ansattId: AnsattId, brukerId: BrukerId, diff: String) = true.also {
         log.trace("Overstyring er gyldig i $diff til for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
     }
-    fun expired(ansattId: AnsattId, brukerId: BrukerId, diff: String) = false.also {
+    fun utgått(ansattId: AnsattId, brukerId: BrukerId, diff: String) = false.also {
             log.warn("Overstyring har gått ut på tid for $diff siden for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
         }
-    fun none(ansattId: AnsattId, brukerId: BrukerId) = false.also {
+    fun ingen(ansattId: AnsattId, brukerId: BrukerId) = false.also {
         log.trace("Ingen overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}' ble funnet i databasen")
     }
     fun avvist(ansattId: AnsattId, brukerId: BrukerId) =

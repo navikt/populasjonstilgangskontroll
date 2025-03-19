@@ -24,7 +24,7 @@ class LederUtvelger :ApplicationListener<LeaderChangedEvent> {
 
 
 @Component
-class SSEHandler(private val builder: Builder, @Value("\${elector.sse.url}") private val uri: URI, val publisher: ApplicationEventPublisher) {
+class SSEHandler(builder: Builder, @Value("\${elector.sse.url}") uri: URI, publisher: ApplicationEventPublisher) {
     init {
         builder.build()
             .get()

@@ -57,10 +57,10 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
 
 @Component
 @Order(LOWEST_PRECEDENCE - 3)
-class AvdødBrukerRegel(val handler: AvdødHandler) : Regel {
+class AvdødBrukerRegel(private val handler: AvdødHandler) : Regel {
     override fun test(ansatt: Ansatt,bruker: Bruker) =
         if (bruker.erAvdød) {
-            handler.håndteravdødBruker(ansatt.ansattId,bruker.brukerId)
+            handler.håndterAvdødBruker(ansatt.ansattId,bruker.brukerId)
         } else true
 
     override val metadata = RegelBeskrivelse("Avdød bruker", AVVIST_AVDØD)
@@ -70,7 +70,7 @@ class AvdødBrukerRegel(val handler: AvdødHandler) : Regel {
 @Counted
 class AvdødHandler {
     private val log = LoggerFactory.getLogger(javaClass)
-    fun håndteravdødBruker(ansattId: AnsattId, brukerId: BrukerId)=
+    fun håndterAvdødBruker(ansattId: AnsattId, brukerId: BrukerId)=
         true.also {  // TODO Endre til false når vi faktisk skal håndtere døde
             log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere avdød bruker ${brukerId.mask()}")
         }

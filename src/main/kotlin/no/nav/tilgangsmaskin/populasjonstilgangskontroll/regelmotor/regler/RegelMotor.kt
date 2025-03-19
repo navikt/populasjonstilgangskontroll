@@ -19,9 +19,9 @@ class RegelMotor(@Qualifier(KJERNE) val kjerne: RegelSett, @Qualifier(KOMPLETT) 
     private val log = LoggerFactory.getLogger(javaClass)
 
     @Counted
-    fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = sjekkRegler(ansatt, bruker, komplett)
+    fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = sjekkRegler(ansatt, bruker, KOMPLETT_REGELTYPE)
     @Counted
-    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = sjekkRegler(ansatt, bruker, kjerne)
+    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = sjekkRegler(ansatt, bruker, KJERNE_REGELTYPE)
 
     fun sjekkRegler(ansatt: Ansatt, bruker: Bruker, type: RegelType) =
         sjekkRegler(ansatt, bruker, type.regelSett())

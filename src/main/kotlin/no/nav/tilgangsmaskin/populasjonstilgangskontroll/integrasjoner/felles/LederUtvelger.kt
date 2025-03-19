@@ -10,9 +10,9 @@ import org.springframework.web.reactive.function.client.WebClient.Builder
 import java.net.InetAddress
 import java.net.URI
 import java.time.LocalDateTime
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.LeaderChangedEventPublisher.LeaderChangedEvent
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.SSEHandler.LeaderChangedEvent
 @Service
-class LederUtvelger(private val builder: Builder) :ApplicationListener<LeaderChangedEvent> {
+class LederUtvelger :ApplicationListener<LeaderChangedEvent> {
 
     private val hostname = InetAddress.getLocalHost().hostName
     var erLeder : Boolean = false
@@ -20,32 +20,20 @@ class LederUtvelger(private val builder: Builder) :ApplicationListener<LeaderCha
     override fun onApplicationEvent(event: LeaderChangedEvent) {
         erLeder = event.leder == hostname
     }
+}
 
-    fun start(uri: URI) =
+
+@Component
+class SSEHandler(private val builder: Builder, @Value("\${elector.sse.url}") private val uri: URI, val publisher: ApplicationEventPublisher) {
+    init {
         builder.build()
             .get()
             .uri(uri)
             .retrieve()
-            .bodyToFlux(LederUtvelgerRespons::class.java)
-
-    data class LederUtvelgerRespons(val name: String, val last_update: LocalDateTime)
-}
-
-
-@Component
-private class SSESubscriber(private val utvelger: LederUtvelger, @Value("\${elector.sse.url}") private val uri: URI, private val publisher: LeaderChangedEventPublisher) {
-    init {
-        utvelger.start(uri).subscribe {
-            publisher.publish(it.name)
+            .bodyToFlux(LederUtvelgerRespons::class.java).subscribe {
+            publisher.publishEvent(LeaderChangedEvent(this,it.name))
         }
     }
-}
-
-@Component
-class LeaderChangedEventPublisher(private val publisher: ApplicationEventPublisher) {
-
-    fun publish(leader: String) {
-        publisher.publishEvent(LeaderChangedEvent(this,leader))
-    }
+    data class LederUtvelgerRespons(val name: String, val last_update: LocalDateTime)
     class LeaderChangedEvent(source: Any, val leder: String) : ApplicationEvent(source)
 }

@@ -18,7 +18,7 @@ enum class AvvisningTekster(val årsak: String) {
     AVVIST_GEOGRAFISK("Mangler tilgang til brukers geografiske adresse"),
     AVVIST_EGNE_DATA("Kan ikke slå opp egne data"),
     AVVIST_EGEN_FAMILIE("Kan ikke slå opp egen familie"),
-    AVVIST_VERGE("TODO"),
+    AVVIST_DØD("Bruker er død"),
     AVVIST_PERSON_UTLAND("Mangler tilgang til person i utlandet"),
     AVVIST_PERSON_UKJENT("Mangler tilgang til person uten kjent adresse")
 

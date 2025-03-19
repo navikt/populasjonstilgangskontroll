@@ -63,7 +63,7 @@ class DødBrukerRegel(val handler: DødsfallHandler) : Regel {
             handler.håndterDødBruker(ansatt.ansattId,bruker.brukerId)
         } else true
 
-    override val metadata = RegelBeskrivelse("Person bosatt utland", AVVIST_PERSON_UTLAND)
+    override val metadata = RegelBeskrivelse("Avdød bruker", AVVIST_DØD)
 }
 
 @Component
@@ -71,9 +71,8 @@ class DødBrukerRegel(val handler: DødsfallHandler) : Regel {
 class DødsfallHandler {
     private val log = LoggerFactory.getLogger(javaClass)
     fun håndterDødBruker(ansattId: AnsattId, brukerId: BrukerId)=
-        true.also {
+        true.also {  // TODO Endre til false når vi faktisk skal håndtere døde
             log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere død ${brukerId.mask()}")
-
         }
 }
 

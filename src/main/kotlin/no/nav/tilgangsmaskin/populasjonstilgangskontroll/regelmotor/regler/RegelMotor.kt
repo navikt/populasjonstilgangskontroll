@@ -10,12 +10,13 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett.RegelType
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett.RegelType.KOMPLETT_REGELTYPE
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 
 @Component
-class RegelMotor(@Qualifier(KJERNE) val kjerne: RegelSett, @Qualifier(KOMPLETT) private val komplett: RegelSett, private val handler: RegelAvvisningsHandler = RegelAvvisningsHandler())  {
+class RegelMotor(@Qualifier(KJERNE) val kjerne: RegelSett, @Qualifier(KOMPLETT) private val komplett: RegelSett, private val handler: RegelsettResultatHandler = RegelsettResultatHandler())  {
     private val log = LoggerFactory.getLogger(javaClass)
 
     @Counted
@@ -37,7 +38,7 @@ class RegelMotor(@Qualifier(KJERNE) val kjerne: RegelSett, @Qualifier(KOMPLETT) 
                     }
                 }
             }.also {
-                log.info("${type.beskrivelse.replaceFirstChar { it.uppercaseChar() }} ga tilgang OK for '${ansatt.ansattId.verdi}' og '${bruker.brukerId}'")
+                handler.ok(type, ansatt.ansattId, bruker.brukerId)
             }
     }
     private fun RegelType.regelSett() =
@@ -50,10 +51,13 @@ class RegelMotor(@Qualifier(KJERNE) val kjerne: RegelSett, @Qualifier(KOMPLETT) 
 
     @Component
     @Counted
-    class RegelAvvisningsHandler() {
+    class RegelsettResultatHandler() {
         private val log = LoggerFactory.getLogger(javaClass)
         fun avvist(pos: String,ansattId: AnsattId, brukerId: BrukerId, regel: Regel) {
             log.warn("[#$pos] Tilgang avvist av regel '${regel.metadata.kortNavn}' (${regel.metadata.begrunnelse.årsak})")
+        }
+        fun ok(type: RegelType, ansattId: AnsattId, brukerId: BrukerId) {
+            log.info("${type.beskrivelse.replaceFirstChar { it.uppercaseChar() }} ga tilgang OK for '$ansattId' og '${brukerId.mask()}'")
         }
     }
 }

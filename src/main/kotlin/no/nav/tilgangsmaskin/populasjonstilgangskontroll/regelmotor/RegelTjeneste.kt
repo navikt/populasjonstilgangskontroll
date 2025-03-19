@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service
 
 @Service
 @Timed
-class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: BrukerTjeneste, private val ansattTjeneste: AnsattOperasjoner, private val overstyringSjekker: OverstyringSjekker)  {
+class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: BrukerTjeneste, private val ansattTjeneste: AnsattOperasjoner, private val sjekker: OverstyringSjekker)  {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -24,7 +24,7 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: B
             runCatching {
                 motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), this)
             }.getOrElse {
-                overstyringSjekker.sjekk(ansattId, brukerId, historiskeIdentifikatorer, it)
+                sjekker.sjekk(ansattId, brukerId, historiskeIdentifikatorer, it)
             }
         }
 

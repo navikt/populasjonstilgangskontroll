@@ -2,7 +2,9 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
 import io.micrometer.core.annotation.Counted
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett.Companion.KJERNE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett.Companion.KOMPLETT
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett.RegelType
@@ -13,7 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 
 @Component
-class RegelMotor(@Qualifier(KJERNE) val kjerne: RegelSett, @Qualifier(KOMPLETT) private val komplett: RegelSett)  {
+class RegelMotor(@Qualifier(KJERNE) val kjerne: RegelSett, @Qualifier(KOMPLETT) private val komplett: RegelSett, private val handler: RegelAvvisningsHandler = RegelAvvisningsHandler())  {
     private val log = LoggerFactory.getLogger(javaClass)
 
     @Counted
@@ -31,7 +33,7 @@ class RegelMotor(@Qualifier(KJERNE) val kjerne: RegelSett, @Qualifier(KOMPLETT) 
                 log.trace("[${index.plus(1)}/${regelSett.size}] Sjekker regel: '${regel.metadata.kortNavn}' fra $beskrivelse for '${ansatt.ansattId.verdi}/${ansatt.bruker?.brukerId}'og '${bruker.brukerId}'")
                 if (!regel.test(ansatt,bruker)) {
                     throw RegelException(bruker.brukerId, ansatt.ansattId, regel).also {
-                        log.warn("[${index.plus(1)}/${regelSett.size}] Tilgang avvist av regel '${regel.metadata.kortNavn}' i '$beskrivelse' (${regel.metadata.begrunnelse.årsak})")
+                        handler.avvist("${index.plus(1)}/${regelSett.size}", ansatt.ansattId, bruker.brukerId, regel)
                     }
                 }
             }.also {
@@ -46,4 +48,12 @@ class RegelMotor(@Qualifier(KJERNE) val kjerne: RegelSett, @Qualifier(KOMPLETT) 
 
     override fun toString() = "${javaClass.simpleName} [kjerneregler=$kjerne,kompletteregler=$komplett]"
 
+    @Component
+    @Counted
+    class RegelAvvisningsHandler() {
+        private val log = LoggerFactory.getLogger(javaClass)
+        fun avvist(pos: String,ansattId: AnsattId, brukerId: BrukerId, regel: Regel) {
+            log.warn("[#$pos] Tilgang avvist av regel '${regel.metadata.kortNavn}' (${regel.metadata.begrunnelse.årsak})")
+        }
+    }
 }

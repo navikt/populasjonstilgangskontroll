@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
-import io.micrometer.core.annotation.Counted
+import io.micrometer.core.instrument.Counter
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AvvisningTekster.*
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
+import java.time.LocalDate
+import java.time.Period
 import java.util.*
 
 @Component
@@ -59,21 +62,38 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
 @Order(LOWEST_PRECEDENCE - 3)
 class AvdødBrukerRegel(private val handler: AvdødHandler) : Regel {
     override fun test(ansatt: Ansatt,bruker: Bruker) =
-        if (bruker.erAvdød) {
-            handler.håndterAvdødBruker(ansatt.ansattId,bruker.brukerId)
-        } else true
-
+        bruker.dødsdato?.let {
+            handler.håndterAvdødBruker(ansatt.ansattId, bruker.brukerId, it)
+        } ?: true
     override val metadata = RegelBeskrivelse("Avdød bruker", AVVIST_AVDØD)
 }
 
 @Component
-@Counted
-class AvdødHandler {
+class AvdødHandler(private val meterRegistry: MeterRegistry) {
+
+
+
     private val log = LoggerFactory.getLogger(javaClass)
-    fun håndterAvdødBruker(ansattId: AnsattId, brukerId: BrukerId)=
+    fun håndterAvdødBruker(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
         true.also {  // TODO Endre til false når vi faktisk skal håndtere døde
+
+            val counter = Counter.builder("dead.attempted.total")
+                .description("Number of deceased users attempted to be accessed")
+                .tag("",tag(dødsdato))
+                .register(meterRegistry)
+            counter.increment()
             log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere avdød bruker ${brukerId.mask()}")
         }
+
+    private fun tag(date: LocalDate): String {
+        val today = LocalDate.now()
+        return when (Period.between(date, today).months + Period.between(date, today).years * 12 + (if (date.dayOfMonth > today.dayOfMonth) 1 else 0)) {
+            in 0..6 -> "0-6"
+            in 7..12 -> "7-12"
+            in 13..24 -> "13-24"
+            else -> ">24"
+        }
+    }
 }
 
 

@@ -17,7 +17,7 @@ object PdlPipTilBrukerMapper {
 
     fun tilBruker(brukerId: BrukerId, respons: PdlPipRespons, erSkjermet: Boolean) =
         with(respons) {
-            Bruker(brukerId, tilGeoTilknytning(geografiskTilknytning), tilBeskyttelse(respons,erSkjermet), tilFamilie(person.familierelasjoner), erDød(person.doedsfall),tilHistoriskeBrukerIds(identer))
+            Bruker(brukerId, tilGeoTilknytning(geografiskTilknytning), tilBeskyttelse(respons,erSkjermet), tilFamilie(person.familierelasjoner), tilDødsdato(person.doedsfall),tilHistoriskeBrukerIds(identer))
         }
 
     private fun tilBeskyttelse(respons: PdlPipRespons, erSkjermet: Boolean) =
@@ -38,7 +38,7 @@ object PdlPipTilBrukerMapper {
             }
     }
 
-    private fun erDød(dødsfall: List<PdlPipDødsfall>) = dødsfall.isNotEmpty()
+    private fun tilDødsdato(dødsfall: List<PdlPipDødsfall>) = dødsfall.maxByOrNull {it.doedsdato }?.doedsdato
 
     private fun tilFamilie(relasjoner: List<PdlPipFamilierelasjon>) : Familie {
         val (foreldre, barn) = relasjoner

@@ -6,6 +6,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.PROD_GC
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.time.LocalDate
+import java.time.Period
 
 class BrukerIdTest {
 
@@ -36,6 +38,10 @@ class BrukerIdTest {
 
     @Test
     fun testIt()  {
-        BrukerId("03046029657")
+       println(måneder(LocalDate.now().minusYears(1)))
+        }
+    private fun måneder(date: LocalDate): Int {
+        val today = LocalDate.now()
+        return Period.between(date, today).months + Period.between(date, today).years * 12 + (if (date.dayOfMonth > today.dayOfMonth) 1 else 0)
     }
 }

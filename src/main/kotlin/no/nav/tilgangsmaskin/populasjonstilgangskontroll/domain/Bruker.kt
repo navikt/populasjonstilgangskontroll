@@ -8,13 +8,14 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.T
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Cluster.Companion.isProd
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.requireDigits
+import java.time.LocalDate
 
 class Bruker(
     val brukerId: BrukerId,
     val geoTilknytning: GeoTilknytning,
     val gruppeKrav: List<GlobalGruppe> = emptyList(),
     familie: Familie = INGEN,
-    val erAvdød: Boolean = false,
+    val dødsdato: LocalDate? = null,
     val historiskeIdentifikatorer: List<BrukerId> = emptyList()) {
 
     @JsonIgnore

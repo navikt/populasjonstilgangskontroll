@@ -19,6 +19,9 @@ class NomVaktmester(private val nom: NomTjeneste, private val lederUtvelger: Led
                 if (it > 0) {
                     log.info("Vaktmester ryddet opp $it rad(er) med utgått informasjon")
                 }
+                else {
+                    log.info("Vaktmester fant ingen utgått informasjon å rydde opp i")
+                }
             }
         } else {
             log.info("Jeg er ikke vaktmester og kan ikke rydde opp")

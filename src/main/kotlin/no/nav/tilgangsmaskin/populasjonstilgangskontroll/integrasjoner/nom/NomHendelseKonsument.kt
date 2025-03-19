@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 
 
+import io.micrometer.core.annotation.Counted
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
@@ -9,7 +10,7 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 
 @Component
-class NomHendelseKonsument(private val nom: NomTjeneste) {
+class NomHendelseKonsument(private val nom: NomTjeneste, private val successHandler: SuccessHandler,private val failureHandler: FailureHandler) {
 
     private val log = getLogger(NomHendelseKonsument::class.java)
     @KafkaListener(topics = ["#{'\${nom.topic}'}"])
@@ -21,11 +22,28 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
                    nom.lagre(it.first, it.second, startdato,sluttdato)
                }
               }.onFailure {
-                log.error("Kunne ikke lagre fødselsnummer ${personident.mask()} for $navident (${it.message})", it)
+                  failureHandler.handle(navident,personident,it)
               }.onSuccess {
-                log.info("Lagret fødselsnummer ${personident.mask()} for $navident OK")
+                 successHandler.handle(navident, personident)
            }
         }
     }
     private fun validate(ansattId: String, brukerId: String) = Pair(AnsattId(ansattId),BrukerId(brukerId))
+}
+
+@Component
+@Counted
+class SuccessHandler {
+    private val log = getLogger(SuccessHandler::class.java)
+    fun handle(ansattId: String, brukerId: String)  {
+        log.info("Lagret fødselsnummer ${brukerId.mask()} for $ansattId OK")
+    }
+}
+@Component
+@Counted
+class FailureHandler {
+    private val log = getLogger(FailureHandler::class.java)
+    fun handle(ansattId: String, brukerId: String, e: Throwable)  {
+        log.error("Kunne ikke lagre fødselsnummer ${brukerId.mask()} for $ansattId (${e.message})", e)
+    }
 }

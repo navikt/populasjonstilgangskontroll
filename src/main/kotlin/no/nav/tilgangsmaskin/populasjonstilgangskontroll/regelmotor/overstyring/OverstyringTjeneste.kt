@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional
 @Cacheable(OVERSTYRING)
 @Transactional
 @Timed
-class OverstyringTjeneste(private val ansatt: AnsattOperasjoner, private val bruker: BrukerTjeneste, private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor, private val handler: OverstyringResultHandler = OverstyringResultHandler()) {
+class OverstyringTjeneste(private val ansatt: AnsattOperasjoner, private val bruker: BrukerTjeneste, private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor, private val handler: OverstyringHandler = OverstyringHandler()) {
 
     private val log = getLogger(OverstyringTjeneste::class.java)
 
@@ -41,9 +41,10 @@ class OverstyringTjeneste(private val ansatt: AnsattOperasjoner, private val bru
          runCatching {
                 log.info("Sjekker kjerneregler før eventuell overstyring for ansatt '${ansattId.verdi}' og bruker '${data.brukerId.mask()}'")
                 motor.kjerneregler(ansatt.ansatt(ansattId), bruker.bruker(data.brukerId))
-                adapter.overstyr(ansattId.verdi, data)
-                refresh(ansattId,data)
-                log.info("Overstyring for ansatt '${ansattId.verdi}' og bruker '${data.brukerId.mask()}' oppdatert i cache")
+                adapter.overstyr(ansattId.verdi, data).also {
+                    handler.overstyrt(ansattId,data.brukerId)
+                    refresh(ansattId,data)
+                }
             }.getOrElse {
                 when (it) {
                     is RegelException ->  throw RegelException(it,OVERSTYRING_MESSAGE_CODE,arrayOf(it.regel.metadata.kortNavn,ansattId.verdi,data.brukerId.verdi)).also {
@@ -61,18 +62,21 @@ class OverstyringTjeneste(private val ansatt: AnsattOperasjoner, private val bru
 
 @Component
 @Counted
-class OverstyringResultHandler {
-    private val log = getLogger(OverstyringResultHandler::class.java)
+class OverstyringHandler {
+    private val log = getLogger(OverstyringHandler::class.java)
     fun gyldig(ansattId: AnsattId, brukerId: BrukerId, diff: String) = true.also {
         log.trace("Overstyring er gyldig i $diff til for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
     }
     fun utgått(ansattId: AnsattId, brukerId: BrukerId, diff: String) = false.also {
-            log.warn("Overstyring har gått ut på tid for $diff siden for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
-        }
+        log.warn("Overstyring har gått ut på tid for $diff siden for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
+    }
     fun ingen(ansattId: AnsattId, brukerId: BrukerId) = false.also {
         log.trace("Ingen overstyring for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}' ble funnet i databasen")
     }
     fun avvist(ansattId: AnsattId, brukerId: BrukerId) =
         log.error("Overstyring er avvist av kjerneregler for '${ansattId.verdi}' og bruker '${brukerId.mask()})")
+
+    fun overstyrt(ansattId: AnsattId, brukerId: BrukerId) =
+        log.info("Overstyring er gjort for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
 }
 

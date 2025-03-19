@@ -87,7 +87,8 @@ class AvdødHandler(private val meterRegistry: MeterRegistry) {
 
     private fun tag(date: LocalDate): String {
         val today = LocalDate.now()
-        return when (Period.between(date, today).months + Period.between(date, today).years * 12 + (if (date.dayOfMonth > today.dayOfMonth) 1 else 0)) {
+        val monthsBetween = Period.between(date, today).let { it.years * 12 + it.months } + if (today.dayOfMonth > date.dayOfMonth) 1 else 0
+        return when (monthsBetween) {
             in 0..6 -> "0-6"
             in 7..12 -> "7-12"
             in 13..24 -> "13-24"

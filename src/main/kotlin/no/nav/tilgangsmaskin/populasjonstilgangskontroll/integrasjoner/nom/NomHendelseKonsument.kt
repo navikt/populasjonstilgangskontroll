@@ -10,7 +10,7 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 
 @Component
-class NomHendelseKonsument(private val nom: NomTjeneste, private val successHandler: SuccessHandler,private val failureHandler: FailureHandler) {
+class NomHendelseKonsument(private val nom: NomTjeneste, private val handler: EventResultHandler) {
 
     private val log = getLogger(NomHendelseKonsument::class.java)
     @KafkaListener(topics = ["#{'\${nom.topic}'}"])
@@ -18,13 +18,13 @@ class NomHendelseKonsument(private val nom: NomTjeneste, private val successHand
         with(hendelse) {
            log.info("Mottatt hendelse: {}", this)
            runCatching {
-               validate(navident, personident).let {
+               validate(navident, personident).also {
                    nom.lagre(it.first, it.second, startdato,sluttdato)
                }
               }.onFailure {
-                  failureHandler.handle(navident,personident,it)
+               handler.handleFailure(navident,personident,it)
               }.onSuccess {
-                 successHandler.handle(navident, personident)
+               handler.handleOK(navident, personident)
            }
         }
     }
@@ -33,17 +33,12 @@ class NomHendelseKonsument(private val nom: NomTjeneste, private val successHand
 
 @Component
 @Counted
-class SuccessHandler {
-    private val log = getLogger(SuccessHandler::class.java)
-    fun handle(ansattId: String, brukerId: String)  {
+class EventResultHandler {
+    private val log = getLogger(EventResultHandler::class.java)
+    fun handleOK(ansattId: String, brukerId: String)  {
         log.info("Lagret fødselsnummer ${brukerId.mask()} for $ansattId OK")
     }
-}
-@Component
-@Counted
-class FailureHandler {
-    private val log = getLogger(FailureHandler::class.java)
-    fun handle(ansattId: String, brukerId: String, e: Throwable)  {
+    fun handleFailure(ansattId: String, brukerId: String, e: Throwable)  {
         log.error("Kunne ikke lagre fødselsnummer $brukerId for $ansattId (${e.message})", e)
     }
 }

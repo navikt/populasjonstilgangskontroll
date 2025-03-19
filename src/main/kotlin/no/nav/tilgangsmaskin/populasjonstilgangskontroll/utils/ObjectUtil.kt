@@ -7,8 +7,8 @@ import kotlin.time.toKotlinDuration
 
 object ObjectUtil {
     fun requireDigits(verdi: String, len: Int): Unit {
-        require(verdi.length == len){ "Ugyldig lengde ${verdi.length} for $verdi, forventet $len" }
-        require(verdi.all { it.isDigit() }) { "Ugyldig(e) tegn i $verdi, forventet kun $len tall" }
+        require(verdi.length == len){ "Ugyldig lengde ${verdi.length} for $verdi, forventet $len siffer" }
+        require(verdi.all { it.isDigit() }) { "Ugyldig(e) tegn i $verdi, forventet  $len siffer" }
     }
 
     fun BrukerId.mask() = verdi.mask()

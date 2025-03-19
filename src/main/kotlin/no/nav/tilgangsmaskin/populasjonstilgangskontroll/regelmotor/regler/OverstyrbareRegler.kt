@@ -71,15 +71,13 @@ class AvdødBrukerRegel(private val handler: AvdødHandler) : Regel {
 @Component
 class AvdødHandler(private val meterRegistry: MeterRegistry) {
 
-
-
     private val log = LoggerFactory.getLogger(javaClass)
     fun håndterAvdødBruker(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
         true.also {  // TODO Endre til false når vi faktisk skal håndtere døde
 
             val counter = Counter.builder("dead.attempted.total")
                 .description("Number of deceased users attempted to be accessed")
-                .tag("",tag(dødsdato))
+                .tag("months",tag(dødsdato))
                 .register(meterRegistry)
             counter.increment()
             log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere avdød bruker ${brukerId.mask()}")

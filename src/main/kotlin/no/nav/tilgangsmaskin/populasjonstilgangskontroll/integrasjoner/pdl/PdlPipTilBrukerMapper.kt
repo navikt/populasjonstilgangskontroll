@@ -8,6 +8,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPi
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipIdenter.PdlPipIdent.PdlPipIdentGruppe.FOLKEREGISTERIDENT
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipAdressebeskyttelse.PdlPipAdressebeskyttelseGradering.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipFamilierelasjon
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipDødsfall
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipFamilierelasjon.PdlPipFamilieRelasjonRolle
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipFamilierelasjon.PdlPipFamilieRelasjonRolle.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlTilBrukerMapper.tilGeoTilknytning
@@ -16,7 +17,7 @@ object PdlPipTilBrukerMapper {
 
     fun tilBruker(brukerId: BrukerId, respons: PdlPipRespons, erSkjermet: Boolean) =
         with(respons) {
-            Bruker(brukerId, tilGeoTilknytning(geografiskTilknytning), tilBeskyttelse(respons,erSkjermet), tilFamilie(person.familierelasjoner), tilHistoriskeBrukerIds(identer))
+            Bruker(brukerId, tilGeoTilknytning(geografiskTilknytning), tilBeskyttelse(respons,erSkjermet), tilFamilie(person.familierelasjoner), erDød(person.doedsfall),tilHistoriskeBrukerIds(identer))
         }
 
     private fun tilBeskyttelse(respons: PdlPipRespons, erSkjermet: Boolean) =
@@ -36,6 +37,8 @@ object PdlPipTilBrukerMapper {
                 add(EGEN_ANSATT_GRUPPE)
             }
     }
+
+    private fun erDød(dødsfall: List<PdlPipDødsfall>) = dødsfall.isNotEmpty()
 
     private fun tilFamilie(relasjoner: List<PdlPipFamilierelasjon>) : Familie {
         val (foreldre, barn) = relasjoner

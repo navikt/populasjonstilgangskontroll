@@ -15,7 +15,7 @@ class BrukerTjeneste(private val pdlTjeneste: PDLTjeneste,val egenAnsatt: Skjerm
     fun bruker(brukerId: BrukerId)  =
         run {
             val skjermet = egenAnsatt.erSkjermet(brukerId)
-            val pip = pdlTjeneste.person(brukerId)
-            tilBruker(brukerId, pip, skjermet)
+            val person = pdlTjeneste.person(brukerId)
+            tilBruker(brukerId, person, skjermet)
         }
 }

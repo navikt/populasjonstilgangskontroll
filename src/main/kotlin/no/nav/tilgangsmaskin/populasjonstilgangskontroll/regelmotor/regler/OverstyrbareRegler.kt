@@ -1,10 +1,15 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
+import io.micrometer.core.annotation.Counted
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AvvisningTekster.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.RegelBeskrivelse
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 import org.springframework.core.annotation.Order
@@ -48,6 +53,28 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
         } else true
 
     override val metadata = RegelBeskrivelse("Person bosatt utland", AVVIST_PERSON_UTLAND)
+}
+
+@Component
+@Order(LOWEST_PRECEDENCE - 3)
+class DødBrukerRegel(val handler: DødsfallHandler) : Regel {
+    override fun test(ansatt: Ansatt,bruker: Bruker) =
+        if (bruker.erDød) {
+            handler.håndterDødBruker(ansatt.ansattId,bruker.brukerId)
+        } else true
+
+    override val metadata = RegelBeskrivelse("Person bosatt utland", AVVIST_PERSON_UTLAND)
+}
+
+@Component
+@Counted
+class DødsfallHandler {
+    private val log = LoggerFactory.getLogger(javaClass)
+    fun håndterDødBruker(ansattId: AnsattId, brukerId: BrukerId)=
+        true.also {
+            log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere død ${brukerId.mask()}")
+
+        }
 }
 
 

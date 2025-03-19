@@ -13,7 +13,8 @@ class Bruker(
     val brukerId: BrukerId,
     val geoTilknytning: GeoTilknytning,
     val gruppeKrav: List<GlobalGruppe> = emptyList(),
-    val familie: Familie = INGEN,
+    familie: Familie = INGEN,
+    val erDød: Boolean = false,
     val historiskeIdentifikatorer: List<BrukerId> = emptyList()) {
 
     @JsonIgnore
@@ -22,13 +23,6 @@ class Bruker(
     fun kreverGlobalGruppe(gruppe: GlobalGruppe) = gruppe in gruppeKrav
 
     override fun toString() = "${javaClass.simpleName} [ident=$brukerId, geoTilknytning=$geoTilknytning,  gruppeKrav=$gruppeKrav,identifikatorer=$historiskeIdentifikatorer]"
-}
-
-@JvmInline
-value class AktørId(val verdi: String){
-    init {
-        requireDigits(verdi, 13)
-    }
 }
 
 @JvmInline

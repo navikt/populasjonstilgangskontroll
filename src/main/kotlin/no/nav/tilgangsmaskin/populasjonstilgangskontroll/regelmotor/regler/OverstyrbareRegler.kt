@@ -63,7 +63,7 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
 class AvdødBrukerRegel(private val teller: AvdødAksessTeller) : Regel {
     override fun test(ansatt: Ansatt,bruker: Bruker) =
         bruker.dødsdato?.let {
-            teller.tellAvdødBruker(ansatt.ansattId, bruker.brukerId, it)
+            teller.avdødBrukerAksess(ansatt.ansattId, bruker.brukerId, it)
         } ?: true
     override val metadata = RegelBeskrivelse("Avdød bruker", AVVIST_AVDØD)
 }
@@ -72,7 +72,7 @@ class AvdødBrukerRegel(private val teller: AvdødAksessTeller) : Regel {
 class AvdødAksessTeller(private val meterRegistry: MeterRegistry) {
 
     private val log = LoggerFactory.getLogger(javaClass)
-    fun tellAvdødBruker(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
+    fun avdødBrukerAksess(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
         true.also {  // TODO Endre til false når vi faktisk skal håndtere døde
             Counter.builder("dead.attempted.total")
                 .description("Number of deceased users attempted to be accessed")

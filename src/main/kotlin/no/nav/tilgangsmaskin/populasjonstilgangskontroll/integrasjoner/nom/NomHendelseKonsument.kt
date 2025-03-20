@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component
 class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler: EventResultHandler) {
 
     private val log = getLogger(NomHendelseKonsument::class.java)
-    @KafkaListener(topics = ["#{'\${nom.topic}'}"], batch = "true", filter = "fnrFilterStrategy")
+    @KafkaListener(topics = ["#{'\${nom.topic}'}"], concurrency = "5", batch = "true", filter = "fnrFilterStrategy")
     fun listen(hendelser: List<NomHendelse>) {
         log.info("Mottok ${hendelser.size} hendelser")
         hendelser.forEach { hendelse ->

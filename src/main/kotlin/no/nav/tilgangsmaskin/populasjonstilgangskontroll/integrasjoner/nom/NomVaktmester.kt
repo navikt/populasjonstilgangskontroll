@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit.SECONDS
 
 @Component
-class NomVaktmester(private val nom: NomTjeneste, private val lederUtvelger: LederUtvelger) {
+class NomVaktmester(private val nom: NomOperasjoner, private val lederUtvelger: LederUtvelger) {
 
     private val log = getLogger(NomVaktmester::class.java)
 

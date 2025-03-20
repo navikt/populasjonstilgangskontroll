@@ -1,6 +1,8 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 
 import io.micrometer.core.annotation.Timed
+import no.nav.boot.conditionals.ConditionalOnDev
+import no.nav.boot.conditionals.ConditionalOnNotDev
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import org.springframework.stereotype.Service
@@ -10,12 +12,24 @@ import java.time.LocalDate
 @Service
 @Transactional
 @Timed
-class NomTjeneste(private val adapter: NomJPAAdapter) {
+@ConditionalOnNotDev
+class NomTjeneste(private val adapter: NomJPAAdapter) : NomOperasjoner {
 
-    fun lagre(ansattId: AnsattId, fnr: BrukerId, startdato: LocalDate? = null,sluttdato: LocalDate? = null) = adapter.upsert(ansattId.verdi, fnr.verdi, startdato, sluttdato)
+    override fun lagre(ansattId: AnsattId, fnr: BrukerId, startdato: LocalDate?, sluttdato: LocalDate?) = adapter.upsert(ansattId.verdi, fnr.verdi, startdato, sluttdato)
 
     @Transactional(readOnly = true)
-    fun fnrForAnsatt(ansattId: AnsattId) = adapter.fnrForAnsatt(ansattId.verdi)
+    override fun fnrForAnsatt(ansattId: AnsattId) = adapter.fnrForAnsatt(ansattId.verdi)
 
-    fun ryddOpp() = adapter.ryddOpp()
+    override fun ryddOpp() = adapter.ryddOpp()
+}
+@ConditionalOnDev
+class NomDevTjeneste(adapter: NomJPAAdapter): NomTjeneste(adapter) {
+    override fun fnrForAnsatt(ansattId: AnsattId) = null
+}
+
+interface NomOperasjoner {
+
+    fun fnrForAnsatt(ansattId: AnsattId): BrukerId?
+    fun ryddOpp(): Int
+    fun lagre(ansattId: AnsattId, fnr: BrukerId, startdato: LocalDate? = null, sluttdato: LocalDate? = null): Long
 }

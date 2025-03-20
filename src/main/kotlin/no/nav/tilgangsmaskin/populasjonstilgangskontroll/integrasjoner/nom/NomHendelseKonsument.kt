@@ -10,7 +10,7 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 
 @Component
-class NomHendelseKonsument(private val nom: NomTjeneste, private val handler: EventResultHandler) {
+class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler: EventResultHandler) {
 
     private val log = getLogger(NomHendelseKonsument::class.java)
     @KafkaListener(topics = ["#{'\${nom.topic}'}"])

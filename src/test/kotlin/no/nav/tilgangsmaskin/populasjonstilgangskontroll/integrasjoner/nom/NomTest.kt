@@ -36,7 +36,7 @@ internal class NomTest {
     @MockkBean
     lateinit var accessor: TokenClaimsAccessor
 
-    lateinit var nom: NomTjeneste
+    lateinit var nom: NomOperasjoner
 
     @BeforeTest
     fun setup() {

@@ -5,7 +5,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestApp
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattOperasjoner
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelMotor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.ukjentBostedBruker
@@ -41,7 +41,7 @@ internal class OverstyringTest {
     @MockkBean
     lateinit var accessor: TokenClaimsAccessor
     @MockK
-    lateinit var ansattTjeneste: AnsattOperasjoner
+    lateinit var ansattTjeneste: AnsattTjeneste
     @MockK
     lateinit var brukerTjeneste: BrukerTjeneste
     @Autowired

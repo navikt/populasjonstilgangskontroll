@@ -17,6 +17,6 @@ class NomJPAAdapter(private val repo: NomRepository) {
              this.fnr = fnr
              startdato = start?.toInstant()
              gyldigtil = slutt?.toInstant()
-        } ?: NomEntity(ansattId, ansattFnr, start?.toInstant(),slutt?.toInstant()))
+        } ?: NomEntity(ansattId, ansattFnr, start?.toInstant(),slutt?.toInstant())).id!!
     fun fnrForAnsatt(ansattId: String) = repo.finnGyldigAnsattFnr(ansattId)?.let { AnsattFnr(it) }
     private fun LocalDate.toInstant(): Instant = atStartOfDay(systemDefault()).toInstant()}

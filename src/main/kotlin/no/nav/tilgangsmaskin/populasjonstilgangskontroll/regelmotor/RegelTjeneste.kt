@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor
 
 import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattOperasjoner
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringSjekker
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service
 
 @Service
 @Timed
-class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: BrukerTjeneste, private val ansattTjeneste: AnsattOperasjoner, private val sjekker: OverstyringSjekker)  {
+class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: BrukerTjeneste, private val ansattTjeneste: AnsattTjeneste, private val sjekker: OverstyringSjekker)  {
 
     private val log = LoggerFactory.getLogger(javaClass)
 

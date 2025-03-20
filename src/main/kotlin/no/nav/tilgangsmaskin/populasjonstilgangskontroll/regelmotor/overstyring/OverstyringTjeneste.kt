@@ -2,10 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 
 import io.micrometer.core.annotation.Counted
 import io.micrometer.core.annotation.Timed
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattOperasjoner
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringEntity.Companion.OVERSTYRING
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelException
@@ -23,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional
 @Cacheable(OVERSTYRING)
 @Transactional
 @Timed
-class OverstyringTjeneste(private val ansatt: AnsattOperasjoner, private val bruker: BrukerTjeneste, private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor, private val handler: OverstyringHandler = OverstyringHandler()) {
+class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker: BrukerTjeneste, private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor, private val handler: OverstyringHandler = OverstyringHandler()) {
 
     private val log = getLogger(OverstyringTjeneste::class.java)
 

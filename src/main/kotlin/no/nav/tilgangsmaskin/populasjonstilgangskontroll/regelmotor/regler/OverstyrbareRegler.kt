@@ -10,6 +10,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.RegelBeskrivelse
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.månederSidenNå
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
@@ -74,25 +75,20 @@ class AvdødHandler(private val meterRegistry: MeterRegistry) {
     private val log = LoggerFactory.getLogger(javaClass)
     fun håndterAvdødBruker(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
         true.also {  // TODO Endre til false når vi faktisk skal håndtere døde
-
-            val counter = Counter.builder("dead.attempted.total")
+            Counter.builder("dead.attempted.total")
                 .description("Number of deceased users attempted to be accessed")
                 .tag("months",tag(dødsdato))
-                .register(meterRegistry)
-            counter.increment()
+                .register(meterRegistry).increment()
             log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere avdød bruker ${brukerId.mask()}")
         }
 
-    private fun tag(date: LocalDate): String {
-        val today = LocalDate.now()
-        val monthsBetween = Period.between(date, today).let { it.years * 12 + it.months } + if (today.dayOfMonth > date.dayOfMonth) 1 else 0
-        return when (monthsBetween) {
+    private fun tag(dato: LocalDate) =
+        when (dato.månederSidenNå()) {
             in 0..6 -> "0-6"
             in 7..12 -> "7-12"
             in 13..24 -> "13-24"
             else -> ">24"
         }
-    }
 }
 
 

@@ -3,6 +3,8 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import java.time.Instant
 import java.time.Instant.now
+import java.time.LocalDate
+import java.time.Period
 import kotlin.time.Duration
 import kotlin.time.toKotlinDuration
 
@@ -16,6 +18,8 @@ object ObjectUtil {
 
     fun String.mask() = if (length == 11) replaceRange(6,11, "*****") else this
 
+
+    fun  LocalDate.månederSidenNå() = Period.between(this, LocalDate.now()).let { it.years * 12 + it.months } + if (LocalDate.now().dayOfMonth > dayOfMonth) 1 else 0
 
     private fun Duration.format(): String {
         val days = inWholeDays

@@ -14,17 +14,11 @@ class NomVaktmester(private val nom: NomOperasjoner, private val lederUtvelger: 
     @Scheduled(fixedRate = 60, timeUnit = SECONDS)
     fun ryddOpp() {
         if (lederUtvelger.erLeder) {
-            log.trace("Jeg er vaktmester og rydder opp")
             nom.ryddOpp().also {
                 if (it > 0) {
                     log.info("Vaktmester ryddet opp $it rad(er) med utgått informasjon om ansatte som ikke lenger jobber i Nav")
                 }
-                else {
-                    log.trace("Vaktmester fant ingen utgått informasjon å rydde opp i")
-                }
             }
-        } else {
-            log.trace("Jeg er ikke vaktmester og kan ikke rydde opp")
         }
     }
 }

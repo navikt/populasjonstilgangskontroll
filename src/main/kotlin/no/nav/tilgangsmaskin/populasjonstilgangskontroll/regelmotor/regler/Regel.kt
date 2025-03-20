@@ -14,7 +14,6 @@ interface Regel: BiPredicate<Ansatt,Bruker> {
         val TYPE_URI =  URI.create("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett")
         const val DETAIL_MESSAGE_CODE: String = "problemDetail.no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException.detail"
         const val OVERSTYRING_MESSAGE_CODE: String = "problemDetail.no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException.kjerneregler"
-
     }
 }
 interface KjerneRegel : Regel

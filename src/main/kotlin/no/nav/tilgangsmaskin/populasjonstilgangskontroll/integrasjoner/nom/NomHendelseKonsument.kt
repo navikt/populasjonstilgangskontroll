@@ -33,11 +33,10 @@ class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler:
 @Component
 class FnrFilterStrategy: RecordFilterStrategy<String, NomHendelse> {
     private val log = getLogger(FnrFilterStrategy::class.java)
-    val regexp = Regex("^(?!\\d{11}$).*$")
-    override fun filter(record: ConsumerRecord<String, NomHendelse>) = record.value().personident.matches(regexp).also {
+    override fun filter(record: ConsumerRecord<String, NomHendelse>) = skalFiltres(record.value().personident).also {
         if (it) log.warn("Ugyldig personident: ${record.value().personident} ble filtrert bort")
     }
-}
+    fun skalFiltres(ident: String) = runCatching { BrukerId(ident) }.isFailure
 
 @Component
 @Counted

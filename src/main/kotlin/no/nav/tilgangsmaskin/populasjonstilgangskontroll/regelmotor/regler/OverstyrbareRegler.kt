@@ -17,7 +17,6 @@ import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 import java.time.LocalDate
-import java.time.Period
 import java.util.*
 
 @Component
@@ -61,19 +60,19 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
 
 @Component
 @Order(LOWEST_PRECEDENCE - 3)
-class AvdødBrukerRegel(private val handler: AvdødHandler) : Regel {
+class AvdødBrukerRegel(private val teller: AvdødAksessTeller) : Regel {
     override fun test(ansatt: Ansatt,bruker: Bruker) =
         bruker.dødsdato?.let {
-            handler.håndterAvdødBruker(ansatt.ansattId, bruker.brukerId, it)
+            teller.tellAvdødBruker(ansatt.ansattId, bruker.brukerId, it)
         } ?: true
     override val metadata = RegelBeskrivelse("Avdød bruker", AVVIST_AVDØD)
 }
 
 @Component
-class AvdødHandler(private val meterRegistry: MeterRegistry) {
+class AvdødAksessTeller(private val meterRegistry: MeterRegistry) {
 
     private val log = LoggerFactory.getLogger(javaClass)
-    fun håndterAvdødBruker(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
+    fun tellAvdødBruker(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
         true.also {  // TODO Endre til false når vi faktisk skal håndtere døde
             Counter.builder("dead.attempted.total")
                 .description("Number of deceased users attempted to be accessed")

@@ -22,6 +22,9 @@ class NomTjeneste(private val adapter: NomJPAAdapter) : NomOperasjoner {
 
     override fun ryddOpp() = adapter.ryddOpp()
 }
+/**
+ * NOM har en rekke fødsesnummer i dev som ikke finnes i PDL
+ */
 @ConditionalOnDev
 class NomDevTjeneste(adapter: NomJPAAdapter): NomTjeneste(adapter) {
     override fun fnrForAnsatt(ansattId: AnsattId) = null

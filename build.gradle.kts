@@ -65,6 +65,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:8.0")
     implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("org.hibernate.orm:hibernate-micrometer")
     implementation("no.nav.boot:boot-conditionals:5.1.6")
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")

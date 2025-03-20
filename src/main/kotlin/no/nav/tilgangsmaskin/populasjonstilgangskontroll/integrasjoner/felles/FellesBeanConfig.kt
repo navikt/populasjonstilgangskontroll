@@ -71,10 +71,10 @@ class FellesBeanConfig : CachingConfigurer {
 
     override fun cacheManager()   =
         CaffeineCacheManager().apply {
-            this.setCaffeine(Caffeine.newBuilder()
+            setCaffeine(Caffeine.newBuilder()
                 .recordStats()
                 .removalListener {
-                    key, value, cause -> log.trace(CONFIDENTIAL,"Cache removal key={}, value={}, cause={}", key, value, cause) })
+                    key, value, cause -> log.trace("Cache removal key={}, value={}, cause={}", key, value, cause) })
         }
 }
 

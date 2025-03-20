@@ -14,6 +14,10 @@ management:
       base-path: /monitoring
 
 spring:
+  jpa:
+    properties:
+      hibernate:
+        generate_statistics: true
   application:
     name: populasjonstilgangskontroll
   kafka:

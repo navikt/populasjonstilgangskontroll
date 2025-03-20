@@ -39,6 +39,7 @@ object ObjectUtil {
         }.trim()
     }
 
+    fun String.pluralize(list: List<Any>) = if (list.size == 1 )  this else if (this.endsWith('e')) "${this}r" else "${this}er"
     fun Instant.isBeforeNow() = isBefore(now())
     fun Instant.diffFromNow() = java.time.Duration.between(now(), this).toKotlinDuration().format()
 

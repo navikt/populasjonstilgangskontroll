@@ -5,6 +5,7 @@ import io.micrometer.core.annotation.Counted
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.pluralize
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
@@ -17,7 +18,7 @@ class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler:
     private val log = getLogger(NomHendelseKonsument::class.java)
     @KafkaListener(topics = ["#{'\${nom.topic}'}"], concurrency = "5", batch = "true", filter = "fnrFilterStrategy")
     fun listen(hendelser: List<NomHendelse>) {
-        log.info("Mottok ${hendelser.size} hendelser")
+        log.info("Mottok ${hendelser.size}${"hendelse".pluralize(hendelser)}")
         hendelser.forEach {
             log.info("Behandler hendelse: {}", it)
             with(it) {
@@ -29,7 +30,7 @@ class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler:
                 )
             }
         }
-        log.info("${hendelser.size} hendelser ferdig behandlet")
+        log.info("${hendelser.size} ${"hendelse".pluralize(hendelser)} ferdig behandlet")
     }
 }
 

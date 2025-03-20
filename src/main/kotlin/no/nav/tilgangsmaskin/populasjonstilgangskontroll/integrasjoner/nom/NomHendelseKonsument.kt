@@ -18,14 +18,16 @@ class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler:
     @KafkaListener(topics = ["#{'\${nom.topic}'}"], concurrency = "5", batch = "true", filter = "fnrFilterStrategy")
     fun listen(hendelser: List<NomHendelse>) {
         log.info("Mottok ${hendelser.size} hendelser")
-        hendelser.forEach { hendelse ->
-            log.info("Behandler hendelse: {}", hendelse)
-            runCatching {
-                nom.lagre(AnsattId(hendelse.navident), BrukerId(hendelse.personident), hendelse.startdato, hendelse.sluttdato)
-            }.fold(
-                onSuccess = { handler.handleOK(hendelse.navident, hendelse.personident) },
-                onFailure = { handler.handleFailure(hendelse.navident, hendelse.personident, it) }
-            )
+        hendelser.forEach {
+            log.info("Behandler hendelse: {}", it)
+            with(it) {
+                runCatching {
+                    nom.lagre(AnsattId(navident), BrukerId(personident), startdato, sluttdato)
+                }.fold(
+                    onSuccess = { handler.handleOK(navident, personident) },
+                    onFailure = { handler.handleFailure(navident, personident, it) }
+                )
+            }
         }
         log.info("${hendelser.size} hendelser ferdig behandlet")
     }
@@ -34,10 +36,11 @@ class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler:
 @Component
 class FnrFilterStrategy: RecordFilterStrategy<String, NomHendelse> {
     private val log = getLogger(FnrFilterStrategy::class.java)
-    override fun filter(record: ConsumerRecord<String, NomHendelse>) = skalFiltres(record.value().personident).also {
-        if (it) log.warn("Ugyldig personident: ${record.value().personident} ble filtrert bort")
-    }
-    fun skalFiltres(ident: String) = runCatching { BrukerId(ident) }.isFailure
+    override fun filter(record: ConsumerRecord<String, NomHendelse>) =
+        runCatching { BrukerId(record.value().personident) }.isFailure.also {
+            if (it) log.warn("Ugyldig personident: ${record.value().personident} ble filtrert bort")
+        }
+
 }
 @Component
 @Counted

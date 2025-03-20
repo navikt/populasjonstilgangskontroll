@@ -37,7 +37,7 @@ class FnrFilterStrategy: RecordFilterStrategy<String, NomHendelse> {
         if (it) log.warn("Ugyldig personident: ${record.value().personident} ble filtrert bort")
     }
     fun skalFiltres(ident: String) = runCatching { BrukerId(ident) }.isFailure
-
+}
 @Component
 @Counted
 class EventResultHandler {

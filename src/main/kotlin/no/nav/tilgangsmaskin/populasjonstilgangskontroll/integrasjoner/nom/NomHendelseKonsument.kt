@@ -27,6 +27,7 @@ class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler:
                 onFailure = { handler.handleFailure(hendelse.navident, hendelse.personident, it) }
             )
         }
+        log.info("${hendelser.size} hendelser ferdig behandlet")
     }
 }
 

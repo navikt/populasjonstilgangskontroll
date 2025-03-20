@@ -21,7 +21,7 @@ object ObjectUtil {
 
     fun  LocalDate.månederSidenIdag() =
         LocalDate.now().let {
-            assert(this <= it) { "Datoen $this er etter dagens dato $it" }
+            assert(isBefore(it)) { "Datoen $this er ikke før dagens dato $it" }
             Period.between(this, it).let { it.years * 12 + it.months } + if (it.dayOfMonth > dayOfMonth) 1 else 0
         }
 

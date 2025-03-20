@@ -3,13 +3,13 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjermin
 import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.RecoverableRestException
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.RetryingOnRecoverableCacheableService
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.CacheableRetryingOnRecoverableService
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig.Companion.SKJERMING
 import org.springframework.core.NestedExceptionUtils
 import org.springframework.retry.ExhaustedRetryException
 import org.springframework.retry.annotation.Recover
 
-@RetryingOnRecoverableCacheableService(cacheNames = [SKJERMING])
+@CacheableRetryingOnRecoverableService(cacheNames = [SKJERMING])
 @Timed
 class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
 

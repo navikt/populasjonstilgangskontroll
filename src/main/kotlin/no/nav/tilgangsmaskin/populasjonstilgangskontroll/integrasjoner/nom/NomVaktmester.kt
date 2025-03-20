@@ -7,19 +7,18 @@ import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit.SECONDS
 
 @Component
-class NomVaktmester(private val nom: NomOperasjoner, private val lederUtvelger: LederUtvelger) {
+class NomVaktmester(private val nom: NomOperasjoner, private val utvelger: LederUtvelger) {
 
     private val log = getLogger(NomVaktmester::class.java)
 
     @Scheduled(fixedRate = 60, timeUnit = SECONDS)
-    fun ryddOpp() {
-        if (lederUtvelger.erLeder) {
+    fun ryddOpp() =
+        if (utvelger.erLeder) {
             nom.ryddOpp().also {
                 if (it > 0) {
                     log.info("Vaktmester ryddet opp $it rad(er) med utgått informasjon om ansatte som ikke lenger jobber i Nav")
                 }
             }
-        }
-    }
+        } else 0
 }
 

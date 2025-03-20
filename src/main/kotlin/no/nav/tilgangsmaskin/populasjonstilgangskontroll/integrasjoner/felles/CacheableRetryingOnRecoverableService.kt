@@ -20,7 +20,7 @@ import kotlin.reflect.KClass
 @Retryable
 @Service
 @Cacheable("set usage")
-annotation class RetryingOnRecoverableCacheableService(
+annotation class CacheableRetryingOnRecoverableService(
     @get:AliasFor(annotation = Retryable::class) val value: Array<KClass<out Throwable>> = [RecoverableRestException::class],
     @get:AliasFor(annotation = Retryable::class) val maxAttempts: Int = 3,
     @get:AliasFor(annotation = Cacheable::class) val cacheNames: Array<String> = [],

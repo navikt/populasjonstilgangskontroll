@@ -10,7 +10,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.RegelBeskrivelse
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.månederSidenNå
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.månederSidenIdag
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -84,7 +84,7 @@ class AvdødAksessTeller(private val meterRegistry: MeterRegistry, private val a
         }
 
     private fun intervallFor(dato: LocalDate) =
-        when (dato.månederSidenNå()) {
+        when (dato.månederSidenIdag()) {
             in 0..6 -> "0-6"
             in 7..12 -> "7-12"
             in 13..24 -> "13-24"

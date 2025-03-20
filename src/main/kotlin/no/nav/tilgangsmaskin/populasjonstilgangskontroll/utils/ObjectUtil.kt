@@ -19,7 +19,7 @@ object ObjectUtil {
     fun String.mask() = if (length == 11) replaceRange(6,11, "*****") else this
 
 
-    fun  LocalDate.månederSidenNå() =
+    fun  LocalDate.månederSidenIdag() =
         LocalDate.now().let {
             assert(this <= it) { "Datoen $this er etter dagens dato $it" }
             Period.between(this, it).let { it.years * 12 + it.months } + if (it.dayOfMonth > dayOfMonth) 1 else 0

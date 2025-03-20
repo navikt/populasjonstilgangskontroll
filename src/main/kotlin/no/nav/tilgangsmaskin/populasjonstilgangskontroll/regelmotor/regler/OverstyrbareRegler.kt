@@ -11,6 +11,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.RegelBeskrivelse
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.månederSidenNå
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
@@ -69,7 +70,7 @@ class AvdødBrukerRegel(private val teller: AvdødAksessTeller) : Regel {
 }
 
 @Component
-class AvdødAksessTeller(private val meterRegistry: MeterRegistry) {
+class AvdødAksessTeller(private val meterRegistry: MeterRegistry, private val accessor: TokenClaimsAccessor) {
 
     private val log = LoggerFactory.getLogger(javaClass)
     fun avdødBrukerAksess(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
@@ -77,8 +78,9 @@ class AvdødAksessTeller(private val meterRegistry: MeterRegistry) {
             Counter.builder("dead.attempted.total")
                 .description("Number of deceased users attempted to be accessed")
                 .tag("months",tag(dødsdato))
+                .tag("system",accessor.system)
                 .register(meterRegistry).increment()
-            log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere avdød bruker ${brukerId.mask()}")
+            log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere avdød bruker ${brukerId.mask()} fra ${accessor.system}")
         }
 
     private fun tag(dato: LocalDate) =

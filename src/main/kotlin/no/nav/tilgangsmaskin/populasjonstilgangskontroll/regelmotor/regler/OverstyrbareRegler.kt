@@ -76,14 +76,14 @@ class AvdødAksessTeller(private val meterRegistry: MeterRegistry, private val a
     fun avdødBrukerAksess(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
         true.also {  // TODO Endre til false når vi faktisk skal håndtere døde
             Counter.builder("dead.attempted.total")
-                .description("Number of deceased users attempted to be accessed")
-                .tag("months",tag(dødsdato))
+                .description("Number of deceased users attempted accessed")
+                .tag("months",intervallFor(dødsdato))
                 .tag("system",accessor.system)
                 .register(meterRegistry).increment()
             log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere avdød bruker ${brukerId.mask()} fra ${accessor.system}")
         }
 
-    private fun tag(dato: LocalDate) =
+    private fun intervallFor(dato: LocalDate) =
         when (dato.månederSidenNå()) {
             in 0..6 -> "0-6"
             in 7..12 -> "7-12"

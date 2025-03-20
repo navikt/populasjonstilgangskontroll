@@ -38,10 +38,7 @@ class BrukerIdTest {
 
     @Test
     fun testIt()  {
-       println(måneder(LocalDate.now().minusYears(1)))
-        }
-    private fun måneder(date: LocalDate): Int {
-        val today = LocalDate.now()
-        return Period.between(date, today).months + Period.between(date, today).years * 12 + (if (date.dayOfMonth > today.dayOfMonth) 1 else 0)
+        val regexp = Regex("^(?!\\d{11}$).*$")
+        println(regexp.matches("0301653632a"))
     }
 }

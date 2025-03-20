@@ -32,8 +32,8 @@ class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler:
 
 @Component
 class FnrFilterStrategy: RecordFilterStrategy<String, NomHendelse> {
-    private val ikke11Tall = Regex("(?!\\d{11})")
-    override fun filter(record: ConsumerRecord<String, NomHendelse>) = record.value().personident.matches(ikke11Tall)
+    val regexp = Regex("^(?!\\d{11}$).*$")
+    override fun filter(record: ConsumerRecord<String, NomHendelse>) = record.value().personident.matches(regexp)
 }
 
 @Component

@@ -5,22 +5,22 @@ import io.micrometer.core.annotation.Counted
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
+import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.kafka.listener.adapter.RecordFilterStrategy
 import org.springframework.stereotype.Component
 
 @Component
 class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler: EventResultHandler) {
 
     private val log = getLogger(NomHendelseKonsument::class.java)
-    @KafkaListener(topics = ["#{'\${nom.topic}'}"])
+    @KafkaListener(topics = ["#{'\${nom.topic}'}"], filter = "fnrFilterStrategy")
     fun listen(hendelse : NomHendelse) {
         with(hendelse) {
            log.info("Mottatt hendelse: {}", this)
            runCatching {
-               validate(navident, personident).also {
-                   nom.lagre(it.first, it.second, startdato,sluttdato)
-               }
+               nom.lagre(AnsattId(navident), BrukerId(personident), startdato, sluttdato)
               }.onFailure {
                handler.handleFailure(navident,personident,it)
               }.onSuccess {
@@ -28,7 +28,12 @@ class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler:
            }
         }
     }
-    private fun validate(ansattId: String, brukerId: String) = Pair(AnsattId(ansattId),BrukerId(brukerId))
+}
+
+@Component
+class FnrFilterStrategy: RecordFilterStrategy<String, NomHendelse> {
+    private val ikke11Tall = Regex("(?!\\d{11})")
+    override fun filter(record: ConsumerRecord<String, NomHendelse>) = record.value().personident.matches(ikke11Tall)
 }
 
 @Component
@@ -39,6 +44,6 @@ class EventResultHandler {
         log.info("Lagret fødselsnummer ${brukerId.mask()} for $ansattId OK")
     }
     fun handleFailure(ansattId: String, brukerId: String, e: Throwable)  {
-        log.error("Kunne ikke lagre fødselsnummer $brukerId for $ansattId (${e.message})", e)
+        log.error("Kunne ikke lagre fødselsnummer ${brukerId.mask()} for $ansattId (${e.message})", e)
     }
 }

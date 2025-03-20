@@ -19,7 +19,11 @@ object ObjectUtil {
     fun String.mask() = if (length == 11) replaceRange(6,11, "*****") else this
 
 
-    fun  LocalDate.månederSidenNå() = Period.between(this, LocalDate.now()).let { it.years * 12 + it.months } + if (LocalDate.now().dayOfMonth > dayOfMonth) 1 else 0
+    fun  LocalDate.månederSidenNå() =
+        LocalDate.now().let {
+            assert(this <= it) { "Datoen $this er etter dagens dato $it" }
+            Period.between(this, it).let { it.years * 12 + it.months } + if (it.dayOfMonth > dayOfMonth) 1 else 0
+        }
 
     private fun Duration.format(): String {
         val days = inWholeDays

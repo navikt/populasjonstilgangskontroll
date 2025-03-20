@@ -15,17 +15,17 @@ import org.springframework.stereotype.Component
 class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler: EventResultHandler) {
 
     private val log = getLogger(NomHendelseKonsument::class.java)
-    @KafkaListener(topics = ["#{'\${nom.topic}'}"], filter = "fnrFilterStrategy")
-    fun listen(hendelse : NomHendelse) {
-        with(hendelse) {
-           log.info("Mottatt hendelse: {}", this)
-           runCatching {
-               nom.lagre(AnsattId(navident), BrukerId(personident), startdato, sluttdato)
-              }.onFailure {
-               handler.handleFailure(navident,personident,it)
-              }.onSuccess {
-               handler.handleOK(navident, personident)
-           }
+    @KafkaListener(topics = ["#{'\${nom.topic}'}"], batch = "true", filter = "fnrFilterStrategy")
+    fun listen(hendelser: List<NomHendelse>) {
+        log.info("Mottok ${hendelser.size} hendelser")
+        hendelser.forEach { hendelse ->
+            log.info("Behandler hendelse: {}", hendelse)
+            runCatching {
+                nom.lagre(AnsattId(hendelse.navident), BrukerId(hendelse.personident), hendelse.startdato, hendelse.sluttdato)
+            }.fold(
+                onSuccess = { handler.handleOK(hendelse.navident, hendelse.personident) },
+                onFailure = { handler.handleFailure(hendelse.navident, hendelse.personident, it) }
+            )
         }
     }
 }

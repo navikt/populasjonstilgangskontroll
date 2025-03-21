@@ -9,6 +9,6 @@ import java.time.Instant
 interface NomRepository : JpaRepository<NomEntity, Long> {
   @Query("SELECT n.fnr FROM NomEntity n WHERE n.navid = :navId AND  n.gyldigtil >= CURRENT_DATE")
   fun ansattFødselsnummer(navId: String): String?
-  fun deleteByGyldigtilBefore(before: Instant) : Int
+  fun deleteByGyldigtilBefore(before: Instant = Instant.now()) : Int
   fun findByNavid(navId: String): NomEntity?
 }

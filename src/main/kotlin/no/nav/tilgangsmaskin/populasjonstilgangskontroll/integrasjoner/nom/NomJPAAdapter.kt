@@ -12,7 +12,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId as Ansa
 @Component
 class NomJPAAdapter(private val repo: NomRepository) {
 
-    fun ryddOpp() = repo.deleteByGyldigtilBefore(now())
+    fun ryddOpp() = repo.deleteByGyldigtilBefore()
 
     fun upsert(data: NomAnsattData) =
        with(data)  {
@@ -22,9 +22,11 @@ class NomJPAAdapter(private val repo: NomRepository) {
     private fun upsert(ansattId: AnsattId, ansattFnr: BrukerId, start: LocalDate, slutt: LocalDate) =
          repo.save(repo.findByNavid(ansattId.verdi)?.apply {
              this.fnr = fnr
+             updated = now()
              startdato = start.toInstant()
              gyldigtil = slutt.toInstant()
         } ?: NomEntity(ansattId.verdi, ansattFnr.verdi, start.toInstant(),slutt.toInstant())).id!!
+
     fun fnrForAnsatt(ansattId: String) = repo.ansattFødselsnummer(ansattId)?.let { AnsattFnr(it) }
 
 }

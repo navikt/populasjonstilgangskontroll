@@ -11,7 +11,9 @@ import java.time.Instant.MAX
 import java.time.LocalDate
 
 @Entity
-@Table(name = "ansatte",  uniqueConstraints = [
+@Table(name = "ansatte", indexes = [
+    Index(name = "idx_gyldig", columnList = "gyldigtil")
+],  uniqueConstraints = [
     UniqueConstraint(name = "uc_ansattentity_navid", columnNames = ["navid"])
 ])
 @EntityListeners(AuditingEntityListener::class, NomEntityListener::class)

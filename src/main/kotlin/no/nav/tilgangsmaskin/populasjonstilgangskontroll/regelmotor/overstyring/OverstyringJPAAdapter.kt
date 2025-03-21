@@ -9,7 +9,10 @@ import kotlin.time.toJavaDuration
 class OverstyringJPAAdapter(private val repository: OverstyringRepository)  {
 
     fun overstyr(ansattId: String, data: OverstyringData) =
-        repository.save(OverstyringEntity(ansattId, data.brukerId.verdi,data.begrunnelse,data.gyldigtil.atStartOfDay(systemDefault()).toInstant().plus(1.days.toJavaDuration())))
+        with(data)  {
+            repository.save(OverstyringEntity(ansattId,brukerId.verdi,begrunnelse,gyldigtil.atStartOfDay(systemDefault()).toInstant()))
+            Unit
+        }
 
-    fun gjeldendeOverstyringGyldighetDato(ansattId: String, brukerId: String, brukerIds: List<String>) = repository.finnGjeldendeOverstyring(ansattId, brukerId, brukerIds)?.expires
+    fun gjeldendeOverstyringGyldighetDato(ansattId: String, brukerId: String, brukerIds: List<String>) = repository.gjeldendeOverstyring(ansattId, brukerId, brukerIds)?.expires
 }

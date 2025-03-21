@@ -4,6 +4,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 import io.micrometer.core.annotation.Counted
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.DateRange
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.pluralize
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -11,6 +12,9 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.listener.adapter.RecordFilterStrategy
 import org.springframework.stereotype.Component
+import java.time.LocalDate
+import java.time.LocalDate.EPOCH
+import java.time.LocalDate.MAX
 
 @Component
 class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler: EventResultHandler) {
@@ -23,7 +27,7 @@ class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler:
             log.info("Behandler hendelse: {}", it)
             with(it) {
                 runCatching {
-                    nom.lagre(AnsattId(navident), BrukerId(personident), startdato, sluttdato)
+                    nom.lagre(NomAnsattData(AnsattId(navident), BrukerId(personident), DateRange(startdato?: EPOCH, sluttdato?: MAX)))
                 }.fold(
                     onSuccess = { handler.handleOK(navident, personident) },
                     onFailure = { handler.handleFailure(navident, personident, it) }
@@ -32,6 +36,7 @@ class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler:
         }
         log.info("${hendelser.size} ${"hendelse".pluralize(hendelser)} ferdig behandlet")
     }
+    data class NomAnsattData(val ansattId: AnsattId, val brukerId: BrukerId, val gyldighet: ClosedRange<LocalDate> = EPOCH..MAX)
 }
 
 @Component

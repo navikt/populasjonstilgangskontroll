@@ -9,6 +9,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.van
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringEntityListener
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomHendelseKonsument.NomAnsattData
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.DateRange
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.extension.ExtendWith
@@ -19,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalDate.now
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -29,6 +32,10 @@ import kotlin.test.Test
 @ActiveProfiles(TEST)
 @Transactional
 internal class NomTest {
+
+    private val IGÅR = DateRange(now().minusDays(1))
+    private val UTGÅTT = NomAnsattData(vanligAnsatt.ansattId, vanligBruker.brukerId, IGÅR)
+    private val GYLDIG = NomAnsattData(vanligAnsatt.ansattId, vanligBruker.brukerId)
 
     @Autowired
     lateinit var repo: NomRepository
@@ -47,21 +54,21 @@ internal class NomTest {
     @Test
     @DisplayName("Test utgått ansatt")
     fun ansattIkkeLengerAnsatt() {
-        nom.lagre(vanligAnsatt.ansattId, vanligBruker.brukerId, LocalDate.now().minusDays(1))
+        nom.lagre(UTGÅTT)
         assertThat(nom.fnrForAnsatt(vanligAnsatt.ansattId)).isNull()
     }
     @Test
     @DisplayName("Test ingen sluttdato ok")
     fun ingenSluttdato() {
-        nom.lagre(vanligAnsatt.ansattId, vanligBruker.brukerId)
-        assertThat(nom.fnrForAnsatt(vanligAnsatt.ansattId)).isEqualTo(vanligBruker.brukerId)
+        nom.lagre(GYLDIG)
+        assertThat(nom.fnrForAnsatt(vanligAnsatt.ansattId)).isEqualTo(GYLDIG.brukerId)
     }
     @Test
     @DisplayName("Test lagre, så oppdater, siste gjelder")
     fun oppdaterSamme() {
-        nom.lagre(vanligAnsatt.ansattId, vanligBruker.brukerId, LocalDate.now().minusDays(1))
+        nom.lagre(UTGÅTT)
         assertThat(nom.fnrForAnsatt(vanligAnsatt.ansattId)).isNull()
-        nom.lagre(vanligAnsatt.ansattId, vanligBruker.brukerId)
-        assertThat(nom.fnrForAnsatt(vanligAnsatt.ansattId)).isEqualTo(vanligBruker.brukerId)
+        nom.lagre(GYLDIG)
+        assertThat(nom.fnrForAnsatt(vanligAnsatt.ansattId)).isEqualTo(GYLDIG.brukerId)
     }
 }

@@ -4,6 +4,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import java.time.Instant
 import java.time.Instant.now
 import java.time.LocalDate
+import java.time.LocalDate.EPOCH
 import java.time.Period
 import kotlin.time.Duration
 import kotlin.time.toKotlinDuration
@@ -43,4 +44,7 @@ object ObjectUtil {
     fun Instant.isBeforeNow() = isBefore(now())
     fun Instant.diffFromNow() = java.time.Duration.between(now(), this).toKotlinDuration().format()
 
+}
+data class DateRange(override val start: LocalDate, override val endInclusive: LocalDate) : ClosedRange<LocalDate> {
+    constructor(endInclusive: LocalDate) : this(EPOCH, endInclusive)
 }

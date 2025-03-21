@@ -8,6 +8,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomHendelseKonsument.NomAnsattData
 
 @Service
 @Transactional
@@ -15,7 +16,7 @@ import java.time.LocalDate
 @ConditionalOnNotDev
 class NomTjeneste(private val adapter: NomJPAAdapter) : NomOperasjoner {
 
-    override fun lagre(ansattId: AnsattId, fnr: BrukerId, startdato: LocalDate?, sluttdato: LocalDate?) = adapter.upsert(ansattId.verdi, fnr.verdi, startdato, sluttdato)
+    override fun lagre(ansattData: NomAnsattData) = adapter.upsert(ansattData)
 
     @Transactional(readOnly = true)
     override fun fnrForAnsatt(ansattId: AnsattId) = adapter.fnrForAnsatt(ansattId.verdi)
@@ -34,5 +35,5 @@ interface NomOperasjoner {
 
     fun fnrForAnsatt(ansattId: AnsattId): BrukerId?
     fun ryddOpp(): Int
-    fun lagre(ansattId: AnsattId, fnr: BrukerId, startdato: LocalDate? = null, sluttdato: LocalDate? = null): Long
+    fun lagre(ansattData: NomAnsattData) : Long
 }

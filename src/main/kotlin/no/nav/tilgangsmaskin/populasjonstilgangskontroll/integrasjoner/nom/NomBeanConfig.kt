@@ -17,7 +17,7 @@ class NomBeanConfig {
             with(runCatching { BrukerId(record.value().personident) }) {
                 if (isFailure) {
                     true.also {
-                        log.warn("Ugyldig personident: ${record.value().personident} ble filtrert bort",exceptionOrNull()?.message)
+                        log.warn("Ugyldig personident: ${record.value().personident} ble filtrert bort ${exceptionOrNull()?.message}",exceptionOrNull())
                     }
                 } else false
             }

@@ -38,7 +38,7 @@ spring:
       key-store-password: ${kafka.credstore.password}
 
     consumer:
-      group-id: ${spring.application.name}-group10
+      group-id: ${spring.application.name}-group11
       key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:

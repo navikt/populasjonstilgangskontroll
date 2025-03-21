@@ -9,7 +9,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.van
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringEntityListener
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomHendelseKonsument.NomAnsattData
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomAnsattData.NomAnsattPeriode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.extension.ExtendWith

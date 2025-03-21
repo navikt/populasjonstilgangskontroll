@@ -2,8 +2,6 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 
 import org.springframework.stereotype.Component
 import java.time.ZoneId.systemDefault
-import kotlin.time.Duration.Companion.days
-import kotlin.time.toJavaDuration
 
 @Component
 class OverstyringJPAAdapter(private val repository: OverstyringRepository)  {
@@ -14,5 +12,5 @@ class OverstyringJPAAdapter(private val repository: OverstyringRepository)  {
             Unit
         }
 
-    fun gjeldendeOverstyringGyldighetDato(ansattId: String, brukerId: String, brukerIds: List<String>) = repository.gjeldendeOverstyring(ansattId, brukerId, brukerIds)?.expires
+    fun gjeldendeOverstyring(ansattId: String, brukerId: String, brukerIds: List<String>) = repository.gjeldendeOverstyring(ansattId, brukerId, brukerIds)?.expires
 }

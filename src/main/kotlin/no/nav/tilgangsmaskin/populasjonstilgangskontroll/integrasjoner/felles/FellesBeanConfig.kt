@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.github.benmanes.caffeine.cache.Caffeine
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties

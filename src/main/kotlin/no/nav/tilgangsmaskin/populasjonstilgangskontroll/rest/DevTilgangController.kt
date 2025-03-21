@@ -2,9 +2,12 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest
 
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomHendelseKonsument
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomJPAAdapter
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomHendelseKonsument.NomAnsattData
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.RegelTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringTjeneste
@@ -13,8 +16,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.DEV
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.web.bind.annotation.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomHendelseKonsument.NomAnsattData
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomTjeneste
 
 
 @UnprotectedRestController(value = ["/${DEV}"])

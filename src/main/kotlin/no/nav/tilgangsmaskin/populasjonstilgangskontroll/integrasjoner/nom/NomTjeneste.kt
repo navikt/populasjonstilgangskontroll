@@ -5,10 +5,9 @@ import no.nav.boot.conditionals.ConditionalOnDev
 import no.nav.boot.conditionals.ConditionalOnNotDev
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomHendelseKonsument.NomAnsattData
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomHendelseKonsument.NomAnsattData
 
 @Service
 @Transactional

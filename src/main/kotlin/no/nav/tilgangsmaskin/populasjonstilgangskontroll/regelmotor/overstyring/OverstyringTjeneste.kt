@@ -2,7 +2,10 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 
 import io.micrometer.core.annotation.Counted
 import io.micrometer.core.annotation.Timed
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringEntity.Companion.OVERSTYRING
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelException

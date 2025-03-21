@@ -4,7 +4,6 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 import io.micrometer.core.annotation.Counted
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.DateRange
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.pluralize
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -27,7 +26,7 @@ class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler:
             log.info("Behandler hendelse: {}", it)
             with(it) {
                 runCatching {
-                    nom.lagre(NomAnsattData(AnsattId(navident), BrukerId(personident), DateRange(startdato?: EPOCH, sluttdato?: LocalDate.now().plusYears(100))))
+                    nom.lagre(NomAnsattData(AnsattId(navident), BrukerId(personident), NomAnsattPeriode(startdato?: EPOCH, sluttdato?: LocalDate.now().plusYears(100))))
                 }.fold(
                     onSuccess = { handler.handleOK(navident, personident) },
                     onFailure = { handler.handleFailure(navident, personident, it) }

@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.SSEHandler.LeaderChangedEvent
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationEventPublisher
@@ -10,7 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient.Builder
 import java.net.InetAddress
 import java.net.URI
 import java.time.LocalDateTime
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.SSEHandler.LeaderChangedEvent
+
 @Service
 class LederUtvelger :ApplicationListener<LeaderChangedEvent> {
 

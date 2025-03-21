@@ -4,8 +4,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
 import java.time.Instant
 import java.time.Instant.now
 import java.time.LocalDate
-import java.time.LocalDate.EPOCH
 import java.time.Period
+import java.time.ZoneId.systemDefault
 import kotlin.time.Duration
 import kotlin.time.toKotlinDuration
 
@@ -26,6 +26,7 @@ object ObjectUtil {
             Period.between(this, it).let { it.years * 12 + it.months } + if (it.dayOfMonth > dayOfMonth) 1 else 0
         }
 
+
     private fun Duration.format(): String {
         val days = inWholeDays
         val hours = inWholeHours % 24
@@ -43,8 +44,5 @@ object ObjectUtil {
     fun String.pluralize(list: List<Any>) = if (list.size == 1 )  this else if (this.endsWith('e')) "${this}r" else "${this}er"
     fun Instant.isBeforeNow() = isBefore(now())
     fun Instant.diffFromNow() = java.time.Duration.between(now(), this).toKotlinDuration().format()
+    fun LocalDate.toInstant(): Instant = atStartOfDay(systemDefault()).toInstant()}
 
-}
-data class DateRange(override val start: LocalDate, override val endInclusive: LocalDate) : ClosedRange<LocalDate> {
-    constructor(endInclusive: LocalDate) : this(EPOCH, endInclusive)
-}

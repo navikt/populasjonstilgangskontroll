@@ -27,7 +27,7 @@ class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler:
             log.info("Behandler hendelse: {}", it)
             with(it) {
                 runCatching {
-                    nom.lagre(NomAnsattData(AnsattId(navident), BrukerId(personident), DateRange(startdato?: EPOCH, sluttdato?: MAX)))
+                    nom.lagre(NomAnsattData(AnsattId(navident), BrukerId(personident), DateRange(startdato?: EPOCH, sluttdato?: LocalDate.now().plusYears(100))))
                 }.fold(
                     onSuccess = { handler.handleOK(navident, personident) },
                     onFailure = { handler.handleFailure(navident, personident, it) }

@@ -14,10 +14,12 @@ class NomBeanConfig {
     @Bean
     fun fnrFilterStrategy(): RecordFilterStrategy<String, NomHendelse> =
         RecordFilterStrategy { record ->
-            runCatching { BrukerId(record.value().personident) }.isFailure.also {
-                if (it) {
-                    log.warn("Ugyldig personident: ${record.value().personident} ble filtrert bort")
-                }
+            with(runCatching { BrukerId(record.value().personident) }) {
+                if (isFailure) {
+                    true.also {
+                        log.warn("Ugyldig personident: ${record.value().personident} ble filtrert bort",exceptionOrNull()?.message)
+                    }
+                } else false
             }
         }
 }

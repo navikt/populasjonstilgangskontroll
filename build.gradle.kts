@@ -38,8 +38,6 @@ repositories {
     }
 }
 
-apply(plugin = "com.diffplug.spotless")
-
 configurations.all {
     resolutionStrategy {
         failOnNonReproducibleResolution()

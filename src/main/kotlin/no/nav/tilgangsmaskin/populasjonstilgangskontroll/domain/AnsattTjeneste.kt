@@ -19,7 +19,7 @@ class AnsattTjeneste(private val entra: EntraTjeneste, private val nom: NomOpera
             val entra =  async { entra.ansatt(ansattId) }.await()
             val ansattFnr =  async { nom.fnrForAnsatt(ansattId) }.await()
             val ansattBruker = ansattFnr?.let { pdl.bruker(it) }
-            Ansatt(AnsattIdentifikatorer(ansattId, entra.oid, ansattFnr), entra.grupper, ansattBruker).also {
+            Ansatt(Ansatt.AnsattIdentifikatorer(ansattId, entra.oid, ansattFnr), entra.grupper, ansattBruker).also {
                 log.trace(CONFIDENTIAL,"Ansatt er {}", it)
             }
         }

@@ -28,15 +28,6 @@ class Bruker(
 
 @JvmInline
 value class BrukerId(@JsonValue val verdi: String) {
-
-    enum class Type { DNR, FNR, TENOR }
-
-    fun type() = when (verdi[0]) {
-        '8', '9' -> Type.TENOR
-        '4', '5' -> Type.DNR
-        else -> Type.FNR
-    }
-
     init {
         with(verdi) {
             requireDigits(this, 11)

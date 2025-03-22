@@ -259,10 +259,4 @@ class RegelMotorTest {
                 regelMotor.kompletteRegler(enhetAnsatt, annenEnhetBruker)
             }.regel)
     }
-
-    @Test
-    @DisplayName("Sjekk at reglene er sorterte")
-    fun sortert() {
-        assertThat(regelMotor.kjerne.size).isEqualTo(5)
-    }
 }

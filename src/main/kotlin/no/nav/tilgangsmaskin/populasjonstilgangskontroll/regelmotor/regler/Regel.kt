@@ -17,3 +17,4 @@ interface Regel: BiPredicate<Ansatt,Bruker> {
     }
 }
 interface KjerneRegel : Regel
+interface OverstyrbarRegel : Regel

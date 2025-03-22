@@ -22,7 +22,7 @@ import java.util.*
 
 @Component
 @Order(LOWEST_PRECEDENCE)
-class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) : Regel {
+class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) : OverstyrbarRegel {
     override fun test(ansatt: Ansatt,bruker: Bruker) =
         ansatt.kanBehandle(id) || ansatt.grupper.any { it.displayName.endsWith("GEO_${
             when (bruker.geoTilknytning) {
@@ -38,7 +38,7 @@ class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) : Regel 
 
 @Component
 @Order(LOWEST_PRECEDENCE - 1)
-class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) : Regel {
+class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) : OverstyrbarRegel {
     override fun test(ansatt: Ansatt,bruker: Bruker) =
         if (bruker.geoTilknytning is UkjentBosted) {
             ansatt.kanBehandle(id)
@@ -50,7 +50,7 @@ class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) 
 
 @Component
 @Order(LOWEST_PRECEDENCE - 2)
-class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) : Regel {
+class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) : OverstyrbarRegel {
     override fun test(ansatt: Ansatt,bruker: Bruker) =
         if (bruker.geoTilknytning is UtenlandskTilknytning) {
             ansatt.kanBehandle(id)
@@ -61,7 +61,7 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
 
 @Component
 @Order(LOWEST_PRECEDENCE - 3)
-class AvdødBrukerRegel(private val teller: AvdødAksessTeller) : Regel {
+class AvdødBrukerRegel(private val teller: AvdødAksessTeller) : OverstyrbarRegel {
     override fun test(ansatt: Ansatt,bruker: Bruker) =
         bruker.dødsdato?.let {
             teller.avdødBrukerAksess(ansatt.ansattId, bruker.brukerId, it)

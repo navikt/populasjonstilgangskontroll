@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils
 
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
 import org.springframework.stereotype.Component
 import java.util.*
 

@@ -1,7 +1,8 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Familie.Companion.INGEN
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie.Companion.INGEN
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe
 import java.time.LocalDate
 
 class Bruker(

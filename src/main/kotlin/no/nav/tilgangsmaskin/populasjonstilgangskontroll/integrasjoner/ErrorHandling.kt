@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.GraphQLErrorHandler
 import org.slf4j.LoggerFactory

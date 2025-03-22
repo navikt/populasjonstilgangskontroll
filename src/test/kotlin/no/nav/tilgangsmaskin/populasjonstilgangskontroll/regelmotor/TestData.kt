@@ -1,14 +1,20 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor
 
 import com.neovisionaries.i18n.CountryCode.SE
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Companion.UdefinertGeoTilknytning
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.Kommune
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.KommuneTilknytning
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.UkjentBosted
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.UtenlandskTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Ansatt
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Enhetsnummer
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.Companion.UdefinertGeoTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.Kommune
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.KommuneTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.UkjentBosted
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GlobalGruppe.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.FamilieRelasjon
 import java.util.UUID
 
 object TestData {
@@ -35,7 +41,9 @@ object TestData {
     internal val vanligBruker = Bruker(vanligBrukerId, UdefinertGeoTilknytning)
     internal val vanligHistoriskBruker = Bruker(historiskBrukerId, UdefinertGeoTilknytning)
     internal val vanligBrukerMedHistoriskIdent = Bruker(vanligBrukerId, UdefinertGeoTilknytning, historiskeIdentifikatorer = listOf(vanligHistoriskBruker.brukerId))
-    internal val annenAnsattBruker = Bruker(annenAnsattBrukerId, UdefinertGeoTilknytning, listOf(EGEN_ANSATT_GRUPPE), Familie(barn = listOf(Familie.FamilieMedlem(vanligBrukerId, FamilieRelasjon.BARN))))
+    internal val annenAnsattBruker = Bruker(annenAnsattBrukerId, UdefinertGeoTilknytning, listOf(EGEN_ANSATT_GRUPPE), Familie(barn = listOf(
+        Familie.FamilieMedlem(vanligBrukerId, FamilieRelasjon.BARN)))
+    )
     internal val ansattBruker = Bruker(ansattBrukerId, UdefinertGeoTilknytning, listOf(EGEN_ANSATT_GRUPPE),)
     internal val egenAnsattStrengtFortroligBruker = Bruker(egenAnsattStrengtFortroligBrukerId, UdefinertGeoTilknytning, listOf(STRENGT_FORTROLIG_GRUPPE, EGEN_ANSATT_GRUPPE),)
     internal val egenAnsattFortroligBruker = Bruker(egenAnsattFortroligBrukerId, UdefinertGeoTilknytning, listOf(FORTROLIG_GRUPPE, EGEN_ANSATT_GRUPPE),)

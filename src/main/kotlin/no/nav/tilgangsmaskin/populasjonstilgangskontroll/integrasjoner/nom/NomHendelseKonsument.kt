@@ -1,13 +1,12 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.pluralize
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
-import java.time.LocalDate
 import java.time.LocalDate.EPOCH
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomAnsattData.NomAnsattPeriode.Companion.FOREVER
@@ -23,7 +22,8 @@ class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler:
             log.info("Behandler hendelse: {}", it)
             with(it) {
                 runCatching {
-                    nom.lagre(NomAnsattData(AnsattId(navident), BrukerId(personident), NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: FOREVER)
+                    nom.lagre(NomAnsattData(
+                        AnsattId(navident), BrukerId(personident), NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: FOREVER)
                     ))
                 }.fold(
                     onSuccess = { handler.handleOK(navident, personident) },

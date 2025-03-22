@@ -1,10 +1,10 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor
 
 import io.micrometer.core.annotation.Timed
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringSjekker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.BulkRegelException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelException

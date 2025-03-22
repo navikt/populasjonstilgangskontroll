@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.Companion.DETAIL_MESSAGE_CODE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.Companion.TYPE_URI
 import org.springframework.http.HttpStatus.FORBIDDEN
@@ -21,4 +21,4 @@ class RegelException(val brukerId: BrukerId, val  ansattId: AnsattId, val regel:
     }, null,messageCode,arguments) {
     constructor(e: RegelException, messageCode: String, arguments: Array<String>) : this(e.brukerId, e.ansattId, e.regel, messageCode, arguments)
 }
-class BulkRegelException(val  ansattId: AnsattId,val exceptions: List<RegelException>) : RuntimeException("${exceptions.size} fødselsnummer ble avvist ved bulk-kjøring av regler for ${ansattId.verdi}")
+class BulkRegelException(val  ansattId: AnsattId, val exceptions: List<RegelException>) : RuntimeException("${exceptions.size} fødselsnummer ble avvist ved bulk-kjøring av regler for ${ansattId.verdi}")

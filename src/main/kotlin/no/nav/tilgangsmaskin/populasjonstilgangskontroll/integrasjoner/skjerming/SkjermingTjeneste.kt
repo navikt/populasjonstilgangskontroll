@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming
 
 import io.micrometer.core.annotation.Timed
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.RecoverableRestException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.RecoverableRestException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.CacheableRetryingOnRecoverableService
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig.Companion.SKJERMING
 import org.springframework.core.NestedExceptionUtils

@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableRestException
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.RecoverableRestException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.IrrecoverableRestException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.RecoverableRestException
 import org.slf4j.LoggerFactory
 import org.springframework.graphql.ResponseError
 import org.springframework.graphql.client.FieldAccessException

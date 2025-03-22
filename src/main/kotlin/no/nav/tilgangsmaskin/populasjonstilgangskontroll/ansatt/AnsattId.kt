@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt
 
 import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil

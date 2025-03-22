@@ -3,8 +3,8 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 import io.micrometer.core.annotation.Timed
 import no.nav.boot.conditionals.ConditionalOnDev
 import no.nav.boot.conditionals.ConditionalOnNotDev
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

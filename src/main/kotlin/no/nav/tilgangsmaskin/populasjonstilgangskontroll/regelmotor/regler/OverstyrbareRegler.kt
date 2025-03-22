@@ -2,12 +2,12 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AvvisningTekster.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.GeoTilknytning.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Ansatt
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningTekster.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.RegelBeskrivelse
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.månederSidenIdag
@@ -23,7 +23,7 @@ import java.util.*
 @Component
 @Order(LOWEST_PRECEDENCE)
 class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) : OverstyrbarRegel {
-    override fun test(ansatt: Ansatt,bruker: Bruker) =
+    override fun test(ansatt: Ansatt, bruker: Bruker) =
         ansatt.kanBehandle(id) || ansatt.grupper.any { it.displayName.endsWith("GEO_${
             when (bruker.geoTilknytning) {
                 is KommuneTilknytning -> bruker.geoTilknytning.kommune.verdi
@@ -39,7 +39,7 @@ class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) : Overst
 @Component
 @Order(LOWEST_PRECEDENCE - 1)
 class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) : OverstyrbarRegel {
-    override fun test(ansatt: Ansatt,bruker: Bruker) =
+    override fun test(ansatt: Ansatt, bruker: Bruker) =
         if (bruker.geoTilknytning is UkjentBosted) {
             ansatt.kanBehandle(id)
         } else true
@@ -51,7 +51,7 @@ class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) 
 @Component
 @Order(LOWEST_PRECEDENCE - 2)
 class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) : OverstyrbarRegel {
-    override fun test(ansatt: Ansatt,bruker: Bruker) =
+    override fun test(ansatt: Ansatt, bruker: Bruker) =
         if (bruker.geoTilknytning is UtenlandskTilknytning) {
             ansatt.kanBehandle(id)
         } else true
@@ -62,7 +62,7 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
 @Component
 @Order(LOWEST_PRECEDENCE - 3)
 class AvdødBrukerRegel(private val teller: AvdødAksessTeller) : OverstyrbarRegel {
-    override fun test(ansatt: Ansatt,bruker: Bruker) =
+    override fun test(ansatt: Ansatt, bruker: Bruker) =
         bruker.dødsdato?.let {
             teller.avdødBrukerAksess(ansatt.ansattId, bruker.brukerId, it)
         } ?: true

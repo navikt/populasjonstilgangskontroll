@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker
 
 import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLTjeneste

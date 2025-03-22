@@ -2,10 +2,10 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.rest
 
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomAnsattData
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.RegelTjeneste
@@ -29,7 +29,7 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatt.ansatt(ansattId)
 
     @PostMapping("ansatt/{ansattId}/{brukerId}")
-    fun nom(@PathVariable ansattId: AnsattId,@PathVariable brukerId: BrukerId) = nom.lagre(NomAnsattData(ansattId, brukerId))
+    fun nom(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) = nom.lagre(NomAnsattData(ansattId, brukerId))
 
     @GetMapping("komplett/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)
@@ -45,7 +45,7 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
 
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(NO_CONTENT)
-    fun bulk(@PathVariable ansattId: AnsattId,@RequestBody  specs: List<RegelSpec>) = regler.bulkRegler(ansattId, specs)
+    fun bulk(@PathVariable ansattId: AnsattId, @RequestBody  specs: List<RegelSpec>) = regler.bulkRegler(ansattId, specs)
 
     @PostMapping("brukerbulk")
     fun brukerBulk(@RequestBody brukerIds: Array<String>) = bruker.brukerBulk(brukerIds.map { BrukerId(it) })}

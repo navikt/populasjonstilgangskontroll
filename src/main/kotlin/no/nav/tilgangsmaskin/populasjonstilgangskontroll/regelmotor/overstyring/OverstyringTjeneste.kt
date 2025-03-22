@@ -1,10 +1,10 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 
 import io.micrometer.core.annotation.Timed
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringEntity.Companion.OVERSTYRING
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelException
@@ -36,7 +36,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
             }
         }
 
-    fun overstyr(ansattId: AnsattId,data: OverstyringData)  =
+    fun overstyr(ansattId: AnsattId, data: OverstyringData)  =
          runCatching {
                 log.info("Sjekker kjerneregler før eventuell overstyring for ansatt '${ansattId.verdi}' og bruker '${data.brukerId.mask()}'")
                 motor.kjerneregler(ansatt.ansatt(ansattId), bruker.bruker(data.brukerId))

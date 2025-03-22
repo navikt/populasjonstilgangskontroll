@@ -1,9 +1,10 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import java.util.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId as AnsattFnr
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId as AnsattFnr
 
 
 class Ansatt(val identifikatorer: AnsattIdentifikatorer, val grupper: List<EntraGruppe>, val bruker: Bruker? = null) {

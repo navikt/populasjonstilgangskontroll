@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.DefaultRestErrorHandler
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableRestException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.DefaultRestErrorHandler
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.IrrecoverableRestException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatusCode

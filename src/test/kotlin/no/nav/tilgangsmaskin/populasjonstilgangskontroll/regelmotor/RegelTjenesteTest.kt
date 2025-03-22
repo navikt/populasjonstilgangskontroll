@@ -8,8 +8,8 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestApp
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.geoUtlandBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.strengtFortroligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligAnsatt

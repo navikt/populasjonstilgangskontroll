@@ -4,8 +4,8 @@ import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableRestException
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.RecoverableRestException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.IrrecoverableRestException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.RecoverableRestException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.FellesRetryListener
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligBruker
 

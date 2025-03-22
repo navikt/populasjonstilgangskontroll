@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 
 import io.micrometer.core.annotation.Counted
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component

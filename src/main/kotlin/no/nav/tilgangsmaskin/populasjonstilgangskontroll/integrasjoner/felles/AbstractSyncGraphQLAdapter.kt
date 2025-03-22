@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.errors.IrrecoverableRestException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.IrrecoverableRestException
 import org.springframework.graphql.client.GraphQlClient
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.web.client.RestClient

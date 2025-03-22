@@ -1,6 +1,6 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AvvisningTekster.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningTekster.*
 
 enum class GlobalGruppe(val begrunnelse: AvvisningTekster) {
     STRENGT_FORTROLIG_GRUPPE(AVVIST_STRENGT_FORTROLIG_ADRESSE),

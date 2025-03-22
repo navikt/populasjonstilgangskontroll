@@ -1,12 +1,12 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Ansatt
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AvvisningTekster
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.Bruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Ansatt
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningTekster
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
 import java.net.URI
 import java.util.function.BiPredicate
 
-interface Regel: BiPredicate<Ansatt,Bruker> {
+interface Regel: BiPredicate<Ansatt, Bruker> {
     val metadata: RegelBeskrivelse
     val erOverstyrbar get() = this !is KjerneRegel
     data class RegelBeskrivelse(val kortNavn: String, val begrunnelse: AvvisningTekster)

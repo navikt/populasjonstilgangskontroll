@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker
 
 import com.neovisionaries.i18n.CountryCode
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil

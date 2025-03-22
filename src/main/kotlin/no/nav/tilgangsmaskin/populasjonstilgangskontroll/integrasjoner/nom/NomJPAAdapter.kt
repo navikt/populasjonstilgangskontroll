@@ -1,12 +1,12 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.AnsattId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.toInstant
 import org.springframework.stereotype.Component
 import java.time.Instant.now
 import java.time.LocalDate
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain.BrukerId as AnsattFnr
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId as AnsattFnr
 
 
 @Component

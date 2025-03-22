@@ -14,8 +14,8 @@ class RegelBeanConfig {
 
     @Bean
     @Qualifier(KJERNE)
-    fun kjerneregelsett(regler: List<Regel>) =
-        RegelSett(KJERNE_REGELTYPE to regler.filterIsInstance<KjerneRegel>().sortedWith(INSTANCE))
+    fun kjerneregelsett(regler: List<KjerneRegel>) =
+        RegelSett(KJERNE_REGELTYPE to regler.sortedWith(INSTANCE))
 
     @Bean
     @Qualifier(KOMPLETT)

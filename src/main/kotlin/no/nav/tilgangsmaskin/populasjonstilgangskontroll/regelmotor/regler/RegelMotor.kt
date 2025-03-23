@@ -45,14 +45,12 @@ class RegelMotor(@Qualifier(KJERNE) private val kjerne: RegelSett, @Qualifier(OV
     }
 
     fun bulkRegler(ansatt: Ansatt, brukere: List<Pair<Bruker, RegelType>>) {
-        val avvisninger = mutableListOf<RegelException>()
-        brukere.forEach { (bruker, type) ->
+        val avvisninger = brukere.mapNotNull { (bruker, type) ->
             runCatching {
                 sjekkRegler(ansatt, bruker, type)
+                null
             }.getOrElse {
-                if (it is RegelException) {
-                    avvisninger.add(it)
-                }
+                if (it is RegelException) it else null
             }
         }
         if (avvisninger.isNotEmpty()) {

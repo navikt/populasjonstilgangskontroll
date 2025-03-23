@@ -42,6 +42,13 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: B
         with(opprinnelige.toMutableList()) {
             removeIf {
                 it.regel.erOverstyrbar && sjekker.overstyring.erOverstyrt(ansattId, it.brukerId)
+            }.also {
+                if (it) {
+                    log.info("Fjernet $${opprinnelige.size - size} exception grunnet overstyrte regler for $ansattId")
+                }
+                else {
+                    log.info("Ingen overstyrte regler for $ansattId")
+                }
             }
             if (isNotEmpty()) {
                 throw BulkRegelException(ansattId, this)

@@ -34,11 +34,11 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: B
             motor.bulkRegler(ansattTjeneste.ansatt(ansattId), specs(specs))
         }.getOrElse {
             if (it is BulkRegelException) {
-                filtrerOverstyrte(it.exceptions, ansattId)
+                filtrerOverstyrte(ansattId, it.exceptions)
             }
         }
 
-    private fun filtrerOverstyrte(opprinnelige: List<RegelException>, ansattId: AnsattId) {
+    private fun filtrerOverstyrte(ansattId: AnsattId, opprinnelige: List<RegelException>) {
         with(opprinnelige.toMutableList()) {
             removeIf {
                 it.regel.erOverstyrbar && sjekker.overstyring.erOverstyrt(ansattId, it.brukerId)

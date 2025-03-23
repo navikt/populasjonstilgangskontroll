@@ -34,21 +34,28 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: B
             motor.bulkRegler(ansattTjeneste.ansatt(ansattId), specs(specs))
         }.getOrElse {
             if (it is BulkRegelException) {
-                val exceptions = it.exceptions.toMutableList()
-                exceptions.forEach { e ->
-                    if (e.regel.erOverstyrbar && sjekker.overstyring.erOverstyrt(ansattId,e.brukerId)) {
-                        log.info("Overstyrt tilgang er gitt til ansatt '${ansattId.verdi}' og bruker '${e.brukerId.verdi}'")
-                        exceptions.remove(e)
-                    }
-               }
-                if (exceptions.isNotEmpty()) {
-                    throw BulkRegelException(ansattId, exceptions)
-                }
-                else {
-                    log.info("Alle regler er overstyrt for ansatt '${ansattId.verdi}'")
-                }
+                filtrerOverstyrte(it.exceptions, ansattId)
             }
         }
+
+
+
+
+    private fun filtrerOverstyrte(opprinnelige: List<RegelException>, ansattId: AnsattId) {
+        val filtrerte = opprinnelige.toMutableList()
+        filtrerte.forEach { e ->
+            if (e.regel.erOverstyrbar && sjekker.overstyring.erOverstyrt(ansattId, e.brukerId)) {
+                log.info("Overstyrt tilgang er gitt til ansatt '${ansattId.verdi}' og bruker '${e.brukerId.verdi}'")
+                filtrerte.remove(e)
+            }
+        }
+        if (filtrerte.isNotEmpty()) {
+            throw BulkRegelException(ansattId, filtrerte)
+        }
+        else {
+            log.info("Alle regler er overstyrt for ansatt '${ansattId.verdi}'")
+        }
+    }
 
     private fun specs(specs: List<RegelSpec>): List<Pair<Bruker, RegelSett.RegelType>> {
         val brukereMap = brukerTjeneste.brukere(specs.map { it.brukerId }).associateBy { it.brukerId }

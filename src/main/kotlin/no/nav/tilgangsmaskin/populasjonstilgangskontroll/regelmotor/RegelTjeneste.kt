@@ -41,7 +41,7 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: B
     private fun filtrerOverstyrte(ansattId: AnsattId, opprinnelige: List<RegelException>) {
         with(opprinnelige.toMutableList()) {
             removeIf {
-                it.regel.erOverstyrbar && sjekker.overstyring.erOverstyrt(ansattId, it.brukerId)
+                it.regel.erOverstyrbar && sjekker.erOverstyrt(ansattId, it.brukerId)
             }.also {
                 if (it) {
                     log.info("Fjernet $${opprinnelige.size - size} exception grunnet overstyrte regler for $ansattId")

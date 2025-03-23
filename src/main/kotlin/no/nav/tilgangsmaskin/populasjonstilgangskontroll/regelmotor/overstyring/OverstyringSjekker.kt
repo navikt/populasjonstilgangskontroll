@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
-class OverstyringSjekker(val overstyring: OverstyringTjeneste)  {
+class OverstyringSjekker(private val overstyring: OverstyringTjeneste)  {
 
     private val log = LoggerFactory.getLogger(OverstyringSjekker::class.java)
 
@@ -18,7 +18,7 @@ class OverstyringSjekker(val overstyring: OverstyringTjeneste)  {
                 with(e.regel) {
                     log.trace("Sjekker om regler er overstyrt for ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                     if (erOverstyrbar) {
-                        if (overstyring.erOverstyrt(ansattId, brukerId)) {
+                        if (erOverstyrt(ansattId, brukerId)) {
                             log.warn("Overstyrt tilgang er gitt til ansatt '${ansattId.verdi}' og bruker '${brukerId.mask()}'")
                         }
                         else {
@@ -30,4 +30,6 @@ class OverstyringSjekker(val overstyring: OverstyringTjeneste)  {
                 }
             else -> throw e.also { log.error("Ukjent feil ved tilgangskontroll for '${ansattId.verdi}' og '${brukerId.mask()}'", it) }
         }
+
+    fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId) = overstyring.erOverstyrt(ansattId, brukerId)
 }

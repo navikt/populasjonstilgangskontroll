@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
-class OverstyringSjekker(private val overstyring: OverstyringTjeneste)  {
+class OverstyringSjekker(val overstyring: OverstyringTjeneste)  {
 
     private val log = LoggerFactory.getLogger(OverstyringSjekker::class.java)
 

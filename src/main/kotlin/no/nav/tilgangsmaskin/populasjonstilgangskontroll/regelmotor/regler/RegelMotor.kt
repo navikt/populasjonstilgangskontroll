@@ -43,12 +43,32 @@ class RegelMotor(@Qualifier(KJERNE) private val kjerne: RegelSett, @Qualifier(OV
                 handler.ok(type, ansatt.ansattId, bruker.brukerId)
             }
     }
+
+    fun bulkRegler(ansatt: Ansatt, brukere: List<Pair<Bruker, RegelType>>) {
+        val avvisninger = mutableListOf<RegelException>()
+        brukere.forEach { (bruker, type) ->
+            runCatching {
+                sjekkRegler(ansatt, bruker, type)
+            }.getOrElse {
+                if (it is RegelException)
+                    avvisninger.add(it)
+            }
+        }
+        if (avvisninger.isNotEmpty()) {
+            throw BulkRegelException(ansatt.ansattId, avvisninger).also {
+                log.info("${brukere.size - avvisninger.size} identer er godtatt, ${avvisninger.size} er avvist for ${ansatt.ansattId}->${avvisninger.map { it.brukerId.verdi to it.body.title }}")
+            }
+        } else {
+            log.info("Alle ${brukere.size} identer er OK for ${ansatt.ansattId}")
+        }
+    }
     private fun RegelType.regelSett() =
         when(this) {
             KJERNE_REGELTYPE -> kjerne
             KOMPLETT_REGELTYPE -> komplett
             OVERSTYRBAR_REGELTYPE -> overstyrbar
         }
+
 
     override fun toString() = "${javaClass.simpleName} [kjerneregler=$kjerne,kompletteregler=$komplett]"
 

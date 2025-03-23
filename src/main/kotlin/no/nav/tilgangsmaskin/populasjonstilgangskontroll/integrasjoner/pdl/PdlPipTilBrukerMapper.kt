@@ -24,6 +24,11 @@ object PdlPipTilBrukerMapper {
             Bruker(brukerId, tilGeoTilknytning(geografiskTilknytning), tilBeskyttelse(respons,erSkjermet), tilFamilie(person.familierelasjoner), tilDødsdato(person.doedsfall),tilHistoriskeBrukerIds(identer))
         }
 
+    fun tilBruker(brukerId: String, respons: PdlPipRespons, erSkjermet: Boolean) =
+    with(respons) {
+        Bruker(BrukerId(brukerId), tilGeoTilknytning(geografiskTilknytning), tilBeskyttelse(respons,erSkjermet), tilFamilie(person.familierelasjoner), tilDødsdato(person.doedsfall),tilHistoriskeBrukerIds(identer))
+    }
+
     private fun tilBeskyttelse(respons: PdlPipRespons, erSkjermet: Boolean) =
          mutableListOf<GlobalGruppe>().apply {
             if (respons.person.adressebeskyttelse.any {

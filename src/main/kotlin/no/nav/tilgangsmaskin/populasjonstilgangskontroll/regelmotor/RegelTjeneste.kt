@@ -38,22 +38,14 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: B
             }
         }
 
-
-
-
     private fun filtrerOverstyrte(opprinnelige: List<RegelException>, ansattId: AnsattId) {
-        val filtrerte = opprinnelige.toMutableList()
-        filtrerte.forEach { e ->
-            if (e.regel.erOverstyrbar && sjekker.overstyring.erOverstyrt(ansattId, e.brukerId)) {
-                log.info("Overstyrt tilgang er gitt til ansatt '${ansattId.verdi}' og bruker '${e.brukerId.verdi}'")
-                filtrerte.remove(e)
+        with(opprinnelige.toMutableList()) {
+            removeIf {
+                it.regel.erOverstyrbar && sjekker.overstyring.erOverstyrt(ansattId, it.brukerId)
             }
-        }
-        if (filtrerte.isNotEmpty()) {
-            throw BulkRegelException(ansattId, filtrerte)
-        }
-        else {
-            log.info("Alle regler er overstyrt for ansatt '${ansattId.verdi}'")
+            if (isNotEmpty()) {
+                throw BulkRegelException(ansattId, this)
+            }
         }
     }
 

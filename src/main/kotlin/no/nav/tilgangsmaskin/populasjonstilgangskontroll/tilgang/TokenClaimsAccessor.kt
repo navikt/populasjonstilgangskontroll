@@ -8,12 +8,13 @@ import java.util.*
 @Component
 class TokenClaimsAccessor (private val contextHolder: TokenValidationContextHolder){
 
-    val system get() = runCatching {
-        claimSet().getStringClaim("azp_name")
+    val system get() = runCatching { claimSet()?.getStringClaim("azp_name")
     }.getOrElse { "N/A" }
-    val  oidFraToken get()  = claimSet().let { UUID.fromString(it.getStringClaim("oid")) }
-    val ansattId get()  = claimSet().getStringClaim("NAVident")?.let { AnsattId(it) }
-    private fun claimSet() = contextHolder.getTokenValidationContext().getClaims(AAD_ISSUER)
+    val  oidFraToken get()  = claimSet()?.let { UUID.fromString(it.getStringClaim("oid")) }
+    val ansattId get()  = claimSet()?.getStringClaim("NAVident")?.let { AnsattId(it) }
+    private fun claimSet() = runCatching {
+        contextHolder.getTokenValidationContext().getClaims(AAD_ISSUER)
+    }.getOrNull()
 
     companion object {
 

@@ -80,7 +80,7 @@ class AvdødAksessTeller(private val meterRegistry: MeterRegistry, private val a
                 .tag("months",intervallFor(dødsdato))
                 .tag("system",accessor.system ?: "unknown")
                 .register(meterRegistry).increment().also {
-                    log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere avdød bruker ${brukerId.maskFnr()} fra ${accessor.system}")
+                    log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere avdød bruker ${brukerId.maskFnr()} med dødsdate $dødsdato fra ${accessor.system}")
                 }
         }
 

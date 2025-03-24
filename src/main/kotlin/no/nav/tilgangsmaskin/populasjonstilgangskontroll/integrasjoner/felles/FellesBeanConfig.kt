@@ -3,15 +3,12 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.github.benmanes.caffeine.cache.Caffeine
 import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang1.TokenClaimsAccessor
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.Include.defaultIncludes
@@ -24,16 +21,13 @@ import org.springframework.cache.interceptor.KeyGenerator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
-import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
-import org.springframework.stereotype.Component
-import org.springframework.web.servlet.HandlerInterceptor
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 
 @Configuration
-class FellesBeanConfig(private val ansattInterceptor: AnsattIdAddingHandlerInterceptor) : CachingConfigurer, WebMvcConfigurer {
+class FellesBeanConfig(private val ansattIdAddingInterceptor: AnsattIdAddingHandlerInterceptor) : CachingConfigurer, WebMvcConfigurer {
 
     private val log = LoggerFactory.getLogger(FellesBeanConfig::class.java)
 
@@ -69,7 +63,7 @@ class FellesBeanConfig(private val ansattInterceptor: AnsattIdAddingHandlerInter
     }
 
     override fun addInterceptors(registry: InterceptorRegistry) {
-        registry.addInterceptor(ansattInterceptor)
+        registry.addInterceptor(ansattIdAddingInterceptor)
     }
 
     override fun keyGenerator() = KeyGenerator { target, method, params ->

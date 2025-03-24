@@ -49,18 +49,3 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
 
     @PostMapping("brukere")
     fun brukerBulk(@RequestBody brukerIds: Array<String>) = bruker.brukere(brukerIds.map { BrukerId(it) })}
-
-/*
-@UnprotectedRestController(value = ["/tmp"])
-@ConditionalOnNotProd
-class TempTilgangController(private val adapter: EntraClientAdapter, private val resolver: OIDResolver, ) {
-    @GetMapping("ansatt/{ansattId}")
-    fun ansatt(@PathVariable ansattId: AnsattId) : Sequence<EntraGrupperBolkAny> {
-        val oid = resolver.oidForAnsatt(ansattId)
-        return adapter.grupperRaw(oid.toString())
-    }
-
- @JsonIgnoreProperties(ignoreUnknown = true)
-data class EntraGrupperBolkAny(@JsonProperty("@odata.nextLink") val next: URI? = null, val value: Any)
-}
-*/

@@ -47,7 +47,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         properties = mapOf(
             "navIdent" to e.ansattId.verdi,
             "avvisninger" to e.exceptions.size,
-            "detaljer" to e.exceptions.map { ::props }
+           // "detaljer" to e.exceptions.map { ::props }
         )
     }
 

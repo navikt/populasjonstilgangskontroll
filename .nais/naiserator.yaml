@@ -94,3 +94,5 @@ spec:
       value: '{{grupper.nasjonal}}'
     - name: GRUPPE_UTLAND
       value: '{{grupper.utland}}'
+    - name: DB_POOLSIZE
+      value: '{{db.poolsize}}'

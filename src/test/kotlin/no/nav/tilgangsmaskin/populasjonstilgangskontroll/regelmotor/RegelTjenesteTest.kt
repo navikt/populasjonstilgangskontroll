@@ -95,19 +95,6 @@ class RegelTjenesteTest {
         assertThrows<RegelException> { regel.kompletteRegler(vanligAnsatt.ansattId, geoUtlandBruker.brukerId) }
     }
 
-    /*
-    @ParameterizedTest
-    @MethodSource("kjerneregelProvider")
-    @DisplayName("Test at tilgang avvist av en av kjernereglene ikke fører til sjekk av midlertidig tilgang")
-    fun ikkeOverstyrbar(regel: Regel)    {
-        assertThrows<RegelException> {
-            avvistHandler.sjekk(ansattId, vanligBrukerId, RegelException(vanligBrukerId, ansattId, regel))
-        }
-        verify {
-            overstyring wasNot Called
-        }
-    }*/
-
     @Test
     fun bulkAvvisninger() {
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
@@ -119,11 +106,4 @@ class RegelTjenesteTest {
             regel.bulkRegler(vanligAnsatt.ansattId, listOf(IdOgType(strengtFortroligBruker.brukerId, KJERNE_REGELTYPE), IdOgType(fortroligBruker.brukerId, KJERNE_REGELTYPE)))
         }.exceptions.size, 2)
     }
-
-    /*
-    companion object {
-        @JvmStatic
-        fun kjerneregelProvider() = motor.kjerneRegelSett.regler.stream()
-    }
-*/
 }

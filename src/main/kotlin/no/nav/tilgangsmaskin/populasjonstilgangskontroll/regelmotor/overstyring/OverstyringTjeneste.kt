@@ -73,10 +73,10 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
                 if (erOverstyrt(ansattId, e.brukerId)) {
                     log.warn("Overstyrt tilgang er gitt til ansatt '${ansattId.verdi}' og bruker '${e.brukerId.maskFnr()}'")
                 } else {
-                    throw e.also { log.warn("Ingen overstyring, tilgang avvist av regel '${metadata.kortNavn}' for '${ansattId.verdi}' '${e.brukerId.maskFnr()}' består") }
+                    throw e.also { log.warn("Ingen overstyring, tilgang avvist av regel '${metadata.kortNavn}' for '${ansattId.verdi}' '${e.brukerId.maskFnr()}' opprettholdes") }
                 }
             } else {
-                throw e.also { log.trace("Tilgang avvist av kjerneregel '${metadata.kortNavn}' for '${ansattId.verdi}' og '${e.brukerId.maskFnr()}', avvisining består") }
+                throw e.also { log.trace("Tilgang avvist av kjerneregel '${metadata.kortNavn}' for '${ansattId.verdi}' og '${e.brukerId.maskFnr()}', avvisning opprettholdes") }
             }
         }
 

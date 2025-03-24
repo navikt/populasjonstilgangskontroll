@@ -20,11 +20,8 @@ class PDLTjeneste(private val pdlAdapter: PdlPipRestClientAdapter) {
         runBlocking {
             brukerIds.map {
                 async {
-                    try {
-                    person(it)
-                    } catch (e: IrrecoverableRestException) {
-                       null
-                    }
+                    runCatching { person(it) }
+                        .getOrNull()
                 }
             }.awaitAll().filterNotNull()
         }

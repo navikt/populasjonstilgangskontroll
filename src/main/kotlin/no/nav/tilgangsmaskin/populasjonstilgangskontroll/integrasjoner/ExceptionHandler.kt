@@ -47,15 +47,15 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         properties = mapOf(
             "navIdent" to e.ansattId.verdi,
             "avvisninger" to e.exceptions.size,
-           // "detaljer" to e.exceptions.map { ::props }
+            "detaljer" to e.exceptions.map { ::props }
         )
     }
 
-    fun props(e: RegelException) =
+    private fun props(e: RegelException) =
         with(e) {
             mapOf(
-                "årsak" to regel.metadata.begrunnelse,
+              //  "årsak" to regel.metadata.begrunnelse,
                 "brukerIdent" to brukerId.verdi,
-                "kanOverstyres" to regel.erOverstyrbar)
+              //  "kanOverstyres" to regel.erOverstyrbar)
         }
 }

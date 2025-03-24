@@ -9,8 +9,5 @@ import java.util.*
 @Component
 class OverstyringAzureAdTokenAuditorAware(private val accessor: TokenClaimsAccessor): AuditorAware<String> {
     override fun getCurrentAuditor() =
-        runCatching {
-            accessor.ansattId.let {  Optional.of(it.verdi) }
-        }.getOrElse { Optional.of("N/A")}
-
+            accessor.ansattId?.let {  Optional.of(it.verdi) } ?: Optional.of("N/A")
 }

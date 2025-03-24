@@ -24,19 +24,19 @@ class TilgangController(private val regler : RegelTjeneste, private val overstyr
 
     @PostMapping("komplett")
     @ResponseStatus(NO_CONTENT)
-    fun kompletteRegler(@RequestBody brukerId: BrukerId)  = regler.kompletteRegler(token.ansattId, brukerId)
+    fun kompletteRegler(@RequestBody brukerId: BrukerId)  = regler.kompletteRegler(token.ansattId!!, brukerId)
 
     @PostMapping("kjerne")
     @ResponseStatus(NO_CONTENT)
-    fun kjerneregler(@RequestBody brukerId: BrukerId) = regler.kjerneregler(token.ansattId, brukerId)
+    fun kjerneregler(@RequestBody brukerId: BrukerId) = regler.kjerneregler(token.ansattId!!, brukerId)
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)
-    fun overstyr(@RequestBody data: OverstyringData) = overstyring.overstyr(token.ansattId,data)
+    fun overstyr(@RequestBody data: OverstyringData) = overstyring.overstyr(token.ansattId!!,data)
 
     @PostMapping("bulk")
     @ResponseStatus(NO_CONTENT)
-    fun bulk(@RequestBody  specs: List<IdOgType>) = regler.bulkRegler(token.ansattId, specs)
+    fun bulk(@RequestBody  specs: List<IdOgType>) = regler.bulkRegler(token.ansattId!!, specs)
 
 }
 

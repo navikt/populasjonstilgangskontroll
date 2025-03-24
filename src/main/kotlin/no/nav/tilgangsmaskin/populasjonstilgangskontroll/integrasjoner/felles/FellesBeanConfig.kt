@@ -67,7 +67,7 @@ class FellesBeanConfig(private val ansattInterceptor: AnsattIdAddingHandlerInter
     fun httpExchangesFilter(repository: HttpExchangeRepository) = object : HttpExchangesFilter(repository, defaultIncludes()) {
         override fun shouldNotFilter(request: HttpServletRequest) = request.servletPath.contains("monitoring")
     }
-    
+
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(ansattInterceptor)
     }

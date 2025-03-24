@@ -12,7 +12,7 @@ class TokenClaimsAccessor (private val contextHolder: TokenValidationContextHold
         claimSet().getStringClaim("azp_name")
     }.getOrElse { "N/A" }
     val  oidFraToken get()  = claimSet().let { UUID.fromString(it.getStringClaim("oid")) }
-    val ansattId get()  = claimSet().getStringClaim("NAVident")?.let { AnsattId(it) }  //throw RuntimeException("NAVident claim not found in token")
+    val ansattId get()  = claimSet().getStringClaim("NAVident")?.let { AnsattId(it) }
     private fun claimSet() = contextHolder.getTokenValidationContext().getClaims(AAD_ISSUER)
 
     companion object {

@@ -1,13 +1,13 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.DEV
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.DEV_GCP
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.GCP
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.LOCAL
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.NAIS_CLUSTER_NAME
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.PROD
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.PROD_GCP
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.TEST
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterConstants.DEV
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterConstants.DEV_GCP
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterConstants.GCP
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterConstants.LOCAL
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterConstants.NAIS_CLUSTER_NAME
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterConstants.PROD
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterConstants.PROD_GCP
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterConstants.TEST
 import java.lang.System.getenv
 import java.lang.System.setProperty
 

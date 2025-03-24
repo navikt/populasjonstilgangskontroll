@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker
 
 import com.fasterxml.jackson.annotation.JsonValue
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterUtils
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions.maskFnr
 

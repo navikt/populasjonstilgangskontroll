@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterUtils.Companion.profiler
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterUtils.Companion.profiler
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication

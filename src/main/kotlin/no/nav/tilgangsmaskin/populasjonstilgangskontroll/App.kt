@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterUtils.Companion.profiler
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterUtils.Companion.profiler
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.TimeExtensions.local
 import org.springframework.boot.SpringBootVersion
 import org.springframework.boot.actuate.info.Info.Builder
@@ -18,10 +18,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.retry.annotation.EnableRetry
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.stereotype.Component
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @SpringBootApplication
 @ConfigurationPropertiesScan

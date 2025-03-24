@@ -4,7 +4,6 @@ import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomAnsattData
@@ -13,7 +12,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.RegelTjenest
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.IdOgType
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.DEV
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterConstants.DEV
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.web.bind.annotation.*

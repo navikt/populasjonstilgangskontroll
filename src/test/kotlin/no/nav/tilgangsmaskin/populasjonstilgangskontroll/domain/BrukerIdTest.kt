@@ -2,8 +2,8 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
 
 import com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.NAIS_CLUSTER_NAME
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.PROD_GCP
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterConstants.NAIS_CLUSTER_NAME
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterConstants.PROD_GCP
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

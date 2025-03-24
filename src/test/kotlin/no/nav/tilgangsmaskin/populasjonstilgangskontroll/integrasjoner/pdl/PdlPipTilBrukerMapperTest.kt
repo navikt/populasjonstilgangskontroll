@@ -17,7 +17,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestApp
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.TEST
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterConstants.TEST
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.json.JsonTest
 import org.springframework.test.context.ActiveProfiles

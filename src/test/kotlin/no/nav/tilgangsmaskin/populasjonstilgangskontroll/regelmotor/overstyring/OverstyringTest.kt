@@ -61,7 +61,11 @@ internal class OverstyringTest {
     fun testOverstyringGyldigHistorisk() {
         every { brukerTjeneste.bruker(vanligBrukerMedHistoriskIdent.brukerId) } returns vanligBrukerMedHistoriskIdent
         every { brukerTjeneste.bruker(vanligHistoriskBruker.brukerId) } returns vanligHistoriskBruker
-        overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData("test", LocalDate.now().plusDays(1),vanligBrukerMedHistoriskIdent.historiskeIdentifikatorer.first()))
+        overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData(
+            vanligBrukerMedHistoriskIdent.historiskeIdentifikatorer.first(),
+            "test",
+            LocalDate.now().plusDays(1)
+        ))
         assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, vanligBrukerMedHistoriskIdent.brukerId)).isTrue
     }
 
@@ -69,15 +73,26 @@ internal class OverstyringTest {
     @DisplayName("Test gyldig overstyring")
     fun testOverstyringGyldig() {
         every { brukerTjeneste.bruker(vanligBruker.brukerId) } returns vanligBruker
-        overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData("gammel", LocalDate.now().minusDays(1),vanligBruker.brukerId))
-        overstyring.overstyr(vanligAnsatt.ansattId,  OverstyringData("ny", LocalDate.now().plusDays(1),vanligBruker.brukerId,))
+        overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData(
+            vanligBruker.brukerId,
+            "gammel",
+            LocalDate.now().minusDays(1)
+        ))
+        overstyring.overstyr(vanligAnsatt.ansattId,  OverstyringData(
+            vanligBruker.brukerId,
+            "ny",
+            LocalDate.now().plusDays(1),))
         assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, vanligBruker.brukerId)).isTrue
     }
     @Test
     @DisplayName("Test utgått overstyring")
     fun testOverstyringUtgått() {
         every { brukerTjeneste.bruker(vanligBruker.brukerId) } returns vanligBruker
-        overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData("ny", LocalDate.now().minusDays(1),vanligBruker.brukerId))
+        overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData(
+            vanligBruker.brukerId,
+            "ny",
+            LocalDate.now().minusDays(1)
+        ))
         assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, vanligBruker.brukerId)).isFalse
 
     }

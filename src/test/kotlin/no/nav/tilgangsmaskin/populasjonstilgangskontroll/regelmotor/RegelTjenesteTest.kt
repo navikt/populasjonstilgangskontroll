@@ -2,14 +2,11 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor
 
 import com.ninjasquad.springmockk.MockkBean
 import io.micrometer.core.instrument.MeterRegistry
-import io.mockk.Called
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import io.mockk.verify
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestApp
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.geoUtlandBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.strengtFortroligBruker
@@ -22,7 +19,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
 import org.assertj.core.api.Assertions.assertThatCode
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -85,7 +81,11 @@ class RegelTjenesteTest {
     fun overstyringOK() {
         every { bruker.bruker(geoUtlandBruker.brukerId) } returns geoUtlandBruker
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
-        overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData("test", LocalDate.now().plusDays(1),  geoUtlandBruker.brukerId))
+        overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData(
+            geoUtlandBruker.brukerId,
+            "test",
+            LocalDate.now().plusDays(1)
+        ))
         assertThatCode { regel.kompletteRegler(vanligAnsatt.ansattId, geoUtlandBruker.brukerId) }.doesNotThrowAnyException()
     }
     @Test

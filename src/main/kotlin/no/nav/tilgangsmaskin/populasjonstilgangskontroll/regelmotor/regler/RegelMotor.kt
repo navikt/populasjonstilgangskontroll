@@ -46,12 +46,9 @@ class RegelMotor(@Qualifier(KJERNE) private val kjerne: RegelSett, @Qualifier(OV
 
     fun bulkRegler(ansatt: Ansatt, brukere: List<Pair<Bruker, RegelType>>) {
         val avvisninger = brukere.mapNotNull { (bruker, type) ->
-            runCatching {
-                sjekkRegler(ansatt, bruker, type)
-                null
-            }.getOrElse {
-                if (it is RegelException) it else null
-            }
+            runCatching { sjekkRegler(ansatt, bruker, type) }
+                .exceptionOrNull()
+                ?.takeIf { it is RegelException } as? RegelException
         }
         if (avvisninger.isNotEmpty()) {
             throw BulkRegelException(ansatt.ansattId, avvisninger)
@@ -63,15 +60,6 @@ class RegelMotor(@Qualifier(KJERNE) private val kjerne: RegelSett, @Qualifier(OV
             KOMPLETT_REGELTYPE -> komplett
             OVERSTYRBAR_REGELTYPE -> overstyrbar
         }
-
-    fun <T> MutableList<T>.addIf(element: T, condition: (T) -> Boolean): Boolean {
-        return if (condition(element)) {
-            this.add(element)
-        } else {
-            false
-        }
-    }
-
 
     override fun toString() = "${javaClass.simpleName} [kjerneregler=$kjerne,kompletteregler=$komplett]"
 

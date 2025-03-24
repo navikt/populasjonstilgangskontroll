@@ -5,6 +5,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett.RegelType.KJERNE_REGELTYPE
 
 
-data class RegelSpec(val brukerId: BrukerId, val type: RegelType = KJERNE_REGELTYPE)
+data class IdOgType(val brukerId: BrukerId, val type: RegelType = KJERNE_REGELTYPE)
 
 

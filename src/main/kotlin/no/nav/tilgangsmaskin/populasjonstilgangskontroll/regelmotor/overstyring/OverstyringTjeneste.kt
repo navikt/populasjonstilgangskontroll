@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringEntity.Companion.OVERSTYRING
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.BulkRegelException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelMotor
@@ -38,7 +39,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
 
     fun overstyr(ansattId: AnsattId, data: OverstyringData)  =
          runCatching {
-                log.info("Sjekker kjerneregler før eventuell overstyring for ansatt '${ansattId.verdi}' og bruker '${data.brukerId.mask()}'")
+                log.info("Sjekker kjerneregler før eventuell overstyring for ansatt '${ansattId.verdi}' og bruker '${data.brukerId.verdi}'")
                 motor.kjerneregler(ansatt.ansatt(ansattId), bruker.bruker(data.brukerId))
                 adapter.overstyr(ansattId.verdi, data).also {
                     handler.overstyrt(ansattId,data.brukerId)
@@ -56,5 +57,43 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
     @CachePut(OVERSTYRING)
      fun refresh(ansattId: AnsattId, data: OverstyringData)  = Unit.also {
         log.info("Refresh cache overstyring for ansatt '${ansattId.verdi}' og bruker '${data.brukerId.mask()}'")
+    }
+
+    fun sjekk(ansattId: AnsattId, e: Throwable) =
+        when (e) {
+            is BulkRegelException -> sjekkOverstyringer(e, ansattId)
+            is RegelException -> sjekkOverstyring(e, ansattId)
+            else -> throw e.also { log.error("Ukjent feil ved tilgangskontroll for '${ansattId.verdi}", it) }
+        }
+
+    private fun sjekkOverstyring(e: RegelException, ansattId: AnsattId) =
+        with(e.regel) {
+            log.trace("Sjekker om regler er overstyrt for ansatt '${ansattId.verdi}' og bruker '${e.brukerId.mask()}'")
+            if (erOverstyrbar) {
+                if (erOverstyrt(ansattId, e.brukerId)) {
+                    log.warn("Overstyrt tilgang er gitt til ansatt '${ansattId.verdi}' og bruker '${e.brukerId.mask()}'")
+                } else {
+                    throw e.also { log.warn("Ingen overstyring, tilgang avvist av regel '${metadata.kortNavn}' for '${ansattId.verdi}' '${e.brukerId.mask()}' består") }
+                }
+            } else {
+                throw e.also { log.trace("Tilgang avvist av kjerneregel '${metadata.kortNavn}' for '${ansattId.verdi}' og '${e.brukerId.mask()}', avvisining består") }
+            }
+        }
+
+    private fun sjekkOverstyringer(e: BulkRegelException, ansattId: AnsattId) {
+        with(e.exceptions.toMutableList()) {
+            removeIf {
+                runCatching { sjekkOverstyring(it, ansattId) }.isSuccess
+            }.also {
+                if (it) {
+                    log.info("Fjernet $${e.exceptions.size - size} exception grunnet overstyrte regler for $ansattId")
+                } else {
+                    log.info("Ingen overstyrte regler for $ansattId")
+                }
+            }
+            if (isNotEmpty()) {
+                throw BulkRegelException(ansattId, this)
+            }
+        }
     }
 }

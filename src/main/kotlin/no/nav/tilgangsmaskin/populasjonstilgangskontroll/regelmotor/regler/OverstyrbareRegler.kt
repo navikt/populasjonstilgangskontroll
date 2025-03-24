@@ -79,8 +79,9 @@ class AvdødAksessTeller(private val meterRegistry: MeterRegistry, private val a
                 .description("Number of deceased users attempted accessed")
                 .tag("months",intervallFor(dødsdato))
                 .tag("system",accessor.system)
-                .register(meterRegistry).increment()
-            log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere avdød bruker ${brukerId.mask()} fra ${accessor.system}")
+                .register(meterRegistry).increment().also {
+                    log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere avdød bruker ${brukerId.mask()} fra ${accessor.system}")
+                }
         }
 
     private fun intervallFor(dato: LocalDate) =

@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service
 @Timed
 class BrukerTjeneste(private val pdlTjeneste: PDLTjeneste,val egenAnsatt: SkjermingTjeneste) {
 
-    fun brukerBulk(brukerIds: List<BrukerId>) = pdlTjeneste.personPipBulk(brukerIds)
+    fun brukere(brukerIds: List<BrukerId>) = pdlTjeneste.personer(brukerIds).map {
+        tilBruker(it.identer.identer.first().ident, it, false) // TODO
+    }
 
     fun bruker(brukerId: BrukerId)  =
         run {

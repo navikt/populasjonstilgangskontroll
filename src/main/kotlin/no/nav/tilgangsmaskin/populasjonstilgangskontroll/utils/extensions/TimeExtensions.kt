@@ -1,10 +1,9 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions
 
-import java.time.Instant
+import java.time.*
 import java.time.Instant.now
-import java.time.LocalDate
-import java.time.Period
 import java.time.ZoneId.systemDefault
+import java.time.format.DateTimeFormatter
 import kotlin.time.Duration
 import kotlin.time.toKotlinDuration
 
@@ -32,4 +31,9 @@ object TimeExtensions {
             if (seconds > 0) append("$seconds ${if (seconds == 1L) "sekund" else "sekunder"}")
         }.trim()
     }
+
+    fun Long.local(fmt : String = "yyyy-MM-dd HH:mm:ss") = LocalDateTime.ofInstant(
+        Instant.ofEpochMilli(this),
+        ZoneId.of("Europe/Oslo")).format(DateTimeFormatter.ofPattern(fmt))
+
 }

@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningTekster
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringSjekker
 import java.net.URI
 import java.util.function.BiPredicate
 

@@ -71,15 +71,13 @@ class RegelTjenesteTest {
 
     private lateinit var regel: RegelTjeneste
 
-    lateinit var sjekker: OverstyringSjekker
 
     @BeforeTest
     fun before() {
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
         every { accessor.system } returns "test"
         overstyring = OverstyringTjeneste(ansatt, bruker, OverstyringJPAAdapter(repo), motor)
-        sjekker = OverstyringSjekker(overstyring)
-        regel = RegelTjeneste(motor, bruker, ansatt,sjekker)
+        regel = RegelTjeneste(motor, bruker, ansatt,overstyring)
     }
 
     @Test

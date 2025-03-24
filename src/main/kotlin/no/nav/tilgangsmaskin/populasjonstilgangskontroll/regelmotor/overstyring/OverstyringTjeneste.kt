@@ -83,10 +83,10 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
     private fun sjekkOverstyringer(e: BulkRegelException, ansattId: AnsattId) {
         with(e.exceptions.toMutableList()) {
             removeIf {
-                it.regel.erOverstyrbar && erOverstyrt(ansattId, it.brukerId)
+                runCatching { sjekkOverstyring(it, ansattId) }.isSuccess
             }.also {
                 if (it) {
-                    log.info("Fjernet $${this.size - size} exception grunnet overstyrte regler for $ansattId")
+                    log.info("Fjernet $${e.exceptions.size - size} exception grunnet overstyrte regler for $ansattId")
                 } else {
                     log.info("Ingen overstyrte regler for $ansattId")
                 }

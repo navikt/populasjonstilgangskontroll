@@ -19,10 +19,7 @@ class PDLTjeneste(private val pdlAdapter: PdlPipRestClientAdapter) {
     fun personer(brukerIds: List<BrukerId>) =
         runBlocking {
             brukerIds.map {
-                async {
-                    runCatching { person(it) }
-                        .getOrNull()
-                }
+                async { runCatching { ::person }.getOrNull() }
             }.awaitAll().filterNotNull()
         }
 }

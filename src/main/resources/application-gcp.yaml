@@ -17,7 +17,7 @@ spring:
   jpa:
     properties:
       hibernate:
-        generate_statistics: true
+        generate_statistics: false
   application:
     name: populasjonstilgangskontroll
   kafka:

@@ -86,13 +86,16 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
                 runCatching { sjekkOverstyring(it, ansattId) }.isSuccess
             }.also {
                 if (it) {
-                    log.info("Fjernet $${e.exceptions.size - size} exception grunnet overstyrte regler for $ansattId")
+                    log.info("Ignorerer ${e.exceptions.size - size} avvisninger grunnet overstyring for $ansattId")
                 } else {
-                    log.info("Ingen overstyrte regler for $ansattId")
+                    log.info("Ingen overstyringer ble funnet for $ansattId")
                 }
             }
             if (isNotEmpty()) {
-                throw BulkRegelException(ansattId, this)
+                throw BulkRegelException(ansattId, this).also {
+                    val avvist = this.intersect(e.exceptions).map { it.brukerId to it.regel.metadata.begrunnelse}
+                    log.error("Følgende brukerId ble avvist for $ansattId : $avvist")
+                }
             }
         }
     }

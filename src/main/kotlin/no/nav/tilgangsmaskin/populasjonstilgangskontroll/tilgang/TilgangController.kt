@@ -9,8 +9,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.RegelTjenest
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.IdOgType
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang.TokenClaimsAccessor
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang.TokenClaimsAccessor.Companion.AAD_ISSUER
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang1.TokenClaimsAccessor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang1.TokenClaimsAccessor.Companion.AAD_ISSUER
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.web.bind.annotation.PostMapping

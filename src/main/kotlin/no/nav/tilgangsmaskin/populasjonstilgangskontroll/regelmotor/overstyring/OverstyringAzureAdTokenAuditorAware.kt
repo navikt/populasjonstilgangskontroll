@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang.TokenClaimsAccessor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang1.TokenClaimsAccessor
 import org.springframework.data.domain.AuditorAware
 import org.springframework.stereotype.Component
 import java.util.*

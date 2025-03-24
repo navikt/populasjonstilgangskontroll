@@ -17,7 +17,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.for
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.TEST
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang.TokenClaimsAccessor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang1.TokenClaimsAccessor
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -105,5 +105,19 @@ class RegelTjenesteTest {
         assertEquals(assertThrows<BulkRegelException> {
             regel.bulkRegler(vanligAnsatt.ansattId, listOf(IdOgType(strengtFortroligBruker.brukerId, KJERNE_REGELTYPE), IdOgType(fortroligBruker.brukerId, KJERNE_REGELTYPE)))
         }.exceptions.size, 2)
+    }
+    @Test
+    fun bulkAvvisningerOverstyrt() {
+        every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
+        every { bruker.bruker(geoUtlandBruker.brukerId) } returns geoUtlandBruker
+        every { bruker.brukere(listOf(geoUtlandBruker.brukerId)) } returns listOf(geoUtlandBruker)
+        overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData(
+            geoUtlandBruker.brukerId,
+            "test",
+            LocalDate.now().plusDays(1)
+        ))
+        assertThatCode {
+            regel.bulkRegler(vanligAnsatt.ansattId, listOf(IdOgType(geoUtlandBruker.brukerId,KOMPLETT_REGELTYPE)))
+        }.doesNotThrowAnyException()
     }
 }

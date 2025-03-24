@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang1
 
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class TokenClaimsAccessor(private val contextHolder: TokenValidationContextHolder){
+class TokenClaimsAccessor (private val contextHolder: TokenValidationContextHolder){
 
     val system get() = runCatching {
         claimSet().getStringClaim("azp_name")

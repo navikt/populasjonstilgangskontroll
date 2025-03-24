@@ -11,7 +11,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.RegelBeskrivelse
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.TimeExtensions.månederSidenIdag
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang.TokenClaimsAccessor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang1.TokenClaimsAccessor
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE

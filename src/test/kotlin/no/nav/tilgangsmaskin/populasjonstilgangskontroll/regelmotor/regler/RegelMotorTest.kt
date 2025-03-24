@@ -26,7 +26,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.ukj
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.TEST
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang.TokenClaimsAccessor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang1.TokenClaimsAccessor
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test

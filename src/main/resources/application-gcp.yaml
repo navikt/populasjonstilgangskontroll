@@ -73,7 +73,7 @@ spring:
     password: ${db.password}
     hikari:
       connection-test-query: SELECT 1
-      maximum-pool-size: 2
+      maximum-pool-size: ${db.poolsize}
   main:
     banner-mode: off
   jackson:

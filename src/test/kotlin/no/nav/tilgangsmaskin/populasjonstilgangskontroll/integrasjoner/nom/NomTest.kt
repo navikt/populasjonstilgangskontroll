@@ -7,8 +7,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestApp
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringEntityListener
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.TEST
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang.TokenClaimsAccessor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomAnsattData.NomAnsattPeriode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName

@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang
 
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId

@@ -16,8 +16,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.fortroligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.TEST
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang.TokenClaimsAccessor
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test

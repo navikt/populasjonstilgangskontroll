@@ -1,16 +1,16 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker
 
 import com.fasterxml.jackson.annotation.JsonValue
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Cluster
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterUtils
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions.maskFnr
 
 @JvmInline
 value class BrukerId(@JsonValue val verdi: String) {
     init {
         with(verdi) {
-            ObjectUtil.requireDigits(this, 11)
-            if (Cluster.isProd) {
+            DomainExtensions.requireDigits(this, 11)
+            if (ClusterUtils.isProd) {
                 require(mod11(W1, this) == this[9] - '0') { "Første kontrollsiffer  ${this[9]} ikke validert" }
                 require(mod11(W2, this) == this[10] - '0') { "Andre kontrollsiffer  ${this[10]} ikke validert" }
             }
@@ -32,6 +32,6 @@ value class BrukerId(@JsonValue val verdi: String) {
             }
     }
 
-    override fun toString() = "${javaClass.simpleName} [verdi=${mask()}]"
+    override fun toString() = "${javaClass.simpleName} [verdi=${maskFnr()}]"
 
 }

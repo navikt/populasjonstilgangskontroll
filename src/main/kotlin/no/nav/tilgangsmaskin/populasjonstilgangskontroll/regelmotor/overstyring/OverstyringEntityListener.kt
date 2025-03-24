@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 
 import jakarta.persistence.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang.TokenClaimsAccessor
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 

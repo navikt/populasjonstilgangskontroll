@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett
 import org.springframework.boot.SpringBootVersion
@@ -13,7 +13,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Component
-class StartupInfoContributor(private val ctx : ConfigurableApplicationContext, vararg val regelsett: RegelSett) : InfoContributor {
+class BootStartupInfoContributor(private val ctx : ConfigurableApplicationContext, vararg val regelsett: RegelSett) : InfoContributor {
 
     override fun contribute(builder : Builder) {
         with(ctx)    {

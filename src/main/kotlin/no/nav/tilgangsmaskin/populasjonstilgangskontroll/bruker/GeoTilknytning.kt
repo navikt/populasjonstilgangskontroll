@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker
 
 import com.neovisionaries.i18n.CountryCode
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions
 
 sealed class GeoTilknytning(val type: Type) {
     enum class Type { BYDEL, KOMMUNE, UDEFINERT, UTLAND, UKJENT_BOSTED }
@@ -9,14 +9,14 @@ sealed class GeoTilknytning(val type: Type) {
     @JvmInline
     value class Kommune(val verdi: String)  {
         init {
-            ObjectUtil.requireDigits(verdi, 4)
+            DomainExtensions.requireDigits(verdi, 4)
         }
     }
 
     @JvmInline
     value class Bydel(val verdi: String)  {
         init {
-            ObjectUtil.requireDigits(verdi, 6)
+            DomainExtensions.requireDigits(verdi, 6)
         }
     }
     data class KommuneTilknytning(val kommune: Kommune) : GeoTilknytning(Type.KOMMUNE)

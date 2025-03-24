@@ -1,6 +1,5 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import java.time.Instant
 import java.time.Instant.now
 import java.time.LocalDate
@@ -9,24 +8,17 @@ import java.time.ZoneId.systemDefault
 import kotlin.time.Duration
 import kotlin.time.toKotlinDuration
 
-object ObjectUtil {
-    fun requireDigits(verdi: String, len: Int): Unit {
-        require(verdi.all { it.isDigit() }) { "Ugyldig(e) tegn i $verdi, forventet $len siffer" }
-        require(verdi.length == len) { "Ugyldig lengde ${verdi.length} for $verdi, forventet $len siffer" }
-    }
+object TimeExtensions {
 
-    fun BrukerId.mask() = verdi.mask()
+    fun Instant.isBeforeNow() = isBefore(now())
+    fun Instant.diffFromNow() = java.time.Duration.between(now(), this).toKotlinDuration().format()
+    fun LocalDate.toInstant(): Instant = atStartOfDay(systemDefault()).toInstant()
 
-    fun String.mask() = if (length == 11) replaceRange(6,11, "*****") else this
-
-
-    fun  LocalDate.månederSidenIdag() =
+    fun LocalDate.månederSidenIdag() =
         LocalDate.now().let {
             assert(isBefore(it)) { "Datoen $this er ikke før dagens dato $it" }
             Period.between(this, it).let { it.years * 12 + it.months } + if (it.dayOfMonth > dayOfMonth) 1 else 0
         }
-
-
     private fun Duration.format(): String {
         val days = inWholeDays
         val hours = inWholeHours % 24
@@ -40,9 +32,4 @@ object ObjectUtil {
             if (seconds > 0) append("$seconds ${if (seconds == 1L) "sekund" else "sekunder"}")
         }.trim()
     }
-
-    fun String.pluralize(list: List<Any>) = if (list.size == 1 )  this else if (this.endsWith('e')) "${this}r" else "${this}er"
-    fun Instant.isBeforeNow() = isBefore(now())
-    fun Instant.diffFromNow() = java.time.Duration.between(now(), this).toKotlinDuration().format()
-    fun LocalDate.toInstant(): Instant = atStartOfDay(systemDefault()).toInstant()}
-
+}

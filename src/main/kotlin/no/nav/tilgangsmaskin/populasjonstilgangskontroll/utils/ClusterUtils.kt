@@ -1,17 +1,17 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.DEV
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.DEV_GCP
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.GCP
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.LOCAL
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.NAIS_CLUSTER_NAME
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.PROD
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.PROD_GCP
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.TEST
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.DEV
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.DEV_GCP
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.GCP
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.LOCAL
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.NAIS_CLUSTER_NAME
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.PROD
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.PROD_GCP
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ClusterConstants.TEST
 import java.lang.System.getenv
 import java.lang.System.setProperty
 
-internal enum class Cluster(private val clusterName: String) {
+internal enum class ClusterUtils(private val clusterName: String) {
     TEST_CLUSTER(TEST),
     LOCAL_CLUSTER(LOCAL),
     DEV_GCP_CLUSTER(DEV_GCP),

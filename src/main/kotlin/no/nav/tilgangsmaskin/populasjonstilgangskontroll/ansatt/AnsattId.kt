@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt
 
 import com.fasterxml.jackson.annotation.JsonValue
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions
 
 @JvmInline
 value class AnsattId(@JsonValue val verdi: String) {
@@ -9,7 +9,7 @@ value class AnsattId(@JsonValue val verdi: String) {
         with(verdi) {
             require(length == 7) { "Ugyldig lengde $length for $this, forventet 7" }
             require(first().isLetter()) { "Ugyldig første tegn ${first()} i $this, må være stor bokstav" }
-            ObjectUtil.requireDigits(substring(1), 6)
+            DomainExtensions.requireDigits(substring(1), 6)
         }
     }
 }

@@ -1,11 +1,11 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt
 
 import com.fasterxml.jackson.annotation.JsonValue
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions
 
 @JvmInline
 value class Enhetsnummer(@JsonValue val verdi: String) {
     init {
-        ObjectUtil.requireDigits(verdi, 4)
+        DomainExtensions.requireDigits(verdi, 4)
     }
 }

@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils
 
-internal object Constants {
+internal object ClusterConstants {
     internal const val LOCAL = "local"
     internal const val GCP = "gcp"
     internal const val TEST = "test"

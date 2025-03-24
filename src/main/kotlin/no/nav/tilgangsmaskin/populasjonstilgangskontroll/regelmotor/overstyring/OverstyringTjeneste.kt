@@ -10,9 +10,9 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.BulkR
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelMotor
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.diffFromNow
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.isBeforeNow
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.ObjectUtil.mask
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.TimeExtensions.diffFromNow
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.TimeExtensions.isBeforeNow
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
@@ -56,7 +56,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
 
     @CachePut(OVERSTYRING)
      fun refresh(ansattId: AnsattId, data: OverstyringData)  = Unit.also {
-        log.info("Refresh cache overstyring for ansatt '${ansattId.verdi}' og bruker '${data.brukerId.mask()}'")
+        log.info("Refresh cache overstyring for ansatt '${ansattId.verdi}' og bruker '${data.brukerId.maskFnr()}'")
     }
 
     fun sjekk(ansattId: AnsattId, e: Throwable) =
@@ -68,15 +68,15 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
 
     private fun sjekkOverstyring(e: RegelException, ansattId: AnsattId) =
         with(e.regel) {
-            log.trace("Sjekker om regler er overstyrt for ansatt '${ansattId.verdi}' og bruker '${e.brukerId.mask()}'")
+            log.trace("Sjekker om regler er overstyrt for ansatt '${ansattId.verdi}' og bruker '${e.brukerId.maskFnr()}'")
             if (erOverstyrbar) {
                 if (erOverstyrt(ansattId, e.brukerId)) {
-                    log.warn("Overstyrt tilgang er gitt til ansatt '${ansattId.verdi}' og bruker '${e.brukerId.mask()}'")
+                    log.warn("Overstyrt tilgang er gitt til ansatt '${ansattId.verdi}' og bruker '${e.brukerId.maskFnr()}'")
                 } else {
-                    throw e.also { log.warn("Ingen overstyring, tilgang avvist av regel '${metadata.kortNavn}' for '${ansattId.verdi}' '${e.brukerId.mask()}' består") }
+                    throw e.also { log.warn("Ingen overstyring, tilgang avvist av regel '${metadata.kortNavn}' for '${ansattId.verdi}' '${e.brukerId.maskFnr()}' består") }
                 }
             } else {
-                throw e.also { log.trace("Tilgang avvist av kjerneregel '${metadata.kortNavn}' for '${ansattId.verdi}' og '${e.brukerId.mask()}', avvisining består") }
+                throw e.also { log.trace("Tilgang avvist av kjerneregel '${metadata.kortNavn}' for '${ansattId.verdi}' og '${e.brukerId.maskFnr()}', avvisining består") }
             }
         }
 

@@ -63,10 +63,8 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
 @Order(LOWEST_PRECEDENCE - 3)
 class AvdødBrukerRegel(private val teller: AvdødAksessTeller) : OverstyrbarRegel {
     override fun test(ansatt: Ansatt, bruker: Bruker) =
-        bruker.dødsdato?.let { d ->
-            true.also {  // TODO Endre til false når vi faktisk skal håndtere døde
-                teller.avdødBrukerAksess(ansatt.ansattId, bruker.brukerId, d)
-            }
+        bruker.dødsdato?.let {
+            teller.avdødBrukerAksess(ansatt.ansattId, bruker.brukerId, it)
         } ?: true
     override val metadata = RegelBeskrivelse("Avdød bruker", AVVIST_AVDØD)
 }
@@ -76,6 +74,7 @@ class AvdødAksessTeller(private val meterRegistry: MeterRegistry, private val a
 
     private val log = LoggerFactory.getLogger(javaClass)
     fun avdødBrukerAksess(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
+        true.also {  // TODO Endre til false når vi faktisk skal håndtere døde
             Counter.builder("dead.attempted.total")
                 .description("Number of deceased users attempted accessed")
                 .tag("months",intervallFor(dødsdato))
@@ -83,7 +82,7 @@ class AvdødAksessTeller(private val meterRegistry: MeterRegistry, private val a
                 .register(meterRegistry).increment().also {
                     log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere avdød bruker ${brukerId.mask()} fra ${accessor.system}")
                 }
-
+        }
 
     private fun intervallFor(dato: LocalDate) =
         when (dato.månederSidenIdag()) {

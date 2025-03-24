@@ -11,7 +11,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomTj
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.RegelTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSpec
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.IdOgType
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.Constants.DEV
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.NO_CONTENT
@@ -45,7 +45,7 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
 
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(NO_CONTENT)
-    fun bulk(@PathVariable ansattId: AnsattId, @RequestBody  specs: List<RegelSpec>) = regler.bulkRegler(ansattId, specs)
+    fun bulk(@PathVariable ansattId: AnsattId, @RequestBody  specs: List<IdOgType>) = regler.bulkRegler(ansattId, specs)
 
     @PostMapping("brukere")
     fun brukerBulk(@RequestBody brukerIds: Array<String>) = bruker.brukere(brukerIds.map { BrukerId(it) })}

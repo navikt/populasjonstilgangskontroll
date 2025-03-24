@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.RegelTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSpec
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.IdOgType
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.TokenClaimsAccessor.Companion.AAD_ISSUER
 import org.springframework.http.HttpStatus.ACCEPTED
@@ -36,7 +36,7 @@ class TilgangController(private val regler : RegelTjeneste, private val overstyr
 
     @PostMapping("bulk")
     @ResponseStatus(NO_CONTENT)
-    fun bulk(@RequestBody  specs: List<RegelSpec>) = regler.bulkRegler(token.ansattId, specs)
+    fun bulk(@RequestBody  specs: List<IdOgType>) = regler.bulkRegler(token.ansattId, specs)
 
 }
 

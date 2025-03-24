@@ -55,7 +55,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         with(e) {
             mapOf(
               //  "årsak" to regel.metadata.begrunnelse,
-                "brukerIdent" to brukerId.verdi,
+                "brukerIdent" to brukerId.verdi)
               //  "kanOverstyres" to regel.erOverstyrbar)
         }
 }

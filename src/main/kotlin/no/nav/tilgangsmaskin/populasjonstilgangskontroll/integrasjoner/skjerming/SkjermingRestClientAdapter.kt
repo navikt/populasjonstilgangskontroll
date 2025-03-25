@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming
 
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestClientAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig.Companion.IDENT
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingConfig.Companion.IDENTER
@@ -12,7 +13,7 @@ import org.springframework.web.client.RestClient
 class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, private val cf : SkjermingConfig): AbstractRestClientAdapter(restClient, cf) {
 
     fun erSkjermet(ident: String) = post<Boolean>(cf.skjermetUri(), mapOf(IDENT to ident))
-    fun erSkjermetBulk(identer: List<String>) = post<Boolean>(cf.skjermetBulkUri(), mapOf(IDENTER to identer))
+    fun erSkjermetBulk(identer: List<String>) = post<Map<BrukerId,Boolean>>(cf.skjermetBulkUri(), mapOf(IDENTER to identer))
 }
 
 

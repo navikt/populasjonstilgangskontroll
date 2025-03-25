@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.RegelBeskrivelse
 import java.util.*
 
 abstract class GlobalGruppeRegel(private val gruppe: GlobalGruppe, private val id: UUID, kortNavn: String):
@@ -11,5 +12,5 @@ abstract class GlobalGruppeRegel(private val gruppe: GlobalGruppe, private val i
         if (bruker.kreverGlobalGruppe(gruppe))  {
             ansatt.kanBehandle(id)
         } else true
-    override val metadata = Regel.RegelBeskrivelse(kortNavn, gruppe.begrunnelse)
+    override val metadata = RegelBeskrivelse(kortNavn, gruppe.begrunnelse)
 }

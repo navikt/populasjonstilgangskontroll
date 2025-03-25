@@ -87,49 +87,74 @@ class PdlPipTilBrukerMapperTest {
    @Test
     fun jall() {
         val json = """
-            {
-  "10108000398": {
-    "aktoerId": "1000096233942",
+ {
+  "08526835671": {
+    "aktoerId": "2179781122252",
     "person": {
       "adressebeskyttelse": [],
       "foedsel": [
         {
-          "foedselsdato": "1980-10-10"
+          "foedselsdato": "1968-12-08"
         }
       ],
       "doedsfall": [],
-      "familierelasjoner": [
-        {
-          "relatertPersonsIdent": "26014401260",
-          "relatertPersonsRolle": "MOR",
-          "minRolleForPerson": "BARN"
-        },
-        {
-          "relatertPersonsIdent": "08074401156",
-          "relatertPersonsRolle": "FAR",
-          "minRolleForPerson": "BARN"
-        }
-      ],
+      "familierelasjoner": [],
       "rettsligHandleevne": []
     },
     "identer": {
       "identer": [
         {
-          "ident": "1000096233942",
-          "historisk": false,
-          "gruppe": "AKTORID"
-        },
-        {
-          "ident": "10108000398",
+          "ident": "08526835671",
           "historisk": false,
           "gruppe": "FOLKEREGISTERIDENT"
+        },
+        {
+          "ident": "2179781122252",
+          "historisk": false,
+          "gruppe": "AKTORID"
         }
       ]
     },
     "geografiskTilknytning": {
       "gtType": "BYDEL",
-      "gtBydel": "460108",
+      "gtBydel": "030116",
       "regel": "3"
+    }
+  },
+  "24506504690": {
+    "aktoerId": "2940259936623",
+    "person": {
+      "adressebeskyttelse": [
+        {
+          "gradering": "STRENGT_FORTROLIG"
+        }
+      ],
+      "foedsel": [
+        {
+          "foedselsdato": "1965-10-24"
+        }
+      ],
+      "doedsfall": [],
+      "familierelasjoner": [],
+      "rettsligHandleevne": []
+    },
+    "identer": {
+      "identer": [
+        {
+          "ident": "24506504690",
+          "historisk": false,
+          "gruppe": "FOLKEREGISTERIDENT"
+        },
+        {
+          "ident": "2940259936623",
+          "historisk": false,
+          "gruppe": "AKTORID"
+        }
+      ]
+    },
+    "geografiskTilknytning": {
+      "gtType": "UDEFINERT",
+      "regel": "1"
     }
   }
 }

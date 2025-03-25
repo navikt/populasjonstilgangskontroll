@@ -71,7 +71,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
             log.trace("Sjekker om regler er overstyrt for  $ansattId og ${e.brukerId}")
             if (erOverstyrbar) {
                 if (erOverstyrt(ansattId, e.brukerId)) {
-                    log.warn("Overstyrt tilgang er gitt til $ansattId og ${e.brukerId}")
+                    log.info("Overstyrt tilgang er gitt til $ansattId og ${e.brukerId}")
                 } else {
                     throw e.also { log.warn("Ingen overstyring, tilgang avvist av regel $kortNavn og $ansattId og ${e.brukerId} opprettholdes") }
                 }
@@ -88,7 +88,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
                 if (it) {
                     log.info("Ignorerer ${e.exceptions.size - size} avvisninger grunnet overstyring for $ansattId")
                 } else {
-                    log.info("Ingen overstyringer ble funnet for $ansattId")
+                    log.info("Ingen overstyringer ble funnet for $ansattId og ${e.exceptions.map { it.brukerId }}")
                 }
             }
             if (isNotEmpty()) {

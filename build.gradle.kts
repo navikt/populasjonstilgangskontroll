@@ -1,6 +1,6 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
-val javaVersion = JavaLanguageVersion.of(24)
+val javaVersion = JavaLanguageVersion.of(23)
 val springdocVersion = "2.8.6"
 val tokenSupportVersion = "5.0.20"
 val springCloudVersion = "4.2.1"
@@ -11,14 +11,14 @@ group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
 version = "1.0.1"
 
 plugins {
-    id("org.jetbrains.kotlin.plugin.allopen") version "1.9.25"
-    kotlin("jvm") version "1.9.25"
+    id("org.jetbrains.kotlin.plugin.allopen") version "2.1.0"
+    kotlin("jvm") version "2.1.0"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("org.springframework.boot") version "3.4.4"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.spring") version "2.1.20"
     id("org.cyclonedx.bom") version "2.2.0"
-    kotlin("plugin.jpa") version "1.9.25"
+    kotlin("plugin.jpa") version "2.1.0"
     id("com.google.cloud.tools.jib") version "3.4.5"
 
     // Apply the application plugin to add support for building a CLI application in Java.
@@ -107,7 +107,7 @@ java {
 }
 
 kotlin {
-jvmToolchain(24)
+jvmToolchain(23)
 
 compilerOptions {
 freeCompilerArgs.add("-Xjsr305=strict")

@@ -12,9 +12,11 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.Irrecover
 
 @CacheableRetryingOnRecoverableService(cacheNames = [PDL])
 @Timed
-class PDLTjeneste(private val pdlAdapter: PdlPipRestClientAdapter) {
+class PDLTjeneste(private val adapter: PdlPipRestClientAdapter) {
 
-    fun person(brukerId: BrukerId) = pdlAdapter.person(brukerId.verdi)
+    fun person(brukerId: BrukerId) = adapter.person(brukerId.verdi)
+
+     fun personer1 (brukerIds: List<BrukerId>) = adapter.personer(brukerIds)
 
     fun personer(brukerIds: List<BrukerId>) =
         runBlocking {

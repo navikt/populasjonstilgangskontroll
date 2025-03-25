@@ -12,7 +12,6 @@ import org.springframework.web.client.RestClient
 @Component
 @Cacheable(PDLPIP)
 class PdlPipRestClientAdapter(@Qualifier(PDLPIP) restClient: RestClient, private val cf : PdlPipConfig): AbstractRestClientAdapter(restClient, cf) {
-    protected val log = getLogger(PdlPipRestClientAdapter::class.java)
 
     fun person(brukerId: String) = get<PdlPipRespons>(cf.personURI(), mapOf("ident" to brukerId))
 

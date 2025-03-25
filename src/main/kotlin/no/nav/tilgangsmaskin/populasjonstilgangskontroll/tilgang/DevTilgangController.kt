@@ -44,7 +44,7 @@ class DevTilgangController(private val pdl: PDLTjeneste,private val bruker : Bru
     @ResponseStatus(ACCEPTED)
     fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody data: OverstyringData) = overstyring.overstyr(ansattId, data)
 
-    @PostMapping("brukere")
+    @PostMapping("brukere1")
     fun personer(@RequestBody  brukerIds: List<BrukerId>) = pdl.personer1(brukerIds)
 
     @PostMapping("bulk/{ansattId}")

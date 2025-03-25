@@ -38,10 +38,10 @@ data class PdlPipRespons1(val person: PdlPipPerson, val identer: PdlPipIdenter =
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class PdlPipPerson(
-        val adressebeskyttelse: Any //List<PdlPipAdressebeskyttelse> = emptyList(),
-        val foedsel: Any //List<PdlPipFødsel> = emptyList(),
-        val doedsfall: Any // List<PdlPipDødsfall> = emptyList(),
-        val familierelasjoner: Any /*List<PdlPipFamilierelasjon> = emptyList()) */ {
+        val adressebeskyttelse: Any, //List<PdlPipAdressebeskyttelse> = emptyList(),
+        val foedsel: Any, //List<PdlPipFødsel> = emptyList(),
+        val doedsfall: Any, // List<PdlPipDødsfall> = emptyList(),
+        val familierelasjoner: Any) /*List<PdlPipFamilierelasjon> = emptyList()) */ {
 
         data class PdlPipAdressebeskyttelse(val gradering: PdlPipAdressebeskyttelseGradering)  {
             enum class PdlPipAdressebeskyttelseGradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG,UGRADERT}

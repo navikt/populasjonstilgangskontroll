@@ -36,7 +36,7 @@ object TimeExtensions {
         Instant.ofEpochMilli(this),
         ZoneId.of("Europe/Oslo")).format(DateTimeFormatter.ofPattern(fmt))
 
-     fun LocalDate.intervallFor() =
+     fun LocalDate.intervallSiden() =
         when (månederSidenIdag()) {
             in 0..6 -> "0-6"
             in 7..12 -> "7-12"

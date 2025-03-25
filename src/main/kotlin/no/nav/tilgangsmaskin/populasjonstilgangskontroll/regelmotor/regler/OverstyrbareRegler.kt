@@ -10,7 +10,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.RegelBeskrivelse
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang1.TokenClaimsAccessor
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.TimeExtensions.intervallFor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.TimeExtensions.intervallSiden
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
@@ -75,7 +75,7 @@ class AvdødAksessTeller(private val meterRegistry: MeterRegistry, private val a
     fun avdødBrukerAksess(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
         true.also {
             // TODO Endre til false når vi faktisk skal håndtere døde
-            val intervall = dødsdato.intervallFor()
+            val intervall = dødsdato.intervallSiden()
             Counter.builder("dead.attempted.total")
                 .description("Number of deceased users attempted accessed")
                 .tag("months",intervall)

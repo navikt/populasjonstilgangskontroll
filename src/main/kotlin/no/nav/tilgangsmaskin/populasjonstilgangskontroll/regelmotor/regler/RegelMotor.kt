@@ -68,10 +68,10 @@ class RegelMotor(@Qualifier(KJERNE) private val kjerne: RegelSett, @Qualifier(OV
     class RegelsettResultatHandler {
         private val log = LoggerFactory.getLogger(javaClass)
         fun avvist(pos: String, ansattId: AnsattId, brukerId: BrukerId, regel: Regel) {
-            log.warn("[#$pos] Tilgang avvist av regel '${regel.kortNavn}' (${regel.avvisningTekst})")
+            log.warn("[#$pos] Tilgang avvist av regel '${regel.kortNavn}' ${regel.avvisningTekst}) for $ansattId og $brukerId")
         }
         fun ok(type: RegelType, ansattId: AnsattId, brukerId: BrukerId) {
-            log.info("${type.beskrivelse.replaceFirstChar { it.uppercaseChar() }} ga tilgang OK for '$ansattId' og '${brukerId.maskFnr()}'")
+            log.info("${type.beskrivelse.replaceFirstChar { it.uppercaseChar() }} ga tilgang OK for $ansattId og $brukerId")
         }
     }
 }

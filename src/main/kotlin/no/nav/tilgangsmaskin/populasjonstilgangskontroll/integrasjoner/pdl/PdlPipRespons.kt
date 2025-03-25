@@ -32,31 +32,3 @@ data class PdlPipRespons(val person: PdlPipPerson, val identer: PdlPipIdenter = 
 }
 
 
-//@JsonIgnoreProperties(ignoreUnknown = true)
-data class PdlPipRespons1(val aktoerId: Any? = null, val person: Any, val identer: Any, val geografiskTilknytning: Any? = null)  {
-/*
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    data class PdlPipPerson(
-        val adressebeskyttelse: Any, //List<PdlPipAdressebeskyttelse> = emptyList(),
-        val foedsel: Any, //List<PdlPipFødsel> = emptyList(),
-        val doedsfall: Any, // List<PdlPipDødsfall> = emptyList(),
-        val familierelasjoner: Any) /*List<PdlPipFamilierelasjon> = emptyList()) */ {
-
-        data class PdlPipAdressebeskyttelse(val gradering: PdlPipAdressebeskyttelseGradering)  {
-            enum class PdlPipAdressebeskyttelseGradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG,UGRADERT}
-        }
-
-        data class PdlPipFødsel(val foedselsdato: LocalDate)
-        data class PdlPipDødsfall(val doedsdato: LocalDate)
-        data class PdlPipFamilierelasjon(val relatertPersonsIdent: BrukerId? = null, val relatertPersonsRolle: PdlPipFamilieRelasjonRolle? = null, val minRolleForPerson: PdlPipFamilieRelasjonRolle? = null) {
-            enum class PdlPipFamilieRelasjonRolle  {MOR,FAR,MEDMOR,MEDFAR,BARN}
-        }
-    }
-    data class PdlPipIdenter(val identer: List<PdlPipIdent> = emptyList()) {
-        data class PdlPipIdent(val ident: String, val historisk: Boolean, val gruppe: PdlPipIdentGruppe) {
-            enum class PdlPipIdentGruppe { AKTORID, FOLKEREGISTERIDENT }
-        }
-    }*/
-}
-
-

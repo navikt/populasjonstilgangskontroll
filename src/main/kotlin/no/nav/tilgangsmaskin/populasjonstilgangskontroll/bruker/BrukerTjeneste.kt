@@ -11,10 +11,8 @@ import org.springframework.stereotype.Service
 class BrukerTjeneste(private val pdlTjeneste: PDLTjeneste,val egenAnsatt: SkjermingTjeneste) {
 
     fun brukere(brukerIds: List<BrukerId>) = pdlTjeneste.personer(brukerIds).map {
-        tilBruker(it.identer.identer.first().ident, it, false) // TODO
+        tilBruker(it.key, it.value, false) // TODO skjerming
     }
-
-    fun brukere1(brukerIds: List<BrukerId>) = pdlTjeneste.personer1(brukerIds)
 
     fun bruker(brukerId: BrukerId)  =
         run {

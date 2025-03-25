@@ -16,15 +16,6 @@ class PDLTjeneste(private val adapter: PdlPipRestClientAdapter) {
 
     fun person(brukerId: BrukerId) = adapter.person(brukerId.verdi)
 
-     fun personer1 (brukerIds: List<BrukerId>) = adapter.personer(brukerIds.map { it.verdi })
+     fun personer (brukerIds: List<BrukerId>) = adapter.personer(brukerIds.map { it.verdi })
 
-    fun personer(brukerIds: List<BrukerId>) =
-        runBlocking {
-            brukerIds.map {
-                async {
-                    runCatching { person(it) }
-                        .getOrNull()
-                }
-            }.awaitAll().filterNotNull()
-        }
 }

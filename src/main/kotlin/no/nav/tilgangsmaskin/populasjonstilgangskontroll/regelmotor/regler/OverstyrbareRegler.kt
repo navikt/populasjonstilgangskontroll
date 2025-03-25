@@ -1,22 +1,14 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
-import io.micrometer.core.instrument.Counter
-import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Ansatt
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningKode.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.RegelBeskrivelse
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang1.TokenClaimsAccessor
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.TimeExtensions.intervallSiden
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
-import java.time.LocalDate
 import java.util.*
 
 @Component
@@ -63,27 +55,9 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
 class AvdødBrukerRegel(private val teller: AvdødAksessTeller) : OverstyrbarRegel {
     override fun test(ansatt: Ansatt, bruker: Bruker) =
         bruker.dødsdato?.let {
-            teller.avdødBrukerAksess(ansatt.ansattId, bruker.brukerId, it)
+            teller.registrerAksess(ansatt.ansattId, bruker.brukerId, it)
         } ?: true
     override val metadata = RegelBeskrivelse("Avdød bruker", AVVIST_AVDØD)
-}
-
-@Component
-class AvdødAksessTeller(private val meterRegistry: MeterRegistry, private val accessor: TokenClaimsAccessor) {
-
-    private val log = LoggerFactory.getLogger(javaClass)
-    fun avdødBrukerAksess(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
-        true.also {
-            // TODO Endre til false når vi faktisk skal håndtere døde
-            val intervall = dødsdato.intervallSiden()
-            Counter.builder("dead.attempted.total")
-                .description("Number of deceased users attempted accessed")
-                .tag("months",intervall)
-                .tag("system",accessor.system ?: "N/A")
-                .register(meterRegistry).increment().also {
-                    log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere avdød bruker $brukerId med dødsdato $intervall måneder siden fra system ${accessor.systemNavn}")
-                }
-        }
 }
 
 

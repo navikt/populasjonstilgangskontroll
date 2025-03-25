@@ -41,31 +41,31 @@ internal class SkjermingRetryTest {
     @Test
     @DisplayName("Returner true etter at antall forsøk er oppbrukt")
     fun erSkjermetEtterTreMislykkedeForsøk() {
-        every { adapter.erSkjermet(vanligBruker.brukerId.verdi) } throws RecoverableRestException(INTERNAL_SERVER_ERROR, uri)
-        assertThat(tjeneste.erSkjermet(vanligBruker.brukerId)).isTrue
+        every { adapter.skjerming(vanligBruker.brukerId.verdi) } throws RecoverableRestException(INTERNAL_SERVER_ERROR, uri)
+        assertThat(tjeneste.skjerming(vanligBruker.brukerId)).isTrue
         verify(exactly = 3) {
-            tjeneste.erSkjermet(vanligBruker.brukerId)
+            tjeneste.skjerming(vanligBruker.brukerId)
         }
     }
 
     @Test
     @DisplayName("Test retry tar seg inn etter først å ha feilet")
     fun testRetryOK() {
-        every { adapter.erSkjermet(vanligBruker.brukerId.verdi) } throws RecoverableRestException(INTERNAL_SERVER_ERROR, uri) andThen false
-        assertThat(tjeneste.erSkjermet(vanligBruker.brukerId)).isFalse
+        every { adapter.skjerming(vanligBruker.brukerId.verdi) } throws RecoverableRestException(INTERNAL_SERVER_ERROR, uri) andThen false
+        assertThat(tjeneste.skjerming(vanligBruker.brukerId)).isFalse
         verify(exactly = 2) {
-            tjeneste.erSkjermet(vanligBruker.brukerId)
+            tjeneste.skjerming(vanligBruker.brukerId)
         }
     }
     @Test
     @DisplayName("Andre exceptions fører ikke til retry, og kastes umiddlelbart videre")
     fun andreExceptions() {
-        every { adapter.erSkjermet(vanligBruker.brukerId.verdi) } throws IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
+        every { adapter.skjerming(vanligBruker.brukerId.verdi) } throws IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
         assertThrows<IrrecoverableRestException>  {
-            tjeneste.erSkjermet(vanligBruker.brukerId)
+            tjeneste.skjerming(vanligBruker.brukerId)
         }
         verify(exactly = 1) {
-            tjeneste.erSkjermet(vanligBruker.brukerId)
+            tjeneste.skjerming(vanligBruker.brukerId)
         }
     }
 }

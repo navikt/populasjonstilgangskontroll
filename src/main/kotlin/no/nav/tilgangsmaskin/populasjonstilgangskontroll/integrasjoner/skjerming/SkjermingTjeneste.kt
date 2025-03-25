@@ -13,9 +13,9 @@ import org.springframework.retry.annotation.Recover
 @Timed
 class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
 
-    fun erSkjermet(brukerId: BrukerId)  =  adapter.erSkjermet(brukerId.verdi)
+    fun skjerming(brukerId: BrukerId)  =  adapter.skjerming(brukerId.verdi)
 
-    fun erSkjermetBulk(brukerId: List<BrukerId>)  =  adapter.erSkjermetBulk(brukerId.map { it.verdi })
+    fun skjerminger(brukerId: List<BrukerId>)  =  adapter.skjerminger(brukerId.map { it.verdi })
 
     @Recover
     fun fallback(e: Throwable, brukerId: BrukerId) =

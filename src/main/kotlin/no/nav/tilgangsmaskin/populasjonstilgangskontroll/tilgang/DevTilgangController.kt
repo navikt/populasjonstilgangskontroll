@@ -49,10 +49,10 @@ class DevTilgangController(private val skjerming: SkjermingTjeneste,private val 
     fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody  specs: List<IdOgType>) = regler.bulkRegler(ansattId, specs)
 
     @PostMapping("skjerming")
-    fun skjerming(@RequestBody brukerId: BrukerId) = skjerming.erSkjermet(brukerId)
+    fun skjerming(@RequestBody brukerId: BrukerId) = skjerming.skjerming(brukerId)
 
     @PostMapping("skjerminger")
-    fun skjerminger(@RequestBody brukerIds: List<BrukerId>) = skjerming.erSkjermetBulk(brukerIds)
+    fun skjerminger(@RequestBody brukerIds: List<BrukerId>) = skjerming.skjerminger(brukerIds)
 
     @PostMapping("brukere")
     fun brukere(@RequestBody brukerIds: List<BrukerId>) = bruker.brukere(brukerIds)

@@ -12,8 +12,8 @@ import org.springframework.web.client.RestClient
 @Component
 class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, private val cf : SkjermingConfig): AbstractRestClientAdapter(restClient, cf) {
 
-    fun erSkjermet(ident: String) = post<Boolean>(cf.skjermetUri(), mapOf(IDENT to ident))
-    fun erSkjermetBulk(identer: List<String>) = post<Map<BrukerId,Boolean>>(cf.skjermetBulkUri(), mapOf(IDENTER to identer))
+    fun skjerming(ident: String) = post<Boolean>(cf.skjermetUri(), mapOf(IDENT to ident))
+    fun skjerminger(identer: List<String>) = post<Map<BrukerId,Boolean>>(cf.skjermetBulkUri(), mapOf(IDENTER to identer))
 }
 
 

@@ -32,7 +32,7 @@ data class PdlPipRespons(val person: PdlPipPerson, val identer: PdlPipIdenter = 
 }
 
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+//@JsonIgnoreProperties(ignoreUnknown = true)
 data class PdlPipRespons1(val aktoerId: Any? = null, val person: Any, val identer: Any, val geografiskTilknytning: Any? = null)  {
 /*
     @JsonIgnoreProperties(ignoreUnknown = true)

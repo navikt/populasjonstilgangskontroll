@@ -33,7 +33,7 @@ class RegelMotor(@Qualifier(KJERNE) private val kjerne: RegelSett, @Qualifier(OV
         with(regelSett) {
             log.info("Sjekker ${type.beskrivelse} for ${ansatt.ansattId} og ${bruker.brukerId}")
             regler.forEachIndexed { index, regel ->
-                log.trace("[${index.plus(1)}/${regelSett.size}] Sjekker regel: '${regel.kortNavn}' fra $beskrivelse for ${ansatt.ansattId}/${ansatt.bruker?.brukerId} og ${bruker.brukerId}")
+                log.trace("[${index.plus(1)}/${regelSett.size}] Sjekker regel: '${regel.kortNavn}' fra $beskrivelse ${ansatt.ansattId} og ${ansatt.bruker?.brukerId} og ${bruker.brukerId}")
                 if (!regel.test(ansatt,bruker)) {
                     throw RegelException(bruker.brukerId, ansatt.ansattId, regel).also {
                         handler.avvist("${index.plus(1)}/${regelSett.size}", ansatt.ansattId, bruker.brukerId, regel)

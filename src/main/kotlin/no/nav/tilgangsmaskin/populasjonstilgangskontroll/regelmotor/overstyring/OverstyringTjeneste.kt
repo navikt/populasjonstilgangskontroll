@@ -68,12 +68,12 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
 
     private fun sjekkOverstyring(e: RegelException, ansattId: AnsattId) =
         with(e.regel) {
-            log.trace("Sjekker om regler er overstyrt for ansatt $ansattId for bruker ${e.brukerId}")
+            log.trace("Sjekker om regler er overstyrt for  $ansattId og ${e.brukerId}")
             if (erOverstyrbar) {
                 if (erOverstyrt(ansattId, e.brukerId)) {
-                    log.warn("Overstyrt tilgang er gitt til ansatt $ansattId for bruker ${e.brukerId}")
+                    log.warn("Overstyrt tilgang er gitt til $ansattId og ${e.brukerId}")
                 } else {
-                    throw e.also { log.warn("Ingen overstyring, tilgang avvist av regel $kortNavn for $ansattId ${e.brukerId} opprettholdes") }
+                    throw e.also { log.warn("Ingen overstyring, tilgang avvist av regel $kortNavn og $ansattId og ${e.brukerId} opprettholdes") }
                 }
             } else {
                 throw e.also { log.trace("Tilgang avvist av kjerneregel $kortNavn for $ansattId og ${e.brukerId}, avvisning opprettholdes") }

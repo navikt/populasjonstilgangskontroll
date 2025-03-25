@@ -16,8 +16,8 @@ class PdlPipRestClientAdapter(@Qualifier(PDLPIP) restClient: RestClient, private
     fun person(brukerId: String) = get<PdlPipRespons>(cf.personURI(), mapOf("ident" to brukerId))
 
     fun personer(brukerIds: List<String>) = post<Any>(cf.personerURI(), brukerIds).let {
-        log.info("PdlPip respons: $it")
-        it as Map<String, PdlPipRespons>
+        log.info("PdlPip respons: $it ${it.javaClass}")
+        it as Map<Any, PdlPipRespons1>
     }
 }
 

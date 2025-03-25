@@ -16,14 +16,14 @@ import java.util.*
 
 @Component
 @Order(HIGHEST_PRECEDENCE)
-class StrengtFortroligRegel(@Value("\${gruppe.strengt}") private val id: UUID) : GlobaleGrupperRegel(GlobalGruppe.STRENGT_FORTROLIG_GRUPPE, id, "Kode 6")
+class StrengtFortroligRegel(@Value("\${gruppe.strengt}") private val id: UUID) : GlobalGruppeRegel(GlobalGruppe.STRENGT_FORTROLIG_GRUPPE, id, "Kode 6")
 @Component
 @Order(HIGHEST_PRECEDENCE + 1)
-class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID): GlobaleGrupperRegel(FORTROLIG_GRUPPE, id, "Kode 7")
+class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID): GlobalGruppeRegel(FORTROLIG_GRUPPE, id, "Kode 7")
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 2)
-class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : GlobaleGrupperRegel(EGEN_ANSATT_GRUPPE, id,"Egen ansatt")
+class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : GlobalGruppeRegel(EGEN_ANSATT_GRUPPE, id,"Egen ansatt")
 
 @Order(HIGHEST_PRECEDENCE + 3)
 @Component

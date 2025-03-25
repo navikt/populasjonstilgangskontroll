@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
 import java.util.*
 
-abstract class GlobaleGrupperRegel(private val gruppe: GlobalGruppe, private val id: UUID, kortNavn: String):
+abstract class GlobalGruppeRegel(private val gruppe: GlobalGruppe, private val id: UUID, kortNavn: String):
     KjerneRegel {
     override fun test(ansatt: Ansatt, bruker: Bruker) =
         if (bruker.kreverGlobalGruppe(gruppe))  {

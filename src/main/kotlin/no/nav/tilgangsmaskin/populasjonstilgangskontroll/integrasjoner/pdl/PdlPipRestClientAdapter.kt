@@ -13,7 +13,7 @@ import org.springframework.web.client.RestClient
 class PdlPipRestClientAdapter(@Qualifier(PDLPIP) restClient: RestClient, private val cf : PdlPipConfig): AbstractRestClientAdapter(restClient, cf) {
     fun person(brukerId: String) = get<PdlPipRespons>(cf.personURI(), mapOf("ident" to brukerId))
 
-    fun personer(brukerIds: List<BrukerId>) = post<Map<String, Any>>(cf.personerURI(), brukerIds)
+    fun personer(brukerIds: List<String>) = post<Map<String, Any>>(cf.personerURI(), brukerIds)
 }
 
 

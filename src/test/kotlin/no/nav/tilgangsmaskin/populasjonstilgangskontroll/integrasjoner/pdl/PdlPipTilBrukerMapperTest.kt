@@ -135,7 +135,7 @@ class PdlPipTilBrukerMapperTest {
 }
 """.trimIndent()
 
-        val deser =mapper.readValue<Map<String, PdlPipRespons>>(json)
+        val deser  =mapper.readValue<Map<String, PdlPipRespons>>(json)
         deser.entries.forEach {
           println(it.value)
         }

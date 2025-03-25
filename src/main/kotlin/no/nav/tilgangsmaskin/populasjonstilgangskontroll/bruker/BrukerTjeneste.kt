@@ -14,6 +14,8 @@ class BrukerTjeneste(private val pdlTjeneste: PDLTjeneste,val egenAnsatt: Skjerm
         tilBruker(it.identer.identer.first().ident, it, false) // TODO
     }
 
+    fun brukere1(brukerIds: List<BrukerId>) = pdlTjeneste.personer1(brukerIds)
+
     fun bruker(brukerId: BrukerId)  =
         run {
             val skjermet = egenAnsatt.erSkjermet(brukerId)

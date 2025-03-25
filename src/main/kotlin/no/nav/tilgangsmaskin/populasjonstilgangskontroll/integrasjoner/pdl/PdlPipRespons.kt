@@ -32,10 +32,9 @@ data class PdlPipRespons(val person: PdlPipPerson, val identer: PdlPipIdenter = 
 }
 
 
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PdlPipRespons1(val aktoerId: String? = null, val person: Any, val identer: Any, val geografiskTilknytning: Any? = null)  {
-
+/*
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class PdlPipPerson(
         val adressebeskyttelse: Any, //List<PdlPipAdressebeskyttelse> = emptyList(),
@@ -57,7 +56,7 @@ data class PdlPipRespons1(val aktoerId: String? = null, val person: Any, val ide
         data class PdlPipIdent(val ident: String, val historisk: Boolean, val gruppe: PdlPipIdentGruppe) {
             enum class PdlPipIdentGruppe { AKTORID, FOLKEREGISTERIDENT }
         }
-    }
+    }*/
 }
 
 

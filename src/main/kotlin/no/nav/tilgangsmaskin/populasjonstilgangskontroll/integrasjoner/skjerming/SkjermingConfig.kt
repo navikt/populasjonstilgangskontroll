@@ -10,12 +10,17 @@ class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enable
 
     fun skjermetUri() = builder().path(DEFAULT_SKJERMING_PATH).build()
 
+    fun skjermetBulkUri() = builder().path(DEFAULT_SKJERMING_BULK_PATH).build()
+
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
         const val SKJERMING = "skjerming"
         const val IDENT = "personident"
+        const val IDENTER = IDENT + "er"
         private const val DEFAULT_PING_PATH = "internal/health/liveness"
         private const val DEFAULT_SKJERMING_PATH = "skjermet"
+        private const val DEFAULT_SKJERMING_BULK_PATH = "skjermetBulk"
+
     }
 }

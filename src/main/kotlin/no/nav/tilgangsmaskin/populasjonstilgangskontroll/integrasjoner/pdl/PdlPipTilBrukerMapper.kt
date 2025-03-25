@@ -15,7 +15,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPi
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipFamilierelasjon
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipFamilierelasjon.PdlPipFamilieRelasjonRolle
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipFamilierelasjon.PdlPipFamilieRelasjonRolle.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlTilBrukerMapper.tilGeoTilknytning
 
 object PdlPipTilBrukerMapper {
 

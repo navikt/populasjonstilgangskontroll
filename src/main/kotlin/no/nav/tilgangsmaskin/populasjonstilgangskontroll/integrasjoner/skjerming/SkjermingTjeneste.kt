@@ -15,6 +15,8 @@ class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
 
     fun erSkjermet(brukerId: BrukerId)  =  adapter.erSkjermet(brukerId.verdi)
 
+    fun erSkjermetBulk(brukerId: List<BrukerId>)  =  adapter.erSkjermetBulk(brukerId.map { it.verdi })
+
     @Recover
     fun fallback(e: Throwable, brukerId: BrukerId) =
         when (e) {

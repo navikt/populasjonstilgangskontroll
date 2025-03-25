@@ -8,6 +8,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomAnsattData
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.RegelTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringTjeneste
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.*
 
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
-class DevTilgangController(private val bruker : BrukerTjeneste, private val ansatt: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyring: OverstyringTjeneste, private val nom: NomTjeneste) {
+class DevTilgangController(private val skjerming: SkjermingTjeneste,private val bruker : BrukerTjeneste, private val ansatt: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyring: OverstyringTjeneste, private val nom: NomTjeneste) {
 
     @GetMapping("bruker/{brukerId}")
     fun bruker(@PathVariable brukerId: BrukerId) = bruker.bruker(brukerId)
@@ -46,6 +47,12 @@ class DevTilgangController(private val bruker : BrukerTjeneste, private val ansa
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(NO_CONTENT)
     fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody  specs: List<IdOgType>) = regler.bulkRegler(ansattId, specs)
+
+    @PostMapping("skjerming")
+    fun skjerming(@RequestBody brukerId: BrukerId) = skjerming.erSkjermet(brukerId)
+
+    @PostMapping("skjerminger")
+    fun skjerminger(@RequestBody brukerIds: List<BrukerId>) = skjerming.erSkjermetBulk(brukerIds)
 
     @PostMapping("brukere")
     fun brukere(@RequestBody brukerIds: List<BrukerId>) = bruker.brukere(brukerIds)

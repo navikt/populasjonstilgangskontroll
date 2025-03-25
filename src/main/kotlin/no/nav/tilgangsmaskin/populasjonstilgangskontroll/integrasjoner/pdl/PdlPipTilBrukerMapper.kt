@@ -1,13 +1,13 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
+import com.neovisionaries.i18n.CountryCode.getByAlpha3Code
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.FamilieRelasjon
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning.GTType.UDEFINERT
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.Companion.UdefinertGeoTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning.GTType.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipIdenter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipIdenter.PdlPipIdent.PdlPipIdentGruppe.FOLKEREGISTERIDENT
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipAdressebeskyttelse.PdlPipAdressebeskyttelseGradering.*
@@ -27,6 +27,19 @@ object PdlPipTilBrukerMapper {
     with(respons) {
         Bruker(BrukerId(brukerId), tilGeoTilknytning(geografiskTilknytning), tilBeskyttelse(respons,erSkjermet), tilFamilie(person.familierelasjoner), tilDødsdato(person.doedsfall),tilHistoriskeBrukerIds(identer))
     }
+
+    fun tilGeoTilknytning(geo: PdlGeoTilknytning?): GeoTilknytning =
+        when (geo?.gtType) {
+            UTLAND ->  geo.gtLand?.let {
+                UtenlandskTilknytning(getByAlpha3Code(it.verdi)) } ?: UkjentBosted()
+            KOMMUNE -> geo.gtKommune?.let {
+                KommuneTilknytning(Kommune(it.verdi))
+            } ?: throw IllegalStateException("Kommunal tilknytning uten kommunekode")
+            BYDEL ->  geo.gtBydel?.let {
+                BydelTilknytning(Bydel(it.verdi))
+            }  ?: throw IllegalStateException("Bydelstilknytning uten bydelskode")
+            else -> UdefinertGeoTilknytning
+        }
 
     private fun tilBeskyttelse(respons: PdlPipRespons, erSkjermet: Boolean) =
          mutableListOf<GlobalGruppe>().apply {

@@ -1,10 +1,10 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractRestClientAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipConfig.Companion.PDLPIP
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component
@@ -16,9 +16,10 @@ class PdlPipRestClientAdapter(@Qualifier(PDLPIP) restClient: RestClient, private
 
     fun person(brukerId: String) = get<PdlPipRespons>(cf.personURI(), mapOf("ident" to brukerId))
 
-    fun personer(brukerIds: List<String>) = post<String>(cf.personerURI(), brukerIds).let {
-        log.info("PdlPip respons: $it ${it.javaClass}")
-        mapper.readerForMapOf(PdlPipRespons::class.java).readValue(it) as Map<String, PdlPipRespons>
+    fun personer(brukerIds: List<String>) = post<String>(cf.personerURI(), brukerIds).let { res ->
+        mapper.readValue<Map<String, PdlPipRespons?>>(res)
+            .mapNotNull { (key, value) -> value?.let { BrukerId(key) to it } }
+            .toMap()
     }
 }
 

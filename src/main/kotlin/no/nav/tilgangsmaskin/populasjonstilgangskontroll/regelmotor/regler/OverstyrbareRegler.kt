@@ -74,13 +74,15 @@ class AvdødAksessTeller(private val meterRegistry: MeterRegistry, private val a
 
     private val log = LoggerFactory.getLogger(javaClass)
     fun avdødBrukerAksess(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
-        true.also {  // TODO Endre til false når vi faktisk skal håndtere døde
+        true.also {
+            // TODO Endre til false når vi faktisk skal håndtere døde
+            val intervall = intervallFor(dødsdato)
             Counter.builder("dead.attempted.total")
                 .description("Number of deceased users attempted accessed")
-                .tag("months",intervallFor(dødsdato))
+                .tag("months",intervall)
                 .tag("system",accessor.system ?: "unknown")
                 .register(meterRegistry).increment().also {
-                    log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere avdød bruker ${brukerId.maskFnr()} med dødsdate $dødsdato fra ${accessor.system}")
+                    log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere avdød bruker ${brukerId.maskFnr()} for dødsdate $intervall måneder siden fra ${accessor.system}")
                 }
         }
 

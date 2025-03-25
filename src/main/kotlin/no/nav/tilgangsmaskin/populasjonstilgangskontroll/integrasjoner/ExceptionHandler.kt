@@ -54,8 +54,8 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     private fun props(e: RegelException) =
         with(e) {
             mapOf(
-                "kode" to regel.metadata.begrunnelse,
-                "årsak" to regel.metadata.begrunnelse.årsak,
+                "kode" to regel.avvisningKode,
+                "årsak" to regel.avvisningTekst,
                 "brukerIdent" to brukerId.verdi)
         }
 }

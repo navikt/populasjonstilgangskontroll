@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Ansatt
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningTekster.AVVIST_EGEN_FAMILIE
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningTekster.AVVIST_EGNE_DATA
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningKode.AVVIST_EGEN_FAMILIE
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningKode.AVVIST_EGNE_DATA
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe.EGEN_ANSATT_GRUPPE

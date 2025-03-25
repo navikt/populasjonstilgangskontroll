@@ -47,7 +47,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
                 }
             }.getOrElse {
                 when (it) {
-                    is RegelException ->  throw RegelException(it,OVERSTYRING_MESSAGE_CODE,arrayOf(it.regel.metadata.kortNavn,ansattId.verdi,data.brukerId.verdi)).also {
+                    is RegelException ->  throw RegelException(it,OVERSTYRING_MESSAGE_CODE,arrayOf(it.regel.kortNavn,ansattId.verdi,data.brukerId.verdi)).also {
                         handler.avvist(ansattId,data.brukerId)
                     }
                     else -> throw it
@@ -68,15 +68,15 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
 
     private fun sjekkOverstyring(e: RegelException, ansattId: AnsattId) =
         with(e.regel) {
-            log.trace("Sjekker om regler er overstyrt for ansatt '${ansattId.verdi}' og bruker '${e.brukerId.maskFnr()}'")
+            log.trace("Sjekker om regler er overstyrt for ansatt $ansattId for bruker ${e.brukerId}")
             if (erOverstyrbar) {
                 if (erOverstyrt(ansattId, e.brukerId)) {
-                    log.warn("Overstyrt tilgang er gitt til ansatt '${ansattId.verdi}' og bruker '${e.brukerId.maskFnr()}'")
+                    log.warn("Overstyrt tilgang er gitt til ansatt $ansattId for bruker ${e.brukerId}")
                 } else {
-                    throw e.also { log.warn("Ingen overstyring, tilgang avvist av regel '${metadata.kortNavn}' for '${ansattId.verdi}' '${e.brukerId.maskFnr()}' opprettholdes") }
+                    throw e.also { log.warn("Ingen overstyring, tilgang avvist av regel $kortNavn for $ansattId ${e.brukerId} opprettholdes") }
                 }
             } else {
-                throw e.also { log.trace("Tilgang avvist av kjerneregel '${metadata.kortNavn}' for '${ansattId.verdi}' og '${e.brukerId.maskFnr()}', avvisning opprettholdes") }
+                throw e.also { log.trace("Tilgang avvist av kjerneregel $kortNavn for $ansattId og ${e.brukerId}, avvisning opprettholdes") }
             }
         }
 
@@ -93,8 +93,8 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
             }
             if (isNotEmpty()) {
                 throw BulkRegelException(ansattId, this).also {
-                    val avvist = this.intersect(e.exceptions).map { it.brukerId to it.regel.metadata.begrunnelse}
-                    log.error("Følgende brukerId ble avvist for $ansattId : $avvist")
+                    val avvist = intersect(e.exceptions).map { it.brukerId to it.regel.avvisningKode}
+                    log.error("Følgende identer ble avvist for $ansattId : $avvist")
                 }
             }
         }

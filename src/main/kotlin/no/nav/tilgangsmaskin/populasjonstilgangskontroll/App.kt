@@ -47,7 +47,7 @@ class StartupInfoContributor(private val ctx : ConfigurableApplicationContext, v
                 "Spring Framework version" to SpringVersion.getVersion())
             )
             regelsett.forEach {
-                builder.withDetail(it.beskrivelse, it.regler.map {r -> r.metadata.kortNavn })
+                builder.withDetail(it.beskrivelse, it.regler.map {r -> r.kortNavn })
             }
         }
     }

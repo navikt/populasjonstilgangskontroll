@@ -16,6 +16,7 @@ class TokenClaimsAccessor (private val contextHolder: TokenValidationContextHold
         contextHolder.getTokenValidationContext().getClaims(AAD_ISSUER)
     }.getOrNull()
 
+    val
     companion object {
 
         const val AAD_ISSUER: String = "azuread"

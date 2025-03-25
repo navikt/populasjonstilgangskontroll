@@ -4,7 +4,7 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningTekster.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningKode.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.*

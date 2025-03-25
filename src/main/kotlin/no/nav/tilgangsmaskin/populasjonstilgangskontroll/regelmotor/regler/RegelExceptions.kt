@@ -9,9 +9,9 @@ import org.springframework.http.ProblemDetail.forStatus
 import org.springframework.web.ErrorResponseException
 import java.net.URI
 
-class RegelException(val brukerId: BrukerId, val  ansattId: AnsattId, val regel: Regel, messageCode: String = DETAIL_MESSAGE_CODE, arguments: Array<String> = arrayOf(ansattId.verdi, brukerId.verdi,regel.metadata.begrunnelse.årsak)) :
+class RegelException(val brukerId: BrukerId, val  ansattId: AnsattId, val regel: Regel, messageCode: String = DETAIL_MESSAGE_CODE, arguments: Array<String> = arrayOf(ansattId.verdi, brukerId.verdi,regel.avvisningTekst)) :
     ErrorResponseException(FORBIDDEN,  forStatus(FORBIDDEN).apply {
-        title = "${regel.metadata.begrunnelse}"
+        title = "${regel.avvisningKode}"
         type = TYPE_URI
         instance = URI.create("${ansattId.verdi}/${brukerId.verdi}")
         properties = mapOf(

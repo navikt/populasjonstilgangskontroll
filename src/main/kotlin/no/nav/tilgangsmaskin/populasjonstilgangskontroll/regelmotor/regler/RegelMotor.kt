@@ -31,9 +31,9 @@ class RegelMotor(@Qualifier(KJERNE) private val kjerne: RegelSett, @Qualifier(OV
 
     private fun sjekkRegler(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) =
         with(regelSett) {
-            log.info("Sjekker ${type.beskrivelse} for '${ansatt.ansattId.verdi}' og '${bruker.brukerId}'")
+            log.info("Sjekker ${type.beskrivelse} for ${ansatt.ansattId} og ${bruker.brukerId}")
             regler.forEachIndexed { index, regel ->
-                log.trace("[${index.plus(1)}/${regelSett.size}] Sjekker regel: '${regel.metadata.kortNavn}' fra $beskrivelse for '${ansatt.ansattId.verdi}/${ansatt.bruker?.brukerId}'og '${bruker.brukerId}'")
+                log.trace("[${index.plus(1)}/${regelSett.size}] Sjekker regel: '${regel.kortNavn}' fra $beskrivelse for ${ansatt.ansattId}/${ansatt.bruker?.brukerId} og ${bruker.brukerId}")
                 if (!regel.test(ansatt,bruker)) {
                     throw RegelException(bruker.brukerId, ansatt.ansattId, regel).also {
                         handler.avvist("${index.plus(1)}/${regelSett.size}", ansatt.ansattId, bruker.brukerId, regel)
@@ -68,7 +68,7 @@ class RegelMotor(@Qualifier(KJERNE) private val kjerne: RegelSett, @Qualifier(OV
     class RegelsettResultatHandler {
         private val log = LoggerFactory.getLogger(javaClass)
         fun avvist(pos: String, ansattId: AnsattId, brukerId: BrukerId, regel: Regel) {
-            log.warn("[#$pos] Tilgang avvist av regel '${regel.metadata.kortNavn}' (${regel.metadata.begrunnelse.årsak})")
+            log.warn("[#$pos] Tilgang avvist av regel '${regel.kortNavn}' (${regel.avvisningTekst})")
         }
         fun ok(type: RegelType, ansattId: AnsattId, brukerId: BrukerId) {
             log.info("${type.beskrivelse.replaceFirstChar { it.uppercaseChar() }} ga tilgang OK for '$ansattId' og '${brukerId.maskFnr()}'")

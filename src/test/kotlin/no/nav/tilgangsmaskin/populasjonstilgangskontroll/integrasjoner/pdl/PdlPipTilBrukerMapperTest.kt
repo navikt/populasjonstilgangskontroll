@@ -160,9 +160,8 @@ class PdlPipTilBrukerMapperTest {
 }
 """.trimIndent()
 
-        val deser  =mapper.readValue<Map<String, PdlPipRespons1>>(json)
-        deser.entries.forEach {
-          println(it.value)
-        }
+       val deser  =mapper.readValue<Any>(json)
+       deser as Map<String, PdlPipRespons1>
+      println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(deser))
     }
 }

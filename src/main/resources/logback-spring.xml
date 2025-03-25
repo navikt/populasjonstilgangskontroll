@@ -5,7 +5,7 @@
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
     <springProfile name="dev">
-        <logger name="org.springframework.web.servlet.mvc.method.annotation" level="trace"/>
+        <logger name="org.springframework.web.servlet.mvc.method.annotation" level="info"/>
         <logger name="org.apache.hc.client5.http.wire"  level="info"/>
         <logger name="org.hibernate.SQL" level="debug"/>
         <logger name="org.hibernate.orm.jdbc.bind" level="trace"/>

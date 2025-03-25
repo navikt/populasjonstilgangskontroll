@@ -9,9 +9,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.RegelBeskrivelse
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions.maskFnr
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.TimeExtensions.månederSidenIdag
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang1.TokenClaimsAccessor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.TimeExtensions.intervallFor
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
@@ -76,22 +75,14 @@ class AvdødAksessTeller(private val meterRegistry: MeterRegistry, private val a
     fun avdødBrukerAksess(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
         true.also {
             // TODO Endre til false når vi faktisk skal håndtere døde
-            val intervall = intervallFor(dødsdato)
+            val intervall = dødsdato.intervallFor()
             Counter.builder("dead.attempted.total")
                 .description("Number of deceased users attempted accessed")
                 .tag("months",intervall)
                 .tag("system",accessor.system ?: "N/A")
                 .register(meterRegistry).increment().also {
-                    log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere avdød bruker $brukerId med dødsdate $intervall måneder siden fra system ${accessor.systemNavn}")
+                    log.warn("Ansatt ${ansattId.verdi} forsøkte å aksessere avdød bruker $brukerId med dødsdato $intervall måneder siden fra system ${accessor.systemNavn}")
                 }
-        }
-
-    private fun intervallFor(dato: LocalDate) =
-        when (dato.månederSidenIdag()) {
-            in 0..6 -> "0-6"
-            in 7..12 -> "7-12"
-            in 13..24 -> "13-24"
-            else -> ">24"
         }
 }
 

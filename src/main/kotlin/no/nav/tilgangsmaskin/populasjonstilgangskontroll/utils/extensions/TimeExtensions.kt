@@ -13,7 +13,7 @@ object TimeExtensions {
     fun Instant.diffFromNow() = java.time.Duration.between(now(), this).toKotlinDuration().format()
     fun LocalDate.toInstant(): Instant = atStartOfDay(systemDefault()).toInstant()
 
-    fun LocalDate.månederSidenIdag() =
+    private  LocalDate.månederSidenIdag() =
         LocalDate.now().let {
             assert(isBefore(it)) { "Datoen $this er ikke før dagens dato $it" }
             Period.between(this, it).let { it.years * 12 + it.months } + if (it.dayOfMonth > dayOfMonth) 1 else 0
@@ -36,4 +36,11 @@ object TimeExtensions {
         Instant.ofEpochMilli(this),
         ZoneId.of("Europe/Oslo")).format(DateTimeFormatter.ofPattern(fmt))
 
+     fun LocalDate.intervallFor() =
+        when (månederSidenIdag()) {
+            in 0..6 -> "0-6"
+            in 7..12 -> "7-12"
+            in 13..24 -> "13-24"
+            else -> ">24"
+        }
 }

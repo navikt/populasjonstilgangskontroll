@@ -1,6 +1,6 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
-val javaVersion = JavaLanguageVersion.of(21)
+val javaVersion = JavaLanguageVersion.of(23)
 val springdocVersion = "2.8.6"
 val tokenSupportVersion = "5.0.20"
 val springCloudVersion = "4.2.1"
@@ -98,6 +98,12 @@ if (project.hasProperty("skipLint")) {
 tasks.test {
     jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
     useJUnitPlatform()
+}
+
+java {
+    toolchain {
+        languageVersion.set(javaVersion)
+    }
 }
 
 kotlin {

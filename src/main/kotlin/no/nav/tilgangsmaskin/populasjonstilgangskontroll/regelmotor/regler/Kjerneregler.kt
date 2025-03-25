@@ -28,7 +28,8 @@ class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Gl
 @Order(HIGHEST_PRECEDENCE + 3)
 @Component
 class EgneDataRegel : KjerneRegel {
-    override fun test(ansatt: Ansatt, bruker: Bruker) = bruker.brukerId != ansatt.bruker?.brukerId
+    override fun test(ansatt: Ansatt, bruker: Bruker) =
+        bruker.brukerId != ansatt.bruker?.brukerId
     override val metadata = RegelBeskrivelse("Egne data", AVVIST_EGNE_DATA)
 }
 
@@ -37,17 +38,5 @@ class EgneDataRegel : KjerneRegel {
 class EgenFamilieRegel : KjerneRegel {
     override fun test(ansatt: Ansatt, bruker: Bruker) =
         bruker.brukerId !in ansatt.familieMedlemmer
-
-
     override val metadata = RegelBeskrivelse("Egen familie", AVVIST_EGEN_FAMILIE)
 }
-abstract class GlobaleGrupperRegel(private val gruppe: GlobalGruppe, private val id: UUID, kortNavn: String):
-    KjerneRegel {
-    override fun test(ansatt: Ansatt, bruker: Bruker) =
-        if (bruker.kreverGlobalGruppe(gruppe))  {
-            ansatt.kanBehandle(id)
-        } else true
-
-    override val metadata = RegelBeskrivelse(kortNavn, gruppe.begrunnelse)
-}
-

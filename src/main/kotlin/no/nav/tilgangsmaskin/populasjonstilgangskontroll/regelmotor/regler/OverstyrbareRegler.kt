@@ -1,10 +1,15 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
+import io.micrometer.core.annotation.Counted
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Ansatt
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningKode.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.RegelBeskrivelse
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang1.TokenClaimsAccessor
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 import org.springframework.core.annotation.Order
@@ -59,6 +64,28 @@ class AvdødBrukerRegel(private val teller: AvdødAksessTeller) : OverstyrbarReg
         } ?: true
     override val metadata = RegelBeskrivelse("Avdød bruker", AVVIST_AVDØD)
 }
+
+@Component
+@Order(LOWEST_PRECEDENCE - 4)
+class SøskenRegel(private val teller: SøskenAksessTeller) : OverstyrbarRegel {
+    override fun test(ansatt: Ansatt, bruker: Bruker) =
+        if (bruker.brukerId in ansatt.søsken) {
+            teller.registrerAksess(ansatt.ansattId, bruker.brukerId)
+        } else true
+
+    override val metadata = RegelBeskrivelse("Oppslag søsken", AVVIST_EGEN_FAMILIE)
+}
+
+@Component
+class SøskenAksessTeller(private val accessor: TokenClaimsAccessor) {
+    private val log = LoggerFactory.getLogger(javaClass)
+    @Counted
+    fun registrerAksess(ansattId: AnsattId, brukerId: BrukerId) =
+        true.also {
+            log.warn("Ansatt $ansattId aksesserte søsken $brukerId fra system ${accessor.systemNavn}")
+        }
+}
+
 
 
 

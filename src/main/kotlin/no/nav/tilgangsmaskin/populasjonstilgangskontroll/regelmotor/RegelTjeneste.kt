@@ -6,7 +6,8 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringTjeneste
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.IdOgType
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelMotor
 import org.springframework.stereotype.Service
 
 @Service

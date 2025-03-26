@@ -7,16 +7,17 @@ import java.util.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId as AnsattFnr
 
 
-class Ansatt(val identifikatorer: AnsattIdentifikatorer, val grupper: List<EntraGruppe>, val bruker: Bruker? = null) {
+data class Ansatt(val identifikatorer: AnsattIdentifikatorer, val grupper: List<EntraGruppe>, val bruker: Bruker? = null) {
 
     @JsonIgnore
     val ansattId = identifikatorer.ansattId
     @JsonIgnore
     val familieMedlemmer = bruker?.familieMedlemmer?.map { it.brukerId } ?: emptyList()
 
-    fun kanBehandle(id: UUID) = grupper.any { it.id == id }
-    override fun toString() = "${javaClass.simpleName} [bruker=$bruker,identifikatorer=$identifikatorer,grupper=$grupper]"
+    @JsonIgnore
+    val søsken = bruker?.søsken?.map { it.brukerId } ?: emptyList()
 
+    fun kanBehandle(id: UUID) = grupper.any { it.id == id }
     data class AnsattIdentifikatorer(val ansattId: AnsattId, val oid: UUID, val ansattFnr: AnsattFnr? = null)
 
 }

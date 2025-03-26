@@ -1,6 +1,5 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.domain
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Enhetsnummer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test

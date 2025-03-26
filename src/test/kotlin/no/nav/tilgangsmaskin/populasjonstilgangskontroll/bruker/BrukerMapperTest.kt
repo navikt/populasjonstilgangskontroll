@@ -1,44 +1,42 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
+package no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.neovisionaries.i18n.CountryCode.SE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning.GTKommune
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning.GTLand
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning.GTType.KOMMUNE
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipAdressebeskyttelse
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPipRespons.PdlPipPerson.PdlPipAdressebeskyttelse.PdlPipAdressebeskyttelseGradering
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlPerson
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering.*
+
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestApp
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterConstants.TEST
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.json.JsonTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPersonMapper.tilPerson
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.PersonTilBrukerMapper.tilBruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons
 
 
 @ActiveProfiles(TEST)
-@JsonTest
 @ContextConfiguration(classes = [TestApp::class])
 
-class PdlPipTilBrukerMapperTest {
-
-    @Autowired
-    lateinit var mapper: ObjectMapper
+class BrukerMapperTest {
 
     private val brukerId = TestData.vanligBruker.brukerId
 
     @Test
     @DisplayName("Test at behandling av brukere med STRENGT_FORTROLIG_UTLAND  krever medlemsskap i STRENGT_FORTROLIG_GRUPPE fra ansatt og at geotilknytning er UtenlandskTilknytning")
     fun strengtFortroligUtland()   {
-        with(PdlPipTilBrukerMapper.tilBruker(brukerId,pipRespons(PdlPipAdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND), false)) {
+        with(tilBruker(person(brukerId, pipRespons(STRENGT_FORTROLIG_UTLAND)), false)) {
             assertThat(gruppeKrav).containsExactly(STRENGT_FORTROLIG_GRUPPE)
             assertThat(geoTilknytning).isInstanceOf(UtenlandskTilknytning::class.java)
         }
@@ -46,7 +44,7 @@ class PdlPipTilBrukerMapperTest {
     @Test
     @DisplayName("Test at behandling av brukere med STRENGT_FORTROLIG vil kreve medlemsskap i STRENGT_FORTROLIG_GRUPPE for ansatt og at geotilknytning er KommuneTilknytning")
     fun strengtFortroligKommune()   {
-        with(PdlPipTilBrukerMapper.tilBruker(brukerId,pipRespons(PdlPipAdressebeskyttelseGradering.STRENGT_FORTROLIG,geoKommune()), false)) {
+        with(tilBruker(person(brukerId, pipRespons(STRENGT_FORTROLIG, geoKommune())), false)) {
             assertThat(gruppeKrav).containsExactly(STRENGT_FORTROLIG_GRUPPE)
             assertThat(geoTilknytning).isInstanceOf(KommuneTilknytning::class.java)
         }
@@ -54,21 +52,21 @@ class PdlPipTilBrukerMapperTest {
     @Test
     @DisplayName("Test at behandling av brukere med EGEN_ANSATT vil kreve medlemsskap i EGEN_ANSATT_GRUPPE for ansatt")
     fun egenAnsatt()   {
-        with(PdlPipTilBrukerMapper.tilBruker(brukerId,pipRespons(), true)) {
+        with(tilBruker(person(brukerId, pipRespons()), true)) {
             assertThat(gruppeKrav).containsExactly(EGEN_ANSATT_GRUPPE)
         }
     }
     @Test
     @DisplayName("Test at behandling av brukere med EGEN_ANSATT og STRENGT_FORTROLIG vil kreve medlemsskap i EGEN_ANSATT_GRUPPE og STRENGT_FORTROLIG_GRUPPE for ansatt")
     fun egenAnsattKode6()   {
-        with(PdlPipTilBrukerMapper.tilBruker(brukerId,pipRespons(PdlPipAdressebeskyttelseGradering.STRENGT_FORTROLIG),  true)) {
+        with(tilBruker(person(brukerId, pipRespons(STRENGT_FORTROLIG)), true)) {
             assertThat(gruppeKrav).containsExactlyInAnyOrder(EGEN_ANSATT_GRUPPE,STRENGT_FORTROLIG_GRUPPE)
         }
     }
     @Test
     @DisplayName("Test at behandling av brukere med EGEN_ANSATT og FORTROLIG vil kreve medlemsskap i EGEN_ANSATT_GRUPPE og FORTROLIG_GRUPPE for ansatt")
     fun egenAnsattKode7()   {
-        with(PdlPipTilBrukerMapper.tilBruker(brukerId,pipRespons(PdlPipAdressebeskyttelseGradering.FORTROLIG), true)) {
+        with(tilBruker(person(brukerId, pipRespons(FORTROLIG)), true)) {
             assertThat(gruppeKrav).containsExactlyInAnyOrder(EGEN_ANSATT_GRUPPE,FORTROLIG_GRUPPE)
         }
     }
@@ -77,10 +75,12 @@ class PdlPipTilBrukerMapperTest {
     private fun geoKommune() = PdlGeoTilknytning(KOMMUNE, gtKommune = GTKommune("1234"))
 
 
-    fun pipRespons(gradering: PdlPipAdressebeskyttelseGradering? = null, geo: PdlGeoTilknytning = geoUtland()) : PdlPipRespons {
+    fun pipRespons(gradering: PdlAdressebeskyttelseGradering? = null, geo: PdlGeoTilknytning = geoUtland()) : PdlRespons {
         val adressebeskyttelse = gradering?.let {
-             listOf(PdlPipAdressebeskyttelse(it))
+             listOf(PdlAdressebeskyttelse(it))
          }?: emptyList()
-        return PdlPipRespons(PdlPipPerson(adressebeskyttelse), geografiskTilknytning = geo)
+        return PdlRespons(PdlPerson(adressebeskyttelse), geografiskTilknytning = geo)
     }
+
+    fun person(brukerId: BrukerId,respons: PdlRespons) = tilPerson(brukerId,respons)
 }

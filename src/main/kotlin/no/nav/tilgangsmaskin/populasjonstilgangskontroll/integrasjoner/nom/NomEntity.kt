@@ -6,9 +6,6 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.Instant
-import java.time.Instant.EPOCH
-import java.time.Instant.MAX
-import java.time.LocalDate
 
 @Entity
 @Table(name = "ansatte", indexes = [

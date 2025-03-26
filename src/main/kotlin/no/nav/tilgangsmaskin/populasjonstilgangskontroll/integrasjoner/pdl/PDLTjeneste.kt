@@ -13,11 +13,9 @@ it
     fun person(brukerId: BrukerId) = tilPerson(brukerId, adapter.person(brukerId.verdi))
 
     fun søsken(brukerId: BrukerId) =
-        person(brukerId).foreldre
-            .map { it.brukerId }
-            .let { personer(it) }
-            .map {  it.barn}
-            .flatten()
+        personer(person(brukerId).foreldre
+            .map { it.brukerId })
+            .flatMap { it.barn }
             .map { it.brukerId }
             .filterNot { it == brukerId }
 

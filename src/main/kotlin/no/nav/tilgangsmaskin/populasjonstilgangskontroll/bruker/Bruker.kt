@@ -18,5 +18,4 @@ data class Bruker(
 
     fun kreverGlobalGruppe(gruppe: GlobalGruppe) = gruppe in gruppeKrav
 
-    override fun toString() = "${javaClass.simpleName} [ident=$brukerId, geoTilknytning=$geoTilknytning,  gruppeKrav=$gruppeKrav,identifikatorer=$historiskeIdentifikatorer]"
 }

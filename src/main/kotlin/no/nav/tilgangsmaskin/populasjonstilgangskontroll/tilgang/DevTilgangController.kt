@@ -29,7 +29,7 @@ class DevTilgangController(private val pdl: PDLTjeneste,private val skjerming: S
 
     @GetMapping("siblings/{brukerId}")
     fun søsken(@PathVariable brukerId: BrukerId) = pdl.søsken(brukerId)
-    
+
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatt.ansatt(ansattId)
 

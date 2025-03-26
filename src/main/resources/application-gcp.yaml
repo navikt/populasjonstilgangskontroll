@@ -81,7 +81,7 @@ spring:
       fail-on-unknown-properties: true
     default-property-inclusion: non_null
   cache:
-    cache-names: pdl, skjerming, graph, overstyring, pdlpip
+    cache-names: pdl, skjerming, graph, overstyring
     caffeine:
       spec: initialCapacity=500,maximumSize=100,expireAfterAccess=3600s
 no.nav.security.jwt:

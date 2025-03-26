@@ -4,18 +4,22 @@ import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.CacheableRetryingOnRecoverableService
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlConfig.Companion.PDL
-
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.runBlocking
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.IrrecoverableRestException
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPersonMapper.tilPerson
 
 @CacheableRetryingOnRecoverableService(cacheNames = [PDL])
 @Timed
-class PDLTjeneste(private val adapter: PdlPipRestClientAdapter) {
+class PDLTjeneste(private val adapter: PdlRestClientAdapter) {
 
-    fun person(brukerId: BrukerId) = adapter.person(brukerId.verdi)
+    fun person(brukerId: BrukerId) = tilPerson(brukerId, adapter.person(brukerId.verdi))
 
-     fun personer (brukerIds: List<BrukerId>) = adapter.personer(brukerIds.map { it.verdi })
+    fun søsken(brukerId: BrukerId) =
+        person(brukerId).foreldre
+            .map { it.brukerId }
+            .let { personer(it) }
+            .filterNot { it.brukerId == brukerId }
 
+     fun personer (brukerIds: List<BrukerId>) =
+         adapter.personer(brukerIds.map { it.verdi })
+             .map { (brukerId, data) -> tilPerson(brukerId, data)
+         }
 }

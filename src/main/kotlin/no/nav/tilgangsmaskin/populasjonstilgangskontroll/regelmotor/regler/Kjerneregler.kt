@@ -3,10 +3,10 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningKode.AVVIST_EGEN_FAMILIE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningKode.AVVIST_EGNE_DATA
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe.EGEN_ANSATT_GRUPPE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe.FORTROLIG_GRUPPE
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.RegelBeskrivelse
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.HIGHEST_PRECEDENCE

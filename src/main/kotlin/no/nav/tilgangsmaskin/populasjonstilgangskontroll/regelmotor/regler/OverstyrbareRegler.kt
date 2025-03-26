@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningKode.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.RegelBeskrivelse
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE

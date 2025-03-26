@@ -6,11 +6,11 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Enhetsnummer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.Companion.UdefinertGeoTilknytning
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.Kommune
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.KommuneTilknytning
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.UkjentBosted
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.UtenlandskTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.Companion.UdefinertGeoTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.Kommune
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.KommuneTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.UkjentBosted
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie

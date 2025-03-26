@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.Companion.UdefinertGeoTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.Companion.UdefinertGeoTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.Gradering
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.Gradering.*
 
@@ -14,7 +14,7 @@ object PersonTilBrukerMapper {
             Bruker(brukerId, geoTilknytning, tilGruppeKrav(geoTilknytning,graderinger,erSkjermet), familie, dødsdato,historiskeIdentifikatorer)
         }
 
-    private fun tilGruppeKrav(geoTilknytning: GeoTilknytning, graderinger: List<Gradering>, erSkjermet: Boolean) =
+    private fun tilGruppeKrav(geoTilknytning: GeografiskTilknytning, graderinger: List<Gradering>, erSkjermet: Boolean) =
         mutableListOf<GlobalGruppe>().apply {
             if (graderinger.any {
                     it in listOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND)

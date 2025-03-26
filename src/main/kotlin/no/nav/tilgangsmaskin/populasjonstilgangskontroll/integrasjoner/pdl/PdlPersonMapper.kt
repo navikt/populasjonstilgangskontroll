@@ -5,9 +5,9 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie.FamilieMedlem.FamilieRelasjon
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.Companion.UdefinertGeoTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.Companion.UdefinertGeoTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning.GTType.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlIdenter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
@@ -36,7 +36,7 @@ object PdlPersonMapper {
             UGRADERT -> Gradering.UGRADERT
         }
 
-    private fun tilGeoTilknytning(geo: PdlGeoTilknytning?): GeoTilknytning =
+    private fun tilGeoTilknytning(geo: PdlGeoTilknytning?): GeografiskTilknytning =
         when (geo?.gtType) {
             UTLAND ->  geo.gtLand?.let {
                 UtenlandskTilknytning(getByAlpha3Code(it.verdi)) } ?: UkjentBosted()

@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie.Companion.INGEN
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning
 import java.time.LocalDate
 
 data class Person(
     val brukerId: BrukerId,
-    val geoTilknytning: GeoTilknytning,
+    val geoTilknytning: GeografiskTilknytning,
     val graderinger: List<Gradering> = emptyList(),
     val familie: Familie = INGEN,
     val dødsdato: LocalDate? = null,

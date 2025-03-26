@@ -2,8 +2,8 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker
 
 import com.neovisionaries.i18n.CountryCode
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions.requireDigits
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.Type.*
-sealed class GeoTilknytning(val type: Type) {
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.Type.*
+sealed class GeografiskTilknytning(val type: Type) {
     enum class Type { BYDEL, KOMMUNE, UDEFINERT, UTLAND, UKJENT_BOSTED }
 
     @JvmInline
@@ -19,11 +19,11 @@ sealed class GeoTilknytning(val type: Type) {
             requireDigits(verdi, 6)
         }
     }
-    data class KommuneTilknytning(val kommune: Kommune) : GeoTilknytning(KOMMUNE)
-    data class BydelTilknytning(val bydel: Bydel) : GeoTilknytning(BYDEL)
-    class UkjentBosted : GeoTilknytning(UKJENT_BOSTED)
-    data class UtenlandskTilknytning(val land: CountryCode) : GeoTilknytning(UTLAND)
-    class UdefinertTilknytning : GeoTilknytning(UDEFINERT)
+    data class KommuneTilknytning(val kommune: Kommune) : GeografiskTilknytning(KOMMUNE)
+    data class BydelTilknytning(val bydel: Bydel) : GeografiskTilknytning(BYDEL)
+    class UkjentBosted : GeografiskTilknytning(UKJENT_BOSTED)
+    data class UtenlandskTilknytning(val land: CountryCode) : GeografiskTilknytning(UTLAND)
+    class UdefinertTilknytning : GeografiskTilknytning(UDEFINERT)
 
     companion object  {
        val UdefinertGeoTilknytning = UdefinertTilknytning()

@@ -3,9 +3,9 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker
 import com.neovisionaries.i18n.CountryCode.SE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.UtenlandskTilknytning
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning.GTKommune
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning.GTLand
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning.GTType.KOMMUNE
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeografiskTilknytning.GTKommune
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeografiskTilknytning.GTLand
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeografiskTilknytning.GTType.KOMMUNE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlPerson
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering
@@ -22,7 +22,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.PersonTilBrukerMapper.tilBruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeoTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeografiskTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons
 
 
@@ -38,7 +38,7 @@ class BrukerMapperTest {
     fun strengtFortroligUtland()   {
         with(tilBruker(person(brukerId, pipRespons(STRENGT_FORTROLIG_UTLAND)), false)) {
             assertThat(gruppeKrav).containsExactly(STRENGT_FORTROLIG_GRUPPE)
-            assertThat(geoTilknytning).isInstanceOf(UtenlandskTilknytning::class.java)
+            assertThat(geografiskTilknytning).isInstanceOf(UtenlandskTilknytning::class.java)
         }
     }
     @Test
@@ -46,7 +46,7 @@ class BrukerMapperTest {
     fun strengtFortroligKommune()   {
         with(tilBruker(person(brukerId, pipRespons(STRENGT_FORTROLIG, geoKommune())), false)) {
             assertThat(gruppeKrav).containsExactly(STRENGT_FORTROLIG_GRUPPE)
-            assertThat(geoTilknytning).isInstanceOf(KommuneTilknytning::class.java)
+            assertThat(geografiskTilknytning).isInstanceOf(KommuneTilknytning::class.java)
         }
     }
     @Test
@@ -71,11 +71,11 @@ class BrukerMapperTest {
         }
     }
 
-    private fun geoUtland() = PdlGeoTilknytning(PdlGeoTilknytning.GTType.UTLAND, gtLand = GTLand(SE.alpha3))
-    private fun geoKommune() = PdlGeoTilknytning(KOMMUNE, gtKommune = GTKommune("1234"))
+    private fun geoUtland() = PdlGeografiskTilknytning(PdlGeografiskTilknytning.GTType.UTLAND, gtLand = GTLand(SE.alpha3))
+    private fun geoKommune() = PdlGeografiskTilknytning(KOMMUNE, gtKommune = GTKommune("1234"))
 
 
-    fun pipRespons(gradering: PdlAdressebeskyttelseGradering? = null, geo: PdlGeoTilknytning = geoUtland()) : PdlRespons {
+    fun pipRespons(gradering: PdlAdressebeskyttelseGradering? = null, geo: PdlGeografiskTilknytning = geoUtland()) : PdlRespons {
         val adressebeskyttelse = gradering?.let {
              listOf(PdlAdressebeskyttelse(it))
          }?: emptyList()

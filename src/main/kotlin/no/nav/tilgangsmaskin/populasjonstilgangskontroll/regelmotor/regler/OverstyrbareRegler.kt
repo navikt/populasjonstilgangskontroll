@@ -16,9 +16,9 @@ import java.util.*
 class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) : OverstyrbarRegel {
     override fun test(ansatt: Ansatt, bruker: Bruker) =
         ansatt.kanBehandle(id) || ansatt.grupper.any { it.displayName.endsWith("GEO_${
-            when (bruker.geoTilknytning) {
-                is KommuneTilknytning -> bruker.geoTilknytning.kommune.verdi
-                is BydelTilknytning -> bruker.geoTilknytning.bydel.verdi
+            when (bruker.geografiskTilknytning) {
+                is KommuneTilknytning -> bruker.geografiskTilknytning.kommune.verdi
+                is BydelTilknytning -> bruker.geografiskTilknytning.bydel.verdi
                 else -> return true
             }
         }")
@@ -31,7 +31,7 @@ class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) : Overst
 @Order(LOWEST_PRECEDENCE - 1)
 class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) : OverstyrbarRegel {
     override fun test(ansatt: Ansatt, bruker: Bruker) =
-        if (bruker.geoTilknytning is UkjentBosted) {
+        if (bruker.geografiskTilknytning is UkjentBosted) {
             ansatt.kanBehandle(id)
         } else true
 
@@ -43,7 +43,7 @@ class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) 
 @Order(LOWEST_PRECEDENCE - 2)
 class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) : OverstyrbarRegel {
     override fun test(ansatt: Ansatt, bruker: Bruker) =
-        if (bruker.geoTilknytning is UtenlandskTilknytning) {
+        if (bruker.geografiskTilknytning is UtenlandskTilknytning) {
             ansatt.kanBehandle(id)
         } else true
 

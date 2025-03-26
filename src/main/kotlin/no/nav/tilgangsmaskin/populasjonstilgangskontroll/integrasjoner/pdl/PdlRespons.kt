@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import java.time.LocalDate
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class PdlRespons(val person: PdlPerson, val identer: PdlIdenter = PdlIdenter(), val geografiskTilknytning: PdlGeoTilknytning? = null)  {
+data class PdlRespons(val person: PdlPerson, val identer: PdlIdenter = PdlIdenter(), val geografiskTilknytning: PdlGeografiskTilknytning? = null)  {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class PdlPerson(

@@ -7,7 +7,7 @@ import java.time.LocalDate
 
 data class Bruker(
     val brukerId: BrukerId,
-    val geoTilknytning: GeografiskTilknytning,
+    val geografiskTilknytning: GeografiskTilknytning,
     val gruppeKrav: List<GlobalGruppe> = emptyList(),
     val familie: Familie = INGEN,
     val dødsdato: LocalDate? = null,

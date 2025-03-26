@@ -1,8 +1,9 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker
 
 import com.neovisionaries.i18n.CountryCode
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions.requireDigits
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.Type.*
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions.requireDigits
+
 sealed class GeografiskTilknytning(val type: Type) {
     enum class Type { BYDEL, KOMMUNE, UDEFINERT, UTLAND, UKJENT_BOSTED }
 

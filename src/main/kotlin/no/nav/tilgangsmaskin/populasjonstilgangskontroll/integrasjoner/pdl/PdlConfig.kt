@@ -15,8 +15,6 @@ class PdlConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, val personPa
 
     private fun uri(path: String) = builder().path(path).build()
 
-
-
     companion object {
         const val PDL = "pdl"
         private const val DEFAULT_PING_PATH = "/internal/health/liveness"

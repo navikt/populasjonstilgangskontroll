@@ -60,12 +60,12 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
 
     fun sjekk(ansattId: AnsattId, e: Throwable) =
         when (e) {
-            is BulkRegelException -> sjekkOverstyringer(e, ansattId)
-            is RegelException -> sjekkOverstyring(e, ansattId)
+            is BulkRegelException -> sjekkOverstyringer(ansattId, e)
+            is RegelException -> sjekkOverstyring(ansattId, e)
             else -> throw e.also { log.error("Ukjent feil ved tilgangskontroll for $ansattId", it) }
         }
 
-    private fun sjekkOverstyring(e: RegelException, ansattId: AnsattId) =
+    private fun sjekkOverstyring(ansattId: AnsattId, e: RegelException) =
         with(e.regel) {
             log.trace("Sjekker om regler er overstyrt for $ansattId og ${e.brukerId}")
             if (erOverstyrbar) {
@@ -79,16 +79,10 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
             }
         }
 
-    private fun sjekkOverstyringer(e: BulkRegelException, ansattId: AnsattId) {
+    private fun sjekkOverstyringer(ansattId: AnsattId, e: BulkRegelException) {
         with(e.exceptions.toMutableList()) {
             removeIf {
-                runCatching { sjekkOverstyring(it, ansattId) }.isSuccess
-            }.also {
-                if (it) {
-                    log.info("Ignorerer ${e.exceptions.size - size} avvisninger grunnet overstyring for $ansattId")
-                } else {
-                    log.info("Ingen overstyringer ble funnet for $ansattId og ${e.exceptions.map { it.brukerId }}")
-                }
+                runCatching { sjekkOverstyring(ansattId, it) }.isSuccess
             }
             if (isNotEmpty()) {
                 throw BulkRegelException(ansattId, this).also {

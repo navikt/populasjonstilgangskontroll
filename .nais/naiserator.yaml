@@ -67,7 +67,6 @@ spec:
           namespace: nom
       external:
         - host: {{pdl}}
-        - host: {{pdlpip}}
     inbound:
       rules:
        {{#each inbound as |app|}}

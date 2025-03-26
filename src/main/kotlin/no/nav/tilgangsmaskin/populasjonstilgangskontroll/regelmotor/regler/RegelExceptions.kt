@@ -19,7 +19,7 @@ class RegelException(val brukerId: BrukerId, val  ansattId: AnsattId, val regel:
             "navIdent" to ansattId.verdi,
             "kanOverstyres" to regel.erOverstyrbar)
     }, null,messageCode,arguments) {
-    constructor(e: RegelException, messageCode: String, arguments: Array<String>) : this(e.brukerId, e.ansattId, e.regel, messageCode, arguments)
+    constructor(messageCode: String, arguments: Array<String>, e: RegelException) : this(e.brukerId, e.ansattId, e.regel, messageCode, arguments)
     val kode = regel.kode
     }
 class BulkRegelException(val  ansattId: AnsattId, val exceptions: List<RegelException>) : RuntimeException("Følgende ${exceptions.size} fødselsnummer ble avvist ved bulk-kjøring av regler for $ansattId ${exceptions.map { it.brukerId to it.regel.kode}}")

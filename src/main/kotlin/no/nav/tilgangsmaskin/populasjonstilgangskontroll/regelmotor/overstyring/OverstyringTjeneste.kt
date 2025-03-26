@@ -46,7 +46,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
                 }
             }.getOrElse {
                 when (it) {
-                    is RegelException ->  throw RegelException(it,OVERSTYRING_MESSAGE_CODE,arrayOf(it.regel.kortNavn,ansattId.verdi,data.brukerId.verdi)).also {
+                    is RegelException ->  throw RegelException(OVERSTYRING_MESSAGE_CODE, arrayOf(it.regel.kortNavn,ansattId.verdi,data.brukerId.verdi), it).also {
                         handler.avvist(ansattId,data.brukerId)
                     }
                     else -> throw it.also { log.error("Ukjent feil ved overstyring for $ansattId", it) }

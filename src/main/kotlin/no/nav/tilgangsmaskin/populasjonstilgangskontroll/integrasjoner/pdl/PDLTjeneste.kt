@@ -17,16 +17,18 @@ class PDLTjeneste(private val adapter: PdlRestClientAdapter) {
         it.copy(familie = Familie(it.foreldre, it.barn, søsken(it)))
     }
 
-     fun personer (brukerIds: List<BrukerId>) =
-         adapter.personer(brukerIds.map { it.verdi })
-             .map { (brukerId, data) -> tilPerson(brukerId, data)
-         }
+    fun personer(brukerIds: List<BrukerId>) =
+        adapter.personer(brukerIds.map(BrukerId::verdi))
+            .map { respons ->
+                tilPerson(respons.key, respons.value).let {
+                    it.copy(familie = Familie(it.foreldre, it.barn, søsken(it)))
+                }
+            }
 
     private fun søsken(person: Person) =
-        personer(person.foreldre
-            .map { it.brukerId })
-            .flatMap { it.barn }
+        adapter.personer(person.foreldre.map { it.brukerId.verdi })
+            .flatMap { tilPerson(it.key, it.value).barn }
             .map { it.brukerId }
             .filterNot { it == person.brukerId }
-            .map { FamilieMedlem(it,SØSKEN) }
+            .map { FamilieMedlem(it, SØSKEN) }
 }

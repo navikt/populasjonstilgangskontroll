@@ -86,8 +86,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
             }
             if (isNotEmpty()) {
                 throw BulkRegelException(ansattId, this).also {
-                    val avvisteIndenter = intersect(e.exceptions.toSet()).map { it.brukerId to it.kode}
-                    log.error("Følgende identer ble avvist for $ansattId : $avvisteIndenter")
+                    log.error(it.message)
                 }
             }
         }

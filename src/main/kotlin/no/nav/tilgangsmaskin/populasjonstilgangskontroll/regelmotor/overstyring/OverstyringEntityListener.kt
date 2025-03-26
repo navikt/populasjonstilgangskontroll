@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 
 import jakarta.persistence.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang1.TokenClaimsAccessor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
@@ -10,28 +11,33 @@ class OverstyringEntityListener(private val token: TokenClaimsAccessor) {
 
     @PrePersist
     private fun lagrer(entity : OverstyringEntity) =  setCreatedBySystem(entity).also {
-        log.trace("Lagrer {} i DB", entity.javaClass.simpleName)
+        log.trace("Lagrer overstyring for ${entity.fnr.maskFnr()} i DB")
     }
 
     @PreUpdate
     private fun oppdaterer(entity : OverstyringEntity) = setCreatedBySystem(entity).also {
-        log.trace("Oppdaterer {} i DB", entity.javaClass.simpleName)
+        log.trace("Oppdaterer overstyring for ${entity.fnr.maskFnr()} i DB")
     }
 
     @PreRemove
-    private fun fjerner(entity : OverstyringEntity) = log.trace("Fjerner {} fra DB", entity.javaClass.simpleName)
+    private fun fjerner(entity : OverstyringEntity) =
+        log.trace("Fjerner overstyring for ${entity.fnr.maskFnr()} i DB")
 
     @PostPersist
-    private fun lagret(entity : OverstyringEntity) = log.trace("Lagret {} i DB", entity.javaClass.simpleName)
+    private fun lagret(entity : OverstyringEntity) =
+        log.trace("Lagret overstyring for ${entity.fnr.maskFnr()} i DB")
 
     @PostUpdate
-    private fun oppdatert(entity : OverstyringEntity) = log.trace("Oppdaterte {} i DB", entity.javaClass.simpleName)
+    private fun oppdatert(entity : OverstyringEntity) =
+        log.trace("Oppdaterte overstyring for ${entity.fnr.maskFnr()} i DB")
 
     @PostRemove
-    private fun fjernet(entity : OverstyringEntity) = log.trace("Fjernet {} fra DB", entity.javaClass.simpleName)
+    private fun fjernet(entity : OverstyringEntity) =
+        log.trace("Fjernet overstyring for ${entity.fnr.maskFnr()} i DB")
 
     @PostLoad
-    private fun lest(entity : OverstyringEntity) = log.trace("Leste {} fra DB", entity.javaClass.simpleName)
+    private fun lest(entity : OverstyringEntity) =
+        log.trace("Leste overstyring for ${entity.fnr.maskFnr()} i DB")
 
     companion object {
 

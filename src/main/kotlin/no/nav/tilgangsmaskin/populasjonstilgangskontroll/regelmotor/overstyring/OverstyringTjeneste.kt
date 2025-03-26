@@ -50,25 +50,25 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
                     is RegelException ->  throw RegelException(it,OVERSTYRING_MESSAGE_CODE,arrayOf(it.regel.kortNavn,ansattId.verdi,data.brukerId.verdi)).also {
                         handler.avvist(ansattId,data.brukerId)
                     }
-                    else -> throw it
+                    else -> throw it.also { log.error("Ukjent feil ved overstyring for $ansattId", it) }
                 }
          }
 
     @CachePut(OVERSTYRING)
      fun refresh(ansattId: AnsattId, data: OverstyringData)  = Unit.also {
-        log.info("Refresh cache overstyring for ansatt '${ansattId.verdi}' og bruker '${data.brukerId.maskFnr()}'")
+        log.info("Refresh cache overstyring for $ansattId og bruker ${data.brukerId}")
     }
 
     fun sjekk(ansattId: AnsattId, e: Throwable) =
         when (e) {
             is BulkRegelException -> sjekkOverstyringer(e, ansattId)
             is RegelException -> sjekkOverstyring(e, ansattId)
-            else -> throw e.also { log.error("Ukjent feil ved tilgangskontroll for '${ansattId.verdi}", it) }
+            else -> throw e.also { log.error("Ukjent feil ved tilgangskontroll for $ansattId", it) }
         }
 
     private fun sjekkOverstyring(e: RegelException, ansattId: AnsattId) =
         with(e.regel) {
-            log.trace("Sjekker om regler er overstyrt for  $ansattId og ${e.brukerId}")
+            log.trace("Sjekker om regler er overstyrt for $ansattId og ${e.brukerId}")
             if (erOverstyrbar) {
                 if (erOverstyrt(ansattId, e.brukerId)) {
                     log.info("Overstyrt tilgang er gitt til $ansattId og ${e.brukerId}")
@@ -93,7 +93,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
             }
             if (isNotEmpty()) {
                 throw BulkRegelException(ansattId, this).also {
-                    val avvist = intersect(e.exceptions).map { it.brukerId to it.regel.avvisningKode}
+                    val avvist = intersect(e.exceptions.toSet()).map { it.brukerId to it.regel.avvisningKode}
                     log.error("Følgende identer ble avvist for $ansattId : $avvist")
                 }
             }

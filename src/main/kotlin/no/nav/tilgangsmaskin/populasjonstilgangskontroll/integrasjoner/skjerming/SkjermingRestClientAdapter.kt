@@ -14,7 +14,7 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
 
     fun skjerming(ident: String) = post<Boolean>(cf.skjermetUri(), mapOf(IDENT to ident))
     fun skjerminger(identer: List<String>) = post<Map<String, Boolean>>(cf.skjermetBulkUri(), mapOf(IDENTER to identer))
-        .map { (key, value) -> BrukerId(key) to value }
+        .map { BrukerId(it.key) to it.value }
         .toMap()
 }
 

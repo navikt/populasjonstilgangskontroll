@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner
 
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.GraphQLErrorHandler
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpRequest
@@ -12,10 +11,6 @@ import org.springframework.stereotype.Component
 import org.springframework.web.ErrorResponseException
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import java.net.URI
-
-@Component
-@Primary
-class DefaultGraphQlErrorHandler : GraphQLErrorHandler
 
 @Component
 @Primary

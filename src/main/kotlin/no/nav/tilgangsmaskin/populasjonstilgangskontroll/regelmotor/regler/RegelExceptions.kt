@@ -22,4 +22,4 @@ class RegelException(val brukerId: BrukerId, val  ansattId: AnsattId, val regel:
     constructor(e: RegelException, messageCode: String, arguments: Array<String>) : this(e.brukerId, e.ansattId, e.regel, messageCode, arguments)
     val kode = regel.kode
     }
-class BulkRegelException(val  ansattId: AnsattId, val exceptions: List<RegelException>) : RuntimeException("Følgende ${exceptions.size} fødselsnummer ble avvist ved bulk-kjøring av regler for $ansattId ${exceptions.map { it.brukerId }}")
+class BulkRegelException(val  ansattId: AnsattId, val exceptions: List<RegelException>) : RuntimeException("Følgende ${exceptions.size} fødselsnummer ble avvist ved bulk-kjøring av regler for $ansattId ${exceptions.map { it.brukerId to it.regel.kode}}")

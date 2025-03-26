@@ -38,7 +38,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
 
     fun overstyr(ansattId: AnsattId, data: OverstyringData)  =
          runCatching {
-                log.info("Sjekker kjerneregler før eventuell overstyring for ansatt '${ansattId.verdi}' og bruker '${data.brukerId.verdi}'")
+                log.info("Sjekker kjerneregler før eventuell overstyring for ansatt $ansattId og bruker ${data.brukerId}")
                 motor.kjerneregler(ansatt.ansatt(ansattId), bruker.bruker(data.brukerId))
                 adapter.overstyr(ansattId.verdi, data).also {
                     handler.overstyrt(ansattId,data.brukerId)
@@ -54,9 +54,10 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
          }
 
     @CachePut(OVERSTYRING)
-     fun refresh(ansattId: AnsattId, data: OverstyringData)  = Unit.also {
-        log.info("Refresh cache overstyring for $ansattId og bruker ${data.brukerId}")
-    }
+    fun refresh(ansattId: AnsattId, data: OverstyringData)  =
+        Unit.also {
+            log.info("Refresh cache overstyring for $ansattId og bruker ${data.brukerId}")
+        }
 
     fun sjekk(ansattId: AnsattId, e: Throwable) =
         when (e) {
@@ -72,7 +73,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
                 if (erOverstyrt(ansattId, e.brukerId)) {
                     log.info("Overstyrt tilgang er gitt til $ansattId og ${e.brukerId}")
                 } else {
-                    throw e.also { log.warn("Ingen overstyring, tilgang avvist av regel $kortNavn og $ansattId og ${e.brukerId} opprettholdes") }
+                    throw e.also { log.warn("Ingen overstyring, tilgang avvist av regel '$kortNavn' og $ansattId og ${e.brukerId} opprettholdes") }
                 }
             } else {
                 throw e.also { log.trace("Tilgang avvist av kjerneregel $kortNavn for $ansattId og ${e.brukerId}, avvisning opprettholdes") }

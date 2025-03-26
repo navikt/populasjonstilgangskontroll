@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 class OverstyringResultatHandler {
     private val log = LoggerFactory.getLogger(OverstyringResultatHandler::class.java)
     fun gyldig(ansattId: AnsattId, brukerId: BrukerId, diff: String) = true.also {
-        log.trace("Overstyring er gyldig i $diff til for ${ansattId} og bruker $brukerId")
+        log.trace("Overstyring er gyldig i $diff til for $ansattId og bruker $brukerId")
     }
     fun utgått(ansattId: AnsattId, brukerId: BrukerId, diff: String) = false.also {
         log.warn("Overstyring har gått ut på tid for $diff siden for  $ansattId og bruker $brukerId")

@@ -11,7 +11,7 @@ class PdlConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, val personPa
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     fun personURI() = uri(personPath)
-    fun personerURI() =uri(personBolkPath)
+    fun personerURI() = uri(personBolkPath)
 
     private fun uri(path: String) = builder().path(path).build()
 

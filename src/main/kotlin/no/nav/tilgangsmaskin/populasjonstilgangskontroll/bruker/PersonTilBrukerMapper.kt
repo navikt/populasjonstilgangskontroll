@@ -14,7 +14,7 @@ object PersonTilBrukerMapper {
             Bruker(brukerId, geoTilknytning, tilGruppeKrav(geoTilknytning,graderinger,erSkjermet), familie, dødsdato,historiskeIdentifikatorer)
         }
 
-    private fun tilGruppeKrav(geo: GeoTilknytning, graderinger: List<Gradering>, erSkjermet: Boolean) =
+    private fun tilGruppeKrav(geoTilknytning: GeoTilknytning, graderinger: List<Gradering>, erSkjermet: Boolean) =
         mutableListOf<GlobalGruppe>().apply {
             if (graderinger.any {
                     it in listOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND)
@@ -23,7 +23,7 @@ object PersonTilBrukerMapper {
             } else if (graderinger.any { it == FORTROLIG }) {
                 add(FORTROLIG_GRUPPE)
             }
-            if (geo == UdefinertGeoTilknytning) {
+            if (geoTilknytning == UdefinertGeoTilknytning) {
                 add(UDEFINERT_GEO_GRUPPE)
             }
             if (erSkjermet) {

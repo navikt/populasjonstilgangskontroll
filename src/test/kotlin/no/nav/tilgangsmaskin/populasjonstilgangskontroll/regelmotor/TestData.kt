@@ -14,7 +14,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeoTilknytning.U
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.entra.EntraGruppe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.FamilieRelasjon
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie.FamilieMedlem.FamilieRelasjon
 import java.util.UUID
 
 object TestData {

@@ -8,5 +8,8 @@ data class Familie(val foreldre: List<FamilieMedlem> = emptyList(), val barn: Li
     companion object {
         val INGEN = Familie()
     }
-    data class FamilieMedlem(val brukerId: BrukerId, val relasjon: FamilieRelasjon)
+    data class FamilieMedlem(val brukerId: BrukerId, val relasjon: FamilieRelasjon) {
+        enum class FamilieRelasjon  {MOR,FAR,MEDMOR,MEDFAR,BARN, SØSKEN}
+
+    }
 }

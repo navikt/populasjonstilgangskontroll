@@ -2,15 +2,17 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker
 
 import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterUtils
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions.requireDigits
 
 @JvmInline
 value class BrukerId(@JsonValue val verdi: String) {
     init {
         with(verdi) {
-            DomainExtensions.requireDigits(this, 11)
-            if (ClusterUtils.isProd) {
+            requireDigits(this, 11)
+            if (isProd) {
                 require(mod11(W1, this) == this[9] - '0') { "Første kontrollsiffer  ${this[9]} ikke validert" }
                 require(mod11(W2, this) == this[10] - '0') { "Andre kontrollsiffer  ${this[10]} ikke validert" }
             }

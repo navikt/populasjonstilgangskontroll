@@ -14,6 +14,9 @@ data class Ansatt(val identifikatorer: AnsattIdentifikatorer, val grupper: List<
     @JsonIgnore
     val familieMedlemmer = bruker?.familieMedlemmer?.map { it.brukerId } ?: emptyList()
 
+    @JsonIgnore
+    val søsken = bruker?.søsken?.map { it.brukerId } ?: emptyList()
+
     fun kanBehandle(id: UUID) = grupper.any { it.id == id }
     data class AnsattIdentifikatorer(val ansattId: AnsattId, val oid: UUID, val ansattFnr: AnsattFnr? = null)
 

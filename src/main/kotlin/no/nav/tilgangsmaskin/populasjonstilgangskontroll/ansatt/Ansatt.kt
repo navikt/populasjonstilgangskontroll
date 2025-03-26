@@ -13,13 +13,14 @@ data class Ansatt(val identifikatorer: AnsattIdentifikatorer, val grupper: List<
     val brukerId = bruker?.brukerId
     @JsonIgnore
     val ansattId = identifikatorer.ansattId
-    @JsonIgnore
-    val familieMedlemmer = bruker?.familieMedlemmer?.map { it.brukerId } ?: emptyList()
 
     @JsonIgnore
     val foreldreOgBarn = bruker?.foreldreOgBarn?.map { it.brukerId } ?: emptyList()
     @JsonIgnore
     val søsken = bruker?.søsken?.map { it.brukerId } ?: emptyList()
+
+    @JsonIgnore
+    val familieMedlemmer = foreldreOgBarn + søsken
 
     fun kanBehandle(id: UUID) = grupper.any { it.id == id }
     data class AnsattIdentifikatorer(val ansattId: AnsattId, val oid: UUID, val ansattFnr: AnsattFnr? = null)

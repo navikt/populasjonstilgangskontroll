@@ -49,7 +49,9 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
                     is RegelException ->  throw RegelException(OVERSTYRING_MESSAGE_CODE, arrayOf(it.regel.kortNavn,ansattId.verdi,data.brukerId.verdi), it).also {
                         handler.avvist(ansattId,data.brukerId)
                     }
-                    else -> throw it.also { log.error("Ukjent feil ved overstyring for $ansattId", it) }
+                    else -> throw it.also {
+                        log.error("Ukjent feil ved overstyring for $ansattId", it)
+                    }
                 }
          }
 
@@ -63,7 +65,9 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
         when (e) {
             is BulkRegelException -> sjekkOverstyringer(ansattId, e)
             is RegelException -> sjekkOverstyring(ansattId, e)
-            else -> throw e.also { log.error("Ukjent feil ved tilgangskontroll for $ansattId", it) }
+            else -> throw e.also {
+                log.error("Ukjent feil ved tilgangskontroll for $ansattId", it)
+            }
         }
 
     private fun sjekkOverstyring(ansattId: AnsattId, e: RegelException) =
@@ -73,17 +77,23 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
                 if (erOverstyrt(ansattId, e.brukerId)) {
                     log.info("Overstyrt tilgang er gitt til $ansattId og ${e.brukerId}")
                 } else {
-                    throw e.also { log.warn("Ingen overstyring, tilgang avvist av regel '$kortNavn' og $ansattId og ${e.brukerId} opprettholdes") }
+                    throw e.also {
+                        log.warn("Ingen overstyring, tilgang avvist av regel '$kortNavn' og $ansattId og ${e.brukerId} opprettholdes")
+                    }
                 }
             } else {
-                throw e.also { log.trace("Tilgang avvist av kjerneregel $kortNavn for $ansattId og ${e.brukerId}, avvisning opprettholdes") }
+                throw e.also {
+                    log.trace("Tilgang avvist av kjerneregel $kortNavn for $ansattId og ${e.brukerId}, avvisning opprettholdes")
+                }
             }
         }
 
     private fun sjekkOverstyringer(ansattId: AnsattId, e: BulkRegelException) {
         with(e.exceptions.toMutableList()) {
             removeIf {
-                runCatching { sjekkOverstyring(ansattId, it) }.isSuccess
+                runCatching {
+                    sjekkOverstyring(ansattId, it)
+                }.isSuccess
             }
             if (isNotEmpty()) {
                 throw BulkRegelException(ansattId, this).also {

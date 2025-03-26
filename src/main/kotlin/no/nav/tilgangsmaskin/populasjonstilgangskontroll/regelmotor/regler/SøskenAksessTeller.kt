@@ -13,6 +13,6 @@ class SøskenAksessTeller(private val accessor: TokenClaimsAccessor) {
     @Counted
     fun registrerAksess(ansattId: AnsattId, brukerId: BrukerId) =
         true.also {
-            log.warn("Ansatt $ansattId aksesserte søsken $brukerId fra system ${accessor.systemNavn}")
+            log.warn("$ansattId slo opp søsken $brukerId fra system ${accessor.systemNavn}")
         }
 }

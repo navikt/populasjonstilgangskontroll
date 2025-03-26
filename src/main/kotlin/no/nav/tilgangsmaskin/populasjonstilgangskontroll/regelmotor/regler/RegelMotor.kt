@@ -2,9 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
 import io.micrometer.core.annotation.Counted
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Ansatt
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett.Companion.KJERNE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett.Companion.OVERSTYRBAR
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett.RegelType
@@ -62,15 +60,4 @@ class RegelMotor(@Qualifier(KJERNE) private val kjerne: RegelSett, @Qualifier(OV
 
     override fun toString() = "${javaClass.simpleName} [kjerneregler=$kjerne,kompletteregler=$komplett]"
 
-    @Component
-    @Counted
-    class RegelsettResultatHandler {
-        private val log = LoggerFactory.getLogger(javaClass)
-        fun avvist(pos: String, ansattId: AnsattId, brukerId: BrukerId, regel: Regel) {
-            log.warn("[#$pos] Tilgang avvist av regel '${regel.kortNavn}' ${regel.avvisningTekst}) for $ansattId og $brukerId")
-        }
-        fun ok(type: RegelType, ansattId: AnsattId, brukerId: BrukerId) {
-            log.info("${type.beskrivelse.replaceFirstChar { it.uppercaseChar() }} ga tilgang OK for $ansattId og $brukerId")
-        }
-    }
 }

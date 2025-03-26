@@ -94,7 +94,7 @@ no.nav.security.jwt:
       pdl-pip-api:
         token-endpoint-url: ${azure.openid.config.token.endpoint}
         grant-type: client_credentials
-        scope: ${pdlpip.scope}
+        scope: ${pdl.scope}
         authentication:
           client-id: ${azure.app.client.id}
           client-jwk: ${azure.app.jwk}

@@ -9,14 +9,17 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPe
 @CacheableRetryingOnRecoverableService(cacheNames = [PDL])
 @Timed
 class PDLTjeneste(private val adapter: PdlRestClientAdapter) {
-
+it
     fun person(brukerId: BrukerId) = tilPerson(brukerId, adapter.person(brukerId.verdi))
 
     fun søsken(brukerId: BrukerId) =
         person(brukerId).foreldre
             .map { it.brukerId }
             .let { personer(it) }
-            .filterNot { it.brukerId == brukerId }
+            .map {  it.barn}
+            .flatten()
+            .map { it.brukerId }
+            .filterNot { it == brukerId }
 
      fun personer (brukerIds: List<BrukerId>) =
          adapter.personer(brukerIds.map { it.verdi })

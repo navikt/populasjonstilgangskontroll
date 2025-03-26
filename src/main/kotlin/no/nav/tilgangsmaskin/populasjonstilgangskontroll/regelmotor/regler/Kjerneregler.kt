@@ -10,6 +10,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.RegelBeskrivelse
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
+import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 import java.util.*
@@ -29,14 +30,25 @@ class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Gl
 @Component
 class EgneDataRegel : KjerneRegel {
     override fun test(ansatt: Ansatt, bruker: Bruker) =
-        bruker.brukerId != ansatt.bruker?.brukerId
+        bruker.brukerId != ansatt.brukerId
     override val metadata = RegelBeskrivelse("Egne data", AVVIST_EGNE_DATA)
 }
 
 @Order(HIGHEST_PRECEDENCE + 4)
 @Component
-class EgenFamilieRegel : KjerneRegel {
+class ForeldreOgBarnRegel : KjerneRegel {
     override fun test(ansatt: Ansatt, bruker: Bruker) =
-        bruker.brukerId !in ansatt.familieMedlemmer
+        bruker.brukerId !in (ansatt.foreldreOgBarn)
     override val metadata = RegelBeskrivelse("Egen familie", AVVIST_EGEN_FAMILIE)
+}
+
+@Component
+@Order(HIGHEST_PRECEDENCE + 5)
+class SøskenRegel(private val teller: SøskenAksessTeller) : OverstyrbarRegel {
+    override fun test(ansatt: Ansatt, bruker: Bruker) =
+        if (bruker.brukerId in ansatt.søsken) {
+            teller.registrerAksess(ansatt.ansattId, bruker.brukerId)
+        } else true
+
+    override val metadata = RegelBeskrivelse("Oppslag søsken", AVVIST_EGEN_FAMILIE)
 }

@@ -60,16 +60,6 @@ class AvdødBrukerRegel(private val teller: AvdødAksessTeller) : OverstyrbarReg
     override val metadata = RegelBeskrivelse("Avdød bruker", AVVIST_AVDØD)
 }
 
-@Component
-@Order(LOWEST_PRECEDENCE - 4)
-class SøskenRegel(private val teller: SøskenAksessTeller) : OverstyrbarRegel {
-    override fun test(ansatt: Ansatt, bruker: Bruker) =
-        if (bruker.brukerId in ansatt.søsken) {
-            teller.registrerAksess(ansatt.ansattId, bruker.brukerId)
-        } else true
-
-    override val metadata = RegelBeskrivelse("Oppslag søsken", AVVIST_EGEN_FAMILIE)
-}
 
 
 

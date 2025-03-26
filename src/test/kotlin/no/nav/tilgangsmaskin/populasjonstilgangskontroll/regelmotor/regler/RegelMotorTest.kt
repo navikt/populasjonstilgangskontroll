@@ -72,7 +72,7 @@ class RegelMotorTest {
     @Test
     @DisplayName("Test at saksbehandler ikke kan behandle egen familie")
     fun egenFamilieAvvises() {
-        assertInstanceOf<EgenFamilieRegel>(
+        assertInstanceOf<ForeldreOgBarnRegel>(
             assertThrows<RegelException> {
                 regelMotor.kompletteRegler(egenAnsattMedFamilie, vanligBruker)
             }.regel)

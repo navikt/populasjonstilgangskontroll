@@ -10,10 +10,14 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId as Ansa
 data class Ansatt(val identifikatorer: AnsattIdentifikatorer, val grupper: List<EntraGruppe>, val bruker: Bruker? = null) {
 
     @JsonIgnore
+    val brukerId = bruker?.brukerId
+    @JsonIgnore
     val ansattId = identifikatorer.ansattId
     @JsonIgnore
     val familieMedlemmer = bruker?.familieMedlemmer?.map { it.brukerId } ?: emptyList()
 
+    @JsonIgnore
+    val foreldreOgBarn = bruker?.foreldreOgBarn?.map { it.brukerId } ?: emptyList()
     @JsonIgnore
     val søsken = bruker?.søsken?.map { it.brukerId } ?: emptyList()
 

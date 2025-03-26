@@ -17,6 +17,9 @@ data class Bruker(
     val familieMedlemmer = familie.familieMedlemmer
 
     @JsonIgnore
+    val foreldreOgBarn = familie.foreldre + familie.barn
+
+    @JsonIgnore
     val søsken = familie.søsken
 
     fun kreverGlobalGruppe(gruppe: GlobalGruppe) = gruppe in gruppeKrav

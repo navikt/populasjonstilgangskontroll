@@ -80,8 +80,6 @@ spec:
       value: {{nais.cluster.type}}
     - name: PDL
       value: {{pdl}}
-    - name: PDLPIP
-      value: {{pdlpip}}
     - name: GRUPPE_STRENGT
       value: '{{grupper.strengt}}'
     - name: GRUPPE_FORTROLIG

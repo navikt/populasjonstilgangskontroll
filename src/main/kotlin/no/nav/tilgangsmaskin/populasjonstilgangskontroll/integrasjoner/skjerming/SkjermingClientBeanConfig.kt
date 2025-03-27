@@ -13,14 +13,11 @@ class SkjermingClientBeanConfig {
 
     @Bean
     @Qualifier(SKJERMING)
-    fun skjermingRestClient(b: Builder, cfg: SkjermingConfig, oAuth2ClientRequestInterceptor: OAuth2ClientRequestInterceptor) =
-        b.baseUrl(cfg.baseUri)
-            .requestInterceptors { it.addFirst(oAuth2ClientRequestInterceptor)
-            }.build()
+    fun skjermingRestClient(b: Builder, cfg: SkjermingConfig) =
+        b.baseUrl(cfg.baseUri).build()
 
     @Bean
     fun skjermingHealthIndicator(a: SkjermingRestClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
-
 
 }
 

@@ -18,7 +18,6 @@ class EntraClientBeanConfig {
     fun graphRestClient(b: RestClient.Builder, cfg: EntraConfig, oAuth2ClientRequestInterceptor: OAuth2ClientRequestInterceptor) =
         b.baseUrl(cfg.baseUri)
             .requestInterceptors {
-                it.addFirst(oAuth2ClientRequestInterceptor)
                 it.add(headerAddingRequestInterceptor(HEADER_CONSISTENCY_LEVEL))
             }.build()
 

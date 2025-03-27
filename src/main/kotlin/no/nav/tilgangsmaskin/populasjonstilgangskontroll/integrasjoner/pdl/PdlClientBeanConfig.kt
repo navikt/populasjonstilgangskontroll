@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
-import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.AbstractPingableHealthIndicator
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlConfig.Companion.PDL
 import org.springframework.beans.factory.annotation.Qualifier
@@ -13,10 +12,7 @@ class PdlClientBeanConfig {
 
     @Bean
     @Qualifier(PDL)
-    fun pdlRestClient(b: Builder, oAuth2ClientRequestInterceptor: OAuth2ClientRequestInterceptor) =
-        b.requestInterceptors {
-            it.addFirst(oAuth2ClientRequestInterceptor)
-        }.build()
+    fun pdlRestClient(b: Builder) = b.build()
 
     @Bean
     fun pdlHealthIndicator(a: PdlRestClientAdapter) = object : AbstractPingableHealthIndicator(a) {}

@@ -8,19 +8,24 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.IdOgType
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelMotor
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
 @Timed
 class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: BrukerTjeneste, private val ansattTjeneste: AnsattTjeneste, private val overstyringTjeneste: OverstyringTjeneste)  {
+    private val log = LoggerFactory.getLogger(javaClass)
 
     fun kompletteRegler(ansattId: AnsattId, brukerId: BrukerId) =
         with(brukerTjeneste.bruker(brukerId)) {
+            log.info("Sjekker komplette regler for ansatt $ansattId og bruker $brukerId")
             runCatching {
                 motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), this)
             }.getOrElse {
                 overstyringTjeneste.sjekk(ansattId, it)
             }
+            log.info("Sjekket komplette regler for ansatt $ansattId og bruker $brukerId")
+
         }
 
     fun kjerneregler(ansattId: AnsattId, brukerId: BrukerId) =

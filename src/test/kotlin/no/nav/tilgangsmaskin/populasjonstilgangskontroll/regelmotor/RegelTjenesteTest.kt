@@ -55,7 +55,7 @@ class RegelTjenesteTest {
     @MockkBean
     lateinit var accessor: TokenClaimsAccessor
     @MockkBean
-    lateinit var meterRegistry : MeterRegistry
+    lateinit var avdød : AvdødAksessTeller
     @Autowired
     lateinit var motor: RegelMotor
     @MockK

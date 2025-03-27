@@ -12,9 +12,9 @@ import org.springframework.stereotype.Component
 import java.time.LocalDate
 
 @Component
+@Counted
 class SøskenAksessTeller(private val accessor: TokenClaimsAccessor) {
     private val log = LoggerFactory.getLogger(javaClass)
-    @Counted
     fun registrerAksess(ansattId: AnsattId, brukerId: BrukerId) =
         true.also {
             log.warn("$ansattId slo opp søsken $brukerId fra system ${accessor.systemNavn}")

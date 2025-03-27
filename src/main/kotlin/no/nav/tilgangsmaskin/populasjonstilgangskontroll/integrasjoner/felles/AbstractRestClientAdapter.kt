@@ -47,12 +47,4 @@ abstract class AbstractRestClientAdapter(
     override fun isEnabled() = cfg.isEnabled
     override fun toString() = "webClient=$restClient, cfg=$cfg, baseUri=$baseUri"
 
-    companion object {
-
-        fun headerAddingRequestInterceptor(vararg verdier : Pair<String, String>) =
-            ClientHttpRequestInterceptor { req, b, next ->
-                verdier.forEach { (key, value) -> req.headers.add(key, value) }
-                next.execute(req, b)
-            }
-    }
 }

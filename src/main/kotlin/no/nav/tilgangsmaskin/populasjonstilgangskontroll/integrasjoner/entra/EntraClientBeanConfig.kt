@@ -8,6 +8,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.Ab
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.web.client.RestClient
 
 @Configuration
@@ -22,6 +23,13 @@ class EntraClientBeanConfig {
                 it.add(headerAddingRequestInterceptor(HEADER_CONSISTENCY_LEVEL))
             }.build()
 
+
     @Bean
     fun graphHealthIndicator(a: EntraRestClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
+
+    private fun headerAddingRequestInterceptor(vararg verdier : Pair<String, String>) =
+        ClientHttpRequestInterceptor { req, b, next ->
+            verdier.forEach { req.headers.add(it.first, it.second) }
+            next.execute(req, b)
+        }
 }

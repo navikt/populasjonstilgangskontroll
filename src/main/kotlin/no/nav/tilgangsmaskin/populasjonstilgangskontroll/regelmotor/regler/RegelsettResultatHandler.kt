@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 class RegelsettResultatHandler {
     private val log = LoggerFactory.getLogger(javaClass)
     fun avvist(pos: String, ansattId: AnsattId, brukerId: BrukerId, regel: Regel) {
-        log.warn("[#$pos] Tilgang avvist av regel '${regel.kortNavn}' ${regel.avvisningTekst}) for $ansattId og $brukerId")
+        log.warn("[#$pos] Tilgang avvist av regel '${regel.kortNavn}' (${regel.avvisningTekst}) for $ansattId og $brukerId")
     }
     fun ok(type: RegelSett.RegelType, ansattId: AnsattId, brukerId: BrukerId) {
         log.info("${type.beskrivelse.replaceFirstChar { it.uppercaseChar() }} ga tilgang OK for $ansattId og $brukerId")

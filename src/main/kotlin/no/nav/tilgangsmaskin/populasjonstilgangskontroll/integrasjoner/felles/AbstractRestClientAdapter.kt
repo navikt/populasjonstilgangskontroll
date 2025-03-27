@@ -40,11 +40,11 @@ abstract class AbstractRestClientAdapter(
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
             .body(T::class.java) ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
 
-    override fun name() = cfg.name
+    override val name = cfg.name
     protected val baseUri = cfg.baseUri
 
     override val pingEndpoint = "${cfg.pingEndpoint}"
-    override fun isEnabled() = cfg.isEnabled
+    override val isEnabled = cfg.isEnabled
     override fun toString() = "webClient=$restClient, cfg=$cfg, baseUri=$baseUri"
 
 }

@@ -12,7 +12,7 @@ abstract class AbstractPingableHealthIndicator(private val pingable: Pingable) :
         }.getOrElse(::down)
 
     private fun up() = with(pingable) {
-        if (isEnabled()) {
+        if (isEnabled) {
             Health.up()
                 .withDetail("endpoint", pingEndpoint)
                 .build()

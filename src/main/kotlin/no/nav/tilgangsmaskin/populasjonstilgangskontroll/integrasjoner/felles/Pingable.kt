@@ -4,6 +4,6 @@ interface Pingable {
 
     fun ping() : Any
     val pingEndpoint : String
-    fun name() : String = javaClass.simpleName
-    fun isEnabled() : Boolean = true
+    val name : String
+    val isEnabled : Boolean
 }

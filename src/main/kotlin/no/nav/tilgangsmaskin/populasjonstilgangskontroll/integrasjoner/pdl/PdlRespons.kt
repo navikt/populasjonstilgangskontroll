@@ -26,7 +26,7 @@ data class PdlRespons(val person: PdlPerson, val identer: PdlIdenter = PdlIdente
     }
     data class PdlIdenter(val identer: List<PdlIdent> = emptyList()) {
         data class PdlIdent(val ident: String, val historisk: Boolean, val gruppe: PdlIdentGruppe) {
-            enum class PdlIdentGruppe { AKTORID, FOLKEREGISTERIDENT }
+            enum class PdlIdentGruppe { AKTORID, FOLKEREGISTERIDENT, NPID }
         }
     }
 }

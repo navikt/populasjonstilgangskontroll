@@ -50,9 +50,6 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: AnsattIdAddingHand
     fun fellesRetryListener() = FellesRetryListener()
 
     @Bean
-    fun oAuth2ClientRequestInterceptor(properties: ClientConfigurationProperties, service: OAuth2AccessTokenService) = OAuth2ClientRequestInterceptor(properties, service)
-
-    @Bean
     @ConditionalOnNotProd
     fun traceRepository() = InMemoryHttpExchangeRepository()
 

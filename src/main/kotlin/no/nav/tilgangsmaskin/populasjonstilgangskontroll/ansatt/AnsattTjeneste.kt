@@ -1,8 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt
 
 import io.micrometer.core.annotation.Timed
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Ansatt.AnsattIdentifikatorer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerTjeneste
@@ -17,10 +15,12 @@ class AnsattTjeneste(private val entra: EntraTjeneste, private val nom: NomOpera
 {
     private val log = getLogger(AnsattTjeneste::class.java)
     fun ansatt(ansattId: AnsattId)  =
-        runBlocking {
-            val entra =  async { entra.ansatt(ansattId) }.await()
-            val ansattFnr =  async { nom.fnrForAnsatt(ansattId) }.await()
-            val ansattBruker = ansattFnr?.let { pdl.bruker(it) }
+        run {
+            val entra =  entra.ansatt(ansattId)
+            val ansattFnr =  nom.fnrForAnsatt(ansattId)
+            val ansattBruker = ansattFnr?.let {
+                pdl.bruker(it)
+            }
             Ansatt(AnsattIdentifikatorer(ansattId, entra.oid, ansattFnr), entra.grupper, ansattBruker).also {
                 log.trace(CONFIDENTIAL,"Ansatt er {}", it)
             }

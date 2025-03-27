@@ -78,12 +78,12 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
                     log.info("Overstyrt tilgang er gitt til $ansattId og ${e.brukerId}")
                 } else {
                     throw e.also {
-                        log.warn("Ingen overstyring, tilgang avvist av regel '$kortNavn' og $ansattId og ${e.brukerId} opprettholdes")
+                        log.warn("Ingen overstyring, avvisning fra regel '$kortNavn' og $ansattId og ${e.brukerId} opprettholdes")
                     }
                 }
             } else {
                 throw e.also {
-                    log.trace("Tilgang avvist av kjerneregel $kortNavn for $ansattId og ${e.brukerId}, avvisning opprettholdes")
+                    log.trace("Avvisning fra kjerneregel $kortNavn for $ansattId og ${e.brukerId} opprettholdes")
                 }
             }
         }

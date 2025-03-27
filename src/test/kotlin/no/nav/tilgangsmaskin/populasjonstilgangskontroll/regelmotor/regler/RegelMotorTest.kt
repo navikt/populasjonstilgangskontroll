@@ -48,9 +48,9 @@ import org.springframework.test.context.TestPropertySource
 class RegelMotorTest {
 
     @MockkBean
-    lateinit var accessor: TokenClaimsAccessor
+    lateinit var avdød: AvdødAksessTeller
     @MockkBean
-    lateinit var meterRegistry : MeterRegistry
+    lateinit var søsken : SøskenAksessTeller
     @Autowired
     lateinit var regelMotor: RegelMotor
 

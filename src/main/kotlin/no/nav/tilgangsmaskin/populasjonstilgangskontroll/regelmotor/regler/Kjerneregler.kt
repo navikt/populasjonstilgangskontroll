@@ -44,7 +44,7 @@ class ForeldreOgBarnRegel : KjerneRegel {
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 5)
-class SøskenRegel(private val teller: SøskenAksessTeller) : OverstyrbarRegel {
+class SøskenRegel(private val teller: SøskenAksessTeller) : KjerneRegel {
     override fun test(ansatt: Ansatt, bruker: Bruker) =
         if (bruker.brukerId in ansatt.søsken) {
             teller.registrerAksess(ansatt.ansattId, bruker.brukerId)

@@ -8,9 +8,10 @@ import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor
 
 @Component
-class AnsattIdAddingHandlerInterceptor(private val accessor: TokenClaimsAccessor) : HandlerInterceptor {
+class ConsumerAwareHandlerInterceptor(private val accessor: TokenClaimsAccessor) : HandlerInterceptor {
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         MDC.put("userid", accessor.ansattId?.verdi ?: "N/A")
+        MDC.put("consumerid", accessor.systemAndNamespace)
         return true
     }
 }

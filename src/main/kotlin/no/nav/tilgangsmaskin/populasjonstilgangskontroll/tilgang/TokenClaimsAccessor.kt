@@ -18,6 +18,10 @@ class TokenClaimsAccessor (private val contextHolder: TokenValidationContextHold
 
     val systemNavn get() = system?.split(":")?.lastOrNull() ?: "N/A"
 
+    val systemAndNamespace get() = runCatching {
+        system?.split(":")?.drop(1)?.joinToString (separator = ":") ?: systemNavn
+    }.getOrElse { systemNavn }
+
     companion object {
 
         const val AAD_ISSUER: String = "azuread"

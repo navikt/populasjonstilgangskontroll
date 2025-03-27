@@ -5,9 +5,6 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
-import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
-import no.nav.security.token.support.client.spring.ClientConfigurationProperties
-import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import org.slf4j.LoggerFactory
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
@@ -27,7 +24,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 
 @Configuration
-class FellesBeanConfig(private val ansattIdAddingInterceptor: AnsattIdAddingHandlerInterceptor) : CachingConfigurer, WebMvcConfigurer {
+class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : CachingConfigurer, WebMvcConfigurer {
 
     private val log = LoggerFactory.getLogger(FellesBeanConfig::class.java)
 

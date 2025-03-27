@@ -31,7 +31,7 @@ class  EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: 
         }.toList().map {
             EntraGruppe(it.id, it.displayName ?: "N/A")
         }.onEach {
-            if (it.displayName == "N/A") log.error("Fant ikke displayName for gruppe ${it.id}")
+            if (it.displayName == "N/A") log.error("Fant ikke displayName for gruppe ${it.id} for $ansattId")
         }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

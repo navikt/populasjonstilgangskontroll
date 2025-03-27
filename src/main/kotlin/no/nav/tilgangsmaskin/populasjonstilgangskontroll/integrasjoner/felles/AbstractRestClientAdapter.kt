@@ -43,7 +43,7 @@ abstract class AbstractRestClientAdapter(
     override fun name() = cfg.name
     protected val baseUri = cfg.baseUri
 
-    override fun pingEndpoint() = "${cfg.pingEndpoint}"
+    override val pingEndpoint = "${cfg.pingEndpoint}"
     override fun isEnabled() = cfg.isEnabled
     override fun toString() = "webClient=$restClient, cfg=$cfg, baseUri=$baseUri"
 

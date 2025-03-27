@@ -14,11 +14,11 @@ abstract class AbstractPingableHealthIndicator(private val pingable: Pingable) :
     private fun up() = with(pingable) {
         if (isEnabled()) {
             Health.up()
-                .withDetail("endpoint", pingEndpoint())
+                .withDetail("endpoint", pingEndpoint)
                 .build()
         } else {
             Health.up()
-                .withDetail("endpoint", pingEndpoint())
+                .withDetail("endpoint", pingEndpoint)
                 .withDetail("status", "disabled")
                 .build()
         }
@@ -26,7 +26,7 @@ abstract class AbstractPingableHealthIndicator(private val pingable: Pingable) :
 
     private fun down(e: Throwable) = with(pingable) {
         Health.down()
-            .withDetail("endpoint", pingEndpoint())
+            .withDetail("endpoint", pingEndpoint)
             .withException(e)
             .build()
     }

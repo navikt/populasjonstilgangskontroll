@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.github.benmanes.caffeine.cache.Caffeine
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.security.token.support.client.core.OAuth2ClientException
+import no.nav.security.token.support.client.core.http.OAuth2HttpClient
+import no.nav.security.token.support.client.core.http.OAuth2HttpRequest
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
@@ -21,7 +24,12 @@ import org.springframework.cache.interceptor.KeyGenerator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
+import org.springframework.http.HttpHeaders
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import org.springframework.stereotype.Component
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
@@ -87,4 +95,27 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                 .removalListener {
                     key, value, cause -> log.trace("Cache removal key={}, value={}, cause={}", key, value, cause) })
         }
+}
+
+@Component
+ class DefaultOAuth2HttpClient : OAuth2HttpClient {
+
+    val restClient = RestClient.builder()
+        .requestFactory(HttpComponentsClientHttpRequestFactory())
+        .build()
+    override fun post(req: OAuth2HttpRequest) =
+        restClient.post()
+            .uri(req.tokenEndpointUrl)
+            .headers { it.addAll(headers(req)) }
+            .body(LinkedMultiValueMap<String, String>().apply {
+                setAll(req.formParameters)
+            }).retrieve()
+            .onStatus({ it.isError }) { _, response ->
+                throw OAuth2ClientException("Received ${response.statusCode} from ${req.tokenEndpointUrl}")
+            }
+            .body<OAuth2AccessTokenResponse>() ?: throw OAuth2ClientException("No body in response from ${req.tokenEndpointUrl}")
+
+    private fun headers(req: OAuth2HttpRequest): HttpHeaders = HttpHeaders().apply { putAll(req.oAuth2HttpHeaders.headers) }
+
+    override fun toString() = "${javaClass.simpleName}  [restClient=$restClient]"
 }

@@ -12,7 +12,7 @@ import org.springframework.web.client.RestClient
 import java.util.*
 
 @Component
-class  EntraClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: EntraConfig): AbstractRestClientAdapter(restClient,cf) {
+class  EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: EntraConfig): AbstractRestClientAdapter(restClient,cf) {
 
     fun oidFraEntra(ansattId: String) = get<EntraSaksbehandlerRespons>(cf.userURI(ansattId)).oids.let {
         if (it.isEmpty()) {

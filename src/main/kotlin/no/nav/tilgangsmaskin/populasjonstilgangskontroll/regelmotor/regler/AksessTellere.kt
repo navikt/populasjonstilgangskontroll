@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
+import io.micrometer.core.annotation.Counted
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
@@ -11,8 +12,17 @@ import org.springframework.stereotype.Component
 import java.time.LocalDate
 
 @Component
-class AvdødAksessTeller(private val meterRegistry: MeterRegistry, private val accessor: TokenClaimsAccessor) {
+class SøskenAksessTeller(private val accessor: TokenClaimsAccessor) {
+    private val log = LoggerFactory.getLogger(javaClass)
+    @Counted
+    fun registrerAksess(ansattId: AnsattId, brukerId: BrukerId) =
+        true.also {
+            log.warn("$ansattId slo opp søsken $brukerId fra system ${accessor.systemNavn}")
+        }
+}
 
+@Component
+class AvdødAksessTeller(private val meterRegistry: MeterRegistry, private val accessor: TokenClaimsAccessor) {
     private val log = LoggerFactory.getLogger(javaClass)
     fun registrerAksess(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
         true.also {

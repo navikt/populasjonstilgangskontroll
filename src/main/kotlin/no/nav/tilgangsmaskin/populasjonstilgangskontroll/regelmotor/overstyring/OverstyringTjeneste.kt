@@ -97,7 +97,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
             }
             if (isNotEmpty()) {
                 throw BulkRegelException(ansattId, this).also {
-                    log.error(it.message)
+                    log.warn(it.message)
                 }
             }
         }

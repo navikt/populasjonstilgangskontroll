@@ -81,7 +81,7 @@ jobs:
       TIMEOUT: 30m
       RESOURCE: .nais/naiserator.yaml
       CLUSTER: ${{matrix.cluster}}
-      VARS: .nais/${{matrix.cluster}}.json
+      VARS:   src/main/resources/${{matrix.cluster}}.json
       IMAGE: ${{needs.build.outputs.image}}
     steps:
       - uses: actions/checkout@v4

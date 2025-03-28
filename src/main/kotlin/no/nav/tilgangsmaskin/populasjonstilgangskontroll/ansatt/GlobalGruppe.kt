@@ -17,8 +17,8 @@ enum class AvvisningKode(val årsak: String) {
     AVVIST_SKJERMING("Mangler tilgang til skjermet person"),
     AVVIST_GEOGRAFISK("Mangler tilgang til brukers geografiske adresse"),
     AVVIST_EGNE_DATA("Kan ikke slå opp egne data"),
-    AVVIST_HABILITET("Avvist grunnet habilitet"),
-    AVVIST_AVDØD("Bruker er død"),
+    AVVIST_HABILITET("Avvist grunnet manglende habilitet"),
+    AVVIST_AVDØD("Bruker er avdød"),
     AVVIST_PERSON_UTLAND("Mangler tilgang til person i utlandet"),
     AVVIST_PERSON_UKJENT("Mangler tilgang til person uten kjent adresse")
 

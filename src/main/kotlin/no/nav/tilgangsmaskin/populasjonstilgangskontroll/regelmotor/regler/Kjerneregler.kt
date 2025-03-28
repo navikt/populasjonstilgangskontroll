@@ -41,14 +41,16 @@ class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Kj
 @Order(HIGHEST_PRECEDENCE + 3)
 @Component
 class EgneDataRegel : KjerneRegel {
-    override fun erOK(ansatt: Ansatt, bruker: Bruker) = bruker.brukerId != ansatt.brukerId
+    override fun erOK(ansatt: Ansatt, bruker: Bruker) =
+        bruker.brukerId != ansatt.brukerId
     override val metadata = RegelBeskrivelse("Egne data", AVVIST_EGNE_DATA)
 }
 
 @Order(HIGHEST_PRECEDENCE + 4)
 @Component
 class ForeldreOgBarnRegel : KjerneRegel {
-    override fun erOK(ansatt: Ansatt, bruker: Bruker) = !(ansatt erForeldreEllerBarnTil bruker)
+    override fun erOK(ansatt: Ansatt, bruker: Bruker) =
+        !(ansatt erForeldreEllerBarnTil bruker)
     override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet", AVVIST_HABILITET)
 }
 

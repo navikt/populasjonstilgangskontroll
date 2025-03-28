@@ -26,7 +26,8 @@ class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) : Overst
 @Component
 @Order(LOWEST_PRECEDENCE - 1)
 class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) : OverstyrbarRegel {
-    override fun erOK(ansatt: Ansatt, bruker: Bruker) = sjekkRegel({ bruker.geografiskTilknytning is UkjentBosted }, bruker, ansatt, id)
+    override fun erOK(ansatt: Ansatt, bruker: Bruker) =
+        sjekkRegel({ bruker.geografiskTilknytning is UkjentBosted }, bruker, ansatt, id)
 
     override val metadata = RegelBeskrivelse("Person bosatt ukjent bosted", AVVIST_PERSON_UKJENT)
 }
@@ -34,7 +35,8 @@ class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) 
 @Component
 @Order(LOWEST_PRECEDENCE - 2)
 class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) : OverstyrbarRegel {
-    override fun erOK(ansatt: Ansatt, bruker: Bruker) = sjekkRegel({ bruker.geografiskTilknytning is UtenlandskTilknytning }, bruker, ansatt, id)
+    override fun erOK(ansatt: Ansatt, bruker: Bruker) =
+        sjekkRegel({ bruker.geografiskTilknytning is UtenlandskTilknytning }, bruker, ansatt, id)
 
     override val metadata = RegelBeskrivelse("Person bosatt utland", AVVIST_PERSON_UTLAND)
 }

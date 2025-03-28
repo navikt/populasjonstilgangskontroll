@@ -13,7 +13,7 @@ import java.time.LocalDate
 @Component
 class SøskenAksessTeller(private val accessor: TokenClaimsAccessor) {
     private val log = LoggerFactory.getLogger(javaClass)
-    fun registrerAksess(ansattId: AnsattId, brukerId: BrukerId) =
+    fun registrerOppslag(ansattId: AnsattId, brukerId: BrukerId) =
         true.also {
             log.warn("$ansattId har manglende habilitet for oppslag mot $brukerId fra system ${accessor.systemNavn}")
         }
@@ -22,7 +22,7 @@ class SøskenAksessTeller(private val accessor: TokenClaimsAccessor) {
 @Component
 class AvdødAksessTeller(private val meterRegistry: MeterRegistry, private val accessor: TokenClaimsAccessor) {
     private val log = LoggerFactory.getLogger(javaClass)
-    fun registrerAksess(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
+    fun registrerOppslag(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
         true.also {
             // TODO Endre til false når vi faktisk skal håndtere døde
             val intervall = dødsdato.intervallSiden()

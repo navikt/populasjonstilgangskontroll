@@ -21,7 +21,7 @@ data class Ansatt(val identifikatorer: AnsattIdentifikatorer, val grupper: List<
     @JsonIgnore
     val søsken = bruker?.søsken ?: emptyList()
 
-    infix fun harGTForBruker(bruker: Bruker) = grupper.any { it.displayName.endsWith("GEO_${
+    infix fun harGTFor(bruker: Bruker) = grupper.any { it.displayName.endsWith("GEO_${
         when (bruker.geografiskTilknytning) {
             is KommuneTilknytning -> bruker.geografiskTilknytning.kommune.verdi
             is BydelTilknytning -> bruker.geografiskTilknytning.bydel.verdi

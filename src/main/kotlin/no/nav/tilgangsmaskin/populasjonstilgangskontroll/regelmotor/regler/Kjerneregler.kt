@@ -57,7 +57,7 @@ class ForeldreOgBarnRegel : KjerneRegel {
 class SøskenRegel(private val teller: SøskenAksessTeller) : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         if (ansatt erSøskenTil bruker) {
-            teller.registrerAksess(ansatt.ansattId, bruker.brukerId)
+            teller.registrerOppslag(ansatt.ansattId, bruker.brukerId)
         } else true
 
     override val metadata = RegelBeskrivelse("Oppslag habilitet", AVVIST_HABILITET)

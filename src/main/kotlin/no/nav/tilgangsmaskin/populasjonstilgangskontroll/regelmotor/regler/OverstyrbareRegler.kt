@@ -18,7 +18,7 @@ interface OverstyrbarRegel : Regel
 @Order(LOWEST_PRECEDENCE)
 class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) : OverstyrbarRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
-        ansatt kanBehandle id || ansatt harGTForBruker bruker
+        ansatt kanBehandle id || ansatt harGTFor bruker
 
     override val metadata = RegelBeskrivelse("Geografisk tilknytning", AVVIST_GEOGRAFISK)
 }
@@ -44,7 +44,7 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
 class AvdødBrukerRegel(private val teller: AvdødAksessTeller) : OverstyrbarRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         bruker.dødsdato?.let {
-            teller.registrerAksess(ansatt.ansattId, bruker.brukerId, it)
+            teller.registrerOppslag(ansatt.ansattId, bruker.brukerId, it)
         } ?: true
     override val metadata = RegelBeskrivelse("Avdød bruker", AVVIST_AVDØD)
 }

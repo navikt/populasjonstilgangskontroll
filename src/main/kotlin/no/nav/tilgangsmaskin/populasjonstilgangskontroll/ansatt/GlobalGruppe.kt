@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningKode.*
 
-enum class GlobalGruppe(val begrunnelse: AvvisningKode) {
+enum class GlobalGruppe(val kode: AvvisningKode) {
     STRENGT_FORTROLIG_GRUPPE(AVVIST_STRENGT_FORTROLIG_ADRESSE),
     FORTROLIG_GRUPPE(AVVIST_FORTROLIG_ADRESSE),
     EGEN_ANSATT_GRUPPE(AVVIST_SKJERMING),

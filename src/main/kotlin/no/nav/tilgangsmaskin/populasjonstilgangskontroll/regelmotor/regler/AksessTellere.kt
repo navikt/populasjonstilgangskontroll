@@ -15,7 +15,7 @@ class SøskenAksessTeller(private val accessor: TokenClaimsAccessor) {
     private val log = LoggerFactory.getLogger(javaClass)
     fun registrerAksess(ansattId: AnsattId, brukerId: BrukerId) =
         true.also {
-            log.warn("$ansattId slo opp søsken $brukerId fra system ${accessor.systemNavn}")
+            log.warn("$ansattId gjorde innhabilt oppslag mot $brukerId fra system ${accessor.systemNavn}")
         }
 }
 

@@ -26,8 +26,8 @@ class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler:
                         AnsattId(navident), BrukerId(personident), NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: FOREVER)
                     ))
                 }.fold(
-                    onSuccess = { handler.handleOK(navident, personident) },
-                    onFailure = { handler.handleFailure(navident, personident, it) }
+                     { handler.handleOK(navident, personident) },
+                     { handler.handleFailure(navident, personident, it) }
                 )
             }
         }

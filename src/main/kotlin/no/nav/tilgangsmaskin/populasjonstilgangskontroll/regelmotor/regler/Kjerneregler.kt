@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Ansatt
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningKode.AVVIST_EGEN_FAMILIE
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningKode.AVVIST_HABILITET
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningKode.AVVIST_EGNE_DATA
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
@@ -49,7 +49,7 @@ class EgneDataRegel : KjerneRegel {
 @Component
 class ForeldreOgBarnRegel : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) = !(ansatt erForeldreEllerBarnTil bruker)
-    override val metadata = RegelBeskrivelse("Oppslag foreldre/barn", AVVIST_EGEN_FAMILIE)
+    override val metadata = RegelBeskrivelse("Oppslag habilitet", AVVIST_HABILITET)
 }
 
 @Component
@@ -60,5 +60,5 @@ class SøskenRegel(private val teller: SøskenAksessTeller) : KjerneRegel {
             teller.registrerAksess(ansatt.ansattId, bruker.brukerId)
         } else true
 
-    override val metadata = RegelBeskrivelse("Oppslag søsken", AVVIST_EGEN_FAMILIE)
+    override val metadata = RegelBeskrivelse("Oppslag habilitet", AVVIST_HABILITET)
 }

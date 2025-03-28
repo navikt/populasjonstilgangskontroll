@@ -12,7 +12,7 @@ import java.net.URI
 
 abstract class AbstractRestClientAdapter(
     protected val restClient: RestClient,
-    protected val cfg: AbstractRestConfig,
+    private val cfg: AbstractRestConfig,
     protected val errorHandler: ErrorHandler = DefaultRestErrorHandler()
 ) : Pingable {
 

@@ -19,13 +19,16 @@ interface KjerneRegel : Regel
 class StrengtFortroligRegel(@Value("\${gruppe.strengt}") private val id: UUID) : KjerneRegel  {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         sjekkRegel({bruker.kreverGlobalGruppe(STRENGT_FORTROLIG_GRUPPE)}, bruker, ansatt, id)
+
         override val metadata = RegelBeskrivelse("Kode 6", STRENGT_FORTROLIG_GRUPPE.kode)
 }
+
 @Component
 @Order(HIGHEST_PRECEDENCE + 1)
 class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID): KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         sjekkRegel({bruker.kreverGlobalGruppe(FORTROLIG_GRUPPE)}, bruker, ansatt, id)
+
     override val metadata = RegelBeskrivelse("Kode 7", FORTROLIG_GRUPPE.kode)
 }
 
@@ -34,15 +37,16 @@ class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID): Kjern
 class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         sjekkRegel({bruker.kreverGlobalGruppe(EGEN_ANSATT_GRUPPE)}, bruker, ansatt, id)
+
     override val metadata = RegelBeskrivelse("Kode 8", EGEN_ANSATT_GRUPPE.kode)
 }
-
 
 @Order(HIGHEST_PRECEDENCE + 3)
 @Component
 class EgneDataRegel : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         bruker.brukerId != ansatt.brukerId
+
     override val metadata = RegelBeskrivelse("Egne data", AVVIST_EGNE_DATA)
 }
 
@@ -51,6 +55,7 @@ class EgneDataRegel : KjerneRegel {
 class ForeldreOgBarnRegel : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         !(ansatt erForeldreEllerBarnTil bruker)
+
     override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet", AVVIST_HABILITET)
 }
 

@@ -41,7 +41,7 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
 
 @Component
 @Order(LOWEST_PRECEDENCE - 3)
-class AvdødBrukerRegel(private val teller: AvdødAksessTeller) : OverstyrbarRegel {
+class AvdødBrukerRegel(private val teller: AvdødOppslagTeller) : OverstyrbarRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         bruker.dødsdato?.let {
             teller.registrerOppslag(ansatt.ansattId, bruker.brukerId, it)

@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor
 
 import com.ninjasquad.springmockk.MockkBean
-import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -55,7 +54,7 @@ class RegelTjenesteTest {
     @MockkBean
     lateinit var accessor: TokenClaimsAccessor
     @MockkBean
-    lateinit var avdød : AvdødAksessTeller
+    lateinit var avdød : AvdødOppslagTeller
     @Autowired
     lateinit var motor: RegelMotor
     @MockK

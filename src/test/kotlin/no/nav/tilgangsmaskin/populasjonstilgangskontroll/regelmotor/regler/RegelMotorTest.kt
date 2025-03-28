@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
 import com.ninjasquad.springmockk.MockkBean
-import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestApp
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.annenAnsattBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.ansattBruker
@@ -26,7 +25,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.ukj
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterConstants.TEST
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang1.TokenClaimsAccessor
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -48,9 +46,9 @@ import org.springframework.test.context.TestPropertySource
 class RegelMotorTest {
 
     @MockkBean
-    lateinit var avdød: AvdødAksessTeller
+    lateinit var avdød: AvdødOppslagTeller
     @MockkBean
-    lateinit var søsken : SøskenAksessTeller
+    lateinit var søsken : SøskenOppslagTeller
     @Autowired
     lateinit var regelMotor: RegelMotor
 

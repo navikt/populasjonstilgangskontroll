@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 import java.time.LocalDate
 
 @Component
-class SøskenAksessTeller(private val accessor: TokenClaimsAccessor) {
+class SøskenOppslagTeller(private val accessor: TokenClaimsAccessor) {
     private val log = LoggerFactory.getLogger(javaClass)
     fun registrerOppslag(ansattId: AnsattId, brukerId: BrukerId) =
         true.also {
@@ -20,7 +20,7 @@ class SøskenAksessTeller(private val accessor: TokenClaimsAccessor) {
 }
 
 @Component
-class AvdødAksessTeller(private val meterRegistry: MeterRegistry, private val accessor: TokenClaimsAccessor) {
+class AvdødOppslagTeller(private val meterRegistry: MeterRegistry, private val accessor: TokenClaimsAccessor) {
     private val log = LoggerFactory.getLogger(javaClass)
     fun registrerOppslag(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
         true.also {

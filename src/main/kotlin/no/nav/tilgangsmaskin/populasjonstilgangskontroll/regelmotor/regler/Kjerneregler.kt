@@ -54,7 +54,7 @@ class ForeldreOgBarnRegel : KjerneRegel {
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 5)
-class SøskenRegel(private val teller: SøskenAksessTeller) : KjerneRegel {
+class SøskenRegel(private val teller: SøskenOppslagTeller) : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         if (ansatt erSøskenTil bruker) {
             teller.registrerOppslag(ansatt.ansattId, bruker.brukerId)

@@ -23,8 +23,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Order(-1)
 class ExceptionHandler : ResponseEntityExceptionHandler() {
 
-    protected val log = getLogger(ExceptionHandler::class.java)
-
+    private val log = getLogger(javaClass)
 
     @ExceptionHandler(BulkRegelException::class)
     fun bulkExceptionHandler(e: BulkRegelException) =

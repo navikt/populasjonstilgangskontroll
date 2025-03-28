@@ -2,13 +2,13 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 
 import io.micrometer.core.annotation.Counted
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions.maskFnr
-import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
 @Counted
 class NomEventResultHandler {
-    private val log = LoggerFactory.getLogger(NomEventResultHandler::class.java)
+    private val log = getLogger(javaClass)
     fun handleOK(ansattId: String, brukerId: String)  {
         log.info("Lagret fødselsnummer ${brukerId.maskFnr()} for $ansattId OK")
     }

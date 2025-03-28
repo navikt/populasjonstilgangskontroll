@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import java.net.URI
@@ -17,7 +16,7 @@ abstract class AbstractRestClientAdapter(
     protected val errorHandler: ErrorHandler = DefaultRestErrorHandler()
 ) : Pingable {
 
-    protected val log = getLogger(AbstractRestClientAdapter::class.java)
+    private val log = getLogger(javaClass)
     override fun ping() = get<Any>(cfg.pingEndpoint)
 
      protected inline fun <reified T> get(uri: URI, headers: Map<String, String> = emptyMap()) =
@@ -41,10 +40,9 @@ abstract class AbstractRestClientAdapter(
             .body(T::class.java) ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
 
     override val name = cfg.name
-    protected val baseUri = cfg.baseUri
 
     override val pingEndpoint = "${cfg.pingEndpoint}"
     override val isEnabled = cfg.isEnabled
-    override fun toString() = "webClient=$restClient, cfg=$cfg, baseUri=$baseUri"
+    override fun toString() = "webClient=$restClient, cfg=$cfg, baseUri=${cfg.baseUri}"
 
 }

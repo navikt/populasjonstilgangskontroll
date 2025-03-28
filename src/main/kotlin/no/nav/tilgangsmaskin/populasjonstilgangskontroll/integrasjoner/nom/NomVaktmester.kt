@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 @Component
 class NomVaktmester(private val nom: NomOperasjoner, private val utvelger: LederUtvelger, private val registry: MeterRegistry) {
 
-    private val log = getLogger(NomVaktmester::class.java)
+    private val log = getLogger(javaClass)
     private val counter =  Counter.builder("vaktmester.rader.fjernet")
     .description("Antall rader fjernet")
     .register(registry)

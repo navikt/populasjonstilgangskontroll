@@ -3,11 +3,13 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 import jakarta.persistence.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang1.TokenClaimsAccessor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.DomainExtensions.maskFnr
-import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
 class OverstyringEntityListener(private val token: TokenClaimsAccessor) {
+
+    private val log = getLogger(javaClass)
 
     @PrePersist
     private fun lagrer(entity : OverstyringEntity) =  setCreatedBySystem(entity).also {
@@ -39,10 +41,6 @@ class OverstyringEntityListener(private val token: TokenClaimsAccessor) {
     private fun lest(entity : OverstyringEntity) =
         log.trace("Leste overstyring for ${entity.fnr.maskFnr()} i DB")
 
-    companion object {
-
-        private val log = LoggerFactory.getLogger(OverstyringEntityListener::class.java)
-    }
     fun setCreatedBySystem(target: OverstyringEntity) {
         target::class.java.declaredFields.forEach {
             if (it.isAnnotationPresent(CreatedBySystem::class.java)) {

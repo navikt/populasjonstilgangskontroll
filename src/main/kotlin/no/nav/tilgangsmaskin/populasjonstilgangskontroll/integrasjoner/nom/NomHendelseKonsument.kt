@@ -14,7 +14,7 @@ import java.time.LocalDate.EPOCH
 @Component
 class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler: NomEventResultHandler) {
 
-    private val log = getLogger(NomHendelseKonsument::class.java)
+    private val log = getLogger(javaClass)
     @KafkaListener(topics = ["#{'\${nom.topic}'}"], concurrency = "5", batch = "true", filter = "fnrFilterStrategy")
     fun listen(hendelser: List<NomHendelse>) {
         log.info("Mottok ${hendelser.size} ${"hendelse".pluralize(hendelser)}")

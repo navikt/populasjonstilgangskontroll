@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner
 
-import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus
@@ -15,14 +15,14 @@ import java.net.URI
 @Component
 @Primary
 class DefaultRestErrorHandler : ErrorHandler {
-    private val log = LoggerFactory.getLogger(DefaultRestErrorHandler::class.java)
+    private val log = getLogger(javaClass)
 
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
         if (res.statusCode.is4xxClientError) throw IrrecoverableRestException(res.statusCode, req.uri, res.statusText).also {
-            log.warn("Irrecoverable etter ${res.statusCode.value()} fra ${req.uri}")
+            log.warn("Irrecoverable exception etter ${res.statusCode.value()} fra ${req.uri}")
         }
         else throw RecoverableRestException(res.statusCode, req.uri, res.statusText).also {
-            log.warn("Reecoverable etter ${res.statusCode.value()} fra ${req.uri}")
+            log.warn("Reecoverable exception etter ${res.statusCode.value()} fra ${req.uri}")
         }
     }
 }

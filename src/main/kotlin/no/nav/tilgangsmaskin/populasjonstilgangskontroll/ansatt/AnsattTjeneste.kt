@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 @Timed
 class AnsattTjeneste(private val entra: EntraTjeneste, private val nom: NomOperasjoner, private val pdl: BrukerTjeneste)
 {
-    private val log = getLogger(AnsattTjeneste::class.java)
+    private val log = getLogger(javaClass)
     fun ansatt(ansattId: AnsattId)  =
         run {
             val entra =  entra.ansatt(ansattId)

@@ -22,9 +22,9 @@ class  EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: 
     }
 
     fun grupper(ansattId: String) =
-        generateSequence(get<EntraGrupperBolkNullable>(cf.grupperURI(ansattId))) { bolk ->
+        generateSequence(get<EntraGrupperBolk>(cf.grupperURI(ansattId))) { bolk ->
             bolk.next?.let {
-                get<EntraGrupperBolkNullable>(it)
+                get<EntraGrupperBolk>(it)
             }
         }.flatMap {
             it.value

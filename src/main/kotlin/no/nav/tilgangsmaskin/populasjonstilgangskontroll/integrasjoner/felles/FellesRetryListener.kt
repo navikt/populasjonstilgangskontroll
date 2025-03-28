@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
-import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.retry.RetryCallback
 import org.springframework.retry.RetryContext
 import org.springframework.retry.RetryListener
@@ -8,7 +8,7 @@ import kotlin.reflect.full.declaredFunctions
 
 class FellesRetryListener: RetryListener {
 
-    private val log = LoggerFactory.getLogger(FellesRetryListener::class.java)
+    private val log = getLogger(javaClass)
     override fun <T : Any, E : Throwable> onSuccess(context: RetryContext, callback: RetryCallback<T, E>, result: T) {
         if (context.retryCount > 0)  {
             log.info("Eksekvering av '${methodFrom(context)}' var vellykket på forsøk ${context.retryCount + 1}")

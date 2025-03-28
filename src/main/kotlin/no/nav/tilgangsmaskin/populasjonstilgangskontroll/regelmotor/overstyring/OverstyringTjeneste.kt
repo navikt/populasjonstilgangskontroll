@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional
 @Timed
 class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker: BrukerTjeneste, private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor, private val handler: OverstyringResultatHandler = OverstyringResultatHandler()) {
 
-    private val log = getLogger(OverstyringTjeneste::class.java)
+    private val log = getLogger(javaClass)
 
     @Transactional(readOnly = true)
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId) =

@@ -1,11 +1,12 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom
 
 import jakarta.persistence.*
-import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
 class NomEntityListener{
+    private val log = getLogger(javaClass)
 
     @PrePersist
     private fun lagrer(entity : NomEntity) =
@@ -34,8 +35,4 @@ class NomEntityListener{
     @PostLoad
     private fun lest(entity : NomEntity) =
         log.trace("Leste ${entity.navid} i DB")
-
-    companion object {
-        private val log = LoggerFactory.getLogger(NomEntity::class.java)
-    }
 }

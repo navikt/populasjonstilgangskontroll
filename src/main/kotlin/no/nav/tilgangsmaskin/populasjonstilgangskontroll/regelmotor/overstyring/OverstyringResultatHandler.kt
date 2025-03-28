@@ -3,13 +3,14 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 import io.micrometer.core.annotation.Counted
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
-import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
 @Counted
 class OverstyringResultatHandler {
-    private val log = LoggerFactory.getLogger(OverstyringResultatHandler::class.java)
+    private val log = getLogger(javaClass)
+
     fun gyldig(ansattId: AnsattId, brukerId: BrukerId, diff: String) = true.also {
         log.trace("Overstyring er gyldig i $diff til for $ansattId og bruker $brukerId")
     }

@@ -49,7 +49,7 @@ class EgneDataRegel : KjerneRegel {
 @Component
 class ForeldreOgBarnRegel : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) = !(ansatt erForeldreEllerBarnTil bruker)
-    override val metadata = RegelBeskrivelse("Oppslag habilitet", AVVIST_HABILITET)
+    override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet", AVVIST_HABILITET)
 }
 
 @Component

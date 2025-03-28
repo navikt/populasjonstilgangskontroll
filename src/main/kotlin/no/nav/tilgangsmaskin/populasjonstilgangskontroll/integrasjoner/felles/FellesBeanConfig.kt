@@ -40,10 +40,6 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     private val log = LoggerFactory.getLogger(FellesBeanConfig::class.java)
 
     @Bean
-    fun oAuth2ClientRequestInterceptor(properties: ClientConfigurationProperties, service: OAuth2AccessTokenService) = OAuth2ClientRequestInterceptor(properties, service)
-
-
-    @Bean
     fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer {it.mixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java) }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -95,27 +91,4 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                 .removalListener {
                     key, value, cause -> log.trace("Cache removal key={}, value={}, cause={}", key, value, cause) })
         }
-}
-
-@Component
- class DefaultOAuth2HttpClient : OAuth2HttpClient {
-
-    val restClient = RestClient.builder()
-        .requestFactory(HttpComponentsClientHttpRequestFactory())
-        .build()
-    override fun post(req: OAuth2HttpRequest) =
-        restClient.post()
-            .uri(req.tokenEndpointUrl)
-            .headers { it.addAll(headers(req)) }
-            .body(LinkedMultiValueMap<String, String>().apply {
-                setAll(req.formParameters)
-            }).retrieve()
-            .onStatus({ it.isError }) { _, response ->
-                throw OAuth2ClientException("Received ${response.statusCode} from ${req.tokenEndpointUrl}")
-            }
-            .body<OAuth2AccessTokenResponse>() ?: throw OAuth2ClientException("No body in response from ${req.tokenEndpointUrl}")
-
-    private fun headers(req: OAuth2HttpRequest): HttpHeaders = HttpHeaders().apply { putAll(req.oAuth2HttpHeaders.headers) }
-
-    override fun toString() = "${javaClass.simpleName}  [restClient=$restClient]"
 }

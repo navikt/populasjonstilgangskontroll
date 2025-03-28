@@ -10,6 +10,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.IdOgT
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelMotor
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import kotlin.time.measureTime
 
 @Service
 @Timed
@@ -17,15 +18,18 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: B
     private val log = LoggerFactory.getLogger(javaClass)
 
     fun kompletteRegler(ansattId: AnsattId, brukerId: BrukerId) =
-        with(brukerTjeneste.bruker(brukerId)) {
-            log.info("Sjekker komplette regler for ansatt $ansattId og bruker $brukerId")
-            runCatching {
-                motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), this)
-            }.getOrElse {
-                overstyringTjeneste.sjekk(ansattId, it)
+        measureTime {
+            with(brukerTjeneste.bruker(brukerId)) {
+                log.info("Sjekker komplette regler for ansatt $ansattId og bruker $brukerId")
+                runCatching {
+                    motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), this)
+                }.getOrElse {
+                    overstyringTjeneste.sjekk(ansattId, it)
+                }
+                log.info("Sjekket komplette regler for ansatt $ansattId og bruker $brukerId")
             }
-            log.info("Sjekket komplette regler for ansatt $ansattId og bruker $brukerId")
-
+        }.also {
+            log.info("Tid brukt på komplette regler for ansatt $ansattId og bruker $brukerId: ${it.inWholeMilliseconds}ms")
         }
 
     fun kjerneregler(ansattId: AnsattId, brukerId: BrukerId) =

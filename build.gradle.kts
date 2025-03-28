@@ -45,6 +45,7 @@ configurations.all {
 }
 
 dependencies {
+    implementation("io.micrometer:micrometer-tracing")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.apache.httpcomponents.client5:httpclient5")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")

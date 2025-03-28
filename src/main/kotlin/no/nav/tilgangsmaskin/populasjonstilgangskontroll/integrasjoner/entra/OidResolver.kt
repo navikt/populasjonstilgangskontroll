@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang1.TokenClaimsAcc
 import org.springframework.stereotype.Component
 
 @Component
-class OIDResolver(private val adapter: EntraRestClientAdapter, private val accessor: TokenClaimsAccessor) {
+class OidResolver(private val adapter: EntraRestClientAdapter, private val accessor: TokenClaimsAccessor) {
     fun oidForAnsatt(ansattId: AnsattId) = oidFraToken() ?: oidFraEntra(ansattId.verdi)
     private fun oidFraToken() = runCatching {
         accessor.oidFraToken

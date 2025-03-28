@@ -19,6 +19,8 @@ data class Bruker(
     @JsonIgnore
     val foreldreOgBarn = familie.foreldre + familie.barn
 
+    val erDød  = dødsdato != null
+
     @JsonIgnore
     val søsken = familie.søsken
 

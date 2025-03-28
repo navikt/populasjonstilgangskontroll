@@ -16,7 +16,7 @@ abstract class AbstractRestClientAdapter(
     protected val errorHandler: ErrorHandler = DefaultRestErrorHandler()
 ) : Pingable {
 
-    private val log = getLogger(javaClass)
+    protected val log = getLogger(javaClass)
     override fun ping() = get<Any>(cfg.pingEndpoint)
 
      protected inline fun <reified T> get(uri: URI, headers: Map<String, String> = emptyMap()) =

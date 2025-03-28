@@ -1,23 +1,19 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Ansatt
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningKode
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
 import java.net.URI
-import java.util.function.BiPredicate
+import java.util.*
+import java.util.function.Predicate
 
-interface Regel: BiPredicate<Ansatt, Bruker> {
+interface Regel  {
+    fun erOK(ansatt: Ansatt, bruker: Bruker): Boolean
     val metadata: RegelBeskrivelse
     val kode get() = metadata.kode
     val avvisningTekst get() = kode.årsak
     val kortNavn get() = metadata.kortNavn
     val erOverstyrbar get() = this is OverstyrbarRegel
-    data class RegelBeskrivelse(val kortNavn: String, val kode: AvvisningKode)
-    companion object    {
-        val TYPE_URI =  URI.create("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett")
-        const val DETAIL_MESSAGE_CODE: String = "problemDetail.no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException.detail"
-        const val OVERSTYRING_MESSAGE_CODE: String = "problemDetail.no.nav.tilgangsmaskin.populasjonstilgangskontroll.regler.RegelException.kjerneregler"
-    }
+
+    fun sjekkRegel(predicate: Predicate<Bruker> , bruker: Bruker, ansatt: Ansatt, id: UUID) = if (predicate.test(bruker)) ansatt kanBehandle id else true
+
 }
-interface KjerneRegel : Regel
-interface OverstyrbarRegel : Regel

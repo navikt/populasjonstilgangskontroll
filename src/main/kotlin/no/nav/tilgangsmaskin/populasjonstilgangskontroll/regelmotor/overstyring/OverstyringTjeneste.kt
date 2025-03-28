@@ -7,7 +7,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringEntity.Companion.OVERSTYRING
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.BulkRegelException
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.Companion.OVERSTYRING_MESSAGE_CODE
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelBeskrivelse.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelMotor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.TimeExtensions.diffFromNow

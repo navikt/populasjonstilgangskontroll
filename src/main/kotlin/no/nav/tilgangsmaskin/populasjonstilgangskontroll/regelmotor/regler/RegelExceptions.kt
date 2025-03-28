@@ -2,8 +2,8 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.Companion.DETAIL_MESSAGE_CODE
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.Regel.Companion.TYPE_URI
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelBeskrivelse.Companion.DETAIL_MESSAGE_CODE
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelBeskrivelse.Companion.TYPE_URI
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.ProblemDetail.forStatus
 import org.springframework.web.ErrorResponseException

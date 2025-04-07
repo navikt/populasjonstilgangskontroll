@@ -32,6 +32,6 @@ value class BrukerId(@JsonValue val verdi: String) {
             }
     }
 
-    override fun toString() = "${javaClass.simpleName} [verdi=${maskFnr()}]"
-
+    override fun toString() = verdi.maskFnr()
+    
 }

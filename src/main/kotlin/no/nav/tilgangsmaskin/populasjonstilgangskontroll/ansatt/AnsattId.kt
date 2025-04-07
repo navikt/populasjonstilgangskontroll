@@ -12,4 +12,5 @@ value class AnsattId(@JsonValue val verdi: String) {
             requireDigits(substring(1), 6)
         }
     }
+    override fun toString() = verdi
 }

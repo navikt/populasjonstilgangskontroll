@@ -20,13 +20,11 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: B
     fun kompletteRegler(ansattId: AnsattId, brukerId: BrukerId) =
         measureTime {
             with(brukerTjeneste.bruker(brukerId)) {
-                log.info("Sjekker komplette regler for ansatt $ansattId og bruker $brukerId")
                 runCatching {
                     motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), this)
                 }.getOrElse {
                     overstyringTjeneste.sjekk(ansattId, it)
                 }
-                log.info("Sjekket komplette regler for ansatt $ansattId og bruker $brukerId")
             }
         }.also {
             log.info("Tid brukt på komplette regler for ansatt $ansattId og bruker $brukerId: ${it.inWholeMilliseconds}ms")

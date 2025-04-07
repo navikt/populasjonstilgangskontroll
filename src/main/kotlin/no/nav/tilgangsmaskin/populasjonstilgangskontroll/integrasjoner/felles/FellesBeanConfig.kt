@@ -64,15 +64,11 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
         override fun shouldNotFilter(request: HttpServletRequest) = request.servletPath.contains("monitoring")
     }
 
-    @Bean
-    fun cacheManager(connectionFactory: RedisConnectionFactory): RedisCacheManager {
-        return RedisCacheManager.create(connectionFactory)
-    }
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(ansattIdAddingInterceptor)
     }
 
-    /*
+
     override fun keyGenerator() = KeyGenerator { target, method, params ->
         buildString {
             append(target::class)
@@ -87,5 +83,5 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                 .recordStats()
                 .removalListener {
                     key, value, cause -> log.trace("Cache removal key={}, value={}, cause={}", key, value, cause) })
-        }*/
+        }
 }

@@ -14,13 +14,6 @@ management:
       base-path: /monitoring
 
 spring:
-  data:
-    redis:
-      url: ${redis.uri.cache}
-      username: ${redis.username.cache}
-      password: ${redis.password.cache}
-      ssl:
-        enabled: true
   threads:
     virtual:
       enabled: true
@@ -93,15 +86,9 @@ spring:
     default-property-inclusion: non_null
   cache:
     cache-names: pdl, skjerming, graph, overstyring
-    type: redis
-    redis:
-      time-to-live: 60
-      time-to-live-for-cache-names:
-        pdl: 60
-        skjerming: 60
-        graph: 60
-        overstyring: 60
-      enable-statistics: true
+    caffeine:
+      spec: initialCapacity=500,maximumSize=1000,expireAfterAccess=24h
+
 
 no.nav.security.jwt:
   issuer:

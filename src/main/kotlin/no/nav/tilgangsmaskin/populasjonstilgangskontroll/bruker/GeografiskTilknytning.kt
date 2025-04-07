@@ -23,10 +23,11 @@ sealed class GeografiskTilknytning(val type: Type) {
     data class KommuneTilknytning(val kommune: Kommune) : GeografiskTilknytning(KOMMUNE)
     data class BydelTilknytning(val bydel: Bydel) : GeografiskTilknytning(BYDEL)
     class UkjentBosted : GeografiskTilknytning(UKJENT_BOSTED)
-    data class UtenlandskTilknytning(val land: CountryCode) : GeografiskTilknytning(UTLAND)
+    class UtenlandskTilknytning : GeografiskTilknytning(UTLAND)
     class UdefinertTilknytning : GeografiskTilknytning(UDEFINERT)
 
     companion object  {
        val UdefinertGeoTilknytning = UdefinertTilknytning()
+        val UtenlandskTilknytning = UtenlandskTilknytning()
     }
 }

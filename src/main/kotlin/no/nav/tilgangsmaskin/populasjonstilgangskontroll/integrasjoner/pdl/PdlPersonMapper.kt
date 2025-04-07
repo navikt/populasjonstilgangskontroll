@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
-import com.neovisionaries.i18n.CountryCode.getByAlpha3Code
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie.FamilieMedlem
@@ -8,6 +7,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie.FamilieM
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.Companion.UdefinertGeoTilknytning
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.Companion.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeografiskTilknytning.GTType.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlIdenter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
@@ -39,7 +39,7 @@ object PdlPersonMapper {
     private fun tilGeoTilknytning(geo: PdlGeografiskTilknytning?): GeografiskTilknytning =
         when (geo?.gtType) {
             UTLAND ->  geo.gtLand?.let {
-                UtenlandskTilknytning(getByAlpha3Code(it.verdi)) } ?: UkjentBosted()
+                UtenlandskTilknytning } ?: UkjentBosted()
             KOMMUNE -> geo.gtKommune?.let {
                 KommuneTilknytning(Kommune(it.verdi))
             } ?: throw IllegalStateException("Kommunal tilknytning uten kommunekode")

@@ -48,7 +48,7 @@ object TestData {
     internal val egenAnsattStrengtFortroligBruker = Bruker(egenAnsattStrengtFortroligBrukerId, UdefinertGeoTilknytning, listOf(STRENGT_FORTROLIG_GRUPPE, EGEN_ANSATT_GRUPPE),)
     internal val egenAnsattFortroligBruker = Bruker(egenAnsattFortroligBrukerId, UdefinertGeoTilknytning, listOf(FORTROLIG_GRUPPE, EGEN_ANSATT_GRUPPE),)
     internal val ukjentBostedBruker = Bruker(ukjentBostedBrukerId, UkjentBosted(), listOf(UDEFINERT_GEO_GRUPPE),)
-    internal val geoUtlandBruker = Bruker(geoUtlandBrukerId, UtenlandskTilknytning(SE), listOf(GEO_PERSON_UTLAND_GRUPPE),)
+    internal val geoUtlandBruker = Bruker(geoUtlandBrukerId, UtenlandskTilknytning(), listOf(GEO_PERSON_UTLAND_GRUPPE),)
     internal val enhetBruker = Bruker(enhetBrukerId, KommuneTilknytning(Kommune(enhet.verdi)))
     internal val annenEnhetBruker = Bruker(annenEnhetBrukerId, KommuneTilknytning(Kommune("4321")), )
 

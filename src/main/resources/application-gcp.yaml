@@ -88,17 +88,17 @@ spring:
     cache-names: pdl, skjerming, graph, overstyring
     type: redis
     redis:
-      url: ${redis.uri.sessions}
+      url: ${redis.uri.cache}
       time-to-live: 60
       time-to-live-for-cache-names:
         pdl: 60
         skjerming: 60
         graph: 60
         overstyring: 60
-      port: ${redis.port.sessions}
-      host: ${redis.host.sessions}
-      username: ${redis.username.sessions}
-      password: ${redis.password.sessions}
+      port: ${redis.port.cache}
+      host: ${redis.host.cache}
+      username: ${redis.username.cache}
+      password: ${redis.password.cache}
       ssl:
         enabled: true
 

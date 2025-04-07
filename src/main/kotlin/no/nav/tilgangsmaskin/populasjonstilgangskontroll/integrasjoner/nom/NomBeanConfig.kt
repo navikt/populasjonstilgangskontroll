@@ -15,7 +15,9 @@ class NomBeanConfig {
     @Bean
     fun fnrFilterStrategy(): RecordFilterStrategy<String, NomHendelse> =
         RecordFilterStrategy { record ->
-            with(runCatching { BrukerId(record.value().personident) }) {
+            with(runCatching {
+                BrukerId(record.value().personident)
+            }) {
                 if (isFailure) {
                     true.also {
                         log.warn("Ugyldig personident: ${record.value().personident.maskFnr()} ble filtrert bort (${exceptionOrNull()?.message})",exceptionOrNull())

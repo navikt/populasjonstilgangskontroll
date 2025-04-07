@@ -16,7 +16,7 @@ management:
 spring:
   data:
     redis:
-      url: redis://${redis.host.cache}:${redis.port.cache}
+      url: ${redis.uri.cache}
       username: ${redis.username.cache}
       password: ${redis.password.cache}
       ssl:

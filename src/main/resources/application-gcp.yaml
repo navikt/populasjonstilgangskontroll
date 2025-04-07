@@ -14,6 +14,9 @@ management:
       base-path: /monitoring
 
 spring:
+  threads:
+    virtual:
+      enabled: true
   jpa:
     properties:
       hibernate:

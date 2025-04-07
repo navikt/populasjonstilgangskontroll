@@ -8,7 +8,7 @@ metadata:
   namespace: tilgangsmaskin
 spec:
   valkey:
-    - instance: cache
+    - instance: sessions
       access: readwrite
   leaderElection: true
   kafka:

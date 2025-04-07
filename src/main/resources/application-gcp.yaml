@@ -86,8 +86,22 @@ spring:
     default-property-inclusion: non_null
   cache:
     cache-names: pdl, skjerming, graph, overstyring
-    caffeine:
-      spec: initialCapacity=500,maximumSize=1000,expireAfterAccess=24h
+    type: redis
+    redis:
+      url: ${redis.uri.sessions}
+      time-to-live: 60
+      time-to-live-for-cache-names:
+        pdl: 60
+        skjerming: 60
+        graph: 60
+        overstyring: 60
+      port: ${redis.port.sessions}
+      host: ${redis.host.sessions}
+      username: ${redis.username.sessions}
+      password: ${redis.password.sessions}
+      ssl:
+        enabled: true
+
 no.nav.security.jwt:
   issuer:
      azuread:

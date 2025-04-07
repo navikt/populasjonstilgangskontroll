@@ -19,6 +19,7 @@ class EntraConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, private va
         .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
         .queryParam(PARAM_NAME_COUNT, "true")
         .queryParam(PARAM_NAME_TOP, size)
+        .queryParam(PARAM_NAME_FILTER, "securityEnabled eq true")
         .build(ansattId)
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"

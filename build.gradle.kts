@@ -66,6 +66,7 @@ dependencies {
     implementation("org.hibernate.orm:hibernate-micrometer")
     implementation("no.nav.boot:boot-conditionals:5.1.6")
     implementation("com.github.ben-manes.caffeine:caffeine")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
     implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")

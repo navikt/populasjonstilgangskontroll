@@ -7,6 +7,8 @@ import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.boot.actuate.health.Health
+import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.Include.defaultIncludes
@@ -19,6 +21,8 @@ import org.springframework.cache.interceptor.KeyGenerator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
+import org.springframework.data.redis.connection.RedisConnectionFactory
+import org.springframework.data.redis.core.RedisConnectionUtils
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -62,6 +66,10 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
         override fun shouldNotFilter(request: HttpServletRequest) = request.servletPath.contains("monitoring")
     }
 
+    @Bean
+    fun customRedisHealthIndicator(redisConnectionFactory: RedisConnectionFactory) = CustomRedisHealthIndicator(redisConnectionFactory)
+
+
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(ansattIdAddingInterceptor)
     }
@@ -82,4 +90,23 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                 .removalListener {
                     key, value, cause -> log.trace("Cache removal key={}, value={}, cause={}", key, value, cause) })
         }
+}
+
+
+class CustomRedisHealthIndicator(private val redisConnectionFactory: RedisConnectionFactory) : HealthIndicator {
+    override fun health(): Health {
+        val connection = RedisConnectionUtils.getConnection(this.redisConnectionFactory)
+        return try {
+            // Custom health check logic
+            if (connection.ping().equals("PONG", ignoreCase = true)) {
+                Health.up().withDetail("Redis", "Connection is healthy").build()
+            } else {
+                Health.down().withDetail("Redis", "Ping failed").build()
+            }
+        } catch (ex: Exception) {
+            Health.down(ex).withDetail("Redis", "Connection failed").build()
+        } finally {
+            RedisConnectionUtils.releaseConnection(connection, this.redisConnectionFactory)
+        }
+    }
 }

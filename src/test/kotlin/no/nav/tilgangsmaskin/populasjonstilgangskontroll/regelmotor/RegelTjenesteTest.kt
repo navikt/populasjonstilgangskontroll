@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor
 
 import com.ninjasquad.springmockk.MockkBean
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -65,7 +66,7 @@ class RegelTjenesteTest {
     fun before() {
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
         every { accessor.system } returns "test"
-        overstyring = OverstyringTjeneste(ansatt, bruker, OverstyringJPAAdapter(repo), motor)
+        overstyring = OverstyringTjeneste(ansatt, bruker, OverstyringJPAAdapter(repo), motor, SimpleMeterRegistry())
         regel = RegelTjeneste(motor, bruker, ansatt,overstyring)
     }
 

@@ -88,9 +88,6 @@ spring:
     default-property-inclusion: non_null
   cache:
     cache-names: pdl, skjerming, graph, overstyring
-    caffeine:
-      spec: initialCapacity=500,maximumSize=1000,expireAfterAccess=24h
-
 
 no.nav.security.jwt:
   issuer:

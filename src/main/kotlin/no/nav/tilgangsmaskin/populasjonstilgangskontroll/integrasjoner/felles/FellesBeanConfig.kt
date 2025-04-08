@@ -94,19 +94,16 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 
 
 class CustomRedisHealthIndicator(private val redisConnectionFactory: RedisConnectionFactory) : HealthIndicator {
-    override fun health(): Health {
-        val connection = RedisConnectionUtils.getConnection(this.redisConnectionFactory)
-        return try {
-            // Custom health check logic
-            if (connection.ping().equals("PONG", ignoreCase = true)) {
-                Health.up().withDetail("Redis", "Connection is healthy").build()
-            } else {
-                Health.down().withDetail("Redis", "Ping failed").build()
+    override fun health() =
+        RedisConnectionUtils.getConnection(redisConnectionFactory).use { connection ->
+            runCatching {
+                if (connection.ping().equals("PONG", ignoreCase = true)) {
+                    Health.up().withDetail("Redis", "Connection is healthy").build()
+                } else {
+                    Health.down().withDetail("Redis", "Ping failed").build()
+                }
+            }.getOrElse { exception ->
+                Health.down(exception).withDetail("Redis", "Connection failed").build()
             }
-        } catch (ex: Exception) {
-            Health.down(ex).withDetail("Redis", "Connection failed").build()
-        } finally {
-            RedisConnectionUtils.releaseConnection(connection, this.redisConnectionFactory)
         }
-    }
 }

@@ -3,6 +3,8 @@ management:
     annotations:
       enabled: true
   health:
+    redis:
+      enabled: false
     ssl:
       enabled: false
     ping:

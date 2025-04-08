@@ -29,7 +29,7 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: B
                 }
             }
         }
-        log.info("Tid brukt på komplett regelsett for ansatt $ansattId og bruker $brukerId: ${duration.inWholeMilliseconds}ms")
+        log.info("Tid brukt på komplett regelsett for ansatt $ansattId og $brukerId: ${duration.inWholeMilliseconds}ms")
     }
 
     fun kjerneregler(ansattId: AnsattId, brukerId: BrukerId) =

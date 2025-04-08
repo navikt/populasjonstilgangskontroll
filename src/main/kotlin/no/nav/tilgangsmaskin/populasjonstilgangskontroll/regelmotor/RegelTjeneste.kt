@@ -15,36 +15,36 @@ import kotlin.time.measureTime
 
 @Service
 @Timed
-class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: BrukerTjeneste, private val ansattTjeneste: AnsattTjeneste, private val overstyringTjeneste: OverstyringTjeneste)  {
+class RegelTjeneste(private val motor: RegelMotor, private val brukere: BrukerTjeneste, private val ansatte: AnsattTjeneste, private val overstyring: OverstyringTjeneste)  {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    fun kompletteRegler(ansattId: AnsattId, brukerId: BrukerId) {
-        val duration = measureTime {
+    fun kompletteRegler(ansattId: AnsattId, brukerId: BrukerId) =
+        measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og $brukerId")
-            with(brukerTjeneste.bruker(brukerId)) {
+            with(brukere.bruker(brukerId)) {
                 runCatching {
-                    motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), this)
+                    motor.kompletteRegler(ansatte.ansatt(ansattId), this)
                 }.getOrElse {
-                    overstyringTjeneste.sjekk(ansattId, it)
+                    overstyring.sjekk(ansattId, it)
                 }
             }
+        }.also {
+            log.info("Tid brukt på komplett regelsett for ansatt $ansattId og $brukerId: ${it.inWholeMilliseconds}ms")
         }
-        log.info("Tid brukt på komplett regelsett for ansatt $ansattId og $brukerId: ${duration.inWholeMilliseconds}ms")
-    }
 
     fun kjerneregler(ansattId: AnsattId, brukerId: BrukerId) =
-        motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.bruker(brukerId))
+        motor.kjerneregler(ansatte.ansatt(ansattId), brukere.bruker(brukerId))
 
     fun bulkRegler(ansattId: AnsattId, idOgType: List<IdOgType>) =
         runCatching {
-            motor.bulkRegler(ansattTjeneste.ansatt(ansattId), idOgType.brukerOgType())
+            motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerOgType())
         }.getOrElse {
-            overstyringTjeneste.sjekk(ansattId, it)
+            overstyring.sjekk(ansattId, it)
         }
 
     private fun List<IdOgType>.brukerOgType() =
          mapNotNull { spec ->
-            brukerTjeneste.brukere(map {
+            brukere.brukere(map {
                 it.brukerId
             }).associateBy {
                 it.brukerId

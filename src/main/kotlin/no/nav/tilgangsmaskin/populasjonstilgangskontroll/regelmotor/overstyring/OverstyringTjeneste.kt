@@ -22,13 +22,13 @@ import org.springframework.transaction.annotation.Transactional
 @Cacheable(OVERSTYRING)
 @Transactional
 @Timed
-class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker: BrukerTjeneste, private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor) {
+class OverstyringTjeneste(private val ansatte: AnsattTjeneste, private val brukere: BrukerTjeneste, private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor) {
 
     private val log = getLogger(javaClass)
 
     @Transactional(readOnly = true)
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId) =
-        with(adapter.gjeldendeOverstyring(ansattId.verdi, brukerId.verdi, bruker.bruker(brukerId).historiskeIdentifikatorer.map { it.verdi })) {
+        with(adapter.gjeldendeOverstyring(ansattId.verdi, brukerId.verdi, brukere.bruker(brukerId).historiskeIdentifikatorer.map { it.verdi })) {
             when {
                 this == null -> false.also {
                     log.trace("Ingen overstyring for $ansattId og $brukerId ble funnet i databasen")
@@ -47,7 +47,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
     fun overstyr(ansattId: AnsattId, data: OverstyringData)  =
          runCatching {
                 log.info("Sjekker kjerneregler før eventuell overstyring for ansatt $ansattId og bruker ${data.brukerId}")
-                motor.kjerneregler(ansatt.ansatt(ansattId), bruker.bruker(data.brukerId))
+                motor.kjerneregler(ansatte.ansatt(ansattId), brukere.bruker(data.brukerId))
                 adapter.overstyr(ansattId.verdi, data).also {
                     log.info("Overstyring er gjort for $ansattId og ${data.brukerId}")
                     refresh(ansattId, data)

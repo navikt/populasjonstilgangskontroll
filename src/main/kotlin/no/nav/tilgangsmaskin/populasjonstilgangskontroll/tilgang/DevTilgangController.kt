@@ -21,13 +21,13 @@ import org.springframework.web.bind.annotation.*
 
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
-class DevTilgangController(private val skjerming: SkjermingTjeneste,private val bruker : BrukerTjeneste, private val ansatt: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyring: OverstyringTjeneste, private val nom: NomTjeneste) {
+class DevTilgangController(private val skjerming: SkjermingTjeneste,private val brukere : BrukerTjeneste, private val ansatte: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyring: OverstyringTjeneste, private val nom: NomTjeneste) {
 
     @GetMapping("bruker/{brukerId}")
-    fun bruker(@PathVariable brukerId: BrukerId) = bruker.bruker(brukerId)
+    fun bruker(@PathVariable brukerId: BrukerId) = brukere.bruker(brukerId)
 
     @GetMapping("ansatt/{ansattId}")
-    fun ansatt(@PathVariable ansattId: AnsattId) = ansatt.ansatt(ansattId)
+    fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)
 
     @PostMapping("ansatt/{ansattId}/{brukerId}")
     fun nom(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) = nom.lagre(NomAnsattData(ansattId, brukerId))
@@ -55,5 +55,5 @@ class DevTilgangController(private val skjerming: SkjermingTjeneste,private val 
     fun skjerminger(@RequestBody brukerIds: List<BrukerId>) = skjerming.skjerminger(brukerIds)
 
     @PostMapping("brukere")
-    fun brukere(@RequestBody brukerIds: List<BrukerId>) = bruker.brukere(brukerIds)
+    fun brukere(@RequestBody brukerIds: List<BrukerId>) = brukere.brukere(brukerIds)
 }

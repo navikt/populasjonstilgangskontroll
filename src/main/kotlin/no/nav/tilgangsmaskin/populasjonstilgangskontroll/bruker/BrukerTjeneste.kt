@@ -8,20 +8,20 @@ import org.springframework.stereotype.Service
 
 @Service
 @Timed
-class BrukerTjeneste(private val pdl: PDLTjeneste, val egenAnsatt: SkjermingTjeneste) {
+class BrukerTjeneste(private val personer: PDLTjeneste, val skjerminger: SkjermingTjeneste) {
 
     fun brukere(brukerIds: List<BrukerId>) =
         run {
-            val skjerminger = egenAnsatt.skjerminger(brukerIds)
-            pdl.personer(brukerIds).map {
+            val skjerminger = skjerminger.skjerminger(brukerIds)
+            personer.personer(brukerIds).map {
                 tilBruker(it, skjerminger[it.brukerId] ?: false)
             }
         }
 
     fun bruker(brukerId: BrukerId)  =
         run {
-            val skjermet = egenAnsatt.skjerming(brukerId)
-            val person = pdl.person(brukerId)
+            val skjermet = skjerminger.skjerming(brukerId)
+            val person = personer.person(brukerId)
             tilBruker(person, skjermet)
         }
 }

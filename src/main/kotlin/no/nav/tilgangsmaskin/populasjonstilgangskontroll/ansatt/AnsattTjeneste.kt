@@ -11,15 +11,15 @@ import org.springframework.stereotype.Service
 
 @Service
 @Timed
-class AnsattTjeneste(private val entra: EntraTjeneste, private val nom: NomOperasjoner, private val pdl: BrukerTjeneste)
+class AnsattTjeneste(private val entra: EntraTjeneste, private val ansatte: NomOperasjoner, private val brukere: BrukerTjeneste)
 {
     private val log = getLogger(javaClass)
     fun ansatt(ansattId: AnsattId)  =
         run {
             val entra =  entra.ansatt(ansattId)
-            val ansattFnr =  nom.fnrForAnsatt(ansattId)
+            val ansattFnr =  ansatte.fnrForAnsatt(ansattId)
             val ansattBruker = ansattFnr?.let {
-                pdl.bruker(it)
+                brukere.bruker(it)
             }
             Ansatt(AnsattIdentifikatorer(ansattId, entra.oid, ansattFnr), entra.grupper, ansattBruker).also {
                 log.trace(CONFIDENTIAL,"Ansatt er {}", it)

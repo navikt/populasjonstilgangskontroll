@@ -8,6 +8,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.IdOgType
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelMotor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import kotlin.time.measureTime
@@ -19,6 +20,7 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: B
 
     fun kompletteRegler(ansattId: AnsattId, brukerId: BrukerId) {
         val duration = measureTime {
+            log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og $brukerId")
             with(brukerTjeneste.bruker(brukerId)) {
                 runCatching {
                     motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), this)

@@ -67,7 +67,21 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 
     @Bean
-    fun customRedisHealthIndicator(redisConnectionFactory: RedisConnectionFactory) = CustomRedisHealthIndicator(redisConnectionFactory)
+    fun customRedisHealthIndicator(redisConnectionFactory: RedisConnectionFactory) = object : HealthIndicator  {
+        override fun health() =
+            RedisConnectionUtils.getConnection(redisConnectionFactory).use { connection ->
+                runCatching {
+                    if (connection.ping().equals("PONG", ignoreCase = true)) {
+                        Health.up().withDetail("Redis", "Connection is healthy").build()
+                    } else {
+                        Health.down().withDetail("Redis", "Ping failed").build()
+                    }
+                }.fold(
+                    onSuccess = { it },
+                    onFailure = { Health.down(it).withDetail("Redis", "Connection failed").build() }
+                )
+            }
+    }
 
 
     override fun addInterceptors(registry: InterceptorRegistry) {
@@ -89,22 +103,5 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                 .recordStats()
                 .removalListener {
                     key, value, cause -> log.trace("Cache removal key={}, value={}, cause={}", key, value, cause) })
-        }
-}
-
-
-class CustomRedisHealthIndicator(private val redisConnectionFactory: RedisConnectionFactory) : HealthIndicator {
-    override fun health() =
-        RedisConnectionUtils.getConnection(redisConnectionFactory).use { connection ->
-            runCatching {
-                if (connection.ping().equals("PONG", ignoreCase = true)) {
-                    Health.up().withDetail("Redis", "Connection is healthy").build()
-                } else {
-                    Health.down().withDetail("Redis", "Ping failed").build()
-                }
-            }.fold(
-                onSuccess = { it },
-                onFailure = { Health.down(it).withDetail("Redis", "Connection failed").build() }
-            )
         }
 }

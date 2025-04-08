@@ -1,6 +1,8 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring
 
 import io.micrometer.core.annotation.Timed
+import io.micrometer.core.instrument.Counter
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
@@ -22,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional
 @Cacheable(OVERSTYRING)
 @Transactional
 @Timed
-class OverstyringTjeneste(private val ansatte: AnsattTjeneste, private val brukere: BrukerTjeneste, private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor) {
+class OverstyringTjeneste(private val ansatte: AnsattTjeneste, private val brukere: BrukerTjeneste, private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor, private val registry: MeterRegistry) {
 
     private val log = getLogger(javaClass)
 
@@ -83,14 +85,17 @@ class OverstyringTjeneste(private val ansatte: AnsattTjeneste, private val bruke
             log.trace("Sjekker om regler er overstyrt for $ansattId og ${e.brukerId}")
             if (erOverstyrbar) {
                 if (erOverstyrt(ansattId, e.brukerId)) {
+                    tellOverstyring()
                     log.info("Overstyrt tilgang er gitt til $ansattId og ${e.brukerId}")
                 } else {
                     throw e.also {
+                        tellAvslag(kortNavn)
                         log.warn("Ingen overstyring, avvisning fra regel '$kortNavn' og $ansattId og ${e.brukerId} opprettholdes")
                     }
                 }
             } else {
                 throw e.also {
+                    tellAvslag(kortNavn)
                     log.trace("Avvisning fra kjerneregel $kortNavn for $ansattId og ${e.brukerId} opprettholdes")
                 }
             }
@@ -110,4 +115,17 @@ class OverstyringTjeneste(private val ansatte: AnsattTjeneste, private val bruke
             }
         }
     }
+    private fun tellAvslag(kortNavn: String) {
+        Counter.builder("regel.avslag.total")
+            .description("Antall avslag pr regel")
+            .tag("kortnavn",kortNavn)
+            .register(registry).increment()
+    }
+    private fun tellOverstyring() {
+        Counter.builder("regel.overstyring.total")
+            .description("Antall overstyringer")
+            .register(registry).increment()
+    }
 }
+
+

@@ -17,8 +17,8 @@ import kotlin.time.measureTime
 class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: BrukerTjeneste, private val ansattTjeneste: AnsattTjeneste, private val overstyringTjeneste: OverstyringTjeneste)  {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    fun kompletteRegler(ansattId: AnsattId, brukerId: BrukerId) =
-        measureTime {
+    fun kompletteRegler(ansattId: AnsattId, brukerId: BrukerId) {
+        val duration = measureTime {
             with(brukerTjeneste.bruker(brukerId)) {
                 runCatching {
                     motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), this)
@@ -26,9 +26,9 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukerTjeneste: B
                     overstyringTjeneste.sjekk(ansattId, it)
                 }
             }
-        }.also {
-            log.info("Tid brukt på komplett regelsett for ansatt $ansattId og bruker $brukerId: ${it.inWholeMilliseconds}ms")
         }
+        log.info("Tid brukt på komplett regelsett for ansatt $ansattId og bruker $brukerId: ${duration.inWholeMilliseconds}ms")
+    }
 
     fun kjerneregler(ansattId: AnsattId, brukerId: BrukerId) =
         motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.bruker(brukerId))

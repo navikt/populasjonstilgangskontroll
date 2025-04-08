@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional
 @Cacheable(OVERSTYRING)
 @Transactional
 @Timed
-class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker: BrukerTjeneste, private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor, private val handler: OverstyringResultatHandler = OverstyringResultatHandler()) {
+class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker: BrukerTjeneste, private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor) {
 
     private val log = getLogger(javaClass)
 
@@ -30,9 +30,17 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId) =
         with(adapter.gjeldendeOverstyring(ansattId.verdi, brukerId.verdi, bruker.bruker(brukerId).historiskeIdentifikatorer.map { it.verdi })) {
             when {
-                this == null -> handler.ingen(ansattId, brukerId)
-                isBeforeNow() -> handler.utgått(ansattId, brukerId, diffFromNow())
-                else -> handler.gyldig(ansattId, brukerId, diffFromNow())
+                this == null -> false.also {
+                    log.trace("Ingen overstyring for $ansattId og $brukerId ble funnet i databasen")
+                }
+
+                isBeforeNow() -> false.also {
+                    log.trace("Overstyring har gått ut på tid for ${diffFromNow()} siden for  $ansattId og $brukerId")
+                }
+
+                else -> true.also {
+                    log.trace("Overstyring er gyldig i ${diffFromNow()} til for $ansattId og  $brukerId")
+                }
             }
         }
 
@@ -41,13 +49,13 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
                 log.info("Sjekker kjerneregler før eventuell overstyring for ansatt $ansattId og bruker ${data.brukerId}")
                 motor.kjerneregler(ansatt.ansatt(ansattId), bruker.bruker(data.brukerId))
                 adapter.overstyr(ansattId.verdi, data).also {
-                    handler.overstyrt(ansattId,data.brukerId)
-                    refresh(ansattId,data)
+                    log.info("Overstyring er gjort for $ansattId og ${data.brukerId}")
+                    refresh(ansattId, data)
                 }
             }.getOrElse {
                 when (it) {
                     is RegelException ->  throw RegelException(OVERSTYRING_MESSAGE_CODE, arrayOf(it.regel.kortNavn,ansattId.verdi,data.brukerId.verdi), it).also {
-                        handler.avvist(ansattId,data.brukerId)
+                        log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}")
                     }
                     else -> throw it.also {
                         log.error("Ukjent feil ved overstyring for $ansattId", it)
@@ -58,7 +66,7 @@ class OverstyringTjeneste(private val ansatt: AnsattTjeneste, private val bruker
     @CachePut(OVERSTYRING)
     fun refresh(ansattId: AnsattId, data: OverstyringData)  =
         Unit.also {
-            log.info("Refresh cache overstyring for $ansattId og bruker ${data.brukerId}")
+            log.info("Refresh cache overstyring for $ansattId og ${data.brukerId}")
         }
 
     fun sjekk(ansattId: AnsattId, e: Throwable) =

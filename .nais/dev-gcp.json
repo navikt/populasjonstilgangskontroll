@@ -13,7 +13,7 @@
     "utland":"de62a4bf-957b-4cde-acdb-6d8bcbf821a0"
   },
   "db": {
-    "poolsize": "2",
+    "poolsize": "10",
     "type": "POSTGRES_17",
     "tier": "db-f1-micro",
     "name": "tilgangsmaskin"

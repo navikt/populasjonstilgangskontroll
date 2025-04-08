@@ -12,9 +12,9 @@
     "utland": "bb308252-d600-4e5c-bc53-bbd2bb8a29ba"
   },
   "db": {
-    "poolsize": "5",
+    "poolsize": "25",
     "type": "POSTGRES_17",
-    "tier": "db-g1-small",
+    "tier": "db-custom-2-3840",
     "name": "tilgangsmaskin"
   },
   "db-flags": {

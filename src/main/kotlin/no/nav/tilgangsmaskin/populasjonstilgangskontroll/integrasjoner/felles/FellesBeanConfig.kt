@@ -102,8 +102,9 @@ class CustomRedisHealthIndicator(private val redisConnectionFactory: RedisConnec
                 } else {
                     Health.down().withDetail("Redis", "Ping failed").build()
                 }
-            }.getOrElse { exception ->
-                Health.down(exception).withDetail("Redis", "Connection failed").build()
-            }
+            }.fold(
+                onSuccess = { it },
+                onFailure = { Health.down(it).withDetail("Redis", "Connection failed").build() }
+            )
         }
 }

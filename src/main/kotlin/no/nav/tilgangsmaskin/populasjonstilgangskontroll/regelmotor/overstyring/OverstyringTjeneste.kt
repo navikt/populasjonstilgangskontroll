@@ -35,21 +35,21 @@ class OverstyringTjeneste(private val ansatte: AnsattTjeneste, private val bruke
                 }
 
                 isBeforeNow() -> false.also {
-                    log.trace("Overstyring har gått ut på tid for ${diffFromNow()} siden for  $ansattId og $brukerId")
+                    log.trace("Overstyring har gått ut på tid for ${diffFromNow()} siden for $ansattId og $brukerId")
                 }
 
                 else -> true.also {
-                    log.trace("Overstyring er gyldig i ${diffFromNow()} til for $ansattId og  $brukerId")
+                    log.trace("Overstyring er gyldig i ${diffFromNow()} til for $ansattId og $brukerId")
                 }
             }
         }
 
     fun overstyr(ansattId: AnsattId, data: OverstyringData)  =
          runCatching {
-                log.info("Sjekker kjerneregler før eventuell overstyring for ansatt $ansattId og bruker ${data.brukerId}")
+                log.info("Sjekker kjerneregler før eventuell overstyring for $ansattId og ${data.brukerId}")
                 motor.kjerneregler(ansatte.ansatt(ansattId), brukere.bruker(data.brukerId))
                 adapter.overstyr(ansattId.verdi, data).also {
-                    log.info("Overstyring er gjort for $ansattId og ${data.brukerId}")
+                    log.info("Overstyring er registrert for $ansattId og ${data.brukerId}")
                     refresh(ansattId, data)
                 }
             }.getOrElse {

@@ -47,7 +47,7 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .activateDefaultTyping(
                 mapper.polymorphicTypeValidator,
-                ObjectMapper.DefaultTyping.JAVA_LANG_OBJECT,
+                ObjectMapper.DefaultTyping.EVERYTHING,
                 JsonTypeInfo.As.PROPERTY
             )
 

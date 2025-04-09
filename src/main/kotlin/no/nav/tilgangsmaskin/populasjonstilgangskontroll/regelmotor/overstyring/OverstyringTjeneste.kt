@@ -12,6 +12,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.BulkR
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelBeskrivelse.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelException
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelMotor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang1.TokenClaimsAccessor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.TimeExtensions.diffFromNow
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.extensions.TimeExtensions.isBeforeNow
 import org.slf4j.LoggerFactory.getLogger
@@ -24,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional
 @Cacheable(OVERSTYRING)
 @Transactional
 @Timed
-class OverstyringTjeneste(private val ansatte: AnsattTjeneste, private val brukere: BrukerTjeneste, private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor, private val registry: MeterRegistry) {
+class OverstyringTjeneste(private val ansatte: AnsattTjeneste, private val brukere: BrukerTjeneste, private val adapter: OverstyringJPAAdapter, private val motor: RegelMotor, private val registry: MeterRegistry, private val accessor: TokenClaimsAccessor) {
 
     private val log = getLogger(javaClass)
 
@@ -89,13 +90,13 @@ class OverstyringTjeneste(private val ansatte: AnsattTjeneste, private val bruke
                     log.info("Overstyrt tilgang er gitt til $ansattId og ${e.brukerId}")
                 } else {
                     throw e.also {
-                        tellAvslag(kortNavn)
+                        tellAvslag(kortNavn, accessor.systemNavn)
                         log.warn("Ingen overstyring, avvisning fra regel '$kortNavn' og $ansattId og ${e.brukerId} opprettholdes")
                     }
                 }
             } else {
                 throw e.also {
-                    tellAvslag(kortNavn)
+                    tellAvslag(kortNavn, accessor.systemNavn)
                     log.trace("Avvisning fra kjerneregel $kortNavn for $ansattId og ${e.brukerId} opprettholdes")
                 }
             }
@@ -115,10 +116,12 @@ class OverstyringTjeneste(private val ansatte: AnsattTjeneste, private val bruke
             }
         }
     }
-    private fun tellAvslag(kortNavn: String) {
+    private fun tellAvslag(kortNavn: String, systemNavn: String) {
         Counter.builder("regel.avslag.total")
             .description("Antall avslag pr regel")
             .tag("kortnavn",kortNavn)
+            .tag("system",systemNavn)
+
             .register(registry).increment()
     }
     private fun tellOverstyring() {

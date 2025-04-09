@@ -53,10 +53,10 @@ internal class OverstyringTest {
     @BeforeTest
     fun setup() {
         every { accessor.system } returns "test"
+        every { accessor.systemNavn } returns "test"
         every { ansattTjeneste.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
         overstyring = OverstyringTjeneste(ansattTjeneste, brukerTjeneste, OverstyringJPAAdapter(repo), motor,
-            SimpleMeterRegistry()
-        )
+            SimpleMeterRegistry(),accessor)
     }
 
     @Test

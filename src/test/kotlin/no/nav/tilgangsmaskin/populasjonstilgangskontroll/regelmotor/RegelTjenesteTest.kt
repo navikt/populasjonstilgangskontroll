@@ -66,7 +66,8 @@ class RegelTjenesteTest {
     fun before() {
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
         every { accessor.system } returns "test"
-        overstyring = OverstyringTjeneste(ansatt, bruker, OverstyringJPAAdapter(repo), motor, SimpleMeterRegistry())
+        every { accessor.systemNavn } returns "test"
+        overstyring = OverstyringTjeneste(ansatt, bruker, OverstyringJPAAdapter(repo), motor, SimpleMeterRegistry(), accessor)
         regel = RegelTjeneste(motor, bruker, ansatt,overstyring)
     }
 

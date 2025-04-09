@@ -44,7 +44,8 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
             }
     }
 
-    override fun cacheManager(): CacheManager {
+    @Bean
+     fun cacheManager1(): CacheManager {
        val my =  mapper.copy().apply {
             val typeValidator = BasicPolymorphicTypeValidator.builder()
                 .allowIfSubType(Any::class.java)

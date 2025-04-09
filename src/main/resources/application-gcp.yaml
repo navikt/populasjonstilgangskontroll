@@ -43,7 +43,7 @@ spring:
       key-store-password: ${kafka.credstore.password}
 
     consumer:
-      group-id: ${spring.application.name}-group16
+      group-id: ${spring.application.name}-group
       key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
@@ -142,4 +142,4 @@ graph:
   scope: https://graph.microsoft.com/.default
   base-uri: https://graph.microsoft.com/v1.0/
 nom:
-  topic: org.nom.api-ressurs-state-v2
+  topic: org.nom.api-ressurs-state-v3

@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomAnsattData
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.RegelTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringData
@@ -23,10 +24,13 @@ import org.springframework.web.bind.annotation.*
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
 @Tag(name = "DevTilgangController", description = "Denne kontrolleren skal kun brukes til testing")
-class DevTilgangController(private val skjerming: SkjermingTjeneste,private val brukere : BrukerTjeneste, private val ansatte: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyring: OverstyringTjeneste, private val nom: NomTjeneste) {
+class DevTilgangController(private val skjerming: SkjermingTjeneste,private val brukere : BrukerTjeneste, private val ansatte: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyring: OverstyringTjeneste, private val nom: NomTjeneste, private val a: PdlRestClientAdapter) {
 
     @GetMapping("bruker/{brukerId}")
     fun bruker(@PathVariable brukerId: BrukerId) = brukere.bruker(brukerId)
+
+    @GetMapping("person/{brukerId}")
+    fun person(@PathVariable brukerId: BrukerId) = a.person(brukerId.verdi)
 
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)

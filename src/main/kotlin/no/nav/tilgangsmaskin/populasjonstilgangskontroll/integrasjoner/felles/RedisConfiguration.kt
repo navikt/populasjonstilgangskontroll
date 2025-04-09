@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator
 import no.nav.boot.conditionals.ConditionalOnDev
 import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator
@@ -44,11 +45,21 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
     }
 
     override fun cacheManager(): CacheManager {
+       val my =  mapper.copy().apply {
+            val typeValidator = BasicPolymorphicTypeValidator.builder()
+                .allowIfSubType(Any::class.java)
+                .build()
+            activateDefaultTyping(
+                typeValidator,
+                ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE,
+                JsonTypeInfo.As.PROPERTY
+            )
+        }
         val config = RedisCacheConfiguration.defaultCacheConfig()
             .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer()))
             .serializeValuesWith(
                 RedisSerializationContext.SerializationPair.fromSerializer(
-                    Jackson2JsonRedisSerializer(mapper,Any::class.java)
+                    GenericJackson2JsonRedisSerializer(my)
                 )
             )
 

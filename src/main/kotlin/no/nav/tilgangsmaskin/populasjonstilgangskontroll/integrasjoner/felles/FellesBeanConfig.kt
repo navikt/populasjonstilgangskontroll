@@ -23,6 +23,9 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.RedisConnectionUtils
+import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
+import org.springframework.data.redis.serializer.StringRedisSerializer
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -81,6 +84,17 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                     onFailure = { Health.down(it).withDetail("Redis", "Connection failed").build() }
                 )
             }
+    }
+
+    @Bean
+    fun redisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, Any> {
+        return RedisTemplate<String, Any>().apply {
+            connectionFactory = redisConnectionFactory
+            keySerializer = StringRedisSerializer()
+            valueSerializer = GenericJackson2JsonRedisSerializer()
+            hashKeySerializer = StringRedisSerializer()
+            hashValueSerializer = GenericJackson2JsonRedisSerializer()
+        }
     }
 
 

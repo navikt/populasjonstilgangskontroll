@@ -16,7 +16,6 @@ management:
       base-path: /monitoring
 
 spring:
-
   data:
     redis:
       host: ${valkey.host.cache}

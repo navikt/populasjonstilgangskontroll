@@ -30,7 +30,7 @@
           "cluster": "dev-fss"
        },
        {
-         "name": "oppgave",
+         "name": "tilgang",
          "namespace": "aap",
          "cluster": "dev-gcp"
        },

@@ -17,6 +17,7 @@ import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilde
 import org.springframework.boot.web.client.RestClientCustomizer
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.CachingConfigurer
+import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.interceptor.KeyGenerator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -35,6 +36,7 @@ import java.time.Duration
 
 
 @Configuration
+@EnableCaching
 class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor, private val cf: RedisConnectionFactory) : CachingConfigurer, WebMvcConfigurer {
 
     private val log = getLogger(javaClass)
@@ -93,7 +95,6 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
         val config = RedisCacheConfiguration.defaultCacheConfig()
             .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer()))
             .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(GenericJackson2JsonRedisSerializer()))
-            .entryTtl(Duration.ofMinutes(1))
 
         return RedisCacheManager.builder(cf)
             .cacheDefaults(config)

@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
 import com.github.benmanes.caffeine.cache.Caffeine
+import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.boot.conditionals.ConditionalOnProd
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CachingConfigurer
@@ -11,7 +12,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @EnableCaching
-@ConditionalOnProd
+@ConditionalOnGCP
 class CaffeineConfiguration : CachingConfigurer {
     private val log = LoggerFactory.getLogger(javaClass)
 

@@ -22,9 +22,9 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext
 import org.springframework.data.redis.serializer.StringRedisSerializer
 
-@Configuration
-@EnableCaching
-@ConditionalOnDev
+//@Configuration
+//@EnableCaching
+//@ConditionalOnDev
 class RedisConfiguration(private val cf: RedisConnectionFactory, private val mapper: ObjectMapper) : CachingConfigurer {
 
     @Bean
@@ -44,9 +44,8 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
             }
     }
 
-    @Bean
-     fun cacheManager1(): CacheManager {
-       val my =  mapper.copy().apply {
+    override fun cacheManager(): CacheManager {
+        mapper.copy().apply {
             val typeValidator = BasicPolymorphicTypeValidator.builder()
                 .allowIfSubType(Any::class.java)
                 .build()
@@ -60,7 +59,7 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
             .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer()))
             .serializeValuesWith(
                 RedisSerializationContext.SerializationPair.fromSerializer(
-                    GenericJackson2JsonRedisSerializer(my)
+                    Jackson2JsonRedisSerializer(mapper,Any::class.java)
                 )
             )
 

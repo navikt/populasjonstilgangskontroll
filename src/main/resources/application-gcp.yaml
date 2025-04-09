@@ -16,16 +16,6 @@ management:
       base-path: /monitoring
 
 spring:
-  data:
-    redis:
-      host: ${valkey.host.cache}
-      port: ${valkey.port.cache}
-      connect-timeout: 10s
-      timeout: 5s
-      username: ${valkey.username.cache}
-      password: ${valkey.password.cache}
-      ssl:
-        enabled: true
   threads:
     virtual:
       enabled: true
@@ -100,11 +90,7 @@ spring:
     default-property-inclusion: non_null
   cache:
     cache-names: pdl, skjerming, graph, overstyring
-    type: redis
-    redis:
-        key-prefix: "spring:cache:"
-        time-to-live: 3600s
-        enable-statistics: true
+
 
 no.nav.security.jwt:
   issuer:

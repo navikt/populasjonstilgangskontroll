@@ -15,3 +15,4 @@ spring:
   cache:
     caffeine:
       spec: initialCapacity=500,maximumSize=1000,expireAfterAccess=24h
+    type: caffeine

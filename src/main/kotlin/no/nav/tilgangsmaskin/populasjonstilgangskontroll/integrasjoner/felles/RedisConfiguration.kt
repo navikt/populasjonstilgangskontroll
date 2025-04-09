@@ -44,10 +44,9 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
 
     override fun cacheManager(): CacheManager {
         val myMapper = mapper.copy()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .activateDefaultTyping(
                 mapper.polymorphicTypeValidator,
-                ObjectMapper.DefaultTyping.EVERYTHING,
+                ObjectMapper.DefaultTyping.NON_FINAL,
                 JsonTypeInfo.As.PROPERTY
             )
 

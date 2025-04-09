@@ -44,13 +44,6 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
 
     override fun cacheManager(): CacheManager {
         val myMapper = mapper.copy()
-
-            .activateDefaultTypingAsProperty(
-                mapper.polymorphicTypeValidator,
-                ObjectMapper.DefaultTyping.NON_FINAL,
-                "@class"
-            )
-
         val config = RedisCacheConfiguration.defaultCacheConfig()
             .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer()))
             .serializeValuesWith(

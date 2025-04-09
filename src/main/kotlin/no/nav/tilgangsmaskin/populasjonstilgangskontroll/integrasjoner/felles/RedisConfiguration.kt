@@ -63,3 +63,4 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
         }
     }
 }
+

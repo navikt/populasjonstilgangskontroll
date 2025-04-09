@@ -35,7 +35,7 @@ import java.time.Duration
 
 
 @Configuration
-class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor, private val mapper: ObjectMapper, private val cf: RedisConnectionFactory) : CachingConfigurer, WebMvcConfigurer {
+class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor, private val cf: RedisConnectionFactory) : CachingConfigurer, WebMvcConfigurer {
 
     private val log = getLogger(javaClass)
 

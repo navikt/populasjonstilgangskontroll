@@ -102,6 +102,7 @@ spring:
     cache-names: pdl, skjerming, graph, overstyring
     type: redis
     redis:
+        key-prefix: "spring:cache:"
         time-to-live: 3600s
         enable-statistics: true
 

@@ -70,9 +70,9 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 
     @Bean
-    fun customRedisHealthIndicator(redisConnectionFactory: RedisConnectionFactory) = object : HealthIndicator  {
+    fun redisHealthIndicator(cf: RedisConnectionFactory) = object : HealthIndicator  {
         override fun health() =
-            RedisConnectionUtils.getConnection(redisConnectionFactory).use { connection ->
+            RedisConnectionUtils.getConnection(cf).use { connection ->
                 runCatching {
                     if (connection.ping().equals("PONG", ignoreCase = true)) {
                         Health.up().withDetail("Redis", "Connection is healthy").build()
@@ -87,9 +87,9 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 
     @Bean
-    fun redisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, Any> {
+    fun redisTemplate(cf: RedisConnectionFactory): RedisTemplate<String, Any> {
         return RedisTemplate<String, Any>().apply {
-            connectionFactory = redisConnectionFactory
+            connectionFactory = cf
             keySerializer = StringRedisSerializer()
             valueSerializer = GenericJackson2JsonRedisSerializer()
             hashKeySerializer = StringRedisSerializer()

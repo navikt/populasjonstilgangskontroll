@@ -57,10 +57,13 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
                     GenericJackson2JsonRedisSerializer(myMapper)
                 )
             )
+
         return RedisCacheManager.builder(cf)
             .cacheDefaults(config)
             .enableStatistics()
-            .build()
+            .build().apply {
+                cacheNames.forEach { name ->this.getCache(name)?.clear() }
+            }
     }
 
 

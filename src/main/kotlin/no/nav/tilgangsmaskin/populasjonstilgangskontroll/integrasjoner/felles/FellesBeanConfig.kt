@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.github.benmanes.caffeine.cache.Caffeine
+import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
@@ -15,24 +15,27 @@ import org.springframework.boot.actuate.web.exchanges.Include.defaultIncludes
 import org.springframework.boot.actuate.web.exchanges.servlet.HttpExchangesFilter
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
 import org.springframework.boot.web.client.RestClientCustomizer
+import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.CachingConfigurer
-import org.springframework.cache.caffeine.CaffeineCacheManager
 import org.springframework.cache.interceptor.KeyGenerator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
+import org.springframework.data.redis.cache.RedisCacheConfiguration
+import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.RedisConnectionUtils
-import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
+import org.springframework.data.redis.serializer.RedisSerializationContext
 import org.springframework.data.redis.serializer.StringRedisSerializer
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import java.time.Duration
 
 
 @Configuration
-class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : CachingConfigurer, WebMvcConfigurer {
+class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor, private val mapper: ObjectMapper, private val cf: RedisConnectionFactory) : CachingConfigurer, WebMvcConfigurer {
 
     private val log = getLogger(javaClass)
 
@@ -86,15 +89,15 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             }
     }
 
-    @Bean
-    fun redisTemplate(cf: RedisConnectionFactory): RedisTemplate<String, Any> {
-        return RedisTemplate<String, Any>().apply {
-            connectionFactory = cf
-            keySerializer = StringRedisSerializer()
-            valueSerializer = GenericJackson2JsonRedisSerializer()
-            hashKeySerializer = StringRedisSerializer()
-            hashValueSerializer = GenericJackson2JsonRedisSerializer()
-        }
+    override fun cacheManager(): CacheManager {
+        val config = RedisCacheConfiguration.defaultCacheConfig()
+            .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer()))
+            .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(GenericJackson2JsonRedisSerializer(mapper)))
+            .entryTtl(Duration.ofMinutes(1))
+
+        return RedisCacheManager.builder(cf)
+            .cacheDefaults(config)
+            .build()
     }
 
 

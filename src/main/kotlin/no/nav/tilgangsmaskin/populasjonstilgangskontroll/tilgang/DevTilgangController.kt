@@ -30,7 +30,7 @@ class DevTilgangController(private val skjerming: SkjermingTjeneste,private val 
     fun bruker(@PathVariable brukerId: BrukerId) = brukere.bruker(brukerId)
 
     @GetMapping("person/{brukerId}")
-    fun person(@PathVariable brukerId: BrukerId) = a.person(brukerId.verdi)
+    fun person(@PathVariable id: String) = a.person(id)
 
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)

@@ -28,6 +28,11 @@
       "name": "gosys",
       "namespace": "isa",
       "cluster": "prod-fss"
+    },
+    {
+      "name": "oppgave",
+      "namespace": "aap",
+      "cluster": "prod-gcp"
     }
   ],
   "nais": {

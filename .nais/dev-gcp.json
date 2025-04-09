@@ -30,6 +30,11 @@
           "cluster": "dev-fss"
        },
        {
+         "name": "oppgave",
+         "namespace": "aap",
+         "cluster": "dev-gcp"
+       },
+       {
           "name": "gosys-q2",
           "namespace": "isa",
           "cluster": "dev-fss"

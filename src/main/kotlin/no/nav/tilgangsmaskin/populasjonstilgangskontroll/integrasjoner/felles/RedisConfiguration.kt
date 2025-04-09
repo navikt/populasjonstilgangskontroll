@@ -44,10 +44,11 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
 
     override fun cacheManager(): CacheManager {
         val myMapper = mapper.copy()
-            .activateDefaultTyping(
+
+            .activateDefaultTypingAsProperty(
                 mapper.polymorphicTypeValidator,
                 ObjectMapper.DefaultTyping.NON_FINAL,
-                JsonTypeInfo.As.PROPERTY
+                "@class"
             )
 
         val config = RedisCacheConfiguration.defaultCacheConfig()

@@ -59,6 +59,7 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
             )
         return RedisCacheManager.builder(cf)
             .cacheDefaults(config)
+            .enableStatistics()
             .build()
     }
 

@@ -20,9 +20,9 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRe
 
 object PdlPersonMapper {
 
-    fun tilPerson(brukerId: BrukerId, data: PdlRespons) =
+    fun tilPerson(data: PdlRespons) =
         with(data) {
-            Person(brukerId, tilGeoTilknytning(geografiskTilknytning), tilGraderinger(person.adressebeskyttelse), tilFamilie(person.familierelasjoner), tilDødsdato(person.doedsfall),tilHistoriskeBrukerIds(identer))
+            Person(BrukerId(data.brukerId), tilGeoTilknytning(geografiskTilknytning), tilGraderinger(person.adressebeskyttelse), tilFamilie(person.familierelasjoner), tilDødsdato(person.doedsfall),tilHistoriskeBrukerIds(identer))
         }
 
     private fun tilGraderinger(beskyttelse: List<PdlAdressebeskyttelse>) =

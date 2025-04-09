@@ -21,7 +21,7 @@ class BrukerTjeneste(private val personer: PDLTjeneste, val skjerminger: Skjermi
     fun bruker(brukerId: BrukerId)  =
         run {
             val skjermet = skjerminger.skjerming(brukerId)
-            val person = personer.person(brukerId)
+            val person = personer.person(brukerId.verdi)
             tilBruker(person, skjermet)
         }
 }

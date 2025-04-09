@@ -2,10 +2,13 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
 import java.time.LocalDate
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PdlRespons(val person: PdlPerson, val identer: PdlIdenter = PdlIdenter(), val geografiskTilknytning: PdlGeografiskTilknytning? = null)  {
+
+    val  brukerId = identer.identer.first { it.gruppe == FOLKEREGISTERIDENT }.ident
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class PdlPerson(

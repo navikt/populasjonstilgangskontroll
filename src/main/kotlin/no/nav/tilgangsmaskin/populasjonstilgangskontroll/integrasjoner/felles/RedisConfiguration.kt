@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.boot.conditionals.ConditionalOnDev
 import org.springframework.boot.actuate.health.Health
@@ -41,14 +43,21 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
     }
 
     override fun cacheManager(): CacheManager {
+        val myMapper = mapper.copy()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .activateDefaultTyping(
+                mapper.polymorphicTypeValidator,
+                ObjectMapper.DefaultTyping.JAVA_LANG_OBJECT,
+                JsonTypeInfo.As.PROPERTY
+            )
+
         val config = RedisCacheConfiguration.defaultCacheConfig()
             .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer()))
             .serializeValuesWith(
                 RedisSerializationContext.SerializationPair.fromSerializer(
-                    GenericJackson2JsonRedisSerializer(mapper)
+                    GenericJackson2JsonRedisSerializer(myMapper)
                 )
             )
-
         return RedisCacheManager.builder(cf)
             .cacheDefaults(config)
             .build()

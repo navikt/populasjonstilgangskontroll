@@ -4,7 +4,7 @@ val javaVersion = JavaLanguageVersion.of(23)
 val springdocVersion = "2.8.6"
 val tokenSupportVersion = "5.0.24"
 val springCloudVersion = "4.2.1"
-val mockkVersion = "1.13.17"
+val mockkVersion = "1.14.0"
 val mockOAuth2ServerVersion = "2.1.10"
 
 group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"

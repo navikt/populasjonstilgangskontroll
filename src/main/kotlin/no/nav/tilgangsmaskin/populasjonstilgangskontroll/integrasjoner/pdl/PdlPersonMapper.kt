@@ -10,7 +10,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilkny
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.Companion.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeografiskTilknytning.GTType.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlIdenter
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlPerson.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering.*
@@ -60,8 +60,8 @@ object PdlPersonMapper {
     }
 
     private fun tilHistoriskeBrukerIds(identer: PdlIdenter) = identer.identer
-        .filter { it.gruppe == FOLKEREGISTERIDENT }
         .filter { it.historisk }
+        .filter { it.gruppe in listOf(FOLKEREGISTERIDENT, NPID) }
         .map { (BrukerId(it.ident)) }
 
     private fun tilRelasjon(relasjon: PdlFamilieRelasjonRolle?) =

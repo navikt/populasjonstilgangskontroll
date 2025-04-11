@@ -96,7 +96,7 @@ class RegelTjenesteTest {
         every { bruker.bruker(strengtFortroligBruker.brukerId.verdi) } returns strengtFortroligBruker
         every { bruker.bruker(fortroligBruker.brukerId.verdi) } returns fortroligBruker
         every { bruker.bruker(vanligBruker.brukerId.verdi) } returns vanligBruker
-        every { bruker.brukere(listOf(strengtFortroligBruker.brukerId.verdi,fortroligBruker.brukerId.verdi)) } returns listOf(strengtFortroligBruker,fortroligBruker)
+        every { bruker.brukere(setOf(strengtFortroligBruker.brukerId.verdi,fortroligBruker.brukerId.verdi)) } returns listOf(strengtFortroligBruker,fortroligBruker)
         assertEquals(assertThrows<BulkRegelException> {
             regel.bulkRegler(vanligAnsatt.ansattId, listOf(IdOgType(strengtFortroligBruker.brukerId.verdi, KJERNE_REGELTYPE), IdOgType(fortroligBruker.brukerId.verdi, KJERNE_REGELTYPE)))
         }.exceptions.size, 2)
@@ -105,7 +105,7 @@ class RegelTjenesteTest {
     fun bulkAvvisningerOverstyrt() {
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
         every { bruker.bruker(geoUtlandBruker.brukerId.verdi) } returns geoUtlandBruker
-        every { bruker.brukere(listOf(geoUtlandBruker.brukerId.verdi)) } returns listOf(geoUtlandBruker)
+        every { bruker.brukere(setOf(geoUtlandBruker.brukerId.verdi)) } returns listOf(geoUtlandBruker)
         overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData(
             geoUtlandBruker.brukerId,
             "test",

@@ -55,8 +55,8 @@ object PdlPersonMapper {
         val (foreldre, barn) = relasjoner
             .mapNotNull { it.relatertPersonsIdent?.let { ident -> it.relatertPersonsRolle to ident } }.partition { it.first != BARN }
         return Familie(
-            foreldre.map { FamilieMedlem(it.second, tilRelasjon(it.first)) },
-            barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) })
+            foreldre.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet(),
+            barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet())
     }
 
     private fun tilHistoriskeBrukerIds(identer: PdlIdenter) = identer.identer

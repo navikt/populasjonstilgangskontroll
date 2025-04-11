@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 
-data class Familie(val foreldre: List<FamilieMedlem> = emptyList(), val barn: List<FamilieMedlem> = emptyList(),val søsken: List<FamilieMedlem> = emptyList()) {
+data class Familie(val foreldre: Set<FamilieMedlem> = emptySet(), val barn: Set<FamilieMedlem> = emptySet(),val søsken: Set<FamilieMedlem> = emptySet()) {
    @JsonIgnore
    val familieMedlemmer = foreldre + barn + søsken
     companion object {

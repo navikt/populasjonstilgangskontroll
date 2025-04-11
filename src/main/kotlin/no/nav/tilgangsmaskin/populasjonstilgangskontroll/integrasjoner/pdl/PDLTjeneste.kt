@@ -18,7 +18,7 @@ class PDLTjeneste(private val adapter: PdlRestClientAdapter) {
         it.copy(familie = Familie(it.foreldre, it.barn, søsken(it)))
     }
 
-    fun personer(brukerIds: List<String>) =
+    fun personer(brukerIds: Set<String>) =
         adapter.personer(brukerIds)
             .map { respons ->
                 tilPerson(respons.value).let {
@@ -27,9 +27,10 @@ class PDLTjeneste(private val adapter: PdlRestClientAdapter) {
             }
 
     private fun søsken(person: Person) =
-        adapter.personer(person.foreldre.map { it.brukerId.verdi })
+        adapter.personer(person.foreldre.map { it.brukerId.verdi }.toSet())
+            .asSequence()
             .flatMap { tilPerson(it.value).barn }
             .map { it.brukerId }
             .filterNot { it == person.brukerId }
-            .map { FamilieMedlem(it, SØSKEN) }
+            .map { FamilieMedlem(it, SØSKEN) }.toSet()
 }

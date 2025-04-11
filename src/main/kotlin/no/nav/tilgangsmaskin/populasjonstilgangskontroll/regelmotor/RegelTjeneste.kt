@@ -46,7 +46,7 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukere: BrukerTj
 
     private fun List<IdOgType>.brukerIdOgType(): List<Pair<Bruker, RegelSett.RegelType>> =
          mapNotNull {
-            brukere.brukere(map { it.brukerId })
+            brukere.brukere(map { it.brukerId }.toSet())
                 .associateBy { it.brukerId.verdi }[it.brukerId]?.let { bruker ->
                 bruker to it.type
             }

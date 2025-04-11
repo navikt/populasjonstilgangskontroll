@@ -41,7 +41,7 @@ object TestData {
     internal val vanligBruker = Bruker(vanligBrukerId, UdefinertGeoTilknytning)
     internal val vanligHistoriskBruker = Bruker(historiskBrukerId, UdefinertGeoTilknytning)
     internal val vanligBrukerMedHistoriskIdent = Bruker(vanligBrukerId, UdefinertGeoTilknytning, historiskeIdentifikatorer = listOf(vanligHistoriskBruker.brukerId))
-    internal val annenAnsattBruker = Bruker(annenAnsattBrukerId, UdefinertGeoTilknytning, listOf(EGEN_ANSATT_GRUPPE), Familie(barn = listOf(
+    internal val annenAnsattBruker = Bruker(annenAnsattBrukerId, UdefinertGeoTilknytning, listOf(EGEN_ANSATT_GRUPPE), Familie(barn = setOf(
         Familie.FamilieMedlem(vanligBrukerId, FamilieRelasjon.BARN)))
     )
     internal val ansattBruker = Bruker(ansattBrukerId, UdefinertGeoTilknytning, listOf(EGEN_ANSATT_GRUPPE),)

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service
 @Timed
 class BrukerTjeneste(private val personer: PDLTjeneste, val skjerminger: SkjermingTjeneste) {
 
-    fun brukere(brukerIds: List<String>) = personer.personer(brukerIds).let { personer ->
+    fun brukere(brukerIds: Set<String>) = personer.personer(brukerIds).let { personer ->
         val skjerminger = skjerminger.skjerminger(personer.map { it.brukerId })
         personer.map { person ->
             tilBruker(person, skjerminger[person.brukerId] ?: false)

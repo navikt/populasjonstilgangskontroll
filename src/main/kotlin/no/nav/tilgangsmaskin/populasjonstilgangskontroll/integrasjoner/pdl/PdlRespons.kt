@@ -2,13 +2,14 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.NPID
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.*
 import java.time.LocalDate
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PdlRespons(val person: PdlPerson, val identer: PdlIdenter = PdlIdenter(), val geografiskTilknytning: PdlGeografiskTilknytning? = null)  {
 
+    val aktørId = identer.identer.firstOrNull { it.gruppe == AKTORID }?.ident
+        ?: throw IllegalStateException("Ingen gyldig aktørid funnet")
     val brukerId = identer.identer.firstOrNull { it.gruppe in listOf(FOLKEREGISTERIDENT, NPID) }?.ident
         ?: throw IllegalStateException("Ingen gyldig identer funnet")
 

@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.AktørId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie.FamilieMedlem
@@ -22,7 +23,7 @@ object PdlPersonMapper {
 
     fun tilPerson(data: PdlRespons) =
         with(data) {
-            Person(BrukerId(data.brukerId), tilGeoTilknytning(geografiskTilknytning), tilGraderinger(person.adressebeskyttelse), tilFamilie(person.familierelasjoner), tilDødsdato(person.doedsfall),tilHistoriskeBrukerIds(identer))
+            Person(BrukerId(brukerId), AktørId(aktørId), tilGeoTilknytning(geografiskTilknytning), tilGraderinger(person.adressebeskyttelse), tilFamilie(person.familierelasjoner), tilDødsdato(person.doedsfall),tilHistoriskeBrukerIds(identer))
         }
 
     private fun tilGraderinger(beskyttelse: List<PdlAdressebeskyttelse>) =

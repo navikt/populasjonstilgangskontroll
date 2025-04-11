@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.AktørId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie.Companion.INGEN
@@ -9,6 +10,7 @@ import java.time.LocalDate
 
 data class Person(
     val brukerId: BrukerId,
+    val aktørId: AktørId,
     val geoTilknytning: GeografiskTilknytning,
     val graderinger: List<Gradering> = emptyList(),
     val familie: Familie = INGEN,

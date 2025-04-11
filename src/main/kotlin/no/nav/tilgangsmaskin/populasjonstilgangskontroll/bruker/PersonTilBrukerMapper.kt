@@ -5,13 +5,13 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.Companion.UdefinertGeoTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.Gradering
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.Gradering.*
-
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker.BrukerIdentifikatorer
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.Person
 
 object PersonTilBrukerMapper {
     fun tilBruker(person: Person, erSkjermet: Boolean) =
         with(person) {
-            Bruker(brukerId, geoTilknytning, tilGruppeKrav(geoTilknytning,graderinger,erSkjermet), familie, dødsdato,historiskeIdentifikatorer)
+            Bruker(BrukerIdentifikatorer(brukerId, aktørId,historiskeIdentifikatorer), geoTilknytning, tilGruppeKrav(geoTilknytning,graderinger,erSkjermet), familie, dødsdato)
         }
 
     private fun tilGruppeKrav(geoTilknytning: GeografiskTilknytning, graderinger: List<Gradering>, erSkjermet: Boolean) =

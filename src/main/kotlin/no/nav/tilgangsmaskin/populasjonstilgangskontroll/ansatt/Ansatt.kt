@@ -35,7 +35,7 @@ data class Ansatt(val identifikatorer: AnsattIdentifikatorer, val grupper: List<
 
     infix fun erSøskenTil(bruker: Bruker) = bruker.brukerId in søsken.map { it.brukerId }
 
-    data class AnsattIdentifikatorer(val ansattId: AnsattId, val oid: UUID, val ansattFnr: AnsattFnr? = null)
+    data class AnsattIdentifikatorer(val ansattId: AnsattId, val oid: UUID)
 
 }
 

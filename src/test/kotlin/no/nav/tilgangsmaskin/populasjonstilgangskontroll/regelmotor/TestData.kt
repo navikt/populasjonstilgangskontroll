@@ -62,17 +62,17 @@ object TestData {
     internal val nasjonalGruppe = EntraGruppe(UUID.fromString("c7107487-310d-4c06-83e0-cf5395dc3be3"), "Nsjonal gruppe")
     internal val enhetGruppe = EntraGruppe(UUID.randomUUID(), "XXX_GEO_${enhet.verdi}")
 
-    internal val egenAnsattFortroligAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid, ansattBruker.brukerId), listOf(fortroligEntraGruppe, egenAnsattEntraGruppe), ansattBruker)
-    internal val egenAnsattStrengtFortroligAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid, ansattBruker.brukerId), listOf(strengtFortroligEntraGruppe, egenAnsattEntraGruppe), ansattBruker)
-    internal val strengtFortroligAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid, ansattBruker.brukerId), listOf(strengtFortroligEntraGruppe), ansattBruker)
-    internal val fortroligAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid, ansattBruker.brukerId), listOf(fortroligEntraGruppe), ansattBruker)
-    internal val egenAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid, ansattBruker.brukerId), listOf(egenAnsattEntraGruppe), ansattBruker)
-    internal val egenAnsattMedFamilie = Ansatt(AnsattIdentifikatorer(ansattId, oid, annenAnsattBruker.brukerId), listOf(annenEntraGruppe), annenAnsattBruker)
+    internal val egenAnsattFortroligAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(fortroligEntraGruppe, egenAnsattEntraGruppe), ansattBruker)
+    internal val egenAnsattStrengtFortroligAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(strengtFortroligEntraGruppe, egenAnsattEntraGruppe), ansattBruker)
+    internal val strengtFortroligAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(strengtFortroligEntraGruppe), ansattBruker)
+    internal val fortroligAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(fortroligEntraGruppe), ansattBruker)
+    internal val egenAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(egenAnsattEntraGruppe), ansattBruker)
+    internal val egenAnsattMedFamilie = Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(annenEntraGruppe), annenAnsattBruker)
 
-    internal val vanligAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid, ansattBruker.brukerId), listOf(annenEntraGruppe), ansattBruker)
-    internal val geoUtlandAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid, ansattBruker.brukerId), listOf(geoUtlandEntraGruppe), ansattBruker)
-    internal val udefinertGeoAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid, ansattBruker.brukerId), listOf(udefinertGruppe), ansattBruker)
-    internal val nasjonalAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid, ansattBruker.brukerId), listOf(nasjonalGruppe), ansattBruker)
-    internal val enhetAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid, ansattBruker.brukerId), listOf(enhetGruppe), ansattBruker)
+    internal val vanligAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(annenEntraGruppe), ansattBruker)
+    internal val geoUtlandAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(geoUtlandEntraGruppe), ansattBruker)
+    internal val udefinertGeoAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(udefinertGruppe), ansattBruker)
+    internal val nasjonalAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(nasjonalGruppe), ansattBruker)
+    internal val enhetAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(enhetGruppe), ansattBruker)
 
 }

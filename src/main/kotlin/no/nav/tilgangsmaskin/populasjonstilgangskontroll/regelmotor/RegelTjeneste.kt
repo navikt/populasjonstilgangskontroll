@@ -4,7 +4,6 @@ import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.IdOgType
@@ -40,18 +39,17 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukere: BrukerTj
 
     fun bulkRegler(ansattId: AnsattId, idOgType: List<IdOgType>) =
         runCatching {
-            motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerOgType())
+            motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerIdOgType())
         }.getOrElse {
             overstyring.sjekk(ansattId, it)
         }
 
-    private fun List<IdOgType>.brukerOgType(): List<Pair<Bruker, RegelSett.RegelType>> {
-        val brukere = brukere.brukere(this.map { it.brukerId }).associateBy { it.brukerId.verdi }
-        return mapNotNull { it ->
-            brukere[it.brukerId]?.let { bruker ->
+    private fun List<IdOgType>.brukerIdOgType(): List<Pair<Bruker, RegelSett.RegelType>> =
+         mapNotNull {
+            brukere.brukere(map { it.brukerId })
+                .associateBy { it.brukerId.verdi }[it.brukerId]?.let { bruker ->
                 bruker to it.type
             }
-        }
     }
 }
 

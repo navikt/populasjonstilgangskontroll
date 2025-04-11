@@ -18,7 +18,7 @@ class PdlRestClientAdapter(@Qualifier(PDL) restClient: RestClient, private val c
 
     fun personer(brukerIds: List<String>) = post<String>(cf.personerURI(), brukerIds).let { res ->
         mapper.readValue<Map<String, PdlRespons?>>(res)
-            .mapNotNull {  it.value?.let {res -> BrukerId(it.key) to res } }
+            .mapNotNull {  it.value?.let {res -> it.key to res } }
             .toMap()
     }
 }

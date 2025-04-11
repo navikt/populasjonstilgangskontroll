@@ -29,10 +29,10 @@ import org.springframework.web.bind.annotation.*
 class DevTilgangController(private val skjerming: SkjermingTjeneste,private val brukere : BrukerTjeneste, private val ansatte: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyring: OverstyringTjeneste, private val nom: NomTjeneste, private val pdl: PDLTjeneste) {
 
     @GetMapping("bruker/{brukerId}")
-    fun bruker(@PathVariable brukerId: String) = brukere.bruker(brukerId)
+    fun bruker(@PathVariable @Valid @ValidId brukerId: String) = brukere.bruker(brukerId)
 
     @GetMapping("person/{id}")
-    fun person(@PathVariable id: String) = pdl.person(id)
+    fun person(@PathVariable @Valid @ValidId id: String) = pdl.person(id)
 
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)

@@ -1,12 +1,16 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.Tilgang
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.ConstraintValidator
+import jakarta.validation.Valid
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.ValidId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.ValidIdLength
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomAnsattData
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLTjeneste
@@ -41,11 +45,11 @@ class DevTilgangController(private val skjerming: SkjermingTjeneste,private val 
 
     @GetMapping("komplett/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)
-    fun kompletteRegler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: String) = regler.kompletteRegler(ansattId, brukerId)
+    fun kompletteRegler(@PathVariable ansattId: AnsattId, @PathVariable @Valid @ValidId brukerId: String) = regler.kompletteRegler(ansattId, brukerId)
 
     @GetMapping("kjerne/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)
-    fun kjerneregler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: String)  = regler.kjerneregler(ansattId, brukerId)
+    fun kjerneregler(@PathVariable ansattId: AnsattId, @PathVariable @Valid @ValidId brukerId: String)  = regler.kjerneregler(ansattId, brukerId)
 
     @PostMapping("overstyr/{ansattId}")
     @ResponseStatus(ACCEPTED)
@@ -53,7 +57,7 @@ class DevTilgangController(private val skjerming: SkjermingTjeneste,private val 
 
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(NO_CONTENT)
-    fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody  specs: List<IdOgType>) = regler.bulkRegler(ansattId, specs)
+    fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody   @Valid @ValidId  specs:List<IdOgType> ) = regler.bulkRegler(ansattId, specs)
 
     @PostMapping("skjerming")
     fun skjerming(@RequestBody brukerId: BrukerId) = skjerming.skjerming(brukerId)
@@ -62,5 +66,5 @@ class DevTilgangController(private val skjerming: SkjermingTjeneste,private val 
     fun skjerminger(@RequestBody brukerIds: List<BrukerId>) = skjerming.skjerminger(brukerIds)
 
     @PostMapping("brukere")
-    fun brukere(@RequestBody brukerIds: List<String>) = brukere.brukere(brukerIds)
+    fun brukere(@RequestBody  @Valid @ValidId brukerIds: List<String>) = brukere.brukere(brukerIds)
 }

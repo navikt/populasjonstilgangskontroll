@@ -4,8 +4,9 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeType.HTTP
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import no.nav.security.token.support.spring.ProtectedRestController
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.ValidId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.RegelTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringTjeneste
@@ -26,11 +27,11 @@ class TilgangController(private val regler : RegelTjeneste, private val overstyr
 
     @PostMapping("komplett")
     @ResponseStatus(NO_CONTENT)
-    fun kompletteRegler(@RequestBody brukerId: String)  = regler.kompletteRegler(token.ansattId!!, brukerId)
+    fun kompletteRegler(@RequestBody  @Valid @ValidId brukerId: String)  = regler.kompletteRegler(token.ansattId!!, brukerId)
 
     @PostMapping("kjerne")
     @ResponseStatus(NO_CONTENT)
-    fun kjerneregler(@RequestBody brukerId: String) = regler.kjerneregler(token.ansattId!!, brukerId)
+    fun kjerneregler(@RequestBody  @Valid @ValidId brukerId: String) = regler.kjerneregler(token.ansattId!!, brukerId)
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)
@@ -38,7 +39,7 @@ class TilgangController(private val regler : RegelTjeneste, private val overstyr
 
     @PostMapping("bulk")
     @ResponseStatus(NO_CONTENT)
-    fun bulk(@RequestBody  specs: List<IdOgType>) = regler.bulkRegler(token.ansattId!!, specs)
+    fun bulk(@RequestBody   @Valid @ValidId  specs: List<IdOgType>) = regler.bulkRegler(token.ansattId!!, specs)
 
 }
 

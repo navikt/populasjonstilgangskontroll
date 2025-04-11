@@ -18,12 +18,10 @@ annotation class ValidId(
 )
 
 class IdValidator : ConstraintValidator<ValidId, Any> {
-    override fun isValid(value: Any, context: ConstraintValidatorContext): Boolean {
-
-        return when (value) {
+    override fun isValid(value: Any, context: ConstraintValidatorContext) =
+        when (value) {
             is String -> value.length == 11 || value.length == 13
             is List<*> -> value.all { it is IdOgType && (it.brukerId.length == 11 || it.brukerId.length == 13) }
             else -> false
         }
-    }
 }

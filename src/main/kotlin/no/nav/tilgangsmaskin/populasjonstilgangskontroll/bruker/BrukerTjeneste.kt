@@ -10,21 +10,15 @@ import org.springframework.stereotype.Service
 @Timed
 class BrukerTjeneste(private val personer: PDLTjeneste, val skjerminger: SkjermingTjeneste) {
 
-    fun brukere(brukerIds: List<BrukerId>) =
-        run {
-            val skjerminger = skjerminger.skjerminger(brukerIds)
-            personer.personer(brukerIds).map {
-                tilBruker(it, skjerminger[it.brukerId] ?: false)
-            }
+    fun brukere(brukerIds: List<String>) = personer.personer(brukerIds).let { personer ->
+        val skjerminger = skjerminger.skjerminger(personer.map { it.brukerId })
+        personer.map { person ->
+            tilBruker(person, skjerminger[person.brukerId] ?: false)
         }
+    }
 
-    @Deprecated("Bruk streng for å støøte alternative IDer")
-    fun bruker(brukerId: BrukerId) =bruker(brukerId.verdi)
-
-    fun bruker(brukerId: String)  =
-        run {
-            val person = personer.person(brukerId)
-            val skjermet = skjerminger.skjerming(person.brukerId)
-            tilBruker(person, skjermet)
+    fun bruker(brukerId: String) =
+        personer.person(brukerId).let {
+            tilBruker(it, skjerminger.skjerming(it.brukerId))
         }
 }

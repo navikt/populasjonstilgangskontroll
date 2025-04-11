@@ -62,5 +62,5 @@ class DevTilgangController(private val skjerming: SkjermingTjeneste,private val 
     fun skjerminger(@RequestBody brukerIds: List<BrukerId>) = skjerming.skjerminger(brukerIds)
 
     @PostMapping("brukere")
-    fun brukere(@RequestBody brukerIds: List<BrukerId>) = brukere.brukere(brukerIds)
+    fun brukere(@RequestBody brukerIds: List<String>) = brukere.brukere(brukerIds)
 }

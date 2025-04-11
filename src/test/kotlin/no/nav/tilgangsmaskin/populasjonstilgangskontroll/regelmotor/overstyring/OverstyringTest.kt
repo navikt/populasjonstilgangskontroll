@@ -62,8 +62,8 @@ internal class OverstyringTest {
     @Test
     @DisplayName("Test gyldig overstyring via historisk ident")
     fun testOverstyringGyldigHistorisk() {
-        every { brukerTjeneste.bruker(vanligBrukerMedHistoriskIdent.brukerId) } returns vanligBrukerMedHistoriskIdent
-        every { brukerTjeneste.bruker(vanligHistoriskBruker.brukerId) } returns vanligHistoriskBruker
+        every { brukerTjeneste.bruker(vanligBrukerMedHistoriskIdent.brukerId.verdi) } returns vanligBrukerMedHistoriskIdent
+        every { brukerTjeneste.bruker(vanligHistoriskBruker.brukerId.verdi) } returns vanligHistoriskBruker
         overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData(
             vanligBrukerMedHistoriskIdent.historiskeIdentifikatorer.first(),
             "test",
@@ -75,7 +75,7 @@ internal class OverstyringTest {
     @Test
     @DisplayName("Test gyldig overstyring")
     fun testOverstyringGyldig() {
-        every { brukerTjeneste.bruker(vanligBruker.brukerId) } returns vanligBruker
+        every { brukerTjeneste.bruker(vanligBruker.brukerId.verdi) } returns vanligBruker
         overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData(
             vanligBruker.brukerId,
             "gammel",
@@ -90,7 +90,7 @@ internal class OverstyringTest {
     @Test
     @DisplayName("Test utgått overstyring")
     fun testOverstyringUtgått() {
-        every { brukerTjeneste.bruker(vanligBruker.brukerId) } returns vanligBruker
+        every { brukerTjeneste.bruker(vanligBruker.brukerId.verdi) } returns vanligBruker
         overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData(
             vanligBruker.brukerId,
             "ny",
@@ -102,7 +102,7 @@ internal class OverstyringTest {
     @Test
     @DisplayName("Test overstyring, intet db innslag")
     fun testOverstyringUtenDBInnslag() {
-        every { brukerTjeneste.bruker(ukjentBostedBruker.brukerId) } returns ukjentBostedBruker
+        every { brukerTjeneste.bruker(ukjentBostedBruker.brukerId.verdi) } returns ukjentBostedBruker
         assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, ukjentBostedBruker.brukerId)).isFalse
     }
 }

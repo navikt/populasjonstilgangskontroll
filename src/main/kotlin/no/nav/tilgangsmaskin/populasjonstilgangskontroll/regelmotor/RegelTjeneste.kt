@@ -3,11 +3,13 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor
 import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.IdOgType
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelMotor
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -17,8 +19,6 @@ import kotlin.time.measureTime
 @Timed
 class RegelTjeneste(private val motor: RegelMotor, private val brukere: BrukerTjeneste, private val ansatte: AnsattTjeneste, private val overstyring: OverstyringTjeneste)  {
     private val log = LoggerFactory.getLogger(javaClass)
-
-    fun kompletteRegler(ansattId: AnsattId, brukerId: BrukerId) = kompletteRegler(ansattId, brukerId.verdi)
 
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) =
         measureTime {
@@ -44,16 +44,14 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukere: BrukerTj
             overstyring.sjekk(ansattId, it)
         }
 
-    private fun List<IdOgType>.brukerOgType() =
-         mapNotNull { spec ->
-            brukere.brukere(map {
-                it.brukerId
-            }).associateBy {
-                it.brukerId
-            }[spec.brukerId]?.let {
-                it to spec.type
+    private fun List<IdOgType>.brukerOgType(): List<Pair<Bruker, RegelSett.RegelType>> {
+        val brukere = brukere.brukere(this.map { it.brukerId }).associateBy { it.brukerId.verdi }
+        return mapNotNull { it ->
+            brukere[it.brukerId]?.let { bruker ->
+                bruker to it.type
             }
         }
+    }
 }
 
 

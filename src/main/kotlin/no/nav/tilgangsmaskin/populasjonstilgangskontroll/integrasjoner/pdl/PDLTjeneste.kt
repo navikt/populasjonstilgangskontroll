@@ -18,8 +18,8 @@ class PDLTjeneste(private val adapter: PdlRestClientAdapter) {
         it.copy(familie = Familie(it.foreldre, it.barn, søsken(it)))
     }
 
-    fun personer(brukerIds: List<BrukerId>) =
-        adapter.personer(brukerIds.map(BrukerId::verdi))
+    fun personer(brukerIds: List<String>) =
+        adapter.personer(brukerIds)
             .map { respons ->
                 tilPerson(respons.value).let {
                     it.copy(familie = Familie(it.foreldre, it.barn, søsken(it)))

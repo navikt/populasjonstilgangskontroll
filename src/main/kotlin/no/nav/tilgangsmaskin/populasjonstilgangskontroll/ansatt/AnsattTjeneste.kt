@@ -19,7 +19,7 @@ class AnsattTjeneste(private val entra: EntraTjeneste, private val ansatte: NomO
             val entra =  entra.ansatt(ansattId)
             val ansattFnr =  ansatte.fnrForAnsatt(ansattId)
             val ansattBruker = ansattFnr?.let {
-                brukere.bruker(it)
+                brukere.bruker(it.verdi)
             }
             Ansatt(AnsattIdentifikatorer(ansattId, entra.oid, ansattFnr), entra.grupper, ansattBruker).also {
                 log.trace(CONFIDENTIAL,"Ansatt er {}", it)

@@ -74,45 +74,45 @@ class RegelTjenesteTest {
     @Test
     @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang gis om overstyring er gjort")
     fun overstyringOK() {
-        every { bruker.bruker(geoUtlandBruker.brukerId) } returns geoUtlandBruker
+        every { bruker.bruker(geoUtlandBruker.brukerId.verdi) } returns geoUtlandBruker
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
         overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData(
             geoUtlandBruker.brukerId,
             "test",
             LocalDate.now().plusDays(1)
         ))
-        assertThatCode { regel.kompletteRegler(vanligAnsatt.ansattId, geoUtlandBruker.brukerId) }.doesNotThrowAnyException()
+        assertThatCode { regel.kompletteRegler(vanligAnsatt.ansattId, geoUtlandBruker.brukerId.verdi) }.doesNotThrowAnyException()
     }
     @Test
     @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang,og at tilgang ikke gis om overstyring ikke er gjort")
     fun ikkeOverstyrt() {
-        every { bruker.bruker(geoUtlandBruker.brukerId) } returns geoUtlandBruker
-        assertThrows<RegelException> { regel.kompletteRegler(vanligAnsatt.ansattId, geoUtlandBruker.brukerId) }
+        every { bruker.bruker(geoUtlandBruker.brukerId.verdi) } returns geoUtlandBruker
+        assertThrows<RegelException> { regel.kompletteRegler(vanligAnsatt.ansattId, geoUtlandBruker.brukerId.verdi) }
     }
 
     @Test
     fun bulkAvvisninger() {
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
-        every { bruker.bruker(strengtFortroligBruker.brukerId) } returns strengtFortroligBruker
-        every { bruker.bruker(fortroligBruker.brukerId) } returns fortroligBruker
-        every { bruker.bruker(vanligBruker.brukerId) } returns vanligBruker
-        every { bruker.brukere(listOf(strengtFortroligBruker.brukerId,fortroligBruker.brukerId)) } returns listOf(strengtFortroligBruker,fortroligBruker)
+        every { bruker.bruker(strengtFortroligBruker.brukerId.verdi) } returns strengtFortroligBruker
+        every { bruker.bruker(fortroligBruker.brukerId.verdi) } returns fortroligBruker
+        every { bruker.bruker(vanligBruker.brukerId.verdi) } returns vanligBruker
+        every { bruker.brukere(listOf(strengtFortroligBruker.brukerId.verdi,fortroligBruker.brukerId.verdi)) } returns listOf(strengtFortroligBruker,fortroligBruker)
         assertEquals(assertThrows<BulkRegelException> {
-            regel.bulkRegler(vanligAnsatt.ansattId, listOf(IdOgType(strengtFortroligBruker.brukerId, KJERNE_REGELTYPE), IdOgType(fortroligBruker.brukerId, KJERNE_REGELTYPE)))
+            regel.bulkRegler(vanligAnsatt.ansattId, listOf(IdOgType(strengtFortroligBruker.brukerId.verdi, KJERNE_REGELTYPE), IdOgType(fortroligBruker.brukerId.verdi, KJERNE_REGELTYPE)))
         }.exceptions.size, 2)
     }
     @Test
     fun bulkAvvisningerOverstyrt() {
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
-        every { bruker.bruker(geoUtlandBruker.brukerId) } returns geoUtlandBruker
-        every { bruker.brukere(listOf(geoUtlandBruker.brukerId)) } returns listOf(geoUtlandBruker)
+        every { bruker.bruker(geoUtlandBruker.brukerId.verdi) } returns geoUtlandBruker
+        every { bruker.brukere(listOf(geoUtlandBruker.brukerId.verdi)) } returns listOf(geoUtlandBruker)
         overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData(
             geoUtlandBruker.brukerId,
             "test",
             LocalDate.now().plusDays(1)
         ))
         assertThatCode {
-            regel.bulkRegler(vanligAnsatt.ansattId, listOf(IdOgType(geoUtlandBruker.brukerId,KOMPLETT_REGELTYPE)))
+            regel.bulkRegler(vanligAnsatt.ansattId, listOf(IdOgType(geoUtlandBruker.brukerId.verdi,KOMPLETT_REGELTYPE)))
         }.doesNotThrowAnyException()
     }
 }

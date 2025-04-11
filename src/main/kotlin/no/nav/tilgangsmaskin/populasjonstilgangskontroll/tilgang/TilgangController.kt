@@ -26,11 +26,11 @@ class TilgangController(private val regler : RegelTjeneste, private val overstyr
 
     @PostMapping("komplett")
     @ResponseStatus(NO_CONTENT)
-    fun kompletteRegler(@RequestBody brukerId: BrukerId)  = regler.kompletteRegler(token.ansattId!!, brukerId)
+    fun kompletteRegler(@RequestBody brukerId: String)  = regler.kompletteRegler(token.ansattId!!, brukerId)
 
     @PostMapping("kjerne")
     @ResponseStatus(NO_CONTENT)
-    fun kjerneregler(@RequestBody brukerId: BrukerId) = regler.kjerneregler(token.ansattId!!, brukerId)
+    fun kjerneregler(@RequestBody brukerId: String) = regler.kjerneregler(token.ansattId!!, brukerId)
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)

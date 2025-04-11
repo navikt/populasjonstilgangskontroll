@@ -25,13 +25,13 @@ import org.springframework.web.bind.annotation.*
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
 @Tag(name = "DevTilgangController", description = "Denne kontrolleren skal kun brukes til testing")
-class DevTilgangController(private val skjerming: SkjermingTjeneste,private val brukere : BrukerTjeneste, private val ansatte: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyring: OverstyringTjeneste, private val nom: NomTjeneste, private val a: PDLTjeneste) {
+class DevTilgangController(private val skjerming: SkjermingTjeneste,private val brukere : BrukerTjeneste, private val ansatte: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyring: OverstyringTjeneste, private val nom: NomTjeneste, private val pdl: PDLTjeneste) {
 
     @GetMapping("bruker/{brukerId}")
-    fun bruker(@PathVariable brukerId: BrukerId) = brukere.bruker(brukerId)
+    fun bruker(@PathVariable brukerId: String) = brukere.bruker(brukerId)
 
     @GetMapping("person/{id}")
-    fun person(@PathVariable id: String) = a.person(id)
+    fun person(@PathVariable id: String) = pdl.person(id)
 
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)
@@ -41,11 +41,11 @@ class DevTilgangController(private val skjerming: SkjermingTjeneste,private val 
 
     @GetMapping("komplett/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)
-    fun kompletteRegler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) = regler.kompletteRegler(ansattId, brukerId)
+    fun kompletteRegler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: String) = regler.kompletteRegler(ansattId, brukerId)
 
     @GetMapping("kjerne/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)
-    fun kjerneregler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId)  = regler.kjerneregler(ansattId, brukerId)
+    fun kjerneregler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: String)  = regler.kjerneregler(ansattId, brukerId)
 
     @PostMapping("overstyr/{ansattId}")
     @ResponseStatus(ACCEPTED)

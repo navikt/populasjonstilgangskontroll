@@ -18,10 +18,13 @@ class BrukerTjeneste(private val personer: PDLTjeneste, val skjerminger: Skjermi
             }
         }
 
-    fun bruker(brukerId: BrukerId)  =
+    @Deprecated("Bruk streng for å støøte alternative IDer")
+    fun bruker(brukerId: BrukerId) =bruker(brukerId.verdi)
+
+    fun bruker(brukerId: String)  =
         run {
-            val skjermet = skjerminger.skjerming(brukerId)
-            val person = personer.person(brukerId.verdi)
+            val person = personer.person(brukerId)
+            val skjermet = skjerminger.skjerming(person.brukerId)
             tilBruker(person, skjermet)
         }
 }

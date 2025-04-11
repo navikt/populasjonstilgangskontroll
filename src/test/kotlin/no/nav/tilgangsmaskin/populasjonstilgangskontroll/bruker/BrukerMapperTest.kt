@@ -24,6 +24,9 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.PersonTilBrukerMapper.tilBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGeografiskTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlIdenter
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlIdenter.PdlIdent
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
 
 
 @ActiveProfiles(TEST)
@@ -31,12 +34,12 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRe
 
 class BrukerMapperTest {
 
-    private val brukerId = TestData.vanligBruker.brukerId
+    private val brukerId = TestData.vanligBruker.brukerId.verdi
 
     @Test
     @DisplayName("Test at behandling av brukere med STRENGT_FORTROLIG_UTLAND  krever medlemsskap i STRENGT_FORTROLIG_GRUPPE fra ansatt og at geotilknytning er UtenlandskTilknytning")
     fun strengtFortroligUtland()   {
-        with(tilBruker(person(brukerId, pipRespons(STRENGT_FORTROLIG_UTLAND)), false)) {
+        with(tilBruker(person(pipRespons(STRENGT_FORTROLIG_UTLAND)), false)) {
             assertThat(gruppeKrav).containsExactly(STRENGT_FORTROLIG_GRUPPE)
             assertThat(geografiskTilknytning).isInstanceOf(UtenlandskTilknytning::class.java)
         }
@@ -44,7 +47,7 @@ class BrukerMapperTest {
     @Test
     @DisplayName("Test at behandling av brukere med STRENGT_FORTROLIG vil kreve medlemsskap i STRENGT_FORTROLIG_GRUPPE for ansatt og at geotilknytning er KommuneTilknytning")
     fun strengtFortroligKommune()   {
-        with(tilBruker(person(brukerId, pipRespons(STRENGT_FORTROLIG, geoKommune())), false)) {
+        with(tilBruker(person(pipRespons(STRENGT_FORTROLIG, geoKommune())), false)) {
             assertThat(gruppeKrav).containsExactly(STRENGT_FORTROLIG_GRUPPE)
             assertThat(geografiskTilknytning).isInstanceOf(KommuneTilknytning::class.java)
         }
@@ -52,21 +55,21 @@ class BrukerMapperTest {
     @Test
     @DisplayName("Test at behandling av brukere med EGEN_ANSATT vil kreve medlemsskap i EGEN_ANSATT_GRUPPE for ansatt")
     fun egenAnsatt()   {
-        with(tilBruker(person(brukerId, pipRespons()), true)) {
+        with(tilBruker(person(pipRespons()), true)) {
             assertThat(gruppeKrav).containsExactly(EGEN_ANSATT_GRUPPE)
         }
     }
     @Test
     @DisplayName("Test at behandling av brukere med EGEN_ANSATT og STRENGT_FORTROLIG vil kreve medlemsskap i EGEN_ANSATT_GRUPPE og STRENGT_FORTROLIG_GRUPPE for ansatt")
     fun egenAnsattKode6()   {
-        with(tilBruker(person(brukerId, pipRespons(STRENGT_FORTROLIG)), true)) {
+        with(tilBruker(person(pipRespons(STRENGT_FORTROLIG)), true)) {
             assertThat(gruppeKrav).containsExactlyInAnyOrder(EGEN_ANSATT_GRUPPE,STRENGT_FORTROLIG_GRUPPE)
         }
     }
     @Test
     @DisplayName("Test at behandling av brukere med EGEN_ANSATT og FORTROLIG vil kreve medlemsskap i EGEN_ANSATT_GRUPPE og FORTROLIG_GRUPPE for ansatt")
     fun egenAnsattKode7()   {
-        with(tilBruker(person(brukerId, pipRespons(FORTROLIG)), true)) {
+        with(tilBruker(person(pipRespons(FORTROLIG)), true)) {
             assertThat(gruppeKrav).containsExactlyInAnyOrder(EGEN_ANSATT_GRUPPE,FORTROLIG_GRUPPE)
         }
     }
@@ -79,8 +82,8 @@ class BrukerMapperTest {
         val adressebeskyttelse = gradering?.let {
              listOf(PdlAdressebeskyttelse(it))
          }?: emptyList()
-        return PdlRespons(PdlPerson(adressebeskyttelse), geografiskTilknytning = geo)
+        return PdlRespons(PdlPerson(adressebeskyttelse), PdlIdenter(listOf(PdlIdent(brukerId,false, FOLKEREGISTERIDENT))), geo)
     }
 
-    fun person(brukerId: BrukerId,respons: PdlRespons) = tilPerson(brukerId,respons)
+    fun person(respons: PdlRespons) = tilPerson(respons)
 }

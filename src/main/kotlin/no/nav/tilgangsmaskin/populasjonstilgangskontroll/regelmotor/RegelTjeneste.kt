@@ -18,7 +18,9 @@ import kotlin.time.measureTime
 class RegelTjeneste(private val motor: RegelMotor, private val brukere: BrukerTjeneste, private val ansatte: AnsattTjeneste, private val overstyring: OverstyringTjeneste)  {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    fun kompletteRegler(ansattId: AnsattId, brukerId: BrukerId) =
+    fun kompletteRegler(ansattId: AnsattId, brukerId: BrukerId) = kompletteRegler(ansattId, brukerId.verdi)
+
+    fun kompletteRegler(ansattId: AnsattId, brukerId: String) =
         measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og $brukerId")
             with(brukere.bruker(brukerId)) {
@@ -32,7 +34,7 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukere: BrukerTj
             log.info("Tid brukt på komplett regelsett for ansatt $ansattId og $brukerId: ${it.inWholeMilliseconds}ms")
         }
 
-    fun kjerneregler(ansattId: AnsattId, brukerId: BrukerId) =
+    fun kjerneregler(ansattId: AnsattId, brukerId: String) =
         motor.kjerneregler(ansatte.ansatt(ansattId), brukere.bruker(brukerId))
 
     fun bulkRegler(ansattId: AnsattId, idOgType: List<IdOgType>) =

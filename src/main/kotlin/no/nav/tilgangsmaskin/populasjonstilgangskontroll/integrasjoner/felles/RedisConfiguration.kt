@@ -22,9 +22,9 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext
 import org.springframework.data.redis.serializer.StringRedisSerializer
 
-//@Configuration
-//@EnableCaching
-//@ConditionalOnDev
+@Configuration
+@EnableCaching
+@ConditionalOnDev
 class RedisConfiguration(private val cf: RedisConnectionFactory, private val mapper: ObjectMapper) : CachingConfigurer {
 
     @Bean
@@ -43,34 +43,6 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
                 )
             }
     }
-
-    override fun cacheManager(): CacheManager {
-        mapper.copy().apply {
-            val typeValidator = BasicPolymorphicTypeValidator.builder()
-                .allowIfSubType(Any::class.java)
-                .build()
-            activateDefaultTyping(
-                typeValidator,
-                ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE,
-                JsonTypeInfo.As.PROPERTY
-            )
-        }
-        val config = RedisCacheConfiguration.defaultCacheConfig()
-            .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer()))
-            .serializeValuesWith(
-                RedisSerializationContext.SerializationPair.fromSerializer(
-                    Jackson2JsonRedisSerializer(mapper,Any::class.java)
-                )
-            )
-
-        return RedisCacheManager.builder(cf)
-            .cacheDefaults(config)
-            .enableStatistics()
-            .build().apply {
-                cacheNames.forEach { name ->this.getCache(name)?.clear() }
-            }
-    }
-
 
     override fun keyGenerator() = KeyGenerator { target, method, params ->
         buildString {

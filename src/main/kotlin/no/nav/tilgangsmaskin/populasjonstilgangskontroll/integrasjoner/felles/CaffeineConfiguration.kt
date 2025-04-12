@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @EnableCaching
-@ConditionalOnGCP
+@ConditionalOnProd
 class CaffeineConfiguration : CachingConfigurer {
     private val log = LoggerFactory.getLogger(javaClass)
 

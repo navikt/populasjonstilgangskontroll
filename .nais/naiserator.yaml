@@ -80,6 +80,8 @@ spec:
   env:
     - name: NAIS_CLUSTER_TYPE
       value: {{nais.cluster.type}}
+    - name: PDLGRAPH
+      value: {{pdlgraph}}
     - name: PDL
       value: {{pdl}}
     - name: GRUPPE_STRENGT

@@ -1,6 +1,8 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
 import com.ninjasquad.springmockk.MockkBean
+import io.micrometer.core.instrument.MeterRegistry
+import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.TestApp
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.annenAnsattBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.ansattBruker
@@ -24,6 +26,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.ude
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.ukjentBostedBruker
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligAnsatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.vanligBruker
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.tilgang1.TokenClaimsAccessor
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterConstants.TEST
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.DisplayName
@@ -31,6 +34,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertInstanceOf
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
@@ -42,13 +46,12 @@ import org.springframework.test.context.TestPropertySource
 @ActiveProfiles(TEST)
 @RestClientTest
 @TestPropertySource(locations = ["classpath:test.properties"])
-@ContextConfiguration(classes = [TestApp::class])
+@AutoConfigureObservability
+@ContextConfiguration(classes = [TestApp::class, TokenClaimsAccessor::class])
 class RegelMotorTest {
 
     @MockkBean
-    lateinit var avdød: AvdødOppslagTeller
-    @MockkBean
-    lateinit var søsken : SøskenOppslagTeller
+    lateinit var holder: TokenValidationContextHolder
     @Autowired
     lateinit var regelMotor: RegelMotor
 

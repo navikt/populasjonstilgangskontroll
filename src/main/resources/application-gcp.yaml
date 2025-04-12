@@ -99,6 +99,16 @@ no.nav.security.jwt:
         accepted_audience: ${azure.app.client.id}
   client:
     registration:
+
+      pdl-api:
+        token-endpoint-url: ${azure.openid.config.token.endpoint}
+        grant-type: client_credentials
+        scope: ${pdlgraph.scope}
+        authentication:
+          client-id: ${azure.app.client.id}
+          client-jwk: ${azure.app.jwk}
+          client-auth-method: private_key_jwt
+
       pdl-pip-api:
         token-endpoint-url: ${azure.openid.config.token.endpoint}
         grant-type: client_credentials
@@ -131,6 +141,11 @@ springdoc:
           client-id: ${azure.app.client.id}
       csrf:
         enabled: true
+
+
+pdlgraph:
+  scope: "api://${nais.cluster.type}-fss.pdl.pdl-api/.default"
+  base-uri: "https://${pdlgraph}/graphql"
 
 pdl:
     scope: "api://${nais.cluster.type}-fss.pdl.pdl-pip-api/.default"

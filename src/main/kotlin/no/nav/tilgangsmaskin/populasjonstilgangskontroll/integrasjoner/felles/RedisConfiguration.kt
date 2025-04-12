@@ -25,7 +25,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer
 @Configuration
 @EnableCaching
 @ConditionalOnDev
-class RedisConfiguration(private val cf: RedisConnectionFactory, private val mapper: ObjectMapper) : CachingConfigurer {
+class RedisConfiguration(private val mapper: ObjectMapper) : CachingConfigurer {
 
     @Bean
     fun redisHealthIndicator(cf: RedisConnectionFactory) = object : HealthIndicator {
@@ -45,7 +45,7 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
     }
 
     @Bean
-    fun redisConfiguration(): RedisCacheConfiguration {
+    fun redisConfig(): RedisCacheConfiguration {
         val copy = mapper.copy().apply {
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             val typeValidator = BasicPolymorphicTypeValidator.builder()

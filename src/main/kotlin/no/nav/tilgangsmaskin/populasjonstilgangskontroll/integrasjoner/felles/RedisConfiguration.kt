@@ -44,6 +44,27 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
             }
     }
 
+    @Bean
+    fun redisConfiguration(): RedisCacheConfiguration {
+        val copy = mapper.copy().apply {
+            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            val typeValidator = BasicPolymorphicTypeValidator.builder()
+                .build()
+            activateDefaultTyping(
+                typeValidator,
+                ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE,
+                JsonTypeInfo.As.PROPERTY
+            )
+        }
+        return RedisCacheConfiguration.defaultCacheConfig()
+            .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer()))
+            .serializeValuesWith(
+                RedisSerializationContext.SerializationPair.fromSerializer(
+                    GenericJackson2JsonRedisSerializer(copy)
+                )
+            )
+    }
+
     override fun keyGenerator() = KeyGenerator { target, method, params ->
         buildString {
             append(target::class)

@@ -37,7 +37,7 @@ data class PdlRespons(val person: PdlPerson, val identer: PdlIdenter = PdlIdente
     }
 }
 
-data class Partnere(val partnere: List<Sivilstand> = emptyList())
+data class Partnere(val sivilstand: List<Sivilstand> = emptyList())
 data class Sivilstand( val type: Sivilstandstype, val relatertVedSivilstand: String?, val bekreftelsesdato: String?, val gyldigFraOgMed: String?) {
     enum class Sivilstandstype {
         UOPPGITT,

@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.*
 @Tag(name = "DevTilgangController", description = "Denne kontrolleren skal kun brukes til testing")
 class DevTilgangController(private val graphql: PdlSyncGraphQLClientAdapter,private val skjerming: SkjermingTjeneste,private val brukere : BrukerTjeneste, private val ansatte: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyring: OverstyringTjeneste, private val nom: NomTjeneste, private val pdl: PDLTjeneste) {
 
-    @GetMapping("bruker/{id}")
+    @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)
 
     @GetMapping("bruker/{id}")

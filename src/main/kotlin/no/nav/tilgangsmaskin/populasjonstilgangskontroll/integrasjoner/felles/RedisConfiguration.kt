@@ -52,7 +52,7 @@ class RedisConfiguration(private val mapper: ObjectMapper) : CachingConfigurer {
                 .build()
             activateDefaultTyping(
                 typeValidator,
-                ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE,
+                ObjectMapper.DefaultTyping.EVERYTHING,
                 JsonTypeInfo.As.PROPERTY
             )
         }

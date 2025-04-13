@@ -30,7 +30,7 @@ class PdlSyncGraphQLClientAdapter(
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
     }
 
-    fun sivilstand(ident: String) = query<List<Sivilstand>>(SIVILSTAND_QUERY, ident(ident))
+    fun sivilstand(ident: String) = query<Partnere>(SIVILSTAND_QUERY, ident(ident))
 
     override fun toString() =
         "${javaClass.simpleName} [restClient=$restClient,graphQlClient=$graphQlClient, cfg=$cfg]"

@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Ansatt
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningKode.*
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningKode.AVVIST_EGNE_DATA
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
 import org.springframework.beans.factory.annotation.Value

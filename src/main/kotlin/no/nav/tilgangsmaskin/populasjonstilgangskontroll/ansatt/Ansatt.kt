@@ -39,7 +39,7 @@ data class Ansatt(val identifikatorer: AnsattIdentifikatorer, val grupper: List<
     infix fun erForeldreEllerBarnTil(bruker: Bruker) = foreldreOgBarn.any { it.brukerId == bruker.brukerId }
 
     infix fun erSøskenTil(bruker: Bruker) = søsken.any { it.brukerId == bruker.brukerId }
-    
+
     data class AnsattIdentifikatorer(val ansattId: AnsattId, val oid: UUID)
 
 }

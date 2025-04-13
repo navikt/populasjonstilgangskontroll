@@ -12,7 +12,7 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPe
 @Timed
 class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL : PdlSyncGraphQLClientAdapter) {
 
-    fun personMedSøsken(id: String) = personUtenSøsken(id).let {
+    fun personMedSøsken(id: String) = tilPerson(adapter.person(id)).let {
         it.copy(familie = Familie(it.foreldre, it.barn, søsken(it)))
     }
 

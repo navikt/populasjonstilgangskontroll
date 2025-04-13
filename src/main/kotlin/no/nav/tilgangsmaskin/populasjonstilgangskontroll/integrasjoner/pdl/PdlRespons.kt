@@ -37,4 +37,20 @@ data class PdlRespons(val person: PdlPerson, val identer: PdlIdenter = PdlIdente
     }
 }
 
+data class Sivilstand( val type: Sivilstandstype, val relatertVedSivilstand: String?, val bekreftelsesdato: String?, val gyldigFraOgMed: String?) {
+    enum class Sivilstandstype {
+        UOPPGITT,
+        UGIFT,
+        GIFT,
+        ENKE_ELLER_ENKEMANN,
+        SKILT,
+        SEPARERT,
+        REGISTRERT_PARTNER,
+        SEPARERT_PARTNER,
+        SKILT_PARTNER,
+        GJENLEVENDE_PARTNER
+    }
+
+}
+
 

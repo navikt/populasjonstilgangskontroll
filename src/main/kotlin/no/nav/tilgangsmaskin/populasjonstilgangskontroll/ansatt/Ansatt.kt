@@ -34,12 +34,12 @@ data class Ansatt(val identifikatorer: AnsattIdentifikatorer, val grupper: List<
 
     infix fun kanBehandle(id: UUID) = grupper.any { it.id == id }
 
-    infix fun erPartnerMed(bruker: Bruker) = bruker.brukerId in parnere.map { it.brukerId }
+    infix fun erPartnerMed(bruker: Bruker) = parnere.any { it.brukerId == bruker.brukerId }
 
-    infix fun erForeldreEllerBarnTil(bruker: Bruker) = bruker.brukerId in foreldreOgBarn.map { it.brukerId }
+    infix fun erForeldreEllerBarnTil(bruker: Bruker) = foreldreOgBarn.any { it.brukerId == bruker.brukerId }
 
-    infix fun erSøskenTil(bruker: Bruker) = bruker.brukerId in søsken.map { it.brukerId }
-
+    infix fun erSøskenTil(bruker: Bruker) = søsken.any { it.brukerId == bruker.brukerId }
+    
     data class AnsattIdentifikatorer(val ansattId: AnsattId, val oid: UUID)
 
 }

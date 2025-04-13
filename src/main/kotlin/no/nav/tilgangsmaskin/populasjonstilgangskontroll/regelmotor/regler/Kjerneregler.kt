@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler
 
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.Ansatt
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningKode.AVVIST_HABILITET
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningKode.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.AvvisningKode.AVVIST_EGNE_DATA
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.GlobalGruppe.*
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Bruker
@@ -47,7 +47,7 @@ class EgneDataRegel : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         bruker.brukerId != ansatt.brukerId
 
-    override val metadata = RegelBeskrivelse("Egne data", AVVIST_EGNE_DATA)
+    override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 0", AVVIST_HABILITET0)
 }
 
 @Order(HIGHEST_PRECEDENCE + 4)
@@ -56,7 +56,7 @@ class ForeldreOgBarnRegel : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         !(ansatt erForeldreEllerBarnTil bruker)
 
-    override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 1", AVVIST_HABILITET)
+    override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 1", AVVIST_HABILITET1)
 }
 
 @Order(HIGHEST_PRECEDENCE + 5)
@@ -65,7 +65,7 @@ class PartnerRegel : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         !(ansatt erPartnerMed bruker)
 
-    override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 2", AVVIST_HABILITET)
+    override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 2", AVVIST_HABILITET2)
 }
 
 @Component
@@ -76,5 +76,5 @@ class SøskenRegel(private val teller: SøskenOppslagTeller) : KjerneRegel {
             teller.registrerOppslag(ansatt.ansattId, bruker.brukerId)
         } else true
 
-    override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 3", AVVIST_HABILITET)
+    override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 3", AVVIST_HABILITET3)
 }

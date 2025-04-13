@@ -62,9 +62,9 @@ internal class OverstyringTest {
     @Test
     @DisplayName("Test gyldig overstyring via historisk ident")
     fun testOverstyringGyldigHistorisk() {
-        every { brukerTjeneste.brukerUtenSøsken(vanligBrukerMedHistoriskIdent.brukerId.verdi) } returns vanligBrukerMedHistoriskIdent
-        every { brukerTjeneste.brukerMedSøsken(vanligBrukerMedHistoriskIdent.brukerId.verdi) } returns vanligBrukerMedHistoriskIdent
-        every { brukerTjeneste.brukerMedSøsken(vanligHistoriskBruker.brukerId.verdi) } returns vanligHistoriskBruker
+        every { brukerTjeneste.nærmesteFamilie(vanligBrukerMedHistoriskIdent.brukerId.verdi) } returns vanligBrukerMedHistoriskIdent
+        every { brukerTjeneste.utvidetFamilie(vanligBrukerMedHistoriskIdent.brukerId.verdi) } returns vanligBrukerMedHistoriskIdent
+        every { brukerTjeneste.utvidetFamilie(vanligHistoriskBruker.brukerId.verdi) } returns vanligHistoriskBruker
         overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData(
             vanligBrukerMedHistoriskIdent.historiskeIdentifikatorer.first(),
             "test",
@@ -76,8 +76,8 @@ internal class OverstyringTest {
     @Test
     @DisplayName("Test gyldig overstyring")
     fun testOverstyringGyldig() {
-        every { brukerTjeneste.brukerUtenSøsken(vanligBruker.brukerId.verdi) } returns vanligBruker
-        every { brukerTjeneste.brukerMedSøsken(vanligBruker.brukerId.verdi) } returns vanligBruker
+        every { brukerTjeneste.nærmesteFamilie(vanligBruker.brukerId.verdi) } returns vanligBruker
+        every { brukerTjeneste.utvidetFamilie(vanligBruker.brukerId.verdi) } returns vanligBruker
         overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData(
             vanligBruker.brukerId,
             "gammel",
@@ -92,8 +92,8 @@ internal class OverstyringTest {
     @Test
     @DisplayName("Test utgått overstyring")
     fun testOverstyringUtgått() {
-        every { brukerTjeneste.brukerMedSøsken(vanligBruker.brukerId.verdi) } returns vanligBruker
-        every { brukerTjeneste.brukerUtenSøsken(vanligBruker.brukerId.verdi) } returns vanligBruker
+        every { brukerTjeneste.utvidetFamilie(vanligBruker.brukerId.verdi) } returns vanligBruker
+        every { brukerTjeneste.nærmesteFamilie(vanligBruker.brukerId.verdi) } returns vanligBruker
         overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData(
             vanligBruker.brukerId,
             "ny",
@@ -105,8 +105,8 @@ internal class OverstyringTest {
     @Test
     @DisplayName("Test overstyring, intet db innslag")
     fun testOverstyringUtenDBInnslag() {
-        every { brukerTjeneste.brukerUtenSøsken(ukjentBostedBruker.brukerId.verdi) } returns ukjentBostedBruker
-        every { brukerTjeneste.brukerMedSøsken(ukjentBostedBruker.brukerId.verdi) } returns ukjentBostedBruker
+        every { brukerTjeneste.nærmesteFamilie(ukjentBostedBruker.brukerId.verdi) } returns ukjentBostedBruker
+        every { brukerTjeneste.utvidetFamilie(ukjentBostedBruker.brukerId.verdi) } returns ukjentBostedBruker
         assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, ukjentBostedBruker.brukerId)).isFalse
     }
 }

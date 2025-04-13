@@ -28,6 +28,9 @@ data class Bruker(
     @JsonIgnore
     val søsken = familie.søsken
 
+    @JsonIgnore
+    val partnere = familie.partnere
+
     fun kreverGlobalGruppe(gruppe: GlobalGruppe) = gruppe in gruppeKrav
 
     data class BrukerIdentifikatorer(val brukerId: BrukerId, val aktørId: AktørId,  val historiskeIdentifikatorer: List<BrukerId> = emptyList())

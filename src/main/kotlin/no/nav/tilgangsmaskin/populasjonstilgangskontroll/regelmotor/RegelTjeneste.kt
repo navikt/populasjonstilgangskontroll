@@ -23,7 +23,7 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukere: BrukerTj
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) =
         measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
-            with(brukere.brukerMedSøsken(brukerId)) {
+            with(brukere.utvidetFamilie(brukerId)) {
                 runCatching {
                     motor.kompletteRegler(ansatte.ansatt(ansattId), this)
                 }.getOrElse {
@@ -35,7 +35,7 @@ class RegelTjeneste(private val motor: RegelMotor, private val brukere: BrukerTj
         }
 
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
-        motor.kjerneregler(ansatte.ansatt(ansattId), brukere.brukerMedSøsken(brukerId))
+        motor.kjerneregler(ansatte.ansatt(ansattId), brukere.utvidetFamilie(brukerId))
 
     fun bulkRegler(ansattId: AnsattId, idOgType: List<IdOgType>) =
         runCatching {

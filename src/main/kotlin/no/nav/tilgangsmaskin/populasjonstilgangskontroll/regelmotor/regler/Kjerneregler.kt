@@ -56,16 +56,25 @@ class ForeldreOgBarnRegel : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         !(ansatt erForeldreEllerBarnTil bruker)
 
-    override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet", AVVIST_HABILITET)
+    override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 1", AVVIST_HABILITET)
+}
+
+@Order(HIGHEST_PRECEDENCE + 5)
+@Component
+class PartnerRegel : KjerneRegel {
+    override fun erOK(ansatt: Ansatt, bruker: Bruker) =
+        !(ansatt erPartnerMed bruker)
+
+    override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 2", AVVIST_HABILITET)
 }
 
 @Component
-@Order(HIGHEST_PRECEDENCE + 5)
+@Order(HIGHEST_PRECEDENCE + 6)
 class SøskenRegel(private val teller: SøskenOppslagTeller) : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         if (ansatt erSøskenTil bruker) {
             teller.registrerOppslag(ansatt.ansattId, bruker.brukerId)
         } else true
 
-    override val metadata = RegelBeskrivelse("Oppslag habilitet", AVVIST_HABILITET)
+    override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 3", AVVIST_HABILITET)
 }

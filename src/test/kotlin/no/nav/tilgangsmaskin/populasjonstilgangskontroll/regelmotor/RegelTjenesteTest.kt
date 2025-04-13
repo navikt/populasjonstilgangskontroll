@@ -74,8 +74,8 @@ class RegelTjenesteTest {
     @Test
     @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang gis om overstyring er gjort")
     fun overstyringOK() {
-        every { bruker.brukerMedSøsken(geoUtlandBruker.brukerId.verdi) } returns geoUtlandBruker
-        every { bruker.brukerUtenSøsken(geoUtlandBruker.brukerId.verdi) } returns geoUtlandBruker
+        every { bruker.utvidetFamilie(geoUtlandBruker.brukerId.verdi) } returns geoUtlandBruker
+        every { bruker.nærmesteFamilie(geoUtlandBruker.brukerId.verdi) } returns geoUtlandBruker
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
         overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData(
             geoUtlandBruker.brukerId,
@@ -87,17 +87,17 @@ class RegelTjenesteTest {
     @Test
     @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang,og at tilgang ikke gis om overstyring ikke er gjort")
     fun ikkeOverstyrt() {
-        every { bruker.brukerUtenSøsken(geoUtlandBruker.brukerId.verdi) } returns geoUtlandBruker
-        every { bruker.brukerMedSøsken(geoUtlandBruker.brukerId.verdi) } returns geoUtlandBruker
+        every { bruker.nærmesteFamilie(geoUtlandBruker.brukerId.verdi) } returns geoUtlandBruker
+        every { bruker.utvidetFamilie(geoUtlandBruker.brukerId.verdi) } returns geoUtlandBruker
         assertThrows<RegelException> { regel.kompletteRegler(vanligAnsatt.ansattId, geoUtlandBruker.brukerId.verdi) }
     }
 
     @Test
     fun bulkAvvisninger() {
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
-        every { bruker.brukerMedSøsken(strengtFortroligBruker.brukerId.verdi) } returns strengtFortroligBruker
-        every { bruker.brukerMedSøsken(fortroligBruker.brukerId.verdi) } returns fortroligBruker
-        every { bruker.brukerMedSøsken(vanligBruker.brukerId.verdi) } returns vanligBruker
+        every { bruker.utvidetFamilie(strengtFortroligBruker.brukerId.verdi) } returns strengtFortroligBruker
+        every { bruker.utvidetFamilie(fortroligBruker.brukerId.verdi) } returns fortroligBruker
+        every { bruker.utvidetFamilie(vanligBruker.brukerId.verdi) } returns vanligBruker
         every { bruker.brukere(setOf(strengtFortroligBruker.brukerId.verdi,fortroligBruker.brukerId.verdi)) } returns listOf(strengtFortroligBruker,fortroligBruker)
         assertEquals(assertThrows<BulkRegelException> {
             regel.bulkRegler(vanligAnsatt.ansattId, listOf(IdOgType(strengtFortroligBruker.brukerId.verdi, KJERNE_REGELTYPE), IdOgType(fortroligBruker.brukerId.verdi, KJERNE_REGELTYPE)))
@@ -106,8 +106,8 @@ class RegelTjenesteTest {
     @Test
     fun bulkAvvisningerOverstyrt() {
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
-        every { bruker.brukerUtenSøsken(geoUtlandBruker.brukerId.verdi) } returns geoUtlandBruker
-        every { bruker.brukerMedSøsken(geoUtlandBruker.brukerId.verdi) } returns geoUtlandBruker
+        every { bruker.nærmesteFamilie(geoUtlandBruker.brukerId.verdi) } returns geoUtlandBruker
+        every { bruker.utvidetFamilie(geoUtlandBruker.brukerId.verdi) } returns geoUtlandBruker
         every { bruker.brukere(setOf(geoUtlandBruker.brukerId.verdi)) } returns listOf(geoUtlandBruker)
         overstyring.overstyr(vanligAnsatt.ansattId, OverstyringData(
             geoUtlandBruker.brukerId,

@@ -19,7 +19,6 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.IdOgType
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterConstants.DEV
-import org.springframework.graphql.client.SyncGraphQlClientInterceptor
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.web.bind.annotation.*
@@ -34,10 +33,10 @@ class DevTilgangController(private val graphql: PdlSyncGraphQLClientAdapter,priv
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)
 
     @GetMapping("bruker/{id}")
-    fun bruker(@PathVariable @Valid @ValidId id: String) = brukere.brukerMedSøsken(id)
+    fun bruker(@PathVariable @Valid @ValidId id: String) = brukere.utvidetFamilie(id)
 
     @GetMapping("person/{id}")
-    fun person(@PathVariable @Valid @ValidId id: String) = pdl.personMedSøsken(id)
+    fun person(@PathVariable @Valid @ValidId id: String) = pdl.utvidetFamile(id)
 
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)

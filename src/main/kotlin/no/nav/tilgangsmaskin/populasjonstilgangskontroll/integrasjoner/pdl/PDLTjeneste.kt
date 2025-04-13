@@ -1,8 +1,10 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
 import io.micrometer.core.annotation.Timed
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie.FamilieMedlem
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.CacheableRetryingOnRecoverableService
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlConfig.Companion.PDL
@@ -12,19 +14,26 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPe
 @Timed
 class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL : PdlSyncGraphQLClientAdapter) {
 
-    fun personMedSøsken(id: String) = tilPerson(adapter.person(id)).let {
-        it.copy(familie = Familie(it.foreldre, it.barn, søsken(it)))
+    fun utvidetFamile(id: String) = tilPerson(adapter.person(id)).let {
+        it.copy(familie = Familie(it.foreldre, it.barn, søsken(it), partnere(id)))
     }
 
-    fun personUtenSøsken(id: String) = tilPerson(adapter.person(id))
+    fun nærmesteFamilie(id: String) = tilPerson(adapter.person(id))
 
     fun personer(brukerIds: Set<String>) =
         adapter.personer(brukerIds)
             .map { respons ->
                 tilPerson(respons.value).let {
-                    it.copy(familie = Familie(it.foreldre, it.barn, søsken(it)))
+                    it.copy(familie = Familie(it.foreldre, it.barn))
                 }
             }
+
+    private fun partnere(id: String) =
+        graphQL.sivilstand(id).sivilstand.mapNotNull {
+            it.relatertVedSivilstand?.let {
+                    brukerId -> FamilieMedlem(BrukerId(brukerId), PARTNER)
+            }
+        }.toSet()
 
     private fun søsken(person: Person) =
         adapter.personer(person.foreldre.map { it.brukerId.verdi }.toSet())

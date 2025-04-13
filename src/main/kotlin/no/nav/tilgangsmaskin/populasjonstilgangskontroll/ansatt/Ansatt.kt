@@ -21,6 +21,9 @@ data class Ansatt(val identifikatorer: AnsattIdentifikatorer, val grupper: List<
     @JsonIgnore
     val søsken = bruker?.søsken ?: emptyList()
 
+    @JsonIgnore
+    val parnere = bruker?.partnere ?: emptyList()
+
     infix fun harGTFor(bruker: Bruker) = grupper.any { it.displayName.endsWith("GEO_${
         when (bruker.geografiskTilknytning) {
             is KommuneTilknytning -> bruker.geografiskTilknytning.kommune.verdi
@@ -30,6 +33,8 @@ data class Ansatt(val identifikatorer: AnsattIdentifikatorer, val grupper: List<
     }") }
 
     infix fun kanBehandle(id: UUID) = grupper.any { it.id == id }
+
+    infix fun erPartnerMed(bruker: Bruker) = bruker.brukerId in parnere.map { it.brukerId }
 
     infix fun erForeldreEllerBarnTil(bruker: Bruker) = bruker.brukerId in foreldreOgBarn.map { it.brukerId }
 

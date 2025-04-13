@@ -1,5 +1,10 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.neovisionaries.i18n.CountryCode.SE
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.GeografiskTilknytning.UtenlandskTilknytning
@@ -26,7 +31,9 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlGe
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlIdenter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlIdenter.PdlIdent
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.AKTORID
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.TestData.aktørId
 
 
 @ActiveProfiles(TEST)
@@ -34,7 +41,24 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlRe
 
 class BrukerMapperTest {
 
+
+
     private val brukerId = TestData.vanligBruker.brukerId.verdi
+
+    @Test
+    fun xxx() {
+        val mapper = jacksonObjectMapper()
+        val copy = mapper.copy().apply {
+            val typeValidator = BasicPolymorphicTypeValidator.builder()
+                .build()
+            activateDefaultTyping(
+                typeValidator,
+                ObjectMapper.DefaultTyping.EVERYTHING,
+                JsonTypeInfo.As.PROPERTY
+            )
+        }
+        println(copy.writerWithDefaultPrettyPrinter().writeValueAsString(person(pipRespons(STRENGT_FORTROLIG_UTLAND))))
+    }
 
     @Test
     @DisplayName("Test at behandling av brukere med STRENGT_FORTROLIG_UTLAND  krever medlemsskap i STRENGT_FORTROLIG_GRUPPE fra ansatt og at geotilknytning er UtenlandskTilknytning")
@@ -82,7 +106,7 @@ class BrukerMapperTest {
         val adressebeskyttelse = gradering?.let {
              listOf(PdlAdressebeskyttelse(it))
          }?: emptyList()
-        return PdlRespons(PdlPerson(adressebeskyttelse), PdlIdenter(listOf(PdlIdent(brukerId,false, FOLKEREGISTERIDENT))), geo)
+        return PdlRespons(PdlPerson(adressebeskyttelse), PdlIdenter(listOf(PdlIdent(brukerId,false, FOLKEREGISTERIDENT),PdlIdent(aktørId.verdi,false, AKTORID))), geo)
     }
 
     fun person(respons: PdlRespons) = tilPerson(respons)

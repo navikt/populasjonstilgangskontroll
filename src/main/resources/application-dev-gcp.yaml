@@ -13,7 +13,7 @@ spring:
       ssl:
         enabled: true
   cache:
-    type: redis
+    type: caffeine
   mvc:
     log-request-details: true
 management:

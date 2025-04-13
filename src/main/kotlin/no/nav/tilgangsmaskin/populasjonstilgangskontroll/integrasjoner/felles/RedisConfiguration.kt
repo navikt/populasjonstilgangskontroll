@@ -22,11 +22,11 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext
 import org.springframework.data.redis.serializer.StringRedisSerializer
 
-@Configuration
-@EnableCaching
-@ConditionalOnDev
+//@Configuration
+//@EnableCaching
+//@ConditionalOnDev
 class RedisConfiguration(private val mapper: ObjectMapper) : CachingConfigurer {
-
+/*
     @Bean
     fun redisHealthIndicator(cf: RedisConnectionFactory) = object : HealthIndicator {
         override fun health() =
@@ -44,10 +44,9 @@ class RedisConfiguration(private val mapper: ObjectMapper) : CachingConfigurer {
             }
     }
 
-    @Bean
+   // @Bean
     fun redisConfig(): RedisCacheConfiguration {
         val copy = mapper.copy().apply {
-            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             val typeValidator = BasicPolymorphicTypeValidator.builder()
                 .build()
             activateDefaultTyping(
@@ -63,7 +62,7 @@ class RedisConfiguration(private val mapper: ObjectMapper) : CachingConfigurer {
                     GenericJackson2JsonRedisSerializer(copy)
                 )
             )
-    }
+    }*/
 
     override fun keyGenerator() = KeyGenerator { target, method, params ->
         buildString {

@@ -12,12 +12,14 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.felles.Va
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomAnsattData
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.nom.NomTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PDLTjeneste
+import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.RegelTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.regler.IdOgType
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.utils.cluster.ClusterConstants.DEV
+import org.springframework.graphql.client.SyncGraphQlClientInterceptor
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.web.bind.annotation.*
@@ -26,13 +28,16 @@ import org.springframework.web.bind.annotation.*
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
 @Tag(name = "DevTilgangController", description = "Denne kontrolleren skal kun brukes til testing")
-class DevTilgangController(private val skjerming: SkjermingTjeneste,private val brukere : BrukerTjeneste, private val ansatte: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyring: OverstyringTjeneste, private val nom: NomTjeneste, private val pdl: PDLTjeneste) {
+class DevTilgangController(private val graphql: PdlSyncGraphQLClientAdapter,private val skjerming: SkjermingTjeneste,private val brukere : BrukerTjeneste, private val ansatte: AnsattTjeneste, private val regler: RegelTjeneste, private val overstyring: OverstyringTjeneste, private val nom: NomTjeneste, private val pdl: PDLTjeneste) {
 
-    @GetMapping("bruker/{brukerId}")
-    fun bruker(@PathVariable @Valid @ValidId brukerId: String) = brukere.bruker(brukerId)
+    @GetMapping("bruker/{id}")
+    fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)
+
+    @GetMapping("bruker/{id}")
+    fun bruker(@PathVariable @Valid @ValidId id: String) = brukere.brukerMedSøsken(id)
 
     @GetMapping("person/{id}")
-    fun person(@PathVariable @Valid @ValidId id: String) = pdl.person(id)
+    fun person(@PathVariable @Valid @ValidId id: String) = pdl.personMedSøsken(id)
 
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)
@@ -54,14 +59,14 @@ class DevTilgangController(private val skjerming: SkjermingTjeneste,private val 
 
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(NO_CONTENT)
-    fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody   @Valid @ValidId  specs:List<IdOgType> ) = regler.bulkRegler(ansattId, specs)
+    fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs:List<IdOgType>) = regler.bulkRegler(ansattId, specs)
 
     @PostMapping("skjerming")
     fun skjerming(@RequestBody brukerId: BrukerId) = skjerming.skjerming(brukerId)
 
     @PostMapping("skjerminger")
-    fun skjerminger(@RequestBody brukerIds: List<BrukerId>) = skjerming.skjerminger(brukerIds)
+    fun skjerminger(@RequestBody ids: List<BrukerId>) = skjerming.skjerminger(ids)
 
     @PostMapping("brukere")
-    fun brukere(@RequestBody  @Valid @ValidId brukerIds: Set<String>) = brukere.brukere(brukerIds)
+    fun brukere(@RequestBody  @Valid @ValidId ids: Set<String>) = brukere.brukere(ids)
 }

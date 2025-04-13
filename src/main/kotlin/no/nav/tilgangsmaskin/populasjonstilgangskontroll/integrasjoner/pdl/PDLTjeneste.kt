@@ -1,8 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl
 
 import io.micrometer.core.annotation.Timed
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.AktørId
-import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.BrukerId
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.populasjonstilgangskontroll.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
@@ -12,11 +10,13 @@ import no.nav.tilgangsmaskin.populasjonstilgangskontroll.integrasjoner.pdl.PdlPe
 
 @CacheableRetryingOnRecoverableService(cacheNames = [PDL])
 @Timed
-class PDLTjeneste(private val adapter: PdlRestClientAdapter) {
+class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL : PdlSyncGraphQLClientAdapter) {
 
-    fun person(id: String) = tilPerson(adapter.person(id)).let {
+    fun personMedSøsken(id: String) = personUtenSøsken(id).let {
         it.copy(familie = Familie(it.foreldre, it.barn, søsken(it)))
     }
+
+    fun personUtenSøsken(id: String) = tilPerson(adapter.person(id))
 
     fun personer(brukerIds: Set<String>) =
         adapter.personer(brukerIds)

@@ -31,7 +31,7 @@ class OverstyringTjeneste(private val ansatte: AnsattTjeneste, private val bruke
 
     @Transactional(readOnly = true)
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId) =
-        with(adapter.gjeldendeOverstyring(ansattId.verdi, brukerId.verdi, brukere.bruker(brukerId.verdi).historiskeIdentifikatorer.map { it.verdi })) {
+        with(adapter.gjeldendeOverstyring(ansattId.verdi, brukerId.verdi, brukere.brukerUtenSøsken(brukerId.verdi).historiskeIdentifikatorer.map { it.verdi })) {
             when {
                 this == null -> false.also {
                     log.trace("Ingen overstyring for $ansattId og $brukerId ble funnet i databasen")
@@ -50,7 +50,7 @@ class OverstyringTjeneste(private val ansatte: AnsattTjeneste, private val bruke
     fun overstyr(ansattId: AnsattId, data: OverstyringData)  =
          runCatching {
                 log.info("Sjekker kjerneregler før eventuell overstyring for $ansattId og ${data.brukerId}")
-                motor.kjerneregler(ansatte.ansatt(ansattId), brukere.bruker(data.brukerId.verdi))
+                motor.kjerneregler(ansatte.ansatt(ansattId), brukere.brukerMedSøsken(data.brukerId.verdi))
                 adapter.overstyr(ansattId.verdi, data).also {
                     log.info("Overstyring er registrert for $ansattId og ${data.brukerId}")
                     refresh(ansattId, data)

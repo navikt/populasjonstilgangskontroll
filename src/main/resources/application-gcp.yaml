@@ -67,7 +67,7 @@ spring:
           json:
             value:
               default:
-                type: no.nav.tilgangsmaskin.populasjonstilgangskontroll.ansatt.nom.NomHendelse
+                type: no.nav.tilgangsmaskin.ansatt.nom.NomHendelse
             use:
               type:
                 headers: false

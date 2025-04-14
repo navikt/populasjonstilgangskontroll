@@ -90,7 +90,7 @@ spring:
   jackson:
     deserialization:
       fail-on-unknown-properties: true
-    default-property-inclusion: non_null
+    default-property-inclusion: non_absent
   cache:
     cache-names: pdl, skjerming, graph, overstyring
 

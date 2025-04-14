@@ -15,7 +15,7 @@ class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler:
 
     private val log = getLogger(javaClass)
 
-    @KafkaListener(topics = ["#{'\${nom.topic}'}"], concurrency = "5", batch = "true", filter = "fnrFilterStrategy")
+    @KafkaListener(topics = ["#{'\${nom.topic}'}"], concurrency = "2", batch = "true", filter = "fnrFilterStrategy")
     fun listen(hendelser: List<NomHendelse>) {
         log.info("Mottok ${hendelser.size} ${"hendelse".pluralize(hendelser)}")
         hendelser.forEach {

@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.felles.LederUtvelger
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.TimeUnit.HOURS
 
 @Component
 class NomVaktmester(
@@ -20,7 +20,7 @@ class NomVaktmester(
         .description("Antall rader fjernet")
         .register(registry)
 
-    @Scheduled(fixedRate = 60, timeUnit = SECONDS)
+    @Scheduled(fixedRate = 24, timeUnit = HOURS)
     fun ryddOpp() =
         if (utvelger.erLeder) {
             nom.ryddOpp().also {

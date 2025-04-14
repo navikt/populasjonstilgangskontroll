@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.regler.TestData.strengtFortroligBruker
 import no.nav.tilgangsmaskin.regler.TestData.vanligAnsatt
 import no.nav.tilgangsmaskin.regler.TestData.vanligBruker
 import no.nav.tilgangsmaskin.regler.motor.*
+import no.nav.tilgangsmaskin.regler.motor.AvdødOppslagTeller.PartnerOppslagTeller
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
@@ -56,6 +57,9 @@ class RegelTjenesteTest {
 
     @MockkBean
     lateinit var avdød: AvdødOppslagTeller
+
+    @MockkBean
+    lateinit var partner: PartnerOppslagTeller
 
     @Autowired
     lateinit var motor: RegelMotor

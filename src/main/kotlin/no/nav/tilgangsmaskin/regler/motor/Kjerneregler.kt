@@ -70,7 +70,6 @@ class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         (ansatt nåværendeEllerTidligerePartner bruker)?.let { partner ->
             teller.registrerOppslag(ansatt.ansattId, bruker.brukerId, partner.relasjon)
-            false
         } ?: true
 
     override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 2", AVVIST_HABILITET2)

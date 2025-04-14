@@ -7,22 +7,24 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
 import no.nav.tilgangsmaskin.tilgang.TokenClaimsAccessor
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 
 @Component
-class SøskenOppslagTeller(private val accessor: TokenClaimsAccessor) {
-    private val log = LoggerFactory.getLogger(javaClass)
+class SøskenOppslagTeller(private val meterRegistry: MeterRegistry, private val accessor: TokenClaimsAccessor) {
     fun registrerOppslag(ansattId: AnsattId, brukerId: BrukerId) =
         true.also {
-            log.warn("$ansattId har manglende habilitet for oppslag mot $brukerId fra system ${accessor.systemNavn}")
+            // TODO Endre til false når vi faktisk skal nekte
+            Counter.builder("siblings.attempted.total")
+                .description("Number of siblings  attempted accessed")
+                .tag("system", accessor.system ?: "N/A")
+                .register(meterRegistry).increment()
         }
 }
 
+
 @Component
 class AvdødOppslagTeller(private val meterRegistry: MeterRegistry, private val accessor: TokenClaimsAccessor) {
-    private val log = LoggerFactory.getLogger(javaClass)
     fun registrerOppslag(ansattId: AnsattId, brukerId: BrukerId, dødsdato: LocalDate) =
         true.also {
             // TODO Endre til false når vi faktisk skal nekte
@@ -31,18 +33,15 @@ class AvdødOppslagTeller(private val meterRegistry: MeterRegistry, private val 
                 .description("Number of deceased users attempted accessed")
                 .tag("months", intervall)
                 .tag("system", accessor.system ?: "N/A")
-                .register(meterRegistry).increment().also {
-                    log.warn("$ansattId slo opp avdød bruker $brukerId med dødsdato $intervall måneder siden fra system ${accessor.systemNavn}")
-                }
+                .register(meterRegistry).increment()
         }
 
     @Component
     class PartnerOppslagTeller(private val meterRegistry: MeterRegistry, private val accessor: TokenClaimsAccessor) {
-        private val log = LoggerFactory.getLogger(javaClass)
         fun registrerOppslag(ansattId: AnsattId, brukerId: BrukerId, relasjon: FamilieRelasjon) =
             true.also {
                 // TODO Endre til false når vi faktisk skal nekte
-                Counter.builder("partner.attempted.total")
+                Counter.builder("partners.attempted.total")
                     .description("Number of partners attempted accessed")
                     .tag("system", accessor.system ?: "N/A")
                     .register(meterRegistry).increment()

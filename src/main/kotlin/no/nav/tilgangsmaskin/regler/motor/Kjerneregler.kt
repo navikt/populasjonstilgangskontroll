@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.EGEN_ANSATT_GRUPPE
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG_GRUPPE
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_GRUPPE
 import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.regler.motor.AvdødOppslagTeller.PartnerOppslagTeller
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
 import org.springframework.core.annotation.Order
@@ -65,9 +66,11 @@ class ForeldreOgBarnRegel : KjerneRegel {
 
 @Order(HIGHEST_PRECEDENCE + 5)
 @Component
-class PartnerRegel : KjerneRegel {
+class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
-        !(ansatt erNåværendeEllerTidligerePartnerMed bruker)
+        (ansatt nåværendeEllerTidligerePartner bruker)?.let { partner ->
+            teller.registrerOppslag(ansatt.ansattId, bruker.brukerId, partner.relasjon)
+        } ?: true
 
     override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 2", AVVIST_HABILITET2)
 }

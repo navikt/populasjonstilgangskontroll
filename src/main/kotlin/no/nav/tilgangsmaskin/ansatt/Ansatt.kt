@@ -43,7 +43,8 @@ data class Ansatt(
 
     infix fun kanBehandle(id: UUID) = grupper.any { it.id == id }
 
-    infix fun erNåværendeEllerTidligerePartnerMed(bruker: Bruker) = parnere.any { it.brukerId == bruker.brukerId }
+    infix fun nåværendeEllerTidligerePartner(bruker: Bruker) =
+        parnere.firstOrNull { it.brukerId == bruker.brukerId }
 
     infix fun erForeldreEllerBarnTil(bruker: Bruker) = foreldreOgBarn.any { it.brukerId == bruker.brukerId }
 

@@ -13,6 +13,15 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.utenlandskTi
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.ENKE_ELLER_ENKEMANN
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.GIFT
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.GJENLEVENDE_PARTNER
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.REGISTRERT_PARTNER
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.SEPARERT
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.SEPARERT_PARTNER
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.SKILT
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.SKILT_PARTNER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTType.BYDEL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTType.KOMMUNE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTType.UTLAND
@@ -47,6 +56,21 @@ object PdlPersonMapper {
                 tilDødsdato(person.doedsfall),
                 tilHistoriskeBrukerIds(identer)
             )
+        }
+
+    fun tilPartner(type: Sivilstandstype) =
+        when (type) {
+            GIFT,
+            REGISTRERT_PARTNER -> FamilieRelasjon.PARTNER
+
+            SKILT,
+            ENKE_ELLER_ENKEMANN,
+            SEPARERT,
+            SKILT_PARTNER,
+            GJENLEVENDE_PARTNER,
+            SEPARERT_PARTNER -> FamilieRelasjon.TIDLIGERE_PARTNER
+
+            else -> FamilieRelasjon.INGEN
         }
 
     private fun tilGraderinger(beskyttelse: List<PdlAdressebeskyttelse>) =
@@ -96,10 +120,8 @@ object PdlPersonMapper {
 
     private fun tilRelasjon(relasjon: PdlFamilieRelasjonRolle?) =
         when (relasjon) {
-            MOR -> FamilieRelasjon.MOR
-            FAR -> FamilieRelasjon.FAR
-            MEDMOR -> FamilieRelasjon.MEDMOR
-            MEDFAR -> FamilieRelasjon.MEDFAR
+            MOR, MEDMOR -> FamilieRelasjon.MOR
+            FAR, MEDFAR -> FamilieRelasjon.FAR
             BARN -> FamilieRelasjon.BARN
             else -> throw IllegalArgumentException("Ukjent relasjon $relasjon")
         }

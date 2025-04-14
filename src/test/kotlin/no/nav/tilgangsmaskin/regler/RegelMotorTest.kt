@@ -11,6 +11,7 @@ import no.nav.tilgangsmaskin.regler.TestData.egenAnsatt
 import no.nav.tilgangsmaskin.regler.TestData.egenAnsattFortroligAnsatt
 import no.nav.tilgangsmaskin.regler.TestData.egenAnsattFortroligBruker
 import no.nav.tilgangsmaskin.regler.TestData.egenAnsattMedFamilie
+import no.nav.tilgangsmaskin.regler.TestData.egenAnsattMedPartner
 import no.nav.tilgangsmaskin.regler.TestData.egenAnsattStrengtFortroligAnsatt
 import no.nav.tilgangsmaskin.regler.TestData.egenAnsattStrengtFortroligBruker
 import no.nav.tilgangsmaskin.regler.TestData.enhetAnsatt
@@ -72,6 +73,16 @@ class RegelMotorTest {
         assertInstanceOf<ForeldreOgBarnRegel>(
             assertThrows<RegelException> {
                 regelMotor.kompletteRegler(egenAnsattMedFamilie, vanligBruker)
+            }.regel
+        )
+    }
+
+    @Test
+    @DisplayName("Test at saksbehandler ikke kan behandle egen partner")
+    fun egenPartnerAvvises() {
+        assertInstanceOf<PartnerRegel>(
+            assertThrows<RegelException> {
+                regelMotor.kompletteRegler(egenAnsattMedPartner, vanligBruker)
             }.regel
         )
     }

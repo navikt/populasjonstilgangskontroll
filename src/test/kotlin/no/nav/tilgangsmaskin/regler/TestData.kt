@@ -62,6 +62,12 @@ object TestData {
         listOf(EGEN_ANSATT_GRUPPE),
         Familie(barn = setOf(FamilieMedlem(vanligBrukerId, FamilieRelasjon.BARN)))
     )
+    internal val annenAnsattBrukerMedPartner = Bruker(
+        BrukerIdentifikatorer(annenAnsattBrukerId, aktørId),
+        udefinertGeoTilknytning,
+        listOf(EGEN_ANSATT_GRUPPE),
+        Familie(partnere = setOf(FamilieMedlem(vanligBrukerId, FamilieRelasjon.PARTNER)))
+    )
     internal val ansattBruker =
         Bruker(BrukerIdentifikatorer(ansattBrukerId, aktørId), udefinertGeoTilknytning, listOf(EGEN_ANSATT_GRUPPE))
     internal val egenAnsattStrengtFortroligBruker = Bruker(
@@ -114,6 +120,10 @@ object TestData {
     internal val egenAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(egenAnsattEntraGruppe), ansattBruker)
     internal val egenAnsattMedFamilie =
         Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(annenEntraGruppe), annenAnsattBruker)
+
+    internal val egenAnsattMedPartner =
+        Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(annenEntraGruppe), annenAnsattBrukerMedPartner)
+
 
     internal val vanligAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(annenEntraGruppe), ansattBruker)
     internal val geoUtlandAnsatt =

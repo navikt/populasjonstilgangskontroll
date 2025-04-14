@@ -5,10 +5,9 @@ import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.felles.LederUtvelger
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit.SECONDS
 
-@Component
+//@Component
 class NomVaktmester(
     private val nom: NomOperasjoner,
     private val utvelger: LederUtvelger,

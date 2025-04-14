@@ -68,7 +68,7 @@ class ForeldreOgBarnRegel : KjerneRegel {
 @Component
 class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
-        (ansatt nåværendeEllerTidligerePartner bruker)?.let { partner ->
+        (ansatt erNåværendeEllerTidligerePartnerTil bruker)?.let { partner ->
             teller.registrerOppslag(ansatt.ansattId, bruker.brukerId, partner.relasjon)
         } ?: true
 

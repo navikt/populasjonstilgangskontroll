@@ -61,6 +61,9 @@ class RegelTjenesteTest {
     @MockkBean
     lateinit var partner: PartnerOppslagTeller
 
+    @MockkBean
+    lateinit var søsken: SøskenOppslagTeller
+
     @Autowired
     lateinit var motor: RegelMotor
 

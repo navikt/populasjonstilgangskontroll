@@ -67,7 +67,7 @@ class ForeldreOgBarnRegel : KjerneRegel {
 @Component
 class PartnerRegel : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
-        !(ansatt erPartnerMed bruker)
+        !(ansatt erNåværendeEllerTidligerePartnerMed bruker)
 
     override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 2", AVVIST_HABILITET2)
 }

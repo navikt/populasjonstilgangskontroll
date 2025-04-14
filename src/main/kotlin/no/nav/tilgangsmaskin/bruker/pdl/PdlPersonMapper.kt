@@ -1,0 +1,106 @@
+package no.nav.tilgangsmaskin.bruker.pdl
+
+import no.nav.tilgangsmaskin.bruker.AktørId
+import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.Familie
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Bydel
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.udefinertGeoTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.utenlandskTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
+import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTType.BYDEL
+import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTType.KOMMUNE
+import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTType.UTLAND
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.NPID
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering.FORTROLIG
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering.UGRADERT
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlDødsfall
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.BARN
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.FAR
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.MEDFAR
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.MEDMOR
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.MOR
+
+object PdlPersonMapper {
+
+    fun tilPerson(data: PdlRespons) =
+        with(data) {
+            Person(
+                BrukerId(brukerId),
+                AktørId(aktørId),
+                tilGeoTilknytning(geografiskTilknytning),
+                tilGraderinger(person.adressebeskyttelse),
+                tilFamilie(person.familierelasjoner),
+                tilDødsdato(person.doedsfall),
+                tilHistoriskeBrukerIds(identer)
+            )
+        }
+
+    private fun tilGraderinger(beskyttelse: List<PdlAdressebeskyttelse>) =
+        beskyttelse.map { tilGradering(it.gradering) }
+
+    private fun tilGradering(gradering: PdlAdressebeskyttelseGradering) =
+        when (gradering) {
+            STRENGT_FORTROLIG_UTLAND -> Gradering.STRENGT_FORTROLIG_UTLAND
+            STRENGT_FORTROLIG -> Gradering.STRENGT_FORTROLIG
+            FORTROLIG -> Gradering.FORTROLIG
+            UGRADERT -> Gradering.UGRADERT
+        }
+
+    private fun tilGeoTilknytning(geo: PdlGeografiskTilknytning?): GeografiskTilknytning =
+        when (geo?.gtType) {
+            UTLAND -> geo.gtLand?.let {
+                utenlandskTilknytning
+            } ?: UkjentBosted()
+
+            KOMMUNE -> geo.gtKommune?.let {
+                KommuneTilknytning(Kommune(it.verdi))
+            } ?: throw IllegalStateException("Kommunal tilknytning uten kommunekode")
+
+            BYDEL -> geo.gtBydel?.let {
+                BydelTilknytning(Bydel(it.verdi))
+            } ?: throw IllegalStateException("Bydelstilknytning uten bydelskode")
+
+            else -> udefinertGeoTilknytning
+        }
+
+    private fun tilDødsdato(dødsfall: List<PdlDødsfall>) = dødsfall.maxByOrNull { it.doedsdato }?.doedsdato
+
+    private fun tilFamilie(relasjoner: List<PdlFamilierelasjon>): Familie {
+        val (foreldre, barn) = relasjoner
+            .mapNotNull { it.relatertPersonsIdent?.let { ident -> it.relatertPersonsRolle to ident } }
+            .partition { it.first != BARN }
+        return Familie(
+            foreldre.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet(),
+            barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet()
+        )
+    }
+
+    private fun tilHistoriskeBrukerIds(identer: PdlIdenter) = identer.identer
+        .filter { it.historisk }
+        .filter { it.gruppe in listOf(FOLKEREGISTERIDENT, NPID) }
+        .map { (BrukerId(it.ident)) }
+
+    private fun tilRelasjon(relasjon: PdlFamilieRelasjonRolle?) =
+        when (relasjon) {
+            MOR -> FamilieRelasjon.MOR
+            FAR -> FamilieRelasjon.FAR
+            MEDMOR -> FamilieRelasjon.MEDMOR
+            MEDFAR -> FamilieRelasjon.MEDFAR
+            BARN -> FamilieRelasjon.BARN
+            else -> throw IllegalArgumentException("Ukjent relasjon $relasjon")
+        }
+}

@@ -6,7 +6,7 @@
     </appender>
     <springProfile name="dev">
         <logger name="org.springframework.web.servlet.mvc.method.annotation" level="info"/>
-        <logger name="org.apache.hc.client5.http.wire"  level="info"/>
+        <logger name="org.apache.hc.client5.http.wire" level="info"/>
         <logger name="org.hibernate.SQL" level="debug"/>
         <logger name="org.hibernate.orm.jdbc.bind" level="trace"/>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
@@ -21,6 +21,7 @@
         <logger name="secure" level="debug" additivity="false">
             <appender-ref ref="stdout"/>
         </logger>
+        <logger name="no.nav.tilgangsmaskin" level="trace"/>
         <logger name="org.hibernate.SQL" level="debug"/>
         <logger name="org.hibernate.orm.jdbc.bind" level="trace"/>
         <logger name="no.nav.security" level="trace"/>

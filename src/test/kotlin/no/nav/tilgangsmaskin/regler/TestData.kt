@@ -17,6 +17,7 @@ import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.udefinertGeoTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.utenlandskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
@@ -77,7 +78,7 @@ object TestData {
         Bruker(BrukerIdentifikatorer(ukjentBostedBrukerId, aktørId), UkjentBosted(), listOf(UDEFINERT_GEO_GRUPPE))
     internal val geoUtlandBruker = Bruker(
         BrukerIdentifikatorer(geoUtlandBrukerId, aktørId),
-        udefinertGeoTilknytning,
+        utenlandskTilknytning,
         listOf(GEO_PERSON_UTLAND_GRUPPE),
     )
     internal val enhetBruker =

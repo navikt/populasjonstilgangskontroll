@@ -33,10 +33,10 @@ jobs:
       - name: Installerer cosign
         uses: sigstore/cosign-installer@main
         with:
-           cosign-release: v2.4.1
+          cosign-release: v2.4.1
 
       - name: Verifiserer distroless base-image
-        run:  cosign verify gcr.io/distroless/java21  --certificate-oidc-issuer https://accounts.google.com --certificate-identity keyless@distroless.iam.gserviceaccount.com
+        run: cosign verify gcr.io/distroless/java21  --certificate-oidc-issuer https://accounts.google.com --certificate-identity keyless@distroless.iam.gserviceaccount.com
 
       - name: Setter tag-navn
         run: echo "TAG=$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
@@ -50,7 +50,7 @@ jobs:
         id: kompiler
         run: |
           echo "image=${{ env.IMAGE }}:${{ env.TAG }}" >> $GITHUB_OUTPUT          
-          ./gradlew jib -Djib.to.tags=latest,${TAG} -Djib.to.image=${{ env.IMAGE }}:${{ env.TAG }}
+          ./gradlew test jib -Djib.to.tags=latest,${TAG} -Djib.to.image=${{ env.IMAGE }}:${{ env.TAG }}
           echo "DIGEST=$(cat build/jib-image.digest)" >> $GITHUB_ENV
         env:
           ORG_GRADLE_PROJECT_githubUser: x-access-token
@@ -71,7 +71,7 @@ jobs:
       id-token: write
     strategy:
       matrix:
-        cluster: [ dev-gcp, prod-gcp]
+        cluster: [ dev-gcp, prod-gcp ]
     name: Deploy til ${{matrix.cluster}}
     needs: build
     runs-on: ubuntu-latest

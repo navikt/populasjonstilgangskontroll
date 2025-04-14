@@ -18,7 +18,7 @@ class NomJPAAdapter(private val repo: NomRepository) {
         }
 
     private fun upsert(ansattId: AnsattId, ansattFnr: BrukerId, start: Instant, slutt: Instant) =
-        repo.upsert(ansattId.verdi, ansattFnr.verdi, start, slutt)
+        repo.upsertAndReturnId(ansattId.verdi, ansattFnr.verdi, start, slutt)
     /*
      repo.save(repo.findByNavid(ansattId.verdi)?.apply {
          this.fnr = fnr

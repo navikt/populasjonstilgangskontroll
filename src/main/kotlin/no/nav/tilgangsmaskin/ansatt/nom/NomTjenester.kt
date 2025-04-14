@@ -18,7 +18,6 @@ class NomTjeneste(private val adapter: NomJPAAdapter) : NomOperasjoner {
 
     @Transactional(readOnly = true)
     override fun fnrForAnsatt(ansattId: AnsattId) = adapter.fnrForAnsatt(ansattId.verdi)
-
     override fun ryddOpp() = adapter.ryddOpp()
 }
 

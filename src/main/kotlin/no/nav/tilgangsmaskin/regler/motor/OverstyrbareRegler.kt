@@ -49,7 +49,7 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
 
 @Component
 @Order(LOWEST_PRECEDENCE - 3)
-class AvdødBrukerRegel(private val teller: AvdødOppslagTeller) :
+class AvdødBrukerRegel(private val teller: AvdødTeller) :
     OverstyrbarRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         if (bruker.erDød) {

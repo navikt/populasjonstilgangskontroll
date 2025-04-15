@@ -37,7 +37,7 @@ class ForeldreBarnTeller(registry: MeterRegistry, accessor: TokenClaimsAccessor)
     HabilitetsTeller(registry, accessor, "parentsorchildren.attempted.total", "Forsøk på å slå opp foreldre eller barn")
 
 @Component
-class AvdødOppslagTeller(private val registry: MeterRegistry, private val accessor: TokenClaimsAccessor) {
+class AvdødTeller(private val registry: MeterRegistry, private val accessor: TokenClaimsAccessor) {
     fun registrerOppslag(dødsdato: LocalDate) {
         val intervall = dødsdato.intervallSiden()
         Counter.builder("dead.attempted.total")

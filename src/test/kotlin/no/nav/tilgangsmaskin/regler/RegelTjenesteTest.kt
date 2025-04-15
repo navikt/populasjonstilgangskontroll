@@ -55,7 +55,7 @@ class RegelTjenesteTest {
     lateinit var accessor: TokenClaimsAccessor
 
     @MockkBean
-    lateinit var avdød: AvdødOppslagTeller
+    lateinit var avdød: AvdødTeller
 
     @MockkBean
     lateinit var partner: PartnerOppslagTeller

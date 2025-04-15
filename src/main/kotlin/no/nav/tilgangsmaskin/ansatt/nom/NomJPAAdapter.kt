@@ -6,11 +6,9 @@ import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.toInstant
-import org.springframework.stereotype.Component
 import java.time.Instant
 
 
-@Component
 @ConditionalOnGCP
 class NomJPAAdapter(val repo: NomRepository, @PersistenceContext protected val entityManager: EntityManager) {
 

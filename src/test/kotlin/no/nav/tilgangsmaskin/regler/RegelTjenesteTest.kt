@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
@@ -46,6 +47,7 @@ import kotlin.test.assertEquals
 @TestPropertySource(locations = ["classpath:test.properties"])
 @ContextConfiguration(classes = [TestApp::class])
 @ExtendWith(MockKExtension::class)
+@AutoConfigureObservability
 class RegelTjenesteTest {
 
     @Autowired
@@ -58,10 +60,16 @@ class RegelTjenesteTest {
     lateinit var avdød: AvdødTeller
 
     @MockkBean
+    lateinit var egne: EgneDataTeller
+
+    @MockkBean
     lateinit var partner: PartnerOppslagTeller
 
     @MockkBean
     lateinit var søsken: SøskenOppslagTeller
+
+    @MockkBean
+    lateinit var foreldrebarg: ForeldreBarnTeller
 
     @Autowired
     lateinit var motor: RegelMotor

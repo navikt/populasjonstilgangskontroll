@@ -5,6 +5,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.toInstant
 import org.springframework.stereotype.Component
 import java.time.Instant
+import java.time.Instant.now
 
 
 @Component
@@ -18,14 +19,13 @@ class NomJPAAdapter(private val repo: NomRepository) {
         }
 
     private fun upsert(ansattId: AnsattId, ansattFnr: BrukerId, start: Instant, slutt: Instant) =
-        repo.upsertAndReturnId(ansattId.verdi, ansattFnr.verdi, start, slutt)
-    /*
-     repo.save(repo.findByNavid(ansattId.verdi)?.apply {
-         this.fnr = fnr
-         updated = now()
-         startdato = start.toInstant()
-         gyldigtil = slutt.toInstant()
-     } ?: NomEntity(ansattId.verdi, ansattFnr.verdi, start.toInstant(), slutt.toInstant())).id!! */
+
+        repo.save(repo.findByNavid(ansattId.verdi)?.apply {
+            this.fnr = fnr
+            updated = now()
+            startdato = start
+            gyldigtil = slutt
+        } ?: NomEntity(ansattId.verdi, ansattFnr.verdi, start, slutt)).id!!
 
     fun fnrForAnsatt(ansattId: String) = repo.ansattFødselsnummer(ansattId)?.let { BrukerId(it) }
 

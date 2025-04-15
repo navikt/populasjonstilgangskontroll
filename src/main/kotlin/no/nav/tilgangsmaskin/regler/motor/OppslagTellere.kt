@@ -2,10 +2,8 @@ package no.nav.tilgangsmaskin.regler.motor
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
 import no.nav.tilgangsmaskin.tilgang.TokenClaimsAccessor
 import org.springframework.stereotype.Component
-import java.time.LocalDate
 
 abstract class HabilitetsTeller(
     protected val registry: MeterRegistry,
@@ -14,11 +12,12 @@ abstract class HabilitetsTeller(
     private val beskrivelse: String
 ) {
 
-    fun registrerOppslag(ok: Boolean = false) =
+    fun registrerOppslag(ok: Boolean = false, vararg tags: Pair<String, String> = emptyArray()) =
         ok.also {
             Counter.builder(tellerNavn)
                 .description(beskrivelse)
                 .tag("system", accessor.system ?: "N/A")
+                .apply { tags.forEach { tag(it.first, it.second) } }
                 .register(registry).increment()
         }
 
@@ -37,16 +36,8 @@ class ForeldreBarnTeller(registry: MeterRegistry, accessor: TokenClaimsAccessor)
     HabilitetsTeller(registry, accessor, "parentsorchildren.attempted.total", "Forsøk på å slå opp foreldre eller barn")
 
 @Component
-class AvdødTeller(private val registry: MeterRegistry, private val accessor: TokenClaimsAccessor) {
-    fun registrerOppslag(dødsdato: LocalDate) {
-        val intervall = dødsdato.intervallSiden()
-        Counter.builder("dead.attempted.total")
-            .description("Number of deceased users attempted accessed")
-            .tag("months", intervall)
-            .tag("system", accessor.system ?: "N/A")
-            .register(registry).increment()
-    }
-}
+class AvdødTeller(registry: MeterRegistry, accessor: TokenClaimsAccessor) :
+    HabilitetsTeller(registry, accessor, "dead.attempted.total", "Forsøk på å slå opp avdøde")
 
 @Component
 class PartnerOppslagTeller(registry: MeterRegistry, accessor: TokenClaimsAccessor) :

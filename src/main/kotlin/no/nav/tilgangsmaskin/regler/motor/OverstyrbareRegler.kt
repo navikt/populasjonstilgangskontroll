@@ -8,6 +8,7 @@ import no.nav.tilgangsmaskin.ansatt.AvvisningKode.AVVIST_PERSON_UTLAND
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 import org.springframework.core.annotation.Order
@@ -51,10 +52,7 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
 @Order(LOWEST_PRECEDENCE - 3)
 class AvdødBrukerRegel(private val teller: AvdødTeller) : OverstyrbarRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
-        if (bruker.erDød) {
-            teller.registrerOppslag(bruker.dødsdato!!)
-            true // TODO endre når vi skal avvise
-        } else true
+        avslåHvis({ bruker.erDød }, teller, true, "months" to bruker.dødsdato!!.intervallSiden())
 
     override val metadata = RegelBeskrivelse("Avdød bruker", AVVIST_AVDØD)
 }

@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.ansatt.nom
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
+import jakarta.persistence.EntityManager
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
@@ -38,6 +39,9 @@ internal class NomTest {
     @Autowired
     lateinit var repo: NomRepository
 
+    @Autowired
+    lateinit var entityManager: EntityManager
+
     @MockkBean
     lateinit var accessor: TokenClaimsAccessor
 
@@ -46,7 +50,7 @@ internal class NomTest {
     @BeforeTest
     fun setup() {
         every { accessor.system } returns "test"
-        nom = NomTjeneste(NomJPAAdapter(repo))
+        nom = NomTjeneste(NomJPATestAdapter(repo, entityManager))
     }
 
     @Test

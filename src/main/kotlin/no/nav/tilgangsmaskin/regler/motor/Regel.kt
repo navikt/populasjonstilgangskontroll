@@ -15,7 +15,7 @@ interface Regel {
     fun sjekkGruppeRegel(predicate: () -> Boolean, ansatt: Ansatt, id: UUID) =
         if (predicate.invoke()) ansatt kanBehandle id else true
 
-    fun nektOgTellHvis(predicate: () -> Boolean, teller: HabilitetsTeller, ok: Boolean = false) =
+    fun avslåOgTellHvis(predicate: () -> Boolean, teller: HabilitetsTeller, ok: Boolean = false) =
         if (predicate.invoke()) teller.registrerOppslag(ok) else true
 
 }

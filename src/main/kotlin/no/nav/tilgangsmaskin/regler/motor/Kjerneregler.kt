@@ -9,7 +9,6 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.EGEN_ANSATT_GRUPPE
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG_GRUPPE
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_GRUPPE
 import no.nav.tilgangsmaskin.bruker.Bruker
-import no.nav.tilgangsmaskin.regler.motor.AvdødOppslagTeller.PartnerOppslagTeller
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
 import org.springframework.core.annotation.Order
@@ -48,18 +47,22 @@ class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Kj
 
 @Order(HIGHEST_PRECEDENCE + 3)
 @Component
-class EgneDataRegel : KjerneRegel {
+class EgneDataRegel(private val teller: EgneDataTeller) : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
-        bruker.brukerId != ansatt.brukerId
+        if (ansatt.brukerId == bruker.brukerId) {
+            teller.registrerOppslag()
+        } else true
 
     override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 0", AVVIST_HABILITET0)
 }
 
 @Order(HIGHEST_PRECEDENCE + 4)
 @Component
-class ForeldreOgBarnRegel : KjerneRegel {
+class ForeldreOgBarnRegel(private val teller: ForeldreBarnTeller) : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
-        !(ansatt erForeldreEllerBarnTil bruker)
+        if (ansatt erForeldreEllerBarnTil bruker) {
+            teller.registrerOppslag()
+        } else true
 
     override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 1", AVVIST_HABILITET1)
 }
@@ -68,9 +71,9 @@ class ForeldreOgBarnRegel : KjerneRegel {
 @Component
 class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
-        (ansatt erNåværendeEllerTidligerePartnerTil bruker)?.let { partner ->
-            teller.registrerOppslag(ansatt.ansattId, bruker.brukerId, partner.relasjon)
-        } ?: true
+        if (ansatt erNåværendeEllerTidligerePartnerTil bruker) {
+            teller.registrerOppslag()
+        } else true
 
     override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 2", AVVIST_HABILITET2)
 }
@@ -81,7 +84,7 @@ class SøskenRegel(private val teller: SøskenOppslagTeller) :
     KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         if (ansatt erSøskenTil bruker) {
-            teller.registrerOppslag(ansatt.ansattId, bruker.brukerId)
+            teller.registrerOppslag()
         } else true
 
     override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 3", AVVIST_HABILITET3)

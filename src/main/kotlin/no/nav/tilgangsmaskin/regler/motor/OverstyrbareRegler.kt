@@ -24,11 +24,7 @@ class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) :
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         ansatt kanBehandle id || ansatt harGTFor bruker
 
-    override val metadata =
-        RegelBeskrivelse(
-            "Geografisk tilknytning",
-            AVVIST_GEOGRAFISK
-        )
+    override val metadata = RegelBeskrivelse("Geografisk tilknytning", AVVIST_GEOGRAFISK)
 }
 
 @Component
@@ -38,11 +34,7 @@ class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) 
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         sjekkRegel({ bruker.geografiskTilknytning is UkjentBosted }, bruker, ansatt, id)
 
-    override val metadata =
-        RegelBeskrivelse(
-            "Person bosatt ukjent bosted",
-            AVVIST_PERSON_UKJENT
-        )
+    override val metadata = RegelBeskrivelse("Person bosatt ukjent bosted", AVVIST_PERSON_UKJENT)
 }
 
 @Component
@@ -52,11 +44,7 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         sjekkRegel({ bruker.geografiskTilknytning is UtenlandskTilknytning }, bruker, ansatt, id)
 
-    override val metadata =
-        RegelBeskrivelse(
-            "Person bosatt utland",
-            AVVIST_PERSON_UTLAND
-        )
+    override val metadata = RegelBeskrivelse("Person bosatt utland", AVVIST_PERSON_UTLAND)
 }
 
 @Component
@@ -65,14 +53,11 @@ class AvdødBrukerRegel(private val teller: AvdødOppslagTeller) :
     OverstyrbarRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         if (bruker.erDød) {
-            teller.registrerOppslag(ansatt.ansattId, bruker.brukerId, bruker.dødsdato!!)
+            teller.registrerOppslag(bruker.dødsdato!!)
+            true // TODO endre når vi skal avvise
         } else true
 
-    override val metadata =
-        RegelBeskrivelse(
-            "Avdød bruker",
-            AVVIST_AVDØD
-        )
+    override val metadata = RegelBeskrivelse("Avdød bruker", AVVIST_AVDØD)
 }
 
 

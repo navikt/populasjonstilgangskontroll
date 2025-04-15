@@ -49,7 +49,7 @@ class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Kj
 @Component
 class EgneDataRegel(private val teller: EgneDataTeller) : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
-        avslåOgTellHvis({ ansatt.brukerId == bruker.brukerId }, teller)
+        avslåHvis({ ansatt.brukerId == bruker.brukerId }, teller)
 
     override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 0", AVVIST_HABILITET0)
 }
@@ -58,7 +58,7 @@ class EgneDataRegel(private val teller: EgneDataTeller) : KjerneRegel {
 @Component
 class ForeldreOgBarnRegel(private val teller: ForeldreBarnTeller) : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
-        avslåOgTellHvis({ ansatt erForeldreEllerBarnTil bruker }, teller)
+        avslåHvis({ ansatt erForeldreEllerBarnTil bruker }, teller)
 
     override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 1", AVVIST_HABILITET1)
 }
@@ -67,7 +67,7 @@ class ForeldreOgBarnRegel(private val teller: ForeldreBarnTeller) : KjerneRegel 
 @Component
 class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
-        avslåOgTellHvis({ ansatt erNåværendeEllerTidligerePartnerTil bruker }, teller)
+        avslåHvis({ ansatt erNåværendeEllerTidligerePartnerTil bruker }, teller)
 
     override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 2", AVVIST_HABILITET2)
 }
@@ -76,7 +76,7 @@ class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
 @Order(HIGHEST_PRECEDENCE + 6)
 class SøskenRegel(private val teller: SøskenOppslagTeller) : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
-        avslåOgTellHvis({ ansatt erSøskenTil bruker }, teller)
+        avslåHvis({ ansatt erSøskenTil bruker }, teller)
 
     override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 3", AVVIST_HABILITET3)
 }

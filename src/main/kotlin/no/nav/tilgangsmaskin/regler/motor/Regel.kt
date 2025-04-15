@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.regler.motor
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import java.util.*
-import java.util.function.Predicate
 
 interface Regel {
     fun erOK(ansatt: Ansatt, bruker: Bruker): Boolean
@@ -13,7 +12,10 @@ interface Regel {
     val avvisningTekst get() = kode.årsak
     val erOverstyrbar get() = this is OverstyrbarRegel
 
-    fun sjekkRegel(predicate: Predicate<Bruker>, bruker: Bruker, ansatt: Ansatt, id: UUID) =
-        if (predicate.test(bruker)) ansatt kanBehandle id else true
+    fun sjekkGruppeRegel(predicate: () -> Boolean, ansatt: Ansatt, id: UUID) =
+        if (predicate.invoke()) ansatt kanBehandle id else true
+
+    fun sjekkOgTell(predicate: () -> Boolean, teller: HabilitetsTeller, ok: Boolean = false) =
+        if (predicate.invoke()) teller.registrerOppslag(ok) else true
 
 }

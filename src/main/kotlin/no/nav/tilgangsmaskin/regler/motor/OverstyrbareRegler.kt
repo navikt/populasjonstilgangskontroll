@@ -32,7 +32,7 @@ class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) :
 class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) :
     OverstyrbarRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
-        sjekkRegel({ bruker.geografiskTilknytning is UkjentBosted }, bruker, ansatt, id)
+        sjekkGruppeRegel({ bruker.geografiskTilknytning is UkjentBosted }, ansatt, id)
 
     override val metadata = RegelBeskrivelse("Person bosatt ukjent bosted", AVVIST_PERSON_UKJENT)
 }
@@ -42,15 +42,14 @@ class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) 
 class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) :
     OverstyrbarRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
-        sjekkRegel({ bruker.geografiskTilknytning is UtenlandskTilknytning }, bruker, ansatt, id)
+        sjekkGruppeRegel({ bruker.geografiskTilknytning is UtenlandskTilknytning }, ansatt, id)
 
     override val metadata = RegelBeskrivelse("Person bosatt utland", AVVIST_PERSON_UTLAND)
 }
 
 @Component
 @Order(LOWEST_PRECEDENCE - 3)
-class AvdødBrukerRegel(private val teller: AvdødTeller) :
-    OverstyrbarRegel {
+class AvdødBrukerRegel(private val teller: AvdødTeller) : OverstyrbarRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
         if (bruker.erDød) {
             teller.registrerOppslag(bruker.dødsdato!!)

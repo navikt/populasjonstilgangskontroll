@@ -12,7 +12,7 @@ abstract class HabilitetsTeller(
     private val beskrivelse: String
 ) {
 
-    fun registrerOppslag(ok: Boolean = false, vararg tags: Pair<String, String> = emptyArray()) =
+    fun registrerOppslag(ok: Boolean, vararg tags: Pair<String, String> = emptyArray()) =
         ok.also {
             Counter.builder(tellerNavn)
                 .description(beskrivelse)

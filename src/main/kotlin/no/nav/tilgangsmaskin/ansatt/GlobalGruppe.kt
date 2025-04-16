@@ -4,8 +4,6 @@ import org.springframework.core.env.Environment
 import java.util.*
 
 
-val GLOBALE_GRUPPER = GlobalGruppe.entries //.map { it.property }.toSet()
-
 enum class GlobalGruppe(val property: String) {
     STRENGT_FORTROLIG_GRUPPE("gruppe.strengt"),
     FORTROLIG_GRUPPE("gruppe.fortrolig"),

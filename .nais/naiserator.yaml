@@ -28,7 +28,7 @@ spec:
   ingresses:
     {{#each ingresses as |ingress|}}
         - {{ingress}}
-      {{/each}}
+    {{/each}}
   image: {{image}}
   observability:
     autoInstrumentation:
@@ -79,11 +79,11 @@ spec:
         - host: {{pdl}}
     inbound:
       rules:
-        {{ #each inbound as |app|}}
+        {{#each inbound as |app|}}
             - application: '{{app.name}}'
                 namespace: '{{app.namespace}}'
                 cluster: '{{app.cluster}}'
-                {{/each}}
+        {{/each}}
   env:
     - name: NAIS_CLUSTER_TYPE
       value: {{nais.cluster.type}}

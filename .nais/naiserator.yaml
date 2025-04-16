@@ -26,7 +26,7 @@ spec:
           - name: pgaudit.log
             value: "{{db-flags.pgaudit.logtype}}"
   ingresses:
-    {{ #each ingresses as |ingress|}}
+    {{#each ingresses as |ingress|}}
         - {{ingress}}
       {{/each}}
   image: {{image}}
@@ -83,7 +83,7 @@ spec:
             - application: '{{app.name}}'
                 namespace: '{{app.namespace}}'
                 cluster: '{{app.cluster}}'
-                {{/each }}
+                {{/each}}
   env:
     - name: NAIS_CLUSTER_TYPE
       value: {{nais.cluster.type}}

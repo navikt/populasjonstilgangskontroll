@@ -59,12 +59,12 @@ spec:
       allowAllUsers: true
       claims:
         groups:
-          - {{grupper.nasjonal}}
-          - {{grupper.utland}}
-          - {{grupper.egenansatt}}
-          - {{grupper.udefinert}}
-          - {{grupper.fortrolig}}
-          - {{grupper.strengt}}
+          - id: {{grupper.nasjonal}}
+          - id: {{grupper.utland}}
+          - id: {{grupper.egenansatt}}
+          - id: {{grupper.udefinert}}
+          - id: {{grupper.fortrolig}}
+          - id: {{grupper.strengt}}
         extra:
           - "NAVident"
           - "azp_name"

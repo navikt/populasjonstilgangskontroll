@@ -26,8 +26,8 @@ spec:
           - name: pgaudit.log
             value: "{{db-flags.pgaudit.logtype}}"
   ingresses:
-    { { #each ingresses as |ingress|}}
-        - {{ingress } }
+    {{ #each ingresses as |ingress|}}
+        - {{ingress}}
       {{/each}}
   image: {{image}}
   observability:
@@ -79,11 +79,11 @@ spec:
         - host: {{pdl}}
     inbound:
       rules:
-        { { #each inbound as |app|}}
+        {{ #each inbound as |app|}}
             - application: '{{app.name}}'
                 namespace: '{{app.namespace}}'
                 cluster: '{{app.cluster}}'
-                {{/each } }
+                {{/each }}
   env:
     - name: NAIS_CLUSTER_TYPE
       value: {{nais.cluster.type}}

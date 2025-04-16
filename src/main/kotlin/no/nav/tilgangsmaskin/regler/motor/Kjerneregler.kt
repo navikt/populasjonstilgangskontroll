@@ -21,7 +21,7 @@ interface KjerneRegel : Regel
 @Component
 @Order(HIGHEST_PRECEDENCE)
 class StrengtFortroligRegel(@Value("\${gruppe.strengt}") private val id: UUID) : KjerneRegel {
-    override fun erOK(ansatt: Ansatt, bruker: Bruker) =
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         sjekkGruppeRegel({ bruker.kreverGlobalGruppe(STRENGT_FORTROLIG_GRUPPE) }, ansatt, id)
 
     override val metadata = RegelBeskrivelse("Kode 6", STRENGT_FORTROLIG_GRUPPE.kode)
@@ -30,7 +30,7 @@ class StrengtFortroligRegel(@Value("\${gruppe.strengt}") private val id: UUID) :
 @Component
 @Order(HIGHEST_PRECEDENCE + 1)
 class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID) : KjerneRegel {
-    override fun erOK(ansatt: Ansatt, bruker: Bruker) =
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         sjekkGruppeRegel({ bruker.kreverGlobalGruppe(FORTROLIG_GRUPPE) }, ansatt, id)
 
     override val metadata = RegelBeskrivelse("Kode 7", FORTROLIG_GRUPPE.kode)
@@ -39,7 +39,7 @@ class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID) : Kjer
 @Component
 @Order(HIGHEST_PRECEDENCE + 2)
 class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : KjerneRegel {
-    override fun erOK(ansatt: Ansatt, bruker: Bruker) =
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         sjekkGruppeRegel({ bruker.kreverGlobalGruppe(EGEN_ANSATT_GRUPPE) }, ansatt, id)
 
     override val metadata = RegelBeskrivelse("Kode 8", EGEN_ANSATT_GRUPPE.kode)
@@ -48,7 +48,7 @@ class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Kj
 @Order(HIGHEST_PRECEDENCE + 3)
 @Component
 class EgneDataRegel(private val teller: EgneDataTeller) : KjerneRegel {
-    override fun erOK(ansatt: Ansatt, bruker: Bruker) =
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis({ ansatt er bruker }, teller)
 
     override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 0", AVVIST_HABILITET0)
@@ -57,7 +57,7 @@ class EgneDataRegel(private val teller: EgneDataTeller) : KjerneRegel {
 @Order(HIGHEST_PRECEDENCE + 4)
 @Component
 class ForeldreOgBarnRegel(private val teller: ForeldreBarnTeller) : KjerneRegel {
-    override fun erOK(ansatt: Ansatt, bruker: Bruker) =
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis({ ansatt erForeldreEllerBarnTil bruker }, teller)
 
     override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 1", AVVIST_HABILITET1)
@@ -66,7 +66,7 @@ class ForeldreOgBarnRegel(private val teller: ForeldreBarnTeller) : KjerneRegel 
 @Order(HIGHEST_PRECEDENCE + 5)
 @Component
 class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
-    override fun erOK(ansatt: Ansatt, bruker: Bruker) =
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis({ ansatt erNåværendeEllerTidligerePartnerTil bruker }, teller)
 
     override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 2", AVVIST_HABILITET2)
@@ -75,7 +75,7 @@ class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
 @Component
 @Order(HIGHEST_PRECEDENCE + 6)
 class SøskenRegel(private val teller: SøskenOppslagTeller) : KjerneRegel {
-    override fun erOK(ansatt: Ansatt, bruker: Bruker) =
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis({ ansatt erSøskenTil bruker }, teller)
 
     override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 3", AVVIST_HABILITET3)

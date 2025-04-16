@@ -22,7 +22,7 @@ interface OverstyrbarRegel : Regel
 @Order(LOWEST_PRECEDENCE)
 class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) :
     OverstyrbarRegel {
-    override fun erOK(ansatt: Ansatt, bruker: Bruker) =
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         ansatt kanBehandle id || ansatt harGTFor bruker
 
     override val metadata = RegelBeskrivelse("Geografisk tilknytning", AVVIST_GEOGRAFISK)
@@ -32,7 +32,7 @@ class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) :
 @Order(LOWEST_PRECEDENCE - 1)
 class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) :
     OverstyrbarRegel {
-    override fun erOK(ansatt: Ansatt, bruker: Bruker) =
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         sjekkGruppeRegel({ bruker.geografiskTilknytning is UkjentBosted }, ansatt, id)
 
     override val metadata = RegelBeskrivelse("Person bosatt ukjent bosted", AVVIST_PERSON_UKJENT)
@@ -42,7 +42,7 @@ class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) 
 @Order(LOWEST_PRECEDENCE - 2)
 class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) :
     OverstyrbarRegel {
-    override fun erOK(ansatt: Ansatt, bruker: Bruker) =
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         sjekkGruppeRegel({ bruker.geografiskTilknytning is UtenlandskTilknytning }, ansatt, id)
 
     override val metadata = RegelBeskrivelse("Person bosatt utland", AVVIST_PERSON_UTLAND)
@@ -51,7 +51,7 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
 @Component
 @Order(LOWEST_PRECEDENCE - 3)
 class AvdødBrukerRegel(private val teller: AvdødTeller) : OverstyrbarRegel {
-    override fun erOK(ansatt: Ansatt, bruker: Bruker) =
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis(
             { bruker.erDød }, teller, true,
             tags = bruker.dødsdato?.let { arrayOf("months" to it.intervallSiden()) } ?: emptyArray()

@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.bruker.Bruker
 import java.util.*
 
 interface Regel {
-    fun erOK(ansatt: Ansatt, bruker: Bruker): Boolean
+    fun evaluer(ansatt: Ansatt, bruker: Bruker): Boolean
     val metadata: RegelBeskrivelse
     val kode get() = metadata.kode
     val kortNavn get() = metadata.kortNavn

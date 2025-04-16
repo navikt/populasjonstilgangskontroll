@@ -37,7 +37,7 @@ class RegelMotor(
         with(regelSett) {
             regler.forEachIndexed { index, regel ->
                 log.trace("[${index.plus(1)}/${regelSett.size}] Sjekker regel: '${regel.kortNavn}' fra $beskrivelse ${ansatt.ansattId} og ${ansatt.bruker?.brukerId} og ${bruker.brukerId}")
-                if (!regel.erOK(ansatt, bruker)) {
+                if (!regel.evaluer(ansatt, bruker)) {
                     throw RegelException(bruker.brukerId, ansatt.ansattId, regel).also {
                         handler.avvist("${index.plus(1)}/${regelSett.size}", ansatt.ansattId, bruker.brukerId, regel)
                     }

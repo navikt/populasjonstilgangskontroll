@@ -7,6 +7,15 @@ import no.nav.tilgangsmaskin.ansatt.AvvisningKode.AVVIST_SKJERMING
 import no.nav.tilgangsmaskin.ansatt.AvvisningKode.AVVIST_STRENGT_FORTROLIG_ADRESSE
 
 
+val GLOBALE_GRUPPER = setOf(
+    "gruppe.nasjonal",
+    "gruppe.udefinert",
+    "gruppe.utland",
+    "gruppe.strengt",
+    "gruppe.fortrolig",
+    "gruppe.egenansatt"
+)
+
 enum class GlobalGruppe(val kode: AvvisningKode) {
     STRENGT_FORTROLIG_GRUPPE(AVVIST_STRENGT_FORTROLIG_ADRESSE),
     FORTROLIG_GRUPPE(AVVIST_FORTROLIG_ADRESSE),

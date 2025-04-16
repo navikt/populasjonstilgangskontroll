@@ -46,6 +46,8 @@ data class Ansatt(
     infix fun erNåværendeEllerTidligerePartnerTil(bruker: Bruker) =
         parnere.any { it.brukerId == bruker.brukerId }
 
+    infix fun er(bruker: Bruker) = brukerId == bruker.brukerId
+
     infix fun erForeldreEllerBarnTil(bruker: Bruker) = foreldreOgBarn.any { it.brukerId == bruker.brukerId }
 
     infix fun erSøskenTil(bruker: Bruker) = søsken.any { it.brukerId == bruker.brukerId }

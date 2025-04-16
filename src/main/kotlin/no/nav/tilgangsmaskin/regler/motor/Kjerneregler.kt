@@ -49,7 +49,7 @@ class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Kj
 @Component
 class EgneDataRegel(private val teller: EgneDataTeller) : KjerneRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis({ ansatt.brukerId == bruker.brukerId }, teller)
+        avslåHvis({ ansatt er bruker }, teller)
 
     override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 0", AVVIST_HABILITET0)
 }

@@ -17,7 +17,7 @@ interface Regel {
 
     fun avslåHvis(
         predicate: () -> Boolean,
-        teller: HabilitetsTeller,
+        teller: Teller,
         ok: Boolean = false,
         vararg tags: Pair<String, String> = emptyArray()
     ) = if (predicate.invoke()) teller.registrerOppslag(ok, *tags) else true

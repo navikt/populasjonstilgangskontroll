@@ -17,7 +17,7 @@ class RegelException(
     arguments: Array<String> = arrayOf(ansattId.verdi, brukerId.verdi, regel.avvisningTekst)
 ) :
     ErrorResponseException(FORBIDDEN, forStatus(FORBIDDEN).apply {
-        title = "${regel.kode}"
+        title = regel.kode
         type = TYPE_URI
         instance = URI.create("${ansattId.verdi}/${brukerId.verdi}")
         properties = mapOf(

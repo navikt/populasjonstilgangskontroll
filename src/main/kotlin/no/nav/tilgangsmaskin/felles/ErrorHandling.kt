@@ -18,14 +18,14 @@ class DefaultRestErrorHandler : ErrorHandler {
     private val log = getLogger(javaClass)
 
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
-        if (res.statusCode.is4xxClientError) throw no.nav.tilgangsmaskin.felles.IrrecoverableRestException(
+        if (res.statusCode.is4xxClientError) throw IrrecoverableRestException(
             res.statusCode,
             req.uri,
             res.statusText
         ).also {
             log.warn("Irrecoverable exception etter ${res.statusCode.value()} fra ${req.uri}")
         }
-        else throw no.nav.tilgangsmaskin.felles.RecoverableRestException(res.statusCode, req.uri, res.statusText).also {
+        else throw RecoverableRestException(res.statusCode, req.uri, res.statusText).also {
             log.warn("Reecoverable exception etter ${res.statusCode.value()} fra ${req.uri}")
         }
     }
@@ -36,14 +36,14 @@ open class IrrecoverableRestException(
     uri: URI,
     msg: String = (status as HttpStatus).reasonPhrase,
     cause: Throwable? = null
-) : ErrorResponseException(status, no.nav.tilgangsmaskin.felles.problemDetail(status, msg, uri), cause)
+) : ErrorResponseException(status, problemDetail(status, msg, uri), cause)
 
 open class RecoverableRestException(
     status: HttpStatusCode,
     uri: URI,
     msg: String = (status as HttpStatus).reasonPhrase,
     cause: Throwable? = null
-) : ErrorResponseException(status, no.nav.tilgangsmaskin.felles.problemDetail(status, msg, uri), cause)
+) : ErrorResponseException(status, problemDetail(status, msg, uri), cause)
 
 private fun problemDetail(status: HttpStatusCode, msg: String, uri: URI) =
     forStatusAndDetail(status, msg).apply {

@@ -16,12 +16,12 @@ class TokenClaimsAccessor(
 
 
     val globaleGrupper
-        get() = GLOBALE_GRUPPER
-            .mapNotNull { gruppe ->
-                claimSet()?.getStringClaim(env.getRequiredProperty(gruppe))?.let { UUID.fromString(it) }
-                    ?.let { EntraGruppe(it, gruppe) }
-            }.toSet()
-
+        get() = GLOBALE_GRUPPER.mapNotNull { gruppe ->
+            val gruppeId = gruppe.id(env)
+            claimSet()
+                ?.getStringClaim(gruppeId.toString())
+                ?.let { EntraGruppe(gruppeId, gruppe.name) }
+        }.toSet()
 
     val system
         get() = runCatching {

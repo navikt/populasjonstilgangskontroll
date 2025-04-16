@@ -1,9 +1,12 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import no.nav.tilgangsmaskin.ansatt.AvvisningKode
 import java.net.URI
 
-data class RegelBeskrivelse(val kortNavn: String, val kode: AvvisningKode) {
+data class RegelBeskrivelse(val tekster: BeskrivelseTekster) {
+    val kode = tekster.kode
+    val årsak = tekster.avvisningÅrsak
+    val kortNavn = tekster.kortNavn
+
     companion object {
         val TYPE_URI = URI.create("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett")
         const val DETAIL_MESSAGE_CODE: String =

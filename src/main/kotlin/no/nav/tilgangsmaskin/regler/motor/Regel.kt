@@ -9,7 +9,7 @@ interface Regel {
     val metadata: RegelBeskrivelse
     val kode get() = metadata.kode
     val kortNavn get() = metadata.kortNavn
-    val avvisningTekst get() = kode.årsak
+    val avvisningTekst get() = metadata.årsak
     val erOverstyrbar get() = this is OverstyrbarRegel
 
     fun sjekkGruppeRegel(predicate: () -> Boolean, ansatt: Ansatt, id: UUID) =

@@ -1,82 +1,93 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.tilgangsmaskin.ansatt.Ansatt
-import no.nav.tilgangsmaskin.ansatt.AvvisningKode.AVVIST_HABILITET0
-import no.nav.tilgangsmaskin.ansatt.AvvisningKode.AVVIST_HABILITET1
-import no.nav.tilgangsmaskin.ansatt.AvvisningKode.AVVIST_HABILITET2
-import no.nav.tilgangsmaskin.ansatt.AvvisningKode.AVVIST_HABILITET3
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.EGEN_ANSATT_GRUPPE
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG_GRUPPE
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_GRUPPE
 import no.nav.tilgangsmaskin.bruker.Bruker
-import org.springframework.beans.factory.annotation.Value
+import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.EGNEDATA
+import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.FORELDREBARN
+import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.FORTROLIG_ADRESSE
+import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.PARTNER
+import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.SKJERMING
+import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.STRENGT_FORTROLIG_ADRESSE
+import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.SØSKEN
 import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
 import org.springframework.core.annotation.Order
+import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
-import java.util.*
 
 interface KjerneRegel : Regel
 
 
 @Component
 @Order(HIGHEST_PRECEDENCE)
-class StrengtFortroligRegel(@Value("\${gruppe.strengt}") private val id: UUID) : KjerneRegel {
+class StrengtFortroligRegel(private val env: Environment) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        sjekkGruppeRegel({ bruker.kreverGlobalGruppe(STRENGT_FORTROLIG_GRUPPE) }, ansatt, id)
+        sjekkGruppeRegel(
+            { bruker.kreverGlobalGruppe(STRENGT_FORTROLIG_GRUPPE) },
+            ansatt,
+            STRENGT_FORTROLIG_GRUPPE.id(env)
+        )
 
-    override val metadata = RegelBeskrivelse("Kode 6", STRENGT_FORTROLIG_GRUPPE.kode)
-}
+    override val metadata = RegelBeskrivelse(STRENGT_FORTROLIG_ADRESSE)
 
-@Component
-@Order(HIGHEST_PRECEDENCE + 1)
-class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID) : KjerneRegel {
-    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        sjekkGruppeRegel({ bruker.kreverGlobalGruppe(FORTROLIG_GRUPPE) }, ansatt, id)
 
-    override val metadata = RegelBeskrivelse("Kode 7", FORTROLIG_GRUPPE.kode)
-}
+    @Component
+    @Order(HIGHEST_PRECEDENCE + 1)
+    class FortroligRegel(private val env: Environment) : KjerneRegel {
+        override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
+            sjekkGruppeRegel(
+                { bruker.kreverGlobalGruppe(FORTROLIG_GRUPPE) }, ansatt,
+                FORTROLIG_GRUPPE.id(env)
+            )
 
-@Component
-@Order(HIGHEST_PRECEDENCE + 2)
-class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : KjerneRegel {
-    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        sjekkGruppeRegel({ bruker.kreverGlobalGruppe(EGEN_ANSATT_GRUPPE) }, ansatt, id)
+        override val metadata = RegelBeskrivelse(FORTROLIG_ADRESSE)
+    }
 
-    override val metadata = RegelBeskrivelse("Skjerming", EGEN_ANSATT_GRUPPE.kode)
-}
+    @Component
+    @Order(HIGHEST_PRECEDENCE + 2)
+    class EgenAnsattRegel(private val env: Environment) : KjerneRegel {
+        override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
+            sjekkGruppeRegel({ bruker.kreverGlobalGruppe(EGEN_ANSATT_GRUPPE) }, ansatt, EGEN_ANSATT_GRUPPE.id(env))
 
-@Order(HIGHEST_PRECEDENCE + 3)
-@Component
-class EgneDataRegel(private val teller: EgneDataOppslagTeller) : KjerneRegel {
-    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis({ ansatt er bruker }, teller)
+        override val metadata = RegelBeskrivelse(SKJERMING)
+    }
 
-    override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 0", AVVIST_HABILITET0)
-}
+    @Order(HIGHEST_PRECEDENCE + 3)
+    @Component
+    class EgneDataRegel(private val teller: EgneDataOppslagTeller) : KjerneRegel {
+        override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
+            avslåHvis({ ansatt er bruker }, teller)
 
-@Order(HIGHEST_PRECEDENCE + 4)
-@Component
-class ForeldreOgBarnRegel(private val teller: ForeldreBarnOppslagTeller) : KjerneRegel {
-    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis({ ansatt erForeldreEllerBarnTil bruker }, teller)
+        override val metadata = RegelBeskrivelse(EGNEDATA)
+    }
 
-    override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 1", AVVIST_HABILITET1)
-}
+    @Order(HIGHEST_PRECEDENCE + 4)
+    @Component
+    class ForeldreOgBarnRegel(private val teller: ForeldreBarnOppslagTeller) : KjerneRegel {
+        override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
+            avslåHvis({ ansatt erForeldreEllerBarnTil bruker }, teller)
 
-@Order(HIGHEST_PRECEDENCE + 5)
-@Component
-class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
-    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis({ ansatt erNåværendeEllerTidligerePartnerTil bruker }, teller)
+        override val metadata = RegelBeskrivelse(FORELDREBARN)
+    }
 
-    override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 2", AVVIST_HABILITET2)
-}
+    @Order(HIGHEST_PRECEDENCE + 5)
+    @Component
+    class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
+        override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
+            avslåHvis({ ansatt erNåværendeEllerTidligerePartnerTil bruker }, teller)
 
-@Component
-@Order(HIGHEST_PRECEDENCE + 6)
-class SøskenRegel(private val teller: SøskenOppslagTeller) : KjerneRegel {
-    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis({ ansatt erSøskenTil bruker }, teller)
+        override val metadata = RegelBeskrivelse(PARTNER)
+    }
 
-    override val metadata = RegelBeskrivelse("Oppslag med manglende habilitet 3", AVVIST_HABILITET3)
+    @Component
+    @Order(HIGHEST_PRECEDENCE + 6)
+    class SøskenRegel(private val teller: SøskenOppslagTeller) : KjerneRegel {
+        override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
+            avslåHvis({ ansatt erSøskenTil bruker }, teller)
+
+        override val metadata = RegelBeskrivelse(SØSKEN)
+    }
+
 }

@@ -52,7 +52,10 @@ class UtlandUdefinertGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) 
 @Order(LOWEST_PRECEDENCE - 3)
 class AvdødBrukerRegel(private val teller: AvdødTeller) : OverstyrbarRegel {
     override fun erOK(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis({ bruker.erDød }, teller, true, "months" to bruker.dødsdato!!.intervallSiden())
+        avslåHvis(
+            { bruker.erDød }, teller, true,
+            tags = bruker.dødsdato?.let { arrayOf("months" to it.intervallSiden()) } ?: emptyArray()
+        )
 
     override val metadata = RegelBeskrivelse("Avdød bruker", AVVIST_AVDØD)
 }

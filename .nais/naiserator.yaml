@@ -18,22 +18,22 @@ spec:
       - type: {{db.type}}
         tier: {{db.tier}}
         databases:
-        - name: {{db.name}}
-          envVarPrefix: DB
+          - name: {{db.name}}
+            envVarPrefix: DB
         flags:
-         - name: cloudsql.enable_pgaudit
-           value: "{{db-flags.pgaudit.enabled}}"
-         - name: pgaudit.log
-           value: "{{db-flags.pgaudit.logtype}}"
+          - name: cloudsql.enable_pgaudit
+            value: "{{db-flags.pgaudit.enabled}}"
+          - name: pgaudit.log
+            value: "{{db-flags.pgaudit.logtype}}"
   ingresses:
-    {{#each ingresses as |ingress|}}
-        - {{ingress}}
-    {{/each}}
+    { { #each ingresses as |ingress|}}
+        - {{ingress } }
+      {{/each}}
   image: {{image}}
   observability:
     autoInstrumentation:
-        enabled: true
-        runtime: java
+      enabled: true
+      runtime: java
   prometheus:
     enabled: true
     path: /monitoring/prometheus
@@ -58,6 +58,13 @@ spec:
       enabled: true
       allowAllUsers: true
       claims:
+        groups:
+          - {{grupper.nasjonal}}
+          - {{grupper.utland}}
+          - {{grupper.egenansatt}}
+          - {{grupper.udefinert}}
+          - {{grupper.fortrolig}}
+          - {{grupper.strengt}}
         extra:
           - "NAVident"
           - "azp_name"
@@ -72,11 +79,11 @@ spec:
         - host: {{pdl}}
     inbound:
       rules:
-       {{#each inbound as |app|}}
-        - application: '{{app.name}}'
-          namespace: '{{app.namespace}}'
-          cluster: '{{app.cluster}}'
-       {{/each}}
+        { { #each inbound as |app|}}
+            - application: '{{app.name}}'
+                namespace: '{{app.namespace}}'
+                cluster: '{{app.cluster}}'
+                {{/each } }
   env:
     - name: NAIS_CLUSTER_TYPE
       value: {{nais.cluster.type}}

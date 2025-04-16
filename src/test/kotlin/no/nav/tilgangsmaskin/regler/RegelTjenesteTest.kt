@@ -60,7 +60,7 @@ class RegelTjenesteTest {
     lateinit var avdød: AvdødTeller
 
     @MockkBean
-    lateinit var egne: EgneDataTeller
+    lateinit var egne: EgneDataOppslagTeller
 
     @MockkBean
     lateinit var partner: PartnerOppslagTeller
@@ -69,7 +69,7 @@ class RegelTjenesteTest {
     lateinit var søsken: SøskenOppslagTeller
 
     @MockkBean
-    lateinit var foreldrebarg: ForeldreBarnTeller
+    lateinit var foreldrebarg: ForeldreBarnOppslagTeller
 
     @Autowired
     lateinit var motor: RegelMotor

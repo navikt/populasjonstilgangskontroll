@@ -27,11 +27,11 @@ class SøskenOppslagTeller(registry: MeterRegistry, accessor: TokenClaimsAccesso
     Teller(registry, accessor, "siblings.attempted.total", "Forsøk på å slå opp søsken")
 
 @Component
-class EgneDataTeller(registry: MeterRegistry, accessor: TokenClaimsAccessor) :
+class EgneDataOppslagTeller(registry: MeterRegistry, accessor: TokenClaimsAccessor) :
     Teller(registry, accessor, "own.attempted.total", "Forsøk på å slå opp egne data")
 
 @Component
-class ForeldreBarnTeller(registry: MeterRegistry, accessor: TokenClaimsAccessor) :
+class ForeldreBarnOppslagTeller(registry: MeterRegistry, accessor: TokenClaimsAccessor) :
     Teller(registry, accessor, "parentsorchildren.attempted.total", "Forsøk på å slå opp foreldre eller barn")
 
 @Component

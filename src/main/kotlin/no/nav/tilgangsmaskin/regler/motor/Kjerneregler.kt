@@ -47,7 +47,7 @@ class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Kj
 
 @Order(HIGHEST_PRECEDENCE + 3)
 @Component
-class EgneDataRegel(private val teller: EgneDataTeller) : KjerneRegel {
+class EgneDataRegel(private val teller: EgneDataOppslagTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis({ ansatt er bruker }, teller)
 
@@ -56,7 +56,7 @@ class EgneDataRegel(private val teller: EgneDataTeller) : KjerneRegel {
 
 @Order(HIGHEST_PRECEDENCE + 4)
 @Component
-class ForeldreOgBarnRegel(private val teller: ForeldreBarnTeller) : KjerneRegel {
+class ForeldreOgBarnRegel(private val teller: ForeldreBarnOppslagTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis({ ansatt erForeldreEllerBarnTil bruker }, teller)
 

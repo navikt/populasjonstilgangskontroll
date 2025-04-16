@@ -42,7 +42,7 @@ class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : Kj
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         sjekkGruppeRegel({ bruker.kreverGlobalGruppe(EGEN_ANSATT_GRUPPE) }, ansatt, id)
 
-    override val metadata = RegelBeskrivelse("Kode 8", EGEN_ANSATT_GRUPPE.kode)
+    override val metadata = RegelBeskrivelse("Skjerming", EGEN_ANSATT_GRUPPE.kode)
 }
 
 @Order(HIGHEST_PRECEDENCE + 3)

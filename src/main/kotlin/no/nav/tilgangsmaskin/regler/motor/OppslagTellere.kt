@@ -10,21 +10,18 @@ abstract class AbstractTeller(
     private val accessor: TokenClaimsAccessor,
     private val tellerNavn: String,
     private val beskrivelse: String
-) : Teller {
+) {
 
-    override fun registrerOppslag(ok: Boolean, vararg tags: Pair<String, String>) =
-        ok.also {
+    fun increment(avslått: Boolean, vararg tags: Pair<String, String>) =
+        if (avslått) {
             Counter.builder(tellerNavn)
                 .description(beskrivelse)
                 .tag("system", accessor.system ?: "N/A")
                 .apply { tags.forEach { tag(it.first, it.second) } }
                 .register(registry).increment()
-        }
+        } else Unit
 }
 
-interface Teller {
-    fun registrerOppslag(ok: Boolean, vararg tags: Pair<String, String> = emptyArray()): Boolean = false
-}
 
 @Component
 class SøskenOppslagTeller(registry: MeterRegistry, accessor: TokenClaimsAccessor) :

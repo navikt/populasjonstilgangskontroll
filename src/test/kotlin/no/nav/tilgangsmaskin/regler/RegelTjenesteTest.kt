@@ -56,21 +56,6 @@ class RegelTjenesteTest {
     @MockkBean
     lateinit var accessor: TokenClaimsAccessor
 
-    @MockkBean
-    lateinit var avdød: AvdødTeller
-
-    @MockkBean
-    lateinit var egne: EgneDataOppslagTeller
-
-    @MockkBean
-    lateinit var partner: PartnerOppslagTeller
-
-    @MockkBean
-    lateinit var søsken: SøskenOppslagTeller
-
-    @MockkBean
-    lateinit var foreldrebarg: ForeldreBarnOppslagTeller
-
     @Autowired
     lateinit var motor: RegelMotor
 
@@ -85,8 +70,20 @@ class RegelTjenesteTest {
     private lateinit var regel: RegelTjeneste
 
 
+    lateinit var avdød: AvdødTeller
+    lateinit var egne: EgneDataOppslagTeller
+    lateinit var partner: PartnerOppslagTeller
+    lateinit var søsken: SøskenOppslagTeller
+    lateinit var foreldrebarn: ForeldreBarnOppslagTeller
+
+
     @BeforeTest
     fun before() {
+        søsken = SøskenOppslagTeller(SimpleMeterRegistry(), accessor)
+        foreldrebarn = ForeldreBarnOppslagTeller(SimpleMeterRegistry(), accessor)
+        partner = PartnerOppslagTeller(SimpleMeterRegistry(), accessor)
+        avdød = AvdødTeller(SimpleMeterRegistry(), accessor)
+        egne = EgneDataOppslagTeller(SimpleMeterRegistry(), accessor)
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
         every { accessor.system } returns "test"
         every { accessor.systemNavn } returns "test"

@@ -28,11 +28,6 @@ import no.nav.tilgangsmaskin.regler.TestData.ukjentBostedBruker
 import no.nav.tilgangsmaskin.regler.TestData.vanligAnsatt
 import no.nav.tilgangsmaskin.regler.TestData.vanligBruker
 import no.nav.tilgangsmaskin.regler.motor.*
-import no.nav.tilgangsmaskin.regler.motor.StrengtFortroligRegel.EgenAnsattRegel
-import no.nav.tilgangsmaskin.regler.motor.StrengtFortroligRegel.EgneDataRegel
-import no.nav.tilgangsmaskin.regler.motor.StrengtFortroligRegel.ForeldreOgBarnRegel
-import no.nav.tilgangsmaskin.regler.motor.StrengtFortroligRegel.FortroligRegel
-import no.nav.tilgangsmaskin.regler.motor.StrengtFortroligRegel.PartnerRegel
 import no.nav.tilgangsmaskin.tilgang.TokenClaimsAccessor
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.DisplayName

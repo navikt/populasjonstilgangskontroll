@@ -27,3 +27,7 @@ data class Person(
 
 enum class Gradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG, UGRADERT }
 
+fun List<Gradering>.erStrengtFortrolig() =
+    any { it in setOf(Gradering.STRENGT_FORTROLIG_UTLAND, Gradering.STRENGT_FORTROLIG) }
+
+fun List<Gradering>.erFortrolig() = any { it == Gradering.FORTROLIG }

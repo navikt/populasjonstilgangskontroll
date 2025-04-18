@@ -1,10 +1,15 @@
 package no.nav.tilgangsmaskin.bruker
 
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.EGEN_ANSATT
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UDEFINERT_GEO
 import no.nav.tilgangsmaskin.bruker.Bruker.BrukerIdentifikatorer
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.udefinertGeoTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.Gradering
 import no.nav.tilgangsmaskin.bruker.pdl.Person
+import no.nav.tilgangsmaskin.bruker.pdl.erFortrolig
+import no.nav.tilgangsmaskin.bruker.pdl.erStrengtFortrolig
 
 object PersonTilBrukerMapper {
     fun tilBruker(person: Person, erSkjermet: Boolean) =
@@ -19,23 +24,15 @@ object PersonTilBrukerMapper {
         }
 
     private fun tilGruppeKrav(
-        geoTilknytning: GeografiskTilknytning,
-        graderinger: List<Gradering>,
-        erSkjermet: Boolean
+        gt: GeografiskTilknytning, graderinger: List<Gradering>, erSkjermet: Boolean
     ) =
-        mutableListOf<GlobalGruppe>().apply {
-            if (graderinger.any {
-                    it in listOf(Gradering.STRENGT_FORTROLIG, Gradering.STRENGT_FORTROLIG_UTLAND)
-                }) {
-                add(GlobalGruppe.STRENGT_FORTROLIG)
-            } else if (graderinger.any { it == Gradering.FORTROLIG }) {
-                add(GlobalGruppe.FORTROLIG)
-            }
-            if (geoTilknytning == udefinertGeoTilknytning) {
-                add(GlobalGruppe.UDEFINERT_GEO)
-            }
-            if (erSkjermet) {
-                add(GlobalGruppe.EGEN_ANSATT)
-            }
-        }
+        listOfNotNull(
+            when {
+                graderinger.erStrengtFortrolig() -> STRENGT_FORTROLIG
+                graderinger.erFortrolig() -> FORTROLIG
+                else -> null
+            },
+            UDEFINERT_GEO.takeIf { gt == udefinertGeoTilknytning },
+            EGEN_ANSATT.takeIf { erSkjermet }
+        )
 }

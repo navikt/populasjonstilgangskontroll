@@ -14,7 +14,7 @@ data class Ansatt(
     val grupper: List<EntraGruppe>,
     val bruker: Bruker? = null
 ) {
-    
+
     @JsonIgnore
     val brukerId = bruker?.brukerId
 
@@ -42,6 +42,7 @@ data class Ansatt(
         )
     }
 
+    infix fun kanBehandle(gruppe: GlobalGruppe) = grupper.any { it.id == gruppe.id }
     infix fun kanBehandle(id: UUID) = grupper.any { it.id == id }
 
     infix fun erNåværendeEllerTidligerePartnerTil(bruker: Bruker) =

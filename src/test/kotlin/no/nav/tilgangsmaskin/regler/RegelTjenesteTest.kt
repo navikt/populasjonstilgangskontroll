@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.context.annotation.Import
@@ -45,6 +46,7 @@ import kotlin.test.assertEquals
 @DataJpaTest
 @EnableJpaAuditing
 @TestPropertySource(locations = ["classpath:test.properties"])
+@EnableConfigurationProperties(Grupper::class)
 @ContextConfiguration(classes = [TestApp::class])
 @ExtendWith(MockKExtension::class)
 @AutoConfigureObservability

@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertInstanceOf
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest
 import org.springframework.context.annotation.Import
@@ -48,6 +49,7 @@ import org.springframework.test.context.TestPropertySource
 @RestClientTest
 @TestPropertySource(locations = ["classpath:test.properties"])
 @AutoConfigureObservability
+@EnableConfigurationProperties(Grupper::class)
 @ContextConfiguration(classes = [TestApp::class, TokenClaimsAccessor::class])
 class RegelMotorTest {
 

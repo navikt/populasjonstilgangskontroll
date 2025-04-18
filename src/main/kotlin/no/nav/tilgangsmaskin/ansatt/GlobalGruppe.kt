@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster
-import org.springframework.core.env.Environment
 import java.util.*
 
 
@@ -13,7 +12,13 @@ enum class GlobalGruppe(val property: String, val metadata: BeskrivelseTekster) 
     BOSTED_UTLAND("gruppe.utland", BeskrivelseTekster.PERSON_UTLAND),
     NASJONAL("gruppe.nasjonal", BeskrivelseTekster.GEOGRAFISK);
 
+    lateinit var id: UUID
 
-    fun id(env: Environment) = UUID.fromString(env.getRequiredProperty(property))
-
+    companion object {
+        fun setIDs(grupper: Map<String, UUID>) {
+            entries.forEach { gruppe ->
+                gruppe.id = grupper[gruppe.property] ?: error("Mangler id for ${gruppe.property}")
+            }
+        }
+    }
 }

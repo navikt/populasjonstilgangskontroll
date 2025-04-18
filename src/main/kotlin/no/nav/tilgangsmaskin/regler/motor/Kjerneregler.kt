@@ -10,7 +10,6 @@ import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.EGNEDATA
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.FORELDREBARN
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.PARTNER
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.SØSKEN
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
 import org.springframework.core.annotation.Order
 import org.springframework.core.env.Environment
@@ -21,9 +20,9 @@ interface KjerneRegel : Regel
 
 @Component
 @Order(HIGHEST_PRECEDENCE)
-class StrengtFortroligRegel(@Value("\${gruppe.strengt}") private val id: UUID) : KjerneRegel {
+class StrengtFortroligRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { bruker krever STRENGT_FORTROLIG && !(ansatt kanBehandle id) }
+        avslåHvis { bruker krever STRENGT_FORTROLIG && !(ansatt kanBehandle STRENGT_FORTROLIG) }
 
     override val metadata = Metadata(STRENGT_FORTROLIG)
 
@@ -31,18 +30,18 @@ class StrengtFortroligRegel(@Value("\${gruppe.strengt}") private val id: UUID) :
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 1)
-class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID) : KjerneRegel {
+class FortroligRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { bruker krever FORTROLIG && !(ansatt kanBehandle id) }
+        avslåHvis { bruker krever FORTROLIG && !(ansatt kanBehandle FORTROLIG) }
 
     override val metadata = Metadata(FORTROLIG)
 }
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 2)
-class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : KjerneRegel {
+class EgenAnsattRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { bruker krever EGEN_ANSATT && !(ansatt kanBehandle id) }
+        avslåHvis { bruker krever EGEN_ANSATT && !(ansatt kanBehandle EGEN_ANSATT) }
 
     override val metadata = Metadata(EGEN_ANSATT)
 }
@@ -62,7 +61,9 @@ class EgneDataRegel(private val teller: EgneDataOppslagTeller) : KjerneRegel {
 @Component
 class ForeldreOgBarnRegel(private val teller: ForeldreBarnOppslagTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { ansatt erForeldreEllerBarnTil bruker }
+        avslåHvis { ansatt erForeldreEllerBarnTil bruker }.also {
+            teller.increment(!it)
+        }
 
     override val metadata = Metadata(FORELDREBARN)
 }

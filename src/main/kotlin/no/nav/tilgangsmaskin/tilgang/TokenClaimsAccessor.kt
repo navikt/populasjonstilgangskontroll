@@ -16,7 +16,7 @@ class TokenClaimsAccessor(
 
     val globaleGrupper
         get() = GlobalGruppe.entries.mapNotNull { gruppe ->
-            val gruppeId = gruppe.id(env)
+            val gruppeId = gruppe.id
             claimSet()
                 ?.getStringClaim(gruppeId.toString())
                 ?.let { EntraGruppe(gruppeId, gruppe.name) }

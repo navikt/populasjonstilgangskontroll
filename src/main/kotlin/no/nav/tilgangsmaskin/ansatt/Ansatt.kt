@@ -43,7 +43,6 @@ data class Ansatt(
     }
 
     infix fun kanBehandle(gruppe: GlobalGruppe) = grupper.any { it.id == gruppe.id }
-    infix fun kanBehandle(id: UUID) = grupper.any { it.id == id }
 
     infix fun erNåværendeEllerTidligerePartnerTil(bruker: Bruker) =
         parnere.any { it.brukerId == bruker.brukerId }

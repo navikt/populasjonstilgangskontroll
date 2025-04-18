@@ -1,60 +1,50 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.tilgangsmaskin.ansatt.Ansatt
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.GEO_PERSON_UTLAND
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UDEFINERT_GEO
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.BOSTED_UTLAND
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.AVDØD
-import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.GEOGRAFISK
-import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.PERSON_UKJENT
-import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.PERSON_UTLAND
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 import org.springframework.core.annotation.Order
-import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
+import java.util.*
 
 
 interface OverstyrbarRegel : Regel
 
 @Component
 @Order(LOWEST_PRECEDENCE)
-class GeoNorgeRegel(private val env: Environment) :
+class GeoNorgeRegel(@Value("\${gruppe.nasjonal}") private val id: UUID) :
     OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        ansatt kanBehandle env.id(NASJONAL) || ansatt harGTFor bruker
+        avslåHvis({ !(ansatt kanBehandle id) && !(ansatt kanBehandle bruker.geografiskTilknytning) })
 
-    override val metadata = RegelBeskrivelse(GEOGRAFISK)
+    override val metadata = Metadata(GlobalGruppe.NASJONAL)
 }
 
 @Component
 @Order(LOWEST_PRECEDENCE - 1)
-class UkjentBostedGeoRegel(private val env: Environment) :
-    OverstyrbarRegel {
+class UkjentBostedGeoRegel(@Value("\${gruppe.udefinert}") private val id: UUID) : OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        sjekkGruppeRegel(
-            { bruker.geografiskTilknytning is UkjentBosted }, ansatt,
-            env.id(UDEFINERT_GEO)
-        )
+        avslåHvis({ bruker.geografiskTilknytning is UkjentBosted && !(ansatt kanBehandle id) })
 
-    override val metadata = RegelBeskrivelse(PERSON_UKJENT)
+    override val metadata = Metadata(UKJENT_BOSTED)
 }
 
 @Component
 @Order(LOWEST_PRECEDENCE - 2)
-class UtlandUdefinertGeoRegel(private val env: Environment) :
+class UtlandGeoRegel(@Value("\${gruppe.utland}") private val id: UUID) :
     OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        sjekkGruppeRegel(
-            { bruker.geografiskTilknytning is UtenlandskTilknytning },
-            ansatt,
-            env.id(GEO_PERSON_UTLAND)
-        )
+        avslåHvis({ bruker.geografiskTilknytning is UtenlandskTilknytning && !(ansatt kanBehandle id) })
 
-    override val metadata = RegelBeskrivelse(PERSON_UTLAND)
+    override val metadata = Metadata(BOSTED_UTLAND)
 }
 
 @Component
@@ -66,7 +56,7 @@ class AvdødBrukerRegel(private val teller: AvdødTeller) : OverstyrbarRegel {
             tags = bruker.dødsdato?.let { arrayOf("months" to it.intervallSiden()) } ?: emptyArray()
         )
 
-    override val metadata = RegelBeskrivelse(AVDØD)
+    override val metadata = Metadata(AVDØD)
 }
 
 

@@ -30,8 +30,8 @@ data class Bruker(
 
     @JsonIgnore
     val partnere = familie.partnere
-
-    fun kreverGlobalGruppe(gruppe: GlobalGruppe) = gruppe in gruppeKrav
+    
+    infix fun krever(gruppe: GlobalGruppe) = gruppe in gruppeKrav
 
     data class BrukerIdentifikatorer(
         val brukerId: BrukerId,

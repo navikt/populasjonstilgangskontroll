@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.ansatt
 import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import java.util.*
@@ -13,7 +14,7 @@ data class Ansatt(
     val grupper: List<EntraGruppe>,
     val bruker: Bruker? = null
 ) {
-
+    
     @JsonIgnore
     val brukerId = bruker?.brukerId
 
@@ -29,12 +30,12 @@ data class Ansatt(
     @JsonIgnore
     val parnere = bruker?.partnere ?: emptyList()
 
-    infix fun harGTFor(bruker: Bruker) = grupper.any {
+    infix fun kanBehandle(gt: GeografiskTilknytning) = grupper.any {
         it.displayName.endsWith(
             "GEO_${
-                when (bruker.geografiskTilknytning) {
-                    is KommuneTilknytning -> bruker.geografiskTilknytning.kommune.verdi
-                    is BydelTilknytning -> bruker.geografiskTilknytning.bydel.verdi
+                when (gt) {
+                    is KommuneTilknytning -> gt.kommune.verdi
+                    is BydelTilknytning -> gt.bydel.verdi
                     else -> return true
                 }
             }"

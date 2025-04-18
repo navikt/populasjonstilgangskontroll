@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.felles
 
 import no.nav.tilgangsmaskin.regler.motor.BulkRegelException
-import no.nav.tilgangsmaskin.regler.motor.RegelBeskrivelse.Companion.TYPE_URI
+import no.nav.tilgangsmaskin.regler.motor.Metadata.Companion.TYPE_URI
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpHeaders

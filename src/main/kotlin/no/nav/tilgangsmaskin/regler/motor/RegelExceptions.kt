@@ -2,8 +2,8 @@ package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.regler.motor.RegelBeskrivelse.Companion.DETAIL_MESSAGE_CODE
-import no.nav.tilgangsmaskin.regler.motor.RegelBeskrivelse.Companion.TYPE_URI
+import no.nav.tilgangsmaskin.regler.motor.Metadata.Companion.DETAIL_MESSAGE_CODE
+import no.nav.tilgangsmaskin.regler.motor.Metadata.Companion.TYPE_URI
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.ProblemDetail.forStatus
 import org.springframework.web.ErrorResponseException

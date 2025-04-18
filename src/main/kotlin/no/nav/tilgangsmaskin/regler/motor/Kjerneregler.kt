@@ -8,11 +8,9 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.EGNEDATA
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.FORELDREBARN
-import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.FORTROLIG_ADRESSE
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.PARTNER
-import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.SKJERMING
-import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.STRENGT_FORTROLIG_ADRESSE
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.SØSKEN
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
 import org.springframework.core.annotation.Order
 import org.springframework.core.env.Environment
@@ -21,42 +19,31 @@ import java.util.*
 
 interface KjerneRegel : Regel
 
-
 @Component
 @Order(HIGHEST_PRECEDENCE)
-class StrengtFortroligRegel(private val env: Environment) : KjerneRegel {
+class StrengtFortroligRegel(@Value("\${gruppe.strengt}") private val id: UUID) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        sjekkGruppeRegel(
-            { bruker.kreverGlobalGruppe(STRENGT_FORTROLIG) },
-            ansatt,
-            env.id(STRENGT_FORTROLIG)
-        )
-
-    override val metadata = RegelBeskrivelse(STRENGT_FORTROLIG_ADRESSE)
+        avslåHvis({ bruker krever STRENGT_FORTROLIG && !(ansatt kanBehandle id) })
+    
+    override val metadata = Metadata(STRENGT_FORTROLIG)
 
 
     @Component
     @Order(HIGHEST_PRECEDENCE + 1)
-    class FortroligRegel(private val env: Environment) : KjerneRegel {
+    class FortroligRegel(@Value("\${gruppe.fortrolig}") private val id: UUID) : KjerneRegel {
         override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-            sjekkGruppeRegel(
-                { bruker.kreverGlobalGruppe(FORTROLIG) }, ansatt,
-                env.id(FORTROLIG)
-            )
+            avslåHvis({ bruker krever FORTROLIG && !(ansatt kanBehandle id) })
 
-        override val metadata = RegelBeskrivelse(FORTROLIG_ADRESSE)
+        override val metadata = Metadata(FORTROLIG)
     }
 
     @Component
     @Order(HIGHEST_PRECEDENCE + 2)
-    class EgenAnsattRegel(private val env: Environment) : KjerneRegel {
+    class EgenAnsattRegel(@Value("\${gruppe.egenansatt}") private val id: UUID) : KjerneRegel {
         override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-            sjekkGruppeRegel(
-                { bruker.kreverGlobalGruppe(EGEN_ANSATT) }, ansatt,
-                env.id(EGEN_ANSATT)
-            )
+            avslåHvis({ bruker krever EGEN_ANSATT && !(ansatt kanBehandle id) })
 
-        override val metadata = RegelBeskrivelse(SKJERMING)
+        override val metadata = Metadata(EGEN_ANSATT)
     }
 
     @Order(HIGHEST_PRECEDENCE + 3)
@@ -65,7 +52,7 @@ class StrengtFortroligRegel(private val env: Environment) : KjerneRegel {
         override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
             avslåHvis({ ansatt er bruker }, teller)
 
-        override val metadata = RegelBeskrivelse(EGNEDATA)
+        override val metadata = Metadata(EGNEDATA)
     }
 
     @Order(HIGHEST_PRECEDENCE + 4)
@@ -74,7 +61,7 @@ class StrengtFortroligRegel(private val env: Environment) : KjerneRegel {
         override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
             avslåHvis({ ansatt erForeldreEllerBarnTil bruker }, teller)
 
-        override val metadata = RegelBeskrivelse(FORELDREBARN)
+        override val metadata = Metadata(FORELDREBARN)
     }
 
     @Order(HIGHEST_PRECEDENCE + 5)
@@ -83,7 +70,7 @@ class StrengtFortroligRegel(private val env: Environment) : KjerneRegel {
         override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
             avslåHvis({ ansatt erNåværendeEllerTidligerePartnerTil bruker }, teller)
 
-        override val metadata = RegelBeskrivelse(PARTNER)
+        override val metadata = Metadata(PARTNER)
     }
 
     @Component
@@ -92,7 +79,7 @@ class StrengtFortroligRegel(private val env: Environment) : KjerneRegel {
         override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
             avslåHvis({ ansatt erSøskenTil bruker }, teller)
 
-        override val metadata = RegelBeskrivelse(SØSKEN)
+        override val metadata = Metadata(SØSKEN)
     }
 
 }

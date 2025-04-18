@@ -6,7 +6,7 @@ import java.util.*
 
 interface Regel {
     fun evaluer(ansatt: Ansatt, bruker: Bruker): Boolean
-    val metadata: RegelBeskrivelse
+    val metadata: Metadata
     val kode get() = metadata.kode
     val kortNavn get() = metadata.kortNavn
     val avvisningTekst get() = metadata.årsak
@@ -17,7 +17,7 @@ interface Regel {
 
     fun avslåHvis(
         predicate: () -> Boolean,
-        teller: Teller,
+        teller: Teller = object : Teller {},
         ok: Boolean = false,
         vararg tags: Pair<String, String> = emptyArray()
     ) = if (predicate.invoke()) teller.registrerOppslag(ok, *tags) else true

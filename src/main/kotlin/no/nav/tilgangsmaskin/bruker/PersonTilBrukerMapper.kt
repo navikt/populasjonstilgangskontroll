@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.bruker
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.EGEN_ANSATT
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UDEFINERT_GEO
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.bruker.Bruker.BrukerIdentifikatorer
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.udefinertGeoTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.Gradering
@@ -32,7 +32,7 @@ object PersonTilBrukerMapper {
                 graderinger.erFortrolig() -> FORTROLIG
                 else -> null
             },
-            UDEFINERT_GEO.takeIf { gt == udefinertGeoTilknytning },
+            UKJENT_BOSTED.takeIf { gt == udefinertGeoTilknytning },
             EGEN_ANSATT.takeIf { erSkjermet }
         )
 }

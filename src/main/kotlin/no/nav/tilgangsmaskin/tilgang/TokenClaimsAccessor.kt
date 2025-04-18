@@ -14,7 +14,6 @@ class TokenClaimsAccessor(
     private val env: ConfigurableEnvironment
 ) {
 
-
     val globaleGrupper
         get() = GlobalGruppe.entries.mapNotNull { gruppe ->
             val gruppeId = gruppe.id(env)

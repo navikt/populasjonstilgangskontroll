@@ -285,7 +285,7 @@ class RegelMotorTest {
     @Test
     @DisplayName("Test at ansatt uten tilgang utland ikke kan behandle bruker med geografisk utland")
     fun geoUtlandGruppeUtenSammeRolle() {
-        assertInstanceOf<UtlandUdefinertGeoRegel>(
+        assertInstanceOf<UtlandGeoRegel>(
             assertThrows<RegelException> {
                 regelMotor.kompletteRegler(vanligAnsatt, geoUtlandBruker)
             }.regel

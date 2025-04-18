@@ -18,30 +18,24 @@ interface OverstyrbarRegel : Regel
 
 @Component
 @Order(LOWEST_PRECEDENCE)
-class GeoNorgeRegel :
-    OverstyrbarRegel {
+class GeoNorgeRegel : GlobalGruppeRegel(NASJONAL), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { !(ansatt kanBehandle NASJONAL) && !(ansatt kanBehandle bruker.geografiskTilknytning) }
-
-    override val metadata = Metadata(NASJONAL)
 }
 
 @Component
 @Order(LOWEST_PRECEDENCE - 1)
-class UkjentBostedGeoRegel : OverstyrbarRegel {
+class UkjentBostedGeoRegel : GlobalGruppeRegel(UKJENT_BOSTED), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { bruker.geografiskTilknytning is UkjentBosted && !(ansatt kanBehandle UKJENT_BOSTED) }
-
-    override val metadata = Metadata(UKJENT_BOSTED)
 }
 
 @Component
 @Order(LOWEST_PRECEDENCE - 2)
-class UtlandGeoRegel : OverstyrbarRegel {
+class UtlandGeoRegel : GlobalGruppeRegel(BOSTED_UTLAND), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { bruker.geografiskTilknytning is UtenlandskTilknytning && !(ansatt kanBehandle BOSTED_UTLAND) }
 
-    override val metadata = Metadata(BOSTED_UTLAND)
 }
 
 @Component

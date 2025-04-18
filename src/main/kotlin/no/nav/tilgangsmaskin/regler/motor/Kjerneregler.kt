@@ -17,31 +17,15 @@ interface KjerneRegel : Regel
 
 @Component
 @Order(HIGHEST_PRECEDENCE)
-class StrengtFortroligRegel : KjerneRegel {
-    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { bruker krever STRENGT_FORTROLIG && !(ansatt kanBehandle STRENGT_FORTROLIG) }
-
-    override val metadata = Metadata(STRENGT_FORTROLIG)
-
-}
+class StrengtFortroligRegel : GlobalGruppeRegel(STRENGT_FORTROLIG), KjerneRegel
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 1)
-class FortroligRegel : KjerneRegel {
-    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { bruker krever FORTROLIG && !(ansatt kanBehandle FORTROLIG) }
-
-    override val metadata = Metadata(FORTROLIG)
-}
+class FortroligRegel : GlobalGruppeRegel(FORTROLIG), KjerneRegel
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 2)
-class EgenAnsattRegel : KjerneRegel {
-    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { bruker krever EGEN_ANSATT && !(ansatt kanBehandle EGEN_ANSATT) }
-
-    override val metadata = Metadata(EGEN_ANSATT)
-}
+class EgenAnsattRegel : GlobalGruppeRegel(EGEN_ANSATT), KjerneRegel
 
 @Order(HIGHEST_PRECEDENCE + 3)
 @Component
@@ -86,3 +70,4 @@ class SøskenRegel(private val teller: SøskenOppslagTeller) : KjerneRegel {
 
     override val metadata = Metadata(SØSKEN)
 }
+

@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.tilgangsmaskin.ansatt.Ansatt
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.bruker.Bruker
 
 interface Regel {
@@ -13,6 +14,13 @@ interface Regel {
 
 
     fun avslåHvis(predicate: () -> Boolean) = !predicate.invoke()
+}
 
+abstract class GlobalGruppeRegel(private val gruppe: GlobalGruppe) : Regel {
+
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
+        avslåHvis { bruker krever gruppe && !(ansatt kanBehandle gruppe) }
+
+    override val metadata = Metadata(gruppe)
 
 }

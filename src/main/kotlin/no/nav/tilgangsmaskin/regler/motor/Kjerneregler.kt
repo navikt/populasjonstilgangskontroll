@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.tilgangsmaskin.ansatt.Ansatt
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.EGEN_ANSATT_GRUPPE
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG_GRUPPE
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_GRUPPE
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.EGEN_ANSATT
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.EGNEDATA
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.FORELDREBARN
@@ -25,9 +25,9 @@ interface KjerneRegel : Regel
 class StrengtFortroligRegel(private val env: Environment) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         sjekkGruppeRegel(
-            { bruker.kreverGlobalGruppe(STRENGT_FORTROLIG_GRUPPE) },
+            { bruker.kreverGlobalGruppe(STRENGT_FORTROLIG) },
             ansatt,
-            STRENGT_FORTROLIG_GRUPPE.id(env)
+            STRENGT_FORTROLIG.id(env)
         )
 
     override val metadata = RegelBeskrivelse(STRENGT_FORTROLIG_ADRESSE)
@@ -38,8 +38,8 @@ class StrengtFortroligRegel(private val env: Environment) : KjerneRegel {
     class FortroligRegel(private val env: Environment) : KjerneRegel {
         override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
             sjekkGruppeRegel(
-                { bruker.kreverGlobalGruppe(FORTROLIG_GRUPPE) }, ansatt,
-                FORTROLIG_GRUPPE.id(env)
+                { bruker.kreverGlobalGruppe(FORTROLIG) }, ansatt,
+                FORTROLIG.id(env)
             )
 
         override val metadata = RegelBeskrivelse(FORTROLIG_ADRESSE)
@@ -49,7 +49,7 @@ class StrengtFortroligRegel(private val env: Environment) : KjerneRegel {
     @Order(HIGHEST_PRECEDENCE + 2)
     class EgenAnsattRegel(private val env: Environment) : KjerneRegel {
         override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-            sjekkGruppeRegel({ bruker.kreverGlobalGruppe(EGEN_ANSATT_GRUPPE) }, ansatt, EGEN_ANSATT_GRUPPE.id(env))
+            sjekkGruppeRegel({ bruker.kreverGlobalGruppe(EGEN_ANSATT) }, ansatt, EGEN_ANSATT.id(env))
 
         override val metadata = RegelBeskrivelse(SKJERMING)
     }

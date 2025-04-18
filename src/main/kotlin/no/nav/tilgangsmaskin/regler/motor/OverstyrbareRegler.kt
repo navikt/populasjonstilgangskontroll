@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.tilgangsmaskin.ansatt.Ansatt
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.GEO_PERSON_UTLAND_GRUPPE
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL_GRUPPE
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UDEFINERT_GEO_GRUPPE
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.GEO_PERSON_UTLAND
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UDEFINERT_GEO
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
@@ -25,7 +25,7 @@ interface OverstyrbarRegel : Regel
 class GeoNorgeRegel(private val env: Environment) :
     OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        ansatt kanBehandle NASJONAL_GRUPPE.id(env) || ansatt harGTFor bruker
+        ansatt kanBehandle NASJONAL.id(env) || ansatt harGTFor bruker
 
     override val metadata = RegelBeskrivelse(GEOGRAFISK)
 }
@@ -35,7 +35,7 @@ class GeoNorgeRegel(private val env: Environment) :
 class UkjentBostedGeoRegel(private val env: Environment) :
     OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        sjekkGruppeRegel({ bruker.geografiskTilknytning is UkjentBosted }, ansatt, UDEFINERT_GEO_GRUPPE.id(env))
+        sjekkGruppeRegel({ bruker.geografiskTilknytning is UkjentBosted }, ansatt, UDEFINERT_GEO.id(env))
 
     override val metadata = RegelBeskrivelse(PERSON_UKJENT)
 }
@@ -48,7 +48,7 @@ class UtlandUdefinertGeoRegel(private val env: Environment) :
         sjekkGruppeRegel(
             { bruker.geografiskTilknytning is UtenlandskTilknytning },
             ansatt,
-            GEO_PERSON_UTLAND_GRUPPE.id(env)
+            GEO_PERSON_UTLAND.id(env)
         )
 
     override val metadata = RegelBeskrivelse(PERSON_UTLAND)

@@ -79,8 +79,8 @@ object PdlPersonMapper {
     private fun tilGradering(gradering: PdlAdressebeskyttelseGradering) =
         when (gradering) {
             STRENGT_FORTROLIG_UTLAND -> Gradering.STRENGT_FORTROLIG_UTLAND
-            STRENGT_FORTROLIG -> Gradering.STRENGT_FORTROLIG
-            FORTROLIG -> Gradering.FORTROLIG
+            PdlAdressebeskyttelse.STRENGT_FORTROLIG -> Gradering.STRENGT_FORTROLIG
+            PdlAdressebeskyttelse.FORTROLIG -> Gradering.FORTROLIG
             UGRADERT -> Gradering.UGRADERT
         }
 

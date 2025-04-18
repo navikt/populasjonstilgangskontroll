@@ -5,12 +5,12 @@ import java.util.*
 
 
 enum class GlobalGruppe(val property: String) {
-    STRENGT_FORTROLIG_GRUPPE("gruppe.strengt"),
-    FORTROLIG_GRUPPE("gruppe.fortrolig"),
-    EGEN_ANSATT_GRUPPE("gruppe.egenansatt"),
-    UDEFINERT_GEO_GRUPPE("gruppe.udefinert"),
-    GEO_PERSON_UTLAND_GRUPPE("gruppe.utland"),
-    NASJONAL_GRUPPE("gruppe.nasjonal");
+    STRENGT_FORTROLIG("gruppe.strengt"),
+    FORTROLIG("gruppe.fortrolig"),
+    EGEN_ANSATT("gruppe.egenansatt"),
+    UDEFINERT_GEO("gruppe.udefinert"),
+    GEO_PERSON_UTLAND("gruppe.utland"),
+    NASJONAL("gruppe.nasjonal");
 
     fun id(env: Environment) = UUID.fromString(env.getRequiredProperty(property))
 

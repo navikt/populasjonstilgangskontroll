@@ -3,11 +3,11 @@ package no.nav.tilgangsmaskin.regler
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.Ansatt.AnsattIdentifikatorer
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.EGEN_ANSATT_GRUPPE
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG_GRUPPE
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.GEO_PERSON_UTLAND_GRUPPE
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_GRUPPE
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UDEFINERT_GEO_GRUPPE
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.EGEN_ANSATT
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.GEO_PERSON_UTLAND
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UDEFINERT_GEO
 import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.Bruker
@@ -45,10 +45,10 @@ object TestData {
     internal val strengtFortroligBruker = Bruker(
         BrukerIdentifikatorer(strengtFortroligBrukerId, aktørId),
         udefinertGeoTilknytning,
-        listOf(STRENGT_FORTROLIG_GRUPPE)
+        listOf(STRENGT_FORTROLIG)
     )
     internal val fortroligBruker =
-        Bruker(BrukerIdentifikatorer(fortroligBrukerId, aktørId), udefinertGeoTilknytning, listOf(FORTROLIG_GRUPPE))
+        Bruker(BrukerIdentifikatorer(fortroligBrukerId, aktørId), udefinertGeoTilknytning, listOf(FORTROLIG))
     internal val vanligBruker = Bruker(BrukerIdentifikatorer(vanligBrukerId, aktørId), udefinertGeoTilknytning)
     internal val vanligHistoriskBruker =
         Bruker(BrukerIdentifikatorer(historiskBrukerId, aktørId), udefinertGeoTilknytning)
@@ -59,33 +59,33 @@ object TestData {
     internal val annenAnsattBruker = Bruker(
         BrukerIdentifikatorer(annenAnsattBrukerId, aktørId),
         udefinertGeoTilknytning,
-        listOf(EGEN_ANSATT_GRUPPE),
+        listOf(EGEN_ANSATT),
         Familie(barn = setOf(FamilieMedlem(vanligBrukerId, FamilieRelasjon.BARN)))
     )
     internal val annenAnsattBrukerMedPartner = Bruker(
         BrukerIdentifikatorer(annenAnsattBrukerId, aktørId),
         udefinertGeoTilknytning,
-        listOf(EGEN_ANSATT_GRUPPE),
+        listOf(EGEN_ANSATT),
         Familie(partnere = setOf(FamilieMedlem(vanligBrukerId, FamilieRelasjon.PARTNER)))
     )
     internal val ansattBruker =
-        Bruker(BrukerIdentifikatorer(ansattBrukerId, aktørId), udefinertGeoTilknytning, listOf(EGEN_ANSATT_GRUPPE))
+        Bruker(BrukerIdentifikatorer(ansattBrukerId, aktørId), udefinertGeoTilknytning, listOf(EGEN_ANSATT))
     internal val egenAnsattStrengtFortroligBruker = Bruker(
         BrukerIdentifikatorer(egenAnsattStrengtFortroligBrukerId, aktørId),
         udefinertGeoTilknytning,
-        listOf(STRENGT_FORTROLIG_GRUPPE, EGEN_ANSATT_GRUPPE),
+        listOf(STRENGT_FORTROLIG, EGEN_ANSATT),
     )
     internal val egenAnsattFortroligBruker = Bruker(
         BrukerIdentifikatorer(egenAnsattFortroligBrukerId, aktørId),
         udefinertGeoTilknytning,
-        listOf(FORTROLIG_GRUPPE, EGEN_ANSATT_GRUPPE),
+        listOf(FORTROLIG, EGEN_ANSATT),
     )
     internal val ukjentBostedBruker =
-        Bruker(BrukerIdentifikatorer(ukjentBostedBrukerId, aktørId), UkjentBosted(), listOf(UDEFINERT_GEO_GRUPPE))
+        Bruker(BrukerIdentifikatorer(ukjentBostedBrukerId, aktørId), UkjentBosted(), listOf(UDEFINERT_GEO))
     internal val geoUtlandBruker = Bruker(
         BrukerIdentifikatorer(geoUtlandBrukerId, aktørId),
         utenlandskTilknytning,
-        listOf(GEO_PERSON_UTLAND_GRUPPE),
+        listOf(GEO_PERSON_UTLAND),
     )
     internal val enhetBruker =
         Bruker(BrukerIdentifikatorer(enhetBrukerId, aktørId), KommuneTilknytning(Kommune(enhet.verdi)))

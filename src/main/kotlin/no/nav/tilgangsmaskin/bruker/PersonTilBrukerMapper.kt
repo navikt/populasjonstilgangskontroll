@@ -1,10 +1,10 @@
 package no.nav.tilgangsmaskin.bruker
 
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.EGEN_ANSATT_GRUPPE
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG_GRUPPE
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_GRUPPE
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UDEFINERT_GEO_GRUPPE
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.EGEN_ANSATT
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UDEFINERT_GEO
 import no.nav.tilgangsmaskin.bruker.Bruker.BrukerIdentifikatorer
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.udefinertGeoTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.Gradering
@@ -32,17 +32,17 @@ object PersonTilBrukerMapper {
     ) =
         mutableListOf<GlobalGruppe>().apply {
             if (graderinger.any {
-                    it in listOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND)
+                    it in listOf(no.nav.tilgangsmaskin.bruker.pdl.STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND)
                 }) {
-                add(STRENGT_FORTROLIG_GRUPPE)
-            } else if (graderinger.any { it == FORTROLIG }) {
-                add(FORTROLIG_GRUPPE)
+                add(no.nav.tilgangsmaskin.ansatt.STRENGT_FORTROLIG)
+            } else if (graderinger.any { it == no.nav.tilgangsmaskin.bruker.pdl.FORTROLIG }) {
+                add(no.nav.tilgangsmaskin.ansatt.FORTROLIG)
             }
             if (geoTilknytning == udefinertGeoTilknytning) {
-                add(UDEFINERT_GEO_GRUPPE)
+                add(UDEFINERT_GEO)
             }
             if (erSkjermet) {
-                add(EGEN_ANSATT_GRUPPE)
+                add(EGEN_ANSATT)
             }
         }
 }

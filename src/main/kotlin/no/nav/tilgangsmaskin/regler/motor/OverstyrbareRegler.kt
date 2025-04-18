@@ -35,7 +35,6 @@ class UkjentBostedGeoRegel : GlobalGruppeRegel(UKJENT_BOSTED), OverstyrbarRegel 
 class UtlandGeoRegel : GlobalGruppeRegel(BOSTED_UTLAND), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { bruker.geografiskTilknytning is UtenlandskTilknytning && !(ansatt kanBehandle BOSTED_UTLAND) }
-
 }
 
 @Component
@@ -45,7 +44,7 @@ class AvdødBrukerRegel(private val teller: AvdødTeller) : OverstyrbarRegel {
         avslåHvis { bruker.erDød }.also {
             if (bruker.dødsdato != null) {
                 val tags = arrayOf("months" to bruker.dødsdato.intervallSiden())
-                teller.increment(false, *tags)
+                teller.increment(true, *tags)
             }
         }
 

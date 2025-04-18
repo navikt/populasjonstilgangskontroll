@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.tilgangsmaskin.ansatt.Ansatt
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.EGEN_ANSATT
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
@@ -12,9 +11,7 @@ import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.PARTNER
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.SØSKEN
 import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
 import org.springframework.core.annotation.Order
-import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
-import java.util.*
 
 interface KjerneRegel : Regel
 
@@ -51,7 +48,7 @@ class EgenAnsattRegel : KjerneRegel {
 class EgneDataRegel(private val teller: EgneDataOppslagTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt er bruker }.also {
-            teller.increment(!it)
+            teller.increment(it)
         }
 
     override val metadata = Metadata(EGNEDATA)
@@ -62,7 +59,7 @@ class EgneDataRegel(private val teller: EgneDataOppslagTeller) : KjerneRegel {
 class ForeldreOgBarnRegel(private val teller: ForeldreBarnOppslagTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt erForeldreEllerBarnTil bruker }.also {
-            teller.increment(!it)
+            teller.increment(it)
         }
 
     override val metadata = Metadata(FORELDREBARN)
@@ -73,7 +70,7 @@ class ForeldreOgBarnRegel(private val teller: ForeldreBarnOppslagTeller) : Kjern
 class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt erNåværendeEllerTidligerePartnerTil bruker }.also {
-            teller.increment(!it)
+            teller.increment(it)
         }
 
     override val metadata = Metadata(PARTNER)
@@ -84,11 +81,8 @@ class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
 class SøskenRegel(private val teller: SøskenOppslagTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt erSøskenTil bruker }.also {
-            teller.increment(!it)
+            teller.increment(it)
         }
 
     override val metadata = Metadata(SØSKEN)
 }
-
-
-fun Environment.id(gruppe: GlobalGruppe) = UUID.fromString(getRequiredProperty(gruppe.property))

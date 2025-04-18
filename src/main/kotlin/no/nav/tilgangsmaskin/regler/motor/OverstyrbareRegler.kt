@@ -51,7 +51,7 @@ class AvdødBrukerRegel(private val teller: AvdødTeller) : OverstyrbarRegel {
         avslåHvis { bruker.erDød }.also {
             if (bruker.dødsdato != null) {
                 val tags = arrayOf("months" to bruker.dødsdato.intervallSiden())
-                teller.increment(it, *tags)
+                teller.increment(false, *tags)
             }
         }
 

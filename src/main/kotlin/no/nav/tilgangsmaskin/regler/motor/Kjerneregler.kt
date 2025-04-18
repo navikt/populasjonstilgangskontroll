@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.tilgangsmaskin.ansatt.Ansatt
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.EGEN_ANSATT
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
@@ -16,6 +17,7 @@ import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
 import org.springframework.core.annotation.Order
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
+import java.util.*
 
 interface KjerneRegel : Regel
 
@@ -27,7 +29,7 @@ class StrengtFortroligRegel(private val env: Environment) : KjerneRegel {
         sjekkGruppeRegel(
             { bruker.kreverGlobalGruppe(STRENGT_FORTROLIG) },
             ansatt,
-            STRENGT_FORTROLIG.id(env)
+            env.id(STRENGT_FORTROLIG)
         )
 
     override val metadata = RegelBeskrivelse(STRENGT_FORTROLIG_ADRESSE)
@@ -39,7 +41,7 @@ class StrengtFortroligRegel(private val env: Environment) : KjerneRegel {
         override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
             sjekkGruppeRegel(
                 { bruker.kreverGlobalGruppe(FORTROLIG) }, ansatt,
-                FORTROLIG.id(env)
+                env.id(FORTROLIG)
             )
 
         override val metadata = RegelBeskrivelse(FORTROLIG_ADRESSE)
@@ -49,7 +51,10 @@ class StrengtFortroligRegel(private val env: Environment) : KjerneRegel {
     @Order(HIGHEST_PRECEDENCE + 2)
     class EgenAnsattRegel(private val env: Environment) : KjerneRegel {
         override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-            sjekkGruppeRegel({ bruker.kreverGlobalGruppe(EGEN_ANSATT) }, ansatt, EGEN_ANSATT.id(env))
+            sjekkGruppeRegel(
+                { bruker.kreverGlobalGruppe(EGEN_ANSATT) }, ansatt,
+                env.id(EGEN_ANSATT)
+            )
 
         override val metadata = RegelBeskrivelse(SKJERMING)
     }
@@ -91,3 +96,5 @@ class StrengtFortroligRegel(private val env: Environment) : KjerneRegel {
     }
 
 }
+
+fun Environment.id(gruppe: GlobalGruppe) = UUID.fromString(getRequiredProperty(gruppe.property))

@@ -25,5 +25,4 @@ enum class BeskrivelseTekster(val kode: String, val avvisningÅrsak: String, val
         "Mangler tilgang til person uten kjent adresse",
         "Person bosatt ukjent bosted"
     )
-
 }

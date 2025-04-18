@@ -12,6 +12,7 @@ enum class GlobalGruppe(val property: String) {
     GEO_PERSON_UTLAND("gruppe.utland"),
     NASJONAL("gruppe.nasjonal");
 
+
     fun id(env: Environment) = UUID.fromString(env.getRequiredProperty(property))
 
 }

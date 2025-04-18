@@ -25,7 +25,7 @@ interface OverstyrbarRegel : Regel
 class GeoNorgeRegel(private val env: Environment) :
     OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        ansatt kanBehandle NASJONAL.id(env) || ansatt harGTFor bruker
+        ansatt kanBehandle env.id(NASJONAL) || ansatt harGTFor bruker
 
     override val metadata = RegelBeskrivelse(GEOGRAFISK)
 }
@@ -35,7 +35,10 @@ class GeoNorgeRegel(private val env: Environment) :
 class UkjentBostedGeoRegel(private val env: Environment) :
     OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        sjekkGruppeRegel({ bruker.geografiskTilknytning is UkjentBosted }, ansatt, UDEFINERT_GEO.id(env))
+        sjekkGruppeRegel(
+            { bruker.geografiskTilknytning is UkjentBosted }, ansatt,
+            env.id(UDEFINERT_GEO)
+        )
 
     override val metadata = RegelBeskrivelse(PERSON_UKJENT)
 }
@@ -48,7 +51,7 @@ class UtlandUdefinertGeoRegel(private val env: Environment) :
         sjekkGruppeRegel(
             { bruker.geografiskTilknytning is UtenlandskTilknytning },
             ansatt,
-            GEO_PERSON_UTLAND.id(env)
+            env.id(GEO_PERSON_UTLAND)
         )
 
     override val metadata = RegelBeskrivelse(PERSON_UTLAND)

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component
 class RegelMotor(
         @Qualifier(KJERNE) private val kjerne: RegelSett,
         @Qualifier(OVERSTYRBAR) private val overstyrbar: RegelSett,
-        private val handler: RegelsettResultatHandler = RegelsettResultatHandler()
+        private val handler: RegelmotorResultatHandler = RegelmotorResultatHandler()
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 

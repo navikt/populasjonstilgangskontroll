@@ -41,10 +41,9 @@ class UtlandRegel : GlobalGruppeRegel(UTENLANDSK), OverstyrbarRegel {
 @Order(LOWEST_PRECEDENCE - 3)
 class AvdødBrukerRegel(private val teller: AvdødTeller) : OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { bruker.erDød }.also {
+        true.also {
             if (bruker.dødsdato != null) {
-                val tags = arrayOf("months" to bruker.dødsdato.intervallSiden())
-                teller.increment(true, *tags)
+                teller.increment(true, *arrayOf("months" to bruker.dødsdato.intervallSiden()))
             }
         }
 

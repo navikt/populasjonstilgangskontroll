@@ -9,15 +9,10 @@ import org.springframework.stereotype.Component
 
 @Component
 @Counted
-class RegelsettResultatHandler {
+class RegelmotorResultatHandler {
     private val log = LoggerFactory.getLogger(javaClass)
-    fun avvist(
-            pos: String,
-            ansattId: AnsattId,
-            brukerId: BrukerId,
-            regel: Regel
-    ) {
-        log.warn("[#$pos] Tilgang avvist av regel '${regel.kortNavn}' (${regel.begrunnelse}) for $ansattId og $brukerId")
+    fun avvist(ix: String, ansattId: AnsattId, brukerId: BrukerId, regel: Regel) {
+        log.warn("[#$ix] Tilgang avvist av regel '${regel.kortNavn}' (${regel.begrunnelse}) for $ansattId og $brukerId")
     }
 
     fun ok(type: RegelType, ansattId: AnsattId, brukerId: BrukerId) {

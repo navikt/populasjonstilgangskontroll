@@ -20,21 +20,21 @@ interface OverstyrbarRegel : Regel
 @Order(LOWEST_PRECEDENCE)
 class NorgeRegel : GlobalGruppeRegel(NASJONAL), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { !(ansatt tilhørerGruppe NASJONAL) && !(ansatt tilhørerGruppe bruker.geografiskTilknytning) }
+        avslåHvis { !(ansatt erMedlemAv NASJONAL) && !(ansatt kanBehandle bruker.geografiskTilknytning) }
 }
 
 @Component
 @Order(LOWEST_PRECEDENCE - 1)
 class UkjentBostedRegel : GlobalGruppeRegel(UKJENT_BOSTED), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { bruker.erRegistrertMed<UkjentBosted>() && !(ansatt tilhørerGruppe UKJENT_BOSTED) }
+        avslåHvis { bruker.erRegistrertMed<UkjentBosted>() && !(ansatt erMedlemAv UKJENT_BOSTED) }
 }
 
 @Component
 @Order(LOWEST_PRECEDENCE - 2)
 class UtlandRegel : GlobalGruppeRegel(UTENLANDSK), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { bruker.erRegistrertMed<UtenlandskTilknytning>() && !(ansatt tilhørerGruppe UTENLANDSK) }
+        avslåHvis { bruker.erRegistrertMed<UtenlandskTilknytning>() && !(ansatt erMedlemAv UTENLANDSK) }
 }
 
 @Component

@@ -30,7 +30,7 @@ data class Ansatt(
     @JsonIgnore
     val parnere = bruker?.partnere ?: emptyList()
 
-    infix fun tilhørerGruppe(gt: GeografiskTilknytning) = grupper.any {
+    infix fun kanBehandle(gt: GeografiskTilknytning) = grupper.any {
         it.displayName.endsWith(
                 "GEO_${
                     when (gt) {
@@ -42,7 +42,7 @@ data class Ansatt(
         )
     }
 
-    infix fun tilhørerGruppe(gruppe: GlobalGruppe) = grupper.any { it.id == gruppe.id }
+    infix fun erMedlemAv(gruppe: GlobalGruppe) = grupper.any { it.id == gruppe.id }
 
     infix fun erNåværendeEllerTidligerePartnerMed(bruker: Bruker) =
         parnere.any { it.brukerId == bruker.brukerId }

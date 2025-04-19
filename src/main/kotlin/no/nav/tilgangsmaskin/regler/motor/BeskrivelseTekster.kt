@@ -19,7 +19,7 @@ enum class BeskrivelseTekster(val kode: String, val avvisningÅrsak: String, val
     PARTNER("AVVIST_HABILITET2", "${INTRO1}habilitet 2", "Oppslag habilitet 2"),
     SØSKEN("AVVIST_HABILITET3", "${INTRO1}habilitet 3", "Oppslag habilitet 3"),
     AVDØD("AVVIST_AVDØD", "${INTRO3}avdød bruker", "Avdød bruker"),
-    PERSON_UTLAND("AVVIST_PERSON_UTLAND", "${INTRO3}person i utlandet", "Person bosatt utland"),
-    PERSON_UKJENT("AVVIST_PERSON_UKJENT", "${INTRO3}person uten kjent adresse", "Person bosatt ukjent bosted")
+    UTENLANDSK("AVVIST_PERSON_UTLAND", "${INTRO3}person i utlandet", "Person bosatt utland"),
+    UKJENT_BOSTED("AVVIST_PERSON_UKJENT", "${INTRO3}person uten kjent adresse", "Person bosatt ukjent bosted")
 
 }

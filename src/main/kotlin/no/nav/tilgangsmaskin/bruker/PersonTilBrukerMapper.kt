@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.bruker
 
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMET
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.bruker.Bruker.BrukerIdentifikatorer
@@ -33,6 +33,6 @@ object PersonTilBrukerMapper {
                     else -> null
                 },
                 UKJENT_BOSTED.takeIf { gt == udefinertGeoTilknytning },
-                SKJERMET.takeIf { erSkjermet }
+                SKJERMING.takeIf { erSkjermet }
         )
 }

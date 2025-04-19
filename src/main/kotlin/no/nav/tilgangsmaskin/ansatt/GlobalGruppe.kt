@@ -7,9 +7,9 @@ import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster
 enum class GlobalGruppe(val property: String, val metadata: BeskrivelseTekster) {
     STRENGT_FORTROLIG("gruppe.strengt", BeskrivelseTekster.STRENGT_FORTROLIG),
     FORTROLIG("gruppe.fortrolig", BeskrivelseTekster.FORTROLIG),
-    SKJERMET("gruppe.egenansatt", BeskrivelseTekster.EGNEDATA),
-    UKJENT_BOSTED("gruppe.udefinert", BeskrivelseTekster.PERSON_UKJENT),
-    UTENLANDS_TILKNYTNING("gruppe.utland", BeskrivelseTekster.PERSON_UTLAND),
+    SKJERMING("gruppe.egenansatt", BeskrivelseTekster.SKJERMING),
+    UKJENT_BOSTED("gruppe.udefinert", BeskrivelseTekster.UKJENT_BOSTED),
+    UTENLANDSK("gruppe.utland", BeskrivelseTekster.UTENLANDSK),
     NASJONAL("gruppe.nasjonal", BeskrivelseTekster.NASJONAL);
 
     lateinit var id: UUID

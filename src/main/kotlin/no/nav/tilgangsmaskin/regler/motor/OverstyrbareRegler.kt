@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.regler.motor
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDS_TILKNYTNING
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
@@ -20,21 +20,21 @@ interface OverstyrbarRegel : Regel
 @Order(LOWEST_PRECEDENCE)
 class NorgeRegel : GlobalGruppeRegel(NASJONAL), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { !(ansatt kanBehandle NASJONAL) && !(ansatt kanBehandle bruker.geografiskTilknytning) }
+        avslåHvis { !(ansatt tilhørerGruppe NASJONAL) && !(ansatt tilhørerGruppe bruker.geografiskTilknytning) }
 }
 
 @Component
 @Order(LOWEST_PRECEDENCE - 1)
 class UkjentBostedRegel : GlobalGruppeRegel(UKJENT_BOSTED), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { bruker.erRegistrertMed<UkjentBosted>() && !(ansatt kanBehandle UKJENT_BOSTED) }
+        avslåHvis { bruker.erRegistrertMed<UkjentBosted>() && !(ansatt tilhørerGruppe UKJENT_BOSTED) }
 }
 
 @Component
 @Order(LOWEST_PRECEDENCE - 2)
-class UtlandRegel : GlobalGruppeRegel(UTENLANDS_TILKNYTNING), OverstyrbarRegel {
+class UtlandRegel : GlobalGruppeRegel(UTENLANDSK), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { bruker.erRegistrertMed<UtenlandskTilknytning>() && !(ansatt kanBehandle UTENLANDS_TILKNYTNING) }
+        avslåHvis { bruker.erRegistrertMed<UtenlandskTilknytning>() && !(ansatt tilhørerGruppe UTENLANDSK) }
 }
 
 @Component

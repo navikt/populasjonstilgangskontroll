@@ -61,7 +61,7 @@ class BrukerMapperTest {
     @DisplayName("Test at behandling av brukere med EGEN_ANSATT vil kreve medlemsskap i EGEN_ANSATT_GRUPPE for ansatt")
     fun egenAnsatt() {
         with(tilBruker(person(pipRespons()), true)) {
-            assertThat(gruppeKrav).containsExactly(GlobalGruppe.SKJERMET)
+            assertThat(gruppeKrav).containsExactly(GlobalGruppe.SKJERMING)
         }
     }
 
@@ -70,7 +70,7 @@ class BrukerMapperTest {
     fun egenAnsattKode6() {
         with(tilBruker(person(pipRespons(STRENGT_FORTROLIG)), true)) {
             assertThat(gruppeKrav).containsExactlyInAnyOrder(
-                    GlobalGruppe.SKJERMET,
+                    GlobalGruppe.SKJERMING,
                     GlobalGruppe.STRENGT_FORTROLIG
             )
         }
@@ -80,7 +80,7 @@ class BrukerMapperTest {
     @DisplayName("Test at behandling av brukere med EGEN_ANSATT og FORTROLIG vil kreve medlemsskap i EGEN_ANSATT_GRUPPE og FORTROLIG_GRUPPE for ansatt")
     fun egenAnsattKode7() {
         with(tilBruker(person(pipRespons(FORTROLIG)), true)) {
-            assertThat(gruppeKrav).containsExactlyInAnyOrder(GlobalGruppe.SKJERMET, GlobalGruppe.FORTROLIG)
+            assertThat(gruppeKrav).containsExactlyInAnyOrder(GlobalGruppe.SKJERMING, GlobalGruppe.FORTROLIG)
         }
     }
 

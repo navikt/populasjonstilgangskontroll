@@ -2,9 +2,10 @@ package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMET
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.EGNEDATA
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.FORELDREBARN
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.PARTNER
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.SØSKEN
@@ -24,7 +25,7 @@ class FortroligRegel : GlobalGruppeRegel(FORTROLIG), KjerneRegel
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 2)
-class EgenAnsattRegel : GlobalGruppeRegel(SKJERMET), KjerneRegel
+class EgenAnsattRegel : GlobalGruppeRegel(SKJERMING), KjerneRegel
 
 @Order(HIGHEST_PRECEDENCE + 3)
 @Component
@@ -34,7 +35,7 @@ class EgneDataRegel(private val teller: EgneDataOppslagTeller) : KjerneRegel {
             teller.increment(it)
         }
 
-    override val metadata = Metadata(SKJERMET)
+    override val metadata = Metadata(EGNEDATA)
 }
 
 @Order(HIGHEST_PRECEDENCE + 4)

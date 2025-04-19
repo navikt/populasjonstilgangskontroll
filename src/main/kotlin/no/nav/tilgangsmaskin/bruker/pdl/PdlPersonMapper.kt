@@ -48,13 +48,13 @@ object PdlPersonMapper {
     fun tilPerson(data: PdlRespons) =
         with(data) {
             Person(
-                BrukerId(brukerId),
-                AktørId(aktørId),
-                tilGeoTilknytning(geografiskTilknytning),
-                tilGraderinger(person.adressebeskyttelse),
-                tilFamilie(person.familierelasjoner),
-                tilDødsdato(person.doedsfall),
-                tilHistoriskeBrukerIds(identer)
+                    BrukerId(brukerId),
+                    AktørId(aktørId),
+                    tilGeoTilknytning(geografiskTilknytning),
+                    tilGraderinger(person.adressebeskyttelse),
+                    tilFamilie(person.familierelasjoner),
+                    tilDødsdato(person.doedsfall),
+                    tilHistoriskeBrukerIds(identer)
             )
         }
 
@@ -108,8 +108,8 @@ object PdlPersonMapper {
             .mapNotNull { it.relatertPersonsIdent?.let { ident -> it.relatertPersonsRolle to ident } }
             .partition { it.first != BARN }
         return Familie(
-            foreldre.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet(),
-            barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet()
+                foreldre.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet(),
+                barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet()
         )
     }
 

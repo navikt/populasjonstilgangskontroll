@@ -18,10 +18,10 @@ import kotlin.time.measureTime
 @Service
 @Timed
 class RegelTjeneste(
-    private val motor: RegelMotor,
-    private val brukere: BrukerTjeneste,
-    private val ansatte: AnsattTjeneste,
-    private val overstyring: OverstyringTjeneste
+        private val motor: RegelMotor,
+        private val brukere: BrukerTjeneste,
+        private val ansatte: AnsattTjeneste,
+        private val overstyring: OverstyringTjeneste
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 

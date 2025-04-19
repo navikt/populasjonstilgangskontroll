@@ -21,9 +21,8 @@ class NomBeanConfig {
                 if (isFailure) {
                     true.also {
                         log.warn(
-                            "Ugyldig personident: ${record.value().personident.maskFnr()} ble filtrert bort (${exceptionOrNull()?.message})",
-                            exceptionOrNull()
-                        )
+                                "Ugyldig personident: ${record.value().personident.maskFnr()} ble filtrert bort (${exceptionOrNull()?.message})",
+                                exceptionOrNull())
                     }
                 } else false
             }

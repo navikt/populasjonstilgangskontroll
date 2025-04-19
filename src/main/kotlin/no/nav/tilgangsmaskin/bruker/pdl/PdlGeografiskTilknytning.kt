@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PdlGeografiskTilknytning(
-    val gtType: GTType,
-    val gtKommune: GTKommune? = null,
-    val gtBydel: GTBydel? = null,
-    val gtLand: GTLand? = null
+        val gtType: GTType,
+        val gtKommune: GTKommune? = null,
+        val gtBydel: GTBydel? = null,
+        val gtLand: GTLand? = null
 ) {
     enum class GTType { BYDEL, KOMMUNE, UDEFINERT, UTLAND }
 

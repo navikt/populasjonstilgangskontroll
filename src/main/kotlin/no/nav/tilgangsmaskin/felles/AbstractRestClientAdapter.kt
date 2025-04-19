@@ -1,17 +1,17 @@
 package no.nav.tilgangsmaskin.felles
 
+import java.net.URI
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
-import java.net.URI
 
 abstract class AbstractRestClientAdapter(
-    protected val restClient: RestClient,
-    val cfg: AbstractRestConfig,
-    protected val errorHandler: ErrorHandler = no.nav.tilgangsmaskin.felles.DefaultRestErrorHandler()
+        protected val restClient: RestClient,
+        val cfg: AbstractRestConfig,
+        protected val errorHandler: ErrorHandler = DefaultRestErrorHandler()
 ) : Pingable {
 
     protected val log = getLogger(javaClass)
@@ -24,10 +24,7 @@ abstract class AbstractRestClientAdapter(
             .headers { it.setAll(headers) }
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
-            .body(T::class.java) ?: throw no.nav.tilgangsmaskin.felles.IrrecoverableRestException(
-            INTERNAL_SERVER_ERROR,
-            uri
-        )
+            .body(T::class.java) ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
 
     protected inline fun <reified T> post(uri: URI, body: Any, headers: Map<String, String> = emptyMap()) =
         restClient
@@ -38,10 +35,7 @@ abstract class AbstractRestClientAdapter(
             .body(body)
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
-            .body(T::class.java) ?: throw no.nav.tilgangsmaskin.felles.IrrecoverableRestException(
-            INTERNAL_SERVER_ERROR,
-            uri
-        )
+            .body(T::class.java) ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
 
     override val name = cfg.name
 

@@ -1,23 +1,22 @@
 package no.nav.tilgangsmaskin.tilgang
 
+import java.util.*
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
 import org.springframework.core.env.ConfigurableEnvironment
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class TokenClaimsAccessor(
-    private val contextHolder: TokenValidationContextHolder,
-    private val env: ConfigurableEnvironment
+        private val contextHolder: TokenValidationContextHolder,
+        private val env: ConfigurableEnvironment
 ) {
-
 
     val globaleGrupper
         get() = GlobalGruppe.entries.mapNotNull { gruppe ->
-            val gruppeId = gruppe.id(env)
+            val gruppeId = gruppe.id
             claimSet()
                 ?.getStringClaim(gruppeId.toString())
                 ?.let { EntraGruppe(gruppeId, gruppe.name) }

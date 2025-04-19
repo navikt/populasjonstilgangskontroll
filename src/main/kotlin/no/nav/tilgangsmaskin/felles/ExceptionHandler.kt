@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.felles
 
 import no.nav.tilgangsmaskin.regler.motor.BulkRegelException
-import no.nav.tilgangsmaskin.regler.motor.RegelBeskrivelse.Companion.TYPE_URI
+import no.nav.tilgangsmaskin.regler.motor.Metadata.Companion.TYPE_URI
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpHeaders
@@ -28,18 +28,18 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         title = e.message
         type = TYPE_URI
         properties = mapOf(
-            "navIdent" to e.ansattId.verdi,
-            "avvisninger" to e.exceptions.size,
-            "begrunnelser" to e.exceptions.map { props(it) }
+                "navIdent" to e.ansattId.verdi,
+                "avvisninger" to e.exceptions.size,
+                "begrunnelser" to e.exceptions.map { props(it) }
         )
     }
 
     private fun props(e: RegelException) =
         with(e) {
             mapOf(
-                "kode" to kode,
-                "årsak" to regel.avvisningTekst,
-                "brukerIdent" to brukerId.verdi
+                    "kode" to kode,
+                    "årsak" to regel.begrunnelse,
+                    "brukerIdent" to brukerId.verdi
             )
         }
 }

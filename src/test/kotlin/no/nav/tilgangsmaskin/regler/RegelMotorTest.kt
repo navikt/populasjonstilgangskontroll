@@ -28,11 +28,6 @@ import no.nav.tilgangsmaskin.regler.TestData.ukjentBostedBruker
 import no.nav.tilgangsmaskin.regler.TestData.vanligAnsatt
 import no.nav.tilgangsmaskin.regler.TestData.vanligBruker
 import no.nav.tilgangsmaskin.regler.motor.*
-import no.nav.tilgangsmaskin.regler.motor.StrengtFortroligRegel.EgenAnsattRegel
-import no.nav.tilgangsmaskin.regler.motor.StrengtFortroligRegel.EgneDataRegel
-import no.nav.tilgangsmaskin.regler.motor.StrengtFortroligRegel.ForeldreOgBarnRegel
-import no.nav.tilgangsmaskin.regler.motor.StrengtFortroligRegel.FortroligRegel
-import no.nav.tilgangsmaskin.regler.motor.StrengtFortroligRegel.PartnerRegel
 import no.nav.tilgangsmaskin.tilgang.TokenClaimsAccessor
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.DisplayName
@@ -40,6 +35,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertInstanceOf
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest
 import org.springframework.context.annotation.Import
@@ -53,6 +49,7 @@ import org.springframework.test.context.TestPropertySource
 @RestClientTest
 @TestPropertySource(locations = ["classpath:test.properties"])
 @AutoConfigureObservability
+@EnableConfigurationProperties(Grupper::class)
 @ContextConfiguration(classes = [TestApp::class, TokenClaimsAccessor::class])
 class RegelMotorTest {
 
@@ -66,9 +63,9 @@ class RegelMotorTest {
     @DisplayName("Test at fortrolig bruker *ikke* kan behandles av ansatt med medlemsskap i strengt fortrolig gruppe")
     fun fortroligBrukerStrengtFortroligAnsattAvvises() {
         assertInstanceOf<FortroligRegel>(
-            assertThrows<RegelException> {
-                regelMotor.kompletteRegler(strengtFortroligAnsatt, fortroligBruker)
-            }.regel
+                assertThrows<RegelException> {
+                    regelMotor.kompletteRegler(strengtFortroligAnsatt, fortroligBruker)
+                }.regel
         )
     }
 
@@ -76,9 +73,9 @@ class RegelMotorTest {
     @DisplayName("Test at saksbehandler ikke kan behandle egen familie")
     fun egenFamilieAvvises() {
         assertInstanceOf<ForeldreOgBarnRegel>(
-            assertThrows<RegelException> {
-                regelMotor.kompletteRegler(egenAnsattMedFamilie, vanligBruker)
-            }.regel
+                assertThrows<RegelException> {
+                    regelMotor.kompletteRegler(egenAnsattMedFamilie, vanligBruker)
+                }.regel
         )
     }
 
@@ -86,9 +83,9 @@ class RegelMotorTest {
     @DisplayName("Test at saksbehandler ikke kan behandle egen partner")
     fun egenPartnerAvvises() {
         assertInstanceOf<PartnerRegel>(
-            assertThrows<RegelException> {
-                regelMotor.kompletteRegler(egenAnsattMedPartner, vanligBruker)
-            }.regel
+                assertThrows<RegelException> {
+                    regelMotor.kompletteRegler(egenAnsattMedPartner, vanligBruker)
+                }.regel
         )
     }
 
@@ -96,9 +93,9 @@ class RegelMotorTest {
     @DisplayName("Test at saksbehandler ikke kan behandle seg selv")
     fun egneDataAvvises() {
         assertInstanceOf<EgneDataRegel>(
-            assertThrows<RegelException> {
-                regelMotor.kompletteRegler(egenAnsatt, ansattBruker)
-            }.regel
+                assertThrows<RegelException> {
+                    regelMotor.kompletteRegler(egenAnsatt, ansattBruker)
+                }.regel
         )
     }
 
@@ -106,9 +103,9 @@ class RegelMotorTest {
     @DisplayName("Test at bruker med fortrolig beskyttelse *ikke* kan behandles av vanlig ansatt")
     fun fortroligBrukerVanligAnsattAvvises() {
         assertInstanceOf<FortroligRegel>(
-            assertThrows<RegelException> {
-                regelMotor.kompletteRegler(vanligAnsatt, fortroligBruker)
-            }.regel
+                assertThrows<RegelException> {
+                    regelMotor.kompletteRegler(vanligAnsatt, fortroligBruker)
+                }.regel
         )
     }
 
@@ -124,9 +121,9 @@ class RegelMotorTest {
     @DisplayName("Test at bruker med strengt fortrolig beskyttelse *ikke* kan behandles av ansatt med medlemsskap i fortrolig gruppe")
     fun strengtFortroligBrukerFortroligAnsattAvvises() {
         assertInstanceOf<StrengtFortroligRegel>(
-            assertThrows<RegelException> {
-                regelMotor.kompletteRegler(fortroligAnsatt, strengtFortroligBruker)
-            }.regel
+                assertThrows<RegelException> {
+                    regelMotor.kompletteRegler(fortroligAnsatt, strengtFortroligBruker)
+                }.regel
         )
     }
 
@@ -134,9 +131,9 @@ class RegelMotorTest {
     @DisplayName("Test at bruker med strengt fortrolig beskyttelse *ikke* kan behandles av vanlig ansatt")
     fun strengtFortroligBrukerVanligAnsattAvvises() {
         assertInstanceOf<StrengtFortroligRegel>(
-            assertThrows<RegelException> {
-                regelMotor.kompletteRegler(vanligAnsatt, strengtFortroligBruker)
-            }.regel
+                assertThrows<RegelException> {
+                    regelMotor.kompletteRegler(vanligAnsatt, strengtFortroligBruker)
+                }.regel
         )
     }
 
@@ -184,9 +181,9 @@ class RegelMotorTest {
     @DisplayName("Test at egen ansatt bruker *ikke* kan behandles av ansatt med medlemsskap i fortrolig gruppe")
     fun egenAnsattBrukerFortroligAnsattAvvises() {
         assertInstanceOf<EgenAnsattRegel>(
-            assertThrows<RegelException> {
-                regelMotor.kompletteRegler(fortroligAnsatt, ansattBruker)
-            }.regel
+                assertThrows<RegelException> {
+                    regelMotor.kompletteRegler(fortroligAnsatt, ansattBruker)
+                }.regel
         )
     }
 
@@ -194,9 +191,9 @@ class RegelMotorTest {
     @DisplayName("Test at egen ansatt bruker *ikke* kan behandles av ansatt med medlemsskap i strengt fortrolig gruppe")
     fun egenAnsattBrukerStrengtFortroligAnsattAvvises() {
         assertInstanceOf<EgenAnsattRegel>(
-            assertThrows<RegelException> {
-                regelMotor.kompletteRegler(strengtFortroligAnsatt, ansattBruker)
-            }.regel
+                assertThrows<RegelException> {
+                    regelMotor.kompletteRegler(strengtFortroligAnsatt, ansattBruker)
+                }.regel
         )
     }
 
@@ -204,9 +201,9 @@ class RegelMotorTest {
     @DisplayName("Test at egen ansatt bruker *ikke* kan behandles av vanlig ansatt")
     fun ansattBrukerVanligAnsattAvvises() {
         assertInstanceOf<EgenAnsattRegel>(
-            assertThrows<RegelException> {
-                regelMotor.kompletteRegler(vanligAnsatt, ansattBruker)
-            }.regel
+                assertThrows<RegelException> {
+                    regelMotor.kompletteRegler(vanligAnsatt, ansattBruker)
+                }.regel
         )
     }
 
@@ -214,9 +211,9 @@ class RegelMotorTest {
     @DisplayName("Test at egen ansatt bruker med strengt fortrolig beskyttelse *ikke* kan behandles av ansatt med medlemsskap kun i egen ansatt gruppe")
     fun egenAnsattStrengtFortroligBrukerEgenAnsattAvvises() {
         assertInstanceOf<StrengtFortroligRegel>(
-            assertThrows<RegelException> {
-                regelMotor.kompletteRegler(egenAnsatt, egenAnsattStrengtFortroligBruker)
-            }.regel
+                assertThrows<RegelException> {
+                    regelMotor.kompletteRegler(egenAnsatt, egenAnsattStrengtFortroligBruker)
+                }.regel
         )
     }
 
@@ -224,9 +221,9 @@ class RegelMotorTest {
     @DisplayName("Test at egen ansatt bruker med fortrolig beskyttelse ikke kan behandles av ansatt med medlemsskap i egen gruppe ansatt")
     fun egenAnsattFortroligBrukerEgenAnsattAvvises() {
         assertInstanceOf<FortroligRegel>(
-            assertThrows<RegelException> {
-                regelMotor.kompletteRegler(egenAnsatt, egenAnsattFortroligBruker)
-            }.regel
+                assertThrows<RegelException> {
+                    regelMotor.kompletteRegler(egenAnsatt, egenAnsattFortroligBruker)
+                }.regel
         )
     }
 
@@ -250,9 +247,9 @@ class RegelMotorTest {
     @DisplayName("Test at egen ansatt bruker med strengt fortrolig beskyttelse  ikke kan behandles av ansatt med medlemsskap i egen ansatt gruppe")
     fun egenAnsattStrengtFortroligBrukerFortroligAnsattAvvises() {
         assertInstanceOf<StrengtFortroligRegel>(
-            assertThrows<RegelException> {
-                regelMotor.kompletteRegler(fortroligAnsatt, egenAnsattStrengtFortroligBruker)
-            }.regel
+                assertThrows<RegelException> {
+                    regelMotor.kompletteRegler(fortroligAnsatt, egenAnsattStrengtFortroligBruker)
+                }.regel
         )
     }
 
@@ -267,10 +264,10 @@ class RegelMotorTest {
     @Test
     @DisplayName("Test at ansatt uten manglende geografisk tilknytning rolle ikke kan behandle bruker med geografisk tilknytning")
     fun brukerMedManglendeGeografiskTilknytningAnsattUtenSammeRoleOK() {
-        assertInstanceOf<UkjentBostedGeoRegel>(
-            assertThrows<RegelException> {
-                regelMotor.kompletteRegler(vanligAnsatt, ukjentBostedBruker)
-            }.regel
+        assertInstanceOf<UkjentBostedRegel>(
+                assertThrows<RegelException> {
+                    regelMotor.kompletteRegler(vanligAnsatt, ukjentBostedBruker)
+                }.regel
         )
     }
 
@@ -285,10 +282,10 @@ class RegelMotorTest {
     @Test
     @DisplayName("Test at ansatt uten tilgang utland ikke kan behandle bruker med geografisk utland")
     fun geoUtlandGruppeUtenSammeRolle() {
-        assertInstanceOf<UtlandUdefinertGeoRegel>(
-            assertThrows<RegelException> {
-                regelMotor.kompletteRegler(vanligAnsatt, geoUtlandBruker)
-            }.regel
+        assertInstanceOf<UtlandRegel>(
+                assertThrows<RegelException> {
+                    regelMotor.kompletteRegler(vanligAnsatt, geoUtlandBruker)
+                }.regel
         )
     }
 
@@ -311,10 +308,10 @@ class RegelMotorTest {
     @Test
     @DisplayName("Test at ansatt med annen geo tilgang enn brukers ikke kan behandle denne")
     fun geoEnhetForskjelligAvvises() {
-        assertInstanceOf<GeoNorgeRegel>(
-            assertThrows<RegelException> {
-                regelMotor.kompletteRegler(enhetAnsatt, annenEnhetBruker)
-            }.regel
+        assertInstanceOf<NorgeRegel>(
+                assertThrows<RegelException> {
+                    regelMotor.kompletteRegler(enhetAnsatt, annenEnhetBruker)
+                }.regel
         )
     }
 }

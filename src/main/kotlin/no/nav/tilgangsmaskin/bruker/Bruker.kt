@@ -1,16 +1,16 @@
 package no.nav.tilgangsmaskin.bruker
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import java.time.LocalDate
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.bruker.Familie.Companion.INGEN
-import java.time.LocalDate
 
 data class Bruker(
-    val brukerIdentifikatorer: BrukerIdentifikatorer,
-    val geografiskTilknytning: GeografiskTilknytning,
-    val gruppeKrav: List<GlobalGruppe> = emptyList(),
-    val familie: Familie = INGEN,
-    val dødsdato: LocalDate? = null
+        val brukerIdentifikatorer: BrukerIdentifikatorer,
+        val geografiskTilknytning: GeografiskTilknytning,
+        val gruppeKrav: List<GlobalGruppe> = emptyList(),
+        val familie: Familie = INGEN,
+        val dødsdato: LocalDate? = null
 ) {
 
     @JsonIgnore
@@ -30,13 +30,15 @@ data class Bruker(
 
     @JsonIgnore
     val partnere = familie.partnere
+    
+    inline fun <reified T : GeografiskTilknytning> erRegistrertMed() = geografiskTilknytning is T
 
-    fun kreverGlobalGruppe(gruppe: GlobalGruppe) = gruppe in gruppeKrav
+    infix fun krever(gruppe: GlobalGruppe) = gruppe in gruppeKrav
 
     data class BrukerIdentifikatorer(
-        val brukerId: BrukerId,
-        val aktørId: AktørId,
-        val historiskeIdentifikatorer: List<BrukerId> = emptyList()
+            val brukerId: BrukerId,
+            val aktørId: AktørId,
+            val historiskeIdentifikatorer: List<BrukerId> = emptyList()
     )
 
 

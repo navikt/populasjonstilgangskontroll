@@ -12,9 +12,9 @@ import org.springframework.web.client.RestClient
 @Component
 @Cacheable(PDL)
 class PdlRestClientAdapter(
-    @Qualifier(PDL) restClient: RestClient,
-    private val cf: PdlConfig,
-    private val mapper: ObjectMapper
+        @Qualifier(PDL) restClient: RestClient,
+        private val cf: PdlConfig,
+        private val mapper: ObjectMapper
 ) : AbstractRestClientAdapter(restClient, cf) {
 
     fun person(brukerId: String) = get<PdlRespons>(cf.personURI(), mapOf("ident" to brukerId))

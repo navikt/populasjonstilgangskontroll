@@ -1,18 +1,23 @@
 package no.nav.tilgangsmaskin.ansatt
 
-import org.springframework.core.env.Environment
 import java.util.*
+import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster
 
 
-enum class GlobalGruppe(val property: String) {
-    STRENGT_FORTROLIG("gruppe.strengt"),
-    FORTROLIG("gruppe.fortrolig"),
-    EGEN_ANSATT("gruppe.egenansatt"),
-    UDEFINERT_GEO("gruppe.udefinert"),
-    GEO_PERSON_UTLAND("gruppe.utland"),
-    NASJONAL("gruppe.nasjonal");
+enum class GlobalGruppe(val property: String, val metadata: BeskrivelseTekster) {
+    STRENGT_FORTROLIG("gruppe.strengt", BeskrivelseTekster.STRENGT_FORTROLIG),
+    FORTROLIG("gruppe.fortrolig", BeskrivelseTekster.FORTROLIG),
+    SKJERMING("gruppe.egenansatt", BeskrivelseTekster.SKJERMING),
+    UKJENT_BOSTED("gruppe.udefinert", BeskrivelseTekster.UKJENT_BOSTED),
+    UTENLANDSK("gruppe.utland", BeskrivelseTekster.UTENLANDSK),
+    NASJONAL("gruppe.nasjonal", BeskrivelseTekster.NASJONAL);
 
+    lateinit var id: UUID
 
-    fun id(env: Environment) = UUID.fromString(env.getRequiredProperty(property))
-
+    companion object {
+        fun setIDs(grupper: Map<String, UUID>) =
+            entries.forEach { gruppe ->
+                gruppe.id = grupper[gruppe.property] ?: error("Mangler id for ${gruppe.property}")
+            }
+    }
 }

@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.felles
 
+import java.net.InetAddress
 import no.nav.tilgangsmaskin.felles.LederUtvelgerHandler.LeaderChangedEvent
 import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Service
-import java.net.InetAddress
 
 @Service
 class LederUtvelger : ApplicationListener<LeaderChangedEvent> {

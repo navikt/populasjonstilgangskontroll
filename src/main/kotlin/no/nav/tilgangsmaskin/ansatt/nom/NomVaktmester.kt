@@ -2,18 +2,14 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
+import java.util.concurrent.TimeUnit.HOURS
 import no.nav.tilgangsmaskin.felles.LederUtvelger
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import java.util.concurrent.TimeUnit.HOURS
 
 @Component
-class NomVaktmester(
-    private val nom: NomOperasjoner,
-    private val utvelger: LederUtvelger,
-    private val registry: MeterRegistry
-) {
+class NomVaktmester(private val nom: NomOperasjoner, private val utvelger: LederUtvelger, registry: MeterRegistry) {
 
     private val log = getLogger(javaClass)
     private val counter = Counter.builder("vaktmester.rader.fjernet")

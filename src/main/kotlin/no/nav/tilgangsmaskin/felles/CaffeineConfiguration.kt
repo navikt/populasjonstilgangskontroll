@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.felles
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import no.nav.boot.conditionals.ConditionalOnGCP
-import no.nav.boot.conditionals.ConditionalOnProd
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
@@ -20,16 +19,16 @@ class CaffeineConfiguration : CachingConfigurer {
     override fun cacheManager() =
         CaffeineCacheManager().apply {
             setCaffeine(
-                Caffeine.newBuilder()
-                    .recordStats()
-                    .removalListener { key, value, cause ->
-                        log.trace(
-                            "Cache removal key={}, value={}, cause={}",
-                            key,
-                            value,
-                            cause
-                        )
-                    })
+                    Caffeine.newBuilder()
+                        .recordStats()
+                        .removalListener { key, value, cause ->
+                            log.trace(
+                                    "Cache removal key={}, value={}, cause={}",
+                                    key,
+                                    value,
+                                    cause
+                            )
+                        })
         }
 
 

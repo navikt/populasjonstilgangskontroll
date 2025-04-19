@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
+import java.net.URI
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.felles.AbstractRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
-import java.net.URI
 
 @ConfigurationProperties(SKJERMING)
 class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) :

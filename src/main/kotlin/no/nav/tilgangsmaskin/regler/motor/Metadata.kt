@@ -1,12 +1,12 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import java.net.URI
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 
 data class Metadata(val tekster: BeskrivelseTekster) {
 
     val kode = tekster.kode
-    val årsak = tekster.avvisningÅrsak
+    val begrunnelse = tekster.avvisningÅrsak
     val kortNavn = tekster.kortNavn
 
     constructor(gruppe: GlobalGruppe) : this(gruppe.metadata)

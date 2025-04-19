@@ -26,12 +26,12 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 @Timed
 class OverstyringTjeneste(
-    private val ansatte: AnsattTjeneste,
-    private val brukere: BrukerTjeneste,
-    private val adapter: OverstyringJPAAdapter,
-    private val motor: RegelMotor,
-    private val registry: MeterRegistry,
-    private val accessor: TokenClaimsAccessor
+        private val ansatte: AnsattTjeneste,
+        private val brukere: BrukerTjeneste,
+        private val adapter: OverstyringJPAAdapter,
+        private val motor: RegelMotor,
+        private val registry: MeterRegistry,
+        private val accessor: TokenClaimsAccessor
 ) {
 
     private val log = getLogger(javaClass)
@@ -39,10 +39,10 @@ class OverstyringTjeneste(
     @Transactional(readOnly = true)
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId) =
         with(
-            adapter.gjeldendeOverstyring(
-                ansattId.verdi,
-                brukerId.verdi,
-                brukere.nærmesteFamilie(brukerId.verdi).historiskeIdentifikatorer.map { it.verdi })
+                adapter.gjeldendeOverstyring(
+                        ansattId.verdi,
+                        brukerId.verdi,
+                        brukere.nærmesteFamilie(brukerId.verdi).historiskeIdentifikatorer.map { it.verdi })
         ) {
             when {
                 this == null -> false.also {
@@ -70,9 +70,9 @@ class OverstyringTjeneste(
         }.getOrElse {
             when (it) {
                 is RegelException -> throw RegelException(
-                    OVERSTYRING_MESSAGE_CODE,
-                    arrayOf(it.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
-                    it
+                        OVERSTYRING_MESSAGE_CODE,
+                        arrayOf(it.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
+                        it
                 ).also {
                     log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}")
                 }

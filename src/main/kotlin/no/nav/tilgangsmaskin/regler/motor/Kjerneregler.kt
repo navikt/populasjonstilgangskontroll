@@ -1,11 +1,10 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.tilgangsmaskin.ansatt.Ansatt
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.EGEN_ANSATT
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMET
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.bruker.Bruker
-import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.EGNEDATA
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.FORELDREBARN
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.PARTNER
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.SØSKEN
@@ -25,17 +24,17 @@ class FortroligRegel : GlobalGruppeRegel(FORTROLIG), KjerneRegel
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 2)
-class EgenAnsattRegel : GlobalGruppeRegel(EGEN_ANSATT), KjerneRegel
+class EgenAnsattRegel : GlobalGruppeRegel(SKJERMET), KjerneRegel
 
 @Order(HIGHEST_PRECEDENCE + 3)
 @Component
 class EgneDataRegel(private val teller: EgneDataOppslagTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { ansatt er bruker }.also {
+        avslåHvis { ansatt erSammeSom bruker }.also {
             teller.increment(it)
         }
 
-    override val metadata = Metadata(EGNEDATA)
+    override val metadata = Metadata(SKJERMET)
 }
 
 @Order(HIGHEST_PRECEDENCE + 4)
@@ -53,7 +52,7 @@ class ForeldreOgBarnRegel(private val teller: ForeldreBarnOppslagTeller) : Kjern
 @Component
 class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { ansatt erNåværendeEllerTidligerePartnerTil bruker }.also {
+        avslåHvis { ansatt erNåværendeEllerTidligerePartnerMed bruker }.also {
             teller.increment(it)
         }
 

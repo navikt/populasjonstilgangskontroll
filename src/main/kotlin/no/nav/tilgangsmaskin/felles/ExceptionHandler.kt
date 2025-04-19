@@ -28,18 +28,18 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         title = e.message
         type = TYPE_URI
         properties = mapOf(
-            "navIdent" to e.ansattId.verdi,
-            "avvisninger" to e.exceptions.size,
-            "begrunnelser" to e.exceptions.map { props(it) }
+                "navIdent" to e.ansattId.verdi,
+                "avvisninger" to e.exceptions.size,
+                "begrunnelser" to e.exceptions.map { props(it) }
         )
     }
 
     private fun props(e: RegelException) =
         with(e) {
             mapOf(
-                "kode" to kode,
-                "årsak" to regel.avvisningTekst,
-                "brukerIdent" to brukerId.verdi
+                    "kode" to kode,
+                    "årsak" to regel.begrunnelse,
+                    "brukerIdent" to brukerId.verdi
             )
         }
 }

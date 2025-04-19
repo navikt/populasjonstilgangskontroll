@@ -17,8 +17,8 @@ class FellesRetryListener : RetryListener {
 
     override fun <T : Any, E : Throwable> onError(context: RetryContext, callback: RetryCallback<T, E>, e: Throwable) {
         log.warn(
-            "Eksekvering av '${methodFrom(context)}' feilet på forsøk ${context.retryCount} ",
-            context.lastThrowable
+                "Eksekvering av '${methodFrom(context)}' feilet på forsøk ${context.retryCount} ",
+                context.lastThrowable
         )
     }
 

@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.bruker
 
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.EGEN_ANSATT
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMET
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.bruker.Bruker.BrukerIdentifikatorer
@@ -15,24 +15,24 @@ object PersonTilBrukerMapper {
     fun tilBruker(person: Person, erSkjermet: Boolean) =
         with(person) {
             Bruker(
-                BrukerIdentifikatorer(brukerId, aktørId, historiskeIdentifikatorer),
-                geoTilknytning,
-                tilGruppeKrav(geoTilknytning, graderinger, erSkjermet),
-                familie,
-                dødsdato
+                    BrukerIdentifikatorer(brukerId, aktørId, historiskeIdentifikatorer),
+                    geoTilknytning,
+                    tilGruppeKrav(geoTilknytning, graderinger, erSkjermet),
+                    familie,
+                    dødsdato
             )
         }
 
     private fun tilGruppeKrav(
-        gt: GeografiskTilknytning, graderinger: List<Gradering>, erSkjermet: Boolean
+            gt: GeografiskTilknytning, graderinger: List<Gradering>, erSkjermet: Boolean
     ) =
         listOfNotNull(
-            when {
-                graderinger.erStrengtFortrolig() -> STRENGT_FORTROLIG
-                graderinger.erFortrolig() -> FORTROLIG
-                else -> null
-            },
-            UKJENT_BOSTED.takeIf { gt == udefinertGeoTilknytning },
-            EGEN_ANSATT.takeIf { erSkjermet }
+                when {
+                    graderinger.erStrengtFortrolig() -> STRENGT_FORTROLIG
+                    graderinger.erFortrolig() -> FORTROLIG
+                    else -> null
+                },
+                UKJENT_BOSTED.takeIf { gt == udefinertGeoTilknytning },
+                SKJERMET.takeIf { erSkjermet }
         )
 }

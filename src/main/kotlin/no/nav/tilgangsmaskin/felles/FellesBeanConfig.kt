@@ -28,8 +28,8 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     @Bean
     fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer {
         it.mixIn(
-            OAuth2AccessTokenResponse::class.java,
-            IgnoreUnknownMixin::class.java
+                OAuth2AccessTokenResponse::class.java,
+                IgnoreUnknownMixin::class.java
         )
     }
 
@@ -39,7 +39,6 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     @Bean
     fun errorMessageSource() = ReloadableResourceBundleMessageSource().apply {
         setBasename("classpath:messages")
-        setDefaultEncoding("UTF-8")
     }
 
     @Bean

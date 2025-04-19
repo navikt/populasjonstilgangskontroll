@@ -1,24 +1,23 @@
 package no.nav.tilgangsmaskin.ansatt
 
-import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster
 import java.util.*
+import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster
 
 
 enum class GlobalGruppe(val property: String, val metadata: BeskrivelseTekster) {
-    STRENGT_FORTROLIG("gruppe.strengt", BeskrivelseTekster.STRENGT_FORTROLIG_ADRESSE),
-    FORTROLIG("gruppe.fortrolig", BeskrivelseTekster.FORTROLIG_ADRESSE),
-    EGEN_ANSATT("gruppe.egenansatt", BeskrivelseTekster.EGNEDATA),
+    STRENGT_FORTROLIG("gruppe.strengt", BeskrivelseTekster.STRENGT_FORTROLIG),
+    FORTROLIG("gruppe.fortrolig", BeskrivelseTekster.FORTROLIG),
+    SKJERMET("gruppe.egenansatt", BeskrivelseTekster.EGNEDATA),
     UKJENT_BOSTED("gruppe.udefinert", BeskrivelseTekster.PERSON_UKJENT),
     BOSTED_UTLAND("gruppe.utland", BeskrivelseTekster.PERSON_UTLAND),
-    NASJONAL("gruppe.nasjonal", BeskrivelseTekster.GEOGRAFISK);
+    NASJONAL("gruppe.nasjonal", BeskrivelseTekster.NASJONAL);
 
     lateinit var id: UUID
 
     companion object {
-        fun setIDs(grupper: Map<String, UUID>) {
+        fun setIDs(grupper: Map<String, UUID>) =
             entries.forEach { gruppe ->
                 gruppe.id = grupper[gruppe.property] ?: error("Mangler id for ${gruppe.property}")
             }
-        }
     }
 }

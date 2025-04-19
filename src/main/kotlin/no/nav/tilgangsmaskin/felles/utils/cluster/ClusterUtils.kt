@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.felles.utils.cluster
 
+import java.lang.System.getenv
+import java.lang.System.setProperty
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV_GCP
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.GCP
@@ -8,8 +10,6 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.NAIS_CLUSTER_
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
-import java.lang.System.getenv
-import java.lang.System.setProperty
 
 internal enum class ClusterUtils(private val clusterName: String) {
     TEST_CLUSTER(TEST),

@@ -61,7 +61,7 @@ class BrukerMapperTest {
     @DisplayName("Test at behandling av brukere med EGEN_ANSATT vil kreve medlemsskap i EGEN_ANSATT_GRUPPE for ansatt")
     fun egenAnsatt() {
         with(tilBruker(person(pipRespons()), true)) {
-            assertThat(gruppeKrav).containsExactly(GlobalGruppe.EGEN_ANSATT)
+            assertThat(gruppeKrav).containsExactly(GlobalGruppe.SKJERMET)
         }
     }
 
@@ -70,8 +70,8 @@ class BrukerMapperTest {
     fun egenAnsattKode6() {
         with(tilBruker(person(pipRespons(STRENGT_FORTROLIG)), true)) {
             assertThat(gruppeKrav).containsExactlyInAnyOrder(
-                GlobalGruppe.EGEN_ANSATT,
-                GlobalGruppe.STRENGT_FORTROLIG
+                    GlobalGruppe.SKJERMET,
+                    GlobalGruppe.STRENGT_FORTROLIG
             )
         }
     }
@@ -80,7 +80,7 @@ class BrukerMapperTest {
     @DisplayName("Test at behandling av brukere med EGEN_ANSATT og FORTROLIG vil kreve medlemsskap i EGEN_ANSATT_GRUPPE og FORTROLIG_GRUPPE for ansatt")
     fun egenAnsattKode7() {
         with(tilBruker(person(pipRespons(FORTROLIG)), true)) {
-            assertThat(gruppeKrav).containsExactlyInAnyOrder(GlobalGruppe.EGEN_ANSATT, GlobalGruppe.FORTROLIG)
+            assertThat(gruppeKrav).containsExactlyInAnyOrder(GlobalGruppe.SKJERMET, GlobalGruppe.FORTROLIG)
         }
     }
 
@@ -89,16 +89,19 @@ class BrukerMapperTest {
 
 
     fun pipRespons(
-        gradering: PdlAdressebeskyttelseGradering? = null,
-        geo: PdlGeografiskTilknytning = geoUtland()
+            gradering: PdlAdressebeskyttelseGradering? = null,
+            geo: PdlGeografiskTilknytning = geoUtland()
     ): PdlRespons {
         val adressebeskyttelse = gradering?.let {
             listOf(PdlAdressebeskyttelse(it))
         } ?: emptyList()
         return PdlRespons(
-            PdlPerson(adressebeskyttelse),
-            PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT), PdlIdent(aktørId.verdi, false, AKTORID))),
-            geo
+                PdlPerson(adressebeskyttelse),
+                PdlIdenter(
+                        listOf(
+                                PdlIdent(brukerId, false, FOLKEREGISTERIDENT),
+                                PdlIdent(aktørId.verdi, false, AKTORID))),
+                geo
         )
     }
 

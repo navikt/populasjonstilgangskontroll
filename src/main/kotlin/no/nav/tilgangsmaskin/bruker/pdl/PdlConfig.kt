@@ -1,18 +1,18 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
+import java.net.URI
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.AbstractRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
-import java.net.URI
 
 @ConfigurationProperties(PDL)
 class PdlConfig(
-    baseUri: URI,
-    pingPath: String = DEFAULT_PING_PATH,
-    val personPath: String = DEFAULT_PERSON_PATH,
-    val personBolkPath: String = DEFAULT_PERSON__BOLK_PATH,
-    enabled: Boolean = true
+        baseUri: URI,
+        pingPath: String = DEFAULT_PING_PATH,
+        val personPath: String = DEFAULT_PERSON_PATH,
+        val personBolkPath: String = DEFAULT_PERSON__BOLK_PATH,
+        enabled: Boolean = true
 ) : AbstractRestConfig(baseUri, pingPath, PDL, enabled) {
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"

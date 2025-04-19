@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.regler.overstyring
 
+import java.util.*
 import no.nav.tilgangsmaskin.tilgang.TokenClaimsAccessor
 import org.springframework.data.domain.AuditorAware
 import org.springframework.stereotype.Component
-import java.util.*
 
 
 @Component

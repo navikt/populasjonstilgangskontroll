@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt.entra
 
-import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.HEADER_CONSISTENCY_LEVEL
 import no.nav.tilgangsmaskin.felles.AbstractPingableHealthIndicator
@@ -15,11 +14,7 @@ class EntraClientBeanConfig {
 
     @Bean
     @Qualifier(GRAPH)
-    fun graphRestClient(
-        b: RestClient.Builder,
-        cfg: EntraConfig,
-        oAuth2ClientRequestInterceptor: OAuth2ClientRequestInterceptor
-    ) =
+    fun graphRestClient(b: RestClient.Builder, cfg: EntraConfig) =
         b.baseUrl(cfg.baseUri)
             .requestInterceptors {
                 it.add(headerAddingRequestInterceptor(HEADER_CONSISTENCY_LEVEL))

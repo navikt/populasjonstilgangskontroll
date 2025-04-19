@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.regler.overstyring
 
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import java.time.LocalDate
+import no.nav.tilgangsmaskin.bruker.BrukerId
 
 data class OverstyringData(val brukerId: BrukerId, val begrunnelse: String, val gyldigtil: LocalDate)

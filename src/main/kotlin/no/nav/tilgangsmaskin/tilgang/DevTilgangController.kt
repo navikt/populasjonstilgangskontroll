@@ -28,14 +28,14 @@ import org.springframework.web.bind.annotation.*
 @ConditionalOnNotProd
 @Tag(name = "DevTilgangController", description = "Denne kontrolleren skal kun brukes til testing")
 class DevTilgangController(
-    private val graphql: PdlSyncGraphQLClientAdapter,
-    private val skjerming: SkjermingTjeneste,
-    private val brukere: BrukerTjeneste,
-    private val ansatte: AnsattTjeneste,
-    private val regler: RegelTjeneste,
-    private val overstyring: OverstyringTjeneste,
-    private val nom: NomTjeneste,
-    private val pdl: PDLTjeneste
+        private val graphql: PdlSyncGraphQLClientAdapter,
+        private val skjerming: SkjermingTjeneste,
+        private val brukere: BrukerTjeneste,
+        private val ansatte: AnsattTjeneste,
+        private val regler: RegelTjeneste,
+        private val overstyring: OverstyringTjeneste,
+        private val nom: NomTjeneste,
+        private val pdl: PDLTjeneste
 ) {
 
     @GetMapping("sivilstand/{id}")
@@ -67,8 +67,8 @@ class DevTilgangController(
     @PostMapping("overstyr/{ansattId}")
     @ResponseStatus(ACCEPTED)
     fun overstyr(
-        @PathVariable ansattId: AnsattId,
-        @RequestBody data: OverstyringData
+            @PathVariable ansattId: AnsattId,
+            @RequestBody data: OverstyringData
     ) =
         overstyring.overstyr(ansattId, data)
 

@@ -9,7 +9,7 @@ interface Regel {
     val metadata: Metadata
     val kode get() = metadata.kode
     val kortNavn get() = metadata.kortNavn
-    val avvisningTekst get() = metadata.årsak
+    val begrunnelse get() = metadata.begrunnelse
     val erOverstyrbar get() = this is OverstyrbarRegel
 
 

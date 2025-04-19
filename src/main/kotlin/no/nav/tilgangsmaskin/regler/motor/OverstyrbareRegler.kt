@@ -1,10 +1,12 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.tilgangsmaskin.ansatt.Ansatt
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.BOSTED_UKJENT
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.BOSTED_UTLAND
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
 import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.AVDØD
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
@@ -16,23 +18,23 @@ interface OverstyrbarRegel : Regel
 
 @Component
 @Order(LOWEST_PRECEDENCE)
-class GeoNorgeRegel : GlobalGruppeRegel(NASJONAL), OverstyrbarRegel {
+class NorgeRegel : GlobalGruppeRegel(NASJONAL), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { !(ansatt kanBehandle NASJONAL) && !(ansatt kanBehandle bruker.geografiskTilknytning) }
 }
 
 @Component
 @Order(LOWEST_PRECEDENCE - 1)
-class UkjentBostedGeoRegel : GlobalGruppeRegel(UKJENT_BOSTED), OverstyrbarRegel {
+class UkjentBostedRegel : GlobalGruppeRegel(BOSTED_UKJENT), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { bruker.harUkjentBosted && !(ansatt kanBehandle UKJENT_BOSTED) }
+        avslåHvis { bruker.erRegistrertMed<UkjentBosted>() && !(ansatt kanBehandle BOSTED_UKJENT) }
 }
 
 @Component
 @Order(LOWEST_PRECEDENCE - 2)
-class UtlandGeoRegel : GlobalGruppeRegel(BOSTED_UTLAND), OverstyrbarRegel {
+class UtlandRegel : GlobalGruppeRegel(BOSTED_UTLAND), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { bruker.erBosattUtenlands && !(ansatt kanBehandle BOSTED_UTLAND) }
+        avslåHvis { bruker.erRegistrertMed<UtenlandskTilknytning>() && !(ansatt kanBehandle BOSTED_UTLAND) }
 }
 
 @Component

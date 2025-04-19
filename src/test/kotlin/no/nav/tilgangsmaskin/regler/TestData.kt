@@ -4,11 +4,11 @@ import java.util.*
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.Ansatt.AnsattIdentifikatorer
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.BOSTED_UKJENT
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.BOSTED_UTLAND
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMET
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.Bruker
@@ -84,7 +84,7 @@ object TestData {
             listOf(FORTROLIG, SKJERMET),
     )
     internal val ukjentBostedBruker =
-        Bruker(BrukerIdentifikatorer(ukjentBostedBrukerId, aktørId), UkjentBosted(), listOf(UKJENT_BOSTED))
+        Bruker(BrukerIdentifikatorer(ukjentBostedBrukerId, aktørId), UkjentBosted(), listOf(BOSTED_UKJENT))
     internal val geoUtlandBruker = Bruker(
             BrukerIdentifikatorer(geoUtlandBrukerId, aktørId),
             utenlandskTilknytning,

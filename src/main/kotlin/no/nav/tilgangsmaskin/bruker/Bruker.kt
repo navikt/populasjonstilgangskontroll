@@ -30,13 +30,8 @@ data class Bruker(
 
     @JsonIgnore
     val partnere = familie.partnere
-
-
-    @JsonIgnore
-    val harUkjentBosted = geografiskTilknytning is GeografiskTilknytning.UkjentBosted
-
-    @JsonIgnore
-    val erBosattUtenlands = geografiskTilknytning is GeografiskTilknytning.UtenlandskTilknytning
+    
+    inline fun <reified T : GeografiskTilknytning> erRegistrertMed() = geografiskTilknytning is T
 
     infix fun krever(gruppe: GlobalGruppe) = gruppe in gruppeKrav
 

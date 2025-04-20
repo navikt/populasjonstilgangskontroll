@@ -23,6 +23,7 @@ import no.nav.tilgangsmaskin.regler.TestData.geoUtlandBruker
 import no.nav.tilgangsmaskin.regler.TestData.nasjonalAnsatt
 import no.nav.tilgangsmaskin.regler.TestData.strengtFortroligAnsatt
 import no.nav.tilgangsmaskin.regler.TestData.strengtFortroligBruker
+import no.nav.tilgangsmaskin.regler.TestData.strengtFortroligUtlandBruker
 import no.nav.tilgangsmaskin.regler.TestData.udefinertGeoAnsatt
 import no.nav.tilgangsmaskin.regler.TestData.ukjentBostedBruker
 import no.nav.tilgangsmaskin.regler.TestData.vanligAnsatt
@@ -66,7 +67,7 @@ class RegelMotorTest {
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(strengtFortroligAnsatt, fortroligBruker)
                 }.regel
-        )
+                                        )
     }
 
     @Test
@@ -76,7 +77,7 @@ class RegelMotorTest {
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(egenAnsattMedFamilie, vanligBruker)
                 }.regel
-        )
+                                             )
     }
 
     @Test
@@ -86,7 +87,7 @@ class RegelMotorTest {
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(egenAnsattMedPartner, vanligBruker)
                 }.regel
-        )
+                                      )
     }
 
     @Test
@@ -96,7 +97,7 @@ class RegelMotorTest {
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(egenAnsatt, ansattBruker)
                 }.regel
-        )
+                                       )
     }
 
     @Test
@@ -106,7 +107,7 @@ class RegelMotorTest {
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(vanligAnsatt, fortroligBruker)
                 }.regel
-        )
+                                        )
     }
 
     @Test
@@ -124,7 +125,16 @@ class RegelMotorTest {
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(fortroligAnsatt, strengtFortroligBruker)
                 }.regel
-        )
+                                               )
+    }
+
+    @Test
+    @DisplayName("Test at bruker med strengt fortrolig beskyttelse *ikke* kan behandles av ansatt med medlemsskap i fortrolig gruppe")
+    fun strengtFortroligUtlandBrukerFortroligAnsattAvvises() {
+        assertInstanceOf<StrengtFortroligUtlandRegel>(
+                assertThrows<RegelException> {
+                    regelMotor.kompletteRegler(fortroligAnsatt, strengtFortroligUtlandBruker)
+                }.regel)
     }
 
     @Test
@@ -134,7 +144,7 @@ class RegelMotorTest {
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(vanligAnsatt, strengtFortroligBruker)
                 }.regel
-        )
+                                               )
     }
 
     @Test
@@ -142,6 +152,14 @@ class RegelMotorTest {
     fun strengtFortroligBrukerStrengtFortroligAnsattOK() {
         assertThatCode {
             regelMotor.kompletteRegler(strengtFortroligAnsatt, strengtFortroligBruker)
+        }.doesNotThrowAnyException()
+    }
+
+    @Test
+    @DisplayName("Test at bruker med strengt fortrolig utland  beskyttelse *kan* behandles av ansatt med medlemsskap i strengt fortrolig gruppe")
+    fun strengtFortroligUtlandBrukerStrengtFortroligAnsattOK() {
+        assertThatCode {
+            regelMotor.kompletteRegler(strengtFortroligAnsatt, strengtFortroligUtlandBruker)
         }.doesNotThrowAnyException()
     }
 
@@ -184,7 +202,7 @@ class RegelMotorTest {
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(fortroligAnsatt, ansattBruker)
                 }.regel
-        )
+                                         )
     }
 
     @Test
@@ -194,7 +212,7 @@ class RegelMotorTest {
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(strengtFortroligAnsatt, ansattBruker)
                 }.regel
-        )
+                                         )
     }
 
     @Test
@@ -204,7 +222,7 @@ class RegelMotorTest {
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(vanligAnsatt, ansattBruker)
                 }.regel
-        )
+                                         )
     }
 
     @Test
@@ -214,7 +232,7 @@ class RegelMotorTest {
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(egenAnsatt, egenAnsattStrengtFortroligBruker)
                 }.regel
-        )
+                                               )
     }
 
     @Test
@@ -224,7 +242,7 @@ class RegelMotorTest {
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(egenAnsatt, egenAnsattFortroligBruker)
                 }.regel
-        )
+                                        )
     }
 
     @Test
@@ -250,7 +268,7 @@ class RegelMotorTest {
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(fortroligAnsatt, egenAnsattStrengtFortroligBruker)
                 }.regel
-        )
+                                               )
     }
 
     @Test
@@ -268,7 +286,7 @@ class RegelMotorTest {
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(vanligAnsatt, ukjentBostedBruker)
                 }.regel
-        )
+                                           )
     }
 
     @Test
@@ -286,7 +304,7 @@ class RegelMotorTest {
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(vanligAnsatt, geoUtlandBruker)
                 }.regel
-        )
+                                     )
     }
 
     @Test
@@ -312,6 +330,6 @@ class RegelMotorTest {
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(enhetAnsatt, annenEnhetBruker)
                 }.regel
-        )
+                                    )
     }
 }

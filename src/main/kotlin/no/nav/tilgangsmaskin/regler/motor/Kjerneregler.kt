@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.tilgangsmaskin.ansatt.Ansatt
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
@@ -70,4 +71,9 @@ class SøskenRegel(private val teller: SøskenOppslagTeller) : KjerneRegel {
 
     override val metadata = Metadata(SØSKEN)
 }
+
+@Component
+@Order(HIGHEST_PRECEDENCE + 7)
+class StrengtFortroligUtlandRegel : GlobalGruppeRegel(GlobalGruppe.STRENGT_FORTROLIG_UTLAND), KjerneRegel
+
 

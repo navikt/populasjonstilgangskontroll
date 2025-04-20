@@ -3,13 +3,15 @@ package no.nav.tilgangsmaskin.bruker
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.bruker.Bruker.BrukerIdentifikatorer
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.udefinertGeoTilknytning
-import no.nav.tilgangsmaskin.bruker.pdl.Gradering
 import no.nav.tilgangsmaskin.bruker.pdl.Person
+import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
 import no.nav.tilgangsmaskin.bruker.pdl.erFortrolig
 import no.nav.tilgangsmaskin.bruker.pdl.erStrengtFortrolig
+import no.nav.tilgangsmaskin.bruker.pdl.erStrengtFortroligUtland
 
 object PersonTilBrukerMapper {
     fun tilBruker(person: Person, erSkjermet: Boolean) =
@@ -27,6 +29,7 @@ object PersonTilBrukerMapper {
         listOfNotNull(
                 when {
                     graderinger.erStrengtFortrolig() -> STRENGT_FORTROLIG
+                    graderinger.erStrengtFortroligUtland() -> STRENGT_FORTROLIG_UTLAND
                     graderinger.erFortrolig() -> FORTROLIG
                     else -> null
                 },

@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
@@ -47,6 +48,11 @@ object TestData {
             udefinertGeoTilknytning,
             listOf(STRENGT_FORTROLIG)
                                                 )
+
+    internal val strengtFortroligUtlandBruker = Bruker(
+            BrukerIdentifikatorer(strengtFortroligBrukerId, aktørId),
+            udefinertGeoTilknytning,
+            listOf(STRENGT_FORTROLIG_UTLAND))
     internal val fortroligBruker =
         Bruker(BrukerIdentifikatorer(fortroligBrukerId, aktørId), udefinertGeoTilknytning, listOf(FORTROLIG))
     internal val vanligBruker = Bruker(BrukerIdentifikatorer(vanligBrukerId, aktørId), udefinertGeoTilknytning)

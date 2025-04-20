@@ -7,6 +7,10 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.Companion.INGEN
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
+import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
+import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
+import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.STRENGT_FORTROLIG_UTLAND
 
 data class Person(
         val brukerId: BrukerId,
@@ -22,11 +26,13 @@ data class Person(
 
     @JsonIgnore
     val barn = familie.barn
+
+    enum class Gradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG, UGRADERT }
+
 }
 
-enum class Gradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG, UGRADERT }
+fun List<Gradering>.erStrengtFortroligUtland() = any { it == STRENGT_FORTROLIG_UTLAND }
 
-fun List<Gradering>.erStrengtFortrolig() =
-    any { it in setOf(Gradering.STRENGT_FORTROLIG_UTLAND, Gradering.STRENGT_FORTROLIG) }
+fun List<Gradering>.erStrengtFortrolig() = any { it == STRENGT_FORTROLIG }
 
-fun List<Gradering>.erFortrolig() = any { it == Gradering.FORTROLIG }
+fun List<Gradering>.erFortrolig() = any { it == FORTROLIG }

@@ -198,31 +198,31 @@ class RegelMotorTest {
     @Test
     @DisplayName("Test at egen ansatt bruker *ikke* kan behandles av ansatt med medlemsskap i fortrolig gruppe")
     fun egenAnsattBrukerFortroligAnsattAvvises() {
-        assertInstanceOf<EgenAnsattRegel>(
+        assertInstanceOf<SkjermingRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(fortroligAnsatt, ansattBruker)
                 }.regel
-                                         )
+                                        )
     }
 
     @Test
     @DisplayName("Test at egen ansatt bruker *ikke* kan behandles av ansatt med medlemsskap i strengt fortrolig gruppe")
     fun egenAnsattBrukerStrengtFortroligAnsattAvvises() {
-        assertInstanceOf<EgenAnsattRegel>(
+        assertInstanceOf<SkjermingRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(strengtFortroligAnsatt, ansattBruker)
                 }.regel
-                                         )
+                                        )
     }
 
     @Test
     @DisplayName("Test at egen ansatt bruker *ikke* kan behandles av vanlig ansatt")
     fun ansattBrukerVanligAnsattAvvises() {
-        assertInstanceOf<EgenAnsattRegel>(
+        assertInstanceOf<SkjermingRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(vanligAnsatt, ansattBruker)
                 }.regel
-                                         )
+                                        )
     }
 
     @Test

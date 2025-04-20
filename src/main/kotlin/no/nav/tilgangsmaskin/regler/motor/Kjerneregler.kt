@@ -1,10 +1,10 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.tilgangsmaskin.ansatt.Ansatt
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.EGNEDATA
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.FORELDREBARN
@@ -22,13 +22,17 @@ class StrengtFortroligRegel : GlobalGruppeRegel(STRENGT_FORTROLIG), KjerneRegel
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 1)
-class FortroligRegel : GlobalGruppeRegel(FORTROLIG), KjerneRegel
+class StrengtFortroligUtlandRegel : GlobalGruppeRegel(STRENGT_FORTROLIG_UTLAND), KjerneRegel
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 2)
-class EgenAnsattRegel : GlobalGruppeRegel(SKJERMING), KjerneRegel
+class FortroligRegel : GlobalGruppeRegel(FORTROLIG), KjerneRegel
 
+@Component
 @Order(HIGHEST_PRECEDENCE + 3)
+class SkjermingRegel : GlobalGruppeRegel(SKJERMING), KjerneRegel
+
+@Order(HIGHEST_PRECEDENCE + 4)
 @Component
 class EgneDataRegel(private val teller: EgneDataOppslagTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
@@ -39,7 +43,7 @@ class EgneDataRegel(private val teller: EgneDataOppslagTeller) : KjerneRegel {
     override val metadata = Metadata(EGNEDATA)
 }
 
-@Order(HIGHEST_PRECEDENCE + 4)
+@Order(HIGHEST_PRECEDENCE + 5)
 @Component
 class ForeldreOgBarnRegel(private val teller: ForeldreBarnOppslagTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
@@ -50,7 +54,7 @@ class ForeldreOgBarnRegel(private val teller: ForeldreBarnOppslagTeller) : Kjern
     override val metadata = Metadata(FORELDREBARN)
 }
 
-@Order(HIGHEST_PRECEDENCE + 5)
+@Order(HIGHEST_PRECEDENCE + 6)
 @Component
 class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
@@ -62,7 +66,7 @@ class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
 }
 
 @Component
-@Order(HIGHEST_PRECEDENCE + 6)
+@Order(HIGHEST_PRECEDENCE + 7)
 class SøskenRegel(private val teller: SøskenOppslagTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt erSøskenTil bruker }.also {
@@ -72,8 +76,5 @@ class SøskenRegel(private val teller: SøskenOppslagTeller) : KjerneRegel {
     override val metadata = Metadata(SØSKEN)
 }
 
-@Component
-@Order(HIGHEST_PRECEDENCE + 7)
-class StrengtFortroligUtlandRegel : GlobalGruppeRegel(GlobalGruppe.STRENGT_FORTROLIG_UTLAND), KjerneRegel
 
 

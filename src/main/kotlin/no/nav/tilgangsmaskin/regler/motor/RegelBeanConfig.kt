@@ -31,7 +31,7 @@ class RegelBeanConfig {
     @Bean
     @Qualifier(KOMPLETT)
     fun komplettRegelsett(@Qualifier(KJERNE) kjerne: RegelSett, @Qualifier(OVERSTYRBAR) overstyrbart: RegelSett) =
-        RegelSett(KOMPLETT_REGELTYPE to kjerne.regler + overstyrbart.regler)
+        RegelSett(KOMPLETT_REGELTYPE to kjerne + overstyrbart)
 }
 
 @ConfigurationProperties("gruppe")

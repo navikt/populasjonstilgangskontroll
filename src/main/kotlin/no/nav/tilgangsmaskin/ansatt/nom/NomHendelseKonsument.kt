@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.ansatt.nom
 import java.time.LocalDate.EPOCH
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
-import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode.Companion.FOREVER
+import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode.Companion.FUTURE
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.pluralize
 import org.slf4j.LoggerFactory.getLogger
@@ -24,15 +24,11 @@ class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler:
                 runCatching {
                     nom.lagre(
                             NomAnsattData(
-                                    AnsattId(navident),
-                                    BrukerId(personident),
-                                    NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: FOREVER)
-                            )
-                    )
+                                    AnsattId(navident), BrukerId(personident),
+                                    NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: FUTURE)))
                 }.fold(
                         { handler.handleOK(navident, personident) },
-                        { handler.handleFailure(navident, personident, it) }
-                )
+                        { handler.handleFailure(navident, personident, it) })
             }
         }
         log.info("${hendelser.size} ${"hendelse".pluralize(hendelser)} ferdig behandlet")

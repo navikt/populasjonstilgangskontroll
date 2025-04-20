@@ -20,12 +20,10 @@ object PersonTilBrukerMapper {
                     tilGruppeKrav(geoTilknytning, graderinger, erSkjermet),
                     familie,
                     dødsdato
-            )
+                  )
         }
 
-    private fun tilGruppeKrav(
-            gt: GeografiskTilknytning, graderinger: List<Gradering>, erSkjermet: Boolean
-    ) =
+    private fun tilGruppeKrav(gt: GeografiskTilknytning, graderinger: List<Gradering>, erSkjermet: Boolean) =
         listOfNotNull(
                 when {
                     graderinger.erStrengtFortrolig() -> STRENGT_FORTROLIG
@@ -33,6 +31,5 @@ object PersonTilBrukerMapper {
                     else -> null
                 },
                 UKJENT_BOSTED.takeIf { gt == udefinertGeoTilknytning },
-                SKJERMING.takeIf { erSkjermet }
-        )
+                SKJERMING.takeIf { erSkjermet })
 }

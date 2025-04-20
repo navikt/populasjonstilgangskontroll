@@ -11,21 +11,19 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentG
 data class PdlRespons(
         val person: PdlPerson,
         val identer: PdlIdenter = PdlIdenter(),
-        val geografiskTilknytning: PdlGeografiskTilknytning? = null
-) {
+        val geografiskTilknytning: PdlGeografiskTilknytning? = null) {
 
     val aktørId = identer.identer.firstOrNull { it.gruppe == AKTORID }?.ident
-        ?: throw IllegalStateException("Ingen gyldig aktørid funnet")
+        ?: error("Ingen gyldig aktørid funnet")
     val brukerId = identer.identer.firstOrNull { it.gruppe in listOf(FOLKEREGISTERIDENT, NPID) }?.ident
-        ?: throw IllegalStateException("Ingen gyldig identer funnet")
+        ?: error("Ingen gyldig identer funnet")
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class PdlPerson(
             val adressebeskyttelse: List<PdlAdressebeskyttelse> = emptyList(),
             val foedsel: List<PdlFødsel> = emptyList(),
             val doedsfall: List<PdlDødsfall> = emptyList(),
-            val familierelasjoner: List<PdlFamilierelasjon> = emptyList()
-    ) {
+            val familierelasjoner: List<PdlFamilierelasjon> = emptyList()) {
 
         data class PdlAdressebeskyttelse(val gradering: PdlAdressebeskyttelseGradering) {
             enum class PdlAdressebeskyttelseGradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG, UGRADERT }
@@ -36,8 +34,7 @@ data class PdlRespons(
         data class PdlFamilierelasjon(
                 val relatertPersonsIdent: BrukerId? = null,
                 val relatertPersonsRolle: PdlFamilieRelasjonRolle? = null,
-                val minRolleForPerson: PdlFamilieRelasjonRolle? = null
-        ) {
+                val minRolleForPerson: PdlFamilieRelasjonRolle? = null) {
             enum class PdlFamilieRelasjonRolle { MOR, FAR, MEDMOR, MEDFAR, BARN }
         }
     }
@@ -55,8 +52,7 @@ data class Partnere(val sivilstand: List<Sivilstand> = emptyList()) {
             val type: Sivilstandstype,
             val relatertVedSivilstand: String?,
             val bekreftelsesdato: String?,
-            val gyldigFraOgMed: String?
-    ) {
+            val gyldigFraOgMed: String?) {
         enum class Sivilstandstype {
             UOPPGITT,
             UGIFT,

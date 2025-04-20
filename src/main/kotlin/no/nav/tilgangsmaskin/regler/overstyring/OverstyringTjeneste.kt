@@ -31,8 +31,7 @@ class OverstyringTjeneste(
         private val adapter: OverstyringJPAAdapter,
         private val motor: RegelMotor,
         private val registry: MeterRegistry,
-        private val accessor: TokenClaimsAccessor
-) {
+        private val accessor: TokenClaimsAccessor) {
 
     private val log = getLogger(javaClass)
 
@@ -42,8 +41,7 @@ class OverstyringTjeneste(
                 adapter.gjeldendeOverstyring(
                         ansattId.verdi,
                         brukerId.verdi,
-                        brukere.nærmesteFamilie(brukerId.verdi).historiskeIdentifikatorer.map { it.verdi })
-        ) {
+                        brukere.nærmesteFamilie(brukerId.verdi).historiskeIdentifikatorer.map { it.verdi })) {
             when {
                 this == null -> false.also {
                     log.trace("Ingen overstyring for $ansattId og $brukerId ble funnet i databasen")
@@ -72,8 +70,7 @@ class OverstyringTjeneste(
                 is RegelException -> throw RegelException(
                         OVERSTYRING_MESSAGE_CODE,
                         arrayOf(it.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
-                        it
-                ).also {
+                        it).also {
                     log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}")
                 }
 

@@ -35,26 +35,18 @@ class RegelBeanConfig {
 }
 
 @ConfigurationProperties("gruppe")
-data class Grupper(val strengt: UUID,
-                   val nasjonal: UUID,
-                   val utland: UUID,
-                   val udefinert: UUID,
-                   var fortrolig: UUID,
-                   val egenansatt: UUID) {
+data class Grupper(val strengt: UUID, val nasjonal: UUID, val utland: UUID,
+                   val udefinert: UUID, var fortrolig: UUID, val egenansatt: UUID) {
 
     @PostConstruct
     fun setIDs() {
-        val grupper = mapOf(
-                "gruppe.strengt" to strengt,
-                "gruppe.nasjonal" to nasjonal,
-                "gruppe.utland" to utland,
-                "gruppe.udefinert" to udefinert,
-                "gruppe.fortrolig" to fortrolig,
-                "gruppe.egenansatt" to egenansatt
-        ).mapNotNull { (key, value) ->
-            value.let { key to it }
-        }.toMap()
-
-        GlobalGruppe.setIDs(grupper)
+        GlobalGruppe.setIDs(
+                mapOf(
+                        "gruppe.strengt" to strengt,
+                        "gruppe.nasjonal" to nasjonal,
+                        "gruppe.utland" to utland,
+                        "gruppe.udefinert" to udefinert,
+                        "gruppe.fortrolig" to fortrolig,
+                        "gruppe.egenansatt" to egenansatt))
     }
 }

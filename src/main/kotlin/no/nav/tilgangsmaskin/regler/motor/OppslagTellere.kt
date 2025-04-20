@@ -9,8 +9,7 @@ abstract class AbstractTeller(
         private val registry: MeterRegistry,
         private val accessor: TokenClaimsAccessor,
         private val tellerNavn: String,
-        private val beskrivelse: String
-) {
+        private val beskrivelse: String) {
 
     fun increment(avslått: Boolean, vararg tags: Pair<String, String>) =
         if (avslått) {

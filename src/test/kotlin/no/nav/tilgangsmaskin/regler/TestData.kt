@@ -46,7 +46,7 @@ object TestData {
             BrukerIdentifikatorer(strengtFortroligBrukerId, aktørId),
             udefinertGeoTilknytning,
             listOf(STRENGT_FORTROLIG)
-    )
+                                                )
     internal val fortroligBruker =
         Bruker(BrukerIdentifikatorer(fortroligBrukerId, aktørId), udefinertGeoTilknytning, listOf(FORTROLIG))
     internal val vanligBruker = Bruker(BrukerIdentifikatorer(vanligBrukerId, aktørId), udefinertGeoTilknytning)
@@ -55,19 +55,19 @@ object TestData {
     internal val vanligBrukerMedHistoriskIdent = Bruker(
             BrukerIdentifikatorer(vanligBrukerId, aktørId, listOf(vanligHistoriskBruker.brukerId)),
             udefinertGeoTilknytning
-    )
+                                                       )
     internal val annenAnsattBruker = Bruker(
             BrukerIdentifikatorer(annenAnsattBrukerId, aktørId),
             udefinertGeoTilknytning,
             listOf(SKJERMING),
             Familie(barn = setOf(FamilieMedlem(vanligBrukerId, FamilieRelasjon.BARN)))
-    )
+                                           )
     internal val annenAnsattBrukerMedPartner = Bruker(
             BrukerIdentifikatorer(annenAnsattBrukerId, aktørId),
             udefinertGeoTilknytning,
             listOf(SKJERMING),
             Familie(partnere = setOf(FamilieMedlem(vanligBrukerId, FamilieRelasjon.PARTNER)))
-    )
+                                                     )
     internal val ansattBruker =
         Bruker(
                 BrukerIdentifikatorer(ansattBrukerId, aktørId),
@@ -77,19 +77,19 @@ object TestData {
             BrukerIdentifikatorer(egenAnsattStrengtFortroligBrukerId, aktørId),
             udefinertGeoTilknytning,
             listOf(STRENGT_FORTROLIG, SKJERMING),
-    )
+                                                          )
     internal val egenAnsattFortroligBruker = Bruker(
             BrukerIdentifikatorer(egenAnsattFortroligBrukerId, aktørId),
             udefinertGeoTilknytning,
             listOf(FORTROLIG, SKJERMING),
-    )
+                                                   )
     internal val ukjentBostedBruker =
         Bruker(BrukerIdentifikatorer(ukjentBostedBrukerId, aktørId), UkjentBosted(), listOf(UKJENT_BOSTED))
     internal val geoUtlandBruker = Bruker(
             BrukerIdentifikatorer(geoUtlandBrukerId, aktørId),
             utenlandskTilknytning,
             listOf(UTENLANDSK),
-    )
+                                         )
     internal val enhetBruker =
         Bruker(BrukerIdentifikatorer(enhetBrukerId, aktørId), KommuneTilknytning(Kommune(enhet.verdi)))
     internal val annenEnhetBruker =
@@ -110,30 +110,29 @@ object TestData {
     internal val enhetGruppe = EntraGruppe(UUID.randomUUID(), "XXX_GEO_${enhet.verdi}")
 
     internal val egenAnsattFortroligAnsatt =
-        Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(fortroligEntraGruppe, egenAnsattEntraGruppe), ansattBruker)
+        Ansatt(AnsattIdentifikatorer(ansattId, oid), setOf(fortroligEntraGruppe, egenAnsattEntraGruppe), ansattBruker)
     internal val egenAnsattStrengtFortroligAnsatt = Ansatt(
             AnsattIdentifikatorer(ansattId, oid),
-            listOf(strengtFortroligEntraGruppe, egenAnsattEntraGruppe),
-            ansattBruker
-    )
+            setOf(strengtFortroligEntraGruppe, egenAnsattEntraGruppe),
+            ansattBruker)
     internal val strengtFortroligAnsatt =
-        Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(strengtFortroligEntraGruppe), ansattBruker)
+        Ansatt(AnsattIdentifikatorer(ansattId, oid), setOf(strengtFortroligEntraGruppe), ansattBruker)
     internal val fortroligAnsatt =
-        Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(fortroligEntraGruppe), ansattBruker)
-    internal val egenAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(egenAnsattEntraGruppe), ansattBruker)
+        Ansatt(AnsattIdentifikatorer(ansattId, oid), setOf(fortroligEntraGruppe), ansattBruker)
+    internal val egenAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), setOf(egenAnsattEntraGruppe), ansattBruker)
     internal val egenAnsattMedFamilie =
-        Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(annenEntraGruppe), annenAnsattBruker)
+        Ansatt(AnsattIdentifikatorer(ansattId, oid), setOf(annenEntraGruppe), annenAnsattBruker)
 
     internal val egenAnsattMedPartner =
-        Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(annenEntraGruppe), annenAnsattBrukerMedPartner)
+        Ansatt(AnsattIdentifikatorer(ansattId, oid), setOf(annenEntraGruppe), annenAnsattBrukerMedPartner)
 
 
-    internal val vanligAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(annenEntraGruppe), ansattBruker)
+    internal val vanligAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), setOf(annenEntraGruppe), ansattBruker)
     internal val geoUtlandAnsatt =
-        Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(geoUtlandEntraGruppe), ansattBruker)
+        Ansatt(AnsattIdentifikatorer(ansattId, oid), setOf(geoUtlandEntraGruppe), ansattBruker)
     internal val udefinertGeoAnsatt =
-        Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(udefinertGruppe), ansattBruker)
-    internal val nasjonalAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(nasjonalGruppe), ansattBruker)
-    internal val enhetAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), listOf(enhetGruppe), ansattBruker)
+        Ansatt(AnsattIdentifikatorer(ansattId, oid), setOf(udefinertGruppe), ansattBruker)
+    internal val nasjonalAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), setOf(nasjonalGruppe), ansattBruker)
+    internal val enhetAnsatt = Ansatt(AnsattIdentifikatorer(ansattId, oid), setOf(enhetGruppe), ansattBruker)
 
 }

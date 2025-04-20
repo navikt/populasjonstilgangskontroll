@@ -9,19 +9,15 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 
 @Entity
 @Table(
-        name = "ansatte", indexes = [
-    Index(name = "idx_gyldig", columnList = "gyldigtil")
-], uniqueConstraints = [
-    UniqueConstraint(name = "uc_ansattentity_navid", columnNames = ["navid"])
-]
-)
+        name = "ansatte",
+        indexes = [Index(name = "idx_gyldig", columnList = "gyldigtil")],
+        uniqueConstraints = [UniqueConstraint(name = "uc_ansattentity_navid", columnNames = ["navid"])])
 @EntityListeners(AuditingEntityListener::class, NomEntityListener::class)
 class NomEntity(
         @Column(length = 7, nullable = false) val navid: String,
         @Column(length = 11, nullable = false) var fnr: String,
         @Column(nullable = false) var startdato: Instant,
-        @Column(nullable = false) var gyldigtil: Instant
-) {
+        @Column(nullable = false) var gyldigtil: Instant) {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -34,5 +30,4 @@ class NomEntity(
     @LastModifiedDate
     @Column(nullable = false)
     var updated: Instant? = null
-
 }

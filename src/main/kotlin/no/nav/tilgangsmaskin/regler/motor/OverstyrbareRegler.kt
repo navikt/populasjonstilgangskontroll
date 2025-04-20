@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
-import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.AVDØD
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
@@ -41,7 +41,7 @@ class UtlandRegel : GlobalGruppeRegel(UTENLANDSK), OverstyrbarRegel {
 @Order(LOWEST_PRECEDENCE - 3)
 class AvdødBrukerRegel(private val teller: AvdødTeller) : OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        true.also {
+        true.also {  // ikke feile
             if (bruker.dødsdato != null) {
                 teller.increment(true, *arrayOf("months" to bruker.dødsdato.intervallSiden()))
             }

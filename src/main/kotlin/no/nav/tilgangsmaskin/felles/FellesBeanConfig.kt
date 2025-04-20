@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletRequest
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.Include.defaultIncludes
@@ -23,14 +22,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @Configuration
 class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : WebMvcConfigurer {
 
-    private val log = getLogger(javaClass)
 
     @Bean
     fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer {
-        it.mixIn(
-                OAuth2AccessTokenResponse::class.java,
-                IgnoreUnknownMixin::class.java
-        )
+        it.mixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

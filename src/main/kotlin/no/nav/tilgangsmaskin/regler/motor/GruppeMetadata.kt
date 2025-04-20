@@ -1,16 +1,13 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-const val INTRO1 = "Avvist grunnet manglende"
+const val INTRO1 = "Avvist grunnet manglende "
 private const val INTRO2 = "tilgang til "
-private const val INTRO3 = "$INTRO1 $INTRO2"
+private const val INTRO3 = "$INTRO1$INTRO2"
 
-enum class BeskrivelseTekster(val kode: String, val avvisningÅrsak: String, val kortNavn: String) {
+enum class GruppeMetadata(val kode: String, val avvisningÅrsak: String, val kortNavn: String) {
 
     STRENGT_FORTROLIG("AVVIST_STRENGT_FORTROLIG_ADRESSE", "${INTRO3}strengt fortrolig adresse", "Kode 6"),
-    AVVIST_STRENGT_FORTROLIG_UTLAND(
-            "AVVIST_STRENGT_FORTROLIG_UTLAND",
-            "${INTRO3}strengt fortrolig adresse utland",
-            "Kode 17"),
+    STRENGT_FORTROLIG_UTLAND("AVVIST_STRENGT_FORTROLIG_UTLAND", "${INTRO3}strengt fortrolig adresse utland", "Kode 17"),
     FORTROLIG("AVVIST_FORTROLIG_ADRESSE", "${INTRO3}fortrolig adresse", "Kode 7"),
     SKJERMING("AVVIST_SKJERMING", "${INTRO3}skjermet person", "Skjerming"),
     NASJONAL("AVVIST_GEOGRAFISK", "${INTRO3}brukers geografiske adresse", "Geografisk tilknytning"),

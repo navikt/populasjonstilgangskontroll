@@ -10,8 +10,7 @@ data class Bruker(
         val geografiskTilknytning: GeografiskTilknytning,
         val gruppeKrav: List<GlobalGruppe> = emptyList(),
         val familie: Familie = INGEN,
-        val dødsdato: LocalDate? = null
-) {
+        val dødsdato: LocalDate? = null) {
 
     @JsonIgnore
     val brukerId = brukerIdentifikatorer.brukerId
@@ -30,7 +29,7 @@ data class Bruker(
 
     @JsonIgnore
     val partnere = familie.partnere
-    
+
     inline fun <reified T : GeografiskTilknytning> erRegistrertMed() = geografiskTilknytning is T
 
     infix fun krever(gruppe: GlobalGruppe) = gruppe in gruppeKrav
@@ -39,7 +38,7 @@ data class Bruker(
             val brukerId: BrukerId,
             val aktørId: AktørId,
             val historiskeIdentifikatorer: List<BrukerId> = emptyList()
-    )
+                                    )
 
 
 }

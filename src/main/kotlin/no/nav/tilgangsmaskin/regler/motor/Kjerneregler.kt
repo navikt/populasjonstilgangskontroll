@@ -5,10 +5,10 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.bruker.Bruker
-import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.EGNEDATA
-import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.FORELDREBARN
-import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.PARTNER
-import no.nav.tilgangsmaskin.regler.motor.BeskrivelseTekster.SØSKEN
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.EGNEDATA
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.FORELDREBARN
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.PARTNER
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.SØSKEN
 import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component

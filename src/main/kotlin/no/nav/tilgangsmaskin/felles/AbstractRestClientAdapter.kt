@@ -11,8 +11,7 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 abstract class AbstractRestClientAdapter(
         protected val restClient: RestClient,
         val cfg: AbstractRestConfig,
-        protected val errorHandler: ErrorHandler = DefaultRestErrorHandler()
-) : Pingable {
+        protected val errorHandler: ErrorHandler = DefaultRestErrorHandler()) : Pingable {
 
     protected val log = getLogger(javaClass)
     override fun ping() = get<Any>(cfg.pingEndpoint)

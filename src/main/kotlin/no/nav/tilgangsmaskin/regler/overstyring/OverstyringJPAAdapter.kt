@@ -11,10 +11,9 @@ class OverstyringJPAAdapter(private val repository: OverstyringRepository) {
             repository.save(
                     OverstyringEntity(
                             ansattId,
-                            brukerId.verdi, begrunnelse,
-                            gyldigtil.atStartOfDay(systemDefault()).toInstant()
-                    )
-            )
+                            brukerId.verdi,
+                            begrunnelse,
+                            gyldigtil.atStartOfDay(systemDefault()).toInstant()))
             Unit
         }
 

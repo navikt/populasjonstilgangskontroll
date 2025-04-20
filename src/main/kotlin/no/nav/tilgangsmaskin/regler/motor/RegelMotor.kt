@@ -17,8 +17,7 @@ import org.springframework.stereotype.Component
 class RegelMotor(
         @Qualifier(KJERNE) private val kjerne: RegelSett,
         @Qualifier(OVERSTYRBAR) private val overstyrbar: RegelSett,
-        private val handler: RegelmotorResultatHandler = RegelmotorResultatHandler()
-) {
+        private val handler: RegelMotorResultatLogger = RegelMotorResultatLogger()) {
     private val log = LoggerFactory.getLogger(javaClass)
 
     private val komplett = RegelSett(KOMPLETT_REGELTYPE to kjerne.regler + overstyrbar.regler)
@@ -33,19 +32,17 @@ class RegelMotor(
     fun sjekkRegler(ansatt: Ansatt, bruker: Bruker, type: RegelType) =
         sjekkRegler(ansatt, bruker, type.regelSett())
 
-    private fun sjekkRegler(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) =
-        with(regelSett) {
-            regler.forEachIndexed { index, regel ->
-                log.trace("[${index.plus(1)}/${regelSett.size}] Sjekker regel: '${regel.kortNavn}' fra $beskrivelse ${ansatt.ansattId} og ${ansatt.bruker?.brukerId} og ${bruker.brukerId}")
-                if (!regel.evaluer(ansatt, bruker)) {
-                    throw RegelException(bruker.brukerId, ansatt.ansattId, regel).also {
-                        handler.avvist("${index.plus(1)}/${regelSett.size}", ansatt.ansattId, bruker.brukerId, regel)
-                    }
-                }
-            }.also {
-                handler.ok(type, ansatt.ansattId, bruker.brukerId)
+    private fun sjekkRegler(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) {
+        regelSett.regler.forEachIndexed { index, regel ->
+            log.trace("[${index + 1}/${regelSett.size}] Sjekker regel: '${regel.kortNavn}' fra ${regelSett.beskrivelse} ${ansatt.ansattId} og ${ansatt.bruker?.brukerId} og ${bruker.brukerId}")
+            if (!regel.evaluer(ansatt, bruker)) {
+                handler.avvist("${index + 1}/${regelSett.size}", ansatt.ansattId, bruker.brukerId, regel)
+                throw RegelException(bruker.brukerId, ansatt.ansattId, regel)
             }
         }
+        handler.ok(regelSett.type, ansatt.ansattId, bruker.brukerId)
+    }
+
 
     fun bulkRegler(ansatt: Ansatt, brukere: List<Pair<Bruker, RegelType>>) {
         val avvisninger = brukere.mapNotNull { (bruker, type) ->

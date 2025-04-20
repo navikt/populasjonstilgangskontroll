@@ -21,8 +21,7 @@ class RegelTjeneste(
         private val motor: RegelMotor,
         private val brukere: BrukerTjeneste,
         private val ansatte: AnsattTjeneste,
-        private val overstyring: OverstyringTjeneste
-) {
+        private val overstyring: OverstyringTjeneste) {
     private val log = LoggerFactory.getLogger(javaClass)
 
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) =

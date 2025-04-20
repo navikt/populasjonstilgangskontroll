@@ -14,8 +14,7 @@ class RegelException(
         val ansattId: AnsattId,
         val regel: Regel,
         messageCode: String = DETAIL_MESSAGE_CODE,
-        arguments: Array<String> = arrayOf(ansattId.verdi, brukerId.verdi, regel.begrunnelse)
-) :
+        arguments: Array<String> = arrayOf(ansattId.verdi, brukerId.verdi, regel.begrunnelse)) :
     ErrorResponseException(FORBIDDEN, forStatus(FORBIDDEN).apply {
         title = regel.kode
         type = TYPE_URI
@@ -23,8 +22,7 @@ class RegelException(
         properties = mapOf(
                 "brukerIdent" to brukerId.verdi,
                 "navIdent" to ansattId.verdi,
-                "kanOverstyres" to regel.erOverstyrbar
-        )
+                "kanOverstyres" to regel.erOverstyrbar)
     }, null, messageCode, arguments) {
     constructor(messageCode: String, arguments: Array<String>, e: RegelException) : this(
             e.brukerId,
@@ -32,10 +30,10 @@ class RegelException(
             e.regel,
             messageCode,
             arguments
-    )
+                                                                                        )
 
     val kode = regel.kode
 }
 
 class BulkRegelException(val ansattId: AnsattId, val exceptions: List<RegelException>) :
-    RuntimeException("Følgende ${exceptions.size} fødselsnummer ble avvist ved bulk-kjøring av regler for $ansattId ${exceptions.map { it.brukerId to it.regel.kode }}")
+    RuntimeException("Følgende ${exceptions.size} identifikatorer ble avvist ved bulk-kjøring av regler for $ansattId ${exceptions.map { it.brukerId to it.regel.kode }}")

@@ -11,24 +11,19 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 
 data class Ansatt(
         val identifikatorer: AnsattIdentifikatorer,
-        val grupper: List<EntraGruppe>,
-        val bruker: Bruker? = null
-) {
+        val grupper: Set<EntraGruppe>,
+        val bruker: Bruker? = null) {
 
-    @JsonIgnore
-    val brukerId = bruker?.brukerId
+    private val brukerId = bruker?.brukerId
 
     @JsonIgnore
     val ansattId = identifikatorer.ansattId
 
-    @JsonIgnore
-    val foreldreOgBarn = bruker?.foreldreOgBarn ?: emptyList()
+    private val foreldreOgBarn = bruker?.foreldreOgBarn ?: emptyList()
 
-    @JsonIgnore
-    val søsken = bruker?.søsken ?: emptyList()
+    private val søsken = bruker?.søsken ?: emptyList()
 
-    @JsonIgnore
-    val parnere = bruker?.partnere ?: emptyList()
+    private val parnere = bruker?.partnere ?: emptyList()
 
     infix fun kanBehandle(gt: GeografiskTilknytning) = grupper.any {
         it.displayName.endsWith(
@@ -38,14 +33,12 @@ data class Ansatt(
                         is BydelTilknytning -> gt.bydel.verdi
                         else -> return true
                     }
-                }"
-        )
+                }")
     }
 
     infix fun erMedlemAv(gruppe: GlobalGruppe) = grupper.any { it.id == gruppe.id }
 
-    infix fun erNåværendeEllerTidligerePartnerMed(bruker: Bruker) =
-        parnere.any { it.brukerId == bruker.brukerId }
+    infix fun erNåværendeEllerTidligerePartnerMed(bruker: Bruker) = parnere.any { it.brukerId == bruker.brukerId }
 
     infix fun erSammeSom(bruker: Bruker) = brukerId == bruker.brukerId
 

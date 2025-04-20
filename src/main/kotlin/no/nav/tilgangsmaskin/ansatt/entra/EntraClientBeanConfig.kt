@@ -25,8 +25,8 @@ class EntraClientBeanConfig {
     fun graphHealthIndicator(a: EntraRestClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
 
     private fun headerAddingRequestInterceptor(vararg verdier: Pair<String, String>) =
-        ClientHttpRequestInterceptor { req, b, next ->
-            verdier.forEach { req.headers.add(it.first, it.second) }
-            next.execute(req, b)
+        ClientHttpRequestInterceptor { request, body, next ->
+            verdier.forEach { (key, value) -> request.headers.add(key, value) }
+            next.execute(request, body)
         }
 }

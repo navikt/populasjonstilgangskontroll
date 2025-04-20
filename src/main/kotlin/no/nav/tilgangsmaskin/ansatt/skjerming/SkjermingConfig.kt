@@ -9,9 +9,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) :
     AbstractRestConfig(baseUri, pingPath, SKJERMING, enabled) {
 
-    fun skjermetUri() = builder().path(DEFAULT_SKJERMING_PATH).build()
+    val skjermingUri = builder().path(DEFAULT_SKJERMING_PATH).build()
 
-    fun skjermetBulkUri() = builder().path(DEFAULT_SKJERMING_BULK_PATH).build()
+    val skjermingerUri = builder().path(DEFAULT_SKJERMING_BULK_PATH).build()
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 

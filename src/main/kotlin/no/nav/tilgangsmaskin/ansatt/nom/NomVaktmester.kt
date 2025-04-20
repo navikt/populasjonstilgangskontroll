@@ -17,14 +17,17 @@ class NomVaktmester(private val nom: NomOperasjoner, private val utvelger: Leder
         .register(registry)
 
     @Scheduled(fixedRate = 24, timeUnit = HOURS)
-    fun ryddOpp() =
-        if (utvelger.erLeder) {
-            nom.ryddOpp().also {
-                if (it > 0) {
-                    counter.increment(it.toDouble())
-                    log.info("Vaktmester ryddet opp $it rad(er) med utgått informasjon om ansatte som ikke lenger jobber i Nav")
-                }
-            }
-        } else 0
+    fun ryddOpp(): Int {
+        if (!utvelger.erLeder) return 0
+
+        val antall = nom.ryddOpp()
+        if (antall > 0) {
+            counter.increment(antall.toDouble())
+            log.info("Vaktmester ryddet opp $antall rad(er) med utgått informasjon om ansatte som ikke lenger jobber i Nav")
+        }
+        return antall
+    }
 }
+
+
 

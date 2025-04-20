@@ -9,8 +9,7 @@ data class NomHendelse(
         val personident: String,
         val navident: String,
         val startdato: LocalDate?,
-        val sluttdato: LocalDate?
-) {
+        val sluttdato: LocalDate?) {
 
     override fun toString() =
         "NomHendelse(personident=${personident.maskFnr()}, navident=$navident, startdato=$startdato, sluttdato=$sluttdato)"

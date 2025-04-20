@@ -11,8 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 class TokenClaimsAccessor(
         private val contextHolder: TokenValidationContextHolder,
-        private val env: ConfigurableEnvironment
-) {
+        private val env: ConfigurableEnvironment) {
 
     val globaleGrupper
         get() = GlobalGruppe.entries.mapNotNull { gruppe ->
@@ -26,7 +25,7 @@ class TokenClaimsAccessor(
         get() = runCatching {
             claimSet()?.getStringClaim("azp_name")
         }.getOrElse { "N/A" }
-    val oidFraToken get() = claimSet()?.let { UUID.fromString(it.getStringClaim("oid")) }
+    val oid get() = claimSet()?.let { UUID.fromString(it.getStringClaim("oid")) }
     val ansattId get() = claimSet()?.getStringClaim("NAVident")?.let { AnsattId(it) }
     private fun claimSet() = runCatching {
         contextHolder.getTokenValidationContext().getClaims(AAD_ISSUER)
@@ -40,7 +39,6 @@ class TokenClaimsAccessor(
         }.getOrElse { systemNavn }
 
     companion object {
-
         const val AAD_ISSUER: String = "azuread"
     }
 }

@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.regler.motor
 import java.net.URI
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 
-data class Metadata(val tekster: BeskrivelseTekster) {
+data class Metadata(val tekster: GruppeMetadata) {
 
     val kode = tekster.kode
     val begrunnelse = tekster.avvisningÅrsak

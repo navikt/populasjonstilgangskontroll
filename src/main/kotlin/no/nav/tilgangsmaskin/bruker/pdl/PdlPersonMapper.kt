@@ -5,6 +5,9 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.INGEN
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.TIDLIGERE_PARTNER
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Bydel
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
@@ -55,22 +58,20 @@ object PdlPersonMapper {
                     tilFamilie(person.familierelasjoner),
                     tilDødsdato(person.doedsfall),
                     tilHistoriskeBrukerIds(identer)
-            )
+                  )
         }
 
     fun tilPartner(type: Sivilstandstype) =
         when (type) {
             GIFT,
-            REGISTRERT_PARTNER -> FamilieRelasjon.PARTNER
-
+            REGISTRERT_PARTNER -> PARTNER
             SKILT,
             ENKE_ELLER_ENKEMANN,
             SEPARERT,
             SKILT_PARTNER,
             GJENLEVENDE_PARTNER,
-            SEPARERT_PARTNER -> FamilieRelasjon.TIDLIGERE_PARTNER
-
-            else -> FamilieRelasjon.INGEN
+            SEPARERT_PARTNER -> TIDLIGERE_PARTNER
+            else -> INGEN
         }
 
     private fun tilGraderinger(beskyttelse: List<PdlAdressebeskyttelse>) =
@@ -110,7 +111,7 @@ object PdlPersonMapper {
         return Familie(
                 foreldre.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet(),
                 barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet()
-        )
+                      )
     }
 
     private fun tilHistoriskeBrukerIds(identer: PdlIdenter) = identer.identer

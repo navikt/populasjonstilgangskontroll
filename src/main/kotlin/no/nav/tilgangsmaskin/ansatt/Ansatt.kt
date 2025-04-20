@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import java.util.*
 import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
@@ -19,7 +20,7 @@ data class Ansatt(
     @JsonIgnore
     val ansattId = identifikatorer.ansattId
 
-    private val foreldreOgBarn = bruker?.foreldreOgBarn ?: emptyList()
+    private val foreldreEllerBarn = bruker?.foreldreOgBarn ?: emptyList()
 
     private val søsken = bruker?.søsken ?: emptyList()
 
@@ -38,13 +39,15 @@ data class Ansatt(
 
     infix fun erMedlemAv(gruppe: GlobalGruppe) = grupper.any { it.id == gruppe.id }
 
-    infix fun erNåværendeEllerTidligerePartnerMed(bruker: Bruker) = parnere.any { it.brukerId == bruker.brukerId }
+    infix fun erNåværendeEllerTidligerePartnerMed(bruker: Bruker) = bruker erEnAv parnere
 
     infix fun erSammeSom(bruker: Bruker) = brukerId == bruker.brukerId
 
-    infix fun erForeldreEllerBarnTil(bruker: Bruker) = foreldreOgBarn.any { it.brukerId == bruker.brukerId }
+    infix fun erForeldreEllerBarnTil(bruker: Bruker) = bruker erEnAv foreldreEllerBarn
 
-    infix fun erSøskenTil(bruker: Bruker) = søsken.any { it.brukerId == bruker.brukerId }
+    infix fun erSøskenTil(bruker: Bruker) = bruker erEnAv søsken
+
+    private infix fun Bruker.erEnAv(medlemmer: Collection<FamilieMedlem>) = medlemmer.any { it.brukerId == brukerId }
 
     data class AnsattIdentifikatorer(val ansattId: AnsattId, val oid: UUID)
 

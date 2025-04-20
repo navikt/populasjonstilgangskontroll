@@ -2,11 +2,11 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
+import java.time.Instant
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.toInstant
-import java.time.Instant
 
 
 @ConditionalOnGCP
@@ -19,8 +19,15 @@ class NomJPAAdapter(val repo: NomRepository, @PersistenceContext protected val e
             upsert(ansattId, brukerId, gyldighet.start.toInstant(), gyldighet.endInclusive.toInstant())
         }
 
-    private fun upsert(ansattId: AnsattId, ansattFnr: BrukerId, start: Instant, slutt: Instant): Long {
-        val query = """
+    private fun upsert(ansattId: AnsattId, ansattFnr: BrukerId, start: Instant, slutt: Instant) =
+        entityManager.createNativeQuery(upsertQuery())
+            .setParameter("navid", ansattId.verdi)
+            .setParameter("fnr", ansattFnr.verdi)
+            .setParameter("startdato", start)
+            .setParameter("gyldigtil", slutt)
+            .singleResult as Long
+
+    private fun upsertQuery() = """
             INSERT INTO Ansatte (navid, fnr, startdato, gyldigtil, created, updated)
             VALUES (:navid, :fnr, :startdato, :gyldigtil, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             ON CONFLICT (navid)
@@ -31,16 +38,8 @@ class NomJPAAdapter(val repo: NomRepository, @PersistenceContext protected val e
                 updated = CURRENT_TIMESTAMP
             RETURNING id
         """
-        return entityManager.createNativeQuery(query)
-            .setParameter("navid", ansattId.verdi)
-            .setParameter("fnr", ansattFnr.verdi)
-            .setParameter("startdato", start)
-            .setParameter("gyldigtil", slutt)
-            .singleResult as Long
-    }
 
-    fun fnrForAnsatt(ansattId: String) = repo.ansattFødselsnummer(ansattId)?.let { BrukerId(it) }
-
+    fun fnrForAnsatt(ansattId: String) = repo.ansattBrukerId(ansattId)?.let(::BrukerId)
 }
 
 

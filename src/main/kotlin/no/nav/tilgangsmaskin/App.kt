@@ -42,13 +42,13 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, va
     override fun contribute(builder: Builder) {
         with(ctx) {
             builder.withDetail(
-                "extra-info", mapOf(
+                    "extra-info", mapOf(
                     "Startup time" to startupDate.local(),
                     "Client ID" to environment.getProperty("azure.app.client.id"),
                     "Name" to environment.getProperty("spring.application.name"),
                     "Spring Boot version" to SpringBootVersion.getVersion(),
                     "Spring Framework version" to SpringVersion.getVersion()
-                )
+            )
             )
             regelsett.forEach {
                 builder.withDetail(it.beskrivelse, it.regler.map { r -> r.kortNavn })

@@ -6,6 +6,8 @@ data class RegelSett(val spec: Pair<RegelType, List<Regel>>) {
     val beskrivelse = type.beskrivelse
     val size = regler.size
 
+    operator fun plus(other: RegelSett) = regler + other.regler
+
     enum class RegelType(val beskrivelse: String) {
         KJERNE_REGELTYPE(KJERNE),
         KOMPLETT_REGELTYPE(KOMPLETT),

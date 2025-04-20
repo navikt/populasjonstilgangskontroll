@@ -1,0 +1,15 @@
+package no.nav.tilgangsmaskin.ansatt.entra
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+import java.net.URI
+import java.util.*
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class EntraGruppe(val id: UUID, val displayName: String = "N/A")
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class EntraGrupper(@JsonProperty("@odata.nextLink") val next: URI? = null,
+                        val value: Set<EntraGruppe> = emptySet())
+
+data class EntraResponse(val oid: UUID, val grupper: Set<EntraGruppe>)

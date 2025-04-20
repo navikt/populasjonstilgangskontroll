@@ -1,11 +1,15 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import java.net.URI
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 
-data class RegelBeskrivelse(val tekster: BeskrivelseTekster) {
+data class Metadata(val tekster: GruppeMetadata) {
+
     val kode = tekster.kode
-    val årsak = tekster.avvisningÅrsak
+    val begrunnelse = tekster.avvisningÅrsak
     val kortNavn = tekster.kortNavn
+
+    constructor(gruppe: GlobalGruppe) : this(gruppe.metadata)
 
     companion object {
         val TYPE_URI = URI.create("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett")

@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.regler.overstyring
 
-import org.springframework.stereotype.Component
 import java.time.ZoneId.systemDefault
+import org.springframework.stereotype.Component
 
 @Component
 class OverstyringJPAAdapter(private val repository: OverstyringRepository) {
@@ -9,12 +9,11 @@ class OverstyringJPAAdapter(private val repository: OverstyringRepository) {
     fun overstyr(ansattId: String, data: OverstyringData) =
         with(data) {
             repository.save(
-                OverstyringEntity(
-                    ansattId,
-                    brukerId.verdi, begrunnelse,
-                    gyldigtil.atStartOfDay(systemDefault()).toInstant()
-                )
-            )
+                    OverstyringEntity(
+                            ansattId,
+                            brukerId.verdi,
+                            begrunnelse,
+                            gyldigtil.atStartOfDay(systemDefault()).toInstant()))
             Unit
         }
 

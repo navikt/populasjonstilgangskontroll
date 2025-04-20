@@ -14,12 +14,12 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 @Component
 class PdlSyncGraphQLClientAdapter(
-    @Qualifier(PDLGRAPH) graphQlClient: GraphQlClient,
-    @Qualifier(PDLGRAPH) restClient: RestClient,
-    graphQlErrorHandler: GraphQLErrorHandler,
-    cfg: PdlGraphQLConfig,
-    errorHandler: ErrorHandler
-) : AbstractSyncGraphQLAdapter(graphQlClient, restClient, cfg, errorHandler, graphQlErrorHandler) {
+        @Qualifier(PDLGRAPH) graphQlClient: GraphQlClient,
+        @Qualifier(PDLGRAPH) restClient: RestClient,
+        graphQlErrorHandler: GraphQLErrorHandler,
+        cfg: PdlGraphQLConfig,
+        errorHandler: ErrorHandler) :
+    AbstractSyncGraphQLAdapter(graphQlClient, restClient, cfg, errorHandler, graphQlErrorHandler) {
 
     override fun ping() {
         restClient
@@ -36,10 +36,9 @@ class PdlSyncGraphQLClientAdapter(
         "${javaClass.simpleName} [restClient=$restClient,graphQlClient=$graphQlClient, cfg=$cfg]"
 
     companion object {
-        private fun ident(ident: String) = mapOf(IDENT to ident)
         private const val IDENT = "ident"
+        private fun ident(ident: String) = mapOf(IDENT to ident)
         private val SIVILSTAND_QUERY = "query-sivilstand" to "hentPerson"
-
     }
 }
 

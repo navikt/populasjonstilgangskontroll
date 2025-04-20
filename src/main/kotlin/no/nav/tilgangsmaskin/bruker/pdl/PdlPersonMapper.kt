@@ -5,6 +5,9 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.INGEN
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.TIDLIGERE_PARTNER
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Bydel
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
@@ -42,35 +45,34 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.MEDFAR
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.MEDMOR
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.MOR
+import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
 
 object PdlPersonMapper {
 
     fun tilPerson(data: PdlRespons) =
         with(data) {
             Person(
-                BrukerId(brukerId),
-                AktørId(aktørId),
-                tilGeoTilknytning(geografiskTilknytning),
-                tilGraderinger(person.adressebeskyttelse),
-                tilFamilie(person.familierelasjoner),
-                tilDødsdato(person.doedsfall),
-                tilHistoriskeBrukerIds(identer)
-            )
+                    BrukerId(brukerId),
+                    AktørId(aktørId),
+                    tilGeoTilknytning(geografiskTilknytning),
+                    tilGraderinger(person.adressebeskyttelse),
+                    tilFamilie(person.familierelasjoner),
+                    tilDødsdato(person.doedsfall),
+                    tilHistoriskeBrukerIds(identer)
+                  )
         }
 
     fun tilPartner(type: Sivilstandstype) =
         when (type) {
             GIFT,
-            REGISTRERT_PARTNER -> FamilieRelasjon.PARTNER
-
+            REGISTRERT_PARTNER -> PARTNER
             SKILT,
             ENKE_ELLER_ENKEMANN,
             SEPARERT,
             SKILT_PARTNER,
             GJENLEVENDE_PARTNER,
-            SEPARERT_PARTNER -> FamilieRelasjon.TIDLIGERE_PARTNER
-
-            else -> FamilieRelasjon.INGEN
+            SEPARERT_PARTNER -> TIDLIGERE_PARTNER
+            else -> INGEN
         }
 
     private fun tilGraderinger(beskyttelse: List<PdlAdressebeskyttelse>) =
@@ -108,9 +110,9 @@ object PdlPersonMapper {
             .mapNotNull { it.relatertPersonsIdent?.let { ident -> it.relatertPersonsRolle to ident } }
             .partition { it.first != BARN }
         return Familie(
-            foreldre.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet(),
-            barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet()
-        )
+                foreldre.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet(),
+                barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet()
+                      )
     }
 
     private fun tilHistoriskeBrukerIds(identer: PdlIdenter) = identer.identer

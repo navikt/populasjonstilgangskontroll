@@ -1,18 +1,16 @@
 package no.nav.tilgangsmaskin.ansatt.entra
 
+import java.net.URI
 import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.AbstractRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
-import java.net.URI
 
 @ConfigurationProperties(GRAPH)
 class EntraConfig(
-    baseUri: URI,
-    pingPath: String = DEFAULT_PING_PATH,
-    private val size: Int = DEFAULT_BATCH_SIZE,
-    enabled: Boolean = true
-) :
-    AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
+        baseUri: URI,
+        pingPath: String = DEFAULT_PING_PATH,
+        private val size: Int = DEFAULT_BATCH_SIZE,
+        enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
 
     fun userURI(navIdent: String) = builder().path(USERS_PATH)
         .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_USER)

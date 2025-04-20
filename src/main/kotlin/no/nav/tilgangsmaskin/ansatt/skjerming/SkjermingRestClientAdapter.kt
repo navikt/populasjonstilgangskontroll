@@ -13,10 +13,12 @@ import org.springframework.web.client.RestClient
 class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, private val cf: SkjermingConfig) :
     AbstractRestClientAdapter(restClient, cf) {
 
-    fun skjerming(ident: String) = post<Boolean>(cf.skjermetUri(), mapOf(IDENT to ident))
-    fun skjerminger(identer: List<String>) = post<Map<String, Boolean>>(cf.skjermetBulkUri(), mapOf(IDENTER to identer))
-        .map { BrukerId(it.key) to it.value }
-        .toMap()
+    fun skjerming(ident: String) = post<Boolean>(cf.skjermingUri, mapOf(IDENT to ident))
+
+    fun skjerminger(identer: List<String>): Map<BrukerId, Boolean> =
+        post<Map<String, Boolean>>(cf.skjermingerUri, mapOf(IDENTER to identer))
+            .map { (brukerId, skjerming) -> BrukerId(brukerId) to skjerming }
+            .toMap()
 }
 
 

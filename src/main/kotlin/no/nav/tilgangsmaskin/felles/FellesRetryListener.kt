@@ -11,19 +11,17 @@ class FellesRetryListener : RetryListener {
     private val log = getLogger(javaClass)
     override fun <T : Any, E : Throwable> onSuccess(context: RetryContext, callback: RetryCallback<T, E>, result: T) {
         if (context.retryCount > 0) {
-            log.info("Eksekvering av '${methodFrom(context)}' var vellykket på forsøk ${context.retryCount + 1}")
+            log.info("Eksekvering av '${method(context)}' var vellykket på forsøk ${context.retryCount + 1}")
         }
     }
 
-    override fun <T : Any, E : Throwable> onError(context: RetryContext, callback: RetryCallback<T, E>, e: Throwable) {
+    override fun <T : Any, E : Throwable> onError(ctx: RetryContext, callback: RetryCallback<T, E>, e: Throwable) {
         log.warn(
-            "Eksekvering av '${methodFrom(context)}' feilet på forsøk ${context.retryCount} ",
-            context.lastThrowable
-        )
+                "Eksekvering av '${method(ctx)}' feilet på forsøk ${ctx.retryCount} ", ctx.lastThrowable)
     }
 
     companion object {
-        private fun methodFrom(ctx: RetryContext): String {
+        private fun method(ctx: RetryContext): String {
             val name = ctx.getAttribute(RetryContext.NAME) as String
             return runCatching {
                 val method = name.substringAfterLast('.').substringBefore('-')

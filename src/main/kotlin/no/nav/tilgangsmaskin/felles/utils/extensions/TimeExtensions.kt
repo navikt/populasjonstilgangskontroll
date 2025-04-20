@@ -34,8 +34,8 @@ object TimeExtensions {
     }
 
     fun Long.local(fmt: String = "yyyy-MM-dd HH:mm:ss") = LocalDateTime.ofInstant(
-        Instant.ofEpochMilli(this),
-        ZoneId.of("Europe/Oslo")
+            Instant.ofEpochMilli(this),
+            ZoneId.of("Europe/Oslo")
     ).format(DateTimeFormatter.ofPattern(fmt))
 
     fun LocalDate.intervallSiden() =

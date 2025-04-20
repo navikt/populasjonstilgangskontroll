@@ -4,6 +4,7 @@ import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.CacheableRetryingOnRecoverableService
+import no.nav.tilgangsmaskin.felles.RecoverableRestException
 import org.springframework.core.NestedExceptionUtils.getMostSpecificCause
 import org.springframework.retry.ExhaustedRetryException
 import org.springframework.retry.annotation.Recover
@@ -19,7 +20,7 @@ class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
     @Recover
     fun fallback(e: Throwable, brukerId: BrukerId) =
         when (e) {
-            is no.nav.tilgangsmaskin.felles.RecoverableRestException -> true
+            is RecoverableRestException -> true
             is ExhaustedRetryException -> throw getMostSpecificCause(e)
             else -> throw e
         }

@@ -22,7 +22,7 @@ class NomTjeneste(private val adapter: NomJPAAdapter) : NomOperasjoner {
 }
 
 /**
- * NOM har en rekke fødsesnummer i dev som ikke finnes i PDL
+ * NOM har en rekke fødsesnummer i dev som ikke finnes i PDL i dev
  */
 @ConditionalOnDev
 class NomDevTjeneste(adapter: NomJPAAdapter) : NomTjeneste(adapter) {

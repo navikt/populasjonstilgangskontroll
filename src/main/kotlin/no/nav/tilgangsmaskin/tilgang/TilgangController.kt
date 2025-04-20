@@ -24,10 +24,9 @@ import org.springframework.web.bind.annotation.ResponseStatus
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "TilgangController", description = "Denne kontrolleren skal brukes i produksjon")
 class TilgangController(
-    private val regler: RegelTjeneste,
-    private val overstyring: OverstyringTjeneste,
-    private val token: TokenClaimsAccessor
-) {
+        private val regler: RegelTjeneste,
+        private val overstyring: OverstyringTjeneste,
+        private val token: TokenClaimsAccessor) {
 
     @PostMapping("komplett")
     @ResponseStatus(NO_CONTENT)

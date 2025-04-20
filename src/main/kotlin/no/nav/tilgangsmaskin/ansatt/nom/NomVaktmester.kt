@@ -2,18 +2,14 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
+import java.util.concurrent.TimeUnit.HOURS
 import no.nav.tilgangsmaskin.felles.LederUtvelger
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import java.util.concurrent.TimeUnit.HOURS
 
 @Component
-class NomVaktmester(
-    private val nom: NomOperasjoner,
-    private val utvelger: LederUtvelger,
-    private val registry: MeterRegistry
-) {
+class NomVaktmester(private val nom: NomOperasjoner, private val utvelger: LederUtvelger, registry: MeterRegistry) {
 
     private val log = getLogger(javaClass)
     private val counter = Counter.builder("vaktmester.rader.fjernet")
@@ -21,14 +17,17 @@ class NomVaktmester(
         .register(registry)
 
     @Scheduled(fixedRate = 24, timeUnit = HOURS)
-    fun ryddOpp() =
-        if (utvelger.erLeder) {
-            nom.ryddOpp().also {
-                if (it > 0) {
-                    counter.increment(it.toDouble())
-                    log.info("Vaktmester ryddet opp $it rad(er) med utgått informasjon om ansatte som ikke lenger jobber i Nav")
-                }
-            }
-        } else 0
+    fun ryddOpp(): Int {
+        if (!utvelger.erLeder) return 0
+
+        val antall = nom.ryddOpp()
+        if (antall > 0) {
+            counter.increment(antall.toDouble())
+            log.info("Vaktmester ryddet opp $antall rad(er) med utgått informasjon om ansatte som ikke lenger jobber i Nav")
+        }
+        return antall
+    }
 }
+
+
 

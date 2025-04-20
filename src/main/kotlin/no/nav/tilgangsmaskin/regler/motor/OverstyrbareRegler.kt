@@ -5,8 +5,6 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.bruker.Bruker
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
@@ -27,14 +25,14 @@ class NorgeRegel : GlobalGruppeRegel(NASJONAL), OverstyrbarRegel {
 @Order(LOWEST_PRECEDENCE - 1)
 class UkjentBostedRegel : GlobalGruppeRegel(UKJENT_BOSTED), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { bruker.erRegistrertMed<UkjentBosted>() && !(ansatt erMedlemAv UKJENT_BOSTED) }
+        avslåHvis { bruker.harUkjentBosted && !(ansatt erMedlemAv UKJENT_BOSTED) }
 }
 
 @Component
 @Order(LOWEST_PRECEDENCE - 2)
 class UtlandRegel : GlobalGruppeRegel(UTENLANDSK), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { bruker.erRegistrertMed<UtenlandskTilknytning>() && !(ansatt erMedlemAv UTENLANDSK) }
+        avslåHvis { bruker.harUtenlandskBosted && !(ansatt erMedlemAv UTENLANDSK) }
 }
 
 @Component

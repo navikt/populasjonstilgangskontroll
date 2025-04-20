@@ -11,14 +11,16 @@ abstract class AbstractTeller(
         private val tellerNavn: String,
         private val beskrivelse: String) {
 
-    fun increment(avslått: Boolean, vararg tags: Pair<String, String>) =
-        if (avslått) {
-            Counter.builder(tellerNavn)
-                .description(beskrivelse)
-                .tag("system", accessor.system ?: "N/A")
-                .apply { tags.forEach { tag(it.first, it.second) } }
-                .register(registry).increment()
-        } else Unit
+    fun increment(avslått: Boolean, vararg tags: Pair<String, String>) {
+        if (!avslått) return
+
+        Counter.builder(tellerNavn)
+            .description(beskrivelse)
+            .tag("system", accessor.system ?: "N/A")
+            .apply { tags.forEach { tag(it.first, it.second) } }
+            .register(registry)
+            .increment()
+    }
 }
 
 

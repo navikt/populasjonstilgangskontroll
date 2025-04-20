@@ -26,16 +26,15 @@ data class Ansatt(
 
     private val parnere = bruker?.partnere ?: emptyList()
 
-    infix fun kanBehandle(gt: GeografiskTilknytning) = grupper.any {
-        it.displayName.endsWith(
-                "GEO_${
-                    when (gt) {
-                        is KommuneTilknytning -> gt.kommune.verdi
-                        is BydelTilknytning -> gt.bydel.verdi
-                        else -> return true
-                    }
-                }")
+    infix fun kanBehandle(gt: GeografiskTilknytning): Boolean {
+        val kode = when (gt) {
+            is KommuneTilknytning -> gt.kommune.verdi
+            is BydelTilknytning -> gt.bydel.verdi
+            else -> return true
+        }
+        return grupper.any { it.displayName.endsWith("GEO_$kode") }
     }
+
 
     infix fun erMedlemAv(gruppe: GlobalGruppe) = grupper.any { it.id == gruppe.id }
 

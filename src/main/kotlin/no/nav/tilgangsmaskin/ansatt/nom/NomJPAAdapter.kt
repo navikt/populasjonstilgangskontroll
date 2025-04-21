@@ -6,8 +6,10 @@ import java.time.Instant
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.toInstant
+import org.springframework.stereotype.Component
 
 
+@Component
 class NomJPAAdapter(val repo: NomRepository, @PersistenceContext val entityManager: EntityManager) {
 
     fun ryddOpp() = repo.deleteByGyldigtilBefore()

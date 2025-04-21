@@ -3,14 +3,12 @@ package no.nav.tilgangsmaskin.ansatt.nom
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import java.time.Instant
-import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.toInstant
 
 
-@ConditionalOnGCP
-class NomJPAAdapter(val repo: NomRepository, @PersistenceContext protected val entityManager: EntityManager) {
+class NomJPAAdapter(val repo: NomRepository, @PersistenceContext val entityManager: EntityManager) {
 
     fun ryddOpp() = repo.deleteByGyldigtilBefore()
 

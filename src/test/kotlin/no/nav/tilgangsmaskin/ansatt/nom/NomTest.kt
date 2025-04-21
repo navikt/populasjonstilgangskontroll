@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.ansatt.nom
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
-import jakarta.persistence.EntityManager
 import java.time.LocalDate.EPOCH
 import java.time.LocalDate.now
 import no.nav.tilgangsmaskin.TestApp
@@ -42,12 +41,8 @@ internal class NomTest {
     private val UTGÅTT = NomAnsattData(vanligAnsatt.ansattId, vanligBruker.brukerId, IGÅR)
     private val GYLDIG = NomAnsattData(vanligAnsatt.ansattId, vanligBruker.brukerId)
 
-
     @Autowired
-    lateinit var repo: NomRepository
-
-    @Autowired
-    lateinit var entityManager: EntityManager
+    lateinit var adapter: NomJPAAdapter
 
     @MockkBean
     lateinit var accessor: TokenClaimsAccessor
@@ -57,7 +52,7 @@ internal class NomTest {
     @BeforeTest
     fun setup() {
         every { accessor.system } returns "test"
-        nom = NomTjeneste(NomJPAAdapter(repo, entityManager))
+        nom = NomTjeneste(adapter)
     }
 
     @Test

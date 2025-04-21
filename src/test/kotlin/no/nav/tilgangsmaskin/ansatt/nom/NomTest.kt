@@ -18,12 +18,16 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.transaction.annotation.Transactional
+import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.junit.jupiter.Testcontainers
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+
 
 @DataJpaTest
 @ContextConfiguration(classes = [NomJPAAdapter::class, OverstyringEntityListener::class, TestApp::class])
@@ -31,11 +35,13 @@ import kotlin.test.Test
 @EnableJpaAuditing
 @ActiveProfiles(TEST)
 @Transactional
+@Testcontainers
 internal class NomTest {
 
     private val IGÅR = NomAnsattPeriode(EPOCH, now().minusDays(1))
     private val UTGÅTT = NomAnsattData(vanligAnsatt.ansattId, vanligBruker.brukerId, IGÅR)
     private val GYLDIG = NomAnsattData(vanligAnsatt.ansattId, vanligBruker.brukerId)
+
 
     @Autowired
     lateinit var repo: NomRepository
@@ -51,7 +57,7 @@ internal class NomTest {
     @BeforeTest
     fun setup() {
         every { accessor.system } returns "test"
-        nom = NomTjeneste(NomJPATestAdapter(repo, entityManager))
+        nom = NomTjeneste(NomJPAAdapter(repo, entityManager))
     }
 
     @Test
@@ -75,5 +81,10 @@ internal class NomTest {
         assertThat(nom.fnrForAnsatt(vanligAnsatt.ansattId)).isNull()
         nom.lagre(GYLDIG)
         assertThat(nom.fnrForAnsatt(vanligAnsatt.ansattId)).isEqualTo(GYLDIG.brukerId)
+    }
+
+    companion object {
+        @ServiceConnection
+        val postgres = PostgreSQLContainer("postgres:17")
     }
 }

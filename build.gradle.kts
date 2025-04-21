@@ -74,6 +74,9 @@ dependencies {
     implementation("org.postgresql:postgresql")
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("com.github.ben-manes.caffeine:caffeine")
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.testcontainers:postgresql:1.20.4")
+    testImplementation("org.testcontainers:junit-jupiter:1.20.4")
     testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock:$springCloudVersion")
@@ -109,9 +112,9 @@ java {
 }
 
 kotlin {
-jvmToolchain(21)
+    jvmToolchain(21)
 
-compilerOptions {
-freeCompilerArgs.add("-Xjsr305=strict")
+    compilerOptions {
+        freeCompilerArgs.add("-Xjsr305=strict")
     }
 }

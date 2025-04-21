@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import java.time.LocalDate
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
@@ -22,10 +23,12 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import java.time.LocalDate
+import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.junit.jupiter.Testcontainers
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -34,6 +37,7 @@ import kotlin.test.Test
 @ExtendWith(MockKExtension::class)
 @EnableJpaAuditing
 @ActiveProfiles(TEST)
+@Testcontainers
 internal class OverstyringTest {
 
     @Autowired
@@ -59,9 +63,9 @@ internal class OverstyringTest {
         every { accessor.systemNavn } returns "test"
         every { ansattTjeneste.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
         overstyring = OverstyringTjeneste(
-            ansattTjeneste, brukerTjeneste, OverstyringJPAAdapter(repo), motor,
-            SimpleMeterRegistry(), accessor
-        )
+                ansattTjeneste, brukerTjeneste, OverstyringJPAAdapter(repo), motor,
+                SimpleMeterRegistry(), accessor
+                                         )
     }
 
     @Test
@@ -71,12 +75,12 @@ internal class OverstyringTest {
         every { brukerTjeneste.utvidetFamilie(vanligBrukerMedHistoriskIdent.brukerId.verdi) } returns vanligBrukerMedHistoriskIdent
         every { brukerTjeneste.utvidetFamilie(vanligHistoriskBruker.brukerId.verdi) } returns vanligHistoriskBruker
         overstyring.overstyr(
-            vanligAnsatt.ansattId, OverstyringData(
+                vanligAnsatt.ansattId, OverstyringData(
                 vanligBrukerMedHistoriskIdent.historiskeIdentifikatorer.first(),
                 "test",
                 LocalDate.now().plusDays(1)
-            )
-        )
+                                                      )
+                            )
         assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, vanligBrukerMedHistoriskIdent.brukerId)).isTrue
     }
 
@@ -86,19 +90,19 @@ internal class OverstyringTest {
         every { brukerTjeneste.nærmesteFamilie(vanligBruker.brukerId.verdi) } returns vanligBruker
         every { brukerTjeneste.utvidetFamilie(vanligBruker.brukerId.verdi) } returns vanligBruker
         overstyring.overstyr(
-            vanligAnsatt.ansattId, OverstyringData(
+                vanligAnsatt.ansattId, OverstyringData(
                 vanligBruker.brukerId,
                 "gammel",
                 LocalDate.now().minusDays(1)
-            )
-        )
+                                                      )
+                            )
         overstyring.overstyr(
-            vanligAnsatt.ansattId, OverstyringData(
+                vanligAnsatt.ansattId, OverstyringData(
                 vanligBruker.brukerId,
                 "ny",
                 LocalDate.now().plusDays(1),
-            )
-        )
+                                                      )
+                            )
         assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, vanligBruker.brukerId)).isTrue
     }
 
@@ -108,12 +112,12 @@ internal class OverstyringTest {
         every { brukerTjeneste.utvidetFamilie(vanligBruker.brukerId.verdi) } returns vanligBruker
         every { brukerTjeneste.nærmesteFamilie(vanligBruker.brukerId.verdi) } returns vanligBruker
         overstyring.overstyr(
-            vanligAnsatt.ansattId, OverstyringData(
+                vanligAnsatt.ansattId, OverstyringData(
                 vanligBruker.brukerId,
                 "ny",
                 LocalDate.now().minusDays(1)
-            )
-        )
+                                                      )
+                            )
         assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, vanligBruker.brukerId)).isFalse
 
     }
@@ -124,5 +128,10 @@ internal class OverstyringTest {
         every { brukerTjeneste.nærmesteFamilie(ukjentBostedBruker.brukerId.verdi) } returns ukjentBostedBruker
         every { brukerTjeneste.utvidetFamilie(ukjentBostedBruker.brukerId.verdi) } returns ukjentBostedBruker
         assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, ukjentBostedBruker.brukerId)).isFalse
+    }
+
+    companion object {
+        @ServiceConnection
+        val postgres = PostgreSQLContainer("postgres:17")
     }
 }

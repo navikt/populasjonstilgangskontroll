@@ -4,6 +4,8 @@ import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import jakarta.persistence.EntityManager
+import java.time.LocalDate.EPOCH
+import java.time.LocalDate.now
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
@@ -20,7 +22,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate.now
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -32,7 +33,7 @@ import kotlin.test.Test
 @Transactional
 internal class NomTest {
 
-    private val IGÅR = NomAnsattPeriode(now().minusDays(1))
+    private val IGÅR = NomAnsattPeriode(EPOCH, now().minusDays(1))
     private val UTGÅTT = NomAnsattData(vanligAnsatt.ansattId, vanligBruker.brukerId, IGÅR)
     private val GYLDIG = NomAnsattData(vanligAnsatt.ansattId, vanligBruker.brukerId)
 

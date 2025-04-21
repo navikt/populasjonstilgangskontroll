@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.bruker.pdl
 import com.neovisionaries.i18n.CountryCode.SE
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.PersonTilBrukerMapper.tilBruker
@@ -43,7 +44,7 @@ class BrukerMapperTest {
     @DisplayName("Test at behandling av brukere med STRENGT_FORTROLIG_UTLAND  krever medlemsskap i STRENGT_FORTROLIG_GRUPPE fra ansatt og at geotilknytning er UtenlandskTilknytning")
     fun strengtFortroligUtland() {
         with(tilBruker(person(pipRespons(STRENGT_FORTROLIG_UTLAND)), false)) {
-            assertThat(gruppeKrav).containsExactly(GlobalGruppe.STRENGT_FORTROLIG)
+            assertThat(gruppeKrav).containsExactly(GlobalGruppe.STRENGT_FORTROLIG_UTLAND)
             assertThat(geografiskTilknytning).isInstanceOf(GeografiskTilknytning.utenlandskTilknytning::class.java)
         }
     }
@@ -61,7 +62,7 @@ class BrukerMapperTest {
     @DisplayName("Test at behandling av brukere med EGEN_ANSATT vil kreve medlemsskap i EGEN_ANSATT_GRUPPE for ansatt")
     fun egenAnsatt() {
         with(tilBruker(person(pipRespons()), true)) {
-            assertThat(gruppeKrav).containsExactly(GlobalGruppe.SKJERMING)
+            assertThat(gruppeKrav).containsExactly(SKJERMING)
         }
     }
 
@@ -70,9 +71,8 @@ class BrukerMapperTest {
     fun egenAnsattKode6() {
         with(tilBruker(person(pipRespons(STRENGT_FORTROLIG)), true)) {
             assertThat(gruppeKrav).containsExactlyInAnyOrder(
-                    GlobalGruppe.SKJERMING,
-                    GlobalGruppe.STRENGT_FORTROLIG
-            )
+                    SKJERMING,
+                    GlobalGruppe.STRENGT_FORTROLIG)
         }
     }
 
@@ -80,7 +80,7 @@ class BrukerMapperTest {
     @DisplayName("Test at behandling av brukere med EGEN_ANSATT og FORTROLIG vil kreve medlemsskap i EGEN_ANSATT_GRUPPE og FORTROLIG_GRUPPE for ansatt")
     fun egenAnsattKode7() {
         with(tilBruker(person(pipRespons(FORTROLIG)), true)) {
-            assertThat(gruppeKrav).containsExactlyInAnyOrder(GlobalGruppe.SKJERMING, GlobalGruppe.FORTROLIG)
+            assertThat(gruppeKrav).containsExactlyInAnyOrder(SKJERMING, GlobalGruppe.FORTROLIG)
         }
     }
 
@@ -91,7 +91,7 @@ class BrukerMapperTest {
     fun pipRespons(
             gradering: PdlAdressebeskyttelseGradering? = null,
             geo: PdlGeografiskTilknytning = geoUtland()
-    ): PdlRespons {
+                  ): PdlRespons {
         val adressebeskyttelse = gradering?.let {
             listOf(PdlAdressebeskyttelse(it))
         } ?: emptyList()
@@ -102,7 +102,7 @@ class BrukerMapperTest {
                                 PdlIdent(brukerId, false, FOLKEREGISTERIDENT),
                                 PdlIdent(aktørId.verdi, false, AKTORID))),
                 geo
-        )
+                         )
     }
 
     fun person(respons: PdlRespons) = tilPerson(respons)

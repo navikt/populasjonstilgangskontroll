@@ -21,7 +21,11 @@ class AnsattTjeneste(
         entra.ansatt(ansattId).let { ansatt ->
             log.trace("Ansatt {} er medlem av følgende globale grupper {}", ansattId, accessor.globaleGrupper)
             val ansattFnr = ansatte.fnrForAnsatt(ansattId)
-            val ansattBruker = ansattFnr?.let { brukere.utvidetFamilie(it.verdi) }
+            val ansattBruker = ansattFnr?.let {
+                runCatching {
+                    brukere.utvidetFamilie(it.verdi)
+                }.getOrNull()
+               }
             Ansatt(AnsattIdentifikatorer(ansattId, ansatt.oid), ansatt.grupper, ansattBruker)
         }
 }

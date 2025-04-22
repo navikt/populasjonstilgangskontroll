@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 @Timed
-@ConditionalOnNotDev
+//@ConditionalOnNotDev
 class NomTjeneste(private val adapter: NomJPAAdapter) : NomOperasjoner {
 
     override fun lagre(ansattData: NomAnsattData) = adapter.upsert(ansattData)
@@ -24,10 +24,12 @@ class NomTjeneste(private val adapter: NomJPAAdapter) : NomOperasjoner {
 /**
  * NOM har en rekke fødsesnummer i dev som ikke finnes i PDL i dev
  */
+/**
 @ConditionalOnDev
 class NomDevTjeneste(adapter: NomJPAAdapter) : NomTjeneste(adapter) {
     override fun fnrForAnsatt(ansattId: AnsattId) = null
 }
+**/
 
 interface NomOperasjoner {
 

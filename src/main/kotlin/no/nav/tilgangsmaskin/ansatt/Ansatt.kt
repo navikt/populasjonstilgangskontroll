@@ -38,7 +38,7 @@ data class Ansatt(val identifikatorer: AnsattIdentifikatorer,
 
     infix fun erNåværendeEllerTidligerePartnerMed(bruker: Bruker) = bruker erEnAv parnere
 
-    infix fun erSammeSom(bruker: Bruker) = brukerId == bruker.brukerId
+    infix fun erDenSammeSom(bruker: Bruker) = brukerId == bruker.brukerId
 
     infix fun erForeldreEllerBarnTil(bruker: Bruker) = bruker erEnAv foreldreEllerBarn
 

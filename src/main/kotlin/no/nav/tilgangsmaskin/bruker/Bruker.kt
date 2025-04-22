@@ -10,7 +10,7 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 data class Bruker(
         val brukerIdentifikatorer: BrukerIdentifikatorer,
         val geografiskTilknytning: GeografiskTilknytning,
-        val gruppeKrav: List<GlobalGruppe> = emptyList(),
+        val gruppeKrav: Set<GlobalGruppe> = emptySet(),
         val familie: Familie = INGEN,
         val dødsdato: LocalDate? = null) {
 
@@ -22,10 +22,7 @@ data class Bruker(
 
     @JsonIgnore
     val foreldreOgBarn = familie.foreldre + familie.barn
-
-    @JsonIgnore
-    val erDød = dødsdato != null
-
+    
     @JsonIgnore
     val søsken = familie.søsken
 

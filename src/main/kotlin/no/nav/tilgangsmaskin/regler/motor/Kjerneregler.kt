@@ -36,7 +36,7 @@ class SkjermingRegel : GlobalGruppeRegel(SKJERMING), KjerneRegel
 @Component
 class EgneDataRegel(private val teller: EgneDataOppslagTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { ansatt erSammeSom bruker }.also {
+        avslåHvis { ansatt erDenSammeSom bruker }.also {
             teller.increment(it)
         }
 

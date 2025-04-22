@@ -26,7 +26,7 @@ object PersonTilBrukerMapper {
         }
 
     private fun tilGruppeKrav(gt: GeografiskTilknytning, graderinger: List<Gradering>, erSkjermet: Boolean) =
-        listOfNotNull(
+        setOfNotNull(
                 when {
                     graderinger.erStrengtFortrolig() -> STRENGT_FORTROLIG
                     graderinger.erStrengtFortroligUtland() -> STRENGT_FORTROLIG_UTLAND

@@ -75,7 +75,7 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
-    testImplementation("org.testcontainers:postgresql:1.20.4")
+    testImplementation("org.testcontainers:postgresql:1.20.6")
     testImplementation("org.testcontainers:junit-jupiter:1.20.4")
     testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
     testImplementation("org.springframework.boot:spring-boot-starter-test")

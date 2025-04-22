@@ -33,5 +33,5 @@ interface NomOperasjoner {
 
     fun fnrForAnsatt(ansattId: AnsattId): BrukerId?
     fun ryddOpp(): Int
-    fun lagre(ansattData: NomAnsattData): Long
+    fun lagre(ansattData: NomAnsattData): Int
 }

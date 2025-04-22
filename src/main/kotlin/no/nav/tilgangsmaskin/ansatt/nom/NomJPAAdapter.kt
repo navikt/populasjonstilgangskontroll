@@ -26,7 +26,8 @@ class NomJPAAdapter(val repo: NomRepository, @PersistenceContext val entityManag
             .setParameter("fnr", ansattFnr.verdi)
             .setParameter("startdato", start)
             .setParameter("gyldigtil", slutt)
-            .singleResult as Long
+            .executeUpdate()
+    //.singleResult as Long
 
     private fun upsertQuery() = """
             INSERT INTO Ansatte (navid, fnr, startdato, gyldigtil, created, updated)
@@ -37,7 +38,6 @@ class NomJPAAdapter(val repo: NomRepository, @PersistenceContext val entityManag
                 startdato = EXCLUDED.startdato,
                 gyldigtil = EXCLUDED.gyldigtil,
                 updated = CURRENT_TIMESTAMP
-            RETURNING id
         """
 
     fun fnrForAnsatt(ansattId: String) = repo.ansattBrukerId(ansattId)?.let(::BrukerId)

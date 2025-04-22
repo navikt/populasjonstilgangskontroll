@@ -8,8 +8,8 @@ import java.time.LocalDate.now
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
-import no.nav.tilgangsmaskin.regler.TestData.vanligAnsatt
-import no.nav.tilgangsmaskin.regler.TestData.vanligBruker
+import no.nav.tilgangsmaskin.regler.ansatte.vanligAnsatt
+import no.nav.tilgangsmaskin.regler.brukere.vanligBruker
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringEntityListener
 import no.nav.tilgangsmaskin.tilgang.TokenClaimsAccessor
 import org.assertj.core.api.Assertions.assertThat

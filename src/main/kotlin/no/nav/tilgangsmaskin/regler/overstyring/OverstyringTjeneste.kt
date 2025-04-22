@@ -41,7 +41,7 @@ class OverstyringTjeneste(
                 adapter.gjeldendeOverstyring(
                         ansattId.verdi,
                         brukerId.verdi,
-                        brukere.nærmesteFamilie(brukerId.verdi).historiskeIdentifikatorer.map { it.verdi })) {
+                        brukere.nærmesteFamilie(brukerId.verdi).historiskeIds.map { it.verdi })) {
             when {
                 this == null -> false.also {
                     log.trace("Ingen overstyring for $ansattId og $brukerId ble funnet i databasen")

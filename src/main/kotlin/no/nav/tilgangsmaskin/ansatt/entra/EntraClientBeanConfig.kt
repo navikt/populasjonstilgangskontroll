@@ -3,10 +3,10 @@ package no.nav.tilgangsmaskin.ansatt.entra
 import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.HEADER_CONSISTENCY_LEVEL
 import no.nav.tilgangsmaskin.felles.AbstractPingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.web.client.RestClient
 
 @Configuration
@@ -24,9 +24,4 @@ class EntraClientBeanConfig {
     @Bean
     fun graphHealthIndicator(a: EntraRestClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
 
-    private fun headerAddingRequestInterceptor(vararg verdier: Pair<String, String>) =
-        ClientHttpRequestInterceptor { request, body, next ->
-            verdier.forEach { (key, value) -> request.headers.add(key, value) }
-            next.execute(request, body)
-        }
 }

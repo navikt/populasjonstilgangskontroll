@@ -14,6 +14,7 @@ import org.springframework.boot.web.client.RestClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
+import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -61,4 +62,13 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(ansattIdAddingInterceptor)
     }
+
+    companion object {
+        fun headerAddingRequestInterceptor(vararg verdier: Pair<String, String>) =
+            ClientHttpRequestInterceptor { request, body, next ->
+                verdier.forEach { (key, value) -> request.headers.add(key, value) }
+                next.execute(request, body)
+            }
+    }
+
 }

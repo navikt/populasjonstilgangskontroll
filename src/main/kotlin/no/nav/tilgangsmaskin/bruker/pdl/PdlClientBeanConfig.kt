@@ -5,6 +5,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.AbstractPingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.GraphQLErrorHandler
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
@@ -14,7 +15,6 @@ import org.springframework.context.annotation.Primary
 import org.springframework.graphql.client.ClientGraphQlRequest
 import org.springframework.graphql.client.HttpSyncGraphQlClient
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor
-import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
@@ -51,12 +51,6 @@ class PdlClientBeanConfig {
 
     @Bean
     fun pdlHealthIndicator(a: PdlRestClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
-
-    private fun headerAddingRequestInterceptor(vararg verdier: Pair<String, String>) =
-        ClientHttpRequestInterceptor { req, b, next ->
-            verdier.forEach { (key, value) -> req.headers.add(key, value) }
-            next.execute(req, b)
-        }
 
     private class LoggingGraphQLInterceptor : SyncGraphQlClientInterceptor {
 

@@ -10,11 +10,11 @@ import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
-import no.nav.tilgangsmaskin.regler.TestData.ukjentBostedBruker
-import no.nav.tilgangsmaskin.regler.TestData.vanligAnsatt
-import no.nav.tilgangsmaskin.regler.TestData.vanligBruker
-import no.nav.tilgangsmaskin.regler.TestData.vanligBrukerMedHistoriskIdent
-import no.nav.tilgangsmaskin.regler.TestData.vanligHistoriskBruker
+import no.nav.tilgangsmaskin.regler.ansatte.vanligAnsatt
+import no.nav.tilgangsmaskin.regler.brukere.ukjentBostedBruker
+import no.nav.tilgangsmaskin.regler.brukere.vanligBruker
+import no.nav.tilgangsmaskin.regler.brukere.vanligBrukerMedHistoriskIdent
+import no.nav.tilgangsmaskin.regler.brukere.vanligHistoriskBruker
 import no.nav.tilgangsmaskin.regler.motor.RegelBeanConfig
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.tilgang.TokenClaimsAccessor
@@ -76,7 +76,7 @@ internal class OverstyringTest {
         every { brukerTjeneste.utvidetFamilie(vanligHistoriskBruker.brukerId.verdi) } returns vanligHistoriskBruker
         overstyring.overstyr(
                 vanligAnsatt.ansattId, OverstyringData(
-                vanligBrukerMedHistoriskIdent.historiskeIdentifikatorer.first(),
+                vanligBrukerMedHistoriskIdent.historiskeIds.first(),
                 "test",
                 LocalDate.now().plusDays(1)
                                                       )

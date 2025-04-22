@@ -5,15 +5,16 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import java.time.LocalDate
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
-import no.nav.tilgangsmaskin.regler.TestData.fortroligBruker
-import no.nav.tilgangsmaskin.regler.TestData.geoUtlandBruker
-import no.nav.tilgangsmaskin.regler.TestData.strengtFortroligBruker
-import no.nav.tilgangsmaskin.regler.TestData.vanligAnsatt
-import no.nav.tilgangsmaskin.regler.TestData.vanligBruker
+import no.nav.tilgangsmaskin.regler.ansatte.vanligAnsatt
+import no.nav.tilgangsmaskin.regler.brukere.fortroligBruker
+import no.nav.tilgangsmaskin.regler.brukere.geoUtlandBruker
+import no.nav.tilgangsmaskin.regler.brukere.strengtFortroligBruker
+import no.nav.tilgangsmaskin.regler.brukere.vanligBruker
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
@@ -37,7 +38,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
-import java.time.LocalDate
 import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
 
@@ -91,12 +91,12 @@ class RegelTjenesteTest {
         every { accessor.systemNavn } returns "test"
         overstyring =
             OverstyringTjeneste(
-                ansatt,
-                bruker, OverstyringJPAAdapter(repo),
-                motor,
-                SimpleMeterRegistry(),
-                accessor
-            )
+                    ansatt,
+                    bruker, OverstyringJPAAdapter(repo),
+                    motor,
+                    SimpleMeterRegistry(),
+                    accessor
+                               )
         regel = RegelTjeneste(motor, bruker, ansatt, overstyring)
     }
 
@@ -107,17 +107,17 @@ class RegelTjenesteTest {
         every { bruker.nærmesteFamilie(geoUtlandBruker.brukerId.verdi) } returns geoUtlandBruker
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
         overstyring.overstyr(
-            vanligAnsatt.ansattId, OverstyringData(
+                vanligAnsatt.ansattId, OverstyringData(
                 geoUtlandBruker.brukerId,
                 "test",
                 LocalDate.now().plusDays(1)
-            )
-        )
+                                                      )
+                            )
         assertThatCode {
             regel.kompletteRegler(
-                vanligAnsatt.ansattId,
-                geoUtlandBruker.brukerId.verdi
-            )
+                    vanligAnsatt.ansattId,
+                    geoUtlandBruker.brukerId.verdi
+                                 )
         }.doesNotThrowAnyException()
     }
 
@@ -137,20 +137,20 @@ class RegelTjenesteTest {
         every { bruker.utvidetFamilie(vanligBruker.brukerId.verdi) } returns vanligBruker
         every {
             bruker.brukere(
-                setOf(
-                    strengtFortroligBruker.brukerId.verdi,
-                    fortroligBruker.brukerId.verdi
-                )
-            )
+                    setOf(
+                            strengtFortroligBruker.brukerId.verdi,
+                            fortroligBruker.brukerId.verdi
+                         )
+                          )
         } returns listOf(strengtFortroligBruker, fortroligBruker)
         assertEquals(assertThrows<BulkRegelException> {
             regel.bulkRegler(
-                vanligAnsatt.ansattId,
-                listOf(
-                    IdOgType(strengtFortroligBruker.brukerId.verdi, KJERNE_REGELTYPE),
-                    IdOgType(fortroligBruker.brukerId.verdi, KJERNE_REGELTYPE)
-                )
-            )
+                    vanligAnsatt.ansattId,
+                    listOf(
+                            IdOgType(strengtFortroligBruker.brukerId.verdi, KJERNE_REGELTYPE),
+                            IdOgType(fortroligBruker.brukerId.verdi, KJERNE_REGELTYPE)
+                          )
+                            )
         }.exceptions.size, 2)
     }
 
@@ -161,17 +161,17 @@ class RegelTjenesteTest {
         every { bruker.utvidetFamilie(geoUtlandBruker.brukerId.verdi) } returns geoUtlandBruker
         every { bruker.brukere(setOf(geoUtlandBruker.brukerId.verdi)) } returns listOf(geoUtlandBruker)
         overstyring.overstyr(
-            vanligAnsatt.ansattId, OverstyringData(
+                vanligAnsatt.ansattId, OverstyringData(
                 geoUtlandBruker.brukerId,
                 "test",
                 LocalDate.now().plusDays(1)
-            )
-        )
+                                                      )
+                            )
         assertThatCode {
             regel.bulkRegler(
-                vanligAnsatt.ansattId,
-                listOf(IdOgType(geoUtlandBruker.brukerId.verdi, KOMPLETT_REGELTYPE))
-            )
+                    vanligAnsatt.ansattId,
+                    listOf(IdOgType(geoUtlandBruker.brukerId.verdi, KOMPLETT_REGELTYPE))
+                            )
         }.doesNotThrowAnyException()
     }
 }

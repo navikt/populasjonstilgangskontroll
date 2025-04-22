@@ -19,7 +19,7 @@ data class Person(
         val graderinger: List<Gradering> = emptyList(),
         val familie: Familie = INGEN,
         val dødsdato: LocalDate? = null,
-        val historiskeIdentifikatorer: List<BrukerId> = emptyList()) {
+        val historiskeIds: Set<BrukerId> = emptySet()) {
 
     @JsonIgnore
     val foreldre = familie.foreldre
@@ -36,3 +36,4 @@ fun List<Gradering>.erStrengtFortroligUtland() = any { it == STRENGT_FORTROLIG_U
 fun List<Gradering>.erStrengtFortrolig() = any { it == STRENGT_FORTROLIG }
 
 fun List<Gradering>.erFortrolig() = any { it == FORTROLIG }
+

@@ -118,7 +118,7 @@ object PdlPersonMapper {
     private fun tilHistoriskeBrukerIds(identer: PdlIdenter) = identer.identer
         .filter { it.historisk }
         .filter { it.gruppe in listOf(FOLKEREGISTERIDENT, NPID) }
-        .map { (BrukerId(it.ident)) }
+        .map { (BrukerId(it.ident)) }.toSet()
 
     private fun tilRelasjon(relasjon: PdlFamilieRelasjonRolle?) =
         when (relasjon) {

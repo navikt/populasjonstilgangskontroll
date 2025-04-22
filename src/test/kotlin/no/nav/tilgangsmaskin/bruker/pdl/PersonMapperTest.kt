@@ -20,8 +20,8 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentG
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering
-import no.nav.tilgangsmaskin.regler.TestData.aktørId
-import no.nav.tilgangsmaskin.regler.TestData.vanligBruker
+import no.nav.tilgangsmaskin.regler.brukere.vanligBruker
+import no.nav.tilgangsmaskin.regler.diverse.aktørId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -63,17 +63,17 @@ class PersonMapperTest {
 
 
     private fun pdlRespons(
-        geo: PdlGeografiskTilknytning,
-        gradering: PdlAdressebeskyttelseGradering? = null
-    ): PdlRespons {
+            geo: PdlGeografiskTilknytning,
+            gradering: PdlAdressebeskyttelseGradering? = null
+                          ): PdlRespons {
         val adressebeskyttelse = gradering?.let {
             listOf(PdlAdressebeskyttelse(it))
         } ?: emptyList()
         return PdlRespons(
-            PdlPerson(adressebeskyttelse),
-            PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT), PdlIdent(aktørid, false, AKTORID))),
-            geo
-        )
+                PdlPerson(adressebeskyttelse),
+                PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT), PdlIdent(aktørid, false, AKTORID))),
+                geo
+                         )
     }
 
 }

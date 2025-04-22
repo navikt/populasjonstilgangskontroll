@@ -1,6 +1,6 @@
-package no.nav.tilgangsmaskin.felles
+package no.nav.tilgangsmaskin.felles.rest
 
-import org.slf4j.LoggerFactory.getLogger
+import org.slf4j.LoggerFactory
 import org.springframework.retry.RetryCallback
 import org.springframework.retry.RetryContext
 import org.springframework.retry.RetryListener
@@ -8,7 +8,7 @@ import kotlin.reflect.full.declaredFunctions
 
 class FellesRetryListener : RetryListener {
 
-    private val log = getLogger(javaClass)
+    private val log = LoggerFactory.getLogger(javaClass)
     override fun <T : Any, E : Throwable> onSuccess(context: RetryContext, callback: RetryCallback<T, E>, result: T) {
         if (context.retryCount > 0) {
             log.info("Eksekvering av '${method(context)}' var vellykket på forsøk ${context.retryCount + 1}")

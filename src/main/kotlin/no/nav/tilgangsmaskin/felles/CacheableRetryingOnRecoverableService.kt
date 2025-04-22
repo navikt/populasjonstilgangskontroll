@@ -1,7 +1,8 @@
 package no.nav.tilgangsmaskin.felles
 
 import java.lang.annotation.Inherited
-import no.nav.tilgangsmaskin.felles.FellesRetryListener.Companion.FELLES_RETRY_LISTENER
+import no.nav.tilgangsmaskin.felles.rest.FellesRetryListener.Companion.FELLES_RETRY_LISTENER
+import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.core.annotation.AliasFor
 import org.springframework.retry.annotation.Backoff
@@ -25,4 +26,4 @@ annotation class CacheableRetryingOnRecoverableService(
         @get:AliasFor(annotation = Cacheable::class) val cacheNames: Array<String> = [],
         @get:AliasFor(annotation = Retryable::class) val listeners: Array<String> = [FELLES_RETRY_LISTENER],
         @get:AliasFor(annotation = Retryable::class) val backoff: Backoff = Backoff(delay = 1000)
-)
+                                                      )

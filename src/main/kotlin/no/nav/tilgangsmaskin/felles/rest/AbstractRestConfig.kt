@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles
+package no.nav.tilgangsmaskin.felles.rest
 
 import java.net.URI
 import org.springframework.web.util.DefaultUriBuilderFactory

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.*
 import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
-import no.nav.tilgangsmaskin.felles.AbstractRestClientAdapter
+import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient

@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles
+package no.nav.tilgangsmaskin.felles.rest.cache
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import no.nav.boot.conditionals.ConditionalOnGCP

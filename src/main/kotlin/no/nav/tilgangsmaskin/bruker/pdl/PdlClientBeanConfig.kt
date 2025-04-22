@@ -4,9 +4,9 @@ import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
-import no.nav.tilgangsmaskin.felles.AbstractPingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
-import no.nav.tilgangsmaskin.felles.GraphQLErrorHandler
+import no.nav.tilgangsmaskin.felles.graphql.GraphQLErrorHandler
+import no.nav.tilgangsmaskin.felles.rest.AbstractPingableHealthIndicator
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean

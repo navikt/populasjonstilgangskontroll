@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
-import no.nav.tilgangsmaskin.felles.AbstractSyncGraphQLAdapter
-import no.nav.tilgangsmaskin.felles.GraphQLErrorHandler
+import no.nav.tilgangsmaskin.felles.graphql.AbstractSyncGraphQLAdapter
+import no.nav.tilgangsmaskin.felles.graphql.GraphQLErrorHandler
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.graphql.client.GraphQlClient
 import org.springframework.http.HttpStatusCode

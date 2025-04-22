@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.skjerming
 
 import java.net.URI
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
-import no.nav.tilgangsmaskin.felles.AbstractRestConfig
+import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(SKJERMING)

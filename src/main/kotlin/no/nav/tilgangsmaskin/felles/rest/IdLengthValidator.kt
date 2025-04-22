@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles
+package no.nav.tilgangsmaskin.felles.rest
 
 import jakarta.validation.Constraint
 import jakarta.validation.ConstraintValidator
@@ -17,7 +17,7 @@ annotation class ValidId(
         val message: String = "Ugyldig ID eller liste av IDs",
         val groups: Array<KClass<*>> = [],
         val payload: Array<KClass<out Payload>> = []
-)
+                        )
 
 class IdValidator : ConstraintValidator<ValidId, Any> {
     override fun isValid(verdi: Any, context: ConstraintValidatorContext) =

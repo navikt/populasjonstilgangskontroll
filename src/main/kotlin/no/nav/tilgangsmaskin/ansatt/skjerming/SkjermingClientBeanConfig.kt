@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
-import no.nav.tilgangsmaskin.felles.AbstractPingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.rest.AbstractPingableHealthIndicator
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

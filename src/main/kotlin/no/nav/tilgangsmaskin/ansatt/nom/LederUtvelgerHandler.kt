@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles
+package no.nav.tilgangsmaskin.ansatt.nom
 
 import java.net.URI
 import java.time.LocalDateTime
@@ -11,7 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient.Builder
 @Component
 class LederUtvelgerHandler(builder: Builder,
                            @Value("\${elector.sse.url}") uri: URI, publisher: ApplicationEventPublisher
-) {
+                          ) {
     init {
         builder.build()
             .get()

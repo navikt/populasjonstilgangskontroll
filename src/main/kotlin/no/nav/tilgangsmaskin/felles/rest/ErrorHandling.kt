@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles
+package no.nav.tilgangsmaskin.felles.rest
 
 import java.net.URI
 import org.slf4j.LoggerFactory.getLogger
@@ -22,7 +22,7 @@ class DefaultRestErrorHandler : ErrorHandler {
                 res.statusCode,
                 req.uri,
                 res.statusText
-        ).also {
+                                                                             ).also {
             log.warn("Irrecoverable exception etter ${res.statusCode.value()} fra ${req.uri}")
         }
         else throw RecoverableRestException(res.statusCode, req.uri, res.statusText).also {
@@ -36,14 +36,14 @@ open class IrrecoverableRestException(
         uri: URI,
         msg: String = (status as HttpStatus).reasonPhrase,
         cause: Throwable? = null
-) : ErrorResponseException(status, problemDetail(status, msg, uri), cause)
+                                     ) : ErrorResponseException(status, problemDetail(status, msg, uri), cause)
 
 open class RecoverableRestException(
         status: HttpStatusCode,
         uri: URI,
         msg: String = (status as HttpStatus).reasonPhrase,
         cause: Throwable? = null
-) : ErrorResponseException(status, problemDetail(status, msg, uri), cause)
+                                   ) : ErrorResponseException(status, problemDetail(status, msg, uri), cause)
 
 private fun problemDetail(status: HttpStatusCode, msg: String, uri: URI) =
     forStatusAndDetail(status, msg).apply {

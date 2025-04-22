@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.bruker.pdl
 import java.net.URI
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
-import no.nav.tilgangsmaskin.felles.AbstractRestConfig
+import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(PDL)

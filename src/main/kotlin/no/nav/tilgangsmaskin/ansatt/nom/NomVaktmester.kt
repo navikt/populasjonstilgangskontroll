@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.ansatt.nom
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import java.util.concurrent.TimeUnit.HOURS
-import no.nav.tilgangsmaskin.felles.LederUtvelger
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component

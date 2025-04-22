@@ -4,7 +4,7 @@ import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.CacheableRetryingOnRecoverableService
-import no.nav.tilgangsmaskin.felles.RecoverableRestException
+import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import org.springframework.core.NestedExceptionUtils.getMostSpecificCause
 import org.springframework.retry.ExhaustedRetryException
 import org.springframework.retry.annotation.Recover

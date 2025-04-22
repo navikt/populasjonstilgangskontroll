@@ -5,7 +5,9 @@ import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import java.net.URI
-import no.nav.tilgangsmaskin.felles.FellesRetryListener
+import no.nav.tilgangsmaskin.felles.rest.FellesRetryListener
+import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
+import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.regler.brukere.vanligBruker
 import org.assertj.core.api.Assertions.assertThat
@@ -38,10 +40,10 @@ internal class SkjermingRetryTest {
     @Test
     @DisplayName("Returner true etter at antall forsøk er oppbrukt")
     fun erSkjermetEtterTreMislykkedeForsøk() {
-        every { adapter.skjerming(vanligBruker.brukerId.verdi) } throws no.nav.tilgangsmaskin.felles.RecoverableRestException(
+        every { adapter.skjerming(vanligBruker.brukerId.verdi) } throws RecoverableRestException(
                 INTERNAL_SERVER_ERROR,
                 uri
-                                                                                                                             )
+                                                                                                )
         assertThat(tjeneste.skjerming(vanligBruker.brukerId)).isTrue
         verify(exactly = 3) {
             tjeneste.skjerming(vanligBruker.brukerId)
@@ -51,10 +53,10 @@ internal class SkjermingRetryTest {
     @Test
     @DisplayName("Test retry tar seg inn etter først å ha feilet")
     fun testRetryOK() {
-        every { adapter.skjerming(vanligBruker.brukerId.verdi) } throws no.nav.tilgangsmaskin.felles.RecoverableRestException(
+        every { adapter.skjerming(vanligBruker.brukerId.verdi) } throws RecoverableRestException(
                 INTERNAL_SERVER_ERROR,
                 uri
-                                                                                                                             ) andThen false
+                                                                                                ) andThen false
         assertThat(tjeneste.skjerming(vanligBruker.brukerId)).isFalse
         verify(exactly = 2) {
             tjeneste.skjerming(vanligBruker.brukerId)
@@ -64,11 +66,11 @@ internal class SkjermingRetryTest {
     @Test
     @DisplayName("Andre exceptions fører ikke til retry, og kastes umiddlelbart videre")
     fun andreExceptions() {
-        every { adapter.skjerming(vanligBruker.brukerId.verdi) } throws no.nav.tilgangsmaskin.felles.IrrecoverableRestException(
+        every { adapter.skjerming(vanligBruker.brukerId.verdi) } throws IrrecoverableRestException(
                 INTERNAL_SERVER_ERROR,
                 uri
-                                                                                                                               )
-        assertThrows<no.nav.tilgangsmaskin.felles.IrrecoverableRestException> {
+                                                                                                  )
+        assertThrows<IrrecoverableRestException> {
             tjeneste.skjerming(vanligBruker.brukerId)
         }
         verify(exactly = 1) {

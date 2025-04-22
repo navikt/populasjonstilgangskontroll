@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles
+package no.nav.tilgangsmaskin.felles.rest.cache
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.cache.annotation.CachingConfigurer
@@ -54,4 +54,3 @@ class RedisConfiguration(private val mapper: ObjectMapper) : CachingConfigurer {
         }
     }
 }
-

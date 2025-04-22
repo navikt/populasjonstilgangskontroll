@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.bruker.pdl
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
-import no.nav.tilgangsmaskin.felles.AbstractRestClientAdapter
+import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component

@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.entra
 
 import java.net.URI
 import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
-import no.nav.tilgangsmaskin.felles.AbstractRestConfig
+import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(GRAPH)

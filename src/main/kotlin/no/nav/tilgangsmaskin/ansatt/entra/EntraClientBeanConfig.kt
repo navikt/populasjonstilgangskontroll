@@ -2,8 +2,8 @@ package no.nav.tilgangsmaskin.ansatt.entra
 
 import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.HEADER_CONSISTENCY_LEVEL
-import no.nav.tilgangsmaskin.felles.AbstractPingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
+import no.nav.tilgangsmaskin.felles.rest.AbstractPingableHealthIndicator
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

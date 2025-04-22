@@ -20,6 +20,7 @@ class NomJPAAdapter(val repo: NomRepository, @PersistenceContext val entityManag
         }
 
     private fun upsert(ansattId: AnsattId, ansattFnr: BrukerId, start: Instant, slutt: Instant) =
+
         entityManager.createNativeQuery(upsertQuery())
             .setParameter("navid", ansattId.verdi)
             .setParameter("fnr", ansattFnr.verdi)

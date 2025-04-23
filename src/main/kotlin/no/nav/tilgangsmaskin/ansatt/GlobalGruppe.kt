@@ -16,7 +16,7 @@ enum class GlobalGruppe(val property: String, val metadata: GruppeMetadata) {
     lateinit var id: UUID
 
     companion object {
-        fun navnFor(id: UUID) = entries.firstOrNull { it.id == id }?.metadata?.name
+        fun navnFor(id: UUID) = entries.firstOrNull { it.id == id }?.name
             ?: "Fant ikke gruppenavn for id $id"
 
         fun getIds() = entries.map { it.id }

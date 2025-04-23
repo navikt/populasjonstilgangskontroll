@@ -5,13 +5,14 @@ import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
-import org.springframework.core.env.ConfigurableEnvironment
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
-class TokenClaimsAccessor(
-        private val contextHolder: TokenValidationContextHolder,
-        private val env: ConfigurableEnvironment) {
+class TokenClaimsAccessor(private val contextHolder: TokenValidationContextHolder) {
+
+    private val log = getLogger(javaClass)
+
 
     val globaleGrupper
         get() = GlobalGruppe.entries.mapNotNull { gruppe ->
@@ -19,7 +20,9 @@ class TokenClaimsAccessor(
             claimSet()
                 ?.getStringClaim(gruppeId.toString())
                 ?.let { EntraGruppe(gruppeId, gruppe.name) }
-        }.toSet()
+        }.toSet().also {
+            log.info("$ansattId er medlem av ${it.size} globale grupper: $it")
+        }
 
     val system
         get() = runCatching {

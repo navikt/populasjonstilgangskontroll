@@ -19,6 +19,7 @@ class AnsattTjeneste(
     private val log = getLogger(javaClass)
     fun ansatt(ansattId: AnsattId) =
         entra.ansatt(ansattId).let { ansatt ->
+            log.info("Ansatt {} er medlem av følgende globale grupper {}", ansattId, accessor.globaleGrupper)
             val ansattFnr = ansatte.fnrForAnsatt(ansattId)
             val ansattBruker = ansattFnr?.let {
                 runCatching {

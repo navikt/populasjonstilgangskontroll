@@ -18,9 +18,9 @@ class TokenClaimsAccessor(private val contextHolder: TokenValidationContextHolde
             claimSet()
                 ?.getAsList("groups")?.map {
                     UUID.fromString(it.toString())
-                }// ?.map {uuid -> EntraGruppe(uuid,  GlobalGruppe.entries.first { it.id = uuid }?.let {  } }
+                }
         }.toSet().also {
-            log.info("$ansattId er medlem av ${it.size} globale grupper: $it")
+            log.info("$ansattId er medlem av følgende globale grupper: $it")
         }
 
     val system

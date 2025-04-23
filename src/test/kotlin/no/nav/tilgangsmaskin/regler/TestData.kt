@@ -137,5 +137,5 @@ object ansatte {
     internal val enhetAnsatt = ansatt(gruppe = enhetGruppe)
 
     internal fun ansatt(bruker: Bruker = ansattBruker, gruppe: EntraGruppe) = ansatt(bruker, setOf(gruppe))
-    internal fun ansatt(bruker: Bruker = ansattBruker, grupper: Set<EntraGruppe>) = Ansatt(aids, grupper, bruker)
+    internal fun ansatt(bruker: Bruker = ansattBruker, grupper: Set<EntraGruppe>) = Ansatt(aids, bruker, grupper)
 }

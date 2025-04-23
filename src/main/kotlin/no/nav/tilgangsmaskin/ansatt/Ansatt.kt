@@ -10,11 +10,14 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 
 
-data class Ansatt(val identifikatorer: AnsattIdentifikatorer,
-                  val grupper: Set<EntraGruppe>,
-                  val bruker: Bruker? = null) {
+class Ansatt(val identifikatorer: AnsattIdentifikatorer,
+             val bruker: Bruker? = null,
+             grupperFraEntra: Set<EntraGruppe>,
+             grupperFraToken: Set<EntraGruppe> = emptySet()) {
 
     private val brukerId = bruker?.brukerId
+
+    val grupper = grupperFraEntra + grupperFraToken
 
     @JsonIgnore
     val ansattId = identifikatorer.ansattId

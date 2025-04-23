@@ -19,10 +19,8 @@ enum class GlobalGruppe(val property: String, val metadata: GruppeMetadata) {
         fun navnFor(id: UUID) = entries.firstOrNull { it.id == id }?.name
             ?: "Fant ikke gruppenavn for id $id"
 
-        fun getIds() = entries.map { it.id }
+        fun getIDs() = entries.map { it.id }
         fun setIDs(grupper: Map<String, UUID>) =
-            entries.forEach { gruppe ->
-                gruppe.id = grupper[gruppe.property] ?: error("Mangler id for ${gruppe.property}")
-            }
+            entries.forEach { it.id = grupper[it.property] ?: error("Mangler id for ${it.property}") }
     }
 }

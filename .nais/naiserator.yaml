@@ -1,6 +1,5 @@
 apiVersion: nais.io/v1alpha1
 kind: Application
-
 metadata:
   labels:
     team: tilgangsmaskin
@@ -26,9 +25,9 @@ spec:
           - name: pgaudit.log
             value: "{{db-flags.pgaudit.logtype}}"
   ingresses:
-    { { #each ingresses as |ingress|}}
-        - {{ingress } }
-      {{/each}}
+    {{#each ingresses as |ingress|}}
+        - {{ingress}}
+    {{/each}}
   image: {{image}}
   observability:
     autoInstrumentation:
@@ -59,12 +58,12 @@ spec:
       allowAllUsers: true
       claims:
         groups:
-          - id: {{grupper.nasjonal}}
-          - id: {{grupper.utland}}
-          - id: {{grupper.egenansatt}}
-          - id: {{grupper.udefinert}}
-          - id: {{grupper.fortrolig}}
-          - id: {{grupper.strengt}}
+          - {{grupper.nasjonal}}
+          - {{grupper.utland}}
+          - {{grupper.egenansatt}}
+          - {{grupper.udefinert}}
+          - {{grupper.fortrolig}}
+          - {{grupper.strengt}}
         extra:
           - "NAVident"
           - "azp_name"
@@ -79,11 +78,11 @@ spec:
         - host: {{pdl}}
     inbound:
       rules:
-        { { #each inbound as |app|}}
+        {{#each inbound as |app|}}
             - application: '{{app.name}}'
-                namespace: '{{app.namespace}}'
-                cluster: '{{app.cluster}}'
-                {{/each } }
+              namespace: '{{app.namespace}}'
+              cluster: '{{app.cluster}}'
+        {{/each}}
   env:
     - name: NAIS_CLUSTER_TYPE
       value: {{nais.cluster.type}}

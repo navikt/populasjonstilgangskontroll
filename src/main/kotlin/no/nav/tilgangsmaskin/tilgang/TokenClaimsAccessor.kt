@@ -20,6 +20,9 @@ class TokenClaimsAccessor(private val contextHolder: TokenValidationContextHolde
                 ?: emptyList()
             GlobalGruppe.getIds().toMutableList().apply {
                 retainAll(claims)
+            }.also {
+                log.info("Ansatt $ansattId er medlem av følgende globale grupper {}", it)
+
             }
         }
 

@@ -20,7 +20,7 @@ class AnsattTjeneste(
     fun ansatt(ansattId: AnsattId) =
         entra.ansatt(ansattId).let { ansatt ->
             val grupperFraToken = accessor.globaleGrupper()
-            // log.info("Ansatt {} er medlem av følgende globale grupper {}", ansattId, grupperFraToken)
+            log.info("Ansatt {} er medlem av følgende globale grupper {}", ansattId, grupperFraToken)
             val ansattFnr = ansatte.fnrForAnsatt(ansattId)
             val ansattBruker = ansattFnr?.let {
                 runCatching {

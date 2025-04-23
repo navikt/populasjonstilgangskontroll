@@ -11,16 +11,15 @@ import org.springframework.stereotype.Component
 class TokenClaimsAccessor(private val contextHolder: TokenValidationContextHolder) {
 
     private val log = getLogger(javaClass)
+    val x = GlobalGruppe.entries.map { it.id }
 
 
     val globaleGrupper
-        get() = GlobalGruppe.entries.mapNotNull { gruppe ->
-            claimSet()
-                ?.getAsList("groups")?.map {
-                    UUID.fromString(it.toString())
-                }
-        }.toSet().also {
-            log.info("$ansattId er medlem av følgende globale grupper: $it")
+        get() = {
+            val claims = claimSet()?.getAsList("groups")
+                ?.mapNotNull { it.toString().let(UUID::fromString) }
+                ?: emptyList()
+            x.toMutableList().apply { retainAll(claims) }
         }
 
     val system

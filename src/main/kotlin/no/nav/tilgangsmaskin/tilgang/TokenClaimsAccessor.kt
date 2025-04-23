@@ -4,6 +4,7 @@ import java.util.*
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.getIds
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.navnFor
 import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
@@ -21,11 +22,7 @@ class TokenClaimsAccessor(private val contextHolder: TokenValidationContextHolde
         return getIds().toMutableList().apply {
             retainAll(claims)
         }.toSet()
-            .map { EntraGruppe(it, "") }.toSet()
-        /*
-        .also {
-            log.info("Ansatt $ansattId er medlem av disse globale gruppene {}", it)
-        }*/
+            .map { EntraGruppe(it, navnFor(it)) }.toSet()
     }
 
     val system

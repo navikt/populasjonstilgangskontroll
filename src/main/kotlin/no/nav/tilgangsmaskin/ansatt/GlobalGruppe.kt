@@ -16,6 +16,7 @@ enum class GlobalGruppe(val property: String, val metadata: GruppeMetadata) {
     lateinit var id: UUID
 
     companion object {
+        fun getIds() = entries.map { it.id }
         fun setIDs(grupper: Map<String, UUID>) =
             entries.forEach { gruppe ->
                 gruppe.id = grupper[gruppe.property] ?: error("Mangler id for ${gruppe.property}")

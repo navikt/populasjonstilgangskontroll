@@ -1,6 +1,6 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
-val javaVersion = JavaLanguageVersion.of(24)
+val javaVersion = JavaLanguageVersion.of(23)
 val springdocVersion = "2.8.6"
 val tokenSupportVersion = "5.0.24"
 val springCloudVersion = "4.2.1"
@@ -112,15 +112,9 @@ java {
 }
 
 kotlin {
-    jvmToolchain(24)
+    jvmToolchain(21)
 
     compilerOptions {
         freeCompilerArgs.add("-Xjsr305=strict")
-    }
-}
-
-jib {
-    from {
-        image = "gcr.io/distroless/java24"
     }
 }

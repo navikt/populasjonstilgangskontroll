@@ -37,14 +37,15 @@ internal class SkjermingRetryTest {
     @Autowired
     lateinit var tjeneste: SkjermingTjeneste
 
-    //@Test
+    @Test
     @DisplayName("Returner true etter at antall forsøk er oppbrukt")
-    fun erSkjermetEtterTreMislykkedeForsøk() {
+    fun feilerEtterTreMislykkedeForsøk() {
         every { adapter.skjerming(vanligBruker.brukerId.verdi) } throws RecoverableRestException(
                 INTERNAL_SERVER_ERROR,
-                uri
-                                                                                                )
-        assertThat(tjeneste.skjerming(vanligBruker.brukerId)).isTrue
+                uri)
+        assertThrows<RecoverableRestException> {
+            tjeneste.skjerming(vanligBruker.brukerId)
+        }
         verify(exactly = 3) {
             tjeneste.skjerming(vanligBruker.brukerId)
         }

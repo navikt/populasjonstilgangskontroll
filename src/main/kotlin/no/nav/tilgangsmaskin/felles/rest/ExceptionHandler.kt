@@ -10,8 +10,12 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Order(-1)
 class ExceptionHandler : ResponseEntityExceptionHandler()
 
-@ExceptionHandler(RecoverableRestException::class)
-fun recoverableFeilet(e: RecoverableRestException) =
+@ExceptionHandler(RuntimeException::class)
+fun recoverableFeilet(e: RuntimeException) = if (e is RecoverableRestException) {
     e.body.apply {
+        println("XXXXXX")
         setStatus(FORBIDDEN)
     }
+} else {
+    throw e
+}

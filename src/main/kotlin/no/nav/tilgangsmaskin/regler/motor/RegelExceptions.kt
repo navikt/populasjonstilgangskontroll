@@ -42,9 +42,13 @@ class BulkRegelException(private val ansattId: AnsattId, val exceptions: List<Re
                 "avvisninger" to exceptions.size,
                 "begrunnelser" to exceptions.map {
                     mapOf(
+                            "type" to TYPE_URI,
                             "title" to it.regel.kode,
+                            "instance" to "${ansattId.verdi}/${it.brukerId.verdi}",
+                            "brukerIdent" to it.brukerId.verdi,
+                            "navIdent" to ansattId.verdi,
                             "begrunnelse" to it.regel.begrunnelse,
-                            "brukerIdent" to it.brukerId.verdi
+                            "kanOverstyres" to it.regel.erOverstyrbar
                          )
                 }.toList())
     }, null)

@@ -44,7 +44,7 @@ class BulkRegelException(private val ansattId: AnsattId, val exceptions: List<Re
                     mapOf(
                             "type" to TYPE_URI,
                             "title" to it.regel.kode,
-                            "instance"  to URI.create("${ansattId.verdi}/${it.brukerId.verdi}")
+                            "instance" to URI.create("${ansattId.verdi}/${it.brukerId.verdi}"),
                             "brukerIdent" to it.brukerId.verdi,
                             "navIdent" to ansattId.verdi,
                             "begrunnelse" to it.regel.begrunnelse,

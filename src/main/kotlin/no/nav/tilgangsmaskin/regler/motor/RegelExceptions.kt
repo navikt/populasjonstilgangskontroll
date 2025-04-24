@@ -31,9 +31,30 @@ class RegelException(
             messageCode,
             arguments
                                                                                         )
-
-    val kode = regel.kode
 }
 
-class BulkRegelException(val ansattId: AnsattId, val exceptions: List<RegelException>) :
-    RuntimeException("Følgende ${exceptions.size} identifikatorer ble avvist ved bulk-kjøring av regler for $ansattId ${exceptions.map { it.brukerId to it.regel.kode }}")
+class BulkRegelException(private val ansattId: AnsattId, val exceptions: List<RegelException>) :
+    ErrorResponseException(FORBIDDEN, forStatus(FORBIDDEN).apply {
+        //  title = "AVVIST_MANGLENDE_DATA"
+
+        type = TYPE_URI
+        properties = mapOf(
+                "navIdent" to ansattId.verdi,
+                "avvisninger" to exceptions.size,
+                "begrunnelser" to exceptions.map { props(it) })
+    }, null) {
+    companion object {
+        private fun props(e: RegelException) {
+            with(e) {
+                mapOf(
+                        "title" to regel.kode,
+                        "årsak" to regel.begrunnelse,
+                        "brukerIdent" to brukerId.verdi
+                     )
+            }
+        }
+    }
+}
+
+//"Følgende ${exceptions.size} identifikatorer ble avvist ved bulk-kjøring av regler for $ansattId ${exceptions.map { it.brukerId to it.regel.kode }}")
+

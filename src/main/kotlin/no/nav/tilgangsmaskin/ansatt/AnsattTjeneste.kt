@@ -20,14 +20,13 @@ class AnsattTjeneste(
     fun ansatt(ansattId: AnsattId) =
         entra.ansatt(ansattId).let { ansatt ->
             val grupperFraToken = accessor.globaleGrupper()
-            log.info("Ansatt {} er medlem av følgende globale grupper {}", ansattId, grupperFraToken)
             val ansattFnr = ansatte.fnrForAnsatt(ansattId)
             val ansattBruker = ansattFnr?.let {
                 runCatching {
                     brukere.utvidetFamilie(it.verdi)
                 }.getOrNull()
             }
-            Ansatt(AnsattIdentifikatorer(ansattId, ansatt.oid), ansattBruker, ansatt.grupper, grupperFraToken).also {
+            Ansatt(AnsattIdentifikatorer(ansattId, ansatt.oid), ansattBruker, ansatt.grupper + grupperFraToken).also {
                 log.info("Ansatt $ansattId er medlem av følgende sammenslåtte grupper ${it.grupper}", ansattId)
             }
         }

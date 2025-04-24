@@ -41,10 +41,10 @@ class BulkRegelException(private val ansattId: AnsattId, val exceptions: List<Re
         properties = mapOf(
                 "navIdent" to ansattId.verdi,
                 "avvisninger" to exceptions.size,
-                "begrunnelser" to exceptions.map { props(it) })
+                "begrunnelser" to exceptions.map { ::begrunnelser }.toList())
     }, null) {
     companion object {
-        private fun props(e: RegelException) {
+        private fun begrunnelser(e: RegelException) =
             with(e) {
                 mapOf(
                         "title" to regel.kode,
@@ -52,7 +52,6 @@ class BulkRegelException(private val ansattId: AnsattId, val exceptions: List<Re
                         "brukerIdent" to brukerId.verdi
                      )
             }
-        }
     }
 }
 

@@ -117,17 +117,11 @@ class OverstyringTjeneste(
         }
 
     private fun sjekkOverstyringer(ansattId: AnsattId, e: BulkRegelException) {
-        with(e.exceptions.toMutableList()) {
-            removeIf {
-                runCatching {
-                    sjekkOverstyring(ansattId, it)
-                }.isSuccess
-            }
-            if (isNotEmpty()) {
-                throw BulkRegelException(ansattId, this).also {
-                    log.warn(it.message)
-                }
-            }
+        val remainingExceptions = e.exceptions.filterNot {
+            runCatching { sjekkOverstyring(ansattId, it) }.isSuccess
+        }
+        if (remainingExceptions.isNotEmpty()) {
+            throw BulkRegelException(ansattId, remainingExceptions)
         }
     }
 
@@ -136,7 +130,6 @@ class OverstyringTjeneste(
             .description("Antall avslag pr regel")
             .tag("kortnavn", kortNavn)
             .tag("system", systemNavn)
-
             .register(registry).increment()
     }
 

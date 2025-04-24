@@ -9,18 +9,17 @@ import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.ProblemDetail.forStatus
 import org.springframework.web.ErrorResponseException
 
-class RegelException(
-        val brukerId: BrukerId,
-        val ansattId: AnsattId,
-        val regel: Regel,
-        messageCode: String = DETAIL_MESSAGE_CODE,
-        arguments: Array<String> = arrayOf(ansattId.verdi, brukerId.verdi, regel.begrunnelse)) :
+class RegelException(val brukerId: BrukerId,
+                     val ansattId: AnsattId,
+                     val regel: Regel,
+                     messageCode: String = DETAIL_MESSAGE_CODE,
+                     arguments: Array<String> = arrayOf(ansattId.verdi, brukerId.verdi, regel.begrunnelse)) :
     ErrorResponseException(FORBIDDEN, forStatus(FORBIDDEN).apply {
         title = regel.kode
         type = TYPE_URI
         instance = URI.create("${ansattId.verdi}/${brukerId.verdi}")
         properties = mapOf(
-                "brukerIdent" to brukerId.verdi,
+                "brukerIdent" to brukerId.verdi.mas,
                 "navIdent" to ansattId.verdi,
                 "begrunnelse" to regel.begrunnelse,
                 "kanOverstyres" to regel.erOverstyrbar)

@@ -35,7 +35,7 @@ class RegelException(
 
 class BulkRegelException(private val ansattId: AnsattId, val exceptions: List<RegelException>) :
     ErrorResponseException(FORBIDDEN, forStatus(FORBIDDEN).apply {
-        title = exceptions.joinToString { it.regel.kode }
+        title = exceptions.map { it.regel.kode }.toSet().joinToString()
         type = TYPE_URI
         properties = mapOf(
                 "navIdent" to ansattId.verdi,
@@ -43,11 +43,9 @@ class BulkRegelException(private val ansattId: AnsattId, val exceptions: List<Re
                 "begrunnelser" to exceptions.map {
                     mapOf(
                             "title" to it.regel.kode,
-                            "årsak" to it.regel.begrunnelse,
+                            "begrunnelse" to it.regel.begrunnelse,
                             "brukerIdent" to it.brukerId.verdi
                          )
                 }.toList())
     }, null)
-
-//"Følgende ${exceptions.size} identifikatorer ble avvist ved bulk-kjøring av regler for $ansattId ${exceptions.map { it.brukerId to it.regel.kode }}")
 

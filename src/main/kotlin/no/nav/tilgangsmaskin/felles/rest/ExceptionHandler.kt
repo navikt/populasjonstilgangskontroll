@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Order(-1)
 class ExceptionHandler : ResponseEntityExceptionHandler() {
 
-    protected val log = getLogger(javaClass)
+    private val log = getLogger(javaClass)
 
 
     @ExceptionHandler(RuntimeException::class)

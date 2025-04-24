@@ -22,6 +22,7 @@ class RegelException(
         properties = mapOf(
                 "brukerIdent" to brukerId.verdi,
                 "navIdent" to ansattId.verdi,
+                "begrunnelse" to regel.begrunnelse,
                 "kanOverstyres" to regel.erOverstyrbar)
     }, null, messageCode, arguments) {
     constructor(messageCode: String, arguments: Array<String>, e: RegelException) : this(
@@ -29,8 +30,7 @@ class RegelException(
             e.ansattId,
             e.regel,
             messageCode,
-            arguments
-                                                                                        )
+            arguments)
 }
 
 class BulkRegelException(private val ansattId: AnsattId, val exceptions: List<RegelException>) :
@@ -41,15 +41,12 @@ class BulkRegelException(private val ansattId: AnsattId, val exceptions: List<Re
                 "navIdent" to ansattId.verdi,
                 "avvisninger" to exceptions.size,
                 "begrunnelser" to exceptions.map {
-                    { e: RegelException ->
-                        with(e) {
-                            mapOf(
-                                    "title" to regel.kode,
-                                    "årsak" to regel.begrunnelse,
-                                    "brukerIdent" to brukerId.verdi)
-                        }
-                    }
-                })
+                    mapOf(
+                            "title" to it.regel.kode,
+                            "årsak" to it.regel.begrunnelse,
+                            "brukerIdent" to it.brukerId.verdi
+                         )
+                }.toList())
     }, null)
 
 //"Følgende ${exceptions.size} identifikatorer ble avvist ved bulk-kjøring av regler for $ansattId ${exceptions.map { it.brukerId to it.regel.kode }}")

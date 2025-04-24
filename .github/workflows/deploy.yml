@@ -36,7 +36,7 @@ jobs:
           cosign-release: v2.4.1
 
       - name: Verifiserer distroless base-image
-        run: cosign verify gcr.io/distroless/java21  --certificate-oidc-issuer https://accounts.google.com --certificate-identity keyless@distroless.iam.gserviceaccount.com
+        run: cosign verify gcr.io/distroless/java24  --certificate-oidc-issuer https://accounts.google.com --certificate-identity keyless@distroless.iam.gserviceaccount.com
 
       - name: Setter tag-navn
         run: echo "TAG=$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
@@ -86,5 +86,3 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: nais/deploy/actions/deploy@v2
-
-

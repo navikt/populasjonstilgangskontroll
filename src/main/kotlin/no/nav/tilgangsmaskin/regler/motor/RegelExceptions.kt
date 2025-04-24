@@ -19,7 +19,7 @@ class RegelException(val brukerId: BrukerId,
         type = TYPE_URI
         instance = URI.create("${ansattId.verdi}/${brukerId.verdi}")
         properties = mapOf(
-                "brukerIdent" to brukerId.verdi.mas,
+                "brukerIdent" to brukerId.verdi,
                 "navIdent" to ansattId.verdi,
                 "begrunnelse" to regel.begrunnelse,
                 "kanOverstyres" to regel.erOverstyrbar)

@@ -14,14 +14,14 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     private val log = getLogger(javaClass)
 
 
-    @ExceptionHandler(RuntimeException::class)
-    fun recoverableFeilet(e: RuntimeException) = if (e is RecoverableRestException) {
+    @ExceptionHandler(Exception::class)
+    fun recoverableFeilet(e: Exception) = if (e is RecoverableRestException) {
         e.body.apply {
-            log.warn("XXXXXX ${e.body}")
+            log.warn("YYYYY ${e.body}")
             setStatus(FORBIDDEN)
         }
     } else {
-        log.warn("Uventet feil", e)
+        log.warn("ZZZZZ Uventet feil", e)
         throw e
     }
 }

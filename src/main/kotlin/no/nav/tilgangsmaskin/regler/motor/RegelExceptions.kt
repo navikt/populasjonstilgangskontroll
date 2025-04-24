@@ -35,25 +35,22 @@ class RegelException(
 
 class BulkRegelException(private val ansattId: AnsattId, val exceptions: List<RegelException>) :
     ErrorResponseException(FORBIDDEN, forStatus(FORBIDDEN).apply {
-        //  title = "AVVIST_MANGLENDE_DATA"
-
+        title = exceptions.joinToString { it.regel.kode }
         type = TYPE_URI
         properties = mapOf(
                 "navIdent" to ansattId.verdi,
                 "avvisninger" to exceptions.size,
-                "begrunnelser" to exceptions.map { ::begrunnelser }.toList())
-    }, null) {
-    companion object {
-        private fun begrunnelser(e: RegelException) =
-            with(e) {
-                mapOf(
-                        "title" to regel.kode,
-                        "årsak" to regel.begrunnelse,
-                        "brukerIdent" to brukerId.verdi
-                     )
-            }
-    }
-}
+                "begrunnelser" to exceptions.map {
+                    { e: RegelException ->
+                        with(e) {
+                            mapOf(
+                                    "title" to regel.kode,
+                                    "årsak" to regel.begrunnelse,
+                                    "brukerIdent" to brukerId.verdi)
+                        }
+                    }
+                })
+    }, null)
 
 //"Følgende ${exceptions.size} identifikatorer ble avvist ved bulk-kjøring av regler for $ansattId ${exceptions.map { it.brukerId to it.regel.kode }}")
 

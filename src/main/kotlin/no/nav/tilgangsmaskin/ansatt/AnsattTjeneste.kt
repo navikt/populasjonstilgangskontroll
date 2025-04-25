@@ -28,10 +28,8 @@ class AnsattTjeneste(
             Ansatt(
                     AnsattIdentifikatorer(ansattId, ansatt.oid),
                     ansattBruker,
-                    ansatt.grupper + accessor.globaleGrupper().also {
-                        log.info("Ansatt $ansattId er medlem av følgende globale grupper $it", ansattId)
-                    }).also {
-                log.info("Ansatt $ansattId er medlem av følgende sammenslåtte grupper ${it.grupper}", ansattId)
+                    ansatt.grupper + accessor.globaleGrupper()).also {
+                log.trace("Ansatt {} er medlem av følgende grupper {}", it.grupper, ansattId)
             }
         }
 }

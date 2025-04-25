@@ -1,8 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import io.micrometer.core.annotation.Timed
-import no.nav.boot.conditionals.ConditionalOnDev
-import no.nav.boot.conditionals.ConditionalOnNotDev
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import org.springframework.stereotype.Service
@@ -11,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 @Timed
-//@ConditionalOnNotDev
 class NomTjeneste(private val adapter: NomJPAAdapter) : NomOperasjoner {
 
     override fun lagre(ansattData: NomAnsattData) = adapter.upsert(ansattData)
@@ -27,9 +24,9 @@ class NomTjeneste(private val adapter: NomJPAAdapter) : NomOperasjoner {
 /**
 @ConditionalOnDev
 class NomDevTjeneste(adapter: NomJPAAdapter) : NomTjeneste(adapter) {
-    override fun fnrForAnsatt(ansattId: AnsattId) = null
+override fun fnrForAnsatt(ansattId: AnsattId) = null
 }
-**/
+ **/
 
 interface NomOperasjoner {
 

@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import com.neovisionaries.i18n.CountryCode.SE
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
@@ -84,7 +83,7 @@ class BrukerMapperTest {
         }
     }
 
-    private fun geoUtland() = PdlGeografiskTilknytning(UTLAND, gtLand = GTLand(SE.alpha3))
+    private fun geoUtland() = PdlGeografiskTilknytning(UTLAND, gtLand = GTLand("SWE"))
     private fun geoKommune() = PdlGeografiskTilknytning(KOMMUNE, gtKommune = GTKommune("1234"))
 
 

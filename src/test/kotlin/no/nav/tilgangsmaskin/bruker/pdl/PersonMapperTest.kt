@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import com.neovisionaries.i18n.CountryCode.SE
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UdefinertTilknytning
@@ -56,7 +55,7 @@ class PersonMapperTest {
         assertThat(tilPerson(pdlRespons(geoBydel())).geoTilknytning).isInstanceOf(BydelTilknytning::class.java)
     }
 
-    private fun geoUtland() = PdlGeografiskTilknytning(UTLAND, gtLand = GTLand(SE.alpha3))
+    private fun geoUtland() = PdlGeografiskTilknytning(UTLAND, gtLand = GTLand("SWE"))
     private fun geoKommune() = PdlGeografiskTilknytning(KOMMUNE, gtKommune = GTKommune("1234"))
     private fun geoBydel() = PdlGeografiskTilknytning(BYDEL, gtBydel = GTBydel("123456"))
     private fun geoUdefinert() = PdlGeografiskTilknytning(UDEFINERT)

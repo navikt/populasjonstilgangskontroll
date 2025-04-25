@@ -83,7 +83,9 @@ internal class OverstyringTest {
     @Test
     @DisplayName("Test gyldig overstyring")
     fun testOverstyringGyldig() {
-        every { brukerTjeneste.nærmesteFamilie(vanligBruker.brukerId.verdi) } returns vanligBruker
+        every {
+            brukerTjeneste.nærmesteFamilie(vanligBruker.brukerId.verdi)
+        } returns vanligBruker
         overstyring.overstyr(
                 vanligAnsatt.ansattId, OverstyringData(
                 vanligBruker.brukerId,
@@ -100,7 +102,9 @@ internal class OverstyringTest {
     @Test
     @DisplayName("Test utgått overstyring")
     fun testOverstyringUtgått() {
-        every { brukerTjeneste.nærmesteFamilie(vanligBruker.brukerId.verdi) } returns vanligBruker
+        every {
+            brukerTjeneste.nærmesteFamilie(vanligBruker.brukerId.verdi)
+        } returns vanligBruker
         overstyring.overstyr(
                 vanligAnsatt.ansattId, OverstyringData(
                 vanligBruker.brukerId,
@@ -113,8 +117,9 @@ internal class OverstyringTest {
     @Test
     @DisplayName("Test overstyring, intet db innslag")
     fun testOverstyringUtenDBInnslag() {
-        every { brukerTjeneste.nærmesteFamilie(ukjentBostedBruker.brukerId.verdi) } returns ukjentBostedBruker
-        every { brukerTjeneste.utvidetFamilie(ukjentBostedBruker.brukerId.verdi) } returns ukjentBostedBruker
+        every {
+            brukerTjeneste.nærmesteFamilie(ukjentBostedBruker.brukerId.verdi)
+        } returns ukjentBostedBruker
         assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, ukjentBostedBruker.brukerId)).isFalse
     }
 

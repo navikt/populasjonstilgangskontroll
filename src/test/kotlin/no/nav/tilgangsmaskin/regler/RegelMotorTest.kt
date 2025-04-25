@@ -66,8 +66,7 @@ class RegelMotorTest {
         assertInstanceOf<FortroligRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(strengtFortroligAnsatt, fortroligBruker)
-                }.regel
-                                        )
+                }.regel)
     }
 
     @Test
@@ -76,8 +75,7 @@ class RegelMotorTest {
         assertInstanceOf<ForeldreOgBarnRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(egenAnsattMedFamilie, vanligBruker)
-                }.regel
-                                             )
+                }.regel)
     }
 
     @Test
@@ -86,8 +84,7 @@ class RegelMotorTest {
         assertInstanceOf<PartnerRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(egenAnsattMedPartner, vanligBruker)
-                }.regel
-                                      )
+                }.regel)
     }
 
     @Test
@@ -96,8 +93,7 @@ class RegelMotorTest {
         assertInstanceOf<EgneDataRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(egenAnsatt, ansattBruker)
-                }.regel
-                                       )
+                }.regel)
     }
 
     @Test
@@ -106,8 +102,7 @@ class RegelMotorTest {
         assertInstanceOf<FortroligRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(vanligAnsatt, fortroligBruker)
-                }.regel
-                                        )
+                }.regel)
     }
 
     @Test
@@ -124,8 +119,7 @@ class RegelMotorTest {
         assertInstanceOf<StrengtFortroligRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(fortroligAnsatt, strengtFortroligBruker)
-                }.regel
-                                               )
+                }.regel)
     }
 
     @Test
@@ -143,8 +137,7 @@ class RegelMotorTest {
         assertInstanceOf<StrengtFortroligRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(vanligAnsatt, strengtFortroligBruker)
-                }.regel
-                                               )
+                }.regel)
     }
 
     @Test
@@ -201,8 +194,7 @@ class RegelMotorTest {
         assertInstanceOf<SkjermingRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(fortroligAnsatt, ansattBruker)
-                }.regel
-                                        )
+                }.regel)
     }
 
     @Test
@@ -211,8 +203,7 @@ class RegelMotorTest {
         assertInstanceOf<SkjermingRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(strengtFortroligAnsatt, ansattBruker)
-                }.regel
-                                        )
+                }.regel)
     }
 
     @Test
@@ -221,8 +212,7 @@ class RegelMotorTest {
         assertInstanceOf<SkjermingRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(vanligAnsatt, ansattBruker)
-                }.regel
-                                        )
+                }.regel)
     }
 
     @Test
@@ -231,8 +221,7 @@ class RegelMotorTest {
         assertInstanceOf<StrengtFortroligRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(egenAnsatt, egenAnsattStrengtFortroligBruker)
-                }.regel
-                                               )
+                }.regel)
     }
 
     @Test
@@ -241,8 +230,7 @@ class RegelMotorTest {
         assertInstanceOf<FortroligRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(egenAnsatt, egenAnsattFortroligBruker)
-                }.regel
-                                        )
+                }.regel)
     }
 
     @Test
@@ -267,8 +255,7 @@ class RegelMotorTest {
         assertInstanceOf<StrengtFortroligRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(fortroligAnsatt, egenAnsattStrengtFortroligBruker)
-                }.regel
-                                               )
+                }.regel)
     }
 
     @Test
@@ -285,8 +272,7 @@ class RegelMotorTest {
         assertInstanceOf<UkjentBostedRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(vanligAnsatt, ukjentBostedBruker)
-                }.regel
-                                           )
+                }.regel)
     }
 
     @Test
@@ -303,8 +289,7 @@ class RegelMotorTest {
         assertInstanceOf<UtlandRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(vanligAnsatt, utlandBruker)
-                }.regel
-                                     )
+                }.regel)
     }
 
     @Test
@@ -329,7 +314,6 @@ class RegelMotorTest {
         assertInstanceOf<NorgeRegel>(
                 assertThrows<RegelException> {
                     regelMotor.kompletteRegler(enhetAnsatt, annenEnhetBruker)
-                }.regel
-                                    )
+                }.regel)
     }
 }

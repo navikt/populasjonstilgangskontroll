@@ -32,7 +32,7 @@ sealed class GeografiskTilknytning(val type: Type) {
     class UdefinertTilknytning : GeografiskTilknytning(UDEFINERT)
 
     companion object {
-        val udefinertGeoTilknytning = UdefinertTilknytning()
+        val udefinertTilknytning = UdefinertTilknytning()
         val utenlandskTilknytning = UtenlandskTilknytning()
     }
 }

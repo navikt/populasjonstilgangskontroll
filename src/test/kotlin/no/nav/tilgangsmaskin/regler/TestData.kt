@@ -4,6 +4,8 @@ import java.util.*
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.Ansatt.AnsattIdentifikatorer
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.Enhetsnummer
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
@@ -11,15 +13,12 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
-import no.nav.tilgangsmaskin.bruker.AktørId
-import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.bruker.*
 import no.nav.tilgangsmaskin.bruker.Bruker.BrukerIds
-import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.BARN
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.udefinertGeoTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.udefinertTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.utenlandskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
@@ -52,7 +51,7 @@ import no.nav.tilgangsmaskin.regler.grupper.udefinertGruppe
 
 object diverse {
     internal val aktørId = AktørId("1234567890123")
-    internal val enhet = no.nav.tilgangsmaskin.ansatt.Enhetsnummer("4242")
+    internal val enhet = Enhetsnummer("4242")
 }
 
 object brukerids {
@@ -71,36 +70,37 @@ object brukerids {
 }
 
 object brukere {
-    internal val strengtFortroligBruker =
-        Bruker(ids(strengtFortroligBrukerId), udefinertGeoTilknytning, setOf(STRENGT_FORTROLIG))
-    internal val strengtFortroligUtlandBruker =
-        Bruker(ids(strengtFortroligBrukerId), udefinertGeoTilknytning, setOf(STRENGT_FORTROLIG_UTLAND))
-    internal val fortroligBruker = Bruker(ids(fortroligBrukerId), udefinertGeoTilknytning, setOf(FORTROLIG))
-    internal val vanligBruker = Bruker(ids(vanligBrukerId), udefinertGeoTilknytning)
-    internal val vanligHistoriskBruker = Bruker(ids(historiskBrukerId), udefinertGeoTilknytning)
+    internal val strengtFortroligBruker = bruker(strengtFortroligBrukerId, STRENGT_FORTROLIG)
+    internal val strengtFortroligUtlandBruker = bruker(strengtFortroligBrukerId, STRENGT_FORTROLIG_UTLAND)
+    internal val fortroligBruker = bruker(fortroligBrukerId, FORTROLIG)
+    internal val vanligBruker = bruker(vanligBrukerId)
+    internal val vanligHistoriskBruker = Bruker(ids(historiskBrukerId), udefinertTilknytning)
     internal val vanligBrukerMedHistoriskIdent =
-        Bruker(BrukerIds(vanligBrukerId, aktørId, setOf(vanligHistoriskBruker.brukerId)), udefinertGeoTilknytning)
-    internal val annenAnsattBruker = Bruker(
-            ids(annenAnsattBrukerId),
-            udefinertGeoTilknytning,
-            setOf(SKJERMING),
-            Familie(barn = setOf(FamilieMedlem(vanligBrukerId, BARN))))
-    internal val annenAnsattBrukerMedPartner = Bruker(
-            ids(annenAnsattBrukerId),
-            udefinertGeoTilknytning,
-            setOf(SKJERMING),
-            Familie(partnere = setOf(FamilieMedlem(vanligBrukerId, PARTNER))))
-    internal val ansattBruker = Bruker(BrukerIds(ansattBrukerId, aktørId), udefinertGeoTilknytning, setOf(SKJERMING))
+        Bruker(ids(vanligBrukerId, setOf(vanligHistoriskBruker.brukerId)), udefinertTilknytning)
+    internal val annenAnsattBruker =
+        bruker(annenAnsattBrukerId, SKJERMING, familie = Familie(barn = setOf(FamilieMedlem(vanligBrukerId, BARN))))
+    internal val annenAnsattBrukerMedPartner =
+        bruker(
+                annenAnsattBrukerId,
+                SKJERMING,
+                familie = Familie(partnere = setOf(FamilieMedlem(vanligBrukerId, PARTNER))))
+    internal val ansattBruker = bruker(ansattBrukerId, SKJERMING)
     internal val egenAnsattStrengtFortroligBruker =
-        Bruker(ids(egenAnsattStrengtFortroligBrukerId), udefinertGeoTilknytning, setOf(STRENGT_FORTROLIG, SKJERMING))
-    internal val egenAnsattFortroligBruker =
-        Bruker(ids(egenAnsattFortroligBrukerId), udefinertGeoTilknytning, setOf(FORTROLIG, SKJERMING))
-    internal val ukjentBostedBruker = Bruker(ids(ukjentBostedBrukerId), UkjentBosted(), setOf(UKJENT_BOSTED))
-    internal val utlandBruker = Bruker(ids(utlandBrukerId), utenlandskTilknytning, setOf(UTENLANDSK))
-    internal val enhetBruker = Bruker(ids(enhetBrukerId), KommuneTilknytning(Kommune(enhet.verdi)))
-    internal val annenEnhetBruker = Bruker(ids(annenEnhetBrukerId), KommuneTilknytning(Kommune("4321")))
+        bruker(egenAnsattStrengtFortroligBrukerId, STRENGT_FORTROLIG, SKJERMING)
 
-    private fun ids(id: BrukerId) = BrukerIds(id, aktørId)
+    internal val egenAnsattFortroligBruker = bruker(egenAnsattFortroligBrukerId, FORTROLIG, SKJERMING)
+    internal val ukjentBostedBruker = bruker(ukjentBostedBrukerId, UKJENT_BOSTED, tilknytning = UkjentBosted())
+    internal val utlandBruker = bruker(utlandBrukerId, UTENLANDSK, tilknytning = utenlandskTilknytning)
+    internal val enhetBruker = bruker(enhetBrukerId, tilknytning = KommuneTilknytning(Kommune(enhet.verdi)))
+    internal val annenEnhetBruker = bruker(annenEnhetBrukerId, tilknytning = KommuneTilknytning(Kommune("4321")))
+
+    private fun bruker(id: BrukerId,
+                       vararg grupper: GlobalGruppe = emptyArray(),
+                       tilknytning: GeografiskTilknytning = udefinertTilknytning,
+                       familie: Familie = Familie.INGEN) =
+        Bruker(ids(id), tilknytning, grupper.toSet(), familie)
+
+    private fun ids(id: BrukerId, historiske: Set<BrukerId> = emptySet()) = BrukerIds(id, aktørId, historiske)
 }
 
 object grupper {

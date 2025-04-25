@@ -11,7 +11,7 @@ import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.TIDLIG
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Bydel
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.udefinertGeoTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.udefinertTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.utenlandskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
@@ -100,7 +100,7 @@ object PdlPersonMapper {
                 BydelTilknytning(Bydel(it.verdi))
             } ?: throw IllegalStateException("Bydelstilknytning uten bydelskode")
 
-            else -> udefinertGeoTilknytning
+            else -> udefinertTilknytning
         }
 
     private fun tilDødsdato(dødsfall: List<PdlDødsfall>) = dødsfall.maxByOrNull { it.doedsdato }?.doedsdato

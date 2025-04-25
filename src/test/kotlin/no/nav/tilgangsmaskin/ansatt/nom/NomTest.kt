@@ -18,7 +18,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.transaction.annotation.Transactional
@@ -31,7 +30,6 @@ import kotlin.test.Test
 @DataJpaTest
 @ContextConfiguration(classes = [NomJPAAdapter::class, OverstyringEntityListener::class, TestApp::class])
 @ExtendWith(MockKExtension::class)
-@EnableJpaAuditing
 @ActiveProfiles(TEST)
 @Transactional
 @Testcontainers
@@ -42,12 +40,12 @@ internal class NomTest {
     private val GYLDIG = NomAnsattData(vanligAnsatt.ansattId, vanligBruker.brukerId)
 
     @Autowired
-    lateinit var adapter: NomJPAAdapter
+    private lateinit var adapter: NomJPAAdapter
 
     @MockkBean
-    lateinit var accessor: TokenClaimsAccessor
+    private lateinit var accessor: TokenClaimsAccessor
 
-    lateinit var nom: NomTjeneste
+    private lateinit var nom: NomTjeneste
 
     @BeforeTest
     fun setup() {
@@ -80,6 +78,6 @@ internal class NomTest {
 
     companion object {
         @ServiceConnection
-        val postgres = PostgreSQLContainer("postgres:17")
+        private val postgres = PostgreSQLContainer("postgres:17")
     }
 }

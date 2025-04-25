@@ -16,7 +16,6 @@ class ExceptionHandler {
     @ExceptionHandler(RecoverableRestException::class)
     fun recoverableFeilet(e: RecoverableRestException) =
         e.body.apply {
-            log.warn("YYYYY ${e.body}")
             setStatus(FORBIDDEN)
         }
 }

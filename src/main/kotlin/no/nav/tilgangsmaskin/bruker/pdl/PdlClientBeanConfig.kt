@@ -54,7 +54,7 @@ class PdlClientBeanConfig {
 
     private class LoggingGraphQLInterceptor : SyncGraphQlClientInterceptor {
 
-        private val log = LoggerFactory.getLogger(LoggingGraphQLInterceptor::class.java)
+        private val log = LoggerFactory.getLogger(javaClass)
 
         override fun intercept(req: ClientGraphQlRequest, chain: SyncGraphQlClientInterceptor.Chain) =
             chain.next(req).also {

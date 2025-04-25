@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 @Timed
-class NomTjeneste(private val adapter: NomJPAAdapter) {
+class Nom(private val adapter: NomJPAAdapter) {
 
     fun lagre(ansattData: NomAnsattData) = adapter.upsert(ansattData)
 

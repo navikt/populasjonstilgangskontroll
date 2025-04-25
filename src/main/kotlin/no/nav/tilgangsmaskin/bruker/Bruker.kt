@@ -8,17 +8,17 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 
 data class Bruker(
-        val brukerIdentifikatorer: BrukerIds,
+        val brukerIds: BrukerIds,
         val geografiskTilknytning: GeografiskTilknytning,
         val gruppeKrav: Set<GlobalGruppe> = emptySet(),
         val familie: Familie = INGEN,
         val dødsdato: LocalDate? = null) {
 
     @JsonIgnore
-    val brukerId = brukerIdentifikatorer.brukerId
+    val brukerId = brukerIds.brukerId
 
     @JsonIgnore
-    val historiskeIds = brukerIdentifikatorer.historiskeIds
+    val historiskeIds = brukerIds.historiskeIds
 
     @JsonIgnore
     val foreldreOgBarn = familie.foreldre + familie.barn

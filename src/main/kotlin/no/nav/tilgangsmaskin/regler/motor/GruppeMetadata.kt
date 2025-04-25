@@ -4,7 +4,7 @@ const val INTRO1 = "Avvist grunnet manglende "
 private const val INTRO2 = "tilgang til "
 private const val INTRO3 = "$INTRO1$INTRO2"
 
-enum class GruppeMetadata(val kode: String, val avvisningÅrsak: String, val kortNavn: String) {
+enum class GruppeMetadata(val kode: String, val begrunnelse: String, val kortNavn: String) {
 
     STRENGT_FORTROLIG("AVVIST_STRENGT_FORTROLIG_ADRESSE", "${INTRO3}strengt fortrolig adresse", "Kode 6"),
     STRENGT_FORTROLIG_UTLAND("AVVIST_STRENGT_FORTROLIG_UTLAND", "${INTRO3}strengt fortrolig adresse utland", "Kode 17"),

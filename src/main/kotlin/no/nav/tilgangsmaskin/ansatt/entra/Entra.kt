@@ -7,7 +7,7 @@ import no.nav.tilgangsmaskin.felles.CacheableRetryingOnRecoverableService
 
 @CacheableRetryingOnRecoverableService(cacheNames = [GRAPH])
 @Timed
-class EntraTjeneste(private val adapter: EntraRestClientAdapter, private val resolver: EntraOidResolver) {
+class Entra(private val adapter: EntraRestClientAdapter, private val resolver: EntraOidResolver) {
 
     fun ansatt(ansattId: AnsattId) =
         resolver.oidForAnsatt(ansattId).let {

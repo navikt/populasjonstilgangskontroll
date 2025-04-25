@@ -12,13 +12,7 @@ class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
 
     private val log = getLogger(javaClass)
 
-    fun skjerming(brukerId: BrukerId) =
-        /* if (brukerId.verdi.startsWith("030165")) throw RecoverableRestException(
-                 HttpStatus.INTERNAL_SERVER_ERROR,
-                 URI.create("https://www.vg.no")).also {
-             log.warn("XXXXXX ${it.body}")
-         }
-         else */ adapter.skjerming(brukerId.verdi)
+    fun skjerming(brukerId: BrukerId) = adapter.skjerming(brukerId.verdi)
 
     fun skjerminger(brukerId: List<BrukerId>) = adapter.skjerminger(brukerId.map { it.verdi })
 

@@ -45,12 +45,12 @@ internal class NomTest {
     @MockkBean
     private lateinit var accessor: TokenClaimsAccessor
 
-    private lateinit var nom: NomTjeneste
+    private lateinit var nom: Nom
 
     @BeforeTest
     fun setup() {
         every { accessor.system } returns "test"
-        nom = NomTjeneste(adapter)
+        nom = Nom(adapter)
     }
 
     @Test

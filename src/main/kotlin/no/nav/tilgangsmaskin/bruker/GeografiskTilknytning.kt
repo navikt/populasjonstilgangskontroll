@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.UTLAND
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
 
 
-sealed class GeografiskTilknytning(val type: Type) {
+sealed class GeografiskTilknytning(type: Type) {
     enum class Type { BYDEL, KOMMUNE, UDEFINERT, UTLAND, UKJENT_BOSTED }
 
     @JvmInline

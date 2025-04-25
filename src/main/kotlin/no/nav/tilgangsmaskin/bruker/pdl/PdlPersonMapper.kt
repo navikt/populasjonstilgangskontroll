@@ -94,11 +94,11 @@ object PdlPersonMapper {
 
             KOMMUNE -> geo.gtKommune?.let {
                 KommuneTilknytning(Kommune(it.verdi))
-            } ?: throw IllegalStateException("Kommunal tilknytning uten kommunekode")
+            } ?: error("Kommunal tilknytning uten kommunekode")
 
             BYDEL -> geo.gtBydel?.let {
                 BydelTilknytning(Bydel(it.verdi))
-            } ?: throw IllegalStateException("Bydelstilknytning uten bydelskode")
+            } ?: error("Bydelstilknytning uten bydelskode")
 
             else -> udefinertTilknytning
         }
@@ -111,8 +111,7 @@ object PdlPersonMapper {
             .partition { it.first != BARN }
         return Familie(
                 foreldre.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet(),
-                barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet()
-                      )
+                barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet())
     }
 
     private fun tilHistoriskeBrukerIds(identer: PdlIdenter) = identer.identer
@@ -125,6 +124,6 @@ object PdlPersonMapper {
             MOR, MEDMOR -> FamilieRelasjon.MOR
             FAR, MEDFAR -> FamilieRelasjon.FAR
             BARN -> FamilieRelasjon.BARN
-            else -> throw IllegalArgumentException("Ukjent relasjon $relasjon")
+            else -> error("Ukjent relasjon $relasjon")
         }
 }

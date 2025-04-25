@@ -11,7 +11,7 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 
 @Component
-class NomHendelseKonsument(private val nom: NomTjeneste, private val handler: NomHendelseResultatLogger) {
+class NomHendelseKonsument(private val nom: Nom, private val handler: NomHendelseResultatLogger) {
 
     private val log = getLogger(javaClass)
 

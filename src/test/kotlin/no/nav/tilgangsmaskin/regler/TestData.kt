@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.regler
 
 import java.util.*
 import no.nav.tilgangsmaskin.ansatt.Ansatt
-import no.nav.tilgangsmaskin.ansatt.Ansatt.AnsattIdentifikatorer
+import no.nav.tilgangsmaskin.ansatt.Ansatt.AnsattIds
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.Enhetsnummer
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
@@ -122,7 +122,7 @@ object grupper {
 object ansatte {
     internal val oid = UUID.randomUUID()
     internal val ansattId = AnsattId("Z999999")
-    private val aids = AnsattIdentifikatorer(ansattId, oid)
+    private val aids = AnsattIds(ansattId, oid)
     internal val egenAnsattFortroligAnsatt = ansatt(grupper = setOf(fortroligGruppe, egenAnsattGruppe))
     internal val egenAnsattStrengtFortroligAnsatt = ansatt(grupper = setOf(strengtFortroligGruppe, egenAnsattGruppe))
     internal val strengtFortroligAnsatt = ansatt(gruppe = strengtFortroligGruppe)

@@ -21,8 +21,7 @@ class DefaultRestErrorHandler : ErrorHandler {
         if (res.statusCode.is4xxClientError) throw IrrecoverableRestException(
                 res.statusCode,
                 req.uri,
-                res.statusText
-                                                                             ).also {
+                res.statusText).also {
             log.warn("Irrecoverable exception etter ${res.statusCode.value()} fra ${req.uri}")
         }
         else throw RecoverableRestException(res.statusCode, req.uri, res.statusText).also {
@@ -32,9 +31,7 @@ class DefaultRestErrorHandler : ErrorHandler {
 }
 
 open class IrrecoverableRestException(
-        status: HttpStatusCode,
-        uri: URI,
-        msg: String = (status as HttpStatus).reasonPhrase,
+        status: HttpStatusCode, uri: URI, msg: String = (status as HttpStatus).reasonPhrase,
         cause: Throwable? = null) : ErrorResponseException(status, problemDetail(status, msg, uri), cause)
 
 open class RecoverableRestException(

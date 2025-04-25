@@ -4,15 +4,14 @@ import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import org.springframework.graphql.client.GraphQlClient
-import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 abstract class AbstractSyncGraphQLAdapter(
-        protected val graphQlClient: GraphQlClient,
-        client: RestClient,
-        cf: AbstractRestConfig,
-        errorHandler: RestClient.ResponseSpec.ErrorHandler,
-        protected val graphQlErrorHandler: GraphQLErrorHandler) : AbstractRestClientAdapter(client, cf, errorHandler) {
+        protected val graphQlClient: GraphQlClient, client: RestClient, cf: AbstractRestConfig,
+        errorHandler: ErrorHandler, protected val graphQlErrorHandler: GraphQLErrorHandler) :
+    AbstractRestClientAdapter(client, cf, errorHandler) {
 
     protected inline fun <reified T> query(query: Pair<String, String>, vars: Map<String, String>) =
         runCatching {
@@ -22,7 +21,7 @@ abstract class AbstractSyncGraphQLAdapter(
                 .executeSync()
                 .field(query.second)
                 .toEntity(T::class.java) ?: throw IrrecoverableRestException(
-                    HttpStatus.INTERNAL_SERVER_ERROR, cfg.baseUri, "Fant ikke feltet ${query.second} i responsen")
+                    INTERNAL_SERVER_ERROR, cfg.baseUri, "Fant ikke feltet ${query.second} i responsen")
         }.getOrElse {
             log.warn("Feil ved oppslag av {}", T::class.java.simpleName, it)
             graphQlErrorHandler.handle(cfg.baseUri, it)

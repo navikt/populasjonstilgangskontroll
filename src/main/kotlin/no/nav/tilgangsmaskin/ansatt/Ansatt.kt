@@ -10,13 +10,12 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 
 
-class Ansatt(identifikatorer: AnsattIdentifikatorer, val bruker: Bruker? = null, val grupper: Set<EntraGruppe>) {
+class Ansatt(ansattIds: AnsattIds, val bruker: Bruker? = null, val grupper: Set<EntraGruppe>) {
 
     private val brukerId = bruker?.brukerId
 
-
     @JsonIgnore
-    val ansattId = identifikatorer.ansattId
+    val ansattId = ansattIds.ansattId
 
     private val foreldreEllerBarn = bruker?.foreldreOgBarn ?: emptyList()
 
@@ -45,7 +44,7 @@ class Ansatt(identifikatorer: AnsattIdentifikatorer, val bruker: Bruker? = null,
 
     private infix fun Bruker.erEnAv(medlemmer: Collection<FamilieMedlem>) = medlemmer.any { it.brukerId == brukerId }
 
-    data class AnsattIdentifikatorer(val ansattId: AnsattId, val oid: UUID)
+    data class AnsattIds(val ansattId: AnsattId, val oid: UUID)
 
 }
 

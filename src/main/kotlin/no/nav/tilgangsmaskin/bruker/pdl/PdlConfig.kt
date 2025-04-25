@@ -10,17 +10,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 class PdlConfig(
         baseUri: URI,
         pingPath: String = DEFAULT_PING_PATH,
-        val personPath: String = DEFAULT_PERSON_PATH,
-        val personBolkPath: String = DEFAULT_PERSON__BOLK_PATH,
+        personPath: String = DEFAULT_PERSON_PATH,
+        personBolkPath: String = DEFAULT_PERSON__BOLK_PATH,
         enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, PDL, enabled) {
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     val personURI = uri(personPath)
     val personerURI = uri(personBolkPath)
-
-    private fun uri(path: String) = builder().path(path).build()
-
+    
     companion object {
         const val PDL = "pdl"
         private const val DEFAULT_PING_PATH = "/internal/health/liveness"

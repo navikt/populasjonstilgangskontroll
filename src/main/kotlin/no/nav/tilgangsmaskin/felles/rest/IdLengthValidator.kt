@@ -16,8 +16,7 @@ import kotlin.reflect.KClass
 annotation class ValidId(
         val message: String = "Ugyldig ID eller liste av IDs",
         val groups: Array<KClass<*>> = [],
-        val payload: Array<KClass<out Payload>> = []
-                        )
+        val payload: Array<KClass<out Payload>> = [])
 
 class IdValidator : ConstraintValidator<ValidId, Any> {
     override fun isValid(verdi: Any, context: ConstraintValidatorContext) =

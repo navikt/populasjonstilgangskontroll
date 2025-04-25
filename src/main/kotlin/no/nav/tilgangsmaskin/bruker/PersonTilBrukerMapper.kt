@@ -21,9 +21,7 @@ object PersonTilBrukerMapper {
                     BrukerIds(brukerId, aktørId, historiskeIds),
                     geoTilknytning,
                     tilGruppeKrav(geoTilknytning, graderinger, erSkjermet),
-                    familie,
-                    dødsdato
-                  )
+                    familie, dødsdato)
         }
 
     private fun tilGruppeKrav(gt: GeografiskTilknytning, graderinger: List<Gradering>, erSkjermet: Boolean) =

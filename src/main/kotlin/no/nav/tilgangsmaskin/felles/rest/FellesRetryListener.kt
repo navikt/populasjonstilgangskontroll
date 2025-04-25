@@ -11,13 +11,12 @@ class FellesRetryListener : RetryListener {
     private val log = LoggerFactory.getLogger(javaClass)
     override fun <T : Any, E : Throwable> onSuccess(context: RetryContext, callback: RetryCallback<T, E>, result: T) {
         if (context.retryCount > 0) {
-            log.info("Eksekvering av '${method(context)}' var vellykket på forsøk ${context.retryCount + 1}")
+            log.info("'${method(context)}' var vellykket på forsøk ${context.retryCount + 1}")
         }
     }
 
     override fun <T : Any, E : Throwable> onError(ctx: RetryContext, callback: RetryCallback<T, E>, e: Throwable) {
-        log.warn(
-                "Eksekvering av '${method(ctx)}' feilet på forsøk ${ctx.retryCount} ", ctx.lastThrowable)
+        log.warn("'${method(ctx)}' feilet på forsøk ${ctx.retryCount} ", ctx.lastThrowable)
     }
 
     companion object {

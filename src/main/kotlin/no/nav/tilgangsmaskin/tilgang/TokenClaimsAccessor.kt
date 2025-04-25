@@ -6,13 +6,10 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.getIDs
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.navnFor
 import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
 class TokenClaimsAccessor(private val contextHolder: TokenValidationContextHolder) {
-
-    private val log = getLogger(javaClass)
 
 
     fun globaleGrupper(): Set<EntraGruppe> {

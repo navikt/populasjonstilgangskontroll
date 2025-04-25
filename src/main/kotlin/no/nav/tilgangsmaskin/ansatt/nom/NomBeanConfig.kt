@@ -12,6 +12,8 @@ class NomBeanConfig {
     @Bean
     fun fnrFilterStrategy(): RecordFilterStrategy<String, NomHendelse> =
         RecordFilterStrategy {
-            runCatching { BrukerId(it.value().personident) }.isFailure
+            runCatching {
+                BrukerId(it.value().personident)
+            }.isFailure
         }
 }

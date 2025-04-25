@@ -11,7 +11,7 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 
 @Component
-class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler: NomEventResultHandler) {
+class NomHendelseKonsument(private val nom: NomTjeneste, private val handler: NomHendelseResultatLogger) {
 
     private val log = getLogger(javaClass)
 
@@ -27,8 +27,8 @@ class NomHendelseKonsument(private val nom: NomOperasjoner, private val handler:
                                     AnsattId(navident), BrukerId(personident),
                                     NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: FUTURE)))
                 }.fold(
-                        { handler.handleOK(navident, personident) },
-                        { handler.handleFailure(navident, personident, it) })
+                        { handler.ok(navident, personident) },
+                        { handler.feilet(navident, personident, it) })
             }
         }
         log.info("${hendelser.size} ${"hendelse".pluralize(hendelser)} ferdig behandlet")

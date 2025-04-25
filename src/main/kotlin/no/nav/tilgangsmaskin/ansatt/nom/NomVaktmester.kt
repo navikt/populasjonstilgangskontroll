@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
 @Component
-class NomVaktmester(private val nom: NomOperasjoner, private val utvelger: LederUtvelger, registry: MeterRegistry) {
+class NomVaktmester(private val nom: NomTjeneste, private val utvelger: LederUtvelger, registry: MeterRegistry) {
 
     private val log = getLogger(javaClass)
     private val counter = Counter.builder("vaktmester.rader.fjernet")

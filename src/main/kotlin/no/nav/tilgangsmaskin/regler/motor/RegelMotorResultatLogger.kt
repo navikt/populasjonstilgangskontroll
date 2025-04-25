@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component
 class RegelMotorResultatLogger {
     private val log = LoggerFactory.getLogger(javaClass)
     fun avvist(ix: String, ansattId: AnsattId, brukerId: BrukerId, regel: Regel) {
-        log.warn("[#$ix] Tilgang avvist av regel '${regel.kortNavn}' (${regel.begrunnelse}) for $ansattId og $brukerId")
+        log.warn("[#$ix] Tilgang til $brukerId avvist av regel '${regel.kortNavn}' (${regel.begrunnelse}) for $ansattId")
     }
 
     fun ok(type: RegelType, ansattId: AnsattId, brukerId: BrukerId) {
-        log.info("${type.beskrivelse.replaceFirstChar { it.uppercaseChar() }} ga tilgang OK for $ansattId og $brukerId")
+        log.info("${type.beskrivelse.replaceFirstChar { it.uppercaseChar() }} ga tilgang til $brukerId for $ansattId")
     }
 }

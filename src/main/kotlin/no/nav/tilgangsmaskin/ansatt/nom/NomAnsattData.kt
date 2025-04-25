@@ -6,9 +6,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode.Companion.ALWAYS
 import no.nav.tilgangsmaskin.bruker.BrukerId
 
-data class NomAnsattData(val ansattId: AnsattId,
-                         val brukerId: BrukerId,
-                         val gyldighet: NomAnsattPeriode = ALWAYS) {
+data class NomAnsattData(val ansattId: AnsattId, val brukerId: BrukerId, val gyldighet: NomAnsattPeriode = ALWAYS) {
 
     data class NomAnsattPeriode(override val start: LocalDate = EPOCH, override val endInclusive: LocalDate = FUTURE) :
         ClosedRange<LocalDate> {

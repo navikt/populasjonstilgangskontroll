@@ -10,8 +10,8 @@ import org.springframework.web.reactive.function.client.WebClient.Builder
 
 @Component
 class LederUtvelgerHandler(builder: Builder,
-                           @Value("\${elector.sse.url}") uri: URI, publisher: ApplicationEventPublisher
-                          ) {
+                           @Value("\${elector.sse.url}") uri: URI,
+                           publisher: ApplicationEventPublisher) {
     init {
         builder.build()
             .get()

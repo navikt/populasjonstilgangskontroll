@@ -57,7 +57,7 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:8.1")
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("org.hibernate.orm:hibernate-micrometer")
-    implementation("no.nav.boot:boot-conditionals:5.1.6")
+    implementation("no.nav.boot:boot-conditionals:5.1.7")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
     implementation("no.nav.security:token-client-spring:$tokenSupportVersion")

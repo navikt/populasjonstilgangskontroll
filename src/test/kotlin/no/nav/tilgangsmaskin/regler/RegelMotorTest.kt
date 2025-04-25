@@ -23,10 +23,10 @@ import no.nav.tilgangsmaskin.regler.brukere.egenAnsattFortroligBruker
 import no.nav.tilgangsmaskin.regler.brukere.egenAnsattStrengtFortroligBruker
 import no.nav.tilgangsmaskin.regler.brukere.enhetBruker
 import no.nav.tilgangsmaskin.regler.brukere.fortroligBruker
-import no.nav.tilgangsmaskin.regler.brukere.geoUtlandBruker
 import no.nav.tilgangsmaskin.regler.brukere.strengtFortroligBruker
 import no.nav.tilgangsmaskin.regler.brukere.strengtFortroligUtlandBruker
 import no.nav.tilgangsmaskin.regler.brukere.ukjentBostedBruker
+import no.nav.tilgangsmaskin.regler.brukere.utlandBruker
 import no.nav.tilgangsmaskin.regler.brukere.vanligBruker
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.tilgang.TokenClaimsAccessor
@@ -293,7 +293,7 @@ class RegelMotorTest {
     @DisplayName("Test at ansatt med tilgang utland kan behandle bruker med geografisk utland")
     fun geoUtlandGruppeOK() {
         assertThatCode {
-            regelMotor.kompletteRegler(geoUtlandAnsatt, geoUtlandBruker)
+            regelMotor.kompletteRegler(geoUtlandAnsatt, utlandBruker)
         }.doesNotThrowAnyException()
     }
 
@@ -302,7 +302,7 @@ class RegelMotorTest {
     fun geoUtlandGruppeUtenSammeRolle() {
         assertInstanceOf<UtlandRegel>(
                 assertThrows<RegelException> {
-                    regelMotor.kompletteRegler(vanligAnsatt, geoUtlandBruker)
+                    regelMotor.kompletteRegler(vanligAnsatt, utlandBruker)
                 }.regel
                                      )
     }

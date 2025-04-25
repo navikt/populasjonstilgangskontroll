@@ -34,10 +34,10 @@ import no.nav.tilgangsmaskin.regler.brukerids.egenAnsattFortroligBrukerId
 import no.nav.tilgangsmaskin.regler.brukerids.egenAnsattStrengtFortroligBrukerId
 import no.nav.tilgangsmaskin.regler.brukerids.enhetBrukerId
 import no.nav.tilgangsmaskin.regler.brukerids.fortroligBrukerId
-import no.nav.tilgangsmaskin.regler.brukerids.geoUtlandBrukerId
 import no.nav.tilgangsmaskin.regler.brukerids.historiskBrukerId
 import no.nav.tilgangsmaskin.regler.brukerids.strengtFortroligBrukerId
 import no.nav.tilgangsmaskin.regler.brukerids.ukjentBostedBrukerId
+import no.nav.tilgangsmaskin.regler.brukerids.utlandBrukerId
 import no.nav.tilgangsmaskin.regler.brukerids.vanligBrukerId
 import no.nav.tilgangsmaskin.regler.diverse.aktørId
 import no.nav.tilgangsmaskin.regler.diverse.enhet
@@ -64,7 +64,7 @@ object brukerids {
     internal val egenAnsattStrengtFortroligBrukerId = BrukerId("08526835674")
     internal val egenAnsattFortroligBrukerId = BrukerId("08526835675")
     internal val ukjentBostedBrukerId = BrukerId("08526835676")
-    internal val geoUtlandBrukerId = BrukerId("08526835677")
+    internal val utlandBrukerId = BrukerId("08526835677")
     internal val enhetBrukerId = BrukerId("08526835678")
     internal val annenEnhetBrukerId = BrukerId("08526835679")
     internal val historiskBrukerId = BrukerId("11111111111")
@@ -96,7 +96,7 @@ object brukere {
     internal val egenAnsattFortroligBruker =
         Bruker(ids(egenAnsattFortroligBrukerId), udefinertGeoTilknytning, setOf(FORTROLIG, SKJERMING))
     internal val ukjentBostedBruker = Bruker(ids(ukjentBostedBrukerId), UkjentBosted(), setOf(UKJENT_BOSTED))
-    internal val geoUtlandBruker = Bruker(ids(geoUtlandBrukerId), utenlandskTilknytning, setOf(UTENLANDSK))
+    internal val utlandBruker = Bruker(ids(utlandBrukerId), utenlandskTilknytning, setOf(UTENLANDSK))
     internal val enhetBruker = Bruker(ids(enhetBrukerId), KommuneTilknytning(Kommune(enhet.verdi)))
     internal val annenEnhetBruker = Bruker(ids(annenEnhetBrukerId), KommuneTilknytning(Kommune("4321")))
 

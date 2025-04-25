@@ -24,19 +24,18 @@ class RegelTjeneste(
         private val overstyring: OverstyringTjeneste) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    fun kompletteRegler(ansattId: AnsattId, brukerId: String) =
-        measureTime {
+    fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
+        val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
-            with(brukere.utvidetFamilie(brukerId)) {
-                runCatching {
-                    motor.kompletteRegler(ansatte.ansatt(ansattId), this)
-                }.getOrElse {
-                    overstyring.sjekk(ansattId, it)
-                }
+            val familie = brukere.nærmesteFamilie(brukerId)
+            runCatching {
+                motor.kompletteRegler(ansatte.ansatt(ansattId), familie)
+            }.getOrElse {
+                overstyring.sjekk(ansattId, it)
             }
-        }.also {
-            log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${it.inWholeMilliseconds}ms")
         }
+        log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
+    }
 
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
         motor.kjerneregler(ansatte.ansatt(ansattId), brukere.utvidetFamilie(brukerId))

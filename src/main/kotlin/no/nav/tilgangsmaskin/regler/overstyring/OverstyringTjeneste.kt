@@ -60,7 +60,7 @@ class OverstyringTjeneste(
     fun overstyr(ansattId: AnsattId, data: OverstyringData) =
         runCatching {
             log.info("Sjekker kjerneregler før eventuell overstyring for $ansattId og ${data.brukerId}")
-            motor.kjerneregler(ansatte.ansatt(ansattId), brukere.utvidetFamilie(data.brukerId.verdi))
+            motor.kjerneregler(ansatte.ansatt(ansattId), brukere.nærmesteFamilie(data.brukerId.verdi))
             adapter.overstyr(ansattId.verdi, data).also {
                 log.info("Overstyring er registrert for $ansattId og ${data.brukerId}")
                 refresh(ansattId, data)

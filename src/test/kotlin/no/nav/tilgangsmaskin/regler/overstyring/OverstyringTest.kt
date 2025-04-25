@@ -64,23 +64,19 @@ internal class OverstyringTest {
         every { ansattTjeneste.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
         overstyring = OverstyringTjeneste(
                 ansattTjeneste, brukerTjeneste, OverstyringJPAAdapter(repo), motor,
-                SimpleMeterRegistry(), accessor
-                                         )
+                SimpleMeterRegistry(), accessor)
     }
 
     @Test
     @DisplayName("Test gyldig overstyring via historisk ident")
     fun testOverstyringGyldigHistorisk() {
         every { brukerTjeneste.nærmesteFamilie(vanligBrukerMedHistoriskIdent.brukerId.verdi) } returns vanligBrukerMedHistoriskIdent
-        every { brukerTjeneste.utvidetFamilie(vanligBrukerMedHistoriskIdent.brukerId.verdi) } returns vanligBrukerMedHistoriskIdent
-        every { brukerTjeneste.utvidetFamilie(vanligHistoriskBruker.brukerId.verdi) } returns vanligHistoriskBruker
+        every { brukerTjeneste.nærmesteFamilie(vanligHistoriskBruker.brukerId.verdi) } returns vanligHistoriskBruker
         overstyring.overstyr(
                 vanligAnsatt.ansattId, OverstyringData(
                 vanligBrukerMedHistoriskIdent.historiskeIds.first(),
                 "test",
-                LocalDate.now().plusDays(1)
-                                                      )
-                            )
+                LocalDate.now().plusDays(1)))
         assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, vanligBrukerMedHistoriskIdent.brukerId)).isTrue
     }
 
@@ -88,36 +84,28 @@ internal class OverstyringTest {
     @DisplayName("Test gyldig overstyring")
     fun testOverstyringGyldig() {
         every { brukerTjeneste.nærmesteFamilie(vanligBruker.brukerId.verdi) } returns vanligBruker
-        every { brukerTjeneste.utvidetFamilie(vanligBruker.brukerId.verdi) } returns vanligBruker
         overstyring.overstyr(
                 vanligAnsatt.ansattId, OverstyringData(
                 vanligBruker.brukerId,
                 "gammel",
-                LocalDate.now().minusDays(1)
-                                                      )
-                            )
+                LocalDate.now().minusDays(1)))
         overstyring.overstyr(
                 vanligAnsatt.ansattId, OverstyringData(
                 vanligBruker.brukerId,
                 "ny",
-                LocalDate.now().plusDays(1),
-                                                      )
-                            )
+                LocalDate.now().plusDays(1)))
         assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, vanligBruker.brukerId)).isTrue
     }
 
     @Test
     @DisplayName("Test utgått overstyring")
     fun testOverstyringUtgått() {
-        every { brukerTjeneste.utvidetFamilie(vanligBruker.brukerId.verdi) } returns vanligBruker
         every { brukerTjeneste.nærmesteFamilie(vanligBruker.brukerId.verdi) } returns vanligBruker
         overstyring.overstyr(
                 vanligAnsatt.ansattId, OverstyringData(
                 vanligBruker.brukerId,
                 "ny",
-                LocalDate.now().minusDays(1)
-                                                      )
-                            )
+                LocalDate.now().minusDays(1)))
         assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, vanligBruker.brukerId)).isFalse
 
     }
@@ -132,6 +120,6 @@ internal class OverstyringTest {
 
     companion object {
         @ServiceConnection
-        val postgres = PostgreSQLContainer("postgres:17")
+        private val postgres = PostgreSQLContainer("postgres:17")
     }
 }

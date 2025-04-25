@@ -2,7 +2,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 val javaVersion = JavaLanguageVersion.of(21)
 val springdocVersion = "2.8.6"
-val tokenSupportVersion = "5.0.24"
+val tokenSupportVersion = "5.0.25"
 val mockkVersion = "1.14.0"
 val mockOAuth2ServerVersion = "2.1.10"
 

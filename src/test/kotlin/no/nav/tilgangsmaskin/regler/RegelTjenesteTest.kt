@@ -104,7 +104,6 @@ class RegelTjenesteTest {
     @Test
     @DisplayName("Verifiser at sjekk om overstyring gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang gis om overstyring er gjort")
     fun overstyringOK() {
-        // every { bruker.utvidetFamilie(utlandBruker.brukerId.verdi) } returns utlandBruker
         every { bruker.nærmesteFamilie(utlandBruker.brukerId.verdi) } returns utlandBruker
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
         overstyring.overstyr(
@@ -134,15 +133,12 @@ class RegelTjenesteTest {
         every { bruker.utvidetFamilie(fortroligBruker.brukerId.verdi) } returns fortroligBruker
         every { bruker.utvidetFamilie(vanligBruker.brukerId.verdi) } returns vanligBruker
         every {
-            bruker.brukere(
-                    setOf(
-                            strengtFortroligBruker.brukerId.verdi,
-                            fortroligBruker.brukerId.verdi))
+            bruker.brukere(setOf(strengtFortroligBruker.brukerId.verdi, fortroligBruker.brukerId.verdi))
         } returns listOf(strengtFortroligBruker, fortroligBruker)
         assertEquals(assertThrows<BulkRegelException> {
             regel.bulkRegler(
                     vanligAnsatt.ansattId,
-                    listOf(
+                    setOf(
                             IdOgType(strengtFortroligBruker.brukerId.verdi, KJERNE_REGELTYPE),
                             IdOgType(fortroligBruker.brukerId.verdi, KJERNE_REGELTYPE)))
         }.exceptions.size, 2)
@@ -162,7 +158,7 @@ class RegelTjenesteTest {
         assertThatCode {
             regel.bulkRegler(
                     vanligAnsatt.ansattId,
-                    listOf(IdOgType(utlandBruker.brukerId.verdi, KOMPLETT_REGELTYPE)))
+                    setOf(IdOgType(utlandBruker.brukerId.verdi, KOMPLETT_REGELTYPE)))
         }.doesNotThrowAnyException()
     }
 

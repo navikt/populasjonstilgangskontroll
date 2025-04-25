@@ -43,7 +43,7 @@ class TilgangController(
 
     @PostMapping("bulk")
     @ResponseStatus(NO_CONTENT)
-    fun bulk(@RequestBody @Valid @ValidId specs: List<IdOgType>) = regler.bulkRegler(token.ansattId!!, specs)
+    fun bulk(@RequestBody @Valid @ValidId specs: Set<IdOgType>) = regler.bulkRegler(token.ansattId!!, specs)
 
 }
 

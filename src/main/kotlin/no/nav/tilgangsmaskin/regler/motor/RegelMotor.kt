@@ -44,7 +44,7 @@ class RegelMotor(
     }
 
 
-    fun bulkRegler(ansatt: Ansatt, brukere: List<Pair<Bruker, RegelType>>) {
+    fun bulkRegler(ansatt: Ansatt, brukere: Set<Pair<Bruker, RegelType>>) {
         val avvisninger = brukere.mapNotNull { (bruker, type) ->
             runCatching { sjekkRegler(ansatt, bruker, type) }
                 .exceptionOrNull()

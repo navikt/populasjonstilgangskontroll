@@ -7,14 +7,15 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import java.time.LocalDate
 import no.nav.tilgangsmaskin.TestApp
+import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.regler.ansatte.vanligAnsatt
 import no.nav.tilgangsmaskin.regler.brukere.fortroligBruker
 import no.nav.tilgangsmaskin.regler.brukere.strengtFortroligBruker
 import no.nav.tilgangsmaskin.regler.brukere.utlandBruker
-import no.nav.tilgangsmaskin.regler.brukere.vanligBruker
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
@@ -104,8 +105,8 @@ class RegelTjenesteTest {
     @Test
     @DisplayName("Verifiser at sjekk om overstyring gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang gis om overstyring er gjort")
     fun overstyringOK() {
-        every { bruker.nærmesteFamilie(utlandBruker.brukerId.verdi) } returns utlandBruker
-        every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
+        expect(utlandBruker)
+        expect(vanligAnsatt)
         overstyring.overstyr(
                 vanligAnsatt.ansattId, OverstyringData(
                 utlandBruker.brukerId,
@@ -121,17 +122,15 @@ class RegelTjenesteTest {
     @Test
     @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang,og at tilgang ikke gis om overstyring ikke er gjort")
     fun ikkeOverstyrt() {
-        every { bruker.nærmesteFamilie(utlandBruker.brukerId.verdi) } returns utlandBruker
-        every { bruker.utvidetFamilie(utlandBruker.brukerId.verdi) } returns utlandBruker
-        assertThrows<RegelException> { regel.kompletteRegler(vanligAnsatt.ansattId, utlandBruker.brukerId.verdi) }
+        expect(utlandBruker)
+        assertThrows<RegelException> {
+            regel.kompletteRegler(vanligAnsatt.ansattId, utlandBruker.brukerId.verdi)
+        }
     }
 
     @Test
     fun bulkAvvisninger() {
-        every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
-        every { bruker.utvidetFamilie(strengtFortroligBruker.brukerId.verdi) } returns strengtFortroligBruker
-        every { bruker.utvidetFamilie(fortroligBruker.brukerId.verdi) } returns fortroligBruker
-        every { bruker.utvidetFamilie(vanligBruker.brukerId.verdi) } returns vanligBruker
+        expect(vanligAnsatt)
         every {
             bruker.brukere(setOf(strengtFortroligBruker.brukerId.verdi, fortroligBruker.brukerId.verdi))
         } returns listOf(strengtFortroligBruker, fortroligBruker)
@@ -147,8 +146,7 @@ class RegelTjenesteTest {
     @Test
     fun bulkAvvisningerOverstyrt() {
         every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
-        every { bruker.nærmesteFamilie(utlandBruker.brukerId.verdi) } returns utlandBruker
-        every { bruker.utvidetFamilie(utlandBruker.brukerId.verdi) } returns utlandBruker
+        expect(utlandBruker)
         every { bruker.brukere(setOf(utlandBruker.brukerId.verdi)) } returns listOf(utlandBruker)
         overstyring.overstyr(
                 vanligAnsatt.ansattId, OverstyringData(
@@ -160,6 +158,18 @@ class RegelTjenesteTest {
                     vanligAnsatt.ansattId,
                     setOf(IdOgType(utlandBruker.brukerId.verdi, KOMPLETT_REGELTYPE)))
         }.doesNotThrowAnyException()
+    }
+
+    private fun expect(b: Bruker) {
+        every {
+            bruker.nærmesteFamilie(b.brukerId.verdi)
+        } returns b
+    }
+
+    private fun expect(a: Ansatt) {
+        every {
+            ansatt.ansatt(a.ansattId)
+        } returns a
     }
 
     companion object {

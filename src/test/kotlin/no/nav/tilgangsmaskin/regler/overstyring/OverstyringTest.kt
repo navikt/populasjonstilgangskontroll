@@ -8,6 +8,7 @@ import io.mockk.junit5.MockKExtension
 import java.time.LocalDate
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.regler.ansatte.vanligAnsatt
@@ -70,8 +71,8 @@ internal class OverstyringTest {
     @Test
     @DisplayName("Test gyldig overstyring via historisk ident")
     fun testOverstyringGyldigHistorisk() {
-        every { brukerTjeneste.nærmesteFamilie(vanligBrukerMedHistoriskIdent.brukerId.verdi) } returns vanligBrukerMedHistoriskIdent
-        every { brukerTjeneste.nærmesteFamilie(vanligHistoriskBruker.brukerId.verdi) } returns vanligHistoriskBruker
+        expect(vanligBrukerMedHistoriskIdent)
+        expect(vanligHistoriskBruker)
         overstyring.overstyr(
                 vanligAnsatt.ansattId, OverstyringData(
                 vanligBrukerMedHistoriskIdent.historiskeIds.first(),
@@ -83,9 +84,7 @@ internal class OverstyringTest {
     @Test
     @DisplayName("Test gyldig overstyring")
     fun testOverstyringGyldig() {
-        every {
-            brukerTjeneste.nærmesteFamilie(vanligBruker.brukerId.verdi)
-        } returns vanligBruker
+        expect(vanligBruker)
         overstyring.overstyr(
                 vanligAnsatt.ansattId, OverstyringData(
                 vanligBruker.brukerId,
@@ -102,9 +101,7 @@ internal class OverstyringTest {
     @Test
     @DisplayName("Test utgått overstyring")
     fun testOverstyringUtgått() {
-        every {
-            brukerTjeneste.nærmesteFamilie(vanligBruker.brukerId.verdi)
-        } returns vanligBruker
+        expect(vanligBruker)
         overstyring.overstyr(
                 vanligAnsatt.ansattId, OverstyringData(
                 vanligBruker.brukerId,
@@ -117,10 +114,14 @@ internal class OverstyringTest {
     @Test
     @DisplayName("Test overstyring, intet db innslag")
     fun testOverstyringUtenDBInnslag() {
-        every {
-            brukerTjeneste.nærmesteFamilie(ukjentBostedBruker.brukerId.verdi)
-        } returns ukjentBostedBruker
+        expect(ukjentBostedBruker)
         assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, ukjentBostedBruker.brukerId)).isFalse
+    }
+
+    private fun expect(bruker: Bruker) {
+        every {
+            brukerTjeneste.nærmesteFamilie(bruker.brukerId.verdi)
+        } returns bruker
     }
 
     companion object {

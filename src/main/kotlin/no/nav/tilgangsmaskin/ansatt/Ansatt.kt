@@ -22,7 +22,7 @@ class Ansatt(identifikatorer: AnsattIdentifikatorer, val bruker: Bruker? = null,
 
     private val søsken = bruker?.søsken ?: emptyList()
 
-    private val parnere = bruker?.partnere ?: emptyList()
+    private val partnere = bruker?.partnere ?: emptyList()
 
     infix fun kanBehandle(gt: GeografiskTilknytning): Boolean {
         val kode = when (gt) {
@@ -35,7 +35,7 @@ class Ansatt(identifikatorer: AnsattIdentifikatorer, val bruker: Bruker? = null,
 
     infix fun erMedlemAv(gruppe: GlobalGruppe) = grupper.any { it.id == gruppe.id }
 
-    infix fun erNåværendeEllerTidligerePartnerMed(bruker: Bruker) = bruker erEnAv parnere
+    infix fun erNåværendeEllerTidligerePartnerMed(bruker: Bruker) = bruker erEnAv partnere
 
     infix fun erDenSammeSom(bruker: Bruker) = brukerId == bruker.brukerId
 

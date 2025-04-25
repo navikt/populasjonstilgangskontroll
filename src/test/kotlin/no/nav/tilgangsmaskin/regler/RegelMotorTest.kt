@@ -55,10 +55,10 @@ import org.springframework.test.context.TestPropertySource
 class RegelMotorTest {
 
     @MockkBean
-    lateinit var holder: TokenValidationContextHolder
+    private lateinit var holder: TokenValidationContextHolder
 
     @Autowired
-    lateinit var regelMotor: RegelMotor
+    private lateinit var regelMotor: RegelMotor
 
     @Test
     @DisplayName("Test at fortrolig bruker *ikke* kan behandles av ansatt med medlemsskap i strengt fortrolig gruppe")

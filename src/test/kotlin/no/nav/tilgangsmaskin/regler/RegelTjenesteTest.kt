@@ -57,13 +57,13 @@ import kotlin.test.assertEquals
 class RegelTjenesteTest {
 
     @Autowired
-    lateinit var repo: OverstyringRepository
+    private lateinit var repo: OverstyringRepository
 
     @MockkBean
-    lateinit var accessor: TokenClaimsAccessor
+    private lateinit var accessor: TokenClaimsAccessor
 
     @Autowired
-    lateinit var motor: RegelMotor
+    private lateinit var motor: RegelMotor
 
     @MockK
     private lateinit var bruker: BrukerTjeneste
@@ -71,16 +71,16 @@ class RegelTjenesteTest {
     @MockK
     private lateinit var ansatt: AnsattTjeneste
 
-    lateinit var overstyring: OverstyringTjeneste
+    private lateinit var overstyring: OverstyringTjeneste
 
     private lateinit var regel: RegelTjeneste
 
 
-    lateinit var avdød: AvdødTeller
-    lateinit var egne: EgneDataOppslagTeller
-    lateinit var partner: PartnerOppslagTeller
-    lateinit var søsken: SøskenOppslagTeller
-    lateinit var foreldrebarn: ForeldreBarnOppslagTeller
+    private lateinit var avdød: AvdødTeller
+    private lateinit var egne: EgneDataOppslagTeller
+    private lateinit var partner: PartnerOppslagTeller
+    private lateinit var søsken: SøskenOppslagTeller
+    private lateinit var foreldrebarn: ForeldreBarnOppslagTeller
 
 
     @BeforeTest

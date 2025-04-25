@@ -41,21 +41,21 @@ import kotlin.test.Test
 internal class OverstyringTest {
 
     @Autowired
-    lateinit var motor: RegelMotor
+    private lateinit var motor: RegelMotor
 
     @MockkBean
-    lateinit var accessor: TokenClaimsAccessor
+    private lateinit var accessor: TokenClaimsAccessor
 
     @MockK
-    lateinit var ansattTjeneste: AnsattTjeneste
+    private lateinit var ansattTjeneste: AnsattTjeneste
 
     @MockK
-    lateinit var brukerTjeneste: BrukerTjeneste
+    private lateinit var brukerTjeneste: BrukerTjeneste
 
     @Autowired
-    lateinit var repo: OverstyringRepository
+    private lateinit var repo: OverstyringRepository
 
-    lateinit var overstyring: OverstyringTjeneste
+    private lateinit var overstyring: OverstyringTjeneste
 
     @BeforeTest
     fun setup() {

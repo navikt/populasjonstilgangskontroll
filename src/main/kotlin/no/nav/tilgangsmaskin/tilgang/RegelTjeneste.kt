@@ -35,7 +35,7 @@ class RegelTjeneste(
                 }
             }
         }.also {
-            log.info("Tid brukt på komplett regelsett for ansatt $ansattId og ${brukerId.maskFnr()}: ${it.inWholeMilliseconds}ms")
+            log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${it.inWholeMilliseconds}ms")
         }
 
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =

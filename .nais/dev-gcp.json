@@ -27,6 +27,16 @@
   },
   "inbound": [
     {
+      "name": "notat-administrasjon-q2",
+      "namespace": "isa",
+      "cluster": "dev-gcp"
+    },
+    {
+      "name": "brev-administrasjon-q2",
+      "namespace": "isa",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "gosys-q1",
       "namespace": "isa",
       "cluster": "dev-fss"

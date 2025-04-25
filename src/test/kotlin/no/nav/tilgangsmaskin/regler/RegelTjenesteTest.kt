@@ -33,11 +33,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
+import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.junit.jupiter.Testcontainers
 import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
 
@@ -50,6 +53,7 @@ import kotlin.test.assertEquals
 @ContextConfiguration(classes = [TestApp::class])
 @ExtendWith(MockKExtension::class)
 @AutoConfigureObservability
+@Testcontainers
 class RegelTjenesteTest {
 
     @Autowired
@@ -173,5 +177,10 @@ class RegelTjenesteTest {
                     listOf(IdOgType(geoUtlandBruker.brukerId.verdi, KOMPLETT_REGELTYPE))
                             )
         }.doesNotThrowAnyException()
+    }
+
+    companion object {
+        @ServiceConnection
+        val postgres = PostgreSQLContainer("postgres:17")
     }
 }

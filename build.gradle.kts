@@ -85,10 +85,6 @@ tasks.withType<BootJar> {
     archiveFileName = "app.jar"
 }
 
-if (project.hasProperty("skipLint")) {
-    gradle.startParameter.excludedTaskNames += "spotlessKotlinCheck"
-}
-
 tasks.test {
     jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
     useJUnitPlatform()

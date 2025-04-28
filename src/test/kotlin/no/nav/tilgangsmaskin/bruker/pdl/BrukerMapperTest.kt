@@ -48,7 +48,7 @@ class BrukerMapperTest {
     @DisplayName("Test at behandling av brukere med STRENGT_FORTROLIG_UTLAND  krever medlemsskap i STRENGT_FORTROLIG_GRUPPE fra ansatt og at geotilknytning er UtenlandskTilknytning")
     fun strengtFortroligUtland() {
         with(tilBruker(person(pipRespons(STRENGT_FORTROLIG_UTLAND)), false)) {
-            assertThat(gruppeKrav).containsExactly(GlobalGruppe.STRENGT_FORTROLIG_UTLAND)
+            assertThat(påkrevdeGrupper).containsExactly(GlobalGruppe.STRENGT_FORTROLIG_UTLAND)
             assertThat(geografiskTilknytning).isInstanceOf(GeografiskTilknytning.utenlandskTilknytning::class.java)
         }
     }
@@ -57,7 +57,7 @@ class BrukerMapperTest {
     @DisplayName("Test at behandling av brukere med STRENGT_FORTROLIG vil kreve medlemsskap i STRENGT_FORTROLIG_GRUPPE for ansatt og at geotilknytning er KommuneTilknytning")
     fun strengtFortroligKommune() {
         with(tilBruker(person(pipRespons(STRENGT_FORTROLIG, geoKommune())), false)) {
-            assertThat(gruppeKrav).containsExactly(GlobalGruppe.STRENGT_FORTROLIG)
+            assertThat(påkrevdeGrupper).containsExactly(GlobalGruppe.STRENGT_FORTROLIG)
             assertThat(geografiskTilknytning).isInstanceOf(KommuneTilknytning::class.java)
         }
     }
@@ -66,7 +66,7 @@ class BrukerMapperTest {
     @DisplayName("Test at behandling av brukere med EGEN_ANSATT vil kreve medlemsskap i EGEN_ANSATT_GRUPPE for ansatt")
     fun egenAnsatt() {
         with(tilBruker(person(pipRespons()), true)) {
-            assertThat(gruppeKrav).containsExactly(SKJERMING)
+            assertThat(påkrevdeGrupper).containsExactly(SKJERMING)
         }
     }
 
@@ -74,7 +74,7 @@ class BrukerMapperTest {
     @DisplayName("Test at behandling av brukere med EGEN_ANSATT og STRENGT_FORTROLIG vil kreve medlemsskap i EGEN_ANSATT_GRUPPE og STRENGT_FORTROLIG_GRUPPE for ansatt")
     fun egenAnsattKode6() {
         with(tilBruker(person(pipRespons(STRENGT_FORTROLIG)), true)) {
-            assertThat(gruppeKrav).containsExactlyInAnyOrder(
+            assertThat(påkrevdeGrupper).containsExactlyInAnyOrder(
                     SKJERMING,
                     GlobalGruppe.STRENGT_FORTROLIG)
         }
@@ -84,7 +84,7 @@ class BrukerMapperTest {
     @DisplayName("Test at behandling av brukere med EGEN_ANSATT og FORTROLIG vil kreve medlemsskap i EGEN_ANSATT_GRUPPE og FORTROLIG_GRUPPE for ansatt")
     fun egenAnsattKode7() {
         with(tilBruker(person(pipRespons(FORTROLIG)), true)) {
-            assertThat(gruppeKrav).containsExactlyInAnyOrder(SKJERMING, GlobalGruppe.FORTROLIG)
+            assertThat(påkrevdeGrupper).containsExactlyInAnyOrder(SKJERMING, GlobalGruppe.FORTROLIG)
         }
     }
 

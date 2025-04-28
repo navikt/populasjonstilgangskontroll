@@ -10,7 +10,7 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 data class Bruker(
         val brukerIds: BrukerIds,
         val geografiskTilknytning: GeografiskTilknytning,
-        val gruppeKrav: Set<GlobalGruppe> = emptySet(),
+        val påkrevdeGrupper: Set<GlobalGruppe> = emptySet(),
         val familie: Familie = INGEN,
         val dødsdato: LocalDate? = null) {
 
@@ -31,7 +31,7 @@ data class Bruker(
 
     val harUkjentBosted = geografiskTilknytning is UkjentBosted
     val harUtenlandskBosted = geografiskTilknytning is UtenlandskTilknytning
-    infix fun krever(gruppe: GlobalGruppe) = gruppe in gruppeKrav
+    infix fun krever(gruppe: GlobalGruppe) = gruppe in påkrevdeGrupper
 
     data class BrukerIds(val brukerId: BrukerId,
                          val historiskeIds: Set<BrukerId> = emptySet(),

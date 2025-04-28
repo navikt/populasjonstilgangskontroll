@@ -76,14 +76,13 @@ internal class OverstyringTest {
     @Test
     @DisplayName("Test gyldig overstyring via historisk ident")
     fun testOverstyringGyldigHistorisk() {
+
         every { brukere.nærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).historiske(
-                setOf(
-                        historiskBrukerId)).build()
+                setOf(historiskBrukerId)).build()
+
         every { brukere.nærmesteFamilie(historiskBrukerId.verdi) } returns BrukerBuilder(historiskBrukerId).build()
-        overstyring.overstyr(
-                ansattId, OverstyringData(
-                BrukerBuilder(vanligBrukerId).historiske(setOf(historiskBrukerId))
-                    .build().historiskeIds.first(), "test", TOMORROW))
+
+        overstyring.overstyr(ansattId, OverstyringData(historiskBrukerId, "test", TOMORROW))
         assertThat(
                 overstyring.erOverstyrt(
                         ansattId, BrukerBuilder(vanligBrukerId).historiske(setOf(historiskBrukerId))

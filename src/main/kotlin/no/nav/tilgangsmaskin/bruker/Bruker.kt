@@ -33,5 +33,8 @@ data class Bruker(
     val harUtenlandskBosted = geografiskTilknytning is UtenlandskTilknytning
     infix fun krever(gruppe: GlobalGruppe) = gruppe in gruppeKrav
 
-    data class BrukerIds(val brukerId: BrukerId, val aktørId: AktørId, val historiskeIds: Set<BrukerId> = emptySet())
+    data class BrukerIds(val brukerId: BrukerId,
+                         val historiskeIds: Set<BrukerId> = emptySet(),
+                         val aktørId: AktørId? = null)
+
 }

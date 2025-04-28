@@ -8,14 +8,17 @@ import io.mockk.junit5.MockKExtension
 import java.time.LocalDate
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
-import no.nav.tilgangsmaskin.regler.ansatte.vanligAnsatt
-import no.nav.tilgangsmaskin.regler.brukere.ukjentBostedBruker
-import no.nav.tilgangsmaskin.regler.brukere.vanligBruker
+import no.nav.tilgangsmaskin.regler.AnsattBuilder
+import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.brukere.vanligBrukerMedHistoriskIdent
 import no.nav.tilgangsmaskin.regler.brukere.vanligHistoriskBruker
+import no.nav.tilgangsmaskin.regler.brukerids
+import no.nav.tilgangsmaskin.regler.grupper
 import no.nav.tilgangsmaskin.regler.motor.RegelBeanConfig
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.tilgang.TokenClaimsAccessor
@@ -62,7 +65,12 @@ internal class OverstyringTest {
     fun setup() {
         every { accessor.system } returns "test"
         every { accessor.systemNavn } returns "test"
-        every { ansattTjeneste.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
+        every {
+            ansattTjeneste.ansatt(
+                    AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId)
+        } returns AnsattBuilder().grupper(
+                grupper.annenGruppe)
+            .build()
         overstyring = OverstyringTjeneste(
                 ansattTjeneste, brukerTjeneste, OverstyringJPAAdapter(repo), motor,
                 SimpleMeterRegistry(), accessor)
@@ -74,48 +82,65 @@ internal class OverstyringTest {
         expect(vanligBrukerMedHistoriskIdent)
         expect(vanligHistoriskBruker)
         overstyring.overstyr(
-                vanligAnsatt.ansattId, OverstyringData(
+                AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId, OverstyringData(
                 vanligBrukerMedHistoriskIdent.historiskeIds.first(),
                 "test",
                 LocalDate.now().plusDays(1)))
-        assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, vanligBrukerMedHistoriskIdent.brukerId)).isTrue
+        assertThat(
+                overstyring.erOverstyrt(
+                        AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
+                        vanligBrukerMedHistoriskIdent.brukerId)).isTrue
     }
 
     @Test
     @DisplayName("Test gyldig overstyring")
     fun testOverstyringGyldig() {
-        expect(vanligBruker)
+        expect(BrukerBuilder(brukerids.vanligBrukerId).build())
         overstyring.overstyr(
-                vanligAnsatt.ansattId, OverstyringData(
-                vanligBruker.brukerId,
+                AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId, OverstyringData(
+                BrukerBuilder(brukerids.vanligBrukerId).build().brukerId,
                 "gammel",
                 LocalDate.now().minusDays(1)))
         overstyring.overstyr(
-                vanligAnsatt.ansattId, OverstyringData(
-                vanligBruker.brukerId,
+                AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId, OverstyringData(
+                BrukerBuilder(brukerids.vanligBrukerId).build().brukerId,
                 "ny",
                 LocalDate.now().plusDays(1)))
-        assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, vanligBruker.brukerId)).isTrue
+        assertThat(
+                overstyring.erOverstyrt(
+                        AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
+                        BrukerBuilder(brukerids.vanligBrukerId).build().brukerId)).isTrue
     }
 
     @Test
     @DisplayName("Test utgått overstyring")
     fun testOverstyringUtgått() {
-        expect(vanligBruker)
+        expect(BrukerBuilder(brukerids.vanligBrukerId).build())
         overstyring.overstyr(
-                vanligAnsatt.ansattId, OverstyringData(
-                vanligBruker.brukerId,
+                AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId, OverstyringData(
+                BrukerBuilder(brukerids.vanligBrukerId).build().brukerId,
                 "ny",
                 LocalDate.now().minusDays(1)))
-        assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, vanligBruker.brukerId)).isFalse
+        assertThat(
+                overstyring.erOverstyrt(
+                        AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
+                        BrukerBuilder(brukerids.vanligBrukerId).build().brukerId)).isFalse
 
     }
 
     @Test
     @DisplayName("Test overstyring, intet db innslag")
     fun testOverstyringUtenDBInnslag() {
-        expect(ukjentBostedBruker)
-        assertThat(overstyring.erOverstyrt(vanligAnsatt.ansattId, ukjentBostedBruker.brukerId)).isFalse
+        expect(
+                BrukerBuilder(brukerids.ukjentBostedBrukerId, GeografiskTilknytning.UkjentBosted())
+                    .grupper(GlobalGruppe.UKJENT_BOSTED)
+                    .build())
+        assertThat(
+                overstyring.erOverstyrt(
+                        AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
+                        BrukerBuilder(brukerids.ukjentBostedBrukerId, GeografiskTilknytning.UkjentBosted())
+                            .grupper(GlobalGruppe.UKJENT_BOSTED)
+                            .build().brukerId)).isFalse
     }
 
     private fun expect(bruker: Bruker) {

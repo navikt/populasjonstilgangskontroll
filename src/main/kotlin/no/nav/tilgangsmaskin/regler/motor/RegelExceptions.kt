@@ -3,8 +3,8 @@ package no.nav.tilgangsmaskin.regler.motor
 import java.net.URI
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.regler.motor.Metadata.Companion.DETAIL_MESSAGE_CODE
-import no.nav.tilgangsmaskin.regler.motor.Metadata.Companion.TYPE_URI
+import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.DETAIL_MESSAGE_CODE
+import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.TYPE_URI
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.ProblemDetail.forStatus
 import org.springframework.web.ErrorResponseException
@@ -18,19 +18,17 @@ class RegelException(val brukerId: BrukerId,
         title = regel.kode
         type = TYPE_URI
         instance = URI.create("${ansattId.verdi}/${brukerId.verdi}")
-        properties = mapOf(
-                "brukerIdent" to brukerId.verdi,
-                "navIdent" to ansattId.verdi,
-                "begrunnelse" to regel.begrunnelse,
-                "kanOverstyres" to regel.erOverstyrbar)
+        properties = entries(brukerId, ansattId, regel)
     }, null, messageCode, arguments) {
     constructor(messageCode: String, arguments: Array<String>, e: RegelException) : this(
-            e.brukerId,
-            e.ansattId,
-            e.regel,
-            messageCode,
-            arguments)
+            e.brukerId, e.ansattId, e.regel, messageCode, arguments)
 }
+
+private fun entries(brukerId: BrukerId, ansattId: AnsattId, regel: Regel) = mapOf(
+        "brukerIdent" to brukerId.verdi,
+        "navIdent" to ansattId.verdi,
+        "begrunnelse" to regel.begrunnelse,
+        "kanOverstyres" to regel.erOverstyrbar)
 
 class BulkRegelException(private val ansattId: AnsattId, val exceptions: List<RegelException>) :
     ErrorResponseException(FORBIDDEN, forStatus(FORBIDDEN).apply {
@@ -40,15 +38,12 @@ class BulkRegelException(private val ansattId: AnsattId, val exceptions: List<Re
                 "navIdent" to ansattId.verdi,
                 "avvisninger" to exceptions.size,
                 "begrunnelser" to exceptions.map {
-                    mapOf(
-                            "type" to TYPE_URI,
-                            "title" to it.regel.kode,
-                            "instance" to URI.create("${ansattId.verdi}/${it.brukerId.verdi}"),
-                            "brukerIdent" to it.brukerId.verdi,
-                            "navIdent" to ansattId.verdi,
-                            "begrunnelse" to it.regel.begrunnelse,
-                            "kanOverstyres" to it.regel.erOverstyrbar
-                         )
+                    entries(it.brukerId, ansattId, it.regel) +
+                            mapOf(
+                                    "type" to TYPE_URI,
+                                    "title" to it.regel.kode,
+                                    "instance" to URI.create("${ansattId.verdi}/${it.brukerId.verdi}"),
+                                 )
                 }.toList())
     }, null)
 

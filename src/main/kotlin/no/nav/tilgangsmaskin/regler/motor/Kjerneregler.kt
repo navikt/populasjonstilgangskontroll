@@ -40,7 +40,7 @@ class EgneDataRegel(private val teller: EgneDataOppslagTeller) : KjerneRegel {
             teller.increment(it)
         }
 
-    override val metadata = Metadata(EGNEDATA)
+    override val metadata = RegelMetadata(EGNEDATA)
 }
 
 @Order(HIGHEST_PRECEDENCE + 5)
@@ -51,7 +51,7 @@ class ForeldreOgBarnRegel(private val teller: ForeldreBarnOppslagTeller) : Kjern
             teller.increment(it)
         }
 
-    override val metadata = Metadata(FORELDREBARN)
+    override val metadata = RegelMetadata(FORELDREBARN)
 }
 
 @Order(HIGHEST_PRECEDENCE + 6)
@@ -62,7 +62,7 @@ class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
             teller.increment(it)
         }
 
-    override val metadata = Metadata(PARTNER)
+    override val metadata = RegelMetadata(PARTNER)
 }
 
 @Component
@@ -73,7 +73,7 @@ class SøskenRegel(private val teller: SøskenOppslagTeller) : KjerneRegel {
             teller.increment(it)
         }
 
-    override val metadata = Metadata(SØSKEN)
+    override val metadata = RegelMetadata(SØSKEN)
 }
 
 

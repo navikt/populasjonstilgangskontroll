@@ -6,12 +6,12 @@ import no.nav.tilgangsmaskin.bruker.Bruker
 
 interface Regel {
     fun evaluer(ansatt: Ansatt, bruker: Bruker): Boolean
-    val metadata: Metadata
+    val metadata: RegelMetadata
     val kode get() = metadata.kode
     val kortNavn get() = metadata.kortNavn
     val begrunnelse get() = metadata.begrunnelse
     val erOverstyrbar get() = this is OverstyrbarRegel
-    
+
     fun avslåHvis(predicate: () -> Boolean) = !predicate.invoke()
 }
 
@@ -20,6 +20,6 @@ abstract class GlobalGruppeRegel(private val gruppe: GlobalGruppe) : Regel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { bruker krever gruppe && !(ansatt erMedlemAv gruppe) }
 
-    override val metadata = Metadata(gruppe)
+    override val metadata = RegelMetadata(gruppe)
 
 }

@@ -3,11 +3,11 @@ package no.nav.tilgangsmaskin.regler.motor
 import java.net.URI
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 
-data class Metadata(val metadata: GruppeMetadata) {
+data class RegelMetadata(val gruppeMetadata: GruppeMetadata) {
 
-    val kode = metadata.kode
-    val begrunnelse = metadata.begrunnelse
-    val kortNavn = metadata.kortNavn
+    val kode = gruppeMetadata.kode
+    val begrunnelse = gruppeMetadata.begrunnelse
+    val kortNavn = gruppeMetadata.kortNavn
 
     constructor(gruppe: GlobalGruppe) : this(gruppe.metadata)
 

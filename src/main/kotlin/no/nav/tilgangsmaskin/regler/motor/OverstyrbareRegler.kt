@@ -45,7 +45,7 @@ class AvdødBrukerRegel(private val teller: AvdødTeller) : OverstyrbarRegel {
             }
         }
 
-    override val metadata = Metadata(AVDØD)
+    override val metadata = RegelMetadata(AVDØD)
 }
 
 

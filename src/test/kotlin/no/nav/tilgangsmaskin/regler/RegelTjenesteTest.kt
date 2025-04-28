@@ -11,7 +11,6 @@ import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.regler.ansatte.vanligAnsatt
 import no.nav.tilgangsmaskin.regler.brukere.fortroligBruker
 import no.nav.tilgangsmaskin.regler.brukere.strengtFortroligBruker
@@ -37,7 +36,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
@@ -46,7 +44,6 @@ import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
 
 @Import(RegelConfig::class)
-@ActiveProfiles(TEST)
 @DataJpaTest
 @EnableJpaAuditing
 @TestPropertySource(locations = ["classpath:test.properties"])
@@ -74,7 +71,7 @@ class RegelTjenesteTest {
 
     private lateinit var overstyring: OverstyringTjeneste
 
-    private lateinit var regel: RegelTjeneste
+    private lateinit var regler: RegelTjeneste
 
 
     private lateinit var avdød: AvdødTeller
@@ -91,7 +88,7 @@ class RegelTjenesteTest {
         partner = PartnerOppslagTeller(SimpleMeterRegistry(), accessor)
         avdød = AvdødTeller(SimpleMeterRegistry(), accessor)
         egne = EgneDataOppslagTeller(SimpleMeterRegistry(), accessor)
-        every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
+        expect(vanligAnsatt)
         every { accessor.system } returns "test"
         every { accessor.systemNavn } returns "test"
         overstyring =
@@ -99,24 +96,24 @@ class RegelTjenesteTest {
                     ansatt,
                     bruker, OverstyringJPAAdapter(repo), motor,
                     SimpleMeterRegistry(), accessor)
-        regel = RegelTjeneste(motor, bruker, ansatt, overstyring)
+        regler = RegelTjeneste(motor, bruker, ansatt, overstyring)
     }
 
     @Test
     @DisplayName("Verifiser at sjekk om overstyring gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang gis om overstyring er gjort")
     fun overstyringOK() {
         expect(utlandBruker)
-        expect(vanligAnsatt)
         overstyring.overstyr(
                 vanligAnsatt.ansattId, OverstyringData(
                 utlandBruker.brukerId,
                 "test",
                 LocalDate.now().plusDays(1)))
         assertThatCode {
-            regel.kompletteRegler(
+            regler.kompletteRegler(
                     vanligAnsatt.ansattId,
                     utlandBruker.brukerId.verdi)
         }.doesNotThrowAnyException()
+
     }
 
     @Test
@@ -124,7 +121,7 @@ class RegelTjenesteTest {
     fun ikkeOverstyrt() {
         expect(utlandBruker)
         assertThrows<RegelException> {
-            regel.kompletteRegler(vanligAnsatt.ansattId, utlandBruker.brukerId.verdi)
+            regler.kompletteRegler(vanligAnsatt.ansattId, utlandBruker.brukerId.verdi)
         }
     }
 
@@ -135,7 +132,7 @@ class RegelTjenesteTest {
             bruker.brukere(setOf(strengtFortroligBruker.brukerId.verdi, fortroligBruker.brukerId.verdi))
         } returns listOf(strengtFortroligBruker, fortroligBruker)
         assertEquals(assertThrows<BulkRegelException> {
-            regel.bulkRegler(
+            regler.bulkRegler(
                     vanligAnsatt.ansattId,
                     setOf(
                             IdOgType(strengtFortroligBruker.brukerId.verdi, KJERNE_REGELTYPE),
@@ -145,7 +142,6 @@ class RegelTjenesteTest {
 
     @Test
     fun bulkAvvisningerOverstyrt() {
-        every { ansatt.ansatt(vanligAnsatt.ansattId) } returns vanligAnsatt
         expect(utlandBruker)
         every { bruker.brukere(setOf(utlandBruker.brukerId.verdi)) } returns listOf(utlandBruker)
         overstyring.overstyr(
@@ -154,7 +150,7 @@ class RegelTjenesteTest {
                 "test",
                 LocalDate.now().plusDays(1)))
         assertThatCode {
-            regel.bulkRegler(
+            regler.bulkRegler(
                     vanligAnsatt.ansattId,
                     setOf(IdOgType(utlandBruker.brukerId.verdi, KOMPLETT_REGELTYPE)))
         }.doesNotThrowAnyException()

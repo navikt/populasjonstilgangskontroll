@@ -17,15 +17,19 @@ import no.nav.tilgangsmaskin.bruker.*
 import no.nav.tilgangsmaskin.bruker.Bruker.BrukerIds
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.BARN
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.FAR
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.udefinertTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.utenlandskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
-import no.nav.tilgangsmaskin.regler.brukere.annenAnsattBruker
-import no.nav.tilgangsmaskin.regler.brukere.annenAnsattBrukerMedPartner
 import no.nav.tilgangsmaskin.regler.brukere.ansattBruker
+import no.nav.tilgangsmaskin.regler.brukere.brukerMedForeldre
+import no.nav.tilgangsmaskin.regler.brukere.brukerMedPartner
+import no.nav.tilgangsmaskin.regler.brukere.brukerMedSøsken
+import no.nav.tilgangsmaskin.regler.brukere.skjermetBrukerMedBarn
 import no.nav.tilgangsmaskin.regler.brukerids.annenAnsattBrukerId
 import no.nav.tilgangsmaskin.regler.brukerids.annenEnhetBrukerId
 import no.nav.tilgangsmaskin.regler.brukerids.ansattBrukerId
@@ -77,9 +81,19 @@ object brukere {
     internal val vanligHistoriskBruker = Bruker(ids(historiskBrukerId), udefinertTilknytning)
     internal val vanligBrukerMedHistoriskIdent =
         Bruker(ids(vanligBrukerId, setOf(vanligHistoriskBruker.brukerId)), udefinertTilknytning)
-    internal val annenAnsattBruker =
+    internal val skjermetBrukerMedBarn =
         bruker(annenAnsattBrukerId, SKJERMING, familie = Familie(barn = setOf(FamilieMedlem(vanligBrukerId, BARN))))
-    internal val annenAnsattBrukerMedPartner =
+    internal val skjermetBruker = bruker(annenAnsattBrukerId, SKJERMING)
+    internal val brukerMedSøsken =
+        bruker(annenAnsattBrukerId, SKJERMING, familie = Familie(søsken = setOf(FamilieMedlem(vanligBrukerId, SØSKEN))))
+
+    internal val brukerMedForeldre =
+        bruker(
+                annenAnsattBrukerId,
+                SKJERMING,
+                familie = Familie(foreldre = setOf(FamilieMedlem(vanligBrukerId, FAR))))
+
+    internal val brukerMedPartner =
         bruker(
                 annenAnsattBrukerId,
                 SKJERMING,
@@ -128,8 +142,10 @@ object ansatte {
     internal val strengtFortroligAnsatt = ansatt(gruppe = strengtFortroligGruppe)
     internal val fortroligAnsatt = ansatt(gruppe = fortroligGruppe)
     internal val egenAnsatt = ansatt(gruppe = egenAnsattGruppe)
-    internal val egenAnsattMedFamilie = ansatt(annenAnsattBruker, annenGruppe)
-    internal val egenAnsattMedPartner = ansatt(annenAnsattBrukerMedPartner, annenGruppe)
+    internal val egenAnsattMedFar = ansatt(brukerMedForeldre, annenGruppe)
+    internal val egenAnsattMedSøsken = ansatt(brukerMedSøsken, annenGruppe)
+    internal val egenAnsattMedBarn = ansatt(skjermetBrukerMedBarn, annenGruppe)
+    internal val egenAnsattMedPartner = ansatt(brukerMedPartner, annenGruppe)
     internal val vanligAnsatt = ansatt(gruppe = annenGruppe)
     internal val geoUtlandAnsatt = ansatt(gruppe = geoUtlandGruppe)
     internal val udefinertGeoAnsatt = ansatt(gruppe = udefinertGruppe)

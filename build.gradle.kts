@@ -4,7 +4,6 @@ val javaVersion = JavaLanguageVersion.of(21)
 val springdocVersion = "2.8.6"
 val tokenSupportVersion = "5.0.25"
 val mockkVersion = "1.14.0"
-val mockOAuth2ServerVersion = "2.1.10"
 
 group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
 version = "1.0.1"
@@ -68,10 +67,13 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
-    testImplementation("org.testcontainers:postgresql:1.21.0")
-    testImplementation("org.testcontainers:junit-jupiter:1.21.0")
+    testImplementation("org.testcontainers:postgresql")
+    testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+    }
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
     testImplementation(kotlin("test"))
@@ -88,6 +90,8 @@ tasks.withType<BootJar> {
 tasks.test {
     jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
     useJUnitPlatform()
+    reports {
+    }
 }
 
 java {
@@ -97,7 +101,7 @@ java {
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(javaVersion.asInt())
 
     compilerOptions {
         freeCompilerArgs.add("-Xjsr305=strict")

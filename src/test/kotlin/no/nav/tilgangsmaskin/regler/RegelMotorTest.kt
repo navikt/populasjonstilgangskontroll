@@ -108,8 +108,7 @@ class RegelMotorTest {
             regelMotor.kompletteRegler(ansatt, bruker)
             forventOK(ansatt, bruker)
         }
-
-
+        
         @Test
         @DisplayName("Egen ansatt bruker kan ikke behandles av vanlig ansatt")
         fun ansattBrukerVanligAnsattAvvises() {

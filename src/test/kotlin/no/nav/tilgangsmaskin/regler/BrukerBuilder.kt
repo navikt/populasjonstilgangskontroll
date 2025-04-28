@@ -10,6 +10,7 @@ import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.*
 import no.nav.tilgangsmaskin.bruker.Bruker.BrukerIds
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.BARN
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.FAR
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.MOR
@@ -31,12 +32,11 @@ data class BrukerBuilder(
         var dødsdato: LocalDate? = null) {
     fun gt(gt: GeografiskTilknytning) = apply { this.gt = gt }
     fun grupper(vararg grupper: GlobalGruppe) = apply { this.grupper = setOf(*grupper) }
-    fun barn(barn: Set<BrukerId>) = apply { this.barn = barn.map { FamilieMedlem(it, BARN) }.toSet() }
-    fun mor(mor: BrukerId?) = apply { mor?.let { this.mor = FamilieMedlem(it, MOR) } }
-    fun far(far: BrukerId?) = apply { far?.let { this.far = FamilieMedlem(far, FAR) } }
-    fun søsken(søsken: Set<BrukerId>) = apply { this.søsken = søsken.map { FamilieMedlem(it, SØSKEN) }.toSet() }
-    fun partnere(partnere: Set<BrukerId>) =
-        apply { this.partnere = partnere.map { FamilieMedlem(it, PARTNER) }.toSet() }
+    fun barn(barn: Set<BrukerId>) = apply { this.barn = barn.tilFamilieMedlemmer(BARN) }
+    fun mor(mor: BrukerId?) = apply { this.mor = mor?.tilFamilieMedlem(MOR) }
+    fun far(far: BrukerId?) = apply { this.far = far?.tilFamilieMedlem(FAR) }
+    fun søsken(søsken: Set<BrukerId>) = apply { this.søsken = søsken.tilFamilieMedlemmer(SØSKEN) }
+    fun partnere(partnere: Set<BrukerId>) = apply { this.partnere = partnere.tilFamilieMedlemmer(PARTNER) }
 
     fun dødsdato(dato: LocalDate) = apply { this.dødsdato = dato }
     fun aktørId(id: AktørId) = apply { this.aktørId = id }
@@ -46,6 +46,13 @@ data class BrukerBuilder(
             grupper,
             Familie(setOfNotNull(mor, far), barn, søsken, partnere),
             dødsdato)
+
+
+    private fun Set<BrukerId>.tilFamilieMedlemmer(relasjon: FamilieRelasjon) =
+        map { FamilieMedlem(it, relasjon) }.toSet()
+
+    private fun BrukerId.tilFamilieMedlem(relasjon: FamilieRelasjon) =
+        FamilieMedlem(this, relasjon)
 }
 
 data class AnsattBuilder(

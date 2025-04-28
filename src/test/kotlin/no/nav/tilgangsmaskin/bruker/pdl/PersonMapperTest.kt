@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
+import no.nav.tilgangsmaskin.bruker.AktørId
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UdefinertTilknytning
@@ -20,8 +22,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.brukerids
-import no.nav.tilgangsmaskin.regler.diverse.aktørId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -29,8 +29,9 @@ import org.junit.jupiter.api.Test
 
 class PersonMapperTest {
 
-    private val brukerId = BrukerBuilder(brukerids.vanligBrukerId).build().brukerId.verdi
-    private val aktørid = aktørId.verdi
+    private val vanligBrukerId = BrukerId("08526835670")
+    private val brukerId = BrukerBuilder(vanligBrukerId).build().brukerId.verdi
+    private val aktørId = AktørId("1234567890123").verdi
 
     @Test
     @DisplayName("Test at behandling av brukere med uten  geotilknytning får UdefinertTilknytning")
@@ -71,9 +72,8 @@ class PersonMapperTest {
         } ?: emptyList()
         return PdlRespons(
                 PdlPerson(adressebeskyttelse),
-                PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT), PdlIdent(aktørid, false, AKTORID))),
-                geo
-                         )
+                PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT), PdlIdent(aktørId, false, AKTORID))),
+                geo)
     }
 
 }

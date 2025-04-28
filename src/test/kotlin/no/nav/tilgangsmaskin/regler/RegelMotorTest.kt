@@ -15,10 +15,9 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
-import no.nav.tilgangsmaskin.regler.brukerids.vanligBrukerId
-import no.nav.tilgangsmaskin.regler.diverse.enhet
 import no.nav.tilgangsmaskin.regler.grupper.annenGruppe
 import no.nav.tilgangsmaskin.regler.grupper.egenAnsattGruppe
+import no.nav.tilgangsmaskin.regler.grupper.enhet
 import no.nav.tilgangsmaskin.regler.grupper.enhetGruppe
 import no.nav.tilgangsmaskin.regler.grupper.fortroligGruppe
 import no.nav.tilgangsmaskin.regler.grupper.nasjonalGruppe
@@ -49,6 +48,9 @@ import kotlin.test.Test
 @ContextConfiguration(classes = [TestApp::class, TokenClaimsAccessor::class])
 @TestInstance(PER_CLASS)
 class RegelMotorTest {
+
+    private val vanligBrukerId = BrukerId("08526835670")
+
 
     @MockkBean
     lateinit var holder: TokenValidationContextHolder
@@ -108,7 +110,7 @@ class RegelMotorTest {
             regelMotor.kompletteRegler(ansatt, bruker)
             forventOK(ansatt, bruker)
         }
-        
+
         @Test
         @DisplayName("Egen ansatt bruker kan ikke behandles av vanlig ansatt")
         fun ansattBrukerVanligAnsattAvvises() {

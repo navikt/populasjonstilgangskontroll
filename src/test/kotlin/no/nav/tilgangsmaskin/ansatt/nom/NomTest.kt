@@ -7,10 +7,10 @@ import java.time.LocalDate.EPOCH
 import java.time.LocalDate.now
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.brukerids
 import no.nav.tilgangsmaskin.regler.grupper
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringEntityListener
 import no.nav.tilgangsmaskin.tilgang.TokenClaimsAccessor
@@ -37,13 +37,16 @@ import kotlin.test.Test
 @Testcontainers
 internal class NomTest {
 
+    private val vanligBrukerId = BrukerId("08526835670")
+
+
     private val IGÅR = NomAnsattPeriode(EPOCH, now().minusDays(1))
     private val UTGÅTT = NomAnsattData(
             AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
-            BrukerBuilder(brukerids.vanligBrukerId).build().brukerId, IGÅR)
+            BrukerBuilder(vanligBrukerId).build().brukerId, IGÅR)
     private val GYLDIG = NomAnsattData(
             AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
-            BrukerBuilder(brukerids.vanligBrukerId).build().brukerId)
+            BrukerBuilder(vanligBrukerId).build().brukerId)
 
     @Autowired
     private lateinit var adapter: NomJPAAdapter

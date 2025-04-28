@@ -17,7 +17,6 @@ import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.MOR
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.udefinertTilknytning
-import no.nav.tilgangsmaskin.regler.ansatte.ansattId
 
 data class BrukerBuilder(
         val id: BrukerId,
@@ -57,7 +56,7 @@ data class BrukerBuilder(
 
 data class AnsattBuilder(
         var grupper: Set<EntraGruppe> = emptySet(),
-        var id: AnsattId = ansattId,
+        var id: AnsattId = AnsattId("Z999999"),
         var oid: UUID = UUID.randomUUID(),
         var bruker: Bruker? = null) {
 

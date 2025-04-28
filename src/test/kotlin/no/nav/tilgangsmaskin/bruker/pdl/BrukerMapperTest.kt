@@ -3,6 +3,8 @@ package no.nav.tilgangsmaskin.bruker.pdl
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
+import no.nav.tilgangsmaskin.bruker.AktørId
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.PersonTilBrukerMapper.tilBruker
@@ -23,8 +25,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttel
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.brukerids
-import no.nav.tilgangsmaskin.regler.diverse.aktørId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -38,7 +38,11 @@ import org.springframework.test.context.ContextConfiguration
 class BrukerMapperTest {
 
 
-    private val brukerId = BrukerBuilder(brukerids.vanligBrukerId).build().brukerId.verdi
+    private val aktørId = AktørId("1234567890123")
+
+    private val vanligBrukerId = BrukerId("08526835670")
+
+    private val brukerId = BrukerBuilder(vanligBrukerId).build().brukerId.verdi
 
     @Test
     @DisplayName("Test at behandling av brukere med STRENGT_FORTROLIG_UTLAND  krever medlemsskap i STRENGT_FORTROLIG_GRUPPE fra ansatt og at geotilknytning er UtenlandskTilknytning")

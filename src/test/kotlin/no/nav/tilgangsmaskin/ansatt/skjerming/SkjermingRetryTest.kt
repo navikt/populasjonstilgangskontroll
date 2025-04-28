@@ -5,12 +5,12 @@ import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import java.net.URI
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.FellesRetryListener
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.brukerids
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.assertThrows
@@ -30,6 +30,9 @@ import kotlin.test.Test
 @SpringBootTest(classes = [FellesRetryListener::class])
 internal class SkjermingRetryTest {
 
+    private val vanligBrukerId = BrukerId("08526835670")
+
+
     private val uri = URI.create("https://www.vg.no")
 
     @MockkBean
@@ -41,42 +44,42 @@ internal class SkjermingRetryTest {
     @Test
     @DisplayName("Returner true etter at antall forsøk er oppbrukt")
     fun feilerEtterTreMislykkedeForsøk() {
-        every { adapter.skjerming(BrukerBuilder(brukerids.vanligBrukerId).build().brukerId.verdi) } throws RecoverableRestException(
+        every { adapter.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId.verdi) } throws RecoverableRestException(
                 INTERNAL_SERVER_ERROR,
                 uri)
         assertThrows<RecoverableRestException> {
-            tjeneste.skjerming(BrukerBuilder(brukerids.vanligBrukerId).build().brukerId)
+            tjeneste.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId)
         }
         verify(exactly = 3) {
-            tjeneste.skjerming(BrukerBuilder(brukerids.vanligBrukerId).build().brukerId)
+            tjeneste.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId)
         }
     }
 
     @Test
     @DisplayName("Test retry tar seg inn etter først å ha feilet")
     fun testRetryOK() {
-        every { adapter.skjerming(BrukerBuilder(brukerids.vanligBrukerId).build().brukerId.verdi) } throws RecoverableRestException(
+        every { adapter.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId.verdi) } throws RecoverableRestException(
                 INTERNAL_SERVER_ERROR,
                 uri
-                                                                                                                                   ) andThen false
-        assertThat(tjeneste.skjerming(BrukerBuilder(brukerids.vanligBrukerId).build().brukerId)).isFalse
+                                                                                                                         ) andThen false
+        assertThat(tjeneste.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId)).isFalse
         verify(exactly = 2) {
-            tjeneste.skjerming(BrukerBuilder(brukerids.vanligBrukerId).build().brukerId)
+            tjeneste.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId)
         }
     }
 
     @Test
     @DisplayName("Andre exceptions fører ikke til retry, og kastes umiddlelbart videre")
     fun andreExceptions() {
-        every { adapter.skjerming(BrukerBuilder(brukerids.vanligBrukerId).build().brukerId.verdi) } throws IrrecoverableRestException(
+        every { adapter.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId.verdi) } throws IrrecoverableRestException(
                 INTERNAL_SERVER_ERROR,
                 uri
-                                                                                                                                     )
+                                                                                                                           )
         assertThrows<IrrecoverableRestException> {
-            tjeneste.skjerming(BrukerBuilder(brukerids.vanligBrukerId).build().brukerId)
+            tjeneste.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId)
         }
         verify(exactly = 1) {
-            tjeneste.skjerming(BrukerBuilder(brukerids.vanligBrukerId).build().brukerId)
+            tjeneste.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId)
         }
     }
 }

@@ -6,17 +6,15 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import no.nav.tilgangsmaskin.TestApp
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.utenlandskTilknytning
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.TOMORROW
-import no.nav.tilgangsmaskin.regler.ansatte.ansattId
-import no.nav.tilgangsmaskin.regler.brukerids.fortroligBrukerId
-import no.nav.tilgangsmaskin.regler.brukerids.strengtFortroligBrukerId
-import no.nav.tilgangsmaskin.regler.brukerids.vanligBrukerId
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringJPAAdapter
@@ -53,6 +51,12 @@ import kotlin.test.assertEquals
 @AutoConfigureObservability
 @Testcontainers
 class RegelTjenesteTest {
+
+    private val strengtFortroligBrukerId = BrukerId("08526835671")
+    private val fortroligBrukerId = BrukerId("08526835672")
+    private val vanligBrukerId = BrukerId("08526835670")
+    private val ansattId = AnsattId("Z999999")
+
 
     @Autowired
     private lateinit var repo: OverstyringRepository

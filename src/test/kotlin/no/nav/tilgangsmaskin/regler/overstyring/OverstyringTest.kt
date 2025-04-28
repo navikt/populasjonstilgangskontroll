@@ -6,6 +6,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import no.nav.tilgangsmaskin.TestApp
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
@@ -14,8 +15,6 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.TOMORROW
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.YESTERDAY
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.ansatte.ansattId
-import no.nav.tilgangsmaskin.regler.brukerids.vanligBrukerId
 import no.nav.tilgangsmaskin.regler.motor.RegelBeanConfig
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.tilgang.TokenClaimsAccessor
@@ -35,7 +34,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @DataJpaTest
-@ContextConfiguration(classes = [RegelMotor::class, RegelBeanConfig::class, TestApp::class])
+@ContextConfiguration(classes = [RegelMotor::class, OverstyringJPAAdapter::class, RegelBeanConfig::class, TestApp::class])
 @ExtendWith(MockKExtension::class)
 @EnableJpaAuditing
 @ActiveProfiles(TEST)
@@ -43,6 +42,8 @@ import kotlin.test.Test
 @AutoConfigureObservability
 internal class OverstyringTest {
 
+    private val vanligBrukerId = BrukerId("08526835670")
+    private val ansattId = AnsattId("Z999999")
     private val historiskBrukerId = BrukerId("11111111111")
 
     @Autowired
@@ -61,7 +62,7 @@ internal class OverstyringTest {
     private lateinit var brukere: BrukerTjeneste
 
     @Autowired
-    private lateinit var repo: OverstyringRepository
+    private lateinit var adapter: OverstyringJPAAdapter
 
     private lateinit var overstyring: OverstyringTjeneste
 
@@ -70,27 +71,21 @@ internal class OverstyringTest {
         every { accessor.system } returns "test"
         every { accessor.systemNavn } returns "test"
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder().build()
-        overstyring = OverstyringTjeneste(ansatte, brukere, OverstyringJPAAdapter(repo), motor, registry, accessor)
+        overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, registry, accessor)
     }
 
     @Test
-    @DisplayName("Test gyldig overstyring via historisk ident")
+    @DisplayName("Gyldig overstyring via historisk ident")
     fun testOverstyringGyldigHistorisk() {
-
-        every { brukere.nærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).historiske(
-                setOf(historiskBrukerId)).build()
-
+        val brukerMedHistorikk = BrukerBuilder(vanligBrukerId).historiske(setOf(historiskBrukerId)).build()
+        every { brukere.nærmesteFamilie(vanligBrukerId.verdi) } returns brukerMedHistorikk
         every { brukere.nærmesteFamilie(historiskBrukerId.verdi) } returns BrukerBuilder(historiskBrukerId).build()
-
         overstyring.overstyr(ansattId, OverstyringData(historiskBrukerId, "test", TOMORROW))
-        assertThat(
-                overstyring.erOverstyrt(
-                        ansattId, BrukerBuilder(vanligBrukerId).historiske(setOf(historiskBrukerId))
-                    .build().brukerId)).isTrue
+        assertThat(overstyring.erOverstyrt(ansattId, BrukerBuilder(vanligBrukerId).build().brukerId)).isTrue
     }
 
     @Test
-    @DisplayName("Test gyldig overstyring")
+    @DisplayName("Gyldig overstyring")
     fun testOverstyringGyldig() {
         val bruker = BrukerBuilder(vanligBrukerId).build()
         every { brukere.nærmesteFamilie(vanligBrukerId.verdi) } returns bruker
@@ -100,7 +95,7 @@ internal class OverstyringTest {
     }
 
     @Test
-    @DisplayName("Test utgått overstyring")
+    @DisplayName("Utgått overstyring")
     fun testOverstyringUtgått() {
         val bruker = BrukerBuilder(vanligBrukerId).build()
         every { brukere.nærmesteFamilie(vanligBrukerId.verdi) } returns bruker
@@ -109,7 +104,7 @@ internal class OverstyringTest {
     }
 
     @Test
-    @DisplayName("Test overstyring, intet db innslag")
+    @DisplayName("Overstyring uten db innslag")
     fun testOverstyringUtenDBInnslag() {
         val bruker = BrukerBuilder(vanligBrukerId).build()
         every { brukere.nærmesteFamilie(vanligBrukerId.verdi) } returns bruker

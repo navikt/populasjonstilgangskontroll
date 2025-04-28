@@ -9,6 +9,7 @@ import kotlin.time.toKotlinDuration
 
 object TimeExtensions {
 
+    val TOMORROW = LocalDate.now().plusDays(1)
     fun Instant.isBeforeNow() = isBefore(now())
     fun Instant.diffFromNow() = java.time.Duration.between(now(), this).toKotlinDuration().format()
     fun LocalDate.toInstant(): Instant = atStartOfDay(systemDefault()).toInstant()
@@ -36,7 +37,8 @@ object TimeExtensions {
     fun Long.local(fmt: String = "yyyy-MM-dd HH:mm:ss") = LocalDateTime.ofInstant(
             Instant.ofEpochMilli(this),
             ZoneId.of("Europe/Oslo")
-    ).format(DateTimeFormatter.ofPattern(fmt))
+                                                                                 )
+        .format(DateTimeFormatter.ofPattern(fmt))
 
     fun LocalDate.intervallSiden() =
         when (månederSidenIdag()) {

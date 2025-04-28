@@ -9,7 +9,8 @@ import no.nav.tilgangsmaskin.felles.rest.FellesRetryListener
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
-import no.nav.tilgangsmaskin.regler.brukere.vanligBruker
+import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import no.nav.tilgangsmaskin.regler.brukerids
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.assertThrows
@@ -40,42 +41,42 @@ internal class SkjermingRetryTest {
     @Test
     @DisplayName("Returner true etter at antall forsøk er oppbrukt")
     fun feilerEtterTreMislykkedeForsøk() {
-        every { adapter.skjerming(vanligBruker.brukerId.verdi) } throws RecoverableRestException(
+        every { adapter.skjerming(BrukerBuilder(brukerids.vanligBrukerId).build().brukerId.verdi) } throws RecoverableRestException(
                 INTERNAL_SERVER_ERROR,
                 uri)
         assertThrows<RecoverableRestException> {
-            tjeneste.skjerming(vanligBruker.brukerId)
+            tjeneste.skjerming(BrukerBuilder(brukerids.vanligBrukerId).build().brukerId)
         }
         verify(exactly = 3) {
-            tjeneste.skjerming(vanligBruker.brukerId)
+            tjeneste.skjerming(BrukerBuilder(brukerids.vanligBrukerId).build().brukerId)
         }
     }
 
     @Test
     @DisplayName("Test retry tar seg inn etter først å ha feilet")
     fun testRetryOK() {
-        every { adapter.skjerming(vanligBruker.brukerId.verdi) } throws RecoverableRestException(
+        every { adapter.skjerming(BrukerBuilder(brukerids.vanligBrukerId).build().brukerId.verdi) } throws RecoverableRestException(
                 INTERNAL_SERVER_ERROR,
                 uri
-                                                                                                ) andThen false
-        assertThat(tjeneste.skjerming(vanligBruker.brukerId)).isFalse
+                                                                                                                                   ) andThen false
+        assertThat(tjeneste.skjerming(BrukerBuilder(brukerids.vanligBrukerId).build().brukerId)).isFalse
         verify(exactly = 2) {
-            tjeneste.skjerming(vanligBruker.brukerId)
+            tjeneste.skjerming(BrukerBuilder(brukerids.vanligBrukerId).build().brukerId)
         }
     }
 
     @Test
     @DisplayName("Andre exceptions fører ikke til retry, og kastes umiddlelbart videre")
     fun andreExceptions() {
-        every { adapter.skjerming(vanligBruker.brukerId.verdi) } throws IrrecoverableRestException(
+        every { adapter.skjerming(BrukerBuilder(brukerids.vanligBrukerId).build().brukerId.verdi) } throws IrrecoverableRestException(
                 INTERNAL_SERVER_ERROR,
                 uri
-                                                                                                  )
+                                                                                                                                     )
         assertThrows<IrrecoverableRestException> {
-            tjeneste.skjerming(vanligBruker.brukerId)
+            tjeneste.skjerming(BrukerBuilder(brukerids.vanligBrukerId).build().brukerId)
         }
         verify(exactly = 1) {
-            tjeneste.skjerming(vanligBruker.brukerId)
+            tjeneste.skjerming(BrukerBuilder(brukerids.vanligBrukerId).build().brukerId)
         }
     }
 }

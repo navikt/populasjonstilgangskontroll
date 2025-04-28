@@ -8,8 +8,10 @@ import java.time.LocalDate.now
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
-import no.nav.tilgangsmaskin.regler.ansatte.vanligAnsatt
-import no.nav.tilgangsmaskin.regler.brukere.vanligBruker
+import no.nav.tilgangsmaskin.regler.AnsattBuilder
+import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import no.nav.tilgangsmaskin.regler.brukerids
+import no.nav.tilgangsmaskin.regler.grupper
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringEntityListener
 import no.nav.tilgangsmaskin.tilgang.TokenClaimsAccessor
 import org.assertj.core.api.Assertions.assertThat
@@ -36,8 +38,12 @@ import kotlin.test.Test
 internal class NomTest {
 
     private val IGÅR = NomAnsattPeriode(EPOCH, now().minusDays(1))
-    private val UTGÅTT = NomAnsattData(vanligAnsatt.ansattId, vanligBruker.brukerId, IGÅR)
-    private val GYLDIG = NomAnsattData(vanligAnsatt.ansattId, vanligBruker.brukerId)
+    private val UTGÅTT = NomAnsattData(
+            AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
+            BrukerBuilder(brukerids.vanligBrukerId).build().brukerId, IGÅR)
+    private val GYLDIG = NomAnsattData(
+            AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
+            BrukerBuilder(brukerids.vanligBrukerId).build().brukerId)
 
     @Autowired
     private lateinit var adapter: NomJPAAdapter
@@ -57,23 +63,27 @@ internal class NomTest {
     @DisplayName("Test utgått ansatt")
     fun ansattIkkeLengerAnsatt() {
         nom.lagre(UTGÅTT)
-        assertThat(nom.fnrForAnsatt(vanligAnsatt.ansattId)).isNull()
+        assertThat(nom.fnrForAnsatt(AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId)).isNull()
     }
 
     @Test
     @DisplayName("Test ingen sluttdato ok")
     fun ingenSluttdato() {
         nom.lagre(GYLDIG)
-        assertThat(nom.fnrForAnsatt(vanligAnsatt.ansattId)).isEqualTo(GYLDIG.brukerId)
+        assertThat(
+                nom.fnrForAnsatt(
+                        AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId)).isEqualTo(GYLDIG.brukerId)
     }
 
     @Test
     @DisplayName("Test lagre, så oppdater, siste gjelder")
     fun oppdaterSamme() {
         nom.lagre(UTGÅTT)
-        assertThat(nom.fnrForAnsatt(vanligAnsatt.ansattId)).isNull()
+        assertThat(nom.fnrForAnsatt(AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId)).isNull()
         nom.lagre(GYLDIG)
-        assertThat(nom.fnrForAnsatt(vanligAnsatt.ansattId)).isEqualTo(GYLDIG.brukerId)
+        assertThat(
+                nom.fnrForAnsatt(
+                        AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId)).isEqualTo(GYLDIG.brukerId)
     }
 
     companion object {

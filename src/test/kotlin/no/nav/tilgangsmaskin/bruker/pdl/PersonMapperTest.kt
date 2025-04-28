@@ -19,7 +19,8 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentG
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering
-import no.nav.tilgangsmaskin.regler.brukere.vanligBruker
+import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import no.nav.tilgangsmaskin.regler.brukerids
 import no.nav.tilgangsmaskin.regler.diverse.aktørId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -28,7 +29,7 @@ import org.junit.jupiter.api.Test
 
 class PersonMapperTest {
 
-    private val brukerId = vanligBruker.brukerId.verdi
+    private val brukerId = BrukerBuilder(brukerids.vanligBrukerId).build().brukerId.verdi
     private val aktørid = aktørId.verdi
 
     @Test

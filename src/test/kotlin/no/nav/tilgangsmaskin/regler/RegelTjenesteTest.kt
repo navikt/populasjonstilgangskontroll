@@ -9,12 +9,17 @@ import java.time.LocalDate
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
-import no.nav.tilgangsmaskin.regler.ansatte.vanligAnsatt
-import no.nav.tilgangsmaskin.regler.brukere.fortroligBruker
-import no.nav.tilgangsmaskin.regler.brukere.strengtFortroligBruker
-import no.nav.tilgangsmaskin.regler.brukere.utlandBruker
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.utenlandskTilknytning
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.TOMORROW
+import no.nav.tilgangsmaskin.regler.ansatte.ansattId
+import no.nav.tilgangsmaskin.regler.brukerids.fortroligBrukerId
+import no.nav.tilgangsmaskin.regler.brukerids.strengtFortroligBrukerId
+import no.nav.tilgangsmaskin.regler.brukerids.vanligBrukerId
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
@@ -88,7 +93,7 @@ class RegelTjenesteTest {
         partner = PartnerOppslagTeller(SimpleMeterRegistry(), accessor)
         avdød = AvdødTeller(SimpleMeterRegistry(), accessor)
         egne = EgneDataOppslagTeller(SimpleMeterRegistry(), accessor)
-        expect(vanligAnsatt)
+        expect(AnsattBuilder().grupper(grupper.annenGruppe).build())
         every { accessor.system } returns "test"
         every { accessor.systemNavn } returns "test"
         overstyring =
@@ -102,16 +107,10 @@ class RegelTjenesteTest {
     @Test
     @DisplayName("Verifiser at sjekk om overstyring gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang gis om overstyring er gjort")
     fun overstyringOK() {
-        expect(utlandBruker)
-        overstyring.overstyr(
-                vanligAnsatt.ansattId, OverstyringData(
-                utlandBruker.brukerId,
-                "test",
-                LocalDate.now().plusDays(1)))
+        expect(BrukerBuilder(vanligBrukerId).build())
+        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "test", TOMORROW))
         assertThatCode {
-            regler.kompletteRegler(
-                    vanligAnsatt.ansattId,
-                    utlandBruker.brukerId.verdi)
+            regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
         }.doesNotThrowAnyException()
 
     }
@@ -119,40 +118,63 @@ class RegelTjenesteTest {
     @Test
     @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang,og at tilgang ikke gis om overstyring ikke er gjort")
     fun ikkeOverstyrt() {
-        expect(utlandBruker)
+        expect(BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(UTENLANDSK).build())
         assertThrows<RegelException> {
-            regler.kompletteRegler(vanligAnsatt.ansattId, utlandBruker.brukerId.verdi)
+            regler.kompletteRegler(
+                    AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
+                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(UTENLANDSK).build().brukerId.verdi)
         }
     }
 
     @Test
     fun bulkAvvisninger() {
-        expect(vanligAnsatt)
+        expect(AnsattBuilder().grupper(grupper.annenGruppe).build())
         every {
-            bruker.brukere(setOf(strengtFortroligBruker.brukerId.verdi, fortroligBruker.brukerId.verdi))
-        } returns listOf(strengtFortroligBruker, fortroligBruker)
+            bruker.brukere(setOf(strengtFortroligBrukerId.verdi, fortroligBrukerId.verdi))
+        } returns listOf(
+                BrukerBuilder(strengtFortroligBrukerId).grupper(STRENGT_FORTROLIG).build(),
+                BrukerBuilder(fortroligBrukerId).grupper(FORTROLIG).build())
         assertEquals(assertThrows<BulkRegelException> {
             regler.bulkRegler(
-                    vanligAnsatt.ansattId,
+                    AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
                     setOf(
-                            IdOgType(strengtFortroligBruker.brukerId.verdi, KJERNE_REGELTYPE),
-                            IdOgType(fortroligBruker.brukerId.verdi, KJERNE_REGELTYPE)))
+                            IdOgType(strengtFortroligBrukerId.verdi, KJERNE_REGELTYPE),
+                            IdOgType(fortroligBrukerId.verdi, KJERNE_REGELTYPE)))
         }.exceptions.size, 2)
     }
 
     @Test
     fun bulkAvvisningerOverstyrt() {
-        expect(utlandBruker)
-        every { bruker.brukere(setOf(utlandBruker.brukerId.verdi)) } returns listOf(utlandBruker)
+        expect(
+                BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(
+                        UTENLANDSK).build())
+        every {
+            bruker.brukere(
+                    setOf(
+                            BrukerBuilder(
+                                    vanligBrukerId,
+                                    utenlandskTilknytning).grupper(
+                                    UTENLANDSK).build().brukerId.verdi))
+        } returns listOf(
+                BrukerBuilder(
+                        vanligBrukerId,
+                        utenlandskTilknytning).grupper(
+                        UTENLANDSK).build())
         overstyring.overstyr(
-                vanligAnsatt.ansattId, OverstyringData(
-                utlandBruker.brukerId,
+                AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId, OverstyringData(
+                BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(
+                        UTENLANDSK).build().brukerId,
                 "test",
                 LocalDate.now().plusDays(1)))
         assertThatCode {
             regler.bulkRegler(
-                    vanligAnsatt.ansattId,
-                    setOf(IdOgType(utlandBruker.brukerId.verdi, KOMPLETT_REGELTYPE)))
+                    AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
+                    setOf(
+                            IdOgType(
+                                    BrukerBuilder(
+                                            vanligBrukerId,
+                                            utenlandskTilknytning).grupper(
+                                            UTENLANDSK).build().brukerId.verdi, KOMPLETT_REGELTYPE)))
         }.doesNotThrowAnyException()
     }
 

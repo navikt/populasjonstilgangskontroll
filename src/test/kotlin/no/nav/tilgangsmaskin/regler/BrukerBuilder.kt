@@ -20,7 +20,7 @@ import no.nav.tilgangsmaskin.regler.ansatte.ansattId
 
 data class BrukerBuilder(
         val id: BrukerId,
-        val gt: GeografiskTilknytning = udefinertTilknytning,
+        var gt: GeografiskTilknytning = udefinertTilknytning,
         var aktørId: AktørId? = null,
         var grupper: Set<GlobalGruppe> = emptySet(),
         var søsken: Set<FamilieMedlem> = emptySet(),
@@ -29,6 +29,7 @@ data class BrukerBuilder(
         var barn: Set<FamilieMedlem> = emptySet(),
         var partnere: Set<FamilieMedlem> = emptySet(),
         var dødsdato: LocalDate? = null) {
+    fun gt(gt: GeografiskTilknytning) = apply { this.gt = gt }
     fun grupper(vararg grupper: GlobalGruppe) = apply { this.grupper = setOf(*grupper) }
     fun barn(barn: Set<BrukerId>) = apply { this.barn = barn.map { FamilieMedlem(it, BARN) }.toSet() }
     fun mor(mor: BrukerId?) = apply { mor?.let { this.mor = FamilieMedlem(it, MOR) } }

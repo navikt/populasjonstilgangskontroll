@@ -1,18 +1,15 @@
 package no.nav.tilgangsmaskin.regler
 
 import com.ninjasquad.springmockk.MockkBean
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry
+import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import java.time.LocalDate
 import no.nav.tilgangsmaskin.TestApp
-import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
-import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.utenlandskTilknytning
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.TOMORROW
@@ -21,8 +18,6 @@ import no.nav.tilgangsmaskin.regler.brukerids.fortroligBrukerId
 import no.nav.tilgangsmaskin.regler.brukerids.strengtFortroligBrukerId
 import no.nav.tilgangsmaskin.regler.brukerids.vanligBrukerId
 import no.nav.tilgangsmaskin.regler.motor.*
-import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
-import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringJPAAdapter
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringRepository
@@ -62,6 +57,9 @@ class RegelTjenesteTest {
     @Autowired
     private lateinit var repo: OverstyringRepository
 
+    @Autowired
+    private lateinit var registry: MeterRegistry
+
     @MockkBean
     private lateinit var accessor: TokenClaimsAccessor
 
@@ -69,10 +67,10 @@ class RegelTjenesteTest {
     private lateinit var motor: RegelMotor
 
     @MockK
-    private lateinit var bruker: BrukerTjeneste
+    private lateinit var brukere: BrukerTjeneste
 
     @MockK
-    private lateinit var ansatt: AnsattTjeneste
+    private lateinit var ansatte: AnsattTjeneste
 
     private lateinit var overstyring: OverstyringTjeneste
 
@@ -85,112 +83,95 @@ class RegelTjenesteTest {
     private lateinit var søsken: SøskenOppslagTeller
     private lateinit var foreldrebarn: ForeldreBarnOppslagTeller
 
-
     @BeforeTest
     fun before() {
-        søsken = SøskenOppslagTeller(SimpleMeterRegistry(), accessor)
-        foreldrebarn = ForeldreBarnOppslagTeller(SimpleMeterRegistry(), accessor)
-        partner = PartnerOppslagTeller(SimpleMeterRegistry(), accessor)
-        avdød = AvdødTeller(SimpleMeterRegistry(), accessor)
-        egne = EgneDataOppslagTeller(SimpleMeterRegistry(), accessor)
-        expect(AnsattBuilder().grupper(grupper.annenGruppe).build())
+        søsken = SøskenOppslagTeller(registry, accessor)
+        foreldrebarn = ForeldreBarnOppslagTeller(registry, accessor)
+        partner = PartnerOppslagTeller(registry, accessor)
+        avdød = AvdødTeller(registry, accessor)
+        egne = EgneDataOppslagTeller(registry, accessor)
+        every { ansatte.ansatt(ansattId) } returns AnsattBuilder().build()
         every { accessor.system } returns "test"
         every { accessor.systemNavn } returns "test"
         overstyring =
             OverstyringTjeneste(
-                    ansatt,
-                    bruker, OverstyringJPAAdapter(repo), motor,
-                    SimpleMeterRegistry(), accessor)
-        regler = RegelTjeneste(motor, bruker, ansatt, overstyring)
+                    ansatte, brukere, OverstyringJPAAdapter(repo), motor,
+                    registry, accessor)
+        regler = RegelTjeneste(motor, brukere, ansatte, overstyring)
     }
 
     @Test
     @DisplayName("Verifiser at sjekk om overstyring gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang gis om overstyring er gjort")
     fun overstyringOK() {
-        expect(BrukerBuilder(vanligBrukerId).build())
+        every { brukere.nærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
         overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "test", TOMORROW))
         assertThatCode {
             regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
         }.doesNotThrowAnyException()
-
     }
 
     @Test
     @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang,og at tilgang ikke gis om overstyring ikke er gjort")
     fun ikkeOverstyrt() {
-        expect(BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(UTENLANDSK).build())
-        assertThrows<RegelException> {
-            regler.kompletteRegler(
-                    AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
+        every {
+            brukere.nærmesteFamilie(
                     BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(UTENLANDSK).build().brukerId.verdi)
+        } returns BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(UTENLANDSK).build()
+        assertThrows<RegelException> {
+            val brukerId = BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(UTENLANDSK).build().brukerId
+            regler.kompletteRegler(ansattId, brukerId.verdi)
         }
     }
 
     @Test
     fun bulkAvvisninger() {
-        expect(AnsattBuilder().grupper(grupper.annenGruppe).build())
+        every { ansatte.ansatt(ansattId) } returns AnsattBuilder().build()
         every {
-            bruker.brukere(setOf(strengtFortroligBrukerId.verdi, fortroligBrukerId.verdi))
+            brukere.brukere(strengtFortroligBrukerId.verdi, fortroligBrukerId.verdi)
         } returns listOf(
                 BrukerBuilder(strengtFortroligBrukerId).grupper(STRENGT_FORTROLIG).build(),
                 BrukerBuilder(fortroligBrukerId).grupper(FORTROLIG).build())
         assertEquals(assertThrows<BulkRegelException> {
             regler.bulkRegler(
-                    AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
-                    setOf(
-                            IdOgType(strengtFortroligBrukerId.verdi, KJERNE_REGELTYPE),
-                            IdOgType(fortroligBrukerId.verdi, KJERNE_REGELTYPE)))
+                    ansattId,
+                    setOf(IdOgType(strengtFortroligBrukerId.verdi), IdOgType(fortroligBrukerId.verdi)))
         }.exceptions.size, 2)
     }
 
     @Test
     fun bulkAvvisningerOverstyrt() {
-        expect(
-                BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(
-                        UTENLANDSK).build())
         every {
-            bruker.brukere(
-                    setOf(
-                            BrukerBuilder(
-                                    vanligBrukerId,
-                                    utenlandskTilknytning).grupper(
-                                    UTENLANDSK).build().brukerId.verdi))
+            brukere.nærmesteFamilie(
+                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(
+                            UTENLANDSK).build().brukerId.verdi)
+        } returns BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(UTENLANDSK).build()
+        every {
+            brukere.brukere(
+                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(UTENLANDSK).build().brukerId.verdi)
         } returns listOf(
                 BrukerBuilder(
                         vanligBrukerId,
                         utenlandskTilknytning).grupper(
                         UTENLANDSK).build())
         overstyring.overstyr(
-                AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId, OverstyringData(
+                ansattId, OverstyringData(
                 BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(
                         UTENLANDSK).build().brukerId,
                 "test",
-                LocalDate.now().plusDays(1)))
+                TOMORROW))
         assertThatCode {
             regler.bulkRegler(
-                    AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
+                    ansattId,
                     setOf(
                             IdOgType(
-                                    BrukerBuilder(
-                                            vanligBrukerId,
-                                            utenlandskTilknytning).grupper(
-                                            UTENLANDSK).build().brukerId.verdi, KOMPLETT_REGELTYPE)))
+                                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(UTENLANDSK)
+                                        .build().brukerId.verdi)))
         }.doesNotThrowAnyException()
     }
 
-    private fun expect(b: Bruker) {
-        every {
-            bruker.nærmesteFamilie(b.brukerId.verdi)
-        } returns b
-    }
-
-    private fun expect(a: Ansatt) {
-        every {
-            ansatt.ansatt(a.ansattId)
-        } returns a
-    }
-
     companion object {
+
+
         @ServiceConnection
         private val postgres = PostgreSQLContainer("postgres:17")
     }

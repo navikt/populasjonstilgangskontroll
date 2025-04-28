@@ -47,7 +47,7 @@ class RegelTjeneste(
 
     private fun Set<IdOgType>.brukerIdOgType() =
         mapNotNull {
-            brukere.brukere(map { it.brukerId }.toSet())
+            brukere.brukere(*map { it.brukerId }.toTypedArray())
                 .associateBy { it.brukerId.verdi }[it.brukerId]?.let { bruker ->
                 bruker to it.type
             }

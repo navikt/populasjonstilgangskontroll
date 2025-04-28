@@ -9,15 +9,14 @@ import java.time.LocalDate
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
-import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.brukere.vanligBrukerMedHistoriskIdent
-import no.nav.tilgangsmaskin.regler.brukere.vanligHistoriskBruker
 import no.nav.tilgangsmaskin.regler.brukerids
+import no.nav.tilgangsmaskin.regler.brukerids.vanligBrukerId
 import no.nav.tilgangsmaskin.regler.grupper
 import no.nav.tilgangsmaskin.regler.motor.RegelBeanConfig
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
@@ -43,6 +42,8 @@ import kotlin.test.Test
 @ActiveProfiles(TEST)
 @Testcontainers
 internal class OverstyringTest {
+
+    private val historiskBrukerId = BrukerId("11111111111")
 
     @Autowired
     private lateinit var motor: RegelMotor
@@ -79,74 +80,85 @@ internal class OverstyringTest {
     @Test
     @DisplayName("Test gyldig overstyring via historisk ident")
     fun testOverstyringGyldigHistorisk() {
-        expect(vanligBrukerMedHistoriskIdent)
-        expect(vanligHistoriskBruker)
+        val bruker1 = BrukerBuilder(vanligBrukerId).historiske(setOf(historiskBrukerId)).build()
+        every {
+            brukerTjeneste.nærmesteFamilie(bruker1.brukerId.verdi)
+        } returns bruker1
+        val bruker = BrukerBuilder(historiskBrukerId).gt(GeografiskTilknytning.Companion.udefinertTilknytning)
+            .build()
+        every {
+            brukerTjeneste.nærmesteFamilie(bruker.brukerId.verdi)
+        } returns bruker
         overstyring.overstyr(
                 AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId, OverstyringData(
-                vanligBrukerMedHistoriskIdent.historiskeIds.first(),
+                BrukerBuilder(vanligBrukerId).historiske(setOf(historiskBrukerId))
+                    .build().historiskeIds.first(),
                 "test",
                 LocalDate.now().plusDays(1)))
         assertThat(
                 overstyring.erOverstyrt(
                         AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
-                        vanligBrukerMedHistoriskIdent.brukerId)).isTrue
+                        BrukerBuilder(vanligBrukerId).historiske(setOf(historiskBrukerId))
+                            .build().brukerId)).isTrue
     }
 
     @Test
     @DisplayName("Test gyldig overstyring")
     fun testOverstyringGyldig() {
-        expect(BrukerBuilder(brukerids.vanligBrukerId).build())
+        val bruker = BrukerBuilder(vanligBrukerId).build()
+        every {
+            brukerTjeneste.nærmesteFamilie(bruker.brukerId.verdi)
+        } returns bruker
         overstyring.overstyr(
                 AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId, OverstyringData(
-                BrukerBuilder(brukerids.vanligBrukerId).build().brukerId,
+                BrukerBuilder(vanligBrukerId).build().brukerId,
                 "gammel",
                 LocalDate.now().minusDays(1)))
         overstyring.overstyr(
                 AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId, OverstyringData(
-                BrukerBuilder(brukerids.vanligBrukerId).build().brukerId,
+                BrukerBuilder(vanligBrukerId).build().brukerId,
                 "ny",
                 LocalDate.now().plusDays(1)))
         assertThat(
                 overstyring.erOverstyrt(
                         AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
-                        BrukerBuilder(brukerids.vanligBrukerId).build().brukerId)).isTrue
+                        BrukerBuilder(vanligBrukerId).build().brukerId)).isTrue
     }
 
     @Test
     @DisplayName("Test utgått overstyring")
     fun testOverstyringUtgått() {
-        expect(BrukerBuilder(brukerids.vanligBrukerId).build())
+        val bruker = BrukerBuilder(vanligBrukerId).build()
+        every {
+            brukerTjeneste.nærmesteFamilie(bruker.brukerId.verdi)
+        } returns bruker
         overstyring.overstyr(
                 AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId, OverstyringData(
-                BrukerBuilder(brukerids.vanligBrukerId).build().brukerId,
+                BrukerBuilder(vanligBrukerId).build().brukerId,
                 "ny",
                 LocalDate.now().minusDays(1)))
         assertThat(
                 overstyring.erOverstyrt(
                         AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
-                        BrukerBuilder(brukerids.vanligBrukerId).build().brukerId)).isFalse
+                        BrukerBuilder(vanligBrukerId).build().brukerId)).isFalse
 
     }
 
     @Test
     @DisplayName("Test overstyring, intet db innslag")
     fun testOverstyringUtenDBInnslag() {
-        expect(
-                BrukerBuilder(brukerids.ukjentBostedBrukerId, GeografiskTilknytning.UkjentBosted())
-                    .grupper(GlobalGruppe.UKJENT_BOSTED)
-                    .build())
+        val bruker = BrukerBuilder(brukerids.ukjentBostedBrukerId, GeografiskTilknytning.UkjentBosted())
+            .grupper(GlobalGruppe.UKJENT_BOSTED)
+            .build()
+        every {
+            brukerTjeneste.nærmesteFamilie(bruker.brukerId.verdi)
+        } returns bruker
         assertThat(
                 overstyring.erOverstyrt(
                         AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
                         BrukerBuilder(brukerids.ukjentBostedBrukerId, GeografiskTilknytning.UkjentBosted())
                             .grupper(GlobalGruppe.UKJENT_BOSTED)
                             .build().brukerId)).isFalse
-    }
-
-    private fun expect(bruker: Bruker) {
-        every {
-            brukerTjeneste.nærmesteFamilie(bruker.brukerId.verdi)
-        } returns bruker
     }
 
     companion object {

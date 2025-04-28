@@ -5,13 +5,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.Enhetsnummer
 import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.AktørId
-import no.nav.tilgangsmaskin.bruker.Bruker
-import no.nav.tilgangsmaskin.bruker.Bruker.BrukerIds
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.udefinertTilknytning
-import no.nav.tilgangsmaskin.regler.brukerids.historiskBrukerId
-import no.nav.tilgangsmaskin.regler.brukerids.vanligBrukerId
-import no.nav.tilgangsmaskin.regler.diverse.aktørId
 import no.nav.tilgangsmaskin.regler.diverse.enhet
 
 object diverse {
@@ -24,15 +18,6 @@ object brukerids {
     internal val strengtFortroligBrukerId = BrukerId("08526835671")
     internal val fortroligBrukerId = BrukerId("08526835672")
     internal val ukjentBostedBrukerId = BrukerId("08526835676")
-    internal val historiskBrukerId = BrukerId("11111111111")
-}
-
-object brukere {
-    internal val vanligHistoriskBruker = Bruker(ids(historiskBrukerId), udefinertTilknytning)
-    internal val vanligBrukerMedHistoriskIdent =
-        Bruker(ids(vanligBrukerId, setOf(vanligHistoriskBruker.brukerId)), udefinertTilknytning)
-
-    private fun ids(id: BrukerId, historiske: Set<BrukerId> = emptySet()) = BrukerIds(id, historiske, aktørId)
 }
 
 object grupper {

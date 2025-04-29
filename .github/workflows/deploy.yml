@@ -54,11 +54,7 @@ jobs:
           ORG_GRADLE_PROJECT_githubUser: x-access-token
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish results (unit test)
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
-        with:
-          junit_files: "**/build/test-results/test/TEST-*.xml"
+    
 
       - name: Attest and sign
         uses: nais/attest-sign@v1.5.7

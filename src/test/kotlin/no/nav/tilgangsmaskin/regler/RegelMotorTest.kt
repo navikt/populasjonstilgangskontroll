@@ -61,7 +61,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Egen ansatt bruker med strengt fortrolig beskyttelse kan ikke behandles av ansatt med medlemsskap kun i egen ansatt gruppe")
         fun egenAnsattStrengtFortroligBrukerEgenAnsattAvvises() {
-            val ansatt = AnsattBuilder().erMedlemI(SKJERMING).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(SKJERMING).build()
             val bruker = BrukerBuilder(vanligBrukerId).krever(STRENGT_FORTROLIG, SKJERMING).build()
             forventAvvist<StrengtFortroligRegel>(ansatt, bruker)
         }
@@ -69,7 +69,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Egen ansatt bruker med fortrolig beskyttelse kan ikke behandles av ansatt med medlemsskap i egen gruppe ansatt")
         fun egenAnsattFortroligBrukerEgenAnsattAvvises() {
-            val ansatt = AnsattBuilder().erMedlemI(SKJERMING).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(SKJERMING).build()
             val bruker = BrukerBuilder(vanligBrukerId).krever(FORTROLIG, SKJERMING).build()
             forventAvvist<FortroligRegel>(ansatt, bruker)
         }
@@ -77,7 +77,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Egen ansatt bruker med fortrolig beskyttelse kan behandles av ansatt med medlemsskap i egen ansatt gruppe som også har medlemsskap i fortrolig gruppe")
         fun egenAnsattFortroligBrukerEgenAnsattFortroligAnsattOK() {
-            val ansatt = AnsattBuilder().erMedlemI(FORTROLIG, SKJERMING).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(FORTROLIG, SKJERMING).build()
             val bruker = BrukerBuilder(vanligBrukerId).krever(FORTROLIG, SKJERMING).build()
             forventOK(ansatt, bruker)
         }
@@ -85,7 +85,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Egen ansatt bruker med strengt fortrolig beskyttelse kan behandles av ansatt i egen ansatt gruppe som også har strengt fortrolig gruppe")
         fun egenAnsattStrengtFortroligBrukerEgenAnsattStrengtFortroligAnsattOK() {
-            val ansatt = AnsattBuilder().erMedlemI(STRENGT_FORTROLIG, SKJERMING).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(STRENGT_FORTROLIG, SKJERMING).build()
             val bruker = BrukerBuilder(vanligBrukerId).krever(STRENGT_FORTROLIG, SKJERMING).build()
             forventOK(ansatt, bruker)
         }
@@ -93,7 +93,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Egen ansatt bruker med strengt fortrolig beskyttelse kan ikke behandles av ansatt med medlemsskap i egen ansatt gruppe")
         fun egenAnsattStrengtFortroligBrukerFortroligAnsattAvvises() {
-            val ansatt = AnsattBuilder().erMedlemI(FORTROLIG).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).krever(STRENGT_FORTROLIG, SKJERMING).build()
             forventAvvist<StrengtFortroligRegel>(ansatt, bruker)
         }
@@ -101,7 +101,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Egen ansatt bruker *kan* behandles av ansatt med medlemsskap i egen ansatt gruppe")
         fun egenAnsattBrukerEgenAnsattOK() {
-            val ansatt = AnsattBuilder().erMedlemI(SKJERMING).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(SKJERMING).build()
             val bruker = BrukerBuilder(vanligBrukerId).krever(SKJERMING).build()
             regelMotor.kompletteRegler(ansatt, bruker)
             forventOK(ansatt, bruker)
@@ -119,14 +119,14 @@ class RegelMotorTest {
         @Test
         fun egneDataAvvist() {
             val bruker = BrukerBuilder(vanligBrukerId).krever(SKJERMING).build()
-            val ansatt = AnsattBuilder().erMedlemI(SKJERMING).bruker(bruker).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(SKJERMING).bruker(bruker).build()
             forventAvvist<EgneDataRegel>(ansatt, bruker)
         }
 
         @Test
         @DisplayName("Egen ansatt bruker kan ikke behandles av ansatt med medlemsskap i fortrolig gruppe")
         fun egenAnsattBrukerFortroligAnsattAvvises() {
-            val ansatt = AnsattBuilder().erMedlemI(FORTROLIG).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).krever(SKJERMING).build()
             forventAvvist<SkjermingRegel>(ansatt, bruker)
         }
@@ -134,7 +134,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Egen ansatt bruker kan ikke behandles av ansatt med medlemsskap i strengt fortrolig gruppe")
         fun egenAnsattBrukerStrengtFortroligAnsattAvvises() {
-            val ansatt = AnsattBuilder().erMedlemI(STRENGT_FORTROLIG).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(STRENGT_FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).krever(SKJERMING).build()
             forventAvvist<SkjermingRegel>(ansatt, bruker)
         }
@@ -148,7 +148,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Fortrolig bruker kan ikke behandles av ansatt med medlemsskap i strengt fortrolig gruppe")
         fun fortroligAvvist() {
-            val ansatt = AnsattBuilder().erMedlemI(STRENGT_FORTROLIG).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(STRENGT_FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).krever(FORTROLIG).build()
             forventAvvist<FortroligRegel>(ansatt, bruker)
         }
@@ -164,7 +164,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Fortrolig bruker kan behandles av ansatt med medlemsskap i fortrolig gruppe")
         fun fortroligOK() {
-            val ansatt = AnsattBuilder().erMedlemI(FORTROLIG).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).krever(FORTROLIG).build()
             forventOK(ansatt, bruker)
         }
@@ -180,7 +180,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Ansatt med nasjonal tilgang kan behandle vanlig bruker")
         fun nasjonal() {
-            val ansatt = AnsattBuilder().erMedlemI(NASJONAL).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(NASJONAL).build()
             val bruker = BrukerBuilder(vanligBrukerId).build()
             forventOK(ansatt, bruker)
         }
@@ -188,7 +188,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Ansatt med manglende geografisk tilknytning gruppe kan behandle bruker uten kjent geografisk tilknytning")
         fun ukjentBosted() {
-            val ansatt = AnsattBuilder().erMedlemI(UKJENT_BOSTED).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(UKJENT_BOSTED).build()
             val bruker = BrukerBuilder(vanligBrukerId, UkjentBosted()).krever(UKJENT_BOSTED).build()
             forventOK(ansatt, bruker)
         }
@@ -272,7 +272,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Test at bruker med strengt fortrolig beskyttelse kan ikke behandles av ansatt med medlemsskap i fortrolig gruppe")
         fun stregtAvvist1() {
-            val ansatt = AnsattBuilder().erMedlemI(FORTROLIG).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).krever(STRENGT_FORTROLIG).build()
             forventAvvist<StrengtFortroligRegel>(ansatt, bruker)
         }
@@ -280,7 +280,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Test at bruker med strengt fortrolig beskyttelse kan behandles av ansatt med medlemsskap i strengt fortrolig gruppe")
         fun strengtOK() {
-            val ansatt = AnsattBuilder().erMedlemI(STRENGT_FORTROLIG).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(STRENGT_FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).krever(STRENGT_FORTROLIG).build()
             forventOK(ansatt, bruker)
         }
@@ -292,7 +292,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Bruker med strengt fortrolig utland beskyttelse kan behandles av ansatt med medlemsskap i strengt fortrolig gruppe")
         fun strengtUtlandOK() {
-            val ansatt = AnsattBuilder().erMedlemI(STRENGT_FORTROLIG).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(STRENGT_FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).krever(STRENGT_FORTROLIG_UTLAND).build()
             forventOK(ansatt, bruker)
         }
@@ -300,7 +300,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Bruker med strengt fortrolig utland beskyttelse kan ikke behandles av ansatt med medlemsskap i fortrolig gruppe")
         fun strengtUtlandAvvist() {
-            val ansatt = AnsattBuilder().erMedlemI(FORTROLIG).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).krever(STRENGT_FORTROLIG_UTLAND).build()
             forventAvvist<StrengtFortroligUtlandRegel>(ansatt, bruker)
         }
@@ -320,7 +320,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Vanlig bruker kan behandles av ansatt med medlemsskap i strengt fortrolig gruppe")
         fun vanligBrukertStrengtFortroligAnsattOK() {
-            val ansatt = AnsattBuilder().erMedlemI(STRENGT_FORTROLIG).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(STRENGT_FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).build()
             forventOK(ansatt, bruker)
         }
@@ -328,7 +328,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Vanlig bruker kan behandles av ansatt med medlemsskap i fortrolig gruppe")
         fun vanligBrukerFortroligAnsattOK() {
-            val ansatt = AnsattBuilder().erMedlemI(FORTROLIG).build()
+            val ansatt = AnsattBuilder().medMedlemskapI(FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).build()
             forventOK(ansatt, bruker)
 

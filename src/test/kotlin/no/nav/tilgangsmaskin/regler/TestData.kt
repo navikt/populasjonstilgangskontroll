@@ -13,7 +13,6 @@ object grupper {
         EntraGruppe(UUID.fromString("ea930b6b-9397-44d9-b9e6-f4cf527a632a"), "Fortrolig gruppe")
     internal val egenAnsattGruppe =
         EntraGruppe(UUID.fromString("dbe4ad45-320b-4e9a-aaa1-73cca4ee124d"), "egen gruppe")
-    internal val annenGruppe = EntraGruppe(UUID.randomUUID(), "Annen gruppe")
     internal val geoUtlandGruppe =
         EntraGruppe(UUID.fromString("de62a4bf-957b-4cde-acdb-6d8bcbf821a0"), "Geo utland gruppe")
     internal val udefinertGruppe =

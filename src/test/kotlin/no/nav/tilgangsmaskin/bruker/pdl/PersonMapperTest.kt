@@ -75,5 +75,4 @@ class PersonMapperTest {
                 PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT), PdlIdent(aktørId, false, AKTORID))),
                 geo)
     }
-
 }

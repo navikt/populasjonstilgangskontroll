@@ -4,18 +4,20 @@ import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import java.time.LocalDate.EPOCH
-import java.time.LocalDate.now
 import no.nav.tilgangsmaskin.TestApp
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
+import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode.Companion.ALWAYS
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
-import no.nav.tilgangsmaskin.regler.AnsattBuilder
-import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.grupper
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.YESTERDAY
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringEntityListener
 import no.nav.tilgangsmaskin.tilgang.TokenClaimsAccessor
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -25,7 +27,6 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.transaction.annotation.Transactional
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Testcontainers
-import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 
@@ -35,18 +36,14 @@ import kotlin.test.Test
 @ActiveProfiles(TEST)
 @Transactional
 @Testcontainers
+@TestInstance(PER_CLASS)
 internal class NomTest {
 
     private val vanligBrukerId = BrukerId("08526835670")
-
-
-    private val IGÅR = NomAnsattPeriode(EPOCH, now().minusDays(1))
-    private val UTGÅTT = NomAnsattData(
-            AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
-            BrukerBuilder(vanligBrukerId).build().brukerId, IGÅR)
-    private val GYLDIG = NomAnsattData(
-            AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId,
-            BrukerBuilder(vanligBrukerId).build().brukerId)
+    private val ansattId = AnsattId("Z999999")
+    private val IGÅR = NomAnsattPeriode(EPOCH, YESTERDAY)
+    private val UTGÅTT = NomAnsattData(ansattId, vanligBrukerId, IGÅR)
+    private val GYLDIG = NomAnsattData(ansattId, vanligBrukerId, ALWAYS)
 
     @Autowired
     private lateinit var adapter: NomJPAAdapter
@@ -56,37 +53,33 @@ internal class NomTest {
 
     private lateinit var nom: Nom
 
-    @BeforeTest
+    @BeforeAll
     fun setup() {
         every { accessor.system } returns "test"
         nom = Nom(adapter)
     }
 
     @Test
-    @DisplayName("Test utgått ansatt")
+    @DisplayName("Utgått ansatt retureres ikke")
     fun ansattIkkeLengerAnsatt() {
         nom.lagre(UTGÅTT)
-        assertThat(nom.fnrForAnsatt(AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId)).isNull()
+        assertThat(nom.fnrForAnsatt(ansattId)).isNull()
     }
 
     @Test
-    @DisplayName("Test ingen sluttdato ok")
+    @DisplayName("Ansatt uten sluttdato er gyldig")
     fun ingenSluttdato() {
         nom.lagre(GYLDIG)
-        assertThat(
-                nom.fnrForAnsatt(
-                        AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId)).isEqualTo(GYLDIG.brukerId)
+        assertThat(nom.fnrForAnsatt(ansattId)).isEqualTo(GYLDIG.brukerId)
     }
 
     @Test
-    @DisplayName("Test lagre, så oppdater, siste gjelder")
+    @DisplayName("Siste hendelse gjelder")
     fun oppdaterSamme() {
         nom.lagre(UTGÅTT)
-        assertThat(nom.fnrForAnsatt(AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId)).isNull()
+        assertThat(nom.fnrForAnsatt(ansattId)).isNull()
         nom.lagre(GYLDIG)
-        assertThat(
-                nom.fnrForAnsatt(
-                        AnsattBuilder().grupper(grupper.annenGruppe).build().ansattId)).isEqualTo(GYLDIG.brukerId)
+        assertThat(nom.fnrForAnsatt(ansattId)).isEqualTo(GYLDIG.brukerId)
     }
 
     companion object {

@@ -15,7 +15,6 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
-import no.nav.tilgangsmaskin.regler.grupper.annenGruppe
 import no.nav.tilgangsmaskin.regler.grupper.egenAnsattGruppe
 import no.nav.tilgangsmaskin.regler.grupper.enhet
 import no.nav.tilgangsmaskin.regler.grupper.enhetGruppe
@@ -160,7 +159,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Bruker med fortrolig beskyttelse kan ikke behandles av vanlig ansatt")
         fun fortroligAvvist1() {
-            val ansatt = AnsattBuilder().grupper(annenGruppe).build()
+            val ansatt = AnsattBuilder().build()
             val bruker = BrukerBuilder(vanligBrukerId).grupper(FORTROLIG).build()
             forventAvvist<FortroligRegel>(ansatt, bruker)
         }

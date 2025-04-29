@@ -59,6 +59,7 @@ jobs:
         uses: mikepenz/action-junit-report@v5
         if: always() # always run even if the previous step fails
         with:
+          include_passed: 'true'
           report_paths: '**/build/test-results/test/TEST-*.xml'
 
       - name: Attest and sign

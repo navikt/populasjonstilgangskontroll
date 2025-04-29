@@ -63,7 +63,7 @@ class RegelMotorTest {
         fun egenAnsattStrengtFortroligBrukerEgenAnsattAvvises() {
             val ansatt = AnsattBuilder().medMedlemskapI(SKJERMING).build()
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(STRENGT_FORTROLIG, SKJERMING).build()
-            forventAvvist<StrengtFortroligRegel>(ansatt, bruker)
+            forventAvvistAv<StrengtFortroligRegel>(ansatt, bruker)
         }
 
         @Test
@@ -71,7 +71,7 @@ class RegelMotorTest {
         fun egenAnsattFortroligBrukerEgenAnsattAvvises() {
             val ansatt = AnsattBuilder().medMedlemskapI(SKJERMING).build()
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(FORTROLIG, SKJERMING).build()
-            forventAvvist<FortroligRegel>(ansatt, bruker)
+            forventAvvistAv<FortroligRegel>(ansatt, bruker)
         }
 
         @Test
@@ -79,7 +79,7 @@ class RegelMotorTest {
         fun egenAnsattFortroligBrukerEgenAnsattFortroligAnsattOK() {
             val ansatt = AnsattBuilder().medMedlemskapI(FORTROLIG, SKJERMING).build()
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(FORTROLIG, SKJERMING).build()
-            forventOK(ansatt, bruker)
+            ansatt kanBehandle bruker
         }
 
         @Test
@@ -87,7 +87,7 @@ class RegelMotorTest {
         fun egenAnsattStrengtFortroligBrukerEgenAnsattStrengtFortroligAnsattOK() {
             val ansatt = AnsattBuilder().medMedlemskapI(STRENGT_FORTROLIG, SKJERMING).build()
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(STRENGT_FORTROLIG, SKJERMING).build()
-            forventOK(ansatt, bruker)
+            ansatt kanBehandle bruker
         }
 
         @Test
@@ -95,7 +95,7 @@ class RegelMotorTest {
         fun egenAnsattStrengtFortroligBrukerFortroligAnsattAvvises() {
             val ansatt = AnsattBuilder().medMedlemskapI(FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(STRENGT_FORTROLIG, SKJERMING).build()
-            forventAvvist<StrengtFortroligRegel>(ansatt, bruker)
+            forventAvvistAv<StrengtFortroligRegel>(ansatt, bruker)
         }
 
         @Test
@@ -104,7 +104,7 @@ class RegelMotorTest {
             val ansatt = AnsattBuilder().medMedlemskapI(SKJERMING).build()
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(SKJERMING).build()
             regelMotor.kompletteRegler(ansatt, bruker)
-            forventOK(ansatt, bruker)
+            ansatt kanBehandle bruker
         }
 
         @Test
@@ -112,7 +112,7 @@ class RegelMotorTest {
         fun ansattBrukerVanligAnsattAvvises() {
             val ansatt = AnsattBuilder().build()
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(SKJERMING).build()
-            forventAvvist<SkjermingRegel>(ansatt, bruker)
+            forventAvvistAv<SkjermingRegel>(ansatt, bruker)
         }
 
         @DisplayName("Ansatt kan ikke behandle seg selv")
@@ -120,7 +120,7 @@ class RegelMotorTest {
         fun egneDataAvvist() {
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(SKJERMING).build()
             val ansatt = AnsattBuilder().medMedlemskapI(SKJERMING).bruker(bruker).build()
-            forventAvvist<EgneDataRegel>(ansatt, bruker)
+            forventAvvistAv<EgneDataRegel>(ansatt, bruker)
         }
 
         @Test
@@ -128,7 +128,7 @@ class RegelMotorTest {
         fun egenAnsattBrukerFortroligAnsattAvvises() {
             val ansatt = AnsattBuilder().medMedlemskapI(FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(SKJERMING).build()
-            forventAvvist<SkjermingRegel>(ansatt, bruker)
+            forventAvvistAv<SkjermingRegel>(ansatt, bruker)
         }
 
         @Test
@@ -136,7 +136,7 @@ class RegelMotorTest {
         fun egenAnsattBrukerStrengtFortroligAnsattAvvises() {
             val ansatt = AnsattBuilder().medMedlemskapI(STRENGT_FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(SKJERMING).build()
-            forventAvvist<SkjermingRegel>(ansatt, bruker)
+            forventAvvistAv<SkjermingRegel>(ansatt, bruker)
         }
     }
 
@@ -150,7 +150,7 @@ class RegelMotorTest {
         fun fortroligAvvist() {
             val ansatt = AnsattBuilder().medMedlemskapI(STRENGT_FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(FORTROLIG).build()
-            forventAvvist<FortroligRegel>(ansatt, bruker)
+            forventAvvistAv<FortroligRegel>(ansatt, bruker)
         }
 
         @Test
@@ -158,7 +158,7 @@ class RegelMotorTest {
         fun fortroligAvvist1() {
             val ansatt = AnsattBuilder().build()
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(FORTROLIG).build()
-            forventAvvist<FortroligRegel>(ansatt, bruker)
+            forventAvvistAv<FortroligRegel>(ansatt, bruker)
         }
 
         @Test
@@ -166,7 +166,7 @@ class RegelMotorTest {
         fun fortroligOK() {
             val ansatt = AnsattBuilder().medMedlemskapI(FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(FORTROLIG).build()
-            forventOK(ansatt, bruker)
+            ansatt kanBehandle bruker
         }
     }
 
@@ -182,7 +182,7 @@ class RegelMotorTest {
         fun nasjonal() {
             val ansatt = AnsattBuilder().medMedlemskapI(NASJONAL).build()
             val bruker = BrukerBuilder(vanligBrukerId).build()
-            forventOK(ansatt, bruker)
+            ansatt kanBehandle bruker
         }
 
         @Test
@@ -190,7 +190,7 @@ class RegelMotorTest {
         fun ukjentBosted() {
             val ansatt = AnsattBuilder().medMedlemskapI(UKJENT_BOSTED).build()
             val bruker = BrukerBuilder(vanligBrukerId, UkjentBosted()).somKreverMedlemskapI(UKJENT_BOSTED).build()
-            forventOK(ansatt, bruker)
+            ansatt kanBehandle bruker
         }
 
         @Test
@@ -198,7 +198,7 @@ class RegelMotorTest {
         fun geoOK() {
             val ansatt = AnsattBuilder().grupper(enhetGruppe).build()
             val bruker = BrukerBuilder(vanligBrukerId).gt(KommuneTilknytning(Kommune(enhet.verdi))).build()
-            forventOK(ansatt, bruker)
+            ansatt kanBehandle bruker
         }
 
         @Test
@@ -206,7 +206,7 @@ class RegelMotorTest {
         fun geoAvslått() {
             val ansatt = AnsattBuilder().grupper(enhetGruppe).build()
             val bruker = BrukerBuilder(vanligBrukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
-            forventAvvist<NorgeRegel>(ansatt, bruker)
+            forventAvvistAv<NorgeRegel>(ansatt, bruker)
         }
     }
 
@@ -224,7 +224,7 @@ class RegelMotorTest {
                     .build()
             val ansatt = AnsattBuilder().bruker(ansattBruker).build()
             val partner = BrukerBuilder(vanligBrukerId).build()
-            forventAvvist<PartnerRegel>(ansatt, partner)
+            forventAvvistAv<PartnerRegel>(ansatt, partner)
         }
 
         @Test
@@ -234,7 +234,7 @@ class RegelMotorTest {
                 BrukerBuilder(annenAnsattBrukerId).somKreverMedlemskapI(SKJERMING).barn(setOf(vanligBrukerId)).build()
             val ansatt = AnsattBuilder().bruker(ansattBruker).build()
             val barn = BrukerBuilder(vanligBrukerId).build()
-            forventAvvist<ForeldreOgBarnRegel>(ansatt, barn)
+            forventAvvistAv<ForeldreOgBarnRegel>(ansatt, barn)
         }
 
         @Test
@@ -244,7 +244,7 @@ class RegelMotorTest {
                 BrukerBuilder(annenAnsattBrukerId).somKreverMedlemskapI(SKJERMING).far(vanligBrukerId).build()
             val ansatt = AnsattBuilder().bruker(ansattBruker).build()
             val far = BrukerBuilder(vanligBrukerId).build()
-            forventAvvist<ForeldreOgBarnRegel>(ansatt, far)
+            forventAvvistAv<ForeldreOgBarnRegel>(ansatt, far)
         }
 
         @Test
@@ -254,7 +254,7 @@ class RegelMotorTest {
                 BrukerBuilder(annenAnsattBrukerId).somKreverMedlemskapI(SKJERMING).søsken(setOf(vanligBrukerId)).build()
             val ansatt = AnsattBuilder().bruker(ansattBruker).build()
             val søsken = BrukerBuilder(vanligBrukerId).build()
-            forventAvvist<SøskenRegel>(ansatt, søsken)
+            forventAvvistAv<SøskenRegel>(ansatt, søsken)
         }
     }
 
@@ -268,7 +268,7 @@ class RegelMotorTest {
         fun strengtAvvist() {
             val ansatt = AnsattBuilder().build()
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(STRENGT_FORTROLIG).build()
-            forventAvvist<StrengtFortroligRegel>(ansatt, bruker)
+            forventAvvistAv<StrengtFortroligRegel>(ansatt, bruker)
         }
 
         @Test
@@ -276,7 +276,7 @@ class RegelMotorTest {
         fun stregtAvvist1() {
             val ansatt = AnsattBuilder().medMedlemskapI(FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(STRENGT_FORTROLIG).build()
-            forventAvvist<StrengtFortroligRegel>(ansatt, bruker)
+            forventAvvistAv<StrengtFortroligRegel>(ansatt, bruker)
         }
 
         @Test
@@ -284,7 +284,7 @@ class RegelMotorTest {
         fun strengtOK() {
             val ansatt = AnsattBuilder().medMedlemskapI(STRENGT_FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(STRENGT_FORTROLIG).build()
-            forventOK(ansatt, bruker)
+            ansatt kanBehandle bruker
         }
     }
 
@@ -296,7 +296,7 @@ class RegelMotorTest {
         fun strengtUtlandOK() {
             val ansatt = AnsattBuilder().medMedlemskapI(STRENGT_FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
-            forventOK(ansatt, bruker)
+            ansatt kanBehandle bruker
         }
 
         @Test
@@ -304,7 +304,7 @@ class RegelMotorTest {
         fun strengtUtlandAvvist() {
             val ansatt = AnsattBuilder().medMedlemskapI(FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
-            forventAvvist<StrengtFortroligUtlandRegel>(ansatt, bruker)
+            forventAvvistAv<StrengtFortroligUtlandRegel>(ansatt, bruker)
         }
 
         @Test
@@ -312,7 +312,7 @@ class RegelMotorTest {
         fun strengtUtlandAvvist1() {
             val ansatt = AnsattBuilder().build()
             val bruker = BrukerBuilder(vanligBrukerId).somKreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
-            forventAvvist<StrengtFortroligUtlandRegel>(ansatt, bruker)
+            forventAvvistAv<StrengtFortroligUtlandRegel>(ansatt, bruker)
         }
     }
 
@@ -324,7 +324,7 @@ class RegelMotorTest {
         fun vanligBrukertStrengtFortroligAnsattOK() {
             val ansatt = AnsattBuilder().medMedlemskapI(STRENGT_FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).build()
-            forventOK(ansatt, bruker)
+            ansatt kanBehandle bruker
         }
 
         @Test
@@ -332,7 +332,7 @@ class RegelMotorTest {
         fun vanligBrukerFortroligAnsattOK() {
             val ansatt = AnsattBuilder().medMedlemskapI(FORTROLIG).build()
             val bruker = BrukerBuilder(vanligBrukerId).build()
-            forventOK(ansatt, bruker)
+            ansatt kanBehandle bruker
 
         }
 
@@ -341,18 +341,18 @@ class RegelMotorTest {
         fun vanligBrukerVanligAnsattOK() {
             val ansatt = AnsattBuilder().build()
             val bruker = BrukerBuilder(vanligBrukerId).build()
-            forventOK(ansatt, bruker)
+            ansatt kanBehandle bruker
         }
     }
 
-    private inline fun <reified T : Regel> forventAvvist(ansatt: Ansatt, bruker: Bruker) =
+    private inline fun <reified T : Regel> forventAvvistAv(ansatt: Ansatt, bruker: Bruker) =
         assertInstanceOf<T>(assertThrows<RegelException> {
             regelMotor.kompletteRegler(ansatt, bruker)
         }.regel)
 
-    private fun forventOK(ansatt: Ansatt, bruker: Bruker) {
+    private infix fun Ansatt.kanBehandle(bruker: Bruker) {
         assertThatCode {
-            regelMotor.kompletteRegler(ansatt, bruker)
+            regelMotor.kompletteRegler(this, bruker)
         }.doesNotThrowAnyException()
     }
 }

@@ -119,10 +119,12 @@ class RegelTjenesteTest {
     fun ikkeOverstyrt() {
         every {
             brukere.nærmesteFamilie(
-                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(UTENLANDSK).build().brukerId.verdi)
-        } returns BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(UTENLANDSK).build()
+                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).krever(UTENLANDSK)
+                        .build().brukerId.verdi)
+        } returns BrukerBuilder(vanligBrukerId, utenlandskTilknytning).krever(UTENLANDSK).build()
         assertThrows<RegelException> {
-            val brukerId = BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(UTENLANDSK).build().brukerId
+            val brukerId =
+                BrukerBuilder(vanligBrukerId, utenlandskTilknytning).krever(UTENLANDSK).build().brukerId
             regler.kompletteRegler(ansattId, brukerId.verdi)
         }
     }
@@ -133,8 +135,8 @@ class RegelTjenesteTest {
         every {
             brukere.brukere(strengtFortroligBrukerId.verdi, fortroligBrukerId.verdi)
         } returns listOf(
-                BrukerBuilder(strengtFortroligBrukerId).grupper(STRENGT_FORTROLIG).build(),
-                BrukerBuilder(fortroligBrukerId).grupper(FORTROLIG).build())
+                BrukerBuilder(strengtFortroligBrukerId).krever(STRENGT_FORTROLIG).build(),
+                BrukerBuilder(fortroligBrukerId).krever(FORTROLIG).build())
         assertEquals(assertThrows<BulkRegelException> {
             regler.bulkRegler(
                     ansattId,
@@ -146,20 +148,21 @@ class RegelTjenesteTest {
     fun bulkAvvisningerOverstyrt() {
         every {
             brukere.nærmesteFamilie(
-                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(
+                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).krever(
                             UTENLANDSK).build().brukerId.verdi)
-        } returns BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(UTENLANDSK).build()
+        } returns BrukerBuilder(vanligBrukerId, utenlandskTilknytning).krever(UTENLANDSK).build()
         every {
             brukere.brukere(
-                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(UTENLANDSK).build().brukerId.verdi)
+                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).krever(UTENLANDSK)
+                        .build().brukerId.verdi)
         } returns listOf(
                 BrukerBuilder(
                         vanligBrukerId,
-                        utenlandskTilknytning).grupper(
+                        utenlandskTilknytning).krever(
                         UTENLANDSK).build())
         overstyring.overstyr(
                 ansattId, OverstyringData(
-                BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(
+                BrukerBuilder(vanligBrukerId, utenlandskTilknytning).krever(
                         UTENLANDSK).build().brukerId,
                 "test",
                 TOMORROW))
@@ -168,7 +171,7 @@ class RegelTjenesteTest {
                     ansattId,
                     setOf(
                             IdOgType(
-                                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).grupper(UTENLANDSK)
+                                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).krever(UTENLANDSK)
                                         .build().brukerId.verdi)))
         }.doesNotThrowAnyException()
     }

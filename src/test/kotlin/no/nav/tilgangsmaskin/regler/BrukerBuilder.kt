@@ -56,12 +56,14 @@ data class BrukerBuilder(
 
 data class AnsattBuilder(
         var grupper: Set<EntraGruppe> = emptySet(),
+        var globaleGrupper: Set<GlobalGruppe> = emptySet(),
         var id: AnsattId = AnsattId("Z999999"),
         var oid: UUID = UUID.randomUUID(),
         var bruker: Bruker? = null) {
 
     fun id(id: AnsattId) = apply { this.id = id }
+    fun globaleGrupper(vararg grupper: GlobalGruppe) = apply { this.globaleGrupper = setOf(*grupper) }
     fun grupper(vararg grupper: EntraGruppe) = apply { this.grupper = setOf(*grupper) }
     fun bruker(bruker: Bruker?) = apply { bruker?.let { this.bruker = it } }
-    fun build() = Ansatt(AnsattIds(id, oid), bruker, grupper)
+    fun build() = Ansatt(AnsattIds(id, oid), bruker, grupper + globaleGrupper.map { EntraGruppe(it.id) }.toSet())
 }

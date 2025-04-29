@@ -31,7 +31,7 @@ data class Bruker(
 
     val harUkjentBosted = geografiskTilknytning is UkjentBosted
     val harUtenlandskBosted = geografiskTilknytning is UtenlandskTilknytning
-    infix fun krever(gruppe: GlobalGruppe) = gruppe in påkrevdeGrupper
+    infix fun kreverMedlemskapI(gruppe: GlobalGruppe) = gruppe in påkrevdeGrupper
 
     data class BrukerIds(val brukerId: BrukerId,
                          val historiskeIds: Set<BrukerId> = emptySet(),

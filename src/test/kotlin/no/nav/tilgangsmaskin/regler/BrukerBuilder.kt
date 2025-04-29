@@ -31,7 +31,7 @@ data class BrukerBuilder(
         var partnere: Set<FamilieMedlem> = emptySet(),
         var dødsdato: LocalDate? = null) {
     fun gt(gt: GeografiskTilknytning) = apply { this.gt = gt }
-    fun krever(vararg grupper: GlobalGruppe) = apply { this.grupper = setOf(*grupper) }
+    fun somKreverMedlemskapI(vararg grupper: GlobalGruppe) = apply { this.grupper = setOf(*grupper) }
     fun barn(barn: Set<BrukerId>) = apply { this.barn = barn.tilFamilieMedlemmer(BARN) }
     fun mor(mor: BrukerId?) = apply { this.mor = mor?.tilFamilieMedlem(MOR) }
     fun far(far: BrukerId?) = apply { this.far = far?.tilFamilieMedlem(FAR) }

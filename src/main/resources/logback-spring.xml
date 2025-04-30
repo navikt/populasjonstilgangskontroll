@@ -4,6 +4,19 @@
               class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
+    <appender name="secureLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/secure-logs/secure.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>/secure-logs/secure.log.%i</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>1</maxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>50MB</maxFileSize>
+        </triggeringPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+
     <springProfile name="dev">
         <logger name="org.springframework.retry" level="trace"/>
         <logger name="org.apache.hc.client5.http.wire" level="info"/>
@@ -26,6 +39,7 @@
         <logger name="org.hibernate.orm.jdbc.bind" level="trace"/>
         <logger name="no.nav.security" level="trace"/>
     </springProfile>
+    
 
     <springProfile name="prod">
         <turboFilter class="ch.qos.logback.classic.turbo.MarkerFilter">

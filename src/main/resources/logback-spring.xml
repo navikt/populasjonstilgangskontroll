@@ -36,7 +36,7 @@
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss} %X{Nav-CallId} [%thread] %-5level %logger{70} - %msg%n</Pattern>
             </layout>
         </appender>
-        <logger name="secure" level="debug" additivity="false">
+        <logger name="secureLog" level="debug" additivity="false">
             <appender-ref ref="stdout"/>
         </logger>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
@@ -54,6 +54,9 @@
         </turboFilter>
         <logger name="org.hibernate.SQL" level="info"/>
         <logger name="org.hibernate.orm.jdbc.bind" level="info"/>
+        <logger name="secureLog" level="info" additivity="false">
+            <appender-ref ref="secureLog"/>
+        </logger>
     </springProfile>
 
     <root level="info">

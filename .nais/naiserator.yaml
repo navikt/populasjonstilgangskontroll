@@ -30,6 +30,9 @@ spec:
     {{/each}}
   image: {{image}}
   observability:
+    logging:
+      destination:
+        - id: secure-logs
     autoInstrumentation:
       enabled: true
       runtime: java

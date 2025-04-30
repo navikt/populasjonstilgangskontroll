@@ -66,6 +66,7 @@ class NaivAnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
     }
 }
 
+@FunctionalInterface
 interface AnsattOperations {
     fun ansatt(ansattId: AnsattId): Ansatt
 }

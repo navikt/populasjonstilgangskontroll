@@ -22,7 +22,7 @@ class CaffeineConfiguration : CachingConfigurer {
                     Caffeine.newBuilder()
                         .recordStats()
                         .removalListener { key, value, cause ->
-                            log.trace("Cache removal key={}, value={}, cause={}", key, value, cause)
+                            log.info("Cache removal key={}, value={}, cause={}", key, value, cause)
                         })
         }
 

@@ -23,6 +23,11 @@
         <logger name="org.hibernate.SQL" level="debug"/>
         <logger name="org.hibernate.orm.jdbc.bind" level="trace"/>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
+
+        <logger name="secureLog" level="info" additivity="false">
+            <appender-ref ref="secureLog"/>
+        </logger>
+
     </springProfile>
     <springProfile name="local | test">
         <appender name="stdout"
@@ -39,7 +44,7 @@
         <logger name="org.hibernate.orm.jdbc.bind" level="trace"/>
         <logger name="no.nav.security" level="trace"/>
     </springProfile>
-    
+
 
     <springProfile name="prod">
         <turboFilter class="ch.qos.logback.classic.turbo.MarkerFilter">

@@ -32,5 +32,5 @@ value class BrukerId(@JsonValue val verdi: String) {
             }
     }
 
-    override fun toString() = if (isProd) verdi.maskFnr() else verdi
+    override fun toString() = verdi.maskFnr()
 }

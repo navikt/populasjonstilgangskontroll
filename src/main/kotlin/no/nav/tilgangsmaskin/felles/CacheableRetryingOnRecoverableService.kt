@@ -25,5 +25,4 @@ annotation class CacheableRetryingOnRecoverableService(
         @get:AliasFor(annotation = Retryable::class) val maxAttempts: Int = 3,
         @get:AliasFor(annotation = Cacheable::class) val cacheNames: Array<String> = [],
         @get:AliasFor(annotation = Retryable::class) val listeners: Array<String> = [FELLES_RETRY_LISTENER],
-        @get:AliasFor(annotation = Retryable::class) val backoff: Backoff = Backoff(delay = 1000)
-                                                      )
+        @get:AliasFor(annotation = Retryable::class) val backoff: Backoff = Backoff(delay = 1000))

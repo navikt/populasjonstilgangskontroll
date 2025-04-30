@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
 @Counted
 class RegelMotorResultatLogger {
 
-    private val secureLogger = getLogger("secure")
+    private val secureLogger = getLogger("secureLog")
     private val log = getLogger(javaClass)
     fun avvist(ix: String, ansattId: AnsattId, brukerId: BrukerId, regel: Regel) {
         log.warn("[#$ix] Tilgang  avvist. (${regel.begrunnelse}) for $ansattId")

@@ -35,8 +35,8 @@ class RegelBeanConfig {
 }
 
 @ConfigurationProperties("gruppe")
-data class Grupper(val strengt: UUID, val nasjonal: UUID, val utland: UUID,
-                   val udefinert: UUID, var fortrolig: UUID, val egenansatt: UUID) {
+data class GlobaleGrupper(val strengt: UUID, val nasjonal: UUID, val utland: UUID,
+                          val udefinert: UUID, var fortrolig: UUID, val egenansatt: UUID) {
 
     @PostConstruct
     fun setIDs() {

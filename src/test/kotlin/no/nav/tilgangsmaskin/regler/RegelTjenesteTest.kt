@@ -45,7 +45,7 @@ import kotlin.test.assertEquals
 @DataJpaTest
 @EnableJpaAuditing
 @TestPropertySource(locations = ["classpath:test.properties"])
-@EnableConfigurationProperties(Grupper::class)
+@EnableConfigurationProperties(GlobaleGrupper::class)
 @ContextConfiguration(classes = [TestApp::class])
 @ExtendWith(MockKExtension::class)
 @AutoConfigureObservability
@@ -94,7 +94,7 @@ class RegelTjenesteTest {
         partner = PartnerOppslagTeller(registry, accessor)
         avdød = AvdødTeller(registry, accessor)
         egne = EgneDataOppslagTeller(registry, accessor)
-        every { ansatte.ansatt(ansattId) } returns AnsattBuilder().build()
+        every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
         every { accessor.system } returns "test"
         every { accessor.systemNavn } returns "test"
         overstyring =
@@ -119,24 +119,24 @@ class RegelTjenesteTest {
     fun ikkeOverstyrt() {
         every {
             brukere.nærmesteFamilie(
-                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).somKreverMedlemskapI(UTENLANDSK)
+                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).kreverMedlemskapI(UTENLANDSK)
                         .build().brukerId.verdi)
-        } returns BrukerBuilder(vanligBrukerId, utenlandskTilknytning).somKreverMedlemskapI(UTENLANDSK).build()
+        } returns BrukerBuilder(vanligBrukerId, utenlandskTilknytning).kreverMedlemskapI(UTENLANDSK).build()
         assertThrows<RegelException> {
             val brukerId =
-                BrukerBuilder(vanligBrukerId, utenlandskTilknytning).somKreverMedlemskapI(UTENLANDSK).build().brukerId
+                BrukerBuilder(vanligBrukerId, utenlandskTilknytning).kreverMedlemskapI(UTENLANDSK).build().brukerId
             regler.kompletteRegler(ansattId, brukerId.verdi)
         }
     }
 
     @Test
     fun bulkAvvisninger() {
-        every { ansatte.ansatt(ansattId) } returns AnsattBuilder().build()
+        every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
         every {
             brukere.brukere(strengtFortroligBrukerId.verdi, fortroligBrukerId.verdi)
         } returns listOf(
-                BrukerBuilder(strengtFortroligBrukerId).somKreverMedlemskapI(STRENGT_FORTROLIG).build(),
-                BrukerBuilder(fortroligBrukerId).somKreverMedlemskapI(FORTROLIG).build())
+                BrukerBuilder(strengtFortroligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build(),
+                BrukerBuilder(fortroligBrukerId).kreverMedlemskapI(FORTROLIG).build())
         assertEquals(assertThrows<BulkRegelException> {
             regler.bulkRegler(
                     ansattId,
@@ -148,21 +148,21 @@ class RegelTjenesteTest {
     fun bulkAvvisningerOverstyrt() {
         every {
             brukere.nærmesteFamilie(
-                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).somKreverMedlemskapI(
+                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).kreverMedlemskapI(
                             UTENLANDSK).build().brukerId.verdi)
-        } returns BrukerBuilder(vanligBrukerId, utenlandskTilknytning).somKreverMedlemskapI(UTENLANDSK).build()
+        } returns BrukerBuilder(vanligBrukerId, utenlandskTilknytning).kreverMedlemskapI(UTENLANDSK).build()
         every {
             brukere.brukere(
-                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).somKreverMedlemskapI(UTENLANDSK)
+                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).kreverMedlemskapI(UTENLANDSK)
                         .build().brukerId.verdi)
         } returns listOf(
                 BrukerBuilder(
                         vanligBrukerId,
-                        utenlandskTilknytning).somKreverMedlemskapI(
+                        utenlandskTilknytning).kreverMedlemskapI(
                         UTENLANDSK).build())
         overstyring.overstyr(
                 ansattId, OverstyringData(
-                BrukerBuilder(vanligBrukerId, utenlandskTilknytning).somKreverMedlemskapI(
+                BrukerBuilder(vanligBrukerId, utenlandskTilknytning).kreverMedlemskapI(
                         UTENLANDSK).build().brukerId,
                 "test",
                 TOMORROW))
@@ -173,7 +173,7 @@ class RegelTjenesteTest {
                             IdOgType(
                                     BrukerBuilder(
                                             vanligBrukerId,
-                                            utenlandskTilknytning).somKreverMedlemskapI(UTENLANDSK)
+                                            utenlandskTilknytning).kreverMedlemskapI(UTENLANDSK)
                                         .build().brukerId.verdi)))
         }.doesNotThrowAnyException()
     }

@@ -70,7 +70,7 @@ internal class OverstyringTest {
     fun setup() {
         every { accessor.system } returns "test"
         every { accessor.systemNavn } returns "test"
-        every { ansatte.ansatt(ansattId) } returns AnsattBuilder().build()
+        every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
         overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, registry, accessor)
     }
 

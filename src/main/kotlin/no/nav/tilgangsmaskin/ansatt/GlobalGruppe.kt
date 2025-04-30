@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import java.util.*
+import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata
 
 
@@ -15,10 +16,10 @@ enum class GlobalGruppe(val property: String, val metadata: GruppeMetadata) {
 
     lateinit var id: UUID
 
-    companion object {
-        fun navnFor(id: UUID) = entries.firstOrNull { it.id == id }?.name
-            ?: "Fant ikke gruppenavn for id $id"
+    val entraGruppe get() = EntraGruppe(id)
 
+    companion object {
+        fun navnFor(id: UUID) = entries.find { it.id == id }?.name ?: "Fant ikke gruppenavn for id $id"
         fun getIDs() = entries.map { it.id }
         fun setIDs(grupper: Map<String, UUID>) =
             entries.forEach { it.id = grupper[it.property] ?: error("Mangler id for ${it.property}") }

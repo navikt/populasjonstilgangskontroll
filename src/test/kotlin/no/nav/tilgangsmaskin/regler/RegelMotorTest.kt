@@ -199,7 +199,6 @@ class RegelMotorTest {
         @DisplayName("Ansatt med tilgang som samme GT som bruker kan behandle denne")
         fun geoOK() {
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).medMedlemskapI(SKJERMING).build()
-            println(ansatt.grupper)
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune(enhet.verdi))).build()
             assertThat(ansatt kanBehandle bruker).isTrue
         }

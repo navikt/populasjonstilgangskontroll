@@ -64,5 +64,5 @@ data class AnsattBuilder(
     fun medMedlemskapI(vararg grupper: GlobalGruppe) = apply { this.grupper += grupper.map { it.entraGruppe }.toSet() }
     fun medMedlemskapI(vararg grupper: EntraGruppe) = apply { this.grupper += setOf(*grupper) }
     fun bruker(bruker: Bruker?) = apply { bruker?.let { this.bruker = it } }
-    fun build() = Ansatt(AnsattIds(id, oid), bruker, grupper)
+    fun build() = Ansatt(AnsattIds(id), bruker, grupper)
 }

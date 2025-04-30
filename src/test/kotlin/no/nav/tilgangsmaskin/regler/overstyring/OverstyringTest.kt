@@ -7,7 +7,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.ansatt.AnsattOperations
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
@@ -56,7 +56,7 @@ internal class OverstyringTest {
     private lateinit var accessor: TokenClaimsAccessor
 
     @MockK
-    private lateinit var ansatte: AnsattTjeneste
+    private lateinit var ansatte: AnsattOperations
 
     @MockK
     private lateinit var brukere: BrukerTjeneste

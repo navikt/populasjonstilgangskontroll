@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.tilgang
 
 import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.ansatt.AnsattOperations
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.IdOgType
@@ -18,7 +18,7 @@ import kotlin.time.measureTime
 class RegelTjeneste(
         private val motor: RegelMotor,
         private val brukere: BrukerTjeneste,
-        private val ansatte: AnsattTjeneste,
+        private val ansatte: AnsattOperations,
         private val overstyring: OverstyringTjeneste) {
     private val log = LoggerFactory.getLogger(javaClass)
 

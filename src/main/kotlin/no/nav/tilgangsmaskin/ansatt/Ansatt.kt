@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import java.util.*
 import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
@@ -44,7 +43,7 @@ class Ansatt(ansattIds: AnsattIds, val bruker: Bruker? = null, val grupper: Set<
 
     private infix fun Bruker.erEnAv(medlemmer: Collection<FamilieMedlem>) = medlemmer.any { it.brukerId == brukerId }
 
-    data class AnsattIds(val ansattId: AnsattId, val oid: UUID)
+    data class AnsattIds(val ansattId: AnsattId)
 
 }
 

@@ -5,7 +5,7 @@ import jakarta.validation.Valid
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.ansatt.AnsattOperations
 import no.nav.tilgangsmaskin.ansatt.nom.Nom
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
@@ -31,7 +31,7 @@ class DevTilgangController(
         private val graphql: PdlSyncGraphQLClientAdapter,
         private val skjerming: SkjermingTjeneste,
         private val brukere: BrukerTjeneste,
-        private val ansatte: AnsattTjeneste,
+        private val ansatte: AnsattOperations,
         private val regler: RegelTjeneste,
         private val overstyring: OverstyringTjeneste,
         private val nom: Nom,

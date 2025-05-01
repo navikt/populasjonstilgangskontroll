@@ -24,7 +24,7 @@ class SmartAnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
     override fun ansatt(ansattId: AnsattId) =
         with(token.globaleGrupper) {
             if (harNasjonalTilgang()) {
-                log.info("$ansattId har tilgang til nasjonal gruppe, slår ikke opp i Entra")
+                log.info("$ansattId har tilgang til nasjonal gruppe, slår ikke opp i Entra for GEO-grupper")
                 ansattMedGrupperFra(ansattId, this)
             } else {
                 ansattMedGrupperFra(ansattId, this + entra.grupper(ansattId))

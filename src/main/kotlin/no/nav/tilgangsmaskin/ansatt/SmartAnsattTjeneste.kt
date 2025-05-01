@@ -1,12 +1,10 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import io.micrometer.core.annotation.Timed
-import no.nav.boot.conditionals.ConditionalOnDev
-import no.nav.boot.conditionals.ConditionalOnProd
+import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.ansatt.entra.Entra
 import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.entra.harNasjonalTilgang
-
 import no.nav.tilgangsmaskin.ansatt.nom.Nom
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token
@@ -15,7 +13,7 @@ import org.springframework.stereotype.Service
 
 @Service
 @Timed
-@ConditionalOnDev
+@ConditionalOnGCP
 class SmartAnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
                           private val brukere: BrukerTjeneste,
                           private val token: Token) : AnsattOperations {
@@ -41,9 +39,9 @@ class SmartAnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
     }
 }
 
-@Service
-@Timed
-@ConditionalOnProd
+//@Service
+//@Timed
+//@ConditionalOnProd
 class NaivAnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
                          private val brukere: BrukerTjeneste,
                          private val token: Token) : AnsattOperations {

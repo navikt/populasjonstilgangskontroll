@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
@@ -9,12 +8,9 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 
 
-class Ansatt(ansattIds: AnsattIds, val bruker: Bruker? = null, val grupper: Set<EntraGruppe>) {
+class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val grupper: Set<EntraGruppe>) {
 
     private val brukerId = bruker?.brukerId
-
-    @JsonIgnore
-    val ansattId = ansattIds.ansattId
 
     private val foreldreEllerBarn = bruker?.foreldreOgBarn ?: emptyList()
 
@@ -42,9 +38,7 @@ class Ansatt(ansattIds: AnsattIds, val bruker: Bruker? = null, val grupper: Set<
     infix fun erSøskenTil(bruker: Bruker) = bruker erEnAv søsken
 
     private infix fun Bruker.erEnAv(medlemmer: Collection<FamilieMedlem>) = medlemmer.any { it.brukerId == brukerId }
-
-    data class AnsattIds(val ansattId: AnsattId)
-
+    
 }
 
 

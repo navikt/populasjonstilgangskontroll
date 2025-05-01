@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.regler
 import java.time.LocalDate
 import java.util.*
 import no.nav.tilgangsmaskin.ansatt.Ansatt
-import no.nav.tilgangsmaskin.ansatt.Ansatt.AnsattIds
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
@@ -64,5 +63,5 @@ data class AnsattBuilder(
     fun medMedlemskapI(vararg grupper: GlobalGruppe) = apply { this.grupper += grupper.map { it.entraGruppe }.toSet() }
     fun medMedlemskapI(vararg grupper: EntraGruppe) = apply { this.grupper += setOf(*grupper) }
     fun bruker(bruker: Bruker?) = apply { bruker?.let { this.bruker = it } }
-    fun build() = Ansatt(AnsattIds(id), bruker, grupper)
+    fun build() = Ansatt(id, bruker, grupper)
 }

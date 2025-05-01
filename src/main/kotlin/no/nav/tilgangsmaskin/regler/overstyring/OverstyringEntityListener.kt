@@ -2,12 +2,12 @@ package no.nav.tilgangsmaskin.regler.overstyring
 
 import jakarta.persistence.*
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
-import no.nav.tilgangsmaskin.tilgang.TokenClaimsAccessor
+import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
-class OverstyringEntityListener(private val token: TokenClaimsAccessor) {
+class OverstyringEntityListener(private val token: Token) {
 
     private val log = getLogger(javaClass)
 

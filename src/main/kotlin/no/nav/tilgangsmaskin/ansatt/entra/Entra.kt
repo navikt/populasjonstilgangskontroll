@@ -9,10 +9,7 @@ import no.nav.tilgangsmaskin.felles.CacheableRetryingOnRecoverableService
 @Timed
 class Entra(private val adapter: EntraRestClientAdapter, private val resolver: EntraOidResolver) {
 
-    fun ansatt(ansattId: AnsattId) =
-        resolver.oidForAnsatt(ansattId).let {
-            EntraResponse(it, adapter.grupper("$it"))
-        }
+    fun grupper(ansattId: AnsattId) = adapter.grupper(resolver.oidForAnsatt(ansattId).toString())
 
     override fun toString() = "${javaClass.simpleName} [adapter=$adapter, resolver=$resolver]"
 }

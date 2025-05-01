@@ -12,7 +12,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.YESTERDAY
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringEntityListener
-import no.nav.tilgangsmaskin.tilgang.TokenClaimsAccessor
+import no.nav.tilgangsmaskin.tilgang.Token
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
@@ -49,13 +49,13 @@ internal class NomTest {
     private lateinit var adapter: NomJPAAdapter
 
     @MockkBean
-    private lateinit var accessor: TokenClaimsAccessor
+    private lateinit var token: Token
 
     private lateinit var nom: Nom
 
     @BeforeAll
     fun setup() {
-        every { accessor.system } returns "test"
+        every { token.system } returns "test"
         nom = Nom(adapter)
     }
 

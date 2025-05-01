@@ -21,7 +21,7 @@ import no.nav.tilgangsmaskin.regler.overstyring.OverstyringJPAAdapter
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringRepository
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
-import no.nav.tilgangsmaskin.tilgang.TokenClaimsAccessor
+import no.nav.tilgangsmaskin.tilgang.Token
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -65,7 +65,7 @@ class RegelTjenesteTest {
     private lateinit var registry: MeterRegistry
 
     @MockkBean
-    private lateinit var accessor: TokenClaimsAccessor
+    private lateinit var token: Token
 
     @Autowired
     private lateinit var motor: RegelMotor
@@ -89,18 +89,18 @@ class RegelTjenesteTest {
 
     @BeforeTest
     fun before() {
-        søsken = SøskenOppslagTeller(registry, accessor)
-        foreldrebarn = ForeldreBarnOppslagTeller(registry, accessor)
-        partner = PartnerOppslagTeller(registry, accessor)
-        avdød = AvdødTeller(registry, accessor)
-        egne = EgneDataOppslagTeller(registry, accessor)
+        søsken = SøskenOppslagTeller(registry, token)
+        foreldrebarn = ForeldreBarnOppslagTeller(registry, token)
+        partner = PartnerOppslagTeller(registry, token)
+        avdød = AvdødTeller(registry, token)
+        egne = EgneDataOppslagTeller(registry, token)
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-        every { accessor.system } returns "test"
-        every { accessor.systemNavn } returns "test"
+        every { token.system } returns "test"
+        every { token.systemNavn } returns "test"
         overstyring =
             OverstyringTjeneste(
                     ansatte, brukere, OverstyringJPAAdapter(repo), motor,
-                    registry, accessor)
+                    registry, token)
         regler = RegelTjeneste(motor, brukere, ansatte, overstyring)
     }
 

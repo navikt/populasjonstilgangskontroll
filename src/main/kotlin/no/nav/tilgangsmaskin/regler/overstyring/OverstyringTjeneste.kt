@@ -14,7 +14,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringEntity.Companion.OVERSTYRING
-import no.nav.tilgangsmaskin.tilgang.TokenClaimsAccessor
+import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
@@ -31,7 +31,7 @@ class OverstyringTjeneste(
         private val adapter: OverstyringJPAAdapter,
         private val motor: RegelMotor,
         private val registry: MeterRegistry,
-        private val accessor: TokenClaimsAccessor) {
+        private val token: Token) {
 
     private val log = getLogger(javaClass)
 
@@ -100,7 +100,7 @@ class OverstyringTjeneste(
             tellOverstyring()
         } else {
             throw e.also {
-                tellAvslag(e.regel.kortNavn, accessor.systemNavn)
+                tellAvslag(e.regel.kortNavn, token.systemNavn)
             }
         }
 

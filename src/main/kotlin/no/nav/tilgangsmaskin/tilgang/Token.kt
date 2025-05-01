@@ -9,18 +9,19 @@ import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
 import org.springframework.stereotype.Component
 
 @Component
-class TokenClaimsAccessor(private val contextHolder: TokenValidationContextHolder) {
+class Token(private val contextHolder: TokenValidationContextHolder) {
 
 
-    fun globaleGrupper(): Set<EntraGruppe> {
-        val claims = claimSet()?.getAsList("groups")
-            ?.mapNotNull { it.toString().let(UUID::fromString) }
-            ?: emptyList()
-        return getIDs().toMutableList().apply {
-            retainAll(claims)
-        }.toSet()
-            .map { EntraGruppe(it, navnFor(it)) }.toSet()
-    }
+    val globaleGrupper: Set<EntraGruppe>
+        get() {
+            val claims = claimSet()?.getAsList("groups")
+                ?.mapNotNull { it.toString().let(UUID::fromString) }
+                ?: emptyList()
+            return getIDs().toMutableList().apply {
+                retainAll(claims)
+            }.toSet()
+                .map { EntraGruppe(it, navnFor(it)) }.toSet()
+        }
 
     val system
         get() = runCatching {

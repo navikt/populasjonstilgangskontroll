@@ -17,7 +17,7 @@ import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.RegelBeanConfig
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.tilgang.TokenClaimsAccessor
+import no.nav.tilgangsmaskin.tilgang.Token
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.extension.ExtendWith
@@ -53,7 +53,7 @@ internal class OverstyringTest {
     private lateinit var registry: MeterRegistry
 
     @MockkBean
-    private lateinit var accessor: TokenClaimsAccessor
+    private lateinit var token: Token
 
     @MockK
     private lateinit var ansatte: AnsattOperations
@@ -68,10 +68,10 @@ internal class OverstyringTest {
 
     @BeforeTest
     fun setup() {
-        every { accessor.system } returns "test"
-        every { accessor.systemNavn } returns "test"
+        every { token.system } returns "test"
+        every { token.systemNavn } returns "test"
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-        overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, registry, accessor)
+        overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, registry, token)
     }
 
     @Test

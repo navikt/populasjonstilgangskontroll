@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import io.micrometer.core.annotation.Counted
-import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.upcase
@@ -21,6 +20,6 @@ class RegelMotorResultatLogger {
     }
 
     fun ok(type: RegelType, ansattId: AnsattId, brukerId: BrukerId) {
-        log.info(CONFIDENTIAL, "${type.beskrivelse.upcase()} ga tilgang til $brukerId for $ansattId")
+        log.info("${type.beskrivelse.upcase()} ga tilgang for $ansattId")
     }
 }

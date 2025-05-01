@@ -41,7 +41,7 @@ class AvdødBrukerRegel(private val teller: AvdødTeller) : OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         true.also {  // ikke feile
             if (bruker.dødsdato != null) {
-                teller.increment(true, *arrayOf("months" to bruker.dødsdato.intervallSiden()))
+                teller.tell(true, *arrayOf("months" to bruker.dødsdato.intervallSiden()))
             }
         }
 

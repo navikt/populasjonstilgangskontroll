@@ -37,7 +37,7 @@ class SkjermingRegel : GlobalGruppeRegel(SKJERMING), KjerneRegel
 class EgneDataRegel(private val teller: EgneDataOppslagTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt erDenSammeSom bruker }.also {
-            teller.increment(it)
+            teller.tell(it)
         }
 
     override val metadata = RegelMetadata(EGNEDATA)
@@ -48,7 +48,7 @@ class EgneDataRegel(private val teller: EgneDataOppslagTeller) : KjerneRegel {
 class ForeldreOgBarnRegel(private val teller: ForeldreBarnOppslagTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt erForeldreEllerBarnTil bruker }.also {
-            teller.increment(it)
+            teller.tell(it)
         }
 
     override val metadata = RegelMetadata(FORELDREBARN)
@@ -59,7 +59,7 @@ class ForeldreOgBarnRegel(private val teller: ForeldreBarnOppslagTeller) : Kjern
 class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt erNåværendeEllerTidligerePartnerMed bruker }.also {
-            teller.increment(it)
+            teller.tell(it)
         }
 
     override val metadata = RegelMetadata(PARTNER)
@@ -70,7 +70,7 @@ class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
 class SøskenRegel(private val teller: SøskenOppslagTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt erSøskenTil bruker }.also {
-            teller.increment(it)
+            teller.tell(it)
         }
 
     override val metadata = RegelMetadata(SØSKEN)

@@ -11,7 +11,7 @@ abstract class AbstractTeller(
         private val tellerNavn: String,
         private val beskrivelse: String) {
 
-    fun increment(avslått: Boolean, vararg tags: Pair<String, String>) {
+    fun tell(avslått: Boolean, vararg tags: Pair<String, String>) {
         if (!avslått) return
 
         Counter.builder(tellerNavn)

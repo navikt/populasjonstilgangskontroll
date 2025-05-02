@@ -7,15 +7,15 @@ import no.nav.tilgangsmaskin.tilgang.Token
 abstract class AbstractTeller(
         private val registry: MeterRegistry,
         private val token: Token,
-        private val tellerNavn: String,
+        private val navn: String,
         private val beskrivelse: String) {
 
     fun tell(vararg tags: Pair<String, Any>) = tell(true, *tags)
 
-    fun tell(avslått: Boolean, vararg tags: Pair<String, Any>) {
-        if (!avslått) return
+    fun tell(skalTelles: Boolean, vararg tags: Pair<String, Any>) {
+        if (!skalTelles) return
 
-        Counter.builder(tellerNavn)
+        Counter.builder(navn)
             .description(beskrivelse)
             .tag("system", token.system ?: "N/A")
             .apply { tags.forEach { tag(it.first, it.second.toString()) } }

@@ -28,15 +28,15 @@ class AnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
             if (girNasjonalTilgang()) {
                 log.info("$ansattId har tilgang til nasjonal gruppe, slår ikke opp i Entra for GEO-grupper")
                 teller.tell("medlem" to true)
-                ansattMedGrupperFra(ansattId, this)
+                ansattMedMedFamileOgGrupper(ansattId, this)
             } else {
                 log.info("$ansattId har *ikke* tilgang til nasjonal gruppe, slår opp i Entra for GEO-grupper")
                 teller.tell("medlem" to false)
-                ansattMedGrupperFra(ansattId, this + entra.grupper(ansattId))
+                ansattMedMedFamileOgGrupper(ansattId, this + entra.grupper(ansattId))
             }
         }
 
-    private fun ansattMedGrupperFra(ansattId: AnsattId, grupper: Set<EntraGruppe>): Ansatt {
+    private fun ansattMedMedFamileOgGrupper(ansattId: AnsattId, grupper: Set<EntraGruppe>): Ansatt {
         val ansattBruker = ansatte.fnrForAnsatt(ansattId)?.let {
             runCatching {
                 brukere.utvidetFamilie(it.verdi)

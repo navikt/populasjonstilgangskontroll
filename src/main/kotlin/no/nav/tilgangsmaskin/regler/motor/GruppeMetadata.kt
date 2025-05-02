@@ -12,7 +12,7 @@ enum class GruppeMetadata(val kode: String, val begrunnelse: String, val kortNav
     STRENGT_FORTROLIG_UTLAND(
             "AVVIST_STRENGT_FORTROLIG_UTLAND",
             "Du har ikke tilgang til brukere med strengt fortrolig adresse i utlandet",
-            "Kode 17"),
+            "Paragraf 19"),
 
     FORTROLIG("AVVIST_FORTROLIG_ADRESSE", "Du har ikke tilgang til brukere med fortrolig adresse", "Kode 7"),
 

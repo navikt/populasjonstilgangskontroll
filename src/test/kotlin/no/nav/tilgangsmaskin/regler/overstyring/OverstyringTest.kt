@@ -17,6 +17,7 @@ import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.RegelBeanConfig
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
+import no.nav.tilgangsmaskin.regler.motor.RegelMotorLogger
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -34,7 +35,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @DataJpaTest
-@ContextConfiguration(classes = [RegelMotor::class, OverstyringJPAAdapter::class, RegelBeanConfig::class, TestApp::class])
+@ContextConfiguration(classes = [RegelMotor::class, RegelMotorLogger::class, OverstyringJPAAdapter::class, RegelBeanConfig::class, TestApp::class])
 @ExtendWith(MockKExtension::class)
 @EnableJpaAuditing
 @ActiveProfiles(TEST)

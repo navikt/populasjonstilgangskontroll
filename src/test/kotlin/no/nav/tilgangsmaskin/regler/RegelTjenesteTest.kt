@@ -14,7 +14,7 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.utenlandskTilknytning
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.TOMORROW
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringJPAAdapter
@@ -108,7 +108,7 @@ class RegelTjenesteTest {
     @DisplayName("Verifiser at sjekk om overstyring gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang gis om overstyring er gjort")
     fun overstyringOK() {
         every { brukere.nærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
-        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "test", TOMORROW))
+        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "test", IMORGEN))
         assertThatCode {
             regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
         }.doesNotThrowAnyException()
@@ -165,7 +165,7 @@ class RegelTjenesteTest {
                 BrukerBuilder(vanligBrukerId, utenlandskTilknytning).kreverMedlemskapI(
                         UTENLANDSK).build().brukerId,
                 "test",
-                TOMORROW))
+                IMORGEN))
         assertThatCode {
             regler.bulkRegler(
                     ansattId,

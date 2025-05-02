@@ -3,9 +3,9 @@ package no.nav.tilgangsmaskin.ansatt.nom
 import java.time.LocalDate.EPOCH
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
-import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode.Companion.FUTURE
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.pluralize
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
@@ -25,7 +25,7 @@ class NomHendelseKonsument(private val nom: Nom, private val handler: NomHendels
                     nom.lagre(
                             NomAnsattData(
                                     AnsattId(navident), BrukerId(personident),
-                                    NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: FUTURE)))
+                                    NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: ALLTID)))
                 }.fold(
                         { handler.ok(navident, personident) },
                         { handler.feilet(navident, personident, it) })

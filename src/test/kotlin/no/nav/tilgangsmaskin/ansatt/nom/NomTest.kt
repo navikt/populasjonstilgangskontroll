@@ -10,7 +10,8 @@ import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode.Companion.ALWAYS
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.YESTERDAY
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringEntityListener
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.assertj.core.api.Assertions.assertThat
@@ -41,8 +42,8 @@ internal class NomTest {
 
     private val vanligBrukerId = BrukerId("08526835670")
     private val ansattId = AnsattId("Z999999")
-    private val IGÅR = NomAnsattPeriode(EPOCH, YESTERDAY)
-    private val UTGÅTT = NomAnsattData(ansattId, vanligBrukerId, IGÅR)
+    private val IGÅR = NomAnsattPeriode(EPOCH, TimeExtensions.IGÅR)
+    private val UTGÅTT = NomAnsattData(ansattId, vanligBrukerId, this@NomTest.IGÅR)
     private val GYLDIG = NomAnsattData(ansattId, vanligBrukerId, ALWAYS)
 
     @Autowired

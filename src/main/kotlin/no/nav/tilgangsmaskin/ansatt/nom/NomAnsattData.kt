@@ -5,14 +5,14 @@ import java.time.LocalDate.EPOCH
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode.Companion.ALWAYS
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
 
 data class NomAnsattData(val ansattId: AnsattId, val brukerId: BrukerId, val gyldighet: NomAnsattPeriode = ALWAYS) {
 
-    data class NomAnsattPeriode(override val start: LocalDate = EPOCH, override val endInclusive: LocalDate = FUTURE) :
+    data class NomAnsattPeriode(override val start: LocalDate = EPOCH, override val endInclusive: LocalDate = ALLTID) :
         ClosedRange<LocalDate> {
 
         companion object {
-            val FUTURE = LocalDate.now().plusYears(100)
             val ALWAYS = NomAnsattPeriode()
         }
     }

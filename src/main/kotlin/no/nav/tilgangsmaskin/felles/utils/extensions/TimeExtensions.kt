@@ -9,8 +9,9 @@ import kotlin.time.toKotlinDuration
 
 object TimeExtensions {
 
-    val TOMORROW = LocalDate.now().plusDays(1)
-    val YESTERDAY = LocalDate.now().minusDays(1)
+    val ALLTID = LocalDate.now().plusYears(100)
+    val IMORGEN get() = LocalDate.now().plusDays(1)
+    val IGÅR get() = LocalDate.now().minusDays(1)
 
     fun Instant.isBeforeNow() = isBefore(now())
     fun Instant.diffFromNow() = java.time.Duration.between(now(), this).toKotlinDuration().format()

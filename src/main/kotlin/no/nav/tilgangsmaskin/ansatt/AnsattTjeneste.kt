@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import io.micrometer.core.annotation.Timed
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.grupperFraToken
 import no.nav.tilgangsmaskin.ansatt.entra.Entra
@@ -8,8 +9,10 @@ import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.entra.girNasjonalTilgang
 import no.nav.tilgangsmaskin.ansatt.nom.Nom
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.felles.AbstractTeller
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 
 @Service
@@ -17,16 +20,18 @@ import org.springframework.stereotype.Service
 @ConditionalOnGCP
 class AnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
                      private val brukere: BrukerTjeneste,
-                     private val token: Token) {
+                     private val token: Token, private val teller: NasjonalGruppeTeller) {
     private val log = getLogger(javaClass)
 
     fun ansatt(ansattId: AnsattId) =
         with(grupperFraToken(token.globaleGruppeIds)) {
             if (girNasjonalTilgang()) {
                 log.info("$ansattId har tilgang til nasjonal gruppe, slår ikke opp i Entra for GEO-grupper")
+                teller.tell("medlem" to true)
                 ansattMedGrupperFra(ansattId, this)
             } else {
                 log.info("$ansattId har *ikke* tilgang til nasjonal gruppe, slår opp i Entra for GEO-grupper")
+                teller.tell("medlem" to false)
                 ansattMedGrupperFra(ansattId, this + entra.grupper(ansattId))
             }
         }
@@ -40,6 +45,11 @@ class AnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
         return Ansatt(ansattId, ansattBruker, grupper)
     }
 }
+
+@Component
+class NasjonalGruppeTeller(registry: MeterRegistry, token: Token) :
+    AbstractTeller(registry, token, "gruppe.medlemskap.nasjonal", "Ansatte med og uten nasjonalt gruppemedlemsskap")
+
 
 
 

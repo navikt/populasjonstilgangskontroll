@@ -10,15 +10,15 @@ abstract class AbstractTeller(
         private val tellerNavn: String,
         private val beskrivelse: String) {
 
-    fun tell(vararg tags: Pair<String, String>) = tell(true, *tags)
-    
-    fun tell(avslått: Boolean, vararg tags: Pair<String, String>) {
+    fun tell(vararg tags: Pair<String, Any>) = tell(true, *tags)
+
+    fun tell(avslått: Boolean, vararg tags: Pair<String, Any>) {
         if (!avslått) return
 
         Counter.builder(tellerNavn)
             .description(beskrivelse)
             .tag("system", token.system ?: "N/A")
-            .apply { tags.forEach { tag(it.first, it.second) } }
+            .apply { tags.forEach { tag(it.first, it.second.toString()) } }
             .register(registry)
             .increment()
     }

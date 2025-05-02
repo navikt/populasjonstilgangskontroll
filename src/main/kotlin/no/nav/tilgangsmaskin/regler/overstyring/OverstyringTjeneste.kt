@@ -4,7 +4,7 @@ import io.micrometer.core.annotation.Timed
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.AnsattOperations
+import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 @Timed
 class OverstyringTjeneste(
-        private val ansatte: AnsattOperations,
+        private val ansatte: AnsattTjeneste,
         private val brukere: BrukerTjeneste,
         private val adapter: OverstyringJPAAdapter,
         private val motor: RegelMotor,

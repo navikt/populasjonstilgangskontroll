@@ -1,27 +1,9 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.tilgangsmaskin.felles.AbstractTeller
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.stereotype.Component
-
-abstract class AbstractTeller(
-        private val registry: MeterRegistry,
-        private val token: Token,
-        private val tellerNavn: String,
-        private val beskrivelse: String) {
-
-    fun tell(avslått: Boolean, vararg tags: Pair<String, String>) {
-        if (!avslått) return
-
-        Counter.builder(tellerNavn)
-            .description(beskrivelse)
-            .tag("system", token.system ?: "N/A")
-            .apply { tags.forEach { tag(it.first, it.second) } }
-            .register(registry)
-            .increment()
-    }
-}
 
 
 @Component

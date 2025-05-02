@@ -32,13 +32,13 @@ class RegelMotor(
 
     private fun sjekkRegler(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) {
         regelSett.regler.forEach { regel ->
-            logger.sjekker(regel, ansatt, bruker)
+            logger.evaluerer(ansatt, bruker, regel)
             if (!regel.evaluer(ansatt, bruker)) {
-                logger.avvist(ansatt.ansattId, bruker.brukerId, regel)
-                throw RegelException(bruker.brukerId, ansatt.ansattId, regel)
+                logger.avvist(ansatt, bruker, regel)
+                throw RegelException(ansatt, bruker, regel)
             }
         }
-        logger.ok(regelSett.type, ansatt.ansattId)
+        logger.ok(ansatt, regelSett)
     }
 
 

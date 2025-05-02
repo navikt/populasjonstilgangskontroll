@@ -96,7 +96,7 @@ class OverstyringTjeneste(
         }
 
     private fun sjekkOverstyring(ansattId: AnsattId, e: RegelException) =
-        if (e.regel.erOverstyrbar && erOverstyrt(ansattId, e.brukerId)) {
+        if (e.regel.erOverstyrbar && erOverstyrt(ansattId, e.bruker.brukerId)) {
             tellOverstyring()
         } else {
             throw e.also {

@@ -31,20 +31,20 @@ class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val grupper: Se
 
     infix fun erMedlemAv(gruppe: GlobalGruppe) = grupper.any { it.id == gruppe.id }
 
-    infix fun erNåværendeEllerTidligerePartnerMed(bruker: Bruker) = bruker erEnAv partnere
+    infix fun erNåværendeEllerTidligerePartnerMed(bruker: Bruker) = bruker erNærståendeMed partnere
 
     infix fun erDenSammeSom(bruker: Bruker) = brukerId == bruker.brukerId
 
-    infix fun erForeldreEllerBarnTil(bruker: Bruker) = bruker erEnAv foreldreEllerBarn
+    infix fun erForeldreEllerBarnTil(bruker: Bruker) = bruker erNærståendeMed foreldreEllerBarn
 
-    infix fun erSøskenTil(bruker: Bruker) = bruker erEnAv søsken
+    infix fun erSøskenTil(bruker: Bruker) = bruker erNærståendeMed søsken
 
     infix fun harFellesBarnMed(bruker: Bruker) = bruker.barn harMinstEnFelles barn
 
     private infix fun Set<FamilieMedlem>.harMinstEnFelles(medlemmer: Set<FamilieMedlem>) =
         intersect(medlemmer).isNotEmpty()
 
-    private infix fun Bruker.erEnAv(medlemmer: Set<FamilieMedlem>) =
+    private infix fun Bruker.erNærståendeMed(medlemmer: Set<FamilieMedlem>) =
         medlemmer.any { it.brukerId == brukerId }
 }
 

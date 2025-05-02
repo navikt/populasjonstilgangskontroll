@@ -80,7 +80,6 @@ class SøskenRegel(private val teller: SøskenOppslagTeller) : KjerneRegel {
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 8)
-@ConditionalOnNotProd
 class FellesBarnRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt harFellesBarnMed bruker }

@@ -40,7 +40,7 @@ class RegelMotor(
                 throw RegelException(bruker.brukerId, ansatt.ansattId, regel)
             }
         }
-        handler.ok(regelSett.type, ansatt.ansattId, bruker.brukerId)
+        handler.ok(regelSett.type, ansatt.ansattId)
     }
 
 

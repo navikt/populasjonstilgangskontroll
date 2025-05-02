@@ -39,10 +39,10 @@ class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val grupper: Se
 
     infix fun erSøskenTil(bruker: Bruker) = bruker erEnAv søsken
 
-    infix fun harFellesBarnMed(bruker: Bruker) = bruker.barn erEnAv barn
+    infix fun harFellesBarnMed(bruker: Bruker) = bruker.barn harMinstEnFelles barn
 
-    private infix fun Set<FamilieMedlem>.erEnAv(medlemmer: Set<FamilieMedlem>) =
-        this.map { it.brukerId }.intersect(medlemmer.map { it.brukerId }).isNotEmpty()
+    private infix fun Set<FamilieMedlem>.harMinstEnFelles(medlemmer: Set<FamilieMedlem>) =
+        intersect(medlemmer).isNotEmpty()
 
     private infix fun Bruker.erEnAv(medlemmer: Set<FamilieMedlem>) =
         medlemmer.any { it.brukerId == brukerId }

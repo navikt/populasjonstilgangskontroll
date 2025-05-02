@@ -31,6 +31,9 @@ enum class GruppeMetadata(val kode: String, val begrunnelse: String, val kortNav
 
     SØSKEN("AVVIST_HABILITET", HABILITET, "Søsken"),
 
+    FELLES_BARN("AVVIST_HABILITET", HABILITET, "Felles barn"),
+
+
     AVDØD("AVVIST_AVDØD", "Du har ikke tilgang til data om avdøde brukere", "Avdød bruker"),
 
     UTENLANDSK("AVVIST_PERSON_UTLAND", "Du har ikke tilgang til person bosatt i utlandet", "Person bosatt utland"),

@@ -12,11 +12,13 @@ class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val grupper: Se
 
     private val brukerId = bruker?.brukerId
 
-    private val foreldreEllerBarn = bruker?.foreldreOgBarn ?: emptyList()
+    private val barn = bruker?.barn ?: emptySet()
 
-    private val søsken = bruker?.søsken ?: emptyList()
+    private val foreldreEllerBarn = bruker?.foreldreOgBarn ?: emptySet()
 
-    private val partnere = bruker?.partnere ?: emptyList()
+    private val søsken = bruker?.søsken ?: emptySet()
+
+    private val partnere = bruker?.partnere ?: emptySet()
 
     infix fun kanBehandle(gt: GeografiskTilknytning): Boolean {
         val kode = when (gt) {
@@ -37,8 +39,13 @@ class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val grupper: Se
 
     infix fun erSøskenTil(bruker: Bruker) = bruker erEnAv søsken
 
-    private infix fun Bruker.erEnAv(medlemmer: Collection<FamilieMedlem>) = medlemmer.any { it.brukerId == brukerId }
-    
+    infix fun harFellesBarnMed(bruker: Bruker) = bruker.barn erEnAv barn
+
+    private infix fun Set<FamilieMedlem>.erEnAv(medlemmer: Set<FamilieMedlem>) =
+        this.map { it.brukerId }.intersect(medlemmer.map { it.brukerId }).isNotEmpty()
+
+    private infix fun Bruker.erEnAv(medlemmer: Set<FamilieMedlem>) =
+        medlemmer.any { it.brukerId == brukerId }
 }
 
 

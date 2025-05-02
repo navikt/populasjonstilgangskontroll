@@ -24,6 +24,9 @@ data class Bruker(
     val foreldreOgBarn = familie.foreldre + familie.barn
 
     @JsonIgnore
+    val barn = familie.barn
+
+    @JsonIgnore
     val søsken = familie.søsken
 
     @JsonIgnore

@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.regler.motor
 
+import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
@@ -7,6 +8,7 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.EGNEDATA
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.FELLES_BARN
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.FORELDREBARN
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.PARTNER
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.SØSKEN
@@ -76,5 +78,14 @@ class SøskenRegel(private val teller: SøskenOppslagTeller) : KjerneRegel {
     override val metadata = RegelMetadata(SØSKEN)
 }
 
+@Component
+@Order(HIGHEST_PRECEDENCE + 8)
+@ConditionalOnNotProd
+class FellesBarnRegel : KjerneRegel {
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
+        avslåHvis { ansatt harFellesBarnMed bruker }
+
+    override val metadata = RegelMetadata(FELLES_BARN)
+}
 
 

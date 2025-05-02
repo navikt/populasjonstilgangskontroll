@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component
 class RegelMotor(
         @Qualifier(KJERNE) private val kjerne: RegelSett,
         @Qualifier(OVERSTYRBAR) private val overstyrbar: RegelSett,
-        private val handler: RegelMotorResultatLogger = RegelMotorResultatLogger()) {
+        private val logger: RegelMotorResultatLogger) {
     private val log = getLogger(javaClass)
 
     private val komplett = RegelSett(KOMPLETT_REGELTYPE to kjerne.regler + overstyrbar.regler)
@@ -34,13 +34,13 @@ class RegelMotor(
 
     private fun sjekkRegler(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) {
         regelSett.regler.forEach { regel ->
-            log.trace("Sjekker regel: '${regel.kortNavn}' fra ${regelSett.beskrivelse} for ${ansatt.ansattId} og ${ansatt.bruker?.brukerId} og ${bruker.brukerId}")
+            log.trace("Sjekker regel: '${regel.kortNavn}' for ${ansatt.ansattId}  og ${bruker.brukerId}")
             if (!regel.evaluer(ansatt, bruker)) {
-                handler.avvist(ansatt.ansattId, bruker.brukerId, regel)
+                logger.avvist(ansatt.ansattId, bruker.brukerId, regel)
                 throw RegelException(bruker.brukerId, ansatt.ansattId, regel)
             }
         }
-        handler.ok(regelSett.type, ansatt.ansattId)
+        logger.ok(regelSett.type, ansatt.ansattId)
     }
 
 

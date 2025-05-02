@@ -218,12 +218,21 @@ class RegelMotorTest {
 
         private val annenAnsattBrukerId = BrukerId("08526835644")
 
+
+        @Test
+        @DisplayName("Ansatt kan ikke behandle noen de har felles barn med")
+        fun fellesBarnAvvist() {
+            val barn = BrukerId("08526835649")
+            val far = BrukerBuilder(annenAnsattBrukerId).barn(setOf(barn)).build()
+            val ansatt = AnsattBuilder(ansattId).bruker(far).build()
+            val mor = BrukerBuilder(brukerId).barn(setOf(barn)).build()
+            forventAvvistAv<FellesBarnRegel>(ansatt, mor)
+        }
+
         @Test
         @DisplayName("Ansatt kan ikke behandle egen partner")
         fun egenPartnerAvvist() {
-            val ansattBruker =
-                BrukerBuilder(annenAnsattBrukerId).kreverMedlemskapI(SKJERMING).partnere(setOf(brukerId))
-                    .build()
+            val ansattBruker = BrukerBuilder(annenAnsattBrukerId).partnere(setOf(brukerId)).build()
             val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
             val partner = BrukerBuilder(brukerId).build()
             forventAvvistAv<PartnerRegel>(ansatt, partner)
@@ -232,8 +241,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Ansatt kan ikke behandle egne barn")
         fun egneBarnAvvist() {
-            val ansattBruker =
-                BrukerBuilder(annenAnsattBrukerId).kreverMedlemskapI(SKJERMING).barn(setOf(brukerId)).build()
+            val ansattBruker = BrukerBuilder(annenAnsattBrukerId).barn(setOf(brukerId)).build()
             val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
             val barn = BrukerBuilder(brukerId).build()
             forventAvvistAv<ForeldreOgBarnRegel>(ansatt, barn)
@@ -243,7 +251,7 @@ class RegelMotorTest {
         @DisplayName("Ansatt kan ikke behandle egne foreldre")
         fun egneForeldreAvvist() {
             val ansattBruker =
-                BrukerBuilder(annenAnsattBrukerId).kreverMedlemskapI(SKJERMING).far(brukerId).build()
+                BrukerBuilder(annenAnsattBrukerId).far(brukerId).build()
             val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
             val far = BrukerBuilder(brukerId).build()
             forventAvvistAv<ForeldreOgBarnRegel>(ansatt, far)
@@ -253,7 +261,7 @@ class RegelMotorTest {
         @DisplayName("Ansatt kan ikke behandle egne søsken")
         fun søskenAvvist() {
             val ansattBruker =
-                BrukerBuilder(annenAnsattBrukerId).kreverMedlemskapI(SKJERMING).søsken(setOf(brukerId)).build()
+                BrukerBuilder(annenAnsattBrukerId).søsken(setOf(brukerId)).build()
             val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
             val søsken = BrukerBuilder(brukerId).build()
             forventAvvistAv<SøskenRegel>(ansatt, søsken)

@@ -9,7 +9,6 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.OVERSTYRBAR_REGELTYPE
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 
@@ -17,8 +16,7 @@ import org.springframework.stereotype.Component
 class RegelMotor(
         @Qualifier(KJERNE) private val kjerne: RegelSett,
         @Qualifier(OVERSTYRBAR) private val overstyrbar: RegelSett,
-        private val logger: RegelMotorResultatLogger) {
-    private val log = getLogger(javaClass)
+        private val logger: RegelMotorLogger) {
 
     private val komplett = RegelSett(KOMPLETT_REGELTYPE to kjerne.regler + overstyrbar.regler)
 
@@ -34,7 +32,7 @@ class RegelMotor(
 
     private fun sjekkRegler(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) {
         regelSett.regler.forEach { regel ->
-            log.trace("Sjekker regel: '${regel.kortNavn}' for ${ansatt.ansattId}  og ${bruker.brukerId}")
+            logger.sjekker(regel, ansatt, bruker)
             if (!regel.evaluer(ansatt, bruker)) {
                 logger.avvist(ansatt.ansattId, bruker.brukerId, regel)
                 throw RegelException(bruker.brukerId, ansatt.ansattId, regel)

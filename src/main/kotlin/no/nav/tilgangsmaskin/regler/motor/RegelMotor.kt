@@ -33,10 +33,10 @@ class RegelMotor(
         sjekkRegler(ansatt, bruker, type.regelSett())
 
     private fun sjekkRegler(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) {
-        regelSett.regler.forEachIndexed { index, regel ->
-            log.trace("[${index + 1}/${regelSett.size}] Sjekker regel: '${regel.kortNavn}' fra ${regelSett.beskrivelse} ${ansatt.ansattId} og ${ansatt.bruker?.brukerId} og ${bruker.brukerId}")
+        regelSett.regler.forEach { regel ->
+            log.trace("Sjekker regel: '${regel.kortNavn}' fra ${regelSett.beskrivelse} for ${ansatt.ansattId} og ${ansatt.bruker?.brukerId} og ${bruker.brukerId}")
             if (!regel.evaluer(ansatt, bruker)) {
-                handler.avvist("${index + 1}/${regelSett.size}", ansatt.ansattId, bruker.brukerId, regel)
+                handler.avvist(ansatt.ansattId, bruker.brukerId, regel)
                 throw RegelException(bruker.brukerId, ansatt.ansattId, regel)
             }
         }

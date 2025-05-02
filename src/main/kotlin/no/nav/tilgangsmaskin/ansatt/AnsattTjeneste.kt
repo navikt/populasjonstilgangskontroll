@@ -26,6 +26,7 @@ class AnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
                 log.info("$ansattId har tilgang til nasjonal gruppe, slår ikke opp i Entra for GEO-grupper")
                 ansattMedGrupperFra(ansattId, this)
             } else {
+                log.info("$ansattId har *ikke* tilgang til nasjonal gruppe, slår opp i Entra for GEO-grupper")
                 ansattMedGrupperFra(ansattId, this + entra.grupper(ansattId))
             }
         }

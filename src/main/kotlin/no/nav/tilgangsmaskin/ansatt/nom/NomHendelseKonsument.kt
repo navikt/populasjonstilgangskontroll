@@ -4,22 +4,19 @@ import java.time.LocalDate.EPOCH
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.pluralize
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 
 @Component
-class NomHendelseKonsument(private val nom: Nom, private val handler: NomHendelseResultatLogger) {
+class NomHendelseKonsument(private val nom: Nom, private val log: NomHendelseLogger) {
 
-    private val log = getLogger(javaClass)
 
     @KafkaListener(topics = ["#{'\${nom.topic}'}"], concurrency = "1", batch = "true", filter = "fnrFilterStrategy")
     fun listen(hendelser: List<NomHendelse>) {
-        log.info("Mottok ${hendelser.size} ${"hendelse".pluralize(hendelser)}")
+        log.start(hendelser)
         hendelser.forEach {
-            log.info("Behandler hendelse: {}", it)
+            log.behandler(it)
             with(it) {
                 runCatching {
                     nom.lagre(
@@ -27,10 +24,10 @@ class NomHendelseKonsument(private val nom: Nom, private val handler: NomHendels
                                     AnsattId(navident), BrukerId(personident),
                                     NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: ALLTID)))
                 }.fold(
-                        { handler.ok(navident, personident) },
-                        { handler.feilet(navident, personident, it) })
+                        { log.ok(navident, personident) },
+                        { log.feilet(navident, personident, it) })
             }
         }
-        log.info("${hendelser.size} ${"hendelse".pluralize(hendelser)} ferdig behandlet")
+        log.ferdig(hendelser)
     }
 }

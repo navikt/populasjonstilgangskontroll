@@ -2,15 +2,29 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 import io.micrometer.core.annotation.Counted
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.pluralize
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
 @Counted
-class NomHendelseResultatLogger {
+class NomHendelseLogger {
     private val log = getLogger(javaClass)
     fun ok(ansattId: String, brukerId: String) {
         log.info("Lagret brukerId ${brukerId.maskFnr()} for $ansattId OK")
+    }
+
+    fun start(hendelser: List<NomHendelse>) {
+        log.info("Mottok ${hendelser.size} ${"hendelse".pluralize(hendelser)}")
+    }
+
+    fun behandler(hendelse: NomHendelse) {
+        log.info("Behandler hendelse: {}", hendelse)
+    }
+
+    fun ferdig(hendelser: List<NomHendelse>) {
+        log.info("${hendelser.size} ${"hendelse".pluralize(hendelser)} ferdig behandlet")
+
     }
 
     fun feilet(ansattId: String, brukerId: String, e: Throwable) {

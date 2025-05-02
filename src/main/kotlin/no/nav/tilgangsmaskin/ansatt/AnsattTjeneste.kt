@@ -2,9 +2,10 @@ package no.nav.tilgangsmaskin.ansatt
 
 import io.micrometer.core.annotation.Timed
 import no.nav.boot.conditionals.ConditionalOnGCP
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.grupperFraToken
 import no.nav.tilgangsmaskin.ansatt.entra.Entra
 import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
-import no.nav.tilgangsmaskin.ansatt.entra.harNasjonalTilgang
+import no.nav.tilgangsmaskin.ansatt.entra.girNasjonalTilgang
 import no.nav.tilgangsmaskin.ansatt.nom.Nom
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token
@@ -14,14 +15,14 @@ import org.springframework.stereotype.Service
 @Service
 @Timed
 @ConditionalOnGCP
-class SmartAnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
-                          private val brukere: BrukerTjeneste,
-                          private val token: Token) : AnsattOperations {
+class AnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
+                     private val brukere: BrukerTjeneste,
+                     private val token: Token) {
     private val log = getLogger(javaClass)
 
-    override fun ansatt(ansattId: AnsattId) =
-        with(token.globaleGrupper) {
-            if (harNasjonalTilgang()) {
+    fun ansatt(ansattId: AnsattId) =
+        with(grupperFraToken(token.globaleGruppeIds)) {
+            if (girNasjonalTilgang()) {
                 log.info("$ansattId har tilgang til nasjonal gruppe, slår ikke opp i Entra for GEO-grupper")
                 ansattMedGrupperFra(ansattId, this)
             } else {
@@ -39,29 +40,6 @@ class SmartAnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
     }
 }
 
-//@Service
-//@Timed
-//@ConditionalOnProd
-class NaivAnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
-                         private val brukere: BrukerTjeneste,
-                         private val token: Token) : AnsattOperations {
-
-    override fun ansatt(ansattId: AnsattId): Ansatt {
-        val grupper = entra.grupper(ansattId)
-        val ansattFnr = ansatte.fnrForAnsatt(ansattId)
-        val ansattBruker = ansattFnr?.let {
-            runCatching {
-                brukere.utvidetFamilie(it.verdi)
-            }.getOrNull()
-        }
-        return Ansatt(ansattId, ansattBruker, grupper + token.globaleGrupper)
-    }
-}
-
-@FunctionalInterface
-interface AnsattOperations {
-    fun ansatt(ansattId: AnsattId): Ansatt
-}
 
 
 

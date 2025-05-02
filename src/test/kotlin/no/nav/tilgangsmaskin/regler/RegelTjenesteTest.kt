@@ -7,7 +7,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.AnsattOperations
+import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
@@ -74,7 +74,7 @@ class RegelTjenesteTest {
     private lateinit var brukere: BrukerTjeneste
 
     @MockK
-    private lateinit var ansatte: AnsattOperations
+    private lateinit var ansatte: AnsattTjeneste
 
     private lateinit var overstyring: OverstyringTjeneste
 

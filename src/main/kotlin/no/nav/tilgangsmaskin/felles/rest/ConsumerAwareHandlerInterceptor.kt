@@ -11,7 +11,7 @@ import org.springframework.web.servlet.HandlerInterceptor
 class ConsumerAwareHandlerInterceptor(private val accessor: Token) : HandlerInterceptor {
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         MDC.put("userid", accessor.ansattId?.verdi ?: "N/A")
-        MDC.put("consumerid", accessor.systemAndNamespace)
+        MDC.put("consumerid", accessor.systemAndNs)
         return true
     }
 }

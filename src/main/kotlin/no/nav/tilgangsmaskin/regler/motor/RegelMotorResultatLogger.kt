@@ -19,7 +19,7 @@ class RegelMotorResultatLogger {
         secureLogger.info("Tilgang til $brukerId avvist av regel '${regel.kortNavn}' (${regel.begrunnelse}) for $ansattId")
     }
 
-    fun ok(type: RegelType, ansattId: AnsattId, brukerId: BrukerId) {
+    fun ok(type: RegelType, ansattId: AnsattId) {
         log.info("${type.beskrivelse.upcase()} ga tilgang for $ansattId")
     }
 }

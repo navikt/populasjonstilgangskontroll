@@ -15,7 +15,7 @@ class RegelMotorLogger {
     private val log = getLogger(javaClass)
     fun avvist(ansatt: Ansatt, bruker: Bruker, regel: Regel) {
         log.warn("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId}")
-        secureLogger.info("Tilgang til ${bruker.brukerId} avvist av regel '${regel.kortNavn}' (${regel.begrunnelse}) for ${ansatt.ansattId}")
+        secureLogger.info("Tilgang til ${bruker.brukerId.verdi} avvist av regel '${regel.kortNavn}' (${regel.begrunnelse}) for ${ansatt.ansattId}")
     }
 
     fun ok(ansatt: Ansatt, regelSett: RegelSett) {

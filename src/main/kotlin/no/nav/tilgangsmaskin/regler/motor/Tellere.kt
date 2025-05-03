@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class HabilitetTeller(registry: MeterRegistry, accessor: Token) :
-    AbstractTeller(registry, accessor, "habilitet.attempted.total", "Forsøk på å slå opp nærstående")
+    AbstractTeller(registry, accessor, "habilitet.oppslag.total", "Forsøk på å slå opp nærstående")
 
 @Component
 class AvdødTeller(registry: MeterRegistry, accessor: Token) :
-    AbstractTeller(registry, accessor, "dead.attempted.total", "Forsøk på å slå opp avdøde")
+    AbstractTeller(registry, accessor, "dead.oppslag.total", "Forsøk på å slå opp avdøde")

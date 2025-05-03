@@ -37,7 +37,7 @@ class OverstyringTjeneste(
         with(
                 adapter.gjeldendeOverstyring(
                         ansattId.verdi, brukerId.verdi,
-                                             brukere.nærmesteFamilie(brukerId.verdi).historiskeIds.map { it.verdi })) {
+                        brukere.nærmesteFamilie(brukerId.verdi).historiskeIds.map { it.verdi })) {
             when {
                 this == null -> false.also {
                     log.trace("Ingen overstyring for $ansattId og $brukerId ble funnet i databasen")
@@ -59,7 +59,7 @@ class OverstyringTjeneste(
             motor.kjerneregler(ansatte.ansatt(ansattId), brukere.nærmesteFamilie(data.brukerId.verdi))
             adapter.overstyr(ansattId.verdi, data).also {
                 teller.tell("overstyrt" to true)
-                log.info("Overstyring er registrert for $ansattId og ${data.brukerId}")
+                log.info("Overstyring er utført for $ansattId og ${data.brukerId}")
                 refresh(ansattId, data)
             }
         }.getOrElse {
@@ -72,32 +72,24 @@ class OverstyringTjeneste(
                     teller.tell("kortnavn" to it.regel.kortNavn, "overstyrt" to false)
 
                 }
-
-                else -> throw it.also {
-                    log.error("Ukjent feil ved overstyring for $ansattId", it)
-                }
+                else -> throw it
             }
         }
 
     @CachePut(OVERSTYRING)
-    fun refresh(ansattId: AnsattId, data: OverstyringData) =
-        Unit.also {
-            log.info("Refresh cache overstyring for $ansattId og ${data.brukerId}")
-        }
+    fun refresh(ansattId: AnsattId, data: OverstyringData) = Unit
 
     fun sjekk(ansattId: AnsattId, e: Throwable) =
         when (e) {
             is BulkRegelException -> sjekkOverstyringer(ansattId, e)
             is RegelException -> sjekkOverstyring(ansattId, e)
-            else -> throw e.also {
-                log.error("Ukjent feil ved tilgangskontroll for $ansattId", it)
-            }
+            else -> throw e
         }
 
-    private fun sjekkOverstyring(ansattId: AnsattId, e: RegelException) =
-        if (!e.regel.erOverstyrbar || !erOverstyrt(ansattId, e.bruker.brukerId)) {
-            throw e
-        } else true
+    private fun sjekkOverstyring(ansattId: AnsattId, e: RegelException): Boolean {
+        if (!e.regel.erOverstyrbar || !erOverstyrt(ansattId, e.bruker.brukerId)) throw e
+        return true
+    }
 
     private fun sjekkOverstyringer(ansattId: AnsattId, e: BulkRegelException) {
         val remainingExceptions = e.exceptions.filterNot {

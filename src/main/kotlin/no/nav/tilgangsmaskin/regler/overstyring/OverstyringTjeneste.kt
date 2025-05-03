@@ -1,8 +1,6 @@
 package no.nav.tilgangsmaskin.regler.overstyring
 
 import io.micrometer.core.annotation.Timed
-import io.micrometer.core.instrument.Counter
-import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -10,11 +8,11 @@ import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.isBeforeNow
 import no.nav.tilgangsmaskin.regler.motor.BulkRegelException
+import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringEntity.Companion.OVERSTYRING
-import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
@@ -30,8 +28,7 @@ class OverstyringTjeneste(
         private val brukere: BrukerTjeneste,
         private val adapter: OverstyringJPAAdapter,
         private val motor: RegelMotor,
-        private val registry: MeterRegistry,
-        private val token: Token) {
+        private val teller: OverstyringTeller) {
 
     private val log = getLogger(javaClass)
 
@@ -39,9 +36,8 @@ class OverstyringTjeneste(
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId) =
         with(
                 adapter.gjeldendeOverstyring(
-                        ansattId.verdi,
-                        brukerId.verdi,
-                        brukere.nærmesteFamilie(brukerId.verdi).historiskeIds.map { it.verdi })) {
+                        ansattId.verdi, brukerId.verdi,
+                                             brukere.nærmesteFamilie(brukerId.verdi).historiskeIds.map { it.verdi })) {
             when {
                 this == null -> false.also {
                     log.trace("Ingen overstyring for $ansattId og $brukerId ble funnet i databasen")
@@ -62,6 +58,7 @@ class OverstyringTjeneste(
             log.info("Sjekker kjerneregler før eventuell overstyring for $ansattId og ${data.brukerId}")
             motor.kjerneregler(ansatte.ansatt(ansattId), brukere.nærmesteFamilie(data.brukerId.verdi))
             adapter.overstyr(ansattId.verdi, data).also {
+                teller.tell("overstyrt" to true)
                 log.info("Overstyring er registrert for $ansattId og ${data.brukerId}")
                 refresh(ansattId, data)
             }
@@ -72,6 +69,8 @@ class OverstyringTjeneste(
                         arrayOf(it.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
                         it).also {
                     log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}")
+                    teller.tell("kortnavn" to it.regel.kortNavn, "overstyrt" to false)
+
                 }
 
                 else -> throw it.also {
@@ -96,13 +95,9 @@ class OverstyringTjeneste(
         }
 
     private fun sjekkOverstyring(ansattId: AnsattId, e: RegelException) =
-        if (e.regel.erOverstyrbar && erOverstyrt(ansattId, e.bruker.brukerId)) {
-            tellOverstyring()
-        } else {
-            throw e.also {
-                tellAvslag(e.regel.kortNavn, token.systemNavn)
-            }
-        }
+        if (!e.regel.erOverstyrbar || !erOverstyrt(ansattId, e.bruker.brukerId)) {
+            throw e
+        } else true
 
     private fun sjekkOverstyringer(ansattId: AnsattId, e: BulkRegelException) {
         val remainingExceptions = e.exceptions.filterNot {
@@ -112,20 +107,4 @@ class OverstyringTjeneste(
             throw BulkRegelException(ansattId, remainingExceptions)
         }
     }
-
-    private fun tellAvslag(kortNavn: String, systemNavn: String) {
-        Counter.builder("regel.avslag.total")
-            .description("Antall avslag pr regel")
-            .tag("kortnavn", kortNavn)
-            .tag("system", systemNavn)
-            .register(registry).increment()
-    }
-
-    private fun tellOverstyring() {
-        Counter.builder("regel.overstyring.total")
-            .description("Antall overstyringer")
-            .register(registry).increment()
-    }
 }
-
-

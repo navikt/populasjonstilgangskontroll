@@ -17,3 +17,7 @@ class NasjonalGruppeTeller(registry: MeterRegistry, token: Token) :
 @Component
 class AvdødTeller(registry: MeterRegistry, accessor: Token) :
     AbstractTeller(registry, accessor, "dead.oppslag.total", "Forsøk på å slå opp avdøde")
+
+@Component
+class OverstyringTeller(registry: MeterRegistry, token: Token) :
+    AbstractTeller(registry, token, "overstyring.forsøk", "Overstyringsforsøk pr resultat")

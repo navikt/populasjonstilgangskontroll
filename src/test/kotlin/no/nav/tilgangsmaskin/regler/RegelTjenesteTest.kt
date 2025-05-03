@@ -17,10 +17,7 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.utenlandskTi
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.motor.*
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringJPAAdapter
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringRepository
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
+import no.nav.tilgangsmaskin.regler.overstyring.*
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.assertj.core.api.Assertions.assertThatCode
@@ -97,7 +94,7 @@ class RegelTjenesteTest {
         overstyring =
             OverstyringTjeneste(
                     ansatte, brukere, OverstyringJPAAdapter(repo), motor,
-                    registry, token)
+                    OverstyringTeller(registry, token))
         regler = RegelTjeneste(motor, brukere, ansatte, overstyring)
     }
 

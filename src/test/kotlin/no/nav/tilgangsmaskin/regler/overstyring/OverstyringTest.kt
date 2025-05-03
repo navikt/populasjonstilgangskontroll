@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
 import no.nav.tilgangsmaskin.regler.motor.RegelBeanConfig
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.motor.RegelMotorLogger
@@ -72,7 +73,7 @@ internal class OverstyringTest {
         every { token.system } returns "test"
         every { token.systemNavn } returns "test"
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-        overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, registry, token)
+        overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, OverstyringTeller(registry, token))
     }
 
     @Test

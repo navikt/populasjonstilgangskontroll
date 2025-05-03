@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
@@ -36,10 +35,10 @@ class SkjermingRegel : GlobalGruppeRegel(SKJERMING), KjerneRegel
 
 @Order(HIGHEST_PRECEDENCE + 4)
 @Component
-class EgneDataRegel(private val teller: EgneDataOppslagTeller) : KjerneRegel {
+class EgneDataRegel(private val teller: HabilitetTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt erDenSammeSom bruker }.also {
-            teller.tell(it)
+            teller.tell(it, EGNEDATA)
         }
 
     override val metadata = RegelMetadata(EGNEDATA)
@@ -47,10 +46,10 @@ class EgneDataRegel(private val teller: EgneDataOppslagTeller) : KjerneRegel {
 
 @Order(HIGHEST_PRECEDENCE + 5)
 @Component
-class ForeldreOgBarnRegel(private val teller: ForeldreBarnOppslagTeller) : KjerneRegel {
+class ForeldreOgBarnRegel(private val teller: HabilitetTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt erForeldreEllerBarnTil bruker }.also {
-            teller.tell(it)
+            teller.tell(it, FORELDREBARN)
         }
 
     override val metadata = RegelMetadata(FORELDREBARN)
@@ -58,10 +57,10 @@ class ForeldreOgBarnRegel(private val teller: ForeldreBarnOppslagTeller) : Kjern
 
 @Order(HIGHEST_PRECEDENCE + 6)
 @Component
-class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
+class PartnerRegel(private val teller: HabilitetTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt erNåværendeEllerTidligerePartnerMed bruker }.also {
-            teller.tell(it)
+            teller.tell(it, PARTNER)
         }
 
     override val metadata = RegelMetadata(PARTNER)
@@ -69,10 +68,10 @@ class PartnerRegel(private val teller: PartnerOppslagTeller) : KjerneRegel {
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 7)
-class SøskenRegel(private val teller: SøskenOppslagTeller) : KjerneRegel {
+class SøskenRegel(private val teller: HabilitetTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt erSøskenTil bruker }.also {
-            teller.tell(it)
+            teller.tell(it, SØSKEN)
         }
 
     override val metadata = RegelMetadata(SØSKEN)

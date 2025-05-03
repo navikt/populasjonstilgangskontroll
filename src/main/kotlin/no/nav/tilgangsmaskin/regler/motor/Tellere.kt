@@ -7,21 +7,9 @@ import org.springframework.stereotype.Component
 
 
 @Component
-class SøskenOppslagTeller(registry: MeterRegistry, accessor: Token) :
-    AbstractTeller(registry, accessor, "siblings.attempted.total", "Forsøk på å slå opp søsken")
-
-@Component
-class EgneDataOppslagTeller(registry: MeterRegistry, accessor: Token) :
-    AbstractTeller(registry, accessor, "own.attempted.total", "Forsøk på å slå opp egne data")
-
-@Component
-class ForeldreBarnOppslagTeller(registry: MeterRegistry, accessor: Token) :
-    AbstractTeller(registry, accessor, "parentsorchildren.attempted.total", "Forsøk på å slå opp foreldre eller barn")
+class HabilitetTeller(registry: MeterRegistry, accessor: Token) :
+    AbstractTeller(registry, accessor, "habilitet.attempted.total", "Forsøk på å slå opp nærstående")
 
 @Component
 class AvdødTeller(registry: MeterRegistry, accessor: Token) :
     AbstractTeller(registry, accessor, "dead.attempted.total", "Forsøk på å slå opp avdøde")
-
-@Component
-class PartnerOppslagTeller(registry: MeterRegistry, accessor: Token) :
-    AbstractTeller(registry, accessor, "partners.attempted.total", "Forsøk på å slå opp partner(e)")

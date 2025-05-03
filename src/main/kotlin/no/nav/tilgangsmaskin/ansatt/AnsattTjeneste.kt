@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import io.micrometer.core.annotation.Timed
-import io.micrometer.core.instrument.MeterRegistry
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.grupperFraToken
 import no.nav.tilgangsmaskin.ansatt.entra.Entra
@@ -9,10 +8,9 @@ import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.entra.girNasjonalTilgang
 import no.nav.tilgangsmaskin.ansatt.nom.Nom
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
-import no.nav.tilgangsmaskin.felles.AbstractTeller
+import no.nav.tilgangsmaskin.regler.motor.NasjonalGruppeTeller
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 
 @Service
@@ -45,11 +43,6 @@ class AnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
         return Ansatt(ansattId, ansattBruker, grupper)
     }
 }
-
-@Component
-class NasjonalGruppeTeller(registry: MeterRegistry, token: Token) :
-    AbstractTeller(registry, token, "gruppe.medlemskap.nasjonal", "Ansatte med og uten nasjonalt gruppemedlemsskap")
-
 
 
 

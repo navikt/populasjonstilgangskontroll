@@ -11,5 +11,9 @@ class HabilitetTeller(registry: MeterRegistry, accessor: Token) :
     AbstractTeller(registry, accessor, "habilitet.oppslag.total", "Forsøk på å slå opp nærstående")
 
 @Component
+class NasjonalGruppeTeller(registry: MeterRegistry, token: Token) :
+    AbstractTeller(registry, token, "gruppe.medlemskap.nasjonal", "Ansatte med og uten nasjonalt gruppemedlemsskap")
+
+@Component
 class AvdødTeller(registry: MeterRegistry, accessor: Token) :
     AbstractTeller(registry, accessor, "dead.oppslag.total", "Forsøk på å slå opp avdøde")

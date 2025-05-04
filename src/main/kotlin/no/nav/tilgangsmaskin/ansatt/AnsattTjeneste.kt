@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import io.micrometer.core.annotation.Timed
+import io.micrometer.core.instrument.Tags
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.grupperFraToken
 import no.nav.tilgangsmaskin.ansatt.entra.Entra
@@ -25,11 +26,11 @@ class AnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
         with(grupperFraToken(token.globaleGruppeIds)) {
             if (girNasjonalTilgang()) {
                 log.info("$ansattId har tilgang til nasjonal gruppe, slår ikke opp i Entra for GEO-grupper")
-                teller.tell("medlem" to true)
+                teller.tell(Tags.of("medlem", true.toString()))
                 ansattMedMedFamileOgGrupper(ansattId, this)
             } else {
                 log.info("$ansattId har *ikke* tilgang til nasjonal gruppe, slår opp i Entra for GEO-grupper")
-                teller.tell("medlem" to false)
+                teller.tell(Tags.of("medlem", false.toString()))
                 ansattMedMedFamileOgGrupper(ansattId, this + entra.grupper(ansattId))
             }
         }

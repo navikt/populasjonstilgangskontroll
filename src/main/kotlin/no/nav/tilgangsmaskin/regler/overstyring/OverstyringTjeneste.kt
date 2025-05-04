@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.regler.overstyring
 
 import io.micrometer.core.annotation.Timed
+import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -58,7 +59,7 @@ class OverstyringTjeneste(
             log.info("Sjekker kjerneregler før eventuell overstyring for $ansattId og ${data.brukerId}")
             motor.kjerneregler(ansatte.ansatt(ansattId), brukere.nærmesteFamilie(data.brukerId.verdi))
             adapter.overstyr(ansattId.verdi, data).also {
-                teller.tell("overstyrt" to true)
+                teller.tell(Tags.of("overstyrt", true.toString()))
                 log.info("Overstyring er utført for $ansattId og ${data.brukerId}")
                 refresh(ansattId, data)
             }
@@ -69,8 +70,7 @@ class OverstyringTjeneste(
                         arrayOf(it.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
                         it).also {
                     log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}")
-                    teller.tell("kortnavn" to it.regel.kortNavn, "overstyrt" to false)
-
+                    teller.tell(Tags.of("kortnavn", it.regel.kortNavn, "overstyrt", false.toString()))
                 }
                 else -> throw it
             }

@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.regler.motor
 
+import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
@@ -41,7 +42,7 @@ class AvdødBrukerRegel(private val teller: AvdødTeller) : OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         true.also {  // ikke feile
             if (bruker.dødsdato != null) {
-                teller.tell(true, *arrayOf("months" to bruker.dødsdato.intervallSiden()))
+                teller.tell(true, Tags.of("months", bruker.dødsdato.intervallSiden()))
             }
         }
 

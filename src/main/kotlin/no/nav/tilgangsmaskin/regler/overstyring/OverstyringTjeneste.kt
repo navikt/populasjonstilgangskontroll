@@ -34,25 +34,26 @@ class OverstyringTjeneste(
     private val log = getLogger(javaClass)
 
     @Transactional(readOnly = true)
-    fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId) =
-        with(
-                adapter.gjeldendeOverstyring(
-                        ansattId.verdi, brukerId.verdi,
-                        brukere.nærmesteFamilie(brukerId.verdi).historiskeIds.map { it.verdi })) {
-            when {
-                this == null -> false.also {
-                    log.trace("Ingen overstyring for $ansattId og $brukerId ble funnet i databasen")
-                }
+    fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId): Boolean {
+        val overstyring = adapter.gjeldendeOverstyring(
+                ansattId.verdi, brukerId.verdi,
+                brukere.nærmesteFamilie(brukerId.verdi).historiskeIds.map { it.verdi })
 
-                isBeforeNow() -> false.also {
-                    log.trace("Overstyring har gått ut på tid for ${diffFromNow()} siden for $ansattId og $brukerId")
-                }
-
-                else -> true.also {
-                    log.trace("Overstyring er gyldig i ${diffFromNow()} til for $ansattId og $brukerId")
-                }
+        return when {
+            overstyring == null -> {
+                log.trace("Ingen overstyring for $ansattId og $brukerId ble funnet i databasen")
+                false
+            }
+            overstyring.isBeforeNow() -> {
+                log.trace("Overstyring har gått ut på tid for ${overstyring.diffFromNow()} siden for $ansattId og $brukerId")
+                false
+            }
+            else -> {
+                log.trace("Overstyring er gyldig i ${overstyring.diffFromNow()} til for $ansattId og $brukerId")
+                true
             }
         }
+    }
 
     fun overstyr(ansattId: AnsattId, data: OverstyringData) =
         runCatching {

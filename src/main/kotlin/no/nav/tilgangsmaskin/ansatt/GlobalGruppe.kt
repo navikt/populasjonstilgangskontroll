@@ -17,13 +17,13 @@ enum class GlobalGruppe(val property: String, val metadata: GruppeMetadata) {
     lateinit var id: UUID
 
     val entraGruppe get() = EntraGruppe(id)
-    
+
     companion object {
         private fun navnFor(id: UUID) = entries.find { it.id == id }?.name ?: "Fant ikke gruppenavn for id $id"
-        private fun ids() = entries.map { it.id }
+        private fun uuids() = entries.map { it.id }
         fun setIDs(grupper: Map<String, UUID>) =
             entries.forEach { it.id = grupper[it.property] ?: error("Mangler id for ${it.property}") }
 
-        fun grupperFraToken(claims: List<UUID>) = claims.intersect(ids()).map { EntraGruppe(it, navnFor(it)) }.toSet()
+        fun grupperFraToken(uuids: List<UUID>) = uuids.intersect(uuids()).map { EntraGruppe(it, navnFor(it)) }.toSet()
     }
 }

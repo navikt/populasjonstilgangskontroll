@@ -79,9 +79,11 @@ class SøskenRegel(private val teller: HabilitetTeller) : KjerneRegel {
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 8)
-class FellesBarnRegel : KjerneRegel {
+class FellesBarnRegel(private val teller: HabilitetTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { ansatt harFellesBarnMed bruker }
+        avslåHvis { ansatt harFellesBarnMed bruker }.also {
+            teller.tell(it, FELLES_BARN)
+        }
 
     override val metadata = RegelMetadata(FELLES_BARN)
 }

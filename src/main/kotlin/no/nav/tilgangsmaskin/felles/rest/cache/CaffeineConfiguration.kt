@@ -7,6 +7,7 @@ import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.caffeine.CaffeineCacheManager
 import org.springframework.cache.interceptor.KeyGenerator
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
@@ -16,6 +17,7 @@ class CaffeineConfiguration : CachingConfigurer {
     private val log = LoggerFactory.getLogger(javaClass)
 
 
+    @Bean
     override fun cacheManager() =
         CaffeineCacheManager().apply {
             setCaffeine(

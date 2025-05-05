@@ -1,4 +1,8 @@
 management:
+  metrics:
+    enable:
+      cache:
+        true: true
   observations:
     annotations:
       enabled: true

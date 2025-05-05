@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.regler.motor
 import io.micrometer.core.annotation.Counted
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.upcase
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
@@ -19,7 +18,7 @@ class RegelMotorLogger {
     }
 
     fun ok(ansatt: Ansatt, regelSett: RegelSett) {
-        log.info("${regelSett.type.beskrivelse.upcase()} ga tilgang for ${ansatt.ansattId}")
+        log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId}")
     }
 
     fun evaluerer(ansatt: Ansatt, bruker: Bruker, regel: Regel) {

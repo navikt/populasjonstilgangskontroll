@@ -1,9 +1,11 @@
 package no.nav.tilgangsmaskin.regler.motor
 
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.upcase
+
 data class RegelSett(val spec: Pair<RegelType, List<Regel>>) {
     val regler = spec.second
     val type = spec.first
-    val beskrivelse = type.beskrivelse
+    val beskrivelse = type.beskrivelse.upcase()
     val size = regler.size
 
     operator fun plus(other: RegelSett) = regler + other.regler

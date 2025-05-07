@@ -16,7 +16,7 @@ abstract class AbstractTeller(
     private val log = getLogger(javaClass)
 
     fun tell(skalTelles: Boolean, metadata: GruppeMetadata) =
-        tell(skalTelles, Tags.of("navn", metadata.name.replace("_", "").lowercase())).also { log.info(skalTelles.toString(), metadata) }
+        tell(skalTelles, Tags.of("navn", metadata.name.replace("_", "").lowercase())).also { log.info(skalTelles.toString(),metadata.name) }
 
     fun tell(tags: Tags) = tell(true, tags)
 

@@ -35,7 +35,7 @@ class SkjermingRegel : GlobalGruppeRegel(SKJERMING), KjerneRegel
 
 @Order(HIGHEST_PRECEDENCE + 4)
 @Component
-class EgneDataRegel(private val teller: HabilitetTeller) : KjerneRegel {
+class EgneDataRegel(private val teller: HabilitetEgenDataTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt erDenSammeSom bruker }.also {
             teller.tell(it, EGNEDATA)
@@ -46,7 +46,7 @@ class EgneDataRegel(private val teller: HabilitetTeller) : KjerneRegel {
 
 @Order(HIGHEST_PRECEDENCE + 5)
 @Component
-class ForeldreOgBarnRegel(private val teller: HabilitetTeller) : KjerneRegel {
+class ForeldreOgBarnRegel(private val teller: HabilitetFamilieTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt erForeldreEllerBarnTil bruker }.also {
             teller.tell(it, FORELDREBARN)
@@ -57,7 +57,7 @@ class ForeldreOgBarnRegel(private val teller: HabilitetTeller) : KjerneRegel {
 
 @Order(HIGHEST_PRECEDENCE + 6)
 @Component
-class PartnerRegel(private val teller: HabilitetTeller) : KjerneRegel {
+class PartnerRegel(private val teller: HabilitetPartnerTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt erNåværendeEllerTidligerePartnerMed bruker }.also {
             teller.tell(it, PARTNER)
@@ -68,7 +68,7 @@ class PartnerRegel(private val teller: HabilitetTeller) : KjerneRegel {
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 7)
-class SøskenRegel(private val teller: HabilitetTeller) : KjerneRegel {
+class SøskenRegel(private val teller: HabilitetSøskenTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt erSøskenTil bruker }.also {
             teller.tell(it, SØSKEN)
@@ -79,7 +79,7 @@ class SøskenRegel(private val teller: HabilitetTeller) : KjerneRegel {
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 8)
-class FellesBarnRegel(private val teller: HabilitetTeller) : KjerneRegel {
+class FellesBarnRegel(private val teller: HabilitetFellesBarnTeller) : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avslåHvis { ansatt harFellesBarnMed bruker }.also {
             teller.tell(it, FELLES_BARN)

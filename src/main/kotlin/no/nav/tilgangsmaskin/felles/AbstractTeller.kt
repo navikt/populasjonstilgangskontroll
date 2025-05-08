@@ -15,13 +15,13 @@ abstract class AbstractTeller(
 
     private val log = getLogger(javaClass)
 
-    fun tell(skalTelles: Boolean, metadata: GruppeMetadata) =
-        tell(skalTelles, Tags.of("navn", metadata.name.replace("_", "").lowercase())).also { log.info(skalTelles.toString(),metadata.name) }
+    fun tell(godkjentTilgang: Boolean, metadata: GruppeMetadata) =
+        tell(godkjentTilgang, Tags.of("navn", metadata.name.replace("_", "").lowercase()))
 
     fun tell(tags: Tags) = tell(true, tags)
 
-    fun tell(skalTelles: Boolean, tags: Tags) {
-        if (!skalTelles) return
+    fun tell(godkjentTilgang: Boolean, tags: Tags) {
+        if (godkjentTilgang) return
 
         log.debug("Registering counter with name: {} and tags: {}", navn, tags)
 

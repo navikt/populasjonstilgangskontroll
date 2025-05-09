@@ -21,7 +21,7 @@ class HabilitetFamilieTeller(registry: MeterRegistry, token: Token) :
 
 @Component
 class HabilitetSøskenTeller(registry: MeterRegistry, token: Token) :
-    AbstractHabilitetTeller(registry, token, "habilitet.oppslag.søsken", "Forsøk på å slå opp søsken data")
+    AbstractHabilitetTeller(registry, token, "habilitet.oppslag.sosken", "Forsøk på å slå opp søsken data")
 
 @Component
 class HabilitetFellesBarnTeller(registry: MeterRegistry, token: Token) :

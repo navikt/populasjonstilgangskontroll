@@ -15,6 +15,32 @@ abstract class AbstractTeller(
 
     private val log = getLogger(javaClass)
 
+    fun tell(skalTelles: Boolean, metadata: GruppeMetadata) =
+        tell(skalTelles, Tags.of("navn", metadata.name.replace("_", "").lowercase()))
+
+    fun tell(tags: Tags) = tell(true, tags)
+
+    fun tell(skalTelles: Boolean, tags: Tags) {
+       if(!skalTelles) return
+
+        log.debug("Registering counter with name: {} and tags: {}", navn, tags)
+
+        Counter.builder(navn)
+            .description(beskrivelse)
+            .tags(tags.and("system", token.system ?: "N/A"))
+            .register(registry)
+            .increment()
+    }
+}
+
+abstract class AbstractHabilitetTeller(
+    private val registry: MeterRegistry,
+    private val token: Token,
+    private val navn: String,
+    private val beskrivelse: String) {
+
+    private val log = getLogger(javaClass)
+
     fun tell(godkjentTilgang: Boolean, metadata: GruppeMetadata) =
         tell(godkjentTilgang, Tags.of("navn", metadata.name.replace("_", "").lowercase()))
 

@@ -1,9 +1,13 @@
 package no.nav.tilgangsmaskin.regler.motor
 
+import io.swagger.v3.oas.annotations.media.Schema
+
 const val HABILITET = "Du har ikke tilgang til data om deg selv eller dine nærstående"
 
+@Schema(description = "Metadata for avvisninger av tilgang")
 enum class GruppeMetadata(val kode: String, val begrunnelse: String, val kortNavn: String) {
 
+    @Schema(description = "Strengt fortrolig adresse")
     STRENGT_FORTROLIG(
             "AVVIST_STRENGT_FORTROLIG_ADRESSE",
             "Du har ikke tilgang til brukere med strengt fortrolig adresse",

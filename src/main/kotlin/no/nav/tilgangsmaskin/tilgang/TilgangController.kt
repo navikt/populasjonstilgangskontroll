@@ -45,7 +45,6 @@ class TilgangController(
                         content = [Content(
                                 mediaType = APPLICATION_PROBLEM_JSON_VALUE,
                                 schema = Schema(
-                                        type = "object",
                                         example = """{
                         "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
                         "title": "AVVIST_STRENGT_FORTROLIG_ADRESSE",

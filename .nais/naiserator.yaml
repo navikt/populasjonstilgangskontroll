@@ -27,7 +27,7 @@ spec:
   ingresses:
     {{#each ingresses as |ingress|}}
         - {{ingress}}
-      {{/each}}
+    {{/each}}
   image: {{image}}
   observability:
     autoInstrumentation:
@@ -76,7 +76,6 @@ spec:
           namespace: nom
         - application: team-logs
           namespace: nais-system
-          port: 5170
       external:
         - host: {{pdl}}
     inbound:

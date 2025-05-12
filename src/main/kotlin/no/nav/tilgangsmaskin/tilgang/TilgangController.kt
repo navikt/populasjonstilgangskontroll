@@ -35,17 +35,18 @@ class TilgangController(
     @PostMapping("komplett")
     @ResponseStatus(NO_CONTENT)
     @ApiResponses(
-            @Schema(implementation = GruppeMetadata::class)
             value = [
                 ApiResponse(
                         responseCode = "204",
-                        description = "Tilgang ble gitt"),
+                        description = "Tilgang ble gitt"
+                           ),
                 ApiResponse(
                         responseCode = "403",
                         description = "Tilgang ble avvist",
                         content = [Content(
                                 mediaType = APPLICATION_PROBLEM_JSON_VALUE,
                                 schema = Schema(
+                                        implementation = GruppeMetadata::class,
                                         example = """{
                         "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
                         "title": "AVVIST_STRENGT_FORTROLIG_ADRESSE",

@@ -23,7 +23,7 @@ import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.web.bind.annotation.*
-
+import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
 
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
@@ -60,11 +60,17 @@ class DevTilgangController(
         value = [
             io.swagger.v3.oas.annotations.responses.ApiResponse(
                 responseCode = "204",
-                description = "Ingen feil oppstod, tilgang er ok"
+                description = "Tilgang er ok, responsen er tom"
             ),
             io.swagger.v3.oas.annotations.responses.ApiResponse(
                 responseCode = "403",
-                description = "Tilgang er ikke ok"
+                description = "Tilgang er avvist",
+                content = [io.swagger.v3.oas.annotations.media.Content(
+                    mediaType = "application/json",
+                    schema = io.swagger.v3.oas.annotations.media.Schema(
+                        implementation = DefaultRestErrorHandler::class)
+                )]
+
             )
         ])
     fun kompletteRegler(@PathVariable ansattId: AnsattId, @PathVariable @Valid @ValidId brukerId: String) =

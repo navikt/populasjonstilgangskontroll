@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.Tilgang
 
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import no.nav.boot.conditionals.ConditionalOnNotProd
@@ -55,6 +56,17 @@ class DevTilgangController(
 
     @GetMapping("komplett/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)
+    @ApiResponses(
+        value = [
+            io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "204",
+                description = "Ingen feil oppstod, tilgang er ok"
+            ),
+            io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "403",
+                description = "Tilgang er ikke ok"
+            )
+        ])
     fun kompletteRegler(@PathVariable ansattId: AnsattId, @PathVariable @Valid @ValidId brukerId: String) =
         regler.kompletteRegler(ansattId, brukerId)
 

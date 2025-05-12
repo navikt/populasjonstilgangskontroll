@@ -22,7 +22,6 @@
     </appender>
 
     <springProfile name="dev">
-        <logger name="no.nav.tilgangsmaskin" level="trace"/>
     </springProfile>
 
     <springProfile name="local | test">
@@ -36,7 +35,6 @@
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss} %X{Nav-CallId} [%thread] %-5level %logger{70} - %msg%n</Pattern>
             </layout>
         </appender>
-        <logger name="no.nav.tilgangsmaskin" level="trace"/>
     </springProfile>
 
     <springProfile name="prod">
@@ -45,8 +43,10 @@
             <Marker>CONFIDENTIAL</Marker>
             <OnMatch>DENY</OnMatch>
         </turboFilter>
+        <logger name="no.nav.tilgangsmaskin" level="info"/>
     </springProfile>
 
+    <logger name="no.nav.tilgangsmaskin" level="trace"/>
     <logger name="secureLog" level="INFO" additivity="false">
         <appender-ref ref="secure-appender"/>
     </logger>

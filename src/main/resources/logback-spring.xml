@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <appender name="stdout"
-              class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="stdout-appender" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
 
-    <appender name="team-logs" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+    <appender name="secure-appender" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
         <destination>team-logs.nais-system:5170</destination>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <customFields>
@@ -27,7 +26,7 @@
     </springProfile>
 
     <springProfile name="local | test">
-        <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <appender name="stdout-appender" class="ch.qos.logback.core.ConsoleAppender">
             <layout class="ch.qos.logback.classic.PatternLayout">
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss} %X{Nav-CallId} [%thread] %-5level %logger{70} - %msg%n</Pattern>
             </layout>
@@ -50,10 +49,9 @@
     </springProfile>
 
     <logger name="secureLog" level="INFO" additivity="false">
-        <appender-ref ref="team-logs"/>
+        <appender-ref ref="secure-appender"/>
     </logger>
     <root level="info">
-        <appender-ref ref="team-logs"/>
-        <appender-ref ref="stdout"/>
+        <appender-ref ref="stdout-appender"/>
     </root>
 </configuration>

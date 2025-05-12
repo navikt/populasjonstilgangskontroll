@@ -15,7 +15,7 @@
         </encoder>
         <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
             <evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
-                <marker>TEAM_LOGS</marker>
+                <marker>SECURE</marker>
             </evaluator>
             <OnMatch>ACCEPT</OnMatch>
             <OnMismatch>DENY</OnMismatch>
@@ -23,16 +23,11 @@
     </appender>
 
     <springProfile name="dev">
-        <logger name="org.springframework.retry" level="trace"/>
-        <logger name="org.apache.hc.client5.http.wire" level="info"/>
-        <logger name="org.hibernate.SQL" level="debug"/>
-        <logger name="org.hibernate.orm.jdbc.bind" level="trace"/>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
     </springProfile>
-    
+
     <springProfile name="local | test">
-        <appender name="stdout"
-                  class="ch.qos.logback.core.ConsoleAppender">
+        <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
             <layout class="ch.qos.logback.classic.PatternLayout">
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss} %X{Nav-CallId} [%thread] %-5level %logger{70} - %msg%n</Pattern>
             </layout>
@@ -44,9 +39,6 @@
             </layout>
         </appender>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
-        <logger name="org.hibernate.SQL" level="debug"/>
-        <logger name="org.hibernate.orm.jdbc.bind" level="trace"/>
-        <logger name="no.nav.security" level="trace"/>
     </springProfile>
 
     <springProfile name="prod">
@@ -55,11 +47,9 @@
             <Marker>CONFIDENTIAL</Marker>
             <OnMatch>DENY</OnMatch>
         </turboFilter>
-        <logger name="org.hibernate.SQL" level="info"/>
-        <logger name="org.hibernate.orm.jdbc.bind" level="info"/>
     </springProfile>
 
-    <logger name="team-logs-logger" level="INFO" additivity="false">
+    <logger name="secureLog" level="INFO" additivity="false">
         <appender-ref ref="team-logs"/>
     </logger>
     <root level="info">

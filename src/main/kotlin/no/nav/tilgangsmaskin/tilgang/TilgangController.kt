@@ -18,7 +18,6 @@ import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
-import org.springframework.http.ProblemDetail
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -35,19 +34,28 @@ class TilgangController(
     @PostMapping("komplett")
     @ResponseStatus(NO_CONTENT)
     @ApiResponses(
-            value = [ApiResponse(
-                    responseCode = "204",
-                    description = "Tilgang ble gitt"),
+            value = [
+                ApiResponse(
+                        responseCode = "204",
+                        description = "Tilgang ble gitt"
+                           ),
                 ApiResponse(
                         responseCode = "403",
                         description = "Tilgang ble avvist",
                         content = [Content(
                                 mediaType = APPLICATION_PROBLEM_JSON_VALUE,
-                                schema = Schema(implementation = ProblemDetail::class))]),
-                ApiResponse(
-                        responseCode = "500",
-                        description = "Internal server error")]
-                 )
+                                schema = Schema(
+                                        type = "object",
+                                        example = """{
+                        "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
+                        "title": "AVVIST_STRENGT_FORTROLIG_ADRESSE",
+                        "status": 403,
+                        "instance": "Z990883/03508331575",
+                        "brukerIdent": "03508331575",
+                        "navIdent": "Z990883",
+                        "begrunnelse": "Du har ikke tilgang til brukere med strengt fortrolig adresse",
+                        "kanOverstyres": false
+                    }"""))])])
     fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String) =
         regler.kompletteRegler(token.ansattId!!, brukerId)
 

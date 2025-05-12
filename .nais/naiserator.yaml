@@ -74,7 +74,7 @@ spec:
       rules:
         - application: skjermede-personer-pip
           namespace: nom
-        - application: team-logs
+        - application: logging
           namespace: nais-system
       external:
         - host: {{pdl}}

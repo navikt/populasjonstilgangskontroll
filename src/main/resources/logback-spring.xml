@@ -4,6 +4,24 @@
               class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
+
+    <appender name="team-logs" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>team-logs.nais-system:5170</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>
+                {"google_cloud_project":"${GOOGLE_CLOUD_PROJECT}","nais_namespace_name":"${NAIS_NAMESPACE}","nais_pod_name":"${HOSTNAME}","nais_container_name":"${NAIS_APP_NAME}"}
+            </customFields>
+            <includeContext>false</includeContext>
+        </encoder>
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
+                <marker>TEAM_LOGS</marker>
+            </evaluator>
+            <OnMatch>ACCEPT</OnMatch>
+            <OnMismatch>DENY</OnMismatch>
+        </filter>
+    </appender>
+
     <appender name="secureLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>/secure-logs/secure.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -27,6 +45,9 @@
         <logger name="secureLog" level="info" additivity="false">
             <appender-ref ref="secureLog"/>
         </logger>
+        <logger name="team-logs-logger" level="INFO" additivity="false">
+            <appender-ref ref="team-logs"/>
+        </logger>
 
     </springProfile>
     <springProfile name="local | test">
@@ -36,8 +57,8 @@
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss} %X{Nav-CallId} [%thread] %-5level %logger{70} - %msg%n</Pattern>
             </layout>
         </appender>
-        <logger name="secureLog" level="debug" additivity="false">
-            <appender-ref ref="stdout"/>
+        <logger name="team-logs-logger" level="INFO" additivity="false">
+            <appender-ref ref="team-logs"/>
         </logger>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
         <logger name="org.hibernate.SQL" level="debug"/>
@@ -60,6 +81,7 @@
     </springProfile>
 
     <root level="info">
+        <appender-ref ref="team-logs"/>
         <appender-ref ref="stdout"/>
     </root>
 </configuration>

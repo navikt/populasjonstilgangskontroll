@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.felles.rest.ValidId
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata
 import no.nav.tilgangsmaskin.regler.motor.IdOgType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
@@ -34,11 +35,11 @@ class TilgangController(
     @PostMapping("komplett")
     @ResponseStatus(NO_CONTENT)
     @ApiResponses(
+            @Schema(implementation = GruppeMetadata::class)
             value = [
                 ApiResponse(
                         responseCode = "204",
-                        description = "Tilgang ble gitt"
-                           ),
+                        description = "Tilgang ble gitt"),
                 ApiResponse(
                         responseCode = "403",
                         description = "Tilgang ble avvist",

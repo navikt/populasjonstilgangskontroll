@@ -31,8 +31,7 @@
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss} %X{Nav-CallId} [%thread] %-5level %logger{70} - %msg%n</Pattern>
             </layout>
         </appender>
-        <appender name="team-logs"
-                  class="ch.qos.logback.core.ConsoleAppender">
+        <appender name="secure-appender" class="ch.qos.logback.core.ConsoleAppender">
             <layout class="ch.qos.logback.classic.PatternLayout">
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss} %X{Nav-CallId} [%thread] %-5level %logger{70} - %msg%n</Pattern>
             </layout>

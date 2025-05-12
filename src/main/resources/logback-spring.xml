@@ -12,13 +12,14 @@
             </customFields>
             <includeContext>false</includeContext>
         </encoder>
+        <!--
         <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
             <evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
                 <marker>SECURE</marker>
             </evaluator>
             <OnMatch>ACCEPT</OnMatch>
             <OnMismatch>DENY</OnMismatch>
-        </filter>
+        </filter> -->
     </appender>
 
     <springProfile name="dev">

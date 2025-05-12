@@ -16,7 +16,7 @@ class RegelMotorLogger {
     fun avvist(ansatt: Ansatt, bruker: Bruker, regel: Regel) {
         log.warn("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId}")
         secureLog.info(
-                SECURE,
+                //    SECURE,
                 "Tilgang til ${bruker.brukerId.verdi} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId}")
     }
 

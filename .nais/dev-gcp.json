@@ -60,6 +60,11 @@
       "name": "ida",
       "namespace": "traktor",
       "cluster": "prod-fss"
+    },
+    {
+      "name": "modiapersonoversikt",
+      "namespace": "personoversikt",
+      "cluster": "dev-gcp"
     }
   ],
   "nais": {

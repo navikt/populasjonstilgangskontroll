@@ -16,7 +16,7 @@
   "db": {
     "poolsize": "2",
     "type": "POSTGRES_17",
-    "tier": "db-custom-2-3840",
+    "tier": "db-f1-micro",
     "name": "tilgangsmaskin"
   },
   "db-flags": {

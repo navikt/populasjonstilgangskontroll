@@ -12,11 +12,11 @@ import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata
         value = [
             ApiResponse(
                     responseCode = "202",
-                    description = "Overstyring ble utført"
+                    description = "Tilgang ble godkjent"
                        ),
             ApiResponse(
                     responseCode = "403",
-                    description = "Overstyring ble avvist",
+                    description = "Tilgang ble avvist",
                     content = [Content(
                             mediaType = "application/json",
                             schema = Schema(

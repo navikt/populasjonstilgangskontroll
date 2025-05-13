@@ -11,7 +11,7 @@ import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata
 @ApiResponses(
         value = [
             ApiResponse(
-                    responseCode = "202",
+                    responseCode = "204",
                     description = "Tilgang ble godkjent"
                        ),
             ApiResponse(

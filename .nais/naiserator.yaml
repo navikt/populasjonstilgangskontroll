@@ -25,7 +25,7 @@ spec:
           - name: pgaudit.log
             value: "{{db-flags.pgaudit.logtype}}"
   ingresses:
-    {{ #each ingresses as |ingress|}}
+    {{#each ingresses as |ingress|}}
         - {{ingress}}
       {{/each}}
   image: {{image}}

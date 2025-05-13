@@ -21,7 +21,7 @@ annotation class ValidId(
 class IdValidator : ConstraintValidator<ValidId, Any> {
     override fun isValid(verdi: Any, context: ConstraintValidatorContext) =
         when (verdi) {
-            is String -> runCatching { AktørId(verdi) }.isSuccess || runCatching { BrukerId(verdi) }.isSuccess
+            is String -> runCatching { AktørId(verdi.trim('"')) }.isSuccess || runCatching { BrukerId(verdi.trim('"')) }.isSuccess
             is List<*> -> verdi.all {
                 it is IdOgType && (runCatching {
                     AktørId(it.brukerId)

@@ -62,7 +62,7 @@
       "cluster": "prod-fss"
     },
     {
-      "name": "modiapersonoversikt",
+      "name": "modiapersonoversikt-api",
       "namespace": "personoversikt",
       "cluster": "dev-gcp"
     },

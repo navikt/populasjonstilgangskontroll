@@ -1,24 +1,18 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType.HTTP
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.felles.rest.ValidId
-import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata
 import no.nav.tilgangsmaskin.regler.motor.IdOgType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.NO_CONTENT
-import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -32,91 +26,23 @@ class TilgangController(
         private val overstyring: OverstyringTjeneste,
         private val token: Token) {
 
-    @PostMapping("komplett")
-    @ResponseStatus(NO_CONTENT)
-    @ApiResponses(
-            value = [
-                ApiResponse(
-                        responseCode = "204",
-                        description = "Tilgang ble gitt"
-                           ),
-                ApiResponse(
-                        responseCode = "403",
-                        description = "Tilgang ble avvist",
-                        content = [Content(
-                                mediaType = APPLICATION_PROBLEM_JSON_VALUE,
-                                schema = Schema(
-                                        implementation = GruppeMetadata::class,
-                                        example = """{
-                        "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
-                        "title": "AVVIST_STRENGT_FORTROLIG_ADRESSE",
-                        "status": 403,
-                        "instance": "Z990883/03508331575",
-                        "brukerIdent": "03508331575",
-                        "navIdent": "Z990883",
-                        "begrunnelse": "Du har ikke tilgang til brukere med strengt fortrolig adresse",
-                        "kanOverstyres": false
-                    }"""))])])
+    @ProblemDetailApiResponse
     fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String) =
         regler.kompletteRegler(token.ansattId!!, brukerId)
 
     @PostMapping("kjerne")
     @ResponseStatus(NO_CONTENT)
-    @ApiResponses(
-        value = [
-            ApiResponse(
-                responseCode = "204",
-                description = "Tilgang ble gitt"
-            ),
-            ApiResponse(
-                responseCode = "403",
-                description = "Tilgang ble avvist",
-                content = [Content(
-                    mediaType = APPLICATION_PROBLEM_JSON_VALUE,
-                    schema = Schema(
-                        implementation = GruppeMetadata::class,
-                        example = """{
-                        "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
-                        "title": "AVVIST_STRENGT_FORTROLIG_ADRESSE",
-                        "status": 403,
-                        "instance": "Z990883/03508331575",
-                        "brukerIdent": "03508331575",
-                        "navIdent": "Z990883",
-                        "begrunnelse": "Du har ikke tilgang til brukere med strengt fortrolig adresse",
-                        "kanOverstyres": false
-                    }"""))])])
+    @ProblemDetailApiResponse
     fun kjerneregler(@RequestBody @Valid @ValidId brukerId: String) = regler.kjerneregler(token.ansattId!!, brukerId)
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)
-    @ApiResponses(
-        value = [
-            ApiResponse(
-                responseCode = "202",
-                description = "Overstyring ble utført"
-            ),
-            ApiResponse(
-                responseCode = "403",
-                description = "Overstyring ble avvist",
-                content = [Content(
-                    mediaType = APPLICATION_PROBLEM_JSON_VALUE,
-                    schema = Schema(
-                        implementation = GruppeMetadata::class,
-                        example = """{
-                        "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
-                        "title": "AVVIST_STRENGT_FORTROLIG_ADRESSE",
-                        "status": 403,
-                        "instance": "Z990883/03508331575",
-                        "brukerIdent": "03508331575",
-                        "navIdent": "Z990883",
-                        "begrunnelse": "Du har ikke tilgang til brukere med strengt fortrolig adresse",
-                        "kanOverstyres": false
-                    }"""))])])
+    @ProblemDetailApiResponse
     fun overstyr(@RequestBody data: OverstyringData) = overstyring.overstyr(token.ansattId!!, data)
 
     @PostMapping("bulk")
     @ResponseStatus(NO_CONTENT)
     fun bulk(@RequestBody @Valid @ValidId specs: Set<IdOgType>) = regler.bulkRegler(token.ansattId!!, specs)
-
 }
+
 

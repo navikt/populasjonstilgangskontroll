@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.Tilgang
 
-import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import no.nav.boot.conditionals.ConditionalOnNotProd
@@ -14,12 +13,12 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
-import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.IdOgType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
+import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.ACCEPTED
@@ -65,33 +64,19 @@ class DevTilgangController(
 
     @GetMapping("komplett/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)
-    @ApiResponses(
-            value = [
-                io.swagger.v3.oas.annotations.responses.ApiResponse(
-                        responseCode = "204",
-                        description = "Tilgang er ok, responsen er tom"
-                                                                   ),
-                io.swagger.v3.oas.annotations.responses.ApiResponse(
-                        responseCode = "403",
-                        description = "Tilgang er avvist",
-                        content = [io.swagger.v3.oas.annotations.media.Content(
-                                mediaType = "application/json",
-                                schema = io.swagger.v3.oas.annotations.media.Schema(
-                                        implementation = DefaultRestErrorHandler::class)
-                                                                              )]
-
-                                                                   )
-            ])
+    @ProblemDetailApiResponse
     fun kompletteRegler(@PathVariable ansattId: AnsattId, @PathVariable @Valid @ValidId brukerId: String) =
         regler.kompletteRegler(ansattId, brukerId)
 
     @GetMapping("kjerne/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)
+    @ProblemDetailApiResponse
     fun kjerneregler(@PathVariable ansattId: AnsattId, @PathVariable @Valid @ValidId brukerId: String) =
         regler.kjerneregler(ansattId, brukerId)
 
     @PostMapping("overstyr/{ansattId}")
     @ResponseStatus(ACCEPTED)
+    @ProblemDetailApiResponse
     fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody data: OverstyringData) =
         overstyring.overstyr(ansattId, data)
 

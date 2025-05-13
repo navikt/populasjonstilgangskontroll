@@ -84,7 +84,7 @@ spec:
         - host: {{pdl}}
     inbound:
       rules:
-        {{ #each inbound as |app|}}
+        {{#each inbound as |app|}}
             - application: '{{app.name}}'
                 namespace: '{{app.namespace}}'
                 cluster: '{{app.cluster}}'

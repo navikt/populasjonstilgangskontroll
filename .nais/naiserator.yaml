@@ -38,7 +38,7 @@ spec:
       enabled: true
       runtime: java
   prometheus:
-  enabled: true
+    enabled: true
   path: /monitoring/prometheus
   readiness:
     path: /monitoring/health/readiness

@@ -39,7 +39,7 @@ spec:
       runtime: java
   prometheus:
     enabled: true
-  path: /monitoring/prometheus
+    path: /monitoring/prometheus
   readiness:
     path: /monitoring/health/readiness
     initialDelay: 30

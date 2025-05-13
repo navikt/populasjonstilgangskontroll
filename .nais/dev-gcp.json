@@ -65,6 +65,11 @@
       "name": "modiapersonoversikt",
       "namespace": "personoversikt",
       "cluster": "dev-gcp"
+    },
+    {
+      "name": "gosys-oppgavebehandling-api",
+      "namespace": "oppgavehandtering",
+      "cluster": "dev-gcp"
     }
   ],
   "nais": {

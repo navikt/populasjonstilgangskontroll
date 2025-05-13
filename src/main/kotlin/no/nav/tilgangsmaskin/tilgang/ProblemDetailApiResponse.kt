@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata
+import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
@@ -18,7 +19,7 @@ import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata
                     responseCode = "403",
                     description = "Tilgang ble avvist",
                     content = [Content(
-                            mediaType = "application/json",
+                            mediaType = APPLICATION_PROBLEM_JSON_VALUE,
                             schema = Schema(
                                     implementation = GruppeMetadata::class,
                                     example = """{

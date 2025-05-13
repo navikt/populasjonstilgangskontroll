@@ -62,10 +62,56 @@ class TilgangController(
 
     @PostMapping("kjerne")
     @ResponseStatus(NO_CONTENT)
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "204",
+                description = "Tilgang ble gitt"
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Tilgang ble avvist",
+                content = [Content(
+                    mediaType = APPLICATION_PROBLEM_JSON_VALUE,
+                    schema = Schema(
+                        implementation = GruppeMetadata::class,
+                        example = """{
+                        "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
+                        "title": "AVVIST_STRENGT_FORTROLIG_ADRESSE",
+                        "status": 403,
+                        "instance": "Z990883/03508331575",
+                        "brukerIdent": "03508331575",
+                        "navIdent": "Z990883",
+                        "begrunnelse": "Du har ikke tilgang til brukere med strengt fortrolig adresse",
+                        "kanOverstyres": false
+                    }"""))])])
     fun kjerneregler(@RequestBody @Valid @ValidId brukerId: String) = regler.kjerneregler(token.ansattId!!, brukerId)
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "202",
+                description = "Overstyring ble utført"
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Overstyring ble avvist",
+                content = [Content(
+                    mediaType = APPLICATION_PROBLEM_JSON_VALUE,
+                    schema = Schema(
+                        implementation = GruppeMetadata::class,
+                        example = """{
+                        "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
+                        "title": "AVVIST_STRENGT_FORTROLIG_ADRESSE",
+                        "status": 403,
+                        "instance": "Z990883/03508331575",
+                        "brukerIdent": "03508331575",
+                        "navIdent": "Z990883",
+                        "begrunnelse": "Du har ikke tilgang til brukere med strengt fortrolig adresse",
+                        "kanOverstyres": false
+                    }"""))])])
     fun overstyr(@RequestBody data: OverstyringData) = overstyring.overstyr(token.ansattId!!, data)
 
     @PostMapping("bulk")

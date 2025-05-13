@@ -14,16 +14,19 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
+import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.IdOgType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.NO_CONTENT
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
+import org.springframework.http.MediaType.TEXT_PLAIN_VALUE
 import org.springframework.web.bind.annotation.*
-import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
 
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
@@ -38,6 +41,9 @@ class DevTilgangController(
         private val nom: Nom,
         private val pdl: PDLTjeneste) {
 
+    private val log = LoggerFactory.getLogger(javaClass)
+
+
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)
 
@@ -50,6 +56,9 @@ class DevTilgangController(
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)
 
+    @PostMapping("test", consumes = [APPLICATION_JSON_VALUE, TEXT_PLAIN_VALUE])
+    fun test(@RequestBody @Valid @ValidId id: String) = log.info("Test: $id")
+
     @PostMapping("ansatt/{ansattId}/{brukerId}")
     fun nom(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
         nom.lagre(NomAnsattData(ansattId, brukerId))
@@ -57,22 +66,22 @@ class DevTilgangController(
     @GetMapping("komplett/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)
     @ApiResponses(
-        value = [
-            io.swagger.v3.oas.annotations.responses.ApiResponse(
-                responseCode = "204",
-                description = "Tilgang er ok, responsen er tom"
-            ),
-            io.swagger.v3.oas.annotations.responses.ApiResponse(
-                responseCode = "403",
-                description = "Tilgang er avvist",
-                content = [io.swagger.v3.oas.annotations.media.Content(
-                    mediaType = "application/json",
-                    schema = io.swagger.v3.oas.annotations.media.Schema(
-                        implementation = DefaultRestErrorHandler::class)
-                )]
+            value = [
+                io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "204",
+                        description = "Tilgang er ok, responsen er tom"
+                                                                   ),
+                io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "403",
+                        description = "Tilgang er avvist",
+                        content = [io.swagger.v3.oas.annotations.media.Content(
+                                mediaType = "application/json",
+                                schema = io.swagger.v3.oas.annotations.media.Schema(
+                                        implementation = DefaultRestErrorHandler::class)
+                                                                              )]
 
-            )
-        ])
+                                                                   )
+            ])
     fun kompletteRegler(@PathVariable ansattId: AnsattId, @PathVariable @Valid @ValidId brukerId: String) =
         regler.kompletteRegler(ansattId, brukerId)
 

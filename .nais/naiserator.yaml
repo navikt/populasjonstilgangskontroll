@@ -25,9 +25,9 @@ spec:
           - name: pgaudit.log
             value: "{{db-flags.pgaudit.logtype}}"
   ingresses:
-    {{#each ingresses as |ingress|}}
-        - {{ingress}}
-    {{/each}}
+    { { #each ingresses as |ingress|}}
+        - {{ingress } }
+      {{/each}}
   image: {{image}}
   observability:
     logging:
@@ -38,8 +38,8 @@ spec:
       enabled: true
       runtime: java
   prometheus:
-    enabled: true
-    path: /monitoring/prometheus
+  enabled: true
+  path: /monitoring/prometheus
   readiness:
     path: /monitoring/health/readiness
     initialDelay: 30
@@ -84,11 +84,11 @@ spec:
         - host: {{pdl}}
     inbound:
       rules:
-        {{#each inbound as |app|}}
+        { { #each inbound as |app|}}
             - application: '{{app.name}}'
-              namespace: '{{app.namespace}}'
-              cluster: '{{app.cluster}}'
-        {{/each}}
+                namespace: '{{app.namespace}}'
+                cluster: '{{app.cluster}}'
+                {{/each } }
   env:
     - name: NAIS_CLUSTER_TYPE
       value: {{nais.cluster.type}}

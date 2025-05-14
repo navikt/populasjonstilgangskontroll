@@ -88,19 +88,20 @@ private class ProblemDetailResponse(
 }"""))])])
 annotation class ProblemDetailBulkApiResponse
 
-data class ProblemDetailBulkResponse(
+private data class ProblemDetailBulkResponse(
         val type: URI,
         val title: List<AvvisningsKode>,
         val status: Int,
         val instance: String,
         val navIdent: String,
-        val begrunnelser: List<ProblemDetailBulkElementBegrunnelse>)
+        val begrunnelser: List<ProblemDetailBulkElementBegrunnelse>) {
+    private data class ProblemDetailBulkElementBegrunnelse(
+            val type: URI,
+            val title: AvvisningsKode,
+            val brukerIdent: String,
+            val navIdent: String,
+            val begrunnelse: String,
+            val kanOverstyres: Boolean,
+            val instance: String)
+}
 
-data class ProblemDetailBulkElementBegrunnelse(
-        val type: URI,
-        val title: AvvisningsKode,
-        val brukerIdent: String,
-        val navIdent: String,
-        val begrunnelse: String,
-        val kanOverstyres: Boolean,
-        val instance: String)

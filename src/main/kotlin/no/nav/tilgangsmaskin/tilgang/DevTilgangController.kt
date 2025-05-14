@@ -19,6 +19,7 @@ import no.nav.tilgangsmaskin.regler.motor.IdOgType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
+import no.nav.tilgangsmaskin.tilgang.ProblemDetailBulkApiResponse
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.ACCEPTED
@@ -77,6 +78,7 @@ class DevTilgangController(
 
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(NO_CONTENT)
+    @ProblemDetailBulkApiResponse
     fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<IdOgType>) =
         regler.bulkRegler(ansattId, specs)
 

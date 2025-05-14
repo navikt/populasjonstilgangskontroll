@@ -94,9 +94,9 @@ data class ProblemDetailBulkResponse(
         val status: Int,
         val instance: String,
         val navIdent: String,
-        val begrunnelser: List<Begrunnelse>)
+        val begrunnelser: List<ProblemDetailBulkElementBegrunnelse>)
 
-data class Begrunnelse(
+data class ProblemDetailBulkElementBegrunnelse(
         val type: URI,
         val title: AvvisningsKode,
         val brukerIdent: String,

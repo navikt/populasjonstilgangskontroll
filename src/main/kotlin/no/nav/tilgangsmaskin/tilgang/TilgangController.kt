@@ -45,6 +45,7 @@ class TilgangController(
 
     @PostMapping("bulk")
     @ResponseStatus(NO_CONTENT)
+    @ProblemDetailBulkApiResponse
     fun bulk(@RequestBody @Valid @ValidId specs: Set<IdOgType>) = regler.bulkRegler(token.ansattId!!, specs)
 }
 

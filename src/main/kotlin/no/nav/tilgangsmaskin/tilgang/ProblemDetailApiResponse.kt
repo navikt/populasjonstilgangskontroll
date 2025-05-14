@@ -70,7 +70,6 @@ internal data class ProblemDetailResponse(
   "begrunnelser": [
     {
       "brukerIdent": "03508331575",
-      "navIdent": "Z990883",
       "begrunnelse": "Du har ikke tilgang til brukere med strengt fortrolig adresse",
       "kanOverstyres": false,
       "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
@@ -79,7 +78,6 @@ internal data class ProblemDetailResponse(
     },
     {
       "brukerIdent": "20478606614",
-      "navIdent": "Z990883",
       "begrunnelse": "Du har ikke tilgang til brukere med strengt fortrolig adresse i utlandet",
       "kanOverstyres": false,
       "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",

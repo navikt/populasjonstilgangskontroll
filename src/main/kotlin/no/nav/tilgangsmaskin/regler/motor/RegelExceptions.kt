@@ -40,7 +40,6 @@ class BulkRegelException(private val ansattId: AnsattId, val exceptions: List<Re
         title = exceptions.map { it.regel.kode }.toSet().joinToString()
         type = TYPE_URI
         properties = mapOf(
-                "navIdent" to ansattId.verdi,
                 "begrunnelser" to exceptions.map {
                     entries(it.bruker.brukerId, ansattId, it.regel) +
                             mapOf(

@@ -6,7 +6,7 @@ import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.grupperFraToken
 import no.nav.tilgangsmaskin.ansatt.entra.Entra
 import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
-import no.nav.tilgangsmaskin.ansatt.entra.girNasjonalTilgang
+import no.nav.tilgangsmaskin.ansatt.entra.harNasjonalTilgang
 import no.nav.tilgangsmaskin.ansatt.nom.Nom
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.regler.motor.NasjonalGruppeTeller
@@ -24,12 +24,12 @@ class AnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
 
     fun ansatt(ansattId: AnsattId) =
         with(grupperFraToken(token.globaleGruppeIds)) {
-            if (girNasjonalTilgang()) {
-                log.info("$ansattId har tilgang til nasjonal gruppe, slår ikke opp i Entra for GEO-grupper")
+            if (harNasjonalTilgang()) {
+                log.info("$ansattId har nasjonal tilgang, slår *ikke* opp GEO-grupper i Entra")
                 teller.tell(Tags.of("medlem", true.toString()))
                 ansattMedMedFamileOgGrupper(ansattId, this)
             } else {
-                log.info("$ansattId har *ikke* tilgang til nasjonal gruppe, slår opp i Entra for GEO-grupper")
+                log.info("$ansattId har *ikke* av nasjonal tilgang, slår opp GEO-grupper i Entra")
                 teller.tell(Tags.of("medlem", false.toString()))
                 ansattMedMedFamileOgGrupper(ansattId, this + entra.grupper(ansattId))
             }

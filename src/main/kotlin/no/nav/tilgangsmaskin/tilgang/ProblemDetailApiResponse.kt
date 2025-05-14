@@ -40,7 +40,7 @@ import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
              )
 annotation class ProblemDetailApiResponse
 
-private class ProblemDetailResponse(
+class ProblemDetailResponse(
         val type: URI,
         val title: AvvisningsKode,
         val status: Int,

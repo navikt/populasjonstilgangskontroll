@@ -77,7 +77,7 @@ class DevTilgangController(
 
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(NO_CONTENT)
-    fun bulkregler(@PathVariable ansattId: AnsattId, /*@RequestBody @Valid @ValidId */specs: Set<IdOgType>) =
+    fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<IdOgType>) =
         regler.bulkRegler(ansattId, specs)
 
     @PostMapping("skjerming")

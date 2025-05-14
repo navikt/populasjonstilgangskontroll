@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 
 data class RegelMetadata(val gruppeMetadata: GruppeMetadata) {
 
-    val kode = gruppeMetadata.kode
+    val kode = gruppeMetadata.meta.name
     val begrunnelse = gruppeMetadata.begrunnelse
     val kortNavn = gruppeMetadata.kortNavn
 

@@ -29,12 +29,13 @@ class TilgangController(
     @ProblemDetailApiResponse
     @PostMapping("komplett")
     fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String) =
-        regler.kompletteRegler(token.ansattId!!, brukerId)
+        regler.kompletteRegler(token.ansattId!!, brukerId.trim('"'))
 
     @PostMapping("kjerne")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
-    fun kjerneregler(@RequestBody @Valid @ValidId brukerId: String) = regler.kjerneregler(token.ansattId!!, brukerId)
+    fun kjerneregler(@RequestBody @Valid @ValidId brukerId: String) =
+        regler.kjerneregler(token.ansattId!!, brukerId.trim('"'))
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)

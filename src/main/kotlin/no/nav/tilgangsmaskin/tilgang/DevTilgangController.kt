@@ -23,8 +23,6 @@ import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.NO_CONTENT
-import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
-import org.springframework.http.MediaType.TEXT_PLAIN_VALUE
 import org.springframework.web.bind.annotation.*
 
 @UnprotectedRestController(value = ["/${DEV}"])
@@ -55,9 +53,6 @@ class DevTilgangController(
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)
 
-    @PostMapping("test", consumes = [APPLICATION_JSON_VALUE, TEXT_PLAIN_VALUE])
-    fun test(@RequestBody @Valid @ValidId id: String) = log.info("Test: $id")
-
     @PostMapping("ansatt/{ansattId}/{brukerId}")
     fun nom(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
         nom.lagre(NomAnsattData(ansattId, brukerId))
@@ -66,13 +61,13 @@ class DevTilgangController(
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     fun kompletteRegler(@PathVariable ansattId: AnsattId, @PathVariable @Valid @ValidId brukerId: String) =
-        regler.kompletteRegler(ansattId, brukerId)
+        regler.kompletteRegler(ansattId, brukerId.trim('"'))
 
     @GetMapping("kjerne/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     fun kjerneregler(@PathVariable ansattId: AnsattId, @PathVariable @Valid @ValidId brukerId: String) =
-        regler.kjerneregler(ansattId, brukerId)
+        regler.kjerneregler(ansattId, brukerId.trim('"'))
 
     @PostMapping("overstyr/{ansattId}")
     @ResponseStatus(ACCEPTED)

@@ -14,8 +14,7 @@ import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
         value = [
             ApiResponse(
                     responseCode = "204",
-                    description = "Tilgang ble godkjent"
-                       ),
+                    description = "Tilgang ble godkjent"),
             ApiResponse(
                     responseCode = "403",
                     description = "Tilgang ble avvist",
@@ -32,14 +31,10 @@ import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
                         "navIdent": "Z990883",
                         "begrunnelse": "Du har ikke tilgang til brukere med strengt fortrolig adresse",
                         "kanOverstyres": false
-                    }"""
-                                           )
-                                      )]
-                       )
-        ]
-             )
+                    }"""))])])
 annotation class ProblemDetailApiResponse
 
+@Schema(description = "Problem Detail")
 private class ProblemDetailResponse(
         val type: URI,
         val title: AvvisningsKode,

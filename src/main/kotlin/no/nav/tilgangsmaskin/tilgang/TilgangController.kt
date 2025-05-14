@@ -26,9 +26,9 @@ class TilgangController(
         private val overstyring: OverstyringTjeneste,
         private val token: Token) {
 
-    @ProblemDetailApiResponse
     @PostMapping("komplett")
     @ResponseStatus(NO_CONTENT)
+    @ProblemDetailApiResponse
     fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String) =
         regler.kompletteRegler(token.ansattId!!, brukerId.trim('"'))
 

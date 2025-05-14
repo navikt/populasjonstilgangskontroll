@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import java.net.URI
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 
@@ -21,7 +22,7 @@ import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
                     content = [Content(
                             mediaType = APPLICATION_PROBLEM_JSON_VALUE,
                             schema = Schema(
-                                    implementation = AvvisningsKode::class,
+                                    implementation = ProblemDetailResponse::class,
                                     example = """{
                         "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
                         "title": "AVVIST_STRENGT_FORTROLIG_ADRESSE",
@@ -38,3 +39,13 @@ import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
         ]
              )
 annotation class ProblemDetailApiResponse
+
+class ProblemDetailResponse(
+        val type: URI,
+        val title: AvvisningsKode,
+        val status: Int,
+        val instance: String,
+        val brukerIdent: String,
+        val navIdent: String,
+        val begrunnelse: String,
+        val kanOverstyres: Boolean)

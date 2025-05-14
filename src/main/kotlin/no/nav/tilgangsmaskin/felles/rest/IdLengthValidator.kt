@@ -7,6 +7,7 @@ import jakarta.validation.Payload
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.motor.IdOgType
+import org.slf4j.LoggerFactory.getLogger
 import kotlin.reflect.KClass
 
 @MustBeDocumented
@@ -19,10 +20,12 @@ annotation class ValidId(
         val payload: Array<KClass<out Payload>> = [])
 
 class IdValidator : ConstraintValidator<ValidId, Any> {
+    private val log = getLogger(javaClass)
     override fun isValid(verdi: Any, context: ConstraintValidatorContext) =
         when (verdi) {
             is String -> runCatching { AktørId(verdi.trim('"')) }.isSuccess || runCatching { BrukerId(verdi.trim('"')) }.isSuccess
             is List<*> -> verdi.all {
+                log.info("XXXXXX")
                 it is IdOgType && (runCatching {
                     AktørId(it.brukerId.trim('"'))
                 }.isSuccess || runCatching {

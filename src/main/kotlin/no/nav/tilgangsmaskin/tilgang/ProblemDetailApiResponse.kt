@@ -7,9 +7,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import java.net.URI
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
+import kotlin.annotation.AnnotationRetention.RUNTIME
+import kotlin.annotation.AnnotationTarget.FUNCTION
 
-@Target(AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.RUNTIME)
+@Target(FUNCTION)
+@Retention(RUNTIME)
 @ApiResponses(
         value = [
             ApiResponse(
@@ -35,7 +37,7 @@ import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 annotation class ProblemDetailApiResponse
 
 @Schema(description = "Problem Detail")
-private data class ProblemDetailResponse(
+internal data class ProblemDetailResponse(
         val type: URI,
         val title: AvvisningsKode,
         val status: Int,
@@ -45,8 +47,8 @@ private data class ProblemDetailResponse(
         val begrunnelse: String,
         val kanOverstyres: Boolean)
 
-@Target(AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.RUNTIME)
+@Target(FUNCTION)
+@Retention(RUNTIME)
 @ApiResponses(
         value = [
             ApiResponse(
@@ -88,14 +90,14 @@ private data class ProblemDetailResponse(
 }"""))])])
 annotation class ProblemDetailBulkApiResponse
 
-private data class ProblemDetailBulkResponse(
+internal data class ProblemDetailBulkResponse(
         val type: URI,
         val title: List<AvvisningsKode>,
         val status: Int,
         val instance: String,
         val navIdent: String,
         val begrunnelser: List<ProblemDetailBulkElementBegrunnelse>) {
-    private data class ProblemDetailBulkElementBegrunnelse(
+    internal data class ProblemDetailBulkElementBegrunnelse(
             val type: URI,
             val title: AvvisningsKode,
             val brukerIdent: String,

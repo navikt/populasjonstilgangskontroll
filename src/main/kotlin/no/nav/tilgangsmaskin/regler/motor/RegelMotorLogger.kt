@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.regler.motor
 import io.micrometer.core.annotation.Counted
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.felles.utils.secureLog
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Component
 @Counted
 class RegelMotorLogger {
 
-    private val secureLog = getLogger("secureLog")
     private val log = getLogger(javaClass)
     fun avvist(ansatt: Ansatt, bruker: Bruker, regel: Regel) {
         MDC.put(BESLUTNING,regel.kode)
@@ -21,7 +21,7 @@ class RegelMotorLogger {
     }
 
     fun ok(ansatt: Ansatt, regelSett: RegelSett) {
-        MDC.put(BESLUTNING,"TILGANG_OK")
+        MDC.put(BESLUTNING,OK)
         log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId}")
         MDC.remove(BESLUTNING)
     }
@@ -36,5 +36,7 @@ class RegelMotorLogger {
 
     companion object   {
         private const val BESLUTNING = "beslutning"
+        private const val OK = "TILGANG_OK"
     }
 }
+

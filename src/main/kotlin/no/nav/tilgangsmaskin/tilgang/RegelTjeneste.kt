@@ -49,10 +49,10 @@ class RegelTjeneste(
     log.info("Tid brukt på bulk regler for $ansattId og ${idOgType.map { it.brukerId }.map { it.maskFnr() }}}: ${elapsedTime.inWholeMilliseconds}ms")
     }
     private fun Set<IdOgType>.brukerIdOgType() =
-        mapNotNull {
+        mapNotNull { spec ->
             brukere.brukere(*map { it.brukerId }.toTypedArray())
-                .associateBy { it.brukerId.verdi }[it.brukerId]?.let { bruker ->
-                bruker to it.type
+                .associateBy { it.brukerId.verdi }[spec.brukerId]?.let { bruker ->
+                bruker to spec.type
             }
         }.toSet()
 }

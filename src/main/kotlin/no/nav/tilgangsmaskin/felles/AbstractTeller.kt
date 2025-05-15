@@ -33,26 +33,11 @@ abstract class AbstractTeller(
     }
 }
 
-open class HabilitetTeller(
-    private val registry: MeterRegistry,
-    private val token: Token,
-    private val navn: String,
-    private val beskrivelse: String): AbstractTeller(registry, token, navn, beskrivelse) {
-
-    private val log = getLogger(javaClass)
+open class HabilitetTeller(registry: MeterRegistry, token: Token, navn: String, beskrivelse: String): AbstractTeller(registry, token, navn, beskrivelse) {
 
     override fun tell(godkjentTilgang: Boolean, metadata: GruppeMetadata) =
-        tell(godkjentTilgang, Tags.of("navn", metadata.name.replace("_", "").lowercase()))
-
+       super.tell(!godkjentTilgang, metadata)
     override fun tell(godkjentTilgang: Boolean, tags: Tags) {
-        if (godkjentTilgang) return
-
-        log.debug("Registering counter with name: {} and tags: {}", navn, tags)
-
-        Counter.builder(navn)
-            .description(beskrivelse)
-            .tags(tags.and("system", token.system ?: "N/A"))
-            .register(registry)
-            .increment()
+       super.tell(!godkjentTilgang, tags)
     }
 }

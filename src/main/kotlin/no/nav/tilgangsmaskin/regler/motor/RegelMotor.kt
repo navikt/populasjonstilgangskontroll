@@ -46,7 +46,15 @@ class RegelMotor(
         val avvisninger = brukere.mapNotNull { (bruker, type) ->
             runCatching { evaluer(ansatt, bruker, type) }
                 .exceptionOrNull()
-                ?.takeIf { it is RegelException } as? RegelException
+                ?.let { e ->
+                    when (e) {
+                        is RegelException -> e
+                        else -> {
+                            logger.warn("Evaluerte ${bruker.brukerId} og fikk feil ${e.message}",e)
+                            null
+                        }
+                    }
+                }
         }
         if (avvisninger.isNotEmpty()) {
             throw BulkRegelException(ansatt.ansattId, avvisninger)

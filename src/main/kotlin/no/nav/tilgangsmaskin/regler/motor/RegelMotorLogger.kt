@@ -24,6 +24,10 @@ class RegelMotorLogger {
         log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId}")
     }
 
+    fun warn(message: String, e: Throwable? = null) {
+        log.warn(message,e)
+    }
+
     fun evaluerer(ansatt: Ansatt, bruker: Bruker, regel: Regel) {
         log.trace("Evaluerer regel: '${regel.kortNavn}' for ${ansatt.ansattId}  og ${bruker.brukerId}")
     }

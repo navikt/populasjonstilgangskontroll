@@ -38,13 +38,16 @@ class RegelTjeneste(
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
         motor.kjerneregler(ansatte.ansatt(ansattId), brukere.utvidetFamilie(brukerId))
 
-    fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>) =
-        runCatching {
+    fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>)  {
+    val elapsedTime = measureTime {
+       runCatching {
             motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerIdOgType())
         }.getOrElse {
             overstyring.sjekk(ansattId, it)
         }
-
+    }
+    log.info("Tid brukt på bulk regler for $ansattId og ${idOgType.map { it.brukerId }.map { it.maskFnr() }}}: ${elapsedTime.inWholeMilliseconds}ms")
+    }
     private fun Set<IdOgType>.brukerIdOgType() =
         mapNotNull {
             brukere.brukere(*map { it.brukerId }.toTypedArray())

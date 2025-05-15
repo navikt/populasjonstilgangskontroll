@@ -95,8 +95,8 @@ spring:
       fail-on-unknown-properties: true
     default-property-inclusion: non_absent
   cache:
+    type: caffeine
     cache-names: pdl, skjerming, graph, overstyring
-
 
 no.nav.security.jwt:
   issuer:

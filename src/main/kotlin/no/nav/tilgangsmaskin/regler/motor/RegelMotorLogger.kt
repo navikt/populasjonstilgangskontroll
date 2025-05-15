@@ -17,11 +17,13 @@ class RegelMotorLogger {
         MDC.put(BESLUTNING,regel.kode)
         log.warn("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId}")
         secureLog.info("Tilgang til ${bruker.brukerId.verdi} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId}")
+        MDC.remove(BESLUTNING)
     }
 
     fun ok(ansatt: Ansatt, regelSett: RegelSett) {
         MDC.put(BESLUTNING,"TILGANG_OK")
         log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId}")
+        MDC.remove(BESLUTNING)
     }
 
     fun warn(message: String, e: Throwable? = null) {

@@ -38,6 +38,6 @@ open class HabilitetTeller(registry: MeterRegistry, token: Token, navn: String, 
     override fun tell(godkjentTilgang: Boolean, metadata: GruppeMetadata) =
        super.tell(!godkjentTilgang, metadata)
     override fun tell(godkjentTilgang: Boolean, tags: Tags) {
-       super.tell(!godkjentTilgang, tags.and("Tilgang", "$godkjentTilgang"))
+       super.tell(!godkjentTilgang, tags.and("tilgang", if (!godkjentTilgang) "Godkjent" else "Avvist"))
     }
 }

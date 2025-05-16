@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.util.concurrent.TimeUnit.HOURS
 
-@Configuration
+@Configuration(proxyBeanMethods = true)
 @EnableCaching
 @ConditionalOnGCP
 class CaffeineConfiguration(private val pdl: PdlConfig, private val entra: EntraConfig, private val skjerming: SkjermingConfig) : CachingConfigurer {
@@ -54,11 +54,10 @@ class CaffeineConfiguration(private val pdl: PdlConfig, private val entra: Entra
                    .build<Any, Any>())
        }
 
-    private fun removalListener(navn: String): RemovalListener<Any?, Any?> {
-        return RemovalListener<Any?, Any?> { key: Any?, value: Any?, cause: RemovalCause ->
+    private fun removalListener(navn: String): RemovalListener<Any?, Any?> =
+        RemovalListener<Any?, Any?> { key: Any?, value: Any?, cause: RemovalCause ->
             log.info("$navn: Cache innslag fjernet: nøkkel={},årsak={}", key, cause)
         }
-    }
 
 
     override fun keyGenerator() = KeyGenerator { target, method, params ->

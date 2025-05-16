@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
 import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.RemovalCause
 import no.nav.boot.conditionals.ConditionalOnGCP
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CachingConfigurer
@@ -18,24 +19,10 @@ class CaffeineConfiguration : CachingConfigurer {
 
 
     @Bean
-     fun cacheManager1() =
-         Caffeine.newBuilder()
-                    .recordStats()
-
-
-    /*
-    @Bean
-    override fun cacheManager() =
-        CaffeineCacheManager().apply {
-            setCaffeine(
-                    Caffeine.newBuilder()
-                        .recordStats()
-                        .removalListener { key, value, cause ->
-                            log.info("Cache removal key={}, value={}, cause={}", key, value, cause)
-                        })
-        }*/
-
-
+     fun caffeine() = Caffeine.newBuilder().recordStats()
+        .removalListener<String, Any> { key: String?, _, cause: RemovalCause ->
+            log.debug("Cache entry with key $key was removed due to $cause")
+        }
     override fun keyGenerator() = KeyGenerator { target, method, params ->
         buildString {
             append(target::class)

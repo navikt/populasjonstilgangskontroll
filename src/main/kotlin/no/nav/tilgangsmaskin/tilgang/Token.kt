@@ -16,7 +16,7 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
                 ?: emptyList()
 
 
-    val system get() = runCatching { claimSet()?.getStringClaim("azp_name") }.getOrElse { "N/A" }
+    val system get() = runCatching { claimSet()?.getStringClaim("azp_name") }.getOrElse { "N/A" } ?: "N/A"
     val oid get() = claimSet()?.let { UUID.fromString(it.getStringClaim("oid")) }
     val ansattId get() = claimSet()?.getStringClaim("NAVident")?.let { AnsattId(it) }
     private fun claimSet() = runCatching { contextHolder.getTokenValidationContext().getClaims(AAD_ISSUER) }.getOrNull()

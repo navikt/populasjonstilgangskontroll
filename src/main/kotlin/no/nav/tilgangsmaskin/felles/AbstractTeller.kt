@@ -27,7 +27,7 @@ abstract class AbstractTeller(
 
         Counter.builder(navn)
             .description(beskrivelse)
-            .tags(tags.and("system", token.system ?: "N/A"))
+            .tags(tags.and("system", token.system))
             .register(registry)
            .increment()
     }
@@ -38,6 +38,6 @@ open class HabilitetTeller(registry: MeterRegistry, token: Token, navn: String, 
     override fun tell(godkjentTilgang: Boolean, metadata: GruppeMetadata) =
        super.tell(!godkjentTilgang, metadata)
     override fun tell(godkjentTilgang: Boolean, tags: Tags) {
-       if (!godkjentTilgang) tell(tags.and("tilgang", "avvist"))
+       if (!godkjentTilgang) tell(tags.and("tilgang", "Avvist"))
     }
 }

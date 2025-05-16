@@ -3,14 +3,15 @@ package no.nav.tilgangsmaskin.ansatt.skjerming
 import java.net.URI
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
+import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(SKJERMING)
 class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH,
-                      val initialCacheSize : Int = 100,
-                      val maxCacheSize : Int  = 50000,
-                      val expireHours : Long = 12,
-                      enabled: Boolean = true) :
+                      override val initialCacheSize : Int = 100,
+                      override val maxCacheSize : Int  = 50000,
+                      override val expireHours : Long = 12,
+                      enabled: Boolean = true) : CachableRestConfig,
     AbstractRestConfig(baseUri, pingPath, SKJERMING, enabled) {
 
     val skjermingUri = uri(DEFAULT_SKJERMING_PATH)

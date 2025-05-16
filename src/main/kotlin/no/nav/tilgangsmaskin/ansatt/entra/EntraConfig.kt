@@ -3,17 +3,18 @@ package no.nav.tilgangsmaskin.ansatt.entra
 import java.net.URI
 import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
+import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(GRAPH)
 class EntraConfig(
     baseUri: URI,
-    val initialCacheSize : Int = 100,
-    val maxCacheSize : Int  = 25000,
-    val expireHours : Long = 12,
+    override val initialCacheSize : Int = 100,
+    override val maxCacheSize : Int  = 25000,
+    override val expireHours : Long = 12,
     pingPath: String = DEFAULT_PING_PATH,
     private val size: Int = DEFAULT_BATCH_SIZE,
-    enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
+    enabled: Boolean = true) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
 
     fun userURI(navIdent: String) = builder().path(USERS_PATH)
         .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_USER)

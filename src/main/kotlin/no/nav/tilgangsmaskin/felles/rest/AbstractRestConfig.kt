@@ -16,3 +16,9 @@ abstract class AbstractRestConfig(
     val pingEndpoint = builder().path(pingPath).build()
     override fun toString() = "name=$name, pingPath=$pingPath,enabled=$isEnabled,baseUri=$baseUri"
 }
+
+interface CachableRestConfig {
+    val initialCacheSize: Int
+    val maxCacheSize: Int
+    val expireHours: Long
+}

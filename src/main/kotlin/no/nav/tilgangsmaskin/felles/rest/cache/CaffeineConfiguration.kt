@@ -10,6 +10,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
+import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
@@ -28,36 +29,21 @@ class CaffeineConfiguration(private val pdl: PdlConfig, private val entra: Entra
     @Bean
      override fun cacheManager() =
        CaffeineCacheManager().apply {
-           registerCustomCache(PDL,
-               Caffeine.newBuilder()
-                   .initialCapacity(pdl.initialCacheSize)
-                   .expireAfterAccess(pdl.expireHours, HOURS)
-                   .maximumSize(pdl.maxCacheSize.toLong())
-                   .recordStats()
-                   .removalListener(removalListener(PDL))
-                   .build<Any, Any>())
-           registerCustomCache(GRAPH,
-               Caffeine.newBuilder()
-                   .initialCapacity(entra.initialCacheSize)
-                   .expireAfterAccess(entra.expireHours, HOURS)
-                   .maximumSize(entra.maxCacheSize.toLong())
-                   .recordStats()
-                   .removalListener(removalListener(GRAPH))
-                   .build<Any, Any>())
-           registerCustomCache(SKJERMING,
-               Caffeine.newBuilder()
-                   .initialCapacity(skjerming.initialCacheSize)
-                   .expireAfterAccess(skjerming.expireHours, HOURS)
-                   .maximumSize(skjerming.maxCacheSize.toLong())
-                   .recordStats()
-                   .removalListener(removalListener(SKJERMING))
-                   .build<Any, Any>())
+           registerCustomCache(PDL, cache(PDL ,pdl))
+           registerCustomCache(GRAPH,cache(GRAPH, entra))
+           registerCustomCache(SKJERMING,cache(SKJERMING, skjerming))
        }
 
-    private fun removalListener(navn: String): RemovalListener<Any?, Any?> =
-        RemovalListener<Any?, Any?> { key: Any?, value: Any?, cause: RemovalCause ->
-            log.info("$navn: Cache innslag fjernet: nøkkel={},årsak={}", key, cause)
-        }
+    private fun cache(navn: String, cfg: CachableRestConfig) =
+        Caffeine.newBuilder()
+            .initialCapacity(cfg.initialCacheSize)
+            .expireAfterAccess(cfg.expireHours, HOURS)
+            .maximumSize(cfg.maxCacheSize.toLong())
+            .recordStats()
+            .removalListener(RemovalListener { key: Any?, value: Any?, cause: RemovalCause ->
+                log.info("$navn: Cache innslag fjernet: nøkkel={},årsak={}", key, cause)
+            })
+            .build<Any, Any>()
 
 
     override fun keyGenerator() = KeyGenerator { target, method, params ->

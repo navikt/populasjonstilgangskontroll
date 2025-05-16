@@ -96,7 +96,9 @@ spring:
     default-property-inclusion: non_absent
   cache:
     type: caffeine
-    cache-names: pdl, skjerming, graph, overstyring
+    cache-names: pdl, skjerming, graph
+    caffeine:
+      spec: expireAfterWrite=5m, maximumSize=1000
 
 no.nav.security.jwt:
   issuer:

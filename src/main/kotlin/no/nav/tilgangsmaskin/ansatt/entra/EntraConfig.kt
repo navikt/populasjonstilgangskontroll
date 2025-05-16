@@ -7,10 +7,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(GRAPH)
 class EntraConfig(
-        baseUri: URI,
-        pingPath: String = DEFAULT_PING_PATH,
-        private val size: Int = DEFAULT_BATCH_SIZE,
-        enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
+    baseUri: URI,
+    val initialCacheSize : Int = 100,
+    val maxCacheSize : Int  = 25000,
+    val expireHours : Long = 12,
+    pingPath: String = DEFAULT_PING_PATH,
+    private val size: Int = DEFAULT_BATCH_SIZE,
+    enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
 
     fun userURI(navIdent: String) = builder().path(USERS_PATH)
         .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_USER)

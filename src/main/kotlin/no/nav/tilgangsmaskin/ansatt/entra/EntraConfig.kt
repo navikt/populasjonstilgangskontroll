@@ -29,6 +29,8 @@ class EntraConfig(
         .queryParam(PARAM_NAME_FILTER, "startswith(displayName,'0000-GA-GEO')")
         .build(ansattId)
 
+    override val navn = GRAPH
+
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
 

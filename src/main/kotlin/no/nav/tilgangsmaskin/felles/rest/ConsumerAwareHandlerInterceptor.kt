@@ -10,8 +10,12 @@ import org.springframework.web.servlet.HandlerInterceptor
 @Component
 class ConsumerAwareHandlerInterceptor(private val accessor: Token) : HandlerInterceptor {
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-        MDC.put("userid", accessor.ansattId?.verdi ?: "N/A")
-        MDC.put("consumerid", accessor.systemAndNs)
+        MDC.put(USER_ID, accessor.ansattId?.verdi ?: "N/A")
+        MDC.put(CONSUMER_ID, accessor.systemAndNs)
         return true
+    }
+    companion object  {
+        const val CONSUMER_ID = "consumerId"
+        const val USER_ID = "userId"
     }
 }

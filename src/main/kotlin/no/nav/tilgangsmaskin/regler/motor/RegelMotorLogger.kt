@@ -4,6 +4,7 @@ import io.micrometer.core.annotation.Counted
 import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
 import no.nav.tilgangsmaskin.felles.utils.secureLog
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
@@ -16,14 +17,14 @@ class RegelMotorLogger(private val teller: AvvisningTeller) {
     fun avvist(ansatt: Ansatt, bruker: Bruker, regel: Regel) {
         MDC.put(BESLUTNING,regel.kode)
         log.warn("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId}")
-        secureLog.info("Tilgang til ${bruker.brukerId.verdi} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId}")
+        secureLog.info("Tilgang til ${bruker.brukerId.verdi} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} fra ${MDC.get(CONSUMER_ID)}")
         teller.tell(Tags.of("begrunnelse",regel.kode ))
         MDC.remove(BESLUTNING)
     }
 
     fun ok(ansatt: Ansatt, regelSett: RegelSett) {
         MDC.put(BESLUTNING,OK)
-        log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId}")
+        log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} fra ${MDC.get(CONSUMER_ID)}")
         MDC.remove(BESLUTNING)
     }
 

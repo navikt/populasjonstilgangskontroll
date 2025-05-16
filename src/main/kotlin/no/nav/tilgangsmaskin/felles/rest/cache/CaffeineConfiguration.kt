@@ -21,7 +21,7 @@ class CaffeineConfiguration : CachingConfigurer {
     @Bean
      fun caffeine() = Caffeine.newBuilder().recordStats()
         .removalListener<String, Any> { key: String?, _, cause: RemovalCause ->
-            log.debug("Cache entry with key $key was removed due to $cause")
+            log.debug("Cache entry with key {} was removed due to {}", key, cause)
         }
     override fun keyGenerator() = KeyGenerator { target, method, params ->
         buildString {

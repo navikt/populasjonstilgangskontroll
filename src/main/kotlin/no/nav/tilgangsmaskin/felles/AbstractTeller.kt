@@ -23,14 +23,13 @@ abstract class AbstractTeller(
     open fun tell(skalTelles: Boolean, tags: Tags) {
        if(!skalTelles) return
 
-        log.info("Registering counter with name: {} and tags: {}", navn, tags)
+        log.trace("Registering counter with name: {} and tags: {}", navn, tags)
 
-       val counter = Counter.builder(navn)
+        Counter.builder(navn)
             .description(beskrivelse)
             .tags(tags.and("system", token.system ?: "N/A"))
             .register(registry)
-            log.info("Registered counter with name: {} and id  {}", navn, counter.id)
-            counter.increment()
+           .increment()
     }
 }
 
@@ -39,6 +38,6 @@ open class HabilitetTeller(registry: MeterRegistry, token: Token, navn: String, 
     override fun tell(godkjentTilgang: Boolean, metadata: GruppeMetadata) =
        super.tell(!godkjentTilgang, metadata)
     override fun tell(godkjentTilgang: Boolean, tags: Tags) {
-       super.tell(!godkjentTilgang, tags.and("tilgang", if (!godkjentTilgang) "Godkjent" else "Avvist"))
+       if (!godkjentTilgang) tell(tags.and("tilgang", "avvist"))
     }
 }

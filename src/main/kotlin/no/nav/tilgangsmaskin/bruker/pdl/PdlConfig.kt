@@ -8,11 +8,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(PDL)
 class PdlConfig(
-        baseUri: URI,
-        pingPath: String = DEFAULT_PING_PATH,
-        personPath: String = DEFAULT_PERSON_PATH,
-        personBolkPath: String = DEFAULT_PERSON__BOLK_PATH,
-        enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, PDL, enabled) {
+    baseUri: URI,
+    val initialCacheSize : Int  = 1000,
+    val maxCacheSize : Int  = 50000,
+    val expireHours : Long = 12,
+    pingPath: String = DEFAULT_PING_PATH,
+    personPath: String = DEFAULT_PERSON_PATH,
+    personBolkPath: String = DEFAULT_PERSON__BOLK_PATH,
+    enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, PDL, enabled) {
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 

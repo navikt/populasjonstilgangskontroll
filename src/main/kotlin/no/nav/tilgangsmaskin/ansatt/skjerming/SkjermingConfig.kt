@@ -6,7 +6,11 @@ import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(SKJERMING)
-class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) :
+class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH,
+                      val initialCacheSize : Int = 100,
+                      val maxCacheSize : Int  = 50000,
+                      val expireHours : Long = 12,
+                      enabled: Boolean = true) :
     AbstractRestConfig(baseUri, pingPath, SKJERMING, enabled) {
 
     val skjermingUri = uri(DEFAULT_SKJERMING_PATH)

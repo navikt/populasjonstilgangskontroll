@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
 @Component
-@Cacheable(OVERSTYRING)
 @Transactional
 @Timed
 class OverstyringTjeneste(
@@ -62,7 +61,6 @@ class OverstyringTjeneste(
             adapter.overstyr(ansattId.verdi, data).also {
                 teller.tell(Tags.of("overstyrt", true.toString()))
                 log.info("Overstyring er utført for $ansattId og ${data.brukerId}")
-                refresh(ansattId, data)
             }
         }.getOrElse {
             when (it) {
@@ -76,9 +74,6 @@ class OverstyringTjeneste(
                 else -> throw it
             }
         }
-
-    @CachePut(OVERSTYRING)
-    fun refresh(ansattId: AnsattId, data: OverstyringData) = Unit
 
     fun sjekk(ansattId: AnsattId, e: Throwable) =
         when (e) {

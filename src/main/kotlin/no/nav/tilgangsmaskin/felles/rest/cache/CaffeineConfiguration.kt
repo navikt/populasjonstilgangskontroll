@@ -18,17 +18,16 @@ class CaffeineConfiguration : CachingConfigurer {
     private val log = LoggerFactory.getLogger(javaClass)
 
 
-    @Bean
-     fun caffeine() = Caffeine.newBuilder().recordStats()
+     private fun caffeine() = Caffeine.newBuilder().recordStats()
 
-    /*
+
     @Bean
      override fun cacheManager() =
         CaffeineCacheManager().apply {
             setCaffeine(caffeine())
         }
 
-     */
+
     override fun keyGenerator() = KeyGenerator { target, method, params ->
         buildString {
             append(target::class)

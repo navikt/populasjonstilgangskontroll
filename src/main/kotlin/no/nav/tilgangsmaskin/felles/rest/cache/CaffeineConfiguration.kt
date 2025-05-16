@@ -23,7 +23,7 @@ class CaffeineConfiguration : CachingConfigurer {
 
     @Bean
      override fun cacheManager() =
-        CaffeineCacheManager().apply {
+        CaffeineCacheManager("pdl","graph","skjerming","overstyring").apply {
             setCaffeine(caffeine())
         }
 

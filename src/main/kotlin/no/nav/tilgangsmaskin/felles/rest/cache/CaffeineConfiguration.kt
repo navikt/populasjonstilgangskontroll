@@ -18,6 +18,13 @@ class CaffeineConfiguration : CachingConfigurer {
 
 
     @Bean
+     fun cacheManager1() =
+         Caffeine.newBuilder()
+                    .recordStats()
+
+
+    /*
+    @Bean
     override fun cacheManager() =
         CaffeineCacheManager().apply {
             setCaffeine(
@@ -26,7 +33,7 @@ class CaffeineConfiguration : CachingConfigurer {
                         .removalListener { key, value, cause ->
                             log.info("Cache removal key={}, value={}, cause={}", key, value, cause)
                         })
-        }
+        }*/
 
 
     override fun keyGenerator() = KeyGenerator { target, method, params ->

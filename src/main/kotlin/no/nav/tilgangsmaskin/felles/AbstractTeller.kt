@@ -25,11 +25,12 @@ abstract class AbstractTeller(
 
         log.info("Registering counter with name: {} and tags: {}", navn, tags)
 
-        Counter.builder(navn)
+       val counter = Counter.builder(navn)
             .description(beskrivelse)
             .tags(tags.and("system", token.system ?: "N/A"))
             .register(registry)
-            .increment()
+            log.info("Registered counter with name: {} and id  {}", navn, counter.id)
+            counter.increment()
     }
 }
 

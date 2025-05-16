@@ -34,9 +34,9 @@ class CaffeineConfiguration(private vararg val cfgs: CachableRestConfig) : Cachi
             .expireAfterAccess(cfg.expireHours, HOURS)
             .maximumSize(cfg.maxCacheSize.toLong())
             .recordStats()
-            .removalListener(RemovalListener { key: Any?, value: Any?, cause: RemovalCause ->
+            .removalListener { key: Any?, value: Any?, cause: RemovalCause ->
                 log.info("${cfg.navn}: Cache innslag fjernet: nøkkel={},årsak={}", key, cause)
-            })
+            }
             .build<Any, Any>()
 
 

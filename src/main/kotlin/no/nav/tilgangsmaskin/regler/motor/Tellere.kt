@@ -38,3 +38,7 @@ class AvdødTeller(registry: MeterRegistry, accessor: Token) :
 @Component
 class OverstyringTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "overstyring.forsøk", "Overstyringsforsøk pr resultat")
+
+@Component
+class AvvisningTeller(registry: MeterRegistry, token: Token) :
+    AbstractTeller(registry, token, "avvisning.regel", "Avvisningsbegrunnelse pr regel")

@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import io.micrometer.core.annotation.Counted
+import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.utils.secureLog
@@ -9,14 +10,14 @@ import org.slf4j.MDC
 import org.springframework.stereotype.Component
 
 @Component
-@Counted
-class RegelMotorLogger {
+class RegelMotorLogger(private val teller: AvvisningTeller) {
 
     private val log = getLogger(javaClass)
     fun avvist(ansatt: Ansatt, bruker: Bruker, regel: Regel) {
         MDC.put(BESLUTNING,regel.kode)
         log.warn("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId}")
         secureLog.info("Tilgang til ${bruker.brukerId.verdi} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId}")
+        teller.tell(Tags.of("begrunnelse",regel.kode ))
         MDC.remove(BESLUTNING)
     }
 
@@ -39,4 +40,6 @@ class RegelMotorLogger {
         private const val OK = "TILGANG_OK"
     }
 }
+
+
 

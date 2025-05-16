@@ -23,7 +23,7 @@ abstract class AbstractTeller(
     open fun tell(skalTelles: Boolean, tags: Tags) {
        if(!skalTelles) return
 
-        log.debug("Registering counter with name: {} and tags: {}", navn, tags)
+        log.info("Registering counter with name: {} and tags: {}", navn, tags)
 
         Counter.builder(navn)
             .description(beskrivelse)

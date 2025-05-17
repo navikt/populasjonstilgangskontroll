@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import io.micrometer.core.annotation.Counted
 import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
@@ -18,7 +17,7 @@ class RegelMotorLogger(private val teller: AvvisningTeller) {
         MDC.put(BESLUTNING,regel.kode)
         log.warn("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId}")
         secureLog.info("Tilgang til ${bruker.brukerId.verdi} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} fra ${MDC.get(CONSUMER_ID)}")
-        teller.tell(Tags.of("regel", regel.kortNavn.replace(" ","_").lowercase()))
+        teller.tell(Tags.of("regel", regel.metricTagVerdi))
         MDC.remove(BESLUTNING)
     }
 

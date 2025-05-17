@@ -9,6 +9,7 @@ interface Regel {
     val metadata: RegelMetadata
     val kode get() = metadata.kode
     val kortNavn get() = metadata.kortNavn
+    val metricTagVerdi get() = kortNavn.replace(" ","_").lowercase()
     val begrunnelse get() = metadata.begrunnelse
     val erOverstyrbar get() = this is OverstyrbarRegel
 

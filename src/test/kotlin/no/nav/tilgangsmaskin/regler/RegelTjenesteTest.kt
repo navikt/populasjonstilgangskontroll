@@ -80,21 +80,13 @@ class RegelTjenesteTest {
 
     private lateinit var regler: RegelTjeneste
 
-
+    private lateinit var avvisningTeller : AvvisningTeller
     private lateinit var avdød: AvdødTeller
-    private lateinit var egneDataTeller: HabilitetEgenDataTeller
-    private lateinit var familieTeller: HabilitetFamilieTeller
-    private lateinit var søskenTeller: HabilitetSøskenTeller
-    private lateinit var fellesBarnTeller: HabilitetFellesBarnTeller
-    private lateinit var patnerTeller: HabilitetPartnerTeller
+
 
     @BeforeTest
     fun before() {
-        egneDataTeller = HabilitetEgenDataTeller(registry, token)
-        familieTeller = HabilitetFamilieTeller(registry, token)
-        søskenTeller = HabilitetSøskenTeller(registry, token)
-        fellesBarnTeller = HabilitetFellesBarnTeller(registry, token)
-        patnerTeller = HabilitetPartnerTeller(registry, token)
+        avvisningTeller = AvvisningTeller(registry, token)
         avdød = AvdødTeller(registry, token)
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
         every { token.system } returns "test"

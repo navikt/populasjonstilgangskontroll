@@ -1,6 +1,9 @@
 package no.nav.tilgangsmaskin.regler
 
 import com.ninjasquad.springmockk.MockkBean
+import io.micrometer.core.instrument.MeterRegistry
+import io.mockk.every
+import io.mockk.verify
 import java.util.*
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.TestApp
@@ -34,6 +37,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 
@@ -54,7 +58,22 @@ class RegelMotorTest {
     lateinit var holder: TokenValidationContextHolder
 
     @Autowired
+    private lateinit var registry: MeterRegistry
+
+    @MockkBean
+    private lateinit var token: Token
+    private lateinit var logger: RegelMotorLogger
+
+
+    @Autowired
     private lateinit var regelMotor: RegelMotor
+
+    @BeforeTest
+    fun before() {
+        logger = RegelMotorLogger(AvvisningTeller(registry,token))
+        every { token.system } returns "test"
+        every { token.systemNavn } returns "test"
+    }
 
     @Nested
     @TestInstance(PER_CLASS)
@@ -355,10 +374,13 @@ class RegelMotorTest {
         }
     }
 
-    private inline fun <reified T : Regel> forventAvvistAv(ansatt: Ansatt, bruker: Bruker) =
-        assertInstanceOf<T>(assertThrows<RegelException> {
+    private inline fun <reified T : Regel> forventAvvistAv(ansatt: Ansatt, bruker: Bruker) {
+        val regel = assertThrows<RegelException> {
             regelMotor.kompletteRegler(ansatt, bruker)
-        }.regel)
+        }.regel
+        assertInstanceOf<T>(regel)
+        verify { logger.avvist(ansatt, bruker,regel) }
+    }
 
     private infix fun Ansatt.kanBehandle(bruker: Bruker): Boolean {
         assertThatCode {

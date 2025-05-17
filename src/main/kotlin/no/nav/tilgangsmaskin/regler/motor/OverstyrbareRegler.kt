@@ -42,7 +42,7 @@ class AvdødBrukerRegel(private val teller: AvdødTeller) : OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         true.also {  // ikke feile
             if (bruker.dødsdato != null) {
-                teller.tell(true, Tags.of("months", bruker.dødsdato.intervallSiden()))
+                teller.tell(Tags.of("months", bruker.dødsdato.intervallSiden()))
             }
         }
 

@@ -35,55 +35,45 @@ class SkjermingRegel : GlobalGruppeRegel(SKJERMING), KjerneRegel
 
 @Order(HIGHEST_PRECEDENCE + 4)
 @Component
-class EgneDataRegel(private val teller: HabilitetEgenDataTeller) : KjerneRegel {
+class EgneDataRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { ansatt erDenSammeSom bruker }.also {
-            teller.tell(it, EGNEDATA)
-        }
+        avslåHvis { ansatt erDenSammeSom bruker }
 
     override val metadata = RegelMetadata(EGNEDATA)
 }
 
 @Order(HIGHEST_PRECEDENCE + 5)
 @Component
-class ForeldreOgBarnRegel(private val teller: HabilitetFamilieTeller) : KjerneRegel {
+class ForeldreOgBarnRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { ansatt erForeldreEllerBarnTil bruker }.also {
-            teller.tell(it, FORELDREBARN)
-        }
+        avslåHvis { ansatt erForeldreEllerBarnTil bruker }
 
     override val metadata = RegelMetadata(FORELDREBARN)
 }
 
 @Order(HIGHEST_PRECEDENCE + 6)
 @Component
-class PartnerRegel(private val teller: HabilitetPartnerTeller) : KjerneRegel {
+class PartnerRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { ansatt erNåværendeEllerTidligerePartnerMed bruker }.also {
-            teller.tell(it, PARTNER)
-        }
+        avslåHvis { ansatt erNåværendeEllerTidligerePartnerMed bruker }
 
     override val metadata = RegelMetadata(PARTNER)
 }
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 7)
-class SøskenRegel(private val teller: HabilitetSøskenTeller) : KjerneRegel {
+class SøskenRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { ansatt erSøskenTil bruker }.also {
-            teller.tell(it, SØSKEN)
-        }
+        avslåHvis { ansatt erSøskenTil bruker }
 
     override val metadata = RegelMetadata(SØSKEN)
 }
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 8)
-class FellesBarnRegel(private val teller: HabilitetFellesBarnTeller) : KjerneRegel {
+class FellesBarnRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { ansatt harFellesBarnMed bruker }.also {
-            teller.tell(it, FELLES_BARN)
-        }
+        avslåHvis { ansatt harFellesBarnMed bruker }
 
     override val metadata = RegelMetadata(FELLES_BARN)
 }

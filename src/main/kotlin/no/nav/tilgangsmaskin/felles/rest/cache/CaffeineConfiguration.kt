@@ -2,11 +2,7 @@ package no.nav.tilgangsmaskin.felles.rest.cache
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.RemovalCause
-import com.github.benmanes.caffeine.cache.RemovalListener
 import no.nav.boot.conditionals.ConditionalOnGCP
-import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CachingConfigurer

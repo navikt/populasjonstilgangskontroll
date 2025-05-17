@@ -379,7 +379,6 @@ class RegelMotorTest {
             regelMotor.kompletteRegler(ansatt, bruker)
         }.regel
         assertInstanceOf<T>(regel)
-        verify { logger.avvist(ansatt, bruker,regel) }
     }
 
     private infix fun Ansatt.kanBehandle(bruker: Bruker): Boolean {

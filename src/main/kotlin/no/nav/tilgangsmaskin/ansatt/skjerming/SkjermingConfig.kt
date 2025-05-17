@@ -18,7 +18,7 @@ class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH,
     val skjermingerUri = uri(DEFAULT_SKJERMING_BULK_PATH)
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
-    override val navn = SKJERMING
+    override val navn = name
 
     companion object {
         const val SKJERMING = "skjerming"

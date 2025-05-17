@@ -21,14 +21,9 @@ class RegelMotor(
     private val komplett = RegelSett(KOMPLETT_REGELTYPE to kjerne.regler + overstyrbar.regler)
 
 
-    @Counted
     fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, komplett)
 
-    @Counted
     fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, kjerne)
-
-    fun evaluer(ansatt: Ansatt, bruker: Bruker, type: RegelType) =
-        evaluer(ansatt, bruker, type.regelSett())
 
     private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) {
         regelSett.regler.forEach { regel ->
@@ -44,7 +39,7 @@ class RegelMotor(
 
     fun bulkRegler(ansatt: Ansatt, brukere: Set<Pair<Bruker, RegelType>>) {
         val avvisninger = brukere.mapNotNull { (bruker, type) ->
-            runCatching { evaluer(ansatt, bruker, type) }
+            runCatching { evaluer(ansatt, bruker, type.regelSett()) }
                 .exceptionOrNull()
                 ?.let { e ->
                     when (e) {

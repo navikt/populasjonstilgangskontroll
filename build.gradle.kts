@@ -38,6 +38,7 @@ configurations.all {
 }
 
 dependencies {
+    implementation("io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter")
     implementation("io.micrometer:micrometer-tracing")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.apache.httpcomponents.client5:httpclient5")
@@ -79,6 +80,11 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
+dependencyManagement {
+    imports {
+        mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.16.0")
+    }
+}
 
 application {
     mainClass.set("no.nav.tilgangsmaskin.populasjonstilgangskontroll.AppKt")

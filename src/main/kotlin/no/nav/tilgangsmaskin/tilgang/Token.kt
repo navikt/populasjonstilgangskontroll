@@ -20,11 +20,8 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
     val oid get() = claimSet()?.let { UUID.fromString(it.getStringClaim("oid")) }
     val ansattId get() = claimSet()?.getStringClaim("NAVident")?.let { AnsattId(it) }
     private fun claimSet() = runCatching { contextHolder.getTokenValidationContext().getClaims(AAD_ISSUER) }.getOrNull()
-    val systemNavn get() = system?.split(":")?.lastOrNull() ?: "N/A"
-    val systemAndNs
-        get() = runCatching {
-            system?.split(":")?.drop(1)?.joinToString(separator = ":") ?: systemNavn
-        }.getOrElse { systemNavn }
+    val systemNavn get() = system.split(":").lastOrNull() ?: "N/A"
+    val systemAndNs get() = runCatching { system.split(":").drop(1).joinToString(separator = ":") }.getOrElse { systemNavn }
 
     companion object {
         const val AAD_ISSUER: String = "azuread"

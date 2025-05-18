@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import no.nav.tilgangsmaskin.regler.motor.RegelException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus.FORBIDDEN
@@ -13,9 +14,6 @@ class ExceptionHandler {
     private val log = getLogger(javaClass)
 
 
-    @ExceptionHandler(RecoverableRestException::class)
-    fun recoverableFeilet(e: RecoverableRestException) =
-        e.body.apply {
-            setStatus(FORBIDDEN)
-        }
+    @ExceptionHandler(RegelException::class)
+    fun  regelException(e: RegelException) : Nothing = throw e.also { log.info("Enriching and rethrowing") }
 }

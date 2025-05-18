@@ -61,7 +61,7 @@ class RegelMotorTest {
     @Autowired
     private lateinit var registry: MeterRegistry
 
-    
+
     @Autowired
     private lateinit var observationRegistry: ObservationRegistry
 

@@ -37,7 +37,7 @@ class SkjermingRegel : GlobalGruppeRegel(SKJERMING), KjerneRegel
 @Component
 class EgneDataRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { ansatt erDenSammeSom bruker }
+        avvisHvis { ansatt erDenSammeSom bruker }
 
     override val metadata = RegelMetadata(EGNEDATA)
 }
@@ -46,7 +46,7 @@ class EgneDataRegel : KjerneRegel {
 @Component
 class ForeldreOgBarnRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { ansatt erForeldreEllerBarnTil bruker }
+        avvisHvis { ansatt erForeldreEllerBarnTil bruker }
 
     override val metadata = RegelMetadata(FORELDREBARN)
 }
@@ -55,7 +55,7 @@ class ForeldreOgBarnRegel : KjerneRegel {
 @Component
 class PartnerRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { ansatt erNåværendeEllerTidligerePartnerMed bruker }
+        avvisHvis { ansatt erNåværendeEllerTidligerePartnerMed bruker }
 
     override val metadata = RegelMetadata(PARTNER)
 }
@@ -64,7 +64,7 @@ class PartnerRegel : KjerneRegel {
 @Order(HIGHEST_PRECEDENCE + 7)
 class SøskenRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { ansatt erSøskenTil bruker }
+        avvisHvis { ansatt erSøskenTil bruker }
 
     override val metadata = RegelMetadata(SØSKEN)
 }
@@ -73,7 +73,7 @@ class SøskenRegel : KjerneRegel {
 @Order(HIGHEST_PRECEDENCE + 8)
 class FellesBarnRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { ansatt harFellesBarnMed bruker }
+        avvisHvis { ansatt harFellesBarnMed bruker }
 
     override val metadata = RegelMetadata(FELLES_BARN)
 }

@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.DETAIL_MESSAGE_CODE
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.TYPE_URI
+import org.slf4j.MDC
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.ProblemDetail.forStatus
 import org.springframework.web.ErrorResponseException

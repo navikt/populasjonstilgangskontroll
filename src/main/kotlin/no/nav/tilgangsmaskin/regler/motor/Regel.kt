@@ -12,13 +12,13 @@ interface Regel {
     val begrunnelse get() = metadata.begrunnelse
     val erOverstyrbar get() = this is OverstyrbarRegel
 
-    fun avslåHvis(predicate: () -> Boolean) = !predicate.invoke()
+    fun avvisHvis(predicate: () -> Boolean) = !predicate.invoke()
 }
 
 abstract class GlobalGruppeRegel(private val gruppe: GlobalGruppe) : Regel {
 
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avslåHvis { bruker kreverMedlemskapI gruppe && !(ansatt erMedlemAv gruppe) }
+        avvisHvis { bruker kreverMedlemskapI gruppe && !(ansatt erMedlemAv gruppe) }
 
     override val metadata = RegelMetadata(gruppe)
 

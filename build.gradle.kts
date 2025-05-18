@@ -38,7 +38,7 @@ configurations.all {
 }
 
 dependencies {
-    implementation("io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter")
+    implementation("io.opentelemetry:opentelemetry-api")
     implementation("io.micrometer:micrometer-tracing")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.apache.httpcomponents.client5:httpclient5")

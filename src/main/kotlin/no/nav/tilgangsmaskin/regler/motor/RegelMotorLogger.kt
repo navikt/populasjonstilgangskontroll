@@ -15,7 +15,7 @@ class RegelMotorLogger(private val teller: AvvisningTeller) {
     private val log = getLogger(javaClass)
     fun avvist(ansatt: Ansatt, bruker: Bruker, regel: Regel) {
         MDC.put(BESLUTNING,regel.kode)
-        log.info("MDC verdier " + MDC.getCopyOfContextMap())
+       // log.info("MDC verdier " + MDC.getCopyOfContextMap())
         log.warn("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId}")
         secureLog.info("Tilgang til ${bruker.brukerId.verdi} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} fra ${MDC.get(CONSUMER_ID)}")
         teller.tell(Tags.of("kode", regel.kode))
@@ -24,6 +24,7 @@ class RegelMotorLogger(private val teller: AvvisningTeller) {
 
     fun ok(ansatt: Ansatt, regelSett: RegelSett) {
         MDC.put(BESLUTNING,OK)
+        log.info("MDC verdier " + MDC.getCopyOfContextMap())
         log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} fra ${MDC.get(CONSUMER_ID)}")
         MDC.remove(BESLUTNING)
     }

@@ -82,10 +82,9 @@ class OverstyringTjeneste(
             else -> throw e
         }
 
-    private fun sjekkOverstyring(ansattId: AnsattId, e: RegelException): Boolean {
+    private fun sjekkOverstyring(ansattId: AnsattId, e: RegelException) =
         if (!e.regel.erOverstyrbar || !erOverstyrt(ansattId, e.bruker.brukerId)) throw e
-        return true
-    }
+        else Unit
 
     private fun sjekkOverstyringer(ansattId: AnsattId, e: BulkRegelException) {
         val remainingExceptions = e.exceptions.filterNot {

@@ -31,6 +31,7 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
                         "instance": "Z990883/03508331575",
                         "brukerIdent": "03508331575",
                         "navIdent": "Z990883",
+                        "traceId": "444290be30ed4fdd9a849654bad9dc1b",
                         "begrunnelse": "Du har ikke tilgang til brukere med strengt fortrolig adresse",
                         "kanOverstyres": false
                     }"""))])])
@@ -45,6 +46,7 @@ internal data class ProblemDetailResponse(
         val brukerIdent: String,
         val navIdent: String,
         val begrunnelse: String,
+        val traceId: String,
         val kanOverstyres: Boolean)
 
 @Target(FUNCTION)
@@ -67,6 +69,7 @@ internal data class ProblemDetailResponse(
   "status": 403,
   "instance": "/dev/bulk/Z990883",
   "navIdent": "Z990883",
+  "traceId": "444290be30ed4fdd9a849654bad9dc1b",
   "begrunnelser": [
     {
       "brukerIdent": "03508331575",

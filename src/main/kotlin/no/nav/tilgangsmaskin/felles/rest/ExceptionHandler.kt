@@ -14,6 +14,7 @@ class ExceptionHandler {
     private val log = getLogger(javaClass)
 
 
-   // @ExceptionHandler(RegelException::class)
-   // fun  regelException(e: RegelException) : Nothing = throw e.also { log.info("Enriching and rethrowing") }
+    @ExceptionHandler(RegelException::class)
+    fun  regelException(e: RegelException)  = e.body.also {
+        log.info("Enriching and rethrowing") }
 }

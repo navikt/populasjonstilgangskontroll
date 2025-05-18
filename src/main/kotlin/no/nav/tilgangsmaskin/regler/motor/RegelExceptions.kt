@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.regler.motor
 
+import io.opentelemetry.api.trace.Span
 import java.net.URI
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -34,6 +35,7 @@ private fun entries(brukerId: BrukerId, ansattId: AnsattId, regel: Regel) = mapO
         "brukerIdent" to brukerId.verdi,
         "navIdent" to ansattId.verdi,
         "begrunnelse" to regel.begrunnelse,
+        "traceId" to Span.current().spanContext.traceId,
         "kanOverstyres" to regel.erOverstyrbar)
 
 class BulkRegelException(private val ansattId: AnsattId, val exceptions: List<RegelException>) :

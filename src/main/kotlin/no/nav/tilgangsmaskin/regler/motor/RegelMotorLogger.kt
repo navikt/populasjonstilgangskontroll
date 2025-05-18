@@ -17,7 +17,6 @@ class RegelMotorLogger(private val teller: AvvisningTeller,private val observati
     private val log = getLogger(javaClass)
     fun avvist(ansatt: Ansatt, bruker: Bruker, regel: Regel) {
         MDC.put(BESLUTNING,regel.kode)
-        log.info("Trace Id " + getCurrentTraceId())
         log.warn("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId}")
         secureLog.info("Tilgang til ${bruker.brukerId.verdi} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} fra ${MDC.get(CONSUMER_ID)}")
         teller.tell(Tags.of("kode", regel.kode))
@@ -26,7 +25,6 @@ class RegelMotorLogger(private val teller: AvvisningTeller,private val observati
 
     fun ok(ansatt: Ansatt, regelSett: RegelSett) {
         MDC.put(BESLUTNING,OK)
-        log.info("Trace Id " + getCurrentTraceId())
         log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} fra ${MDC.get(CONSUMER_ID)}")
         MDC.remove(BESLUTNING)
     }
@@ -38,8 +36,6 @@ class RegelMotorLogger(private val teller: AvvisningTeller,private val observati
     fun evaluerer(ansatt: Ansatt, bruker: Bruker, regel: Regel) {
         log.trace("Evaluerer regel: '${regel.kortNavn}' for ${ansatt.ansattId}  og ${bruker.brukerId}")
     }
-
-    fun getCurrentTraceId() = Span.current().spanContext.traceId
 
     companion object   {
         private const val BESLUTNING = "beslutning"

@@ -1,6 +1,8 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import io.micrometer.core.instrument.Tags
+import io.micrometer.observation.ObservationRegistry
+import io.opentelemetry.api.trace.Span
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
@@ -10,12 +12,12 @@ import org.slf4j.MDC
 import org.springframework.stereotype.Component
 
 @Component
-class RegelMotorLogger(private val teller: AvvisningTeller) {
+class RegelMotorLogger(private val teller: AvvisningTeller,private val observationRegistry: ObservationRegistry) {
 
     private val log = getLogger(javaClass)
     fun avvist(ansatt: Ansatt, bruker: Bruker, regel: Regel) {
         MDC.put(BESLUTNING,regel.kode)
-       // log.info("MDC verdier " + MDC.getCopyOfContextMap())
+        log.info("Trace Id " + getCurrentTraceId())
         log.warn("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId}")
         secureLog.info("Tilgang til ${bruker.brukerId.verdi} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} fra ${MDC.get(CONSUMER_ID)}")
         teller.tell(Tags.of("kode", regel.kode))
@@ -24,7 +26,7 @@ class RegelMotorLogger(private val teller: AvvisningTeller) {
 
     fun ok(ansatt: Ansatt, regelSett: RegelSett) {
         MDC.put(BESLUTNING,OK)
-        log.info("MDC verdier " + MDC.getCopyOfContextMap())
+        log.info("Trace Id " + getCurrentTraceId())
         log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} fra ${MDC.get(CONSUMER_ID)}")
         MDC.remove(BESLUTNING)
     }
@@ -36,6 +38,8 @@ class RegelMotorLogger(private val teller: AvvisningTeller) {
     fun evaluerer(ansatt: Ansatt, bruker: Bruker, regel: Regel) {
         log.trace("Evaluerer regel: '${regel.kortNavn}' for ${ansatt.ansattId}  og ${bruker.brukerId}")
     }
+
+    fun getCurrentTraceId() = Span.current().spanContext.traceId
 
     companion object   {
         private const val BESLUTNING = "beslutning"

@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.regler
 
 import com.ninjasquad.springmockk.MockkBean
 import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.observation.ObservationRegistry
 import io.mockk.every
 import io.mockk.verify
 import java.util.*
@@ -60,6 +61,10 @@ class RegelMotorTest {
     @Autowired
     private lateinit var registry: MeterRegistry
 
+    
+    @Autowired
+    private lateinit var observationRegistry: ObservationRegistry
+
     @MockkBean
     private lateinit var token: Token
     private lateinit var logger: RegelMotorLogger
@@ -70,7 +75,7 @@ class RegelMotorTest {
 
     @BeforeTest
     fun before() {
-        logger = RegelMotorLogger(AvvisningTeller(registry,token))
+        logger = RegelMotorLogger(AvvisningTeller(registry,token),observationRegistry)
         every { token.system } returns "test"
         every { token.systemNavn } returns "test"
     }

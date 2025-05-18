@@ -22,9 +22,10 @@ class RegelMotorLogger(private val teller: AvvisningTeller,private val observati
         MDC.remove(BESLUTNING)
     }
 
-    fun ok(ansatt: Ansatt, regelSett: RegelSett) {
+    fun ok(ansatt: Ansatt, bruker: Bruker,regelSett: RegelSett) {
         MDC.put(BESLUTNING,OK)
         log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} fra ${MDC.get(CONSUMER_ID)}")
+        secureLog.info("${regelSett.beskrivelse} ga tilgang til  ${bruker.brukerId.verdi}  for ${ansatt.ansattId} fra ${MDC.get(CONSUMER_ID)}")
         MDC.remove(BESLUTNING)
     }
 

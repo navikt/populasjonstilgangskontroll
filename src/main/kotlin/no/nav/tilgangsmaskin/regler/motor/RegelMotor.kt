@@ -33,7 +33,7 @@ class RegelMotor(
                 throw RegelException(ansatt, bruker, regel)
             }
         }
-        logger.ok(ansatt, regelSett)
+        logger.ok(ansatt, bruker,regelSett)
     }
 
 

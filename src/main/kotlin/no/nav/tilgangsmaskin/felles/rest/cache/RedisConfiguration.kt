@@ -57,6 +57,7 @@ class RedisConfiguration(private val cf: RedisConnectionFactory) : CachingConfig
         return RedisCacheManager.builder(nonLockingRedisCacheWriter(cf))
             .cacheDefaults(defaultCacheConfig())
             .withInitialCacheConfigurations(cacheConfigs)
+            .enableStatistics()
             .build()
     }
 

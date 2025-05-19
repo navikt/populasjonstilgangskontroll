@@ -60,11 +60,7 @@ class RegelMotorTest {
 
     @Autowired
     private lateinit var registry: MeterRegistry
-
-
-    @Autowired
-    private lateinit var observationRegistry: ObservationRegistry
-
+    
     @MockkBean
     private lateinit var token: Token
     private lateinit var logger: RegelMotorLogger
@@ -75,7 +71,7 @@ class RegelMotorTest {
 
     @BeforeTest
     fun before() {
-        logger = RegelMotorLogger(AvvisningTeller(registry,token),observationRegistry)
+        logger = RegelMotorLogger(AvvisningTeller(registry,token))
         every { token.system } returns "test"
         every { token.systemNavn } returns "test"
     }

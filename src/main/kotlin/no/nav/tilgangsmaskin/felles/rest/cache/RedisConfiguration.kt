@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.boot.conditionals.ConditionalOnDev
 import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
@@ -24,7 +25,7 @@ import java.time.Duration
 @Configuration
 @EnableCaching
 @ConditionalOnDev
-class RedisConfiguration(private val cf: RedisConnectionFactory) : CachingConfigurer {
+class RedisConfiguration(private val cf: RedisConnectionFactory, mapper: ObjectMapper) : CachingConfigurer {
 
 
         @Bean
@@ -47,7 +48,7 @@ class RedisConfiguration(private val cf: RedisConnectionFactory) : CachingConfig
     @Bean
     override fun cacheManager(): RedisCacheManager {
         val keySerializer = StringRedisSerializer()
-        val valueSerializer = GenericJackson2JsonRedisSerializer()
+        val valueSerializer = GenericJackson2JsonRedisSerializer(mapper)
         val customCacheConfig = defaultCacheConfig()
             .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(keySerializer))
             .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(valueSerializer))

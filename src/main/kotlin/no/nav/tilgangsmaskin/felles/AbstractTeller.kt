@@ -16,7 +16,7 @@ abstract class AbstractTeller(
 
     open fun tell(tags: Tags) =
         with(tags.and("system", token.system)) {
-            log.info("Registrerer teller med navn: {} og tags: {}", navn, this)
+           // log.info("Registrerer teller med navn: {} og tags: {}", navn, this)
             Counter.builder(navn)
                 .description(beskrivelse)
                 .tags(this)

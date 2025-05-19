@@ -17,7 +17,7 @@ class RegelMotorLogger(private val teller: AvvisningTeller) {
         MDC.put(BESLUTNING,regel.kode)
         log.warn("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId}")
         secureLog.warn("Tilgang til ${bruker.brukerId.verdi} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} fra ${MDC.get(CONSUMER_ID)}")
-        teller.tell(Tags.of("navn", regel.navn, "kode", regel.kode))
+        teller.tell(Tags.of("navn", regel.navn))
         MDC.remove(BESLUTNING)
     }
 

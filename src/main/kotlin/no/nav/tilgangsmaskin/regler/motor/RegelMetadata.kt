@@ -8,7 +8,7 @@ data class RegelMetadata(val gruppeMetadata: GruppeMetadata) {
     val kode = gruppeMetadata.meta.name
     val begrunnelse = gruppeMetadata.begrunnelse
     val kortNavn = gruppeMetadata.kortNavn
-    val navn = gruppeMetadata.meta.name
+    val navn = gruppeMetadata.name
 
     constructor(gruppe: GlobalGruppe) : this(gruppe.metadata)
 

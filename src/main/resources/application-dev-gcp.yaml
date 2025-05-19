@@ -13,10 +13,13 @@ spring:
       ssl:
         enabled: true
   cache:
-    type: caffeine
+    type: redis
   mvc:
     log-request-details: true
 management:
+  health:
+    redis:
+      enabled: true
   endpoint:
     env:
       show-values: always

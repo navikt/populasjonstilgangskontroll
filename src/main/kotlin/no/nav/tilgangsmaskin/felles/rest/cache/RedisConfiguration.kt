@@ -1,12 +1,15 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import no.nav.boot.conditionals.ConditionalOnDev
 import org.springframework.cache.annotation.CachingConfigurer
+import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.interceptor.KeyGenerator
+import org.springframework.context.annotation.Configuration
 
-//@Configuration
-//@EnableCaching
-//@ConditionalOnDev
+@Configuration
+@EnableCaching
+@ConditionalOnDev
 class RedisConfiguration(private val mapper: ObjectMapper) : CachingConfigurer {
     /*
         @Bean

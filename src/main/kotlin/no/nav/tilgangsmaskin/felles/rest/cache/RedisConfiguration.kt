@@ -25,7 +25,7 @@ import java.time.Duration
 @Configuration
 @EnableCaching
 @ConditionalOnDev
-class RedisConfiguration(private val cf: RedisConnectionFactory, mapper: ObjectMapper) : CachingConfigurer {
+class RedisConfiguration(private val cf: RedisConnectionFactory, private val mapper: ObjectMapper) : CachingConfigurer {
 
 
         @Bean

@@ -82,7 +82,7 @@ class RedisConfiguration(private val cf: RedisConnectionFactory) : CachingConfig
             registerModule(JavaTimeModule())
             configure(INCLUDE_SOURCE_IN_LOCATION, true)
             activateDefaultTyping(polymorphicTypeValidator,
-                ObjectMapper.DefaultTyping.NON_FINAL,
+                ObjectMapper.DefaultTyping.EVERYTHING,
                 JsonTypeInfo.As.PROPERTY
             )
         }

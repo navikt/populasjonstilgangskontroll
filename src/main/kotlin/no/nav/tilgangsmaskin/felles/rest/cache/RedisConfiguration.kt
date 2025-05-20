@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.rest.cache
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.boot.conditionals.ConditionalOnDev
 import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
@@ -76,6 +77,7 @@ class RedisConfiguration(private val cf: RedisConnectionFactory) : CachingConfig
 
     companion object {
         val mapper = jacksonObjectMapper().apply {
+            registerModule(JavaTimeModule())
             activateDefaultTyping(polymorphicTypeValidator,
                 ObjectMapper.DefaultTyping.NON_FINAL,
                 JsonTypeInfo.As.PROPERTY

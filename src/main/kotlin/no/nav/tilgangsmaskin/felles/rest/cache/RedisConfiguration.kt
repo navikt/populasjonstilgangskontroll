@@ -1,6 +1,9 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
+import com.fasterxml.jackson.core.StreamReadFeature
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -77,6 +80,7 @@ class RedisConfiguration(private val cf: RedisConnectionFactory) : CachingConfig
     companion object {
         val mapper = jacksonObjectMapper().apply {
             registerModule(JavaTimeModule())
+            configure(INCLUDE_SOURCE_IN_LOCATION, true)
             activateDefaultTyping(polymorphicTypeValidator,
                 ObjectMapper.DefaultTyping.NON_FINAL,
                 JsonTypeInfo.As.PROPERTY

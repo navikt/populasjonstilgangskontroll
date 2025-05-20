@@ -1,10 +1,8 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
-import com.fasterxml.jackson.core.StreamReadFeature
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.boot.conditionals.ConditionalOnDev
@@ -31,7 +29,7 @@ import java.time.Duration
 @Configuration
 @EnableCaching
 @ConditionalOnDev
-class RedisConfiguration(private val cf: RedisConnectionFactory) : CachingConfigurer {
+class RedisConfiguration(private val cf: RedisConnectionFactory, private val m: ObjectMapper) : CachingConfigurer {
 
 
         @Bean
@@ -54,11 +52,11 @@ class RedisConfiguration(private val cf: RedisConnectionFactory) : CachingConfig
     @Bean
     override fun cacheManager(): RedisCacheManager {
         val keySerializer = StringRedisSerializer()
-        val valueSerializer = GenericJackson2JsonRedisSerializer(mapper)
+        val valueSerializer = GenericJackson2JsonRedisSerializer(mapper(m))
         val customCacheConfig = defaultCacheConfig()
           .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(keySerializer))
             .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(valueSerializer))
-            .entryTtl(Duration.ofMinutes(10)) // Example: 10 min TTL
+            .entryTtl(Duration.ofHours(24)) // Example: 10 min TTL
         val cacheConfigs = mapOf(PDL to customCacheConfig, SKJERMING to customCacheConfig, GRAPH to customCacheConfig)
 
         return RedisCacheManager.builder(nonLockingRedisCacheWriter(cf))
@@ -77,14 +75,13 @@ class RedisConfiguration(private val cf: RedisConnectionFactory) : CachingConfig
         }
     }
 
-    companion object {
-        val mapper = jacksonObjectMapper().apply {
-            registerModule(JavaTimeModule())
-            configure(INCLUDE_SOURCE_IN_LOCATION, true)
-            activateDefaultTyping(polymorphicTypeValidator,
-                ObjectMapper.DefaultTyping.EVERYTHING,
-                JsonTypeInfo.As.PROPERTY
-            )
-        }
+    private fun mapper(m: ObjectMapper) =
+        //jacksonObjectMapper().registerModule(JavaTimeModule())
+        m.copy()
+            .apply {
+        activateDefaultTyping(polymorphicTypeValidator,
+            EVERYTHING,
+            PROPERTY
+        )
     }
 }

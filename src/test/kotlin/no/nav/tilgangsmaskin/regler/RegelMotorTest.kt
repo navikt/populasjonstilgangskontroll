@@ -87,15 +87,14 @@ class RegelMotorTest {
         val mapper = jacksonObjectMapper().apply {
             activateDefaultTyping(
                 polymorphicTypeValidator,
-                ObjectMapper.DefaultTyping.NON_FINAL,
+                ObjectMapper.DefaultTyping.EVERYTHING,
                 JsonTypeInfo.As.PROPERTY
             )
         }
         val json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(bruker)
         println(json)
 
-        val b = mapper.readerFor(Bruker::class.java).readValue<Bruker>(json)
-       // val  b = mapper.readValue<Bruker>(json)
+       val  b = mapper.readValue<Bruker>(json)
         println(b)
         //assertEquals(bruker, b)
     }

@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.boot.conditionals.ConditionalOnDev
 import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
@@ -47,11 +48,11 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
 
     @Bean
     override fun cacheManager(): RedisCacheManager {
-       // val keySerializer = StringRedisSerializer()
-      //  val valueSerializer = GenericJackson2JsonRedisSerializer(mapper)
+        val keySerializer = StringRedisSerializer()
+        val valueSerializer = GenericJackson2JsonRedisSerializer(mapper())
         val customCacheConfig = defaultCacheConfig()
-        //    .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(keySerializer))
-        //    .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(valueSerializer))
+          .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(keySerializer))
+            .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(valueSerializer))
             .entryTtl(Duration.ofMinutes(10)) // Example: 10 min TTL
         val cacheConfigs = mapOf(PDL to customCacheConfig, SKJERMING to customCacheConfig, GRAPH to customCacheConfig)
 
@@ -60,6 +61,16 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
             .withInitialCacheConfigurations(cacheConfigs)
             .enableStatistics()
             .build()
+    }
+
+
+    fun mapper() =
+         mapper.copy().apply {
+            activateDefaultTyping(
+                polymorphicTypeValidator,
+                ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.PROPERTY
+            )
     }
 
 

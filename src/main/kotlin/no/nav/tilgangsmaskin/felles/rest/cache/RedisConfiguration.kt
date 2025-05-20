@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.rest.cache
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.boot.conditionals.ConditionalOnDev
 import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
@@ -26,7 +27,7 @@ import java.time.Duration
 @Configuration
 @EnableCaching
 @ConditionalOnDev
-class RedisConfiguration(private val cf: RedisConnectionFactory, private val mapper: ObjectMapper) : CachingConfigurer {
+class RedisConfiguration(private val cf: RedisConnectionFactory) : CachingConfigurer {
 
 
         @Bean
@@ -49,7 +50,7 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
     @Bean
     override fun cacheManager(): RedisCacheManager {
         val keySerializer = StringRedisSerializer()
-        val valueSerializer = GenericJackson2JsonRedisSerializer(mapper())
+        val valueSerializer = GenericJackson2JsonRedisSerializer(mapper)
         val customCacheConfig = defaultCacheConfig()
           .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(keySerializer))
             .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(valueSerializer))
@@ -64,21 +65,21 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
     }
 
 
-    fun mapper() =
-         mapper.copy().apply {
-            activateDefaultTyping(
-                polymorphicTypeValidator,
-                ObjectMapper.DefaultTyping.NON_FINAL,
-                JsonTypeInfo.As.PROPERTY
-            )
-    }
-
 
     override fun keyGenerator() = KeyGenerator { target, method, params ->
         buildString {
             append(target::class)
             append(method.name)
             params.forEach { append(it) }
+        }
+    }
+
+    companion object {
+        val mapper = jacksonObjectMapper().apply {
+            activateDefaultTyping(polymorphicTypeValidator,
+                ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.PROPERTY
+            )
         }
     }
 }

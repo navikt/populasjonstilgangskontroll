@@ -1,10 +1,11 @@
 package no.nav.tilgangsmaskin.regler
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.micrometer.core.instrument.MeterRegistry
-import io.micrometer.observation.ObservationRegistry
 import io.mockk.every
-import io.mockk.verify
 import java.util.*
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.TestApp
@@ -40,6 +41,8 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import com.fasterxml.jackson.module.kotlin.readValue
+import kotlin.test.assertEquals
 
 
 @Import(RegelConfig::class)
@@ -52,6 +55,8 @@ import kotlin.test.Test
 @TestInstance(PER_CLASS)
 class RegelMotorTest {
 
+    @Autowired
+    private lateinit var jacksonObjectMapper: ObjectMapper
     private val brukerId = BrukerId("08526835670")
     private val ansattId = AnsattId("Z999999")
 
@@ -74,6 +79,23 @@ class RegelMotorTest {
         logger = RegelMotorLogger(AvvisningTeller(registry,token))
         every { token.system } returns "test"
         every { token.systemNavn } returns "test"
+    }
+
+    @Test
+    fun jackson() {
+        val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(FORTROLIG, SKJERMING).build()
+        val mapper = jacksonObjectMapper().apply {
+            activateDefaultTyping(
+                polymorphicTypeValidator,
+                ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.PROPERTY
+            )
+        }
+        val json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(bruker)
+        println(json)
+        val  b = mapper.readValue<Bruker>(json)
+        println(b)
+        //assertEquals(bruker, b)
     }
 
     @Nested

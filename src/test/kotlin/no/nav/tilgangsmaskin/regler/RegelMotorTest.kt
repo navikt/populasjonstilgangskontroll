@@ -93,7 +93,9 @@ class RegelMotorTest {
         }
         val json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(bruker)
         println(json)
-        val  b = mapper.readValue<Bruker>(json)
+
+        val b = mapper.readerFor(Bruker::class.java).readValue<Bruker>(json)
+       // val  b = mapper.readValue<Bruker>(json)
         println(b)
         //assertEquals(bruker, b)
     }

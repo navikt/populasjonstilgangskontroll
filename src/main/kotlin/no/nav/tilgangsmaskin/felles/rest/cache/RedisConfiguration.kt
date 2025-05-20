@@ -59,7 +59,6 @@ class RedisConfiguration(private val cf: RedisConnectionFactory) : CachingConfig
         val cacheConfigs = mapOf(PDL to customCacheConfig, SKJERMING to customCacheConfig, GRAPH to customCacheConfig)
 
         return RedisCacheManager.builder(nonLockingRedisCacheWriter(cf))
-            .cacheDefaults(defaultCacheConfig())
             .withInitialCacheConfigurations(cacheConfigs)
             .enableStatistics()
             .build()

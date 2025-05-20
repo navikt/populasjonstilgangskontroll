@@ -47,11 +47,11 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val map
 
     @Bean
     override fun cacheManager(): RedisCacheManager {
-        val keySerializer = StringRedisSerializer()
-        val valueSerializer = GenericJackson2JsonRedisSerializer(mapper)
+       // val keySerializer = StringRedisSerializer()
+      //  val valueSerializer = GenericJackson2JsonRedisSerializer(mapper)
         val customCacheConfig = defaultCacheConfig()
-            .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(keySerializer))
-            .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(valueSerializer))
+        //    .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(keySerializer))
+        //    .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(valueSerializer))
             .entryTtl(Duration.ofMinutes(10)) // Example: 10 min TTL
         val cacheConfigs = mapOf(PDL to customCacheConfig, SKJERMING to customCacheConfig, GRAPH to customCacheConfig)
 

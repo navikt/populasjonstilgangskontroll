@@ -11,6 +11,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.STRENGT_FORTROLIG_UTLAND
+import java.io.Serializable
 
 data class Person(
         val brukerId: BrukerId,
@@ -19,7 +20,7 @@ data class Person(
         val graderinger: List<Gradering> = emptyList(),
         val familie: Familie = INGEN,
         val dødsdato: LocalDate? = null,
-        val historiskeIds: Set<BrukerId> = emptySet()) {
+        val historiskeIds: Set<BrukerId> = emptySet()) : Serializable {
 
     @JsonIgnore
     val foreldre = familie.foreldre

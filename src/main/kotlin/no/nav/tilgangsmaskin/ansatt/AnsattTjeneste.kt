@@ -32,13 +32,16 @@ class AnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
             } else {
                 if (token.ansattId != null) {
                     log.info("OBO-flow: $ansattId har *ikke* av nasjonal tilgang, slår opp GEO-grupper i Entra")
+                    ansattMedMedFamileOgGrupper(ansattId, this + entra.geoGrupper(ansattId)).also {
+                        teller.tell(Tags.of("medlem", true.toString()))
+                    }
                 }
                 else  {
-                    log.trace("CC-flow: slår opp GEO-grupper i Entra")
+                    log.trace("CC-flow: slår opp globale og GEO-grupper i Entra")
+                    ansattMedMedFamileOgGrupper(ansattId, entra.geoOgGlobaleGrupper(ansattId)).also {
+                        teller.tell(Tags.of("medlem", (it erMedlemAv NASJONAL).toString()))
+                    }
                 }
-                 ansattMedMedFamileOgGrupper(ansattId, this + entra.grupper(ansattId)).also {
-                     teller.tell(Tags.of("medlem", (it erMedlemAv NASJONAL).toString()))
-                 }
             }
         }
 

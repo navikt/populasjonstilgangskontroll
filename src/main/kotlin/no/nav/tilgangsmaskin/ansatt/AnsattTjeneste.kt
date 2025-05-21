@@ -28,19 +28,19 @@ class AnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
             val grupper = token.globaleGrupper()
             if (grupper.girNasjonalTilgang()) {
                 log.info("OBO-flow: $ansattId har nasjonal tilgang, slår *ikke* opp GEO-grupper i Entra")
-                teller.tell(Tags.of("medlem", true.toString()))
+                tell( true)
                 return ansattMedMedFamileOgGrupper(ansattId, grupper)
             }
             else {
                 log.info("OBO-flow: $ansattId har ikke nasjonal tilgang, slår opp GEO-grupper i Entra")
-                teller.tell(Tags.of("medlem", false.toString()))
+                tell( false)
                 return ansattMedMedFamileOgGrupper(ansattId, grupper + entra.geoGrupper(ansattId))
             }
         }
         else {
             log.info("CC-flow: slår opp globale og GEO-grupper i Entra")
             return ansattMedMedFamileOgGrupper(ansattId, entra.geoOgGlobaleGrupper(ansattId)).also {
-                teller.tell(Tags.of("medlem", (it erMedlemAv NASJONAL).toString()))
+                tell ( (it erMedlemAv NASJONAL))
             }
         }
     }
@@ -53,6 +53,14 @@ class AnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
             }.getOrNull()
         }
         return Ansatt(ansattId, ansattBruker, grupper)
+    }
+
+    private fun tell(status: Boolean) {
+        teller.tell(Tags.of(MEDLEM,status.toString()))
+    }
+    companion object {
+        private const val MEDLEM = "medlem"
+
     }
 }
 

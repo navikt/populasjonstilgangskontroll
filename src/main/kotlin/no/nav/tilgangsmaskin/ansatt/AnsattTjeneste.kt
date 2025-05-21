@@ -27,18 +27,18 @@ class AnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
         if (token.erObo) {
             val grupper = grupperFraToken(token.globaleGruppeIds)
             if (grupper.harNasjonalTilgang()) {
-                log.info("$ansattId har nasjonal tilgang, slår *ikke* opp GEO-grupper i Entra")
+                log.info("OBO-flow: $ansattId har nasjonal tilgang, slår *ikke* opp GEO-grupper i Entra")
                 teller.tell(Tags.of("medlem", true.toString()))
                 return ansattMedMedFamileOgGrupper(ansattId, grupper)
             }
             else {
-                log.info("$ansattId har ikke nasjonal tilgang, slår opp GEO-grupper i Entra")
+                log.info("OBO-flow: $ansattId har ikke nasjonal tilgang, slår opp GEO-grupper i Entra")
                 teller.tell(Tags.of("medlem", false.toString()))
                 return ansattMedMedFamileOgGrupper(ansattId, grupper + entra.geoGrupper(ansattId))
             }
         }
         else {
-            log.trace("CC-flow: slår opp globale og GEO-grupper i Entra")
+            log.info("CC-flow: slår opp globale og GEO-grupper i Entra")
             return ansattMedMedFamileOgGrupper(ansattId, entra.geoOgGlobaleGrupper(ansattId)).also {
                 teller.tell(Tags.of("medlem", (it erMedlemAv NASJONAL).toString()))
             }

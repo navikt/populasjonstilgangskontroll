@@ -23,27 +23,28 @@ class AnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
                      private val token: Token, private val teller: NasjonalGruppeTeller) {
     private val log = getLogger(javaClass)
 
-    fun ansatt(ansattId: AnsattId) =
-        with(grupperFraToken(token.globaleGruppeIds)) {
-            if (harNasjonalTilgang()) {
+    fun ansatt(ansattId: AnsattId) : Ansatt {
+        if (token.erObo) {
+            val grupper = grupperFraToken(token.globaleGruppeIds)
+            if (grupper.harNasjonalTilgang()) {
                 log.info("$ansattId har nasjonal tilgang, slår *ikke* opp GEO-grupper i Entra")
                 teller.tell(Tags.of("medlem", true.toString()))
-                ansattMedMedFamileOgGrupper(ansattId, this)
-            } else {
-                if (token.ansattId != null) {
-                    log.info("OBO-flow: $ansattId har *ikke* av nasjonal tilgang, slår opp GEO-grupper i Entra")
-                    ansattMedMedFamileOgGrupper(ansattId, this + entra.geoGrupper(ansattId)).also {
-                        teller.tell(Tags.of("medlem", true.toString()))
-                    }
-                }
-                else  {
-                    log.trace("CC-flow: slår opp globale og GEO-grupper i Entra")
-                    ansattMedMedFamileOgGrupper(ansattId, entra.geoOgGlobaleGrupper(ansattId)).also {
-                        teller.tell(Tags.of("medlem", (it erMedlemAv NASJONAL).toString()))
-                    }
-                }
+                return ansattMedMedFamileOgGrupper(ansattId, grupper)
+            }
+            else {
+                log.info("$ansattId har ikke nasjonal tilgang, slår opp GEO-grupper i Entra")
+                teller.tell(Tags.of("medlem", false.toString()))
+                return ansattMedMedFamileOgGrupper(ansattId, grupper + entra.geoGrupper(ansattId))
             }
         }
+        else {
+            log.trace("CC-flow: slår opp globale og GEO-grupper i Entra")
+            return ansattMedMedFamileOgGrupper(ansattId, entra.geoOgGlobaleGrupper(ansattId)).also {
+                teller.tell(Tags.of("medlem", (it erMedlemAv NASJONAL).toString()))
+            }
+        }
+    }
+
 
     private fun ansattMedMedFamileOgGrupper(ansattId: AnsattId, grupper: Set<EntraGruppe>): Ansatt {
         val ansattBruker = ansatte.fnrForAnsatt(ansattId)?.let {

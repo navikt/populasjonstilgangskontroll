@@ -29,6 +29,7 @@ class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val grupper: Se
         return grupper.any { it.displayName.endsWith("GEO_$kode") }
     }
 
+
     infix fun erMedlemAv(gruppe: GlobalGruppe) = grupper.any { it.id == gruppe.id }
 
     infix fun erNåværendeEllerTidligerePartnerMed(bruker: Bruker) = bruker erNærståendeMed partnere

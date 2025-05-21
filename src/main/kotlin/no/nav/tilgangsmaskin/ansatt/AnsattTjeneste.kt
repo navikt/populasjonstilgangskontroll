@@ -13,6 +13,7 @@ import no.nav.tilgangsmaskin.regler.motor.NasjonalGruppeTeller
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 
 @Service
 @Timed
@@ -29,9 +30,15 @@ class AnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
                 teller.tell(Tags.of("medlem", true.toString()))
                 ansattMedMedFamileOgGrupper(ansattId, this)
             } else {
-                log.info("$ansattId har *ikke* av nasjonal tilgang, slår opp GEO-grupper i Entra")
-                teller.tell(Tags.of("medlem", false.toString()))
-                ansattMedMedFamileOgGrupper(ansattId, this + entra.grupper(ansattId))
+                if (token.ansattId != null) {
+                    log.info("OBO-flow: $ansattId har *ikke* av nasjonal tilgang, slår opp GEO-grupper i Entra")
+                }
+                else  {
+                    log.trace("CC-flow: slår opp GEO-grupper i Entra")
+                }
+                 ansattMedMedFamileOgGrupper(ansattId, this + entra.grupper(ansattId)).also {
+                     teller.tell(Tags.of("medlem", (it erMedlemAv NASJONAL).toString()))
+                 }
             }
         }
 

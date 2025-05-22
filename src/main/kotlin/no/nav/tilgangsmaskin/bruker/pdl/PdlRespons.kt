@@ -47,7 +47,7 @@ data class PdlRespons(
 }
 
 
-data class Partnere(val sivilstand: List<Sivilstand> = emptyList()) {
+data class Partnere(val sivilstand: Set<Sivilstand> = emptySet()) {
     data class Sivilstand(
             val type: Sivilstandstype,
             val relatertVedSivilstand: String?,

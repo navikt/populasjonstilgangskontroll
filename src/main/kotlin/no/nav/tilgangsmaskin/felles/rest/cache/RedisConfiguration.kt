@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
+import com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
@@ -76,10 +77,11 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val m: 
     }
 
     private fun mapper(m: ObjectMapper) =
-        //jacksonObjectMapper().registerModule(JavaTimeModule())
-        m.copy()
+        jacksonObjectMapper().registerModule(JavaTimeModule())
+       // m.copy()
             .apply {
-        activateDefaultTyping(polymorphicTypeValidator,
+                configure(INCLUDE_SOURCE_IN_LOCATION, true)
+                activateDefaultTyping(polymorphicTypeValidator,
             EVERYTHING,
             PROPERTY
         )

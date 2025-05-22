@@ -30,7 +30,7 @@ import java.time.Duration
 @Configuration
 @EnableCaching
 @ConditionalOnDev
-class RedisConfiguration(private val cf: RedisConnectionFactory, private val m: ObjectMapper) : CachingConfigurer {
+class RedisConfiguration(private val cf: RedisConnectionFactory) : CachingConfigurer {
 
 
         @Bean
@@ -53,7 +53,7 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val m: 
     @Bean
     override fun cacheManager(): RedisCacheManager {
         val keySerializer = StringRedisSerializer()
-        val valueSerializer = GenericJackson2JsonRedisSerializer(mapper(m))
+        val valueSerializer = GenericJackson2JsonRedisSerializer(mapper)
         val customCacheConfig = defaultCacheConfig()
           .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(keySerializer))
             .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(valueSerializer))
@@ -76,7 +76,7 @@ class RedisConfiguration(private val cf: RedisConnectionFactory, private val m: 
         }
     }
 
-    private fun mapper(m: ObjectMapper) =
+    private val mapper =
         jacksonObjectMapper().registerModule(JavaTimeModule())
        // m.copy()
             .apply {

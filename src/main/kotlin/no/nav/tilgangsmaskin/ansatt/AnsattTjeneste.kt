@@ -29,24 +29,24 @@ class AnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
             if (grupper.girNasjonalTilgang()) {
                 log.info("OBO-flow: $ansattId har nasjonal tilgang, slår *ikke* opp GEO-grupper i Entra")
                 tell( true)
-                return ansattMedMedFamileOgGrupper(ansattId, grupper)
+                return ansatt(ansattId, grupper)
             }
             else {
                 log.info("OBO-flow: $ansattId har ikke nasjonal tilgang, slår opp GEO-grupper i Entra")
                 tell( false)
-                return ansattMedMedFamileOgGrupper(ansattId, grupper + entra.geoGrupper(ansattId))
+                return ansatt(ansattId, grupper + entra.geoGrupper(ansattId))
             }
         }
         else {
             log.info("CC-flow: slår opp globale og GEO-grupper i Entra")
-            return ansattMedMedFamileOgGrupper(ansattId, entra.geoOgGlobaleGrupper(ansattId)).also {
-                tell ( (it erMedlemAv NASJONAL))
+            return ansatt(ansattId, entra.geoOgGlobaleGrupper(ansattId)).also {
+                tell (it erMedlemAv NASJONAL)
             }
         }
     }
 
 
-    private fun ansattMedMedFamileOgGrupper(ansattId: AnsattId, grupper: Set<EntraGruppe>): Ansatt {
+    private fun ansatt(ansattId: AnsattId, grupper: Set<EntraGruppe>): Ansatt {
         val ansattBruker = ansatte.fnrForAnsatt(ansattId)?.let {
             runCatching {
                 brukere.utvidetFamilie(it.verdi)
@@ -55,12 +55,10 @@ class AnsattTjeneste(private val entra: Entra, private val ansatte: Nom,
         return Ansatt(ansattId, ansattBruker, grupper)
     }
 
-    private fun tell(status: Boolean) {
-        teller.tell(Tags.of(MEDLEM,status.toString()))
-    }
+    private fun tell(status: Boolean) = teller.tell(Tags.of(MEDLEM,"$status"))
+
     companion object {
         private const val MEDLEM = "medlem"
-
     }
 }
 

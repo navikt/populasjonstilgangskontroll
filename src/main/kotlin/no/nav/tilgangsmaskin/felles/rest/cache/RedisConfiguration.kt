@@ -19,7 +19,6 @@ import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.nonLockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.RedisConnectionUtils
-import org.springframework.data.redis.core.RedisConnectionUtils.getConnection
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
 import java.time.Duration
@@ -34,7 +33,7 @@ class RedisConfiguration(private val cf: RedisConnectionFactory,private vararg v
 
         @Bean
         fun redisHealthIndicator() = HealthIndicator {
-            RedisConnectionUtils.getConnection(cf).use { connection ->
+            getConnection(cf).use { connection ->
                 runCatching {
                     if (connection.ping().equals("PONG", ignoreCase = true)) {
                         Health.up().withDetail("Redis", "Frisk og rask").build()

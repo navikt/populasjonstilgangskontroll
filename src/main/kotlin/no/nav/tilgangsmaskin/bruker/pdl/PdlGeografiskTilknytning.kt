@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PdlGeografiskTilknytning(
@@ -17,8 +17,8 @@ data class PdlGeografiskTilknytning(
     //@JvmInline
     data class GTBydel(val verdi: String)
 
-    //@JvmInline
-    data class GTLand(val verdi: String)
+   // @JvmInline
+   data class GTLand(@JsonValue val verdi: String)
 }
 
 

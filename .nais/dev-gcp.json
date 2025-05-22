@@ -70,6 +70,11 @@
       "name": "gosys-oppgavebehandling-api",
       "namespace": "oppgavehandtering",
       "cluster": "dev-gcp"
+    },
+    {
+      "name": "veilarbvedtaksstotte",
+      "namespace": "obo",
+      "cluster": "dev-gcp"
     }
   ],
   "nais": {

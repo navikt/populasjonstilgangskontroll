@@ -90,10 +90,4 @@ class DevTilgangController(
 
     @PostMapping("brukere")
     fun brukere(@RequestBody @Valid @ValidId vararg ids: String) = brukere.brukere(*ids)
-
-    @PostMapping("bulk/{ansattId}")
-    @ResponseStatus(NO_CONTENT)
-    @ProblemDetailBulkApiResponse
-    fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<IdOgType>) =
-        regler.bulkRegler(ansattId, specs)
 }

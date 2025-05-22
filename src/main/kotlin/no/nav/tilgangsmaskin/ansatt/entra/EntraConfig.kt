@@ -23,18 +23,19 @@ class EntraConfig(
         .queryParam(PARAM_NAME_COUNT, "true")
         .build()
 
-    fun grupperURI(ansattId: String) = builder().path(GRUPPER_PATH)
+     fun grupperURI(ansattId: String, isCCF: Boolean) = if (isCCF) grupperCcfURI(ansattId) else grupperOboURI(ansattId)
+
+    private fun grupperOboURI(ansattId: String) = builder().path(GRUPPER_PATH)
         .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
         .queryParam(PARAM_NAME_COUNT, "true")
         .queryParam(PARAM_NAME_TOP, size)
         .queryParam(PARAM_NAME_FILTER, "startswith(displayName,'0000-GA-GEO')")
         .build(ansattId)
 
-    fun grupperCcfURI(ansattId: String) = builder().path(GRUPPER_PATH)
+    private fun grupperCcfURI(ansattId: String) = builder().path(GRUPPER_PATH)
         .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
         .queryParam(PARAM_NAME_COUNT, "true")
         .queryParam(PARAM_NAME_TOP, size)
-
         .queryParam(PARAM_NAME_FILTER,
             "id in(${GlobalGruppe.uuids().joinToString(separator ="','" , prefix = "'", postfix = "'")}) or startswith(displayName, '0000-GA-GEO')")
         .build(ansattId)

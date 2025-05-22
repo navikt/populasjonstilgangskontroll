@@ -18,7 +18,7 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCache
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.nonLockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.data.redis.core.RedisConnectionUtils
+import org.springframework.data.redis.core.RedisConnectionUtils.getConnection
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
 import java.time.Duration
@@ -29,6 +29,7 @@ import kotlin.use
 @EnableCaching
 @ConditionalOnDev
 class RedisConfiguration(private val cf: RedisConnectionFactory,private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
+
 
         @Bean
         fun redisHealthIndicator() = HealthIndicator {

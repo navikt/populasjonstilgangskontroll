@@ -25,8 +25,8 @@ class EntraUrl {
     @Test
     @DisplayName("UUIDene til gruppene kommer i rett formatering")
     fun `GrupperCcfURI should correctly format PARAM_NAME_FILTER`() {
-        val globale = GlobalGruppe.entries.map { env.getProperty(it.property) }.joinToString(",") { "'$it'" }
-        val expectedFilter = "id in($globale) or startswith(displayName, '0000-GA-GEO')"
+        val globaleGrupper = GlobalGruppe.entries.map { env.getProperty(it.property) }.joinToString(",") { "'$it'" }
+        val expectedFilter = "id in($globaleGrupper) or startswith(displayName, '0000-GA-GEO')"
         val actualFilter = EntraConfig(baseUri = URI("https://example.com")).grupperURI("Z999999", true).query.substringAfter("\$filter=").substringBefore("&")
         assertEquals(expectedFilter, actualFilter, "PARAM_NAME_FILTER is not formatted correctly")
     }

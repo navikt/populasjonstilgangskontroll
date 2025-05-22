@@ -4,6 +4,7 @@ import java.net.URI
 import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(GRAPH)
@@ -29,6 +30,14 @@ class EntraConfig(
         .queryParam(PARAM_NAME_FILTER, "startswith(displayName,'0000-GA-GEO')")
         .build(ansattId)
 
+    fun GrupperCcfURI(ansattId: String) = builder().path(GRUPPER_PATH)
+        .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
+        .queryParam(PARAM_NAME_COUNT, "true")
+        .queryParam(PARAM_NAME_TOP, size)
+
+        .queryParam(PARAM_NAME_FILTER,
+            "id in(${GlobalGruppe.uuids().joinToString(separator ="','" , prefix = "'", postfix = "'")}) or startswith(displayName, '0000-GA-GEO')")
+        .build(ansattId)
     override val navn = name
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"

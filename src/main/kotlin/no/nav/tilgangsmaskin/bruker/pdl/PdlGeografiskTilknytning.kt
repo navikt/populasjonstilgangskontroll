@@ -11,14 +11,14 @@ data class PdlGeografiskTilknytning(
 ) {
     enum class GTType { BYDEL, KOMMUNE, UDEFINERT, UTLAND }
 
-    @JvmInline
-    value class GTKommune(val verdi: String)
+    //@JvmInline
+    data class GTKommune(val verdi: String)
 
-    @JvmInline
-    value class GTBydel(val verdi: String)
+    //@JvmInline
+    data class GTBydel(val verdi: String)
 
-    @JvmInline
-    value class GTLand(val verdi: String)
+    //@JvmInline
+    data class GTLand(val verdi: String)
 }
 
 

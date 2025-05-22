@@ -30,7 +30,7 @@ class EntraUrl {
             enabled = true
         )
 
-        val uri = config.GrupperCcfURI(ansattId)
+        val uri = config.grupperCcfURI(ansattId)
         val query = uri.query
 
         val expectedFilter = "id in('11111111-1111-1111-1111-111111111111'," +

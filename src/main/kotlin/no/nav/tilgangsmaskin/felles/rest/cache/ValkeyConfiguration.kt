@@ -28,8 +28,7 @@ import kotlin.use
 @Configuration
 @EnableCaching
 @ConditionalOnDev
-class RedisConfiguration(private val cf: RedisConnectionFactory,private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
-
+class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
         @Bean
         fun redisHealthIndicator() = HealthIndicator {

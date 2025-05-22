@@ -26,6 +26,17 @@ class EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: E
             .map { EntraGruppe(it.id, it.displayName) }
             .toSet()
 
+
+    fun globaleogGeoGrupper(ansattId: String): Set<EntraGruppe> =
+        generateSequence(get<EntraGrupper>(cf.GrupperCcfURI(ansattId))) { bolk ->
+            bolk.next?.let {
+                get<EntraGrupper>(it)
+            }
+        }
+            .flatMap { it.value }
+            .map { EntraGruppe(it.id, it.displayName) }
+            .toSet()
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class EntraSaksbehandlerRespons(@JsonProperty("value") val oids: Set<EntraOids>) {
         data class EntraOids(val id: UUID)

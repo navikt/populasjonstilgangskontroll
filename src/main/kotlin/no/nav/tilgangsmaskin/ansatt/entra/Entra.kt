@@ -9,7 +9,7 @@ import no.nav.tilgangsmaskin.felles.CacheableRetryingOnRecoverableService
 @Timed
 class Entra(private val adapter: EntraRestClientAdapter, private val resolver: EntraOidResolver) {
 
-    fun geoOgGlobaleGrupper(ansattId: AnsattId) = emptySet<EntraGruppe>() // TODO
+    fun geoOgGlobaleGrupper(ansattId: AnsattId) = adapter.globaleogGeoGrupper(ansattId.toString())
 
     fun geoGrupper(ansattId: AnsattId) = adapter.grupper(resolver.oidForAnsatt(ansattId).toString())
 

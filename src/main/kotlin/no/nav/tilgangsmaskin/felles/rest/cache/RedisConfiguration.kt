@@ -30,7 +30,6 @@ import kotlin.use
 @ConditionalOnDev
 class RedisConfiguration(private val cf: RedisConnectionFactory,private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
-
         @Bean
         fun redisHealthIndicator() = HealthIndicator {
             getConnection(cf).use { connection ->

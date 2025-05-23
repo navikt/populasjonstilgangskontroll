@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.ansatt
 import io.micrometer.core.annotation.Timed
 import io.micrometer.core.instrument.Tags
 import no.nav.boot.conditionals.ConditionalOnGCP
-import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.nom.Nom
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.regler.motor.NasjonalGruppeTeller
@@ -15,16 +14,15 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 @ConditionalOnGCP
 class AnsattTjeneste(private val ansatte: Nom,
                      private val brukere: BrukerTjeneste,
-                     private val gruppeResolver: AnsattGruppeResolver,
+                     private val resolver: AnsattGruppeResolver,
                      private val teller: NasjonalGruppeTeller) {
 
     fun ansatt(ansattId: AnsattId) =
-        ansatt(ansattId,gruppeResolver.grupperForAnsatt(ansattId)).also {
+        Ansatt(ansattId,ansattBruker(ansattId), ansattGrupper(ansattId)).also {
             tell(it erMedlemAv NASJONAL)
         }
 
-    private fun ansatt(ansattId: AnsattId, grupper: Set<EntraGruppe>) =
-        Ansatt(ansattId, ansattBruker(ansattId), grupper)
+    private fun ansattGrupper(ansattId: AnsattId) = resolver.grupperForAnsatt(ansattId)
 
     private fun ansattBruker(ansattId: AnsattId) =
         ansatte.fnrForAnsatt(ansattId)?.let {
@@ -36,8 +34,6 @@ class AnsattTjeneste(private val ansatte: Nom,
     companion object {
         private const val MEDLEM = "medlem"
     }
-
-
 }
 
 

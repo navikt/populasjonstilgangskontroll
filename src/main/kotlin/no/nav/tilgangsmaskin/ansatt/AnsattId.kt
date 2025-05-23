@@ -3,8 +3,7 @@ package no.nav.tilgangsmaskin.ansatt
 import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
 
-@JvmInline
-value class AnsattId(@JsonValue val verdi: String) {
+data class AnsattId(@JsonValue val verdi: String) {
     init {
         with(verdi) {
             require(length == 7) { "Ugyldig lengde $length for $this, forventet 7" }

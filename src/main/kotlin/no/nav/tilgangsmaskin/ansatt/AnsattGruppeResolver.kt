@@ -4,13 +4,13 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.*
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.globaleGrupper
 import no.nav.tilgangsmaskin.ansatt.entra.Entra
 import no.nav.tilgangsmaskin.tilgang.Token
-import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
 class AnsattGruppeResolver(private val entra: Entra, private val token: Token) {
 
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val log = getLogger(javaClass)
 
     fun grupperForAnsatt(ansattId: AnsattId) =
         if (token.erObo) {

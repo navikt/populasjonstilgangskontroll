@@ -41,9 +41,6 @@ class DevTilgangController(
         private val nom: Nom,
         private val pdl: PDLTjeneste) {
 
-    private val log = LoggerFactory.getLogger(javaClass)
-
-
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)
 

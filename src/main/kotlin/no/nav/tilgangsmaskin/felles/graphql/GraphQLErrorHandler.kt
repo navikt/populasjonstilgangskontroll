@@ -29,7 +29,7 @@ interface GraphQLErrorHandler {
         }
 
     companion object {
-        private val log = getLogger(javaClass)
+        private val log = getLogger(GraphQLErrorHandler::class.java)
         private fun FieldAccessException.oversett(uri: URI) = response.errors.oversett(message, uri)
 
         private fun List<ResponseError>.oversett(message: String?, uri: URI) = oversett(

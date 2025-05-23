@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.regler
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
@@ -171,7 +173,6 @@ class RegelTjenesteTest {
                                         .build().brukerId.verdi)))
         }.doesNotThrowAnyException()
     }
-
 
     companion object {
 

@@ -4,6 +4,7 @@ import net.minidev.json.annotate.JsonIgnore
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.regler.motor.RegelMotor.BulkRegelResult.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.KJERNE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.OVERSTYRBAR
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -44,11 +45,11 @@ class RegelMotor(
           brukere.map { (bruker, type) ->
             runCatching { evaluer(ansatt, bruker, type.regelSett()) }
                 .fold(
-                    onSuccess = { BulkRegelResult.Success(bruker.brukerId) },
+                    onSuccess = { Success(bruker.brukerId) },
                     onFailure = { if (it is RegelException) {
-                        BulkRegelResult.RegelFailure(bruker.brukerId, it, HttpStatus.valueOf(it.statusCode.value()))
+                        RegelFailure(bruker.brukerId, it, HttpStatus.valueOf(it.statusCode.value()))
                     } else {
-                        BulkRegelResult.InternalError(bruker.brukerId, INTERNAL_SERVER_ERROR, it)
+                        InternalError(bruker.brukerId, INTERNAL_SERVER_ERROR, it)
                     } }
                 )
         }

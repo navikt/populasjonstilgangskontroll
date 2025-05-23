@@ -22,6 +22,7 @@ import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailBulkApiResponse
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.*
 import org.springframework.web.bind.annotation.*
@@ -39,6 +40,8 @@ class DevTilgangController(
         private val pip: PdlRestClientAdapter,
         private val nom: Nom,
         private val pdl: PDLTjeneste) {
+
+    private  val log = getLogger(javaClass)
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)
@@ -81,7 +84,9 @@ class DevTilgangController(
     @ResponseStatus(MULTI_STATUS)
     @ProblemDetailBulkApiResponse
     fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<IdOgType>) =
-        regler.bulkRegler(ansattId, specs)
+        regler.bulkRegler(ansattId, specs).also {
+            log.info("Returnerer $it etter bulk for $ansattId")
+        }
 
     @PostMapping("skjerming")
     fun skjerming(@RequestBody brukerId: BrukerId) = skjerming.skjerming(brukerId)

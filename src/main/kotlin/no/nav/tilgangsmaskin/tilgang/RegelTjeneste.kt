@@ -43,25 +43,26 @@ class RegelTjeneste(
         motor.kjerneregler(ansatte.ansatt(ansattId), brukere.utvidetFamilie(brukerId))
 
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>): List<Pair<BrukerId, Int>> {
-        lateinit var resultater: List<Pair<BrukerId,Int>>
+        lateinit var resultater: List<Pair<BrukerId,Any>>
         val elapsedTime = measureTime {
             log.info("Eksekverer bulk regler for $ansattId og ${idOgType.map { it.brukerId }.map { it.maskFnr() }}")
             resultater = motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerIdOgType()).map { spec ->
                 when (spec) {
-                    is Success -> Pair(spec.brukerId,204).also {
-                        log.info("Regel for ${it.first} er OK")
+                    is Success -> {
+                        log.info("Regel for ${spec.brukerId} er OK")
+                        Pair(spec.brukerId,204)
                     }
                     is RegelFailure ->
                         if (overstyring.erOverstyrt(ansattId, spec.brukerId)) {
-                            Pair(spec.brukerId,204).also {
-                                log.info("Regel for ${it.first} er overstyrt")
-                            }
+                            log.info("Regel for ${spec.brukerId} er overstyrt")
+                            Pair(spec.brukerId,spec.exception.body)
                         } else {
                             log.warn("Regel for ${spec.brukerId} er avvist med ${spec.exception.message}")
                             Pair(spec.brukerId, spec.statusCode.value())
                         }
-                    is InternalError -> Pair(spec.brukerId,500).also {
-                        log.error("Regel for ${it.first} feilet med ${spec.exception.message}")
+                    is InternalError ->{
+                        log.error("Regel for ${spec.brukerId} feilet med ${spec.exception.message}")
+                        Pair(spec.brukerId,500)
                     }
                 }
             }

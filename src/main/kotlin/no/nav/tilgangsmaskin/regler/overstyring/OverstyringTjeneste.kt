@@ -37,15 +37,15 @@ class OverstyringTjeneste(
 
         return when {
             overstyring == null -> {
-                log.trace("Ingen overstyring for $ansattId og $brukerId ble funnet i databasen")
+                log.trace("Ingen overstyring for {} og {} ble funnet", ansattId, brukerId)
                 false
             }
             overstyring.isBeforeNow() -> {
-                log.trace("Overstyring har gått ut på tid for ${overstyring.diffFromNow()} siden for $ansattId og $brukerId")
+                log.trace("Overstyring har gått ut på tid for {} siden for {} og {}", overstyring.diffFromNow(), ansattId, brukerId)
                 false
             }
             else -> {
-                log.trace("Overstyring er gyldig i ${overstyring.diffFromNow()} til for $ansattId og $brukerId")
+                log.trace("Overstyring er gyldig i {} til for {} og {}", overstyring.diffFromNow(), ansattId, brukerId)
                 true
             }
         }
@@ -74,7 +74,6 @@ class OverstyringTjeneste(
 
     fun sjekk(ansattId: AnsattId, e: Throwable) =
         when (e) {
-            is BulkRegelException -> sjekkOverstyringer(ansattId, e)
             is RegelException -> sjekkOverstyring(ansattId, e)
             else -> throw e
         }
@@ -82,13 +81,4 @@ class OverstyringTjeneste(
     private fun sjekkOverstyring(ansattId: AnsattId, e: RegelException) =
         if (!e.regel.erOverstyrbar || !erOverstyrt(ansattId, e.bruker.brukerId)) throw e
         else Unit
-
-    private fun sjekkOverstyringer(ansattId: AnsattId, e: BulkRegelException) {
-        val remainingExceptions = e.exceptions.filterNot {
-            runCatching { sjekkOverstyring(ansattId, it) }.isSuccess
-        }
-        if (remainingExceptions.isNotEmpty()) {
-            throw BulkRegelException(ansattId, remainingExceptions)
-        }
-    }
 }

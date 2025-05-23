@@ -42,6 +42,7 @@ class RegelTjeneste(
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>)  {
     val elapsedTime = measureTime {
        runCatching {
+           log.info("Eksekverer bulk regler for $ansattId og ${idOgType.map { it.brukerId }.map { it.maskFnr()}}")
             motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerIdOgType())
         }.getOrElse {
             overstyring.sjekk(ansattId, it)

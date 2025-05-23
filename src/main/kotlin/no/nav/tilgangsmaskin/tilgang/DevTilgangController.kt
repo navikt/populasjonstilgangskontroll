@@ -22,9 +22,8 @@ import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailBulkApiResponse
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
-import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.ACCEPTED
-import org.springframework.http.HttpStatus.NO_CONTENT
+import org.springframework.http.HttpStatus.*
 import org.springframework.web.bind.annotation.*
 
 @UnprotectedRestController(value = ["/${DEV}"])
@@ -79,7 +78,7 @@ class DevTilgangController(
         overstyring.overstyr(ansattId, data)
 
     @PostMapping("bulk/{ansattId}")
-    @ResponseStatus(NO_CONTENT)
+    @ResponseStatus(MULTI_STATUS)
     @ProblemDetailBulkApiResponse
     fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<IdOgType>) =
         regler.bulkRegler(ansattId, specs)

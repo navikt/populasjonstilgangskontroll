@@ -42,7 +42,7 @@ class RegelTjeneste(
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
         motor.kjerneregler(ansatte.ansatt(ansattId), brukere.utvidetFamilie(brukerId))
 
-    fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>): List<BulkRegelResult> {
+    fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>): List<Pair<BrukerId, Int>> {
         lateinit var resultater: List<Pair<BrukerId,Int>>
         val elapsedTime = measureTime {
             log.info("Eksekverer bulk regler for $ansattId og ${idOgType.map { it.brukerId }.map { it.maskFnr() }}")

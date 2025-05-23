@@ -55,10 +55,11 @@ class RegelTjeneste(
                     is RegelFailure ->
                         if (overstyring.erOverstyrt(ansattId, spec.brukerId)) {
                             log.info("Regel for ${spec.brukerId} er overstyrt")
-                            Pair(spec.brukerId,spec.exception.body)
+                            Pair(spec.brukerId,204)
                         } else {
                             log.warn("Regel for ${spec.brukerId} er avvist med ${spec.exception.message}")
-                            Pair(spec.brukerId, spec.statusCode.value())
+                            Pair(spec.brukerId,spec.exception.body)
+                          //  Pair(spec.brukerId, spec.statusCode.value())
                         }
                     is InternalError ->{
                         log.error("Regel for ${spec.brukerId} feilet med ${spec.exception.message}")

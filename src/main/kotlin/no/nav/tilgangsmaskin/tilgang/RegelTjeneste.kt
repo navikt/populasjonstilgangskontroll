@@ -26,9 +26,9 @@ class RegelTjeneste(
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
-            val familie = brukere.nærmesteFamilie(brukerId)
+            val bruker = brukere.nærmesteFamilie(brukerId)
             runCatching {
-                motor.kompletteRegler(ansatte.ansatt(ansattId), familie)
+                motor.kompletteRegler(ansatte.ansatt(ansattId), bruker)
             }.getOrElse {
                 overstyring.sjekk(ansattId, it)
             }

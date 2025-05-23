@@ -56,9 +56,7 @@ class RegelTjeneste(
                 .associateBy { it.brukerId.verdi }[spec.brukerId]?.let { bruker ->
                 bruker to spec.type
             }
-        }.toSet().also {
-            log.info("ids og type: $it")
-        }
+        }.toSet()
 }
 
 

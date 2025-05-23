@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 
 
-class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val grupper: Set<EntraGruppe>) {
+data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val grupper: Set<EntraGruppe>) {
 
     private val brukerId = bruker?.brukerId
 
@@ -28,6 +28,7 @@ class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val grupper: Se
         }
         return grupper.any { it.displayName.endsWith("GEO_$kode") }
     }
+
 
     infix fun erMedlemAv(gruppe: GlobalGruppe) = grupper.any { it.id == gruppe.id }
 

@@ -1,10 +1,11 @@
 package no.nav.tilgangsmaskin.regler
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.micrometer.core.instrument.MeterRegistry
-import io.micrometer.observation.ObservationRegistry
 import io.mockk.every
-import io.mockk.verify
 import java.util.*
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.TestApp
@@ -75,7 +76,6 @@ class RegelMotorTest {
         every { token.system } returns "test"
         every { token.systemNavn } returns "test"
     }
-
     @Nested
     @TestInstance(PER_CLASS)
     inner class SkjermingTester {

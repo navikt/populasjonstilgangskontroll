@@ -11,15 +11,13 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDig
 sealed class GeografiskTilknytning(type: Type) {
     enum class Type { BYDEL, KOMMUNE, UDEFINERT, UTLAND, UKJENT_BOSTED }
 
-    @JvmInline
-    value class Kommune(val verdi: String) {
+    data class Kommune(val verdi: String) {
         init {
             requireDigits(verdi, 4)
         }
     }
 
-    @JvmInline
-    value class Bydel(val verdi: String) {
+    data class Bydel(val verdi: String) {
         init {
             requireDigits(verdi, 6)
         }

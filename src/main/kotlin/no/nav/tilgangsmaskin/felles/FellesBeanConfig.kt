@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles
 
+import com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.boot.conditionals.ConditionalOnNotProd
@@ -28,6 +29,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 
     @Bean
     fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer {
+        it.featuresToEnable(INCLUDE_SOURCE_IN_LOCATION)
         it.mixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
     }
 

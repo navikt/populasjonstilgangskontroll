@@ -12,7 +12,7 @@ plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
     kotlin("plugin.jpa") version "1.9.25"
-    id("org.springframework.boot") version "3.4.5"
+    id("org.springframework.boot") version "3.5.0"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.cyclonedx.bom") version "2.3.0"
     id("com.google.cloud.tools.jib") version "3.4.5"
@@ -66,7 +66,7 @@ dependencies {
     implementation("org.flywaydb:flyway-core")
     implementation("org.postgresql:postgresql")
     implementation("org.flywaydb:flyway-database-postgresql")
-    implementation("com.github.ben-manes.caffeine:caffeine")
+    //implementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:junit-jupiter")

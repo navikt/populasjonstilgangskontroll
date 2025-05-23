@@ -13,8 +13,6 @@ data class EntraGruppe(val id: UUID, val displayName: String = "N/A") {
 
 }
 
-fun Set<EntraGruppe>.harNasjonalTilgang() = any { it.id == NASJONAL.id }
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class EntraGrupper(@JsonProperty("@odata.nextLink") val next: URI? = null,
                         val value: Set<EntraGruppe> = emptySet())

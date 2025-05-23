@@ -43,7 +43,7 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, va
         with(ctx) {
             builder.withDetail(
                     "extra-info", mapOf(
-                    "Startup time" to startupDate.local(),
+                    "Startup" to startupDate.local(),
                     "Java version" to environment.getProperty("java.version"),
                     "Client ID" to environment.getProperty("azure.app.client.id"),
                     "Name" to environment.getProperty("spring.application.name"),

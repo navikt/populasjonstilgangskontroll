@@ -8,16 +8,18 @@ import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import java.net.URI
 
 @Component
 class EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: EntraConfig) :
     AbstractRestClientAdapter(restClient, cf) {
 
+
     fun oidFraEntra(ansattId: String) =
         get<EntraSaksbehandlerRespons>(cf.userURI(ansattId)).oids.single().id
 
-    fun grupper(ansattId: String): Set<EntraGruppe> =
-        generateSequence(get<EntraGrupper>(cf.grupperURI(ansattId))) { bolk ->
+    fun grupper(ansattId: String, trengerGlobaleGrupper: Boolean): Set<EntraGruppe> =
+        generateSequence(get<EntraGrupper>(cf.grupperURI(ansattId,trengerGlobaleGrupper))) { bolk ->
             bolk.next?.let {
                 get<EntraGrupper>(it)
             }
@@ -25,6 +27,7 @@ class EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: E
             .flatMap { it.value }
             .map { EntraGruppe(it.id, it.displayName) }
             .toSet()
+
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class EntraSaksbehandlerRespons(@JsonProperty("value") val oids: Set<EntraOids>) {

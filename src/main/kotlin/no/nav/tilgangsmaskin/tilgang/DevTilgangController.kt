@@ -12,6 +12,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
@@ -36,11 +37,9 @@ class DevTilgangController(
         private val ansatte: AnsattTjeneste,
         private val regler: RegelTjeneste,
         private val overstyring: OverstyringTjeneste,
+        private val pip: PdlRestClientAdapter,
         private val nom: Nom,
         private val pdl: PDLTjeneste) {
-
-    private val log = LoggerFactory.getLogger(javaClass)
-
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)
@@ -50,6 +49,9 @@ class DevTilgangController(
 
     @GetMapping("person/{id}")
     fun person(@PathVariable @Valid @ValidId id: String) = pdl.utvidetFamile(id)
+
+    @GetMapping("person/pip/{id}")
+    fun pip(@PathVariable @Valid @ValidId id: String) = pip.person(id)
 
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)
@@ -86,7 +88,7 @@ class DevTilgangController(
     fun skjerming(@RequestBody brukerId: BrukerId) = skjerming.skjerming(brukerId)
 
     @PostMapping("skjerminger")
-    fun skjerminger(@RequestBody ids: List<BrukerId>) = skjerming.skjerminger(ids)
+    fun skjerminger(@RequestBody ids: Set<BrukerId>) = skjerming.skjerminger(ids)
 
     @PostMapping("brukere")
     fun brukere(@RequestBody @Valid @ValidId vararg ids: String) = brukere.brukere(*ids)

@@ -3,6 +3,8 @@ package no.nav.tilgangsmaskin.tilgang
 import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.IdOgType
@@ -41,25 +43,25 @@ class RegelTjeneste(
         motor.kjerneregler(ansatte.ansatt(ansattId), brukere.utvidetFamilie(brukerId))
 
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>): List<BulkRegelResult> {
-        lateinit var resultater: List<BulkRegelResult>
+        lateinit var resultater: List<Pair<BrukerId,Int>>
         val elapsedTime = measureTime {
             log.info("Eksekverer bulk regler for $ansattId og ${idOgType.map { it.brukerId }.map { it.maskFnr() }}")
-            resultater = motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerIdOgType()).map {
-                when (it) {
-                    is Success -> it.also {
-                        log.info("Regel for ${it.brukerId} er OK")
+            resultater = motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerIdOgType()).map { spec ->
+                when (spec) {
+                    is Success -> Pair(spec.brukerId,204).also {
+                        log.info("Regel for ${it.first} er OK")
                     }
                     is RegelFailure ->
-                        if (overstyring.erOverstyrt(ansattId, it.brukerId)) {
-                            Success(it.brukerId).also {
-                                log.info("Regel for ${it.brukerId} er overstyrt")
+                        if (overstyring.erOverstyrt(ansattId, spec.brukerId)) {
+                            Pair(spec.brukerId,204).also {
+                                log.info("Regel for ${it.first} er overstyrt")
                             }
                         } else {
-                            log.warn("Regel for ${it.brukerId} er avvist med ${it.exception.message}")
-                            it
+                            log.warn("Regel for ${spec.brukerId} er avvist med ${spec.exception.message}")
+                            Pair(spec.brukerId, spec.statusCode.value())
                         }
-                    is InternalError -> it.also {
-                        log.error("Regel for ${it.brukerId} feilet med ${it.exception.message}")
+                    is InternalError -> Pair(spec.brukerId,500).also {
+                        log.error("Regel for ${it.first} feilet med ${spec.exception.message}")
                     }
                 }
             }

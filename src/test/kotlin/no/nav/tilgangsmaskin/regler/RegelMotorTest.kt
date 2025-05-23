@@ -41,8 +41,6 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import com.fasterxml.jackson.module.kotlin.readValue
-import kotlin.test.assertEquals
 
 
 @Import(RegelConfig::class)
@@ -55,8 +53,6 @@ import kotlin.test.assertEquals
 @TestInstance(PER_CLASS)
 class RegelMotorTest {
 
-    @Autowired
-    private lateinit var jacksonObjectMapper: ObjectMapper
     private val brukerId = BrukerId("08526835670")
     private val ansattId = AnsattId("Z999999")
 
@@ -80,25 +76,6 @@ class RegelMotorTest {
         every { token.system } returns "test"
         every { token.systemNavn } returns "test"
     }
-
-    @Test
-    fun jackson() {
-        val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(FORTROLIG, SKJERMING).build()
-        val mapper = jacksonObjectMapper().apply {
-            activateDefaultTyping(
-                polymorphicTypeValidator,
-                ObjectMapper.DefaultTyping.EVERYTHING,
-                JsonTypeInfo.As.PROPERTY
-            )
-        }
-        val json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(bruker)
-        println(json)
-
-       val  b = mapper.readValue<Bruker>(json)
-        println(b)
-        //assertEquals(bruker, b)
-    }
-
     @Nested
     @TestInstance(PER_CLASS)
     inner class SkjermingTester {

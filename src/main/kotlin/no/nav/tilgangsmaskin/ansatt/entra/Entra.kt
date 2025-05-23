@@ -2,12 +2,13 @@ package no.nav.tilgangsmaskin.ansatt.entra
 
 import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.AnsattOidResolver
 import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.CacheableRetryingOnRecoverableService
 
 @CacheableRetryingOnRecoverableService(cacheNames = [GRAPH])
 @Timed
-class Entra(private val adapter: EntraRestClientAdapter, private val resolver: EntraOidResolver) {
+class Entra(private val adapter: EntraRestClientAdapter, private val resolver: AnsattOidResolver) {
 
     fun geoOgGlobaleGrupper(ansattId: AnsattId) = adapter.grupper(resolve(ansattId), true)
 

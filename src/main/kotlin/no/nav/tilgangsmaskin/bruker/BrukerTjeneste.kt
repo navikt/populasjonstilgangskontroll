@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 class BrukerTjeneste(private val personer: PDLTjeneste, val skjerminger: SkjermingTjeneste) {
 
     fun brukere(vararg brukerIds: String) = personer.personer(brukerIds.toSet()).let { personer ->
-        val skjerminger = skjerminger.skjerminger(personer.map { it.brukerId })
+        val skjerminger = skjerminger.skjerminger(personer.map { it.brukerId }.toSet())
         personer.map {
             tilBruker(it, skjerminger[it.brukerId] ?: false)
         }

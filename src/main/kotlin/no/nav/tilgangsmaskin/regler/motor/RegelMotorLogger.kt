@@ -28,7 +28,7 @@ class RegelMotorLogger(private val teller: AvvisningTeller) {
         MDC.remove(BESLUTNING)
     }
 
-    fun warn(message: String, e: Throwable? = null) {
+    fun info(message: String, e: Throwable? = null) {
         log.warn(message,e)
     }
 

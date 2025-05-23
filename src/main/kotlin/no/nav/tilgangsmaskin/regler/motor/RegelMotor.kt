@@ -43,11 +43,15 @@ class RegelMotor(
 
     fun bulkRegler(ansatt: Ansatt, brukere: Set<Pair<Bruker, RegelType>>) =
           brukere.map { (bruker, type) ->
+              logger.info("Bulk evaluerer ${type.beskrivelse} for ${bruker.brukerId}")
             runCatching { evaluer(ansatt, bruker, type.regelSett()) }
                 .fold(
-                    onSuccess = { Success(bruker.brukerId) },
+                    onSuccess = {
+                        Success(bruker.brukerId).also { logger.info("Bulk Success $bruker.bruker=$it") } },
                     onFailure = { if (it is RegelException) {
-                        RegelFailure(bruker.brukerId, it, HttpStatus.valueOf(it.statusCode.value()))
+                        RegelFailure(bruker.brukerId, it, HttpStatus.valueOf(it.statusCode.value()).also {
+                            logger.info("Bulk Avvist  $it for ${bruker.brukerId}")
+                        })
                     } else {
                         InternalError(bruker.brukerId, INTERNAL_SERVER_ERROR, it)
                     } }

@@ -1,8 +1,9 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import io.micrometer.core.annotation.Counted
+import net.minidev.json.annotate.JsonIgnore
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.KJERNE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.OVERSTYRBAR
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -10,7 +11,9 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.OVERSTYRBAR_REGELTYPE
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
+import org.springframework.http.HttpStatus.*
 
 @Component
 class RegelMotor(
@@ -37,7 +40,19 @@ class RegelMotor(
     }
 
 
-    fun bulkRegler(ansatt: Ansatt, brukere: Set<Pair<Bruker, RegelType>>) {
+    fun bulkRegler(ansatt: Ansatt, brukere: Set<Pair<Bruker, RegelType>>) =
+          brukere.map { (bruker, type) ->
+            runCatching { evaluer(ansatt, bruker, type.regelSett()) }
+                .fold(
+                    onSuccess = { BulkRegelResult.Success(bruker.brukerId) },
+                    onFailure = { if (it is RegelException) {
+                        BulkRegelResult.RegelFailure(bruker.brukerId, it, HttpStatus.valueOf(it.statusCode.value()))
+                    } else {
+                        BulkRegelResult.InternalError(bruker.brukerId, INTERNAL_SERVER_ERROR, it)
+                    } }
+                )
+        }
+        /*
         val avvisninger = brukere.mapNotNull { (bruker, type) ->
             runCatching { evaluer(ansatt, bruker, type.regelSett()) }
                 .exceptionOrNull()
@@ -53,7 +68,13 @@ class RegelMotor(
         }
         if (avvisninger.isNotEmpty()) {
             throw BulkRegelException(ansatt.ansattId, avvisninger)
-        }
+        }*/
+   // }
+
+    sealed class BulkRegelResult(val statusCode: HttpStatus) {
+        data class Success(val brukerId: BrukerId) : BulkRegelResult(ACCEPTED)
+        data class RegelFailure(val brukerId: BrukerId, @JsonIgnore val exception: RegelException, val status: HttpStatus) : BulkRegelResult(status)
+        data class InternalError(val brukerId: BrukerId,val status: HttpStatus, @JsonIgnore val exception: Throwable) : BulkRegelResult(status)
     }
 
     private fun RegelType.regelSett() =

@@ -6,13 +6,11 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 
 
 
-@Schema(example = """
-[
+@Schema(requiredProperties = ["brukerId"],  description = "Sett av identifikatorer og regelsett", example = """
   {
     "brukerId": "string",
     "type": "KOMPLETT_REGELTYPE"
   }
-]
 """)
 data class IdOgType(val brukerId: String, val type: RegelType = KOMPLETT_REGELTYPE)
 

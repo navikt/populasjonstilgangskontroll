@@ -1,6 +1,14 @@
 package no.nav.tilgangsmaskin.regler.overstyring
 
+import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDate
 import no.nav.tilgangsmaskin.bruker.BrukerId
 
+@Schema(requiredProperties = ["brukerId","begrunnelse","gyldigTil"], example = """
+  {
+  "brukerId": "22420094160",
+  "begrunnelse": "En begrunnelse",
+  "gyldigtil": "2025-05-24"
+}
+""")
 data class OverstyringData(val brukerId: BrukerId, val begrunnelse: String, val gyldigtil: LocalDate)

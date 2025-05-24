@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.Tilgang
 
+import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import no.nav.boot.conditionals.ConditionalOnNotProd
@@ -77,8 +78,13 @@ class DevTilgangController(
     @PostMapping("overstyr/{ansattId}")
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse
-    fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody data: OverstyringData) =
-        overstyring.overstyr(ansattId, data)
+    @Operation(
+        summary = "Overstyr regler for en bruker",
+        description = """Setter overstyring for en bruker, slik at den kan saksbehandles selv om den opprinnelig ikke har tilgang.
+                BrukerId må være gyldig og finnes i PDL. Kjerneregelsettet vil bli kjørt før overstyring, og hvis de feiler vil overstyring ikke bli gjort.
+                Overstyring vil gjelde frem til utløpsdatoen."""
+    )
+    fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody data: OverstyringData) = overstyring.overstyr(ansattId, data)
 
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(MULTI_STATUS)

@@ -47,10 +47,9 @@ class TilgangController(
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse
     @Operation(summary = "Overstyr regler for en bruker",
-        description = """
-            Setter overstyring for en bruker, slik at den kan saksbehandles selv om den opprinnelig ikke har tilgang.
-            BrukerId må være gyldig og finnes i PDL. Kjerneregelsettet vil bli kjørt før overstyring, og hvis de feiler vil overstyring ikke bli gjort.
-            Overstyring vil gjelde frem til utløpsdatoen."""
+        description = """Setter overstyring for en bruker, slik at den kan saksbehandles selv om tilgang opprinnelig avslås.
+                         BrukerId må være gyldig og finnes i PDL. Kjerneregelsettet vil bli kjørt før overstyring, og hvis de feiler vil overstyring ikke bli gjort.
+                         Overstyring vil gjelde frem til utløpsdatoen.""".trimIndent()
     )
     fun overstyr(@RequestBody data: OverstyringData) = overstyring.overstyr(token.ansattId!!, data)
 

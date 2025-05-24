@@ -62,8 +62,8 @@ class TilgangController(
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er og regeltyper.")
 
     fun bulkOBO(@RequestBody @Valid @ValidId specs: Set<IdOgType>) =
-        if (token.erOBO) {
-            regler.bulkRegler(ansattId, specs)
+        if (token.erObo) {
+            regler.bulkRegler(token.ansattId!!, specs)
         }
         else throw ResponseStatusException(HttpStatus.FORBIDDEN, "Dette endepunkt er kun tilgjengelig for obo-flow.")
 

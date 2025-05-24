@@ -42,15 +42,19 @@ class RegelTjeneste(
 
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>): List<Pair<BrukerId, Any>> {
         lateinit var resultater: List<Pair<BrukerId,Any>>
+        val ikkeFunnet = idOgType.map { it.brukerId }.toMutableList()
         val elapsedTime = measureTime {
             log.info("Eksekverer bulk regler for $ansattId og ${idOgType.map { it.brukerId }.map { it.maskFnr() }}")
             resultater = motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerIdOgType()).map { spec ->
+
                 when (spec) {
                     is Success -> {
+                        ikkeFunnet -= spec.brukerId.verdi
                         log.info("Regel for ${spec.brukerId} er OK")
                         Pair(spec.brukerId,204)
                     }
-                    is RegelFailure ->
+                    is RegelFailure ->{
+                        ikkeFunnet -= spec.brukerId.verdi
                         if (overstyring.erOverstyrt(ansattId, spec.brukerId)) {
                             log.info("Regel for ${spec.brukerId} er overstyrt")
                             Pair(spec.brukerId,204)
@@ -58,8 +62,9 @@ class RegelTjeneste(
                             log.warn("Regel for ${spec.brukerId} er avvist med ${spec.exception.message}")
                             Pair(spec.brukerId,spec.exception.body)
                           //  Pair(spec.brukerId, spec.statusCode.value())
-                        }
+                        } }
                     is InternalError ->{
+                        ikkeFunnet -= spec.brukerId.verdi
                         log.error("Regel for ${spec.brukerId} feilet med ${spec.exception.message}")
                         Pair(spec.brukerId,500)
                     }
@@ -67,6 +72,7 @@ class RegelTjeneste(
             }
         }
         log.info("Tid brukt på bulk regler for $ansattId og ${idOgType.map { it.brukerId }.map { it.maskFnr() }}: ${elapsedTime.inWholeMilliseconds}ms")
+        log.info("Ikke funnet brukere: ${ikkeFunnet.map { it.maskFnr() }}")
         return resultater
     }
 
@@ -77,6 +83,11 @@ class RegelTjeneste(
                 bruker to spec.type
             }
         }.toSet()
+
+
+    operator fun Set<IdOgType>.minus(brukerId: String): Set<IdOgType> =
+        this.filterNot { it.brukerId == brukerId }.toSet()
+
 }
 
 

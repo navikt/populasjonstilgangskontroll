@@ -21,7 +21,9 @@ class PdlRestClientAdapter(
     fun personer(brukerIds: Set<String>) = post<String>(cf.personerURI, brukerIds).let { res ->
         mapper.readValue<Map<String, PdlRespons?>>(res)
             .mapNotNull { it.value?.let { res -> it.key to res } }
-            .toMap()
+            .toMap().also {
+                log.info("Personer hentet $it for identer: $brukerIds fra ${cf.personerURI}")
+            }
     }
 }
 

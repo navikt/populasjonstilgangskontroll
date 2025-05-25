@@ -72,7 +72,6 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
         jacksonObjectMapper()
             .registerModule(JavaTimeModule())
             .apply {
-                enable(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)
                 enable(ACCEPT_SINGLE_VALUE_AS_ARRAY)
                 configure(INCLUDE_SOURCE_IN_LOCATION, true)
                 activateDefaultTyping(polymorphicTypeValidator,

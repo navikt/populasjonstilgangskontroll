@@ -19,7 +19,7 @@ class BrukerTjeneste(private val personer: PDLTjeneste, val skjerminger: Skjermi
         val skjermingerMap = skjerminger.skjerminger(brukerIdSet).also {
             log.info("Hentet skjerminger $it for  brukere: $brukerIdSet")
         }
-        personer.map { tilBruker(it, skjermingerMap[it.brukerId] ?: false) }
+        personer.map { tilBruker(it, skjermingerMap[it.brukerId.verdi] ?: false) }
     }
 
     fun nærmesteFamilie(brukerId: String) =

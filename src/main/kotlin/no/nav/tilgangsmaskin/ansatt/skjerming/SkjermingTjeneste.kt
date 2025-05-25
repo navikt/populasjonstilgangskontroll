@@ -11,6 +11,6 @@ class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
 
     fun skjerming(brukerId: BrukerId) = adapter.skjerming(brukerId.verdi)
 
-    fun skjerminger(brukerId: Set<BrukerId>) = adapter.skjerminger(brukerId.map { it.verdi }.toSet())
+    fun skjerminger(brukerIds: Set<BrukerId>) = adapter.skjerminger(brukerIds.map { it.verdi }.toSet())
 
 }

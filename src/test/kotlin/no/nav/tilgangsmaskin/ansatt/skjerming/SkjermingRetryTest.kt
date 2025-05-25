@@ -41,7 +41,7 @@ internal class SkjermingRetryTest {
     @Autowired
     lateinit var tjeneste: SkjermingTjeneste
 
-    @Test
+     @Test
     @DisplayName("Returner true etter at antall forsøk er oppbrukt")
     fun feilerEtterTreMislykkedeForsøk() {
         every { adapter.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId.verdi) } throws RecoverableRestException(

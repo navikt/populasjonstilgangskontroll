@@ -45,7 +45,11 @@ class RegelTjeneste(
         val ikkeFunnet = idOgType.map { it.brukerId }.toMutableList()
         val elapsedTime = measureTime {
             log.info("Eksekverer bulk regler for $ansattId og ${idOgType.map { it.brukerId }.map { it.maskFnr() }}")
-            resultater = motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerIdOgType()).map { spec ->
+            val ansatt = ansatte.ansatt(ansattId)
+            log.info("Henter brukere for ${idOgType.map { it.brukerId }.map { it.maskFnr() }}")
+            val brukere = idOgType.brukerIdOgType()
+            log.info("Henntet brukere: $brukere")
+            resultater = motor.bulkRegler(ansatt, brukere).map { spec ->
 
                 when (spec) {
                     is Success -> {

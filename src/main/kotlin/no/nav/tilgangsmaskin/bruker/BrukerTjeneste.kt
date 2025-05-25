@@ -13,17 +13,13 @@ class BrukerTjeneste(private val personer: PDLTjeneste, val skjerminger: Skjermi
 
     private val log = getLogger(javaClass)
 
-    fun brukere(vararg brukerIds: String) = personer.personer(brukerIds.toSet()).let {
-            personer ->
-                val p = personer.map { it.brukerId }.toSet().also {
-                    log.info("Henter skjerminger for brukere: $it")
-                }
-        val skjerminger = skjerminger.skjerminger(p).also {
-            log.info("Hentet skjerminger $skjerminger for  brukere: $p")
+    fun brukere(vararg brukerIds: String) = personer.personer(brukerIds.toSet()).let { personer ->
+        log.info("Henter skjerminger for $personer")
+        val brukerIdSet = personer.map { it.brukerId }.toSet()
+        val skjermingerMap = skjerminger.skjerminger(brukerIdSet).also {
+            log.info("Hentet skjerminger $it for  brukere: $brukerIdSet")
         }
-        personer.map {
-            tilBruker(it, skjerminger[it.brukerId] ?: false)
-        }
+        personer.map { tilBruker(it, skjermingerMap[it.brukerId] ?: false) }
     }
 
     fun nærmesteFamilie(brukerId: String) =

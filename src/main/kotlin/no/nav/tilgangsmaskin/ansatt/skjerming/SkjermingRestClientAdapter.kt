@@ -15,10 +15,14 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
 
     fun skjerming(ident: String) = post<Boolean>(cf.skjermingUri, mapOf(IDENT to ident))
 
-    fun skjerminger(identer: Set<String>): Map<BrukerId, Boolean> =
-        post<Map<String, Boolean>>(cf.skjermingerUri, mapOf(IDENTER to identer))
+    fun skjerminger(identer: Set<String>): Map<BrukerId, Boolean> {
+       log.info("Henter skjerminger for identer: $identer fra ${cf.skjermingerUri}")
+        return post<Map<String, Boolean>>(cf.skjermingerUri, mapOf(IDENTER to identer))
             .map { (brukerId, skjerming) -> BrukerId(brukerId) to skjerming }
-            .toMap()
+            .toMap().also {
+            log.info("Skjerminger for identer: $identer er: $it")
+            }
+    }
 }
 
 

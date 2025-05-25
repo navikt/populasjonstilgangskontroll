@@ -49,6 +49,7 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
             .enableStatistics()
             .build()
 
+
     override fun keyGenerator() = KeyGenerator { target, method, params ->
         buildString {
             append(target::class)

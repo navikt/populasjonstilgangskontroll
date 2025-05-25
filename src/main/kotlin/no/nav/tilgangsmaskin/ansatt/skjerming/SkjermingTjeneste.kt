@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMIN
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.CacheableRetryingOnRecoverableService
 
-@CacheableRetryingOnRecoverableService(cacheNames = [SKJERMING])
+//@CacheableRetryingOnRecoverableService(cacheNames = [SKJERMING])
 @Timed
 class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
 

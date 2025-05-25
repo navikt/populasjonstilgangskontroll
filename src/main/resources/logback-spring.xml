@@ -32,9 +32,7 @@
         <logger name="org.springframework.data.redis" level="trace"/>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
         <logger name="com.fasterxml.jackson.databind" level="trace"/>
-        <logger name="com.fasterxml.jackson.core" level="trace"/>
-        <logger name="io.lettuce" level="trace"/>
-
+        <logger name="org.springframework.web" level="trace"/>
     </springProfile>
 
     <springProfile name="prod">

@@ -2,7 +2,10 @@ package no.nav.tilgangsmaskin.felles.rest.cache
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
 import com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.boot.conditionals.ConditionalOnDev
@@ -69,6 +72,8 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
         jacksonObjectMapper()
             .registerModule(JavaTimeModule())
             .apply {
+                enable(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)
+                enable(ACCEPT_SINGLE_VALUE_AS_ARRAY)
                 configure(INCLUDE_SOURCE_IN_LOCATION, true)
                 activateDefaultTyping(polymorphicTypeValidator,
                     EVERYTHING,

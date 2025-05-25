@@ -50,7 +50,7 @@ class RegelTjeneste(
             val brukere = idOgType.brukerIdOgType()
             log.info("Hentet brukere: $brukere")
             resultater = motor.bulkRegler(ansatt, brukere).map { spec ->
-
+                log.info("Ikke funnet $ikkeFunnet")
                 when (spec) {
                     is Success -> {
                         ikkeFunnet -= spec.brukerId.verdi

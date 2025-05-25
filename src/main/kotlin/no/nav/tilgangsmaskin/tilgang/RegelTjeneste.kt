@@ -48,7 +48,7 @@ class RegelTjeneste(
             val ansatt = ansatte.ansatt(ansattId)
             log.info("Henter brukere for ${idOgType.map { it.brukerId }.map { it.maskFnr() }}")
             val brukere = idOgType.brukerIdOgType()
-            log.info("Henntet brukere: $brukere")
+            log.info("Hentet brukere: $brukere")
             resultater = motor.bulkRegler(ansatt, brukere).map { spec ->
 
                 when (spec) {

@@ -17,6 +17,10 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
 
     fun skjerminger(identer: Set<String>): Map<BrukerId, Boolean> {
         log.info("Henter skjerminger for identer: $identer fra ${cf.skjermingerUri}")
+        if (identer.isEmpty()) {
+            log.info("Ingen identer å hente skjerminger for, returnerer tom map")
+            return emptyMap()
+        }
         return post<Map<String, Boolean>>(cf.skjermingerUri, mapOf(IDENTER to identer))
             .map { (brukerId, skjerming) -> BrukerId(brukerId) to skjerming }
             .toMap().also {

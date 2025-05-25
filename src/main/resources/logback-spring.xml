@@ -36,7 +36,7 @@
         </appender>
         <logger name="org.springframework.data.redis" level="trace"/>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
-       /springProfile>
+       </springProfile>
 
     <springProfile name="prod">
         <turboFilter class="ch.qos.logback.classic.turbo.MarkerFilter">

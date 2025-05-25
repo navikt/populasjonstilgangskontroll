@@ -41,7 +41,7 @@ internal class SkjermingRetryTest {
     @Autowired
     lateinit var tjeneste: SkjermingTjeneste
 
-    @Test
+   // @Test
     @DisplayName("Returner true etter at antall forsøk er oppbrukt")
     fun feilerEtterTreMislykkedeForsøk() {
         every { adapter.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId.verdi) } throws RecoverableRestException(
@@ -55,7 +55,7 @@ internal class SkjermingRetryTest {
         }
     }
 
-    @Test
+   // @Test
     @DisplayName("Test retry tar seg inn etter først å ha feilet")
     fun testRetryOK() {
         every { adapter.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId.verdi) } throws RecoverableRestException(

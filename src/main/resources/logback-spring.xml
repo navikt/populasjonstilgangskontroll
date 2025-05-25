@@ -29,7 +29,10 @@
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss} %X{Nav-CallId} [%thread] %-5level %logger{70} - %msg%n</Pattern>
             </layout>
         </appender>
+        <logger name="org.springframework.data.redis" level="trace"/>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
+        <logger name="io.lettuce" level="trace"/>
+
     </springProfile>
 
     <springProfile name="prod">

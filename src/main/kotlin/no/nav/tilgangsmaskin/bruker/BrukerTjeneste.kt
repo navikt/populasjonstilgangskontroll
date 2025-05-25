@@ -14,8 +14,8 @@ class BrukerTjeneste(private val personer: PDLTjeneste, val skjerminger: Skjermi
     private val log = getLogger(javaClass)
 
     fun brukere(vararg brukerIds: String) = personer.personer(brukerIds.toSet()).let { personer ->
-        log.info("Henter skjerminger for $personer")
         val brukerIdSet = personer.map { it.brukerId }.toSet()
+        log.info("Henter skjerminger for $brukerIdSet")
         val skjermingerMap = skjerminger.skjerminger(brukerIdSet).also {
             log.info("Hentet skjerminger $it for  brukere: $brukerIdSet")
         }

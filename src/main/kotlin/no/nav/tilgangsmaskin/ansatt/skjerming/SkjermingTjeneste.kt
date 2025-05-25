@@ -4,10 +4,8 @@ import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.CacheableRetryingOnRecoverableService
-import org.springframework.stereotype.Service
 
-//@CacheableRetryingOnRecoverableService(cacheNames = [SKJERMING])
-@Service
+@CacheableRetryingOnRecoverableService(cacheNames = [SKJERMING])
 @Timed
 class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
 

@@ -2,18 +2,6 @@ logging:
   level:
     mvc: trace
 spring:
-  data:
-    redis:
-      host: ${valkey.host.cache}
-      port: ${valkey.port.cache}
-      connect-timeout: 10s
-      timeout: 5s
-      username: ${valkey.username.cache}
-      password: ${valkey.password.cache}
-      ssl:
-        enabled: true
-  cache:
-    type: redis
   mvc:
     log-request-details: true
 management:

@@ -7,7 +7,7 @@ management:
       enabled: true
   health:
     redis:
-      enabled: false
+      enabled: true
     ssl:
       enabled: false
     ping:
@@ -74,7 +74,18 @@ spring:
             use:
               type:
                 headers: false
-
+  data:
+    redis:
+      host: ${valkey.host.cache}
+      port: ${valkey.port.cache}
+      connect-timeout: 10s
+      timeout: 5s
+      username: ${valkey.username.cache}
+      password: ${valkey.password.cache}
+      ssl:
+        enabled: true
+  cache:
+    type: redis
   mvc:
     problemdetails:
       enabled: true
@@ -94,11 +105,6 @@ spring:
     deserialization:
       fail-on-unknown-properties: true
     default-property-inclusion: non_absent
-  cache:
-    type: caffeine
-    cache-names: pdl, skjerming, graph
-    caffeine:
-      spec: expireAfterWrite=5m, maximumSize=1000
 
 no.nav.security.jwt:
   issuer:

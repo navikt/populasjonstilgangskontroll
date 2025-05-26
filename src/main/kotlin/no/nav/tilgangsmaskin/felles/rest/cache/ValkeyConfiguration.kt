@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.boot.conditionals.ConditionalOnDev
+import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator
@@ -27,6 +28,7 @@ import kotlin.use
 
 @Configuration
 @EnableCaching
+@ConditionalOnGCP
 class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
         @Bean

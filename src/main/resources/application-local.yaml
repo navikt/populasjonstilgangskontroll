@@ -13,8 +13,9 @@ no.nav.security.jwt:
           client-id:  client id
           client-jwk: ${azure.app.client.jwk}
           client-auth-method: private_key_jwt
-
-
+spring:
+  cache:
+    type: caffeine
 
 microsoft:
     graph:

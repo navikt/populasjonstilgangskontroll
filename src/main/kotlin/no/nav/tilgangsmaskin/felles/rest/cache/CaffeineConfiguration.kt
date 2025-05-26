@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.felles.rest.cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.RemovalCause
 import no.nav.boot.conditionals.ConditionalOnGCP
+import no.nav.boot.conditionals.ConditionalOnLocalOrTest
 import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.slf4j.LoggerFactory
@@ -13,10 +14,10 @@ import org.springframework.cache.interceptor.KeyGenerator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.util.concurrent.TimeUnit.HOURS
-/** Deaktivert caffeine cache
+
 @Configuration
 @EnableCaching
-
+@ConditionalOnLocalOrTest
 class CaffeineConfiguration(private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -45,4 +46,3 @@ class CaffeineConfiguration(private vararg val cfgs: CachableRestConfig) : Cachi
         }
     }
 }
-        **/

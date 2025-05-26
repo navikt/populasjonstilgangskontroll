@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.*
 
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
-@Tag(name = "DevTilgangController", description = "Denne kontrolleren skal kun brukes til testing")
+@Tag(name = "DevTilgangController", description = "Denne kontrolleren skal kun brukes til testing i dev-gcp")
 class DevTilgangController(
         private val graphql: PdlSyncGraphQLClientAdapter,
         private val skjerming: SkjermingTjeneste,
@@ -45,40 +45,49 @@ class DevTilgangController(
     private  val log = getLogger(javaClass)
 
     @GetMapping("sivilstand/{id}")
+    @Operation(description = "Henter sivilstand fra pdl-api")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)
 
     @GetMapping("bruker/{id}")
+    @Operation(description = "Henter bruker inkludert utvidet familie fra pdl-api og pdl-pip")
     fun bruker(@PathVariable @Valid @ValidId id: String) = brukere.utvidetFamilie(id)
 
     @GetMapping("person/{id}")
+    @Operation(description = "Henter person fra pdl-api")
     fun person(@PathVariable @Valid @ValidId id: String) = pdl.utvidetFamile(id)
 
     @GetMapping("person/pip/{id}")
+    @Operation(description = "Henter person fra pdl-pip")
     fun pip(@PathVariable @Valid @ValidId id: String) = pip.person(id)
 
-
     @PostMapping("personer/pip")
+    @Operation(description = "Henter personer fra pdl-pip")
     fun pippersoner(@RequestBody  ids: Set<String>) = pip.personer(ids)
 
     @PostMapping("personer")
+    @Operation(description = "Henter personer fra pdl-api")
     fun personer(@RequestBody  ids: Set<String>) = pdl.personer(ids)
 
     @GetMapping("ansatt/{ansattId}")
+    @Operation(description = "Henter ansatt")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)
 
     @PostMapping("ansatt/{ansattId}/{brukerId}")
+    @Operation(description = "Setter kobling mellom NavID og fnr ")
     fun nom(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
         nom.lagre(NomAnsattData(ansattId, brukerId))
 
     @GetMapping("komplett/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
+    @Operation(description = "Eksekverer et komplett regelsett for en bruker")
     fun kompletteRegler(@PathVariable ansattId: AnsattId, @PathVariable @Valid @ValidId brukerId: String) =
         regler.kompletteRegler(ansattId, brukerId.trim('"'))
 
     @GetMapping("kjerne/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
+    @Operation(description = "Eksekverer kjerneregelsett for en bruker")
     fun kjerneregler(@PathVariable ansattId: AnsattId, @PathVariable @Valid @ValidId brukerId: String) =
         regler.kjerneregler(ansattId, brukerId.trim('"'))
 

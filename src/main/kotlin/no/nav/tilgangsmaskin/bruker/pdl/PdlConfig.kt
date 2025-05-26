@@ -29,7 +29,6 @@ class PdlConfig(
         private const val DEFAULT_PING_PATH = "/internal/health/liveness"
         private val DEFAULT_PERSON_PATH = "/api/v1/person"
         private val DEFAULT_PERSON__BOLK_PATH = "/api/v1/personBolk"
-
     }
 }
 

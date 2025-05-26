@@ -82,7 +82,7 @@ class RegelTjeneste(
 
     private fun Set<IdOgType>.brukerIdOgType() =
         mapNotNull { spec ->
-            brukere.brukere(*map { it.brukerId }.toTypedArray())
+            brukere.brukere(map { it.brukerId }.toSet())
                 .associateBy { it.brukerId.verdi }[spec.brukerId]?.let { bruker ->
                 bruker to spec.type
             }

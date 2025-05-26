@@ -56,6 +56,13 @@ class DevTilgangController(
     @GetMapping("person/pip/{id}")
     fun pip(@PathVariable @Valid @ValidId id: String) = pip.person(id)
 
+
+    @PostMapping("personer/pip")
+    fun pippersoner(@RequestBody  ids: Set<String>) = pip.personer(ids)
+
+    @PostMapping("personer")
+    fun personer(@RequestBody  ids: Set<String>) = pdl.personer(ids)
+
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)
 
@@ -101,5 +108,5 @@ class DevTilgangController(
     fun skjerminger(@RequestBody ids: Set<BrukerId>) = skjerming.skjerminger(ids)
 
     @PostMapping("brukere")
-    fun brukere(@RequestBody @Valid @ValidId vararg ids: String) = brukere.brukere(*ids)
+    fun brukere(@RequestBody @Valid @ValidId ids: Set<String>) = brukere.brukere(ids)
 }

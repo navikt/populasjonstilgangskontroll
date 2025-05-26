@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service
 class BrukerTjeneste(private val personer: PDLTjeneste, val skjerminger: SkjermingTjeneste) {
 
     private val log = getLogger(javaClass)
+    fun brukere( brukerIds: Set<String>) = brukere(*brukerIds.toTypedArray())
 
     fun brukere(vararg brukerIds: String) = personer.personer(brukerIds.toSet()).let { personer ->
         val brukerIdSet = personer.map { it.brukerId }.toSet()

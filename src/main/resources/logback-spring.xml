@@ -15,9 +15,9 @@
     </appender>
 
     <springProfile name="dev">
-        <logger name="com.fasterxml.jackson.databind" level="trace"/>
-        <logger name="org.springframework.web" level="trace"/>
-        <logger name="org.springframework.data.redis" level="trace"/>
+        <logger name="com.fasterxml.jackson.databind" level="info"/>
+        <logger name="org.springframework.web" level="info"/>
+        <logger name="org.springframework.data.redis" level="info"/>
         <logger name="com.fasterxml.jackson.core" level="warn"/>
         <logger name="com.fasterxml.jackson.databind" level="warn"/>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>

@@ -5,12 +5,8 @@ import com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.lettuce.core.resource.ClientResources
-import io.lettuce.core.tracing.MicrometerTracing
-import io.micrometer.observation.ObservationRegistry
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.cache.annotation.CachingConfigurer
@@ -22,31 +18,11 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCache
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.nonLockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration
-import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.core.RedisConnectionUtils.getConnection
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
 import java.time.Duration
-
-@Configuration
-class ObservabilityConfiguration  {
-@Bean
-fun clientResources(observationRegistry: ObservationRegistry) =
-    ClientResources.builder()
-        .tracing(MicrometerTracing(observationRegistry, "cache.redis"))
-        .build()
-
-    @Bean
-    fun  lettuceConnectionFactory(@Value("\${valkey.host.cache}") host: String, @Value("\${valkey.host.cache}") port: String, clientResources: ClientResources) : LettuceConnectionFactory {
-        val clientConfig = LettuceClientConfiguration.builder()
-            .clientResources(clientResources).build();
-        val redisConfiguration = RedisStandaloneConfiguration(host, port.toInt())
-        return  LettuceConnectionFactory(redisConfiguration, clientConfig);
-    }
-}
 
 @Configuration
 @EnableCaching

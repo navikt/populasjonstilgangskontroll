@@ -13,10 +13,10 @@ import org.springframework.cache.interceptor.KeyGenerator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.util.concurrent.TimeUnit.HOURS
-
+/** Deaktivert caffeine cache
 @Configuration
 @EnableCaching
-@ConditionalOnProd
+
 class CaffeineConfiguration(private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -45,3 +45,4 @@ class CaffeineConfiguration(private vararg val cfgs: CachableRestConfig) : Cachi
         }
     }
 }
+        **/

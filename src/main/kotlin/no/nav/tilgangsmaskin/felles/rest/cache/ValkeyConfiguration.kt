@@ -27,7 +27,6 @@ import kotlin.use
 
 @Configuration
 @EnableCaching
-@ConditionalOnDev
 class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
         @Bean

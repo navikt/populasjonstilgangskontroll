@@ -31,17 +31,28 @@ import org.springframework.data.redis.serializer.RedisSerializationContext.Seria
 import org.springframework.data.redis.serializer.StringRedisSerializer
 import java.time.Duration
 
+@Configuration
+class ObservabilityConfiguration  {
+@Bean
+fun clientResources(observationRegistry: ObservationRegistry) =
+    ClientResources.builder()
+        .tracing(MicrometerTracing(observationRegistry, "cache.redis"))
+        .build()
+
+    @Bean
+    fun  lettuceConnectionFactory(@Value("\${valkey.host.cache}") host: String, @Value("\${valkey.host.cache}") port: Int, clientResources: ClientResources) : LettuceConnectionFactory {
+        val clientConfig = LettuceClientConfiguration.builder()
+            .clientResources(clientResources).build();
+        val redisConfiguration = RedisStandaloneConfiguration(host, port)
+        return  LettuceConnectionFactory(redisConfiguration, clientConfig);
+    }
+}
 
 @Configuration
 @EnableCaching
 @ConditionalOnGCP
 class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
-    @Bean
-    fun clientResources(observationRegistry: ObservationRegistry) =
-        ClientResources.builder()
-            .tracing(MicrometerTracing(observationRegistry, "cache.redis"))
-            .build()
 
     @Bean
         fun redisHealthIndicator() = HealthIndicator {
@@ -55,14 +66,6 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
                 }.getOrElse { Health.down(it).withDetail("Redis", "Ingen forbindelse").build() }
             }
         }
-
-    @Bean
-    fun  lettuceConnectionFactory(@Value("\${valkey.host.cache}") host: String, @Value("\${valkey.host.cache}") port: Int, clientResources: ClientResources) : LettuceConnectionFactory {
-        val clientConfig = LettuceClientConfiguration.builder()
-            .clientResources(clientResources).build();
-        val redisConfiguration = RedisStandaloneConfiguration(host, port)
-        return  LettuceConnectionFactory(redisConfiguration, clientConfig);
-    }
 
     @Bean
     override fun cacheManager(): RedisCacheManager =

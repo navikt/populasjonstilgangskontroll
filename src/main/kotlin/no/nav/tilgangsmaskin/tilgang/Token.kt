@@ -22,8 +22,8 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
     private fun claimSet() = runCatching { contextHolder.getTokenValidationContext().getClaims(AAD_ISSUER) }.getOrNull()
     val systemNavn get() = system.split(":").lastOrNull() ?: "N/A"
     val systemAndNs get() = runCatching { system.split(":").drop(1).joinToString(separator = ":") }.getOrElse { systemNavn }
-    val erObo get() = claimSet()?.getStringClaim(IDTYP)?.let { it != APP } ?: false
-    val erCC get() = !erObo
+    val erCC get() =  claimSet()?.getStringClaim(IDTYP)?.let { it == APP } ?: false
+    val erObo get() =  !erCC
     companion object {
         const val AAD_ISSUER: String = "azuread"
         private const val APP = "app"

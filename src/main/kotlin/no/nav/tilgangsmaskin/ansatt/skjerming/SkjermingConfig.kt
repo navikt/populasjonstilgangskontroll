@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(SKJERMING)
 class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH,
                       override val initialCacheSize : Int = 100,
-                      override val maxCacheSize : Int  = 50000,
+                      override val maxCacheSize : Int  = 150000,
                       override val expireHours : Long = 12,
                       enabled: Boolean = true) : CachableRestConfig,
     AbstractRestConfig(baseUri, pingPath, SKJERMING, enabled) {

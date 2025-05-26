@@ -40,10 +40,10 @@ fun clientResources(observationRegistry: ObservationRegistry) =
         .build()
 
     @Bean
-    fun  lettuceConnectionFactory(@Value("\${valkey.host.cache}") host: String, @Value("\${valkey.host.cache}") port: Int, clientResources: ClientResources) : LettuceConnectionFactory {
+    fun  lettuceConnectionFactory(@Value("\${valkey.host.cache}") host: String, @Value("\${valkey.host.cache}") port: String, clientResources: ClientResources) : LettuceConnectionFactory {
         val clientConfig = LettuceClientConfiguration.builder()
             .clientResources(clientResources).build();
-        val redisConfiguration = RedisStandaloneConfiguration(host, port)
+        val redisConfiguration = RedisStandaloneConfiguration(host, port.toInt())
         return  LettuceConnectionFactory(redisConfiguration, clientConfig);
     }
 }

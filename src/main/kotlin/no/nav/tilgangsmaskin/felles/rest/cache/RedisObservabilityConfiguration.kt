@@ -10,15 +10,15 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 
-@Configuration
+//@Configuration
 class RedisObservabilityConfiguration  {
-@Bean
+//@Bean
 fun clientResources(observationRegistry: ObservationRegistry) =
     ClientResources.builder()
         .tracing(MicrometerTracing(observationRegistry, "cache.redis"))
         .build()
 
-    @Bean
+   // @Bean
     fun  lettuceConnectionFactory(@Value("\${valkey.host.cache}") host: String, @Value("\${valkey.port.cache}") port: String, clientResources: ClientResources) : LettuceConnectionFactory {
         val clientConfig = LettuceClientConfiguration.builder()
             .clientResources(clientResources).build();

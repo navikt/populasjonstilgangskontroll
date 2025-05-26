@@ -2,7 +2,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 val javaVersion = JavaLanguageVersion.of(21)
 val springdocVersion = "2.8.8"
-val tokenSupportVersion = "5.0.28"
+val tokenSupportVersion = "5.0.25"
 val mockkVersion = "1.14.2"
 
 group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"

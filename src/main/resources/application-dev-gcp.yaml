@@ -5,9 +5,6 @@ spring:
   mvc:
     log-request-details: true
 management:
-  health:
-    redis:
-      enabled: true
   endpoint:
     env:
       show-values: always

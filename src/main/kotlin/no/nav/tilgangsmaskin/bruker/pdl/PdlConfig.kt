@@ -10,8 +10,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(PDL)
 class PdlConfig(
     baseUri: URI,
-    override val initialCacheSize : Int  = 1000,
-    override val maxCacheSize : Int  = 350000,
     override val expireHours : Long = 12,
     pingPath: String = DEFAULT_PING_PATH,
     personPath: String = DEFAULT_PERSON_PATH,

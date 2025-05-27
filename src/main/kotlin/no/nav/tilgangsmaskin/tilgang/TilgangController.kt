@@ -9,6 +9,7 @@ import jakarta.validation.Valid
 import no.nav.security.token.support.core.api.Unprotected
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.ValidId
@@ -32,12 +33,12 @@ import org.springframework.web.server.ResponseStatusException
 class TilgangController(
         private val regler: RegelTjeneste,
         private val overstyring: OverstyringTjeneste,
-        private val skjerming: SkjermingTjeneste,
+        private val skjerming: SkjermingRestClientAdapter,
         private val token: Token) {
 
     @PostMapping("skjerming")
     @Unprotected  // TODO midlertidig
-    fun skjerming(@RequestBody brukerId: BrukerId) = skjerming.skjerming(brukerId)
+    fun skjerming(@RequestBody brukerId: String) = skjerming.skjerming(brukerId)
 
 
     @PostMapping("komplett")

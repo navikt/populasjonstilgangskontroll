@@ -22,6 +22,7 @@ import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.lockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.RedisConnectionUtils.getConnection
+import org.springframework.data.redis.core.ScanOptions
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
@@ -95,6 +96,18 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
 @Component
 class CacheSizeMetrics(private val redisTemplate: StringRedisTemplate) : MeterBinder {
     override fun bindTo(registry: MeterRegistry) {
-        registry.gauge("cache.size.skjerming",redisTemplate.keys("*").size.toDouble())
+        registry.gauge("cache.size.skjerming", redisTemplate) { template ->
+            val scanOptions = ScanOptions.scanOptions().match("*").count(1000).build()
+            var count = 0L
+            template.connectionFactory?.connection?.let { connection ->
+                connection.keyCommands().scan(scanOptions).use { cursor ->
+                    while (cursor.hasNext()) {
+                        cursor.next()
+                        count++
+                    }
+                }
+            }
+            count.toDouble()
+        }
     }
 }

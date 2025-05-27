@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
 import no.nav.boot.conditionals.ConditionalOnGCP
@@ -22,27 +23,25 @@ import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.lockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.RedisConnectionUtils.getConnection
-import org.springframework.data.redis.core.ScanOptions
+import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
 import java.time.Duration
 import kotlin.reflect.jvm.jvmName
-import kotlin.text.toDouble
 
 @Configuration
 @EnableCaching
 @ConditionalOnGCP
 class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
-
     @Bean
     fun valkeyCacheSizeMeterBinder(redisTemplate: StringRedisTemplate): MeterBinder =
         MeterBinder { registry ->
             cfgs.forEach { cfg ->
+                val scanOptions = scanOptions().match("*${cfg.navn}*").count(1000).build()
                 registry.gauge("cache.size", Tags.of("navn", cfg.navn), redisTemplate) { template ->
-                    val scanOptions = ScanOptions.scanOptions().match("*${cfg.navn}*").count(1000).build()
                     template.connectionFactory?.connection
                         ?.keyCommands()
                         ?.scan(scanOptions)
@@ -53,17 +52,19 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
             }
         }
     @Bean
-        fun redisHealthIndicator() = HealthIndicator {
+        fun valkeyHealthIndicator(registry: MeterRegistry) = HealthIndicator {
             getConnection(cf).use { connection ->
                 runCatching {
                     if (connection.ping().equals("PONG", ignoreCase = true)) {
-                        Health.up().withDetail("ValKey", "Frisk og rask").build()
+                        Health.up().withDetails(caches(registry)).build()
                     } else {
                         Health.down().withDetail("ValKey", "Ikke helt i slag i dag").build()
                     }
                 }.getOrElse { Health.down(it).withDetail("ValKey", "Ingen forbindelse").build() }
             }
         }
+
+    private fun caches(registry: MeterRegistry) = cfgs.map { it.navn to (registry.find("cache.size").tag("navn", it.navn).gauge()?.value() ?: 0.0).toLong() }.toMap()
 
     @Bean
     override fun cacheManager(): RedisCacheManager =

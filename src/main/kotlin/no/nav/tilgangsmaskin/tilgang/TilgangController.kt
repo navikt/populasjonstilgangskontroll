@@ -6,8 +6,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import no.nav.security.token.support.core.api.Unprotected
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.regler.motor.IdOgType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
@@ -29,7 +32,12 @@ import org.springframework.web.server.ResponseStatusException
 class TilgangController(
         private val regler: RegelTjeneste,
         private val overstyring: OverstyringTjeneste,
+        private val skjerming: SkjermingTjeneste,
         private val token: Token) {
+
+    @PostMapping("skjerming")
+    @Unprotected  // TODO midlertidig
+    fun skjerming(@RequestBody brukerId: BrukerId) = skjerming.skjerming(brukerId)
 
 
     @PostMapping("komplett")

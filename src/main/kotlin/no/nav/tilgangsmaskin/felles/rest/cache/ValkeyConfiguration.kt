@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.boot.conditionals.ConditionalOnGCP
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator
@@ -54,8 +55,14 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
     override fun keyGenerator() = KeyGenerator { target, method, params ->
         buildString {
             append(target::class.jvmName)
+            append(":")
             append(method.name)
-            params.forEach { append(it) }
+            append(":")
+            params.forEach {
+                if (it is BrukerId)
+                append(it.verdi)
+                else append(it)
+            }
         }
     }
 

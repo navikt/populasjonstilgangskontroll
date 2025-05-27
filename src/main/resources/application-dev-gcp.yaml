@@ -1,7 +1,7 @@
 logging:
   level:
     org.springframework.data.redis: TRACE
-    io.lettuce.core: TRACE
+    io.lettuce.core: INFO
     org.springframework.cache: TRACE
 spring:
   mvc:

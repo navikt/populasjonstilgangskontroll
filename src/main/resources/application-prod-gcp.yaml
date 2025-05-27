@@ -1,7 +1,7 @@
 logging:
     level:
-      org.springframework.data.redis: TRACE
-      org.springframework.cache: TRACE
+      org.springframework.data.redis: INFO
+      org.springframework.cache: INFO
 management:
   endpoint:
     env:

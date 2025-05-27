@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.micrometer.core.instrument.Tag
+import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -41,7 +41,7 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
     fun valkeyCacheSizeMeterBinder(redisTemplate: StringRedisTemplate): MeterBinder =
         MeterBinder { registry ->
             cfgs.forEach { cfg ->
-                registry.gauge("cache.size", listOf(Tag.of("navn", cfg.navn)), redisTemplate) { template ->
+                registry.gauge("cache.size", Tags.of("navn", cfg.navn), redisTemplate) { template ->
                     val scanOptions = ScanOptions.scanOptions().match("*${cfg.navn}*").count(1000).build()
                     template.connectionFactory?.connection
                         ?.keyCommands()

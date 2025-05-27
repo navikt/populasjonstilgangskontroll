@@ -23,6 +23,7 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
 import java.time.Duration
+import kotlin.reflect.jvm.jvmName
 
 @Configuration
 @EnableCaching
@@ -52,7 +53,7 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
 
     override fun keyGenerator() = KeyGenerator { target, method, params ->
         buildString {
-            append(target::class)
+            append(target::class.jvmName)
             append(method.name)
             params.forEach { append(it) }
         }

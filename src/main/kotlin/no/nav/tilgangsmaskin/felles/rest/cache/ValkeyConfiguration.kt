@@ -37,11 +37,11 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
             getConnection(cf).use { connection ->
                 runCatching {
                     if (connection.ping().equals("PONG", ignoreCase = true)) {
-                        Health.up().withDetail("Redis", "Frisk og rask").build()
+                        Health.up().withDetail("ValKey", "Frisk og rask").build()
                     } else {
-                        Health.down().withDetail("Redis", "Ikke helt i slag i dag").build()
+                        Health.down().withDetail("ValKey", "Ikke helt i slag i dag").build()
                     }
-                }.getOrElse { Health.down(it).withDetail("Redis", "Ingen forbindelse").build() }
+                }.getOrElse { Health.down(it).withDetail("ValKey", "Ingen forbindelse").build() }
             }
         }
 

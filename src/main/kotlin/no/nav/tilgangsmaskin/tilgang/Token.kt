@@ -16,9 +16,9 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
                 ?: emptyList()
 
 
-    val system get() = runCatching { claimSet()?.getStringClaim("azp_name") }.getOrElse { "N/A" } ?: "N/A"
+    val system get() = runCatching { claimSet()?.getStringClaim(AZP_NAME) }.getOrElse { "N/A" } ?: "N/A"
     val oid get() = claimSet()?.let { UUID.fromString(it.getStringClaim("oid")) }
-    val ansattId get() = claimSet()?.getStringClaim("NAVident")?.let { AnsattId(it) }
+    val ansattId get() = claimSet()?.getStringClaim(NAVIDENT)?.let { AnsattId(it) }
     private fun claimSet() = runCatching { contextHolder.getTokenValidationContext().getClaims(AAD_ISSUER) }.getOrNull()
     val systemNavn get() = system.split(":").lastOrNull() ?: "N/A"
     val systemAndNs get() = runCatching { system.split(":").drop(1).joinToString(separator = ":") }.getOrElse { systemNavn }
@@ -28,5 +28,9 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
         const val AAD_ISSUER: String = "azuread"
         private const val APP = "app"
         private const val IDTYP = "idtyp"
+        private const val AZP_NAME = "azp_name"
+        private const val NAVIDENT = "NAVident"
+
+
     }
 }

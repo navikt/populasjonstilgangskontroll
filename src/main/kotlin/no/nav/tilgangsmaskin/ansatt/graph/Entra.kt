@@ -1,9 +1,9 @@
-package no.nav.tilgangsmaskin.ansatt.entra
+package no.nav.tilgangsmaskin.ansatt.graph
 
 import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidResolver
-import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
+import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.CacheableRetryingOnRecoverableService
 
 @CacheableRetryingOnRecoverableService(cacheNames = [GRAPH])

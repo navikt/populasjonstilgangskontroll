@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import no.nav.tilgangsmaskin.TestApp
-import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig
+import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig
 import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName

@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt
 
-import no.nav.tilgangsmaskin.ansatt.entra.EntraRestClientAdapter
+import no.nav.tilgangsmaskin.ansatt.graph.EntraRestClientAdapter
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.stereotype.Component
 

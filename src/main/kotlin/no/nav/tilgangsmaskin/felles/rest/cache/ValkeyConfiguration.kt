@@ -27,11 +27,8 @@ import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
-import org.springframework.stereotype.Component
 import java.time.Duration
-import java.util.function.Supplier
 import kotlin.reflect.jvm.jvmName
-import kotlin.text.toDouble
 
 @Configuration
 @EnableCaching
@@ -39,6 +36,23 @@ import kotlin.text.toDouble
 class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
 
+    @Bean
+    fun valkeyCacheSizeMeterBinder(redisTemplate: StringRedisTemplate): MeterBinder =
+        MeterBinder { registry ->
+            cfgs.forEach { cfg ->
+                registry.gauge("cache.${cfg.navn}.size", redisTemplate) { template ->
+                    val scanOptions = ScanOptions.scanOptions().match("*${cfg.navn}*").count(1000).build()
+                    var count = 0L
+                    template.connectionFactory?.connection?.keyCommands()?.scan(scanOptions)?.use { cursor ->
+                        while (cursor.hasNext()) {
+                            cursor.next()
+                            count++
+                        }
+                    }
+                    count.toDouble()
+                }
+            }
+        }
     @Bean
         fun redisHealthIndicator() = HealthIndicator {
             getConnection(cf).use { connection ->
@@ -91,23 +105,4 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
                     PROPERTY
                 )
             }
-}
-
-@Component
-class CacheSizeMetrics(private val redisTemplate: StringRedisTemplate) : MeterBinder {
-    override fun bindTo(registry: MeterRegistry) {
-        registry.gauge("cache.size.skjerming", redisTemplate) { template ->
-            val scanOptions = ScanOptions.scanOptions().match("*").count(1000).build()
-            var count = 0L
-            template.connectionFactory?.connection?.let { connection ->
-                connection.keyCommands().scan(scanOptions).use { cursor ->
-                    while (cursor.hasNext()) {
-                        cursor.next()
-                        count++
-                    }
-                }
-            }
-            count.toDouble()
-        }
-    }
 }

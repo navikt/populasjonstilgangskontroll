@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import java.util.*
-import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata
 import no.nav.tilgangsmaskin.tilgang.Token
 

@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.ansatt
 
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.*
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.globaleGrupper
-import no.nav.tilgangsmaskin.ansatt.entra.Entra
+import no.nav.tilgangsmaskin.ansatt.graph.Entra
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component

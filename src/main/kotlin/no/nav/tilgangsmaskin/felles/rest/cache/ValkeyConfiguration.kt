@@ -59,9 +59,11 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
             append(method.name)
             append(":")
             params.forEach {
-                if (it is BrukerId)
-                append(it.verdi)
-                else append(it)
+            //    if (it is BrukerId)
+             //   append(it.verdi)
+                // else
+                    append(it)
+
             }
         }
     }

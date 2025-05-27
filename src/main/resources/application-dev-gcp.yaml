@@ -1,6 +1,8 @@
 logging:
   level:
-    mvc: trace
+    org.springframework.data.redis: TRACE
+    io.lettuce.core: TRACE
+    org.springframework.cache: TRACE
 spring:
   mvc:
     log-request-details: true

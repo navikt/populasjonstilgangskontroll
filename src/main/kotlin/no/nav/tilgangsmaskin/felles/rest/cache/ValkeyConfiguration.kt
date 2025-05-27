@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.binder.MeterBinder
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -29,6 +29,7 @@ import org.springframework.data.redis.serializer.RedisSerializationContext.Seria
 import org.springframework.data.redis.serializer.StringRedisSerializer
 import java.time.Duration
 import kotlin.reflect.jvm.jvmName
+import kotlin.text.toDouble
 
 @Configuration
 @EnableCaching
@@ -40,16 +41,14 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
     fun valkeyCacheSizeMeterBinder(redisTemplate: StringRedisTemplate): MeterBinder =
         MeterBinder { registry ->
             cfgs.forEach { cfg ->
-                registry.gauge("cache.${cfg.navn}.size", redisTemplate) { template ->
+                registry.gauge("cache.size", listOf(Tag.of("navn", cfg.navn)), redisTemplate) { template ->
                     val scanOptions = ScanOptions.scanOptions().match("*${cfg.navn}*").count(1000).build()
-                    var count = 0L
-                    template.connectionFactory?.connection?.keyCommands()?.scan(scanOptions)?.use { cursor ->
-                        while (cursor.hasNext()) {
-                            cursor.next()
-                            count++
-                        }
-                    }
-                    count.toDouble()
+                    template.connectionFactory?.connection
+                        ?.keyCommands()
+                        ?.scan(scanOptions)
+                        ?.asSequence()
+                        ?.count()
+                        ?.toDouble() ?: 0.0
                 }
             }
         }

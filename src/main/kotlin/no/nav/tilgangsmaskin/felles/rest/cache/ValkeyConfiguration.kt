@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.binder.MeterBinder
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
@@ -20,11 +22,15 @@ import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.lockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.RedisConnectionUtils.getConnection
+import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
+import org.springframework.stereotype.Component
 import java.time.Duration
+import java.util.function.Supplier
 import kotlin.reflect.jvm.jvmName
+import kotlin.text.toDouble
 
 @Configuration
 @EnableCaching
@@ -84,4 +90,11 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
                     PROPERTY
                 )
             }
+}
+
+@Component
+class CacheSizeMetrics(private val redisTemplate: StringRedisTemplate) : MeterBinder {
+    override fun bindTo(registry: MeterRegistry) {
+        registry.gauge("cache.size.skjerming",redisTemplate.keys("no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste:skjerming:*").size.toDouble())
+    }
 }

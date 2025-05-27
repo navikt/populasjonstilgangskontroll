@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
 import no.nav.boot.conditionals.ConditionalOnGCP
@@ -40,31 +39,24 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
     fun valkeyCacheSizeMeterBinder(redisTemplate: StringRedisTemplate): MeterBinder =
         MeterBinder { registry ->
             cfgs.forEach { cfg ->
-                val scanOptions = scanOptions().match("*${cfg.navn}*").count(1000).build()
                 registry.gauge("cache.size", Tags.of("navn", cfg.navn), redisTemplate) { template ->
-                    template.connectionFactory?.connection
-                        ?.keyCommands()
-                        ?.scan(scanOptions)
-                        ?.asSequence()
-                        ?.count()
-                        ?.toDouble() ?: 0.0
+                    cacheSize(template, cfg.navn)
                 }
             }
         }
+
     @Bean
-        fun valkeyHealthIndicator(registry: MeterRegistry) = HealthIndicator {
+        fun valkeyHealthIndicator(template: StringRedisTemplate) = HealthIndicator {
             getConnection(cf).use { connection ->
                 runCatching {
                     if (connection.ping().equals("PONG", ignoreCase = true)) {
-                        Health.up().withDetails(caches(registry)).build()
+                        Health.up().withDetails(cacheSizes(template)).build()
                     } else {
                         Health.down().withDetail("ValKey", "Ikke helt i slag i dag").build()
                     }
                 }.getOrElse { Health.down(it).withDetail("ValKey", "Ingen forbindelse").build() }
             }
         }
-
-    private fun caches(registry: MeterRegistry) = cfgs.map { it.navn to (registry.find("cache.size").tag("navn", it.navn).gauge()?.value() ?: 0.0).toLong() }.toMap()
 
     @Bean
     override fun cacheManager(): RedisCacheManager =
@@ -86,6 +78,20 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
 
             }
         }
+    }
+
+    private fun cacheSizes(template: StringRedisTemplate) = cfgs.associate {
+        it.navn to cacheSize(template,it.navn)
+    }
+
+    private fun cacheSize(template: StringRedisTemplate, cacheName: String): Double {
+        val scanOptions = scanOptions().match("*$cacheName*").count(1000).build()
+        return template.connectionFactory?.connection
+            ?.keyCommands()
+            ?.scan(scanOptions)
+            ?.asSequence()
+            ?.count()
+            ?.toDouble() ?: 0.0
     }
 
     private fun cacheConfig(cfg: CachableRestConfig) =

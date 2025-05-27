@@ -33,12 +33,18 @@ import org.springframework.web.server.ResponseStatusException
 class TilgangController(
         private val regler: RegelTjeneste,
         private val overstyring: OverstyringTjeneste,
-        private val skjerming: SkjermingRestClientAdapter,
+        private val skjermingAdapter: SkjermingRestClientAdapter,
+        private val skjerming: SkjermingTjeneste,
         private val token: Token) {
 
     @PostMapping("skjerming")
     @Unprotected  // TODO midlertidig
-    fun skjerming(@RequestBody brukerId: String) = skjerming.skjerming(brukerId)
+    fun skjerming(@RequestBody brukerId: BrukerId) = skjerming.skjerming(brukerId)
+
+    @PostMapping("skjermingadaptere")
+    @Unprotected  // TODO midlertidig
+    fun skjermingAdapter(@RequestBody brukerId: String) = skjermingAdapter.skjerming(brukerId)
+
 
 
     @PostMapping("komplett")

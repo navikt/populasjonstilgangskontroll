@@ -17,6 +17,7 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.interceptor.KeyGenerator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.lockingRedisCacheWriter
@@ -36,7 +37,7 @@ import kotlin.reflect.jvm.jvmName
 class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
     @Bean
-    fun valkeyCacheSizeMeterBinder(redisTemplate: StringRedisTemplate): MeterBinder =
+    fun valkeyCacheSizeMeterBinder(redisTemplate: StringRedisTemplate) =
         MeterBinder { registry ->
             cfgs.forEach { cfg ->
                 registry.gauge("cache.size", Tags.of("navn", cfg.navn), redisTemplate) { template ->
@@ -61,9 +62,12 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
     @Bean
     override fun cacheManager(): RedisCacheManager =
         RedisCacheManager.builder(lockingRedisCacheWriter(cf))
-            .withInitialCacheConfigurations(cfgs.associate { it.navn to cacheConfig(it) })
+            .withInitialCacheConfigurations(cfgs.associate<CachableRestConfig, String, RedisCacheConfiguration> {
+                it.navn to cacheConfig(it)
+            })
             .enableStatistics()
             .build()
+
 
     override fun keyGenerator() = KeyGenerator { target, method, params ->
         buildString {
@@ -80,9 +84,7 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
         }
     }
 
-    private fun cacheSizes(template: StringRedisTemplate) = cfgs.associate {
-        it.navn to cacheSize(template,it.navn)
-    }
+    private fun cacheSizes(template: StringRedisTemplate) = cfgs.associate { it.navn to cacheSize(template,it.navn) }
 
     private fun cacheSize(template: StringRedisTemplate, cacheName: String): Double {
         val scanOptions = scanOptions().match("*$cacheName*").count(1000).build()

@@ -95,6 +95,6 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
 @Component
 class CacheSizeMetrics(private val redisTemplate: StringRedisTemplate) : MeterBinder {
     override fun bindTo(registry: MeterRegistry) {
-        registry.gauge("cache.size.skjerming",redisTemplate.keys("no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste:skjerming:*").size.toDouble())
+        registry.gauge("cache.size.skjerming",redisTemplate.keys("*").size.toDouble())
     }
 }

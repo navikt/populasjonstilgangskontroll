@@ -4,11 +4,13 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.security.token.support.core.api.Unprotected
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.Nom
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
@@ -34,6 +36,7 @@ import org.springframework.web.bind.annotation.*
 class DevTilgangController(
         private val graphql: PdlSyncGraphQLClientAdapter,
         private val skjerming: SkjermingTjeneste,
+        private val skjermingAdapter: SkjermingRestClientAdapter,
         private val brukere: BrukerTjeneste,
         private val ansatte: AnsattTjeneste,
         private val regler: RegelTjeneste,
@@ -96,6 +99,9 @@ class DevTilgangController(
         regler.bulkRegler(ansattId, specs).also {
             log.info("Returnerer $it etter bulk for $ansattId")
         }
+
+    @PostMapping("skjermingadaptere")
+    fun skjermingAdapter(@RequestBody brukerId: String) = skjermingAdapter.skjerming(brukerId)
 
     @PostMapping("skjerming")
     fun skjerming(@RequestBody brukerId: BrukerId) = skjerming.skjerming(brukerId)

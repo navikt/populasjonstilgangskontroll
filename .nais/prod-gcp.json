@@ -52,6 +52,11 @@
       "name": "gosys-oppgavebehandling-api",
       "namespace": "oppgavehandtering",
       "cluster": "prod-gcp"
+    },
+    {
+      "name": "repr-fullmakt",
+      "namespace": "repr",
+      "cluster": "prod-fss"
     }
   ],
   "nais": {

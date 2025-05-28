@@ -10,6 +10,7 @@ import io.micrometer.core.instrument.binder.MeterBinder
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.cache.annotation.CachingConfigurer
@@ -36,6 +37,9 @@ import kotlin.reflect.jvm.jvmName
 @ConditionalOnGCP
 class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
+    private val log = getLogger(javaClass)
+
+
     @Bean
     fun valkeyCacheSizeMeterBinder(redisTemplate: StringRedisTemplate) = MeterBinder { registry ->
             cfgs.forEach { cfg ->
@@ -50,6 +54,7 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
             getConnection(cf).use { connection ->
                 runCatching {
                     if (connection.ping().equals("PONG", ignoreCase = true)) {
+                        log.info("PONG")
                         Health.up().withDetails(cacheSizes(template)).build()
                     } else {
                         Health.down().withDetail("ValKey", "Ikke helt i slag i dag").build()

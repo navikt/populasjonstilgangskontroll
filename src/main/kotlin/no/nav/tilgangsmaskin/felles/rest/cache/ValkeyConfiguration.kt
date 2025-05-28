@@ -54,11 +54,13 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
             getConnection(cf).use { connection ->
                 runCatching {
                     if (connection.ping().equals("PONG", ignoreCase = true)) {
-                        Health.up().withDetail("Redis","I toppform").build()
+                        Health.up().withDetail("ValKey","I toppform").build()
                     } else {
                         Health.down().withDetail("ValKey", "Ikke helt i slag i dag").build()
                     }
-                }.getOrElse { Health.down(it).withDetail("ValKey", "Ingen forbindelse").build() }
+                }.getOrElse {
+                    log.warn("Feil ved ping av ValKey", it)
+                    Health.down(it).withDetail("ValKey", "Ingen forbindelse").build() }
             }
         }
 
@@ -83,8 +85,6 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
             }
         }
     }
-
-    private fun cacheSizes(template: StringRedisTemplate) = cfgs.associate { it.navn to cacheSize(template,it.navn) }
 
     private fun cacheSize(template: StringRedisTemplate, cacheName: String) =
         runCatching {

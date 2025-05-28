@@ -50,7 +50,7 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
         }
 
     @Bean
-        fun valkeyHealthIndicator = HealthIndicator {
+    fun valkeyHealthIndicator() = HealthIndicator {
             getConnection(cf).use { connection ->
                 runCatching {
                     if (connection.ping().equals("PONG", ignoreCase = true)) {

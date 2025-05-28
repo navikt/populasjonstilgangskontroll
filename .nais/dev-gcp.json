@@ -75,6 +75,11 @@
       "name": "veilarbvedtaksstotte",
       "namespace": "obo",
       "cluster": "dev-gcp"
+    },
+    {
+      "name": "repr-fullmakt",
+      "namespace": "repr",
+      "cluster": "dev-fss"
     }
   ],
   "nais": {

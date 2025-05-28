@@ -37,8 +37,7 @@ import kotlin.reflect.jvm.jvmName
 class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
     @Bean
-    fun valkeyCacheSizeMeterBinder(redisTemplate: StringRedisTemplate) =
-        MeterBinder { registry ->
+    fun valkeyCacheSizeMeterBinder(redisTemplate: StringRedisTemplate) = MeterBinder { registry ->
             cfgs.forEach { cfg ->
                 registry.gauge("cache.size", Tags.of("navn", cfg.navn), redisTemplate) { template ->
                     cacheSize(template, cfg.navn)

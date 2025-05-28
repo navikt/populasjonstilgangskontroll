@@ -54,7 +54,6 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
             getConnection(cf).use { connection ->
                 runCatching {
                     if (connection.ping().equals("PONG", ignoreCase = true)) {
-                        log.info("PONG")
                         Health.up().withDetails(cacheSizes(template)).build()
                     } else {
                         Health.down().withDetail("ValKey", "Ikke helt i slag i dag").build()
@@ -90,15 +89,20 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
 
     private fun cacheSizes(template: StringRedisTemplate) = cfgs.associate { it.navn to cacheSize(template,it.navn) }
 
-    private fun cacheSize(template: StringRedisTemplate, cacheName: String): Double {
-        val scanOptions = scanOptions().match("*$cacheName*").count(1000).build()
-        return template.connectionFactory?.connection
-            ?.keyCommands()
-            ?.scan(scanOptions)
-            ?.asSequence()
-            ?.count()
-            ?.toDouble() ?: 0.0
-    }
+    private fun cacheSize(template: StringRedisTemplate, cacheName: String) =
+        runCatching {
+            log.info("PONG")
+            val scanOptions = scanOptions().match("*$cacheName*").count(1000).build()
+            template.connectionFactory?.connection
+                ?.keyCommands()
+                ?.scan(scanOptions)
+                ?.asSequence()
+                ?.count()
+                ?.toDouble() ?: 0.0
+        }.getOrElse {
+            log.warn("Kunne ikke hente størrelse på cache $cacheName", it)
+            0.0
+        }
 
     private fun cacheConfig(cfg: CachableRestConfig) =
         defaultCacheConfig()

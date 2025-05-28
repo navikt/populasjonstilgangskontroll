@@ -50,11 +50,11 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
         }
 
     @Bean
-        fun valkeyHealthIndicator(template: StringRedisTemplate) = HealthIndicator {
+        fun valkeyHealthIndicator = HealthIndicator {
             getConnection(cf).use { connection ->
                 runCatching {
                     if (connection.ping().equals("PONG", ignoreCase = true)) {
-                        Health.up().withDetails(cacheSizes(template)).build()
+                        Health.up().withDetail("Redis","I toppform").build()
                     } else {
                         Health.down().withDetail("ValKey", "Ikke helt i slag i dag").build()
                     }
@@ -65,12 +65,9 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
     @Bean
     override fun cacheManager(): RedisCacheManager =
         RedisCacheManager.builder(lockingRedisCacheWriter(cf))
-            .withInitialCacheConfigurations(cfgs.associate<CachableRestConfig, String, RedisCacheConfiguration> {
-                it.navn to cacheConfig(it)
-            })
+            .withInitialCacheConfigurations(cfgs.associate { it.navn to cacheConfig(it) })
             .enableStatistics()
             .build()
-
 
     override fun keyGenerator() = KeyGenerator { target, method, params ->
         buildString {

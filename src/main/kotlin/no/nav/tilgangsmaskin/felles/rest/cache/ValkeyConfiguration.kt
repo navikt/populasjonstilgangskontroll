@@ -10,6 +10,7 @@ import io.micrometer.core.instrument.binder.MeterBinder
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
+import no.nav.tilgangsmaskin.felles.rest.Pingable
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.health.Health
@@ -34,10 +35,13 @@ import kotlin.reflect.jvm.jvmName
 @Configuration
 @EnableCaching
 @ConditionalOnGCP
-class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
-
+class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg val cfgs: CachableRestConfig, @Value("\${valkey.host.cache}") private val host: String,@Value("\${valkey.port.cache}") private val port: String ) : CachingConfigurer, Pingable {
     private val log = getLogger(ValkeyConfiguration::class.java)
 
+
+    override val pingEndpoint  = "$host:$port"
+    override val name = "ValKey Cache"
+    override val isEnabled = true
 
     @Bean
     fun valkeyCacheSizeMeterBinder(template: StringRedisTemplate) = MeterBinder { registry ->
@@ -48,6 +52,7 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
             }
         }
 
+    /*
     @Bean
     fun valkeyHealthIndicator( @Value("\${valkey.host.cache}") host: String,@Value("\${valkey.port.cache}") port: String  ) = HealthIndicator {
         cf.connection.use { connection ->
@@ -70,7 +75,7 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
                     .withException(it)
                     .build() }
         }
-    }
+    }*/
 
     @Bean
     override fun cacheManager(): RedisCacheManager =
@@ -127,4 +132,15 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
                     PROPERTY
                 )
             }
+
+    override fun ping(): Any {
+       return  cf.connection.use { connection ->
+                if (connection.ping().equals("PONG", ignoreCase = true)) {
+                    Unit
+                }
+                else {
+                    throw IllegalStateException("ValKey ping failed")
+                }
+            }
+    }
 }

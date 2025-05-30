@@ -15,20 +15,20 @@ import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.FAR
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.MOR
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.udefinertTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UdefinertTilknytning
 
 data class BrukerBuilder(
-        val id: BrukerId,
-        var gt: GeografiskTilknytning = udefinertTilknytning,
-        var historiske: Set<BrukerId> = emptySet(),
-        var aktørId: AktørId? = null,
-        var grupper: Set<GlobalGruppe> = emptySet(),
-        var søsken: Set<FamilieMedlem> = emptySet(),
-        var mor: FamilieMedlem? = null,
-        var far: FamilieMedlem? = null,
-        var barn: Set<FamilieMedlem> = emptySet(),
-        var partnere: Set<FamilieMedlem> = emptySet(),
-        var dødsdato: LocalDate? = null) {
+    val id: BrukerId,
+    var gt: GeografiskTilknytning = UdefinertTilknytning(),
+    var historiske: Set<BrukerId> = emptySet(),
+    var aktørId: AktørId? = null,
+    var grupper: Set<GlobalGruppe> = emptySet(),
+    var søsken: Set<FamilieMedlem> = emptySet(),
+    var mor: FamilieMedlem? = null,
+    var far: FamilieMedlem? = null,
+    var barn: Set<FamilieMedlem> = emptySet(),
+    var partnere: Set<FamilieMedlem> = emptySet(),
+    var dødsdato: LocalDate? = null) {
     fun gt(gt: GeografiskTilknytning) = apply { this.gt = gt }
     fun kreverMedlemskapI(vararg grupper: GlobalGruppe) = apply { this.grupper = setOf(*grupper) }
     fun barn(barn: Set<BrukerId>) = apply { this.barn = barn.tilFamilieMedlemmer(BARN) }

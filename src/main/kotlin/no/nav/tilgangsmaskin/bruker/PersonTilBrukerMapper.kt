@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.bruker.Bruker.BrukerIds
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.udefinertTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UdefinertTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
 import no.nav.tilgangsmaskin.bruker.pdl.erFortrolig
@@ -32,6 +32,6 @@ object PersonTilBrukerMapper {
                     graderinger.erFortrolig() -> FORTROLIG
                     else -> null
                 },
-                UKJENT_BOSTED.takeIf { gt == udefinertTilknytning },
+                UKJENT_BOSTED.takeIf { gt is UdefinertTilknytning },
                 SKJERMING.takeIf { erSkjermet })
 }

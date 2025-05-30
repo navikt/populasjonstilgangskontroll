@@ -1,7 +1,5 @@
 package no.nav.tilgangsmaskin.regler
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
@@ -15,7 +13,7 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Companion.utenlandskTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.motor.*
@@ -115,12 +113,12 @@ class RegelTjenesteTest {
     fun ikkeOverstyrt() {
         every {
             brukere.nærmesteFamilie(
-                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).kreverMedlemskapI(UTENLANDSK)
+                    BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK)
                         .build().brukerId.verdi)
-        } returns BrukerBuilder(vanligBrukerId, utenlandskTilknytning).kreverMedlemskapI(UTENLANDSK).build()
+        } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
         assertThrows<RegelException> {
             val brukerId =
-                BrukerBuilder(vanligBrukerId, utenlandskTilknytning).kreverMedlemskapI(UTENLANDSK).build().brukerId
+                BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId
             regler.kompletteRegler(ansattId, brukerId.verdi)
         }
     }
@@ -144,21 +142,21 @@ class RegelTjenesteTest {
     fun bulkAvvisningerOverstyrt() {
         every {
             brukere.nærmesteFamilie(
-                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).kreverMedlemskapI(
+                    BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(
                             UTENLANDSK).build().brukerId.verdi)
-        } returns BrukerBuilder(vanligBrukerId, utenlandskTilknytning).kreverMedlemskapI(UTENLANDSK).build()
+        } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
         every {
             brukere.brukere(
-                    BrukerBuilder(vanligBrukerId, utenlandskTilknytning).kreverMedlemskapI(UTENLANDSK)
+                    BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK)
                         .build().brukerId.verdi)
         } returns listOf(
                 BrukerBuilder(
                         vanligBrukerId,
-                        utenlandskTilknytning).kreverMedlemskapI(
+                    UtenlandskTilknytning()).kreverMedlemskapI(
                         UTENLANDSK).build())
         overstyring.overstyr(
                 ansattId, OverstyringData(
-                BrukerBuilder(vanligBrukerId, utenlandskTilknytning).kreverMedlemskapI(
+                BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(
                         UTENLANDSK).build().brukerId,
                 "test",
                 IMORGEN))
@@ -169,7 +167,7 @@ class RegelTjenesteTest {
                             IdOgType(
                                     BrukerBuilder(
                                             vanligBrukerId,
-                                            utenlandskTilknytning).kreverMedlemskapI(UTENLANDSK)
+                                        UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK)
                                         .build().brukerId.verdi)))
         }.doesNotThrowAnyException()
     }

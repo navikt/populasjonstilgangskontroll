@@ -56,7 +56,7 @@ class BrukerMapperTest {
     fun strengtFortroligUtland() {
         with(tilBruker(person(pipRespons(STRENGT_FORTROLIG_UTLAND)), false)) {
             assertThat(påkrevdeGrupper).containsExactly(GlobalGruppe.STRENGT_FORTROLIG_UTLAND)
-            assertThat(geografiskTilknytning).isInstanceOf(GeografiskTilknytning.utenlandskTilknytning::class.java)
+            assertThat(geografiskTilknytning).isInstanceOf(GeografiskTilknytning.UtenlandskTilknytning::class.java)
         }
     }
 

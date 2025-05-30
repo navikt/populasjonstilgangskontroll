@@ -135,7 +135,7 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, private va
     override fun ping(): Any {
        return  cf.connection.use { connection ->
                 if (connection.ping().equals("PONG", ignoreCase = true)) {
-                    Unit
+                   cacheSizes()
                 }
                 else {
                     throw IllegalStateException("$name ping failed")

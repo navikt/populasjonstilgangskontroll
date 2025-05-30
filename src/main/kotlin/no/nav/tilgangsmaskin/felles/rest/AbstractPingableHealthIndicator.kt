@@ -5,16 +5,16 @@ import org.springframework.boot.actuate.health.HealthIndicator
 
 abstract class AbstractPingableHealthIndicator(private val pingable: Pingable) : HealthIndicator {
 
-    override fun health() =
-        runCatching {
-            pingable.ping()
-            up()
-        }.getOrElse(::down)
+    override fun health() = runCatching {
+        val respons = pingable.ping()
+        if (respons is Map<*, *>) up(respons) else up()
+    }.getOrElse(::down)
 
-    private fun up() = with(pingable) {
+    private fun up(details: Map<Any,Any> = emptyMap()) = with(pingable) {
         if (isEnabled) {
             Health.up()
                 .withDetail("endpoint", pingEndpoint)
+                .withDetails(details)
                 .build()
         } else {
             Health.up()

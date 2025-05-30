@@ -9,12 +9,11 @@ import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.rest.AbstractPingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.actuate.health.Health
-import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.interceptor.KeyGenerator
@@ -29,15 +28,15 @@ import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
+import org.springframework.stereotype.Component
 import java.time.Duration
 import kotlin.reflect.jvm.jvmName
 
 @Configuration
 @EnableCaching
 @ConditionalOnGCP
-class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg val cfgs: CachableRestConfig, @Value("\${valkey.host.cache}") private val host: String,@Value("\${valkey.port.cache}") private val port: String ) : CachingConfigurer, Pingable {
-    private val log = getLogger(ValkeyConfiguration::class.java)
-
+class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, private vararg val cfgs: CachableRestConfig, @Value("\${valkey.host.cache}") private val host: String, @Value("\${valkey.port.cache}") private val port: String ) : CachingConfigurer, Pingable {
+    private val log = getLogger(ValkeyBeanConfiguration::class.java)
 
     override val pingEndpoint  = "$host:$port"
     override val name = "ValKey Cache"
@@ -139,8 +138,11 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
                     Unit
                 }
                 else {
-                    throw IllegalStateException("ValKey ping failed")
+                    throw IllegalStateException("$name ping failed")
                 }
             }
     }
 }
+
+@Component
+class ValkeyHealthIndicator(private val config: ValkeyBeanConfiguration) : AbstractPingableHealthIndicator(config)

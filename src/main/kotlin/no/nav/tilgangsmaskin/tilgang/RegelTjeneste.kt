@@ -1,25 +1,17 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.micrometer.core.annotation.Timed
-import net.minidev.json.annotate.JsonIgnore
-import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.IdOgType
-import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor.BulkRegelResult.*
-import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatus.ACCEPTED
-import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.stereotype.Service
 import kotlin.time.measureTime
 
@@ -35,7 +27,7 @@ class RegelTjeneste(
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
-            val bruker = brukere.nærmesteFamilie(brukerId)
+            val bruker = brukere.medNærmesteFamilie(brukerId)
             runCatching {
                 motor.kompletteRegler(ansatte.ansatt(ansattId), bruker)
             }.getOrElse {
@@ -49,7 +41,7 @@ class RegelTjeneste(
     }
 
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
-        motor.kjerneregler(ansatte.ansatt(ansattId), brukere.utvidetFamilie(brukerId))
+        motor.kjerneregler(ansatte.ansatt(ansattId), brukere.medUtvidetFamilie(brukerId))
 
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>): List<Pair<BrukerId, Any>> {
         val resultater = motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerIdOgType()).map {

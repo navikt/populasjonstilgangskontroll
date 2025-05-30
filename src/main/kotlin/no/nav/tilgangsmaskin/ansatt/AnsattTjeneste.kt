@@ -32,7 +32,7 @@ class AnsattTjeneste(private val ansatte: Nom,
 
     private fun ansattBruker(ansattId: AnsattId) =
         ansatte.fnrForAnsatt(ansattId)?.let {
-            runCatching { brukere.utvidetFamilie(it.verdi) }.getOrNull()
+            runCatching { brukere.medUtvidetFamilie(it.verdi) }.getOrNull()
         }
 
     private fun tell(status: Boolean) = teller.tell(Tags.of(MEDLEM,"$status"))

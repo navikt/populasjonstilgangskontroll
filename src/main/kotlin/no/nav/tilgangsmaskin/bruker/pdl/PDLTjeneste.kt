@@ -13,12 +13,12 @@ import no.nav.tilgangsmaskin.felles.CacheableRetryingOnRecoverableService
 @Timed
 class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL: PdlSyncGraphQLClientAdapter) {
 
-    fun utvidetFamile(id: String) =
-        with(nærmesteFamilie(id)) {
+    fun medUtvidetFamile(id: String) =
+        with(medNærmesteFamilie(id)) {
             copy(familie = familie.copy(søsken = søsken(foreldre, brukerId), partnere = partnere(id)))
         }
 
-    fun nærmesteFamilie(id: String) = tilPerson(adapter.person(id))
+    fun medNærmesteFamilie(id: String) = tilPerson(adapter.person(id))
 
     fun personer(brukerIds: Set<String>) = adapter.personer(brukerIds).map { tilPerson(it.value) }
 

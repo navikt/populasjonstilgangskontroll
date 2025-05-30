@@ -23,6 +23,7 @@ import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.lockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.ScanOptions.scanOptions
+import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
@@ -38,9 +39,9 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
 
 
     @Bean
-    fun valkeyCacheSizeMeterBinder() = MeterBinder { registry ->
+    fun valkeyCacheSizeMeterBinder(template: StringRedisTemplate) = MeterBinder { registry ->
             cfgs.forEach { cfg ->
-                registry.gauge("cache.size", Tags.of("navn", cfg.navn), null) { template ->
+                registry.gauge("cache.size", Tags.of("navn", cfg.navn), template) { template ->
                     cacheSize( cfg.navn)
                 }
             }

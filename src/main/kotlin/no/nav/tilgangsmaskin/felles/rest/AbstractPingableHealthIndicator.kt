@@ -2,21 +2,19 @@ package no.nav.tilgangsmaskin.felles.rest
 
 import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.map
 
 abstract class AbstractPingableHealthIndicator(private val pingable: Pingable) : HealthIndicator {
 
-    override fun health() = runCatching {
-        up((pingable.ping() as? Map<*, *>)?.map { (k, v) -> k.toString() to v.toString() }?.toMap() ?: emptyMap())
-    }.getOrElse(::down)
+    override fun health() =
+        runCatching {
+            pingable.ping()
+            up()
+        }.getOrElse(::down)
 
-    private fun up(details: Map<String,String> = emptyMap()) = with(pingable) {
+    private fun up() = with(pingable) {
         if (isEnabled) {
             Health.up()
                 .withDetail("endpoint", pingEndpoint)
-                .withDetails(details)
                 .build()
         } else {
             Health.up()

@@ -98,7 +98,7 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, private va
         }
     }
 
-    private fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag i cache"}
+    fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag i cache"}
 
     private fun cacheSize(cacheName: String) =
         runCatching {
@@ -145,4 +145,4 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, private va
 }
 
 @Component
-class ValkeyHealthIndicator(private val config: ValkeyBeanConfiguration) : AbstractPingableHealthIndicator(config)
+class ValkeyHealthIndicator(config: ValkeyBeanConfiguration) : AbstractPingableHealthIndicator(config)

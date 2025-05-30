@@ -13,8 +13,6 @@ import org.springframework.web.client.RestClient
 class EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: EntraConfig) :
     AbstractRestClientAdapter(restClient, cf) {
 
-    override fun ping() = get<Any>(cfg.pingEndpoint).let { emptyMap<String,String>() }
-
     fun oidFraEntra(ansattId: String) =
         get<EntraSaksbehandlerRespons>(cf.userURI(ansattId)).oids.single().id
 

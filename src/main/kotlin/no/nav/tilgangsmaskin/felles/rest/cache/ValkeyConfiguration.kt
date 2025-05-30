@@ -22,9 +22,7 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCache
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.lockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.data.redis.core.RedisConnectionUtils.getConnection
 import org.springframework.data.redis.core.ScanOptions.scanOptions
-import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
@@ -40,10 +38,10 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
 
 
     @Bean
-    fun valkeyCacheSizeMeterBinder(redisTemplate: StringRedisTemplate) = MeterBinder { registry ->
+    fun valkeyCacheSizeMeterBinder() = MeterBinder { registry ->
             cfgs.forEach { cfg ->
-                registry.gauge("cache.size", Tags.of("navn", cfg.navn), redisTemplate) { template ->
-                    cacheSize(template, cfg.navn)
+                registry.gauge("cache.size", Tags.of("navn", cfg.navn), null) { template ->
+                    cacheSize( cfg.navn)
                 }
             }
         }
@@ -53,7 +51,10 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
         cf.connection.use { connection ->
             runCatching {
                 if (connection.ping().equals("PONG", ignoreCase = true)) {
-                    Health.up().withDetail("ValKey","I toppform").build()
+                    Health.up()
+                        .withDetail("ValKey","I toppform").
+                         withDetails(cacheSizes())
+                        .build()
                 } else {
                     Health.down().withDetail("ValKey", "Ikke helt i slag i dag").build()
                 }
@@ -85,7 +86,9 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
         }
     }
 
-    private fun cacheSize(template: StringRedisTemplate, cacheName: String) =
+    private fun cacheSizes() = cfgs.associate { it.navn to cacheSize(it.navn) }
+
+    private fun cacheSize(cacheName: String) =
         runCatching {
             val scanOptions = scanOptions().match("*$cacheName*").count(1000).build()
             cf.connection

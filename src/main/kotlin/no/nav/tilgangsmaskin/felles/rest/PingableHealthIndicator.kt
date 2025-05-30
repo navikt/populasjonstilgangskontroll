@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.felles.rest
 import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator
 
-abstract class AbstractPingableHealthIndicator(private val pingable: Pingable) : HealthIndicator {
+abstract class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator {
 
     override fun health() =
         runCatching {
@@ -14,22 +14,26 @@ abstract class AbstractPingableHealthIndicator(private val pingable: Pingable) :
     private fun up() = with(pingable) {
         if (isEnabled) {
             Health.up()
-                .withDetail("endpoint", pingEndpoint)
+                .withDetail(ENDPOINT, pingEndpoint)
                 .build()
         } else {
             Health.up()
-                .withDetail("endpoint", pingEndpoint)
-                .withDetail("status", "disabled")
+                .withDetail(ENDPOINT, pingEndpoint)
+                .withDetail("enabled", "false")
                 .build()
         }
     }
 
     private fun down(e: Throwable) = with(pingable) {
         Health.down()
-            .withDetail("endpoint", pingEndpoint)
+            .withDetail(ENDPOINT, pingEndpoint)
             .withException(e)
             .build()
     }
 
     override fun toString() = "${javaClass.simpleName} [pingable=$pingable]"
+
+    companion object {
+        const val ENDPOINT = "endpoint"
+    }
 }

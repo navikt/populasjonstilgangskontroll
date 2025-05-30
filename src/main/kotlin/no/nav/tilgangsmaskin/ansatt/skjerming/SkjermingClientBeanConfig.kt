@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
-import no.nav.tilgangsmaskin.felles.rest.AbstractPingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -15,7 +15,7 @@ class SkjermingClientBeanConfig {
     fun skjermingRestClient(b: Builder, cfg: SkjermingConfig) = b.baseUrl(cfg.baseUri).build()
 
     @Bean
-    fun skjermingHealthIndicator(a: SkjermingRestClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
+    fun skjermingHealthIndicator(a: SkjermingRestClientAdapter) = object : PingableHealthIndicator(a) {}
 
 }
 

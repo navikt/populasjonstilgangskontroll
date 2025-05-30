@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNU
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.graphql.GraphQLErrorHandler
-import no.nav.tilgangsmaskin.felles.rest.AbstractPingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
@@ -47,10 +47,10 @@ class PdlClientBeanConfig {
     fun pdlRestClient(b: Builder) = b.build()
 
     @Bean
-    fun pdlGraphHealthIndicator(a: PdlSyncGraphQLClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
+    fun pdlGraphHealthIndicator(a: PdlSyncGraphQLClientAdapter) = object : PingableHealthIndicator(a) {}
 
     @Bean
-    fun pdlHealthIndicator(a: PdlRestClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
+    fun pdlHealthIndicator(a: PdlRestClientAdapter) = object : PingableHealthIndicator(a) {}
 
     private class LoggingGraphQLInterceptor : SyncGraphQlClientInterceptor {
 

@@ -9,7 +9,7 @@ import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.rest.AbstractPingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
 import org.slf4j.LoggerFactory.getLogger
@@ -51,31 +51,6 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, private va
             }
         }
 
-    /*
-    @Bean
-    fun valkeyHealthIndicator( @Value("\${valkey.host.cache}") host: String,@Value("\${valkey.port.cache}") port: String  ) = HealthIndicator {
-        cf.connection.use { connection ->
-            runCatching {
-                if (connection.ping().equals("PONG", ignoreCase = true)) {
-                    Health.up()
-                        .withDetail("ValKey","I toppform")
-                        .withDetail("endpoint", "$host:$port")
-                        . withDetails(cacheSizes())
-                        .build()
-                } else {
-                    Health.down()
-                        .withDetail("ValKey", "Ikke helt i slag i dag")
-                        .build()
-                }
-            }.getOrElse {
-                log.warn("Feil ved ping av ValKey", it)
-                Health.down(it)
-                    .withDetail("ValKey", "Ingen forbindelse")
-                    .withException(it)
-                    .build() }
-        }
-    }*/
-
     @Bean
     override fun cacheManager(): RedisCacheManager =
         RedisCacheManager.builder(lockingRedisCacheWriter(cf))
@@ -97,6 +72,16 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, private va
             }
         }
     }
+    override fun ping() =
+        cf.connection.use {
+            if (it.ping().equals("PONG", ignoreCase = true)) {
+                emptyMap<String,String>()
+            }
+            else {
+                throw IllegalStateException("$name ping failed")
+            }
+        }
+
 
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag i cache"}
 
@@ -131,18 +116,7 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, private va
                     PROPERTY
                 )
             }
-
-    override fun ping(): Any {
-       return  cf.connection.use { connection ->
-                if (connection.ping().equals("PONG", ignoreCase = true)) {
-                   cacheSizes()
-                }
-                else {
-                    throw IllegalStateException("$name ping failed")
-                }
-            }
-    }
 }
 
 @Component
-class ValkeyHealthIndicator(config: ValkeyBeanConfiguration) : AbstractPingableHealthIndicator(config)
+class ValkeyHealthIndicator(config: ValkeyBeanConfiguration) : PingableHealthIndicator(config)

@@ -11,6 +11,7 @@ import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.cache.annotation.CachingConfigurer
@@ -48,20 +49,26 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
         }
 
     @Bean
-    fun valkeyHealthIndicator() = HealthIndicator {
+    fun valkeyHealthIndicator( @Value("\${valkey.host.cache}") host: String,@Value("\${valkey.port.cache}") port: String  ) = HealthIndicator {
         cf.connection.use { connection ->
             runCatching {
                 if (connection.ping().equals("PONG", ignoreCase = true)) {
                     Health.up()
-                        .withDetail("ValKey","I toppform").
-                         withDetails(cacheSizes())
+                        .withDetail("ValKey","I toppform")
+                        .withDetail("endpoint", "$host:$port")
+                        . withDetails(cacheSizes())
                         .build()
                 } else {
-                    Health.down().withDetail("ValKey", "Ikke helt i slag i dag").build()
+                    Health.down()
+                        .withDetail("ValKey", "Ikke helt i slag i dag")
+                        .build()
                 }
             }.getOrElse {
                 log.warn("Feil ved ping av ValKey", it)
-                Health.down(it).withDetail("ValKey", "Ingen forbindelse").build() }
+                Health.down(it)
+                    .withDetail("ValKey", "Ingen forbindelse")
+                    .withException(it)
+                    .build() }
         }
     }
 

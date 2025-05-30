@@ -50,18 +50,18 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
 
     @Bean
     fun valkeyHealthIndicator() = HealthIndicator {
-            getConnection(cf).use { connection ->
-                runCatching {
-                    if (connection.ping().equals("PONG", ignoreCase = true)) {
-                        Health.up().withDetail("ValKey","I toppform").build()
-                    } else {
-                        Health.down().withDetail("ValKey", "Ikke helt i slag i dag").build()
-                    }
-                }.getOrElse {
-                    log.warn("Feil ved ping av ValKey", it)
-                    Health.down(it).withDetail("ValKey", "Ingen forbindelse").build() }
-            }
+        cf.connection.use { connection ->
+            runCatching {
+                if (connection.ping().equals("PONG", ignoreCase = true)) {
+                    Health.up().withDetail("ValKey","I toppform").build()
+                } else {
+                    Health.down().withDetail("ValKey", "Ikke helt i slag i dag").build()
+                }
+            }.getOrElse {
+                log.warn("Feil ved ping av ValKey", it)
+                Health.down(it).withDetail("ValKey", "Ingen forbindelse").build() }
         }
+    }
 
     @Bean
     override fun cacheManager(): RedisCacheManager =
@@ -88,12 +88,12 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
     private fun cacheSize(template: StringRedisTemplate, cacheName: String) =
         runCatching {
             val scanOptions = scanOptions().match("*$cacheName*").count(1000).build()
-            template.connectionFactory?.connection
-                ?.keyCommands()
-                ?.scan(scanOptions)
-                ?.asSequence()
-                ?.count()
-                ?.toDouble() ?: 0.0
+            cf.connection
+                .keyCommands()
+                .scan(scanOptions)
+                .asSequence()
+                .count()
+                .toDouble()
         }.getOrElse {
             log.warn("Kunne ikke hente størrelse på cache $cacheName", it)
             0.0

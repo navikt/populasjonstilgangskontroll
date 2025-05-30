@@ -18,7 +18,6 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.interceptor.KeyGenerator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.lockingRedisCacheWriter
@@ -37,7 +36,7 @@ import kotlin.reflect.jvm.jvmName
 @ConditionalOnGCP
 class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
-    private val log = getLogger(javaClass)
+    private val log = getLogger(ValkeyConfiguration::class.java)
 
 
     @Bean
@@ -88,7 +87,6 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
 
     private fun cacheSize(template: StringRedisTemplate, cacheName: String) =
         runCatching {
-            log.info("PONG")
             val scanOptions = scanOptions().match("*$cacheName*").count(1000).build()
             template.connectionFactory?.connection
                 ?.keyCommands()

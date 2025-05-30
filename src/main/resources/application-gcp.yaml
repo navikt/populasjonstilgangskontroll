@@ -7,7 +7,7 @@ management:
       enabled: true
   health:
     redis:
-      enabled: true
+      enabled: false
     ssl:
       enabled: false
     ping:

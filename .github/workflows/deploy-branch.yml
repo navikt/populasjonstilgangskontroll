@@ -11,7 +11,7 @@ jobs:
     name: build
     permissions:
       checks: write
-      contents: read
+      contents: write
       id-token: write
     runs-on: ubuntu-latest
     steps:
@@ -68,6 +68,9 @@ jobs:
           include_passed: 'true'
           detailed_summary: 'true'
           report_paths: '**/build/test-results/test/TEST-*.xml'
+
+      - name: Generate and submit dependency graph
+        uses: gradle/actions/dependency-submission@v4
 
       - name: Attest and sign
         uses: nais/attest-sign@v1.5.7

@@ -11,6 +11,7 @@ import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.cache.annotation.CachingConfigurer
@@ -18,12 +19,10 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.interceptor.KeyGenerator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.lockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.data.redis.core.RedisConnectionUtils.getConnection
 import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
@@ -37,32 +36,41 @@ import kotlin.reflect.jvm.jvmName
 @ConditionalOnGCP
 class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
-    private val log = getLogger(javaClass)
+    private val log = getLogger(ValkeyConfiguration::class.java)
 
 
     @Bean
-    fun valkeyCacheSizeMeterBinder(redisTemplate: StringRedisTemplate) = MeterBinder { registry ->
+    fun valkeyCacheSizeMeterBinder(template: StringRedisTemplate) = MeterBinder { registry ->
             cfgs.forEach { cfg ->
-                registry.gauge("cache.size", Tags.of("navn", cfg.navn), redisTemplate) { template ->
-                    cacheSize(template, cfg.navn)
+                registry.gauge("cache.size", Tags.of("navn", cfg.navn), template) { template ->
+                    cacheSize( cfg.navn)
                 }
             }
         }
 
     @Bean
-    fun valkeyHealthIndicator() = HealthIndicator {
-            getConnection(cf).use { connection ->
-                runCatching {
-                    if (connection.ping().equals("PONG", ignoreCase = true)) {
-                        Health.up().withDetail("ValKey","I toppform").build()
-                    } else {
-                        Health.down().withDetail("ValKey", "Ikke helt i slag i dag").build()
-                    }
-                }.getOrElse {
-                    log.warn("Feil ved ping av ValKey", it)
-                    Health.down(it).withDetail("ValKey", "Ingen forbindelse").build() }
-            }
+    fun valkeyHealthIndicator( @Value("\${valkey.host.cache}") host: String,@Value("\${valkey.port.cache}") port: String  ) = HealthIndicator {
+        cf.connection.use { connection ->
+            runCatching {
+                if (connection.ping().equals("PONG", ignoreCase = true)) {
+                    Health.up()
+                        .withDetail("ValKey","I toppform")
+                        .withDetail("endpoint", "$host:$port")
+                        . withDetails(cacheSizes())
+                        .build()
+                } else {
+                    Health.down()
+                        .withDetail("ValKey", "Ikke helt i slag i dag")
+                        .build()
+                }
+            }.getOrElse {
+                log.warn("Feil ved ping av ValKey", it)
+                Health.down(it)
+                    .withDetail("ValKey", "Ingen forbindelse")
+                    .withException(it)
+                    .build() }
         }
+    }
 
     @Bean
     override fun cacheManager(): RedisCacheManager =
@@ -86,16 +94,17 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
         }
     }
 
-    private fun cacheSize(template: StringRedisTemplate, cacheName: String) =
+    private fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag i cache"}
+
+    private fun cacheSize(cacheName: String) =
         runCatching {
-            log.info("PONG")
             val scanOptions = scanOptions().match("*$cacheName*").count(1000).build()
-            template.connectionFactory?.connection
-                ?.keyCommands()
-                ?.scan(scanOptions)
-                ?.asSequence()
-                ?.count()
-                ?.toDouble() ?: 0.0
+            cf.connection
+                .keyCommands()
+                .scan(scanOptions)
+                .asSequence()
+                .count()
+                .toDouble()
         }.getOrElse {
             log.warn("Kunne ikke hente størrelse på cache $cacheName", it)
             0.0

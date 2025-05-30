@@ -27,47 +27,37 @@ class RegelTjeneste(
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
-            val bruker = brukere.nærmesteFamilie(brukerId)
+            val bruker = brukere.medNærmesteFamilie(brukerId)
             runCatching {
                 motor.kompletteRegler(ansatte.ansatt(ansattId), bruker)
             }.getOrElse {
-                overstyring.sjekk(ansattId, it)
+                if (overstyring.erOverstyrt(ansattId,bruker.brukerId)) {
+                    Unit
+                }
+                else throw it
             }
         }
         log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
     }
 
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
-        motor.kjerneregler(ansatte.ansatt(ansattId), brukere.utvidetFamilie(brukerId))
+        motor.kjerneregler(ansatte.ansatt(ansattId), brukere.medUtvidetFamilie(brukerId))
 
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>): List<Pair<BrukerId, Any>> {
-        lateinit var resultater: List<Pair<BrukerId,Any>>
-        val elapsedTime = measureTime {
-            log.info("Eksekverer bulk regler for $ansattId og ${idOgType.map { it.brukerId }.map { it.maskFnr() }}")
-            resultater = motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerIdOgType()).map { spec ->
-                when (spec) {
-                    is Success -> {
-                        log.info("Regel for ${spec.brukerId} er OK")
-                        Pair(spec.brukerId,204)
-                    }
-                    is RegelFailure ->
-                        if (overstyring.erOverstyrt(ansattId, spec.brukerId)) {
-                            log.info("Regel for ${spec.brukerId} er overstyrt")
-                            Pair(spec.brukerId,204)
-                        } else {
-                            log.warn("Regel for ${spec.brukerId} er avvist med ${spec.exception.message}")
-                            Pair(spec.brukerId,spec.exception.body)
-                          //  Pair(spec.brukerId, spec.statusCode.value())
-                        }
-                    is InternalError ->{
-                        log.error("Regel for ${spec.brukerId} feilet med ${spec.exception.message}")
-                        Pair(spec.brukerId,500)
-                    }
-                }
+        val resultater = motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerIdOgType()).map {
+            when (it) {
+                is Success -> it.brukerId to "OK"
+                is RegelFailure -> if (overstyring.erOverstyrt(ansattId, it.brukerId))
+                    it.brukerId to "OK"
+                      else it.brukerId to "403"
+
+                is InternalError -> it.brukerId to "500"
             }
         }
-        log.info("Tid brukt på bulk regler for $ansattId og ${idOgType.map { it.brukerId }.map { it.maskFnr() }}: ${elapsedTime.inWholeMilliseconds}ms")
-        return resultater
+        val notFound = idOgType.map { it.brukerId }
+            .filterNot { brukerId -> resultater.any { it.first.verdi == brukerId } }
+            .map { BrukerId(it) to "404" }
+        return resultater + notFound
     }
 
     private fun Set<IdOgType>.brukerIdOgType() =

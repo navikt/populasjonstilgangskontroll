@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.security.token.support.core.api.Unprotected
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
@@ -51,10 +50,10 @@ class DevTilgangController(
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)
 
     @GetMapping("bruker/{id}")
-    fun bruker(@PathVariable @Valid @ValidId id: String) = brukere.utvidetFamilie(id)
+    fun bruker(@PathVariable @Valid @ValidId id: String) = brukere.medUtvidetFamilie(id)
 
     @GetMapping("person/{id}")
-    fun person(@PathVariable @Valid @ValidId id: String) = pdl.utvidetFamile(id)
+    fun person(@PathVariable @Valid @ValidId id: String) = pdl.medUtvidetFamile(id)
 
     @GetMapping("person/pip/{id}")
     fun pip(@PathVariable @Valid @ValidId id: String) = pip.person(id)

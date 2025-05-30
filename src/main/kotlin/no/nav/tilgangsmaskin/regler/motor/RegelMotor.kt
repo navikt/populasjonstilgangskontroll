@@ -42,44 +42,29 @@ class RegelMotor(
 
 
     fun bulkRegler(ansatt: Ansatt, brukere: Set<Pair<Bruker, RegelType>>) =
-          brukere.map { (bruker, type) ->
-              logger.info("Bulk evaluerer ${type.beskrivelse} for ${bruker.brukerId}")
-            runCatching { evaluer(ansatt, bruker, type.regelSett()) }
-                .fold(
-                    onSuccess = {
-                        Success(bruker.brukerId).also { logger.info("Bulk Success $bruker.bruker=$it") } },
-                    onFailure = { if (it is RegelException) {
-                        RegelFailure(bruker.brukerId, it, HttpStatus.valueOf(it.statusCode.value()).also {
-                            logger.info("Bulk Avvist  $it for ${bruker.brukerId}")
-                        })
-                    } else {
-                        InternalError(bruker.brukerId, INTERNAL_SERVER_ERROR, it)
-                    } }
-                )
-        }
-        /*
-        val avvisninger = brukere.mapNotNull { (bruker, type) ->
-            runCatching { evaluer(ansatt, bruker, type.regelSett()) }
-                .exceptionOrNull()
-                ?.let { e ->
-                    when (e) {
-                        is RegelException -> e
-                        else -> {
-                            logger.warn("Evaluerte ${bruker.brukerId} og fikk feil ${e.message}",e)
-                            null
-                        }
-                    }
+        brukere.map { (bruker, type) ->
+            logger.info("Bulk evaluerer ${type.beskrivelse} for ${bruker.brukerId}")
+            runCatching {
+                evaluer(ansatt, bruker, type.regelSett())
+                Success(bruker.brukerId).also {
+                    logger.info("Bulk OK for ${bruker.brukerId} med ${type.beskrivelse}")
                 }
-        }
-        if (avvisninger.isNotEmpty()) {
-            throw BulkRegelException(ansatt.ansattId, avvisninger)
-        }*/
-   // }
+            }.getOrElse {
+                if (it is RegelException) {
+                    RegelFailure(bruker.brukerId, it, HttpStatus.valueOf(it.statusCode.value()).also {
+                        logger.info("Bulk Avvist  $it for ${bruker.brukerId}")
+                    })
+                } else {
+                    InternalError(bruker.brukerId, INTERNAL_SERVER_ERROR, it)
+                }
+            }
+        }.toSet()
 
-    sealed class BulkRegelResult(val statusCode: HttpStatus) {
-        data class Success(val brukerId: BrukerId) : BulkRegelResult(ACCEPTED)
-        data class RegelFailure(val brukerId: BrukerId, @JsonIgnore val exception: RegelException, val status: HttpStatus) : BulkRegelResult(status)
-        data class InternalError(val brukerId: BrukerId,val status: HttpStatus, @JsonIgnore val exception: Throwable) : BulkRegelResult(status)
+
+    sealed class BulkRegelResult(val statusCode: HttpStatus, val brukerId: BrukerId) {
+        class Success( brukerId: BrukerId) : BulkRegelResult(ACCEPTED, brukerId)
+        class RegelFailure( brukerId: BrukerId, @JsonIgnore val exception: RegelException, val status: HttpStatus) : BulkRegelResult(status, brukerId)
+        class InternalError(brukerId: BrukerId,val status: HttpStatus, @JsonIgnore val exception: Throwable) : BulkRegelResult(status,brukerId)
     }
 
     private fun RegelType.regelSett() =

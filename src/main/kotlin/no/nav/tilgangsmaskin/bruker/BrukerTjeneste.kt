@@ -17,13 +17,13 @@ class BrukerTjeneste(private val personer: PDLTjeneste, val skjerminger: Skjermi
         }
     }
 
-    fun nærmesteFamilie(brukerId: String) =
-        personer.nærmesteFamilie(brukerId).let {
+    fun medNærmesteFamilie(brukerId: String) =
+        personer.medNærmesteFamilie(brukerId).let {
             tilBruker(it, skjerminger.skjerming(it.brukerId))
         }
 
-    fun utvidetFamilie(brukerId: String) =
-        personer.utvidetFamile(brukerId).let {
+    fun medUtvidetFamilie(brukerId: String) =
+        personer.medUtvidetFamile(brukerId).let {
             tilBruker(it, skjerminger.skjerming(it.brukerId))
         }
 }

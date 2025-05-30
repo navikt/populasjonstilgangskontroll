@@ -8,7 +8,6 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.isBeforeNow
-import no.nav.tilgangsmaskin.regler.motor.BulkRegelException
 import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.OVERSTYRING_MESSAGE_CODE
@@ -33,7 +32,7 @@ class OverstyringTjeneste(
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId): Boolean {
         val overstyring = adapter.gjeldendeOverstyring(
                 ansattId.verdi, brukerId.verdi,
-                brukere.nærmesteFamilie(brukerId.verdi).historiskeIds.map { it.verdi })
+                brukere.medNærmesteFamilie(brukerId.verdi).historiskeIds.map { it.verdi })
 
         return when {
             overstyring == null -> {
@@ -54,7 +53,7 @@ class OverstyringTjeneste(
     fun overstyr(ansattId: AnsattId, data: OverstyringData) =
         runCatching {
             log.info("Sjekker kjerneregler før eventuell overstyring for $ansattId og ${data.brukerId}")
-            motor.kjerneregler(ansatte.ansatt(ansattId), brukere.nærmesteFamilie(data.brukerId.verdi))
+            motor.kjerneregler(ansatte.ansatt(ansattId), brukere.medNærmesteFamilie(data.brukerId.verdi))
             adapter.overstyr(ansattId.verdi, data).also {
                 teller.tell(Tags.of("overstyrt", true.toString()))
                 log.info("Overstyring er utført for $ansattId og ${data.brukerId}")
@@ -71,14 +70,4 @@ class OverstyringTjeneste(
                 else -> throw it
             }
         }
-
-    fun sjekk(ansattId: AnsattId, e: Throwable) =
-        when (e) {
-            is RegelException -> sjekkOverstyring(ansattId, e)
-            else -> throw e
-        }
-
-    private fun sjekkOverstyring(ansattId: AnsattId, e: RegelException) =
-        if (!e.regel.erOverstyrbar || !erOverstyrt(ansattId, e.bruker.brukerId)) throw e
-        else Unit
 }

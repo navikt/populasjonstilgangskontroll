@@ -71,14 +71,4 @@ class OverstyringTjeneste(
                 else -> throw it
             }
         }
-
-    fun sjekk(ansattId: AnsattId, e: Throwable) =
-        when (e) {
-            is RegelException -> sjekkOverstyring(ansattId, e)
-            else -> throw e
-        }
-
-    private fun sjekkOverstyring(ansattId: AnsattId, e: RegelException) =
-        if (!e.regel.erOverstyrbar || !erOverstyrt(ansattId, e.bruker.brukerId)) throw e
-        else Unit
 }

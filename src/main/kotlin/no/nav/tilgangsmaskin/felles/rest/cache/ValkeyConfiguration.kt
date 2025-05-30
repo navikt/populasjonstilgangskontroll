@@ -94,7 +94,7 @@ class ValkeyConfiguration(private val cf: RedisConnectionFactory, private vararg
         }
     }
 
-    private fun cacheSizes() = cfgs.associate { it.navn to cacheSize(it.navn) }
+    private fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn)} innslag i cache"}
 
     private fun cacheSize(cacheName: String) =
         runCatching {

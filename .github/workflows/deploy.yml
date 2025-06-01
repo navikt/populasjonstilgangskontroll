@@ -68,7 +68,7 @@ jobs:
           report_paths: '**/build/test-results/test/TEST-*.xml'
 
       - name: Attest and sign
-        uses: nais/attest-sign@v1.5.7
+        uses: nais/attest-sign@v1.5.14
         with:
           image_ref: ${{env.IMAGE}}@${{env.DIGEST}}
           sbom: build/reports/application.cdx.json

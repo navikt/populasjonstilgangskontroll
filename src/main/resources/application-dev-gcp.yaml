@@ -24,7 +24,8 @@ management:
       enabled: true
 
   regler:
-    "Kode 6" :
-        enabled: true
-    "Kode 7" :
-        enabled: false
+    toggles:
+       "Kode 6" :
+          enabled: true
+       "Kode 7" :
+          enabled: false

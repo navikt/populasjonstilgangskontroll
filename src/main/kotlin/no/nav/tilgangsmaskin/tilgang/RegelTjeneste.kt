@@ -72,9 +72,9 @@ class RegelTjeneste(
 }
 
 @ConfigurationProperties("regler")
-class RegelConfig(private val cfg: Map<String,Boolean>) {
+data class RegelConfig(val toggles: Map<String,Boolean>) {
 
-    fun isEnabled(type: String) = cfg[type] ?: true
+    fun isEnabled(type: String) = toggles[type] ?: true
 
 }
 

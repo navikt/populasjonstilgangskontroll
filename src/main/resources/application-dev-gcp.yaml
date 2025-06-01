@@ -23,9 +23,9 @@ management:
     recording:
       enabled: true
 
-  regler:
-    toggles:
-       "Kode 6" :
-          enabled: true
-       "Kode 7" :
-          enabled: false
+regler:
+  toggles:
+      "Kode 6" :
+         enabled: true
+      "Kode 7" :
+         enabled: false

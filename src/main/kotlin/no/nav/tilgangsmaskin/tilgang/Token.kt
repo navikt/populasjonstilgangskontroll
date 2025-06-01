@@ -23,7 +23,7 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
     val systemNavn get() = system.split(":").lastOrNull() ?: "N/A"
     val systemAndNs get() = runCatching { system.split(":").drop(1).joinToString(separator = ":") }.getOrElse { systemNavn }
     val erCC get() = idType == APP
-    val erObo get() = idType != APP
+    val erObo get() = idType?.let { it != APP } ?: false
     val idType get() = claimSet()?.getStringClaim(IDTYP)
     companion object {
         const val AAD_ISSUER: String = "azuread"

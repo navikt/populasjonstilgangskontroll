@@ -21,8 +21,8 @@ class JsonCacheableModule : SimpleModule() {
 
     private val log = getLogger(javaClass)
 
-    override fun setupModule(context: SetupContext) {
-        context.insertAnnotationIntrospector(object : JacksonAnnotationIntrospector() {
+    override fun setupModule(ctx: SetupContext) {
+        ctx.insertAnnotationIntrospector(object : JacksonAnnotationIntrospector() {
             override fun findTypeResolver(config: MapperConfig<*>, ac: AnnotatedClass, baseType: JavaType) =
                 if (ac.hasAnnotation(JsonCacheable::class.java)) {
                     log.trace("${ac.name} er annotert ned @JsonCacheable, bruker JsonTypeInfo for å serialisere typeinformasjon")

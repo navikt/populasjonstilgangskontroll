@@ -23,7 +23,7 @@ class EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: E
             }
         }
             .flatMap { it.value }
-            .map { EntraGruppe(it.id, it.displayName) }
+            //.map { EntraGruppe(it.id, it.displayName) }
             .toSet()
 
 

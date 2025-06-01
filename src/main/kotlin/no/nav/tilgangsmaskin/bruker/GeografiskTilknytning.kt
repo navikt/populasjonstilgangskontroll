@@ -25,7 +25,17 @@ sealed class GeografiskTilknytning(type: Type) {
 
     data class KommuneTilknytning(val kommune: Kommune) : GeografiskTilknytning(KOMMUNE)
     data class BydelTilknytning(val bydel: Bydel) : GeografiskTilknytning(BYDEL)
-    class UkjentBosted : GeografiskTilknytning(UKJENT_BOSTED)
-    class UtenlandskTilknytning : GeografiskTilknytning(UTLAND)
-    class UdefinertTilknytning : GeografiskTilknytning(UDEFINERT)
+    class UkjentBosted : GeografiskTilknytning(UKJENT_BOSTED) {
+        override fun equals(other: Any?) = other is UkjentBosted
+        override fun hashCode() = javaClass.hashCode()
+    }
+
+    class UtenlandskTilknytning : GeografiskTilknytning(UTLAND){
+        override fun equals(other: Any?) = other is UtenlandskTilknytning
+        override fun hashCode() = javaClass.hashCode()
+    }
+    class UdefinertTilknytning : GeografiskTilknytning(UDEFINERT) {
+        override fun equals(other: Any?) = other is UdefinertTilknytning
+        override fun hashCode() = javaClass.hashCode()
+    }
 }

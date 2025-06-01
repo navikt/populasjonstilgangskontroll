@@ -1,11 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
-import com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION
-import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
@@ -32,9 +27,10 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttel
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.json.JsonTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 
@@ -44,6 +40,7 @@ import org.springframework.test.context.ContextConfiguration
 
 class BrukerMapperTest {
 
+    @Autowired
 
     private val aktørId = AktørId("1234567890123")
 
@@ -54,7 +51,7 @@ class BrukerMapperTest {
     @Test
     @DisplayName("Test at behandling av brukere med STRENGT_FORTROLIG_UTLAND  krever medlemsskap i STRENGT_FORTROLIG_GRUPPE fra ansatt og at geotilknytning er UtenlandskTilknytning")
     fun strengtFortroligUtland() {
-        with(tilBruker(person(pipRespons(STRENGT_FORTROLIG_UTLAND)), false)) {
+        with(tilBruker(tilPerson(pipRespons(STRENGT_FORTROLIG_UTLAND)), false)) {
             assertThat(påkrevdeGrupper).containsExactly(GlobalGruppe.STRENGT_FORTROLIG_UTLAND)
             assertThat(geografiskTilknytning).isInstanceOf(GeografiskTilknytning.UtenlandskTilknytning::class.java)
         }
@@ -63,7 +60,7 @@ class BrukerMapperTest {
     @Test
     @DisplayName("Test at behandling av brukere med STRENGT_FORTROLIG vil kreve medlemsskap i STRENGT_FORTROLIG_GRUPPE for ansatt og at geotilknytning er KommuneTilknytning")
     fun strengtFortroligKommune() {
-        with(tilBruker(person(pipRespons(STRENGT_FORTROLIG, geoKommune())), false)) {
+        with(tilBruker(tilPerson(pipRespons(STRENGT_FORTROLIG, geoKommune())), false)) {
             assertThat(påkrevdeGrupper).containsExactly(GlobalGruppe.STRENGT_FORTROLIG)
             assertThat(geografiskTilknytning).isInstanceOf(KommuneTilknytning::class.java)
         }
@@ -72,7 +69,7 @@ class BrukerMapperTest {
     @Test
     @DisplayName("Test at behandling av brukere med EGEN_ANSATT vil kreve medlemsskap i EGEN_ANSATT_GRUPPE for ansatt")
     fun egenAnsatt() {
-        with(tilBruker(person(pipRespons()), true)) {
+        with(tilBruker(tilPerson(pipRespons()), true)) {
             assertThat(påkrevdeGrupper).containsExactly(SKJERMING)
         }
     }
@@ -80,7 +77,7 @@ class BrukerMapperTest {
     @Test
     @DisplayName("Test at behandling av brukere med EGEN_ANSATT og STRENGT_FORTROLIG vil kreve medlemsskap i EGEN_ANSATT_GRUPPE og STRENGT_FORTROLIG_GRUPPE for ansatt")
     fun egenAnsattKode6() {
-        with(tilBruker(person(pipRespons(STRENGT_FORTROLIG)), true)) {
+        with(tilBruker(tilPerson(pipRespons(STRENGT_FORTROLIG)), true)) {
             assertThat(påkrevdeGrupper).containsExactlyInAnyOrder(
                     SKJERMING,
                     GlobalGruppe.STRENGT_FORTROLIG)
@@ -90,7 +87,7 @@ class BrukerMapperTest {
     @Test
     @DisplayName("Test at behandling av brukere med EGEN_ANSATT og FORTROLIG vil kreve medlemsskap i EGEN_ANSATT_GRUPPE og FORTROLIG_GRUPPE for ansatt")
     fun egenAnsattKode7() {
-        with(tilBruker(person(pipRespons(FORTROLIG)), true)) {
+        with(tilBruker(tilPerson(pipRespons(FORTROLIG)), true)) {
             assertThat(påkrevdeGrupper).containsExactlyInAnyOrder(SKJERMING, GlobalGruppe.FORTROLIG)
         }
     }
@@ -116,25 +113,4 @@ class BrukerMapperTest {
                 geo
                          )
     }
-
-    fun person(respons: PdlRespons) = tilPerson(respons)
-
-    @Test
-    fun xxx()  {
-        //val pip = pipRespons(STRENGT_FORTROLIG_UTLAND)
-        // val string = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(pip)
-        val swe =  mapper.writerWithDefaultPrettyPrinter().writeValueAsString(GTLand("SWE"))
-        println(swe)
-        val back = mapper.readValue(swe, GTLand::class.java)
-        println(back)
-        //Assertions.assertEquals(pip, back)
-    }
-
-    val mapper = jacksonObjectMapper().registerModule(JavaTimeModule())
-        .apply {
-            configure(INCLUDE_SOURCE_IN_LOCATION, true)
-            activateDefaultTyping(polymorphicTypeValidator,
-                EVERYTHING,
-                PROPERTY)
-        }
 }

@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.ansatt
 
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig
-import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupper
+import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -15,7 +15,7 @@ import org.springframework.core.env.Environment
 import java.net.URI
 @RestClientTest
 @TestPropertySource(locations = ["classpath:test.properties"])
-@EnableConfigurationProperties(GlobaleGrupper::class)
+@EnableConfigurationProperties(GlobaleGrupperConfig::class)
 @ContextConfiguration(classes = [TestApp::class])
 class EntraUrl {
 

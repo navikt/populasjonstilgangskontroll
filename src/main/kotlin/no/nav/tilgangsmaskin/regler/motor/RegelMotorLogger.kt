@@ -28,8 +28,15 @@ class RegelMotorLogger(private val teller: AvvisningTeller) {
         MDC.remove(BESLUTNING)
     }
 
-    fun info(message: String, e: Throwable? = null) {
+    fun info(message: String) {
+        log.info(message)
+    }
+    fun warn(message: String, e: Throwable? = null) {
         log.warn(message,e)
+    }
+
+    fun trace(message: String, e: Throwable? = null) {
+        log.trace(message,e)
     }
 
     fun evaluerer(ansatt: Ansatt, bruker: Bruker, regel: Regel) {

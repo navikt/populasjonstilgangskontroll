@@ -40,11 +40,11 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
 
-@Import(RegelConfig::class)
+@Import(RegelTestConfig::class)
 @DataJpaTest
 @EnableJpaAuditing
 @TestPropertySource(locations = ["classpath:test.properties"])
-@EnableConfigurationProperties(GlobaleGrupper::class)
+@EnableConfigurationProperties(GlobaleGrupperConfig::class)
 @ContextConfiguration(classes = [TestApp::class])
 @ExtendWith(MockKExtension::class)
 @AutoConfigureObservability

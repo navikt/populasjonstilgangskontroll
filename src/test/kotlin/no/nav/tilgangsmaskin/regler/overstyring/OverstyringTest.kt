@@ -16,15 +16,18 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.AvvisningTeller
+import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
 import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
 import no.nav.tilgangsmaskin.regler.motor.RegelBeanConfig
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.motor.RegelMotorLogger
+import no.nav.tilgangsmaskin.tilgang.RegelConfig
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
@@ -37,6 +40,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @DataJpaTest
+@EnableConfigurationProperties(value= arrayOf(RegelConfig::class))
 @ContextConfiguration(classes = [RegelMotor::class, RegelMotorLogger::class, OverstyringJPAAdapter::class, RegelBeanConfig::class, TestApp::class])
 @ExtendWith(MockKExtension::class)
 @EnableJpaAuditing

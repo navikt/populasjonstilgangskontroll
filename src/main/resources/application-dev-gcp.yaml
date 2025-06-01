@@ -22,3 +22,9 @@ management:
   httpexchanges:
     recording:
       enabled: true
+
+  regler:
+    "Kode 6" :
+        enabled: true
+    "Kode 7" :
+        enabled: false

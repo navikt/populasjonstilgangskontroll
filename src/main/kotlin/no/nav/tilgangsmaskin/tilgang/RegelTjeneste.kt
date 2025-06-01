@@ -1,6 +1,8 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.micrometer.core.annotation.Timed
+import no.nav.boot.conditionals.ConditionalOnDev
+import org.springframework.boot.context.properties.ConfigurationProperties
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -67,6 +69,13 @@ class RegelTjeneste(
                 bruker to spec.type
             }
         }.toSet()
+}
+
+@ConfigurationProperties("regler")
+class RegelConfig(private val cfg: Map<String,Boolean>) {
+
+    fun isEnabled(type: String) = cfg[type] ?: true
+
 }
 
 

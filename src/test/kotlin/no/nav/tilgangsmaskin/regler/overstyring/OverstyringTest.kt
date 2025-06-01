@@ -40,7 +40,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @DataJpaTest
-@EnableConfigurationProperties(value= arrayOf(RegelConfig::class))
+@EnableConfigurationProperties(RegelConfig::class)
 @ContextConfiguration(classes = [RegelMotor::class, RegelMotorLogger::class, OverstyringJPAAdapter::class, RegelBeanConfig::class, TestApp::class])
 @ExtendWith(MockKExtension::class)
 @EnableJpaAuditing

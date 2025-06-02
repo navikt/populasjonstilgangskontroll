@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.micrometer.core.annotation.Timed
+import org.springframework.boot.context.properties.ConfigurationProperties
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -67,6 +68,11 @@ class RegelTjeneste(
                 bruker to spec.type
             }
         }.toSet()
+}
+
+@ConfigurationProperties("regler")
+data class RegelConfig(val toggles: Map<String,Boolean> = emptyMap()) {
+    fun isEnabled(regel: String) = toggles[regel.lowercase() +".enabled"]  ?: true
 }
 
 

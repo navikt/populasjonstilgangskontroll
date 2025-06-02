@@ -11,6 +11,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.OVERSTYRBAR_REGELTYPE
+import no.nav.tilgangsmaskin.tilgang.RegelConfig
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
@@ -18,9 +19,10 @@ import org.springframework.http.HttpStatus.*
 
 @Component
 class RegelMotor(
-        @Qualifier(KJERNE) private val kjerne: RegelSett,
-        @Qualifier(OVERSTYRBAR) private val overstyrbar: RegelSett,
-        private val logger: RegelMotorLogger) {
+    @Qualifier(KJERNE) private val kjerne: RegelSett,
+    @Qualifier(OVERSTYRBAR) private val overstyrbar: RegelSett,
+    private val cfg: RegelConfig,
+    private val logger: RegelMotorLogger) {
 
     private val komplett = RegelSett(KOMPLETT_REGELTYPE to kjerne.regler + overstyrbar.regler)
 
@@ -32,6 +34,10 @@ class RegelMotor(
     private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) {
         regelSett.regler.forEach { regel ->
             logger.evaluerer(ansatt, bruker, regel)
+            if (!cfg.isEnabled(regel.navn)) {
+                logger.trace("Regel ${regel.navn} er deaktivert i konfigurasjonen, hopper over evaluering.")
+                return@forEach
+            }
             if (!regel.evaluer(ansatt, bruker)) {
                 logger.avvist(ansatt, bruker, regel)
                 throw RegelException(ansatt, bruker, regel)

@@ -23,6 +23,7 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.regler.motor.*
+import no.nav.tilgangsmaskin.tilgang.RegelConfig
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
@@ -40,12 +41,12 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 
-@Import(RegelConfig::class)
+@Import(RegelTestConfig::class)
 @ActiveProfiles(TEST)
 @RestClientTest
 @TestPropertySource(locations = ["classpath:test.properties"])
 @AutoConfigureObservability
-@EnableConfigurationProperties(GlobaleGrupper::class)
+@EnableConfigurationProperties(value = [GlobaleGrupperConfig::class, RegelConfig::class])
 @ContextConfiguration(classes = [TestApp::class, Token::class])
 @TestInstance(PER_CLASS)
 class RegelMotorTest {

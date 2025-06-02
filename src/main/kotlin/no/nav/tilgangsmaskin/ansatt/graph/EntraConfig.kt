@@ -21,30 +21,28 @@ class EntraConfig(
         .queryParam(PARAM_NAME_COUNT, "true")
         .build()
 
-     fun grupperURI(ansattId: String, isCCF: Boolean) = if (isCCF) grupperCcfURI(ansattId) else grupperOboURI(ansattId)
+     fun grupperURI(ansattId: String, isCCF: Boolean) = if (isCCF) ccUri(ansattId) else oboUri(ansattId)
 
-    private fun grupperOboURI(ansattId: String) = builder().path(GRUPPER_PATH)
+    private fun oboUri(ansattId: String) = query(ansattId,GEO_PREFIX)
+
+    private fun ccUri(ansattId: String) = query(ansattId,"id in(${uuidsFormatted()}) or $GEO_PREFIX")
+
+    private fun query(ansattId: String, filter: String) =  builder().path(GRUPPER_PATH)
         .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
         .queryParam(PARAM_NAME_COUNT, "true")
         .queryParam(PARAM_NAME_TOP, size)
-        .queryParam(PARAM_NAME_FILTER, "startswith(displayName,'0000-GA-GEO')")
+        .queryParam(PARAM_NAME_FILTER,filter)
         .build(ansattId)
 
-    private fun grupperCcfURI(ansattId: String) = builder().path(GRUPPER_PATH)
-        .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
-        .queryParam(PARAM_NAME_COUNT, "true")
-        .queryParam(PARAM_NAME_TOP, size)
-        .queryParam(PARAM_NAME_FILTER,
-            "id in(${GlobalGruppe.uuids().joinToString(separator ="','" , prefix = "'", postfix = "'")}) or startswith(displayName, '0000-GA-GEO')")
-        .build(ansattId)
     override val navn = name
+
+    private fun uuidsFormatted() = GlobalGruppe.uuids().joinToString(separator ="','" , prefix = "'", postfix = "'")
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
-
     companion object {
+        const val GEO_PREFIX = "startswith(displayName,'0000-GA-GEO')"
         const val GRAPH = "graph"
-        val HEADER_CONSISTENCY_LEVEL = "ConsistencyLevel" to "eventual"
         private const val DEFAULT_BATCH_SIZE = 250
         private const val USERS_PATH = "/users"
         private const val GRUPPER_PATH = "/users/{ansattId}/memberOf"

@@ -1,8 +1,9 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import no.nav.tilgangsmaskin.TestApp
+import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GEO_PREFIX
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig
-import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupper
+import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -15,7 +16,7 @@ import org.springframework.core.env.Environment
 import java.net.URI
 @RestClientTest
 @TestPropertySource(locations = ["classpath:test.properties"])
-@EnableConfigurationProperties(GlobaleGrupper::class)
+@EnableConfigurationProperties(GlobaleGrupperConfig::class)
 @ContextConfiguration(classes = [TestApp::class])
 class EntraUrl {
 
@@ -26,7 +27,7 @@ class EntraUrl {
     @DisplayName("UUIDene til gruppene kommer i rett formatering")
     fun `GrupperCcfURI should correctly format PARAM_NAME_FILTER`() {
         val globaleGrupper = GlobalGruppe.entries.map { env.getProperty(it.property) }.joinToString(",") { "'$it'" }
-        val expectedFilter = "id in($globaleGrupper) or startswith(displayName, '0000-GA-GEO')"
+        val expectedFilter = "id in($globaleGrupper) or $GEO_PREFIX"
         val actualFilter = EntraConfig(baseUri = URI("https://example.com")).grupperURI("Z999999", true).query.substringAfter("\$filter=").substringBefore("&")
         assertEquals(expectedFilter, actualFilter, "PARAM_NAME_FILTER is not formatted correctly")
     }

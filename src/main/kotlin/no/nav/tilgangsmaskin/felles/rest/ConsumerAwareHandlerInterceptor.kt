@@ -14,11 +14,11 @@ class ConsumerAwareHandlerInterceptor(private val token: Token, private val regi
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         MDC.put(USER_ID, token.ansattId?.verdi ?: "N/A")
         MDC.put(CONSUMER_ID, token.systemAndNs)
-        registry.counter(METRIC, Tags.of("remote_host", request.getHeader("X-Forwarded-Host"))).increment()
+       // registry.counter(METRIC, Tags.of("remote_host", request.getHeader("X-Forwarded-Host"))).increment()
         return true
     }
     companion object  {
-        private const val METRIC = "http_requests_by_remote_host"
+      //  private const val METRIC = "http_requests_by_remote_host"
         const val CONSUMER_ID = "consumerId"
         const val USER_ID = "userId"
     }

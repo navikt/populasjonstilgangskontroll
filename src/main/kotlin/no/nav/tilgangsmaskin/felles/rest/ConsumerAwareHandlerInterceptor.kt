@@ -1,7 +1,5 @@
 package no.nav.tilgangsmaskin.felles.rest
 
-import io.micrometer.core.instrument.MeterRegistry
-import io.micrometer.core.instrument.Tags
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import no.nav.tilgangsmaskin.tilgang.Token
@@ -17,7 +15,6 @@ class ConsumerAwareHandlerInterceptor(private val token: Token) : HandlerInterce
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         MDC.put(USER_ID, token.ansattId?.verdi ?: "N/A")
         MDC.put(CONSUMER_ID, token.systemAndNs)
-        log.info("X-forwarded-host: ${request.getHeader("X-Forwarded-Host")}, X-forwarded-for: ${request.getHeader("X-Forwarded-For")}")
         return true
     }
     companion object  {

@@ -80,6 +80,11 @@
       "name": "repr-fullmakt",
       "namespace": "repr",
       "cluster": "dev-fss"
+    },
+    {
+      "name": "istilgangskontroll",
+      "namespace": "teamsykefravr",
+      "cluster": "dev-gcp"
     }
   ],
   "nais": {

@@ -1,0 +1,37 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    team: tilgangsmaskin
+  name: Alerts-tilgangmaskin
+  namespace: tilgangsmaskin
+spec:
+  groups:
+    - name: client-errors
+      rules:
+        - alert: HttpClientErrorRateHigh
+          expr: |
+            1 - (
+              sum(
+                rate(
+                  http_client_request_duration_seconds_count{app="tilgangsmaskin.nav.no", http_response_status_code="200"}[5m]
+                )
+              ) by (server_address)
+              /
+              sum(
+                rate(
+                  http_client_request_duration_seconds_count{app="tilgangsmaskin.nav.no"}[5m]
+                )
+              ) by (server_address)
+            ) * 100 < 95
+          for: 10m
+          annotations:
+            summary: "High error rate for outbound http requests"
+            consequence: "Users are experiencing errors when using the application."
+            action: "Check the logs using `kubectl logs` for errors and check upstream services."
+            message: "Requests to `{{ $labels.server_address }}` are failing at {{ $value }}% over the last 5 minutes."
+            runbook_url: ""
+            dashboard_url: "https://grafana.nav.cloud.nais.io/"
+          labels:
+            severity: Error
+            namespace: tilgangsmaskin

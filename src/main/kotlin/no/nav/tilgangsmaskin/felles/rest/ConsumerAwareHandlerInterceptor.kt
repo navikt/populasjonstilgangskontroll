@@ -14,8 +14,7 @@ class ConsumerAwareHandlerInterceptor(private val accessor: Token, private val r
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         MDC.put(USER_ID, accessor.ansattId?.verdi ?: "N/A")
         MDC.put(CONSUMER_ID, accessor.systemAndNs)
-        val forwardedHost = request.getHeader("X-Forwarded-Host")
-        registry.counter(METRIC, Tags.of("remote_host", forwardedHost)).increment()
+        registry.counter(METRIC, Tags.of("remote_host", request.getHeader("X-Forwarded-Host"))).increment()
         return true
     }
     companion object  {

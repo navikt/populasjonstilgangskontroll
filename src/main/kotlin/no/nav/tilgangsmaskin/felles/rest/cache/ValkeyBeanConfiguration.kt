@@ -65,10 +65,12 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, private va
             append(method.name)
             append(":")
             params.forEach {
-               if (it is BrukerId)
-               append(it.verdi)
-                 else append(it)
-
+                if (it is BrukerId) {
+                    append(it.verdi)
+                }
+                else {
+                    append(it)
+                }
             }
         }
     }
@@ -78,7 +80,7 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, private va
                 emptyMap<String,String>()
             }
             else {
-                throw IllegalStateException("$name ping failed")
+                error("$name ping failed")
             }
         }
 
@@ -86,18 +88,14 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, private va
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag i cache"}
 
     private fun cacheSize(cacheName: String) =
-        runCatching {
-            val scanOptions = scanOptions().match("*$cacheName*").count(1000).build()
-            cf.connection
-                .keyCommands()
-                .scan(scanOptions)
+        cf.connection.use {
+            it.keyCommands()
+                .scan(scanOptions().match("*$cacheName*").count(1000).build())
                 .asSequence()
                 .count()
                 .toDouble()
-        }.getOrElse {
-            log.warn("Kunne ikke hente størrelse på cache $cacheName", it)
-            0.0
         }
+
 
     private fun cacheConfig(cfg: CachableRestConfig) =
         defaultCacheConfig()

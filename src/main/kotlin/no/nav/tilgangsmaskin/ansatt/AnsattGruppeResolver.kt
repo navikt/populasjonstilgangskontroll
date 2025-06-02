@@ -37,7 +37,7 @@ class AnsattGruppeResolver(private val entra: Entra, private val token: Token, p
                 }
             }
             else -> {
-                log.info("Intet token, IDTYP er ${token.idType}")
+                log.info("Intet token, ok bare i dev")
                 if (isDevOrLocal(env)) {
                     log.info("Intet token: $ansattId slår opp globale og GEO-grupper i Entra")
                     entra.geoOgGlobaleGrupper(ansattId)

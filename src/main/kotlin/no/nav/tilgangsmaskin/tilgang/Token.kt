@@ -16,18 +16,20 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
                 ?: emptyList()
 
 
-    val system get() = runCatching { claimSet()?.getStringClaim(AZP_NAME) }.getOrElse { "N/A" } ?: "N/A"
-    val oid get() = claimSet()?.let { UUID.fromString(it.getStringClaim("oid")) }
-    val ansattId get() = claimSet()?.getStringClaim(NAVIDENT)?.let { AnsattId(it) }
+    val system get() = stringClaim(AZP_NAME)  ?: "N/A"
+    val oid get() = stringClaim(OID)?.let { UUID.fromString(it) }
+    val ansattId get() = stringClaim(NAVIDENT)?.let { AnsattId(it) }
+    private val idType get() = stringClaim(IDTYP)
+    fun stringClaim(name: String) = claimSet()?.getStringClaim(name)
     private fun claimSet() = runCatching { contextHolder.getTokenValidationContext().getClaims(AAD_ISSUER) }.getOrNull()
     val systemNavn get() = system.split(":").lastOrNull() ?: "N/A"
     val systemAndNs get() = runCatching { system.split(":").drop(1).joinToString(separator = ":") }.getOrElse { systemNavn }
     val erCC get() = idType == APP
-    val erObo get() = idType?.let { it != APP } ?: false
-    val idType get() = claimSet()?.getStringClaim(IDTYP)
+    val erObo get()  = oid != null
     companion object {
         const val AAD_ISSUER: String = "azuread"
         private const val APP = "app"
+        private const val OID = "oid"
         private const val IDTYP = "idtyp"
         private const val AZP_NAME = "azp_name"
         private const val NAVIDENT = "NAVident"

@@ -1,20 +1,14 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
-import com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
@@ -30,36 +24,24 @@ import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
-import org.springframework.stereotype.Component
 import java.time.Duration
 import kotlin.reflect.jvm.jvmName
 
 @Configuration
 @EnableCaching
 @ConditionalOnGCP
-class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, objectMapper: ObjectMapper,private vararg val cfgs: CachableRestConfig, @Value("\${valkey.host.cache}") private val host: String, @Value("\${valkey.port.cache}") private val port: String ) : CachingConfigurer, Pingable {
+class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, objectMapper: ObjectMapper,
+                              @Value("\${valkey.host.cache}") private val host: String,
+                              @Value("\${valkey.port.cache}") private val port: String,
+                              private vararg val cfgs: CachableRestConfig) : CachingConfigurer, Pingable {
 
     override val pingEndpoint  = "$host:$port"
     override val name = "ValKey Cache"
-    override val isEnabled = true
 
     private val mapper =
-        jacksonObjectMapper()
-            .registerModule(JavaTimeModule())
-            .apply {
-                configure(INCLUDE_SOURCE_IN_LOCATION, true)
-                activateDefaultTyping(polymorphicTypeValidator,
-                    EVERYTHING,
-                    PROPERTY
-                )
-            }
-    private val mapper1 =
         objectMapper.copy()
             .apply {
-                activateDefaultTyping(polymorphicTypeValidator,
-                    EVERYTHING,
-                    PROPERTY
-                )
+                activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
             }
 
     @Bean
@@ -103,8 +85,7 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, objectMapp
                 error("$name ping failed")
             }
         }
-
-
+    
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag i cache"}
 
     private fun cacheSize(cacheName: String) =
@@ -116,16 +97,10 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, objectMapp
                 .toDouble()
         }
 
-
     private fun cacheConfig(cfg: CachableRestConfig) =
         defaultCacheConfig()
             .disableCachingNullValues()
             .entryTtl(Duration.ofHours(cfg.expireHours))
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))
-            .serializeValuesWith(fromSerializer(GenericJackson2JsonRedisSerializer(mapper1)))
-
-
+            .serializeValuesWith(fromSerializer(GenericJackson2JsonRedisSerializer(mapper)))
 }
-
-@Component
-class ValkeyHealthIndicator(config: ValkeyBeanConfiguration) : PingableHealthIndicator(config)

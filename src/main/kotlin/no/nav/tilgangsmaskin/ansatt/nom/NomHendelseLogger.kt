@@ -23,7 +23,6 @@ class NomHendelseLogger {
 
     fun ferdig(hendelser: List<NomHendelse>) {
         log.info("${hendelser.size} ${"hendelse".pluralize(hendelser)} ferdig behandlet")
-
     }
 
     fun feilet(ansattId: String, brukerId: String, e: Throwable) {

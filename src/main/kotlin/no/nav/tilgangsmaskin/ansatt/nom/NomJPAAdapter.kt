@@ -21,15 +21,17 @@ class NomJPAAdapter(val repo: NomRepository, @PersistenceContext val entityManag
 
     private fun upsert(ansattId: AnsattId, ansattFnr: BrukerId, start: Instant, slutt: Instant) =
 
-        entityManager.createNativeQuery(upsertQuery())
+        entityManager.createNativeQuery(UPSERT_QUERY)
             .setParameter("navid", ansattId.verdi)
             .setParameter("fnr", ansattFnr.verdi)
             .setParameter("startdato", start)
             .setParameter("gyldigtil", slutt)
             .executeUpdate()
-    //.singleResult as Long
 
-    private fun upsertQuery() = """
+    fun fnrForAnsatt(ansattId: String) = repo.ansattBrukerId(ansattId)?.let(::BrukerId)
+
+    companion object {
+        private const val UPSERT_QUERY = """
             INSERT INTO Ansatte (navid, fnr, startdato, gyldigtil, created, updated)
             VALUES (:navid, :fnr, :startdato, :gyldigtil, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             ON CONFLICT (navid)
@@ -39,8 +41,7 @@ class NomJPAAdapter(val repo: NomRepository, @PersistenceContext val entityManag
                 gyldigtil = EXCLUDED.gyldigtil,
                 updated = CURRENT_TIMESTAMP
         """
-
-    fun fnrForAnsatt(ansattId: String) = repo.ansattBrukerId(ansattId)?.let(::BrukerId)
+    }
 }
 
 

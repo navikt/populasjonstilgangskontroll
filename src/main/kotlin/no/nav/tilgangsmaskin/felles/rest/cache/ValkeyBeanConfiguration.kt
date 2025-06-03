@@ -47,6 +47,7 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory,
 
     private val valkeyMapper =
         mapper.copy().apply {
+            log.info("Modules for default  mapper: ${registeredModuleIds.joinToString()}")
             if (EnvUtil.isDevOrLocal(env)) {
                 registerModule(JsonCacheableModule())
             }

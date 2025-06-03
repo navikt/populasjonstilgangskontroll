@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.felles.rest.cache
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
+import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.*
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
 import no.nav.boot.conditionals.ConditionalOnGCP
@@ -50,8 +50,11 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory,
             log.info("Modules for default  mapper: ${registeredModuleIds.joinToString()}")
             if (EnvUtil.isDevOrLocal(env)) {
                 registerModule(JsonCacheableModule())
+                activateDefaultTyping(polymorphicTypeValidator, NON_FINAL_AND_ENUMS, PROPERTY)
             }
-            activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
+            else {
+                activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
+            }
             log.info("Modules for ValKey cache mapper: ${registeredModuleIds.joinToString()}")
         }
 

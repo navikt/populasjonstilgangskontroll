@@ -57,6 +57,11 @@
       "name": "repr-fullmakt",
       "namespace": "repr",
       "cluster": "prod-fss"
+    },
+    {
+      "name": "istilgangskontroll",
+      "namespace": "teamsykefravr",
+      "cluster": "prod-gcp"
     }
   ],
   "nais": {

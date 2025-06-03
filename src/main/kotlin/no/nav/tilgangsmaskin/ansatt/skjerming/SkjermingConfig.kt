@@ -25,6 +25,5 @@ class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH,
         private const val DEFAULT_PING_PATH = "internal/health/liveness"
         private const val DEFAULT_SKJERMING_PATH = "skjermet"
         private const val DEFAULT_SKJERMING_BULK_PATH = "skjermetBulk"
-
     }
 }

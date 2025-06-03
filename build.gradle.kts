@@ -2,7 +2,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 val javaVersion = JavaLanguageVersion.of(21)
 val springdocVersion = "2.8.8"
-val tokenSupportVersion = "5.0.25"
+val tokenSupportVersion = "5.0.29"
 val mockkVersion = "1.14.2"
 
 group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
@@ -57,11 +57,11 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:8.1")
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("org.hibernate.orm:hibernate-micrometer")
-    implementation("no.nav.boot:boot-conditionals:5.1.7")
+    implementation("no.nav.boot:boot-conditionals:5.1.8")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
     implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
-    implementation("no.nav.boot:boot-conditionals:5.1.7")
+    implementation("no.nav.boot:boot-conditionals:5.1.8")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.flywaydb:flyway-core")
     implementation("org.postgresql:postgresql")

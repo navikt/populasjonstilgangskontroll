@@ -11,12 +11,9 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 
 @Component
-class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, private val cf: SkjermingConfig) :
-    AbstractRestClientAdapter(restClient, cf) {
+class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, private val cf: SkjermingConfig) : AbstractRestClientAdapter(restClient, cf) {
 
-    fun skjerming(ident: String) = post<Boolean>(cf.skjermingUri, mapOf(IDENT to ident)).also {
-        log.info("${ident.maskFnr()} skjerming status: $it")
-    }
+    fun skjerming(ident: String) = post<Boolean>(cf.skjermingUri, mapOf(IDENT to ident))
 
     fun skjerminger(identer: Set<String>): Map<BrukerId, Boolean> =
         post<Map<String, Boolean>>(cf.skjermingerUri, mapOf(IDENTER to identer))

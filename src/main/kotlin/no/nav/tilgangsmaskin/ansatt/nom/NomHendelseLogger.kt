@@ -1,13 +1,12 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
-import io.micrometer.core.annotation.Counted
+
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.pluralize
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
-@Counted
 class NomHendelseLogger {
     private val log = getLogger(javaClass)
     fun ok(ansattId: String, brukerId: String) {
@@ -24,7 +23,6 @@ class NomHendelseLogger {
 
     fun ferdig(hendelser: List<NomHendelse>) {
         log.info("${hendelser.size} ${"hendelse".pluralize(hendelser)} ferdig behandlet")
-
     }
 
     fun feilet(ansattId: String, brukerId: String, e: Throwable) {

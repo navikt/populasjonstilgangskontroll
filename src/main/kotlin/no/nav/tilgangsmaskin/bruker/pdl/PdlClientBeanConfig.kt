@@ -7,7 +7,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.graphql.GraphQLErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
-import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -21,7 +21,6 @@ import org.springframework.web.client.RestClient.Builder
 
 @Configuration
 class PdlClientBeanConfig {
-
 
     @Component
     @Primary
@@ -54,7 +53,7 @@ class PdlClientBeanConfig {
 
     private class LoggingGraphQLInterceptor : SyncGraphQlClientInterceptor {
 
-        private val log = LoggerFactory.getLogger(javaClass)
+        private val log = getLogger(javaClass)
 
         override fun intercept(req: ClientGraphQlRequest, chain: SyncGraphQlClientInterceptor.Chain) =
             chain.next(req).also {

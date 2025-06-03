@@ -15,21 +15,30 @@ class RegelMotorLogger(private val teller: AvvisningTeller) {
     private val log = getLogger(javaClass)
     fun avvist(ansatt: Ansatt, bruker: Bruker, regel: Regel) {
         MDC.put(BESLUTNING,regel.kode)
-        log.warn("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId}")
-        secureLog.warn("Tilgang til ${bruker.brukerId.verdi} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} fra ${MDC.get(CONSUMER_ID)}")
+        val fra =  MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: ""
+        log.warn("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} $fra")
+        secureLog.warn("Tilgang til ${bruker.brukerId.verdi} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} $fra")
         teller.tell(Tags.of("navn", regel.navn))
         MDC.remove(BESLUTNING)
     }
 
     fun ok(ansatt: Ansatt, bruker: Bruker,regelSett: RegelSett) {
         MDC.put(BESLUTNING,OK)
-        log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} fra ${MDC.get(CONSUMER_ID)}")
-        secureLog.info("${regelSett.beskrivelse} ga tilgang til  ${bruker.brukerId.verdi}  for ${ansatt.ansattId} fra ${MDC.get(CONSUMER_ID)}")
+        val fra =  MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: ""
+        log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} $fra")
+        secureLog.info("${regelSett.beskrivelse} ga tilgang til  ${bruker.brukerId.verdi}  for ${ansatt.ansattId} $fra")
         MDC.remove(BESLUTNING)
     }
 
-    fun info(message: String, e: Throwable? = null) {
+    fun info(message: String) {
+        log.info(message)
+    }
+    fun warn(message: String, e: Throwable? = null) {
         log.warn(message,e)
+    }
+
+    fun trace(message: String, e: Throwable? = null) {
+        log.trace(message,e)
     }
 
     fun evaluerer(ansatt: Ansatt, bruker: Bruker, regel: Regel) {

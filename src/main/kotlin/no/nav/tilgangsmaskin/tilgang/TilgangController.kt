@@ -18,7 +18,7 @@ import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatus.ACCEPTED
+import org.springframework.http.HttpStatus.*
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -33,19 +33,7 @@ import org.springframework.web.server.ResponseStatusException
 class TilgangController(
         private val regler: RegelTjeneste,
         private val overstyring: OverstyringTjeneste,
-        private val skjermingAdapter: SkjermingRestClientAdapter,
-        private val skjerming: SkjermingTjeneste,
         private val token: Token) {
-
-    @PostMapping("skjerming")
-    @Unprotected  // TODO midlertidig
-    fun skjerming(@RequestBody brukerId: BrukerId) = skjerming.skjerming(brukerId)
-
-    @PostMapping("skjermingadaptere")
-    @Unprotected  // TODO midlertidig
-    fun skjermingAdapter(@RequestBody brukerId: String) = skjermingAdapter.skjerming(brukerId)
-
-
 
     @PostMapping("komplett")
     @ResponseStatus(NO_CONTENT)
@@ -80,7 +68,7 @@ class TilgangController(
         if (token.erObo) {
             regler.bulkRegler(token.ansattId!!, specs)
         }
-        else throw ResponseStatusException(HttpStatus.FORBIDDEN, "Dette endepunkt er kun tilgjengelig for obo-flow.")
+        else throw ResponseStatusException(FORBIDDEN, "Dette endepunkt er kun tilgjengelig for obo-flow.")
 
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(NO_CONTENT)
@@ -93,7 +81,7 @@ class TilgangController(
         if (token.erCC) {
             regler.bulkRegler(ansattId, specs)
         }
-        else throw ResponseStatusException(HttpStatus.FORBIDDEN, "Dette endepunkt er kun tilgjengelig client credentials-flow.")
+        else throw ResponseStatusException(FORBIDDEN, "Dette endepunkt er kun tilgjengelig client credentials-flow.")
 }
 
 

@@ -18,14 +18,11 @@ class DefaultRestErrorHandler : ErrorHandler {
     private val log = getLogger(javaClass)
 
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
-        if (res.statusCode.is4xxClientError) throw IrrecoverableRestException(
-                res.statusCode,
-                req.uri,
-                res.statusText).also {
+        if (res.statusCode.is4xxClientError) throw IrrecoverableRestException(res.statusCode, req.uri, res.statusText).also {
             log.warn("Irrecoverable exception etter ${res.statusCode.value()} fra ${req.uri}")
         }
         else throw RecoverableRestException(res.statusCode, req.uri, res.statusText).also {
-            log.warn("Reecoverable exception etter ${res.statusCode.value()} fra ${req.uri}")
+            log.warn("Recoverable exception etter ${res.statusCode.value()} fra ${req.uri}")
         }
     }
 }

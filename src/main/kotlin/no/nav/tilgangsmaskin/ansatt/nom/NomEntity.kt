@@ -12,7 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
         name = "ansatte",
         indexes = [Index(name = "idx_gyldig", columnList = "gyldigtil")],
         uniqueConstraints = [UniqueConstraint(name = "uc_ansattentity_navid", columnNames = ["navid"])])
-@EntityListeners(AuditingEntityListener::class, NomEntityListener::class)
+@EntityListeners( NomEntityListener::class)
 class NomEntity(
         @Column(length = 7, nullable = false) val navid: String,
         @Column(length = 11, nullable = false) var fnr: String,
@@ -23,11 +23,9 @@ class NomEntity(
     @GeneratedValue(strategy = IDENTITY)
     val id: Long? = null
 
-    @CreatedDate
     @Column(nullable = false, updatable = false)
     var created: Instant? = null
 
-    @LastModifiedDate
     @Column(nullable = false)
     var updated: Instant? = null
 }

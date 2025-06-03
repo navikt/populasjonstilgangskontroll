@@ -32,7 +32,7 @@ import kotlin.reflect.jvm.jvmName
 @Configuration
 @EnableCaching
 @ConditionalOnGCP
-class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, objectMapper: ObjectMapper,
+class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory,
                               @Value("\${valkey.host.cache}") private val host: String,
                               @Value("\${valkey.port.cache}") private val port: String,
                               @Qualifier(VALKEY) private val valkeyMapper: ObjectMapper,
@@ -40,9 +40,7 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, objectMapp
 
     override val pingEndpoint  = "$host:$port"
     override val name = "ValKey Cache"
-
-    private val log = getLogger(javaClass)
-
+    
     @Bean
     fun valkeyCacheSizeMeterBinder(template: StringRedisTemplate) = MeterBinder { registry ->
             cfgs.forEach { cfg ->

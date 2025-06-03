@@ -6,14 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
 import no.nav.boot.conditionals.ConditionalOnGCP
-import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.boot.conditionals.EnvUtil
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
@@ -39,7 +36,7 @@ import kotlin.reflect.jvm.jvmName
 class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory,
                               @Value("\${valkey.host.cache}") private val host: String,
                               @Value("\${valkey.port.cache}") private val port: String,
-                              private val mapper: ObjectMapper,
+                              mapper: ObjectMapper,
                               private val env: Environment,
                               private vararg val cfgs: CachableRestConfig) : CachingConfigurer, Pingable {
 

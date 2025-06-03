@@ -36,27 +36,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @Configuration
 class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : WebMvcConfigurer {
 
-    private val log = getLogger(javaClass)
-
-
-    @Bean
-    @ConditionalOnNotProd
-    @Qualifier(VALKEY)
-    fun valkeyMapperNonProd(mapper: ObjectMapper) = valkeyMapper(mapper).apply {
-        registerModule(JsonCacheableModule())
-    }
-
-    @Bean
-    @ConditionalOnProd
-    @Qualifier(VALKEY)
-    fun valkeyMapperProd(mapper: ObjectMapper) = valkeyMapper(mapper)
-
-    private fun valkeyMapper(mapper: ObjectMapper) =
-        mapper.copy().apply {
-            activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
-            log.info("Modules for ValKey cache mapper: ${registeredModuleIds.joinToString()}")
-        }
-
     @Bean
     fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer {
         it.featuresToEnable(INCLUDE_SOURCE_IN_LOCATION)

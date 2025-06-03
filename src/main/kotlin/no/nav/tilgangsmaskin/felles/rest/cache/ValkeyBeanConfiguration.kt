@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
 import no.nav.boot.conditionals.ConditionalOnGCP
+import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.boot.conditionals.ConditionalOnProd
+import no.nav.boot.conditionals.EnvUtil
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
@@ -17,6 +20,7 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.interceptor.KeyGenerator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.env.Environment
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.lockingRedisCacheWriter
@@ -35,12 +39,24 @@ import kotlin.reflect.jvm.jvmName
 class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory,
                               @Value("\${valkey.host.cache}") private val host: String,
                               @Value("\${valkey.port.cache}") private val port: String,
-                              @Qualifier(VALKEY) private val valkeyMapper: ObjectMapper,
+                              private val mapper: ObjectMapper,
+                              private val env: Environment,
                               private vararg val cfgs: CachableRestConfig) : CachingConfigurer, Pingable {
+
+    private val log = getLogger(javaClass)
 
     override val pingEndpoint  = "$host:$port"
     override val name = "ValKey Cache"
-    
+
+    private val valkeyMapper =
+        mapper.copy().apply {
+            if (EnvUtil.isDevOrLocal(env)) {
+                registerModule(JsonCacheableModule())
+            }
+            activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
+            log.info("Modules for ValKey cache mapper: ${registeredModuleIds.joinToString()}")
+        }
+
     @Bean
     fun valkeyCacheSizeMeterBinder(template: StringRedisTemplate) = MeterBinder { registry ->
             cfgs.forEach { cfg ->
@@ -100,8 +116,4 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory,
             .entryTtl(Duration.ofHours(cfg.expireHours))
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))
             .serializeValuesWith(fromSerializer(GenericJackson2JsonRedisSerializer(valkeyMapper)))
-
-    companion object {
-        const val VALKEY = "valkey"
-    }
 }

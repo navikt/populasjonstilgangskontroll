@@ -11,8 +11,10 @@ import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.STRENGT_FORTROLIG_UTLAND
+import no.nav.tilgangsmaskin.felles.rest.cache.JsonCacheable
 import java.io.Serializable
 
+@JsonCacheable
 data class Person(
         val brukerId: BrukerId,
         val aktørId: AktørId,

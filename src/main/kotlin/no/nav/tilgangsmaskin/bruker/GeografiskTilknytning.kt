@@ -37,10 +37,12 @@ sealed class GeografiskTilknytning(type: Type) {
         override fun hashCode() = javaClass.hashCode()
     }
 
+    @JsonCacheable
     class UtenlandskTilknytning : GeografiskTilknytning(UTLAND){
         override fun equals(other: Any?) = other is UtenlandskTilknytning
         override fun hashCode() = javaClass.hashCode()
     }
+    @JsonCacheable
     class UdefinertTilknytning : GeografiskTilknytning(UDEFINERT) {
         override fun equals(other: Any?) = other is UdefinertTilknytning
         override fun hashCode() = javaClass.hashCode()

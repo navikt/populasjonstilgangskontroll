@@ -26,7 +26,7 @@ class JsonCacheableModule : SimpleModule() {
         ctx.insertAnnotationIntrospector(object : JacksonAnnotationIntrospector() {
             override fun findTypeResolver(config: MapperConfig<*>, ac: AnnotatedClass, baseType: JavaType) =
                 if (ac.hasAnnotation(JsonCacheable::class.java)) {
-                    log.trace("${ac.name} er annotert ned @JsonCacheable, bruker JsonTypeInfo for å serialisere typeinformasjon")
+                    log.trace("${ac.name} er annotert med @JsonCacheable, bruker JsonTypeInfo for å serialisere typeinformasjon")
                     StdTypeResolverBuilder()
                         .init(CLASS, null)
                         .inclusion(PROPERTY)

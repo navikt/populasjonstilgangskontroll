@@ -10,13 +10,14 @@ import com.fasterxml.jackson.databind.jsontype.impl.StdTypeResolverBuilder
 import com.fasterxml.jackson.databind.module.SimpleModule
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 
 /**
     Denne modulen konfigurerer Jackson til å serialisere classes annotatert med  @JsonCacheable, slik at de inkluderer typeinformasjon i JSON-representasjonen.
     Tas inn i produksjon når Jackson 3.0 er i bruke, antagelig høsten 2025.
     Mapper brukt for serialiserig av cache innslag i ValKey må da endres til NON_FINAL_AND_ENUMS, og alle mulig cachebare klasser må transitivt annoteres
  */
-@ConditionalOnNotProd  // TODO fix when Jackson 3.0 is in use
+@ConditionalOnProperty("valkey.json.enabled", havingValue = "true")  // TODO fix when Jackson 3.0 is in use
 class JsonCacheableModule : SimpleModule() {
 
     private val log = getLogger(javaClass)

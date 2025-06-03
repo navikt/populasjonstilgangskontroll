@@ -45,6 +45,7 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, objectMapp
     private val mapper =
         objectMapper.copy()
             .apply {
+                registerModule(JsonCacheableModule())
                 activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
                 log.info("Modules for ValKey cache mapper: ${this.registeredModuleIds.joinToString()}")
             }

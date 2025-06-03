@@ -9,18 +9,45 @@ spec:
   groups:
     - name: client-errors
       rules:
+        - alert: ApplikasjonNede
+          expr: kube_deployment_status_replicas_available{namespace="tilgangsmaskin", deployment="populasjonstilgangskontroll"} != 0
+          for: 2m
+          annotations:
+            consequence: tilgangsmaskin er nede
+            action: "Ta en titt på Grafana og Kibana  test av melding til slack  ved å sei replica ulik 0"
+            summary: |-
+              Grafana: https://grafana.nav.cloud.nais.io/goto/LQb7lCfNg?orgId=1
+              Loki securelogs: 
+              Kibana securelogs: 
+              Kibana åpne logger:
+          labels:
+            namespace: tilgangsmaskin
+            severity: critical
+        - alert: ErrorLogMessages
+          expr: sum(increase(log_messages_errors{app="populasjonstilgangskontroll", level="Error"}[10m])) > 0
+          for: 1s
+          annotations:
+            consequence: tilgangsmaskin har feil i loggene
+            action: "Ta en titt på Grafana og Kibana"
+            summary: |-
+              Grafana: https://grafana.nav.cloud.nais.io/goto/LQb7lCfNg?orgId=1
+              
+                Loki securelogs:
+          labels:
+            namespace: tilgangsmaskin
+            severity: critical
         - alert: HttpClientErrorRateHigh
           expr: |
             1 - (
               sum(
                 rate(
-                  http_client_request_duration_seconds_count{app="tilgangsmaskin.nav.no", http_response_status_code="200"}[5m]
+                  http_client_request_duration_seconds_count{app="populasjonstilgangskontroll.nav.no", http_response_status_code="200"}[5m]
                 )
               ) by (server_address)
               /
               sum(
                 rate(
-                  http_client_request_duration_seconds_count{app="tilgangsmaskin.nav.no"}[5m]
+                  http_client_request_duration_seconds_count{app="populasjonstilgangskontroll.nav.no"}[5m]
                 )
               ) by (server_address)
             ) * 100 < 95

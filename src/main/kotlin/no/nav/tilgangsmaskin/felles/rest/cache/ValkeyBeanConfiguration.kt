@@ -9,6 +9,7 @@ import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
@@ -38,10 +39,14 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, objectMapp
     override val pingEndpoint  = "$host:$port"
     override val name = "ValKey Cache"
 
+    private val log = getLogger(javaClass)
+
+
     private val mapper =
         objectMapper.copy()
             .apply {
                 activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
+                log.info("Modules for ValKey cache mapper: ${this.registeredModuleIds.joinToString()}")
             }
 
     @Bean

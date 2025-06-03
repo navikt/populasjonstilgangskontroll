@@ -17,7 +17,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
     Tas inn i produksjon når Jackson 3.0 er i bruke, antagelig høsten 2025.
     Mapper brukt for serialiserig av cache innslag i ValKey må da endres til NON_FINAL_AND_ENUMS, og alle mulig cachebare klasser må transitivt annoteres
  */
-@ConditionalOnProperty("valkey.json.enabled", havingValue = "true")  // TODO fix when Jackson 3.0 is in use
+@ConditionalOnProperty("valkey.json.enabled", havingValue = "true")  // TODO Registrer manuelt foreløpig
 class JsonCacheableModule : SimpleModule() {
 
     private val log = getLogger(javaClass)

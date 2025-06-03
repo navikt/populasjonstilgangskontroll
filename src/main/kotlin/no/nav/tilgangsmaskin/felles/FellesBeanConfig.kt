@@ -1,13 +1,21 @@
 package no.nav.tilgangsmaskin.felles
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
 import com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.FellesRetryListener
+import no.nav.tilgangsmaskin.felles.rest.cache.JsonCacheableModule
+import no.nav.tilgangsmaskin.felles.rest.cache.ValkeyBeanConfiguration.Companion.VALKEY
+import org.slf4j.LoggerFactory.getLogger
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.Include.defaultIncludes
@@ -28,6 +36,26 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @Configuration
 class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : WebMvcConfigurer {
 
+    private val log = getLogger(javaClass)
+
+
+    @Bean
+    @ConditionalOnNotProd
+    @Qualifier(VALKEY)
+    fun valkeyMapperNonProd(mapper: ObjectMapper) = valkeyMapper(mapper).apply {
+        registerModule(JsonCacheableModule())
+    }
+
+    @Bean
+    @ConditionalOnProd
+    @Qualifier(VALKEY)
+    fun valkeyMapperProd(mapper: ObjectMapper) = valkeyMapper(mapper)
+
+    private fun valkeyMapper(mapper: ObjectMapper) =
+        mapper.copy().apply {
+            activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
+            log.info("Modules for ValKey cache mapper: ${registeredModuleIds.joinToString()}")
+        }
 
     @Bean
     fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer {

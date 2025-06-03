@@ -10,6 +10,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
@@ -34,6 +35,7 @@ import kotlin.reflect.jvm.jvmName
 class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, objectMapper: ObjectMapper,
                               @Value("\${valkey.host.cache}") private val host: String,
                               @Value("\${valkey.port.cache}") private val port: String,
+                              @Qualifier(VALKEY) private val valkeyMapper: ObjectMapper,
                               private vararg val cfgs: CachableRestConfig) : CachingConfigurer, Pingable {
 
     override val pingEndpoint  = "$host:$port"
@@ -41,19 +43,10 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, objectMapp
 
     private val log = getLogger(javaClass)
 
-
-    private val mapper =
-        objectMapper.copy()
-            .apply {
-                registerModule(JsonCacheableModule())
-                activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
-                log.info("Modules for ValKey cache mapper: ${this.registeredModuleIds.joinToString()}")
-            }
-
     @Bean
     fun valkeyCacheSizeMeterBinder(template: StringRedisTemplate) = MeterBinder { registry ->
             cfgs.forEach { cfg ->
-                registry.gauge("cache.size", Tags.of("navn", cfg.navn), template) { template ->
+                registry.gauge("cache.size", Tags.of("navn", cfg.navn), template) { _ ->
                     cacheSize( cfg.navn)
                 }
             }
@@ -108,5 +101,9 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory, objectMapp
             .disableCachingNullValues()
             .entryTtl(Duration.ofHours(cfg.expireHours))
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))
-            .serializeValuesWith(fromSerializer(GenericJackson2JsonRedisSerializer(mapper)))
+            .serializeValuesWith(fromSerializer(GenericJackson2JsonRedisSerializer(valkeyMapper)))
+
+    companion object {
+        const val VALKEY = "valkey"
+    }
 }

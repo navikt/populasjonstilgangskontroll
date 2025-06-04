@@ -7,7 +7,6 @@ import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.boot.conditionals.EnvUtil.isDevOrLocal
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
-import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.interceptor.KeyGenerator
@@ -21,7 +20,6 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
-import org.springframework.stereotype.Component
 import java.time.Duration
 import kotlin.reflect.jvm.jvmName
 
@@ -34,7 +32,7 @@ class ValKeyBeanConfiguration(private val cf: RedisConnectionFactory,
                               private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
 
-    private val valkeyMapper =
+    private val valKeyMapper =
         mapper.copy().apply {
             if (isDevOrLocal(env)) {
                 registerModule(JsonCacheableModule())
@@ -74,6 +72,6 @@ class ValKeyBeanConfiguration(private val cf: RedisConnectionFactory,
             .disableCachingNullValues()
             .entryTtl(Duration.ofHours(cfg.expireHours))
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))
-            .serializeValuesWith(fromSerializer(GenericJackson2JsonRedisSerializer(valkeyMapper)))
+            .serializeValuesWith(fromSerializer(GenericJackson2JsonRedisSerializer(valKeyMapper)))
 }
 

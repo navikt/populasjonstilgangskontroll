@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Component
 
 @Component
-class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig, private val template: StringRedisTemplate, private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
+class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
 
     override val pingEndpoint  =  "${cfg.hostValue}:${cfg.portValue}"
     override val name = "ValKey Cache"
@@ -39,7 +39,7 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig, p
 
     override fun bindTo(registry: MeterRegistry) {
         cfgs.forEach { cfg ->
-            registry.gauge("cache.size", Tags.of("navn", cfg.navn), template) { _ ->
+            registry.gauge("cache.size", Tags.of("navn", cfg.navn), cf) { _ ->
                 cacheSize( cfg.navn)
             }
         }

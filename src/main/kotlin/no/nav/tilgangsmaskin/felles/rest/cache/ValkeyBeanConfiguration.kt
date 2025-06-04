@@ -12,6 +12,7 @@ import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.interceptor.KeyGenerator
@@ -118,3 +119,6 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory,
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))
             .serializeValuesWith(fromSerializer(GenericJackson2JsonRedisSerializer(valkeyMapper)))
 }
+
+@ConfigurationProperties
+data class ValkeyConfig(@Value("\${valkey.host.cache}") val host: String, @Value("\${valkey.port.cache}") val port: String) 

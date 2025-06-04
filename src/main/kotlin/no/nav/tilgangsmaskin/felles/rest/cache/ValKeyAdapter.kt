@@ -28,20 +28,23 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,pr
 
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag i cache"}
 
-    private fun cacheSize(cacheName: String) =
-        cf.connection.use {
-            it.keyCommands()
-                .scan(scanOptions().match("*$cacheName*").count(1000).build())
-                .asSequence()
-                .count()
-                .toDouble()
-        }
-
     override fun bindTo(registry: MeterRegistry) {
         cfgs.forEach { cfg ->
-            registry.gauge("cache.size", Tags.of("navn", cfg.navn), cf) { _ ->
+            registry.gauge("cache.size", Tags.of("navn", cfg.navn), cf) {
                 cacheSize( cfg.navn)
             }
         }
     }
+
+    private fun cacheSize(cacheName: String) =
+        cf.connection.use {
+            it.keyCommands()
+                .scan(scanOptions()
+                    .match("*$cacheName*")
+                    .count(1000)
+                    .build())
+                .asSequence()
+                .count()
+                .toDouble()
+        }
 }

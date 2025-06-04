@@ -44,7 +44,7 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, pr
     override fun contribute(builder: Builder) {
         with(ctx) {
             builder.withDetail(
-                    "extra-info", mapOf(
+                "extra-info", mapOf(
                     "Startup" to startupDate.local(),
                     "Java version" to environment.getProperty("java.version"),
                     "Client ID" to environment.getProperty("azure.app.client.id"),
@@ -53,7 +53,7 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, pr
                     "Spring Boot version" to SpringBootVersion.getVersion(),
                     "Spring Framework version" to SpringVersion.getVersion()))
             regelsett.forEach {
-                builder.withDetail(it.beskrivelse, it.regler.map { r -> r.kortNavn })
+                builder.withDetail(it.beskrivelse, it.regler.map { it.kortNavn })
             }
         }
     }

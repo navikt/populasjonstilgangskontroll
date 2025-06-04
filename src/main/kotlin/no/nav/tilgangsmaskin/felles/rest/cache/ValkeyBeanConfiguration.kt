@@ -11,7 +11,6 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.interceptor.KeyGenerator
@@ -39,9 +38,8 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory,
                               private val env: Environment,
                               private vararg val cfgs: CachableRestConfig) : CachingConfigurer, Pingable {
 
-    private val log = getLogger(javaClass)
 
-    override val pingEndpoint  =  "${cfg.hostValue}:${cfg.portValue}" 
+    override val pingEndpoint  =  "${cfg.hostValue}:${cfg.portValue}"
     override val name = "ValKey Cache"
 
     private val valkeyMapper =

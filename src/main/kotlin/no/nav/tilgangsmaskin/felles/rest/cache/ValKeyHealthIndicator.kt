@@ -4,4 +4,4 @@ import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.springframework.stereotype.Component
 
 @Component
-class ValkeyHealthIndicator(config: ValkeyBeanConfiguration) : PingableHealthIndicator(config)
+class ValKeyHealthIndicator(adapter: ValKeyAdapter) : PingableHealthIndicator(adapter)

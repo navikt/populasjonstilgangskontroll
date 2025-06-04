@@ -34,7 +34,7 @@ import org.springframework.core.env.Environment
 
 
 @Configuration
-class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor, private val env: Environment) : WebMvcConfigurer {
+class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : WebMvcConfigurer {
 
     @Bean
     fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer {
@@ -57,19 +57,6 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             it.addFirst(interceptor)
         }
     }
-
-    @Qualifier("jalla")
-    @Bean
-    fun jalla(mapper: ObjectMapper) =
-        mapper.copy().apply {
-            if (isDevOrLocal(env)) {
-                registerModule(JsonCacheableModule())
-                activateDefaultTyping(polymorphicTypeValidator, NON_FINAL_AND_ENUMS, PROPERTY)
-            }
-            else {
-                activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
-            }
-        }
 
     @Bean
     fun fellesRetryListener() = FellesRetryListener()

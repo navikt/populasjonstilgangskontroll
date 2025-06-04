@@ -120,5 +120,5 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory,
             .serializeValuesWith(fromSerializer(GenericJackson2JsonRedisSerializer(valkeyMapper)))
 }
 
-@ConfigurationProperties
-data class ValkeyConfig(@Value("\${valkey.host.cache}") val host: String, @Value("\${valkey.port.cache}") val port: String) 
+@ConfigurationProperties("valkey")
+data class ValkeyConfig(@Value("\${host.cache}") val host: String, @Value("\${port.cache}") val port: String)

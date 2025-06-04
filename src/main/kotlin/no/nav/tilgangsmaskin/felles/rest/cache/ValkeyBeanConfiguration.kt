@@ -121,4 +121,9 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory,
 }
 
 @ConfigurationProperties("valkey")
-data class ValkeyConfig(@Value("\${host.cache}") val host: String, @Value("\${port.cache}") val port: String)
+data class ValkeyConfig(val host: Host, val port: Port) {
+    val hostValue = host.cache
+    val portValue = port.cache
+    data class Host(val cache: String)
+    data class Port(val cache: String)
+}

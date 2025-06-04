@@ -103,7 +103,9 @@ object PdlPersonMapper {
 
             BYDEL -> geo.gtBydel?.let {
                 BydelTilknytning(Bydel(it.verdi))
-            } ?: error("Bydelstilknytning uten bydelskode")
+            } ?:   UkjentBosted().also {
+                log.warn("Bydelstilknytning uten bydelskode, antar ukjent bosted")
+            }
 
             else -> UdefinertTilknytning()
         }

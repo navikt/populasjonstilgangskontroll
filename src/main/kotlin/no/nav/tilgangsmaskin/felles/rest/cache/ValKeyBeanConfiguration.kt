@@ -3,14 +3,11 @@ package no.nav.tilgangsmaskin.felles.rest.cache
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.*
-import io.micrometer.core.instrument.Tags
-import io.micrometer.core.instrument.binder.MeterBinder
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.boot.conditionals.EnvUtil.isDevOrLocal
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
-import no.nav.tilgangsmaskin.felles.rest.Pingable
-import org.slf4j.LoggerFactory.getLogger
+import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.interceptor.KeyGenerator
@@ -21,26 +18,21 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCache
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.lockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.data.redis.core.ScanOptions.scanOptions
-import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
+import org.springframework.stereotype.Component
 import java.time.Duration
 import kotlin.reflect.jvm.jvmName
 
 @Configuration
 @EnableCaching
 @ConditionalOnGCP
-class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory,
-                              private val cfg: ValkeyConfig,
+class ValKeyBeanConfiguration(private val cf: RedisConnectionFactory,
                               mapper: ObjectMapper,
                               private val env: Environment,
-                              private vararg val cfgs: CachableRestConfig) : CachingConfigurer, Pingable {
+                              private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
-
-    override val pingEndpoint  =  "${cfg.hostValue}:${cfg.portValue}"
-    override val name = "ValKey Cache"
 
     private val valkeyMapper =
         mapper.copy().apply {
@@ -50,15 +42,6 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory,
             }
             else {
                 activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
-            }
-        }
-
-    @Bean
-    fun valkeyCacheSizeMeterBinder(template: StringRedisTemplate) = MeterBinder { registry ->
-            cfgs.forEach { cfg ->
-                registry.gauge("cache.size", Tags.of("navn", cfg.navn), template) { _ ->
-                    cacheSize( cfg.navn)
-                }
             }
         }
 
@@ -85,26 +68,6 @@ class ValkeyBeanConfiguration(private val cf: RedisConnectionFactory,
             }
         }
     }
-    override fun ping() =
-        cf.connection.use {
-            if (it.ping().equals("PONG", ignoreCase = true)) {
-                emptyMap<String,String>()
-            }
-            else {
-                error("$name ping failed")
-            }
-        }
-    
-    fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag i cache"}
-
-    private fun cacheSize(cacheName: String) =
-        cf.connection.use {
-            it.keyCommands()
-                .scan(scanOptions().match("*$cacheName*").count(1000).build())
-                .asSequence()
-                .count()
-                .toDouble()
-        }
 
     private fun cacheConfig(cfg: CachableRestConfig) =
         defaultCacheConfig()

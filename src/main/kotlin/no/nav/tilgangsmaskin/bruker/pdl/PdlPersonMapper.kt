@@ -62,11 +62,7 @@ object PdlPersonMapper {
                 tilFamilie(person.familierelasjoner),
                 tilDødsdato(person.doedsfall),
                 tilHistoriskeBrukerIds(identer)
-            ).also {
-                if (brukerId.endsWith("29653")) {
-                    log.info("XXXXX " + it)
-                }
-            }
+            )
         }
 
     fun tilPartner(type: Sivilstandstype) =
@@ -101,7 +97,9 @@ object PdlPersonMapper {
 
             KOMMUNE -> geo.gtKommune?.let {
                 KommuneTilknytning(Kommune(it.verdi))
-            } ?: error("Kommunal tilknytning uten kommunekode")
+            } ?: UkjentBosted().also {
+                log.warn("Kommunal tilknytning uten kommunekode, antar ukjent bosted")
+            }
 
             BYDEL -> geo.gtBydel?.let {
                 BydelTilknytning(Bydel(it.verdi))

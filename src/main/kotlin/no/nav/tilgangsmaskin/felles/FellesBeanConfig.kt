@@ -87,20 +87,3 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             }
     }
 }
-
-@Configuration
-class CachingObjectMapperConfig(private val env: Environment) {
-
-    @Qualifier("jalla")
-    @Bean
-    fun jalla(mapper: ObjectMapper) =
-        mapper.copy().apply {
-            if (isDevOrLocal(env)) {
-                registerModule(JsonCacheableModule())
-                activateDefaultTyping(polymorphicTypeValidator, NON_FINAL_AND_ENUMS, PROPERTY)
-            }
-            else {
-                activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
-            }
-        }
-}

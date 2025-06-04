@@ -42,18 +42,6 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
         it.mixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
     }
 
-    @Qualifier("jalla")
-    fun jalla(mapper: ObjectMapper) =
-        mapper.copy().apply {
-            if (isDevOrLocal(env)) {
-                registerModule(JsonCacheableModule())
-                activateDefaultTyping(polymorphicTypeValidator, NON_FINAL_AND_ENUMS, PROPERTY)
-            }
-            else {
-                activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
-            }
-        }
-
     @JsonIgnoreProperties(ignoreUnknown = true)
     private interface IgnoreUnknownMixin
 

@@ -46,20 +46,23 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.MEDMOR
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.MOR
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
+import org.slf4j.LoggerFactory.getLogger
 
 object PdlPersonMapper {
+    private val log = getLogger(javaClass)
 
     fun tilPerson(data: PdlRespons) =
         with(data) {
+
             Person(
-                    BrukerId(brukerId),
-                    AktørId(aktørId),
-                    tilGeoTilknytning(geografiskTilknytning),
-                    tilGraderinger(person.adressebeskyttelse),
-                    tilFamilie(person.familierelasjoner),
-                    tilDødsdato(person.doedsfall),
-                    tilHistoriskeBrukerIds(identer)
-                  )
+                BrukerId(brukerId),
+                AktørId(aktørId),
+                tilGeoTilknytning(geografiskTilknytning),
+                tilGraderinger(person.adressebeskyttelse),
+                tilFamilie(person.familierelasjoner),
+                tilDødsdato(person.doedsfall),
+                tilHistoriskeBrukerIds(identer)
+            )
         }
 
     fun tilPartner(type: Sivilstandstype) =
@@ -94,11 +97,15 @@ object PdlPersonMapper {
 
             KOMMUNE -> geo.gtKommune?.let {
                 KommuneTilknytning(Kommune(it.verdi))
-            } ?: error("Kommunal tilknytning uten kommunekode")
+            } ?: UkjentBosted().also {
+                log.warn("Kommunal tilknytning uten kommunekode, antar ukjent bosted")
+            }
 
             BYDEL -> geo.gtBydel?.let {
                 BydelTilknytning(Bydel(it.verdi))
-            } ?: error("Bydelstilknytning uten bydelskode")
+            } ?:   UkjentBosted().also {
+                log.warn("Bydelstilknytning uten bydelskode, antar ukjent bosted")
+            }
 
             else -> UdefinertTilknytning()
         }

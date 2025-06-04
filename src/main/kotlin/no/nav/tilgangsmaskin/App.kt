@@ -2,7 +2,8 @@ package no.nav.tilgangsmaskin
 
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
-import no.nav.tilgangsmaskin.felles.rest.cache.ValkeyBeanConfiguration
+import no.nav.tilgangsmaskin.felles.rest.cache.ValKeyAdapter
+import no.nav.tilgangsmaskin.felles.rest.cache.ValKeyBeanConfiguration
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.profiler
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.local
 import no.nav.tilgangsmaskin.regler.motor.RegelSett
@@ -37,13 +38,13 @@ fun main(args: Array<String>) {
 }
 
 @Component
-class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, private  val valKey: ValkeyBeanConfiguration,vararg val regelsett: RegelSett) :
+class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, private  val valKey: ValKeyAdapter, vararg val regelsett: RegelSett) :
     InfoContributor {
 
     override fun contribute(builder: Builder) {
         with(ctx) {
             builder.withDetail(
-                    "extra-info", mapOf(
+                "extra-info", mapOf(
                     "Startup" to startupDate.local(),
                     "Java version" to environment.getProperty("java.version"),
                     "Client ID" to environment.getProperty("azure.app.client.id"),
@@ -52,7 +53,7 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, pr
                     "Spring Boot version" to SpringBootVersion.getVersion(),
                     "Spring Framework version" to SpringVersion.getVersion()))
             regelsett.forEach {
-                builder.withDetail(it.beskrivelse, it.regler.map { r -> r.kortNavn })
+                builder.withDetail(it.beskrivelse, it.regler.map { it.kortNavn })
             }
         }
     }

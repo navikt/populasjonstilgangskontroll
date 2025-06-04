@@ -46,20 +46,27 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.MEDMOR
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.MOR
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
+import org.slf4j.LoggerFactory.getLogger
 
 object PdlPersonMapper {
+    private val log = getLogger(javaClass)
 
     fun tilPerson(data: PdlRespons) =
         with(data) {
+
             Person(
-                    BrukerId(brukerId),
-                    AktørId(aktørId),
-                    tilGeoTilknytning(geografiskTilknytning),
-                    tilGraderinger(person.adressebeskyttelse),
-                    tilFamilie(person.familierelasjoner),
-                    tilDødsdato(person.doedsfall),
-                    tilHistoriskeBrukerIds(identer)
-                  )
+                BrukerId(brukerId),
+                AktørId(aktørId),
+                tilGeoTilknytning(geografiskTilknytning),
+                tilGraderinger(person.adressebeskyttelse),
+                tilFamilie(person.familierelasjoner),
+                tilDødsdato(person.doedsfall),
+                tilHistoriskeBrukerIds(identer)
+            ).also {
+                if (brukerId.endsWith("29653")) {
+                    log.info("XXXXX " + it)
+                }
+            }
         }
 
     fun tilPartner(type: Sivilstandstype) =

@@ -58,6 +58,19 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
         }
     }
 
+    @Qualifier("jalla")
+    @Bean
+    fun jalla(mapper: ObjectMapper) =
+        mapper.copy().apply {
+            if (isDevOrLocal(env)) {
+                registerModule(JsonCacheableModule())
+                activateDefaultTyping(polymorphicTypeValidator, NON_FINAL_AND_ENUMS, PROPERTY)
+            }
+            else {
+                activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
+            }
+        }
+
     @Bean
     fun fellesRetryListener() = FellesRetryListener()
 
@@ -86,5 +99,4 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                 next.execute(request, body)
             }
     }
-
 }

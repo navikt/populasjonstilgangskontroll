@@ -1,10 +1,10 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  labels:
-    team: tilgangsmaskin
     name: tilgangmaskin-alerts
-    namespace: tilgangsmaskin
+    namespace: "tilgangsmaskin"
+    labels:
+      team: tilgangsmaskin
 spec:
   groups:
     - name: client-errors

@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.CacheableRetryingOnRecoverableService
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CacheEvict
+import org.springframework.retry.annotation.Retryable
 
 @CacheableRetryingOnRecoverableService(cacheNames = [GRAPH])
 @Timed

@@ -23,8 +23,7 @@ class Entra(private val adapter: EntraRestClientAdapter, private val resolver: A
 
     @CacheEvict(
         cacheNames = [GRAPH],
-        key = "#root.targetClass.packageName + ':' + 'geoOgGlobaleGrupper' + ':' + #ansattId"
-    )
+        key = "#root.targetClass.packageName + ':geoOgGlobaleGrupper:' + #ansattId")
     fun evict(ansattId: AnsattId) {
         log.info("Resetter cache for $ansattId")
     }

@@ -10,7 +10,7 @@ import kotlin.reflect.full.declaredFunctions
 class FellesRetryListener : RetryListener {
 
     private val log = getLogger(javaClass)
-    override fun <T : Any, E : Throwable> onSuccess(context: RetryContext, callback: RetryCallback<T, E>, result: T) {
+    override fun <T : Any, E : Throwable> onSuccess(context: RetryContext, callback: RetryCallback<T, E>, result: T?) {
         if (context.retryCount > 0) {
             log.info("'${method(context)}' var vellykket på forsøk ${context.retryCount + 1}")
         }

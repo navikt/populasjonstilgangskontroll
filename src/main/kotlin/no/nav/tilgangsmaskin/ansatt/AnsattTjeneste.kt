@@ -23,14 +23,6 @@ class AnsattTjeneste(private val ansatte: Nom,
 
     private val log = getLogger(javaClass)
 
-    @CacheEvict(
-        cacheNames = [GRAPH],
-        key = "no.nav.tilgangsmaskin.ansatt.graph:Entra:geoOgGlobaleGrupper:" + #ansattId")
-    fun evict(ansattId: AnsattId) {
-        log.info("Resetter cache for $ansattId")
-    }
-
-
     fun ansatt(ansattId: AnsattId) =
         Ansatt(ansattId,ansattBruker(ansattId), ansattGrupper(ansattId)).also {
             tell(it erMedlemAv NASJONAL)

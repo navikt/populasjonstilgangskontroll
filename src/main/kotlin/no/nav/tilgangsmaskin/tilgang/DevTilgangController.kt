@@ -38,7 +38,6 @@ class DevTilgangController(
         private val skjerming: SkjermingTjeneste,
         private val skjermingAdapter: SkjermingRestClientAdapter,
         private val brukere: BrukerTjeneste,
-        private val entra: Entra,
         private val ansatte: AnsattTjeneste,
         private val regler: RegelTjeneste,
         private val overstyring: OverstyringTjeneste,
@@ -64,7 +63,7 @@ class DevTilgangController(
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)
 
     @GetMapping("ansatt/{ansattId}/evict")
-    fun evict(@PathVariable ansattId: AnsattId) = entra.evict(ansattId)
+    fun evict(@PathVariable ansattId: AnsattId) = ansatte.evict(ansattId)
 
     @PostMapping("ansatt/{ansattId}/{brukerId}")
     fun nom(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =

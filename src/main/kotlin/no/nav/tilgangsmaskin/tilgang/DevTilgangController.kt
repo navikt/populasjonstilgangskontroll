@@ -8,6 +8,7 @@ import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.Nom
+import no.nav.tilgangsmaskin.ansatt.graph.Entra
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
@@ -37,6 +38,7 @@ class DevTilgangController(
         private val skjerming: SkjermingTjeneste,
         private val skjermingAdapter: SkjermingRestClientAdapter,
         private val brukere: BrukerTjeneste,
+        private val entra: Entra,
         private val ansatte: AnsattTjeneste,
         private val regler: RegelTjeneste,
         private val overstyring: OverstyringTjeneste,
@@ -60,6 +62,9 @@ class DevTilgangController(
 
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)
+
+    @GetMapping("ansatt/{ansattId/evict")
+    fun evict(@PathVariable ansattId: AnsattId) = entra.evict(ansattId)
 
     @PostMapping("ansatt/{ansattId}/{brukerId}")
     fun nom(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =

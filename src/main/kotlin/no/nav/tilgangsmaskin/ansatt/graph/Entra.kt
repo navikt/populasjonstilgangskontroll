@@ -21,9 +21,12 @@ class Entra(private val adapter: EntraRestClientAdapter, private val resolver: A
 
     private fun resolve(ansattId: AnsattId) = resolver.oidForAnsatt(ansattId).toString()
 
-    @CacheEvict(cacheNames = [GRAPH], key = "T(this).class.simpleName + ':' + #root.method.name + ':' + #ansattId")
+    @CacheEvict(
+        cacheNames = [GRAPH],
+        key = "#root.targetClass.packageName + ':' + 'geoOgGlobaleGrupper' + ':' + #ansattId"
+    )
     fun evict(ansattId: AnsattId) {
-       log.info("Resetter cache for $ansattId")
+        log.info("Resetter cache for $ansattId")
     }
 
     override fun toString() = "${javaClass.simpleName} [adapter=$adapter, resolver=$resolver]"

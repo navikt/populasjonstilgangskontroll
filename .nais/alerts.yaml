@@ -10,7 +10,7 @@ spec:
     - name: client-errors
       rules:
         - alert: ApplikasjonNede
-          expr: kube_deployment_status_replicas_available{namespace="tilgangsmaskin", deployment="populasjonstilgangskontroll"} = 0
+          expr: kube_deployment_status_replicas_available{namespace="tilgangsmaskin", deployment="populasjonstilgangskontroll"} == 0
           for: 2m
           annotations:
             consequence: tilgangsmaskin er nede

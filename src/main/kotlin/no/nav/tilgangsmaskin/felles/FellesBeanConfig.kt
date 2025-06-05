@@ -30,7 +30,6 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import org.springframework.core.env.Environment
 
 
 @Configuration

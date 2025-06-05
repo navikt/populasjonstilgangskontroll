@@ -63,7 +63,7 @@ class DevTilgangController(
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)
 
-    @GetMapping("ansatt/{ansattId/evict")
+    @GetMapping("ansatt/{ansattId}/evict")
     fun evict(@PathVariable ansattId: AnsattId) = entra.evict(ansattId)
 
     @PostMapping("ansatt/{ansattId}/{brukerId}")

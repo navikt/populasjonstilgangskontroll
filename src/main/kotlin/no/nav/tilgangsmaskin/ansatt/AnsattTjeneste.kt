@@ -25,7 +25,7 @@ class AnsattTjeneste(private val ansatte: Nom,
 
     @CacheEvict(
         cacheNames = [GRAPH],
-        key = "'no.nav.tilgangsmaskin.ansatt.graph:geoOgGlobaleGrupper:' + #ansattId")
+        key = "'no.nav.tilgangsmaskin.ansatt.graph:Entra:geoOgGlobaleGrupper:' + #ansattId")
     fun evict(ansattId: AnsattId) {
         log.info("Resetter cache for $ansattId")
     }

@@ -78,8 +78,6 @@ spec:
       rules:
         - application: skjermede-personer-pip
           namespace: nom
-        - application: monitoring-prometheus-blackbox-exporter
-          namespace: nais-system
         - application: logging
           namespace: nais-system
       external:
@@ -91,6 +89,8 @@ spec:
               namespace: '{{app.namespace}}'
               cluster: '{{app.cluster}}'
        {{/each}}
+           - application: monitoring-prometheus-blackbox-exporter
+             namespace: nais-system
   env:
     - name: NAIS_CLUSTER_TYPE
       value: {{nais.cluster.type}}

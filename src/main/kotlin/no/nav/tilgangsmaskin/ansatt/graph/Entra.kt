@@ -21,7 +21,7 @@ class Entra(private val adapter: EntraRestClientAdapter, private val resolver: A
 
     private fun resolve(ansattId: AnsattId) = resolver.oidForAnsatt(ansattId).toString()
 
-    @CacheEvict(cacheNames = [GRAPH], key = "#ansattId")
+    @CacheEvict(cacheNames = [GRAPH])
     fun evict(ansattId: AnsattId) {
        log.info("Resetter cache for $ansattId")
     }

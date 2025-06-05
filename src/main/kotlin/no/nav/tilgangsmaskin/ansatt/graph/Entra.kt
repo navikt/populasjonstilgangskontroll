@@ -21,6 +21,7 @@ class Entra(private val adapter: EntraRestClientAdapter, private val resolver: A
 
     private fun resolve(ansattId: AnsattId) = resolver.oidForAnsatt(ansattId).toString()
 
+    @Retryable(maxAttempts = 1)
     @CacheEvict(
         cacheNames = [GRAPH],
         key = "#root.targetClass.packageName + ':geoOgGlobaleGrupper:' + #ansattId")

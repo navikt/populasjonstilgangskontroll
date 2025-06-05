@@ -50,6 +50,7 @@ class ValKeyBeanConfiguration(private val cf: RedisConnectionFactory,
             .enableStatistics()
             .build()
 
+    @Bean
     override fun keyGenerator() = KeyGenerator { target, method, params ->
         buildString {
             append(target::class.jvmName)

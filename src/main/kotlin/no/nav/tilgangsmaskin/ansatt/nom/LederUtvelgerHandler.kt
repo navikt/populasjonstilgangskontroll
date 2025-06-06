@@ -31,7 +31,7 @@ class LederUtvelgerHandler(private val builder: Builder,
             }
     }
 
-    data class LederUtvelgerRespons(val name: String, val last_update: LocalDateTime)
+    private data class LederUtvelgerRespons(val name: String, val last_update: LocalDateTime)
     class LeaderChangedEvent(source: Any, val leder: String) : ApplicationEvent(source)
 }
 

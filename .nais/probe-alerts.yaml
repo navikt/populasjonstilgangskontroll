@@ -1,0 +1,81 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+    name: tilgangmaskin-probe-alerts
+    namespace: "tilgangsmaskin"
+    labels:
+      team: tilgangsmaskin
+spec:
+  groups:
+    - name: probe-errors
+      rules:
+        - alert: HelsesjekkPdlPipFeilet
+          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/pdl", namespace="tilgangsmaskin"} == 0
+          for: 2m
+          annotations:
+            consequence: PDL-pip er nede
+            action: "Sjekk Grafana og Kibana"
+            summary: |-
+              Grafana: https://grafana.nav.cloud.nais.io/goto/LQb7lCfNg?orgId=1
+              Loki securelogs: 
+              Kibana securelogs: 
+              Kibana åpne logger:
+          labels:
+            namespace: tilgangsmaskin
+            severity: critical
+        - alert: HelsesjekkPdlGraphQLFeilet
+          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/pdlGraph", namespace="tilgangsmaskin"} == 0
+          for: 2m
+          annotations:
+            consequence: PDL er nede
+            action: "Sjekk Grafana og Kibana"
+            summary: |-
+              Grafana: https://grafana.nav.cloud.nais.io/goto/LQb7lCfNg?orgId=1
+              Loki securelogs: 
+              Kibana securelogs: 
+              Kibana åpne logger:
+          labels:
+            namespace: tilgangsmaskin
+            severity: critical
+        - alert: HelsesjekkSkjermingFeilet
+          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/skjerming", namespace="tilgangsmaskin"} == 0
+          for: 2m
+          annotations:
+            consequence: Skjermingsløsninen er nede
+            action: "Sjekk Grafana og Kibana"
+            summary: |-
+              Grafana: https://grafana.nav.cloud.nais.io/goto/LQb7lCfNg?orgId=1
+              Loki securelogs: 
+              Kibana securelogs: 
+              Kibana åpne logger:
+          labels:
+            namespace: tilgangsmaskin
+            severity: critical
+        - alert: HelsesjekkValKeyFeilet
+          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/valkey", namespace="tilgangsmaskin"} == 0
+          for: 2m
+          annotations:
+            consequence: Valkey er nede
+            action: "Sjekk Grafana og Kibana"
+            summary: |-
+              Grafana: https://grafana.nav.cloud.nais.io/goto/LQb7lCfNg?orgId=1
+              Loki securelogs: 
+              Kibana securelogs: 
+              Kibana åpne logger:
+          labels:
+            namespace: tilgangsmaskin
+            severity: critical
+        - alert: HelsesjekkEntraFeilet
+          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/graph", namespace="tilgangsmaskin"} == 0
+          for: 2m
+          annotations:
+            consequence: Entra er nede
+            action: "Sjekk Grafana og Kibana"
+            summary: |-
+              Grafana: https://grafana.nav.cloud.nais.io/goto/LQb7lCfNg?orgId=1
+              Loki securelogs: 
+              Kibana securelogs: 
+              Kibana åpne logger:
+          labels:
+            namespace: tilgangsmaskin
+            severity: critical

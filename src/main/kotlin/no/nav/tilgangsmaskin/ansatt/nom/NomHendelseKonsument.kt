@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class NomHendelseKonsument(private val nom: Nom, private val logger: NomHendelseLogger) {
-    
+
     @KafkaListener(topics = ["#{'\${nom.topic}'}"], concurrency = "1", batch = "true", filter = "fnrFilterStrategy")
     fun listen(hendelser: List<NomHendelse>) {
         logger.start(hendelser)

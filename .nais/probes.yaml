@@ -2,6 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: Probe
 metadata:
   name: helsesjekker
+  namespace: tilgangsmaskin
 spec:
   interval: 60s
   module: http_2xx

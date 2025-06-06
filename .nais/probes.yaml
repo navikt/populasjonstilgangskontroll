@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: helsesjekk
+spec:
+  interval: 60s
+  module: http_2xx
+  prober:
+    path: /probe
+    url: monitoring-prometheus-blackbox-exporter.nais-system:80
+  targets:
+    staticConfig:
+      static:
+      - http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/graph
+      - http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/pdl
+      - http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/pdlGraph
+      - http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/skjerming
+      - http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/valKey
+      - http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/db
+

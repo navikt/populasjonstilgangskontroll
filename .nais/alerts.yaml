@@ -9,12 +9,27 @@ spec:
   groups:
     - name: client-errors
       rules:
+        - alert: HelsesjekkFeilet
+          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/pdl", namespace="tilgangsmaskin"} == 1
+          for: 2m
+          annotations:
+            consequence: PDL er nede
+            action: "Ta en titt på Grafana og Kibana (dett er en test)"
+            summary: |-
+              Grafana: https://grafana.nav.cloud.nais.io/goto/LQb7lCfNg?orgId=1
+              Loki securelogs: 
+              Kibana securelogs: 
+              Kibana åpne logger:
+          labels:
+            namespace: tilgangsmaskin
+            severity: critical
+        - alert: ErrorLogMessages
         - alert: ApplikasjonNede
           expr: kube_deployment_status_replicas_available{namespace="tilgangsmaskin", deployment="populasjonstilgangskontroll"} == 0
           for: 2m
           annotations:
             consequence: tilgangsmaskin er nede
-            action: "Ta en titt på Grafana og Kibana  test av melding til slack  ved å sei replica ulik 0"
+            action: "Ta en titt på Grafana og Kibana"
             summary: |-
               Grafana: https://grafana.nav.cloud.nais.io/goto/LQb7lCfNg?orgId=1
               Loki securelogs: 

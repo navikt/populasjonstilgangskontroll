@@ -9,25 +9,27 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 
 @Component
-class NomHendelseKonsument(private val nom: Nom, private val log: NomHendelseLogger) {
-
-
+class NomHendelseKonsument(private val nom: Nom, private val logger: NomHendelseLogger) {
+    
     @KafkaListener(topics = ["#{'\${nom.topic}'}"], concurrency = "1", batch = "true", filter = "fnrFilterStrategy")
     fun listen(hendelser: List<NomHendelse>) {
-        log.start(hendelser)
-        hendelser.forEach {
-            log.behandler(it)
-            with(it) {
-                runCatching {
-                    nom.lagre(
-                            NomAnsattData(
-                                    AnsattId(navident), BrukerId(personident),
-                                    NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: ALLTID)))
-                }.fold(
-                        { log.ok(navident, personident) },
-                        { log.feilet(navident, personident, it) })
+        logger.start(hendelser)
+        hendelser.forEach { hendelse ->
+            logger.behandler(hendelse)
+            runCatching {
+                nom.lagre(
+                    NomAnsattData(
+                        AnsattId(hendelse.navident),
+                        BrukerId(hendelse.personident),
+                        NomAnsattPeriode(hendelse.startdato ?: EPOCH, hendelse.sluttdato ?: ALLTID)
+                    )
+                )
+            }.onSuccess {
+                logger.ok(hendelse.navident, hendelse.personident)
+            }.onFailure {
+                logger.feilet(hendelse.navident, hendelse.personident, it)
             }
         }
-        log.ferdig(hendelser)
+        logger.ferdig(hendelser)
     }
 }

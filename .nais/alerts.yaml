@@ -23,7 +23,6 @@ spec:
           labels:
             namespace: tilgangsmaskin
             severity: critical
-        - alert: ErrorLogMessages
         - alert: ApplikasjonNede
           expr: kube_deployment_status_replicas_available{namespace="tilgangsmaskin", deployment="populasjonstilgangskontroll"} == 0
           for: 2m

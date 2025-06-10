@@ -6,6 +6,11 @@ management:
     annotations:
       enabled: true
   health:
+    group:
+      readiness:
+        show-components: never
+      liveness:
+        show-components: never
     redis:
       enabled: false
     ssl:

@@ -77,7 +77,7 @@
     "min": "350m"
   },
   "replica": {
-    "min": 2,
-    "max": 4
+    "min": 3,
+    "max": 6
   }
 }

@@ -16,7 +16,7 @@ spec:
             consequence: PDL-pip er nede
             action: "Sjekk Grafana og Kibana"
             summary: |-
-              Grafana: https://grafana.nav.cloud.nais.io/goto/LQb7lCfNg?orgId=1
+              Grafana: https://grafana.nav.cloud.nais.io/d/42e329f6-6f6c-4365-84a1-7c65def92463/tilgangmaskin-prod?orgId=1
               Loki securelogs: 
               Kibana securelogs: 
               Kibana åpne logger:
@@ -30,7 +30,7 @@ spec:
             consequence: PDL er nede
             action: "Sjekk Grafana og Kibana"
             summary: |-
-              Grafana: https://grafana.nav.cloud.nais.io/goto/LQb7lCfNg?orgId=1
+              Grafana: https://grafana.nav.cloud.nais.io/d/42e329f6-6f6c-4365-84a1-7c65def92463/tilgangmaskin-prod?orgId=1
               Loki securelogs: 
               Kibana securelogs: 
               Kibana åpne logger:
@@ -44,7 +44,7 @@ spec:
             consequence: Skjermingsløsninen er nede
             action: "Sjekk Grafana og Kibana"
             summary: |-
-              Grafana: https://grafana.nav.cloud.nais.io/goto/LQb7lCfNg?orgId=1
+              Grafana: https://grafana.nav.cloud.nais.io/d/42e329f6-6f6c-4365-84a1-7c65def92463/tilgangmaskin-prod?orgId=1
               Loki securelogs: 
               Kibana securelogs: 
               Kibana åpne logger:
@@ -58,7 +58,7 @@ spec:
             consequence: Valkey er nede
             action: "Sjekk Grafana og Kibana"
             summary: |-
-              Grafana: https://grafana.nav.cloud.nais.io/goto/LQb7lCfNg?orgId=1
+              Grafana: https://grafana.nav.cloud.nais.io/d/42e329f6-6f6c-4365-84a1-7c65def92463/tilgangmaskin-prod?orgId=1
               Loki securelogs: 
               Kibana securelogs: 
               Kibana åpne logger:
@@ -72,7 +72,7 @@ spec:
             consequence: Entra er nede
             action: "Sjekk Grafana og Kibana"
             summary: |-
-              Grafana: https://grafana.nav.cloud.nais.io/goto/LQb7lCfNg?orgId=1
+              Grafana: https://grafana.nav.cloud.nais.io/d/42e329f6-6f6c-4365-84a1-7c65def92463/tilgangmaskin-prod?orgId=1
               Loki securelogs: 
               Kibana securelogs: 
               Kibana åpne logger:

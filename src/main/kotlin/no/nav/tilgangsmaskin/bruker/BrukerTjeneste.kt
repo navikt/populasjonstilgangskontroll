@@ -5,11 +5,15 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.PersonTilBrukerMapper.tilBruker
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.Person
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 
 @Service
 @Timed
 class BrukerTjeneste(private val personer: PDLTjeneste, val skjerminger: SkjermingTjeneste) {
+
+    private val log = getLogger(javaClass)
+
 
     fun brukere(vararg brukerIds: String) = personer.personer(brukerIds.toSet()).let { personer ->
         val skjerminger = skjerminger.skjerminger(personer.map { it.brukerId }.toSet())
@@ -26,6 +30,15 @@ class BrukerTjeneste(private val personer: PDLTjeneste, val skjerminger: Skjermi
 
     private fun brukerMedSkjerming(id: String, hentFamilie: (String) -> Person) =
         with(hentFamilie(id)) {
-             tilBruker(this, skjerminger.skjerminger(historiskeIds + brukerId).values.any { it })
+            val statuser = skjerminger.skjerminger(historiskeIds + brukerId)
+            statuser.filterValues { it }.forEach { (key, _) ->
+                if (key.verdi != id) {
+                    log.info("Bruker $key er skjermet grunnet historikk")
+                }
+                else {
+                    log.trace("Bruker {} er skjermet", key)
+                }
+            }
+            tilBruker(this, statuser.values.any { it })
         }
 }

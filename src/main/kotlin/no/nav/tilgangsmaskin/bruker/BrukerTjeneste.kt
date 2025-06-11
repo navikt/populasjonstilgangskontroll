@@ -35,9 +35,6 @@ class BrukerTjeneste(private val personer: PDLTjeneste, val skjerminger: Skjermi
                 if (key.verdi != id) {
                     log.info("Bruker $key er skjermet grunnet historikk")
                 }
-                else {
-                    log.trace("Bruker {} er skjermet", key)
-                }
             }
             tilBruker(this, statuser.values.any { it })
         }

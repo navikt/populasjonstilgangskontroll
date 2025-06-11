@@ -37,7 +37,7 @@ class ValKeyBeanConfiguration(private val cf: RedisConnectionFactory,
             if (isDevOrLocal(env)) {
               //  registerModule(JsonCacheableModule())
                 activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
-             //   activateDefaultTyping(polymorphicTypeValidator, NON_FINAL_AND_ENUMS, PROPERTY)
+             //    activateDefaultTyping(polymorphicTypeValidator, NON_FINAL_AND_ENUMS, PROPERTY)
             }
             else {
                 activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)

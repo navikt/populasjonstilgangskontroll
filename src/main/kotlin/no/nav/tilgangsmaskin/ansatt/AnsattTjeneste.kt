@@ -8,9 +8,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.regler.motor.NasjonalGruppeTeller
 import org.springframework.stereotype.Service
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
-import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.cache.annotation.CacheEvict
 
 @Service
 @Timed
@@ -33,7 +31,7 @@ class AnsattTjeneste(private val ansatte: Nom,
 
     private fun ansattBruker(ansattId: AnsattId) =
         ansatte.fnrForAnsatt(ansattId)?.let {
-            runCatching { brukere.medUtvidetFamilie(it.verdi) }.getOrNull()
+            runCatching { brukere.brukerMedUtvidetFamilie(it.verdi) }.getOrNull()
         }
 
     private fun tell(status: Boolean) = teller.tell(Tags.of(MEDLEM,"$status"))

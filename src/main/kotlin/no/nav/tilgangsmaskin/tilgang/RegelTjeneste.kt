@@ -28,7 +28,7 @@ class RegelTjeneste(
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
-            val bruker = brukere.medNærmesteFamilie(brukerId)
+            val bruker = brukere.brukerMedNærmesteFamilie(brukerId)
             runCatching {
                 motor.kompletteRegler(ansatte.ansatt(ansattId), bruker)
             }.getOrElse {
@@ -42,7 +42,7 @@ class RegelTjeneste(
     }
 
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
-        motor.kjerneregler(ansatte.ansatt(ansattId), brukere.medUtvidetFamilie(brukerId))
+        motor.kjerneregler(ansatte.ansatt(ansattId), brukere.brukerMedUtvidetFamilie(brukerId))
 
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>): List<Pair<BrukerId, Any>> {
         val resultater = motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerIdOgType()).map {

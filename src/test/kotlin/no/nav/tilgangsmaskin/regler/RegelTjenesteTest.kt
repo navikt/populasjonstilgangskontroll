@@ -102,7 +102,7 @@ class RegelTjenesteTest {
     @Test
     @DisplayName("Verifiser at sjekk om overstyring gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang gis om overstyring er gjort")
     fun overstyringOK() {
-        every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
+        every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
         overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "test", IMORGEN))
         assertThatCode {
             regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
@@ -113,7 +113,7 @@ class RegelTjenesteTest {
     @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang,og at tilgang ikke gis om overstyring ikke er gjort")
     fun ikkeOverstyrt() {
         every {
-            brukere.medNærmesteFamilie(
+            brukere.brukerMedNærmesteFamilie(
                     BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK)
                         .build().brukerId.verdi)
         } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
@@ -142,7 +142,7 @@ class RegelTjenesteTest {
     //@Test
     fun bulkAvvisningerOverstyrt() {
         every {
-            brukere.medNærmesteFamilie(
+            brukere.brukerMedNærmesteFamilie(
                     BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(
                             UTENLANDSK).build().brukerId.verdi)
         } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()

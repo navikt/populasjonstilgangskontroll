@@ -8,7 +8,6 @@ import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.Nom
-import no.nav.tilgangsmaskin.ansatt.graph.Entra
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
@@ -53,7 +52,7 @@ class DevTilgangController(
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)
 
     @GetMapping("bruker/{id}")
-    fun bruker(@PathVariable @Valid @ValidId id: String) = brukere.medUtvidetFamilie(id)
+    fun bruker(@PathVariable @Valid @ValidId id: String) = brukere.brukerMedUtvidetFamilie(id)
 
     @GetMapping("person/{id}")
     fun person(@PathVariable @Valid @ValidId id: String) = pdl.medUtvidetFamile(id)

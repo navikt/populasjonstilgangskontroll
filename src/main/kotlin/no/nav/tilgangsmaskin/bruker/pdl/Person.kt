@@ -34,9 +34,11 @@ data class Person(
 
 }
 
-fun List<Gradering>.erStrengtFortroligUtland() = any { it == STRENGT_FORTROLIG_UTLAND }
+fun List<Gradering>.erStrengtFortroligUtland() = inneholder(STRENGT_FORTROLIG_UTLAND)
 
-fun List<Gradering>.erStrengtFortrolig() = any { it == STRENGT_FORTROLIG }
+fun List<Gradering>.erStrengtFortrolig() = inneholder(STRENGT_FORTROLIG)
 
-fun List<Gradering>.erFortrolig() = any { it == FORTROLIG }
+fun List<Gradering>.erFortrolig() = inneholder(FORTROLIG)
+
+private fun List<Gradering>.inneholder(gradering: Gradering) = any { it == gradering }
 

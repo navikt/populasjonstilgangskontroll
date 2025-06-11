@@ -4,6 +4,7 @@ import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.PersonTilBrukerMapper.tilBruker
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
+import no.nav.tilgangsmaskin.bruker.pdl.Person
 import org.springframework.stereotype.Service
 
 @Service
@@ -17,13 +18,14 @@ class BrukerTjeneste(private val personer: PDLTjeneste, val skjerminger: Skjermi
         }
     }
 
-    fun medNærmesteFamilie(brukerId: String) =
-        personer.medNærmesteFamilie(brukerId).let {
-            tilBruker(it, skjerminger.skjerming(it.brukerId))
-        }
+    fun brukerMedNærmesteFamilie(brukerId: String) =
+        brukerMedSkjerming(brukerId, personer::medNærmesteFamilie)
 
-    fun medUtvidetFamilie(brukerId: String) =
-        personer.medUtvidetFamile(brukerId).let {
-            tilBruker(it, skjerminger.skjerming(it.brukerId))
+    fun brukerMedUtvidetFamilie(brukerId: String) =
+        brukerMedSkjerming(brukerId, personer::medUtvidetFamile)
+
+    private fun brukerMedSkjerming(id: String, hentFamilie: (String) -> Person) =
+        with(hentFamilie(id)) {
+             tilBruker(this, skjerminger.skjerminger(historiskeIds + brukerId).values.any { it })
         }
 }

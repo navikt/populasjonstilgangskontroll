@@ -10,27 +10,27 @@ import org.springframework.stereotype.Service
 
 @Service
 @Timed
-class BrukerTjeneste(private val personer: PDLTjeneste, val skjerminger: SkjermingTjeneste) {
+class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjeneste: SkjermingTjeneste) {
 
     private val log = getLogger(javaClass)
 
 
-    fun brukere(vararg brukerIds: String) = personer.personer(brukerIds.toSet()).let { personer ->
-        val skjerminger = skjerminger.skjerminger(personer.map { it.brukerId }.toSet())
+    fun brukere(vararg brukerIds: String) = personTjeneste.personer(brukerIds.toSet()).let { personer ->
+        val skjerminger = skjermingTjeneste.skjerminger(personer.map { it.brukerId }.toSet())
         personer.map {
             tilBruker(it, skjerminger[it.brukerId] ?: false)
         }
     }
 
     fun brukerMedNærmesteFamilie(brukerId: String) =
-        brukerMedSkjerming(brukerId, personer::medNærmesteFamilie)
+        brukerMedSkjerming(brukerId, personTjeneste::medNærmesteFamilie)
 
     fun brukerMedUtvidetFamilie(brukerId: String) =
-        brukerMedSkjerming(brukerId, personer::medUtvidetFamile)
+        brukerMedSkjerming(brukerId, personTjeneste::medUtvidetFamile)
 
     private fun brukerMedSkjerming(id: String, hentFamilie: (String) -> Person) =
         with(hentFamilie(id)) {
-            val statuser = skjerminger.skjerminger(historiskeIds + brukerId)
+            val statuser = skjermingTjeneste.skjerminger(historiskeIds + brukerId)
             statuser.filterValues { it }.forEach { (brukerId, status) ->
                 if (brukerId.verdi != id && status) {
                     log.info("Bruker $brukerId er skjermet grunnet historikk")

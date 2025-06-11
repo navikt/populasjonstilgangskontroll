@@ -31,8 +31,8 @@ class BrukerTjeneste(private val personer: PDLTjeneste, val skjerminger: Skjermi
     private fun brukerMedSkjerming(id: String, hentFamilie: (String) -> Person) =
         with(hentFamilie(id)) {
             val statuser = skjerminger.skjerminger(historiskeIds + brukerId)
-            statuser.filterValues { it }.forEach { (brukerId, _) ->
-                if (brukerId.verdi != id) {
+            statuser.filterValues { it }.forEach { (brukerId, status) ->
+                if (brukerId.verdi != id && status) {
                     log.info("Bruker $brukerId er skjermet grunnet historikk")
                 }
             }

@@ -62,6 +62,11 @@
       "name": "istilgangskontroll",
       "namespace": "teamsykefravr",
       "cluster": "prod-gcp"
+    },
+    {
+      "name": "arbeid-og-inntekt",
+      "namespace": "team-inntekt",
+      "cluster": "prod-fss"
     }
   ],
   "nais": {

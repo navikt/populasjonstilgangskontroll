@@ -35,8 +35,9 @@ class ValKeyBeanConfiguration(private val cf: RedisConnectionFactory,
     private val valKeyMapper =
         mapper.copy().apply {
             if (isDevOrLocal(env)) {
-                registerModule(JsonCacheableModule())
-                activateDefaultTyping(polymorphicTypeValidator, NON_FINAL_AND_ENUMS, PROPERTY)
+              //  registerModule(JsonCacheableModule())
+                activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
+             //   activateDefaultTyping(polymorphicTypeValidator, NON_FINAL_AND_ENUMS, PROPERTY)
             }
             else {
                 activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)

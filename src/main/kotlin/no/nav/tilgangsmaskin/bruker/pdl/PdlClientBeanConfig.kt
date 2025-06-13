@@ -35,23 +35,19 @@ class PdlClientBeanConfig {
 
     @Bean
     @Qualifier(PDLGRAPH)
-    fun syncPdlGraphQLClient(@Qualifier(PDLGRAPH) client: RestClient, cfg: PdlGraphQLConfig) =
+    fun syncPdlGraphQLClient(@Qualifier(PDLGRAPH) client: RestClient, cfg: PdlGraphQLConfig,  interceptors: List<SyncGraphQlClientInterceptor>) =
         HttpSyncGraphQlClient.builder(client)
             .url(cfg.baseUri)
-            .interceptor(LoggingGraphQLInterceptor())
-            .build()
+            .interceptors {
+                it.addAll(interceptors)
+            }.build()
 
     @Bean
     @Qualifier(PDL)
     fun pdlRestClient(b: Builder) = b.build()
 
     @Bean
-    fun pdlGraphHealthIndicator(a: PdlSyncGraphQLClientAdapter) = object : PingableHealthIndicator(a) {}
-
-    @Bean
-    fun pdlHealthIndicator(a: PdlRestClientAdapter) = object : PingableHealthIndicator(a) {}
-
-    private class LoggingGraphQLInterceptor : SyncGraphQlClientInterceptor {
+    fun loggingGraphQLInterceptor() = object:  SyncGraphQlClientInterceptor {
 
         private val log = getLogger(javaClass)
 
@@ -60,4 +56,11 @@ class PdlClientBeanConfig {
                 log.trace(CONFIDENTIAL, "Eksekverer {} med variabler {}", req.document, req.variables)
             }
     }
+
+    @Bean
+    fun pdlGraphHealthIndicator(a: PdlSyncGraphQLClientAdapter) = object : PingableHealthIndicator(a) {}
+
+    @Bean
+    fun pdlHealthIndicator(a: PdlRestClientAdapter) = object : PingableHealthIndicator(a) {}
+
 }

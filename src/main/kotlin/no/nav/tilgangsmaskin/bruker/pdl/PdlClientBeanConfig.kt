@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Primary
 import org.springframework.graphql.client.ClientGraphQlRequest
 import org.springframework.graphql.client.HttpSyncGraphQlClient
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor
+import org.springframework.graphql.client.SyncGraphQlClientInterceptor.Chain
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
@@ -52,7 +53,7 @@ class PdlClientBeanConfig {
 
         private val log = getLogger(javaClass)
 
-        override fun intercept(req: ClientGraphQlRequest, chain: SyncGraphQlClientInterceptor.Chain) =
+        override fun intercept(req: ClientGraphQlRequest, chain:    Chain) =
             chain.next(req).also {
                 log.trace("Eksekverer {} med variabler {}", req.document, req.variables)
             }

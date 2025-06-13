@@ -11,7 +11,7 @@
     "utland": "bb308252-d600-4e5c-bc53-bbd2bb8a29ba"
   },
   "db": {
-    "poolsize": "2",
+    "poolsize": "4",
     "type": "POSTGRES_17",
     "tier": "db-custom-2-3840",
     "name": "tilgangsmaskin"

@@ -110,8 +110,12 @@
       "name": "arbeid-og-inntekt-ascension",
       "namespace": "team-inntekt",
       "cluster": "dev-fss"
+    },
+    {
+      "name": "historisk-helt-backend",
+      "namespace": "historisk",
+      "cluster": "dev-gcp"
     }
-
   ],
   "nais": {
     "cluster": {

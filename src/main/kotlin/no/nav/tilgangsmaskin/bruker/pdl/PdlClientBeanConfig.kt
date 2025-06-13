@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
+import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
@@ -47,13 +47,14 @@ class PdlClientBeanConfig {
     fun pdlRestClient(b: Builder) = b.build()
 
     @Bean
+    @ConditionalOnNotProd
     fun loggingGraphQLInterceptor() = object:  SyncGraphQlClientInterceptor {
 
         private val log = getLogger(javaClass)
 
         override fun intercept(req: ClientGraphQlRequest, chain: SyncGraphQlClientInterceptor.Chain) =
             chain.next(req).also {
-                log.trace(CONFIDENTIAL, "Eksekverer {} med variabler {}", req.document, req.variables)
+                log.trace("Eksekverer {} med variabler {}", req.document, req.variables)
             }
     }
 

@@ -18,7 +18,7 @@ import java.net.URI
 @TestPropertySource(locations = ["classpath:test.properties"])
 @EnableConfigurationProperties(GlobaleGrupperConfig::class)
 @ContextConfiguration(classes = [TestApp::class])
-class EntraUrl {
+class EntraURL {
 
     @Autowired
     private lateinit var env: Environment

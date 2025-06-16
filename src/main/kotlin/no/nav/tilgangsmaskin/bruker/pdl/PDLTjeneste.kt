@@ -7,9 +7,11 @@ import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
-import no.nav.tilgangsmaskin.felles.CacheableRetryingOnRecoverableService
+import no.nav.tilgangsmaskin.felles.RetryingOnRecoverableService
+import org.springframework.cache.annotation.Cacheable
 
-@CacheableRetryingOnRecoverableService(cacheNames = [PDL])
+@RetryingOnRecoverableService
+@Cacheable(cacheNames = [PDL])
 @Timed
 class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL: PdlSyncGraphQLClientAdapter) {
 

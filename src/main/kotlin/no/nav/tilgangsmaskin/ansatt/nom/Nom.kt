@@ -3,19 +3,19 @@ package no.nav.tilgangsmaskin.ansatt.nom
 import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
-import no.nav.tilgangsmaskin.felles.CacheableRetryingOnRecoverableService
-import org.springframework.stereotype.Service
+import no.nav.tilgangsmaskin.felles.RetryingOnRecoverableService
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.transaction.annotation.Transactional
 
 @Transactional
 @Timed
-@CacheableRetryingOnRecoverableService(cacheNames = [NOM])
+@RetryingOnRecoverableService
 class Nom(private val adapter: NomJPAAdapter) {
 
     fun lagre(ansattData: NomAnsattData) = adapter.upsert(ansattData)
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = [NOM])
     fun fnrForAnsatt(ansattId: AnsattId) = adapter.fnrForAnsatt(ansattId.verdi)
     fun ryddOpp() = adapter.ryddOpp()
 }

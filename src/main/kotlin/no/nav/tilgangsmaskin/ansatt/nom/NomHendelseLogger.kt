@@ -10,6 +10,10 @@ import org.springframework.stereotype.Component
 
 @Component
 class NomHendelseLogger(private val registry: MeterRegistry, private val repo: NomRepository) {
+
+    init {
+        size()
+    }
     private val log = getLogger(javaClass)
     fun ok(ansattId: String, brukerId: String) {
         log.info("Lagret brukerId ${brukerId.maskFnr()} for $ansattId OK")
@@ -24,12 +28,15 @@ class NomHendelseLogger(private val registry: MeterRegistry, private val repo: N
     }
 
     fun ferdig(hendelser: List<NomHendelse>) {
-        log.info("${hendelser.size} ${"hendelse".pluralize(hendelser)} ferdig behandlet")
-        registry.gauge("nom.size",repo) {
-            repo.count().toDouble()
+        log.info("${hendelser.size} ${"hendelse".pluralize(hendelser)} ferdig behandlet").also {
+            size()
         }
     }
 
+    private fun size() =
+        registry.gauge("nom.size",repo) {
+            repo.count().toDouble()
+        }
     fun feilet(ansattId: String, brukerId: String, e: Throwable) {
         log.error("Kunne ikke lagre brukerId ${brukerId.maskFnr()} for $ansattId (${e.message})", e)
     }

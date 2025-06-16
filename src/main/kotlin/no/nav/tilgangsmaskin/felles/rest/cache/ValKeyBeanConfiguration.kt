@@ -13,6 +13,7 @@ import org.springframework.cache.interceptor.KeyGenerator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
+import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.lockingRedisCacheWriter
@@ -70,10 +71,12 @@ class ValKeyBeanConfiguration(private val cf: RedisConnectionFactory,
     }
 
     private fun cacheConfig(cfg: CachableRestConfig) =
-        defaultCacheConfig()
-            .disableCachingNullValues()
+         defaultCacheConfig()
             .entryTtl(Duration.ofHours(cfg.expireHours))
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))
             .serializeValuesWith(fromSerializer(GenericJackson2JsonRedisSerializer(valKeyMapper)))
+            .apply {
+                if (!cfg.cacheNull) disableCachingNullValues()
+            }
 }
 

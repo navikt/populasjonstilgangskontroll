@@ -9,6 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 class NomConfig(val topic: String): CachableRestConfig {
     override val expireHours= 12L
     override val navn = NOM
+    override val cacheNull=true
 
     companion object {
         const val NOM = "nom"

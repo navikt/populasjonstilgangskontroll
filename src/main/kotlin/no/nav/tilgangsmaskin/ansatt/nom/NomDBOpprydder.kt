@@ -10,7 +10,7 @@ import java.net.InetAddress
 import java.util.concurrent.TimeUnit.HOURS
 
 @Component
-class NomDBOpprydder(private val registry: MeterRegistry, private val nom: NomJPAAdapter)  {
+class NomDBOpprydder(private val registry: MeterRegistry, private val nom: Nom)  {
 
     private val log = LoggerFactory.getLogger(javaClass)
 

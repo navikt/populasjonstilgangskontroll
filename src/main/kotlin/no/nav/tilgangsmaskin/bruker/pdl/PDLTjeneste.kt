@@ -18,7 +18,6 @@ class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL
 
     private val log = getLogger(javaClass)
 
-
     fun medUtvidetFamile(id: String) =
         with(medNærmesteFamilie(id)) {
             copy(familie = familie.copy(søsken = søsken(foreldre, brukerId), partnere = partnere(id)))

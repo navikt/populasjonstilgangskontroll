@@ -16,10 +16,16 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
 
 
     fun brukere(vararg brukerIds: String) : List<Bruker> {
-        return personTjeneste.personer(brukerIds.toSet()).let { personer ->
-            log.info("Bulk hentet ${personer.size} brukere: for ${brukerIds.joinToString(",")}")
-            val skjerminger = skjermingTjeneste.skjerminger(personer.map { it.brukerId }.toSet())
-            personer.map {
+        val personer =  personTjeneste.personer(brukerIds.toSet())
+        val notFound = brukerIds.toSet() - personer.map { it.brukerId.verdi }.toSet()
+        val found =  personer.filter { !notFound.contains(it.brukerId.verdi) }
+        log.info("Bulk Fant ikke personer for ${notFound.joinToString(",")}")
+        log.info("Bulk Fant personer for ${found.joinToString(",")}")
+
+        return found.let { p ->
+            log.info("Bulk hentet ${p.size} brukere: for ${brukerIds.joinToString(",")}")
+            val skjerminger = skjermingTjeneste.skjerminger(p.map { it.brukerId }.toSet())
+            p.map {
                 tilBruker(it, skjerminger[it.brukerId] ?: false)
             }
         }

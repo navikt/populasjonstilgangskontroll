@@ -59,8 +59,7 @@ class RegelTjeneste(
 
         val resultBrukerIds = resultater.map { it.first.verdi }.toSet()
         val notFound = (idOgType.map { it.brukerId }.toSet() - resultBrukerIds)
-            .map { BrukerId(it) to NOT_FOUND }
-
+        notFound.map { BrukerId(it) to NOT_FOUND }
         return resultater + notFound
     }
 

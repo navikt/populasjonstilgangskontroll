@@ -9,12 +9,12 @@ import org.springframework.stereotype.Component
 
 @Component
 class NomVaktmester(private val nom: Nom, private val utvelger: LederUtvelger, registry: MeterRegistry) {
+    private val log = getLogger(NomVaktmester::class.java)
 
     init {
         ryddOpp()
     }
 
-    private val log = getLogger(javaClass)
     private val counter = Counter.builder("vaktmester.rader.fjernet")
         .description("Antall rader fjernet")
         .register(registry)

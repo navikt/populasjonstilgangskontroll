@@ -5,6 +5,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.PersonTilBrukerMapper.tilBruker
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.Person
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 
@@ -19,8 +20,8 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
         val personer =  personTjeneste.personer(brukerIds.toSet())
         val notFound = brukerIds.toSet() - personer.map { it.brukerId.verdi }.toSet()
         val found =  personer.filter { !notFound.contains(it.brukerId.verdi) }
-        log.info("Bulk Fant ikke personer for ${notFound.joinToString(",")}")
-        log.info("Bulk Fant personer for ${found.joinToString(",")}")
+        log.info("Bulk fant ikke følgende ${notFound.size} personer for ${notFound.joinToString { it.maskFnr() }}")
+        log.info("Bulk fant følgende ${found.size} personer fra ${brukerIds.joinToString { it.maskFnr() }}")
 
         return found.let { p ->
             log.info("Bulk hentet ${p.size} brukere: for ${brukerIds.joinToString(",")}")

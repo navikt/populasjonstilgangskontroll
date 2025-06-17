@@ -47,23 +47,20 @@ class RegelTjeneste(
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
         motor.kjerneregler(ansatte.ansatt(ansattId), brukere.brukerMedUtvidetFamilie(brukerId))
 
-    fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>): List<Pair<BrukerId, HttpStatus>> {
-        log.info("Sjekker bulk for ansatt $ansattId og ${idOgType} brukere")
+    fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>): Set<Pair<BrukerId, HttpStatus>> {
+        log.info("Sjekker bulk for ansatt $ansattId og $idOgType brukere")
         val resultater = motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerIdOgType()).map { (brukerId, status) ->
             if (status == UNAUTHORIZED && overstyring.erOverstyrt(ansattId, brukerId)) {
                 brukerId to ACCEPTED
             } else {
                 brukerId to status
             }
-        }
-
+        }.toSet()
         val resultBrukerIds = resultater.map { it.first.verdi }.toSet()
         val notFound = (idOgType.map { it.brukerId }.toSet() - resultBrukerIds)
-        notFound.map { BrukerId(it) to NOT_FOUND }
-        return resultater + notFound
+        val nf = notFound.map { BrukerId(it) to NOT_FOUND }
+        return resultater + nf
     }
-
-
     private fun Set<IdOgType>.brukerIdOgType(): Set<Pair<Bruker, RegelSett.RegelType>> {
         log.info("Bulk henter ${size} brukere")
         return mapNotNull { spec ->

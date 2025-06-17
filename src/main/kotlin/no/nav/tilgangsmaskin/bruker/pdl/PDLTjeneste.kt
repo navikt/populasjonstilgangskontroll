@@ -22,7 +22,10 @@ class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL
 
     fun medNærmesteFamilie(id: String) = tilPerson(adapter.person(id))
 
-    fun personer(brukerIds: Set<String>) = adapter.personer(brukerIds).map { tilPerson(it.value) }
+    fun personer(brukerIds: Set<String>) : List<Person> {
+        log.info("Bulk henter personer for ${brukerIds.joinToString(",")}")
+        return adapter.personer(brukerIds).map { tilPerson(it.value) }
+    }
 
     private fun partnere(id: String) =
         graphQL.sivilstand(id).sivilstand

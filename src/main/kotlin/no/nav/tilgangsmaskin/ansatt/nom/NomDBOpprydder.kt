@@ -24,6 +24,7 @@ class NomDBOpprydder(private val registry: MeterRegistry, private val nom: Nom) 
     @EventListener(LederUtvelgerHandler.LeaderChangedEvent::class)
     fun onApplicationEvent(event: LederUtvelgerHandler.LeaderChangedEvent) {
         erLeder = event.leder == hostname
+        log.info("Vaktmester erLeder=$erLeder, me=$hostname, leder=${event.leder}")
         if (erLeder) {
             ryddOpp()
         }

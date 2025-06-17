@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import no.nav.tilgangsmaskin.ansatt.nom.LederUtvelgerHandler.LeaderChangedEvent
+import org.slf4j.LoggerFactory.getLogger
 import java.net.URI
 import java.time.LocalDateTime
 import org.springframework.beans.factory.annotation.Value
@@ -37,11 +38,14 @@ class LederUtvelgerHandler(private val builder: Builder,
 @Component
 class LederUtvelger  {
 
+    private val log = getLogger(javaClass)
+
     private val hostname = InetAddress.getLocalHost().hostName
     var erLeder: Boolean = false
 
     @EventListener(LeaderChangedEvent::class)
     fun onApplicationEvent(event: LeaderChangedEvent) {
         erLeder = event.leder == hostname
+        log.info("LederUtvelger: erLeder=$erLeder, leder=${event.leder}, hostname=$hostname")
     }
 }

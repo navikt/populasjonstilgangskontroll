@@ -2,26 +2,36 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
-import java.util.concurrent.TimeUnit.HOURS
-import org.slf4j.LoggerFactory.getLogger
+import org.slf4j.LoggerFactory
+import org.springframework.context.event.EventListener
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
+import java.net.InetAddress
+import java.util.concurrent.TimeUnit.HOURS
 
 @Component
-class NomVaktmester(private val nom: Nom, private val utvelger: LederUtvelger, registry: MeterRegistry) {
-    private val log = getLogger(NomVaktmester::class.java)
+class NomDBOpprydder(private val registry: MeterRegistry, private val nom: NomJPAAdapter)  {
 
-    init {
-        ryddOpp()
-    }
+    private val log = LoggerFactory.getLogger(javaClass)
 
     private val counter = Counter.builder("vaktmester.rader.fjernet")
         .description("Antall rader fjernet")
         .register(registry)
 
+    private val hostname = InetAddress.getLocalHost().hostName
+    var erLeder: Boolean = false
+
+    @EventListener(LederUtvelgerHandler.LeaderChangedEvent::class)
+    fun onApplicationEvent(event: LederUtvelgerHandler.LeaderChangedEvent) {
+        erLeder = event.leder == hostname
+        if (erLeder) {
+            ryddOpp()
+        }
+    }
+
     @Scheduled(fixedRate = 24, timeUnit = HOURS)
     fun ryddOpp(): Int {
-        if (!utvelger.erLeder) {
+        if (!erLeder) {
             log.info("Vaktmester er ikke leder, hopper over rydding i Nom-databasen")
             return 0
         }
@@ -37,6 +47,3 @@ class NomVaktmester(private val nom: Nom, private val utvelger: LederUtvelger, r
         return antall
     }
 }
-
-
-

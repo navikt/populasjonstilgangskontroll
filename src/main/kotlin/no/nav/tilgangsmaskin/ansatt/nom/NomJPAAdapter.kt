@@ -12,8 +12,6 @@ import org.springframework.stereotype.Component
 @Component
 class NomJPAAdapter(val repo: NomRepository, @PersistenceContext val entityManager: EntityManager) {
 
-    fun count() = repo.count()
-
     fun ryddOpp() = repo.deleteByGyldigtilBefore()
 
     fun upsert(data: NomAnsattData) =

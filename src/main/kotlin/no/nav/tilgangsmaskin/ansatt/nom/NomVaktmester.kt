@@ -21,7 +21,10 @@ class NomVaktmester(private val nom: Nom, private val utvelger: LederUtvelger, r
 
     @Scheduled(fixedRate = 24, timeUnit = HOURS)
     fun ryddOpp(): Int {
-        if (!utvelger.erLeder) return 0
+        if (!utvelger.erLeder) {
+            log.info("Vaktmester er ikke leder, hopper over rydding i Nom-databasen")
+            return 0
+        }
         log.info("Vaktmester rydder opp i Nom-databasen")
         val antall = nom.ryddOpp()
         if (antall > 0) {

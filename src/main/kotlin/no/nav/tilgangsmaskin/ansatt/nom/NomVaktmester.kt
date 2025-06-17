@@ -28,6 +28,9 @@ class NomVaktmester(private val nom: Nom, private val utvelger: LederUtvelger, r
             counter.increment(antall.toDouble())
             log.info("Vaktmester ryddet opp $antall rad(er) med utgått informasjon om ansatte som ikke lenger jobber i Nav")
         }
+        else {
+            log.info("Vaktmester fant ingen rader å rydde opp i")
+        }
         return antall
     }
 }

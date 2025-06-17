@@ -24,13 +24,14 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
         log.info("Bulk fant følgende ${found.size} personer  ${found.joinToString { it.brukerId.verdi.maskFnr() }}")
 
         return found.let { p ->
-            log.info("Bulk hentet ${p.size} brukere: for ${brukerIds.joinToString(",")}")
-            val skjerminger = skjermingTjeneste.skjerminger(p.map { it.brukerId }.toSet())
-            p.map {
-                tilBruker(it, skjerminger[it.brukerId] ?: false)
+            log.info("Bulk henter skjerminger for ${p.map { it.brukerId }}")
+                val skjerminger = skjermingTjeneste.skjerminger(p.map { it.brukerId }.toSet())
+                log.info("Bulk hentet skjerminger $skjerminger")
+                p.map {
+                    tilBruker(it, skjerminger[it.brukerId] ?: false)
+                }
             }
         }
-    }
 
     fun brukerMedNærmesteFamilie(brukerId: String) =
         brukerMedSkjerming(brukerId, personTjeneste::medNærmesteFamilie)

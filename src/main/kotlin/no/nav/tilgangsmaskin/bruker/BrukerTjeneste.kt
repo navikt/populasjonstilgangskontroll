@@ -15,10 +15,13 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
     private val log = getLogger(javaClass)
 
 
-    fun brukere(vararg brukerIds: String) = personTjeneste.personer(brukerIds.toSet()).let { personer ->
-        val skjerminger = skjermingTjeneste.skjerminger(personer.map { it.brukerId }.toSet())
-        personer.map {
-            tilBruker(it, skjerminger[it.brukerId] ?: false)
+    fun brukere(vararg brukerIds: String) : List<Bruker> {
+        return personTjeneste.personer(brukerIds.toSet()).let { personer ->
+            log.info("Bulk hentet ${personer.size} brukere: for ${brukerIds.joinToString(",")}")
+            val skjerminger = skjermingTjeneste.skjerminger(personer.map { it.brukerId }.toSet())
+            personer.map {
+                tilBruker(it, skjerminger[it.brukerId] ?: false)
+            }
         }
     }
 

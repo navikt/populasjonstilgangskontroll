@@ -8,12 +8,16 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.felles.RetryingOnRecoverableService
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
 
 @RetryingOnRecoverableService
 @Cacheable(cacheNames = [PDL])
 @Timed
 class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL: PdlSyncGraphQLClientAdapter) {
+
+    private val log = getLogger(javaClass)
+
 
     fun medUtvidetFamile(id: String) =
         with(medNærmesteFamilie(id)) {

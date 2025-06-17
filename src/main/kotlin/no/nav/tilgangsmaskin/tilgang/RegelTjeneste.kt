@@ -9,10 +9,11 @@ import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.IdOgType
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.regler.motor.RegelMotor.BulkRegelResult.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Service
 import kotlin.time.measureTime
 
@@ -44,22 +45,22 @@ class RegelTjeneste(
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
         motor.kjerneregler(ansatte.ansatt(ansattId), brukere.brukerMedUtvidetFamilie(brukerId))
 
-    fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>): List<Pair<BrukerId, Any>> {
-        val resultater = motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerIdOgType()).map {
-            when (it) {
-                is Success -> it.brukerId to "OK"
-                is RegelFailure -> if (overstyring.erOverstyrt(ansattId, it.brukerId))
-                    it.brukerId to "OK"
-                      else it.brukerId to "403"
-
-                is InternalError -> it.brukerId to "500"
+    fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>): List<Pair<BrukerId, HttpStatus>> {
+        val resultater = motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerIdOgType()).map { (brukerId, status) ->
+            if (status == UNAUTHORIZED && overstyring.erOverstyrt(ansattId, brukerId)) {
+                brukerId to ACCEPTED
+            } else {
+                brukerId to status
             }
         }
-        val notFound = idOgType.map { it.brukerId }
-            .filterNot { brukerId -> resultater.any { it.first.verdi == brukerId } }
-            .map { BrukerId(it) to "404" }
+
+        val resultBrukerIds = resultater.map { it.first.verdi }.toSet()
+        val notFound = (idOgType.map { it.brukerId }.toSet() - resultBrukerIds)
+            .map { BrukerId(it) to NOT_FOUND }
+
         return resultater + notFound
     }
+
 
     private fun Set<IdOgType>.brukerIdOgType() =
         mapNotNull { spec ->

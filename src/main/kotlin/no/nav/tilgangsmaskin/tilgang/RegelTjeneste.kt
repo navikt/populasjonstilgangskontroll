@@ -4,11 +4,13 @@ import io.micrometer.core.annotation.Timed
 import org.springframework.boot.context.properties.ConfigurationProperties
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.IdOgType
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
+import no.nav.tilgangsmaskin.regler.motor.RegelSett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import org.slf4j.LoggerFactory.getLogger
@@ -63,13 +65,15 @@ class RegelTjeneste(
     }
 
 
-    private fun Set<IdOgType>.brukerIdOgType() =
-        mapNotNull { spec ->
+    private fun Set<IdOgType>.brukerIdOgType(): Set<Pair<Bruker, RegelSett.RegelType>> {
+        log.info("Bulk henter ${size} brukere")
+        return mapNotNull { spec ->
             brukere.brukere(*map { it.brukerId }.toTypedArray())
                 .associateBy { it.brukerId.verdi }[spec.brukerId]?.let { bruker ->
                 bruker to spec.type
             }
         }.toSet()
+    }
 }
 
 @ConfigurationProperties("regler")

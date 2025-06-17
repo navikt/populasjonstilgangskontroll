@@ -21,7 +21,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
         val notFound = brukerIds.toSet() - personer.map { it.brukerId.verdi }.toSet()
         val found =  personer.filter { !notFound.contains(it.brukerId.verdi) }
         log.info("Bulk fant ikke følgende ${notFound.size} personer for ${notFound.joinToString { it.maskFnr() }}")
-        log.info("Bulk fant følgende ${found.size} personer fra ${brukerIds.joinToString { it.maskFnr() }}")
+        log.info("Bulk fant følgende ${found.size} personer fra ${found.joinToString { it.brukerId.verdi.maskFnr() }}")
 
         return found.let { p ->
             log.info("Bulk hentet ${p.size} brukere: for ${brukerIds.joinToString(",")}")

@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.IdOgType
+import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.motor.RegelSett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
@@ -49,10 +50,14 @@ class RegelTjeneste(
 
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>): Set<Pair<BrukerId, HttpStatus>> {
         log.info("Sjekker bulk for ansatt $ansattId og $idOgType brukere")
-        val resultater = motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerIdOgType()).map { (brukerId, status) ->
+        val ansatt = ansatte.ansatt(ansattId)
+        val brukere = idOgType.brukerIdOgType()
+        val resultater = motor.bulkRegler(ansatt, brukere).map { (brukerId, status, regel) ->
             if (status == UNAUTHORIZED && overstyring.erOverstyrt(ansattId, brukerId)) {
                 brukerId to ACCEPTED
             } else {
+                val bruker = brukere.first { it.first.brukerId == brukerId }.first
+               // RegelException(ansatt, bruker,regel!!,  status = status)
                 brukerId to status
             }
         }.toSet()

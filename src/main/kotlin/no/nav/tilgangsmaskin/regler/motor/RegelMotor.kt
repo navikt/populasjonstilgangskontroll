@@ -49,12 +49,12 @@ class RegelMotor(
             logger.info("Bulk evaluerer ${type.beskrivelse} for ${bruker.brukerId}")
             runCatching {
                 evaluer(ansatt, bruker, type.regelSett())
-                Pair(bruker.brukerId, ACCEPTED)
+                Triple(bruker.brukerId, ACCEPTED, null)
             }.getOrElse {
                 if (it is RegelException) {
-                    Pair(bruker.brukerId, UNAUTHORIZED)
+                    Triple(bruker.brukerId, UNAUTHORIZED, it.regel)
                 } else {
-                    Pair(bruker.brukerId, INTERNAL_SERVER_ERROR)
+                    Triple(bruker.brukerId, INTERNAL_SERVER_ERROR, null)
                 }
             }
         }.toSet()

@@ -19,15 +19,15 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
     fun brukere(vararg brukerIds: String) : List<Bruker> {
         val personer =  personTjeneste.personer(brukerIds.toSet())
         val notFound = brukerIds.toSet() - personer.map { it.brukerId.verdi }.toSet()
-        val found =  personer.filter { !notFound.contains(it.brukerId.verdi) }
+        val found =  personer.map { it.brukerId }.toSet()
         log.info("Bulk fant ikke følgende ${notFound.size} personer  ${notFound.joinToString { it.maskFnr() }}")
-        log.info("Bulk fant følgende ${found.size} personer  ${found.joinToString { it.brukerId.verdi.maskFnr() }}")
+        log.info("Bulk fant følgende ${found.size} personer  ${found.joinToString { it.verdi.maskFnr() }}")
 
         return found.let { p ->
-            log.info("Bulk henter skjerminger for ${p.map { it.brukerId }}")
-                val skjerminger = skjermingTjeneste.skjerminger(p.map { it.brukerId }.toSet())
-                log.info("Bulk hentet skjerminger $skjerminger")
-                p.map {
+            log.info("Bulk henter skjerminger for $found")
+                val skjerminger = skjermingTjeneste.skjerminger(found)
+                log.info("Bulk hentet ${skjerminger.size} skjerminger $skjerminger")
+                personer.map {
                     tilBruker(it, skjerminger[it.brukerId] ?: false)
                 }
             }

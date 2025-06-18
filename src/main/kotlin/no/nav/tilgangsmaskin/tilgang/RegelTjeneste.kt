@@ -68,7 +68,7 @@ class RegelTjeneste(
                 .associateBy { it.brukerId.verdi }[spec.brukerId]?.let { bruker ->
                 bruker to spec.type
             }
-        }.toSet()
+        }.toSet().also { log.info("Henter ${size} brukere $it") }
     }
 }
 

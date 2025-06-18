@@ -8,10 +8,11 @@ import org.springframework.cache.annotation.Cacheable
 
 
 @RetryingOnRecoverableService
-@Cacheable(cacheNames = [SKJERMING])
+//@Cacheable(cacheNames = [SKJERMING])
 @Timed
 class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
 
+    @Cacheable(cacheNames = [SKJERMING])
     fun skjerming(brukerId: BrukerId) = adapter.skjerming(brukerId.verdi)
 
     fun skjerminger(brukerIds: Set<BrukerId>) = adapter.skjerminger(brukerIds.map { it.verdi }.toSet())

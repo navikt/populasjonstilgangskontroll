@@ -1,10 +1,8 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import net.minidev.json.annotate.JsonIgnore
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.regler.motor.RegelMotor.BulkRegelResult.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.KJERNE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.OVERSTYRBAR
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -13,7 +11,6 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.OVERSTYRBAR_REGELTYPE
 import no.nav.tilgangsmaskin.tilgang.RegelConfig
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.http.HttpStatus.*
 
@@ -52,26 +49,16 @@ class RegelMotor(
             logger.info("Bulk evaluerer ${type.beskrivelse} for ${bruker.brukerId}")
             runCatching {
                 evaluer(ansatt, bruker, type.regelSett())
-                Success(bruker.brukerId).also {
-                    logger.info("Bulk OK for ${bruker.brukerId} med ${type.beskrivelse}")
-                }
+                Triple(bruker.brukerId, ACCEPTED, null)
             }.getOrElse {
                 if (it is RegelException) {
-                    RegelFailure(bruker.brukerId, it, HttpStatus.valueOf(it.statusCode.value()).also {
-                        logger.info("Bulk Avvist  $it for ${bruker.brukerId}")
-                    })
+                    Triple(bruker.brukerId, UNAUTHORIZED, it.regel)
                 } else {
-                    InternalError(bruker.brukerId, INTERNAL_SERVER_ERROR, it)
+                    Triple(bruker.brukerId, INTERNAL_SERVER_ERROR, null)
                 }
             }
         }.toSet()
 
-
-    sealed class BulkRegelResult(val statusCode: HttpStatus, val brukerId: BrukerId) {
-        class Success( brukerId: BrukerId) : BulkRegelResult(ACCEPTED, brukerId)
-        class RegelFailure( brukerId: BrukerId, @JsonIgnore val exception: RegelException, val status: HttpStatus) : BulkRegelResult(status, brukerId)
-        class InternalError(brukerId: BrukerId,val status: HttpStatus, @JsonIgnore val exception: Throwable) : BulkRegelResult(status,brukerId)
-    }
 
     private fun RegelType.regelSett() =
         when (this) {

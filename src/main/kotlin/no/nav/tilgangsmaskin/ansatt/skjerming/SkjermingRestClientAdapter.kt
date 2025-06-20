@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMIN
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
@@ -15,10 +16,12 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
 
     fun skjerming(ident: String) = post<Boolean>(cf.skjermingUri, mapOf(IDENT to ident))
 
-    fun skjerminger(identer: Set<String>): Map<BrukerId, Boolean> =
-        post<Map<String, Boolean>>(cf.skjermingerUri, mapOf(IDENTER to identer))
+    fun skjerminger(identer: Set<String>) : Map<BrukerId, Boolean> {
+       if (identer.isEmpty()) return emptyMap()
+        return post<Map<String, Boolean>>(cf.skjermingerUri, mapOf(IDENTER to identer))
             .map { (brukerId, skjerming) -> BrukerId(brukerId) to skjerming }
             .toMap()
+    }
 }
 
 

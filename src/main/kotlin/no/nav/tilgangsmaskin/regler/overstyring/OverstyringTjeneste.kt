@@ -63,7 +63,7 @@ class OverstyringTjeneste(
                 is RegelException -> throw RegelException(
                         OVERSTYRING_MESSAGE_CODE,
                         arrayOf(it.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
-                        it).also {
+                        e = it).also {
                     log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}")
                     teller.tell(Tags.of("kortnavn", it.regel.kortNavn, "overstyrt", false.toString()))
                 }

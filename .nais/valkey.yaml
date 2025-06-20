@@ -1,0 +1,12 @@
+apiVersion: aiven.io/v1alpha1
+kind: ServiceIntegration
+metadata:
+  labels:
+    team: tilgangsmaskin
+  name: valkey-tilgangsmaskin-cache
+  namespace: tilgangsmaskin
+spec:
+  project: nav-prod
+  integrationType: prometheus
+  destinationEndpointId: '{{destinationEndpointId}}'
+  sourceServiceName: valkey--tilgangsmaskin-cache

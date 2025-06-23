@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.rest
 
-import org.slf4j.LoggerFactory
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.retry.RetryCallback
 import org.springframework.retry.RetryContext

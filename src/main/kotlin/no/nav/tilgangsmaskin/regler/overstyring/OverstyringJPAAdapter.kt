@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.regler.overstyring
 
-import java.time.ZoneId.systemDefault
 import org.springframework.stereotype.Component
+import java.time.ZoneId.systemDefault
 
 @Component
 class OverstyringJPAAdapter(private val repository: OverstyringRepository) {

@@ -1,15 +1,7 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import io.swagger.v3.oas.annotations.media.Schema
-import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_AVDØD
-import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_FORTROLIG_ADRESSE
-import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_GEOGRAFISK
-import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_HABILITET
-import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_PERSON_UKJENT
-import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_PERSON_UTLAND
-import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_SKJERMING
-import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_STRENGT_FORTROLIG_ADRESSE
-import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_STRENGT_FORTROLIG_UTLAND
+import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.*
 
 const val HABILITET = "Du har ikke tilgang til data om deg selv eller dine nærstående"
 

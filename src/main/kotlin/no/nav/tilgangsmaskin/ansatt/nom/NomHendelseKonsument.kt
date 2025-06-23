@@ -1,12 +1,12 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
-import java.time.LocalDate.EPOCH
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
+import java.time.LocalDate.EPOCH
 
 @Component
 class NomHendelseKonsument(private val nom: Nom, private val logger: NomHendelseLogger) {

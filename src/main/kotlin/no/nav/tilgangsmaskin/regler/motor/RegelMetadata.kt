@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import java.net.URI
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import java.net.URI
 
 data class RegelMetadata(val gruppeMetadata: GruppeMetadata) {
 

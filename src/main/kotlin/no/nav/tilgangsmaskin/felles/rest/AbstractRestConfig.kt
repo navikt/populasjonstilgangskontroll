@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest
 
-import java.net.URI
 import org.springframework.web.util.DefaultUriBuilderFactory
+import java.net.URI
 
 abstract class AbstractRestConfig(
         val baseUri: URI,

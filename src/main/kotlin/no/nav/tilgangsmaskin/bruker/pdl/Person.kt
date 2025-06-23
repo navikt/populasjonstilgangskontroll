@@ -1,18 +1,15 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import java.time.LocalDate
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.Companion.INGEN
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
-import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
-import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.STRENGT_FORTROLIG
-import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.STRENGT_FORTROLIG_UTLAND
+import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.*
 import no.nav.tilgangsmaskin.felles.rest.cache.JsonCacheable
-import java.io.Serializable
+import java.time.LocalDate
 
 @JsonCacheable
 data class Person(

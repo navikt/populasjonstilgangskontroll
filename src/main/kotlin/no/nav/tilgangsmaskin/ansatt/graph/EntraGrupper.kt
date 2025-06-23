@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.graph
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 import java.net.URI
 import java.util.*
 
@@ -9,7 +10,6 @@ import java.util.*
 data class EntraGruppe(val id: UUID, val displayName: String = "N/A") {
     override fun equals(other: Any?) = other is EntraGruppe && id == other.id
     override fun hashCode() = id.hashCode()
-
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)

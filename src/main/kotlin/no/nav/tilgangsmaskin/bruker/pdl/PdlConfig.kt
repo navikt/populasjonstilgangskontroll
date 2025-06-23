@@ -1,10 +1,10 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import java.net.URI
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
+import java.net.URI
 
 @ConfigurationProperties(PDL)
 class PdlConfig(

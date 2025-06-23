@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.regler.motor
 import jakarta.annotation.PostConstruct
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import org.springframework.boot.context.properties.ConfigurationProperties
-import java.util.UUID
+import java.util.*
 
 @ConfigurationProperties("gruppe")
 data class GlobaleGrupperConfig(val strengt: UUID, val nasjonal: UUID, val utland: UUID,

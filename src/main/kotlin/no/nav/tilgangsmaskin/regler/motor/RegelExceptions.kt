@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import io.opentelemetry.api.trace.Span
-import java.net.URI
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.Bruker
@@ -12,6 +11,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.ProblemDetail.forStatus
 import org.springframework.web.ErrorResponseException
+import java.net.URI
 
 class RegelException(val ansatt: Ansatt,
                      val bruker: Bruker,

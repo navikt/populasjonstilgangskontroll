@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.tilgang
 
-import java.util.*
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 class Token(private val contextHolder: TokenValidationContextHolder) {

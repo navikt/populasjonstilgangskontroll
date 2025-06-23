@@ -4,7 +4,6 @@ import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
@@ -13,7 +12,6 @@ import no.nav.tilgangsmaskin.regler.motor.BrukerOgType
 import no.nav.tilgangsmaskin.regler.motor.Regel
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import org.slf4j.LoggerFactory.getLogger
@@ -57,14 +55,14 @@ class RegelTjeneste(
         val resultater = motor.bulkRegler(ansatt, brukere)
         val godkjente = godkjente(resultater)
         val avviste = avviste(resultater, ansattId, brukere, ansatt)
-        val ikkeFunnet = ikkeFunnet(idOgType, resultater)
+        val ikkeFunnet = ikkeFunnet(idOgType, resultater.map { it.first }.toSet())
 
         return BulkResultater(ansattId, godkjente + avviste + ikkeFunnet)
     }
 
-    private fun ikkeFunnet(idOgType: Set<BrukerIdOgType>, resultater: Set<Triple<BrukerId, HttpStatus, Regel?>>) = idOgType
+    private fun ikkeFunnet(oppgitt: Set<BrukerIdOgType>, funnet: Set<BrukerId>) = oppgitt
         .map { it.brukerId }
-        .filterNot { it in resultater.map { it.first }.toSet() }
+        .filterNot { it in funnet }
         .map { BulkResultat(it, NOT_FOUND) }
         .toSet()
 

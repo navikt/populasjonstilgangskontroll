@@ -51,23 +51,23 @@ class RegelTjeneste(
 
         val godkjente = resultater
             .filter { it.second == NO_CONTENT }
-            .map { BulkResultat(it.first, NO_CONTENT.value()) }
-            .toSet()
+            .map {
+                BulkResultat(it.first, NO_CONTENT)
+            }.toSet()
 
         val avviste = resultater
             .filter { it.second == UNAUTHORIZED && !overstyring.erOverstyrt(ansattId, it.first) }
             .map { avvist ->
                 val bruker = brukere.first { it.first.brukerId == avvist.first }.first
                 val e = RegelException(ansatt, bruker, avvist.third!!, status = avvist.second)
-                BulkResultat(e.bruker.brukerId, e.status.value(), e.body)
-            }
-            .toSet()
+                BulkResultat(e.bruker.brukerId, e.status, e.body)
+            }.toSet()
 
         val funnetBrukerIder = resultater.map { it.first }.toSet()
         val ikkeFunnet = idOgType
             .map { it.brukerId }
             .filterNot { it in funnetBrukerIder }
-            .map { BulkResultat(it, NOT_FOUND.value()) }
+            .map { BulkResultat(it, NOT_FOUND) }
             .toSet()
 
         return BulkResultater(ansattId, godkjente + avviste + ikkeFunnet)

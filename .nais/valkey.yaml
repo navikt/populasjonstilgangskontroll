@@ -6,7 +6,7 @@ metadata:
   name: valkey-tilgangsmaskin-cache
   namespace: tilgangsmaskin
 spec:
-  project: nav-prod
+  project: nav-dev
   integrationType: prometheus
   destinationEndpointId: f20f5b48-18f4-4e2a-8e5f-4ab3edb19733
-  sourceServiceName: valkey--tilgangsmaskin-cache
+  sourceServiceName: valkey-tilgangsmaskin-cache

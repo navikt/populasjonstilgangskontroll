@@ -52,7 +52,9 @@ class RegelTjeneste(
         log.info("Sjekker bulk for ansatt $ansattId og $idOgType brukere")
         val ansatt = ansatte.ansatt(ansattId)
         val brukere = idOgType.brukerIdOgType()
-        val resultater = motor.bulkRegler(ansatt, brukere)
+        val resultater = motor.bulkRegler(ansatt, brukere).also {
+            log.info("Bulk regler raw resultater: $it")
+        }
         val unauth = resultater.filter { it.second == UNAUTHORIZED }
         val ok = resultater.filter { it.second == OK }.map { EnkeltResultat(it.first,OK) }.toSet()
         log.info("Fant $ok godkjente")

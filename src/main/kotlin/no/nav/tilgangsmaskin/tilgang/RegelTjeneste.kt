@@ -1,24 +1,20 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.micrometer.core.annotation.Timed
-import io.opentelemetry.api.trace.Span
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.IdOgType
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.regler.motor.RegelSett.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
-import no.nav.tilgangsmaskin.tilgang.BulkResultater.BulkResultat
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Service
 import kotlin.time.measureTime
+import  no.nav.tilgangsmaskin.tilgang.BulkResultater.BulkResultat
 
 @Service
 @Timed
@@ -76,15 +72,11 @@ class RegelTjeneste(
 
         return BulkResultater(ansattId, godkjente + avviste + ikkeFunnet)
     }
-
-data class BulkResultater(val ansattId: AnsattId,val resultater: Set<BulkResultat>,val traceId: String = Span.current().spanContext.traceId) {
-    data class BulkResultat(val brukerId: BrukerId, val status: Int, val body: Any? = null )
+    private fun Set<IdOgType>.brukerIdOgType() =
+        mapNotNull { spec ->
+            brukere.brukere(*map { it.brukerId.verdi }.toTypedArray())
+                .associateBy { it.brukerId.verdi }[spec.brukerId.verdi]?.let { bruker ->
+                bruker to spec.type
+            }
+        }.toSet()
 }
-
-
-@ConfigurationProperties("regler")
-data class RegelConfig(val toggles: Map<String,Boolean> = emptyMap()) {
-    fun isEnabled(regel: String) = toggles[regel.lowercase() +".enabled"]  ?: true
-}
-
-

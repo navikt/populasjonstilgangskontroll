@@ -6,10 +6,10 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.KJERNE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.OVERSTYRBAR
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.*
-import no.nav.tilgangsmaskin.tilgang.RegelConfig
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Component
+import  no.nav.tilgangsmaskin.tilgang.RegelConfig
 
 @Component
 class RegelMotor(

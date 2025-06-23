@@ -56,7 +56,7 @@ class RegelTjeneste(
             log.info("Bulk regler raw resultater: $it")
         }
         val unauth = resultater.filter { it.second == UNAUTHORIZED }
-        val ok = resultater.filter { it.second == OK }.map { EnkeltResultat(it.first,OK) }.toSet()
+        val ok = resultater.filter { it.second == ACCEPTED }.map { EnkeltResultat(it.first,OK) }.toSet()
         log.info("Fant $ok godkjente")
          val exceptions = unauth.filter {
              !overstyring.erOverstyrt(ansattId,it.first)

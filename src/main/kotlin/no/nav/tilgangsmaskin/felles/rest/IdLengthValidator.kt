@@ -24,13 +24,13 @@ class IdValidator : ConstraintValidator<ValidId, Any> {
     override fun isValid(verdi: Any, context: ConstraintValidatorContext) =
         when (verdi) {
             is String -> runCatching { AktørId(verdi.trim('"')) }.isSuccess || runCatching { BrukerId(verdi.trim('"')) }.isSuccess
-            is Set<*> -> verdi.all {
+            is Set<*> -> true /*verdi.all {
                 it is IdOgType && (runCatching {
                     AktørId(it.brukerId.trim('"'))
                 }.isSuccess || runCatching {
                     BrukerId(it.brukerId.trim('"'))
                 }.isSuccess)
-            }
+            }*/
             else -> false
         }
 }

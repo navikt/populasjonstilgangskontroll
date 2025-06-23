@@ -63,17 +63,17 @@ class RegelTjeneste(
          }.map { EnkeltResultat(it.bruker.brukerId,it.status) }.toSet()
         log.info("Fant $exceptions avviste")
 
-        val resultBrukerIds = resultater.map { it.first.verdi }.toSet()
+        val resultBrukerIds = resultater.map { it.first }.toSet()
         val notFound = (idOgType.map { it.brukerId }.toSet() - resultBrukerIds)
-        val nf = notFound.map { BrukerId(it)}.map { EnkeltResultat(it,NOT_FOUND) }.toSet()
+        val nf = notFound.map { EnkeltResultat(it,NOT_FOUND) }.toSet()
         log.info("Ikke funnet $nf")
         return ok + exceptions + nf
     }
     private fun Set<IdOgType>.brukerIdOgType(): Set<Pair<Bruker, RegelSett.RegelType>> {
         log.info("Bulk henter ${size} brukere")
         return mapNotNull { spec ->
-            brukere.brukere(*map { it.brukerId }.toTypedArray())
-                .associateBy { it.brukerId.verdi }[spec.brukerId]?.let { bruker ->
+            brukere.brukere(*map { it.brukerId.verdi }.toTypedArray())
+                .associateBy { it.brukerId.verdi }[spec.brukerId.verdi]?.let { bruker ->
                 bruker to spec.type
             }
         }.toSet().also { log.info("Henter ${size} brukere $it") }

@@ -48,7 +48,7 @@ class RegelTjeneste(
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
         motor.kjerneregler(ansatte.ansatt(ansattId), brukere.brukerMedUtvidetFamilie(brukerId))
 
-    fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>): Set<EnkeltResultat> {
+    fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>): BulkResultater {
         log.info("Sjekker bulk for ansatt $ansattId og $idOgType brukere")
         val ansatt = ansatte.ansatt(ansattId)
         val brukere = idOgType.brukerIdOgType()
@@ -56,20 +56,20 @@ class RegelTjeneste(
             log.info("Bulk regler raw resultater: $it")
         }
         val unauth = resultater.filter { it.second == UNAUTHORIZED }
-        val ok = resultater.filter { it.second == ACCEPTED }.map { EnkeltResultat(it.first,OK) }.toSet()
+        val ok = resultater.filter { it.second == ACCEPTED }.map { BulkResultat(it.first,OK.value()) }.toSet()
         log.info("Fant $ok godkjente")
          val exceptions = unauth.filter {
              !overstyring.erOverstyrt(ansattId,it.first)
          }.map { r ->
              RegelException(ansatt, brukere.first {  it.first.brukerId == r.first}.first, r.third!!, status = r.second)
-         }.map { EnkeltResultat(it.bruker.brukerId,it.status, it.body) }.toSet()
+         }.map { BulkResultat(it.bruker.brukerId,it.status.value(), it.body) }.toSet()
         log.info("Fant $exceptions avviste")
 
         val resultBrukerIds = resultater.map { it.first }.toSet()
         val notFound = (idOgType.map { it.brukerId }.toSet() - resultBrukerIds)
-        val nf = notFound.map { EnkeltResultat(it,NOT_FOUND) }.toSet()
+        val nf = notFound.map { BulkResultat(it,NOT_FOUND.value()) }.toSet()
         log.info("Ikke funnet $nf")
-        return ok + exceptions + nf
+        return BulkResultater(ansattId,ok + exceptions + nf)
     }
     private fun Set<IdOgType>.brukerIdOgType(): Set<Pair<Bruker, RegelSett.RegelType>> {
         log.info("Bulk henter ${size} brukere")
@@ -82,9 +82,11 @@ class RegelTjeneste(
     }
 }
 
- data class EnkeltResultat(
+data class BulkResultater(val ansattId: AnsattId, val resultater: Set<BulkResultat>)
+
+ data class BulkResultat(
     val brukerId: BrukerId,
-    val status: HttpStatus,
+    val status: Int,
     val body: Any? = null ) {
 }
 

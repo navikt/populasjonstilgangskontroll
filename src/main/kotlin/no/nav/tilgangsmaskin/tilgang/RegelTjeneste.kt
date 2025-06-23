@@ -50,8 +50,8 @@ class RegelTjeneste(
         val resultater = motor.bulkRegler(ansatt, brukere)
 
         val godkjente = resultater
-            .filter { it.second == ACCEPTED }
-            .map { BulkResultat(it.first, OK.value()) }
+            .filter { it.second == NO_CONTENT }
+            .map { BulkResultat(it.first, NO_CONTENT.value()) }
             .toSet()
 
         val avviste = resultater

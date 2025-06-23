@@ -46,7 +46,7 @@ class RegelMotor(
             logger.info("Bulk evaluerer ${type.beskrivelse} for ${bruker.brukerId}")
             runCatching {
                 evaluer(ansatt, bruker, type.regelSett())
-                Triple(bruker.brukerId, ACCEPTED, null)
+                Triple(bruker.brukerId, NO_CONTENT, null)
             }.getOrElse {
                 if (it is RegelException) {
                     Triple(bruker.brukerId, UNAUTHORIZED, it.regel)

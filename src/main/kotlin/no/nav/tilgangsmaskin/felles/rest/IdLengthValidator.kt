@@ -6,7 +6,6 @@ import jakarta.validation.ConstraintValidatorContext
 import jakarta.validation.Payload
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.regler.motor.IdOgType
 import org.slf4j.LoggerFactory.getLogger
 import kotlin.reflect.KClass
 

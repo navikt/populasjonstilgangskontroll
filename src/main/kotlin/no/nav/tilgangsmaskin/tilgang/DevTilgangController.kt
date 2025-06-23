@@ -19,7 +19,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
-import no.nav.tilgangsmaskin.regler.motor.IdOgType
+import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
@@ -103,7 +103,7 @@ class DevTilgangController(
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(MULTI_STATUS)
     @ProblemDetailBulkApiResponse
-    fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<IdOgType>) =
+    fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgType>) =
         regler.bulkRegler(ansattId, specs).also {
             log.info("Returnerer $it etter bulk for $ansattId")
         }

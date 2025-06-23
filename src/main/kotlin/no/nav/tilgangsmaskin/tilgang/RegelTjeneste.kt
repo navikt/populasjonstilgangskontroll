@@ -1,13 +1,18 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.micrometer.core.annotation.Timed
+import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
-import no.nav.tilgangsmaskin.regler.motor.IdOgType
+import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgType
+import no.nav.tilgangsmaskin.regler.motor.Regel
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
+import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import org.slf4j.LoggerFactory.getLogger
@@ -15,6 +20,7 @@ import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Service
 import kotlin.time.measureTime
 import  no.nav.tilgangsmaskin.tilgang.BulkResultater.BulkResultat
+import org.springframework.http.HttpStatus
 
 @Service
 @Timed
@@ -44,39 +50,45 @@ class RegelTjeneste(
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
         motor.kjerneregler(ansatte.ansatt(ansattId), brukere.brukerMedUtvidetFamilie(brukerId))
 
-    fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>): BulkResultater {
+    fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgType>): BulkResultater {
         val ansatt = ansatte.ansatt(ansattId)
-        val brukere = idOgType.brukerIdOgType()
+        val brukere = idOgType.brukerOgType()
         val resultater = motor.bulkRegler(ansatt, brukere)
-
-        val godkjente = resultater
-            .filter { it.second == NO_CONTENT }
-            .map {
-                BulkResultat(it.first, NO_CONTENT)
-            }.toSet()
-
-        val avviste = resultater
-            .filter { it.second == UNAUTHORIZED && !overstyring.erOverstyrt(ansattId, it.first) }
-            .map { avvist ->
-                val bruker = brukere.first { it.first.brukerId == avvist.first }.first
-                val e = RegelException(ansatt, bruker, avvist.third!!, status = avvist.second)
-                BulkResultat(e.bruker.brukerId, e.status, e.body)
-            }.toSet()
-
-        val funnetBrukerIder = resultater.map { it.first }.toSet()
-        val ikkeFunnet = idOgType
-            .map { it.brukerId }
-            .filterNot { it in funnetBrukerIder }
-            .map { BulkResultat(it, NOT_FOUND) }
-            .toSet()
+        val godkjente = godkjente(resultater)
+        val avviste = avviste(resultater, ansattId, brukere, ansatt)
+        val ikkeFunnet = ikkeFunnet(idOgType, resultater)
 
         return BulkResultater(ansattId, godkjente + avviste + ikkeFunnet)
     }
-    private fun Set<IdOgType>.brukerIdOgType() =
+
+    private fun ikkeFunnet(idOgType: Set<BrukerIdOgType>, resultater: Set<Triple<BrukerId, HttpStatus, Regel?>>) = idOgType
+        .map { it.brukerId }
+        .filterNot { it in resultater.map { it.first }.toSet() }
+        .map { BulkResultat(it, NOT_FOUND) }
+        .toSet()
+
+    private fun avviste(resultater: Set<Triple<BrukerId, HttpStatus, Regel?>>, ansattId: AnsattId, brukere: Set<BrukerOgType>, ansatt: Ansatt) = resultater
+        .filter { it.second == FORBIDDEN && !overstyring.erOverstyrt(ansattId, it.first) }
+        .map { avvist ->
+            val bruker = brukere.first { it.bruker.brukerId == avvist.first }.bruker
+            val e = RegelException(ansatt, bruker, avvist.third!!, status = avvist.second)
+            BulkResultat(e.bruker.brukerId, e.status, e.body)
+        }.toSet()
+
+    private fun godkjente(resultater: Set<Triple<BrukerId, HttpStatus, Regel?>>) = resultater
+        .filter { it.second == NO_CONTENT }
+        .map {
+            BulkResultat(it.first, NO_CONTENT)
+        }.toSet()
+
+    data class BrukerOgType(val bruker: Bruker, val type: RegelType)
+    data class BulkRegelResultat(val brukerId: BrukerId, val status: HttpStatus, val regel: Regel?)
+
+    private fun Set<BrukerIdOgType>.brukerOgType(): Set<BrukerOgType> =
         mapNotNull { spec ->
             brukere.brukere(*map { it.brukerId.verdi }.toTypedArray())
                 .associateBy { it.brukerId.verdi }[spec.brukerId.verdi]?.let { bruker ->
-                bruker to spec.type
+                BrukerOgType(bruker, spec.type)
             }
         }.toSet()
 }

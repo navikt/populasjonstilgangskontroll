@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Component
 import  no.nav.tilgangsmaskin.tilgang.RegelConfig
+import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
 
 @Component
 class RegelMotor(
@@ -41,15 +42,14 @@ class RegelMotor(
     }
 
 
-    fun bulkRegler(ansatt: Ansatt, brukere: Set<Pair<Bruker, RegelType>>) =
+    fun bulkRegler(ansatt: Ansatt, brukere: Set<RegelTjeneste.BrukerOgType>) =
         brukere.map { (bruker, type) ->
-            logger.info("Bulk evaluerer ${type.beskrivelse} for ${bruker.brukerId}")
             runCatching {
                 evaluer(ansatt, bruker, type.regelSett())
                 Triple(bruker.brukerId, NO_CONTENT, null)
             }.getOrElse {
                 if (it is RegelException) {
-                    Triple(bruker.brukerId, UNAUTHORIZED, it.regel)
+                    Triple(bruker.brukerId, FORBIDDEN, it.regel)
                 } else {
                     Triple(bruker.brukerId, INTERNAL_SERVER_ERROR, null)
                 }

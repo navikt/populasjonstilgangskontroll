@@ -9,7 +9,7 @@ import jakarta.validation.Valid
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.ValidId
-import no.nav.tilgangsmaskin.regler.motor.IdOgType
+import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
@@ -58,7 +58,7 @@ class TilgangController(
         description = "Dette endepunktet er kun tilgjengelig for obo-flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er og regeltyper.")
 
-    fun bulkOBO(@RequestBody @Valid @ValidId specs: Set<IdOgType>) =
+    fun bulkOBO(@RequestBody @Valid @ValidId specs: Set<BrukerIdOgType>) =
         if (token.erObo) {
             regler.bulkRegler(token.ansattId!!, specs)
         }
@@ -70,7 +70,7 @@ class TilgangController(
     @Operation(summary = "Kjør bulkregler for en ansatt",
         description = "Dette endepunktet er kun tilgjengelig for client credentials-flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er og regeltyper.")
-    fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<IdOgType>) =
+    fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgType>) =
 
         if (token.erCC) {
             regler.bulkRegler(ansattId, specs)

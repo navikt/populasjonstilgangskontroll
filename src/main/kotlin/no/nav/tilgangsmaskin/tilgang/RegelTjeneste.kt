@@ -62,7 +62,7 @@ class RegelTjeneste(
              !overstyring.erOverstyrt(ansattId,it.first)
          }.map { r ->
              RegelException(ansatt, brukere.first {  it.first.brukerId == r.first}.first, r.third!!, status = r.second)
-         }.map { EnkeltResultat(it.bruker.brukerId,it.status) }.toSet()
+         }.map { EnkeltResultat(it.bruker.brukerId,it.status, it.body) }.toSet()
         log.info("Fant $exceptions avviste")
 
         val resultBrukerIds = resultater.map { it.first }.toSet()

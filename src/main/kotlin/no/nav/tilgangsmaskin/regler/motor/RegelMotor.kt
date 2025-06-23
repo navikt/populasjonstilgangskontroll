@@ -42,7 +42,7 @@ class RegelMotor(
     }
 
 
-    fun bulkRegler(ansatt: Ansatt, brukere: Set<RegelTjeneste.BrukerOgType>) =
+    fun bulkRegler(ansatt: Ansatt, brukere: Set<BrukerOgType>) =
         brukere.map { (bruker, type) ->
             runCatching {
                 evaluer(ansatt, bruker, type.regelSett())

@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgType
+import no.nav.tilgangsmaskin.regler.motor.BrukerOgType
 import no.nav.tilgangsmaskin.regler.motor.Regel
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
@@ -80,9 +81,6 @@ class RegelTjeneste(
         .map {
             BulkResultat(it.first, NO_CONTENT)
         }.toSet()
-
-    data class BrukerOgType(val bruker: Bruker, val type: RegelType)
-    data class BulkRegelResultat(val brukerId: BrukerId, val status: HttpStatus, val regel: Regel?)
 
     private fun Set<BrukerIdOgType>.brukerOgType(): Set<BrukerOgType> =
         mapNotNull { spec ->

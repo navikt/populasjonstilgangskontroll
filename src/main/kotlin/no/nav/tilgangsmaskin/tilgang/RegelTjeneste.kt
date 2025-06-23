@@ -1,21 +1,21 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.micrometer.core.annotation.Timed
+import io.opentelemetry.api.trace.Span
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.IdOgType
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.regler.motor.RegelSett
+import no.nav.tilgangsmaskin.regler.motor.RegelSett.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
+import no.nav.tilgangsmaskin.tilgang.BulkResultater.BulkResultat
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Service
 import kotlin.time.measureTime
@@ -49,46 +49,38 @@ class RegelTjeneste(
         motor.kjerneregler(ansatte.ansatt(ansattId), brukere.brukerMedUtvidetFamilie(brukerId))
 
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>): BulkResultater {
-        log.info("Sjekker bulk for ansatt $ansattId og $idOgType brukere")
         val ansatt = ansatte.ansatt(ansattId)
         val brukere = idOgType.brukerIdOgType()
-        val resultater = motor.bulkRegler(ansatt, brukere).also {
-            log.info("Bulk regler raw resultater: $it")
-        }
-        val unauth = resultater.filter { it.second == UNAUTHORIZED }
-        val ok = resultater.filter { it.second == ACCEPTED }.map { BulkResultat(it.first,OK.value()) }.toSet()
-        log.info("Fant $ok godkjente")
-         val exceptions = unauth.filter {
-             !overstyring.erOverstyrt(ansattId,it.first)
-         }.map { r ->
-             RegelException(ansatt, brukere.first {  it.first.brukerId == r.first}.first, r.third!!, status = r.second)
-         }.map { BulkResultat(it.bruker.brukerId,it.status.value(), it.body) }.toSet()
-        log.info("Fant $exceptions avviste")
+        val resultater = motor.bulkRegler(ansatt, brukere)
 
-        val resultBrukerIds = resultater.map { it.first }.toSet()
-        val notFound = (idOgType.map { it.brukerId }.toSet() - resultBrukerIds)
-        val nf = notFound.map { BulkResultat(it,NOT_FOUND.value()) }.toSet()
-        log.info("Ikke funnet $nf")
-        return BulkResultater(ansattId,ok + exceptions + nf)
-    }
-    private fun Set<IdOgType>.brukerIdOgType(): Set<Pair<Bruker, RegelSett.RegelType>> {
-        log.info("Bulk henter ${size} brukere")
-        return mapNotNull { spec ->
-            brukere.brukere(*map { it.brukerId.verdi }.toTypedArray())
-                .associateBy { it.brukerId.verdi }[spec.brukerId.verdi]?.let { bruker ->
-                bruker to spec.type
+        val godkjente = resultater
+            .filter { it.second == ACCEPTED }
+            .map { BulkResultat(it.first, OK.value()) }
+            .toSet()
+
+        val avviste = resultater
+            .filter { it.second == UNAUTHORIZED && !overstyring.erOverstyrt(ansattId, it.first) }
+            .map { avvist ->
+                val bruker = brukere.first { it.first.brukerId == avvist.first }.first
+                val e = RegelException(ansatt, bruker, avvist.third!!, status = avvist.second)
+                BulkResultat(e.bruker.brukerId, e.status.value(), e.body)
             }
-        }.toSet().also { log.info("Henter ${size} brukere $it") }
+            .toSet()
+
+        val funnetBrukerIder = resultater.map { it.first }.toSet()
+        val ikkeFunnet = idOgType
+            .map { it.brukerId }
+            .filterNot { it in funnetBrukerIder }
+            .map { BulkResultat(it, NOT_FOUND.value()) }
+            .toSet()
+
+        return BulkResultater(ansattId, godkjente + avviste + ikkeFunnet)
     }
+
+data class BulkResultater(val ansattId: AnsattId,val resultater: Set<BulkResultat>,val traceId: String = Span.current().spanContext.traceId) {
+    data class BulkResultat(val brukerId: BrukerId, val status: Int, val body: Any? = null )
 }
 
-data class BulkResultater(val ansattId: AnsattId, val resultater: Set<BulkResultat>)
-
- data class BulkResultat(
-    val brukerId: BrukerId,
-    val status: Int,
-    val body: Any? = null ) {
-}
 
 @ConfigurationProperties("regler")
 data class RegelConfig(val toggles: Map<String,Boolean> = emptyMap()) {

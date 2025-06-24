@@ -104,9 +104,7 @@ class DevTilgangController(
     @ResponseStatus(MULTI_STATUS)
     @ProblemDetailBulkApiResponse
     fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgType>) =
-        regler.bulkRegler(ansattId, specs).also {
-            log.info("Returnerer $it etter bulk for $ansattId")
-        }
+        regler.bulkRegler(ansattId, specs)
 
     @PostMapping("skjermingadaptere")
     fun skjermingAdapter(@RequestBody brukerId: String) = skjermingAdapter.skjerming(brukerId)

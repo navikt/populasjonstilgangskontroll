@@ -6,7 +6,7 @@ management:
   metrics:
     distribution:
       percentiles-histogram:
-        '[method_timed_seconds]': true
+        '[komplette_regler]': true
     enable:
       cache: true
   observations:

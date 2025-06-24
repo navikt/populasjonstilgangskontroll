@@ -1,12 +1,12 @@
 package no.nav.tilgangsmaskin.felles.rest
 
-import java.net.URI
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
+import java.net.URI
 
 abstract class AbstractRestClientAdapter(
         protected val restClient: RestClient,

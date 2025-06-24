@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
 @Configuration
 @EnableCaching
 @ConditionalOnLocalOrTest
-class CaffeineConfiguration(private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
+class CaffeineConfigurer(private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
     private val log = LoggerFactory.getLogger(javaClass)
 
     @Bean

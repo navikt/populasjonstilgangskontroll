@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.ansatt
 
-import java.util.*
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata
 import no.nav.tilgangsmaskin.tilgang.Token
+import java.util.*
 
 
 enum class GlobalGruppe(val property: String, val metadata: GruppeMetadata) {
@@ -26,5 +26,6 @@ enum class GlobalGruppe(val property: String, val metadata: GruppeMetadata) {
             entries.forEach { it.id = grupper[it.property] ?: error("Mangler id for ${it.property}") }
 
         fun Token.globaleGrupper() = globaleGruppeIds.intersect(uuids()).map { EntraGruppe(it, navnFor(it)) }.toSet()
+        fun Set<EntraGruppe>.girNasjonalTilgang() = any { it.id == NASJONAL.id }
     }
 }

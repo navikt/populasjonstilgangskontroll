@@ -1,11 +1,9 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import java.time.LocalDate
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.AKTORID
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.NPID
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.*
+import java.time.LocalDate
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PdlRespons(

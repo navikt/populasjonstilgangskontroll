@@ -3,12 +3,12 @@ package no.nav.tilgangsmaskin.ansatt
 import io.micrometer.core.annotation.Timed
 import io.micrometer.core.instrument.Tags
 import no.nav.boot.conditionals.ConditionalOnGCP
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.nom.Nom
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.regler.motor.NasjonalGruppeTeller
-import org.springframework.stereotype.Service
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.stereotype.Service
 
 @Service
 @Timed

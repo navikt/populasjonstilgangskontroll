@@ -1,19 +1,20 @@
-package no.nav.tilgangsmaskin.ansatt.nom
+package no.nav.tilgangsmaskin.felles.utils
 
-import java.net.URI
-import java.time.LocalDateTime
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.client.WebClient.Builder
+import org.springframework.web.reactive.function.client.WebClient
+import java.net.URI
+import java.time.LocalDateTime
 
 @Component
-class LederUtvelgerHandler(private val builder: Builder,
+class LederUtvelgerHandler(private val builder: WebClient.Builder,
                            @Value("\${elector.sse.url}") private val uri: URI,
-                           private val publisher: ApplicationEventPublisher) {
+                           private val publisher: ApplicationEventPublisher
+) {
 
 
     @EventListener(ApplicationReadyEvent::class)
@@ -31,4 +32,3 @@ class LederUtvelgerHandler(private val builder: Builder,
     private data class LederUtvelgerRespons(val name: String, val last_update: LocalDateTime)
     class LeaderChangedEvent(source: Any, val leder: String) : ApplicationEvent(source)
 }
-

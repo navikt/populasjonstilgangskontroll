@@ -6,20 +6,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import no.nav.security.token.support.core.api.Unprotected
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.ValidId
-import no.nav.tilgangsmaskin.regler.motor.IdOgType
+import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
-import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -61,27 +55,27 @@ class TilgangController(
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailBulkApiResponse
     @Operation(summary = "Kjør bulkregler for en ansatt",
-        description = "Dette endepunktet er kun tilgjengelig for obo-flow. " +
+        description = "Dette endepunktet er kun tilgjengelig for obo flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er og regeltyper.")
 
-    fun bulkOBO(@RequestBody @Valid @ValidId specs: Set<IdOgType>) =
-        if (token.erObo) {
-            regler.bulkRegler(token.ansattId!!, specs)
+    fun bulkOBO(@RequestBody @Valid @ValidId specs: Set<BrukerIdOgType>) =
+        if (!token.erObo) {
+            throw ResponseStatusException(FORBIDDEN, "Dette endepunkt er kun tilgjengelig for obo flow.")
         }
-        else throw ResponseStatusException(FORBIDDEN, "Dette endepunkt er kun tilgjengelig for obo-flow.")
+        else regler.bulkRegler(token.ansattId!!, specs)
+
 
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailBulkApiResponse
     @Operation(summary = "Kjør bulkregler for en ansatt",
-        description = "Dette endepunktet er kun tilgjengelig for client credentials-flow. " +
+        description = "Dette endepunktet er kun tilgjengelig for client credentials flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er og regeltyper.")
-    fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<IdOgType>) =
-
-        if (token.erCC) {
-            regler.bulkRegler(ansattId, specs)
+    fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgType>) =
+        if (!token.erCC) {
+            throw ResponseStatusException(FORBIDDEN, "Dette endepunkt er kun tilgjengelig client credentials-flow.")
         }
-        else throw ResponseStatusException(FORBIDDEN, "Dette endepunkt er kun tilgjengelig client credentials-flow.")
+        else regler.bulkRegler(ansattId, specs)
 }
 
 

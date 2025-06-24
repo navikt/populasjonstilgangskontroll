@@ -1,14 +1,13 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.CLASS
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.CLASS
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.cfg.MapperConfig
 import com.fasterxml.jackson.databind.introspect.AnnotatedClass
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector
 import com.fasterxml.jackson.databind.jsontype.impl.StdTypeResolverBuilder
 import com.fasterxml.jackson.databind.module.SimpleModule
-import no.nav.boot.conditionals.ConditionalOnNotProd
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 

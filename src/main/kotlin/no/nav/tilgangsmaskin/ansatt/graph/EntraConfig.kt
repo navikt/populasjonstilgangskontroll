@@ -1,11 +1,11 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
-import java.net.URI
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import org.springframework.boot.context.properties.ConfigurationProperties
+import java.net.URI
 
 @ConfigurationProperties(GRAPH)
 class EntraConfig(

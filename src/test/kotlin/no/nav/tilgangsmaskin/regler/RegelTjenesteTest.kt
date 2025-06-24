@@ -135,7 +135,7 @@ class RegelTjenesteTest {
         assertEquals(assertThrows<BulkRegelException> {
             regler.bulkRegler(
                     ansattId,
-                    setOf(IdOgType(strengtFortroligBrukerId.verdi), IdOgType(fortroligBrukerId.verdi)))
+                    setOf(BrukerIdOgType(strengtFortroligBrukerId), BrukerIdOgType(fortroligBrukerId)))
         }.exceptions.size, 2)
     }
 
@@ -165,11 +165,11 @@ class RegelTjenesteTest {
             regler.bulkRegler(
                     ansattId,
                     setOf(
-                            IdOgType(
+                            BrukerIdOgType(
                                     BrukerBuilder(
                                             vanligBrukerId,
                                         UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK)
-                                        .build().brukerId.verdi)))
+                                        .build().brukerId)))
         }.doesNotThrowAnyException()
     }
 

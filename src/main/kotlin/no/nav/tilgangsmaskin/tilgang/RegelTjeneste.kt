@@ -1,18 +1,19 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.micrometer.core.annotation.Timed
-import org.springframework.boot.context.properties.ConfigurationProperties
+import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
-import no.nav.tilgangsmaskin.regler.motor.IdOgType
-import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.regler.motor.RegelMotor.BulkRegelResult.*
+import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
+import no.nav.tilgangsmaskin.tilgang.BulkResultater.BulkResultat
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Service
 import kotlin.time.measureTime
 
@@ -44,35 +45,42 @@ class RegelTjeneste(
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
         motor.kjerneregler(ansatte.ansatt(ansattId), brukere.brukerMedUtvidetFamilie(brukerId))
 
-    fun bulkRegler(ansattId: AnsattId, idOgType: Set<IdOgType>): List<Pair<BrukerId, Any>> {
-        val resultater = motor.bulkRegler(ansatte.ansatt(ansattId), idOgType.brukerIdOgType()).map {
-            when (it) {
-                is Success -> it.brukerId to "OK"
-                is RegelFailure -> if (overstyring.erOverstyrt(ansattId, it.brukerId))
-                    it.brukerId to "OK"
-                      else it.brukerId to "403"
+    fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgType>): BulkResultater {
+        val ansatt = ansatte.ansatt(ansattId)
+        val brukere = idOgType.brukerOgType()
+        val resultater = motor.bulkRegler(ansatt, brukere)
+        val godkjente = godkjente(resultater)
+        val avviste = avviste(resultater, ansattId, brukere, ansatt)
+        val ikkeFunnet = ikkeFunnet(idOgType, resultater.map { it.first }.toSet())
 
-                is InternalError -> it.brukerId to "500"
-            }
-        }
-        val notFound = idOgType.map { it.brukerId }
-            .filterNot { brukerId -> resultater.any { it.first.verdi == brukerId } }
-            .map { BrukerId(it) to "404" }
-        return resultater + notFound
+        return BulkResultater(ansattId, godkjente + avviste + ikkeFunnet)
     }
 
-    private fun Set<IdOgType>.brukerIdOgType() =
+    private fun ikkeFunnet(oppgitt: Set<BrukerIdOgType>, funnet: Set<BrukerId>) = oppgitt
+        .map { it.brukerId }
+        .filterNot { it in funnet }
+        .map { BulkResultat(it, NOT_FOUND) }
+        .toSet()
+
+    private fun avviste(resultater: Set<Triple<BrukerId, HttpStatus, Regel?>>, ansattId: AnsattId, brukere: Set<BrukerOgType>, ansatt: Ansatt) = resultater
+        .filter { it.second == FORBIDDEN && !overstyring.erOverstyrt(ansattId, it.first) }
+        .map { avvist ->
+            val bruker = brukere.first { it.bruker.brukerId == avvist.first }.bruker
+            val e = RegelException(ansatt, bruker, avvist.third!!, status = avvist.second)
+            BulkResultat(e.bruker.brukerId, e.status, e.body)
+        }.toSet()
+
+    private fun godkjente(resultater: Set<Triple<BrukerId, HttpStatus, Regel?>>) = resultater
+        .filter { it.second == NO_CONTENT }
+        .map {
+            BulkResultat(it.first, NO_CONTENT)
+        }.toSet()
+
+    private fun Set<BrukerIdOgType>.brukerOgType(): Set<BrukerOgType> =
         mapNotNull { spec ->
-            brukere.brukere(*map { it.brukerId }.toTypedArray())
-                .associateBy { it.brukerId.verdi }[spec.brukerId]?.let { bruker ->
-                bruker to spec.type
+            brukere.brukere(*map { it.brukerId.verdi }.toTypedArray())
+                .associateBy { it.brukerId.verdi }[spec.brukerId.verdi]?.let { bruker ->
+                BrukerOgType(bruker, spec.type)
             }
         }.toSet()
 }
-
-@ConfigurationProperties("regler")
-data class RegelConfig(val toggles: Map<String,Boolean> = emptyMap()) {
-    fun isEnabled(regel: String) = toggles[regel.lowercase() +".enabled"]  ?: true
-}
-
-

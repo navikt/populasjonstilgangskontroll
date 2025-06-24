@@ -2,9 +2,7 @@ package no.nav.tilgangsmaskin.regler.motor
 
 import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.Ansatt
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.*
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD

@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.regler.overstyring
 
 import io.swagger.v3.oas.annotations.media.Schema
-import java.time.LocalDate
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import java.time.LocalDate
 
 @Schema(requiredProperties = ["brukerId","begrunnelse","gyldigTil"], example = """
   {

@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import no.nav.tilgangsmaskin.felles.rest.cache.ValKeyAdapter
-import no.nav.tilgangsmaskin.felles.rest.cache.ValKeyBeanConfiguration
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.profiler
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.local
 import no.nav.tilgangsmaskin.regler.motor.RegelSett

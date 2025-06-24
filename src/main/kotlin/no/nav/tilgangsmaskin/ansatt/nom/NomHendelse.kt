@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import java.time.LocalDate
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import java.time.LocalDate
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class NomHendelse(

@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import io.micrometer.core.annotation.Timed
-import java.time.Instant
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import java.time.Instant
 
 @Timed
 interface NomRepository : JpaRepository<NomEntity, Long> {

@@ -1,10 +1,7 @@
 package no.nav.tilgangsmaskin.felles.graphql
 
-import java.net.URI
-import java.util.*
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
-import org.slf4j.LoggerFactory
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.graphql.ResponseError
 import org.springframework.graphql.client.FieldAccessException
@@ -12,6 +9,8 @@ import org.springframework.graphql.client.GraphQlTransportException
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.UNAUTHORIZED
+import java.net.URI
+import java.util.*
 
 interface GraphQLErrorHandler {
     fun handle(uri: URI, e: Throwable): Nothing =

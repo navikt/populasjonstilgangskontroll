@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service
 import kotlin.time.measureTime
 
 @Service
+@Timed
 class RegelTjeneste(
     private val motor: RegelMotor,
     private val brukere: BrukerTjeneste,

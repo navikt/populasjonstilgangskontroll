@@ -9,7 +9,7 @@ group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
 version = "1.0.1"
 
 plugins {
-    kotlin("jvm") version "1.9.25"
+    kotlin("jvm") version "2.2.0"
     kotlin("plugin.spring") version "1.9.25"
     kotlin("plugin.jpa") version "1.9.25"
     id("org.springframework.boot") version "3.5.3"

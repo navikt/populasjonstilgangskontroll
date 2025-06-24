@@ -7,19 +7,15 @@ import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
-import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgType
-import no.nav.tilgangsmaskin.regler.motor.BrukerOgType
-import no.nav.tilgangsmaskin.regler.motor.Regel
-import no.nav.tilgangsmaskin.regler.motor.RegelException
-import no.nav.tilgangsmaskin.regler.motor.RegelMotor
+import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
+import no.nav.tilgangsmaskin.tilgang.BulkResultater.BulkResultat
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Service
 import kotlin.time.measureTime
-import  no.nav.tilgangsmaskin.tilgang.BulkResultater.BulkResultat
-import org.springframework.http.HttpStatus
 
 @Service
 @Timed

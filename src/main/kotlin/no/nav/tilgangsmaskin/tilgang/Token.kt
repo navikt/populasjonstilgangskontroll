@@ -32,7 +32,5 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
         private const val IDTYP = "idtyp"
         private const val AZP_NAME = "azp_name"
         private const val NAVIDENT = "NAVident"
-
-
     }
 }

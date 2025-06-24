@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import no.nav.boot.conditionals.EnvUtil.isDevOrLocal
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.globaleGrupper
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.girNasjonalTilgang
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.globaleGrupper
 import no.nav.tilgangsmaskin.ansatt.graph.Entra
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.tilgang.Token

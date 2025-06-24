@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.tilgangsmaskin.felles.utils.LederUtvelgerHandler
 import org.slf4j.LoggerFactory
 import org.springframework.context.event.EventListener
 import org.springframework.scheduling.annotation.Scheduled
@@ -38,13 +39,7 @@ class NomDBOpprydder(registry: MeterRegistry, private val nom: Nom)  {
         }
         log.info("Vaktmester rydder opp i Nom-databasen")
         val antall = nom.ryddOpp()
-        if (antall > 0) {
-            counter.increment(antall.toDouble())
-            log.info("Vaktmester ryddet opp $antall rad(er) med utgått informasjon om ansatte som ikke lenger jobber i Nav")
-        }
-        else {
-            log.info("Vaktmester fant ingen rader å rydde opp i")
-        }
+        counter.increment(antall.toDouble())
         return antall
     }
 }

@@ -5,22 +5,17 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
-import org.springframework.http.MediaType
-import org.springframework.http.MediaType.*
-import kotlin.annotation.AnnotationRetention.*
-import kotlin.annotation.AnnotationTarget.*
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
+import kotlin.annotation.AnnotationRetention.RUNTIME
+import kotlin.annotation.AnnotationTarget.FUNCTION
 
 @Target(FUNCTION)
 @Retention(RUNTIME)
 @ApiResponses(
         value = [
             ApiResponse(
-                responseCode = "204",
-                description = "Tilgang ble godkjent"
-            ),
-            ApiResponse(
-                responseCode = "403",
-                description = "Tilgang ble avvist",
+                responseCode = "207",
+                description = "Tilganger ble evaluert for alle brukere i bulk",
                 content = [Content(
                     mediaType = APPLICATION_JSON_VALUE,
                     schema = Schema(

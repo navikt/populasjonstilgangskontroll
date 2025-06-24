@@ -23,7 +23,7 @@ import kotlin.annotation.AnnotationTarget.*
                 content = [Content(
                     mediaType = APPLICATION_JSON_VALUE,
                     schema = Schema(
-                        implementation = BulkResultater::class,
+                        implementation = BulkSwaggerResultater::class,
                         example = """{
                           "ansattId": "Z990883",
                           "traceId": "f85c9caa87a57b6dfde1068ce97f10a5",
@@ -54,19 +54,19 @@ import kotlin.annotation.AnnotationTarget.*
                        ]
                    }"""))])])
 annotation class ProblemDetailBulkApiResponse
-data class BulkResultater(
+private data class BulkSwaggerResultater(
     val ansattId: String,
     val traceId: String,
-    val resultater: List<BulkResultat>
+    val resultater: List<BulkSwaggerResultat>
 )
 
-data class BulkResultat(
+data class BulkSwaggerResultat(
     val brukerId: String,
     val status: Int,
-    val detaljer: Detaljer? = null
+    val detaljer: BulkSwaggerDetaljer? = null
 )
 
-data class Detaljer(
+data class BulkSwaggerDetaljer(
     val type: String,
     val title: String,
     val status: Int,

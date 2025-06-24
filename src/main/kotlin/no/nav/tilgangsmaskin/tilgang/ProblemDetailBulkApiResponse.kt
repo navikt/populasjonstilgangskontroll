@@ -25,32 +25,55 @@ import kotlin.annotation.AnnotationTarget.*
                     schema = Schema(
                         implementation = BulkResultater::class,
                         example = """{
-  "ansattId": "Z990883",
-  "traceId": "f85c9caa87a57b6dfde1068ce97f10a5",
-  "resultater": [
-    {
-      "brukerId": "08526835671",
-      "status": 204
-    },
-    {
-      "brukerId": "03508331575",
-      "status": 403,
-      "detaljer": {
-        "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
-        "title": "AVVIST_STRENGT_FORTROLIG_ADRESSE",
-        "status": 403,
-        "instance": "Z990883/03508331575",
-        "brukerIdent": "03508331575",
-        "navIdent": "Z990883",
-        "begrunnelse": "Du har ikke tilgang til brukere med strengt fortrolig adresse",
-        "traceId": "f85c9caa87a57b6dfde1068ce97f10a5",
-        "kanOverstyres": false
-      }
-    },
-    {
-      "brukerId": "01011111111",
-      "status": 404
-    }
-  ]
-}"""))])])
+                          "ansattId": "Z990883",
+                          "traceId": "f85c9caa87a57b6dfde1068ce97f10a5",
+                          "resultater": [
+                          {
+                             "brukerId": "08526835671",
+                             "status": 204
+                          },
+                          {
+                              "brukerId": "03508331575",
+                              "status": 403,
+                              "detaljer": {
+                                 "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
+                                 "title": "AVVIST_STRENGT_FORTROLIG_ADRESSE",
+                                 "status": 403,
+                                 "instance": "Z990883/03508331575",
+                                 "brukerIdent": "03508331575",
+                                 "navIdent": "Z990883",
+                                 "begrunnelse": "Du har ikke tilgang til brukere med strengt fortrolig adresse",
+                                 "traceId": "f85c9caa87a57b6dfde1068ce97f10a5",
+                                 "kanOverstyres": false
+                              }
+                           },
+                           {
+                             "brukerId": "01011111111",
+                             "status": 404
+                           }
+                       ]
+                   }"""))])])
 annotation class ProblemDetailBulkApiResponse
+data class BulkResultater(
+    val ansattId: String,
+    val traceId: String,
+    val resultater: List<BulkResultat>
+)
+
+data class BulkResultat(
+    val brukerId: String,
+    val status: Int,
+    val detaljer: Detaljer? = null
+)
+
+data class Detaljer(
+    val type: String,
+    val title: String,
+    val status: Int,
+    val instance: String,
+    val brukerIdent: String,
+    val navIdent: String,
+    val begrunnelse: String,
+    val traceId: String,
+    val kanOverstyres: Boolean
+)

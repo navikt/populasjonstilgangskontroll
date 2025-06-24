@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.micrometer.core.annotation.Timed
+import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Service
 import kotlin.time.measureTime
 
 @Service
-@Timed
+@Observed
 class RegelTjeneste(
     private val motor: RegelMotor,
     private val brukere: BrukerTjeneste,
@@ -65,7 +66,7 @@ class RegelTjeneste(
     private fun avviste(resultater: Set<Triple<BrukerId, HttpStatus, Regel?>>, ansattId: AnsattId, brukere: Set<BrukerOgType>, ansatt: Ansatt) = resultater
         .filter { it.second == FORBIDDEN && !overstyring.erOverstyrt(ansattId, it.first) }
         .map { avvist ->
-            val bruker = brukere.first { it.bruker.brukerId == avvist.first }.bruker
+            val bruker = brukere.finnBruker(avvist.first)
             val e = RegelException(ansatt, bruker, avvist.third!!, status = avvist.second)
             BulkResultat(e.bruker.brukerId, e.status, e.body)
         }.toSet()
@@ -75,6 +76,8 @@ class RegelTjeneste(
         .map {
             BulkResultat(it.first, NO_CONTENT)
         }.toSet()
+
+    fun Set<BrukerOgType>.finnBruker(brukerId: BrukerId)  = first { it.bruker.brukerId == brukerId }.bruker
 
     private fun Set<BrukerIdOgType>.brukerOgType(): Set<BrukerOgType> =
         mapNotNull { spec ->

@@ -19,8 +19,7 @@ import org.springframework.stereotype.Service
 import kotlin.time.measureTime
 
 @Service
-@Observed
-@Timed(description = "Tid brukt i RegelTjeneste", histogram = true, percentiles = [0.5, 0.9, 0.95, 0.99])
+@Timed
 class RegelTjeneste(
     private val motor: RegelMotor,
     private val brukere: BrukerTjeneste,

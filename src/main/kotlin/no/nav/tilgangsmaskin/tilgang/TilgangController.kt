@@ -56,7 +56,7 @@ class TilgangController(
     @ProblemDetailBulkApiResponse
     @Operation(summary = "Kjør bulkregler for en ansatt",
         description = "Dette endepunktet er kun tilgjengelig for obo flow. " +
-                "Det evaluerer regler for en ansatt mot et sett av brukerId-er og regeltyper.")
+                "Det evaluerer regler for en ansatt mot et sett av brukerId-er og regeltyper. Om ingen regeltype oppgis, evalueres det komplette regelsettet")
 
     fun bulkOBO(@RequestBody @Valid @ValidId specs: Set<BrukerIdOgType>) =
         if (!token.erObo) {
@@ -70,7 +70,7 @@ class TilgangController(
     @ProblemDetailBulkApiResponse
     @Operation(summary = "Kjør bulkregler for en ansatt",
         description = "Dette endepunktet er kun tilgjengelig for client credentials flow. " +
-                "Det evaluerer regler for en ansatt mot et sett av brukerId-er og regeltyper.")
+                "Det evaluerer regler for en ansatt mot et sett av brukerId-er og regeltyper. Om ingen regeltype oppgis, evalueres det komplette regelsettet")
     fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgType>) =
         if (!token.erCC) {
             throw ResponseStatusException(FORBIDDEN, "Dette endepunkt er kun tilgjengelig client credentials-flow.")

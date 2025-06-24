@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
-import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import java.net.URI
 import kotlin.annotation.AnnotationRetention.RUNTIME
@@ -37,7 +36,6 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
                         "kanOverstyres": false
                     }"""))])])
 annotation class ProblemDetailApiResponse
-
 @Schema(description = "Problem Detail")
 internal data class ProblemDetailResponse(
         val type: URI,
@@ -49,49 +47,4 @@ internal data class ProblemDetailResponse(
         val begrunnelse: String,
         val traceId: String,
         val kanOverstyres: Boolean)
-
-@Target(FUNCTION)
-@Retention(RUNTIME)
-@ApiResponses(
-        value = [
-            ApiResponse(
-                    responseCode = "204",
-                    description = "Tilgang ble godkjent"),
-            ApiResponse(
-                    responseCode = "403",
-                    description = "Tilgang ble avvist",
-                    content = [Content(
-                            mediaType = APPLICATION_JSON_VALUE,
-                            schema = Schema(
-                                    implementation = BulkResultater::class,
-                                    example = """{
-  "ansattId": "Z990883",
-  "traceId": "f85c9caa87a57b6dfde1068ce97f10a5",
-  "resultater": [
-    {
-      "brukerId": "08526835671",
-      "status": 204
-    },
-    {
-      "brukerId": "03508331575",
-      "status": 403,
-      "detaljer": {
-        "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
-        "title": "AVVIST_STRENGT_FORTROLIG_ADRESSE",
-        "status": 403,
-        "instance": "Z990883/03508331575",
-        "brukerIdent": "03508331575",
-        "navIdent": "Z990883",
-        "begrunnelse": "Du har ikke tilgang til brukere med strengt fortrolig adresse",
-        "traceId": "f85c9caa87a57b6dfde1068ce97f10a5",
-        "kanOverstyres": false
-      }
-    },
-    {
-      "brukerId": "01011111111",
-      "status": 404
-    }
-  ],
-}"""))])])
-annotation class ProblemDetailBulkApiResponse
 

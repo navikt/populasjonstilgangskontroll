@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import java.net.URI
 import kotlin.annotation.AnnotationRetention.RUNTIME
@@ -60,7 +61,7 @@ internal data class ProblemDetailResponse(
                     responseCode = "403",
                     description = "Tilgang ble avvist",
                     content = [Content(
-                            mediaType = APPLICATION_PROBLEM_JSON_VALUE,
+                            mediaType = APPLICATION_JSON_VALUE,
                             schema = Schema(
                                     implementation = BulkResultater::class,
                                     example = """{

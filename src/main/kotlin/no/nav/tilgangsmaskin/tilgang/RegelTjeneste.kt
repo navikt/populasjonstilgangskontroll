@@ -20,6 +20,7 @@ import kotlin.time.measureTime
 
 @Service
 @Observed
+@Timed(description = "Tid brukt i RegelTjeneste")
 class RegelTjeneste(
     private val motor: RegelMotor,
     private val brukere: BrukerTjeneste,

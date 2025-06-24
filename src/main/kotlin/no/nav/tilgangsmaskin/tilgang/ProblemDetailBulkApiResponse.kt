@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
 import org.springframework.http.MediaType
 import org.springframework.http.MediaType.*
 import kotlin.annotation.AnnotationRetention.*
@@ -26,7 +27,6 @@ import kotlin.annotation.AnnotationTarget.*
                         implementation = BulkSwaggerResultater::class,
                         example = """{
                           "ansattId": "Z990883",
-                          "traceId": "f85c9caa87a57b6dfde1068ce97f10a5",
                           "resultater": [
                           {
                              "brukerId": "08526835671",
@@ -56,7 +56,6 @@ import kotlin.annotation.AnnotationTarget.*
 annotation class ProblemDetailBulkApiResponse
 private data class BulkSwaggerResultater(
     val ansattId: String,
-    val traceId: String,
     val resultater: List<BulkSwaggerResultat>
 )
 
@@ -68,7 +67,7 @@ data class BulkSwaggerResultat(
 
 data class BulkSwaggerDetaljer(
     val type: String,
-    val title: String,
+    val title: AvvisningsKode,
     val status: Int,
     val instance: String,
     val brukerIdent: String,

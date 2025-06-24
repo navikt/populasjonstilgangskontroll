@@ -62,7 +62,7 @@ internal data class ProblemDetailResponse(
                     content = [Content(
                             mediaType = APPLICATION_PROBLEM_JSON_VALUE,
                             schema = Schema(
-                                    implementation = ProblemDetailBulkResponse::class,
+                                    implementation = BulkResultater::class,
                                     example = """{
   "ansattId": "Z990883",
   "traceId": "f85c9caa87a57b6dfde1068ce97f10a5",
@@ -93,21 +93,4 @@ internal data class ProblemDetailResponse(
   ],
 }"""))])])
 annotation class ProblemDetailBulkApiResponse
-
-internal data class ProblemDetailBulkResponse(
-        val type: URI,
-        val title: List<AvvisningsKode>,
-        val status: Int,
-        val instance: String,
-        val navIdent: String,
-        val begrunnelser: List<ProblemDetailBulkElementBegrunnelse>) {
-    internal data class ProblemDetailBulkElementBegrunnelse(
-            val type: URI,
-            val title: AvvisningsKode,
-            val brukerIdent: String,
-            val navIdent: String,
-            val begrunnelse: String,
-            val kanOverstyres: Boolean,
-            val instance: String)
-}
 

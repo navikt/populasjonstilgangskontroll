@@ -46,7 +46,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
 
     @Bean
     override fun cacheManager(): RedisCacheManager =
-        RedisCacheManager.builder(nonlockingRedisCacheWriter(cf))
+        RedisCacheManager.builder(nonLockingRedisCacheWriter(cf))
             .withInitialCacheConfigurations(cfgs.associate { it.navn to cacheConfig(it) })
             .enableStatistics()
             .build()

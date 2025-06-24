@@ -64,30 +64,33 @@ internal data class ProblemDetailResponse(
                             schema = Schema(
                                     implementation = ProblemDetailBulkResponse::class,
                                     example = """{
-  "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
-  "title": "AVVIST_STRENGT_FORTROLIG_ADRESSE, AVVIST_STRENGT_FORTROLIG_UTLAND",
-  "status": 403,
-  "instance": "/dev/bulk/Z990883",
-  "navIdent": "Z990883",
-  "traceId": "444290be30ed4fdd9a849654bad9dc1b",
-  "begrunnelser": [
+  "ansattId": "Z990883",
+  "traceId": "f85c9caa87a57b6dfde1068ce97f10a5",
+  "resultater": [
     {
-      "brukerIdent": "03508331575",
-      "begrunnelse": "Du har ikke tilgang til brukere med strengt fortrolig adresse",
-      "kanOverstyres": false,
-      "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
-      "title": "AVVIST_STRENGT_FORTROLIG_ADRESSE",
-      "instance": "Z990883/03508331575"
+      "brukerId": "08526835671",
+      "status": 204
     },
     {
-      "brukerIdent": "20478606614",
-      "begrunnelse": "Du har ikke tilgang til brukere med strengt fortrolig adresse i utlandet",
-      "kanOverstyres": false,
-      "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
-      "title": "AVVIST_STRENGT_FORTROLIG_UTLAND",
-      "instance": "Z990883/20478606614"
+      "brukerId": "03508331575",
+      "status": 403,
+      "detaljer": {
+        "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
+        "title": "AVVIST_STRENGT_FORTROLIG_ADRESSE",
+        "status": 403,
+        "instance": "Z990883/03508331575",
+        "brukerIdent": "03508331575",
+        "navIdent": "Z990883",
+        "begrunnelse": "Du har ikke tilgang til brukere med strengt fortrolig adresse",
+        "traceId": "f85c9caa87a57b6dfde1068ce97f10a5",
+        "kanOverstyres": false
+      }
+    },
+    {
+      "brukerId": "01011111111",
+      "status": 404
     }
-  ]
+  ],
 }"""))])])
 annotation class ProblemDetailBulkApiResponse
 

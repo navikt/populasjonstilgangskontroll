@@ -1,3 +1,7 @@
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true
 management:
   metrics:
     enable:

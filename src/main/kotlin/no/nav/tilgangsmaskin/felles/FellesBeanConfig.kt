@@ -2,10 +2,9 @@ package no.nav.tilgangsmaskin.felles
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION
-import io.micrometer.core.annotation.Timed
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
-import io.micrometer.core.instrument.Tag
+import io.micrometer.core.instrument.Tags
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
@@ -13,7 +12,6 @@ import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInt
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.FellesRetryListener
 import no.nav.tilgangsmaskin.tilgang.Token
-import org.aspectj.lang.ProceedingJoinPoint
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.Include.defaultIncludes
@@ -61,7 +59,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 
     @Bean
     fun clusterAddingTimedAspect(meterRegistry: MeterRegistry, token: Token) =
-        TimedAspect(meterRegistry, Function { _ -> listOf(Tag.of("cluster", token.cluster)) })
+        TimedAspect(meterRegistry, Function { _ -> Tags.of("cluster", token.cluster) })
 
     @Bean
     fun fellesRetryListener() = FellesRetryListener()

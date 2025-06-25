@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service
 import kotlin.time.measureTime
 
 @Service
-@Timed( value = "komplette_regler", histogram = true)
 class RegelTjeneste(
     private val motor: RegelMotor,
     private val brukere: BrukerTjeneste,
@@ -27,6 +26,7 @@ class RegelTjeneste(
     private val overstyring: OverstyringTjeneste) {
     private val log = getLogger(javaClass)
 
+    @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "komplett"])
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
@@ -43,9 +43,11 @@ class RegelTjeneste(
         log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
     }
 
+    @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
         motor.kjerneregler(ansatte.ansatt(ansattId), brukere.brukerMedUtvidetFamilie(brukerId))
 
+    @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgType>): BulkResultater {
         val ansatt = ansatte.ansatt(ansattId)
         val brukere = idOgType.brukerOgType()

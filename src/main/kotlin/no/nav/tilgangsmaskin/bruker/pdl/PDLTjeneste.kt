@@ -13,7 +13,7 @@ import org.springframework.cache.annotation.Cacheable
 
 @RetryingOnRecoverableService
 @Cacheable(cacheNames = [PDL])
-@Timed
+@Timed( value = "pdl_tjeneste", histogram = true)
 class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL: PdlSyncGraphQLClientAdapter) {
 
     private val log = getLogger(javaClass)

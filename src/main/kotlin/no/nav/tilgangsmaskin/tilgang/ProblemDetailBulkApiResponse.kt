@@ -12,15 +12,18 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
 @Target(FUNCTION)
 @Retention(RUNTIME)
 @ApiResponses(
-        value = [
-            ApiResponse(
-                responseCode = "207",
-                description = "Tilganger ble evaluert for alle brukere i bulk",
-                content = [Content(
-                    mediaType = APPLICATION_JSON_VALUE,
-                    schema = Schema(
-                        implementation = BulkSwaggerResultater::class,
-                        example = """{
+    value = [
+        ApiResponse(
+            responseCode = "413",
+            description = "Mer enn 1000 id-er ble sendt i bulk"),
+        ApiResponse(
+            responseCode = "207",
+            description = "Tilganger ble evaluert for alle brukere i bulk",
+            content = [Content(
+                mediaType = APPLICATION_JSON_VALUE,
+                schema = Schema(
+                    implementation = BulkSwaggerResultater::class,
+                    example = """{
                           "ansattId": "Z990883",
                           "resultater": [
                           {

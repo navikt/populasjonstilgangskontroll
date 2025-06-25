@@ -13,6 +13,7 @@ import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -75,7 +76,15 @@ class TilgangController(
         if (!token.erCC) {
             throw ResponseStatusException(FORBIDDEN, "Dette endepunkt er kun tilgjengelig client credentials-flow.")
         }
-        else regler.bulkRegler(ansattId, specs)
+        else {
+            if (specs.size > 1000) {
+                throw ResponseStatusException(
+                    PAYLOAD_TOO_LARGE,
+                    "Maksimalt 1000 brukerId-er kan sendes i bulk-regler. Antall mottatt: ${specs.size}"
+                )
+            }
+            regler.bulkRegler(ansattId, specs)
+        }
 }
 
 

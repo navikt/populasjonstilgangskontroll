@@ -61,7 +61,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 
     @Bean
     fun clusterAddingTimedAspect(meterRegistry: MeterRegistry, token: Token) =
-        TimedAspect(meterRegistry, Function { _: ProceedingJoinPoint -> listOf(Tag.of("cluster", token.cluster)) })
+        TimedAspect(meterRegistry, Function { _ -> listOf(Tag.of("cluster", token.cluster)) })
 
     @Bean
     fun fellesRetryListener() = FellesRetryListener()

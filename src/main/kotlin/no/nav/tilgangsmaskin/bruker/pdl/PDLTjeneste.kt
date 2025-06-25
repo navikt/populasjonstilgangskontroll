@@ -17,16 +17,13 @@ class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL
 
     private val log = getLogger(javaClass)
 
-    @Timed( value = "pdl_tjeneste", histogram = true, extraTags = ["type", "utvidet"] )
     fun medUtvidetFamile(id: String) =
         with(medNærmesteFamilie(id)) {
             copy(familie = familie.copy(søsken = søsken(foreldre, brukerId), partnere = partnere(id)))
         }
 
-    @Timed( value = "pdl_tjeneste", histogram = true, extraTags = ["type", "nærmeste"] )
     fun medNærmesteFamilie(id: String) = tilPerson(adapter.person(id))
 
-    @Timed( value = "pdl_tjeneste", histogram = true, extraTags = ["type", "personer"] )
     fun personer(brukerIds: Set<String>) : List<Person> {
         log.info("Bulk henter personer for ${brukerIds.joinToString(",")}")
         return adapter.personer(brukerIds).map { tilPerson(it.value) }

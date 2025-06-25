@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
+import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.graphql.AbstractSyncGraphQLAdapter
 import no.nav.tilgangsmaskin.felles.graphql.GraphQLErrorHandler
@@ -13,6 +14,7 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 @Component
+@Timed( value = "pdl_tjeneste", histogram = true, extraTags = ["type", "graphql"] )
 class PdlSyncGraphQLClientAdapter(
         @Qualifier(PDLGRAPH) graphQlClient: GraphQlClient,
         @Qualifier(PDLGRAPH) restClient: RestClient,

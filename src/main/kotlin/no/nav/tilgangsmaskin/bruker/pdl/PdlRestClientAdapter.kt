@@ -12,7 +12,7 @@ import org.springframework.web.client.RestClient
 
 @Component
 @Cacheable(PDL)
-@Timed( value = "pdl_tjeneste", histogram = true, extraTags = ["backend", "pip"] )
+@Timed(histogram = true, extraTags = ["backend", "pip"] )
 class PdlRestClientAdapter(
         @Qualifier(PDL) restClient: RestClient,
         private val cf: PdlConfig,

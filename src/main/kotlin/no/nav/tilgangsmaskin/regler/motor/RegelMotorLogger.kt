@@ -30,20 +30,13 @@ class RegelMotorLogger(private val teller: AvvisningTeller) {
         MDC.remove(BESLUTNING)
     }
 
-    fun info(message: String) {
-        log.info(message)
-    }
-    fun warn(message: String, e: Throwable? = null) {
-        log.warn(message,e)
-    }
+    fun info(message: String) = log.info(message)
 
-    fun trace(message: String, e: Throwable? = null) {
-        log.trace(message,e)
-    }
+    fun warn(message: String, e: Throwable? = null) = log.warn(message,e)
 
-    fun evaluerer(ansatt: Ansatt, bruker: Bruker, regel: Regel) {
-        log.trace("Evaluerer regel: '${regel.kortNavn}' for ${ansatt.ansattId}  og ${bruker.brukerId}")
-    }
+    fun trace(message: String) = log.trace(message)
+
+    fun evaluerer(ansatt: Ansatt, bruker: Bruker, regel: Regel) = log.trace("Evaluerer regel: '${regel.kortNavn}' for ${ansatt.ansattId}  og ${bruker.brukerId}")
 
     companion object   {
         private const val BESLUTNING = "beslutning"

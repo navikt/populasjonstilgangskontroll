@@ -66,6 +66,9 @@ class TilgangController(
     @PostMapping("bulk/{regelType}")
     @ResponseStatus(MULTI_STATUS)
     @ProblemDetailBulkApiResponse
+    @Operation(summary = "Kjør bulkregler for en ansatt",
+        description = "Dette endepunktet er kun tilgjengelig for obo flow. " +
+                "Det evaluerer regler for en ansatt mot et sett av brukerId-er med samme regeltype")
     fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>) =
         doBulkOBO(brukerIds.map { BrukerIdOgType(it,regelType) }.toSet())
 
@@ -81,6 +84,9 @@ class TilgangController(
     @PostMapping("bulk/{ansattId}/{regelType}")
     @ResponseStatus(MULTI_STATUS)
     @ProblemDetailBulkApiResponse
+    @Operation(summary = "Kjør bulkregler for en ansatt",
+        description = "Dette endepunktet er kun tilgjengelig for client credentials flow. " +
+                "Det evaluerer regler for en ansatt mot et sett av brukerId-er med samme regeltype")
     fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>) =
         doBulkCCF(ansattId,brukerIds.map { BrukerIdOgType(it,regelType) }.toSet())
 

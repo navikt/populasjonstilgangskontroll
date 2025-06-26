@@ -7,7 +7,7 @@ management:
     distribution:
       percentiles-histogram:
         '[komplette_regler]': true
-        '[http_client_requests_seconds]': true
+        '[http_client_requests_seconds_sum]': true
         '[pdl_tjeneste]': true
     enable:
       cache: true

@@ -9,7 +9,7 @@ import org.springframework.cache.annotation.Cacheable
 
 @RetryingOnRecoverableService
 @Cacheable(cacheNames = [GRAPH])
-@@Timed( value = "entra", histogram = true)
+@Timed( value = "entra", histogram = true)
 class Entra(private val adapter: EntraRestClientAdapter, private val resolver: AnsattOidResolver) {
 
     fun geoOgGlobaleGrupper(ansattId: AnsattId) = adapter.grupper(resolve(ansattId), true)

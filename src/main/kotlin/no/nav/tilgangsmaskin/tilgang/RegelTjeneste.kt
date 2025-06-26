@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.micrometer.core.annotation.Timed
-import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
@@ -53,24 +52,19 @@ class RegelTjeneste(
         val brukere = idOgType.brukerOgType()
         val resultater = motor.bulkRegler(ansatt, brukere)
         val godkjente = godkjente(resultater)
-        val avviste = avviste(resultater, ansattId, brukere, ansatt)
-        val ikkeFunnet = ikkeFunnet(idOgType, resultater.map { it.first }.toSet())
-
+        val avviste = avviste(resultater.filter { it.second == FORBIDDEN }.toSet(), ansattId, brukere, ansatt)
+        val ikkeFunnet = ikkeFunnet(idOgType.map { it.brukerId }.toSet(), resultater.map { it.first }.toSet())
         return BulkResultater(ansattId, godkjente + avviste + ikkeFunnet)
     }
 
-    private fun ikkeFunnet(oppgitt: Set<BrukerIdOgType>, funnet: Set<BrukerId>) = oppgitt
-        .map { it.brukerId }
-        .filterNot { it in funnet }
-        .map { BulkResultat(it, NOT_FOUND) }
-        .toSet()
+    private fun ikkeFunnet(oppgitt: Set<BrukerId>, funnet: Set<BrukerId>) = oppgitt.subtract(funnet).map { BulkResultat(it, NOT_FOUND) }.toSet()
 
     private fun avviste(resultater: Set<Triple<BrukerId, HttpStatus, Regel?>>, ansattId: AnsattId, brukere: Set<BrukerOgType>, ansatt: Ansatt) = resultater
-        .filter { it.second == FORBIDDEN && !overstyring.erOverstyrt(ansattId, it.first) }
-        .map { avvist ->
-            val bruker = brukere.finnBruker(avvist.first)
-            val e = RegelException(ansatt, bruker, avvist.third!!, status = avvist.second)
-            BulkResultat(e.bruker.brukerId, e.status, e.body)
+        .filterNot {overstyring.erOverstyrt(ansattId, it.first) }
+        .map {
+            with(it) {
+                BulkResultat(RegelException(ansatt, brukere.finnBruker(first), third!!, status = second))
+            }
         }.toSet()
 
     private fun godkjente(resultater: Set<Triple<BrukerId, HttpStatus, Regel?>>) = resultater
@@ -79,7 +73,7 @@ class RegelTjeneste(
             BulkResultat(it.first, NO_CONTENT)
         }.toSet()
 
-    fun Set<BrukerOgType>.finnBruker(brukerId: BrukerId)  = first { it.bruker.brukerId == brukerId }.bruker
+    private fun Set<BrukerOgType>.finnBruker(brukerId: BrukerId)  = first { it.bruker.brukerId == brukerId }.bruker
 
     private fun Set<BrukerIdOgType>.brukerOgType(): Set<BrukerOgType> =
         mapNotNull { spec ->

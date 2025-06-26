@@ -8,6 +8,7 @@ management:
       percentiles-histogram:
         '[komplette_regler]': true
         '[pdl_tjeneste]': true
+        '[entra]': true
     enable:
       cache: true
   observations:

@@ -14,7 +14,7 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 @Component
-@Timed(histogram = true, extraTags = ["backend", "graphql"] )
+@Timed( value = "pdl_tjeneste", histogram = true, extraTags = ["backend", "graphql"] )
 class PdlSyncGraphQLClientAdapter(
         @Qualifier(PDLGRAPH) graphQlClient: GraphQlClient,
         @Qualifier(PDLGRAPH) restClient: RestClient,

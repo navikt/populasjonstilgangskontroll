@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 import java.time.LocalDate.EPOCH
 
 @Component
-class NomHendelseKonsument(private val nom: Nom, private val logger: NomHendelseLogger) {
+class NomHendelseKonsument(private val nom: NomTjeneste, private val logger: NomHendelseLogger) {
 
     @KafkaListener(topics = ["#{'\${nom.topic}'}"], concurrency = "1", batch = "true", filter = "fnrFilterStrategy")
     fun listen(hendelser: List<NomHendelse>) {

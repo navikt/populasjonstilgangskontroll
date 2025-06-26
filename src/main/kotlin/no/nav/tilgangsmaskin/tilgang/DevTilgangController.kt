@@ -8,7 +8,7 @@ import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
-import no.nav.tilgangsmaskin.ansatt.nom.Nom
+import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
@@ -20,7 +20,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgType
-import no.nav.tilgangsmaskin.regler.motor.RegelSett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
@@ -36,16 +35,16 @@ import org.springframework.web.bind.annotation.*
 @ConditionalOnNotProd
 @Tag(name = "DevTilgangController", description = "Denne kontrolleren skal kun brukes til testing")
 class DevTilgangController(
-        private val graphql: PdlSyncGraphQLClientAdapter,
-        private val skjerming: SkjermingTjeneste,
-        private val skjermingAdapter: SkjermingRestClientAdapter,
-        private val brukere: BrukerTjeneste,
-        private val ansatte: AnsattTjeneste,
-        private val regler: RegelTjeneste,
-        private val overstyring: OverstyringTjeneste,
-        private val pip: PdlRestClientAdapter,
-        private val nom: Nom,
-        private val pdl: PDLTjeneste) {
+    private val graphql: PdlSyncGraphQLClientAdapter,
+    private val skjerming: SkjermingTjeneste,
+    private val skjermingAdapter: SkjermingRestClientAdapter,
+    private val brukere: BrukerTjeneste,
+    private val ansatte: AnsattTjeneste,
+    private val regler: RegelTjeneste,
+    private val overstyring: OverstyringTjeneste,
+    private val pip: PdlRestClientAdapter,
+    private val nom: NomTjeneste,
+    private val pdl: PDLTjeneste) {
 
     private  val log = getLogger(javaClass)
 

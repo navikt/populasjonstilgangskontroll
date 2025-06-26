@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.ansatt
 import no.nav.boot.conditionals.EnvUtil.isDevOrLocal
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.girNasjonalTilgang
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.globaleGrupper
-import no.nav.tilgangsmaskin.ansatt.graph.Entra
+import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 
 @Component
-class ProdAnsattGruppeResolver(private val entra: Entra, private val token: Token, private val env: Environment) : AnsattGruppeResolver {
+class ProdAnsattGruppeResolver(private val entra: EntraTjeneste, private val token: Token, private val env: Environment) : AnsattGruppeResolver {
 
     private val log = getLogger(javaClass)
 

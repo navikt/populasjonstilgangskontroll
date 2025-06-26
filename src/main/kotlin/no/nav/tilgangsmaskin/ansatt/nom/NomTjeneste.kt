@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 @Timed
 @RetryingOnRecoverableService
-class Nom(private val adapter: NomJPAAdapter) {
+class NomTjeneste(private val adapter: NomJPAAdapter) {
 
     private val log = getLogger(javaClass)
 

@@ -11,7 +11,7 @@ import java.net.InetAddress
 import java.util.concurrent.TimeUnit.HOURS
 
 @Component
-class NomDBOpprydder(registry: MeterRegistry, private val nom: Nom)  {
+class NomDBOpprydder(registry: MeterRegistry, private val nom: NomTjeneste)  {
 
     private val log = LoggerFactory.getLogger(javaClass)
 

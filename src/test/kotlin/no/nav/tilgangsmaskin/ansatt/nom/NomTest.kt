@@ -11,7 +11,6 @@ import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode.Companion
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringEntityListener
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.assertj.core.api.Assertions.assertThat
@@ -52,12 +51,12 @@ internal class NomTest {
     @MockkBean
     private lateinit var token: Token
 
-    private lateinit var nom: Nom
+    private lateinit var nom: NomTjeneste
 
     @BeforeAll
     fun setup() {
         every { token.system } returns "test"
-        nom = Nom(adapter)
+        nom = NomTjeneste(adapter)
     }
 
     @Test

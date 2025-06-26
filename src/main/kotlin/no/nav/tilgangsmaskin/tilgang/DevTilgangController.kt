@@ -20,6 +20,8 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgType
+import no.nav.tilgangsmaskin.regler.motor.RegelSett
+import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
@@ -105,6 +107,12 @@ class DevTilgangController(
     @ProblemDetailBulkApiResponse
     fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgType>) =
         regler.bulkRegler(ansattId, specs)
+
+    @PostMapping("bulk/{ansattId}/{regelType}")
+    @ResponseStatus(MULTI_STATUS)
+    @ProblemDetailBulkApiResponse
+    fun bulkreglerForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>) =
+        regler.bulkRegler(ansattId, brukerIds.map { BrukerIdOgType(it,regelType) }.toSet())
 
     @PostMapping("skjermingadaptere")
     fun skjermingAdapter(@RequestBody brukerId: String) = skjermingAdapter.skjerming(brukerId)

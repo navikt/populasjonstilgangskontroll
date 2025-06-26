@@ -8,8 +8,10 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgType
+import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
@@ -58,13 +60,14 @@ class TilgangController(
     @Operation(summary = "Kjør bulkregler for en ansatt",
         description = "Dette endepunktet er kun tilgjengelig for obo flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er og regeltyper. Om ingen regeltype oppgis, evalueres det komplette regelsettet")
-
     fun bulkOBO(@RequestBody @Valid @ValidId specs: Set<BrukerIdOgType>) =
-        if (!token.erObo) {
-            throw ResponseStatusException(FORBIDDEN, "Dette endepunkt er kun tilgjengelig for obo flow.")
-        }
-        else regler.bulkRegler(token.ansattId!!, specs)
+        doBulkOBO(specs)
 
+    @PostMapping("bulk/{regelType}")
+    @ResponseStatus(MULTI_STATUS)
+    @ProblemDetailBulkApiResponse
+    fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>) =
+        doBulkOBO(brukerIds.map { BrukerIdOgType(it,regelType) }.toSet())
 
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(NO_CONTENT)
@@ -73,18 +76,31 @@ class TilgangController(
         description = "Dette endepunktet er kun tilgjengelig for client credentials flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er og regeltyper. Om ingen regeltype oppgis, evalueres det komplette regelsettet")
     fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgType>) =
+        doBulkCCF(ansattId, specs)
+
+    @PostMapping("bulk/{ansattId}/{regelType}")
+    @ResponseStatus(MULTI_STATUS)
+    @ProblemDetailBulkApiResponse
+    fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>) =
+        doBulkCCF(ansattId,brukerIds.map { BrukerIdOgType(it,regelType) }.toSet())
+
+    private fun doBulkCCF(ansattId: AnsattId,specs: Set<BrukerIdOgType>) =
         if (!token.erCC) {
             throw ResponseStatusException(FORBIDDEN, "Dette endepunkt er kun tilgjengelig client credentials-flow.")
         }
         else {
             if (specs.size > 1000) {
-                throw ResponseStatusException(
-                    PAYLOAD_TOO_LARGE,
-                    "Maksimalt 1000 brukerId-er kan sendes i bulk-regler. Antall mottatt: ${specs.size}"
+                throw ResponseStatusException(PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i bulk-regler. Antall mottatt: ${specs.size}"
                 )
             }
             regler.bulkRegler(ansattId, specs)
         }
+
+    private fun doBulkOBO(specs: Set<BrukerIdOgType>) =
+        if (!token.erObo) {
+            throw ResponseStatusException(FORBIDDEN, "Dette endepunkt er kun tilgjengelig for obo flow.")
+        }
+        else regler.bulkRegler(token.ansattId!!, specs)
 }
 
 

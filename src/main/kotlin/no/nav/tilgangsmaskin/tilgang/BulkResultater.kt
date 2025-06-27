@@ -11,4 +11,10 @@ data class BulkResultater(val ansattId: AnsattId, val resultater: Set<BulkResult
         constructor(e: RegelException) : this(e.bruker.brukerId, e.status,e.body)
         val status = httpStatus.value()
     }
+    @JsonIgnore
+    val ukjente = resultater.filter { it.httpStatus == HttpStatus.NOT_FOUND }.map { it.brukerId }.toSet()
+    @JsonIgnore
+    val godkjente = resultater.filter { it.httpStatus.is2xxSuccessful }.map { it.brukerId }.toSet()
+    @JsonIgnore
+    val avviste = resultater.filter { it.httpStatus == HttpStatus.FORBIDDEN }.map { it.brukerId }.toSet()
 }

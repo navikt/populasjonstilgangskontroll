@@ -124,22 +124,26 @@ class RegelTjenesteTest {
         }
     }
 
-    //@Test
+    @Test
     fun bulkAvvisninger() {
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
+        every { brukere.brukerMedNærmesteFamilie(fortroligBrukerId.verdi) } returns BrukerBuilder(fortroligBrukerId).build()
+        every { brukere.brukerMedNærmesteFamilie(strengtFortroligBrukerId.verdi) } returns BrukerBuilder(strengtFortroligBrukerId).build()
         every {
-            brukere.brukere(strengtFortroligBrukerId.verdi, fortroligBrukerId.verdi)
-        } returns listOf(
+            brukere.brukere(setOf(strengtFortroligBrukerId.verdi, fortroligBrukerId.verdi))
+        } returns setOf(
                 BrukerBuilder(strengtFortroligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build(),
                 BrukerBuilder(fortroligBrukerId).kreverMedlemskapI(FORTROLIG).build())
-        assertEquals(assertThrows<BulkRegelException> {
+        val resultater =
             regler.bulkRegler(
                     ansattId,
                     setOf(BrukerIdOgType(strengtFortroligBrukerId), BrukerIdOgType(fortroligBrukerId)))
-        }.exceptions.size, 2)
+        assertEquals(2, resultater.avviste.size)
+        assertEquals(0, resultater.godkjente.size)
+        assertEquals(0, resultater.ukjente.size)
     }
 
-    //@Test
+    @Test
     fun bulkAvvisningerOverstyrt() {
         every {
             brukere.brukerMedNærmesteFamilie(
@@ -148,9 +152,9 @@ class RegelTjenesteTest {
         } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
         every {
             brukere.brukere(
-                    BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK)
-                        .build().brukerId.verdi)
-        } returns listOf(
+                    setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK)
+                        .build().brukerId.verdi))
+        } returns setOf(
                 BrukerBuilder(
                         vanligBrukerId,
                     UtenlandskTilknytning()).kreverMedlemskapI(
@@ -161,8 +165,7 @@ class RegelTjenesteTest {
                         UTENLANDSK).build().brukerId,
                 "test",
                 IMORGEN))
-        assertThatCode {
-            regler.bulkRegler(
+           val resultater  =  regler.bulkRegler(
                     ansattId,
                     setOf(
                             BrukerIdOgType(
@@ -170,7 +173,9 @@ class RegelTjenesteTest {
                                             vanligBrukerId,
                                         UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK)
                                         .build().brukerId)))
-        }.doesNotThrowAnyException()
+        assertEquals(0, resultater.avviste.size)
+        assertEquals(1, resultater.godkjente.size)
+        assertEquals(0, resultater.ukjente.size)
     }
 
     companion object {

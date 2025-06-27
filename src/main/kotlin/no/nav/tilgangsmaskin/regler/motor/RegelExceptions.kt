@@ -39,18 +39,4 @@ private fun entries(brukerId: BrukerId, ansattId: AnsattId, regel: Regel) = mapO
         "traceId" to Span.current().spanContext.traceId,
         "kanOverstyres" to regel.erOverstyrbar)
 
-class BulkRegelException(private val ansattId: AnsattId, val exceptions: List<RegelException>) :
-    ErrorResponseException(FORBIDDEN, forStatus(FORBIDDEN).apply {
-        title = exceptions.map { it.regel.kode }.toSet().joinToString()
-        type = TYPE_URI
-        properties = mapOf(
-                "begrunnelser" to exceptions.map {
-                    entries(it.bruker.brukerId, ansattId, it.regel) +
-                            mapOf(
-                                    "type" to TYPE_URI,
-                                    "title" to it.regel.kode,
-                                    "instance" to URI.create("${ansattId.verdi}/${it.bruker.brukerId.verdi}"),
-                                 )
-                }.toList())
-    }, null)
 

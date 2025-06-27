@@ -16,9 +16,9 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
     private val log = getLogger(javaClass)
 
 
-    fun brukere(vararg brukerIds: String) : List<Bruker> {
-        val personer =  personTjeneste.personer(brukerIds.toSet())
-        val notFound = brukerIds.toSet() - personer.map { it.brukerId.verdi }.toSet()
+    fun brukere(brukerIds: Set<String>) : Set<Bruker> {
+        val personer =  personTjeneste.personer(brukerIds)
+        val notFound = brukerIds - personer.map { it.brukerId.verdi }.toSet()
         val found =  personer.map { it.brukerId }.toSet()
         log.info("Bulk fant ikke følgende ${notFound.size} personer  ${notFound.joinToString { it.maskFnr() }}")
         log.info("Bulk fant følgende ${found.size} personer  ${found.joinToString { it.verdi.maskFnr() }}")
@@ -30,7 +30,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
                 personer.map {
                     tilBruker(it, skjerminger[it.brukerId] ?: false)
                 }
-            }
+            }.toSet()
         }
 
     fun brukerMedNærmesteFamilie(brukerId: String) =

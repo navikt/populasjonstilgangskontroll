@@ -51,8 +51,11 @@ class RegelTjeneste(
         val ansatt = ansatte.ansatt(ansattId)
         val brukere = idOgType.brukerOgType()
         val resultater = motor.bulkRegler(ansatt, brukere)
-        val godkjente = godkjente(resultater)
+        val godkjente = godkjente(resultater, ansattId)
+        val godkjenteIds = godkjente.map { it.brukerId }.toSet()
         val avviste = avviste(resultater.filter { it.second == FORBIDDEN }.toSet(), ansattId, brukere, ansatt)
+            .filterNot { it.brukerId in godkjenteIds }
+            .toSet()
         val ikkeFunnet = ikkeFunnet(idOgType.map { it.brukerId }.toSet(), resultater.map { it.first }.toSet())
         return BulkResultater(ansattId, godkjente + avviste + ikkeFunnet)
     }
@@ -60,26 +63,38 @@ class RegelTjeneste(
     private fun ikkeFunnet(oppgitt: Set<BrukerId>, funnet: Set<BrukerId>) = oppgitt.subtract(funnet).map { BulkResultat(it, NOT_FOUND) }.toSet()
 
     private fun avviste(resultater: Set<Triple<BrukerId, HttpStatus, Regel?>>, ansattId: AnsattId, brukere: Set<BrukerOgType>, ansatt: Ansatt) = resultater
-        .filterNot {overstyring.erOverstyrt(ansattId, it.first) }
         .map {
             with(it) {
                 BulkResultat(RegelException(ansatt, brukere.finnBruker(first), third!!, status = second))
             }
         }.toSet()
 
-    private fun godkjente(resultater: Set<Triple<BrukerId, HttpStatus, Regel?>>) = resultater
-        .filter { it.second == NO_CONTENT }
-        .map {
-            BulkResultat(it.first, NO_CONTENT)
-        }.toSet()
+    private fun godkjente(resultater: Set<Triple<BrukerId, HttpStatus, Regel?>>, ansattId: AnsattId) : Set<BulkResultat> {
+        val overstyrte = resultater
+            .filter {
+                overstyring.erOverstyrt(ansattId, it.first)
+            }
+            .map {
+                BulkResultat(it.first, NO_CONTENT)
+            }
+        val godkjente =  resultater
+            .filter { it.second == NO_CONTENT }
+            .map {
+                BulkResultat(it.first, NO_CONTENT)
+            }
+        return (godkjente + overstyrte).toSet()
+    }
 
-    private fun Set<BrukerOgType>.finnBruker(brukerId: BrukerId)  = first { it.bruker.brukerId == brukerId }.bruker
+
+private fun Set<BrukerOgType>.finnBruker(brukerId: BrukerId)  = first { it.bruker.brukerId == brukerId }.bruker
 
     private fun Set<BrukerIdOgType>.brukerOgType(): Set<BrukerOgType> =
-        mapNotNull { spec ->
-            brukere.brukere(*map { it.brukerId.verdi }.toTypedArray())
-                .associateBy { it.brukerId.verdi }[spec.brukerId.verdi]?.let { bruker ->
-                BrukerOgType(bruker, spec.type)
+        mapNotNull {
+            with(it) {
+                brukere.brukere(map { it.brukerId.verdi }.toSet())
+                    .associateBy { it.brukerId.verdi }[brukerId.verdi]?.let { bruker ->
+                    BrukerOgType(bruker, type)
+                }
             }
         }.toSet()
 }

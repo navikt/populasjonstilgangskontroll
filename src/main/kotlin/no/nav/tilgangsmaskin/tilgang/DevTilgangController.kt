@@ -19,7 +19,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
-import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgType
+import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
@@ -104,14 +104,14 @@ class DevTilgangController(
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(MULTI_STATUS)
     @ProblemDetailBulkApiResponse
-    fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgType>) =
+    fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgRegelsett>) =
         regler.bulkRegler(ansattId, specs)
 
     @PostMapping("bulk/{ansattId}/{regelType}")
     @ResponseStatus(MULTI_STATUS)
     @ProblemDetailBulkApiResponse
     fun bulkreglerForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>) =
-        regler.bulkRegler(ansattId, brukerIds.map { BrukerIdOgType(it,regelType) }.toSet())
+        regler.bulkRegler(ansattId, brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet())
 
     @PostMapping("skjermingadaptere")
     fun skjermingAdapter(@RequestBody brukerId: String) = skjermingAdapter.skjerming(brukerId)

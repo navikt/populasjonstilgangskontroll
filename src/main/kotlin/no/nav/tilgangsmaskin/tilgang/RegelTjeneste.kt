@@ -14,6 +14,7 @@ import no.nav.tilgangsmaskin.tilgang.BulkRespons.BulkResultat
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Service
+import kotlin.collections.map
 import kotlin.time.measureTime
 
 @Service
@@ -46,32 +47,40 @@ class RegelTjeneste(
         motor.kjerneregler(ansatte.ansatt(ansattId), brukere.brukerMedUtvidetFamilie(brukerId))
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
-    fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgType>): BulkRespons {
+    fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): BulkRespons {
         val ansatt = ansatte.ansatt(ansattId)
         val brukere = idOgType.brukerOgType()
-        val resultater = motor.bulkRegler(ansatt, brukere)
-        val godkjente = godkjente(resultater, ansattId)
-        val avviste = avviste(godkjente,resultater, brukere, ansatt)
-        val ikkeFunnet = ikkeFunnet(idOgType.map { it.brukerId }.toSet(), resultater.map { it.brukerId }.toSet())
-        return BulkRespons(ansattId, godkjente + avviste + ikkeFunnet)
+        with(motor.bulkRegler(ansatt, brukere))  {
+            val godkjente = godkjente(ansatt, this)
+            val avviste = avviste(ansatt, godkjente, this, brukere)
+            val ikkeFunnet = ikkeFunnet(idOgType, this)
+            return BulkRespons(ansattId, godkjente + avviste + ikkeFunnet)
+        }
     }
 
-    private fun ikkeFunnet(oppgitt: Set<BrukerId>, funnet: Set<BrukerId>) = oppgitt.subtract(funnet).map { BulkResultat(it, NOT_FOUND) }.toSet()
+    private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<Bulk>) =
+       (oppgitt.map { it.brukerId } - funnet.map { it.brukerId })
+           .map {
+               BulkResultat(it, NOT_FOUND)
+           }.toSet()
 
-    private fun avviste(godkjente: Set<BulkResultat>, resultater: Set<Bulk>, brukere: Set<BrukerOgType>, ansatt: Ansatt) = resultater
-        .filter { it.status == FORBIDDEN }
-        .map {
-            with(it) {
-                BulkResultat(RegelException(ansatt, brukere.finnBruker(brukerId), regel!!, status = status))
+    private fun avviste(ansatt: Ansatt, godkjente: Set<BulkResultat>, resultater: Set<Bulk>, brukere: Set<BrukerOgType>) = resultater
+        .filter {
+            it.status == FORBIDDEN
+        }
+        .filterNot {
+            it.brukerId in godkjente.map { it.brukerId
             }
         }
-        .filterNot { it.brukerId in godkjente.map { it.brukerId } }
+        .map {
+            with(it) { BulkResultat(RegelException(ansatt, brukere.finnBruker(brukerId), regel!!, status = status)) }
+        }
         .toSet()
 
-    private fun godkjente(resultater: Set<Bulk>, ansattId: AnsattId) : Set<BulkResultat> {
+    private fun godkjente(ansatt: Ansatt, resultater: Set<Bulk>) : Set<BulkResultat> {
         val overstyrte = resultater
             .filter {
-                overstyring.erOverstyrt(ansattId, it.brukerId)
+                overstyring.erOverstyrt(ansatt.ansattId, it.brukerId)
             }
             .map {
                 BulkResultat(it.brukerId, NO_CONTENT)
@@ -87,7 +96,7 @@ class RegelTjeneste(
 
 private fun Set<BrukerOgType>.finnBruker(brukerId: BrukerId)  = first { it.bruker.brukerId == brukerId }.bruker
 
-    private fun Set<BrukerIdOgType>.brukerOgType(): Set<BrukerOgType> =
+    private fun Set<BrukerIdOgRegelsett>.brukerOgType(): Set<BrukerOgType> =
         mapNotNull {
             with(it) {
                 brukere.brukere(map { it.brukerId.verdi }.toSet())

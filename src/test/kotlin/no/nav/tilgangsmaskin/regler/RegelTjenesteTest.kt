@@ -40,7 +40,6 @@ import org.springframework.test.context.TestPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Testcontainers
 import kotlin.test.BeforeTest
-import kotlin.test.assertEquals
 
 @Import(RegelTestConfig::class)
 @DataJpaTest
@@ -130,7 +129,7 @@ class RegelTjenesteTest {
                 BrukerBuilder(strengtFortroligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build(),
                 BrukerBuilder(fortroligBrukerId).kreverMedlemskapI(FORTROLIG).build())
         val resultater = regler.bulkRegler(ansattId,
-                    setOf(BrukerIdOgType(strengtFortroligBrukerId), BrukerIdOgType(fortroligBrukerId)))
+                    setOf(BrukerIdOgRegelsett(strengtFortroligBrukerId), BrukerIdOgRegelsett(fortroligBrukerId)))
         assertThat(resultater.avviste).hasSize(2)
         assertThat(resultater.godkjente).isEmpty()
         assertThat(resultater.ukjente).isEmpty()
@@ -151,7 +150,7 @@ class RegelTjenesteTest {
         val resultater  =  regler.bulkRegler(
             ansattId,
             setOf(
-                BrukerIdOgType(
+                BrukerIdOgRegelsett(
                     BrukerBuilder(
                         vanligBrukerId,
                         UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK)

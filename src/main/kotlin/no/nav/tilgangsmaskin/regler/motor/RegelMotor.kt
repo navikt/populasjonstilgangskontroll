@@ -2,12 +2,14 @@ package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.KJERNE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.OVERSTYRBAR
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.*
 import no.nav.tilgangsmaskin.tilgang.RegelConfig
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Component
 
@@ -45,12 +47,12 @@ class RegelMotor(
         brukere.map { (bruker, type) ->
             runCatching {
                 evaluer(ansatt, bruker, type.regelSett())
-                Triple(bruker.brukerId, NO_CONTENT, null)
+                Bulk.ok(bruker.brukerId)
             }.getOrElse {
                 if (it is RegelException) {
-                    Triple(bruker.brukerId, FORBIDDEN, it.regel)
+                    Bulk.avvist(bruker.brukerId, it.regel)
                 } else {
-                    Triple(bruker.brukerId, INTERNAL_SERVER_ERROR, null)
+                    Bulk(bruker.brukerId, INTERNAL_SERVER_ERROR, null)
                 }
             }
         }.toSet()
@@ -65,4 +67,12 @@ class RegelMotor(
 
     override fun toString() = "${javaClass.simpleName} [kjerneregler=$kjerne,kompletteregler=$komplett]"
 
+}
+
+data class Bulk(val brukerId: BrukerId, val status: HttpStatus, val regel: Regel? =null) {
+    companion object {
+        fun ok(id: BrukerId) = Bulk(id, NO_CONTENT)
+        fun avvist(id: BrukerId, regel: Regel) = Bulk(id, FORBIDDEN, regel)
+
+    }
 }

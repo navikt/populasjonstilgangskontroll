@@ -10,9 +10,8 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
-import no.nav.tilgangsmaskin.tilgang.BulkResultater.BulkResultat
+import no.nav.tilgangsmaskin.tilgang.BulkRespons.BulkResultat
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Service
 import kotlin.time.measureTime
@@ -47,40 +46,40 @@ class RegelTjeneste(
         motor.kjerneregler(ansatte.ansatt(ansattId), brukere.brukerMedUtvidetFamilie(brukerId))
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
-    fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgType>): BulkResultater {
+    fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgType>): BulkRespons {
         val ansatt = ansatte.ansatt(ansattId)
         val brukere = idOgType.brukerOgType()
         val resultater = motor.bulkRegler(ansatt, brukere)
         val godkjente = godkjente(resultater, ansattId)
-        val godkjenteIds = godkjente.map { it.brukerId }.toSet()
-        val avviste = avviste(resultater.filter { it.second == FORBIDDEN }.toSet(), ansattId, brukere, ansatt)
-            .filterNot { it.brukerId in godkjenteIds }
-            .toSet()
-        val ikkeFunnet = ikkeFunnet(idOgType.map { it.brukerId }.toSet(), resultater.map { it.first }.toSet())
-        return BulkResultater(ansattId, godkjente + avviste + ikkeFunnet)
+        val avviste = avviste(godkjente,resultater, brukere, ansatt)
+        val ikkeFunnet = ikkeFunnet(idOgType.map { it.brukerId }.toSet(), resultater.map { it.brukerId }.toSet())
+        return BulkRespons(ansattId, godkjente + avviste + ikkeFunnet)
     }
 
     private fun ikkeFunnet(oppgitt: Set<BrukerId>, funnet: Set<BrukerId>) = oppgitt.subtract(funnet).map { BulkResultat(it, NOT_FOUND) }.toSet()
 
-    private fun avviste(resultater: Set<Triple<BrukerId, HttpStatus, Regel?>>, ansattId: AnsattId, brukere: Set<BrukerOgType>, ansatt: Ansatt) = resultater
+    private fun avviste(godkjente: Set<BulkResultat>, resultater: Set<Bulk>, brukere: Set<BrukerOgType>, ansatt: Ansatt) = resultater
+        .filter { it.status == FORBIDDEN }
         .map {
             with(it) {
-                BulkResultat(RegelException(ansatt, brukere.finnBruker(first), third!!, status = second))
+                BulkResultat(RegelException(ansatt, brukere.finnBruker(brukerId), regel!!, status = status))
             }
-        }.toSet()
+        }
+        .filterNot { it.brukerId in godkjente.map { it.brukerId } }
+        .toSet()
 
-    private fun godkjente(resultater: Set<Triple<BrukerId, HttpStatus, Regel?>>, ansattId: AnsattId) : Set<BulkResultat> {
+    private fun godkjente(resultater: Set<Bulk>, ansattId: AnsattId) : Set<BulkResultat> {
         val overstyrte = resultater
             .filter {
-                overstyring.erOverstyrt(ansattId, it.first)
+                overstyring.erOverstyrt(ansattId, it.brukerId)
             }
             .map {
-                BulkResultat(it.first, NO_CONTENT)
+                BulkResultat(it.brukerId, NO_CONTENT)
             }
         val godkjente =  resultater
-            .filter { it.second == NO_CONTENT }
+            .filter { it.status == NO_CONTENT }
             .map {
-                BulkResultat(it.first, NO_CONTENT)
+                BulkResultat(it.brukerId, NO_CONTENT)
             }
         return (godkjente + overstyrte).toSet()
     }

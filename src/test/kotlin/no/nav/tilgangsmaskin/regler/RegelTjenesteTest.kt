@@ -21,6 +21,7 @@ import no.nav.tilgangsmaskin.regler.overstyring.*
 import no.nav.tilgangsmaskin.tilgang.RegelConfig
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -45,7 +46,7 @@ import kotlin.test.assertEquals
 @DataJpaTest
 @EnableJpaAuditing
 @TestPropertySource(locations = ["classpath:test.properties"])
-@EnableConfigurationProperties(value= arrayOf(RegelConfig::class,GlobaleGrupperConfig::class))
+@EnableConfigurationProperties(value= [RegelConfig::class, GlobaleGrupperConfig::class])
 @ContextConfiguration(classes = [TestApp::class])
 @ExtendWith(MockKExtension::class)
 @AutoConfigureObservability
@@ -92,10 +93,7 @@ class RegelTjenesteTest {
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
         every { token.system } returns "test"
         every { token.systemNavn } returns "test"
-        overstyring =
-            OverstyringTjeneste(
-                    ansatte, brukere, OverstyringJPAAdapter(repo), motor,
-                    OverstyringTeller(registry, token))
+        overstyring = OverstyringTjeneste(ansatte, brukere, OverstyringJPAAdapter(repo), motor, OverstyringTeller(registry, token))
         regler = RegelTjeneste(motor, brukere, ansatte, overstyring)
     }
 
@@ -126,56 +124,41 @@ class RegelTjenesteTest {
 
     @Test
     fun bulkAvvisninger() {
-        every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
         every { brukere.brukerMedNærmesteFamilie(fortroligBrukerId.verdi) } returns BrukerBuilder(fortroligBrukerId).build()
         every { brukere.brukerMedNærmesteFamilie(strengtFortroligBrukerId.verdi) } returns BrukerBuilder(strengtFortroligBrukerId).build()
-        every {
-            brukere.brukere(setOf(strengtFortroligBrukerId.verdi, fortroligBrukerId.verdi))
-        } returns setOf(
+        every { brukere.brukere(setOf(strengtFortroligBrukerId.verdi, fortroligBrukerId.verdi)) } returns setOf(
                 BrukerBuilder(strengtFortroligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build(),
                 BrukerBuilder(fortroligBrukerId).kreverMedlemskapI(FORTROLIG).build())
-        val resultater =
-            regler.bulkRegler(
-                    ansattId,
+        val resultater = regler.bulkRegler(ansattId,
                     setOf(BrukerIdOgType(strengtFortroligBrukerId), BrukerIdOgType(fortroligBrukerId)))
-        assertEquals(2, resultater.avviste.size)
-        assertEquals(0, resultater.godkjente.size)
-        assertEquals(0, resultater.ukjente.size)
+        assertThat(resultater.avviste).hasSize(2)
+        assertThat(resultater.godkjente).isEmpty()
+        assertThat(resultater.ukjente).isEmpty()
     }
 
     @Test
     fun bulkAvvisningerOverstyrt() {
         every {
-            brukere.brukerMedNærmesteFamilie(
-                    BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(
-                            UTENLANDSK).build().brukerId.verdi)
-        } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
+            brukere.brukerMedNærmesteFamilie(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId.verdi) } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
         every {
-            brukere.brukere(
-                    setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK)
-                        .build().brukerId.verdi))
-        } returns setOf(
-                BrukerBuilder(
-                        vanligBrukerId,
-                    UtenlandskTilknytning()).kreverMedlemskapI(
-                        UTENLANDSK).build())
+            brukere.brukere(setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId.verdi))
+        } returns setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build())
+
         overstyring.overstyr(
-                ansattId, OverstyringData(
+            ansattId, OverstyringData(
                 BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(
-                        UTENLANDSK).build().brukerId,
-                "test",
-                IMORGEN))
-           val resultater  =  regler.bulkRegler(
-                    ansattId,
-                    setOf(
-                            BrukerIdOgType(
-                                    BrukerBuilder(
-                                            vanligBrukerId,
-                                        UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK)
-                                        .build().brukerId)))
-        assertEquals(0, resultater.avviste.size)
-        assertEquals(1, resultater.godkjente.size)
-        assertEquals(0, resultater.ukjente.size)
+                    UTENLANDSK).build().brukerId, "test", IMORGEN))
+        val resultater  =  regler.bulkRegler(
+            ansattId,
+            setOf(
+                BrukerIdOgType(
+                    BrukerBuilder(
+                        vanligBrukerId,
+                        UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK)
+                        .build().brukerId)))
+        assertThat(resultater.avviste.isEmpty())
+        assertThat(resultater.godkjente.isEmpty())
+        assertThat(resultater.godkjente).hasSize(1)
     }
 
     companion object {

@@ -115,6 +115,16 @@
       "name": "historisk-helt-backend",
       "namespace": "historisk",
       "cluster": "dev-gcp"
+    },
+    {
+      "name": "oh-tilgangskontroll",
+      "namespace": "oppgavehandtering",
+      "cluster": "dev-gcp"
+    },
+    {
+      "name": "oppgave",
+      "namespace": "oppgavehandtering",
+      "cluster": "dev-fss"
     }
   ],
   "nais": {

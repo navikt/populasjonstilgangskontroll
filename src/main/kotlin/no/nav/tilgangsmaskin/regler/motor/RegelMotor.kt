@@ -3,6 +3,8 @@ package no.nav.tilgangsmaskin.regler.motor
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.regler.motor.Bulk.Companion.avvist
+import no.nav.tilgangsmaskin.regler.motor.Bulk.Companion.ok
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.KJERNE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.OVERSTYRBAR
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -43,17 +45,15 @@ class RegelMotor(
     }
 
 
-    fun bulkRegler(ansatt: Ansatt, brukere: Set<BrukerOgType>) =
+    fun bulkRegler(ansatt: Ansatt, brukere: Set<BrukerOgRegelsett>) =
         brukere.map { (bruker, type) ->
             runCatching {
                 evaluer(ansatt, bruker, type.regelSett())
-                Bulk.ok(bruker.brukerId)
+                ok(bruker)
             }.getOrElse {
                 if (it is RegelException) {
-                    Bulk.avvist(bruker.brukerId, it.regel)
-                } else {
-                    Bulk(bruker.brukerId, INTERNAL_SERVER_ERROR, null)
-                }
+                    avvist(bruker, it)
+                } else throw it
             }
         }.toSet()
 
@@ -69,10 +69,10 @@ class RegelMotor(
 
 }
 
-data class Bulk(val brukerId: BrukerId, val status: HttpStatus, val regel: Regel? =null) {
+data class Bulk(val brukerId: BrukerId, val status: HttpStatus, val regel: Regel? = null) {
     companion object {
-        fun ok(id: BrukerId) = Bulk(id, NO_CONTENT)
-        fun avvist(id: BrukerId, regel: Regel) = Bulk(id, FORBIDDEN, regel)
+        fun ok(bruker: Bruker) = Bulk(bruker.brukerId, NO_CONTENT)
+        fun avvist(bruker: Bruker, e: RegelException) = Bulk(bruker.brukerId, FORBIDDEN, e.regel)
 
     }
 }

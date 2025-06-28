@@ -15,8 +15,8 @@
     </appender>
 
     <springProfile name="dev">
-        <logger name="org.springframework.cache" level="trace"/>
-        <logger name="org.springframework.data.redis" level="trace"/>
+        <logger name="org.springframework.cache" level="info"/>
+        <logger name="org.springframework.data.redis" level="info"/>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
     </springProfile>
 

@@ -33,7 +33,6 @@ class OverstyringTjeneste(
         val overstyring = adapter.gjeldendeOverstyring(
                 ansattId.verdi, brukerId.verdi,
                 brukere.brukerMedNærmesteFamilie(brukerId.verdi).historiskeIds.map { it.verdi })
-
         return when {
             overstyring == null -> {
                 log.trace("Ingen overstyring for {} og {} ble funnet", ansattId, brukerId)
@@ -55,7 +54,7 @@ class OverstyringTjeneste(
             log.info("Sjekker kjerneregler før eventuell overstyring for $ansattId og ${data.brukerId}")
             motor.kjerneregler(ansatte.ansatt(ansattId), brukere.brukerMedNærmesteFamilie(data.brukerId.verdi))
             adapter.overstyr(ansattId.verdi, data).also {
-                teller.tell(Tags.of("overstyrt", true.toString()))
+                teller.tell(Tags.of("overstyrt", "true"))
                 log.info("Overstyring er registret for $ansattId og ${data.brukerId}")
             }
         }.getOrElse {

@@ -25,7 +25,9 @@ enum class GlobalGruppe(val property: String, val metadata: GruppeMetadata) {
         fun setIDs(grupper: Map<String, UUID>) =
             entries.forEach { it.id = grupper[it.property] ?: error("Mangler id for ${it.property}") }
 
-        fun Token.globaleGrupper() = globaleGruppeIds.intersect(uuids()).map { EntraGruppe(it, navnFor(it)) }.toSet()
+        fun Token.globaleGrupper() = globaleGruppeIds.intersect(uuids()).map { uuid ->
+            EntraGruppe(uuid, navnFor(uuid))
+        }.toSet()
         fun Set<EntraGruppe>.girNasjonalTilgang() = any { it.id == NASJONAL.id }
     }
 }

@@ -110,24 +110,29 @@ class RegelTjenesteTest {
     @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang,og at tilgang ikke gis om overstyring ikke er gjort")
     fun ikkeOverstyrt() {
         every {
-            brukere.brukerMedNærmesteFamilie(
-                    BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK)
-                        .build().brukerId.verdi)
+            brukere.brukerMedNærmesteFamilie(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId.verdi)
         } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
         assertThrows<RegelException> {
-            val brukerId =
-                BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId
+            val brukerId = BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId
             regler.kompletteRegler(ansattId, brukerId.verdi)
         }
     }
 
     @Test
     fun bulkAvvisninger() {
-        every { brukere.brukerMedNærmesteFamilie(fortroligBrukerId.verdi) } returns BrukerBuilder(fortroligBrukerId).build()
-        every { brukere.brukerMedNærmesteFamilie(strengtFortroligBrukerId.verdi) } returns BrukerBuilder(strengtFortroligBrukerId).build()
-        every { brukere.brukere(setOf(strengtFortroligBrukerId.verdi, fortroligBrukerId.verdi)) } returns setOf(
-                BrukerBuilder(strengtFortroligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build(),
+        every {
+            brukere.brukerMedNærmesteFamilie(fortroligBrukerId.verdi)
+        } returns BrukerBuilder(fortroligBrukerId).build()
+
+        every {
+            brukere.brukerMedNærmesteFamilie(strengtFortroligBrukerId.verdi)
+        } returns BrukerBuilder(strengtFortroligBrukerId).build()
+
+        every {
+            brukere.brukere(setOf(strengtFortroligBrukerId.verdi, fortroligBrukerId.verdi))
+        } returns setOf(BrukerBuilder(strengtFortroligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build(),
                 BrukerBuilder(fortroligBrukerId).kreverMedlemskapI(FORTROLIG).build())
+
         val resultater = regler.bulkRegler(ansattId,
                     setOf(BrukerIdOgRegelsett(strengtFortroligBrukerId), BrukerIdOgRegelsett(fortroligBrukerId)))
         assertThat(resultater.avviste).hasSize(2)
@@ -143,18 +148,11 @@ class RegelTjenesteTest {
             brukere.brukere(setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId.verdi))
         } returns setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build())
 
-        overstyring.overstyr(
-            ansattId, OverstyringData(
+        overstyring.overstyr(ansattId, OverstyringData(
                 BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(
                     UTENLANDSK).build().brukerId, "test", IMORGEN))
-        val resultater  =  regler.bulkRegler(
-            ansattId,
-            setOf(
-                BrukerIdOgRegelsett(
-                    BrukerBuilder(
-                        vanligBrukerId,
-                        UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK)
-                        .build().brukerId)))
+        val resultater  =  regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId)))
+
         assertThat(resultater.avviste.isEmpty())
         assertThat(resultater.godkjente.isEmpty())
         assertThat(resultater.godkjente).hasSize(1)

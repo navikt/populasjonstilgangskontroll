@@ -20,8 +20,8 @@ import kotlin.time.measureTime
 @Service
 class RegelTjeneste(
     private val motor: RegelMotor,
-    private val brukere: BrukerTjeneste,
-    private val ansatte: AnsattTjeneste,
+    private val brukerTjeneste: BrukerTjeneste,
+    private val ansattTjeneste: AnsattTjeneste,
     private val overstyring: OverstyringTjeneste) {
     private val log = getLogger(javaClass)
 
@@ -29,9 +29,9 @@ class RegelTjeneste(
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
-            val bruker = brukere.brukerMedNærmesteFamilie(brukerId)
+            val bruker = brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
             runCatching {
-                motor.kompletteRegler(ansatte.ansatt(ansattId), bruker)
+                motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
             }.getOrElse {
                 if (overstyring.erOverstyrt(ansattId,bruker.brukerId)) {
                     Unit
@@ -44,12 +44,12 @@ class RegelTjeneste(
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
-        motor.kjerneregler(ansatte.ansatt(ansattId), brukere.brukerMedUtvidetFamilie(brukerId))
+        motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedUtvidetFamilie(brukerId))
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): BulkRespons {
-        val ansatt = ansatte.ansatt(ansattId)
-        val brukere = idOgType.brukerOgType()
+        val ansatt = ansattTjeneste.ansatt(ansattId)
+        val brukere = idOgType.brukerOgRegelsett()
         with(motor.bulkRegler(ansatt, brukere))  {
             val godkjente = godkjente(ansatt, this)
             val avviste = avviste(ansatt, godkjente, this, brukere)
@@ -59,12 +59,12 @@ class RegelTjeneste(
     }
 
     private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<Bulk>) =
-       (oppgitt.map { it.brukerId } - funnet.map { it.brukerId })
-           .map {
-               BulkResultat(it, NOT_FOUND)
-           }.toSet()
+        (oppgitt.map { it.brukerId } - funnet.map { it.brukerId })
+            .map {
+                BulkResultat(it, NOT_FOUND)
+            }.toSet()
 
-    private fun avviste(ansatt: Ansatt, godkjente: Set<BulkResultat>, resultater: Set<Bulk>, brukere: Set<BrukerOgType>) = resultater
+    private fun avviste(ansatt: Ansatt, godkjente: Set<BulkResultat>, resultater: Set<Bulk>, brukere: Set<BrukerOgRegelsett>) = resultater
         .filter {
             it.status == FORBIDDEN
         }
@@ -93,16 +93,14 @@ class RegelTjeneste(
         return (godkjente + overstyrte).toSet()
     }
 
+    private fun Set<BrukerIdOgRegelsett>.brukerOgRegelsett() =
+        with(associate { it.brukerId.verdi to it.type }) {
+            log.info("Henter $size brukere")
+            val brukere = brukerTjeneste.brukere(keys)
+            brukere.map {
+                BrukerOgRegelsett(it, this[it.brukerId.verdi] ?: KOMPLETT_REGELTYPE)
+            }.toSet()
+        }
 
-private fun Set<BrukerOgType>.finnBruker(brukerId: BrukerId)  = first { it.bruker.brukerId == brukerId }.bruker
-
-    private fun Set<BrukerIdOgRegelsett>.brukerOgType(): Set<BrukerOgType> =
-        mapNotNull {
-            with(it) {
-                brukere.brukere(map { it.brukerId.verdi }.toSet())
-                    .associateBy { it.brukerId.verdi }[brukerId.verdi]?.let { bruker ->
-                    BrukerOgType(bruker, type)
-                }
-            }
-        }.toSet()
+    private fun Set<BrukerOgRegelsett>.finnBruker(brukerId: BrukerId)  = first { it.bruker.brukerId == brukerId }.bruker
 }

@@ -13,4 +13,17 @@ interface OverstyringRepository : JpaRepository<OverstyringEntity, Long> {
             @Param("ansattId") ansattId: String,
             @Param("brukerId") brukerId: String,
             @Param("brukerIds") brukerIds: List<String>): OverstyringEntity?
+
+    @Query("""
+    SELECT o FROM overstyring o
+    WHERE o.navid = :ansattId
+      AND o.fnr IN :brukerIds
+      AND o.created = (
+          SELECT MAX(o2.created) FROM overstyring o2
+          WHERE o2.fnr = o.fnr AND o2.navid = o.navid
+      )
+""")
+    fun gjeldendeOverstyringer(
+        @Param("ansattId") ansattId: String,
+        @Param("brukerIds") brukerIds: List<String>): List<OverstyringEntity>
 }

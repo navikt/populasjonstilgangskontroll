@@ -101,6 +101,15 @@ class DevTilgangController(
     )
     fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody data: OverstyringData) = overstyring.overstyr(ansattId, data)
 
+    @PostMapping("overstyringer/{ansattId}")
+    @ResponseStatus(ACCEPTED)
+    @ProblemDetailApiResponse
+    @Operation(
+        summary = "Hent overstyringer for en ansatt og en eller flere brukere",
+        description = """Henter overstyringer for en eller flere  brukere."""
+    )
+    fun overstyringer(@PathVariable ansattId: AnsattId, @RequestBody brukerIds: List<BrukerId>) = overstyring.overstyringer(ansattId, brukerIds)
+
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(MULTI_STATUS)
     @ProblemDetailBulkApiResponse

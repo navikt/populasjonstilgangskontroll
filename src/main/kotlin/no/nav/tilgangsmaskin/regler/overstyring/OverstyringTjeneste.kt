@@ -15,44 +15,38 @@ import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
+
 
 @Component
 @Transactional
 @Timed
 class OverstyringTjeneste(
-        private val ansatte: AnsattTjeneste,
-        private val brukere: BrukerTjeneste,
-        private val adapter: OverstyringJPAAdapter,
-        private val motor: RegelMotor,
-        private val teller: OverstyringTeller) {
+    private val ansattTjeneste: AnsattTjeneste,
+    private val brukerTjeneste: BrukerTjeneste,
+    private val adapter: OverstyringJPAAdapter,
+    private val motor: RegelMotor,
+    private val teller: OverstyringTeller) {
 
     private val log = getLogger(javaClass)
 
     @Transactional(readOnly = true)
+    fun overstyringer(ansattId: AnsattId, brukerIds: List<BrukerId>) =
+        adapter.gjeldendeOverstyringer(ansattId.verdi,brukerIds.map { it.verdi }).associate { it.first to it.second }
+
+    @Transactional(readOnly = true)
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId): Boolean {
         val overstyring = adapter.gjeldendeOverstyring(
-                ansattId.verdi, brukerId.verdi,
-                brukere.brukerMedNærmesteFamilie(brukerId.verdi).historiskeIds.map { it.verdi })
-        return when {
-            overstyring == null -> {
-                log.trace("Ingen overstyring for {} og {} ble funnet", ansattId, brukerId)
-                false
-            }
-            overstyring.isBeforeNow() -> {
-                log.trace("Overstyring har gått ut på tid for {} siden for {} og {}", overstyring.diffFromNow(), ansattId, brukerId)
-                false
-            }
-            else -> {
-                log.trace("Overstyring er gyldig i {} til for {} og {}", overstyring.diffFromNow(), ansattId, brukerId)
-                true
-            }
-        }
+            ansattId.verdi, brukerId.verdi,
+            brukerTjeneste.brukerMedNærmesteFamilie(brukerId.verdi).historiskeIds.map { it.verdi })?.expires
+        return erOverstyrt(ansattId,brukerId,overstyring)
     }
+
 
     fun overstyr(ansattId: AnsattId, data: OverstyringData) =
         runCatching {
             log.info("Sjekker kjerneregler før eventuell overstyring for $ansattId og ${data.brukerId}")
-            motor.kjerneregler(ansatte.ansatt(ansattId), brukere.brukerMedNærmesteFamilie(data.brukerId.verdi))
+            motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi))
             adapter.overstyr(ansattId.verdi, data).also {
                 teller.tell(Tags.of("overstyrt", "true"))
                 log.info("Overstyring er registret for $ansattId og ${data.brukerId}")
@@ -67,6 +61,22 @@ class OverstyringTjeneste(
                     teller.tell(Tags.of("kortnavn", it.regel.kortNavn, "overstyrt", false.toString()))
                 }
                 else -> throw it
+            }
+        }
+
+    private fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId, expires: Instant?) =
+        when {
+            expires == null -> {
+                log.trace("Ingen overstyring for {} og {} ble funnet", ansattId, brukerId)
+                false
+            }
+            expires.isBeforeNow() -> {
+                log.trace("Overstyring har gått ut på tid for {} siden for {} og {}", expires.diffFromNow(), ansattId, brukerId)
+                false
+            }
+            else -> {
+                log.trace("Overstyring er gyldig i {} til for {} og {}", expires.diffFromNow(), ansattId, brukerId)
+                true
             }
         }
 }

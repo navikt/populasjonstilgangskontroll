@@ -22,7 +22,7 @@ class RegelTjeneste(
     private val motor: RegelMotor,
     private val brukerTjeneste: BrukerTjeneste,
     private val ansattTjeneste: AnsattTjeneste,
-    private val overstyring: OverstyringTjeneste) {
+    private val overstyringTjeneste: OverstyringTjeneste) {
     private val log = getLogger(javaClass)
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "komplett"])
@@ -33,7 +33,7 @@ class RegelTjeneste(
             runCatching {
                 motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
             }.getOrElse {
-                if (overstyring.erOverstyrt(ansattId,bruker.brukerId)) {
+                if (overstyringTjeneste.erOverstyrt(ansattId,bruker.brukerId)) {
                     Unit
                 }
                 else throw it
@@ -50,18 +50,20 @@ class RegelTjeneste(
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): BulkRespons {
         val ansatt = ansattTjeneste.ansatt(ansattId)
         val brukere = idOgType.brukerOgRegelsett()
-        with(motor.bulkRegler(ansatt, brukere))  {
+        return with(motor.bulkRegler(ansatt, brukere))  {
             val godkjente = godkjente(ansatt, this)
             val avviste = avviste(ansatt, godkjente, this, brukere)
             val ikkeFunnet = ikkeFunnet(idOgType, this)
-            return BulkRespons(ansattId, godkjente + avviste + ikkeFunnet)
+            BulkRespons(ansattId, godkjente + avviste + ikkeFunnet)
         }
     }
 
+    private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<Bulk>) = filterNot { it.brukerId in funnet.map { it.brukerId } }.toSet()
+
     private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<Bulk>) =
-        (oppgitt.map { it.brukerId } - funnet.map { it.brukerId })
+        (oppgitt - funnet)
             .map {
-                BulkResultat(it, NOT_FOUND)
+                BulkResultat(it.brukerId, NOT_FOUND)
             }.toSet()
 
     private fun avviste(ansatt: Ansatt, godkjente: Set<BulkResultat>, resultater: Set<Bulk>, brukere: Set<BrukerOgRegelsett>) = resultater
@@ -78,15 +80,16 @@ class RegelTjeneste(
         .toSet()
 
     private fun godkjente(ansatt: Ansatt, resultater: Set<Bulk>) : Set<BulkResultat> {
+        overstyringTjeneste.overstyringer(ansatt.ansattId,resultater.map { it.brukerId })
         val overstyrte = resultater
             .filter {
-                overstyring.erOverstyrt(ansatt.ansattId, it.brukerId)
+                overstyringTjeneste.erOverstyrt(ansatt.ansattId, it.brukerId)
             }
             .map {
                 BulkResultat(it.brukerId, NO_CONTENT)
             }
         val godkjente =  resultater
-            .filter { it.status == NO_CONTENT }
+            .filter { it.status.is2xxSuccessful }
             .map {
                 BulkResultat(it.brukerId, NO_CONTENT)
             }

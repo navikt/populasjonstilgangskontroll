@@ -80,7 +80,7 @@ dependencies {
 
 dependencyManagement {
     imports {
-        mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.16.0")
+        mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.17.0")
     }
 }
 

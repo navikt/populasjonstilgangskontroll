@@ -114,7 +114,7 @@ class DevTilgangController(
     @ResponseStatus(MULTI_STATUS)
     @ProblemDetailBulkApiResponse
     fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgRegelsett>) =
-        regler.bulkRegler(ansattId, specs)
+        regler.bulkRegler( ansattId, specs)
 
     @PostMapping("bulk/{ansattId}/{regelType}")
     @ResponseStatus(MULTI_STATUS)

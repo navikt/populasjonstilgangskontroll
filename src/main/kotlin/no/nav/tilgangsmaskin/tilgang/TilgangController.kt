@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -27,21 +28,21 @@ import org.springframework.web.server.ResponseStatusException
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "TilgangController", description = "Denne kontrolleren skal brukes i produksjon")
 class TilgangController(
-        private val regler: RegelTjeneste,
-        private val overstyring: OverstyringTjeneste,
-        private val token: Token) {
+    private val regelTjeneste: RegelTjeneste,
+    private val overstyringTjeneste: OverstyringTjeneste,
+    private val token: Token) {
 
     @PostMapping("komplett")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et komplett regelsett for en bruker")
-    fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String) = regler.kompletteRegler(token.ansattId!!, brukerId.trim('"'))
+    fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String) = regelTjeneste.kompletteRegler(token.ansattId!!, brukerId.trim('"'))
 
     @PostMapping("kjerne")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et kjerneregelsett for en bruker")
-    fun kjerneregler(@RequestBody @Valid @ValidId brukerId: String) = regler.kjerneregler(token.ansattId!!, brukerId.trim('"'))
+    fun kjerneregler(@RequestBody @Valid @ValidId brukerId: String) = regelTjeneste.kjerneregler(token.ansattId!!, brukerId.trim('"'))
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)
@@ -51,7 +52,7 @@ class TilgangController(
     BrukerId må være gyldig og finnes i PDL. Kjerneregelsettet vil bli kjørt før overstyring, og hvis de feiler vil overstyring ikke bli gjort.
     Overstyring vil gjelde frem til og med utløpsdatoen."""
     )
-    fun overstyr(@RequestBody data: OverstyringData) = overstyring.overstyr(token.ansattId!!, data)
+    fun overstyr(@RequestBody data: OverstyringData) = overstyringTjeneste.overstyr(token.ansattId!!, data)
 
     @PostMapping("bulk")
     @ResponseStatus(NO_CONTENT)
@@ -60,7 +61,7 @@ class TilgangController(
         description = "Dette endepunktet er kun tilgjengelig for obo flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er og regeltyper. Om ingen regeltype oppgis, evalueres det komplette regelsettet")
     fun bulkOBO(@RequestBody @Valid @ValidId specs: Set<BrukerIdOgRegelsett>) =
-        doBulkOBO(specs)
+        bulkRegler({token.ansattId!!},{token.erObo}, specs)
 
     @PostMapping("bulk/{regelType}")
     @ResponseStatus(MULTI_STATUS)
@@ -69,7 +70,7 @@ class TilgangController(
         description = "Dette endepunktet er kun tilgjengelig for obo flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er med gitt regeltype")
     fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>) =
-        doBulkOBO(brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet())
+        bulkRegler({token.ansattId!!},{token.erObo},brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet())
 
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(NO_CONTENT)
@@ -78,7 +79,7 @@ class TilgangController(
         description = "Dette endepunktet er kun tilgjengelig for client credentials flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er og regeltyper. Om ingen regeltype oppgis, evalueres det komplette regelsettet")
     fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgRegelsett>) =
-        doBulkCCF(ansattId, specs)
+        bulkRegler({ansattId},{token.erCC}, specs)
 
     @PostMapping("bulk/{ansattId}/{regelType}")
     @ResponseStatus(MULTI_STATUS)
@@ -87,25 +88,16 @@ class TilgangController(
         description = "Dette endepunktet er kun tilgjengelig for client credentials flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er med gitt regeltype")
     fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>) =
-        doBulkCCF(ansattId,brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet())
+        bulkRegler({ ansattId }, { token.erCC }, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet())
 
-    private fun doBulkCCF(ansattId: AnsattId,specs: Set<BrukerIdOgRegelsett>) =
-        if (!token.erCC) {
-            throw ResponseStatusException(FORBIDDEN, "Dette endepunkt er kun tilgjengelig client credentials-flow.")
-        }
-        else {
-            if (specs.size > 1000) {
-                throw ResponseStatusException(PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i bulk-regler. Antall mottatt: ${specs.size}"
-                )
-            }
-            regler.bulkRegler(ansattId, specs)
+    private fun bulkRegler(ansattId: () -> AnsattId, tokenTypeCondition: () -> Boolean, specs: Set<BrukerIdOgRegelsett>) =
+        with(ansattId.invoke()) {
+            requires(tokenTypeCondition.invoke(), FORBIDDEN)
+            requires(specs.size <= 1000, PAYLOAD_TOO_LARGE)
+            regelTjeneste.bulkRegler( this, specs)
         }
 
-    private fun doBulkOBO(specs: Set<BrukerIdOgRegelsett>) =
-        if (!token.erObo) {
-            throw ResponseStatusException(FORBIDDEN, "Dette endepunkt er kun tilgjengelig for obo flow.")
-        }
-        else regler.bulkRegler(token.ansattId!!, specs)
+     private inline fun requires(condition: Boolean, status: HttpStatus)  {
+        if (!condition) throw ResponseStatusException(status)
+    }
 }
-
-

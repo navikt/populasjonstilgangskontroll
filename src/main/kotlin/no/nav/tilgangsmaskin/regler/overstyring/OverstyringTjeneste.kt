@@ -32,7 +32,10 @@ class OverstyringTjeneste(
 
     @Transactional(readOnly = true)
     fun overstyringer(ansattId: AnsattId, brukerIds: List<BrukerId>) =
-        adapter.gjeldendeOverstyringer(ansattId.verdi,brukerIds.map { it.verdi }).associate { it.first to it.second }
+        adapter.gjeldendeOverstyringer(ansattId.verdi,brukerIds.map { it.verdi }).associate { it.first to it.second }.filter {
+            erOverstyrt(ansattId,it.key,it.value)
+        }
+            .map { it.key }
 
     @Transactional(readOnly = true)
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId): Boolean {
@@ -41,8 +44,7 @@ class OverstyringTjeneste(
             brukerTjeneste.brukerMedNærmesteFamilie(brukerId.verdi).historiskeIds.map { it.verdi })?.expires
         return erOverstyrt(ansattId,brukerId,overstyring)
     }
-
-
+    @Transactional(readOnly = true)
     fun overstyr(ansattId: AnsattId, data: OverstyringData) =
         runCatching {
             log.info("Sjekker kjerneregler før eventuell overstyring for $ansattId og ${data.brukerId}")

@@ -11,6 +11,7 @@ import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.BulkRespons.BulkResultat
+import no.nav.tilgangsmaskin.tilgang.BulkRespons.BulkResultat.Companion.ok
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Service
@@ -80,21 +81,14 @@ class RegelTjeneste(
         .toSet()
 
     private fun godkjente(ansatt: Ansatt, resultater: Set<Bulk>) : Set<BulkResultat> {
-        overstyringTjeneste.overstyringer(ansatt.ansattId,resultater.map { it.brukerId })
-        val overstyrte = resultater
-            .filter {
-                overstyringTjeneste.erOverstyrt(ansatt.ansattId, it.brukerId)
-            }
-            .map {
-                BulkResultat(it.brukerId, NO_CONTENT)
-            }
+        val overstyrte = overstyringTjeneste.overstyringer(ansatt.ansattId,resultater.map { it.brukerId })
+            .map { brukerId -> ok(brukerId) }
         val godkjente =  resultater
             .filter { it.status.is2xxSuccessful }
-            .map {
-                BulkResultat(it.brukerId, NO_CONTENT)
-            }
+            .map { bruker -> ok(bruker.brukerId) }
         return (godkjente + overstyrte).toSet()
     }
+
 
     private fun Set<BrukerIdOgRegelsett>.brukerOgRegelsett() =
         with(associate { it.brukerId.verdi to it.type }) {

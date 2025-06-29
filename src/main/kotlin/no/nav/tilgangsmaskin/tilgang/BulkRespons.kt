@@ -11,6 +11,10 @@ data class BulkRespons(val ansattId: AnsattId, val resultater: Set<BulkResultat>
     data class BulkResultat(val brukerId: BrukerId, @JsonIgnore val httpStatus: HttpStatus, val detaljer: Any? = null ) {
         constructor(e: RegelException) : this(e.bruker.brukerId, e.status,e.body)
         val status = httpStatus.value()
+
+        companion object {
+            fun ok(brukerId: BrukerId) = BulkResultat(brukerId, NO_CONTENT)
+        }
     }
     @JsonIgnore
     val ukjente = filter(NOT_FOUND)

@@ -92,12 +92,12 @@ class TilgangController(
 
     private fun bulkRegler(ansattId: () -> AnsattId, tokenTypeCondition: () -> Boolean, specs: Set<BrukerIdOgRegelsett>) =
         with(ansattId()) {
-            requires(tokenTypeCondition(), FORBIDDEN)
-            requires(specs.size <= 1000, PAYLOAD_TOO_LARGE)
+            requires(tokenTypeCondition(), FORBIDDEN,"Mismatch mellom token type og endepunkt")
+            requires(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
             regelTjeneste.bulkRegler( this, specs)
         }
 
-     private fun requires(condition: Boolean, status: HttpStatus)  {
-        if (!condition) throw ResponseStatusException(status)
+     private fun requires(condition: Boolean, status: HttpStatus, message: String) {
+        if (!condition) throw ResponseStatusException(status,message)
     }
 }

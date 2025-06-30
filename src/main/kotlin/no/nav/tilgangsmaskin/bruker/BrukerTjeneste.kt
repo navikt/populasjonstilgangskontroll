@@ -26,13 +26,13 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
             log.debug("Fant ikke ${notFound.size} ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
         }
         if (found.isNotEmpty()) {
-            log.info("Bulk fant følgende ${found.size}  ${"person".pluralize(found)}  ${found.joinToString { it.verdi.maskFnr() }}")
+            log.info("Bulk fant følgende ${found.size} ${"person".pluralize(found)} ${found.joinToString { it.verdi.maskFnr() }}")
         }
 
         return found.let { p ->
             log.info("Bulk henter skjerminger for $found")
                 val skjerminger = skjermingTjeneste.skjerminger(found)
-                log.info("Bulk hentet ${skjerminger.size}  $skjerminger")
+                log.info("Bulk hentet ${skjerminger.size} ${"skjerming".pluralize(skjerminger.keys)}")
                 personer.map {
                     tilBruker(it, skjerminger[it.brukerId] ?: false)
                 }

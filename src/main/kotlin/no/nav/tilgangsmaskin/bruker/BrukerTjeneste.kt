@@ -23,17 +23,17 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
         val notFound = brukerIds - personer.map { it.brukerId.verdi }.toSet()
         val found =  personer.map { it.brukerId }.toSet()
         if (notFound.isNotEmpty()) {
-            log.debug("Fant ikke ${notFound.size} ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
+            log.debug("Fant ikke ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
         }
         if (found.isNotEmpty()) {
-            log.info("Bulk fant følgende ${found.size} ${"person".pluralize(found)} ${found.joinToString { it.verdi.maskFnr() }}")
+            log.info("Bulk fant følgende ${"person".pluralize(found)} ${found.joinToString { it.verdi.maskFnr() }}")
         }
 
         return found.let { p ->
             if (p.isNotEmpty()) {
                 log.info("Bulk henter skjerminger for $p")
                 val skjerminger = skjermingTjeneste.skjerminger(found)
-                log.info("Bulk hentet ${skjerminger.size} ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
+                log.info("Bulk hentet ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
                 personer.map {
                     tilBruker(it, skjerminger[it.brukerId] ?: false)
                 }

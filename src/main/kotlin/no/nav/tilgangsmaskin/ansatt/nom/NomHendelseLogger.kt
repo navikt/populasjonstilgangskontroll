@@ -19,7 +19,7 @@ class NomHendelseLogger(private val registry: MeterRegistry, private val repo: N
     }
 
     fun start(hendelser: List<NomHendelse>) {
-        log.info("Mottok ${hendelser.size} ${"hendelse".pluralize(hendelser)}")
+        log.info("Mottok ${"hendelse".pluralize(hendelser)}")
     }
 
     fun behandler(hendelse: NomHendelse) {
@@ -27,7 +27,7 @@ class NomHendelseLogger(private val registry: MeterRegistry, private val repo: N
     }
 
     fun ferdig(hendelser: List<NomHendelse>) {
-        log.info("${hendelser.size} ${"hendelse".pluralize(hendelser)} ferdig behandlet").also {
+        log.info("${"hendelse".pluralize(hendelser)} ferdig behandlet").also {
             size()
         }
     }

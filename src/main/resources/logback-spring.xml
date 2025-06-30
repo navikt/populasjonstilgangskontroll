@@ -14,6 +14,10 @@
         </encoder>
     </appender>
 
+    <appender name="otel" class="io.opentelemetry.instrumentation.logback.mdc.v1_0.OpenTelemetryAppender">
+        <appender-ref ref="stdout-appender" />
+    </appender>
+
     <springProfile name="dev">
         <logger name="org.springframework.cache" level="info"/>
         <logger name="org.springframework.data.redis" level="info"/>
@@ -43,10 +47,10 @@
         <logger name="no.nav.tilgangsmaskin" level="info"/>
     </springProfile>
 
-    <logger name="secureLog" level="INFO" additivity="false">
+    <logger name="secureLog" level="info" additivity="false">
         <appender-ref ref="secure-appender"/>
     </logger>
     <root level="info">
-        <appender-ref ref="stdout-appender"/>
+        <appender-ref ref="otel"/>
     </root>
 </configuration>

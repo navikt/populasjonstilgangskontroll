@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.bruker.PersonTilBrukerMapper.tilBruker
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.pluralize
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 
@@ -17,16 +18,19 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
 
 
     fun brukere(brukerIds: Set<String>) : Set<Bruker> {
+        log.debug("Slår opp ${brukerIds.size} brukere: ${brukerIds.joinToString { it.maskFnr() }}")
         val personer =  personTjeneste.personer(brukerIds)
         val notFound = brukerIds - personer.map { it.brukerId.verdi }.toSet()
         val found =  personer.map { it.brukerId }.toSet()
-        log.info("Bulk fant ikke følgende ${notFound.size} personer  ${notFound.joinToString { it.maskFnr() }}")
+        if (notFound.isNotEmpty()) {
+            log.debug("Fant ikke ${notFound.size} ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
+        }
         log.info("Bulk fant følgende ${found.size} personer  ${found.joinToString { it.verdi.maskFnr() }}")
 
         return found.let { p ->
             log.info("Bulk henter skjerminger for $found")
                 val skjerminger = skjermingTjeneste.skjerminger(found)
-                log.info("Bulk hentet ${skjerminger.size} skjerminger $skjerminger")
+                log.info("Bulk hentet ${skjerminger.size}  $skjerminger")
                 personer.map {
                     tilBruker(it, skjerminger[it.brukerId] ?: false)
                 }

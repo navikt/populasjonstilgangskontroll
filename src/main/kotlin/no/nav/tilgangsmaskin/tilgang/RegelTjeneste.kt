@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.pluralize
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
@@ -92,7 +93,7 @@ class RegelTjeneste(
 
     private fun Set<BrukerIdOgRegelsett>.brukerOgRegelsett() =
         with(associate { it.brukerId.verdi to it.type }) {
-            log.info("Henter $size brukere")
+            log.info("Henter $size ${"bruker".pluralize(this.keys,"e")}")
             val brukere = brukerTjeneste.brukere(keys)
             brukere.map {
                 BrukerOgRegelsett(it, this[it.brukerId.verdi] ?: KOMPLETT_REGELTYPE)

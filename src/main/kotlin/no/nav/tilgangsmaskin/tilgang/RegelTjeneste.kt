@@ -50,6 +50,7 @@ class RegelTjeneste(
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): BulkRespons {
+        log.debug("Kjører bulk regler for $ansattId og $idOgType")
         val ansatt = ansattTjeneste.ansatt(ansattId)
         val brukere = idOgType.brukerOgRegelsett()
         return with(motor.bulkRegler(ansatt, brukere))  {
@@ -93,7 +94,7 @@ class RegelTjeneste(
 
     private fun Set<BrukerIdOgRegelsett>.brukerOgRegelsett() =
         with(associate { it.brukerId.verdi to it.type }) {
-            log.info("Henter $size ${"bruker".pluralize(this.keys,"e")}")
+            log.info("Henter $size ${"bruker".pluralize(keys,"e")}")
             val brukere = brukerTjeneste.brukere(keys)
             brukere.map {
                 BrukerOgRegelsett(it, this[it.brukerId.verdi] ?: KOMPLETT_REGELTYPE)

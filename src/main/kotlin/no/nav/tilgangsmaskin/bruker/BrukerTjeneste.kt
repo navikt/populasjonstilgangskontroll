@@ -18,7 +18,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
 
 
     fun brukere(brukerIds: Set<String>) : Set<Bruker> {
-        log.debug("Slår opp ${brukerIds.size} ${"bruker".pluralize(brukerIds,"e")}: ${brukerIds.joinToString { it.maskFnr() }}")
+        log.debug("Slår opp ${"bruker".pluralize(brukerIds,"e")}: ${brukerIds.joinToString { it.maskFnr() }}")
         val personer =  personTjeneste.personer(brukerIds)
         val notFound = brukerIds - personer.map { it.brukerId.verdi }.toSet()
         val found =  personer.map { it.brukerId }.toSet()
@@ -31,7 +31,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
 
         return found.let { p ->
             if (p.isNotEmpty()) {
-                log.info("Bulk henter skjerminger for $p")
+                log.info("Bulk henter  ${"skjerming".pluralize(p)} for $p")
                 val skjerminger = skjermingTjeneste.skjerminger(found)
                 log.info("Bulk hentet ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
                 personer.map {

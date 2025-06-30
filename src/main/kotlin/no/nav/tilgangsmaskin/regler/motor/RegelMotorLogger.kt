@@ -24,7 +24,7 @@ class RegelMotorLogger(private val teller: AvvisningTeller) {
 
     fun ok(ansatt: Ansatt, bruker: Bruker,regelSett: RegelSett) {
         MDC.put(BESLUTNING,OK)
-        val fra =  MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: ""
+        val fra =  MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "ukjent konsument"
         log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} $fra")
         secureLog.info("${regelSett.beskrivelse} ga tilgang til  ${bruker.brukerId.verdi}  for ${ansatt.ansattId} $fra")
         MDC.remove(BESLUTNING)

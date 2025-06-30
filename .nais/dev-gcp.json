@@ -27,6 +27,11 @@
   },
   "inbound": [
     {
+      "name": "arena",
+      "namespace": "teamarenanais",
+      "cluster": "dev-fss"
+    },
+    {
       "name": "azure-token-generator",
       "namespace": "nais",
       "cluster": "dev-gcp"

@@ -30,14 +30,18 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
         }
 
         return found.let { p ->
-            log.info("Bulk henter skjerminger for $found")
+            if (p.isNotEmpty()) {
+                log.info("Bulk henter skjerminger for $p")
                 val skjerminger = skjermingTjeneste.skjerminger(found)
-                log.info("Bulk hentet ${skjerminger.size} ${"skjerming".pluralize(skjerminger.keys)}")
+                log.info("Bulk hentet ${skjerminger.size} ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
                 personer.map {
                     tilBruker(it, skjerminger[it.brukerId] ?: false)
                 }
+            } else {
+                emptyList()
             }.toSet()
         }
+    }
 
     fun brukerMedNærmesteFamilie(brukerId: String) =
         brukerMedSkjerming(brukerId, personTjeneste::medNærmesteFamilie)

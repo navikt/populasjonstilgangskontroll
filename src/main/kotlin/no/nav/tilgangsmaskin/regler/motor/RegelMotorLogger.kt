@@ -36,7 +36,8 @@ class RegelMotorLogger(private val teller: AvvisningTeller) {
 
     fun trace(message: String) = log.trace(message)
 
-    fun evaluerer(ansatt: Ansatt, bruker: Bruker, regel: Regel) = log.trace("Evaluerer regel: '${regel.kortNavn}' for ${ansatt.ansattId}  og ${bruker.brukerId}")
+    fun evaluerer(ansatt: Ansatt, bruker: Bruker, regel: Regel) =
+        log.trace("Evaluerer regel: '{}' for {}  og {}", regel.kortNavn, ansatt.ansattId, bruker.brukerId)
 
     companion object   {
         private const val BESLUTNING = "beslutning"

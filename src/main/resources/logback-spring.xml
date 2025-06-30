@@ -17,7 +17,7 @@
     <springProfile name="dev">
         <logger name="org.springframework.cache" level="info"/>
         <logger name="org.springframework.data.redis" level="info"/>
-        <logger name="no.nav.tilgangsmaskin" level="trace"/>
+        <logger name="no.nav.tilgangsmaskin" level="debug"/>
     </springProfile>
 
     <springProfile name="local | test">

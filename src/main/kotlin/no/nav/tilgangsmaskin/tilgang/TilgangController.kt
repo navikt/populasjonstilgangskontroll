@@ -91,13 +91,13 @@ class TilgangController(
         bulkRegler({ ansattId }, { token.erCC }, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet())
 
     private fun bulkRegler(ansattId: () -> AnsattId, tokenTypeCondition: () -> Boolean, specs: Set<BrukerIdOgRegelsett>) =
-        with(ansattId.invoke()) {
-            requires(tokenTypeCondition.invoke(), FORBIDDEN)
+        with(ansattId()) {
+            requires(tokenTypeCondition(), FORBIDDEN)
             requires(specs.size <= 1000, PAYLOAD_TOO_LARGE)
             regelTjeneste.bulkRegler( this, specs)
         }
 
-     private inline fun requires(condition: Boolean, status: HttpStatus)  {
+     private fun requires(condition: Boolean, status: HttpStatus)  {
         if (!condition) throw ResponseStatusException(status)
     }
 }

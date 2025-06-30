@@ -25,7 +25,9 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
         if (notFound.isNotEmpty()) {
             log.debug("Fant ikke ${notFound.size} ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
         }
-        log.info("Bulk fant følgende ${found.size} personer  ${found.joinToString { it.verdi.maskFnr() }}")
+        if (found.isNotEmpty()) {
+            log.info("Bulk fant følgende ${found.size}  ${"person".pluralize(found)}  ${found.joinToString { it.verdi.maskFnr() }}")
+        }
 
         return found.let { p ->
             log.info("Bulk henter skjerminger for $found")

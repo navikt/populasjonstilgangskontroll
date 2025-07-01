@@ -63,7 +63,7 @@ class RegelTjeneste(
             log.info("Bulk respons er $bulkRespons")
             bulkRespons
         }
-        log.info("Tid brukt på bulk regelsett for $ansattId: ${elapsedTime.inWholeMilliseconds}ms")
+        log.info("Tid brukt på bulk med størrelse ${idOgType.size} for $ansattId: ${elapsedTime.inWholeMilliseconds}ms")
         return respons
     }
 

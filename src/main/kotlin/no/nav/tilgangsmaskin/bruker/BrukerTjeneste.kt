@@ -36,7 +36,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
         return found.let { p ->
             if (p.isNotEmpty()) {
                 log.info("Bulk slår opp ${"skjerming".pluralize(p)} for $p")
-                val skjerminger = skjermingTjeneste.skjerminger(found)
+                val skjerminger = skjermingTjeneste.skjerminger(p)
                 log.info("Bulk slo opp ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
                 personer.map {
                     tilBruker(it, skjerminger[it.brukerId] ?: false)

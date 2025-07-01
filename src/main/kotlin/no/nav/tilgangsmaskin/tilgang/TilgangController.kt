@@ -67,7 +67,7 @@ class TilgangController(
     fun bulkOBO(@RequestBody @Valid @ValidId specs: Set<BrukerIdOgRegelsett>) =
         bulkRegler({token.ansattId!!},{token.erObo}, specs)
 
-    @PostMapping("bulk/{regelType}")
+    @PostMapping("bulk/obo/{regelType}")
     @ResponseStatus(MULTI_STATUS)
     @ProblemDetailBulkApiResponse
     @Operation(summary = "Kjør bulkregler for en ansatt",
@@ -76,7 +76,7 @@ class TilgangController(
     fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>) =
         bulkRegler({token.ansattId!!},{token.erObo},brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet())
 
-    @PostMapping("bulk/{ansattId}")
+    @PostMapping("bulk/ccf/{ansattId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailBulkApiResponse
     @Operation(summary = "Kjør bulkregler for en ansatt",

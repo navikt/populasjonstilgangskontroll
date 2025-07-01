@@ -7,7 +7,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelException
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
 
-data class BulkRespons(val ansattId: AnsattId, val resultater: Set<BulkResultat>) {
+data class BulkRespons(val ansattId: AnsattId, val resultater: Set<BulkResultat> = emptySet()) {
     data class BulkResultat(val brukerId: BrukerId, @JsonIgnore val httpStatus: HttpStatus, val detaljer: Any? = null ) {
         constructor(e: RegelException) : this(e.bruker.brukerId, e.status,e.body)
         val status = httpStatus.value()
@@ -24,4 +24,5 @@ data class BulkRespons(val ansattId: AnsattId, val resultater: Set<BulkResultat>
     val avviste = filter(FORBIDDEN)
 
     private fun filter(status: HttpStatus) = resultater.filter { it.httpStatus == status }.toSet()
+
 }

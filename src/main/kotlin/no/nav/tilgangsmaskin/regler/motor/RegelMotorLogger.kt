@@ -15,8 +15,8 @@ class RegelMotorLogger(private val teller: AvvisningTeller) {
     private val log = getLogger(javaClass)
     fun avvist(ansatt: Ansatt, bruker: Bruker, regel: Regel) {
         MDC.put(BESLUTNING,regel.kode)
-        val fra =  MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: ""
-        log.warn("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} $fra")
+        val fra =  MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
+        log.warn("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for $bruker $fra")
         secureLog.warn("Tilgang til ${bruker.brukerId.verdi} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} $fra")
         teller.tell(Tags.of("navn", regel.navn))
         MDC.remove(BESLUTNING)
@@ -24,7 +24,7 @@ class RegelMotorLogger(private val teller: AvvisningTeller) {
 
     fun ok(ansatt: Ansatt, bruker: Bruker,regelSett: RegelSett) {
         MDC.put(BESLUTNING,OK)
-        val fra =  MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "ukjent konsument"
+        val fra =  MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
         log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} $fra")
         secureLog.info("${regelSett.beskrivelse} ga tilgang til  ${bruker.brukerId.verdi}  for ${ansatt.ansattId} $fra")
         MDC.remove(BESLUTNING)

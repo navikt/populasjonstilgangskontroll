@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
 import org.springframework.web.bind.annotation.PathVariable
@@ -31,6 +32,9 @@ class TilgangController(
     private val regelTjeneste: RegelTjeneste,
     private val overstyringTjeneste: OverstyringTjeneste,
     private val token: Token) {
+
+    private val log = getLogger(javaClass)
+
 
     @PostMapping("komplett")
     @ResponseStatus(NO_CONTENT)
@@ -94,6 +98,7 @@ class TilgangController(
         with(ansattId()) {
             requires(tokenTypeCondition(), FORBIDDEN,"Mismatch mellom token type og endepunkt")
             requires(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
+            log.debug("Kjører bulk regler for {} og {}", this, specs.map { it.brukerId })
             regelTjeneste.bulkRegler( this, specs)
         }
 

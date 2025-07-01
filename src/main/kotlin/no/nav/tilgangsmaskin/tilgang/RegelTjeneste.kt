@@ -50,22 +50,24 @@ class RegelTjeneste(
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): BulkRespons {
-        val elapsedTime = measureTime {
+        val elapsedTime: kotlin.time.Duration
+        val respons = measureTime {
             log.debug("Kjører bulk regler for $ansattId og $idOgType")
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val brukere = idOgType.brukerOgRegelsett()
-            val respons =  with(motor.bulkRegler(ansatt, brukere))  {
-                val godkjente = godkjente(ansatt, this)
-                val avviste = avviste(ansatt, godkjente, this, brukere)
-                val ikkeFunnet = ikkeFunnet(idOgType, this)
-                BulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {
-                    log.info("Bulk respons er $it")
-                }
+            val resultater = motor.bulkRegler(ansatt, brukere)
+            val godkjente = godkjente(ansatt, resultater)
+            val avviste = avviste(ansatt, godkjente, resultater, brukere)
+            val ikkeFunnet = ikkeFunnet(idOgType, resultater)
+            BulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {
+                log.info("Bulk respons er $it")
             }
+        }.let { (result, time) ->
+            elapsedTime = time
+            result
         }
-        return response.also {
-            log.info("Tid brukt på bulk regelsett for $ansattId: ${elapsedTime.inWholeMilliseconds}ms")
-        }
+        log.info("Tid brukt på bulk regelsett for $ansattId: ${elapsedTime.inWholeMilliseconds}ms")
+        return respons
     }
 
     private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<Bulk>) = filterNot { it.brukerId in funnet.map { it.brukerId } }.toSet()

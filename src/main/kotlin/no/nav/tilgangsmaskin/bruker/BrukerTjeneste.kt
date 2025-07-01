@@ -19,7 +19,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
 
     fun brukere(brukerIds: Set<String>) : Set<Bruker> {
         if (brukerIds.isEmpty()) {
-            log.debug("Ingen ${"bruker".pluralize(brukerIds)} å slå opp")
+            log.debug("${"bruker".pluralize(brukerIds, ingen = "Ingen")} å slå opp")
             return emptySet()
         }
         log.debug("Slår opp ${"bruker".pluralize(brukerIds,"e")}: ${brukerIds.joinToString { it.maskFnr() }}")
@@ -30,18 +30,19 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
             log.debug("Fant ikke ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
         }
         if (found.isNotEmpty()) {
-            log.info("Bulk fant følgende ${"person".pluralize(found)} ${found.joinToString { it.verdi.maskFnr() }}")
+            log.info("Bulk slo opp  ${"person".pluralize(found)} ${found.joinToString { it.verdi.maskFnr() }}")
         }
 
         return found.let { p ->
             if (p.isNotEmpty()) {
-                log.info("Bulk henter  ${"skjerming".pluralize(p)} for $p")
+                log.info("Bulk slår opp ${"skjerming".pluralize(p)} for $p")
                 val skjerminger = skjermingTjeneste.skjerminger(found)
-                log.info("Bulk hentet ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
+                log.info("Bulk slo opp ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
                 personer.map {
                     tilBruker(it, skjerminger[it.brukerId] ?: false)
                 }
             } else {
+                log.debug("${"skjerming".pluralize(p, ingen = "Ingen")} å slå opp")
                 emptyList()
             }.toSet()
         }

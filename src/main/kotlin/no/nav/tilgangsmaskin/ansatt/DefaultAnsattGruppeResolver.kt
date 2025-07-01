@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 
 @Component
-class ProdAnsattGruppeResolver(private val entra: EntraTjeneste, private val token: Token, private val env: Environment) : AnsattGruppeResolver {
+class DefaultAnsattGruppeResolver(private val entra: EntraTjeneste, private val token: Token, private val env: Environment) : AnsattGruppeResolver {
 
     private val log = getLogger(javaClass)
 

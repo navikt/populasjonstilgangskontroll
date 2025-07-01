@@ -94,7 +94,7 @@ class RegelTjeneste(
 
     private fun Set<BrukerIdOgRegelsett>.brukerOgRegelsett() =
         with(associate { it.brukerId.verdi to it.type }) {
-            log.debug("Henter {} {}", "bruker".pluralize(keys,"e"), map { it.key.maskFnr() })
+            log.debug("Slår opp {} {}", "bruker".pluralize(keys,"e"), keys.map { it.maskFnr() })
             val brukere = brukerTjeneste.brukere(keys)
             brukere.map {
                 BrukerOgRegelsett(it, this[it.brukerId.verdi] ?: KOMPLETT_REGELTYPE)

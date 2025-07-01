@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Service
 import kotlin.collections.map
+import kotlin.time.measureTimedValue
 import kotlin.time.measureTime
 
 @Service
@@ -50,8 +51,7 @@ class RegelTjeneste(
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): BulkRespons {
-        val elapsedTime: kotlin.time.Duration
-        val respons = measureTime {
+        val (respons, elapsedTime) = measureTimedValue {
             log.debug("Kjører bulk regler for $ansattId og $idOgType")
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val brukere = idOgType.brukerOgRegelsett()
@@ -59,12 +59,9 @@ class RegelTjeneste(
             val godkjente = godkjente(ansatt, resultater)
             val avviste = avviste(ansatt, godkjente, resultater, brukere)
             val ikkeFunnet = ikkeFunnet(idOgType, resultater)
-            BulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {
-                log.info("Bulk respons er $it")
-            }
-        }.let { (result, time) ->
-            elapsedTime = time
-            result
+            val bulkRespons = BulkRespons(ansattId, godkjente + avviste + ikkeFunnet)
+            log.info("Bulk respons er $bulkRespons")
+            bulkRespons
         }
         log.info("Tid brukt på bulk regelsett for $ansattId: ${elapsedTime.inWholeMilliseconds}ms")
         return respons

@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.regler.motor
 
+import io.micrometer.core.instrument.DistributionSummary
+import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
@@ -10,7 +12,12 @@ import org.slf4j.MDC
 import org.springframework.stereotype.Component
 
 @Component
-class RegelMotorLogger(private val teller: AvvisningTeller) {
+class RegelMotorLogger(private val teller: AvvisningTeller, registry: MeterRegistry) {
+
+    private val bulkHistogram: DistributionSummary = DistributionSummary
+        .builder("bulk.histogram")
+        .description("Histogram av bulk-størrelse")
+        .register(registry)
 
     private val log = getLogger(javaClass)
     fun avvist(ansatt: Ansatt, bruker: Bruker, regel: Regel) {
@@ -38,6 +45,8 @@ class RegelMotorLogger(private val teller: AvvisningTeller) {
 
     fun evaluerer(ansatt: Ansatt, bruker: Bruker, regel: Regel) =
         log.trace("Evaluerer regel: '{}' for {}  og {}", regel.kortNavn, ansatt.ansattId, bruker.brukerId)
+
+    fun tellBulkSize(size: Int) = bulkHistogram.record(size.toDouble())
 
     companion object   {
         private const val BESLUTNING = "beslutning"

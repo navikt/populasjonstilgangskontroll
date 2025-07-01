@@ -46,7 +46,7 @@ class RegelMotor(
 
 
     fun bulkRegler(ansatt: Ansatt, brukere: Set<BrukerOgRegelsett>) =
-        brukere.map { (bruker, type) ->
+        (brukere.map { (bruker, type) ->
             runCatching {
                 evaluer(ansatt, bruker, type.regelSett())
                 ok(bruker)
@@ -55,7 +55,9 @@ class RegelMotor(
                     avvist(bruker, it)
                 } else throw it
             }
-        }.toSet()
+        }.toSet()).also {
+            logger.tellBulkSize(it.size)
+        }
 
 
     private fun RegelType.regelSett() =

@@ -58,7 +58,7 @@ class TilgangController(
     )
     fun overstyr(@RequestBody data: OverstyringData) = overstyringTjeneste.overstyr(token.ansattId!!, data)
 
-    @PostMapping("bulk")
+    @PostMapping("bulk/obo")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailBulkApiResponse
     @Operation(summary = "Kjør bulkregler for en ansatt",
@@ -85,7 +85,7 @@ class TilgangController(
     fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgRegelsett>) =
         bulkRegler({ansattId},{token.erCC}, specs)
 
-    @PostMapping("bulk/{ansattId}/{regelType}")
+    @PostMapping("bulk/ccf/{ansattId}/{regelType}")
     @ResponseStatus(MULTI_STATUS)
     @ProblemDetailBulkApiResponse
     @Operation(summary = "Kjør bulkregler for en ansatt",

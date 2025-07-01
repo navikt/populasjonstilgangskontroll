@@ -8,6 +8,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.felles.RetryingOnRecoverableService
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
 
@@ -25,7 +26,7 @@ class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL
     fun medNærmesteFamilie(id: String) = tilPerson(adapter.person(id))
 
     fun personer(brukerIds: Set<String>) : List<Person> {
-        log.info("Bulk henter personer for ${brukerIds.joinToString(",")}")
+        log.debug("Bulk henter personer for  ${brukerIds.map { it.maskFnr() }.joinToString { "," }}")
         return adapter.personer(brukerIds).map { tilPerson(it.value) }
     }
 

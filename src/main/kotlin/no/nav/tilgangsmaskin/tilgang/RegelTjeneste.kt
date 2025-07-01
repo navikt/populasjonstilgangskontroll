@@ -50,16 +50,21 @@ class RegelTjeneste(
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): BulkRespons {
-        log.debug("Kjører bulk regler for $ansattId og $idOgType")
-        val ansatt = ansattTjeneste.ansatt(ansattId)
-        val brukere = idOgType.brukerOgRegelsett()
-        return with(motor.bulkRegler(ansatt, brukere))  {
-            val godkjente = godkjente(ansatt, this)
-            val avviste = avviste(ansatt, godkjente, this, brukere)
-            val ikkeFunnet = ikkeFunnet(idOgType, this)
-            BulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {
-                log.info("Bulk respons for $it")
+        val elapsedTime = measureTime {
+            log.debug("Kjører bulk regler for $ansattId og $idOgType")
+            val ansatt = ansattTjeneste.ansatt(ansattId)
+            val brukere = idOgType.brukerOgRegelsett()
+            val respons =  with(motor.bulkRegler(ansatt, brukere))  {
+                val godkjente = godkjente(ansatt, this)
+                val avviste = avviste(ansatt, godkjente, this, brukere)
+                val ikkeFunnet = ikkeFunnet(idOgType, this)
+                BulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {
+                    log.info("Bulk respons for $it")
+                }
             }
+        }
+        return response.also {
+            log.info("Tid brukt på bulk regelsett for $ansattId: ${elapsedTime.inWholeMilliseconds}ms")
         }
     }
 

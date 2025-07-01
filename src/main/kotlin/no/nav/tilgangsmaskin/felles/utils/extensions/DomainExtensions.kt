@@ -9,6 +9,10 @@ object DomainExtensions {
 
     fun String.upcase() = this.replaceFirstChar { it.uppercaseChar() }
     fun String.maskFnr() = if (length == 11) replaceRange(6, 11, "*****") else this
-    fun String.pluralize(l: Collection<Any>, suffix: String? = "er") = if (l.isEmpty()) "ingen $this" else if (l.size == 1) this else  l.size.toString() +  " " + this+suffix
-
+    fun String.pluralize(items: Collection<Any>, suffix: String = "er"): String =
+        when (items.size) {
+            0 -> "ingen $this"
+            1 -> this
+            else -> "${items.size} $this$suffix"
+        }
 }

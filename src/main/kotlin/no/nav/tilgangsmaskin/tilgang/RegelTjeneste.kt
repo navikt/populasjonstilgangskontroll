@@ -59,7 +59,7 @@ class RegelTjeneste(
                 val avviste = avviste(ansatt, godkjente, this, brukere)
                 val ikkeFunnet = ikkeFunnet(idOgType, this)
                 BulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {
-                    log.info("Bulk respons for $it")
+                    log.info("Bulk respons er $it")
                 }
             }
         }

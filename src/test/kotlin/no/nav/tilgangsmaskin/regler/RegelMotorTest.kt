@@ -70,7 +70,7 @@ class RegelMotorTest {
 
     @BeforeTest
     fun before() {
-        logger = RegelMotorLogger(registry, token)
+        logger = RegelMotorLogger(AvvisningTeller(registry,token),registry, token)
         every { token.system } returns "test"
         every { token.systemNavn } returns "test"
     }

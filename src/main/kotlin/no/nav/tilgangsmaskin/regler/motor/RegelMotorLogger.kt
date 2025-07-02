@@ -7,22 +7,18 @@ import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
 import no.nav.tilgangsmaskin.felles.utils.secureLog
-import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
 
 @Component
-class RegelMotorLogger(registry: MeterRegistry, token: Token) {
-
-    private val teller = AvvisningTeller(registry, token)
+class RegelMotorLogger(private val teller: AvvisningTeller, registry: MeterRegistry) {
 
     private val bulkHistogram: DistributionSummary = DistributionSummary
         .builder("bulk.histogram")
         .description("Histogram av bulk-størrelse")
         .publishPercentileHistogram(true)
         .serviceLevelObjectives(10.0, 20.0, 50.0, 100.0, 200.0, 500.0, 1000.0)
-        .tags(Tags.of("system", token.system))
         .register(registry)
 
     private val log = getLogger(javaClass)

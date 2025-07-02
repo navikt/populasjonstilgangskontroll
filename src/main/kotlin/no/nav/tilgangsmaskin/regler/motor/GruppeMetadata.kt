@@ -19,7 +19,7 @@ enum class GruppeMetadata(val meta: AvvisningsKode, val begrunnelse: String, val
     FELLES_BARN(AVVIST_HABILITET, HABILITET, "Felles barn"),
     AVDØD(AVVIST_AVDØD, "Du har ikke tilgang til ubformasjon om avdøde brukere", "Avdød bruker"),
     UTENLANDSK(AVVIST_PERSON_UTLAND, "Du har ikke tilgang til person bosatt i utlandet", "Person bosatt utland"),
-    UKJENT_BOSTED(AVVIST_PERSON_UKJENT, "Du har ikke tilgang til person uten kjent adresse", "Person bosatt ukjent bosted")
+    UKJENT_BOSTED(AVVIST_UKJENT_BOSTED, "Du har ikke tilgang til person uten kjent adresse", "Person bosatt ukjent bosted")
 }
 
 @Schema(description = "Avvisningskoder")
@@ -30,7 +30,7 @@ enum class AvvisningsKode {
     AVVIST_PERSON_UTLAND,
     AVVIST_SKJERMING,
     AVVIST_FORTROLIG_ADRESSE,
-    AVVIST_PERSON_UKJENT,
+    AVVIST_UKJENT_BOSTED,
     AVVIST_GEOGRAFISK,
     AVVIST_HABILITET
 }

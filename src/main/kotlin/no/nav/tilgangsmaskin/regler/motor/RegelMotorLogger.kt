@@ -10,10 +10,12 @@ import no.nav.tilgangsmaskin.felles.utils.secureLog
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
+import no.nav.tilgangsmaskin.tilgang.Token
 
 @Component
-class RegelMotorLogger(private val teller: AvvisningTeller, registry: MeterRegistry) {
+class RegelMotorLogger(private val registry: MeterRegistry, private val token: Token) {
 
+    private val teller: AvvisningTeller = AvvisningTeller(registry, token)
     private val bulkHistogram: DistributionSummary = DistributionSummary
         .builder("bulk.histogram")
         .description("Histogram av bulk-størrelse")
@@ -48,7 +50,8 @@ class RegelMotorLogger(private val teller: AvvisningTeller, registry: MeterRegis
     fun evaluerer(ansatt: Ansatt, bruker: Bruker, regel: Regel) =
         log.trace("Evaluerer regel: '{}' for {}  og {}", regel.kortNavn, ansatt.ansattId, bruker.brukerId)
 
-    fun tellBulkSize(size: Int) = bulkHistogram.record(size.toDouble())
+    fun tellBulkSize(size: Int) =   registry.summary("bulk.histogram", "system", token.system)
+        .record(size.toDouble())
 
     companion object   {
         private const val BESLUTNING = "beslutning"

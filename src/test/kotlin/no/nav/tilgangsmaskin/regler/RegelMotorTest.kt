@@ -62,15 +62,12 @@ class RegelMotorTest {
     
     @MockkBean
     private lateinit var token: Token
-    private lateinit var logger: RegelMotorLogger
-
 
     @Autowired
     private lateinit var regelMotor: RegelMotor
 
     @BeforeTest
     fun before() {
-        logger = RegelMotorLogger(AvvisningTeller(registry,token),registry, token)
         every { token.system } returns "test"
         every { token.systemNavn } returns "test"
     }

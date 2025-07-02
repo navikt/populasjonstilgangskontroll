@@ -44,7 +44,9 @@ class DefaultAnsattGruppeResolver(private val entra: EntraTjeneste, private val 
     private fun grupperForUautentisert(ansattId: AnsattId) =
         if (isDevOrLocal(env)) {
             log.info("Intet token i dev for $ansattId, slår opp globale og GEO-grupper i Entra")
-            entra.geoOgGlobaleGrupper(ansattId)
+            entra.geoOgGlobaleGrupper(ansattId).also {
+                log.info("Uautentisert: $ansattId slo opp $it i Entra")
+            }
         } else {
             throw HttpClientErrorException(UNAUTHORIZED, "Autentisering påkrevet i produksjonsmiljøet", HttpHeaders(), null, null)
         }

@@ -59,7 +59,7 @@ class TilgangController(
     fun overstyr(@RequestBody data: OverstyringData) = overstyringTjeneste.overstyr(token.ansattId!!, data)
 
     @PostMapping("bulk/obo")
-    @ResponseStatus(NO_CONTENT)
+    @ResponseStatus(MULTI_STATUS)
     @ProblemDetailBulkApiResponse
     @Operation(summary = "Kjør bulkregler for en ansatt",
         description = "Dette endepunktet er kun tilgjengelig for obo flow. " +
@@ -77,7 +77,7 @@ class TilgangController(
         bulkRegler({token.ansattId!!},{token.erObo},brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet())
 
     @PostMapping("bulk/ccf/{ansattId}")
-    @ResponseStatus(NO_CONTENT)
+    @ResponseStatus(MULTI_STATUS)
     @ProblemDetailBulkApiResponse
     @Operation(summary = "Kjør bulkregler for en ansatt",
         description = "Dette endepunktet er kun tilgjengelig for client credentials flow. " +

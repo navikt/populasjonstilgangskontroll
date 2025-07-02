@@ -17,6 +17,8 @@ class RegelMotorLogger(private val teller: AvvisningTeller, registry: MeterRegis
     private val bulkHistogram: DistributionSummary = DistributionSummary
         .builder("bulk.histogram")
         .description("Histogram av bulk-størrelse")
+        .publishPercentileHistogram(true)
+        .serviceLevelObjectives(10.0, 20.0, 50.0, 100.0, 200.0, 500.0, 1000.0)
         .register(registry)
 
     private val log = getLogger(javaClass)

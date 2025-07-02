@@ -10,9 +10,9 @@ class AnsattOidResolver(private val adapter: EntraRestClientAdapter, private val
 
     private val log = getLogger(javaClass)
 
-    fun oidForAnsatt(ansattId: AnsattId) = token.oid ?: oidFraEntra(ansattId.verdi)
+    fun oidForAnsatt(ansattId: AnsattId) =  if (token.erObo)  token.oid else oidFraEntra(ansattId.verdi)
 
     private fun oidFraEntra(ansattId: String) = adapter.oidFraEntra(ansattId).also {
-        log.debug("OID fra Entra for $ansattId er $it")
+        log.debug("OID fra Entra for {} er {}", ansattId, it)
     }
 }

@@ -100,7 +100,7 @@ class RegelTjenesteTest {
     @DisplayName("Verifiser at sjekk om overstyring gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang gis om overstyring er gjort")
     fun overstyringOK() {
         every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
-        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "test", IMORGEN))
+        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
         assertThatCode {
             regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
         }.doesNotThrowAnyException()
@@ -150,7 +150,7 @@ class RegelTjenesteTest {
 
         overstyring.overstyr(ansattId, OverstyringData(
                 BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(
-                    UTENLANDSK).build().brukerId, "test", IMORGEN))
+                    UTENLANDSK).build().brukerId, "Dette er en test", IMORGEN))
         val resultater  =  regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId)))
 
         assertThat(resultater.avviste.isEmpty())

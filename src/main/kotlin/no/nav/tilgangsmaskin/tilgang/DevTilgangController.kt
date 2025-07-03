@@ -97,7 +97,7 @@ class DevTilgangController(
                 Overstyring vil gjelde frem til og med utløpsdatoen."""
     )
     @Valid
-    fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody @Valid data: OverstyringData) = overstyring.overstyr(ansattId, data)
+    fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody data: OverstyringData) = overstyring.overstyr(ansattId, data)
 
     @PostMapping("overstyringer/{ansattId}")
     @ResponseStatus(ACCEPTED)

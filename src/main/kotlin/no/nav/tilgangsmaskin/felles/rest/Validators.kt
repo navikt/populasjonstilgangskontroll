@@ -46,10 +46,14 @@ annotation class ValidOverstyring(
     val payload: Array<KClass<out Payload>> = [])
 
 class OverstyringValidator : ConstraintValidator<ValidOverstyring, LocalDate> {
+    private val log = getLogger(javaClass)
+
     private var months: Long = 3
     override fun initialize(constraintAnnotation: ValidOverstyring) {
         months = constraintAnnotation.months
     }
     override fun isValid(verdi: LocalDate, context: ConstraintValidatorContext) =
-        verdi in LocalDate.now()..LocalDate.now().plusMonths(months)
+        verdi in LocalDate.now()..LocalDate.now().plusMonths(months).also {
+            log.info("Overstyring validering for $verdi, gyldig: $it")
+        }
 }

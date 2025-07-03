@@ -96,6 +96,7 @@ class DevTilgangController(
                 BrukerId må være gyldig og finnes i PDL. Kjerneregelsettet vil bli kjørt før overstyring, og hvis de feiler vil overstyring ikke bli gjort.
                 Overstyring vil gjelde frem til og med utløpsdatoen."""
     )
+    @Valid
     fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody @Valid data: OverstyringData) = overstyring.overstyr(ansattId, data)
 
     @PostMapping("overstyringer/{ansattId}")

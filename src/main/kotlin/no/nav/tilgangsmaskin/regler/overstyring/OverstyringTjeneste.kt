@@ -53,12 +53,13 @@ class OverstyringTjeneste(
                 teller.tell(Tags.of("overstyrt", "true"))
                 log.info("Overstyring  til ${data.gyldigtil} ble registret for $ansattId og ${data.brukerId}")
             }
+            true
         }.getOrElse {
             when (it) {
                 is RegelException -> throw RegelException(
-                        OVERSTYRING_MESSAGE_CODE,
-                        arrayOf(it.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
-                        e = it).also {
+                    OVERSTYRING_MESSAGE_CODE,
+                    arrayOf(it.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
+                    e = it).also {
                     log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}")
                     teller.tell(Tags.of("kortnavn", it.regel.kortNavn, "overstyrt", false.toString()))
                 }

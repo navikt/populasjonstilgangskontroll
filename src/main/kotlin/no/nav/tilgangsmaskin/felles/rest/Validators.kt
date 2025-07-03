@@ -7,6 +7,7 @@ import jakarta.validation.Payload
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import org.slf4j.LoggerFactory.getLogger
+import java.time.LocalDate
 import kotlin.reflect.KClass
 
 @MustBeDocumented
@@ -32,4 +33,23 @@ class IdValidator : ConstraintValidator<ValidId, Any> {
             }*/
             else -> false
         }
+}
+
+@MustBeDocumented
+@Constraint(validatedBy = [OverstyringValidator::class])
+@Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class ValidOverstyring(
+    val message: String = "Overstyring må være fra nå og maks 3 måneder frem i tid",
+    val groups: Array<KClass<*>> = [],
+    val months: Long = 3,
+    val payload: Array<KClass<out Payload>> = [])
+
+class OverstyringValidator : ConstraintValidator<ValidOverstyring, LocalDate> {
+    private var months: Long = 3
+    override fun initialize(constraintAnnotation: ValidOverstyring) {
+        months = constraintAnnotation.months
+    }
+    override fun isValid(verdi: LocalDate, context: ConstraintValidatorContext) =
+        verdi in LocalDate.now()..LocalDate.now().plusMonths(months)
 }

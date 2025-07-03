@@ -40,10 +40,6 @@ class OverstyringEntity(
     @Column(name = "system", length = 50)
     @CreatedBySystem
     var system: String? = null
-
-    companion object {
-        const val OVERSTYRING = "overstyring"
-    }
 }
 
 

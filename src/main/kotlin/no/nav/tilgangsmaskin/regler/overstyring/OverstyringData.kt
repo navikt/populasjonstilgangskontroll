@@ -3,6 +3,8 @@ package no.nav.tilgangsmaskin.regler.overstyring
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Size
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
+import org.springframework.cglib.core.Local
 import java.time.LocalDate
 
 @Schema(requiredProperties = ["brukerId","begrunnelse","gyldigTil"], example = """
@@ -12,4 +14,4 @@ import java.time.LocalDate
   "gyldigtil": "2025-05-24"
 }
 """)
-data class OverstyringData(val brukerId: BrukerId, @Size(min = 10, max = 255) val begrunnelse: String, val gyldigtil: LocalDate)
+data class OverstyringData(val brukerId: BrukerId, @Size(min = 10, max = 255) val begrunnelse: String, @ValidOverstyring val gyldigtil: LocalDate = LocalDate.now().plusMonths(3))

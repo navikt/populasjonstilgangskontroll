@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import org.slf4j.LoggerFactory
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpRequest
@@ -49,9 +50,11 @@ private fun problemDetail(status: HttpStatusCode, msg: String, uri: URI) =
 @ControllerAdvice
 class ValidationExceptionHandler {
 
+    private val log = LoggerFactory.getLogger(javaClass)
+    
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationException(e: MethodArgumentNotValidException): Nothing {
-        val errors = ex.bindingResult.fieldErrors.associate { it.field to (it.defaultMessage ?: "Invalid value") }
+        val errors = e.bindingResult.fieldErrors.associate { it.field to (it.defaultMessage ?: "Invalid value") }
         throw ErrorResponseException(HttpStatus.BAD_REQUEST,forStatusAndDetail(HttpStatus.BAD_REQUEST,"").apply {
             title = "Valideringsfeil"
             properties = mapOf("errors" to errors)

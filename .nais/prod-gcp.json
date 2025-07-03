@@ -77,6 +77,11 @@
       "name": "oh-tilgangskontroll",
       "namespace": "oppgavehandtering",
       "cluster": "prod-gcp"
+    },
+    {
+      "name": "tilbakekreving-backend",
+      "namespace": "tilbake",
+      "cluster": "prod-gcp"
     }
 
   ],

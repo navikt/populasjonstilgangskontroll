@@ -130,6 +130,11 @@
       "name": "oppgave",
       "namespace": "oppgavehandtering",
       "cluster": "dev-fss"
+    },
+    {
+      "name": "tilbakekreving-backend",
+      "namespace": "tilbake",
+      "cluster": "dev-gcp"
     }
   ],
   "nais": {

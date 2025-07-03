@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import kotlin.annotation.AnnotationRetention.RUNTIME
@@ -51,26 +53,18 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
                            }
                        ]
                    }"""))])])
-annotation class ProblemDetailBulkApiResponse
-private data class BulkSwaggerResultater(
-    val ansattId: String,
-    val resultater: List<BulkSwaggerResultat>
-)
+annotation class BulkApiResponse
+private data class BulkSwaggerResultater(val ansattId: String, val resultater: List<BulkSwaggerResultat>) {
+    data class BulkSwaggerResultat(val brukerId: String, val status: Int, val detaljer: BulkSwaggerDetaljer? = null) {
+        data class BulkSwaggerDetaljer(val type: String, val title: AvvisningsKode, val status: Int, val instance: String,
+                                               val brukerIdent: BrukerId,
+                                               val navIdent: AnsattId,
+                                               val begrunnelse: String,
+                                               val traceId: String,
+                                               val kanOverstyres: Boolean
+        )
+    }
 
-data class BulkSwaggerResultat(
-    val brukerId: String,
-    val status: Int,
-    val detaljer: BulkSwaggerDetaljer? = null
-)
+}
 
-data class BulkSwaggerDetaljer(
-    val type: String,
-    val title: AvvisningsKode,
-    val status: Int,
-    val instance: String,
-    val brukerIdent: String,
-    val navIdent: String,
-    val begrunnelse: String,
-    val traceId: String,
-    val kanOverstyres: Boolean
-)
+

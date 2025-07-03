@@ -25,7 +25,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
-import no.nav.tilgangsmaskin.tilgang.ProblemDetailBulkApiResponse
+import no.nav.tilgangsmaskin.tilgang.BulkApiResponse
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CacheEvict
@@ -117,13 +117,13 @@ class DevTilgangController(
 
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(MULTI_STATUS)
-    @ProblemDetailBulkApiResponse
+    @BulkApiResponse
     fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgRegelsett>) =
         regler.bulkRegler( ansattId, specs)
 
     @PostMapping("bulk/{ansattId}/{regelType}")
     @ResponseStatus(MULTI_STATUS)
-    @ProblemDetailBulkApiResponse
+    @BulkApiResponse
     fun bulkreglerForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>) =
         regler.bulkRegler(ansattId, brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet())
 

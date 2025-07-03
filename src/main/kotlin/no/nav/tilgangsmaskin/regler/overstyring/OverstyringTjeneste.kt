@@ -44,7 +44,7 @@ class OverstyringTjeneste(
             brukerTjeneste.brukerMedNærmesteFamilie(brukerId.verdi).historiskeIds.map { it.verdi })?.expires
         return erOverstyrt(ansattId,brukerId,overstyring)
     }
-    @Transactional(readOnly = true)
+    @Transactional
     fun overstyr(ansattId: AnsattId, data: OverstyringData) =
         runCatching {
             log.info("Sjekker kjerneregler før eventuell overstyring for $ansattId og ${data.brukerId}")

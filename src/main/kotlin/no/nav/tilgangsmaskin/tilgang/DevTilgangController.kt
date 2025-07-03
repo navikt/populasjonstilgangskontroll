@@ -67,15 +67,7 @@ class DevTilgangController(
 
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)
-
-    @GetMapping("ansatt/{ansattId}/evict")
-    @CacheEvict(
-        cacheNames = [GRAPH],
-        key = "'no.nav.tilgangsmaskin.ansatt.graph:Entra:geoOgGlobaleGrupper:' + #ansattId")
-    fun evict(ansattId: AnsattId) {
-        log.info("Resetter cache for $ansattId")
-    }
-
+    
     @PostMapping("ansatt/{ansattId}/{brukerId}")
     fun nom(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
         nom.lagre(NomAnsattData(ansattId, brukerId))
@@ -104,14 +96,14 @@ class DevTilgangController(
                 BrukerId må være gyldig og finnes i PDL. Kjerneregelsettet vil bli kjørt før overstyring, og hvis de feiler vil overstyring ikke bli gjort.
                 Overstyring vil gjelde frem til og med utløpsdatoen."""
     )
-    fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody data: OverstyringData) = overstyring.overstyr(ansattId, data)
+    fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody @Valid data: OverstyringData) = overstyring.overstyr(ansattId, data)
 
     @PostMapping("overstyringer/{ansattId}")
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse
     @Operation(
         summary = "Hent overstyringer for en ansatt og en eller flere brukere",
-        description = """Henter overstyringer for en eller flere  brukere."""
+        description = "Henter overstyringer for en eller flere  brukere."
     )
     fun overstyringer(@PathVariable ansattId: AnsattId, @RequestBody brukerIds: List<BrukerId>) = overstyring.overstyringer(ansattId, brukerIds)
 

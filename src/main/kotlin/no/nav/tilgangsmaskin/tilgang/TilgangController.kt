@@ -56,7 +56,7 @@ class TilgangController(
     BrukerId må være gyldig og finnes i PDL. Kjerneregelsettet vil bli kjørt før overstyring, og hvis de feiler vil overstyring ikke bli gjort.
     Overstyring vil gjelde frem til og med utløpsdatoen."""
     )
-    fun overstyr(@RequestBody data: OverstyringData) = overstyringTjeneste.overstyr(token.ansattId!!, data)
+    fun overstyr(@RequestBody @Valid data: OverstyringData) = overstyringTjeneste.overstyr(token.ansattId!!, data)
 
     @PostMapping("bulk/obo")
     @ResponseStatus(MULTI_STATUS)

@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.regler.overstyring
 
 import jakarta.persistence.*
 import jakarta.persistence.GenerationType.IDENTITY
+import org.hibernate.annotations.Check
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
@@ -13,6 +14,7 @@ import kotlin.annotation.AnnotationTarget.FIELD
 @Entity(name = "overstyring")
 @Table(indexes = [Index(name = "idx_overstyringentity_navid", columnList = "navid, fnr")])
 @EntityListeners(OverstyringEntityListener::class, AuditingEntityListener::class)
+@Check(constraints = "char_length(begrunnelse) >= 10 AND char_length(begrunnelse) <= 255")
 class OverstyringEntity(
         @Column(length = 7, nullable = false) val navid: String,
         @Column(length = 11, nullable = false) val fnr: String,

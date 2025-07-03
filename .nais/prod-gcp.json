@@ -72,6 +72,11 @@
       "name": "oppgave",
       "namespace": "oppgavehandtering",
       "cluster": "prod-fss"
+    },
+    {
+      "name": "oh-tilgangskontroll",
+      "namespace": "oppgavehandtering",
+      "cluster": "prod-gcp"
     }
 
   ],

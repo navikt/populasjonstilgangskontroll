@@ -14,4 +14,4 @@ import java.time.LocalDate
   "gyldigtil": "2025-05-24"
 }
 """)
-data class OverstyringData(val brukerId: BrukerId, @Size(min = 10, max = 255) val begrunnelse: String, @ValidOverstyring val gyldigtil: LocalDate = LocalDate.now().plusMonths(3))
+data class OverstyringData(val brukerId: BrukerId, @Valid @Size(min = 10, max = 255) val begrunnelse: String, @ValidOverstyring val gyldigtil: LocalDate = LocalDate.now().plusMonths(3))

@@ -9,6 +9,9 @@ import org.springframework.http.ProblemDetail.forStatusAndDetail
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.stereotype.Component
 import org.springframework.web.ErrorResponseException
+import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.web.bind.annotation.ControllerAdvice
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import java.net.URI
 
@@ -43,3 +46,17 @@ private fun problemDetail(status: HttpStatusCode, msg: String, uri: URI) =
         properties = mapOf("uri" to "$uri")
     }
 
+@ControllerAdvice
+class ValidationExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleValidationException(e: MethodArgumentNotValidException): Nothing {
+        val errors = ex.bindingResult.fieldErrors.associate { it.field to (it.defaultMessage ?: "Invalid value") }
+        throw ErrorResponseException(HttpStatus.BAD_REQUEST,forStatusAndDetail(HttpStatus.BAD_REQUEST,"").apply {
+            title = "Valideringsfeil"
+            properties = mapOf("errors" to errors)
+        },e).also {
+            log.warn("Valideringsfeil: ${errors.entries.joinToString(", ")}")
+        }
+    }
+}

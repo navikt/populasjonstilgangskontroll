@@ -6,6 +6,7 @@ import jakarta.validation.ConstraintValidatorContext
 import jakarta.validation.Payload
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import org.slf4j.LoggerFactory.getLogger
 import java.time.LocalDate
 import kotlin.reflect.KClass
@@ -45,15 +46,15 @@ annotation class ValidOverstyring(
     val months: Long = 3,
     val payload: Array<KClass<out Payload>> = [])
 
-class OverstyringValidator : ConstraintValidator<ValidOverstyring, LocalDate> {
+class OverstyringValidator : ConstraintValidator<ValidOverstyring, OverstyringData> {
     private val log = getLogger(javaClass)
 
     private var months: Long = 3
     override fun initialize(constraintAnnotation: ValidOverstyring) {
         months = constraintAnnotation.months
     }
-    override fun isValid(verdi: LocalDate, context: ConstraintValidatorContext) =
-        verdi in LocalDate.now()..LocalDate.now().plusMonths(months).also {
+    override fun isValid(verdi: OverstyringData, context: ConstraintValidatorContext) =
+        verdi.gyldigtil in LocalDate.now()..LocalDate.now().plusMonths(months).also {
             log.info("Overstyring validering for $verdi, gyldig: $it")
         }
 }

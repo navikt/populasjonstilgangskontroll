@@ -67,7 +67,13 @@
       "name": "arbeid-og-inntekt",
       "namespace": "team-inntekt",
       "cluster": "prod-fss"
+    },
+    {
+      "name": "oppgave",
+      "namespace": "oppgavehandtering",
+      "cluster": "prod-fss"
     }
+
   ],
   "nais": {
     "cluster": {

@@ -89,7 +89,7 @@ internal class OverstyringTest {
         val brukerMedHistorikk = BrukerBuilder(vanligBrukerId).historiske(setOf(historiskBrukerId)).build()
         every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns brukerMedHistorikk
         every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns BrukerBuilder(historiskBrukerId).build()
-        overstyring.overstyr(ansattId, OverstyringData(historiskBrukerId, "test", IMORGEN))
+        overstyring.overstyr(ansattId, OverstyringData(historiskBrukerId, "Dette er en test", IMORGEN))
         assertThat(overstyring.erOverstyrt(ansattId, BrukerBuilder(vanligBrukerId).build().brukerId)).isTrue
     }
 
@@ -98,8 +98,8 @@ internal class OverstyringTest {
     fun testOverstyringGyldig() {
         val bruker = BrukerBuilder(vanligBrukerId).build()
         every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "gammel", IGÅR))
-        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "ny", IMORGEN))
+        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Denne er gammel", IGÅR))
+        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Denne er ny", IMORGEN))
         assertThat(overstyring.erOverstyrt(ansattId, vanligBrukerId)).isTrue
     }
 
@@ -108,7 +108,7 @@ internal class OverstyringTest {
     fun testOverstyringUtgått() {
         val bruker = BrukerBuilder(vanligBrukerId).build()
         every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "ny", IGÅR))
+        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Denne er ny", IGÅR))
         assertThat(overstyring.erOverstyrt(ansattId, vanligBrukerId)).isFalse
     }
 

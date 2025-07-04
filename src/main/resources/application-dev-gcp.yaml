@@ -17,3 +17,8 @@ management:
   httpexchanges:
     recording:
       enabled: true
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.boot: DEBUG
+    org.springframework.context: DEBUG

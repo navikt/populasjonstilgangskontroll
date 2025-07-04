@@ -51,7 +51,7 @@ private fun problemDetail(status: HttpStatusCode, msg: String, uri: URI) =
 class ValidationExceptionHandler {
 
     private val log = LoggerFactory.getLogger(javaClass)
-    
+
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationException(e: MethodArgumentNotValidException): Nothing {
         val errors = e.bindingResult.fieldErrors.associate { it.field to (it.defaultMessage ?: "Invalid value") }

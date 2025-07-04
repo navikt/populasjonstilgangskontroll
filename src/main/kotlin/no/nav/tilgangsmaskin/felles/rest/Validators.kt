@@ -54,7 +54,15 @@ class OverstyringValidator : ConstraintValidator<ValidOverstyring, OverstyringDa
         months = constraintAnnotation.months
     }
     override fun isValid(verdi: OverstyringData, context: ConstraintValidatorContext) =
-        verdi.gyldigtil in LocalDate.now()..LocalDate.now().plusMonths(months).also {
-            log.info("Overstyring validering for $verdi, gyldig: $it")
-        }
+        gyldigDato(verdi.gyldigtil) && gyldigLengde(verdi.begrunnelse)
+
+    private fun gyldigLengde(verdi: String) = (verdi.length in 10..255).also {
+        if (!it) log.warn("Overstyring med begrunnelse '$verdi' er ugyldig, må være mellom 10 og 255 tegn")
+    }
+
+    private fun gyldigDato(verdi: LocalDate) =
+        verdi.isAfter(LocalDate.now()) && verdi.isBefore(LocalDate.now().plusMonths(3))
+            .also {
+                if (!it) log.warn("Overstyring med gyldig til $verdi er ugyldig, må være fra nå og maks 3 måneder frem i tid")
+            }
 }

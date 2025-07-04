@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.rest
 
-import org.slf4j.LoggerFactory
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpRequest
@@ -10,9 +9,6 @@ import org.springframework.http.ProblemDetail.forStatusAndDetail
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.stereotype.Component
 import org.springframework.web.ErrorResponseException
-import org.springframework.web.bind.MethodArgumentNotValidException
-import org.springframework.web.bind.annotation.ControllerAdvice
-import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import java.net.URI
 
@@ -47,20 +43,3 @@ private fun problemDetail(status: HttpStatusCode, msg: String, uri: URI) =
         properties = mapOf("uri" to "$uri")
     }
 
-@ControllerAdvice
-class ValidationExceptionHandler {
-
-    private val log = getLogger(javaClass)
-
-    @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handleValidationException(e: MethodArgumentNotValidException): Nothing {
-        log.warn("Validation error", e)
-        val errors = e.bindingResult.fieldErrors.associate { it.field to (it.defaultMessage ?: "Invalid value") }
-        throw ErrorResponseException(HttpStatus.BAD_REQUEST,forStatusAndDetail(HttpStatus.BAD_REQUEST,"").apply {
-            title = "Valideringsfeil"
-            properties = mapOf("errors" to errors)
-        },e).also {
-            log.warn("Valideringsfeil: ${errors.entries.joinToString(", ")}")
-        }
-    }
-}

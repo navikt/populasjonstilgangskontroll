@@ -25,7 +25,8 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,pr
             }
         }
 
-    fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag i cache"}
+
+    fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl:  ${it.varighet}" }
 
     override fun bindTo(registry: MeterRegistry) {
         cfgs.forEach { cfg ->

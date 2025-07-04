@@ -50,10 +50,11 @@ private fun problemDetail(status: HttpStatusCode, msg: String, uri: URI) =
 @ControllerAdvice
 class ValidationExceptionHandler {
 
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val log = getLogger(javaClass)
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationException(e: MethodArgumentNotValidException): Nothing {
+        log.warn("Validation error", e)
         val errors = e.bindingResult.fieldErrors.associate { it.field to (it.defaultMessage ?: "Invalid value") }
         throw ErrorResponseException(HttpStatus.BAD_REQUEST,forStatusAndDetail(HttpStatus.BAD_REQUEST,"").apply {
             title = "Valideringsfeil"

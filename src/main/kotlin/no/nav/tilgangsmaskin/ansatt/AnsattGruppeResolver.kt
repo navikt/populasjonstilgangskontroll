@@ -4,7 +4,6 @@ import no.nav.boot.conditionals.EnvUtil.isDevOrLocal
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.girNasjonalTilgang
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.globaleGrupper
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.env.Environment
@@ -14,11 +13,11 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 
 @Component
-class DefaultAnsattGruppeResolver(private val entra: EntraTjeneste, private val token: Token, private val env: Environment) : AnsattGruppeResolver {
+class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: Token, private val env: Environment)  {
 
     private val log = getLogger(javaClass)
 
-    override fun grupperForAnsatt(ansattId: AnsattId) =
+     fun grupperForAnsatt(ansattId: AnsattId) =
         when {
             token.erCC ->  grupperForCC(ansattId)
             token.erObo -> grupperForObo(ansattId)
@@ -50,8 +49,4 @@ class DefaultAnsattGruppeResolver(private val entra: EntraTjeneste, private val 
         } else {
             throw HttpClientErrorException(UNAUTHORIZED, "Autentisering påkrevet i produksjonsmiljøet", HttpHeaders(), null, null)
         }
-}
-
-interface AnsattGruppeResolver {
-    fun grupperForAnsatt(ansattId: AnsattId): Set<EntraGruppe>
 }

@@ -6,11 +6,12 @@ import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
+import java.time.Duration
 
 @ConfigurationProperties(GRAPH)
 class EntraConfig(
     baseUri: URI,
-    override val expireHours : Long = 12,
+    override val varighet : Duration = Duration.ofHours(12),
     pingPath: String = DEFAULT_PING_PATH,
     private val size: Int = DEFAULT_BATCH_SIZE,
     enabled: Boolean = true) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {

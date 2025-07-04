@@ -26,7 +26,7 @@ class CaffeineConfigurer(private vararg val cfgs: CachableRestConfig) : CachingC
 
     private fun cache(cfg: CachableRestConfig) =
         Caffeine.newBuilder()
-            .expireAfterAccess(cfg.expireHours, TimeUnit.HOURS)
+            .expireAfterAccess(cfg.varighet.toHours(), TimeUnit.HOURS)
             .recordStats()
             .removalListener { key: Any?, _: Any?, cause: RemovalCause ->
                 log.info("${cfg.navn}: Cache innslag fjernet: nøkkel={},årsak={}", key, cause)

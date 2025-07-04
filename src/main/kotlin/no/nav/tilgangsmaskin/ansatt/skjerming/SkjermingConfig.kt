@@ -5,10 +5,11 @@ import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
+import java.time.Duration
 
 @ConfigurationProperties(SKJERMING)
 class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH,
-                      override val expireHours : Long = 12,
+                      override val varighet : Duration = Duration.ofHours(12),
                       enabled: Boolean = true) : CachableRestConfig,
     AbstractRestConfig(baseUri, pingPath, SKJERMING, enabled) {
 

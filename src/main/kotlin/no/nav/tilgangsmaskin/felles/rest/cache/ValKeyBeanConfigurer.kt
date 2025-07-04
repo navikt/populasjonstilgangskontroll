@@ -71,7 +71,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
 
     private fun cacheConfig(cfg: CachableRestConfig) =
          defaultCacheConfig()
-            .entryTtl(Duration.ofHours(cfg.expireHours))
+            .entryTtl(cfg.varighet)
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))
             .serializeValuesWith(fromSerializer(GenericJackson2JsonRedisSerializer(valKeyMapper)))
             .apply {

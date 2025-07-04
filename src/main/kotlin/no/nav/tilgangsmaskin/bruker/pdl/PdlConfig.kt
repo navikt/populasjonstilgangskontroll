@@ -5,11 +5,13 @@ import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
+import java.time.Duration
+
 
 @ConfigurationProperties(PDL)
 class PdlConfig(
     baseUri: URI,
-    override val expireHours : Long = 12,
+    override val varighet : Duration = Duration.ofHours(12),
     pingPath: String = DEFAULT_PING_PATH,
     personPath: String = DEFAULT_PERSON_PATH,
     personBolkPath: String = DEFAULT_PERSON__BOLK_PATH,

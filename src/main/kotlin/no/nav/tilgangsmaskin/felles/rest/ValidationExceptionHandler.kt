@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import org.slf4j.LoggerFactory
+import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.web.ErrorResponseException
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 
 @ControllerAdvice
+@Order(0) // Highest precedence
 class ValidationExceptionHandler {
 
     private val log = LoggerFactory.getLogger(javaClass)

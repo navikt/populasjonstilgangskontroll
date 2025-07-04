@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.felles.rest
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
+import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException
 import org.springframework.web.ErrorResponseException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -15,7 +16,7 @@ class ValidationExceptionHandler {
     @ExceptionHandler(Throwable::class)
     fun handleValidationException(e: MethodArgumentNotValidException): Nothing {
         log.warn("Validation error", e)
-        val errors = e.bindingResult.fieldErrors.associate { it.field to (it.defaultMessage ?: "Invalid value") }
+        val errors = e.bindingResult?.fieldErrors?.associate { it.field to (it.defaultMessage ?: "Invalid value") }
         throw ErrorResponseException(
             HttpStatus.BAD_REQUEST,
             ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "").apply {
@@ -24,7 +25,7 @@ class ValidationExceptionHandler {
             },
             e
         ).also {
-            log.warn("Valideringsfeil: ${errors.entries.joinToString(", ")}")
+            log.warn("Valideringsfeil: ${errors?.entries?.joinToString(", ")}")
         }
     }
 }

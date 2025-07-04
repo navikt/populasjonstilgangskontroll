@@ -1,0 +1,13 @@
+apiVersion: aiven.io/v1alpha1
+kind: Valkey
+metadata:
+  labels:
+    app: populasjonstilgangskontroll
+    team: tilgangsmaskin
+  name: valkey-tilgangsmaskin-cache
+  namespace: tilgangsmaskin
+spec:
+  plan: startup-8
+  project: nav-prod
+  userConfig:
+    valkey_maxmemory_policy: allkeys-lru

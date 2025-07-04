@@ -13,9 +13,11 @@ class ValidationExceptionHandler {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handleValidationException(e: MethodArgumentNotValidException): Nothing {
+    @ExceptionHandler(Throwable::class)
+    fun handleValidationException(e: Throwable): Nothing {
         log.warn("Validation error", e)
+        throw e
+        /*
         val errors = e.bindingResult.fieldErrors.associate { it.field to (it.defaultMessage ?: "Invalid value") }
         throw ErrorResponseException(
             HttpStatus.BAD_REQUEST,
@@ -26,6 +28,6 @@ class ValidationExceptionHandler {
             e
         ).also {
             log.warn("Valideringsfeil: ${errors.entries.joinToString(", ")}")
-        }
+        }*/
     }
 }

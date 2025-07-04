@@ -16,7 +16,7 @@ class EntraTjeneste(private val adapter: EntraRestClientAdapter, private val res
 
     fun geoGrupper(ansattId: AnsattId) = adapter.grupper(resolve(ansattId), false)
 
-    fun resolve(ansattId: AnsattId) = resolver.oidForAnsatt(ansattId).toString()
+    private fun resolve(ansattId: AnsattId) = resolver.oidForAnsatt(ansattId).toString()
 
     override fun toString() = "${javaClass.simpleName} [adapter=$adapter, resolver=$resolver]"
 }

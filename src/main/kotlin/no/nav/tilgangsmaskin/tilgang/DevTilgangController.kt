@@ -51,9 +51,6 @@ class DevTilgangController(
 
     private  val log = getLogger(javaClass)
 
-    @GetMapping("resolve/{ansattId}")
-    fun resolve(@PathVariable ansattId: AnsattId) = entra.resolve(ansattId)
-
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)
 

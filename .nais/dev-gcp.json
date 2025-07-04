@@ -135,6 +135,16 @@
       "name": "tilbakekreving-backend",
       "namespace": "tilbake",
       "cluster": "dev-gcp"
+    },
+    {
+      "name": "melosys",
+      "namespace": "teammelosys",
+      "cluster": "dev-fss"
+    },
+    {
+      "name": "melosys-q1",
+      "namespace": "teammelosys",
+      "cluster": "dev-fss"
     }
   ],
   "nais": {

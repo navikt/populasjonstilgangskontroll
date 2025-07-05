@@ -9,8 +9,5 @@ metadata:
 spec:
   plan: {{nais.cluster.plan}}
   project: nav-{{nais.cluster.type}}
-  integrationType: prometheus
-  destinationEndpointId: {{nais.cluster.endpoint}}
-  sourceServiceName: valkey-tilgangsmaskin-cache
   userConfig:
     valkey_maxmemory_policy: allkeys-lru

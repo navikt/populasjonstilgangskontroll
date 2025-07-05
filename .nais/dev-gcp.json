@@ -149,6 +149,7 @@
   ],
   "nais": {
     "cluster": {
+      "plan" : "startup-4",
       "type": "dev"
     }
   },

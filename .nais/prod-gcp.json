@@ -87,6 +87,7 @@
   ],
   "nais": {
     "cluster": {
+      "plan" : "startup-8",
       "type": "prod"
     }
   },

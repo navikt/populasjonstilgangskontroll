@@ -7,7 +7,7 @@ metadata:
   name: valkey-tilgangsmaskin-cache
   namespace: tilgangsmaskin
 spec:
-  plan: startup-8
+  plan: {{nais.cluster.plan}}
   project: nav-{{nais.cluster.type}}
   userConfig:
     valkey_maxmemory_policy: allkeys-lru

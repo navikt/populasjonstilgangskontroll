@@ -72,30 +72,4 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             }
         }
     }
-
-    @Bean
-    override fun cacheResolver() = NoCacheForCollectionArgResolver(SimpleCacheResolver(cacheManager()))
-
-    private fun cacheConfig(cfg: CachableRestConfig) =
-         defaultCacheConfig()
-            .entryTtl(cfg.varighet)
-            .serializeKeysWith(fromSerializer(StringRedisSerializer()))
-            .serializeValuesWith(fromSerializer(GenericJackson2JsonRedisSerializer(valKeyMapper)))
-            .apply {
-                if (!cfg.cacheNulls) disableCachingNullValues()
-            }
-}
-
-class NoCacheForCollectionArgResolver(private val delegate: CacheResolver) : CacheResolver {
-    private val log = getLogger(javaClass)
-    override fun resolveCaches(context: CacheOperationInvocationContext<*>): Collection<Cache> {
-        if (context.args.any { it is Collection<*> }) {
-            log.warn("Ingen cache for {}. Argumenter: {}", context.method.name, context.args)
-            return emptyList()
-        }
-        return delegate.resolveCaches(context).also {
-            log.debug("Cache er {} for {}. Argumenter: {}", it,context.method.name, context.args)
-        }
-
-    }
 }

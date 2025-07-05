@@ -8,6 +8,6 @@ metadata:
   namespace: tilgangsmaskin
 spec:
   plan: startup-8
-  project: nav-prod
+  project: nav-{{nais.cluster.type}}
   userConfig:
     valkey_maxmemory_policy: allkeys-lru

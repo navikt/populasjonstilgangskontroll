@@ -14,8 +14,7 @@ import org.springframework.cache.annotation.Cacheable
 
 @RetryingOnRecoverableService
 @Cacheable(cacheNames = [PDL],
-    condition = "#root.args.?[!(#this instanceof T(java.util.Collection))].size() == #root.args.size()"
-)
+    condition = "#root.args.?[!(#this instanceof T(java.util.Collection))].length == #root.args.length")
 class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL: PdlSyncGraphQLClientAdapter) {
 
     private val log = getLogger(javaClass)

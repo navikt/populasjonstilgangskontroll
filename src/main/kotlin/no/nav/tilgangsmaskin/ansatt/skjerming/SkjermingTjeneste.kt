@@ -10,7 +10,7 @@ import org.springframework.cache.annotation.Cacheable
 @RetryingOnRecoverableService
 @Timed
 @Cacheable(cacheNames = [SKJERMING],
-    condition = "#root.args.?[!(#this instanceof T(java.util.Collection))].size() == #root.args.size()")
+    condition = "#root.args.?[!(#this instanceof T(java.util.Collection))].length == #root.args.length")
 class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
 
     fun skjerming(brukerId: BrukerId) = adapter.skjerming(brukerId.verdi)

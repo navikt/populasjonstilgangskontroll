@@ -1,0 +1,15 @@
+
+apiVersion: aiven.io/v1alpha1
+kind: ServiceIntegration
+metadata:
+  labels:
+    app: populasjonstilgangskontroll
+    team: tilgangsmaskin
+  name: valkey-tilgangsmaskin-cache
+  namespace: tilgangsmaskin
+spec:
+  project: nav-{{nais.cluster.type}}
+  integrationType: prometheus
+  destinationEndpointId: {{nais.cluster.endpoint}}
+  sourceServiceName: valkey-tilgangsmaskin-cache
+

@@ -8,6 +8,7 @@ import no.nav.tilgangsmaskin.felles.rest.Pingable
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.stereotype.Component
+import java.util.Properties
 
 @Component
 class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
@@ -23,6 +24,11 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,pr
             else {
                 error("$name ping failed")
             }
+        }
+
+    fun info() =
+        cf.connection.use  {
+            it.serverCommands().info()
         }
 
 

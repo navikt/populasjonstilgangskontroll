@@ -38,6 +38,8 @@ configurations.all {
 dependencies {
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.17.0-alpha")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.ehcache:ehcache:3.10.8")
+    implementation("org.hibernate.orm:hibernate-jcache:6.4.4.Final")
     implementation("io.micrometer:micrometer-core")
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("io.micrometer:micrometer-tracing")

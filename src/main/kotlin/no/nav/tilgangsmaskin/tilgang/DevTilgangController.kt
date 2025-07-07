@@ -7,8 +7,6 @@ import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
-import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
@@ -20,7 +18,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
-import no.nav.tilgangsmaskin.felles.rest.cache.ValKeyAdapter
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -30,8 +27,6 @@ import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
 import no.nav.tilgangsmaskin.tilgang.BulkApiResponse
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.cache.annotation.CacheEvict
-import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.http.HttpStatus.*
 import org.springframework.web.bind.annotation.*
 
@@ -39,13 +34,11 @@ import org.springframework.web.bind.annotation.*
 @ConditionalOnNotProd
 @Tag(name = "DevTilgangController", description = "Denne kontrolleren skal kun brukes til testing")
 class DevTilgangController(
-    private val valkey: ValKeyAdapter,
     private val graphql: PdlSyncGraphQLClientAdapter,
     private val skjerming: SkjermingTjeneste,
     private val skjermingAdapter: SkjermingRestClientAdapter,
     private val brukere: BrukerTjeneste,
     private val ansatte: AnsattTjeneste,
-    private val entra: EntraTjeneste,
     private val regler: RegelTjeneste,
     private val overstyring: OverstyringTjeneste,
     private val pip: PdlRestClientAdapter,
@@ -54,12 +47,12 @@ class DevTilgangController(
 
     private  val log = getLogger(javaClass)
 
+    @GetMapping("nom/{id}")
+    fun nom(@PathVariable ansattId: AnsattId) = nom.fnrForAnsatt(ansattId )
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)
 
-    @GetMapping("valkey")
-    fun valkey() = valkey.info()
     @GetMapping("bruker/{id}")
     fun bruker(@PathVariable @Valid @ValidId id: String) = brukere.brukerMedUtvidetFamilie(id)
 

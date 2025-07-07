@@ -47,7 +47,7 @@ class DevTilgangController(
 
     private  val log = getLogger(javaClass)
 
-    @GetMapping("nom/{id}")
+    @GetMapping("nom/{ansattId}")
     fun nom(@PathVariable ansattId: AnsattId) = nom.fnrForAnsatt(ansattId )
 
     @GetMapping("sivilstand/{id}")

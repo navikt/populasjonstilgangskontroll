@@ -36,7 +36,7 @@ configurations.all {
 }
 
 dependencies {
-    implementation("com.github.debop:hibernate-redis:2.3.2")
+    implementation("org.hibernate.orm:hibernate-jcache")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.17.0-alpha")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.micrometer:micrometer-core")

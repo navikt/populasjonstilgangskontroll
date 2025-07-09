@@ -22,19 +22,14 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,pr
 
     override fun ping() =
         cf.connection.use {
-            val res = it.execute("HELLO","3".toByteArray())
-            log.info("ValKey HELLO response: $res")
+           // val res = it.execute("HELLO","3".toByteArray())
+          //  log.info("ValKey HELLO response: $res")
             if (it.ping().equals("PONG", ignoreCase = true)) {
                 emptyMap<String,String>()
             }
             else {
                 error("$name ping failed")
             }
-        }
-
-    fun info() =
-        cf.connection.use  {
-            it.serverCommands().info()
         }
 
 

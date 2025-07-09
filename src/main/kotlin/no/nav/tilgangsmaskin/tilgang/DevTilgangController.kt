@@ -39,7 +39,6 @@ import org.springframework.web.bind.annotation.*
 @ConditionalOnNotProd
 @Tag(name = "DevTilgangController", description = "Denne kontrolleren skal kun brukes til testing")
 class DevTilgangController(
-    private val valkey: ValKeyAdapter,
     private val graphql: PdlSyncGraphQLClientAdapter,
     private val skjerming: SkjermingTjeneste,
     private val skjermingAdapter: SkjermingRestClientAdapter,
@@ -58,8 +57,6 @@ class DevTilgangController(
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)
 
-    @GetMapping("valkey")
-    fun valkey() = valkey.info()
     @GetMapping("bruker/{id}")
     fun bruker(@PathVariable @Valid @ValidId id: String) = brukere.brukerMedUtvidetFamilie(id)
 

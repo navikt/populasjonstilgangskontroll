@@ -9,7 +9,6 @@ import java.time.Duration
 
 @ConfigurationProperties(SKJERMING)
 class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH,
-                      override val varighet : Duration = Duration.ofHours(12),
                       enabled: Boolean = true) : CachableRestConfig,
     AbstractRestConfig(baseUri, pingPath, SKJERMING, enabled) {
 

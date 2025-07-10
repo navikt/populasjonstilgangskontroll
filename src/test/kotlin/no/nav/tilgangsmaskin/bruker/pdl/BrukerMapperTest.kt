@@ -39,9 +39,7 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(classes = [TestApp::class])
 
 class BrukerMapperTest {
-
-    @Autowired
-
+    
     private val aktørId = AktørId("1234567890123")
 
     private val vanligBrukerId = BrukerId("08526835670")

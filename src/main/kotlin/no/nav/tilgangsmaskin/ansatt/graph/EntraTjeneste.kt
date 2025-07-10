@@ -18,5 +18,5 @@ class EntraTjeneste(private val adapter: EntraRestClientAdapter, private val res
 
     private fun resolve(ansattId: AnsattId) = resolver.oidForAnsatt(ansattId).toString()
 
-    override fun toString() = "${javaClass.simpleName} [adapter=$adapter, resolver=$resolver]"
+    override fun toString() = "${javaClass.simpleName} [adapter=$adapter resolver=$resolver]"
 }

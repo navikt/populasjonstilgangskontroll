@@ -8,7 +8,6 @@ import java.time.Duration
 
 @ConfigurationProperties(NOM)
 class NomConfig(val topic: String): CachableRestConfig {
-    override val varighet= Duration.ofHours(12)
     override val navn = NOM
     override val cacheNulls=true
 

@@ -19,7 +19,7 @@ class NomHendelseLogger(private val registry: MeterRegistry, private val repo: N
     }
 
     fun start(hendelser: List<NomHendelse>) {
-        log.info("Mottok ${"hendelse".pluralize(hendelser)}")
+        log.info("Mottok ${hendelser.size}")
     }
 
     fun behandler(hendelse: NomHendelse) {
@@ -27,10 +27,12 @@ class NomHendelseLogger(private val registry: MeterRegistry, private val repo: N
     }
 
     fun ferdig(hendelser: List<NomHendelse>) {
-        log.info("${"hendelse".pluralize(hendelser)} ferdig behandlet").also {
+        log.info("${hendelser.plural() } ferdig behandlet").also {
             size()
         }
     }
+
+    private fun List<NomHendelse>.plural() = "hendelse".pluralize(this)
 
     private fun size() =
         registry.gauge("nom.size",repo) {

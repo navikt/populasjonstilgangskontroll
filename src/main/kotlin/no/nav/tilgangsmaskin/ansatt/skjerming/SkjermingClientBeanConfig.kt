@@ -14,8 +14,7 @@ class SkjermingClientBeanConfig {
     @Qualifier(SKJERMING)
     fun skjermingRestClient(b: Builder, cfg: SkjermingConfig) = b.baseUrl(cfg.baseUri).build()
 
-    @Bean
-    fun skjermingHealthIndicator(a: SkjermingRestClientAdapter) = object : PingableHealthIndicator(a) {}
+    fun skjermingHealthIndicator(a: SkjermingRestClientAdapter) =PingableHealthIndicator(a)
 
 }
 

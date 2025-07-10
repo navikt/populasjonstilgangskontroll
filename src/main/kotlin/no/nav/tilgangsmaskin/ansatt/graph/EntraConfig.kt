@@ -11,16 +11,16 @@ import java.time.Duration
 @ConfigurationProperties(GRAPH)
 class EntraConfig(
     baseUri: URI,
-    override val varighet : Duration = Duration.ofHours(12),
     pingPath: String = DEFAULT_PING_PATH,
     private val size: Int = DEFAULT_BATCH_SIZE,
     enabled: Boolean = true) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
 
-    fun userURI(navIdent: String) = builder().path(USERS_PATH)
-        .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_USER)
-        .queryParam(PARAM_NAME_FILTER, "onPremisesSamAccountName eq '$navIdent'")
-        .queryParam(PARAM_NAME_COUNT, "true")
-        .build()
+    fun userURI(navIdent: String) = builder().apply {
+        path(USERS_PATH)
+        queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_USER)
+        queryParam(PARAM_NAME_FILTER, "onPremisesSamAccountName eq'$navIdent'")
+        queryParam(PARAM_NAME_COUNT, "true")
+    }.build()
 
      fun grupperURI(ansattId: String, isCCF: Boolean) = if (isCCF) ccUri(ansattId) else oboUri(ansattId)
 
@@ -28,13 +28,13 @@ class EntraConfig(
 
     private fun ccUri(ansattId: String) = query(ansattId,"id in(${uuidsFormatted()}) or $GEO_PREFIX")
 
-    private fun query(ansattId: String, filter: String) =  builder().path(GRUPPER_PATH)
-        .queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
-        .queryParam(PARAM_NAME_COUNT, "true")
-        .queryParam(PARAM_NAME_TOP, size)
-        .queryParam(PARAM_NAME_FILTER,filter)
-        .build(ansattId)
-
+    private fun query(ansattId: String, filter: String) = builder().apply {
+        path(GRUPPER_PATH)
+        queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
+        queryParam(PARAM_NAME_COUNT, "true")
+        queryParam(PARAM_NAME_TOP, size)
+        queryParam(PARAM_NAME_FILTER, filter)
+    }.build(ansattId)
     override val navn = name
 
     private fun uuidsFormatted() = GlobalGruppe.uuids().joinToString(separator ="','" , prefix = "'", postfix = "'")

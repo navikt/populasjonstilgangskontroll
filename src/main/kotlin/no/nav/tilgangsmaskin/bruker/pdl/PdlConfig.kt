@@ -11,7 +11,6 @@ import java.time.Duration
 @ConfigurationProperties(PDL)
 class PdlConfig(
     baseUri: URI,
-    override val varighet : Duration = Duration.ofHours(12),
     pingPath: String = DEFAULT_PING_PATH,
     personPath: String = DEFAULT_PERSON_PATH,
     personBolkPath: String = DEFAULT_PERSON__BOLK_PATH,

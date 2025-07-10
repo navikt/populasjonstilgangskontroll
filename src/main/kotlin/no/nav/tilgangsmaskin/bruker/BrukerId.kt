@@ -10,7 +10,7 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDig
 data class BrukerId(@JsonValue val verdi: String) {
     init {
         with(verdi) {
-            requireDigits(this, 11)
+            requireDigits(this, BRUKERID_LENGTH)
             if (isProd) {
                 require(mod11(this, W1) == this[9] - '0') { "Første kontrollsiffer  ${this[9]} ikke validert" }
                 require(mod11(this, W2) == this[10] - '0') { "Andre kontrollsiffer  ${this[10]} ikke validert" }
@@ -20,6 +20,7 @@ data class BrukerId(@JsonValue val verdi: String) {
 
     companion object {
 
+        const val BRUKERID_LENGTH = 11
         private val W1 = intArrayOf(2, 5, 4, 9, 8, 1, 6, 7, 3)
         private val W2 = intArrayOf(2, 3, 4, 5, 6, 7, 2, 3, 4, 5)
 

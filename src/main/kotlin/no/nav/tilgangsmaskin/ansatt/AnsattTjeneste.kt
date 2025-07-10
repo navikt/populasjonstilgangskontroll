@@ -19,12 +19,10 @@ class AnsattTjeneste(private val ansatte: NomTjeneste,
                      private val teller: NasjonalGruppeTeller) {
 
 
-    private val log = getLogger(javaClass)
 
     fun ansatt(ansattId: AnsattId) =
         Ansatt(ansattId,ansattBruker(ansattId), ansattGrupper(ansattId)).also {
             tell(it erMedlemAv NASJONAL)
-            log.trace("Ansatt er {}", it)
         }
 
     private fun ansattGrupper(ansattId: AnsattId) = resolver.grupperForAnsatt(ansattId)

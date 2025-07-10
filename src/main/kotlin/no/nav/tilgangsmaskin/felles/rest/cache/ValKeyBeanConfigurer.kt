@@ -7,6 +7,7 @@ import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.boot.conditionals.EnvUtil.isDevOrLocal
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
+import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.Cache
 import org.springframework.cache.annotation.CachingConfigurer
@@ -82,5 +83,8 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             .apply {
                 if (!cfg.cacheNulls) disableCachingNullValues()
             }
+
+    @Bean
+    fun valKeyHealthIndicator(adapter: ValKeyAdapter)  = PingableHealthIndicator(adapter)
 }
 

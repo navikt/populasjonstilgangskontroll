@@ -13,24 +13,22 @@ import java.util.*
 class EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: EntraConfig) :
     AbstractRestClientAdapter(restClient, cf) {
 
-    fun oidFraEntra(ansattId: String) =
-        get<EntraSaksbehandlerRespons>(cf.userURI(ansattId)).oids.single().id
-
-    fun grupper(ansattId: String, trengerGlobaleGrupper: Boolean): Set<EntraGruppe> =
-        generateSequence(get<EntraGrupper>(cf.grupperURI(ansattId,trengerGlobaleGrupper))) { bolk ->
-            bolk.next?.let {
-                get<EntraGrupper>(it)
-            }
+    fun grupper(oid: UUID, trengerGlobaleGrupper: Boolean): Set<EntraGruppe> =
+        generateSequence(get<EntraGrupper>(cf.grupperURI("$oid",trengerGlobaleGrupper))) {
+                bolk -> bolk.next?.let {
+            get<EntraGrupper>(it)
+        }
         }
             .flatMap { it.value }
             .toSet()
+
+    fun oidForAnsatt(ansattId: String) =
+        get<EntraSaksbehandlerRespons>(cf.userURI(ansattId)).oids.single().id
 
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class EntraSaksbehandlerRespons(@JsonProperty("value") val oids: Set<EntraOids>) {
         data class EntraOids(val id: UUID)
     }
-
-    override fun toString() = "${javaClass.simpleName} [client=$restClient, config=$cf, errorHandler=$errorHandler]"
-
 }
+

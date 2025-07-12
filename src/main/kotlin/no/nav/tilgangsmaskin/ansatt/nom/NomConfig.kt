@@ -1,13 +1,12 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
-import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
+import no.nav.tilgangsmaskin.felles.rest.ConfigurableCache
 import org.springframework.boot.context.properties.ConfigurationProperties
-import java.time.Duration
 
 
 @ConfigurationProperties(NOM)
-class NomConfig(val topic: String): CachableRestConfig {
+class NomConfig(val topic: String): ConfigurableCache {
     override val navn = NOM
     override val cacheNulls=true
 

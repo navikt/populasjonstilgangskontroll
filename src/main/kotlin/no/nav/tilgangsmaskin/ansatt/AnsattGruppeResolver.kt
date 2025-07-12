@@ -4,13 +4,15 @@ import no.nav.boot.conditionals.EnvUtil.isDevOrLocal
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.girNasjonalTilgang
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.globaleGrupper
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
+import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter.Companion.requires
 import no.nav.tilgangsmaskin.tilgang.Token
+import no.nav.tilgangsmaskin.tilgang.Token.TokenType.CC
+import no.nav.tilgangsmaskin.tilgang.Token.TokenType.OBO
+import no.nav.tilgangsmaskin.tilgang.Token.TokenType.UNAUTHENTICATED
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.env.Environment
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.stereotype.Component
-import org.springframework.web.client.HttpClientErrorException
 
 @Component
 class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: Token, private val env: Environment)  {
@@ -18,10 +20,13 @@ class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: 
     private val log = getLogger(javaClass)
 
      fun grupperForAnsatt(ansattId: AnsattId) =
-        when {
-            token.erCC ->  grupperForCC(ansattId)
-            token.erObo -> grupperForObo(ansattId)
-            else -> grupperForUautentisert(ansattId)
+        when (token.type) {
+            CC ->  grupperForCC(ansattId)
+            OBO -> grupperForObo(ansattId)
+            UNAUTHENTICATED -> {
+                requires(isDevOrLocal(env),UNAUTHORIZED,   "Uautentisert oppslag kun støttet i dev")
+                grupperForUautentisert(ansattId)
+            }
         }
 
     private fun grupperForCC(ansattId: AnsattId) =
@@ -41,12 +46,10 @@ class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: 
         }
     }
     private fun grupperForUautentisert(ansattId: AnsattId) =
-        if (isDevOrLocal(env)) {
-            log.info("Intet token i dev for $ansattId, slår opp globale og GEO-grupper i Entra")
-            entra.geoOgGlobaleGrupper(ansattId).also {
-                log.info("Uautentisert: $ansattId slo opp $it i Entra for $ansattId")
-            }
-        } else {
-            throw HttpClientErrorException(UNAUTHORIZED, "Autentisering påkrevet i produksjonsmiljøet", HttpHeaders(), null, null)
-        }
+           with(ansattId) {
+               log.info("Intet token i dev for $this, slår opp globale og GEO-grupper i Entra")
+               entra.geoOgGlobaleGrupper(this).also {
+                   log.info("Uautentisert: $ansattId slo opp $it i Entra for $this")
+               }
+           }
 }

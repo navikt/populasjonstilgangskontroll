@@ -2,14 +2,12 @@ package no.nav.tilgangsmaskin.ansatt.skjerming
 
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
-import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
+import no.nav.tilgangsmaskin.felles.rest.ConfigurableCache
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
-import java.time.Duration
 
 @ConfigurationProperties(SKJERMING)
-class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH,
-                      enabled: Boolean = true) : CachableRestConfig,
+class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) : ConfigurableCache,
     AbstractRestConfig(baseUri, pingPath, SKJERMING, enabled) {
 
     val skjermingUri = uri(DEFAULT_SKJERMING_PATH)

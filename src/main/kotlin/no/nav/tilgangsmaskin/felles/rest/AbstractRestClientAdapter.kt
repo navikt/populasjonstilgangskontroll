@@ -1,11 +1,13 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
+import org.springframework.web.server.ResponseStatusException
 import java.net.URI
 
 abstract class AbstractRestClientAdapter(
@@ -36,10 +38,17 @@ abstract class AbstractRestClientAdapter(
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
             .body(T::class.java) ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
 
+
     override val name = cfg.name
 
     override val pingEndpoint = "${cfg.pingEndpoint}"
     override val isEnabled = cfg.isEnabled
     override fun toString() = "webClient=$restClient, cfg=$cfg, baseUri=${cfg.baseUri}"
+
+    companion object {
+        fun requires(condition: Boolean, status: HttpStatus, message: String) {
+            if (!condition) throw ResponseStatusException(status,message)
+        }
+    }
 
 }

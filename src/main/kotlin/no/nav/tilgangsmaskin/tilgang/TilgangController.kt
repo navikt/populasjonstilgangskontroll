@@ -9,6 +9,7 @@ import jakarta.validation.Valid
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter.Companion.requires
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -107,7 +108,5 @@ class TilgangController(
             }
         }
 
-     private fun requires(condition: Boolean, status: HttpStatus, message: String) {
-        if (!condition) throw ResponseStatusException(status,message)
-    }
+
 }

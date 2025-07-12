@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.tilgang
 import no.nav.boot.conditionals.Cluster.LOCAL
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.tilgang.Token.TokenType.*
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -25,8 +26,14 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
     val systemNavn get() = system.split(":").lastOrNull() ?: "N/A"
     val systemAndNs get() = runCatching { system.split(":").drop(1).joinToString(separator = ":") }.getOrElse { systemNavn }
     val cluster get() = runCatching { system.split(":").first() }.getOrElse { LOCAL.name.lowercase() }
-    val erCC get() = stringClaim(IDTYP) == APP
-    val erObo get()  = !erCC && oid != null
+    private val erCC get() = stringClaim(IDTYP) == APP
+    private val erObo get()  = !erCC && oid != null
+     val type: TokenType
+        get() = when {
+            erCC -> CC
+            erObo -> OBO
+            else -> UNAUTHENTICATED
+        }
     companion object {
         const val AAD_ISSUER: String = "azuread"
         private const val APP = "app"
@@ -34,5 +41,9 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
         private const val IDTYP = "idtyp"
         private const val AZP_NAME = "azp_name"
         private const val NAVIDENT = "NAVident"
+    }
+
+    enum class TokenType {
+        CC, OBO, UNAUTHENTICATED
     }
 }

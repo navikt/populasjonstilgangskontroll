@@ -7,7 +7,6 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.regler.motor.NasjonalGruppeTeller
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 
 @Service

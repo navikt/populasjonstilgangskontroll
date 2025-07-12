@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.felles.rest.cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.RemovalCause
 import no.nav.boot.conditionals.ConditionalOnLocalOrTest
-import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
+import no.nav.tilgangsmaskin.felles.rest.ConfigurableCache
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
 @Configuration
 @EnableCaching
 @ConditionalOnLocalOrTest
-class CaffeineConfigurer(private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
+class CaffeineConfigurer(private vararg val cfgs: ConfigurableCache) : CachingConfigurer {
     private val log = LoggerFactory.getLogger(javaClass)
 
     @Bean
@@ -24,9 +24,9 @@ class CaffeineConfigurer(private vararg val cfgs: CachableRestConfig) : CachingC
         cfgs.forEach { registerCustomCache(it.navn, cache(it)) }
     }
 
-    private fun cache(cfg: CachableRestConfig) =
+    private fun cache(cfg: ConfigurableCache) =
         Caffeine.newBuilder()
-            .expireAfterAccess(cfg.varighet.toHours(), TimeUnit.HOURS)
+            .expireAfterAccess(cfg.ttl.toHours(), TimeUnit.HOURS)
             .recordStats()
             .removalListener { key: Any?, _: Any?, cause: RemovalCause ->
                 log.info("${cfg.navn}: Cache innslag fjernet: nøkkel={},årsak={}", key, cause)

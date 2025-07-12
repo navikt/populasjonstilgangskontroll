@@ -6,16 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.boot.conditionals.EnvUtil.isDevOrLocal
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
+import no.nav.tilgangsmaskin.felles.rest.ConfigurableCache
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
-import org.slf4j.LoggerFactory.getLogger
-import org.springframework.cache.Cache
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
-import org.springframework.cache.interceptor.CacheOperationInvocationContext
-import org.springframework.cache.interceptor.CacheResolver
 import org.springframework.cache.interceptor.KeyGenerator
-import org.springframework.cache.interceptor.SimpleCacheResolver
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
@@ -34,7 +29,7 @@ import kotlin.reflect.jvm.jvmName
 class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
                            mapper: ObjectMapper,
                            private val env: Environment,
-                           private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
+                           private vararg val cfgs: ConfigurableCache) : CachingConfigurer {
 
 
     private val valKeyMapper =
@@ -75,9 +70,9 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
     }
 
 
-    private fun cacheConfig(cfg: CachableRestConfig) =
+    private fun cacheConfig(cfg: ConfigurableCache) =
          defaultCacheConfig()
-            .entryTtl(cfg.varighet)
+            .entryTtl(cfg.ttl)
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))
             .serializeValuesWith(fromSerializer(GenericJackson2JsonRedisSerializer(valKeyMapper)))
             .apply {

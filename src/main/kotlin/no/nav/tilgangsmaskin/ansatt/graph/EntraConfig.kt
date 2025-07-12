@@ -3,17 +3,13 @@ package no.nav.tilgangsmaskin.ansatt.graph
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
-import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
+import no.nav.tilgangsmaskin.felles.rest.ConfigurableCache
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
-import java.time.Duration
+
 
 @ConfigurationProperties(GRAPH)
-class EntraConfig(
-    baseUri: URI,
-    pingPath: String = DEFAULT_PING_PATH,
-    private val size: Int = DEFAULT_BATCH_SIZE,
-    enabled: Boolean = true) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
+class EntraConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, private val size: Int = DEFAULT_BATCH_SIZE, enabled: Boolean = true) : ConfigurableCache, AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
 
     fun userURI(navIdent: String) = builder().apply {
         path(USERS_PATH)
@@ -37,7 +33,7 @@ class EntraConfig(
     }.build(ansattId)
     override val navn = name
 
-    private fun uuidsFormatted() = GlobalGruppe.uuids().joinToString(separator ="','" , prefix = "'", postfix = "'")
+    private fun uuidsFormatted() = GlobalGruppe.uuids().joinToString(separator ="','" , prefix = "'", postfix ="'")
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 

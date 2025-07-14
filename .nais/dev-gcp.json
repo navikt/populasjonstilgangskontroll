@@ -137,6 +137,31 @@
       "cluster": "dev-gcp"
     },
     {
+      "name": "saf-q0",
+      "namespace": "teamdokumenthandtering",
+      "cluster": "dev-fss"
+    },
+    {
+      "name": "saf-q1",
+      "namespace": "teamdokumenthandtering",
+      "cluster": "dev-fss"
+    },
+    {
+      "name": "saf",
+      "namespace": "teamdokumenthandtering",
+      "cluster": "dev-fss"
+    },
+    {
+      "name": "saf-q4",
+      "namespace": "teamdokumenthandtering",
+      "cluster": "dev-fss"
+    },
+    {
+      "name": "saf-q5",
+      "namespace": "teamdokumenthandtering",
+      "cluster": "dev-fss"
+    },
+    {
       "name": "melosys",
       "namespace": "teammelosys",
       "cluster": "dev-fss"

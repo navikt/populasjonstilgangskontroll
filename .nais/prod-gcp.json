@@ -79,6 +79,11 @@
       "cluster": "prod-gcp"
     },
     {
+      "name": "saf",
+      "namespace": "teamdokumenthandtering",
+      "cluster": "prod-fss"
+    },
+    {
       "name": "tilbakekreving-backend",
       "namespace": "tilbake",
       "cluster": "prod-gcp"

@@ -18,7 +18,7 @@ class EntraConfig(
     fun userURI(navIdent: String) = builder().apply {
         path(USERS_PATH)
         queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_USER)
-        queryParam(PARAM_NAME_FILTER, "onPremisesSamAccountName eq'$navIdent'")
+        queryParam(PARAM_NAME_FILTER, "onPremisesSamAccountName eq '$navIdent'")
         queryParam(PARAM_NAME_COUNT, "true")
     }.build()
 

@@ -36,7 +36,7 @@ configurations.all {
 }
 
 dependencies {
-    implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.17.1-alpha")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.18.0-alpha")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.micrometer:micrometer-core")
     implementation("io.micrometer:micrometer-registry-prometheus")

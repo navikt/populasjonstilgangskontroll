@@ -44,7 +44,6 @@ class DevTilgangController(
     private val skjermingAdapter: SkjermingRestClientAdapter,
     private val brukere: BrukerTjeneste,
     private val ansatte: AnsattTjeneste,
-    private val entra: EntraTjeneste,
     private val regler: RegelTjeneste,
     private val overstyring: OverstyringTjeneste,
     private val pip: PdlRestClientAdapter,
@@ -60,8 +59,8 @@ class DevTilgangController(
     @GetMapping("bruker/{id}")
     fun bruker(@PathVariable @Valid @ValidId id: String) = brukere.brukerMedUtvidetFamilie(id)
 
-    @GetMapping("person/{id}")
-    fun person(@PathVariable @Valid @ValidId id: String) = pdl.medUtvidetFamile(id)
+  //  @GetMapping("person/{id}")
+  //  fun person(@PathVariable @Valid @ValidId id: String) = pdl.medUtvidetFamile(id)
 
     @GetMapping("person/pip/{id}")
     fun pip(@PathVariable @Valid @ValidId id: String) = pip.person(id)

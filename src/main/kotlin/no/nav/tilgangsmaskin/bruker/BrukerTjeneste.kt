@@ -52,7 +52,12 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
         brukerMedSkjerming(brukerId, personTjeneste::medNærmesteFamilie)
 
     fun brukerMedUtvidetFamilie(brukerId: String) =
-        brukerMedSkjerming(brukerId, personTjeneste::medUtvidetFamile)
+        brukerMedSkjerming(brukerId, { utvidetFamilie(it)})
+
+    private fun utvidetFamilie(id: String) =
+        with(personTjeneste.medNærmesteFamilie(id)) {
+            copy(familie = familie.copy(søsken = personTjeneste.søsken(foreldre, brukerId), partnere =personTjeneste.partnere(id)))
+        }
 
     private fun brukerMedSkjerming(id: String, hentFamilie: (String) -> Person) =
         with(hentFamilie(id)) {

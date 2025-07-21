@@ -14,15 +14,9 @@ import org.springframework.cache.annotation.Cacheable
 
 @RetryingOnRecoverableService
 @Cacheable(cacheNames = [PDL])
-   // condition = "#root.args.?[!(#this instanceof T(java.util.Collection))].length == #root.args.length")
 class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL: PdlSyncGraphQLClientAdapter) {
 
     private val log = getLogger(javaClass)
-
-    fun medUtvidetFamile(id: String) =
-        with(medNærmesteFamilie(id)) {
-            copy(familie = familie.copy(søsken = søsken(foreldre, brukerId), partnere = partnere(id)))
-        }
 
     fun medNærmesteFamilie(id: String) = tilPerson(adapter.person(id))
 
@@ -31,7 +25,7 @@ class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL
         return adapter.personer(brukerIds).map { tilPerson(it.value) }
     }
 
-    private fun partnere(id: String) =
+    fun partnere(id: String) =
         graphQL.sivilstand(id).sivilstand
             .mapNotNull {
                 it.relatertVedSivilstand?.let { brukerId ->
@@ -39,7 +33,7 @@ class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL
                 }
             }.toSet()
 
-    private fun søsken(foreldre: Set<FamilieMedlem>, ansatt: BrukerId) =
+    fun søsken(foreldre: Set<FamilieMedlem>, ansatt: BrukerId) =
         adapter.personer(foreldre.map { it.brukerId.verdi }.toSet())
             .asSequence()
             .flatMap { tilPerson(it.value).barn }

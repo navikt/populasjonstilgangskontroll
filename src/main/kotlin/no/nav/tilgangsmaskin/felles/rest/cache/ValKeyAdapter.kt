@@ -17,7 +17,7 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,pr
 
     private val log = getLogger(javaClass)
 
-    override val pingEndpoint  =  "${cfg.hostValue}:${cfg.portValue}"
+    override val pingEndpoint  =  "${cfg.host}:${cfg.port}"
     override val name = "ValKey Cache"
 
     override fun ping() =

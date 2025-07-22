@@ -24,7 +24,12 @@ class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL
             copy(familie = familie.copy(søsken = søsken(foreldre, brukerId), partnere = partnere(id)))
         }
 
-    fun medNærmesteFamilie(id: String) = tilPerson(adapter.person(id))
+    fun medNærmesteFamilie(id: String): Person {
+        log.info("Slår opp person med id ${id.maskFnr()} i PDL")
+        val p = adapter.person(id)
+        log.info("Slo opp person med id ${p.brukerId.maskFnr()} i PDL")
+        return tilPerson(p)
+    }
 
     fun personer(brukerIds: Set<String>) : List<Person> {
         log.debug("Bulk henter personer for  ${brukerIds.map { it.maskFnr() }.joinToString { "," }}")

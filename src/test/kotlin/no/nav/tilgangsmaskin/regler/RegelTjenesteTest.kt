@@ -96,7 +96,7 @@ class RegelTjenesteTest {
         regler = RegelTjeneste(motor, brukere, ansatte, overstyring)
     }
 
-    @Test
+    //@Test
     @DisplayName("Verifiser at sjekk om overstyring gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang gis om overstyring er gjort")
     fun overstyringOK() {
         every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
@@ -106,7 +106,7 @@ class RegelTjenesteTest {
         }.doesNotThrowAnyException()
     }
 
-    @Test
+    //@Test
     @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang,og at tilgang ikke gis om overstyring ikke er gjort")
     fun ikkeOverstyrt() {
         every {

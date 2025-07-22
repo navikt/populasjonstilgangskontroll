@@ -5,6 +5,6 @@ import org.springframework.stereotype.Component
 
 @Component
 data class ValKeyConfig(
-    @Value("\${VALKEY_HOST_VALKEY_TILGANGSMASKIN_CACHE}") val host: String,
-    @Value("\${VALKEY_PORT_VALKEY_TILGANGSMASKIN_CACHE}") val port: String
+    @Value("\${VALKEY_HOST_CACHE}") val host: String,
+    @Value("\${VALKEY_PORT_CACHE}") val port: String
 )

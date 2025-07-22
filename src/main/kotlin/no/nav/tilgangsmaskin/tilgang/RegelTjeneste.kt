@@ -36,6 +36,7 @@ class RegelTjeneste(
             runCatching {
                 motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
             }.getOrElse {
+                log.warn("Feil ved kjøring av komplette regler for $ansattId og ${brukerId.maskFnr()}", it)
                /* if (overstyringTjeneste.erOverstyrt(ansattId,bruker.brukerId)) {
                     Unit
                 }

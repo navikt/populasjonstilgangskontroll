@@ -36,10 +36,10 @@ class RegelTjeneste(
             runCatching {
                 motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
             }.getOrElse {
-                if (overstyringTjeneste.erOverstyrt(ansattId,bruker.brukerId)) {
+               /* if (overstyringTjeneste.erOverstyrt(ansattId,bruker.brukerId)) {
                     Unit
                 }
-                else throw it
+                else throw it*/
             }
         }
         log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")

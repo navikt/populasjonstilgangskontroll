@@ -94,8 +94,8 @@ spring:
       port: ${valkey.port.valkey-tilgangsmaskin-cache}
       connect-timeout: 10s
       timeout: 5s
-      username: ${valkey.username.cache}
-      password: ${valkey.password.cache}
+      username: ${valkey.username.valkey-tilgangsmaskin-cache}
+      password: ${valkey.password.valkey-tilgangsmaskin-cache}
       ssl:
         enabled: true
   cache:

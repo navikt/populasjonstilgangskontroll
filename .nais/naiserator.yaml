@@ -6,6 +6,9 @@ metadata:
   name: populasjonstilgangskontroll
   namespace: tilgangsmaskin
 spec:
+  valkey:
+    - instance: cache
+      access: readwrite
   leaderElection: true
   kafka:
     pool: nav-{{nais.cluster.type}}

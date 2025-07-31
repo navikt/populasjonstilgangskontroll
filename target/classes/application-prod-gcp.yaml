@@ -1,0 +1,17 @@
+logging:
+    level:
+      org.springframework.data.redis: INFO
+      org.springframework.cache: INFO
+management:
+  endpoint:
+    env:
+      show-values: always
+    configprops:
+      show-values: always
+    health:
+      show-details: always
+      show-components: always
+  endpoints:
+    web:
+      exposure:
+        include: '*'

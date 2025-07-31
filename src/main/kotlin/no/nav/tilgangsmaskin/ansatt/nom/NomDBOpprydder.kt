@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 import java.net.InetAddress
 import java.util.concurrent.TimeUnit.HOURS
 
-@Component
+//@Component
 class NomDBOpprydder(registry: MeterRegistry, private val nom: NomTjeneste)  {
 
     private val log = LoggerFactory.getLogger(javaClass)

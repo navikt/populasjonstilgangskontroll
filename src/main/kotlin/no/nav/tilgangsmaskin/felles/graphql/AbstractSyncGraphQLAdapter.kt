@@ -13,7 +13,7 @@ abstract class AbstractSyncGraphQLAdapter(
         errorHandler: ErrorHandler, protected val graphQlErrorHandler: GraphQLErrorHandler) :
     AbstractRestClientAdapter(client, cf, errorHandler) {
 
-    protected inline fun <reified T> query(query: Pair<String, String>, vars: Map<String, String>) =
+    protected inline fun <reified T: Any> query(query: Pair<String, String>, vars: Map<String, String>) =
         runCatching {
             graphQlClient
                 .documentName(query.first)

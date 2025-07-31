@@ -17,8 +17,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class RegelMotor(
-    @Qualifier(KJERNE) private val kjerne: RegelSett,
-    @Qualifier(OVERSTYRBAR) private val overstyrbar: RegelSett,
+    @param:Qualifier(KJERNE) private val kjerne: RegelSett,
+    @param:Qualifier(OVERSTYRBAR) private val overstyrbar: RegelSett,
     private val cfg: RegelConfig,
     private val logger: RegelMotorLogger) {
 

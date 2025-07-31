@@ -1,0 +1,2 @@
+ALTER TABLE ansatte
+    ADD startdato TIMESTAMP WITHOUT TIME ZONE;

@@ -15,9 +15,10 @@ import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.Include.defaultIncludes
-import org.springframework.boot.actuate.web.exchanges.servlet.HttpExchangesFilter
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
-import org.springframework.boot.web.client.RestClientCustomizer
+import org.springframework.boot.jackson.JsonMixin
+import org.springframework.boot.jackson.autoconfigure.Jackson2ObjectMapperBuilderCustomizer
+import org.springframework.boot.restclient.RestClientCustomizer
+import org.springframework.boot.servlet.actuate.exchanges.HttpExchangesFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
@@ -27,7 +28,6 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import java.lang.reflect.Method
 import java.util.function.Function
 
 

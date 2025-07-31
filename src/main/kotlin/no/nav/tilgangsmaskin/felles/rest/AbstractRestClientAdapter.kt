@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.web.client.RestClient
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import java.net.URI
 
@@ -16,16 +17,15 @@ abstract class AbstractRestClientAdapter(
     protected val log = getLogger(javaClass)
     override fun ping() = get<Any>(cfg.pingEndpoint)
 
-    protected inline fun <reified T> get(uri: URI, headers: Map<String, String> = emptyMap()) =
+    protected inline fun <reified T : Any> get(uri: URI, headers: Map<String, String> = emptyMap()) =
         restClient.get()
             .uri(uri)
             .accept(APPLICATION_JSON)
             .headers { it.setAll(headers) }
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
-            .body(T::class.java) ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
-
-    protected inline fun <reified T> post(uri: URI, body: Any, headers: Map<String, String> = emptyMap()) =
+            .body(object : ParameterizedTypeReference<T>() {}) ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
+    protected inline fun <reified T : Any> post(uri: URI, body: Any, headers: Map<String, String> = emptyMap()) =
         restClient
             .post()
             .uri(uri)
@@ -34,7 +34,7 @@ abstract class AbstractRestClientAdapter(
             .body(body)
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
-            .body(T::class.java) ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
+            .body(object : ParameterizedTypeReference<T>() {}) ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
 
     override val name = cfg.name
 

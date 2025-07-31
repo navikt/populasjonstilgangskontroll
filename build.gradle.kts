@@ -1,6 +1,6 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
-val javaVersion = JavaLanguageVersion.of(21)
+val javaVersion = JavaLanguageVersion.of(24)
 val springdocVersion = "2.8.9"
 val tokenSupportVersion = "5.0.33"
 val mockkVersion = "1.14.5"
@@ -9,10 +9,10 @@ group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
 version = "1.0.1"
 
 plugins {
-    kotlin("jvm") version "1.9.25"
-    kotlin("plugin.spring") version "1.9.25"
-    kotlin("plugin.jpa") version "1.9.25"
-    id("org.springframework.boot") version "3.5.4"
+    kotlin("jvm") version "2.2.0"
+    kotlin("plugin.spring") version "2.2.0"
+    kotlin("plugin.jpa") version "2.2.0"
+    id("org.springframework.boot") version "4.0.0-M1"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.cyclonedx.bom") version "2.3.1"
     id("com.google.cloud.tools.jib") version "3.4.5"
@@ -58,12 +58,14 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-health")
+    implementation("org.springframework.boot:spring-boot-starter-restclient")
+    implementation("org.springframework.boot:spring-boot-starter-jackson")
     implementation("org.springframework.boot:spring-boot-starter-graphql")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.kafka:spring-kafka")
-    implementation("org.springframework.retry:spring-retry")
     implementation("org.springframework:spring-aspects")
     testImplementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")

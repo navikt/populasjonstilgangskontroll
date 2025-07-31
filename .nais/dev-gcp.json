@@ -27,6 +27,21 @@
   },
   "inbound": [
     {
+      "name": "inst2",
+      "namespace": "team-rocket",
+      "cluster": "dev-fss"
+    },
+    {
+      "name": "inst2-q1",
+      "namespace": "team-rocket",
+      "cluster": "dev-fss"
+    },
+    {
+      "name": "inst2-q2",
+      "namespace": "team-rocket",
+      "cluster": "dev-fss"
+    },
+    {
       "name": "arena",
       "namespace": "teamarenanais",
       "cluster": "dev-fss"

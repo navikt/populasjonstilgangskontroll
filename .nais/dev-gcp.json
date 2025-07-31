@@ -27,6 +27,16 @@
   },
   "inbound": [
     {
+      "name": "bidrag-tilgangskontroll-feature",
+      "namespace": "bidrag",
+      "cluster": "dev-gcp"
+    },
+    {
+      "name": "bidrag-tilgangskontroll",
+      "namespace": "bidrag",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "inst2",
       "namespace": "team-rocket",
       "cluster": "dev-fss"

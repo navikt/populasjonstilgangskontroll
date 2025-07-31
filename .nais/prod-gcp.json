@@ -23,6 +23,11 @@
     }
   },
   "inbound": [
+   {
+      "name": "inst2",
+      "namespace": "team-rocket",
+      "cluster": "prod-fss"
+    },
     {
       "name": "notat-administrasjon",
       "namespace": "isa",

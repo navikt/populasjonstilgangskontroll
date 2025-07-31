@@ -102,6 +102,7 @@ tasks.test {
 }
 
 java {
+    targetCompatibility = JavaVersion.VERSION_21
     toolchain {
         languageVersion.set(javaVersion)
     }

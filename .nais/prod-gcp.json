@@ -23,7 +23,12 @@
     }
   },
   "inbound": [
-   {
+    {
+      "name": "bidrag-tilgangskontroll",
+      "namespace": "bidrag",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "inst2",
       "namespace": "team-rocket",
       "cluster": "prod-fss"

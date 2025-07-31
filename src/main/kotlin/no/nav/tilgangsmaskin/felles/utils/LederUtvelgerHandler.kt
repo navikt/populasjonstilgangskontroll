@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient
 import java.net.URI
 import java.time.LocalDateTime
 
-@Component
+//@Component
 class LederUtvelgerHandler(private val builder: WebClient.Builder,
                            @Value("\${elector.sse.url}") private val uri: URI,
                            private val publisher: ApplicationEventPublisher

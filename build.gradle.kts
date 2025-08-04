@@ -76,9 +76,7 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
-springBoot {
-    mainClass.set("no.nav.tilgangsmaskin.AppKt")
-}
+
 
 tasks.withType<BootJar> {
     archiveFileName = "xxxxxxxx.jar"

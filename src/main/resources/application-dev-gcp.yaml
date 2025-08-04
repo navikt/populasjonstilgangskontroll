@@ -18,4 +18,4 @@ management:
   httpexchanges:
     recording:
       enabled: true
-debug: true
+debug: false

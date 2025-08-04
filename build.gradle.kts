@@ -13,11 +13,12 @@ plugins {
     kotlin("plugin.spring") version "1.9.25"
     kotlin("plugin.jpa") version "1.9.25"
     id("org.springframework.boot") version "3.5.4"
-    id("io.spring.dependency-management") version "1.1.7"
     id("org.cyclonedx.bom") version "2.3.1"
     id("com.google.cloud.tools.jib") version "3.4.5"
     application
 }
+
+apply(plugin = "io.spring.dependency-management")
 
 
 repositories {
@@ -29,13 +30,8 @@ repositories {
     }
 }
 
-configurations.all {
-    resolutionStrategy {
-        failOnNonReproducibleResolution()
-    }
-}
-
 dependencies {
+    implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.18.1"))
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.18.1-alpha")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.micrometer:micrometer-core")
@@ -78,13 +74,6 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
     testImplementation(kotlin("test"))
 }
-
-dependencyManagement {
-    imports {
-        mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.18.1")
-    }
-}
-
 application {
     mainClass.set("no.nav.tilgangsmaskin.populasjonstilgangskontroll.AppKt")
 }
@@ -107,7 +96,6 @@ java {
 
 kotlin {
     jvmToolchain(javaVersion.asInt())
-
     compilerOptions {
         freeCompilerArgs.add("-Xjsr305=strict")
     }

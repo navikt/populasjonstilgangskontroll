@@ -81,6 +81,10 @@ tasks.test {
     useJUnitPlatform()
 }
 
+springBoot {
+    buildInfo()
+}
+
 java {
     toolchain {
         languageVersion.set(javaVersion)

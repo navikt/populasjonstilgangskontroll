@@ -79,11 +79,11 @@ jobs:
       - name: Generate and submit dependency graph
         uses: gradle/actions/dependency-submission@v4
 
-      - name: Attest and sign
-        uses: nais/attest-sign@v1.5.16
-        with:
-          image_ref: ${{env.IMAGE}}@${{env.DIGEST}}
-          sbom: build/reports/build.json
+     # - name: Attest and sign
+     #   uses: nais/attest-sign@v1.5.16
+     #   with:
+     #     image_ref: ${{env.IMAGE}}@${{env.DIGEST}}
+     #     sbom: build/reports/build.json
 
     outputs:
       image: ${{ steps.kompiler.outputs.image }}

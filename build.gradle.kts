@@ -81,7 +81,7 @@ springBoot {
 }
 
 tasks.withType<BootJar> {
-    archiveFileName = "app.jar"
+    archiveFileName = "xxxxxxxx.jar"
 }
 
 

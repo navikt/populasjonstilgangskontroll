@@ -82,13 +82,13 @@ class RegelTjenesteTest {
     private lateinit var regler: RegelTjeneste
 
     private lateinit var avvisningTeller : AvvisningTeller
-    private lateinit var avdød: AvdødTeller
+    private lateinit var avdød: AvdodTeller
 
 
     @BeforeTest
     fun before() {
         avvisningTeller = AvvisningTeller(registry, token)
-        avdød = AvdødTeller(registry, token)
+        avdød = AvdodTeller(registry, token)
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
         every { token.system } returns "test"
         every { token.systemNavn } returns "test"

@@ -76,13 +76,6 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
-
-
-tasks.withType<BootJar> {
-    archiveFileName = "xxxxxxxx.jar"
-}
-
-
 tasks.test {
     jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
     useJUnitPlatform()

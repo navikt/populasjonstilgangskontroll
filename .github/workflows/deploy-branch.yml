@@ -55,7 +55,7 @@ jobs:
         run: |
           echo "image=${{ env.IMAGE }}:${{ env.TAG }}" >> $GITHUB_OUTPUT  
           ./gradlew bootBuildImage --imageName=${{ env.IMAGE }}:${{ env.TAG }} --publishImage
-          docker images --digests
+          docker images --digests | awk '{print $2}'
         # | grep ${{ env.IMAGE }}:${{ env.TAG }}
         #  echo "DIGEST=$(cat build/jib-image.digest)" >> $GITHUB_ENV
         env:

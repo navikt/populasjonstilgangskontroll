@@ -65,7 +65,7 @@ jobs:
       - name: Get image digest
         run: |
             HASH=$(docker images --digests | awk '{split($3, a, ":"); print a[2]}' | grep -v '^$' | head -n 1)
-            echo "DIGEST=$HASH" >> $GITHUB_ENV
+            echo "DIGEST=sha256:$HASH" >> $GITHUB_ENV
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v5

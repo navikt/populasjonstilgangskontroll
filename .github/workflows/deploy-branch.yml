@@ -63,7 +63,7 @@ jobs:
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get image digest
-        run: echo "DIGEST=$(docker images --digests | awk '{print $3}')" >> $GITHUB_ENV
+        run: echo "DIGEST=$(docker images --digests | awk '{split($3, a, ":"); print a[2]}')" >> $GITHUB_ENV
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v5

@@ -62,7 +62,7 @@ jobs:
           ORG_GRADLE_PROJECT_githubUser: x-access-token
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set image digest, create CycloneDX BOM
+      - name: Set image digest
         run: |
             HASH=$(docker images --digests | awk '{split($3, a, ":"); print a[2]}' | grep -v '^$' | head -n 1)
             echo "DIGEST=sha256:$HASH" >> $GITHUB_ENV

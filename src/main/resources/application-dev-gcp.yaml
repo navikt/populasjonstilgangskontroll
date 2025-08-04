@@ -1,3 +1,4 @@
+
 spring:
   mvc:
     log-request-details: true
@@ -17,3 +18,4 @@ management:
   httpexchanges:
     recording:
       enabled: true
+debug: true

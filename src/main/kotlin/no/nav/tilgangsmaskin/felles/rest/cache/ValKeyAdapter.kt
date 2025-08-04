@@ -30,8 +30,9 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,pr
             }
         }
 
+    val sizes = name to cacheSizes
 
-    fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl:  ${it.varighet}" }
+    private val cacheSizes get()  = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.toHours()}" }
 
     override fun bindTo(registry: MeterRegistry) {
         cfgs.forEach { cfg ->

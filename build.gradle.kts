@@ -76,7 +76,7 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 application {
-    mainClass.set("no.nav.tilgangsmaskin.populasjonstilgangskontroll.AppKt")
+    mainClass.set("no.nav.tilgangsmaskin.AppKt")
 }
 tasks.withType<BootJar> {
     archiveFileName = "app.jar"

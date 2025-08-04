@@ -80,6 +80,10 @@ springBoot {
     mainClass.set("no.nav.tilgangsmaskin.AppKt")
 }
 
+tasks.withType<BootJar> {
+    archiveFileName = "app.jar"
+}
+
 
 tasks.test {
     jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")

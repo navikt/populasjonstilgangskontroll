@@ -1,3 +1,4 @@
+import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 val javaVersion = JavaLanguageVersion.of(21)
@@ -80,6 +81,7 @@ application {
 tasks.withType<BootJar> {
     archiveFileName = "app.jar"
 }
+
 
 tasks.test {
     jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")

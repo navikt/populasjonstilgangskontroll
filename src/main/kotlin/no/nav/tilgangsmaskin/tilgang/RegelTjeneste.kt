@@ -38,6 +38,7 @@ class RegelTjeneste(
                 motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
             }.getOrElse {
                 log.warn("Feil ved kjøring av komplette regler for $ansattId og ${brukerId.maskFnr()}", it)
+                throw it
                /* if (overstyringTjeneste.erOverstyrt(ansattId,bruker.brukerId)) {
                     Unit
                 }

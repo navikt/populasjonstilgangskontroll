@@ -19,7 +19,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
 
     fun brukere(brukerIds: Set<String>) : Set<Bruker> {
         if (brukerIds.isEmpty()) {
-            log.debug("${"bruker".pluralize(brukerIds, ingen = "Ingen")} å slå opp")
+            log.debug("Bulk ${"bruker".pluralize(brukerIds, ingen = "ingen")} å slå opp")
             return emptySet()
         }
         log.debug("Bulk slår opp ${"bruker".pluralize(brukerIds,"e")}: ${brukerIds.joinToString { it.maskFnr() }}")
@@ -27,22 +27,22 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
         val notFound = brukerIds - personer.map { it.brukerId.verdi }.toSet()
         val found =  personer.map { it.brukerId }.toSet()
         if (notFound.isNotEmpty()) {
-            log.debug("Fant ikke ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
+            log.debug("Bulk fant ikke ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
         }
         if (found.isNotEmpty()) {
-            log.info("Bulk slo opp  ${"person".pluralize(found)} ${found.joinToString { it.verdi.maskFnr() }}")
+            log.debug("Bulk slo opp  ${"person".pluralize(found)} ${found.joinToString { it.verdi.maskFnr() }}")
         }
 
         return found.let { p ->
             if (p.isNotEmpty()) {
-                log.info("Bulk slår opp ${"skjerming".pluralize(p)} for $p")
+                log.debug("Bulk slår opp ${"skjerming".pluralize(p)} for $p")
                 val skjerminger = skjermingTjeneste.skjerminger(p)
                 log.info("Bulk slo opp ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
                 personer.map {
                     tilBruker(it, skjerminger[it.brukerId] ?: false)
                 }
             } else {
-                log.debug("${"skjerming".pluralize(p, ingen = "Ingen")} å slå opp")
+                log.debug("Bulk ${"skjerming".pluralize(p, ingen = "Ingen")} å slå opp")
                 emptyList()
             }.toSet()
         }

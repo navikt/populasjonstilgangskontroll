@@ -67,13 +67,20 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
                 }
                 else {
                     if (it is Collection<*>) {
-                        log.trace("Bulk cache" + it.firstOrNull()?.javaClass?.simpleName)
+                        append(it.customToString())
                     }
-                    append(it)
+                    else {
+                        append(it)
+                    }
                 }
             }
         }
     }
+
+    fun <T> Collection<T>.customToString(): String =
+        joinToString(prefix = "[", postfix = "]") {
+            if (it is BrukerId) it.verdi else it.toString()
+        }
 
 
     private fun cacheConfig(cfg: CachableRestConfig) =

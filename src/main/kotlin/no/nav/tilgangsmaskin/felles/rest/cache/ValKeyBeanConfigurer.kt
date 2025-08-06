@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.boot.conditionals.EnvUtil.isDevOrLocal
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
@@ -62,16 +63,17 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             append(method.name)
             append(":")
             params.forEach {
-                if (it is BrukerId) {
-                    log.trace("Genererer cache-nøkkel med hash")
+                if (it is BrukerId || it is AnsattId) {
+                    log.info("Genererer cache-nøkkel med hash for $it")
                     append(it.hashCode().toString())
                 }
                 else {
                     if (it is Set<*>) {
-                        log.trace("Genererer cache-nøkkel for samling: {}", it.customToString())
+                        log.info("Genererer cache-nøkkel for samling: {}", it.customToString())
                         append(it.customToString())
                     }
                     else {
+                        log.info("cache-nøkkel Argument er $it")
                         append(it)
                     }
                 }

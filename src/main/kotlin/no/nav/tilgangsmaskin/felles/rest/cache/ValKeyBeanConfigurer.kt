@@ -63,6 +63,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             append(":")
             params.forEach {
                 if (it is BrukerId) {
+                    log.trace("Genererer cache-nøkkel med hash")
                     append(it.hashCode().toString())
                 }
                 else {

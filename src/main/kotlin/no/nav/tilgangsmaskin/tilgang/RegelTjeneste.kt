@@ -37,6 +37,7 @@ class RegelTjeneste(
                 motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
             }.getOrElse {
                 log.warn("Feil ved kjøring av komplette regler for $ansattId og ${brukerId.maskFnr()}", it)
+                throw it
             }
         }
         log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")

@@ -63,7 +63,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             append(method.name)
             append(":")
             params.forEach {
-                log.info("cache-nøkkel param er ${it.javaClass}")
+                log.info("Cache-nøkkel param er ${it.javaClass}")
                 if (it is BrukerId || it is AnsattId) {
                     log.info("Genererer cache-nøkkel med hash for $it")
                     append(it.hashCode().toString())

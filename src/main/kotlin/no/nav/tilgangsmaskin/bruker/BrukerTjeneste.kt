@@ -22,7 +22,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
             log.debug("${"bruker".pluralize(brukerIds, ingen = "Ingen")} å slå opp")
             return emptySet()
         }
-        log.debug("Slår opp ${"bruker".pluralize(brukerIds,"e")}: ${brukerIds.joinToString { it.maskFnr() }}")
+        log.debug("Bulk slår opp ${"bruker".pluralize(brukerIds,"e")}: ${brukerIds.joinToString { it.maskFnr() }}")
         val personer =  personTjeneste.personer(brukerIds)
         val notFound = brukerIds - personer.map { it.brukerId.verdi }.toSet()
         val found =  personer.map { it.brukerId }.toSet()

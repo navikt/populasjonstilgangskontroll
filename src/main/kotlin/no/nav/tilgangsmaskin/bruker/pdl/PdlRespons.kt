@@ -18,15 +18,15 @@ data class PdlRespons(
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class PdlPerson(
-            val adressebeskyttelse: List<PdlAdressebeskyttelse> = emptyList(),
-            val doedsfall: List<PdlDødsfall> = emptyList(),
-            val familierelasjoner: List<PdlFamilierelasjon> = emptyList()) {
+        val adressebeskyttelse: List<PdlAdressebeskyttelse> = emptyList(),
+        val doedsfall: List<PdlDoedsfall> = emptyList(),
+        val familierelasjoner: List<PdlFamilierelasjon> = emptyList()) {
 
         data class PdlAdressebeskyttelse(val gradering: PdlAdressebeskyttelseGradering) {
             enum class PdlAdressebeskyttelseGradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG, UGRADERT }
         }
 
-        data class PdlDødsfall(val doedsdato: LocalDate)
+        data class PdlDoedsfall(val doedsdato: LocalDate)
         data class PdlFamilierelasjon(
                 val relatertPersonsIdent: BrukerId? = null,
                 val relatertPersonsRolle: PdlFamilieRelasjonRolle? = null,

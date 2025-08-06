@@ -24,6 +24,11 @@
   },
   "inbound": [
     {
+      "name": "nav-persondata-api",
+      "namespace": "holmes",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "oppslag-bruker-frontend",
       "namespace": "holmes",
       "cluster": "prod-gcp"

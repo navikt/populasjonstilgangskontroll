@@ -70,8 +70,8 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
                 }
                 else {
                     if (it is Set<*>) {
-                        log.info("Genererer en cache-nøkkel for samling: {}", it.customToString())
-                        append(it.customToString())
+                        log.info("Genererer en cache-nøkkel for Set: {}", it)
+                        append(it.hashCode().toString())
                     }
                     else {
                         append(it)

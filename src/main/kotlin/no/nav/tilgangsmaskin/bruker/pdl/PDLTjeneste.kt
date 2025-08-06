@@ -19,7 +19,7 @@ class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL
 
     fun medUtvidetFamile(id: String) =
         with(medNaermesteFamilie(id)) {
-            copy(familie = familie.copy(søsken = søsken(foreldre, brukerId), partnere = partnere(id)))
+            copy(familie = familie.copy(søsken = soesken(foreldre, brukerId), partnere = partnere(id)))
         }
 
     fun medNaermesteFamilie(id: String) = tilPerson(adapter.person(id))
@@ -36,7 +36,7 @@ class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL
                 }
             }.toSet()
 
-    private fun søsken(foreldre: Set<FamilieMedlem>, ansatt: BrukerId) =
+    private fun soesken(foreldre: Set<FamilieMedlem>, ansatt: BrukerId) =
         adapter.personer(foreldre.map { it.brukerId.verdi }.toSet())
             .asSequence()
             .flatMap { tilPerson(it.value).barn }

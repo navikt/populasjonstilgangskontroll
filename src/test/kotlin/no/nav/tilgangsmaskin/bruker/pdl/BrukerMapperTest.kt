@@ -1,10 +1,9 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
-import no.nav.tilgangsmaskin.bruker.AktørId
+import no.nav.tilgangsmaskin.bruker.AktoerId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
@@ -29,8 +28,6 @@ import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.json.JsonTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 
@@ -40,7 +37,7 @@ import org.springframework.test.context.ContextConfiguration
 
 class BrukerMapperTest {
     
-    private val aktørId = AktørId("1234567890123")
+    private val aktørId = AktoerId("1234567890123")
 
     private val vanligBrukerId = BrukerId("08526835670")
 

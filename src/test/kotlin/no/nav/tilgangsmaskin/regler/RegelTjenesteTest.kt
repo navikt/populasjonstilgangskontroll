@@ -99,7 +99,7 @@ class RegelTjenesteTest {
     //@Test
     @DisplayName("Verifiser at sjekk om overstyring gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang gis om overstyring er gjort")
     fun overstyringOK() {
-        every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
+        every { brukere.brukerMedNaermesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
         overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
         assertThatCode {
             regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
@@ -110,7 +110,7 @@ class RegelTjenesteTest {
     @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang,og at tilgang ikke gis om overstyring ikke er gjort")
     fun ikkeOverstyrt() {
         every {
-            brukere.brukerMedNærmesteFamilie(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId.verdi)
+            brukere.brukerMedNaermesteFamilie(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId.verdi)
         } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
         assertThrows<RegelException> {
             val brukerId = BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId
@@ -121,11 +121,11 @@ class RegelTjenesteTest {
     @Test
     fun bulkAvvisninger() {
         every {
-            brukere.brukerMedNærmesteFamilie(fortroligBrukerId.verdi)
+            brukere.brukerMedNaermesteFamilie(fortroligBrukerId.verdi)
         } returns BrukerBuilder(fortroligBrukerId).build()
 
         every {
-            brukere.brukerMedNærmesteFamilie(strengtFortroligBrukerId.verdi)
+            brukere.brukerMedNaermesteFamilie(strengtFortroligBrukerId.verdi)
         } returns BrukerBuilder(strengtFortroligBrukerId).build()
 
         every {
@@ -143,7 +143,7 @@ class RegelTjenesteTest {
     @Test
     fun bulkAvvisningerOverstyrt() {
         every {
-            brukere.brukerMedNærmesteFamilie(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId.verdi) } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
+            brukere.brukerMedNaermesteFamilie(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId.verdi) } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
         every {
             brukere.brukere(setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId.verdi))
         } returns setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build())

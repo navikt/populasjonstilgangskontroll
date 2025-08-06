@@ -41,14 +41,14 @@ class OverstyringTjeneste(
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId): Boolean {
         val overstyring = adapter.gjeldendeOverstyring(
             ansattId.verdi, brukerId.verdi,
-            brukerTjeneste.brukerMedNærmesteFamilie(brukerId.verdi).historiskeIds.map { it.verdi })?.expires
+            brukerTjeneste.brukerMedNaermesteFamilie(brukerId.verdi).historiskeIds.map { it.verdi })?.expires
         return erOverstyrt(ansattId,brukerId,overstyring)
     }
     @Transactional
     fun overstyr(ansattId: AnsattId, data: OverstyringData) =
         runCatching {
             log.info("Sjekker kjerneregler før eventuell overstyring for $ansattId og ${data.brukerId}")
-            motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi))
+            motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedNaermesteFamilie(data.brukerId.verdi))
             adapter.overstyr(ansattId.verdi, data).also {
                 teller.tell(Tags.of("overstyrt", "true"))
                 log.info("Overstyring  til ${data.gyldigtil} ble registret for $ansattId og ${data.brukerId}")

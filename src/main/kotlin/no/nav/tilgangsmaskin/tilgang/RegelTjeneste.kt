@@ -32,7 +32,7 @@ class RegelTjeneste(
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
-            val bruker = brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
+            val bruker = brukerTjeneste.brukerMedNaermesteFamilie(brukerId)
             log.info("Bruker OK for $ansattId og ${brukerId.maskFnr()}")
             runCatching {
                 motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)

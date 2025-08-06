@@ -7,7 +7,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.felles.RetryingOnRecoverableService
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
 
@@ -19,11 +18,11 @@ class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL
     private val log = getLogger(javaClass)
 
     fun medUtvidetFamile(id: String) =
-        with(medNærmesteFamilie(id)) {
+        with(medNaermesteFamilie(id)) {
             copy(familie = familie.copy(søsken = søsken(foreldre, brukerId), partnere = partnere(id)))
         }
 
-    fun medNærmesteFamilie(id: String) = tilPerson(adapter.person(id))
+    fun medNaermesteFamilie(id: String) = tilPerson(adapter.person(id))
 
     fun personer(brukerIds: Set<String>) : List<Person> {
         return adapter.personer(brukerIds).map { tilPerson(it.value) }

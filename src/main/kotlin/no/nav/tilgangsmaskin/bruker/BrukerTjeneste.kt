@@ -48,8 +48,8 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
         }
     }
 
-    fun brukerMedNærmesteFamilie(brukerId: String) =
-        brukerMedSkjerming(brukerId, personTjeneste::medNærmesteFamilie)
+    fun brukerMedNaermesteFamilie(brukerId: String) =
+        brukerMedSkjerming(brukerId, personTjeneste::medNaermesteFamilie)
 
     fun brukerMedUtvidetFamilie(brukerId: String) =
         brukerMedSkjerming(brukerId, personTjeneste::medUtvidetFamile)

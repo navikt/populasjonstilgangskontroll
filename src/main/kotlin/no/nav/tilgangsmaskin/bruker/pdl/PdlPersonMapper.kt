@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import no.nav.tilgangsmaskin.bruker.AktørId
+import no.nav.tilgangsmaskin.bruker.AktoerId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
@@ -36,7 +36,7 @@ object PdlPersonMapper {
 
             Person(
                 BrukerId(brukerId),
-                AktørId(aktørId),
+                AktoerId(aktørId),
                 tilGeoTilknytning(geografiskTilknytning),
                 tilGraderinger(person.adressebeskyttelse),
                 tilFamilie(person.familierelasjoner),

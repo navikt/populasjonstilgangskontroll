@@ -67,6 +67,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
                 }
                 else {
                     if (it is Collection<*>) {
+                        log.trace("Genererer cache-nøkkel for samling: {}", it.customToString())
                         append(it.customToString())
                     }
                     else {
@@ -77,7 +78,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
         }
     }
 
-    fun <T> Collection<T>.customToString(): String =
+    private fun <T> Collection<T>.customToString(): String =
         joinToString(prefix = "[", postfix = "]") {
             if (it is BrukerId) it.verdi else it.toString()
         }

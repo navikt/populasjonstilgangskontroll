@@ -8,6 +8,7 @@ import no.nav.boot.conditionals.EnvUtil.isDevOrLocal
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.interceptor.KeyGenerator
@@ -31,6 +32,8 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
                            private val env: Environment,
                            private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
+
+    private val log = getLogger(javaClass)
 
     private val valKeyMapper =
         mapper.copy().apply {
@@ -63,6 +66,9 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
                     append(it.verdi)
                 }
                 else {
+                    if (it is Collection<*>) {
+                        log.trace("Bulk cache" + it.firstOrNull()?.javaClass?.simpleName)
+                    }
                     append(it)
                 }
             }

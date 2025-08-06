@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.boot.conditionals.EnvUtil.isDevOrLocal
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.interceptor.KeyGenerator
@@ -31,6 +33,8 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
                            private val env: Environment,
                            private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
+
+    private val log = getLogger(javaClass)
 
     private val valKeyMapper =
         mapper.copy().apply {
@@ -59,16 +63,23 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             append(method.name)
             append(":")
             params.forEach {
-                if (it is BrukerId) {
-                    append(it.verdi)
+                log.info("cache-nøkkel param er ${it.javaClass}")
+                if (it is BrukerId || it is AnsattId) {
+                    log.info("Genererer cache-nøkkel med hash for ${it.javaClass.simpleName}")
+                    append(it.hashCode().toString())
                 }
                 else {
-                    append(it)
+                    if (it is Set<*>) {
+                        log.info("Genererer en cache-nøkkel for Set: {}", it)
+                        append(it.hashCode().toString())
+                    }
+                    else {
+                        append(it)
+                    }
                 }
             }
         }
     }
-
 
     private fun cacheConfig(cfg: CachableRestConfig) =
          defaultCacheConfig()

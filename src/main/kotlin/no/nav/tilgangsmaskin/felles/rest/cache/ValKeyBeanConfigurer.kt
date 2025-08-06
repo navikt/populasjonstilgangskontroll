@@ -73,7 +73,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
                         append(it.customToString())
                     }
                     else {
-                        log.info("cache-nøkkel Argument er $it")
+                        log.info("cache-nøkkel Argument er ${it.javaClass}")
                         append(it)
                     }
                 }

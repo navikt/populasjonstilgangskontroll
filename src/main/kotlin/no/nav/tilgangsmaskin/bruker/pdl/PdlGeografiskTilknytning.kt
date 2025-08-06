@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTType.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PdlGeografiskTilknytning(
-    val gtType: GTType? = UDEFINERT,
+    val gtType: GTType? = UDEFINERT ,
     val gtKommune: GTKommune? = null,
     val gtBydel: GTBydel? = null,
     val gtLand: GTLand? = null

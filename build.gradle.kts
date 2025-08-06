@@ -9,6 +9,8 @@ val mockkVersion = "1.14.5"
 group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
 version = "1.0.1"
 
+ext["commons-lang3.version"] ="3.18.0"
+
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"

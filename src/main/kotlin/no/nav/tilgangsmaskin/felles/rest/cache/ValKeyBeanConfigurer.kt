@@ -79,7 +79,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
         }
     }
 
-    private fun <T> Collection<T>.customToString(): String =
+    private fun <T> Set<T>.customToString(): String =
         joinToString(prefix = "[", postfix = "]") {
             if (it is BrukerId) it.verdi else it.toString()
         }

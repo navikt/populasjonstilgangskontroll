@@ -24,6 +24,11 @@
   },
   "inbound": [
     {
+      "name": "oppslag-bruker-frontend",
+      "namespace": "holmes",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "bidrag-tilgangskontroll",
       "namespace": "bidrag",
       "cluster": "prod-gcp"

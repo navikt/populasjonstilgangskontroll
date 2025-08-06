@@ -33,15 +33,10 @@ class RegelTjeneste(
         val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
             val bruker = brukerTjeneste.brukerMedNaermesteFamilie(brukerId)
-            log.info("Bruker OK for $ansattId og ${brukerId.maskFnr()}")
             runCatching {
                 motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
             }.getOrElse {
                 log.warn("Feil ved kjøring av komplette regler for $ansattId og ${brukerId.maskFnr()}", it)
-               /* if (overstyringTjeneste.erOverstyrt(ansattId,bruker.brukerId)) {
-                    Unit
-                }
-                else throw it*/
             }
         }
         log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")

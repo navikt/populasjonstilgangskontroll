@@ -14,7 +14,7 @@ data class PdlRespons(
     val aktørId = identer.identer.firstOrNull { it.gruppe == AKTORID }?.ident
         ?: error("Ingen gyldig aktørid funnet")
     val brukerId = identer.identer.firstOrNull { it.gruppe in listOf(FOLKEREGISTERIDENT, NPID) }?.ident
-        ?: error("Ingen gyldig identer funnet")
+        ?: error("Ingen gyldig ident funnet")
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class PdlPerson(

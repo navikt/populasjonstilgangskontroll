@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.interceptor.KeyGenerator
+import org.springframework.cache.interceptor.LoggingCacheErrorHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
@@ -55,6 +56,10 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             .enableStatistics()
             .build()
 
+
+    @Bean
+    fun cacheErrorHandler() = LoggingCacheErrorHandler(true)
+
     @Bean
     override fun keyGenerator() = KeyGenerator { target, method, params ->
         buildString {
@@ -93,4 +98,36 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
     @Bean
     fun valKeyHealthIndicator(adapter: ValKeyAdapter)  = PingableHealthIndicator(adapter)
 }
+
+/*
+@Component
+class CustomCacheErrorHandler : CacheErrorHandler {
+    override fun handleCacheGetError(
+        exception: java.lang.RuntimeException,
+        cache: Cache,
+        key: Any
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun handleCachePutError(
+        exception: java.lang.RuntimeException,
+        cache: Cache,
+        key: Any,
+        value: Any?
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun handleCacheEvictError(
+        exception: java.lang.RuntimeException,
+        cache: Cache,
+        key: Any
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun handleCacheClearError(exception: RuntimeException, cache: Cache) {}
+
+} */
 

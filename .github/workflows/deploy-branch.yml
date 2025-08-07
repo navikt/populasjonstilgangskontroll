@@ -2,7 +2,7 @@ name: Build and deploy branch
 on:
   pull_request:
     branches:
-      - main
+      - '*'
 
 env:
   IMAGE: europe-north1-docker.pkg.dev/nais-management-233d/tilgangsmaskin/${{ github.event.repository.name }}

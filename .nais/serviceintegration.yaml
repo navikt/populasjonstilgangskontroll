@@ -5,11 +5,11 @@ metadata:
   labels:
     app: populasjonstilgangskontroll
     team: tilgangsmaskin
-  name: valkey-tilgangsmaskin-cache
+  name: valkey-tilgangsmaskin-cache1
   namespace: tilgangsmaskin
 spec:
   project: nav-{{nais.cluster.type}}
   integrationType: prometheus
   destinationEndpointId: {{nais.cluster.endpoint}}
-  sourceServiceName: valkey-tilgangsmaskin-cache
+  sourceServiceName: valkey-tilgangsmaskin-cache1
 

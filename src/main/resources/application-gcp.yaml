@@ -90,12 +90,12 @@ spring:
                 headers: false
   data:
     redis:
-      host: ${valkey.host.cache}
-      port: ${valkey.port.cache}
+      host: ${valkey.host.cache1}
+      port: ${valkey.port.cache1}
       connect-timeout: 10s
       timeout: 5s
-      username: ${valkey.username.cache}
-      password: ${valkey.password.cache}
+      username: ${valkey.username.cache1}
+      password: ${valkey.password.cache1}
       ssl:
         enabled: true
   cache:

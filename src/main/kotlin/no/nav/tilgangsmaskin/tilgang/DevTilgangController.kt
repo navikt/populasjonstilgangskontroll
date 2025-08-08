@@ -50,7 +50,7 @@ class DevTilgangController(
     private val overstyring: OverstyringTjeneste,
     private val pip: PdlRestClientAdapter,
     private val nom: NomTjeneste,
-    private val valkey: RedisTemplate,
+    private val valkey: RedisTemplate<Any,Any >,
     private val pdl: PDLTjeneste) {
 
     private  val log = getLogger(javaClass)

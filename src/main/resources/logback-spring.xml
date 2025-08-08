@@ -20,6 +20,7 @@
 
     <springProfile name="dev">
         <logger name="org.springframework.cache" level="trace"/>
+        <logger name="org.springframework.cache.interceptor" level="trace"/>
         <logger name="org.springframework.data.redis" level="trace"/>
         <logger name="no.nav.tilgangsmaskin" level="debug"/>
     </springProfile>

@@ -32,6 +32,7 @@ import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.data.redis.connection.RedisConnectionFactory
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.http.HttpStatus.*
 import org.springframework.web.bind.annotation.*
 
@@ -49,10 +50,21 @@ class DevTilgangController(
     private val overstyring: OverstyringTjeneste,
     private val pip: PdlRestClientAdapter,
     private val nom: NomTjeneste,
+    private val valkey: RedisTemplate<Any,Any >,
     private val pdl: PDLTjeneste) {
 
     private  val log = getLogger(javaClass)
 
+
+    @GetMapping("valkey/{cache}")
+    fun valkey(@PathVariable  cache: String) {
+        log.info("Henter fra cache: $cache")
+        val dbIndex = valkey.connectionFactory?.connection?.db
+        log.info("Current Redis DB index: $dbIndex")
+        valkey.keys("*").forEach {
+            log.info("Cachenøkkel er: $it")
+        }
+    }
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)

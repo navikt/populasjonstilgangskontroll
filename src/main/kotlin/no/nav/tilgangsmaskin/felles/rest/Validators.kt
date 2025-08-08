@@ -4,7 +4,7 @@ import jakarta.validation.Constraint
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
 import jakarta.validation.Payload
-import no.nav.tilgangsmaskin.bruker.AktørId
+import no.nav.tilgangsmaskin.bruker.AktoerId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import org.slf4j.LoggerFactory.getLogger
@@ -24,7 +24,7 @@ class IdValidator : ConstraintValidator<ValidId, Any> {
     private val log = getLogger(javaClass)
     override fun isValid(verdi: Any, context: ConstraintValidatorContext) =
         when (verdi) {
-            is String -> runCatching { AktørId(verdi.trim('"')) }.isSuccess || runCatching { BrukerId(verdi.trim('"')) }.isSuccess
+            is String -> runCatching { AktoerId(verdi.trim('"')) }.isSuccess || runCatching { BrukerId(verdi.trim('"')) }.isSuccess
             is Set<*> -> true /*verdi.all {
                 it is IdOgType && (runCatching {
                     AktørId(it.brukerId.trim('"'))

@@ -1,3 +1,4 @@
+import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 val javaVersion = JavaLanguageVersion.of(21)
@@ -8,16 +9,18 @@ val mockkVersion = "1.14.5"
 group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
 version = "1.0.1"
 
+ext["commons-lang3.version"] ="3.18.0"
+
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
     kotlin("plugin.jpa") version "1.9.25"
     id("org.springframework.boot") version "3.5.4"
-    id("io.spring.dependency-management") version "1.1.7"
     id("org.cyclonedx.bom") version "2.3.1"
-    id("com.google.cloud.tools.jib") version "3.4.5"
     application
 }
+
+apply(plugin = "io.spring.dependency-management")
 
 
 repositories {
@@ -29,13 +32,8 @@ repositories {
     }
 }
 
-configurations.all {
-    resolutionStrategy {
-        failOnNonReproducibleResolution()
-    }
-}
-
 dependencies {
+    implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.18.1"))
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.18.1-alpha")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.micrometer:micrometer-core")
@@ -79,24 +77,13 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
-dependencyManagement {
-    imports {
-        mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.18.1")
-    }
-}
-
-application {
-    mainClass.set("no.nav.tilgangsmaskin.populasjonstilgangskontroll.AppKt")
-}
-tasks.withType<BootJar> {
-    archiveFileName = "app.jar"
-}
-
 tasks.test {
     jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
     useJUnitPlatform()
-    reports {
-    }
+}
+
+springBoot {
+    buildInfo()
 }
 
 java {
@@ -107,7 +94,6 @@ java {
 
 kotlin {
     jvmToolchain(javaVersion.asInt())
-
     compilerOptions {
         freeCompilerArgs.add("-Xjsr305=strict")
     }

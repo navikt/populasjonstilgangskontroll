@@ -4,7 +4,7 @@ metadata:
   labels:
     app: populasjonstilgangskontroll
     team: tilgangsmaskin
-  name: valkey-tilgangsmaskin-cache
+  name: valkey-tilgangsmaskin-cache1
   namespace: tilgangsmaskin
 spec:
   terminationProtection: false

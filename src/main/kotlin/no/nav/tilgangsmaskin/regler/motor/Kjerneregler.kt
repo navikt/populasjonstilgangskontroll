@@ -55,14 +55,14 @@ class ForeldreOgBarnRegel : KjerneRegel {
 @Component
 class PartnerRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avvisHvis { ansatt erNåværendeEllerTidligerePartnerMed bruker }
+        avvisHvis { ansatt erNaaværendeEllerTidligerePartnerMed bruker }
 
     override val metadata = RegelMetadata(PARTNER)
 }
 
 @Component
 @Order(HIGHEST_PRECEDENCE + 7)
-class SøskenRegel : KjerneRegel {
+class SoskenRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis { ansatt erSøskenTil bruker }
 

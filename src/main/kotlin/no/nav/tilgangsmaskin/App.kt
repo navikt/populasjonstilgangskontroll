@@ -45,10 +45,11 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, pr
             builder.withDetail(
                 "extra-info", mapOf(
                     "Startup" to startupDate.local(),
-                    "Java version" to environment.getProperty("java.version"),
+                    "Java runtime version" to environment.getProperty("java.runtime.version"),
+                    "Java vendor" to environment.getProperty("java.vm.vendor"),
                     "Client ID" to environment.getProperty("azure.app.client.id"),
                     "Name" to environment.getProperty("spring.application.name"),
-                    valKey.name to valKey.cacheSizes(),
+                    valKey.sizes,
                     "Spring Boot version" to SpringBootVersion.getVersion(),
                     "Spring Framework version" to SpringVersion.getVersion()))
             regelsett.forEach {

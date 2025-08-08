@@ -279,7 +279,7 @@ class RegelMotorTest {
                 BrukerBuilder(annenAnsattBrukerId).søsken(setOf(brukerId)).build()
             val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
             val søsken = BrukerBuilder(brukerId).build()
-            forventAvvistAv<SøskenRegel>(ansatt, søsken)
+            forventAvvistAv<SoskenRegel>(ansatt, søsken)
         }
     }
 

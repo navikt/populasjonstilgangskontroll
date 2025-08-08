@@ -57,7 +57,7 @@ class DevTilgangController(
 
 
     @GetMapping("valkey/{cache}")
-    fun sivilstand(@PathVariable  cache: String) {
+    fun valkey(@PathVariable  cache: String) {
         log.info("Henter fra cache: $cache")
         valkey.keys("*$cache*").forEach {
             log.info("Cache key: $it")

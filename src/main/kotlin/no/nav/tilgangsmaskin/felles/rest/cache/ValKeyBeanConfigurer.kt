@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.interceptor.KeyGenerator
-import org.springframework.cache.interceptor.LoggingCacheErrorHandler
+import org.springframework.cache.interceptor.*
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
@@ -48,6 +48,9 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
                 activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
             }
         }
+
+    @Bean
+    fun simpleKeyGenerator() = SimpleKeyGenerator()
 
     @Bean
     override fun cacheManager(): RedisCacheManager =

@@ -95,7 +95,7 @@ spring:
       connect-timeout: 10s
       timeout: 5s
       username: ${valkey.username.${nais.cluster.cache}}
-      username: ${valkey.username.${nais.cluster.cache}}
+      password: ${valkey.password.${nais.cluster.cache}}
       ssl:
         enabled: true
   cache:

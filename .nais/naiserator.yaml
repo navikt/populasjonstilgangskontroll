@@ -94,7 +94,7 @@ spec:
   env:
     - name: NAIS_CLUSTER_TYPE
       value: {{nais.cluster.type}}
-    - name: CACHE_NAME
+    - name: NAIS_CACHE_NAME
       value: {{nais.cluster.cache}}
     - name: PDLGRAPH
       value: {{pdlgraph}}

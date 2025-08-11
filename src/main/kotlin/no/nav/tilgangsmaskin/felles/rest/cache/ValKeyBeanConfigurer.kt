@@ -50,46 +50,11 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
         }
 
     @Bean
-    fun simpleKeyGenerator() = SimpleKeyGenerator()
-
-    @Bean
     override fun cacheManager(): RedisCacheManager =
         RedisCacheManager.builder(lockingRedisCacheWriter(cf))
             .withInitialCacheConfigurations(cfgs.associate { it.navn to cacheConfig(it) })
             .enableStatistics()
             .build()
-
-
-    @Bean
-    fun acacheErrorHandler() = LoggingCacheErrorHandler(true)
-
-    /*
-    @Bean
-    override fun keyGenerator() = KeyGenerator { target, method, params ->
-        buildString {
-            append(target::class.jvmName)
-            append(":")
-            append(method.name)
-            append(":")
-            params.forEach {
-                log.info("cache-nøkkel param er ${it.javaClass}")
-                if (it is BrukerId || it is AnsattId) {
-                    log.info("Genererer cache-nøkkel med hash for ${it.javaClass.simpleName}")
-                    append(it.hashCode().toString())
-                }
-                else {
-                    if (it is Set<*>) {
-                        log.info("Genererer en cache nøkkel for Set: {}", it)
-                        append(it.hashCode().toString())
-                    }
-                    else {
-                        append(it)
-                    }
-                }
-            }
-        }
-    }
-    */
 
     private fun cacheConfig(cfg: CachableRestConfig) =
          defaultCacheConfig()
@@ -103,36 +68,4 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
     @Bean
     fun valKeyHealthIndicator(adapter: ValKeyAdapter)  = PingableHealthIndicator(adapter)
 }
-
-/*
-@Component
-class CustomCacheErrorHandler : CacheErrorHandler {
-    override fun handleCacheGetError(
-        exception: java.lang.RuntimeException,
-        cache: Cache,
-        key: Any
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun handleCachePutError(
-        exception: java.lang.RuntimeException,
-        cache: Cache,
-        key: Any,
-        value: Any?
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun handleCacheEvictError(
-        exception: java.lang.RuntimeException,
-        cache: Cache,
-        key: Any
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun handleCacheClearError(exception: RuntimeException, cache: Cache) {}
-
-} */
 

@@ -6,6 +6,8 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.pluralize
 import no.nav.tilgangsmaskin.regler.motor.*
@@ -14,6 +16,7 @@ import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.BulkRespons.BulkResultat
 import no.nav.tilgangsmaskin.tilgang.BulkRespons.BulkResultat.Companion.ok
 import org.slf4j.LoggerFactory.getLogger
+import org.slf4j.MDC
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Service
 import kotlin.collections.map
@@ -31,16 +34,25 @@ class RegelTjeneste(
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "komplett"])
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
+            if (!ClusterUtils.isProd) {
+                MDC.put("brukerId", brukerId)
+            }
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
             val bruker = brukerTjeneste.brukerMedNaermesteFamilie(brukerId)
             runCatching {
                 motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
             }.getOrElse {
                 log.warn("Feil ved kjøring av komplette regler for $ansattId og ${brukerId.maskFnr()}", it)
+                if (!ClusterUtils.isProd) {
+                    MDC.remove("brukerId")
+                }
                 throw it
             }
         }
         log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
+        if (!ClusterUtils.isProd) {
+            MDC.remove("brukerId")
+        }
     }
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])

@@ -11,17 +11,18 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
 
 @RetryingOnRecoverableService
-@Cacheable(cacheNames = [PDL])
    // condition = "#root.args.?[!(#this instanceof T(java.util.Collection))].length == #root.args.length")
 class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL: PdlSyncGraphQLClientAdapter) {
 
     private val log = getLogger(javaClass)
 
+    @Cacheable(cacheNames = [PDL])
     fun medUtvidetFamile(id: String) =
         with(medNaermesteFamilie(id)) {
             copy(familie = familie.copy(søsken = soesken(foreldre, brukerId), partnere = partnere(id)))
         }
 
+    @Cacheable(cacheNames = [PDL])
     fun medNaermesteFamilie(id: String) = tilPerson(adapter.person(id))
 
     fun personer(brukerIds: Set<String>) : List<Person> {

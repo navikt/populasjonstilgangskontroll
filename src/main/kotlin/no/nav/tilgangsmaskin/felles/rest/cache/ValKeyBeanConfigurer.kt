@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager
+import org.springframework.data.redis.cache.BatchStrategies
 import org.springframework.data.redis.cache.RedisCacheWriter.lockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
@@ -51,7 +52,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
 
     @Bean
     override fun cacheManager(): RedisCacheManager =
-        RedisCacheManager.builder(lockingRedisCacheWriter(cf))
+        RedisCacheManager.builder(lockingRedisCacheWriter(cf,BatchStrategies.scan(1000)))
             .withInitialCacheConfigurations(cfgs.associate { it.navn to cacheConfig(it) })
             .enableStatistics()
             .build()

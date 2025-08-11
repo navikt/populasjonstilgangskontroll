@@ -27,6 +27,11 @@
   },
   "inbound": [
     {
+      "name": "aareg-tilgangskontroll-q2",
+      "namespace": "arbeidsforhold",
+      "cluster": "dev-fss"
+    },
+    {
       "name": "nav-persondata-api",
       "namespace": "holmes",
       "cluster": "dev-gcp"

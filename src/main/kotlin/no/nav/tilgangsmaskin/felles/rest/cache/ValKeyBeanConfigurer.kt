@@ -51,25 +51,6 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             .enableStatistics()
             .build()
 
-    @Bean
-    override fun keyGenerator() = KeyGenerator { target, method, params ->
-        buildString {
-            append(target::class.jvmName)
-            append(":")
-            append(method.name)
-            append(":")
-            params.forEach {
-                if (it is BrukerId) {
-                    append(it.verdi)
-                }
-                else {
-                    append(it)
-                }
-            }
-        }
-    }
-
-
     private fun cacheConfig(cfg: CachableRestConfig) =
          defaultCacheConfig()
             .entryTtl(cfg.varighet)

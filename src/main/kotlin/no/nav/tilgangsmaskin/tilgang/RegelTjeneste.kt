@@ -39,10 +39,6 @@ class RegelTjeneste(
             }.getOrElse {
                 log.warn("Feil ved kjøring av komplette regler for $ansattId og ${brukerId.maskFnr()}", it)
                 throw it
-               /* if (overstyringTjeneste.erOverstyrt(ansattId,bruker.brukerId)) {
-                    Unit
-                }
-                else throw it*/
             }
         }
         log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")

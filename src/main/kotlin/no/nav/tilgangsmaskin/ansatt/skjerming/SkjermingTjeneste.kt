@@ -11,7 +11,7 @@ import org.springframework.cache.annotation.Cacheable
 @Timed
 class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
 
-    @Cacheable(cacheNames = [SKJERMING])
+    @Cacheable(cacheNames = [SKJERMING], key = "#brukerId.verdi")
     fun skjerming(brukerId: BrukerId) = adapter.skjerming(brukerId.verdi)
 
     fun skjerminger(brukerIds: Set<BrukerId>) = adapter.skjerminger(brukerIds.map { it.verdi }.toSet())

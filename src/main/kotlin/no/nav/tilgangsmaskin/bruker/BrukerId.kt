@@ -34,5 +34,5 @@ data class BrukerId(@JsonValue val verdi: String) {
             }
     }
 
-    //override fun toString() = verdi.maskFnr()
+    override fun toString() = verdi.maskFnr()
 }

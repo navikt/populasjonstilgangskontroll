@@ -16,13 +16,12 @@ class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL
 
     private val log = getLogger(javaClass)
 
-    @Cacheable(cacheNames = [PDL])
+    @Cacheable(cacheNames = [PDL],  key = "#root.methodName + ':' + #id")
     fun medUtvidetFamile(id: String) =
         with(medNaermesteFamilie(id)) {
             copy(familie = familie.copy(søsken = soesken(foreldre, brukerId), partnere = partnere(id)))
         }
 
-    @Cacheable(cacheNames = [PDL])
     fun medNaermesteFamilie(id: String) = tilPerson(adapter.person(id))
 
     fun personer(brukerIds: Set<String>) : List<Person> {

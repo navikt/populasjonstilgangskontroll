@@ -63,6 +63,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
     @Bean
     fun acacheErrorHandler() = LoggingCacheErrorHandler(true)
 
+    /*
     @Bean
     override fun keyGenerator() = KeyGenerator { target, method, params ->
         buildString {
@@ -88,6 +89,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             }
         }
     }
+    */
 
     private fun cacheConfig(cfg: CachableRestConfig) =
          defaultCacheConfig()

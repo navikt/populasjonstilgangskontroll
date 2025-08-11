@@ -59,8 +59,6 @@ class DevTilgangController(
     @GetMapping("valkey/{cache}")
     fun valkey(@PathVariable  cache: String) {
         log.info("Henter fra cache: $cache")
-        val dbIndex = valkey.connectionFactory?.connection?.db
-        log.info("Current Redis DB index: $dbIndex")
         valkey.keys("*").forEach {
             log.info("Cachenøkkel er: $it")
         }

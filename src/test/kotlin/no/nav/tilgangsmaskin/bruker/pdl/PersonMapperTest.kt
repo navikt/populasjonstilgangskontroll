@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import no.nav.tilgangsmaskin.bruker.AktoerId
+import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
@@ -31,7 +31,7 @@ class PersonMapperTest {
 
     private val vanligBrukerId = BrukerId("08526835670")
     private val brukerId = BrukerBuilder(vanligBrukerId).build().brukerId.verdi
-    private val aktørId = AktoerId("1234567890123").verdi
+    private val aktørId = AktørId("1234567890123").verdi
 
     @Test
     @DisplayName("Test at behandling av brukere med uten  geotilknytning får UdefinertTilknytning")

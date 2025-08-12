@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.felles.rest.cache.JsonCacheable
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
 
 @JsonCacheable
-data class AktoerId(@JsonValue val verdi: String) {
+data class AktørId(@JsonValue val verdi: String) {
     init {
         requireDigits(verdi, 13)
     }

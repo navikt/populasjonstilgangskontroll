@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import no.nav.tilgangsmaskin.bruker.AktoerId
+import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
@@ -36,7 +36,7 @@ object PdlPersonMapper {
 
             Person(
                 BrukerId(brukerId),
-                AktoerId(aktørId),
+                AktørId(aktørId),
                 tilGeoTilknytning(geografiskTilknytning),
                 tilGraderinger(person.adressebeskyttelse),
                 tilFamilie(person.familierelasjoner),
@@ -90,7 +90,7 @@ object PdlPersonMapper {
             else -> UdefinertTilknytning()
         }
 
-    private fun tilDødsdato(dødsfall: List<PdlDoedsfall>) = dødsfall.maxByOrNull { it.doedsdato }?.doedsdato
+    private fun tilDødsdato(dødsfall: List<PdlDødsfall>) = dødsfall.maxByOrNull { it.doedsdato }?.doedsdato
 
     private fun tilFamilie(relasjoner: List<PdlFamilierelasjon>): Familie {
         val (foreldre, barn) = relasjoner

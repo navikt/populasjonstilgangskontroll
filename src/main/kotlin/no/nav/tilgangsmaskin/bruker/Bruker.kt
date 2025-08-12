@@ -38,6 +38,6 @@ data class Bruker(
 
     data class BrukerIds(val brukerId: BrukerId,
                          val historiskeIds: Set<BrukerId> = emptySet(),
-                         val aktørId: AktoerId? = null)
+                         val aktørId: AktørId? = null)
 
 }

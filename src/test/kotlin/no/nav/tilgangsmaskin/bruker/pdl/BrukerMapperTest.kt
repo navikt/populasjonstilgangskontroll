@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.bruker.pdl
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
-import no.nav.tilgangsmaskin.bruker.AktoerId
+import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
@@ -37,7 +37,7 @@ import org.springframework.test.context.ContextConfiguration
 
 class BrukerMapperTest {
     
-    private val aktørId = AktoerId("1234567890123")
+    private val aktørId = AktørId("1234567890123")
 
     private val vanligBrukerId = BrukerId("08526835670")
 

@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import no.nav.tilgangsmaskin.bruker.AktoerId
+import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.Companion.INGEN
@@ -14,7 +14,7 @@ import java.time.LocalDate
 @JsonCacheable
 data class Person(
     val brukerId: BrukerId,
-    val aktørId: AktoerId,
+    val aktørId: AktørId,
     val geoTilknytning: GeografiskTilknytning,
     val graderinger: List<Gradering> = emptyList(),
     val familie: Familie = INGEN,

@@ -92,6 +92,14 @@ java {
     }
 }
 
+tasks.named<BootBuildImage>("bootBuildImage") {
+    builder.set("paketobuildpacks/builder-jammy-base")
+    environment.put("BPE_LANG", "en_US.utf8")
+   // environment.put("BP_ARCH", "amd64")
+   // imagePlatform.set("linux/amd64")
+  //  trustBuilder.set(false)
+}
+
 kotlin {
     jvmToolchain(javaVersion.asInt())
     compilerOptions {

@@ -16,7 +16,7 @@ class AnsattOidResolver(private val adapter: EntraRestClientAdapter, private val
 
     fun oidForAnsatt(ansattId: AnsattId) =  if (token.erObo)  token.oid else oidFraEntra(ansattId.verdi)
 
-    //@Cacheable(cacheNames = ["entra-oid"]) // TODO
+    @Cacheable(cacheNames = ["entra-oid"], key = "#ansattId") 
      fun oidFraEntra(ansattId: String) = adapter.oidFraEntra(ansattId).also {
         log.debug("OID fra Entra for {} er {}", ansattId, it)
     }

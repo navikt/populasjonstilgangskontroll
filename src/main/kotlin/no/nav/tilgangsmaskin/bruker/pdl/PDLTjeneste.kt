@@ -14,8 +14,6 @@ import org.springframework.cache.annotation.Cacheable
 @RetryingOnRecoverableService
 class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL: PdlSyncGraphQLClientAdapter) {
 
-    private val log = getLogger(javaClass)
-
     @Cacheable(cacheNames = [PDL],  key = "#root.methodName + ':' + #id")
     fun medUtvidetFamile(id: String) =
         with(medNærmesteFamilie(id)) {

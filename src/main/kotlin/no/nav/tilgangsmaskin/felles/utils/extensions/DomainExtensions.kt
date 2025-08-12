@@ -19,8 +19,11 @@ object DomainExtensions {
             else -> "${items.size} $this$suffix"
         }
 
-    inline fun <T> withMDC(key: String, value: String, block: () -> T): T {
-        MDC.put(key, value)
-        return try { block() } finally { MDC.remove(key) }
-    }
+    inline fun <T> withMDC(key: String, value: String, block: () -> T) =
+        try {
+            MDC.put(key, value)
+            block()
+        } finally {
+            MDC.remove(key)
+        }
 }

@@ -90,12 +90,12 @@ spring:
                 headers: false
   data:
     redis:
-      host: ${valkey.host.cache1}
-      port: ${valkey.port.cache1}
+      host: ${valkey.host}
+      port: ${valkey.port}
       connect-timeout: 10s
       timeout: 5s
-      username: ${valkey.username.cache1}
-      password: ${valkey.password.cache1}
+      username: ${valkey.username}
+      password: ${valkey.password}
       ssl:
         enabled: true
   cache:
@@ -187,5 +187,9 @@ graph:
 nom:
   topic: org.nom.api-ressurs-state-v3
 valkey:
+  username: ${valkey.username.${nais.cluster.cache}}
+  password: ${valkey.password.${nais.cluster.cache}}
+  port: ${valkey.port.${nais.cluster.cache}}
+  host: ${valkey.host.${nais.cluster.cache}}
   json:
     enabled: false

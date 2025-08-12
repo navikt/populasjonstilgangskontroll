@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.utils.extensions
 
 import org.slf4j.MDC
+import kotlin.collections.remove
 
 
 object DomainExtensions {
@@ -20,10 +21,6 @@ object DomainExtensions {
 
     inline fun <T> withMDC(key: String, value: String, block: () -> T): T {
         MDC.put(key, value)
-        return try {
-            block()
-        } finally {
-            MDC.remove(key)
-        }
+        return try { block() } finally { MDC.remove(key) }
     }
 }

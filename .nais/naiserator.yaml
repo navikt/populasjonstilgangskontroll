@@ -7,7 +7,7 @@ metadata:
   namespace: tilgangsmaskin
 spec:
   valkey:
-    - instance: cache1
+    - instance: {{nais.cluster.cache}}
       access: readwrite
   leaderElection: true
   kafka:
@@ -94,6 +94,8 @@ spec:
   env:
     - name: NAIS_CLUSTER_TYPE
       value: {{nais.cluster.type}}
+    - name: NAIS_CLUSTER_CACHE
+      value: {{nais.cluster.cache}}
     - name: PDLGRAPH
       value: {{pdlgraph}}
     - name: PDL

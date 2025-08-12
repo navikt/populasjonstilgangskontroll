@@ -18,7 +18,7 @@ class NomTjeneste(private val adapter: NomJPAAdapter) {
     fun lagre(ansattData: NomAnsattData) = adapter.upsert(ansattData)
 
     @Transactional(readOnly = true)
-    @Cacheable(cacheNames = [NOM])
+    @Cacheable(cacheNames = [NOM],  key = "#ansattId.verdi")
     fun fnrForAnsatt(ansattId: AnsattId) = adapter.fnrForAnsatt(ansattId.verdi)
     fun ryddOpp() = adapter.ryddOpp().also {
         if (it > 0) log.info("Vaktmester ryddet opp $it rad(er) med utgått informasjon om ansatte som ikke lenger jobber i Nav")

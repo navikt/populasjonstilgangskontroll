@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.felles.utils.extensions
 
+import org.slf4j.MDC
+
 
 object DomainExtensions {
     fun requireDigits(verdi: String, len: Int) {
@@ -15,4 +17,13 @@ object DomainExtensions {
             1 -> this
             else -> "${items.size} $this$suffix"
         }
+
+    inline fun <T> withMDC(key: String, value: String, block: () -> T): T {
+        MDC.put(key, value)
+        return try {
+            block()
+        } finally {
+            MDC.remove(key)
+        }
+    }
 }

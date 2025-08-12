@@ -47,4 +47,8 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,pr
                 .count()
                 .toDouble()
         }
+
+    companion object {
+        const val VALKEY = "valkey"
+    }
 }

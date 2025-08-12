@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.felles.utils
 
 import org.slf4j.LoggerFactory
 
-object secureLog {
+object Secure {
     private val secureLog = LoggerFactory.getLogger("secureLog")
 
     fun trace(message: String) = secureLog.trace(message)

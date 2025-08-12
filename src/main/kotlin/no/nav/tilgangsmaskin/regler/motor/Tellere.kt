@@ -22,3 +22,7 @@ class OverstyringTeller(registry: MeterRegistry, token: Token) :
 @Component
 class AvvisningTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "avvist.regel", "Avvisningsbegrunnelse pr regel")
+
+@Component
+class RegeltypeTeller(registry: MeterRegistry, token: Token) :
+    AbstractTeller(registry, token, "type.konsument", "Regeltype pr konsument")

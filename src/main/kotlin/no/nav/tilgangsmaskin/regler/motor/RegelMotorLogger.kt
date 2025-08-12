@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
 import no.nav.tilgangsmaskin.felles.utils.secureLog
+import no.nav.tilgangsmaskin.regler.motor.RegelSett.*
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
@@ -15,7 +16,8 @@ import no.nav.tilgangsmaskin.tilgang.Token
 @Component
 class RegelMotorLogger(private val registry: MeterRegistry, private val token: Token) {
 
-    private val teller: AvvisningTeller = AvvisningTeller(registry, token)
+    private val avvisningTeller = AvvisningTeller(registry, token)
+    private val regeltypeTeller = RegeltypeTeller(registry, token)
     private val bulkHistogram: DistributionSummary = DistributionSummary
         .builder("bulk.histogram")
         .description("Histogram av bulk-størrelse")
@@ -24,12 +26,16 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         .register(registry)
 
     private val log = getLogger(javaClass)
+
+     fun tellRegelType(type: RegelType) {
+        regeltypeTeller.tell(Tags.of("type",type.name, "system", token.system))
+    }
     fun avvist(ansatt: Ansatt, bruker: Bruker, regel: Regel) {
         MDC.put(BESLUTNING,regel.kode)
         val fra =  MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
         log.warn("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for $bruker $fra")
         secureLog.warn("Tilgang til ${bruker.brukerId.verdi} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} $fra")
-        teller.tell(Tags.of("navn", regel.navn))
+        avvisningTeller.tell(Tags.of("navn", regel.navn))
         MDC.remove(BESLUTNING)
     }
 

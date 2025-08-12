@@ -11,11 +11,9 @@ import java.net.URI
 import java.time.LocalDateTime
 
 @Component
-class LederUtvelgerHandler(private val builder: WebClient.Builder,
-                           @Value("\${elector.sse.url}") private val uri: URI,
-                           private val publisher: ApplicationEventPublisher
-) {
-
+class LederUtvelger(private val builder: WebClient.Builder,
+                    @Value("\${elector.sse.url}") private val uri: URI,
+                    private val publisher: ApplicationEventPublisher) {
 
     @EventListener(ApplicationReadyEvent::class)
     fun onApplicationReady() {

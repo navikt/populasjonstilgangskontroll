@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.tilgangsmaskin.felles.utils.LederUtvelgerHandler
+import no.nav.tilgangsmaskin.felles.utils.LederUtvelger.LeaderChangedEvent
 import org.slf4j.LoggerFactory
 import org.springframework.context.event.EventListener
 import org.springframework.scheduling.annotation.Scheduled
@@ -22,8 +22,8 @@ class NomDBOpprydder(registry: MeterRegistry, private val nom: NomTjeneste)  {
     private val hostname = InetAddress.getLocalHost().hostName
     var erLeder: Boolean = false
 
-    @EventListener(LederUtvelgerHandler.LeaderChangedEvent::class)
-    fun onApplicationEvent(event: LederUtvelgerHandler.LeaderChangedEvent) {
+    @EventListener(LeaderChangedEvent::class)
+    fun onApplicationEvent(event: LeaderChangedEvent) {
         erLeder = event.leder == hostname
         log.info("Vaktmester erLeder=$erLeder, me=$hostname, leder=${event.leder}")
         if (erLeder) {

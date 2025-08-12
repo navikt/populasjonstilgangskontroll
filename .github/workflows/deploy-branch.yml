@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Sjekker ut kode
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
@@ -100,5 +100,5 @@ jobs:
       VARS: .nais/${{matrix.cluster}}.json
       IMAGE: ${{needs.build.outputs.image}}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: nais/deploy/actions/deploy@v2

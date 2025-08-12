@@ -19,3 +19,6 @@ management:
     recording:
       enabled: true
 debug: false
+
+valkey:
+  suffix: cache1

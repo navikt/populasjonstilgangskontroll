@@ -1,11 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.stereotype.Component
+import org.springframework.boot.context.properties.ConfigurationProperties
 
-@Component
-data class ValKeyConfig( @Value("\${valkey.host}") val host: String,
-                          @Value("\${valkey.port}") val port: String) {
-
-
-}
+@ConfigurationProperties(prefix = "valkey")
+data class ValKeyConfig(val host: String, val port: String)

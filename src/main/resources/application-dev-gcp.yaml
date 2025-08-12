@@ -21,6 +21,5 @@ management:
 debug: false
 
 valkey:
-  suffix: ${nais.cluster.cache}
-  port: ${valkey.port.${valkey.suffix}}
-  host: ${valkey.host.${valkey.suffix}}
+  port: ${valkey.port.${nais.cluster.cache}}
+  host: ${valkey.host.${nais.cluster.cache}}

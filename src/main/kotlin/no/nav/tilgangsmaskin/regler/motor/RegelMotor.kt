@@ -30,7 +30,7 @@ class RegelMotor(
     fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, kjerne)
 
     private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) {
-        logger.tellRegelType(regelSett.type)
+        logger.tellRegelSett(regelSett)
         regelSett.regler.forEach { regel ->
             logger.evaluerer(ansatt, bruker, regel)
             if (!cfg.isEnabled(regel.navn)) {

@@ -7,7 +7,6 @@ import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
 import no.nav.tilgangsmaskin.felles.utils.secureLog
-import no.nav.tilgangsmaskin.regler.motor.RegelSett.*
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
@@ -27,9 +26,8 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
 
     private val log = getLogger(javaClass)
 
-     fun tellRegelType(type: RegelType) {
-        regeltypeTeller.tell(Tags.of("type",type.name, "system", token.system))
-    }
+    fun tellRegelSett(regelSett: RegelSett) = regeltypeTeller.tell(Tags.of("type",regelSett.type.name, "system", token.system))
+
     fun avvist(ansatt: Ansatt, bruker: Bruker, regel: Regel) {
         MDC.put(BESLUTNING,regel.kode)
         val fra =  MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"

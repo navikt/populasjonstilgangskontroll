@@ -37,7 +37,7 @@ class RegelTjeneste(
             runCatching {
                 motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
             }.getOrElse {
-                if (overstyringTjeneste.erOverstyrt(ansattId) && it is RegelException) {
+                if (overstyringTjeneste.erOverstyrt(ansattId, bruker.brukerId) && it is RegelException) {
                     log.trace("Overstyring for $ansattId og ${brukerId.maskFnr()} ble funnet", it)
                 }
                 else {

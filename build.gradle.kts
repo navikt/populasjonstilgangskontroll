@@ -114,5 +114,6 @@ kotlin {
     }
 }
 tasks.named<BootBuildImage>("bootBuildImage") {
+    builder.set("paketobuildpacks/builder-noble-base")
     environment.put("BPE_LANG", "en_US.utf8")
 }

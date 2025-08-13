@@ -117,6 +117,6 @@ tasks.named<BootBuildImage>("bootBuildImage") {
     builder.set("paketobuildpacks/ubuntu-noble-builder-buildpackless:latest")
     runImage.set("paketobuildpacks/ubuntu-noble-run-base")
     buildpacks.set(listOf("docker.io/paketobuildpacks/java"))
-    environment.put("BPE_LANG", "nb_NO.utf8")
+    environment.put("BPE_LANG", "en_US.utf8")
 }
 

@@ -37,8 +37,13 @@ class RegelTjeneste(
             runCatching {
                 motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
             }.getOrElse {
-                log.warn("Feil ved kjøring av komplette regler for $ansattId og ${brukerId.maskFnr()}", it)
-                throw it
+                if (overstyringTjeneste.erOverstyrt(ansattId, bruker.brukerId) && it is RegelException) {
+                    log.trace("Overstyring for $ansattId og ${brukerId.maskFnr()} ble funnet", it)
+                }
+                else {
+                    log.warn("Feil ved kjøring av komplette regler for $ansattId og ${brukerId.maskFnr()}", it)
+                    throw it
+                }
             }
         }
         log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")

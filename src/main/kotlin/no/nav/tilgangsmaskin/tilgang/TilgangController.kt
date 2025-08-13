@@ -12,6 +12,8 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
+import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
+import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
@@ -40,13 +42,14 @@ class TilgangController(
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et komplett regelsett for en bruker")
-    fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String) = regelTjeneste.kompletteRegler(token.ansattId!!, brukerId.trim('"'))
+    fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KOMPLETT_REGELTYPE)
+
 
     @PostMapping("kjerne")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et kjerneregelsett for en bruker")
-    fun kjerneregler(@RequestBody @Valid @ValidId brukerId: String) = regelTjeneste.kjerneregler(token.ansattId!!, brukerId.trim('"'))
+    fun kjerneregler(@RequestBody @Valid @ValidId brukerId: String) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KJERNE_REGELTYPE)
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)
@@ -64,7 +67,7 @@ class TilgangController(
         description = "Dette endepunktet er kun tilgjengelig for obo flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er og regeltyper. Om ingen regeltype oppgis, evalueres det komplette regelsettet")
     fun bulkOBO(@RequestBody @Valid @ValidId specs: Set<BrukerIdOgRegelsett>) =
-        bulkRegler({token.ansattId!!},{token.erObo}, specs)
+        bulkOppslag({token.ansattId!!},{token.erObo}, specs)
 
     @PostMapping("bulk/obo/{regelType}")
     @ResponseStatus(MULTI_STATUS)
@@ -73,7 +76,7 @@ class TilgangController(
         description = "Dette endepunktet er kun tilgjengelig for obo flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er med gitt regeltype")
     fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>) =
-        bulkRegler({token.ansattId!!},{token.erObo},brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet())
+        bulkOppslag({token.ansattId!!},{token.erObo},brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet())
 
     @PostMapping("bulk/ccf/{ansattId}")
     @ResponseStatus(MULTI_STATUS)
@@ -82,7 +85,7 @@ class TilgangController(
         description = "Dette endepunktet er kun tilgjengelig for client credentials flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er og regeltyper. Om ingen regeltype oppgis, evalueres det komplette regelsettet")
     fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgRegelsett>) =
-        bulkRegler({ansattId},{token.erCC}, specs)
+        bulkOppslag({ansattId},{token.erCC}, specs)
 
     @PostMapping("bulk/ccf/{ansattId}/{regelType}")
     @ResponseStatus(MULTI_STATUS)
@@ -91,9 +94,9 @@ class TilgangController(
         description = "Dette endepunktet er kun tilgjengelig for client credentials flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er med gitt regeltype")
     fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>) =
-        bulkRegler({ ansattId }, { token.erCC }, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet())
+        bulkOppslag({ ansattId }, { token.erCC }, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet())
 
-    private fun bulkRegler(ansattId: () -> AnsattId, tokenTypeCondition: () -> Boolean, specs: Set<BrukerIdOgRegelsett>) =
+    private fun bulkOppslag(ansattId: () -> AnsattId, tokenTypeCondition: () -> Boolean, specs: Set<BrukerIdOgRegelsett>) =
         with(ansattId()) {
             if (specs.isNotEmpty()) {
                 requires(tokenTypeCondition(), FORBIDDEN,"Mismatch mellom token type og endepunkt")
@@ -105,6 +108,19 @@ class TilgangController(
                 log.debug("Ingen brukerId-er oppgitt i bulk forespørsel for {}", this)
                 BulkRespons(this)
             }
+        }
+
+    private fun enkeltOppslag(ansattId: () -> AnsattId, tokenTypeCondition: () -> Boolean, brukerId: String, regelType: RegelType) =
+        with(ansattId()) {
+            requires(tokenTypeCondition(), FORBIDDEN,"Mismatch mellom token type og endepunkt")
+            requires(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
+                BAD_REQUEST, "Ugyldig regeltype: $regelType")
+                if (regelType == KJERNE_REGELTYPE) {
+                   return regelTjeneste.kjerneregler(this, brukerId)
+                }
+                if (regelType == KOMPLETT_REGELTYPE) {
+                    return regelTjeneste.kompletteRegler(this, brukerId)
+                }
         }
 
      private fun requires(condition: Boolean, status: HttpStatus, message: String) {

@@ -41,15 +41,27 @@ class TilgangController(
     @PostMapping("komplett")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
-    @Operation(summary = "Evaluer et komplett regelsett for en bruker")
+    @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter OBO-token")
     fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KOMPLETT_REGELTYPE)
+
+    @PostMapping("/ccf/komplett")
+    @ResponseStatus(NO_CONTENT)
+    @ProblemDetailApiResponse
+    @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter CCF-token")
+    fun kompletteReglerCCF(@PathVariable ansattId: AnsattId,@RequestBody @Valid @ValidId brukerId: String) = enkeltOppslag({ansattId}, {token.erCC}, brukerId, KOMPLETT_REGELTYPE)
 
 
     @PostMapping("kjerne")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
-    @Operation(summary = "Evaluer et kjerneregelsett for en bruker")
+    @Operation(summary = "Evaluer et kjerneregelsett for en bruker, forutsetter OBO-token")
     fun kjerneregler(@RequestBody @Valid @ValidId brukerId: String) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KJERNE_REGELTYPE)
+
+    @PostMapping("/ccf/kjerne")
+    @ResponseStatus(NO_CONTENT)
+    @ProblemDetailApiResponse
+    @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter CCF-token")
+    fun kjerneReglerCCF(@PathVariable ansattId: AnsattId,@RequestBody @Valid @ValidId brukerId: String) = enkeltOppslag({ansattId}, {token.erCC}, brukerId, KJERNE_REGELTYPE)
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)
@@ -115,15 +127,15 @@ class TilgangController(
             requires(tokenTypeCondition(), FORBIDDEN,"Mismatch mellom token type og endepunkt")
             requires(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")
-                if (regelType == KJERNE_REGELTYPE) {
-                   return regelTjeneste.kjerneregler(this, brukerId)
-                }
-                if (regelType == KOMPLETT_REGELTYPE) {
-                    return regelTjeneste.kompletteRegler(this, brukerId)
-                }
+            if (regelType == KJERNE_REGELTYPE) {
+                return regelTjeneste.kjerneregler(this, brukerId)
+            }
+            if (regelType == KOMPLETT_REGELTYPE) {
+                return regelTjeneste.kompletteRegler(this, brukerId)
+            }
         }
 
-     private fun requires(condition: Boolean, status: HttpStatus, message: String) {
+    private fun requires(condition: Boolean, status: HttpStatus, message: String) {
         if (!condition) throw ResponseStatusException(status,message)
     }
 }

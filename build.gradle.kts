@@ -114,6 +114,7 @@ kotlin {
     }
 }
 tasks.named<BootBuildImage>("bootBuildImage") {
+    builder.set("paketobuildpacks/ubuntu-noble-run-tiny")
     environment.put("BPE_LANG", "en_US.utf8")
 }
 

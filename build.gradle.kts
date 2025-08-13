@@ -1,4 +1,5 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 
 val javaVersion = JavaLanguageVersion.of(21)
 val springdocVersion = "2.8.9"
@@ -111,4 +112,8 @@ kotlin {
     compilerOptions {
         freeCompilerArgs.add("-Xjsr305=strict")
     }
+}
+tasks.named<BootBuildImage>("bootBuildImage") {
+    builder.set("paketobuildpacks/ubuntu-noble-builder-buildpackless")
+    environment.put("BPE_LANG", "en_US.utf8")
 }

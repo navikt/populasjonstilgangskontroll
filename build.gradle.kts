@@ -6,7 +6,7 @@ val springdocVersion = "2.8.9"
 val tokenSupportVersion = "5.0.34"
 val mockkVersion = "1.14.5"
 
-group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
+group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
 version = "1.0.1"
 
 plugins {
@@ -81,7 +81,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("no.nav.tilgangsmaskin.populasjonstilgangskontroll.AppKt")
+    mainClass.set("no.nav.tilgangsmaskin.AppKt")
 }
 tasks.withType<BootJar> {
     archiveFileName = "app.jar"

@@ -25,7 +25,7 @@ class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: 
         }
 
     private fun grupperForCC(ansattId: AnsattId) =
-        entra.geoOgGlobaleGrupper(ansattId,oid.oidFraEntra(ansattId)).also {
+        entra.geoOgGlobaleGrupper(ansattId, oid.oidFraEntra(ansattId)).also {
             log.info("CC-flow: $ansattId slo opp globale og GEO-grupper i Entra")
         }
 

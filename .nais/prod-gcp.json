@@ -24,6 +24,11 @@
   },
   "inbound": [
     {
+      "name": "melosys",
+      "namespace": "teammelosys",
+      "cluster": "prod-fss"
+    },
+    {
       "name": "nav-persondata-api",
       "namespace": "holmes",
       "cluster": "prod-gcp"

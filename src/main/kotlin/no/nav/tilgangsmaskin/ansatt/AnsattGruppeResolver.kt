@@ -35,7 +35,7 @@ class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: 
                 log.info("OBO-flow: $ansattId har nasjonal tilgang, slo *ikke* opp GEO-grupper i Entra")
             }
         } else {
-            (this + entra.geoGrupper(ansattId,token.oid!!)).also {
+            (this + entra.geoGrupper(ansattId, token.oid!!)).also {
                 log.info("OBO-flow: $ansattId har ikke nasjonal tilgang, slo opp GEO-grupper i Entra")
             }
         }

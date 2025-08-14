@@ -9,6 +9,7 @@ import jakarta.validation.Valid
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
@@ -45,8 +46,8 @@ class TilgangController(
     @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter OBO-token")
     fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String) {
         log.info(CONFIDENTIAL, "Controller evaluerer komplette regler for brukerId: {}", brukerId)
+        requires(isValidId(brukerId), BAD_REQUEST, "Ugyldig brukerId: $brukerId")
         regelTjeneste.kompletteRegler(token.ansattId!!, brukerId)
-
     }
        // enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KOMPLETT_REGELTYPE)
 /*
@@ -134,6 +135,7 @@ class TilgangController(
 
     private fun enkeltOppslag(ansattId: () -> AnsattId, tokenTypeCondition: () -> Boolean, brukerId: String, regelType: RegelType) =
         with(ansattId()) {
+            requires(isValidId(brukerId), BAD_REQUEST, "Ugyldig brukerId: $brukerId")
             requires(tokenTypeCondition(), FORBIDDEN,"Mismatch mellom token type og endepunkt")
             requires(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")
@@ -147,5 +149,8 @@ class TilgangController(
 
     private fun requires(condition: Boolean, status: HttpStatus, message: String) {
         if (!condition) throw ResponseStatusException(status,message)
+    }
+    fun isValidId(verdi: String): Boolean {
+        return runCatching { AktørId(verdi) }.isSuccess || runCatching { BrukerId(verdi) }.isSuccess
     }
 }

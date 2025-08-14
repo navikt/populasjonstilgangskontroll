@@ -15,8 +15,6 @@ plugins {
     kotlin("plugin.jpa") version "1.9.25"
     id("org.springframework.boot") version "3.5.4"
     id("org.cyclonedx.bom") version "2.3.1"
-    id("com.google.cloud.tools.jib") version "3.4.5"
-  //  application
 }
 
 apply(plugin = "io.spring.dependency-management")
@@ -79,15 +77,9 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
     testImplementation(kotlin("test"))
 }
-/*
-application {
-    mainClass.set("no.nav.tilgangsmaskin.AppKt")
-}*/
+
 tasks.withType<BootJar> {
     archiveFileName = "app.jar"
-    layered {
-        enabled = true
-    }
 }
 
 tasks.test {

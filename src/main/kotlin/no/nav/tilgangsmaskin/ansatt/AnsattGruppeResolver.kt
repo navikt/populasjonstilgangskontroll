@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 
 @Component
-class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: Token, private val env: Environment)  {
+class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: Token, private val oid: AnsattOidTjeneste,private val env: Environment)  {
 
     private val log = getLogger(javaClass)
 
@@ -25,7 +25,7 @@ class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: 
         }
 
     private fun grupperForCC(ansattId: AnsattId) =
-        entra.geoOgGlobaleGrupper(ansattId).also {
+        entra.geoOgGlobaleGrupper(ansattId,oid.oidFraEntra(ansattId)).also {
             log.info("CC-flow: $ansattId slo opp globale og GEO-grupper i Entra")
         }
 
@@ -35,7 +35,7 @@ class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: 
                 log.info("OBO-flow: $ansattId har nasjonal tilgang, slo *ikke* opp GEO-grupper i Entra")
             }
         } else {
-            (this + entra.geoGrupper(ansattId)).also {
+            (this + entra.geoGrupper(ansattId,token.oid!!)).also {
                 log.info("OBO-flow: $ansattId har ikke nasjonal tilgang, slo opp GEO-grupper i Entra")
             }
         }
@@ -43,7 +43,7 @@ class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: 
     private fun grupperForUautentisert(ansattId: AnsattId) =
         if (isDevOrLocal(env)) {
             log.info("Intet token i dev for $ansattId, slår opp globale og GEO-grupper i Entra")
-            entra.geoOgGlobaleGrupper(ansattId).also {
+            entra.geoOgGlobaleGrupper(ansattId,oid.oidFraEntra(ansattId)).also {
                 log.info("Uautentisert: $ansattId slo opp $it i Entra for $ansattId")
             }
         } else {

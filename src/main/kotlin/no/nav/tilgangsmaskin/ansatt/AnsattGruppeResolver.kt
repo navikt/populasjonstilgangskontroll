@@ -43,7 +43,7 @@ class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: 
     private fun grupperForUautentisert(ansattId: AnsattId) =
         if (isDevOrLocal(env)) {
             log.info("Intet token i dev for $ansattId, slår opp globale og GEO-grupper i Entra")
-            entra.geoOgGlobaleGrupper(ansattId,oid.oidFraEntra(ansattId)).also {
+            entra.geoOgGlobaleGrupper(ansattId, oid.oidFraEntra(ansattId)).also {
                 log.info("Uautentisert: $ansattId slo opp $it i Entra for $ansattId")
             }
         } else {

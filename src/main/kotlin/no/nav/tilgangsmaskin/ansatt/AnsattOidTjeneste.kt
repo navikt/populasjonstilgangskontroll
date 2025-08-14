@@ -20,6 +20,6 @@ class AnsattOidTjeneste(private val adapter: EntraRestClientAdapter) : CachableR
     override val navn = ENTRA_OID
 
     companion object {
-        const val ENTRA_OID = "entra-oid"
+        const val ENTRA_OID = "entraoid"
     }
 }

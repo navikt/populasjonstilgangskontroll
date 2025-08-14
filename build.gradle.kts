@@ -14,12 +14,12 @@ plugins {
     kotlin("plugin.spring") version "1.9.25"
     kotlin("plugin.jpa") version "1.9.25"
     id("org.springframework.boot") version "3.5.4"
-    id("io.spring.dependency-management") version "1.1.7"
     id("org.cyclonedx.bom") version "2.3.1"
     id("com.google.cloud.tools.jib") version "3.4.5"
     application
 }
 
+apply(plugin = "io.spring.dependency-management")
 
 repositories {
     mavenCentral()
@@ -80,12 +80,6 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
-dependencyManagement {
-    imports {
-        mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.18.1")
-    }
-}
-
 application {
     mainClass.set("no.nav.tilgangsmaskin.populasjonstilgangskontroll.AppKt")
 }
@@ -121,6 +115,6 @@ tasks.named<BootBuildImage>("bootBuildImage") {
     runImage.set("paketobuildpacks/ubuntu-noble-run-base")
     buildpacks.set(listOf("docker.io/paketobuildpacks/java"))
     environment.put("BPE_LANG", "en_US.utf8")
-
+    verboseLogging.set(true)
 }
 

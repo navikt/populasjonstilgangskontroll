@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 
 @Component
-class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: Token, private val oid: AnsattOidTjeneste,private val env: Environment)  {
+class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: Token, private val oid: AnsattOidTjeneste, private val env: Environment)  {
 
     private val log = getLogger(javaClass)
 

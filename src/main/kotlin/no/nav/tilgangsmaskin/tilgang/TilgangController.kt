@@ -45,9 +45,7 @@ class TilgangController(
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter OBO-token")
     fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String) {
-        log.info(CONFIDENTIAL, "Controller evaluerer komplette regler for brukerId: {}", brukerId)
-        requires(isValidId(brukerId), BAD_REQUEST, "Ugyldig brukerId: $brukerId")
-        regelTjeneste.kompletteRegler(token.ansattId!!, brukerId)
+        regelTjeneste.kompletteRegler(token.ansattId!!,brukerId.trim('"'))
     }
        // enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KOMPLETT_REGELTYPE)
 /*
@@ -63,7 +61,7 @@ class TilgangController(
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et kjerneregelsett for en bruker, forutsetter OBO-token")
     fun kjerneregler(@RequestBody @Valid @ValidId brukerId: String) =
-        regelTjeneste.kjerneregler(token.ansattId!!, brukerId)
+        regelTjeneste.kjerneregler(token.ansattId!!, brukerId.trim('"'))
 
    // enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KJERNE_REGELTYPE)
 
@@ -135,7 +133,6 @@ class TilgangController(
 
     private fun enkeltOppslag(ansattId: () -> AnsattId, tokenTypeCondition: () -> Boolean, brukerId: String, regelType: RegelType) =
         with(ansattId()) {
-            requires(isValidId(brukerId), BAD_REQUEST, "Ugyldig brukerId: $brukerId")
             requires(tokenTypeCondition(), FORBIDDEN,"Mismatch mellom token type og endepunkt")
             requires(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")
@@ -149,8 +146,5 @@ class TilgangController(
 
     private fun requires(condition: Boolean, status: HttpStatus, message: String) {
         if (!condition) throw ResponseStatusException(status,message)
-    }
-    fun isValidId(verdi: String): Boolean {
-        return runCatching { AktørId(verdi) }.isSuccess || runCatching { BrukerId(verdi) }.isSuccess
     }
 }

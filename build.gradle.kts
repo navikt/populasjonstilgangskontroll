@@ -91,6 +91,9 @@ application {
 }
 tasks.withType<BootJar> {
     archiveFileName = "app.jar"
+    layered {
+        enabled = true
+    }
 }
 
 tasks.test {
@@ -118,5 +121,6 @@ tasks.named<BootBuildImage>("bootBuildImage") {
     runImage.set("paketobuildpacks/ubuntu-noble-run-base")
     buildpacks.set(listOf("docker.io/paketobuildpacks/java"))
     environment.put("BPE_LANG", "en_US.utf8")
+
 }
 

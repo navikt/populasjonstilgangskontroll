@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -42,8 +43,11 @@ class TilgangController(
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter OBO-token")
-    fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String) =
+    fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String) {
+        log.info(CONFIDENTIAL, "Controller evaluerer komplette regler for brukerId: {}", brukerId)
         regelTjeneste.kompletteRegler(token.ansattId!!, brukerId)
+
+    }
        // enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KOMPLETT_REGELTYPE)
 /*
     @PostMapping("/ccf/komplett")

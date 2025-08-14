@@ -16,7 +16,6 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("org.cyclonedx.bom") version "2.3.1"
     id("com.google.cloud.tools.jib") version "3.4.5"
-    application
 }
 
 
@@ -85,9 +84,6 @@ dependencyManagement {
     }
 }
 
-application {
-    mainClass.set("no.nav.tilgangsmaskin.populasjonstilgangskontroll.AppKt")
-}
 tasks.withType<BootJar> {
     archiveFileName = "app.jar"
 }

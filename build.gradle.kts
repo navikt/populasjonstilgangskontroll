@@ -108,5 +108,10 @@ tasks.named<BootBuildImage>("bootBuildImage") {
     buildpacks.set(listOf("docker.io/paketobuildpacks/java"))
     environment.put("BPE_LANG", "en_US.utf8")
     verboseLogging.set(true)
+    buildCache  {
+        image = "europe-north1-docker.pkg.dev/nais-management-233d/tilgangsmaskin/populasjonstilgangskontroll"
+        publish = true
+        pull = true
+    }
 }
 

@@ -110,8 +110,7 @@ tasks.named<BootBuildImage>("bootBuildImage") {
     verboseLogging.set(true)
     buildCache  {
         imageName.set("europe-north1-docker.pkg.dev/nais-management-233d/tilgangsmaskin/populasjonstilgangskontroll")
-        publish = true
-        pull = true
+        publish.set(true)
     }
 }
 

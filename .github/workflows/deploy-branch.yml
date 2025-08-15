@@ -5,6 +5,7 @@ on:
       - main
 
 env:
+
   IMAGE: europe-north1-docker.pkg.dev/nais-management-233d/tilgangsmaskin/${{ github.event.repository.name }}
 jobs:
   build:
@@ -54,7 +55,7 @@ jobs:
         id: kompiler
         run: |
           echo "image=${{ env.IMAGE }}:${{ env.TAG }}" >> $GITHUB_OUTPUT  
-          ./gradlew test cyclonedxbom bootBuildImage --imageName=${{ env.IMAGE }}:${{ env.TAG }} --publishImage
+          ./gradlew test cyclonedxbom bootBuildImage --imageName=${{ env.IMAGE }}:${{ env.TAG }}  --cache-image ${{ env.IMAGE }}/buildpack-cache:latest --publishImage
         #   ./gradlew test jib -Djib.to.tags=latest,${TAG} -Djib.to.image=${{ env.IMAGE }}:${{ env.TAG }}
         #  echo "DIGEST=$(cat build/jib-image.digest)" >> $GITHUB_ENV
         env:

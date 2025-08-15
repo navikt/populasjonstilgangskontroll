@@ -109,7 +109,7 @@ tasks.named<BootBuildImage>("bootBuildImage") {
     environment.put("BPE_LANG", "en_US.utf8")
     verboseLogging.set(true)
     buildCache  {
-        image = "europe-north1-docker.pkg.dev/nais-management-233d/tilgangsmaskin/populasjonstilgangskontroll"
+        imageName.set("europe-north1-docker.pkg.dev/nais-management-233d/tilgangsmaskin/populasjonstilgangskontroll")
         publish = true
         pull = true
     }

@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.regler.motor.Bulk.Companion.avvist
 import no.nav.tilgangsmaskin.regler.motor.Bulk.Companion.ok
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.KJERNE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.OVERSTYRBAR
+import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.TELLENDE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.*
 import no.nav.tilgangsmaskin.tilgang.RegelConfig
@@ -19,11 +20,12 @@ import org.springframework.stereotype.Component
 class RegelMotor(
     @Qualifier(KJERNE) private val kjerne: RegelSett,
     @Qualifier(OVERSTYRBAR) private val overstyrbar: RegelSett,
+    @Qualifier(TELLENDE) private val tellende: RegelSett,
+
     private val cfg: RegelConfig,
     private val logger: RegelMotorLogger) {
 
-    private val komplett = RegelSett(KOMPLETT_REGELTYPE to kjerne.regler + overstyrbar.regler)
-
+    private val komplett = RegelSett(KOMPLETT_REGELTYPE to kjerne.regler + overstyrbar.regler + tellende.regler)
 
     fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, komplett)
 

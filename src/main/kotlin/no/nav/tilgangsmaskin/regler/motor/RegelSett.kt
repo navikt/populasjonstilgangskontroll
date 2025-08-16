@@ -12,6 +12,7 @@ data class RegelSett(val spec: Pair<RegelType, List<Regel>>) {
 
     enum class RegelType(val beskrivelse: String) {
         KJERNE_REGELTYPE(KJERNE),
+        TELLENDE_REGELTYPE(TELLENDE_REGELTYPE),
         KOMPLETT_REGELTYPE(KOMPLETT),
         OVERSTYRBAR_REGELTYPE(OVERSTYRBAR)
     }
@@ -19,6 +20,7 @@ data class RegelSett(val spec: Pair<RegelType, List<Regel>>) {
     companion object {
         const val KJERNE = "kjerneregelsett"
         const val KOMPLETT = "komplett regelsett"
+        const val TELLENDE = "tellende regelsett"
         const val OVERSTYRBAR = "overstyrbart regelsett"
     }
 }

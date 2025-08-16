@@ -13,7 +13,7 @@ class AnsattOidTjeneste(private val adapter: EntraRestClientAdapter) : CachableR
 
     private val log = getLogger(javaClass)
 
-    @Cacheable(cacheNames = [ENTRA_OID])
+    @Cacheable(cacheNames = [ENTRA_OID],key = "#ansattId.verdi")
      fun oidFraEntra(ansattId: AnsattId) = adapter.oidFraEntra(ansattId.verdi)
 
     override val varighet = Duration.ofDays(365)  // Godt nok, blås i skuddår

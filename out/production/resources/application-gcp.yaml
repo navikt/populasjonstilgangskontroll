@@ -1,0 +1,195 @@
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true
+management:
+  metrics:
+    distribution:
+      percentiles-histogram:
+        '[komplette_regler]': true
+        '[pdl_tjeneste]': true
+        '[entra]': true
+    enable:
+      cache: true
+  observations:
+    annotations:
+      enabled: true
+  health:
+    group:
+      readiness:
+        show-components: never
+      liveness:
+        show-components: never
+    redis:
+      enabled: false
+    ssl:
+      enabled: false
+    ping:
+      enabled: false
+    diskspace:
+      enabled: false
+  endpoints:
+    web:
+      base-path: /monitoring
+
+spring:
+  threads:
+    virtual:
+      enabled: true
+  jpa:
+    properties:
+      hibernate:
+        generate_statistics: false
+  application:
+    name: populasjonstilgangskontroll
+  kafka:
+    bootstrap-servers: ${kafka.brokers}
+    properties:
+      ssl:
+        endpoint:
+          identification:
+            algorithm: ''
+    security:
+      protocol: SSL
+    ssl:
+      trust-store-location: file:${kafka.truststore.path}
+      trust-store-type: JKS
+      trust-store-password: ${kafka.credstore.password}
+      key-store-location: file:${kafka.keystore.path}
+      key-store-type: PKCS12
+      key-store-password: ${kafka.credstore.password}
+
+    consumer:
+      group-id: ${spring.application.name}-groupxxx
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        max:
+          poll:
+            records: 3
+        auto:
+          offset:
+            reset: earliest
+        spring:
+          deserializer:
+            key:
+              delegate:
+                class: org.apache.kafka.common.serialization.StringDeserializer
+            value:
+              delegate:
+                class: org.springframework.kafka.support.serializer.JsonDeserializer
+            use:
+              type:
+                headers: false
+          json:
+            value:
+              default:
+                type: no.nav.tilgangsmaskin.ansatt.nom.NomHendelse
+            use:
+              type:
+                headers: false
+  data:
+    redis:
+      host: ${valkey.host}
+      port: ${valkey.port}
+      connect-timeout: 10s
+      timeout: 5s
+      username: ${valkey.username}
+      password: ${valkey.password}
+      ssl:
+        enabled: true
+  cache:
+    type: redis
+  mvc:
+    problemdetails:
+      enabled: true
+  datasource:
+    url: ${db.jdbc.url}
+    username: ${db.username}
+    password: ${db.password}
+    hikari:
+      connection-timeout: 5000
+      max-lifetime: 1200000
+      idle-timeout: 600000
+      connection-test-query: SELECT 1
+      maximum-pool-size: ${db.poolsize}
+  main:
+    banner-mode: off
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+    default-property-inclusion: non_default
+
+no.nav.security.jwt:
+  issuer:
+    azuread:
+      discovery-url: ${azure.app.well.known.url}
+      accepted_audience: ${azure.app.client.id}
+  client:
+    registration:
+
+      pdl-api:
+        token-endpoint-url: ${azure.openid.config.token.endpoint}
+        grant-type: client_credentials
+        scope: ${pdlgraph.scope}
+        authentication:
+          client-id: ${azure.app.client.id}
+          client-jwk: ${azure.app.jwk}
+          client-auth-method: private_key_jwt
+
+      pdl-pip-api:
+        token-endpoint-url: ${azure.openid.config.token.endpoint}
+        grant-type: client_credentials
+        scope: ${pdl.scope}
+        authentication:
+          client-id: ${azure.app.client.id}
+          client-jwk: ${azure.app.jwk}
+          client-auth-method: private_key_jwt
+
+      skjermede-personer-pip:
+        token-endpoint-url: ${azure.openid.config.token.endpoint}
+        grant-type: client_credentials
+        scope: ${skjerming.scope}
+        authentication:
+          client-id: ${azure.app.client.id}
+          client-jwk: ${azure.app.jwk}
+          client-auth-method: private_key_jwt
+
+      graph:
+        token-endpoint-url: ${azure.openid.config.token.endpoint}
+        grant-type: client_credentials
+        scope: ${graph.scope}
+        authentication:
+          client-id: ${azure.app.client.id}
+          client-jwk: ${azure.app.jwk}
+          client-auth-method: private_key_jwt
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: ${azure.app.client.id}
+    csrf:
+      enabled: true
+
+
+pdlgraph:
+  scope: "api://${nais.cluster.type}-fss.pdl.pdl-api/.default"
+  base-uri: "https://${pdlgraph}/graphql"
+
+pdl:
+  scope: "api://${nais.cluster.type}-fss.pdl.pdl-pip-api/.default"
+  base-uri: "https://${pdl}"
+skjerming:
+  base-uri: "http://skjermede-personer-pip.nom"
+  scope: "api://${nais.cluster.type}-gcp.nom.skjermede-personer-pip/.default"
+graph:
+  scope: https://graph.microsoft.com/.default
+  base-uri: https://graph.microsoft.com/v1.0/
+nom:
+  topic: org.nom.api-ressurs-state-v3
+valkey:
+  username: ${valkey.username.${nais.cluster.cache}}
+  password: ${valkey.password.${nais.cluster.cache}}
+  port: ${valkey.port.${nais.cluster.cache}}
+  host: ${valkey.host.${nais.cluster.cache}}
+  json:
+    enabled: false

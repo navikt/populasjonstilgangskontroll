@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.regler.motor
 
+import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.bruker.Bruker
@@ -14,6 +15,17 @@ interface Regel {
     val erOverstyrbar get() = this is OverstyrbarRegel
 
     fun avvisHvis(predicate: () -> Boolean) = !predicate.invoke()
+}
+interface TellendeRegel : Regel {
+    val predikat: (Ansatt, Bruker) -> Boolean
+    fun tell(ansatt: Ansatt, bruker: Bruker)
+
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker): Boolean {
+        if (predikat(ansatt, bruker)) {
+            tell(ansatt, bruker)
+        }
+        return true
+    }
 }
 
 abstract class GlobalGruppeRegel(private val gruppe: GlobalGruppe) : Regel {

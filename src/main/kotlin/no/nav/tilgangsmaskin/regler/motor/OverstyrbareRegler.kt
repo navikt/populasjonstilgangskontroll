@@ -36,11 +36,12 @@ class UtlandRegel : GlobalGruppeRegel(UTENLANDSK), OverstyrbarRegel {
 
 @Component
 @Order(LOWEST_PRECEDENCE - 3)
-class AvdødBrukerRegel(val teller: AvdødTeller) : TellendeRegel {
-    override val predikat: (Ansatt, Bruker) -> Boolean = { _, bruker -> bruker.dødsdato != null }
+class AvdødBrukerRegel(private val teller: AvdødTeller) : TellendeRegel {
+    override val predikat = { _: Ansatt, bruker: Bruker -> bruker.dødsdato != null }
     override val metadata = RegelMetadata(AVDØD)
 
-    override fun tell(ansatt: Ansatt, bruker: Bruker) = teller.tell(Tags.of("months", bruker.dødsdato!!.intervallSiden()))
+    override fun tell(ansatt: Ansatt, bruker: Bruker) =
+        teller.tell(Tags.of("months", bruker.dødsdato!!.intervallSiden()))
 }
 
 

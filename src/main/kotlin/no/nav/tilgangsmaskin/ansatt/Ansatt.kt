@@ -20,7 +20,7 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
 
     private val partnere = bruker?.partnere ?: emptySet()
 
-    infix fun kanBehandle(gt: GeografiskTilknytning): Boolean {
+    private infix fun kanBehandle(gt: GeografiskTilknytning): Boolean {
         val kode = when (gt) {
             is KommuneTilknytning -> gt.kommune.verdi
             is BydelTilknytning -> gt.bydel.verdi
@@ -29,7 +29,13 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
         return grupper.any { it.displayName.endsWith("GEO_$kode") }
     }
 
-    infix fun erMedlemAv(gruppe: GlobalGruppe) = grupper.any { it.id == gruppe.id }
+    infix fun kanIkkeBehandle(gt: GeografiskTilknytning) = !kanBehandle(gt)
+
+
+    infix fun erMedlemAv(gruppe: GlobalGruppe) = grupper.any { it.id == gruppe.id
+    }
+
+    infix fun ikkeErMedlemAv(gruppe: GlobalGruppe) = !erMedlemAv(gruppe)
 
     infix fun erNåværendeEllerTidligerePartnerMed(bruker: Bruker) = bruker erNærståendeMed partnere
 

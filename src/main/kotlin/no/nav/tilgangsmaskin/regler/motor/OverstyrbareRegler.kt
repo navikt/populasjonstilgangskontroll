@@ -17,32 +17,24 @@ interface OverstyrbarRegel : Regel
 @Order(LOWEST_PRECEDENCE)
 class NorgeRegel : GlobalGruppeRegel(NASJONAL), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avvisHvis { !(ansatt erMedlemAv NASJONAL) && !(ansatt kanBehandle bruker.geografiskTilknytning) }
+        avvisHvis { ansatt ikkeErMedlemAv NASJONAL && ansatt kanIkkeBehandle bruker.geografiskTilknytning }
 }
 
 @Component
 @Order(LOWEST_PRECEDENCE - 1)
 class UkjentBostedRegel : GlobalGruppeRegel(UKJENT_BOSTED), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avvisHvis { bruker.harUkjentBosted && !(ansatt erMedlemAv UKJENT_BOSTED) }
+        avvisHvis { bruker.harUkjentBosted && ansatt ikkeErMedlemAv UKJENT_BOSTED }
 }
 
 @Component
 @Order(LOWEST_PRECEDENCE - 2)
 class UtlandRegel : GlobalGruppeRegel(UTENLANDSK), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avvisHvis { bruker.harUtenlandskBosted && !(ansatt erMedlemAv UTENLANDSK) }
+        avvisHvis { bruker.harUtenlandskBosted && ansatt ikkeErMedlemAv UTENLANDSK }
 }
 
-@Component
-@Order(LOWEST_PRECEDENCE - 3)
-class AvdødBrukerRegel(private val teller: AvdødTeller) : TellendeRegel {
-    override val predikat = { _: Ansatt, bruker: Bruker -> bruker.dødsdato != null }
-    override val metadata = RegelMetadata(AVDØD)
 
-    override fun tell(ansatt: Ansatt, bruker: Bruker) =
-        teller.tell(Tags.of("months", bruker.dødsdato!!.intervallSiden()))
-}
 
 
 

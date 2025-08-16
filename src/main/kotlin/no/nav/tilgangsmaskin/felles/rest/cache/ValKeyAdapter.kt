@@ -5,9 +5,11 @@ import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.format
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.stereotype.Component
+import kotlin.time.toKotlinDuration
 
 @Component
 class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
@@ -26,7 +28,7 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,pr
         }
 
 
-    fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl:  ${it.varighet}" }
+    fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl:  ${it.varighet.toKotlinDuration().format()}" }
 
     override fun bindTo(registry: MeterRegistry) {
         cfgs.forEach { cfg ->

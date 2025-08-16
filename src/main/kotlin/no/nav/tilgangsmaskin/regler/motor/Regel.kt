@@ -19,7 +19,7 @@ interface Regel {
 abstract class GlobalGruppeRegel(private val gruppe: GlobalGruppe) : Regel {
 
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avvisHvis { bruker kreverMedlemskapI gruppe && !(ansatt erMedlemAv gruppe) }
+        avvisHvis { bruker kreverMedlemskapI gruppe && ansatt ikkeErMedlemAv gruppe }
 
     override val metadata = RegelMetadata(gruppe)
 

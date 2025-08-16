@@ -1,5 +1,0 @@
-ALTER TABLE ansatte
-    ALTER COLUMN gyldigtil SET NOT NULL;
-
-ALTER TABLE ansatte
-    ALTER COLUMN startdato SET NOT NULL;

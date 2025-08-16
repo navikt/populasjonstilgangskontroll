@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
 
-data class Identifikator(val verdi: String) {
+data class Identifikator(@JsonValue val verdi: String) {
     init {
         require(runCatching {
             AktørId(verdi)

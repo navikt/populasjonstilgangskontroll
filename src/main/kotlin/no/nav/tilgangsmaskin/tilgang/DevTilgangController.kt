@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
@@ -33,6 +34,8 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.http.HttpStatus.*
+import org.springframework.http.MediaType
+import org.springframework.http.MediaType.*
 import org.springframework.web.bind.annotation.*
 
 @UnprotectedRestController(value = ["/${DEV}"])
@@ -56,6 +59,9 @@ class DevTilgangController(
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)
+
+    @PostMapping("brukeridentifikator", consumes = [APPLICATION_JSON_VALUE, TEXT_PLAIN_VALUE])
+    fun brukerIdentifikator(@RequestBody id: Identifikator) = brukere.brukerMedUtvidetFamilie(id.verdi)
 
     @GetMapping("bruker/{id}")
     fun bruker(@PathVariable @Valid @ValidId id: String) = brukere.brukerMedUtvidetFamilie(id)

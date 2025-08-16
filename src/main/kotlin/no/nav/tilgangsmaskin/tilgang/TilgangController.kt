@@ -112,8 +112,8 @@ class TilgangController(
     private fun bulkOppslag(ansattId: () -> AnsattId, tokenTypeCondition: () -> Boolean, specs: Set<BrukerIdOgRegelsett>) =
         with(ansattId()) {
             if (specs.isNotEmpty()) {
-                requires(tokenTypeCondition(), FORBIDDEN,"Mismatch mellom token type og endepunkt")
-                requires(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
+                preCondition(tokenTypeCondition(), FORBIDDEN,"Mismatch mellom token type og endepunkt")
+                preCondition(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
                 log.info("Kjører bulk regler for {} og {} fra ${token.system}", this, specs.map { it.brukerId })
                 regelTjeneste.bulkRegler( this, specs)
             }
@@ -123,10 +123,10 @@ class TilgangController(
             }
         }
 
-    private fun enkeltOppslag(ansattId: () -> AnsattId, tokenTypeCondition: () -> Boolean, brukerId: String, regelType: RegelType) =
+    private fun enkeltOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, brukerId: String, regelType: RegelType) =
         with(brukerId.trim('"')) {
-            requires(tokenTypeCondition(), FORBIDDEN,"Mismatch mellom token type og endepunkt")
-            requires(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
+            preCondition(predikat(), FORBIDDEN,"Mismatch mellom token type og endepunkt")
+            preCondition(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")
             if (regelType == KJERNE_REGELTYPE) {
                 return regelTjeneste.kjerneregler(ansattId(), this)
@@ -136,7 +136,7 @@ class TilgangController(
             }
         }
 
-    private fun requires(condition: Boolean, status: HttpStatus, message: String) {
-        if (!condition) throw ResponseStatusException(status,message)
+    private fun preCondition(predikat: Boolean, status: HttpStatus, message: String) {
+        if (!predikat) throw ResponseStatusException(status,message)
     }
 }

@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.isBeforeNow
 import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
@@ -39,6 +40,7 @@ class OverstyringTjeneste(
 
     @Transactional(readOnly = true)
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId): Boolean {
+        log.info("Sjekker eventuell overstyring for $ansattId og ${brukerId.verdi.maskFnr()}")
         val overstyring = adapter.gjeldendeOverstyring(
             ansattId.verdi, brukerId.verdi,
             brukerTjeneste.brukerMedNærmesteFamilie(brukerId.verdi).historiskeIds.map { it.verdi })?.expires

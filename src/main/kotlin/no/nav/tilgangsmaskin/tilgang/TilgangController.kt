@@ -9,7 +9,6 @@ import jakarta.validation.Valid
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -43,7 +42,7 @@ class TilgangController(
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter OBO-token")
-    fun kompletteRegler(@RequestBody identifikator: Identifikator) = enkeltOppslag({token.ansattId!!}, {token.erObo}, identifikator.verdi, KOMPLETT_REGELTYPE)
+    fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KOMPLETT_REGELTYPE)
 /*
     @PostMapping("/ccf/komplett")
     @ResponseStatus(NO_CONTENT)
@@ -56,7 +55,7 @@ class TilgangController(
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et kjerneregelsett for en bruker, forutsetter OBO-token")
-    fun kjerneregler(@RequestBody identifikator: Identifikator) = enkeltOppslag({token.ansattId!!}, {token.erObo}, identifikator.verdi, KJERNE_REGELTYPE)
+    fun kjerneregler(@RequestBody @Valid @ValidId brukerId: String) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KJERNE_REGELTYPE)
 
     /*
     @PostMapping("/ccf/kjerne")
@@ -125,15 +124,15 @@ class TilgangController(
         }
 
     private fun enkeltOppslag(ansattId: () -> AnsattId, tokenTypeCondition: () -> Boolean, brukerId: String, regelType: RegelType) =
-        with(ansattId()) {
+        with(brukerId.trim('"')) {
             requires(tokenTypeCondition(), FORBIDDEN,"Mismatch mellom token type og endepunkt")
             requires(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")
             if (regelType == KJERNE_REGELTYPE) {
-                return regelTjeneste.kjerneregler(this, brukerId)
+                return regelTjeneste.kjerneregler(ansattId(), this)
             }
             if (regelType == KOMPLETT_REGELTYPE) {
-                return regelTjeneste.kompletteRegler(this, brukerId)
+                return regelTjeneste.kompletteRegler(ansattId(), this)
             }
         }
 

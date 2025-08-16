@@ -9,6 +9,7 @@ import jakarta.validation.Valid
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -42,10 +43,7 @@ class TilgangController(
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter OBO-token")
-    fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String) {
-        regelTjeneste.kompletteRegler(token.ansattId!!,brukerId.trim('"'))
-    }
-       // enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KOMPLETT_REGELTYPE)
+    fun kompletteRegler(@RequestBody identifikator: Identifikator) = enkeltOppslag({token.ansattId!!}, {token.erObo}, identifikator.verdi, KOMPLETT_REGELTYPE)
 /*
     @PostMapping("/ccf/komplett")
     @ResponseStatus(NO_CONTENT)
@@ -58,10 +56,7 @@ class TilgangController(
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et kjerneregelsett for en bruker, forutsetter OBO-token")
-    fun kjerneregler(@RequestBody @Valid @ValidId brukerId: String) =
-        regelTjeneste.kjerneregler(token.ansattId!!, brukerId.trim('"'))
-
-   // enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KJERNE_REGELTYPE)
+    fun kjerneregler(@RequestBody identifikator: Identifikator) = enkeltOppslag({token.ansattId!!}, {token.erObo}, identifikator.verdi, KJERNE_REGELTYPE)
 
     /*
     @PostMapping("/ccf/kjerne")

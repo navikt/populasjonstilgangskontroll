@@ -1,11 +1,12 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 
 val javaVersion = JavaLanguageVersion.of(21)
 val springdocVersion = "2.8.9"
 val tokenSupportVersion = "5.0.34"
 val mockkVersion = "1.14.5"
 
-group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
+group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
 version = "1.0.1"
 
 plugins {
@@ -13,12 +14,10 @@ plugins {
     kotlin("plugin.spring") version "1.9.25"
     kotlin("plugin.jpa") version "1.9.25"
     id("org.springframework.boot") version "3.5.4"
-    id("io.spring.dependency-management") version "1.1.7"
     id("org.cyclonedx.bom") version "2.3.1"
-    id("com.google.cloud.tools.jib") version "3.4.5"
-    application
 }
 
+apply(plugin = "io.spring.dependency-management")
 
 repositories {
     mavenCentral()
@@ -79,15 +78,6 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
-dependencyManagement {
-    imports {
-        mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.18.1")
-    }
-}
-
-application {
-    mainClass.set("no.nav.tilgangsmaskin.populasjonstilgangskontroll.AppKt")
-}
 tasks.withType<BootJar> {
     archiveFileName = "app.jar"
 }
@@ -112,3 +102,15 @@ kotlin {
         freeCompilerArgs.add("-Xjsr305=strict")
     }
 }
+tasks.named<BootBuildImage>("bootBuildImage") {
+    builder.set("paketobuildpacks/ubuntu-noble-builder-buildpackless:latest")
+    runImage.set("paketobuildpacks/ubuntu-noble-run-base")
+    buildpacks.set(listOf("docker.io/paketobuildpacks/java"))
+    environment.put("BPE_LANG", "en_US.utf8")
+    verboseLogging.set(true)
+    buildCache  {
+        imageName.set("europe-north1-docker.pkg.dev/nais-management-233d/tilgangsmaskin/populasjonstilgangskontroll/build-cache:latest")
+        publish.set(true)
+    }
+}
+

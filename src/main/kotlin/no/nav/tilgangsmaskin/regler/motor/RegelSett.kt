@@ -12,7 +12,7 @@ data class RegelSett(val spec: Pair<RegelType, List<Regel>>) {
 
     enum class RegelType(val beskrivelse: String) {
         KJERNE_REGELTYPE(KJERNE),
-        TELLENDE_REGELTYPE(TELLENDE_REGELTYPE),
+        TELLENDE_REGELTYPE(TELLENDE),
         KOMPLETT_REGELTYPE(KOMPLETT),
         OVERSTYRBAR_REGELTYPE(OVERSTYRBAR)
     }

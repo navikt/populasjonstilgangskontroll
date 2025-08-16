@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.motor.Bulk.Companion.avvist
 import no.nav.tilgangsmaskin.regler.motor.Bulk.Companion.ok
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.KJERNE
+import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.KOMPLETT
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.OVERSTYRBAR
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.TELLENDE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -19,14 +20,11 @@ import org.springframework.stereotype.Component
 @Component
 class RegelMotor(
     @Qualifier(KJERNE) private val kjerne: RegelSett,
-    @Qualifier(OVERSTYRBAR) private val overstyrbar: RegelSett,
-    @Qualifier(TELLENDE) private val tellende: RegelSett,
+    @Qualifier(KOMPLETT) private val komplett: RegelSett,
 
     private val cfg: RegelConfig,
     private val logger: RegelMotorLogger) {
-
-    private val komplett = RegelSett(KOMPLETT_REGELTYPE to kjerne.regler + overstyrbar.regler + tellende.regler)
-
+    
     fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, komplett)
 
     fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, kjerne)
@@ -67,7 +65,8 @@ class RegelMotor(
         when (this) {
             KJERNE_REGELTYPE -> kjerne
             KOMPLETT_REGELTYPE -> komplett
-            OVERSTYRBAR_REGELTYPE -> overstyrbar
+            OVERSTYRBAR_REGELTYPE -> komplett.regler.filter { it is OverstyrbarRegel }.let { RegelSett(OVERSTYRBAR_REGELTYPE to it) }
+            TELLENDE_REGELTYPE -> komplett.regler.filter { it is TellendeRegel }.let { RegelSett(TELLENDE_REGELTYPE to it) }
         }
 
     override fun toString() = "${javaClass.simpleName} [kjerneregler=$kjerne,kompletteregler=$komplett]"

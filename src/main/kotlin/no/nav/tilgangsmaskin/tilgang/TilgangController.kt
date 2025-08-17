@@ -6,10 +6,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett

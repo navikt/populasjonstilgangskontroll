@@ -30,8 +30,7 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
     }
 
     infix fun kanIkkeBehandle(gt: GeografiskTilknytning) = !kanBehandle(gt)
-
-
+    
     infix fun erMedlemAv(gruppe: GlobalGruppe) = grupper.any { it.id == gruppe.id
     }
 

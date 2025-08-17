@@ -22,7 +22,6 @@ class RegelMotor(
 
     private val cfg: RegelConfig,
     private val logger: RegelMotorLogger) {
-
     fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, komplett)
 
     fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, kjerne)

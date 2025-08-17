@@ -45,7 +45,7 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, pr
         with(ctx) {
             builder.withDetail(
                 "extra-info", mapOf(
-                    "Cluster" to ClusterUtils.current.name,
+                    "Cluster" to ClusterUtils.current.clusterName,
                     "Startup" to startupDate.local(),
                     "Java runtime version" to environment.getProperty("java.runtime.version"),
                     "Java vendor" to environment.getProperty("java.vm.vendor"),

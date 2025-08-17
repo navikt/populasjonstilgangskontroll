@@ -11,7 +11,7 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import java.lang.System.getenv
 import java.lang.System.setProperty
 
-internal enum class ClusterUtils(private val clusterName: String) {
+internal enum class ClusterUtils(val clusterName: String) {
     TEST_CLUSTER(TEST),
     LOCAL_CLUSTER(LOCAL),
     DEV_GCP_CLUSTER(DEV_GCP),

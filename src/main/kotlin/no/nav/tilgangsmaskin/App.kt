@@ -55,7 +55,7 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, pr
                     "Spring Boot version" to SpringBootVersion.getVersion(),
                     "Spring Framework version" to SpringVersion.getVersion()))
             regelsett.forEach {
-                builder.withDetail(it.beskrivelse + " (" + it.javaClass.simpleName +")", it.regler.map { it.kortNavn })
+                builder.withDetail(it.beskrivelse, it.regler.map { "(${it.javaClass.simpleName}) ${it.kortNavn}" })
             }
         }
     }

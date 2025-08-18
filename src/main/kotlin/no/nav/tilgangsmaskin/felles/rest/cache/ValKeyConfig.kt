@@ -5,4 +5,4 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
 
 @ConfigurationProperties(VALKEY)
-data class ValKeyConfig(val host: String, val port: String, val uri: URI)
+data class ValKeyConfig(val username: String, val password: String, val host: String, val port: String, val uri: URI)

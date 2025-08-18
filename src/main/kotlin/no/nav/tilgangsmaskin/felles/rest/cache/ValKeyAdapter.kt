@@ -1,9 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.lettuce.core.RedisClient
-import io.lettuce.core.RedisURI
 import io.lettuce.core.api.sync.RedisCommands
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
@@ -11,6 +9,7 @@ import io.micrometer.core.instrument.binder.MeterBinder
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.format
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.stereotype.Component
@@ -18,6 +17,8 @@ import java.util.UUID
 
 @Component
 class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,private vararg val cfgs: CachableRestConfig, val configurer: ValKeyBeanConfigurer) : Pingable, MeterBinder {
+
+    private val log = getLogger(javaClass)
 
     override val pingEndpoint  =  "${cfg.host}:${cfg.port}"
     override val name = "ValKey Cache"
@@ -39,7 +40,9 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,pr
 
     private inline fun <reified T> lookup1(key: String): T? {
         val commands: RedisCommands<String, String> = connection.sync()
+        log.info("Lookup key: $key, type: ${T::class.java.simpleName}")
         val value = commands.get(key)
+        log.info("Lookup key: $key, value: $value")
         return configurer.valKeyMapper.readValue<T>(value)
     }
 

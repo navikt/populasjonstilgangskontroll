@@ -35,10 +35,10 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,pr
             }
         }
 
-    fun lookup(key: String) = lookup(key, UUID::class)
+    fun lookup(key: String) = lookup1<UUID>(key)
 
 
-    private inline fun <reified T> lookup(key: String, clazz: T): T? {
+    private inline fun <reified T> lookup1(key: String): T? {
         val commands: RedisCommands<String, String> = connection.sync()
         val value = commands.get(key)
         return mapper.readValue<T>(value)

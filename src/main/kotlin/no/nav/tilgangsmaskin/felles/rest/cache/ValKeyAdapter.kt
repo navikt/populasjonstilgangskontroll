@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component
 import java.util.UUID
 
 @Component
-class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,private vararg val cfgs: CachableRestConfig, val configurer: ValKeyBeanConfigurer) : Pingable, MeterBinder {
+class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
 
     private val log = getLogger(javaClass)
 

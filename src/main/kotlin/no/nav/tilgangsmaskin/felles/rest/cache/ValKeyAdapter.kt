@@ -8,17 +8,16 @@ import io.lettuce.core.RedisClient
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
-import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste.Companion.ENTRA_OID
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.format
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.stereotype.Component
 import java.util.UUID
-import kotlin.text.get
 
 @Component
 class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnectionFactory, cfg: ValKeyConfig, private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
@@ -46,12 +45,10 @@ class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnec
 
     fun lookup(cache: String, key: String) = doLookup<UUID>(cache, key)
 
-    private inline fun <reified T> doLookup(cache: String, key: String): T? {
-        val prefix = prefixes[cache]?.getKeyPrefixFor(cache) ?: throw IllegalStateException("Cache prefix for $cache not found")
-        val value = conn.sync().get("$prefix$key")
-        log.debug("$value for $cache")
-        return value?.let { mapper.readValue<T>(it) }
-    }
+    private inline fun <reified T> doLookup(cache: String, key: String) =
+        conn.sync().get("${prefixes.prefixFor(cache)}$key")?.let { mapper.readValue<T>(it) }
+
+    private fun Map<String, RedisCacheConfiguration>.prefixFor(cache: String) = this.get(cache)?.getKeyPrefixFor(cache) ?: throw IllegalStateException("Cache prefix for $cache not found")
 
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}" }
 

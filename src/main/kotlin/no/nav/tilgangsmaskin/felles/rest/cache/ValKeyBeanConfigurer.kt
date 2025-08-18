@@ -48,6 +48,10 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             .enableStatistics()
             .build()
 
+    @Bean
+    fun prefixes(mgr: RedisCacheManager) =
+        mgr.cacheConfigurations.map { (key,value) -> key to value.keyPrefix }
+
     private fun cacheConfig(cfg: CachableRestConfig) =
          defaultCacheConfig()
             .entryTtl(cfg.varighet)

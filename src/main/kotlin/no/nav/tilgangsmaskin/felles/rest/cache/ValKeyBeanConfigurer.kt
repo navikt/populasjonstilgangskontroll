@@ -5,18 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.boot.conditionals.EnvUtil.isDevOrLocal
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
-import org.springframework.cache.interceptor.KeyGenerator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager
-import org.springframework.data.redis.cache.RedisCacheWriter.lockingRedisCacheWriter
+import org.springframework.data.redis.cache.RedisCacheWriter.nonLockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
@@ -46,7 +44,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
 
     @Bean
     override fun cacheManager(): RedisCacheManager =
-        RedisCacheManager.builder(lockingRedisCacheWriter(cf))
+        RedisCacheManager.builder(nonLockingRedisCacheWriter(cf))
             .withInitialCacheConfigurations(cfgs.associate { it.navn to cacheConfig(it) })
             .enableStatistics()
             .build()

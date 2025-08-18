@@ -30,7 +30,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
                            private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
 
-    val valKeyMapper =
+    private val valKeyMapper =
         mapper.copy().apply {
             if (isDevOrLocal(env)) {
                // addMixIn(UUID::class.java, UUIDMixin::class.java)

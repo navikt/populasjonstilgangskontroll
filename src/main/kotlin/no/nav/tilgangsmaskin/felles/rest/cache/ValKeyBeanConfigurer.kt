@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
 import UUIDMixin
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.ObjectMapper

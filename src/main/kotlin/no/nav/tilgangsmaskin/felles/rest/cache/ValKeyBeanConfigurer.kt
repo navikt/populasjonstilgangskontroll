@@ -1,8 +1,12 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
+import UUIDMixin
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
+import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
+import com.fasterxml.jackson.databind.SerializerProvider
+import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.boot.conditionals.EnvUtil.isDevOrLocal
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
@@ -19,6 +23,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
+import java.util.UUID
 
 @Configuration(proxyBeanMethods = true)
 @EnableCaching
@@ -32,6 +37,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
     private val valKeyMapper =
         mapper.copy().apply {
             if (isDevOrLocal(env)) {
+                addMixIn(UUID::class.java, UUIDMixin::class.java)
               //  registerModule(JsonCacheableModule())
                 activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
              //    activateDefaultTyping(polymorphicTypeValidator, NON_FINAL_AND_ENUMS, PROPERTY)
@@ -40,6 +46,10 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
                 activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
             }
         }
+
+    abstract class UUIDMixin {
+        @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY)
+    }
 
     @Bean
     override fun cacheManager(): RedisCacheManager =

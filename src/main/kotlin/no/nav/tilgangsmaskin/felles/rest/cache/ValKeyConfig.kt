@@ -8,11 +8,10 @@ import java.net.URI
 
 @ConfigurationProperties(VALKEY)
 data class ValKeyConfig(val username: String, val password: String, val host: String, val port: String, val uri: URI) {
-    val redisURI = RedisURI.Builder
+    val valkeyURI = RedisURI.Builder
         .redis(host, port.toInt())
         .withSsl(true)
         .withAuthentication(username, password)
         .build()
-    //val redisURI  = RedisURI.create("$URI_SCHEME_REDIS_SECURE://${username}:${password}@${host}:${port}");
 }
 

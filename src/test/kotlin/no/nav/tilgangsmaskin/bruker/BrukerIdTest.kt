@@ -39,9 +39,4 @@ class BrukerIdTest {
         assertThrows<IllegalArgumentException> { BrukerId("1111111111a") }
     }
 
-    @Test
-    fun testIt() {
-        val regexp = Regex("^(?!\\d{11}$).*$")
-        println(regexp.matches("0301653632a"))
-    }
 }

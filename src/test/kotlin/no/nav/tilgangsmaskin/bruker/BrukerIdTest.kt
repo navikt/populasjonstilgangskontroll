@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.bruker
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator
 import com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.NAIS_CLUSTER_NAME
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
@@ -7,6 +9,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import io.lettuce.core.RedisURI
+import java.util.UUID
 
 
 class BrukerIdTest {
@@ -38,5 +41,17 @@ class BrukerIdTest {
     fun ikkeBareTall() {
         assertThrows<IllegalArgumentException> { BrukerId("1111111111a") }
     }
+    @Test
+    @DisplayName("Fødselsnummer med ugyldig format skal kaste IllegalArgumentException")
+    fun jalla() {
+        val json = "[\"java.util.UUID\",\"3454c8df-a65a-4a0b-9390-1741395f9c78\"]"
 
+        val mapper = ObjectMapper().apply {
+            val ptv = BasicPolymorphicTypeValidator.builder().allowIfSubType(UUID::class.java).build()
+            activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.EVERYTHING)
+        }
+
+        val uuid = mapper.readValue(json, UUID::class.java)
+        println(uuid) // 3454c8df-a65a-4a0b-9390-1741395f9c78
+    }
 }

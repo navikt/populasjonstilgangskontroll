@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component
 import java.util.UUID
 
 @Component
-class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,private vararg val cfgs: CachableRestConfig, val mapper: ObjectMapper) : Pingable, MeterBinder {
+class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,private vararg val cfgs: CachableRestConfig, val configurer: ValKeyBeanConfigurer) : Pingable, MeterBinder {
 
     override val pingEndpoint  =  "${cfg.host}:${cfg.port}"
     override val name = "ValKey Cache"
@@ -40,7 +40,7 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,pr
     private inline fun <reified T> lookup1(key: String): T? {
         val commands: RedisCommands<String, String> = connection.sync()
         val value = commands.get(key)
-        return mapper.readValue<T>(value)
+        return configurer.valKeyMapper.readValue<T>(value)
     }
 
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}" }

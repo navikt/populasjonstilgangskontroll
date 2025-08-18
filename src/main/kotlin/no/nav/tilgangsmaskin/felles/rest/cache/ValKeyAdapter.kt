@@ -1,5 +1,8 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
+import io.lettuce.core.RedisClient
+import io.lettuce.core.RedisURI
+import io.lettuce.core.api.sync.RedisCommands
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
@@ -9,13 +12,14 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.format
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.stereotype.Component
-import kotlin.time.toKotlinDuration
 
 @Component
-class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
+class ValKeyAdapter(private val cf: RedisConnectionFactory, private val cfg: ValKeyConfig,private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
 
     override val pingEndpoint  =  "${cfg.host}:${cfg.port}"
     override val name = "ValKey Cache"
+    val client = RedisClient.create(cfg.redisURI)
+
 
     override fun ping() =
         cf.connection.use {
@@ -26,6 +30,14 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,pr
                 error("$name ping failed")
             }
         }
+
+    fun lookup(key: String): String? {
+        val connection = client.connect()
+        val commands: RedisCommands<String, String> = connection.sync()
+        val value = commands.get(key)
+        connection.close()
+        return value
+    }
 
 
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}" }

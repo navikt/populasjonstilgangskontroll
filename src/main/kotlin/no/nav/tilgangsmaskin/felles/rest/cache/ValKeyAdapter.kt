@@ -53,7 +53,7 @@ class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnec
         cfgs.forEach { cfg ->
             registry.gauge("cache.size", Tags.of("navn", cfg.navn), cf) {
                 val prefix = (prefixes[cfg.navn]!!.getKeyPrefixFor(cfg.navn))
-                log.infp("Cache size for prefix '$prefix' is being measured")
+                log.info("Cache size for prefix '$prefix' is being measured")
                 cacheSize(prefix)
             }
         }

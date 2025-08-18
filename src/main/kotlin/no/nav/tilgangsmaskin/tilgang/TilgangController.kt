@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeType.HTTP
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -42,7 +43,7 @@ class TilgangController(
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter OBO-token")
-    fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KOMPLETT_REGELTYPE)
+    fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String,request: HttpServletRequest) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KOMPLETT_REGELTYPE,request)
 /*
     @PostMapping("/ccf/komplett")
     @ResponseStatus(NO_CONTENT)
@@ -55,7 +56,7 @@ class TilgangController(
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et kjerneregelsett for en bruker, forutsetter OBO-token")
-    fun kjerneregler(@RequestBody @Valid @ValidId brukerId: String) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KJERNE_REGELTYPE)
+    fun kjerneregler(@RequestBody @Valid @ValidId brukerId: String, request: HttpServletRequest) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KJERNE_REGELTYPE, request)
 
     /*
     @PostMapping("/ccf/kjerne")
@@ -79,8 +80,8 @@ class TilgangController(
     @Operation(summary = "Kjør bulkregler for en ansatt",
         description = "Dette endepunktet er kun tilgjengelig for obo flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er og regeltyper. Om ingen regeltype oppgis, evalueres det komplette regelsettet")
-    fun bulkOBO(@RequestBody @Valid @ValidId specs: Set<BrukerIdOgRegelsett>) =
-        bulkOppslag({token.ansattId!!},{token.erObo}, specs)
+    fun bulkOBO(@RequestBody @Valid @ValidId specs: Set<BrukerIdOgRegelsett>,request: HttpServletRequest) =
+        bulkOppslag({token.ansattId!!},{token.erObo}, specs,request)
 
     @PostMapping("bulk/obo/{regelType}")
     @ResponseStatus(MULTI_STATUS)
@@ -88,8 +89,8 @@ class TilgangController(
     @Operation(summary = "Kjør bulkregler for en ansatt",
         description = "Dette endepunktet er kun tilgjengelig for obo flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er med gitt regeltype")
-    fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>) =
-        bulkOppslag({token.ansattId!!},{token.erObo},brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet())
+    fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>,request: HttpServletRequest) =
+        bulkOppslag({token.ansattId!!},{token.erObo},brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet(),request)
 
     @PostMapping("bulk/ccf/{ansattId}")
     @ResponseStatus(MULTI_STATUS)
@@ -97,8 +98,8 @@ class TilgangController(
     @Operation(summary = "Kjør bulkregler for en ansatt",
         description = "Dette endepunktet er kun tilgjengelig for client credentials flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er og regeltyper. Om ingen regeltype oppgis, evalueres det komplette regelsettet")
-    fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgRegelsett>) =
-        bulkOppslag({ansattId},{token.erCC}, specs)
+    fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgRegelsett>,request: HttpServletRequest) =
+        bulkOppslag({ansattId},{token.erCC}, specs,request)
 
     @PostMapping("bulk/ccf/{ansattId}/{regelType}")
     @ResponseStatus(MULTI_STATUS)
@@ -106,13 +107,13 @@ class TilgangController(
     @Operation(summary = "Kjør bulkregler for en ansatt",
         description = "Dette endepunktet er kun tilgjengelig for client credentials flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er med gitt regeltype")
-    fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>) =
-        bulkOppslag({ ansattId }, { token.erCC }, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet())
+    fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>, request: HttpServletRequest) =
+        bulkOppslag({ ansattId }, { token.erCC }, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(),request)
 
-    private fun bulkOppslag(ansattId: () -> AnsattId, tokenTypeCondition: () -> Boolean, specs: Set<BrukerIdOgRegelsett>) =
+    private fun bulkOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, specs: Set<BrukerIdOgRegelsett>,request: HttpServletRequest) =
         with(ansattId()) {
             if (specs.isNotEmpty()) {
-                preCondition(tokenTypeCondition(), FORBIDDEN,"Mismatch mellom token type og endepunkt")
+                preCondition(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og ${request.requestURI}")
                 preCondition(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
                 log.info("Kjører bulk regler for {} og {} fra ${token.system}", this, specs.map { it.brukerId })
                 regelTjeneste.bulkRegler( this, specs)
@@ -123,9 +124,10 @@ class TilgangController(
             }
         }
 
-    private fun enkeltOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, brukerId: String, regelType: RegelType) =
+    private fun enkeltOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, brukerId: String, regelType: RegelType, request: HttpServletRequest) =
         with(brukerId.trim('"')) {
-            preCondition(predikat(), FORBIDDEN,"Mismatch mellom token type og endepunkt")
+            log.trace("Kjører {} regler for {} og {}", regelType, ansattId(), this)
+            preCondition(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og ${request.requestURI}")
             preCondition(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")
             if (regelType == KJERNE_REGELTYPE) {

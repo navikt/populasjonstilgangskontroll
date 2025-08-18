@@ -36,3 +36,15 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
         private const val NAVIDENT = "NAVident"
     }
 }
+
+enum class TokenType {
+    OBO, CCF, UNAUTHENTICATED;
+
+    companion object {
+        fun from(token: Token): TokenType = when {
+            token.erObo -> OBO
+            token.erCC -> CCF
+            else -> UNAUTHENTICATED
+        }
+    }
+}

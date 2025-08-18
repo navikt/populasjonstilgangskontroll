@@ -18,7 +18,6 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, private val cfg: Val
 
     override val pingEndpoint  =  "${cfg.host}:${cfg.port}"
     override val name = "ValKey Cache"
-    val client = RedisClient.create(cfg.redisURI)
 
 
     override fun ping() =
@@ -32,6 +31,7 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, private val cfg: Val
         }
 
     fun lookup(key: String): String? {
+        val client = RedisClient.create(cfg.redisURI)
         val connection = client.connect()
         val commands: RedisCommands<String, String> = connection.sync()
         val value = commands.get(key)

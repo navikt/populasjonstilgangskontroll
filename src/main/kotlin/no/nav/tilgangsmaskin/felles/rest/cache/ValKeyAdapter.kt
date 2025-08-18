@@ -34,7 +34,6 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, private val cfg: Val
     fun lookup(key: String): String? {
         val commands: RedisCommands<String, String> = connection.sync()
         val value = commands.get(key)
-        connection.close()
         return value
     }
 

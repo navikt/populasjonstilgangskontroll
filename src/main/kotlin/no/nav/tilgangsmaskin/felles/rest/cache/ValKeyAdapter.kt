@@ -1,5 +1,8 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
+import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.lettuce.core.RedisClient
 import io.lettuce.core.api.sync.RedisCommands
@@ -39,11 +42,17 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,pr
 
 
     private inline fun <reified T> lookup1(key: String): T? {
+        val mapper = jacksonObjectMapper().apply {
+            activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
+        }
         val commands: RedisCommands<String, String> = connection.sync()
         log.info("Lookup key: $key, type: ${T::class.java.simpleName}")
         val value = commands.get(key)
         log.info("Lookup key: $key, value: $value")
-        return configurer.valKeyMapper.readValue<T>(value)
+        return mapper.readValue<T>(value).also {
+            log.info("Lookup key converted: $key, value: $it")
+
+        }
     }
 
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}" }

@@ -8,19 +8,23 @@ import io.lettuce.core.RedisClient
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
+import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste.Companion.ENTRA_OID
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.format
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.stereotype.Component
 import java.util.UUID
 
 @Component
-class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
+class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnectionFactory, cfg: ValKeyConfig, private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
 
     private val log = getLogger(javaClass)
+
+    pprivate val prefixes = cacheManager.cacheConfigurations
 
     override val pingEndpoint  =  "${cfg.host}:${cfg.port}"
     override val name = "ValKey Cache"
@@ -41,7 +45,7 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,pr
 
     fun lookup(cache: String, key: String) = doLookup<UUID>(cache, key)
 
-    private inline fun <reified T> doLookup(cache: String, key: String) = mapper.readValue<T>(conn.sync().get("$cache::$key"))
+    private inline fun <reified T> doLookup(cache: String, key: String) = mapper.readValue<T>(conn.sync().get("${prefixes[ENTRA_OID]?.keyPrefix}::$key"))
 
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}" }
 

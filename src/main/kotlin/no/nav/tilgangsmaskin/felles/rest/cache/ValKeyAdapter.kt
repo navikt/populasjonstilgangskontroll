@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.lettuce.core.RedisClient
-import io.lettuce.core.api.sync.RedisCommands
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
@@ -25,8 +24,10 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,pr
 
     override val pingEndpoint  =  "${cfg.host}:${cfg.port}"
     override val name = "ValKey Cache"
-     val connection = RedisClient.create(cfg.valkeyURI).connect()
-
+     val conn = RedisClient.create(cfg.valkeyURI).connect()
+    private val mapper = jacksonObjectMapper().apply {
+        activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
+    }
 
     override fun ping() =
         cf.connection.use {
@@ -38,22 +39,9 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,pr
             }
         }
 
-    fun lookup(key: String) = lookup1<UUID>(key)
+    fun lookup(key: String, cache: String) = doLookup<UUID>(key, cache)
 
-
-    private inline fun <reified T> lookup1(key: String): T? {
-        val mapper = jacksonObjectMapper().apply {
-            activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
-        }
-        val commands: RedisCommands<String, String> = connection.sync()
-        log.info("Lookup key: $key, type: ${T::class.java.simpleName}")
-        val value = commands.get(key)
-        log.info("Lookup key: $key, value: $value")
-        return mapper.readValue<T>(value).also {
-            log.info("Lookup key converted: $key, value: $it")
-
-        }
-    }
+    private inline fun <reified T> doLookup(key: String, cache: String) = mapper.readValue<T>(conn.sync().get("$cache::$key"))
 
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}" }
 

@@ -6,6 +6,8 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import io.lettuce.core.RedisURI
+
 
 class BrukerIdTest {
 

@@ -18,6 +18,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.stereotype.Component
 import java.util.UUID
+import kotlin.text.get
 
 @Component
 class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnectionFactory, cfg: ValKeyConfig, private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
@@ -45,16 +46,19 @@ class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnec
 
     fun lookup(cache: String, key: String) = doLookup<UUID>(cache, key)
 
-    private inline fun <reified T> doLookup(cache: String, key: String) = mapper.readValue<T>(conn.sync().get("${prefixes[ENTRA_OID]?.keyPrefix}::$key"))
+    private inline fun <reified T> doLookup(cache: String, key: String): T? {
+        val prefix = prefixes[cache]?.getKeyPrefixFor(cache) ?: throw IllegalStateException("Cache prefix for $cache not found")
+        val value = conn.sync().get("$prefix$key")
+        log.debug("$value for $cache")
+        return value?.let { mapper.readValue<T>(it) }
+    }
 
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}" }
 
     override fun bindTo(registry: MeterRegistry) {
         cfgs.forEach { cfg ->
             registry.gauge("cache.size", Tags.of("navn", cfg.navn), cf) {
-                val prefix = (prefixes[cfg.navn]!!.getKeyPrefixFor(cfg.navn))
-                log.info("Cache size for prefix '$prefix' is being measured")
-                cacheSize(prefix)
+                cacheSize((prefixes[cfg.navn]!!.getKeyPrefixFor(cfg.navn)))
             }
         }
     }

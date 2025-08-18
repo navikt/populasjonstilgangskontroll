@@ -52,10 +52,13 @@ class DevTilgangController(
     private val overstyring: OverstyringTjeneste,
     private val pip: PdlRestClientAdapter,
     private val nom: NomTjeneste,
-    private val pdl: PDLTjeneste) {
+    private val pdl: PDLTjeneste,
+    private val valkey: ValKeyAdapter) {
 
     private  val log = getLogger(javaClass)
 
+    @GetMapping("valkey/{key}")
+    fun valkey(@PathVariable key: String) = valkey.lookup(key)
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)

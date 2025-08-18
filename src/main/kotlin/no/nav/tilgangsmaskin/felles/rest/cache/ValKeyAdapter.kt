@@ -24,7 +24,7 @@ class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnec
 
     private val log = getLogger(javaClass)
 
-    pprivate val prefixes = cacheManager.cacheConfigurations
+    private val prefixes = cacheManager.cacheConfigurations
 
     override val pingEndpoint  =  "${cfg.host}:${cfg.port}"
     override val name = "ValKey Cache"
@@ -52,16 +52,18 @@ class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnec
     override fun bindTo(registry: MeterRegistry) {
         cfgs.forEach { cfg ->
             registry.gauge("cache.size", Tags.of("navn", cfg.navn), cf) {
-                cacheSize( cfg.navn)
+                val prefix = (prefixes[cfg.navn]!!.getKeyPrefixFor(cfg.navn))
+                log.infp("Cache size for prefix '$prefix' is being measured")
+                cacheSize(prefix)
             }
         }
     }
 
-    private fun cacheSize(cacheName: String) =
+    private fun cacheSize(prefix: String) =
         cf.connection.use {
             it.keyCommands()
                 .scan(scanOptions()
-                    .match("*$cacheName*")
+                    .match("$prefix*")
                     .count(1000)
                     .build())
                 .asSequence()

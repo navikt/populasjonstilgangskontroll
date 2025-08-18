@@ -7,6 +7,6 @@ import java.net.URI
 
 @ConfigurationProperties(VALKEY)
 data class ValKeyConfig(val username: String, val password: String, val host: String, val port: String, val uri: URI) {
-    val redisURI  = RedisURI.create("rediss://${username}:${password}@${host:$port}");
+    val redisURI  = RedisURI.create("rediss://${username}:${password}@${host}:${port}");
 }
 

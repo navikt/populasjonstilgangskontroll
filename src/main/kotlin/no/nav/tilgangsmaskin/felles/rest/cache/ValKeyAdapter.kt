@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.format
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.stereotype.Component
+import java.util.UUID
 
 @Component
 class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,private vararg val cfgs: CachableRestConfig, val mapper: ObjectMapper) : Pingable, MeterBinder {
@@ -34,7 +35,7 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,pr
             }
         }
 
-    fun lookup(key: String) = lookup(key,UUID::class)
+    fun lookup(key: String) = lookup(key, UUID::class)
 
 
     private inline fun <reified T> lookup(key: String, clazz: T): T? {

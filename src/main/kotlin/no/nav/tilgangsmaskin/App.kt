@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import no.nav.tilgangsmaskin.felles.rest.cache.ValKeyAdapter
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.profiler
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.local
 import no.nav.tilgangsmaskin.regler.motor.RegelSett
@@ -44,6 +45,7 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, pr
         with(ctx) {
             builder.withDetail(
                 "extra-info", mapOf(
+                    "Cluster" to ClusterUtils.current.clusterName,
                     "Startup" to startupDate.local(),
                     "Java runtime version" to environment.getProperty("java.runtime.version"),
                     "Java vendor" to environment.getProperty("java.vm.vendor"),
@@ -53,7 +55,7 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, pr
                     "Spring Boot version" to SpringBootVersion.getVersion(),
                     "Spring Framework version" to SpringVersion.getVersion()))
             regelsett.forEach {
-                builder.withDetail(it.beskrivelse, it.regler.map { it.kortNavn })
+                builder.withDetail(it.beskrivelse, it.regler.map { "(${it.javaClass.simpleName}) ${it.kortNavn}" })
             }
         }
     }

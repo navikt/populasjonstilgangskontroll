@@ -18,7 +18,9 @@ plugins {
     id("com.google.cloud.tools.jib") version "3.4.5"
     application
 }
-
+springBoot {
+    buildInfo()
+}
 
 repositories {
     mavenCentral()

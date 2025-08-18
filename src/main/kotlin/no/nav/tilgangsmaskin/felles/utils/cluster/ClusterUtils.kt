@@ -11,14 +11,14 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import java.lang.System.getenv
 import java.lang.System.setProperty
 
-internal enum class ClusterUtils(private val clusterName: String) {
+internal enum class ClusterUtils(val clusterName: String) {
     TEST_CLUSTER(TEST),
     LOCAL_CLUSTER(LOCAL),
     DEV_GCP_CLUSTER(DEV_GCP),
     PROD_GCP_CLUSTER(PROD_GCP);
 
     companion object {
-        private val current = (getenv(NAIS_CLUSTER_NAME) ?: LOCAL).let { e -> entries.first { it.clusterName == e } }
+        val current = (getenv(NAIS_CLUSTER_NAME) ?: LOCAL).let { e -> entries.first { it.clusterName == e } }
         val isProd = current == PROD_GCP_CLUSTER
         val profiler =
             when (current) {

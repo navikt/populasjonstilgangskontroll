@@ -39,9 +39,9 @@ class ValKeyAdapter(private val cf: RedisConnectionFactory, cfg: ValKeyConfig,pr
             }
         }
 
-    fun lookup(key: String, cache: String) = doLookup<UUID>(key, cache)
+    fun lookup(cache: String, key: String) = doLookup<UUID>(cache, key)
 
-    private inline fun <reified T> doLookup(key: String, cache: String) = mapper.readValue<T>(conn.sync().get("$cache::$key"))
+    private inline fun <reified T> doLookup(cache: String, key: String) = mapper.readValue<T>(conn.sync().get("$cache::$key"))
 
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}" }
 

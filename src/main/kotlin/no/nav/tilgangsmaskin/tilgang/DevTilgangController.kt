@@ -7,7 +7,6 @@ import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
@@ -31,10 +30,7 @@ import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
 import no.nav.tilgangsmaskin.tilgang.BulkApiResponse
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.cache.annotation.CacheEvict
-import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.http.HttpStatus.*
-import org.springframework.http.MediaType
 import org.springframework.http.MediaType.*
 import org.springframework.web.bind.annotation.*
 
@@ -57,8 +53,8 @@ class DevTilgangController(
 
     private  val log = getLogger(javaClass)
 
-    @GetMapping("valkey/{key}")
-    fun valkey(@PathVariable key: String) = valkey.lookup(key)
+    @GetMapping("valkey/{cache}/{key}")
+    fun valkey(@PathVariable cache: String, @PathVariable key: String) = valkey.lookup(cache, key)
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)

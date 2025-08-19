@@ -23,7 +23,9 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
             val slåttOpp = skjermingerFraREST(identer.minus(cached.keys))
             log.info("Hentet ${cached.size} skjerminger fra cache, ${slåttOpp.size} fra REST av totalt ${identer.size} identer")
             //todo lagre slåttOpp i cache
-            return (cached  + slåttOpp).map { BrukerId(it.key) to it.value }.toMap()
+            return (cached  + slåttOpp).map { BrukerId(it.key) to it.value }.toMap().also {
+                log.info("Totalt $it skjerminger")
+            }
         }
     }
 

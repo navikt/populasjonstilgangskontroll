@@ -26,17 +26,21 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
                     log.info("Alle (${identer.size}) skjerminger ble funnet i cache ${identer.size}")
                 }
             }
-            val slåttOpp = skjermingerFraREST(identer/*.minus(cached.keys.map { it.verdi }).toSet()*/)
+
+            val slåttOpp = skjermingerFraREST(identer.minus(cached.keys.map { it.verdi }).toSet())
             log.info("Slo opp ${slåttOpp.size} skjerminger fra REST for ${identer.size} identer, ${cached.size} fra cache")
+
             valkey.mset(SKJERMING, *slåttOpp.map { it.key.verdi to it.value }.toList()
                 .toTypedArray<Pair<String, Boolean>>()
             )
-            skjermingerFraCache(identer).also {
+
+            val alle = skjermingerFraCache(identer).also {
                 if (it.size == identer.size) {
                     log.info("Hentet som forventet ${it.size} skjerminger fra cache etter oppdatering av cache")
                 }
             }  // Skal nå treffe alle
-            return slåttOpp
+            return alle
+            //return slåttOpp
         }
     }
 

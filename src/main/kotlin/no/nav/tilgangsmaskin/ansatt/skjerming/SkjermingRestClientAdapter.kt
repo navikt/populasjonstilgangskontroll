@@ -26,11 +26,11 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
             return slåttOpp
             //  return (cached  + slåttOpp).map { BrukerId(it.key) to it.value }.toMap().also {
             //      log.info("Totalt $it skjerminger")
+            // }
         }
     }
-}
 
-private fun skjermingerFraREST(identer: Set<String>): Map<String, Boolean> =
+    private fun skjermingerFraREST(identer: Set<String>): Map<String, Boolean> =
         post<Map<String, Boolean>>(cf.skjermingerUri, mapOf(IDENTER to identer))
             .map { (brukerId, skjerming) ->brukerId to skjerming }
             .toMap()

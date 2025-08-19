@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.ansatt.skjerming
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.IDENT
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.IDENTER
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
-import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
 import no.nav.tilgangsmaskin.felles.rest.cache.ValKeyAdapter
@@ -22,8 +21,10 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
             val cached = skjermingerFraCache(identer)
             val slåttOpp = skjermingerFraREST(identer/*.minus(cached.keys)*/)
             log.info("Hentet ${cached.size} skjerminger fra cache av totalt ${identer.size} identer")
-            valkey.mset(SKJERMING,slåttOpp.map { it.key.verdi to it.value }.toMap())
-            cached = skjermingerFraCache(identer)  // Skal nå treffe alle
+            valkey.mset(SKJERMING, *slåttOpp.map { it.key.verdi to it.value }.toList()
+                .toTypedArray<Pair<String, Boolean>>()
+            )
+            skjermingerFraCache(identer)  // Skal nå treffe alle
             return slåttOpp
             //  return (cached  + slåttOpp).map { BrukerId(it.key) to it.value }.toMap().also {
             //      log.info("Totalt $it skjerminger")

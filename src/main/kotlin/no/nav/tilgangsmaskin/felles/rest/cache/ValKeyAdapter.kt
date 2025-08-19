@@ -78,13 +78,11 @@ class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnec
         }
 
     private inline fun <reified T> mget(cache: String, vararg ids: String): List<Pair<String, T>> {
-        val one =  conn.sync()
+        val all =  conn.sync()
             .mget(*ids.map { it.prefixed(cache) }.toTypedArray())
-        log.info("One is $one")
-        val two = one.filter { it.hasValue() }
+        val filtered = all.filter { it.hasValue() }
             .map { it.key.unprefixed(cache) to mapper.readValue<T>(it.value) }
-        log.info("Two for is $two")
-        return two
+        return filtered
     }
 
     private fun String.prefixed(cache: String) = "${prefixes.prefixFor(cache)}$this"

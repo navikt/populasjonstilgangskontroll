@@ -23,7 +23,7 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
                     log.info("Ikke alle ${identer.size} ble funnet i cache, det mangler ${identer.size - it.size}")
                 }
                 else {
-                    log.info("Alle skjerminger ble funnet i cache ($identer.size)")
+                    log.info("Alle skjerminger ble funnet i cache ${identer.size}")
                 }
             }
             val slåttOpp = skjermingerFraREST(identer/*.minus(cached.keys)*/)

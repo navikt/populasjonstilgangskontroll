@@ -17,19 +17,20 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
     fun skjerming(ident: String) = post<Boolean>(cf.skjermingUri, mapOf(IDENT to ident))
 
     fun skjerminger(identer: Set<String>): Map<BrukerId, Boolean> {
-        if (identer.isEmpty()) return emptyMap<BrukerId, Boolean>()
+        if (identer.isEmpty()) return emptyMap()
         else {
             val cached = skjermingerFraCache(identer)
-            val slåttOpp = skjermingerFraREST(identer.minus(cached.keys))
+            val slåttOpp = skjermingerFraREST(identer/*.minus(cached.keys)*/)
             log.info("Hentet ${cached.size} skjerminger fra cache, ${slåttOpp.size} fra REST av totalt ${identer.size} identer")
             //todo lagre slåttOpp i cache
-            return (cached  + slåttOpp).map { BrukerId(it.key) to it.value }.toMap().also {
-                log.info("Totalt $it skjerminger")
-            }
+            return slåttOpp
+            //  return (cached  + slåttOpp).map { BrukerId(it.key) to it.value }.toMap().also {
+            //      log.info("Totalt $it skjerminger")
         }
     }
+}
 
-    private fun skjermingerFraREST(identer: Set<String>): Map<String, Boolean> =
+private fun skjermingerFraREST(identer: Set<String>): Map<String, Boolean> =
         post<Map<String, Boolean>>(cf.skjermingerUri, mapOf(IDENTER to identer))
             .map { (brukerId, skjerming) ->brukerId to skjerming }
             .toMap()

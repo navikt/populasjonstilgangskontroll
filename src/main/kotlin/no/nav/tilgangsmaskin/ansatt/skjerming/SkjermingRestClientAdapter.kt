@@ -20,10 +20,10 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
         else {
             skjermingerFraCache(identer,"1").also {
                 if (it.size < identer.size) {
-                    log.info("Ikke alle skjerminger ble funnet i cache, det mangler ${identer.size - it.size}")
+                    log.info("Ikke alle ${identer.size} ble funnet i cache, det mangler ${identer.size - it.size}")
                 }
                 else {
-                    log.info("Alle skjerminger ble funnet i cache")
+                    log.info("Alle skjerminger ble funnet i cache ($identer.size)")
                 }
             }
             val slåttOpp = skjermingerFraREST(identer/*.minus(cached.keys)*/)
@@ -48,7 +48,6 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
         runCatching {
             valkey.skjerminger(*identer.toTypedArray())
                 .associate { (ident, skjerming) -> BrukerId(ident) to skjerming }.also {
-                  //  log.info("$msg Hentet ${it.size} skjerminger for ${identer.size} identer fra cache")
                 }
         }.getOrElse {
             log.warn("Kunne ikke hente skjerminger for ${identer} identer fra cache",it)

@@ -18,8 +18,7 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
     fun skjerminger(identer: Set<String>): Map<BrukerId, Boolean> {
         if (identer.isEmpty()) return emptyMap()
         else {
-            skjermingerFraCache(identer,"1")
-            val slåttOpp = skjermingerFraREST(identer/*.minus(cached.keys)*/).also {
+            skjermingerFraCache(identer,"1").also {
                 if (it.size < identer.size) {
                     log.info("Ikke alle skjerminger ble funnet i cache, det mangler ${identer.size - it.size}")
                 }
@@ -27,6 +26,7 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
                     log.info("Alle skjerminger ble funnet i cache")
                 }
             }
+            val slåttOpp = skjermingerFraREST(identer/*.minus(cached.keys)*/)
             valkey.mset(SKJERMING, *slåttOpp.map { it.key.verdi to it.value }.toList()
                 .toTypedArray<Pair<String, Boolean>>()
             )
@@ -48,7 +48,7 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
         runCatching {
             valkey.skjerminger(*identer.toTypedArray())
                 .associate { (ident, skjerming) -> BrukerId(ident) to skjerming }.also {
-                    log.info("$msg Hentet ${it.size} skjerminger for ${identer.size} identer fra cache")
+                  //  log.info("$msg Hentet ${it.size} skjerminger for ${identer.size} identer fra cache")
                 }
         }.getOrElse {
             log.warn("Kunne ikke hente skjerminger for ${identer} identer fra cache",it)

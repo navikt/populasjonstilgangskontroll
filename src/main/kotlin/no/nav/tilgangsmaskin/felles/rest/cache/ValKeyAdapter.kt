@@ -43,12 +43,21 @@ class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnec
             }
         }
 
-    fun lookup(cache: String, key: String) = doLookup<UUID>(cache, key)
+    fun getUUID(cache: String, key: String) = get<UUID>(cache, key)
+    fun getUUIDs(cache: String, vararg keys: String) = mget<UUID>(cache, *keys)
 
-    private inline fun <reified T> doLookup(cache: String, key: String) =
+    private inline fun <reified T> get(cache: String, key: String) =
         conn.sync().get("${prefixes.prefixFor(cache)}$key")?.let {
             mapper.readValue<T>(it)
         }
+
+    private inline fun <reified T> mget(cache: String, vararg keys: String) =
+        conn.sync().mget(*keys.map {
+            "${prefixes.prefixFor(cache)}$it"
+        }.toTypedArray())
+            .mapNotNull { it.value }.map {
+            mapper.readValue<T>(it)
+            }
 
     private fun Map<String, RedisCacheConfiguration>.prefixFor(cache: String) = get(cache)?.getKeyPrefixFor(cache) ?: throw IllegalStateException("Cache prefix for $cache not found")
 

@@ -54,7 +54,10 @@ class DevTilgangController(
     private  val log = getLogger(javaClass)
 
     @GetMapping("valkey/{cache}/{key}")
-    fun valkey(@PathVariable cache: String, @PathVariable key: String) = valkey.lookup(cache, key)
+    fun valkey(@PathVariable cache: String, @PathVariable key: String) = valkey.getUUID(cache, key)
+
+    @PostMapping("valkey/{cache}")
+    fun valkeys(@PathVariable cache: String, @RequestBody vararg keys: String) = valkey.getUUIDs(cache, *keys)
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)

@@ -55,8 +55,9 @@ class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnec
         conn.sync().mget(*keys.map {
             "${prefixes.prefixFor(cache)}$it"
         }.toTypedArray())
-            .mapNotNull { it.value }.map {
-            mapper.readValue<T>(it)
+            .mapNotNull { it }
+            .map {
+                mapper.readValue<T>(it.value)
             }
 
     private fun Map<String, RedisCacheConfiguration>.prefixFor(cache: String) = get(cache)?.getKeyPrefixFor(cache) ?: throw IllegalStateException("Cache prefix for $cache not found")

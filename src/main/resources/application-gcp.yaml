@@ -118,7 +118,7 @@ spring:
   jackson:
     deserialization:
       fail-on-unknown-properties: true
-    default-property-inclusion: non_default
+    default-property-inclusion: non_null
 
 no.nav.security.jwt:
   issuer:

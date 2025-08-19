@@ -51,7 +51,7 @@ class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnec
             mapper.readValue<T>(it)
         }
 
-    private inline fun <reified T> mget(cache: String, vararg keys: String) : T? {
+    private inline fun <reified T> mget(cache: String, vararg keys: String) : List<T>? {
         val m = conn.sync().mget(*keys.map {
             "${prefixes.prefixFor(cache)}$it"
         }.toTypedArray())

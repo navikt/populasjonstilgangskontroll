@@ -81,9 +81,9 @@ class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnec
         val one =  conn.sync()
             .mget(*ids.map { it.prefixed(cache) }.toTypedArray())
         log.info("One is $one")
-        var two = one.filter { it.hasValue() }
+        val two = one.filter { it.hasValue() }
             .map { it.key.unprefixed(cache) to mapper.readValue<T>(it.value) }
-        log.info("Two is $two")
+        log.info("Two for is $two")
         return two
     }
 

@@ -8,6 +8,8 @@ import io.lettuce.core.RedisClient
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
+import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste.Companion.ENTRA_OID
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.format
@@ -43,11 +45,10 @@ class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnec
             }
         }
 
-    fun getUUID(cache: String, key: String) = get<UUID>(cache, key)
-    fun getUUIDs(cache: String, vararg keys: String) = mget<UUID>(cache, *keys)
-
-
-
+    fun oid(navId: String) = get<UUID>(ENTRA_OID, navId)
+    fun oids(vararg navIds: String) = mget<UUID>(ENTRA_OID, *navIds)
+    fun skjerming(navId: String) = get<Boolean>(SKJERMING, navId)
+    fun skjerminger(vararg navIds: String) = mget<Boolean>(SKJERMING, *navIds)
 
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}" }
 
@@ -71,14 +72,14 @@ class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnec
                 .toDouble()
         }
 
-    private inline fun <reified T> get(cache: String, key: String) =
-        conn.sync().get(key.prefixed(cache))?.let {
+    private inline fun <reified T> get(cache: String, id: String) =
+        conn.sync().get(id.prefixed(cache))?.let {
             mapper.readValue<T>(it)
         }
 
-    private inline fun <reified T> mget(cache: String, vararg keys: String): List<Pair<String, T>> {
+    private inline fun <reified T> mget(cache: String, vararg ids: String): List<Pair<String, T>> {
         return conn.sync()
-            .mget(*keys.map { it.prefixed(cache) }.toTypedArray())
+            .mget(*ids.map { it.prefixed(cache) }.toTypedArray())
             .filter { it.hasValue() }
             .map { it.key.unprefixed(cache) to mapper.readValue<T>(it.value) }
     }

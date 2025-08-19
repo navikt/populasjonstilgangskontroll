@@ -19,17 +19,23 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
         if (identer.isEmpty()) return emptyMap()
         else {
             skjermingerFraCache(identer,"1")
-            val slåttOpp = skjermingerFraREST(identer/*.minus(cached.keys)*/)
+            val slåttOpp = skjermingerFraREST(identer/*.minus(cached.keys)*/).also {
+                if (it.size < identer.size) {
+                    log.info("Ikke alle skjerminger ble funnet i cache, det mangler ${identer.size - it.size}")
+                }
+                else {
+                    log.info("Alle skjerminger ble funnet i cache")
+                }
+            }
             valkey.mset(SKJERMING, *slåttOpp.map { it.key.verdi to it.value }.toList()
                 .toTypedArray<Pair<String, Boolean>>()
             )
             skjermingerFraCache(identer, "2").also {
-                log.info("Hentet $it skjerminger fra cache etter oppdatering")
+                if (it.size == identer.size) {
+                    log.info("Hentet som forventet ${it.size} skjerminger fra cache etter oppdatering av cache")
+                }
             }  // Skal nå treffe alle
             return slåttOpp
-            //  return (cached  + slåttOpp).map { BrukerId(it.key) to it.value }.toMap().also {
-            //      log.info("Totalt $it skjerminger")
-            // }
         }
     }
 

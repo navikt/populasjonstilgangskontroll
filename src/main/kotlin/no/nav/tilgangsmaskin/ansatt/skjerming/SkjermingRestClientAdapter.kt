@@ -20,7 +20,6 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
         else {
             val cached = skjermingerFraCache(identer,"1")
             val slåttOpp = skjermingerFraREST(identer/*.minus(cached.keys)*/)
-            log.info("Hentet ${cached.size} skjerminger fra cache av totalt ${identer.size} identer")
             valkey.mset(SKJERMING, *slåttOpp.map { it.key.verdi to it.value }.toList()
                 .toTypedArray<Pair<String, Boolean>>()
             )

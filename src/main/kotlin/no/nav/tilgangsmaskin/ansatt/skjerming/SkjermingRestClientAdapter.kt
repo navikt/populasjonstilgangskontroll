@@ -18,19 +18,19 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
     fun skjerminger(identer: Set<String>): Map<BrukerId, Boolean> {
         if (identer.isEmpty()) return emptyMap()
         else {
-            skjermingerFraCache(identer,"1").also {
+            skjermingerFraCache(identer).also {
                 if (it.size < identer.size) {
-                    log.info("Ikke alle ${identer.size} ble funnet i cache, det mangler ${identer.size - it.size}")
+                    log.info("Ikke alle ${identer.size} skjerminger ble funnet i cache, det mangler ${identer.size - it.size}")
                 }
                 else {
-                    log.info("Alle skjerminger ble funnet i cache ${identer.size}")
+                    log.info("Alle (${identer.size}) skjerminger ble funnet i cache ${identer.size}")
                 }
             }
             val slåttOpp = skjermingerFraREST(identer/*.minus(cached.keys)*/)
             valkey.mset(SKJERMING, *slåttOpp.map { it.key.verdi to it.value }.toList()
                 .toTypedArray<Pair<String, Boolean>>()
             )
-            skjermingerFraCache(identer, "2").also {
+            skjermingerFraCache(identer).also {
                 if (it.size == identer.size) {
                     log.info("Hentet som forventet ${it.size} skjerminger fra cache etter oppdatering av cache")
                 }
@@ -44,13 +44,12 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
             .map { (brukerId, skjerming) -> BrukerId(brukerId) to skjerming }
             .toMap()
 
-    private fun skjermingerFraCache(identer: Set<String>, msg: String) =
+    private fun skjermingerFraCache(identer: Set<String>) =
         runCatching {
             valkey.skjerminger(*identer.toTypedArray())
-                .associate { (ident, skjerming) -> BrukerId(ident) to skjerming }.also {
-                }
+                .associate { (ident, skjerming) -> BrukerId(ident) to skjerming }
         }.getOrElse {
-            log.warn("Kunne ikke hente skjerminger for ${identer} identer fra cache",it)
+            log.warn("Kunne ikke hente skjerminger for $identer identer fra cache",it)
             emptyMap()
         }
 }

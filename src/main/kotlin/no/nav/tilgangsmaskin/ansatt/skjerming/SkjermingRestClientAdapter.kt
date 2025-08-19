@@ -30,9 +30,9 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
         }
     }
 
-    private fun skjermingerFraREST(identer: Set<String>): Map<String, Boolean> =
+    private fun skjermingerFraREST(identer: Set<String>): Map<BrukerId, Boolean> =
         post<Map<String, Boolean>>(cf.skjermingerUri, mapOf(IDENTER to identer))
-            .map { (brukerId, skjerming) ->brukerId to skjerming }
+            .map { (brukerId, skjerming) -> BrukerId(brukerId) to skjerming }
             .toMap()
 
     private fun skjermingerFraCache(identer: Set<String>) =

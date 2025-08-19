@@ -46,19 +46,8 @@ class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnec
     fun getUUID(cache: String, key: String) = get<UUID>(cache, key)
     fun getUUIDs(cache: String, vararg keys: String) = mget<UUID>(cache, *keys)
 
-    private inline fun <reified T> get(cache: String, key: String) =
-        conn.sync().get("${prefixes.prefixFor(cache)}$key")?.let {
-            mapper.readValue<T>(it)
-        }
 
-    private inline fun <reified T> mget(cache: String, vararg keys: String): List<Pair<String, T>> {
-        return conn.sync()
-            .mget(*keys.map { "${prefixes.prefixFor(cache)}$it" }.toTypedArray())
-            .filter { it.hasValue() }
-            .map { it.key to mapper.readValue<T>(it.value) }
-    }
 
-    private fun Map<String, RedisCacheConfiguration>.prefixFor(cache: String) = get(cache)?.getKeyPrefixFor(cache) ?: throw IllegalStateException("Har ingen cache med navn $cache")
 
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}" }
 
@@ -81,6 +70,25 @@ class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnec
                 .count()
                 .toDouble()
         }
+
+    private inline fun <reified T> get(cache: String, key: String) =
+        conn.sync().get(key.prefixed(cache))?.let {
+            mapper.readValue<T>(it)
+        }
+
+    private inline fun <reified T> mget(cache: String, vararg keys: String): List<Pair<String, T>> {
+        return conn.sync()
+            .mget(*keys.map { it.prefixed(cache) }.toTypedArray())
+            .filter { it.hasValue() }
+            .map { it.key.unprefixed(cache) to mapper.readValue<T>(it.value) }
+    }
+
+    private fun String.prefixed(cache: String) = "${prefixes.prefixFor(cache)}$this"
+
+    private fun String.unprefixed(cache: String) = removePrefix(prefixes.prefixFor(cache))
+
+    private fun Map<String, RedisCacheConfiguration>.prefixFor(cache: String) = get(cache)?.getKeyPrefixFor(cache) ?: throw IllegalStateException("Har ingen cache med navn $cache")
+
 
     companion object {
         const val VALKEY = "valkey"

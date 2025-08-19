@@ -84,6 +84,10 @@ class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnec
             .map { it.key.unprefixed(cache) to mapper.readValue<T>(it.value) }
         return filtered
     }
+    fun mset(cache: String, vararg pairs: Pair<String, Any>) {
+        val mapped = pairs.associate { it.first.prefixed(cache) to mapper.writeValueAsString(it.second) }
+        conn.sync().mset(mapped)
+    }
 
     private fun String.prefixed(cache: String) = "${prefixes.prefixFor(cache)}$this"
 

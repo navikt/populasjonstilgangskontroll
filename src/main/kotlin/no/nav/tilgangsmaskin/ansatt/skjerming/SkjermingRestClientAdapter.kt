@@ -23,11 +23,14 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
                     log.info("Ikke alle ${identer.size} skjerminger ble funnet i cache, det mangler ${identer.size - it.size}")
                 }
                 else {
-                    log.info("Alle (${identer.size}) skjerminger ble funnet i cache ${identer.size}")
+                    log.info("Alle (${identer.size}) skjerminger ble funnet i cache, returnerer")
+                    return it
                 }
             }
-            val slåttOpp = skjermingerFraREST(identer/*.minus(cached.keys.map { it.verdi }).toSet()*/)
-            log.info("Slo opp ${slåttOpp.size} skjerminger fra REST for ${identer.size} identer, ${cached.size} fra cache")
+            val gjenværende = identer.minus(cached.keys.map { it.verdi })
+            val slåttOpp = skjermingerFraREST(gjenværende)
+            log.info("Slo opp ${slåttOpp.size} gjenværende skjerminger fra REST for ${identer.size} identer, ${cached.size} fra cache")
+
             valkey.mset(SKJERMING, *slåttOpp.map { it.key.verdi to it.value }.toList()
                 .toTypedArray<Pair<String, Boolean>>()
             )
@@ -36,8 +39,8 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
                     log.info("Hentet som forventet ${it.size} skjerminger fra cache etter oppdatering av cache")
                 }
             }  // Skal nå treffe alle
-            //return alle
-            return slåttOpp
+            return alle
+            //return slåttOpp
         }
     }
 

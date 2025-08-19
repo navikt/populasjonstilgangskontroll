@@ -51,16 +51,18 @@ class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnec
             mapper.readValue<T>(it)
         }
 
-    private inline fun <reified T> mget(cache: String, vararg keys: String) =
-        conn.sync().mget(*keys.map {
+    private inline fun <reified T> mget(cache: String, vararg keys: String) : T? {
+        val m = conn.sync().mget(*keys.map {
             "${prefixes.prefixFor(cache)}$it"
         }.toTypedArray())
-            .mapNotNull { it }
+       log.info("mget for cache $cache, keys: ${keys.joinToString(",")}, result: $m")
+        return m.mapNotNull { it }
             .map {
                 mapper.readValue<T>(it.value)
             }
+    }
 
-    private fun Map<String, RedisCacheConfiguration>.prefixFor(cache: String) = get(cache)?.getKeyPrefixFor(cache) ?: throw IllegalStateException("Cache prefix for $cache not found")
+    private fun Map<String, RedisCacheConfiguration>.prefixFor(cache: String) = get(cache)?.getKeyPrefixFor(cache) ?: throw IllegalStateException("Har ingen cache med navn $cache")
 
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}" }
 

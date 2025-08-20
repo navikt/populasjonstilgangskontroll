@@ -44,7 +44,7 @@ class ValKeyCacheAdapter(cacheManager: RedisCacheManager, private val cf: RedisC
             }
         }
 
-    fun skjerminger(navIds: Set<String>) = hentVerdier<Boolean>(SKJERMING,navIds)
+    fun skjerminger(navIds: Set<String>) = get<Boolean>(SKJERMING,navIds)
 
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}" }
 
@@ -68,12 +68,12 @@ class ValKeyCacheAdapter(cacheManager: RedisCacheManager, private val cf: RedisC
                 .toDouble()
         }
 
-    private inline fun <reified T> hentVerdi(cache: String, id: String) =
+    private inline fun <reified T> get(cache: String, id: String) =
         conn.sync().get(id.prefixed(cache))?.let {key ->
             mapper.readValue<T>(key)
         }
 
-    private inline fun <reified T> hentVerdier(cache: String, ids: Set<String>)  =
+    private inline fun <reified T> get(cache: String, ids: Set<String>)  =
         if (ids.isEmpty()) {
             emptySet()
         }
@@ -87,16 +87,14 @@ class ValKeyCacheAdapter(cacheManager: RedisCacheManager, private val cf: RedisC
                 it.key.unprefixed(cache) to mapper.readValue<T>(it.value)
             }.toSet()
 
-    fun put(cache: String, innslag: Map<String, Any>) =
-        if (innslag.isEmpty()) {
-            Unit
-        }
-        else conn.sync()
-            .mset(innslag.mapKeys {
-                it.key.prefixed(cache)
-            }.mapValues {
-                mapper.writeValueAsString(it.value)
-            })
+    fun put(cache: String, innslag: Map<String, Any>): Int {
+        if (innslag.isEmpty()) return 0
+        conn.sync().mset(
+            innslag.mapKeys { it.key.prefixed(cache) }
+                .mapValues { mapper.writeValueAsString(it.value) }
+        )
+        return innslag.size
+    }
 
 
     private fun String.prefixed(cache: String) = "${prefixes.prefixFor(cache)}$this"

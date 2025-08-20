@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import io.lettuce.core.KeyValue
 import io.lettuce.core.RedisClient
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
-import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste.Companion.ENTRA_OID
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
@@ -19,10 +19,9 @@ import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.stereotype.Component
-import java.util.UUID
 
 @Component
-class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnectionFactory, cfg: ValKeyConfig, private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
+class ValKeyCacheAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnectionFactory, cfg: ValKeyConfig, private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
 
     private val log = getLogger(javaClass)
 
@@ -45,10 +44,7 @@ class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnec
             }
         }
 
-    fun oid(navId: String) = get<UUID>(ENTRA_OID, navId)
-    fun oids(vararg navIds: String) = mget<UUID>(ENTRA_OID, *navIds)
-    fun skjerming(navId: String) = get<Boolean>(SKJERMING, navId)
-    fun skjerminger(vararg navIds: String) = mget<Boolean>(SKJERMING, *navIds)
+    fun skjerminger(navIds: Set<String>) = hentVerdier<Boolean>(SKJERMING,navIds)
 
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}" }
 
@@ -72,22 +68,36 @@ class ValKeyAdapter(cacheManager: RedisCacheManager, private val cf: RedisConnec
                 .toDouble()
         }
 
-    private inline fun <reified T> get(cache: String, id: String) =
-        conn.sync().get(id.prefixed(cache))?.let {
-            mapper.readValue<T>(it)
+    private inline fun <reified T> hentVerdi(cache: String, id: String) =
+        conn.sync().get(id.prefixed(cache))?.let {key ->
+            mapper.readValue<T>(key)
         }
 
-    private inline fun <reified T> mget(cache: String, vararg ids: String): List<Pair<String, T>> {
-        val all =  conn.sync()
-            .mget(*ids.map { it.prefixed(cache) }.toTypedArray())
-        val filtered = all.filter { it.hasValue() }
-            .map { it.key.unprefixed(cache) to mapper.readValue<T>(it.value) }
-        return filtered
-    }
-    fun mset(cache: String, vararg pairs: Pair<String, Any>) {
-        val mapped = pairs.associate { it.first.prefixed(cache) to mapper.writeValueAsString(it.second) }
-        conn.sync().mset(mapped)
-    }
+    private inline fun <reified T> hentVerdier(cache: String, ids: Set<String>)  =
+        if (ids.isEmpty()) {
+            emptySet()
+        }
+        else conn.sync()
+            .mget(*ids.map {key ->
+                key.prefixed(cache)
+            }.toTypedArray<String>()).filter {
+                it.hasValue()
+            }
+            .map<KeyValue<String, String>, Pair<String, T>> {
+                it.key.unprefixed(cache) to mapper.readValue<T>(it.value).
+            }.toSet()
+
+    fun put(cache: String, innslag: Map<String, Any>) =
+        if (innslag.isEmpty()) {
+            Unit
+        }
+        else conn.sync()
+            .mset(innslag.mapKeys {
+                it.key.prefixed(cache)
+            }.mapValues {
+                mapper.writeValueAsString(it.value)
+            })
+
 
     private fun String.prefixed(cache: String) = "${prefixes.prefixFor(cache)}$this"
 

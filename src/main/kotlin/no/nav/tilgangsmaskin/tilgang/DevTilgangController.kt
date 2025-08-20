@@ -20,7 +20,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
-import no.nav.tilgangsmaskin.felles.rest.cache.ValKeyAdapter
+import no.nav.tilgangsmaskin.felles.rest.cache.ValKeyCacheAdapter
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -49,21 +49,12 @@ class DevTilgangController(
     private val pip: PdlRestClientAdapter,
     private val nom: NomTjeneste,
     private val pdl: PDLTjeneste,
-    private val valkey: ValKeyAdapter) {
+    private val valkey: ValKeyCacheAdapter) {
 
     private  val log = getLogger(javaClass)
 
-    @GetMapping("valkey/oid/{navId}")
-    fun valkeyOID(@PathVariable navId: String) = valkey.oid(navId)
-
-    @PostMapping("valkey/oids")
-    fun valkeyOIDS(@RequestBody vararg navIds: String) = valkey.oids(*navIds)
-
-    @GetMapping("valkey/skjerming/{navId}")
-    fun valkeySkjerming(@PathVariable navId: String) = valkey.skjerming(navId)
-
     @PostMapping("valkey/skjerminger")
-    fun valkeySkjerminger(@RequestBody vararg navIds: String) = valkey.skjerminger(*navIds)
+    fun valkeySkjerminger(@RequestBody  navIds: Set<String>) = valkey.skjerminger(navIds)
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)

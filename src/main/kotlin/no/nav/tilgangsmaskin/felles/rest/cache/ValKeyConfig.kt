@@ -1,8 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
-import io.lettuce.core.RedisURI.URI_SCHEME_REDIS_SECURE
 import io.lettuce.core.RedisURI
-import no.nav.tilgangsmaskin.felles.rest.cache.ValKeyAdapter.Companion.VALKEY
+import no.nav.tilgangsmaskin.felles.rest.cache.ValKeyCacheAdapter.Companion.VALKEY
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
 

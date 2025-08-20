@@ -67,6 +67,6 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             }
 
     @Bean
-    fun valKeyHealthIndicator(adapter: ValKeyAdapter)  = PingableHealthIndicator(adapter)
+    fun valKeyHealthIndicator(adapter: ValKeyCacheAdapter)  = PingableHealthIndicator(adapter)
 }
 

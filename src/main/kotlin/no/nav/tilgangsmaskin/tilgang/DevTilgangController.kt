@@ -57,7 +57,7 @@ class DevTilgangController(
     fun valkeySkjerminger(@RequestBody  navIds: Set<String>) = valkey.skjerminger(navIds)
 
     @GetMapping("sivilstand/{id}")
-    fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)
+    fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.partnere(id)
 
     @PostMapping("brukeridentifikator", consumes = [APPLICATION_JSON_VALUE, TEXT_PLAIN_VALUE])
     fun brukerIdentifikator(@RequestBody id: Identifikator) = brukere.brukerMedUtvidetFamilie(id.verdi)

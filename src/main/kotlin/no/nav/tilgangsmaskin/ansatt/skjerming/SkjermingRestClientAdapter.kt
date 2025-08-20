@@ -27,7 +27,7 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
         }
         else {
             post<Map<String, Boolean>>(cf.skjermingerUri, mapOf(IDENTER to identer)).also {
-                log.info("Hentet ${it.size} skjerminger fra REST for ${identer.size}")
+                log.info("Hentet ${it.size} skjerming(er) fra REST for ${identer.size} ident(er)")
             }
         }
 
@@ -39,7 +39,7 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
         else  {
             cache.skjerminger(identer)
                 .associate { (ident, erSkjermet) -> ident to erSkjermet }.also {
-                    log.info("Hentet ${it.size} skjerminger fra cache for ${identer.size}")
+                    log.info("Hentet ${it.size} skjerming(er) fra cache for ${identer.size} ident(er)")
                 }
         }
 }

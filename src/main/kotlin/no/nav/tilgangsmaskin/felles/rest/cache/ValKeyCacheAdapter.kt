@@ -84,7 +84,7 @@ class ValKeyCacheAdapter(cacheManager: RedisCacheManager, private val cf: RedisC
                 it.hasValue()
             }
             .map<KeyValue<String, String>, Pair<String, T>> {
-                it.key.unprefixed(cache) to mapper.readValue<T>(it.value).
+                it.key.unprefixed(cache) to mapper.readValue<T>(it.value)
             }.toSet()
 
     fun put(cache: String, innslag: Map<String, Any>) =

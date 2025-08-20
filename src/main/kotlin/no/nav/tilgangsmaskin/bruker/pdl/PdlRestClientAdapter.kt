@@ -30,7 +30,10 @@ class PdlRestClientAdapter(
     fun person(brukerId: String) = tilPerson(get<PdlRespons>(cf.personURI, mapOf("ident" to brukerId)))
 
     fun personer(brukerIds: Set<String>) : List<Person> {
-        cache.personer()
+        //. Slå opp i cache
+        // Slå opp fra tjenesten
+        // oppdater cache
+        // slå sammen resultater
 
         return post<String>(cf.personerURI, brukerIds).let { res ->
             mapper.readValue<Map<String, PdlRespons?>>(res)

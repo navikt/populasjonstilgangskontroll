@@ -5,13 +5,13 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.IDENTER
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
-import no.nav.tilgangsmaskin.felles.rest.cache.ValKeyCacheAdapter
+import no.nav.tilgangsmaskin.felles.rest.cache.ValkeyCacheClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 
 @Component
-class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, private val cf: SkjermingConfig, private val cache: ValKeyCacheAdapter) : AbstractRestClientAdapter(restClient, cf) {
+class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, private val cf: SkjermingConfig, private val cache: ValkeyCacheClient) : AbstractRestClientAdapter(restClient, cf) {
 
     fun skjerming(ident: String) = post<Boolean>(cf.skjermingUri, mapOf(IDENT to ident))
 
@@ -31,15 +31,14 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
             }
         }
 
-
-    private fun fraCache(identer: Set<String>) =
-        if (identer.isEmpty()) {
+    private fun fraCache(ids: Set<String>) =
+        if (ids.isEmpty()) {
             emptyMap()
         }
         else  {
-            cache.skjerminger(identer)
+            cache.mget<Boolean>(SKJERMING, ids)
                 .associate { (ident, erSkjermet) -> ident to erSkjermet }.also {
-                    log.info("Hentet ${it.size} skjerming(er) fra cache for ${identer.size} ident(er)")
+                    log.info("Hentet ${it.size} skjerming(er) fra cache for ${ids.size} ident(er)")
                 }
         }
 }

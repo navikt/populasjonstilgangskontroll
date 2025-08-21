@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
-import no.nav.tilgangsmaskin.felles.rest.cache.ValKeyCacheAdapter
+import no.nav.tilgangsmaskin.felles.rest.cache.ValkeyCacheClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
@@ -18,7 +18,7 @@ import org.springframework.web.client.RestClient
 class PdlRestClientAdapter(
     @Qualifier(PDL) restClient: RestClient,
     private val cf: PdlConfig,
-    private val cache: ValKeyCacheAdapter,
+    private val cache: ValkeyCacheClient,
     private val mapper: ObjectMapper) : AbstractRestClientAdapter(restClient, cf) {
 
 
@@ -34,7 +34,8 @@ class PdlRestClientAdapter(
         // Slå opp fra tjenesten
         // oppdater cache
         // slå sammen resultater
-       val fraCache = cache.personer(ids)
+
+        val fraCache = cache.mget<Person>(PDL,ids)
         val personerFraCache = fraCache.map { it.second }.toSet()
 
 

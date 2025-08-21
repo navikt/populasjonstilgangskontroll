@@ -10,17 +10,20 @@ import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
+import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
-import no.nav.tilgangsmaskin.felles.rest.cache.ValKeyCacheAdapter
+import no.nav.tilgangsmaskin.felles.rest.cache.ValkeyCacheClient
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -49,15 +52,15 @@ class DevTilgangController(
     private val pip: PdlRestClientAdapter,
     private val nom: NomTjeneste,
     private val pdl: PDLTjeneste,
-    private val valkey: ValKeyCacheAdapter) {
+    private val cache: ValkeyCacheClient) {
 
     private  val log = getLogger(javaClass)
 
-    @PostMapping("valkey/skjerminger")
-    fun valkeySkjerminger(@RequestBody  navIds: Set<String>) = valkey.skjerminger(navIds)
+    @PostMapping("cache/skjerminger")
+    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cache.mget<Boolean>(SKJERMING,navIds)
 
-    @PostMapping("valkey/personer")
-    fun valkeyPersoner(@RequestBody  navIds: Set<String>) = valkey.personer(navIds)
+    @PostMapping("cache/personer")
+    fun cachePersoner(@RequestBody  navIds: Set<String>) = cache.mget<Person>(PDL,navIds)
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.partnere(id)

@@ -41,7 +41,7 @@ class PdlRestClientAdapter(
         val cacheIds = personerFraCache.map { it.brukerId.verdi }.toSet()
         log.info("Fant $cacheIds personer fra cache for ${ids.size} ident(er)")
         if (ids.size == cacheIds.size) {
-            log.info("Alle $ids persopner er i cache, returnerer ${personerFraCache.size} personer")
+            log.info("Alle $ids personer er i cache, returnerer ${personerFraCache.size} personer")
         }
         else {
             log.info("Ikke alle $ids personer er i cache, slår opp ${ids - cacheIds} ident(er) i PDL")

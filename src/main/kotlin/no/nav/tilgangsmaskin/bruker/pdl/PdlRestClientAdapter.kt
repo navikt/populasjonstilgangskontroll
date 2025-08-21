@@ -34,9 +34,9 @@ class PdlRestClientAdapter(
         // Slå opp fra tjenesten
         // oppdater cache
         // slå sammen resultater
-        var fraCache = cache.personer(ids)
+       // var fraCache = cache.personer(ids)
 
-        var fraRest =  mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, ids))
+        val fraRest =  mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, ids))
             .mapNotNull { (_, res) -> res?.let { tilPerson(it) } }
         return fraRest
     }

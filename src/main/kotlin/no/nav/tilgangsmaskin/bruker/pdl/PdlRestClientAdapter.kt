@@ -35,8 +35,8 @@ class PdlRestClientAdapter(
         // oppdater cache
         // slå sammen resultater
 
-        val fraCache = cache.mget<Person>(PDL,ids)
-        val personerFraCache = fraCache.map { it.second }.toSet()
+        val personerFraCache = cache.mget<Person>(PDL, ids, "medNærmesteFamilie").map { it.second
+        }.toSet()
 
 
         val cacheIds = personerFraCache.map { it.brukerId.verdi }.toSet()

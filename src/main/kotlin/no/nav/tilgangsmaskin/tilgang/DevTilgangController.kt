@@ -56,6 +56,9 @@ class DevTilgangController(
     @PostMapping("valkey/skjerminger")
     fun valkeySkjerminger(@RequestBody  navIds: Set<String>) = valkey.skjerminger(navIds)
 
+    @PostMapping("valkey/personer")
+    fun valkeyPersoner(@RequestBody  navIds: Set<String>) = valkey.personer(navIds)
+
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.partnere(id)
 

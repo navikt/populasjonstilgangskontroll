@@ -34,7 +34,8 @@ class PdlRestClientAdapter(
         // Slå opp fra tjenesten
         // oppdater cache
         // slå sammen resultater
-       // var fraCache = cache.personer(ids)
+       val fraCache = cache.personer(ids)
+        log.info("Hentet $fraCache personer fra cache for ${ids.size} ident(er)")
 
         val fraRest =  mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, ids))
             .mapNotNull { (_, res) -> res?.let { tilPerson(it) } }

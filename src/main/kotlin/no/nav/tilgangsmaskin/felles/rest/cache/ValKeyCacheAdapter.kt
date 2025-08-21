@@ -47,7 +47,7 @@ class ValKeyCacheAdapter(cacheManager: RedisCacheManager, private val cf: RedisC
         }
 
     fun skjerminger(navIds: Set<String>) = mget<Boolean>(SKJERMING, navIds)
-    fun personer(navIds: Set<String>, prefix: String) = mget<Person>(PDL, navIds, prefix)
+    fun personer(navIds: Set<String>) = mget<Person>(PDL, navIds, "medNærmesteFamilie")
 
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}" }
 

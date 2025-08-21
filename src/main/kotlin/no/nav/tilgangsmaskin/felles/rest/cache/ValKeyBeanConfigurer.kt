@@ -19,7 +19,6 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
-import kotlin.reflect.jvm.jvmName
 
 @Configuration(proxyBeanMethods = true)
 @EnableCaching

@@ -27,19 +27,18 @@ class PdlRestClientAdapter(
             copy(familie = familie.copy(søsken = søsken(foreldre, brukerId.verdi), partnere = partnere))
         }
 
-    fun person(brukerId: String) = tilPerson(get<PdlRespons>(cf.personURI, mapOf("ident" to brukerId)))
+    fun person(id: String) = tilPerson(get<PdlRespons>(cf.personURI, mapOf("ident" to id)))
 
-    fun personer(brukerIds: Set<String>) : List<Person> {
+    fun personer(ids: Set<String>) : List<Person> {
         //. Slå opp i cache
         // Slå opp fra tjenesten
         // oppdater cache
         // slå sammen resultater
+        var fraCache = cache.personer(ids)
 
-        return post<String>(cf.personerURI, brukerIds).let { res ->
-            mapper.readValue<Map<String, PdlRespons?>>(res)
-                .mapNotNull { it.value?.let { res -> it.key to res } }
-                .toMap().map { tilPerson(it.value) }
-        }
+        var fraRest =  mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, ids))
+            .mapNotNull { (_, res) -> res?.let { tilPerson(it) } }
+        return fraRest
     }
 
     private fun søsken(foreldre: Set<FamilieMedlem>, ansattBrukerId: String): Set<FamilieMedlem> =

@@ -24,6 +24,11 @@
   },
   "inbound": [
     {
+      "name": "tiltakspenger-saksbehandling-api",
+      "namespace": "tpts",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "melosys",
       "namespace": "teammelosys",
       "cluster": "prod-fss"

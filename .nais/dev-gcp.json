@@ -27,6 +27,11 @@
   },
   "inbound": [
     {
+      "name": "tiltakspenger-saksbehandling-api",
+      "namespace": "tpts",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "aareg-tilgangskontroll-q2",
       "namespace": "arbeidsforhold",
       "cluster": "dev-fss"

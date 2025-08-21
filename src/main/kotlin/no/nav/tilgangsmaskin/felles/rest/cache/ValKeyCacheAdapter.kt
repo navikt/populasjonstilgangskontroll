@@ -99,7 +99,7 @@ class ValKeyCacheAdapter(cacheManager: RedisCacheManager, private val cf: RedisC
         return innslag.size
     }
 
-    private fun String.prefixed(cache: String, extraPrefix: String? = null) = if (extraPrefix != null) "${prefixes.prefixFor(cache)}$extraPrefix:$this:" else "${prefixes.prefixFor(cache)}$this"
+    private fun String.prefixed(cache: String, extraPrefix: String? = null) = if (extraPrefix != null) "${prefixes.prefixFor(cache)}$extraPrefix:$this" else "${prefixes.prefixFor(cache)}$this"
 
     private fun String.unprefixed(cache: String, extraPrefix: String? = null) = if (extraPrefix != null) removePrefix( prefixes.prefixFor(cache) + extraPrefix + ":") else removePrefix(prefixes.prefixFor(cache))
 

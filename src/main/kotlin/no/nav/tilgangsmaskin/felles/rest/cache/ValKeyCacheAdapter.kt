@@ -91,6 +91,7 @@ class ValKeyCacheAdapter(cacheManager: RedisCacheManager, private val cf: RedisC
             }.toSet()
 
     fun put(cache: String, innslag: Map<String, Any>): Int {
+        if (innslag.isEmpty()) {return 0}
         conn.sync().mset(
             innslag.mapKeys { it.key.prefixed(cache) }
                 .mapValues { mapper.writeValueAsString(it.value) }

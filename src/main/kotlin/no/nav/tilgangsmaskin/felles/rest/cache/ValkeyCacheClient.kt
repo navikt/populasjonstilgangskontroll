@@ -6,7 +6,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.lettuce.core.KeyValue
 import io.lettuce.core.RedisClient
-import org.slf4j.LoggerFactory
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.stereotype.Component
 
@@ -18,12 +17,12 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler, cfg: ValKeyConfig, p
         activateDefaultTyping(polymorphicTypeValidator, EVERYTHING,PROPERTY)
     }
 
-    inline fun <reified T> get(cache: String, id: String) =
+    inline final fun <reified T> get(cache: String, id: String) =
         conn.sync().get(handler.toKey(cache,id))?.let { json ->
             mapper.readValue<T>(json)
         }
 
-    inline fun <reified T> mget(cache: String, ids: Set<String>, extraPrefix: String? = null)  =
+    inline final fun <reified T> mget(cache: String, ids: Set<String>, extraPrefix: String? = null)  =
         if (ids.isEmpty()) { emptySet() }
         else conn.sync()
             .mget(*ids.map {key -> handler.toKey(cache,key) }.toTypedArray<String>())

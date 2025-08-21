@@ -8,9 +8,10 @@ import io.lettuce.core.KeyValue
 import io.lettuce.core.RedisClient
 import org.slf4j.LoggerFactory
 import org.springframework.data.redis.connection.RedisConnectionFactory
+import org.springframework.stereotype.Component
 
+@Component
 class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler, cfg: ValKeyConfig, private val cf: RedisConnectionFactory) {
-    private val log = LoggerFactory.getLogger(javaClass)
 
     val conn = RedisClient.create(cfg.valkeyURI).connect()
     val mapper = jacksonObjectMapper().apply {

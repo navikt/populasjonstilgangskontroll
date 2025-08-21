@@ -46,9 +46,8 @@ class ValKeyCacheAdapter(cacheManager: RedisCacheManager, private val cf: RedisC
             }
         }
 
-    fun skjerminger(navIds: Set<String>) = get<Boolean>(SKJERMING,navIds)
-    fun personer(navIds: Set<String>) = get<Person>(PDL,navIds)
-
+    fun skjerminger(navIds: Set<String>) = mget<Boolean>(SKJERMING, navIds)
+    fun personer(navIds: Set<String>, prefix: String) = mget<Person>(PDL, navIds, prefix)
 
     fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}" }
 
@@ -77,18 +76,18 @@ class ValKeyCacheAdapter(cacheManager: RedisCacheManager, private val cf: RedisC
             mapper.readValue<T>(key)
         }
 
-    private inline fun <reified T> get(cache: String, ids: Set<String>)  =
+    private inline fun <reified T> mget(cache: String, ids: Set<String>, extraPrefix: String? = null)  =
         if (ids.isEmpty()) {
             emptySet()
         }
         else conn.sync()
             .mget(*ids.map {key ->
-                key.prefixed(cache)
+                key.prefixed(cache,extraPrefix)
             }.toTypedArray<String>()).filter {
                 it.hasValue()
             }
             .map<KeyValue<String, String>, Pair<String, T>> {
-                it.key.unprefixed(cache) to mapper.readValue<T>(it.value)
+                it.key.unprefixed(cache,extraPrefix) to mapper.readValue<T>(it.value)
             }.toSet()
 
     fun put(cache: String, innslag: Map<String, Any>): Int {
@@ -100,10 +99,9 @@ class ValKeyCacheAdapter(cacheManager: RedisCacheManager, private val cf: RedisC
         return innslag.size
     }
 
+    private fun String.prefixed(cache: String, extraPrefix: String? = null) = if (extraPrefix != null) "$extraPrefix:${prefixes.prefixFor(cache)}$this" else "${prefixes.prefixFor(cache)}$this"
 
-    private fun String.prefixed(cache: String) = "${prefixes.prefixFor(cache)}$this"
-
-    private fun String.unprefixed(cache: String) = removePrefix(prefixes.prefixFor(cache))
+    private fun String.unprefixed(cache: String, extraPrefix: String? = null) = if (extraPrefix != null) removePrefix(extraPrefix + ":" + prefixes.prefixFor(cache)) else removePrefix(prefixes.prefixFor(cache))
 
     private fun Map<String, RedisCacheConfiguration>.prefixFor(cache: String) = get(cache)?.getKeyPrefixFor(cache) ?: throw IllegalStateException("Har ingen cache med navn $cache")
 

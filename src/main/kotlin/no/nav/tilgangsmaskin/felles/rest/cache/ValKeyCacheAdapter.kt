@@ -82,16 +82,15 @@ class ValKeyCacheAdapter(cacheManager: RedisCacheManager, private val cf: RedisC
         }
         else conn.sync()
             .mget(*ids.map {key ->
-                key.prefixed(cache,extraPrefix)
+                key.prefixed(cache,extraPrefix).also { log.info("Prefix for cache $cache er $it") }
             }.toTypedArray<String>()).filter {
                 it.hasValue()
             }
             .map<KeyValue<String, String>, Pair<String, T>> {
-                it.key.unprefixed(cache,extraPrefix) to mapper.readValue<T>(it.value)
+                it.key.unprefixed(cache,extraPrefix).also { log.info("Unprefix for cache $cache er  $it") } to mapper.readValue<T>(it.value)
             }.toSet()
 
     fun put(cache: String, innslag: Map<String, Any>): Int {
-        if (innslag.isEmpty()) return 0
         conn.sync().mset(
             innslag.mapKeys { it.key.prefixed(cache) }
                 .mapValues { mapper.writeValueAsString(it.value) }

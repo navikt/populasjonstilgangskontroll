@@ -35,7 +35,17 @@ class PdlRestClientAdapter(
         // oppdater cache
         // slå sammen resultater
        val fraCache = cache.personer(ids)
-        log.info("Hentet $fraCache personer fra cache for ${ids.size} ident(er)")
+        val personerFraCache = fraCache.map { it.second }.toSet()
+
+        log.info("Hentet $personerFraCache personer fra cache for ${ids.size} personer")
+        val cacheIds = personerFraCache.map { it.brukerId.verdi }.toSet()
+        log.info("Fant $cacheIds personer fra cache for ${ids.size} ident(er)")
+        if (ids.size == cacheIds.size) {
+            log.info("Alle $ids persopner er i cache, returnerer ${personerFraCache.size} personer")
+        }
+        else {
+            log.info("Ikke alle $ids personer er i cache, slår opp ${ids - cacheIds} ident(er) i PDL")
+        }
 
         val fraRest =  mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, ids))
             .mapNotNull { (_, res) -> res?.let { tilPerson(it) } }

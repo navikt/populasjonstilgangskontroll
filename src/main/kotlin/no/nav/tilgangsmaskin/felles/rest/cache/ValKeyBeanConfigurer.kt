@@ -26,7 +26,6 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
                            mapper: ObjectMapper,
                            private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
-
     private val valKeyMapper =
         mapper.copy().apply {
             activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
@@ -40,9 +39,13 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             .build()
 
     @Bean
-    fun valkeyCacheClient(handler: ValkeyCacheKeyHandler, cfg: ValKeyConfig, mapper: ObjectMapper): ValkeyCacheClient =
+    fun redisClient(cfg: ValKeyConfig): RedisClient =
+        RedisClient.create(cfg.valkeyURI)
+
+    @Bean
+    fun valkeyCacheClient(client: RedisClient, handler: ValkeyCacheKeyHandler, mapper: ObjectMapper): ValkeyCacheClient =
         ValkeyCacheClient(handler,
-            RedisClient.create(cfg.valkeyURI).connect(),
+            client.connect(),
             mapper.copy().apply {
                 activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
             })
@@ -53,10 +56,12 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
 
 
     @Bean
-    fun valKeyHealthIndicator(adapter: ValKeyCacheAdapter)  = PingableHealthIndicator(adapter)
+    fun valKeyHealthIndicator(adapter: ValKeyCacheAdapter)  =
+        PingableHealthIndicator(adapter)
 
     @Bean
-    fun cacheKeyHandler(cacheManager: RedisCacheManager)  = ValkeyCacheKeyHandler(cacheManager.cacheConfigurations)
+    fun cacheKeyHandler(cacheManager: RedisCacheManager)  =
+        ValkeyCacheKeyHandler(cacheManager.cacheConfigurations)
 
     private fun cacheConfig(cfg: CachableRestConfig) =
         defaultCacheConfig()

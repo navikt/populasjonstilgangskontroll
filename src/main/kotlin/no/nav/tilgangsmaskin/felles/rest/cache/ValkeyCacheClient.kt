@@ -25,7 +25,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler, cfg: ValKeyConfig, p
     inline final fun <reified T> mget(cache: String, ids: Set<String>, extraPrefix: String? = null)  =
         if (ids.isEmpty()) { emptySet() }
         else conn.sync()
-            .mget(*ids.map {key -> handler.toKey(cache,key) }.toTypedArray<String>())
+            .mget(*ids.map {id -> handler.toKey(cache,id)}.toTypedArray<String>())
             .filter { it.hasValue() }
             .map<KeyValue<String, String>, Pair<String, T>> { handler.fromKey(cache,it.key,extraPrefix) to mapper.readValue<T>(it.value)
             }.toSet()

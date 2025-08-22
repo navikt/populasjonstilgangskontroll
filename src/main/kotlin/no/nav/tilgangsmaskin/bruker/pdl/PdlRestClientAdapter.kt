@@ -35,22 +35,25 @@ class PdlRestClientAdapter(
         // oppdater cache
         // slå sammen resultater
 
+        val personerFraCache = fraCache(ids)
+
+        val personerFraRest =  mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, ids))
+            .mapNotNull { (_, res) -> res?.let { tilPerson(it) } }
+        return personerFraRest // TODO
+    }
+
+    private fun fraCache(ids: Set<String>) : Set<Person> {
         val personerFraCache = cache.mget<Person>(PDL, ids, "medNærmesteFamilie").map { it.second
         }.toSet()
 
-
-        val cacheIds = personerFraCache.map { it.brukerId.verdi }.toSet()
-        log.info("Fant ${cacheIds.size} personer fra cache for ${ids.size} ident(er)")
-        if (ids.size == cacheIds.size) {
-            log.info("Alle ${ids.size} personer er i cache, returnerer ${personerFraCache.size} personer")
+        log.info("Fant ${personerFraCache.size} personer fra PDL cache for ${ids.size} ident(er)")
+        if (ids.size == personerFraCache.size) {
+            log.info("Alle ${ids.size} personer er i PDL cache, returnerer ${personerFraCache.size} personer")
         }
         else {
-            log.info("Ikke alle ${ids.size} personer er i cache, slår opp resterende  ${ids - cacheIds} ident(er) i PDL")
+            log.info("Ikke alle ${ids.size} personer er i PDL cache, slår opp resterende  ${ids.size - personerFraCache.size} ident(er) i PDL")
         }
-
-        val fraRest =  mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, ids))
-            .mapNotNull { (_, res) -> res?.let { tilPerson(it) } }
-        return fraRest
+        return personerFraCache
     }
 
     private fun søsken(foreldre: Set<FamilieMedlem>, ansattBrukerId: String): Set<FamilieMedlem> =

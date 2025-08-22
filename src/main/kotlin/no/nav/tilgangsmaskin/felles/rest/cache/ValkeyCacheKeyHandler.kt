@@ -8,12 +8,12 @@ class ValkeyCacheKeyHandler(val configs: Map<String, RedisCacheConfiguration>) {
 
     fun toKey(cache: String, key: String, extraPrefix: String? = null) =
         ("${prefixFor(cache)}${extraPrefix?.let { "$it:" } ?: ""}$key").also {
-            log.debug("La til prefix for cache $cache: $key -> $it")
+            log.info("La til prefix for cache $cache: $key -> $it")
         }
 
     fun fromKey(cache: String, key: String, extraPrefix: String? = null)  =
         key.removePrefix("${prefixFor(cache)}${extraPrefix?.let { "$it:" } ?: ""}").also {
-            log.debug("Fjernet prefix for cache $cache: $key -> $it")
+            log.info("Fjernet prefix for cache $cache: $key -> $it")
         }
 
     private fun prefixFor(cache: String): String =

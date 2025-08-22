@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.felles.rest.cache
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
+import io.lettuce.core.RedisClient
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
@@ -39,7 +40,15 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             .build()
 
     @Bean
-    fun prefixes(mgr: RedisCacheManager) =
+    fun valkeyCacheClient(handler: ValkeyCacheKeyHandler, cfg: ValKeyConfig, mapper: ObjectMapper): ValkeyCacheClient =
+        ValkeyCacheClient(handler,
+            RedisClient.create(cfg.valkeyURI).connect(),
+            mapper.copy().apply {
+                activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
+            })
+
+    @Bean
+    fun cachePrefixes(mgr: RedisCacheManager) =
         mgr.cacheConfigurations.map { (key,value) -> key to value.keyPrefix }
 
 
@@ -58,5 +67,3 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
                 if (!cfg.cacheNulls) disableCachingNullValues()
             }
 }
-
-

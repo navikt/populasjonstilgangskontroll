@@ -28,7 +28,7 @@ class ValkeyCacheKeyHandlerTest {
     @Test
     fun `toKey adds prefix and key`() {
         val key = "myKey"
-        val result = handler.toKey(key, cacheName)
+        val result = handler.toKey(cacheName, key)
         assertEquals("$prefix$key", result)
     }
 
@@ -36,7 +36,7 @@ class ValkeyCacheKeyHandlerTest {
     fun `toKey adds extraPrefix when provided`() {
         val key = "myKey"
         val extraPrefix = "extra"
-        val result = handler.toKey(key, cacheName, extraPrefix)
+        val result = handler.toKey(cacheName, key, extraPrefix)
         assertEquals("$prefix$extraPrefix:$key", result)
     }
 
@@ -45,7 +45,7 @@ class ValkeyCacheKeyHandlerTest {
         val key = "myKey"
         val extraPrefix = "extra"
         val fullKey = "$prefix$extraPrefix:$key"
-        val result = handler.fromKey(fullKey, cacheName, extraPrefix)
+        val result = handler.fromKey(cacheName, fullKey, extraPrefix)
         assertEquals(key, result)
     }
 
@@ -53,7 +53,7 @@ class ValkeyCacheKeyHandlerTest {
     fun `fromKey removes only prefix when extraPrefix is null`() {
         val key = "myKey"
         val fullKey = "$prefix$key"
-        val result = handler.fromKey(fullKey, cacheName)
+        val result = handler.fromKey(cacheName, fullKey)
         assertEquals(key, result)
     }
 
@@ -61,7 +61,7 @@ class ValkeyCacheKeyHandlerTest {
     fun `throws exception if cache config is missing`() {
         val handlerMissing = ValkeyCacheKeyHandler(emptyMap())
         assertThrows<IllegalStateException> {
-            handlerMissing.toKey("key", "unknownCache")
+            handlerMissing.toKey("unknown", "key")
         }
     }
 }

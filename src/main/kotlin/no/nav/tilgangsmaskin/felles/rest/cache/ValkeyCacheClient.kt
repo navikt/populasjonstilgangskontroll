@@ -2,10 +2,11 @@ package no.nav.tilgangsmaskin.felles.rest.cache
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.lettuce.core.KeyValue
 import io.lettuce.core.api.StatefulRedisConnection
 
-class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,  val conn: StatefulRedisConnection<String,String>,  val mapper: ObjectMapper)  {
+class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
+                        val conn: StatefulRedisConnection<String,String>,
+                        val mapper: ObjectMapper)  {
 
     inline fun <reified T> get(cache: String, id: String) =
         conn.sync().get(handler.toKey(cache,id))?.let { json ->

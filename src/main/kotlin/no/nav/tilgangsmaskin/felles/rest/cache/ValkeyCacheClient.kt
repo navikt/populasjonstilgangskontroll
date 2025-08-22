@@ -24,7 +24,12 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,  val conn: StatefulR
             }.toSet()
 
     fun put(cache: String, innslag: Map<String, Any>) =
-        conn.sync().mset(innslag
-            .mapKeys { handler.toKey(cache,it.key) }
-            .mapValues { mapper.writeValueAsString(it.value) })
+        if (innslag.isEmpty()) {
+            Unit
+        }
+        else {
+            conn.sync().mset(innslag
+                .mapKeys { handler.toKey(cache,it.key) }
+                .mapValues { mapper.writeValueAsString(it.value) })
+        }
 }

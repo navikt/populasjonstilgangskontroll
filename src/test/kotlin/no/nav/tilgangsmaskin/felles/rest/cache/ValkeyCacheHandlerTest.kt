@@ -14,7 +14,7 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration
 class ValkeyCacheKeyHandlerTest {
 
     private val cacheName = "testCache"
-    private val prefix = "prefix:"
+    private val prefix = "prefix::"
     @MockK
     private lateinit var redisConfig: RedisCacheConfiguration
     private lateinit var handler: ValkeyCacheKeyHandler

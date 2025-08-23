@@ -8,8 +8,8 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                         val conn: StatefulRedisConnection<String,String>,
                         val mapper: ObjectMapper)  {
 
-    inline fun <reified T> get(cache: String, id: String) =
-        conn.sync().get(handler.toKey(cache,id))?.let { json ->
+    inline fun <reified T> get(cache: String, id: String, extraPrefix: String? = null) =
+        conn.sync().get(handler.toKey(cache,id,extraPrefix))?.let { json ->
             mapper.readValue<T>(json)
         }
 
@@ -18,18 +18,18 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
             emptySet()
         }
         else conn.sync()
-            .mget(*ids.map {id -> handler.toKey(cache,id)}.toTypedArray<String>())
+            .mget(*ids.map {id -> handler.toKey(cache,id,extraPrefix)}.toTypedArray<String>())
             .filter { it.hasValue() }
             .map { handler.fromKey(cache,it.key,extraPrefix) to mapper.readValue<T>(it.value)
             }.toSet()
 
-    fun put(cache: String, innslag: Map<String, Any>) =
+    fun put(cache: String, innslag: Map<String, Any>, extraPrefix: String? = null) =
         if (innslag.isEmpty()) {
             Unit
         }
         else {
             conn.sync().mset(innslag
-                .mapKeys { handler.toKey(cache,it.key) }
+                .mapKeys { handler.toKey(cache,it.key,extraPrefix) }
                 .mapValues { mapper.writeValueAsString(it.value) })
         }
 }

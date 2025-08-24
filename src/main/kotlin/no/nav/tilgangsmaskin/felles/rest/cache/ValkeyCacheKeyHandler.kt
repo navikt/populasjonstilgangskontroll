@@ -6,18 +6,20 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration
 class ValkeyCacheKeyHandler(val configs: Map<String, RedisCacheConfiguration>) {
     private val log = getLogger(javaClass)
 
-    fun toKey(cache: String, key: String, extraPrefix: String? = null) =
+    fun toKey(cache: CacheName, key: String, extraPrefix: String? = null) =
         ("${prefixFor(cache)}${extraPrefix?.let { "$it:" } ?: ""}$key").also {
-            log.info("La til prefix (med extra $extraPrefix) for cache $cache: $key -> $it")
+            log.trace("La til prefix (med extra $extraPrefix) for cache $cache: $key -> $it")
         }
 
-    fun fromKey(cache: String, key: String, extraPrefix: String? = null)  =
+    fun fromKey(cache: CacheName, key: String, extraPrefix: String? = null)  =
         key.removePrefix("${prefixFor(cache)}${extraPrefix?.let { "$it:" } ?: ""}").also {
-            log.info("Fjernet prefix (med extra $extraPrefix) for cache $cache: $key -> $it")
+            log.trace("Fjernet prefix (med extra $extraPrefix) for cache $cache: $key -> $it")
         }
 
-    private fun prefixFor(cache: String): String =
-        configs[cache]?.getKeyPrefixFor(cache)
-            ?: throw IllegalStateException("Har ingen cache med navn $cache")
-
+    private fun prefixFor(cache: CacheName): String =
+        configs[cache.name]?.getKeyPrefixFor(cache.name)
+            ?: throw IllegalStateException("Har ingen cache med navn ${cache.name}")
 }
+
+@JvmInline
+value class CacheName(val name: String)

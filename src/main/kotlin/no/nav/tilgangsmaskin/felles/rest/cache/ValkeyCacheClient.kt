@@ -3,33 +3,41 @@ package no.nav.tilgangsmaskin.felles.rest.cache
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.lettuce.core.api.StatefulRedisConnection
+import org.slf4j.LoggerFactory.getLogger
 
 class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                         val conn: StatefulRedisConnection<String,String>,
                         val mapper: ObjectMapper)  {
 
-    inline fun <reified T> get(cache: String, id: String, extraPrefix: String? = null) =
+    val log = getLogger(javaClass)
+
+
+    inline fun <reified T> get(cache: CacheName, id: String, extraPrefix: String? = null) =
         conn.sync().get(handler.toKey(cache,id,extraPrefix))?.let { json ->
             mapper.readValue<T>(json)
         }
 
-    inline fun <reified T> mget(cache: String, ids: Set<String>, extraPrefix: String? = null)  =
+    inline fun <reified T> mget(cache: CacheName, ids: Set<String>, extraPrefix: String? = null)  =
         if (ids.isEmpty()) {
-            emptySet()
+            emptyMap()
         }
         else conn.sync()
             .mget(*ids.map {id -> handler.toKey(cache,id,extraPrefix)}.toTypedArray<String>())
             .filter { it.hasValue() }
-            .map { handler.fromKey(cache,it.key,extraPrefix) to mapper.readValue<T>(it.value)
-            }.toSet()
+            .associate { handler.fromKey(cache, it.key, extraPrefix) to mapper.readValue<T>(it.value)
+            }.also {
+                log.info("Fant ${it.size} verdier i cache ${cache.name} for ${ids.size} id(er)")
+            }
 
-    fun put(cache: String, innslag: Map<String, Any>, extraPrefix: String? = null) =
+    fun put(cache: CacheName, innslag: Map<String, Any>, extraPrefix: String? = null) =
         if (innslag.isEmpty()) {
             Unit
         }
         else {
             conn.sync().mset(innslag
                 .mapKeys { handler.toKey(cache,it.key,extraPrefix) }
-                .mapValues { mapper.writeValueAsString(it.value) })
+                .mapValues { mapper.writeValueAsString(it.value) }).also {
+                log.info("La til ${innslag.size} verdier i cache ${cache.name}")
+            }
         }
 }

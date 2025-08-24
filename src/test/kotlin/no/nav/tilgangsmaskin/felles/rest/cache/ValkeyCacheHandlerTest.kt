@@ -9,11 +9,13 @@ import org.junit.jupiter.api.extension.ExtendWith
 import io.mockk.every
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.data.redis.cache.RedisCacheConfiguration
+import no.nav.tilgangsmaskin.felles.rest.cache.CacheName
+
 
 @ExtendWith(MockKExtension::class)
 class ValkeyCacheKeyHandlerTest {
 
-    private val cacheName = "testCache"
+    private val cacheName = CacheName("testCache")
     private val prefix = "prefix::"
     @MockK
     private lateinit var redisConfig: RedisCacheConfiguration
@@ -21,8 +23,8 @@ class ValkeyCacheKeyHandlerTest {
 
     @BeforeEach
     fun setUp() {
-        every { redisConfig.getKeyPrefixFor(cacheName) } returns prefix
-        handler = ValkeyCacheKeyHandler(mapOf(cacheName to redisConfig))
+        every { redisConfig.getKeyPrefixFor(cacheName.name) } returns prefix
+        handler = ValkeyCacheKeyHandler(mapOf(cacheName.name to redisConfig))
     }
 
     @Test
@@ -61,7 +63,7 @@ class ValkeyCacheKeyHandlerTest {
     fun `throws exception if cache config is missing`() {
         val handlerMissing = ValkeyCacheKeyHandler(emptyMap())
         assertThrows<IllegalStateException> {
-            handlerMissing.toKey("unknown", "key")
+            handlerMissing.toKey(CacheName("unknown"), "key")
         }
     }
 }

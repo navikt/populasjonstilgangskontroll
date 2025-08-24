@@ -52,16 +52,15 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
 
     @Bean
     fun cachePrefixes(mgr: RedisCacheManager) =
-        mgr.cacheConfigurations.map { (key,value) -> key to value.keyPrefix }
-
+        mgr.cacheConfigurations.mapValues { it.value.keyPrefix }
 
     @Bean
     fun valKeyHealthIndicator(adapter: ValKeyCacheAdapter)  =
         PingableHealthIndicator(adapter)
 
     @Bean
-    fun cacheKeyHandler(cacheManager: RedisCacheManager)  =
-        ValkeyCacheKeyHandler(cacheManager.cacheConfigurations)
+    fun cacheKeyHandler(mgr: RedisCacheManager)  =
+        ValkeyCacheKeyHandler(mgr.cacheConfigurations)
 
     private fun cacheConfig(cfg: CachableRestConfig) =
         defaultCacheConfig()

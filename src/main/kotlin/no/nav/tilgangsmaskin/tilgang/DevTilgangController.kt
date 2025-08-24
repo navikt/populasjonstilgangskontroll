@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
 import org.springframework.http.MediaType.*
 import org.springframework.web.bind.annotation.*
+import no.nav.tilgangsmaskin.felles.rest.cache.CacheName
+
 
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
@@ -57,10 +59,10 @@ class DevTilgangController(
     private  val log = getLogger(javaClass)
 
     @PostMapping("cache/skjerminger")
-    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cache.mget<Boolean>(SKJERMING,navIds)
+    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cache.mget<Boolean>(CacheName(SKJERMING),navIds)
 
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<String>) = cache.mget<Person>(PDL,navIds)
+    fun cachePersoner(@RequestBody  navIds: Set<String>) = cache.mget<Person>(CacheName(PDL),navIds)
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.partnere(id)

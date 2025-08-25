@@ -3,11 +3,14 @@ package no.nav.tilgangsmaskin.felles.rest.cache
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.lettuce.core.api.StatefulRedisConnection
+import io.micrometer.core.instrument.Tags
+import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
 
 class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                         val conn: StatefulRedisConnection<String,String>,
-                        val mapper: ObjectMapper)  {
+                        val mapper: ObjectMapper,
+                         val teller: BulkCacheTeller)  {
 
     val log = getLogger(javaClass)
 
@@ -27,6 +30,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
             .filter { it.hasValue() }
             .associate { handler.fromKey(cache, it.key, extraPrefix) to mapper.readValue<T>(it.value)
             }.also {
+                teller.tell(Tags.of("hits", "${it.size}", "cache", cache.name))
                 log.info("Fant ${it.size} verdier i cache ${cache.name} for ${ids.size} id(er)")
             }
 
@@ -40,6 +44,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                 .mapKeys { handler.toKey(cache,it.key,extraPrefix) }
                 .mapValues { mapper.writeValueAsString(it.value) }).also {
                 log.info("La til ${innslag.size} verdier i cache ${cache.name} med prefix $extraPrefix" )
+                teller.tell(Tags.of("misses", "${innslag.size}", "cache", cache.name))
             }
         }
 }

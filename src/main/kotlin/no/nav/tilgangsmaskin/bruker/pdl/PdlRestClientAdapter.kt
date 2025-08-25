@@ -33,7 +33,7 @@ class PdlRestClientAdapter(
     fun personer(ids: Set<String>) : Set<Person> {
         val fraCache = cache.mget<Person>(PDL_CACHE, ids, EXTRA)
         val fraRest = fraRest(ids  - fraCache.keys)
-        cache.put(PDL_CACHE, fraRest)
+        cache.put(PDL_CACHE, fraRest, EXTRA)
         return (fraRest.values + fraCache.values).toSet()
     }
 

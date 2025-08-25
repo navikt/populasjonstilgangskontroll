@@ -39,7 +39,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
             conn.sync().mset(innslag
                 .mapKeys { handler.toKey(cache,it.key,extraPrefix) }
                 .mapValues { mapper.writeValueAsString(it.value) }).also {
-                log.info("La til ${innslag.size} verdier i cache ${cache.name}")
+                log.info("La til ${innslag.size} verdier i cache ${cache.name} med prefix $extraPrefix" )
             }
         }
 }

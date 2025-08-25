@@ -7,7 +7,6 @@ import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
@@ -15,12 +14,13 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
-import no.nav.tilgangsmaskin.felles.rest.cache.ValKeyAdapter
+import no.nav.tilgangsmaskin.felles.rest.cache.ValKeyCacheAdapter
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -30,9 +30,8 @@ import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
 import no.nav.tilgangsmaskin.tilgang.BulkApiResponse
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.cache.annotation.CacheEvict
-import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.http.HttpStatus.*
+import org.springframework.http.MediaType.*
 import org.springframework.web.bind.annotation.*
 
 @UnprotectedRestController(value = ["/${DEV}"])
@@ -49,13 +48,19 @@ class DevTilgangController(
     private val overstyring: OverstyringTjeneste,
     private val pip: PdlRestClientAdapter,
     private val nom: NomTjeneste,
-    private val pdl: PDLTjeneste) {
+    private val pdl: PDLTjeneste,
+    private val valkey: ValKeyCacheAdapter) {
 
     private  val log = getLogger(javaClass)
 
+    @PostMapping("valkey/skjerminger")
+    fun valkeySkjerminger(@RequestBody  navIds: Set<String>) = valkey.skjerminger(navIds)
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.sivilstand(id)
+
+    @PostMapping("brukeridentifikator", consumes = [APPLICATION_JSON_VALUE, TEXT_PLAIN_VALUE])
+    fun brukerIdentifikator(@RequestBody id: Identifikator) = brukere.brukerMedUtvidetFamilie(id.verdi)
 
     @GetMapping("bruker/{id}")
     fun bruker(@PathVariable @Valid @ValidId id: String) = brukere.brukerMedUtvidetFamilie(id)

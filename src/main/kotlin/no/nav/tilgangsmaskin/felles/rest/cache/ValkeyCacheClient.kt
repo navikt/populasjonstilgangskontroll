@@ -19,6 +19,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
 
     inline fun <reified T> mget(cache: CacheName, ids: Set<String>, extraPrefix: String? = null)  =
         if (ids.isEmpty()) {
+            log.trace("Forespurt 0 id'er for cache ${cache.name}, returnerer tomt resultat")
             emptyMap()
         }
         else conn.sync()
@@ -31,6 +32,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
 
     fun put(cache: CacheName, innslag: Map<String, Any>, extraPrefix: String? = null) =
         if (innslag.isEmpty()) {
+            log.trace("Skal legge til 0 verdier i cache ${cache.name}, gjør ingenting")
             Unit
         }
         else {

@@ -42,7 +42,6 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
     fun put(cache: CacheName, innslag: Map<String, Any>, extraPrefix: String? = null) =
         if (innslag.isEmpty()) {
             log.trace("Skal legge til 0 verdier i cache ${cache.name}, gjør ingenting")
-            Unit
         }
         else {
             conn.sync().mset(innslag

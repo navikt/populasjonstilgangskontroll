@@ -115,7 +115,6 @@ class TilgangController(
             if (specs.isNotEmpty()) {
                 preCondition(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og ${request.requestURI}")
                 preCondition(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
-                log.info("Kjører bulk regler for {} og {} fra ${token.system}", this, specs.map { it.brukerId })
                 regelTjeneste.bulkRegler( this, specs)
             }
             else {

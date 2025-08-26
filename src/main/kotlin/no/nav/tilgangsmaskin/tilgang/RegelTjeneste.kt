@@ -56,7 +56,7 @@ class RegelTjeneste(
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): BulkRespons {
         val (respons, elapsedTime) = measureTimedValue {
-            log.debug("Kjører bulk regler for {} og {}", ansattId, idOgType)
+            log.debug("Kjører bulk regler for {} og {} identer", ansattId, idOgType.size)
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val brukere = idOgType.brukerOgRegelsett()
             val resultater = motor.bulkRegler(ansatt, brukere)

@@ -43,9 +43,15 @@ class PdlRestClientAdapter(
         }
         else {
             mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, ids))
-                .mapValues { (_, pdlRespons) -> pdlRespons?.let(::tilPerson) }
-                .filterValues { it != null }
-                .mapValues { it.value!! }
+                .mapValues {
+                    (_, pdlRespons) -> pdlRespons?.let(::tilPerson)
+                }
+                .filterValues {
+                    it != null
+                }
+                .mapValues {
+                    it.value!!
+                }
                 .also {
                     log.info("Hentet ${it.size} person(er) fra REST for ${ids.size} ident(er)")
                 }
@@ -54,9 +60,15 @@ class PdlRestClientAdapter(
     private fun søsken(foreldre: Set<FamilieMedlem>, ansattBrukerId: String): Set<FamilieMedlem> =
         personer(foreldre.map { it.brukerId.verdi }.toSet())
             .asSequence()
-            .flatMap { it.barn }
-            .filterNot { it.brukerId.verdi == ansattBrukerId }
-            .map { FamilieMedlem(it.brukerId, SØSKEN) }
+            .flatMap {
+                it.barn
+            }
+            .filterNot {
+                it.brukerId.verdi == ansattBrukerId
+            }
+            .map {
+                FamilieMedlem(it.brukerId, SØSKEN)
+            }
             .toSet()
 
     companion object {

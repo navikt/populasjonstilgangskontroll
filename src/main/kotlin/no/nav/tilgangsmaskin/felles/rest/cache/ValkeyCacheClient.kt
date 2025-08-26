@@ -30,7 +30,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
             .filter { it.hasValue() }
             .associate { handler.fromKey(cache, it.key, extraPrefix) to mapper.readValue<T>(it.value)
             }.also {
-                teller.tell(Tags.of( "cache", cache.name,"result","hot"),it.size)
+                teller.tell(Tags.of( "cache", cache.name,"result","hit"),it.size)
                 log.info("Fant ${it.size} verdier i cache ${cache.name} for ${ids.size} id(er)")
             }
 

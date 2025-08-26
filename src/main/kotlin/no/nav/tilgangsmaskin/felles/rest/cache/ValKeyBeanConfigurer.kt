@@ -25,20 +25,12 @@ import org.springframework.data.redis.serializer.StringRedisSerializer
 @ConditionalOnGCP
 class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
                            mapper: ObjectMapper,
-                           private val env: Environment,
                            private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
 
     private val valKeyMapper =
         mapper.copy().apply {
-            if (isDevOrLocal(env)) {
-              //  registerModule(JsonCacheableModule())
-                activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
-             //    activateDefaultTyping(polymorphicTypeValidator, NON_FINAL_AND_ENUMS, PROPERTY)
-            }
-            else {
-                activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
-            }
+            activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
         }
 
     @Bean

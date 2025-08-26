@@ -32,6 +32,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
     private val valKeyMapper =
         mapper.copy().apply {
             if (isDevOrLocal(env)) {
+               // addMixIn(UUID::class.java, UUIDMixin::class.java)
               //  registerModule(JsonCacheableModule())
                 activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
              //    activateDefaultTyping(polymorphicTypeValidator, NON_FINAL_AND_ENUMS, PROPERTY)
@@ -41,12 +42,20 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             }
         }
 
+    abstract class UUIDMixin {
+       // @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY)
+    }
+
     @Bean
     override fun cacheManager(): RedisCacheManager =
         RedisCacheManager.builder(nonLockingRedisCacheWriter(cf))
             .withInitialCacheConfigurations(cfgs.associate { it.navn to cacheConfig(it) })
             .enableStatistics()
             .build()
+
+    @Bean
+    fun prefixes(mgr: RedisCacheManager) =
+        mgr.cacheConfigurations.map { (key,value) -> key to value.keyPrefix }
 
     private fun cacheConfig(cfg: CachableRestConfig) =
          defaultCacheConfig()
@@ -58,6 +67,6 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             }
 
     @Bean
-    fun valKeyHealthIndicator(adapter: ValKeyAdapter)  = PingableHealthIndicator(adapter)
+    fun valKeyHealthIndicator(adapter: ValKeyCacheAdapter)  = PingableHealthIndicator(adapter)
 }
 

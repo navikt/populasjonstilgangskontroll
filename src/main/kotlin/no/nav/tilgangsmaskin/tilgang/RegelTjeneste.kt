@@ -51,7 +51,7 @@ class RegelTjeneste(
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
-        motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedUtvidetFamilie(brukerId))
+        motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedNærmesteFamilie(brukerId))
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): BulkRespons {

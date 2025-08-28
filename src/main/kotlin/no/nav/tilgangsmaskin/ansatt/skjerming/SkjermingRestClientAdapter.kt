@@ -23,11 +23,11 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
     fun skjerminger(ids: Set<String>): Map<BrukerId, Boolean> {
         val fraCache = fraCache(ids)
         if (fraCache.size == ids.size) {
-            teller.tell(Tags.of("name", SKJERMING_CACHE.name,"suksess","true"))
+            tell(true)
         }
         val fraRest = fraRest(ids - fraCache.keys)
         cache.put(SKJERMING_CACHE, fraRest)
-        teller.tell(Tags.of("name", SKJERMING_CACHE.name,"suksess","false"))
+        tell(false)
         return (fraRest + fraCache).mapKeys {  BrukerId(it.key) }
     }
     private fun fraRest(ids: Set<String>) =
@@ -38,6 +38,8 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
             post<Map<String, Boolean>>(cf.skjermingerUri, mapOf(IDENTER to ids))
         }
 
+    private fun tell(status: Boolean) =
+        teller.tell(Tags.of("name", SKJERMING_CACHE.name,"suksess",status.toString()))
     private fun fraCache(ids: Set<String>) =
             cache.mget<Boolean>(SKJERMING_CACHE, ids)
 

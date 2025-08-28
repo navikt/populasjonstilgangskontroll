@@ -118,7 +118,7 @@ class TilgangController(
             if (specs.isNotEmpty()) {
                 preCondition(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og $uri")
                 preCondition(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
-                teller.tell(Tags.of("type","bulk","token",TokenType.from(token).name.lowercase()))
+                tell("bulk")
                 regelTjeneste.bulkRegler( this, specs)
             }
             else {
@@ -133,7 +133,7 @@ class TilgangController(
             preCondition(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og $uri")
             preCondition(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")
-            teller.tell(Tags.of("type","single","token",TokenType.from(token).name.lowercase()))
+            tell("single")
             if (regelType == KJERNE_REGELTYPE) {
                 return regelTjeneste.kjerneregler(ansattId(), this)
             }
@@ -141,6 +141,10 @@ class TilgangController(
                 return regelTjeneste.kompletteRegler(ansattId(), this)
             }
         }
+
+    private fun tell(type: String) =
+        teller.tell(Tags.of("type",type,"token",TokenType.from(token).name.lowercase()))
+
 
     private fun preCondition(predikat: Boolean, status: HttpStatus, message: String) {
         if (!predikat) throw ResponseStatusException(status,message)

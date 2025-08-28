@@ -1,4 +1,4 @@
-name: Build and deploy branch
+name: Build and deploy a branch
 on:
   workflow_dispatch:
     inputs:

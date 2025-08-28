@@ -101,8 +101,8 @@ class TilgangController(
     @Operation(summary = "Kjør bulkregler for en ansatt",
         description = "Dette endepunktet er kun tilgjengelig for client credentials flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er og regeltyper. Om ingen regeltype oppgis, evalueres det komplette regelsettet")
-    fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgRegelsett>,uri: String) =
-        bulkOppslag({ansattId},{token.erCC}, specs,uri)
+    fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgRegelsett>,request: HttpServletRequest) =
+        bulkOppslag({ansattId},{token.erCC}, specs,request.requestURI)
 
     @PostMapping("bulk/ccf/{ansattId}/{regelType}")
     @ResponseStatus(MULTI_STATUS)
@@ -110,8 +110,8 @@ class TilgangController(
     @Operation(summary = "Kjør bulkregler for en ansatt",
         description = "Dette endepunktet er kun tilgjengelig for client credentials flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er med gitt regeltype")
-    fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>, uri: String) =
-        bulkOppslag({ ansattId }, { token.erCC }, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(),uri)
+    fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>, request: HttpServletRequest) =
+        bulkOppslag({ ansattId }, { token.erCC }, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(),request.requestURI)
 
     private fun bulkOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, specs: Set<BrukerIdOgRegelsett>,uri: String) =
         with(ansattId()) {

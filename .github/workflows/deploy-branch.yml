@@ -91,7 +91,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     environment:
-      reviewers:  jan-olaveide
+      reviewers: [jan-olaveide]
       ${{matrix.cluster}}:tilgangsmaskin
     env:
       PRINT_PAYLOAD: true

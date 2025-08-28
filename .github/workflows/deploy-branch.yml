@@ -90,7 +90,9 @@ jobs:
     name: Deploy til ${{matrix.cluster}}
     needs: build
     runs-on: ubuntu-latest
-    environment: ${{matrix.cluster}}:tilgangsmaskin
+    environment:
+      reviewers:  jan-olaveide
+      ${{matrix.cluster}}:tilgangsmaskin
     env:
       PRINT_PAYLOAD: true
       TIMEOUT: 30m

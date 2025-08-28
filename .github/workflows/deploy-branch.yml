@@ -92,6 +92,8 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       ${{matrix.cluster}}:tilgangsmaskin
+      name: tilgangsmaskin-${{matrix.cluster}}
+      reviewers: [ jan-olaveide ]
     env:
       PRINT_PAYLOAD: true
       TIMEOUT: 30m

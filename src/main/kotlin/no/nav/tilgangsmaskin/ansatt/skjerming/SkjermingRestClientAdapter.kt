@@ -42,7 +42,6 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
             cache.mget<Boolean>(SKJERMING_CACHE, ids)
 
     companion object {
-        const val EXTRA = "medNærmesteFamilie"
         private val SKJERMING_CACHE = CacheName(SKJERMING)
     }
 }

@@ -44,13 +44,12 @@ class TilgangController(
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter OBO-token")
     fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String,request: HttpServletRequest) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KOMPLETT_REGELTYPE,request)
-/*
+
     @PostMapping("/ccf/komplett")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter CCF-token")
     fun kompletteReglerCCF(@PathVariable ansattId: AnsattId,@RequestBody @Valid @ValidId brukerId: String) = enkeltOppslag({ansattId}, {token.erCC}, brukerId, KOMPLETT_REGELTYPE)
-*/
 
     @PostMapping("kjerne")
     @ResponseStatus(NO_CONTENT)
@@ -58,13 +57,14 @@ class TilgangController(
     @Operation(summary = "Evaluer et kjerneregelsett for en bruker, forutsetter OBO-token")
     fun kjerneregler(@RequestBody @Valid @ValidId brukerId: String, request: HttpServletRequest) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KJERNE_REGELTYPE, request)
 
-    /*
+
     @PostMapping("/ccf/kjerne")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter CCF-token")
     fun kjerneReglerCCF(@PathVariable ansattId: AnsattId,@RequestBody @Valid @ValidId brukerId: String) = enkeltOppslag({ansattId}, {token.erCC}, brukerId, KJERNE_REGELTYPE)
-*/
+
+    
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse

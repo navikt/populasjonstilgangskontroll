@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.tilgang
 
+import io.micrometer.core.instrument.Tags
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType.HTTP
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
@@ -15,9 +16,12 @@ import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
+import no.nav.tilgangsmaskin.regler.motor.TokenTypeTeller
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
+import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
+import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
@@ -34,7 +38,8 @@ import org.springframework.web.server.ResponseStatusException
 class TilgangController(
     private val regelTjeneste: RegelTjeneste,
     private val overstyringTjeneste: OverstyringTjeneste,
-    private val token: Token) {
+    private val token: Token,
+    private val teller: TokenTypeTeller) {
 
     private val log = getLogger(javaClass)
 
@@ -115,6 +120,7 @@ class TilgangController(
             if (specs.isNotEmpty()) {
                 preCondition(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og $uri")
                 preCondition(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
+                teller.tell(Tags.of("type","bulk","token",TokenType.from(token).name.lowercase()))
                 regelTjeneste.bulkRegler( this, specs)
             }
             else {
@@ -129,6 +135,7 @@ class TilgangController(
             preCondition(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og $uri")
             preCondition(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")
+            teller.tell(Tags.of("type","single","token",TokenType.from(token).name.lowercase()))
             if (regelType == KJERNE_REGELTYPE) {
                 return regelTjeneste.kjerneregler(ansattId(), this)
             }

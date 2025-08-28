@@ -4,7 +4,6 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.IDENT
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.IDENTER
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
 import no.nav.tilgangsmaskin.felles.rest.cache.CacheName
 import no.nav.tilgangsmaskin.felles.rest.cache.ValkeyCacheClient

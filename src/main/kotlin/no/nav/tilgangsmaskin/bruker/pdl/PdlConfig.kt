@@ -5,7 +5,6 @@ import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
-import java.time.Duration
 
 
 @ConfigurationProperties(PDL)
@@ -25,8 +24,8 @@ class PdlConfig(
     companion object {
         const val PDL = "pdl"
         private const val DEFAULT_PING_PATH = "/internal/health/liveness"
-        private val DEFAULT_PERSON_PATH = "/api/v1/person"
-        private val DEFAULT_PERSON__BOLK_PATH = "/api/v1/personBolk"
+        private const val DEFAULT_PERSON_PATH = "/api/v1/person"
+        private const val DEFAULT_PERSON__BOLK_PATH = "/api/v1/personBolk"
 
     }
 }

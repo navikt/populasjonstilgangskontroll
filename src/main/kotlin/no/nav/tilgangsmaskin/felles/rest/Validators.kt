@@ -21,7 +21,6 @@ annotation class ValidId(
         val payload: Array<KClass<out Payload>> = [])
 
 class IdValidator : ConstraintValidator<ValidId, Any> {
-    private val log = getLogger(javaClass)
     override fun isValid(verdi: Any, context: ConstraintValidatorContext) =
         when (verdi) {
             is String -> runCatching { AktørId(verdi.trim('"')) }.isSuccess || runCatching { BrukerId(verdi.trim('"')) }.isSuccess

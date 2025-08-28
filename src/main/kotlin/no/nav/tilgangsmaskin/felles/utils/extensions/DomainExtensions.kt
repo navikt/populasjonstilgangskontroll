@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.felles.utils.extensions
 
 import org.slf4j.MDC
-import kotlin.collections.remove
 
 
 object DomainExtensions {

@@ -1,9 +1,7 @@
 package no.nav.tilgangsmaskin.bruker
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
-import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.NAIS_CLUSTER_NAME
@@ -11,8 +9,6 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import io.lettuce.core.RedisURI
-import no.nav.boot.conditionals.EnvUtil.isDevOrLocal
 import java.util.UUID
 
 

@@ -20,8 +20,6 @@ import no.nav.tilgangsmaskin.regler.motor.TokenTypeTeller
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
-import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
-import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*

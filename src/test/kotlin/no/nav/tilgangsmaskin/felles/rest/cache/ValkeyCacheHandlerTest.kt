@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import io.mockk.every
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.data.redis.cache.RedisCacheConfiguration
-import no.nav.tilgangsmaskin.felles.rest.cache.CacheName
 
 
 @ExtendWith(MockKExtension::class)

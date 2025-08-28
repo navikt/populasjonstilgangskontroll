@@ -7,7 +7,6 @@ import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
@@ -48,7 +47,6 @@ class DevTilgangController(
     private val skjermingAdapter: SkjermingRestClientAdapter,
     private val brukere: BrukerTjeneste,
     private val ansatte: AnsattTjeneste,
-    private val entra: EntraTjeneste,
     private val regler: RegelTjeneste,
     private val overstyring: OverstyringTjeneste,
     private val pip: PdlRestClientAdapter,

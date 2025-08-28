@@ -88,7 +88,8 @@ class RegelTjeneste(
             it.status == FORBIDDEN
         }
         .filterNot {
-            it.brukerId in godkjente.map { it.brukerId
+            it.brukerId in godkjente.map {
+                it.brukerId
             }
         }
         .map {
@@ -98,10 +99,16 @@ class RegelTjeneste(
 
     private fun godkjente(ansatt: Ansatt, resultater: Set<Bulk>) : Set<BulkResultat> {
         val overstyrte = overstyringTjeneste.overstyringer(ansatt.ansattId,resultater.map { it.brukerId })
-            .map { brukerId -> ok(brukerId) }
+            .map {
+                brukerId -> ok(brukerId)
+            }
         val godkjente =  resultater
-            .filter { it.status.is2xxSuccessful }
-            .map { bruker -> ok(bruker.brukerId) }
+            .filter {
+                it.status.is2xxSuccessful
+            }
+            .map {
+                bruker -> ok(bruker.brukerId)
+            }
         return (godkjente + overstyrte).toSet()
     }
 

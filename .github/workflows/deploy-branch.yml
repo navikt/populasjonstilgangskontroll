@@ -1,8 +1,11 @@
 name: Build and deploy branch
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch name'
+        type: string
+        required: true
 env:
   IMAGE: europe-north1-docker.pkg.dev/nais-management-233d/tilgangsmaskin/${{ github.event.repository.name }}
 jobs:

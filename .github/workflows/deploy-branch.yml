@@ -3,7 +3,7 @@ on:
   pull_request:
     branches:
       - main
-
+  workflow_dispatch:
 env:
   IMAGE: europe-north1-docker.pkg.dev/nais-management-233d/tilgangsmaskin/${{ github.event.repository.name }}
 jobs:

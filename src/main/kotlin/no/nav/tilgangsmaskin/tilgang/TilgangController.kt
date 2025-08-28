@@ -45,7 +45,7 @@ class TilgangController(
     @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter OBO-token")
     fun kompletteRegler(@RequestBody @Valid @ValidId brukerId: String,request: HttpServletRequest) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KOMPLETT_REGELTYPE,request.requestURI)
 
-    @PostMapping("/ccf/komplett")
+    @PostMapping("/ccf/komplett/{ansattId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter CCF-token")
@@ -58,7 +58,7 @@ class TilgangController(
     fun kjerneregler(@RequestBody @Valid @ValidId brukerId: String, request: HttpServletRequest) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KJERNE_REGELTYPE, request.requestURI)
 
 
-    @PostMapping("/ccf/kjerne")
+    @PostMapping("/ccf/kjerne/{ansattId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter CCF-token")

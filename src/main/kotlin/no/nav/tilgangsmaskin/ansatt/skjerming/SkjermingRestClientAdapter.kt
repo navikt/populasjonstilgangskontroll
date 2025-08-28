@@ -18,7 +18,7 @@ import org.springframework.web.client.RestClient
 @Component
 class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, private val cf: SkjermingConfig, private val cache: ValkeyCacheClient, private val teller : BulkCacheSuksessTeller) : AbstractRestClientAdapter(restClient, cf) {
 
-    fun skjerming(ident: String) = post<Boolean>(cf.skjermingUri, mapOf(IDENT to ident))
+    fun skjerming(id: String) = post<Boolean>(cf.skjermingUri, mapOf(IDENT to id))
 
     fun skjerminger(ids: Set<String>): Map<BrukerId, Boolean> {
         val fraCache = fraCache(ids)
@@ -30,12 +30,12 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
         teller.tell(Tags.of("name", SKJERMING_CACHE.name,"suksess","false"))
         return (fraRest + fraCache).mapKeys {  BrukerId(it.key) }
     }
-    private fun fraRest(identer: Set<String>) =
-        if (identer.isEmpty()) {
+    private fun fraRest(ids: Set<String>) =
+        if (ids.isEmpty()) {
             emptyMap()
         }
         else {
-            post<Map<String, Boolean>>(cf.skjermingerUri, mapOf(IDENTER to identer))
+            post<Map<String, Boolean>>(cf.skjermingerUri, mapOf(IDENTER to ids))
         }
 
     private fun fraCache(ids: Set<String>) =

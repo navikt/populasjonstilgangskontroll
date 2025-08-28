@@ -31,5 +31,9 @@ class BulkCacheTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "bulk.cache", "Hits/misses for bulk")
 
 @Component
+class BulkCacheSuksessTeller(registry: MeterRegistry, token: Token) :
+    AbstractTeller(registry, token, "bulk.cache.suksess", "Hits/misses for entire bulk")
+
+@Component
 class TokenTypeTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "token.type", "Token type")

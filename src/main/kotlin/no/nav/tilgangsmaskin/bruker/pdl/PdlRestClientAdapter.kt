@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 
 @Component
-@Timed( value = "pdl_tjeneste", histogram = true, extraTags = ["backend", "pip"] )
 class PdlRestClientAdapter(
     @Qualifier(PDL) restClient: RestClient,
     private val cf: PdlConfig,

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.micrometer.core.annotation.Timed
 import io.micrometer.core.instrument.Tags
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL

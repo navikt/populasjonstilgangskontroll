@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.micrometer.core.annotation.Timed
 import io.micrometer.core.instrument.Tags
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
@@ -36,13 +37,12 @@ class PdlRestClientAdapter(
     fun personer(ids: Set<String>) : Set<Person> {
         val fraCache = cache.mget<Person>(PDL_CACHE, ids, EXTRA)
         if (fraCache.size == ids.size) {
-            teller.tell(Tags.of("name", PDL_CACHE.name,"suksess","true"))
+            tell(true)
             return fraCache.values.toSet()
         }
         val fraRest = fraRest(ids  - fraCache.keys)
         cache.put(PDL_CACHE, fraRest, EXTRA)
-        teller.tell(Tags.of("name", PDL_CACHE.name,"suksess","false"))
-
+        tell(false)
         return (fraRest.values + fraCache.values).toSet()
     }
 
@@ -79,6 +79,9 @@ class PdlRestClientAdapter(
                 FamilieMedlem(it.brukerId, SØSKEN)
             }
             .toSet()
+
+    private fun tell(status: Boolean) =
+        teller.tell(Tags.of("name", PDL_CACHE.name,"suksess",status.toString()))
 
     companion object {
         const val EXTRA = "medNærmesteFamilie"

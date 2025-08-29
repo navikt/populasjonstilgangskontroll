@@ -24,13 +24,13 @@ class RegelMotor(
     private val cfg: RegelConfig,
     private val logger: RegelMotorLogger) {
 
-    @WithSpan( "regelmotor.kompletteregler")
+    @WithSpan
     fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, komplett)
 
-    @WithSpan("regelmotor.kjerneregler")
+    @WithSpan
     fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, kjerne)
 
-    @WithSpan("regelmotor.evauler")
+    @WithSpan
     private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) {
         logger.tellRegelSett(regelSett)
         regelSett.regler.forEach { regel ->

@@ -25,16 +25,16 @@ class PdlRestClientAdapter(
     private val teller: BulkCacheSuksessTeller,
     private val mapper: ObjectMapper) : AbstractRestClientAdapter(restClient, cf) {
 
-    @WithSpan("PDLTjeneste.medNærmesteFamilie")
+    @WithSpan
     fun medUtvidetFamile(id: String, partnere: Set<FamilieMedlem>) =
         with(person(id)) {
             copy(familie = familie.copy(søsken = søsken(foreldre, brukerId.verdi), partnere = partnere))
         }
 
-    @WithSpan("PDLTjeneste.person")
+    @WithSpan
     fun person(id: String) = tilPerson(get<PdlRespons>(cf.personURI, mapOf("ident" to id)))
 
-    @WithSpan("PDLTjeneste.personer")
+    @WithSpan
     fun personer(ids: Set<String>) : Set<Person> {
         val fraCache = cache.mget<Person>(PDL_CACHE, ids, EXTRA)
         if (fraCache.size == ids.size) {

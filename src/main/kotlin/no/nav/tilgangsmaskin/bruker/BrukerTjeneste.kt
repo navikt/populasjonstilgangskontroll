@@ -31,14 +31,14 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
             log.debug("Fant ikke ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
         }
         if (found.isNotEmpty()) {
-            log.info("Bulk slo opp  ${"person".pluralize(found)} ${found.joinToString { it.verdi.maskFnr() }}")
+            log.trace("Bulk slo opp  ${"person".pluralize(found)} ${found.joinToString { it.verdi.maskFnr() }}")
         }
 
         return found.let { p ->
             if (p.isNotEmpty()) {
-                log.info("Bulk slår opp ${"skjerming".pluralize(p)} for $p")
+                log.trace("Bulk slår opp ${"skjerming".pluralize(p)} for $p")
                 val skjerminger = skjermingTjeneste.skjerminger(p)
-                log.info("Bulk slo opp ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
+                log.trace("Bulk slo opp ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
                 personer.map {
                     tilBruker(it, skjerminger[it.brukerId] ?: false)
                 }

@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.bruker
 
-import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.PersonTilBrukerMapper.tilBruker
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service
 import io.opentelemetry.instrumentation.annotations.WithSpan
 
 @Service
-@Timed
 class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjeneste: SkjermingTjeneste) {
 
     private val log = getLogger(javaClass)

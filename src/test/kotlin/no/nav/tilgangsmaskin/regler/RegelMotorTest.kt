@@ -70,6 +70,8 @@ class RegelMotorTest {
     fun before() {
         every { token.system } returns "test"
         every { token.systemNavn } returns "test"
+        every { token.clusterAndSystem } returns "cluster:test"
+
     }
     @Nested
     @TestInstance(PER_CLASS)

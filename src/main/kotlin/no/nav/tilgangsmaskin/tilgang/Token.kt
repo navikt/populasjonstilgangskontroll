@@ -22,6 +22,10 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
     val ansattId get() = stringClaim(NAVIDENT)?.let { AnsattId(it) }
     private fun stringClaim(name: String) = claimSet()?.getStringClaim(name)
     private fun claimSet() = runCatching { contextHolder.getTokenValidationContext().getClaims(AAD_ISSUER) }.getOrNull()
+    val clusterAndSystem get() = system.split(":").let { parts ->
+        if (parts.size == 3) "${parts[2]}:${parts[0]}" else system
+    }
+
     val systemNavn get() = system.split(":").lastOrNull() ?: "N/A"
     val systemAndNs get() = runCatching { system.split(":").drop(1).joinToString(separator = ":") }.getOrElse { systemNavn }
     val cluster get() = runCatching { system.split(":").first() }.getOrElse { LOCAL.name.lowercase() }
@@ -34,5 +38,17 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
         private const val IDTYP = "idtyp"
         private const val AZP_NAME = "azp_name"
         private const val NAVIDENT = "NAVident"
+    }
+}
+
+enum class TokenType {
+    OBO, CCF, UNAUTHENTICATED;
+
+    companion object {
+        fun from(token: Token): TokenType = when {
+            token.erObo -> OBO
+            token.erCC -> CCF
+            else -> UNAUTHENTICATED
+        }
     }
 }

@@ -16,16 +16,17 @@ import no.nav.tilgangsmaskin.tilgang.Token
 @Component
 class RegelMotorLogger(private val registry: MeterRegistry, private val token: Token) {
 
+    private val log = getLogger(javaClass)
     private val avvisningTeller = AvvisningTeller(registry, token)
     private val regeltypeTeller = RegeltypeTeller(registry, token)
-    private val bulkHistogram: DistributionSummary = DistributionSummary
+    private fun  bulkHistogram() =  DistributionSummary
         .builder("bulk.histogram")
         .description("Histogram av bulk-størrelse")
+        .baseUnit("størrelse")
         .publishPercentileHistogram(true)
-        .serviceLevelObjectives(10.0, 20.0, 50.0, 100.0, 200.0, 500.0, 1000.0)
+        .tags("system", token.system)
+        .serviceLevelObjectives(1.0,2.0,5.0,10.0, 20.0, 50.0, 100.0)
         .register(registry)
-
-    private val log = getLogger(javaClass)
 
     fun tellRegelSett(regelSett: RegelSett) = regeltypeTeller.tell(Tags.of("type",regelSett.beskrivelse, "system", token.system))
 
@@ -53,8 +54,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
     fun evaluerer(ansatt: Ansatt, bruker: Bruker, regel: Regel) =
         log.trace("Evaluerer regel: '{}' for {}  og {}", regel.kortNavn, ansatt.ansattId, bruker.brukerId)
 
-    fun tellBulkSize(size: Int) =   registry.summary("bulk.histogram", "system", token.system)
-        .record(size.toDouble())
+    fun tellBulkSize(size: Int) =   bulkHistogram().record(size.toDouble())
 
     companion object   {
         private const val BESLUTNING = "beslutning"

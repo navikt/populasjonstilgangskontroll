@@ -91,6 +91,8 @@ class RegelTjenesteTest {
         avdød = AvdødTeller(registry, token)
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
         every { token.system } returns "test"
+        every { token.clusterAndSystem } returns "cluster:test"
+
         every { token.systemNavn } returns "test"
         overstyring = OverstyringTjeneste(ansatte, brukere, OverstyringJPAAdapter(repo), motor, OverstyringTeller(registry, token))
         regler = RegelTjeneste(motor, brukere, ansatte, overstyring)

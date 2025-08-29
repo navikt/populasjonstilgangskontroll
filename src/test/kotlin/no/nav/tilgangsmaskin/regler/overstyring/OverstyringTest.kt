@@ -79,6 +79,7 @@ internal class OverstyringTest {
     fun setup() {
         every { token.system } returns "test"
         every { token.systemNavn } returns "test"
+        every { token.clusterAndSystem } returns "cluster:test"
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
         overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, OverstyringTeller(registry, token))
     }

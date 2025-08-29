@@ -32,13 +32,10 @@ data class BrukerBuilder(
     fun gt(gt: GeografiskTilknytning) = apply { this.gt = gt }
     fun kreverMedlemskapI(vararg grupper: GlobalGruppe) = apply { this.grupper = setOf(*grupper) }
     fun barn(barn: Set<BrukerId>) = apply { this.barn = barn.tilFamilieMedlemmer(BARN) }
-    fun mor(mor: BrukerId?) = apply { this.mor = mor?.tilFamilieMedlem(MOR) }
     fun far(far: BrukerId?) = apply { this.far = far?.tilFamilieMedlem(FAR) }
     fun søsken(søsken: Set<BrukerId>) = apply { this.søsken = søsken.tilFamilieMedlemmer(SØSKEN) }
     fun partnere(partnere: Set<BrukerId>) = apply { this.partnere = partnere.tilFamilieMedlemmer(PARTNER) }
     fun historiske(historiske: Set<BrukerId>) = apply { this.historiske = historiske }
-    fun dødsdato(dato: LocalDate) = apply { this.dødsdato = dato }
-    fun aktørId(id: AktørId) = apply { this.aktørId = id }
     fun build() = Bruker(
             BrukerIds(id, historiske, aktørId),
             gt, grupper,

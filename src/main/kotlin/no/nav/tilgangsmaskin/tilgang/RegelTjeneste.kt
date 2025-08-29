@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.micrometer.core.annotation.Timed
+import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
@@ -29,6 +30,7 @@ class RegelTjeneste(
     private val log = getLogger(javaClass)
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "komplett"])
+    @WithSpan
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
@@ -50,13 +52,15 @@ class RegelTjeneste(
     }
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])
+    @WithSpan
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
-        motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedUtvidetFamilie(brukerId))
+        motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedNærmesteFamilie(brukerId))
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
+    @WithSpan
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): BulkRespons {
         val (respons, elapsedTime) = measureTimedValue {
-            log.debug("Kjører bulk regler for {} og {}", ansattId, idOgType)
+            log.debug("Kjører bulk regler for {} med {} identer", ansattId, idOgType.size)
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val brukere = idOgType.brukerOgRegelsett()
             val resultater = motor.bulkRegler(ansatt, brukere)
@@ -84,7 +88,8 @@ class RegelTjeneste(
             it.status == FORBIDDEN
         }
         .filterNot {
-            it.brukerId in godkjente.map { it.brukerId
+            it.brukerId in godkjente.map {
+                it.brukerId
             }
         }
         .map {
@@ -94,10 +99,16 @@ class RegelTjeneste(
 
     private fun godkjente(ansatt: Ansatt, resultater: Set<Bulk>) : Set<BulkResultat> {
         val overstyrte = overstyringTjeneste.overstyringer(ansatt.ansattId,resultater.map { it.brukerId })
-            .map { brukerId -> ok(brukerId) }
+            .map {
+                brukerId -> ok(brukerId)
+            }
         val godkjente =  resultater
-            .filter { it.status.is2xxSuccessful }
-            .map { bruker -> ok(bruker.brukerId) }
+            .filter {
+                it.status.is2xxSuccessful
+            }
+            .map {
+                bruker -> ok(bruker.brukerId)
+            }
         return (godkjente + overstyrte).toSet()
     }
 

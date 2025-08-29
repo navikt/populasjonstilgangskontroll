@@ -7,7 +7,7 @@ import java.net.URI
 
 @ConfigurationProperties(PDLGRAPH)
 class PdlGraphQLConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) :
-    AbstractRestConfig(baseUri, pingPath, PdlConfig.Companion.PDL, enabled) {
+    AbstractRestConfig(baseUri, pingPath, PdlConfig.PDL, enabled) {
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 

@@ -6,7 +6,6 @@ import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
-import java.time.Duration
 
 @ConfigurationProperties(GRAPH)
 class EntraConfig(

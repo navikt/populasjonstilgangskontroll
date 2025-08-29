@@ -36,7 +36,7 @@ interface GraphQLErrorHandler {
                 message ?: "Ukjent feil", uri
                                                                                        )
             .also {
-                log.warn("GraphQL returnerte $size feil, oversatte $message til ${it.javaClass.simpleName}", this)
+                log.warn("GraphQL returnerte $size feil, oversatte $message til ${it.javaClass.simpleName}", it)
             }
 
         private fun oversett(kode: String, msg: String, uri: URI) =

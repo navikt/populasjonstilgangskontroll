@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.pluralize
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
+import io.opentelemetry.instrumentation.annotations.WithSpan
 
 @Service
 @Timed
@@ -16,7 +17,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
 
     private val log = getLogger(javaClass)
 
-
+    @WithSpan("brukertjeneste.brukere")
     fun brukere(brukerIds: Set<String>) : Set<Bruker> {
         if (brukerIds.isEmpty()) {
             log.debug("${"bruker".pluralize(brukerIds, ingen = "Ingen")} å slå opp")
@@ -48,12 +49,15 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
         }
     }
 
+    @WithSpan("brukertjeneste.brukermednermestefamilie")
     fun brukerMedNærmesteFamilie(brukerId: String) =
         brukerMedSkjerming(brukerId, personTjeneste::medNærmesteFamilie)
 
+    @WithSpan("brukertjeneste.brukermedutvidetfamilie")
     fun brukerMedUtvidetFamilie(brukerId: String) =
         brukerMedSkjerming(brukerId, personTjeneste::medUtvidetFamile)
 
+    @WithSpan("brukertjeneste.brukermedskjerming")
     private fun brukerMedSkjerming(id: String, hentFamilie: (String) -> Person) =
         with(hentFamilie(id)) {
             tilBruker(this, skjermingTjeneste.skjerming(brukerId))

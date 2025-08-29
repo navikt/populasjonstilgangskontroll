@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import io.micrometer.core.annotation.Timed
+import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
 import no.nav.tilgangsmaskin.felles.RetryingOnRecoverableService
@@ -19,6 +20,7 @@ class NomTjeneste(private val adapter: NomJPAAdapter) {
 
     @Transactional(readOnly = true)
     @Cacheable(cacheNames = [NOM],  key = "#ansattId.verdi")
+    @WithSpan("nomtjeneste.fnrforansatt")
     fun fnrForAnsatt(ansattId: AnsattId) = adapter.fnrForAnsatt(ansattId.verdi)
     fun ryddOpp() = adapter.ryddOpp().also {
         if (it > 0) log.info("Vaktmester ryddet opp $it rad(er) med utgått informasjon om ansatte som ikke lenger jobber i Nav")

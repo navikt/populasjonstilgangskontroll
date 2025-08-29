@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Component
+import io.opentelemetry.instrumentation.annotations.WithSpan
 
 @Component
 class RegelMotor(
@@ -22,10 +23,14 @@ class RegelMotor(
 
     private val cfg: RegelConfig,
     private val logger: RegelMotorLogger) {
+
+    @WithSpan( "regelmotor.kompletteregler")
     fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, komplett)
 
+    @WithSpan("regelmotor.kjerneregler")
     fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, kjerne)
 
+    @WithSpan("regelmotor.evauler")
     private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) {
         logger.tellRegelSett(regelSett)
         regelSett.regler.forEach { regel ->
@@ -42,7 +47,7 @@ class RegelMotor(
         logger.ok(ansatt, bruker,regelSett)
     }
 
-
+    @WithSpan("regelMotor.bulk")
     fun bulkRegler(ansatt: Ansatt, brukere: Set<BrukerOgRegelsett>) =
         (brukere.map { (bruker, type) ->
             runCatching {

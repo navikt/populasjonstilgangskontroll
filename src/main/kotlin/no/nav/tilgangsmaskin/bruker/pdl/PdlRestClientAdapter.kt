@@ -62,7 +62,7 @@ class PdlRestClientAdapter(
                     it.value!!
                 }
                 .also {
-                    log.info("Hentet ${it.size} person(er) fra REST for ${ids.size} ident(er)")
+                    log.trace("Hentet ${it.size} person(er) fra REST for ${ids.size} ident(er)")
                 }
         }
 

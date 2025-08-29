@@ -36,7 +36,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                 handler.fromKey(cache, it.key, extraPrefix) to mapper.readValue<T>(it.value)
             }.also {
                 teller.tell(Tags.of( "cache", cache.name,"result","hit"),it.size)
-                log.info("Fant ${it.size} verdier i cache ${cache.name} for ${ids.size} id(er)")
+                log.trace("Fant ${it.size} verdier i cache ${cache.name} for ${ids.size} id(er)")
             }
 
     fun put(cache: CacheName, innslag: Map<String, Any>, extraPrefix: String? = null) =
@@ -47,7 +47,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
             conn.sync().mset(innslag
                 .mapKeys { handler.toKey(cache,it.key,extraPrefix) }
                 .mapValues { mapper.writeValueAsString(it.value) }).also {
-                log.info("La til ${innslag.size} verdier i cache ${cache.name} med prefix $extraPrefix" )
+                log.trace("La til ${innslag.size} verdier i cache ${cache.name} med prefix $extraPrefix" )
                 teller.tell(Tags.of( "cache", cache.name,"result","miss"),innslag.size )
             }
         }

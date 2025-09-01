@@ -78,19 +78,11 @@ class RegelTjeneste(
                 EnkeltBulkRespons(it.brukerId, NOT_FOUND)
             }.toSet()
 
-    private fun avviste(ansatt: Ansatt, godkjente: Set<EnkeltBulkRespons>, resultater: Set<BulkResultat>, brukere: Set<BrukerOgRegelsett>) = resultater
-        .filter {
-            it.status == FORBIDDEN
-        }
-        .filterNot {
-            it.brukerId in godkjente.map {
-                it.brukerId
-            }
-        }
-        .map {
-            with(it) { EnkeltBulkRespons(RegelException(ansatt, brukere.finnBruker(brukerId), regel!!, status = status)) }
-        }
-        .toSet()
+    private fun avviste(ansatt: Ansatt, godkjente: Set<EnkeltBulkRespons>, resultater: Set<BulkResultat>, brukere: Set<BrukerOgRegelsett>) =
+        resultater
+            .filter { it.status == FORBIDDEN && it.brukerId !in godkjente.map { g -> g.brukerId } }
+            .map { EnkeltBulkRespons(RegelException(ansatt, brukere.finnBruker(it.brukerId), it.regel!!, status = it.status)) }
+            .toSet()
 
     private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) : Set<EnkeltBulkRespons> {
 

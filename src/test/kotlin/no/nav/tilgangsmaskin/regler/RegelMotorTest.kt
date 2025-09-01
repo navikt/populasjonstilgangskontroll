@@ -8,7 +8,6 @@ import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.Enhetsnummer
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
@@ -18,10 +17,12 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
+import no.nav.tilgangsmaskin.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.tilgang.RegelConfig
 import no.nav.tilgangsmaskin.tilgang.Token
@@ -59,6 +60,9 @@ class RegelMotorTest {
 
     @Autowired
     private lateinit var registry: MeterRegistry
+
+    @MockkBean
+    private lateinit var oppfølging: OppfølgingTjeneste
     
     @MockkBean
     private lateinit var token: Token
@@ -68,6 +72,7 @@ class RegelMotorTest {
 
     @BeforeTest
     fun before() {
+        every { oppfølging.enhet(brukerId) } returns null
         every { token.system } returns "test"
         every { token.systemNavn } returns "test"
         every { token.clusterAndSystem } returns "cluster:test"

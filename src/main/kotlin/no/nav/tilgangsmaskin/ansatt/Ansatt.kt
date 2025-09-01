@@ -29,6 +29,14 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
         return grupper.any { it.displayName.endsWith("GEO_$kode") }
     }
 
+    private infix fun tilhørerOppfølgingsEnhet(bruker: Bruker) =
+        bruker.oppfølgingsenhet?.let { enhet ->
+            grupper.any { it.displayName.endsWith("ENHET_${enhet.verdi}") }
+        } ?: false
+
+
+    infix fun tilhørerIkkeOppølgingsEnhet(bruker: Bruker) = !tilhørerOppfølgingsEnhet(bruker)
+
     infix fun kanIkkeBehandle(gt: GeografiskTilknytning) = !kanBehandle(gt)
     
     infix fun erMedlemAv(gruppe: GlobalGruppe) = grupper.any { it.id == gruppe.id
@@ -48,6 +56,6 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
 
     private infix fun Set<FamilieMedlem>.harMinstEnFelles(medlemmer: Set<FamilieMedlem>) = intersect(medlemmer).isNotEmpty()
     private infix fun Bruker.erNærståendeMed(medlemmer: Set<FamilieMedlem>) = medlemmer.any { it.brukerId == brukerId }
-}
 
+}
 

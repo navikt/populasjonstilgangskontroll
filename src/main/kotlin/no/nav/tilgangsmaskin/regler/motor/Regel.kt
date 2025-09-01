@@ -12,8 +12,9 @@ interface Regel {
     val begrunnelse get() = metadata.begrunnelse
     val navn get() = metadata.navn
     val erOverstyrbar get() = this is OverstyrbarRegel
-
+    val postCondition: (ansatt: Ansatt, bruker: Bruker) -> Boolean get() = { _, _ -> false }
     fun avvisHvis(predicate: () -> Boolean) = !predicate.invoke()
+    fun godtaHvis(predicate: () -> Boolean) = !avvisHvis(predicate)
 }
 
 abstract class GlobalGruppeRegel(private val gruppe: GlobalGruppe) : Regel {

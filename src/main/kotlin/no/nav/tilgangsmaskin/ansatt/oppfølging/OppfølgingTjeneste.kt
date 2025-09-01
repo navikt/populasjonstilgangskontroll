@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.oppfølging
+package no.nav.tilgangsmaskin.ansatt.oppfølging
 
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId

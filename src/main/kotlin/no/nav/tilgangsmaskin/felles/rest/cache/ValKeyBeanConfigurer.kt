@@ -7,6 +7,7 @@ import io.lettuce.core.RedisClient
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
+import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
@@ -44,12 +45,12 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
         RedisClient.create(cfg.valkeyURI)
 
     @Bean
-    fun valkeyCacheClient(client: RedisClient, handler: ValkeyCacheKeyHandler, mapper: ObjectMapper, teller: BulkCacheTeller): ValkeyCacheClient =
+    fun valkeyCacheClient(client: RedisClient, handler: ValkeyCacheKeyHandler, mapper: ObjectMapper, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller): ValkeyCacheClient =
         ValkeyCacheClient(handler,
             client.connect(),
             mapper.copy().apply {
                 activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
-            },teller)
+            },sucessTeller,teller)
 
     @Bean
     fun cachePrefixes(mgr: RedisCacheManager) =

@@ -12,7 +12,6 @@ data class Bruker(
         val geografiskTilknytning: GeografiskTilknytning,
         val påkrevdeGrupper: Set<GlobalGruppe> = emptySet(),
         val familie: Familie = INGEN,
-        var oppfølgingsenhet: Enhetsnummer? = null,
         val dødsdato: LocalDate? = null) {
 
     @JsonIgnore

@@ -17,7 +17,7 @@ object PersonTilBrukerMapper {
                     BrukerIds(brukerId, historiskeIds, aktørId),
                     geoTilknytning,
                     tilGruppeKrav(geoTilknytning, graderinger, erSkjermet),
-                    familie, oppfølgingsenhet,
+                    familie,
                 dødsdato)
         }
 

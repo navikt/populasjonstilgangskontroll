@@ -72,7 +72,7 @@ class RegelMotorTest {
 
     @BeforeTest
     fun before() {
-        every { oppfølging.enhet(brukerId) } returns null
+        every { oppfølging.enhetFor(brukerId) } returns null
         every { token.system } returns "test"
         every { token.systemNavn } returns "test"
         every { token.clusterAndSystem } returns "cluster:test"
@@ -230,7 +230,7 @@ class RegelMotorTest {
         fun geoAvslått() {
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
-            forventAvvistAv<NorgeRegel>(ansatt, bruker)
+            forventAvvistAv<GeografiskRegel>(ansatt, bruker)
         }
     }
 

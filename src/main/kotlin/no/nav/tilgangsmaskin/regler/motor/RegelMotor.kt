@@ -39,7 +39,7 @@ class RegelMotor(
                 logger.trace("Regel ${regel.navn} er deaktivert i konfigurasjonen, hopper over evaluering.")
                 return@forEach
             }
-            if (!regel.evaluer(ansatt, bruker) && !regel.postCondition(ansatt, bruker)) {
+            if (!regel.evaluer(ansatt, bruker) && !regel.postProsesser(ansatt, bruker)) {
                 logger.avvist(ansatt, bruker, regel)
                 throw RegelException(ansatt, bruker, regel)
             }

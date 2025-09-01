@@ -13,14 +13,12 @@ interface OverstyrbarRegel : Regel
 
 @Component
 @Order(LOWEST_PRECEDENCE)
-class NorgeRegel(private val oppfølging: OppfølgingTjeneste) : GlobalGruppeRegel(NASJONAL), OverstyrbarRegel {
+class GeografiskRegel(private val oppfølging: OppfølgingTjeneste) : GlobalGruppeRegel(NASJONAL), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avvisHvis { ansatt ikkeErMedlemAv NASJONAL && ansatt kanIkkeBehandle bruker.geografiskTilknytning  }
+        avvisHvis { ansatt ikkeErMedlemAv NASJONAL && ansatt ikkeKanBehandle bruker.geografiskTilknytning  }
 
-    override val postCondition: (ansatt: Ansatt, bruker: Bruker) -> Boolean = { ansatt, bruker ->
-        val enhet = oppfølging.enhet(bruker.brukerId)
-        val copy = bruker.copy(oppfølgingsenhet = enhet)
-        godtaHvis { copy.oppfølgingsenhet != null } // TODO sjekk gruppe
+    override val postProsesser: (ansatt: Ansatt, bruker: Bruker) -> Boolean = { ansatt, bruker ->
+        godtaHvis { ansatt tilhører oppfølging.enhetFor(bruker.brukerId) }
     }
 }
 

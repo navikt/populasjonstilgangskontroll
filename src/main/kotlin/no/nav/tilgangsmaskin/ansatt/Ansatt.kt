@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.ansatt
 
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
@@ -29,15 +30,13 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
         return grupper.any { it.displayName.endsWith("GEO_$kode") }
     }
 
-    private infix fun tilhørerOppfølgingsEnhet(bruker: Bruker) =
-        bruker.oppfølgingsenhet?.let { enhet ->
+    infix fun tilhører(enhet: Enhetsnummer?) =
+        enhet?.let { enhet ->
             grupper.any { it.displayName.endsWith("ENHET_${enhet.verdi}") }
         } ?: false
 
 
-    infix fun tilhørerIkkeOppølgingsEnhet(bruker: Bruker) = !tilhørerOppfølgingsEnhet(bruker)
-
-    infix fun kanIkkeBehandle(gt: GeografiskTilknytning) = !kanBehandle(gt)
+    infix fun ikkeKanBehandle(gt: GeografiskTilknytning) = !kanBehandle(gt)
     
     infix fun erMedlemAv(gruppe: GlobalGruppe) = grupper.any { it.id == gruppe.id
     }

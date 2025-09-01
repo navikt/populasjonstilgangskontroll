@@ -27,7 +27,7 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
             return fraCache.mapKeys { BrukerId(it.key) }
         }
         val fraRest = fraRest(ids - fraCache.keys)
-        cache.put(SKJERMING_CACHE, fraRest)
+        cache.putMany(SKJERMING_CACHE, fraRest)
         tell(false)
         return (fraRest + fraCache).mapKeys {  BrukerId(it.key) }
     }
@@ -42,7 +42,7 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
     private fun tell(status: Boolean) =
         teller.tell(Tags.of("name", SKJERMING_CACHE.name,"suksess",status.toString()))
     private fun fraCache(ids: Set<String>) =
-            cache.mget<Boolean>(SKJERMING_CACHE, ids)
+            cache.getMany<Boolean>(SKJERMING_CACHE, ids)
 
     companion object {
         private val SKJERMING_CACHE = CacheName(SKJERMING)

@@ -17,12 +17,12 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
     val log = getLogger(javaClass)
 
 
-    inline fun <reified T> get(cache: CacheName, id: String, extraPrefix: String? = null) =
+    inline fun <reified T> getOne(cache: CacheName, id: String, extraPrefix: String? = null) =
         conn.sync().get(handler.toKey(cache,id,extraPrefix))?.let { json ->
             mapper.readValue<T>(json)
         }
 
-    inline fun <reified T> mget(cache: CacheName, ids: Set<String>, extraPrefix: String? = null)  =
+    inline fun <reified T> getMany(cache: CacheName, ids: Set<String>, extraPrefix: String? = null)  =
         if (ids.isEmpty()) {
             log.trace("Forespurt 0 id'er for cache ${cache.name}, returnerer tomt resultat")
             emptyMap()
@@ -43,7 +43,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                 log.trace("Fant ${it.size} verdier i cache ${cache.name} for ${ids.size} id(er)")
             }
 
-    fun put(cache: CacheName, innslag: Map<String, Any>, extraPrefix: String? = null) =
+    fun putMany(cache: CacheName, innslag: Map<String, Any>, extraPrefix: String? = null) =
         if (innslag.isEmpty()) {
             log.trace("Skal legge til 0 verdier i cache ${cache.name}, gjør ingenting")
         }

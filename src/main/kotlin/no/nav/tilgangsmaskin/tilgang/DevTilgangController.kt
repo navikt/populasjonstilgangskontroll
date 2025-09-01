@@ -57,10 +57,10 @@ class DevTilgangController(
     private  val log = getLogger(javaClass)
 
     @PostMapping("cache/skjerminger")
-    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cache.mget<Boolean>(CacheName(SKJERMING),navIds)
+    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cache.getMany<Boolean>(CacheName(SKJERMING),navIds)
 
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<String>) = cache.mget<Person>(CacheName(PDL),navIds)
+    fun cachePersoner(@RequestBody  navIds: Set<String>) = cache.getMany<Person>(CacheName(PDL),navIds)
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.partnere(id)

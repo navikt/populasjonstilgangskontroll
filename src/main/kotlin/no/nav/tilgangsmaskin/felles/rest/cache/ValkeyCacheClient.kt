@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.felles.rest.cache
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.lettuce.core.api.StatefulRedisConnection
-import io.micrometer.core.instrument.Tags
+import io.micrometer.core.instrument.Tags.of
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory.getLogger
 class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                         val conn: StatefulRedisConnection<String,String>,
                         val mapper: ObjectMapper,
-                        private val alleTreffTeller: BulkCacheSuksessTeller,
+                        val alleTreffTeller: BulkCacheSuksessTeller,
                         val teller: BulkCacheTeller)  {
 
     val log = getLogger(javaClass)
@@ -37,8 +37,9 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
             .associate {
                 handler.fromKey(cache, it.key, extraPrefix) to mapper.readValue<T>(it.value)
             }.also {
-                tell(it.size == ids.size, cache)
-                tellHitsMisses(it.size, ids.size - it.size, cache)
+                alleTreffTeller.tell(of("name", cache.name, "suksess", (it.size == ids.size).toString()))
+                teller.tell(of("cache", cache.name, "result", "miss"), ids.size - it.size)
+                teller.tell(of("cache", cache.name, "result", "hit"), it.size)
                 log.trace("Fant ${it.size} verdier i cache ${cache.name} for ${ids.size} id(er)")
             }
 
@@ -53,11 +54,5 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                 log.trace("La til ${innslag.size} verdier i cache ${cache.name} med prefix $extraPrefix" )
             }
         }
-    fun tellHitsMisses(hits: Int, misses: Int, cache: CacheName) {
-        teller.tell(Tags.of( "cache", cache.name,"result","miss"),misses)
-        teller.tell(Tags.of( "cache", cache.name,"result","hit"),hits)
-    }
 
-    fun tell(traffAlle: Boolean, cache: CacheName) =
-        alleTreffTeller.tell(Tags.of("name", cache.name,"suksess",traffAlle.toString()))
 }

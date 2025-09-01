@@ -3,8 +3,8 @@ package no.nav.tilgangsmaskin.regler.motor
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.regler.motor.Bulk.Companion.avvist
-import no.nav.tilgangsmaskin.regler.motor.Bulk.Companion.ok
+import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.avvist
+import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.ok
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.KJERNE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.KOMPLETT
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -75,10 +75,10 @@ class RegelMotor(
 
 }
 
-data class Bulk(val brukerId: BrukerId, val status: HttpStatus, val regel: Regel? = null) {
+data class BulkResultat(val brukerId: BrukerId, val status: HttpStatus, val regel: Regel? = null) {
     companion object {
-        fun ok(bruker: Bruker) = Bulk(bruker.brukerId, NO_CONTENT)
-        fun avvist(bruker: Bruker, e: RegelException) = Bulk(bruker.brukerId, FORBIDDEN, e.regel)
+        fun ok(bruker: Bruker) = BulkResultat(bruker.brukerId, NO_CONTENT)
+        fun avvist(bruker: Bruker, e: RegelException) = BulkResultat(bruker.brukerId, FORBIDDEN, e.regel)
 
     }
 }

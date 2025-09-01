@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.tilgang
 
-import io.micrometer.core.annotation.Timed
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -12,8 +11,8 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.pluralize
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
-import no.nav.tilgangsmaskin.tilgang.BulkRespons.BulkResultat
-import no.nav.tilgangsmaskin.tilgang.BulkRespons.BulkResultat.Companion.ok
+import no.nav.tilgangsmaskin.tilgang.BulkRespons.EnkeltBulkRespons
+import no.nav.tilgangsmaskin.tilgang.BulkRespons.EnkeltBulkRespons.Companion.ok
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Service
@@ -71,15 +70,15 @@ class RegelTjeneste(
         return respons
     }
 
-    private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<Bulk>) = filterNot { it.brukerId in funnet.map { it.brukerId } }.toSet()
+    private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<BulkResultat>) = filterNot { it.brukerId in funnet.map { it.brukerId } }.toSet()
 
-    private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<Bulk>) =
+    private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) =
         (oppgitt - funnet)
             .map {
-                BulkResultat(it.brukerId, NOT_FOUND)
+                EnkeltBulkRespons(it.brukerId, NOT_FOUND)
             }.toSet()
 
-    private fun avviste(ansatt: Ansatt, godkjente: Set<BulkResultat>, resultater: Set<Bulk>, brukere: Set<BrukerOgRegelsett>) = resultater
+    private fun avviste(ansatt: Ansatt, godkjente: Set<EnkeltBulkRespons>, resultater: Set<BulkResultat>, brukere: Set<BrukerOgRegelsett>) = resultater
         .filter {
             it.status == FORBIDDEN
         }
@@ -89,23 +88,16 @@ class RegelTjeneste(
             }
         }
         .map {
-            with(it) { BulkResultat(RegelException(ansatt, brukere.finnBruker(brukerId), regel!!, status = status)) }
+            with(it) { EnkeltBulkRespons(RegelException(ansatt, brukere.finnBruker(brukerId), regel!!, status = status)) }
         }
         .toSet()
 
-    private fun godkjente(ansatt: Ansatt, resultater: Set<Bulk>) : Set<BulkResultat> {
-        val overstyrte = overstyringTjeneste.overstyringer(ansatt.ansattId,resultater.map { it.brukerId })
-            .map {
-                brukerId -> ok(brukerId)
-            }
-        val godkjente =  resultater
-            .filter {
-                it.status.is2xxSuccessful
-            }
-            .map {
-                bruker -> ok(bruker.brukerId)
-            }
-        return (godkjente + overstyrte).toSet()
+    private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) : Set<EnkeltBulkRespons> {
+
+        val (success, fail) = resultater.partition { it.status.is2xxSuccessful }
+        val ids = success.map { it.brukerId } +
+                overstyringTjeneste.overstyringer(ansatt.ansattId, fail.map { it.brukerId })
+        return ids.map(::ok).toSet()
     }
 
 

@@ -21,7 +21,7 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
 
     private val partnere = bruker?.partnere ?: emptySet()
 
-    private infix fun kanBehandle(gt: GeografiskTilknytning): Boolean {
+    infix fun kanBehandle(gt: GeografiskTilknytning): Boolean {
         val kode = when (gt) {
             is KommuneTilknytning -> gt.kommune.verdi
             is BydelTilknytning -> gt.bydel.verdi

@@ -17,7 +17,7 @@ class GeografiskRegel(private val oppfølging: OppfølgingTjeneste) : GlobalGrup
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         godtaHvis { ansatt erMedlemAv NASJONAL || ansatt kanBehandle bruker.geografiskTilknytning  }
 
-    override val postProsesser: (ansatt: Ansatt, bruker: Bruker) -> Boolean = { ansatt, bruker ->
+    override val unless: (ansatt: Ansatt, bruker: Bruker) -> Boolean = { ansatt, bruker ->
         godtaHvis { ansatt tilhører oppfølging.enhetFor(bruker.brukerId) }
     }
 }

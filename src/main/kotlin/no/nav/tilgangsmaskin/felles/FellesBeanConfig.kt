@@ -13,6 +13,9 @@ import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.FellesRetryListener
 import no.nav.tilgangsmaskin.felles.rest.cache.JsonCacheable
 import no.nav.tilgangsmaskin.tilgang.Token
+import org.aspectj.lang.ProceedingJoinPoint
+import org.aspectj.lang.annotation.Around
+import org.aspectj.lang.annotation.Aspect
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
@@ -26,6 +29,7 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import org.springframework.stereotype.Component
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -98,6 +102,17 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
     override fun configureContentNegotiation(configurer: ContentNegotiationConfigurer) {
         configurer.defaultContentType(APPLICATION_JSON)
+    }
+
+    @Aspect
+    @Component
+    class TimingAspect(private val meterRegistry: MeterRegistry) {
+
+        @Around("execution(* no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor.intercept(..))")
+        fun timeMethod(joinPoint: ProceedingJoinPoint): Any? {
+            val timer = meterRegistry.timer("mslogin", "method", joinPoint.signature.name)
+            return timer.recordCallable { joinPoint.proceed() }
+        }
     }
 
     companion object {

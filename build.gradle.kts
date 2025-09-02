@@ -5,6 +5,7 @@ val springdocVersion = "2.8.11"
 val tokenSupportVersion = "5.0.36"
 val mockkVersion = "1.14.5"
 
+
 group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
 version = "1.0.1"
 

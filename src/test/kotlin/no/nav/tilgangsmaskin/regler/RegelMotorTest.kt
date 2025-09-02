@@ -3,12 +3,12 @@ package no.nav.tilgangsmaskin.regler
 import com.ninjasquad.springmockk.MockkBean
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
+import io.mockk.verify
 import java.util.*
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.Enhetsnummer
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
@@ -18,10 +18,12 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.tilgang.RegelConfig
 import no.nav.tilgangsmaskin.tilgang.Token
@@ -59,6 +61,9 @@ class RegelMotorTest {
 
     @Autowired
     private lateinit var registry: MeterRegistry
+
+    @MockkBean
+    private lateinit var oppfølging: OppfølgingTjeneste
     
     @MockkBean
     private lateinit var token: Token
@@ -195,6 +200,8 @@ class RegelMotorTest {
 
         private val enhet = Enhetsnummer("4242")
         private val enhetGruppe = EntraGruppe(UUID.randomUUID(), "XXX_GEO_${enhet.verdi}")
+        private val oppfølgingGruppe = EntraGruppe(UUID.randomUUID(), "XXX_ENHET_${enhet.verdi}")
+
 
         @Test
         @DisplayName("Ansatt med nasjonal tilgang kan behandle vanlig bruker")
@@ -202,6 +209,8 @@ class RegelMotorTest {
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(NASJONAL).build()
             val bruker = BrukerBuilder(brukerId).build()
             assertThat(ansatt kanBehandle bruker).isTrue
+            verify(exactly = 0) { oppfølging.enhetFor(brukerId) }
+
         }
 
         @Test
@@ -218,14 +227,27 @@ class RegelMotorTest {
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).medMedlemskapI(SKJERMING).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune(enhet.verdi))).build()
             assertThat(ansatt kanBehandle bruker).isTrue
+            verify(exactly = 0) { oppfølging.enhetFor(brukerId) }
+
         }
 
         @Test
         @DisplayName("Ansatt uten tilgang som samme GT som bruker kan ikke behandle denne")
         fun geoAvslått() {
+            every { oppfølging.enhetFor(brukerId) } returns null
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
-            forventAvvistAv<NorgeRegel>(ansatt, bruker)
+            forventAvvistAv<GeografiskRegel>(ansatt, bruker)
+            verify(exactly = 1) { oppfølging.enhetFor(brukerId) }
+        }
+        @Test
+        @DisplayName("Ansatt uten Nasjonal tilgang og uten GT kan likevel behandle om den har tilgang til brukerens oppfølgingsenhet")
+        fun geoOppfølgingsEnhet() {
+            every { oppfølging.enhetFor(brukerId) } returns enhet
+            val ansatt = AnsattBuilder(ansattId).medMedlemskapI(oppfølgingGruppe).build()
+            val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
+            assertThat(ansatt kanBehandle bruker).isTrue
+            verify(exactly = 1) { oppfølging.enhetFor(brukerId) }
         }
     }
 

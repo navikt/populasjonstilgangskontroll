@@ -47,7 +47,7 @@ class RegelMotor(
         logger.ok(ansatt, bruker,regelSett)
     }
 
-    @WithSpan("regelMotor.bulk")
+    @WithSpan
     fun bulkRegler(ansatt: Ansatt, brukere: Set<BrukerOgRegelsett>) =
         (brukere.map { (bruker, type) ->
             runCatching {

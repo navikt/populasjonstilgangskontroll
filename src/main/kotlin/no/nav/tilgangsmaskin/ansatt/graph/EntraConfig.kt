@@ -41,7 +41,7 @@ class EntraConfig(
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
-        const val GEO_PREFIX = "startswith(displayName,'0000-GA-GEO')"
+        const val GEO_PREFIX = "startswith(displayName,'0000-GA-GEO') or startswith(displayName,'0000-GA-ENHET') "
         const val GRAPH = "graph"
         private const val DEFAULT_BATCH_SIZE = 250
         private const val USERS_PATH = "/users"

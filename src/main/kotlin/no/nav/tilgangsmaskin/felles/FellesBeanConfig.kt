@@ -110,7 +110,11 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 
         @Around("execution(* no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor.intercept(..))")
         fun timeMethod(joinPoint: ProceedingJoinPoint): Any? {
-            val timer = meterRegistry.timer("mslogin", "method", joinPoint.signature.name)
+            val timer = Timer.builder("mslogin")
+                .description("Timer med histogram for mslogin")
+                .tags("method", joinPoint.signature.name)
+                .publishPercentileHistogram()
+                .register(meterRegistry)
             return timer.recordCallable { joinPoint.proceed() }
         }
     }

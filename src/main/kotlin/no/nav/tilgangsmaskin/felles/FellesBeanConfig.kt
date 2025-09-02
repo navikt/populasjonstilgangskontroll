@@ -13,6 +13,7 @@ import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.FellesRetryListener
 import no.nav.tilgangsmaskin.felles.rest.cache.JsonCacheable
 import no.nav.tilgangsmaskin.tilgang.Token
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.Include.defaultIncludes
@@ -34,6 +35,8 @@ import java.util.function.Function
 @Configuration
 class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : WebMvcConfigurer {
 
+    private val log = getLogger(javaClass)
+
     @Bean
     fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer {
         it.featuresToEnable(INCLUDE_SOURCE_IN_LOCATION)
@@ -49,13 +52,27 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 
     @Bean
-    fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor) = RestClientCustomizer {
-        it.requestFactory(HttpComponentsClientHttpRequestFactory())
-        it.requestInterceptors {
+    fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor) = RestClientCustomizer { c ->
+        c.requestFactory(HttpComponentsClientHttpRequestFactory().apply {
+            setConnectTimeout(2000)
+            setReadTimeout(2000)
+        })
+        c.requestInterceptors {
             it.addFirst(interceptor)
+            it.add(headerLoggingInterceptor())
         }
     }
 
+    private fun headerLoggingInterceptor() = ClientHttpRequestInterceptor { request, body, next ->
+        // Log request details
+        log.trace("Request: {} {}", request.method, request.uri)
+        log.trace("Headers: {}", request.headers)
+        log.trace("Body: ${String(body)}")
+        val response = next.execute(request, body)
+        log.trace("Response status: {}", response.statusCode)
+        log.trace("Response headers: {}", response.headers)
+        response
+    }
 
     @Bean
     fun clusterAddingTimedAspect(meterRegistry: MeterRegistry, token: Token) =

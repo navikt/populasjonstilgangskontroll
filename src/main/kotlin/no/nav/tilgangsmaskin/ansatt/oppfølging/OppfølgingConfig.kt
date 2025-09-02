@@ -15,6 +15,6 @@ class OppfølgingConfig(baseUri: URI = DEFAULT_URI, pingPath: String = DEFAULT_P
     companion object {
         private val DEFAULT_URI = URI.create("http://www.todo.com") // TODO
         private const val DEFAULT_PING_PATH = "/internal/health/liveness"
-        const val OPPFØLGING = "oppfølging"
+        const val OPPFØLGING = "oppfolging"
     }
 }

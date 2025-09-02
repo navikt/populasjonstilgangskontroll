@@ -14,11 +14,11 @@ import java.util.UUID
 class EntraTjeneste(private val adapter: EntraRestClientAdapter, private val resolver: AnsattOidTjeneste) {
 
     @Cacheable(cacheNames = [GRAPH],  key = "#root.methodName + ':' + #ansattId.verdi")
-    @WithSpan("entratjeneste.geoogglobalegrupper")
+    @WithSpan
     fun geoOgGlobaleGrupper(ansattId: AnsattId, oid: UUID) = adapter.grupper(oid.toString(), true)
 
     @Cacheable(cacheNames = [GRAPH],  key = "#root.methodName + ':' + #ansattId.verdi")
-    @WithSpan("entratjeneste.geogrupper")
+    @WithSpan
     fun geoGrupper(ansattId: AnsattId, oid: UUID) = adapter.grupper(oid.toString(), false)
 
     override fun toString() = "${javaClass.simpleName} [adapter=$adapter resolver=$resolver]"

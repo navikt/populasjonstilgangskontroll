@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.tilgang
 
+import io.micrometer.core.annotation.Timed
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -28,7 +29,8 @@ class RegelTjeneste(
     private val overstyringTjeneste: OverstyringTjeneste) {
     private val log = getLogger(javaClass)
 
-    @WithSpan
+    @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "komplett"])
+        @WithSpan
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
@@ -48,10 +50,12 @@ class RegelTjeneste(
         log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
     }
 
+    @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])
     @WithSpan
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
         motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedNærmesteFamilie(brukerId))
 
+    @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
     @WithSpan
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): BulkRespons {
         val (respons, elapsedTime) = measureTimedValue {

@@ -64,12 +64,14 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 
     private fun headerLoggingInterceptor() = ClientHttpRequestInterceptor { request, body, next ->
-        log.debug("Request: {} {}", request.method, request.uri)
-        log.debug("Headers: {}", request.headers)
-        log.debug("Body: ${String(body)}")
+        log.trace("Headers: {}", request.headers)
+        if (!body.isEmpty()) {
+            log.debug("Body for {} {} : {} ",request.method, request.uri,String(body))
+        }
         val response = next.execute(request, body)
-        log.debug("Response status: {}", response.statusCode)
-        log.debug("Response headers: {}", response.headers)
+        if (!response.statusCode.is2xxSuccessful) {
+            log.debug("Response status for {} {}: {}", request.method, request.uri, response.statusCode)
+        }
         response
     }
 

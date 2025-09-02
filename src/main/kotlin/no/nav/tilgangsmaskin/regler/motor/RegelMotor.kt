@@ -39,7 +39,7 @@ class RegelMotor(
                 logger.trace("Regel ${regel.navn} er deaktivert i konfigurasjonen, hopper over evaluering.")
                 return@forEach
             }
-            if (!regel.evaluer(ansatt, bruker) && !regel.unless(ansatt, bruker)) {
+            if (!regel.evaluer(ansatt, bruker)) {
                 logger.avvist(ansatt, bruker, regel)
                 throw RegelException(ansatt, bruker, regel)
             }
@@ -47,7 +47,7 @@ class RegelMotor(
         logger.ok(ansatt, bruker,regelSett)
     }
 
-    @WithSpan("regelMotor.bulk")
+    @WithSpan
     fun bulkRegler(ansatt: Ansatt, brukere: Set<BrukerOgRegelsett>) =
         (brukere.map { (bruker, type) ->
             runCatching {

@@ -15,11 +15,7 @@ interface OverstyrbarRegel : Regel
 @Order(LOWEST_PRECEDENCE)
 class GeografiskRegel(private val oppfølging: OppfølgingTjeneste) : GlobalGruppeRegel(NASJONAL), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        godtaHvis { ansatt erMedlemAv NASJONAL || ansatt kanBehandle bruker.geografiskTilknytning  }
-
-    override val unless: (ansatt: Ansatt, bruker: Bruker) -> Boolean = { ansatt, bruker ->
-        godtaHvis { ansatt tilhører oppfølging.enhetFor(bruker.brukerId) }
-    }
+        godtaHvis {ansatt erMedlemAv NASJONAL || ansatt kanBehandle bruker.geografiskTilknytning || ansatt tilhører oppfølging.enhetFor(bruker.brukerId)}
 }
 
 @Component
@@ -28,14 +24,12 @@ class UkjentBostedRegel : GlobalGruppeRegel(UKJENT_BOSTED), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis { bruker.harUkjentBosted && ansatt ikkeErMedlemAv UKJENT_BOSTED }
 }
-
 @Component
 @Order(LOWEST_PRECEDENCE - 2)
 class UtlandRegel : GlobalGruppeRegel(UTENLANDSK), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis { bruker.harUtenlandskBosted && ansatt ikkeErMedlemAv UTENLANDSK }
 }
-
 
 
 

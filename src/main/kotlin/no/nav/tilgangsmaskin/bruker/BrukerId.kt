@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.bruker
 import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.tilgangsmaskin.felles.rest.cache.JsonCacheable
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
 
@@ -47,4 +48,10 @@ data class BrukerId(@JsonValue val verdi: String) {
     }
 
     override fun toString() = verdi.maskFnr()
+}
+
+data class Enhetsnummer(@JsonValue val verdi: String) {
+    init {
+        requireDigits(verdi, 4)
+    }
 }

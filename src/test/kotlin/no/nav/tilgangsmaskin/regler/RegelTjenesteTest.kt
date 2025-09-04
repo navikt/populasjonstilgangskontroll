@@ -16,6 +16,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.overstyring.*
 import no.nav.tilgangsmaskin.tilgang.RegelConfig
@@ -68,6 +69,10 @@ class RegelTjenesteTest {
     @MockkBean
     private lateinit var token: Token
 
+    @MockkBean
+    private lateinit var oppfølging: OppfølgingTjeneste
+
+
     @Autowired
     private lateinit var motor: RegelMotor
 
@@ -90,6 +95,8 @@ class RegelTjenesteTest {
         avvisningTeller = AvvisningTeller(registry, token)
         avdød = AvdødTeller(registry, token)
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
+        every { oppfølging.enhetFor(vanligBrukerId) } returns null
+
         every { token.system } returns "test"
         every { token.clusterAndSystem } returns "cluster:test"
 

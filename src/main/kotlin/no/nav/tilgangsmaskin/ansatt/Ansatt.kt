@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.ansatt
 
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
@@ -20,7 +21,7 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
 
     private val partnere = bruker?.partnere ?: emptySet()
 
-    private infix fun kanBehandle(gt: GeografiskTilknytning): Boolean {
+    infix fun kanBehandle(gt: GeografiskTilknytning): Boolean {
         val kode = when (gt) {
             is KommuneTilknytning -> gt.kommune.verdi
             is BydelTilknytning -> gt.bydel.verdi
@@ -29,7 +30,13 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
         return grupper.any { it.displayName.endsWith("GEO_$kode") }
     }
 
-    infix fun kanIkkeBehandle(gt: GeografiskTilknytning) = !kanBehandle(gt)
+    infix fun tilhører(enhet: Enhetsnummer?) =
+        enhet?.let { enhet ->
+            grupper.any { it.displayName.endsWith("ENHET_${enhet.verdi}") }
+        } ?: false
+
+
+    infix fun ikkeKanBehandle(gt: GeografiskTilknytning) = !kanBehandle(gt)
     
     infix fun erMedlemAv(gruppe: GlobalGruppe) = grupper.any { it.id == gruppe.id
     }
@@ -48,6 +55,6 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
 
     private infix fun Set<FamilieMedlem>.harMinstEnFelles(medlemmer: Set<FamilieMedlem>) = intersect(medlemmer).isNotEmpty()
     private infix fun Bruker.erNærståendeMed(medlemmer: Set<FamilieMedlem>) = medlemmer.any { it.brukerId == brukerId }
-}
 
+}
 

@@ -11,13 +11,14 @@ import no.nav.tilgangsmaskin.bruker.pdl.erStrengtFortroligUtland
 
 
 object PersonTilBrukerMapper {
-    fun tilBruker(person: Person, erSkjermet: Boolean) =
+    fun tilBruker(person: Person, erSkjermet: Boolean, oppfølgingsenhet: Enhetsnummer? = null) =
         with(person) {
             Bruker(
                     BrukerIds(brukerId, historiskeIds, aktørId),
                     geoTilknytning,
                     tilGruppeKrav(geoTilknytning, graderinger, erSkjermet),
-                    familie, dødsdato)
+                    familie,
+                dødsdato)
         }
 
     private fun tilGruppeKrav(gt: GeografiskTilknytning, graderinger: List<Gradering>, erSkjermet: Boolean) =

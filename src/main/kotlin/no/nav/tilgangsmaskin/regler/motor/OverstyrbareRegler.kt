@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.regler.motor
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.*
 import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
@@ -12,9 +13,13 @@ interface OverstyrbarRegel : Regel
 
 @Component
 @Order(LOWEST_PRECEDENCE)
-class NorgeRegel : GlobalGruppeRegel(NASJONAL), OverstyrbarRegel {
+class GeografiskRegel(private val oppfølging: OppfølgingTjeneste) : GlobalGruppeRegel(NASJONAL), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avvisHvis { ansatt ikkeErMedlemAv NASJONAL && ansatt kanIkkeBehandle bruker.geografiskTilknytning }
+        godtaHvis {
+            ansatt erMedlemAv NASJONAL
+                    || ansatt kanBehandle bruker.geografiskTilknytning
+                    || ansatt tilhører oppfølging.enhetFor(bruker.brukerId)
+        }
 }
 
 @Component
@@ -30,7 +35,6 @@ class UtlandRegel : GlobalGruppeRegel(UTENLANDSK), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis { bruker.harUtenlandskBosted && ansatt ikkeErMedlemAv UTENLANDSK }
 }
-
 
 
 

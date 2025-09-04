@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
+import io.micrometer.core.instrument.Timer
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
@@ -13,6 +14,10 @@ import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.FellesRetryListener
 import no.nav.tilgangsmaskin.felles.rest.cache.JsonCacheable
 import no.nav.tilgangsmaskin.tilgang.Token
+import org.aspectj.lang.ProceedingJoinPoint
+import org.aspectj.lang.annotation.Around
+import org.aspectj.lang.annotation.Aspect
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.Include.defaultIncludes
@@ -25,6 +30,7 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import org.springframework.stereotype.Component
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -33,6 +39,8 @@ import java.util.function.Function
 
 @Configuration
 class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : WebMvcConfigurer {
+
+    private val log = getLogger(javaClass)
 
     @Bean
     fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer {
@@ -49,13 +57,28 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 
     @Bean
-    fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor) = RestClientCustomizer {
-        it.requestFactory(HttpComponentsClientHttpRequestFactory())
-        it.requestInterceptors {
+    fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor) = RestClientCustomizer { c ->
+        c.requestFactory(HttpComponentsClientHttpRequestFactory().apply {
+            setConnectTimeout(2000)
+            setReadTimeout(2000)
+        })
+        c.requestInterceptors {
             it.addFirst(interceptor)
+            it.add(headerLoggingInterceptor())
         }
     }
 
+    private fun headerLoggingInterceptor() = ClientHttpRequestInterceptor { request, body, next ->
+        log.trace("Headers: {}", request.headers)
+        if (!body.isEmpty()) {
+            log.debug("Body for {} {} : {} ",request.method, request.uri,String(body))
+        }
+        val response = next.execute(request, body)
+        if (!response.statusCode.is2xxSuccessful) {
+            log.debug("Response status for {} {}: {}", request.method, request.uri, response.statusCode)
+        }
+        response
+    }
 
     @Bean
     fun clusterAddingTimedAspect(meterRegistry: MeterRegistry, token: Token) =
@@ -80,6 +103,21 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
     override fun configureContentNegotiation(configurer: ContentNegotiationConfigurer) {
         configurer.defaultContentType(APPLICATION_JSON)
+    }
+
+    @Aspect
+    @Component
+    class TimingAspect(private val meterRegistry: MeterRegistry) {
+
+        @Around("execution(* no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor.intercept(..))")
+        fun timeMethod(joinPoint: ProceedingJoinPoint): Any? {
+            val timer = Timer.builder("mslogin")
+                .description("Timer med histogram for mslogin")
+                .tags("method", joinPoint.signature.name)
+                .publishPercentileHistogram()
+                .register(meterRegistry)
+            return timer.recordCallable { joinPoint.proceed() }
+        }
     }
 
     companion object {

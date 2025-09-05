@@ -11,7 +11,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.erStrengtFortroligUtland
 
 
 object PersonTilBrukerMapper {
-    fun tilBruker(person: Person, erSkjermet: Boolean, oppfølgingsenhet: Enhetsnummer? = null) =
+    fun tilBruker(person: Person, erSkjermet: Boolean) =
         with(person) {
             Bruker(
                     BrukerIds(brukerId, historiskeIds, aktørId),

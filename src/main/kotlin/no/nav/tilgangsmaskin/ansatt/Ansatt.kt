@@ -31,8 +31,8 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
     }
 
     infix fun tilhører(enhet: Enhetsnummer?) =
-        enhet?.let { enhet ->
-            grupper.any { it.displayName.endsWith("ENHET_${enhet.verdi}") }
+        enhet?.let { e ->
+            grupper.any { it.displayName.endsWith("ENHET_${e.verdi}") }
         } ?: false
 
 

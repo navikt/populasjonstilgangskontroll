@@ -46,7 +46,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
     fun putMany(cache: CacheName, innslag: Map<String, Any>, extraPrefix: String? = null) =
         if (innslag.isEmpty()) {
             log.trace("Skal legge til 0 verdier i cache ${cache.name}, gjør ingenting")
-            "OK"
+            "OK" 
         }
         else {
             conn.sync().mset(innslag

@@ -4,10 +4,10 @@ on:
     branches:
       - main
 env:
-  IMAGE: europe-north1-docker.pkg.dev/nais-management-233d/tilgangsmaskin/${{ github.event.repository.name }}
 jobs:
   build:
     env:
+      IMAGE: europe-north1-docker.pkg.dev/nais-management-233d/tilgangsmaskin/${{ github.event.repository.name }}
       BASE: europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/jre:openjdk-21
     name: build
     permissions:
@@ -37,7 +37,6 @@ jobs:
         uses: sigstore/cosign-installer@main
         with:
           cosign-release: v2.4.1
-
 
       - name: Setter tag-navn
         run: echo "TAG=$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV

@@ -12,7 +12,6 @@ import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenRespons
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.FellesRetryListener
-import no.nav.tilgangsmaskin.felles.rest.cache.JsonCacheable
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
@@ -110,14 +109,11 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     class TimingAspect(private val meterRegistry: MeterRegistry) {
 
         @Around("execution(* no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor.intercept(..))")
-        fun timeMethod(joinPoint: ProceedingJoinPoint): Any? {
-            val timer = Timer.builder("mslogin")
-                .description("Timer med histogram for mslogin")
-                .tags("method", joinPoint.signature.name)
-                .publishPercentileHistogram()
-                .register(meterRegistry)
-            return timer.recordCallable { joinPoint.proceed() }
-        }
+        fun timeMethod(joinPoint: ProceedingJoinPoint) = Timer.builder("mslogin")
+            .description("Timer med histogram for mslogin")
+            .tags("method", joinPoint.signature.name)
+            .publishPercentileHistogram()
+            .register(meterRegistry).recordCallable { joinPoint.proceed() }
     }
 
     companion object {

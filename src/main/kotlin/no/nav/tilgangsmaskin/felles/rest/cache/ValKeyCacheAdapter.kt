@@ -41,7 +41,7 @@ class ValKeyCacheAdapter(private val handler: ValkeyCacheKeyHandler, private val
             it.keyCommands()
                 .scan(scanOptions()
                     .match("$prefix*")
-                    .count(1000)
+                    .count(10000)
                     .build())
                 .asSequence()
                 .count()

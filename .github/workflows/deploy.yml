@@ -50,7 +50,7 @@ jobs:
       - name: Test og bygg
         id: kompiler
         run: |
-          ./gradlew --warning-mode all test jib  -Djib.from.image={{env.BASE}} -Djib.to.tags=latest,${TAG} -Djib.to.image=${{ env.IMAGE }}:${{ env.TAG }}
+          ./gradlew --warning-mode all test jib  -Djib.from.image=${{ env.BASE }} -Djib.to.tags=latest,${TAG} -Djib.to.image=${{ env.IMAGE }}:${{ env.TAG }}
           echo "DIGEST=$(cat build/jib-image.digest)" >> $GITHUB_ENV
         env:
           ORG_GRADLE_PROJECT_githubUser: x-access-token

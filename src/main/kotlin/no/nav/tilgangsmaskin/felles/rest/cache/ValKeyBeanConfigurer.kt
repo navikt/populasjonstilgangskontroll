@@ -13,6 +13,7 @@ import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.nonLockingRedisCacheWriter
@@ -53,16 +54,14 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             },sucessTeller,teller)
 
     @Bean
-    fun cachePrefixes(mgr: RedisCacheManager) =
-        mgr.cacheConfigurations.mapValues { it.value.keyPrefix }
+    fun cachePrefixes(cfgs: Map<String, RedisCacheConfiguration>) = cfgs.mapValues { it.value.keyPrefix }
 
     @Bean
     fun valKeyHealthIndicator(adapter: ValKeyCacheAdapter)  =
         PingableHealthIndicator(adapter)
 
     @Bean
-    fun cacheKeyHandler(mgr: RedisCacheManager)  =
-        ValkeyCacheKeyHandler(mgr.cacheConfigurations)
+    fun cacheConfigurations(mgr: RedisCacheManager)  = mgr.cacheConfigurations
 
     private fun cacheConfig(cfg: CachableRestConfig) =
         defaultCacheConfig()

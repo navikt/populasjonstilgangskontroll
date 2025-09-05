@@ -51,9 +51,9 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
         else {
             conn.sync().mset(innslag
                 .mapKeys { handler.toKey(cache,it.key,extraPrefix) }
-                .mapValues { mapper.writeValueAsString(it.value) }).also {
-                log.trace("La til ${innslag.size} verdier i cache ${cache.name} med prefix $extraPrefix" )
-            }
+                .mapValues { mapper.writeValueAsString(it.value) }.also {
+                    log.trace("Lager {} verdier for cache {} med prefix {}", it.values, cache.name, extraPrefix)
+                })
         }
 
 }

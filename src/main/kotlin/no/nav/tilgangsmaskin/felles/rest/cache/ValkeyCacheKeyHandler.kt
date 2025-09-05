@@ -1,8 +1,11 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
+import org.hibernate.annotations.Comment
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.redis.cache.RedisCacheConfiguration
+import org.springframework.stereotype.Component
 
+@Component
 class ValkeyCacheKeyHandler(val configs: Map<String, RedisCacheConfiguration>) {
     private val log = getLogger(javaClass)
 

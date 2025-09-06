@@ -54,7 +54,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             },sucessTeller,teller)
 
     @Bean
-    fun cachePrefixes(cfgs: Map<String, RedisCacheConfiguration>) = cfgs.mapValues { it.value.keyPrefix }
+    fun cachePrefixes(cfgs: Map<String, RedisCacheConfiguration>) = cfgs.mapValues { it.value.keyPrefix}
 
     @Bean
     fun valKeyHealthIndicator(adapter: ValKeyCacheAdapter)  =

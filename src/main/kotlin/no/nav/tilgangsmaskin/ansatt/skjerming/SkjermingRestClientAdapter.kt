@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.IDENTER
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
-import no.nav.tilgangsmaskin.felles.rest.cache.CacheName
+import no.nav.tilgangsmaskin.felles.rest.cache.CacheConfig
 import no.nav.tilgangsmaskin.felles.rest.cache.ValkeyCacheClient
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import org.springframework.beans.factory.annotation.Qualifier
@@ -45,7 +45,7 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
             cache.getMany<Boolean>(SKJERMING_CACHE, ids)
 
     companion object {
-        private val SKJERMING_CACHE = CacheName(SKJERMING)
+        private val SKJERMING_CACHE = CacheConfig(SKJERMING)
     }
 }
 

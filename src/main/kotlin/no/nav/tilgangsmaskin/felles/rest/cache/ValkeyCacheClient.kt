@@ -17,25 +17,25 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
     val log = getLogger(javaClass)
 
 
-    inline fun <reified T> getOne(cache: CacheName, id: String, extraPrefix: String? = null) =
-        conn.sync().get(handler.toKey(cache,id,extraPrefix))?.let { json ->
+    inline fun <reified T> getOne(cache: CacheConfig, id: String, extraPrefix: String? = null) =
+        conn.sync().get(handler.toKey(cache,id))?.let { json ->
             mapper.readValue<T>(json)
         }
 
-    inline fun <reified T> getMany(cache: CacheName, ids: Set<String>, extraPrefix: String? = null)  =
+    inline fun <reified T> getMany(cache: CacheConfig, ids: Set<String>, extraPrefix: String? = null)  =
         if (ids.isEmpty()) {
             log.trace("Forespurt 0 id'er for cache ${cache.name}, returnerer tomt resultat")
             emptyMap()
         }
         else conn.sync()
             .mget(*ids.map {
-                id -> handler.toKey(cache,id,extraPrefix)}.toTypedArray<String>()
+                id -> handler.toKey(cache,id)}.toTypedArray<String>()
             )
             .filter {
                 it.hasValue()
             }
             .associate {
-                handler.fromKey(cache, it.key, extraPrefix) to mapper.readValue<T>(it.value)
+                handler.fromKey(cache, it.key) to mapper.readValue<T>(it.value)
             }.also {
                 alleTreffTeller.tell(of("name", cache.name, "suksess", (it.size == ids.size).toString()))
                 teller.tell(of("cache", cache.name, "result", "miss"), ids.size - it.size)
@@ -43,14 +43,14 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                 log.trace("Fant ${it.size} verdier i cache ${cache.name} for ${ids.size} id(er)")
             }
 
-    fun putMany(cache: CacheName, innslag: Map<String, Any>, extraPrefix: String? = null) =
+    fun putMany(cache: CacheConfig, innslag: Map<String, Any>, extraPrefix: String? = null) =
         if (innslag.isEmpty()) {
             log.trace("Skal legge til 0 verdier i cache ${cache.name}, gjør ingenting")
             "OK" 
         }
         else {
             conn.sync().mset(innslag
-                .mapKeys { handler.toKey(cache,it.key,extraPrefix) }
+                .mapKeys { handler.toKey(cache,it.key) }
                 .mapValues { mapper.writeValueAsString(it.value) }.also {
                     log.trace("Lager {} verdier for cache {} med prefix {}", it.values, cache.name, extraPrefix)
                 })

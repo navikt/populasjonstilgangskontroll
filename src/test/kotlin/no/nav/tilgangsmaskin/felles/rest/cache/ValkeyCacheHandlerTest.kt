@@ -14,7 +14,11 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration
 @ExtendWith(MockKExtension::class)
 class ValkeyCacheKeyHandlerTest {
 
-    private val cacheName = CacheName("testCache")
+   private val key = "myKey"
+
+
+    private val MED_EXTRA = CacheConfig("testCache", "extra")
+    private val UTEN_EXTRA = CacheConfig("testCache")
     private val prefix = "prefix::"
     @MockK
     private lateinit var redisConfig: RedisCacheConfiguration
@@ -22,39 +26,33 @@ class ValkeyCacheKeyHandlerTest {
 
     @BeforeEach
     fun setUp() {
-        every { redisConfig.getKeyPrefixFor(cacheName.name) } returns prefix
-        handler = ValkeyCacheKeyHandler(mapOf(cacheName.name to redisConfig))
+        every { redisConfig.getKeyPrefixFor(MED_EXTRA.name) } returns prefix
+        handler = ValkeyCacheKeyHandler(mapOf(MED_EXTRA.name to redisConfig))
     }
 
     @Test
     fun `toKey adds prefix and key`() {
-        val key = "myKey"
-        val result = handler.toKey(cacheName, key)
+        val result = handler.toKey(UTEN_EXTRA, key)
         assertEquals("$prefix$key", result)
     }
 
     @Test
     fun `toKey adds extraPrefix when provided`() {
-        val key = "myKey"
-        val extraPrefix = "extra"
-        val result = handler.toKey(cacheName, key, extraPrefix)
-        assertEquals("$prefix$extraPrefix:$key", result)
+        val result = handler.toKey(MED_EXTRA, key)
+        assertEquals("$prefix${MED_EXTRA.extraPrefix}:$key", result)
     }
 
     @Test
     fun `fromKey removes prefix and extraPrefix`() {
-        val key = "myKey"
-        val extraPrefix = "extra"
-        val fullKey = "$prefix$extraPrefix:$key"
-        val result = handler.fromKey(cacheName, fullKey, extraPrefix)
+        val fullKey = "$prefix${MED_EXTRA.extraPrefix}:$key"
+        val result = handler.fromKey(MED_EXTRA, fullKey)
         assertEquals(key, result)
     }
 
     @Test
     fun `fromKey removes only prefix when extraPrefix is null`() {
-        val key = "myKey"
         val fullKey = "$prefix$key"
-        val result = handler.fromKey(cacheName, fullKey)
+        val result = handler.fromKey(UTEN_EXTRA, fullKey)
         assertEquals(key, result)
     }
 
@@ -62,7 +60,7 @@ class ValkeyCacheKeyHandlerTest {
     fun `throws exception if cache config is missing`() {
         val handlerMissing = ValkeyCacheKeyHandler(emptyMap())
         assertThrows<IllegalStateException> {
-            handlerMissing.toKey(CacheName("unknown"), "key")
+            handlerMissing.toKey(CacheConfig("unknown"), "key")
         }
     }
 }

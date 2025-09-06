@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
-import no.nav.tilgangsmaskin.felles.rest.cache.CacheName
+import no.nav.tilgangsmaskin.felles.rest.cache.CacheConfig
 import no.nav.tilgangsmaskin.felles.rest.cache.ValkeyCacheClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
@@ -88,9 +88,11 @@ class PdlRestClientAdapter(
 
 
     companion object {
-        const val EXTRA = "medNærmesteFamilie"
-        private val PDL_CACHE = CacheName(PDL)
+        private const val EXTRA = "medNærmesteFamilie"
+        private val PDL_CACHE = CacheConfig(PDL, EXTRA)
     }
 }
+
+
 
 

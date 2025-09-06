@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
 import org.springframework.http.MediaType.*
 import org.springframework.web.bind.annotation.*
-import no.nav.tilgangsmaskin.felles.rest.cache.CacheName
+import no.nav.tilgangsmaskin.felles.rest.cache.CacheConfig
 
 
 @UnprotectedRestController(value = ["/${DEV}"])
@@ -57,10 +57,10 @@ class DevTilgangController(
     private  val log = getLogger(javaClass)
 
     @PostMapping("cache/skjerminger")
-    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cache.getMany<Boolean>(CacheName(SKJERMING),navIds)
+    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cache.getMany<Boolean>(CacheConfig(SKJERMING),navIds)
 
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<String>) = cache.getMany<Person>(CacheName(PDL),navIds)
+    fun cachePersoner(@RequestBody  navIds: Set<String>) = cache.getMany<Person>(CacheConfig(PDL),navIds)
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.partnere(id)

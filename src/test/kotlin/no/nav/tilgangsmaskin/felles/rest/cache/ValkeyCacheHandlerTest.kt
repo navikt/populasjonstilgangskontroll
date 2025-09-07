@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import io.mockk.every
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.data.redis.cache.RedisCacheConfiguration
+import org.junit.jupiter.api.DisplayName
 
 
 @ExtendWith(MockKExtension::class)
@@ -31,33 +32,38 @@ class ValkeyCacheKeyHandlerTest {
     }
 
     @Test
-    fun `toKey adds prefix and key`() {
+    @DisplayName("toKey adds prefix and key")
+    fun toKey_addsPrefixAndKey() {
         val result = handler.toKey(UTEN_EXTRA, key)
         assertEquals("$prefix$key", result)
     }
 
     @Test
-    fun `toKey adds extraPrefix when provided`() {
+    @DisplayName("toKey adds extraPrefix when provided")
+    fun toKey_addsExtraPrefix() {
         val result = handler.toKey(MED_EXTRA, key)
         assertEquals("$prefix${MED_EXTRA.extraPrefix}:$key", result)
     }
 
     @Test
-    fun `fromKey removes prefix and extraPrefix`() {
+    @DisplayName("fromKey removes prefix and extraPrefix")
+    fun fromKey_removesPrefixAndExtraPrefix() {
         val fullKey = "$prefix${MED_EXTRA.extraPrefix}:$key"
         val result = handler.fromKey(MED_EXTRA, fullKey)
         assertEquals(key, result)
     }
 
     @Test
-    fun `fromKey removes only prefix when extraPrefix is null`() {
+    @DisplayName("fromKey removes only prefix when extraPrefix is null")
+    fun fromKey_removesOnlyPrefix() {
         val fullKey = "$prefix$key"
         val result = handler.fromKey(UTEN_EXTRA, fullKey)
         assertEquals(key, result)
     }
 
     @Test
-    fun `throws exception if cache config is missing`() {
+    @DisplayName("throws exception if cache config is missing")
+    fun throwsExceptionIfCacheConfigMissing() {
         val handlerMissing = ValkeyCacheKeyHandler(emptyMap())
         assertThrows<IllegalStateException> {
             handlerMissing.toKey(CacheConfig("unknown"), "key")

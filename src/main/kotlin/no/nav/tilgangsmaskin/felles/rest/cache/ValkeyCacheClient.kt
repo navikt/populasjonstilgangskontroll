@@ -14,7 +14,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                         val alleTreffTeller: BulkCacheSuksessTeller,
                         val teller: BulkCacheTeller)  {
 
-    private val log = getLogger(javaClass)
+    val log = getLogger(javaClass)
 
 
     inline fun <reified T> getOne(cache: CacheConfig, id: String) =
@@ -24,12 +24,11 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
 
     inline fun <reified T> getMany(cache: CacheConfig, ids: Set<String>)  =
         if (ids.isEmpty()) {
-            log.trace("Forespurt 0 id'er for cache ${cache.name}, returnerer tomt resultat")
             emptyMap()
         }
         else conn.sync()
             .mget(*ids.map {
-                id -> handler.toKey(cache,id)}.toTypedArray<String>()
+                    id -> handler.toKey(cache,id)}.toTypedArray<String>()
             )
             .filter {
                 it.hasValue()
@@ -37,10 +36,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
             .associate {
                 handler.fromKey(cache, it.key) to mapper.readValue<T>(it.value)
             }.also {
-                alleTreffTeller.tell(of("name", cache.name, "suksess", (it.size == ids.size).toString()))
-                teller.tell(of("cache", cache.name, "result", "miss"), ids.size - it.size)
-                teller.tell(of("cache", cache.name, "result", "hit"), it.size)
-                log.trace("Fant ${it.size} verdier i cache ${cache.name} for ${ids.size} id(er)")
+                tellOgLog(cache.name, it.size, ids.size)
             }
 
     fun putMany(cache: CacheConfig, innslag: Map<String, Any>, extraPrefix: String? = null) =
@@ -56,4 +52,10 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                 })
         }
 
+    fun tellOgLog(navn: String, funnet: Int, etterspurt: Int) {
+        alleTreffTeller.tell(of("name", navn, "suksess", (funnet == etterspurt).toString()))
+        teller.tell(of("cache", navn, "result", "miss"), etterspurt - funnet)
+        teller.tell(of("cache", navn, "result", "hit"), funnet)
+        log.trace("Fant $funnet verdier i cache $navn for $etterspurt id(er)")
+    }
 }

@@ -47,7 +47,6 @@ class ValkeyServerTest {
 
     private lateinit var valkeyMapper: ObjectMapper
 
-
     @MockkBean
     private lateinit var token: Token
 
@@ -80,11 +79,11 @@ class ValkeyServerTest {
     }
 
     @Test
-    fun mput() {
+    fun putAndGet() {
         val id = BrukerId("03016536325")
         val person = Person(id, AktørId("1234567890123"), GeografiskTilknytning.KommuneTilknytning(
             GeografiskTilknytning.Kommune("0301")))
-        client.putMany(cacheName, mapOf(id.verdi to person))
+        client.putOne(cacheName, id.verdi,person)
         val one = client.getOne<Person>(cacheName,id.verdi)
         assertEquals(person, one)
     }

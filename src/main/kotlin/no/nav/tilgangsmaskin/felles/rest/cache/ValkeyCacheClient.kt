@@ -22,6 +22,9 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
             mapper.readValue<T>(json)
         }
 
+    fun putOne(cache: CacheConfig, id: String, value: Any?)  =
+        conn.sync().set(handler.toKey(cache,id), mapper.writeValueAsString(value))
+
     inline fun <reified T> getMany(cache: CacheConfig, ids: Set<String>)  =
         if (ids.isEmpty()) {
             emptyMap()

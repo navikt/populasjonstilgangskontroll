@@ -44,7 +44,7 @@ import kotlin.test.assertTrue
 @Import(JacksonAutoConfiguration::class)
 class ValkeyServerTest {
 
-    private val cacheName = CacheConfig("testCache")
+    private val cacheName = CacheConfig("testCache","extra")
 
     @Autowired
     private lateinit var objectMapper: ObjectMapper

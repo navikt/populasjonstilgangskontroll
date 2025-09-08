@@ -71,8 +71,6 @@ dependencies {
     implementation("org.springframework.retry:spring-retry")
     implementation("org.springframework:spring-aspects")
     testImplementation("com.redis:testcontainers-redis")
-    testImplementation("com.github.ben-manes.caffeine:caffeine")
-    testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("org.junit.jupiter:junit-jupiter")

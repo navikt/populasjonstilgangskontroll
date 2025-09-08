@@ -14,7 +14,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                         val alleTreffTeller: BulkCacheSuksessTeller,
                         val teller: BulkCacheTeller)  {
 
-    val log = getLogger(javaClass)
+    private val log = getLogger(javaClass)
 
 
     inline fun <reified T> getOne(cache: CacheConfig, id: String) =

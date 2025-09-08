@@ -17,7 +17,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
     val log = getLogger(javaClass)
 
 
-    inline fun <reified T> getOne(cache: CacheConfig, id: String, extraPrefix: String? = null) =
+    inline fun <reified T> getOne(cache: CacheConfig, id: String) =
         conn.sync().get(handler.toKey(cache,id))?.let { json ->
             mapper.readValue<T>(json)
         }

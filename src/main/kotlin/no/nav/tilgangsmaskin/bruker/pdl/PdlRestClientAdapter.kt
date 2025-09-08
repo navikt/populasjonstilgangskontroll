@@ -46,7 +46,7 @@ class PdlRestClientAdapter(
         if (ids.isEmpty()) {
             return emptyMap()
         }
-        val innslag = cache.getMany<Person>(PDL_CACHE, ids, EXTRA)
+        val innslag = cache.getMany<Person>(PDL_CACHE, ids)
         log.trace("Hentet ${innslag.size} person(er) fra cache for ${ids.size} ident(er)")
         return innslag
     }

@@ -5,13 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
-import io.lettuce.core.RedisClient
+import io.lettuce.core.RedisClient.create
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.junit5.MockKExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import no.nav.tilgangsmaskin.TestApp
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
@@ -22,14 +21,17 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTest
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
-import org.springframework.data.redis.cache.RedisCacheConfiguration
-import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.springframework.context.annotation.Import
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
+import org.springframework.data.redis.cache.RedisCacheConfiguration
+import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
+import org.springframework.data.redis.cache.RedisCacheManager.builder
 import kotlin.test.assertEquals
 
 @DataRedisTest
@@ -62,17 +64,17 @@ class ValkeyServerTest {
                 activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
             }
         val meterRegistry = SimpleMeterRegistry()
-        val redisClient = RedisClient.create("redis://${redis.host}:${redis.firstMappedPort}")
-        val customConfig = RedisCacheConfiguration.defaultCacheConfig()
-            .prefixCacheNameWith("myprefix::")
-            .disableCachingNullValues()
 
-        val cacheConfigs = mapOf(cacheName.name to customConfig)
-        val mgr = RedisCacheManager.builder(cf)
-            .withInitialCacheConfigurations(cacheConfigs)
+        val mgr = builder(cf)
+            .withInitialCacheConfigurations(mapOf(
+                cacheName.name to RedisCacheConfiguration.defaultCacheConfig()
+                    .prefixCacheNameWith("myprefix::")
+                    .disableCachingNullValues()
+            ))
             .build()
         mgr.getCache(cacheName.name)
-        client = ValkeyCacheClient(ValkeyCacheKeyHandler(mgr.cacheConfigurations),redisClient.connect(), valkeyMapper,
+        client = ValkeyCacheClient(ValkeyCacheKeyHandler(mgr.cacheConfigurations),
+            create("redis://${redis.host}:${redis.firstMappedPort}").connect(), valkeyMapper,
             BulkCacheSuksessTeller(meterRegistry, token),
             BulkCacheTeller(meterRegistry,token)
         )
@@ -81,8 +83,7 @@ class ValkeyServerTest {
     @Test
     fun putAndGet() {
         val id = BrukerId("03016536325")
-        val person = Person(id, AktørId("1234567890123"), GeografiskTilknytning.KommuneTilknytning(
-            GeografiskTilknytning.Kommune("0301")))
+        val person = Person(id, AktørId("1234567890123"), KommuneTilknytning(Kommune("0301")))
         client.putOne(cacheName, id.verdi,person)
         val one = client.getOne<Person>(cacheName,id.verdi)
         assertEquals(person, one)

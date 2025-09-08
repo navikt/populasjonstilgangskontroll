@@ -22,7 +22,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
             mapper.readValue<T>(json)
         }
 
-    inline fun <reified T> getMany(cache: CacheConfig, ids: Set<String>, extraPrefix: String? = null)  =
+    inline fun <reified T> getMany(cache: CacheConfig, ids: Set<String>)  =
         if (ids.isEmpty()) {
             log.trace("Forespurt 0 id'er for cache ${cache.name}, returnerer tomt resultat")
             emptyMap()

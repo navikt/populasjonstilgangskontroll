@@ -85,7 +85,7 @@ class ValkeyServerTest {
     fun putAndGetOne() {
         val id = BrukerId("03508331575")
         val person = Person(id, AktørId("1234567890123"), KommuneTilknytning(Kommune("0301")))
-        client.putOne(cacheName, id.verdi,person)
+        client.putOne(cacheName, id.verdi,person, Duration.ofMinutes(5))
         val one = client.getOne<Person>(cacheName,id.verdi)
         assertEquals(person, one)
     }

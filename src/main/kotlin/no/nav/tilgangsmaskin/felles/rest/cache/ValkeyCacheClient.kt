@@ -23,8 +23,13 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
             mapper.readValue<T>(json)
         }
 
-    fun putOne(cache: CacheConfig, id: String, value: Any?)  =
-        conn.sync().set(handler.toKey(cache,id), mapper.writeValueAsString(value))
+    fun putOne(cache: CacheConfig, id: String, value: Any, ttl: Duration)  {
+        val key = handler.toKey(cache,id)
+        conn.sync().set(key, mapper.writeValueAsString(value))
+        if (!ttl.isZero && !ttl.isNegative) {
+            conn.sync().expire(key, ttl.seconds)
+        }
+    }
 
     inline fun <reified T> getMany(cache: CacheConfig, ids: Set<String>)  =
         if (ids.isEmpty()) {
@@ -53,9 +58,8 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
             conn.sync().mset(valuesAsJson)
             log.trace("Lager {} verdier for cache {} med prefix {}", valuesAsJson.values, cache.name, cache.extraPrefix)
             if (!ttl.isZero && !ttl.isNegative) {
-                val commands = conn.sync()
                 for (key in valuesAsJson.keys) {
-                    commands.expire(key, ttl.seconds)
+                    conn.sync().expire(key, ttl.seconds)
                 }
             }
         }

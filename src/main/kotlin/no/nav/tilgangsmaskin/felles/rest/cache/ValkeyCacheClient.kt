@@ -30,7 +30,6 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                 conn.sync().expire(this, ttl.seconds)
             }
         }
-
     }
 
     inline fun <reified T> getMany(cache: CacheConfig, ids: Set<String>)  =

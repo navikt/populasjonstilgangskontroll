@@ -31,6 +31,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import org.springframework.data.redis.cache.RedisCacheConfiguration
+import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import java.time.Duration
 import kotlin.test.assertEquals
@@ -41,7 +42,7 @@ import kotlin.test.assertEquals
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(MockKExtension::class)
 @Import(JacksonAutoConfiguration::class)
-class ValkeyServerTest {
+class ValkeyClientTest {
 
     private val cacheName = CacheConfig("testCache","extra")
 
@@ -68,7 +69,7 @@ class ValkeyServerTest {
 
         val mgr = builder(cf)
             .withInitialCacheConfigurations(mapOf(
-                cacheName.name to RedisCacheConfiguration.defaultCacheConfig()
+                cacheName.name to defaultCacheConfig()
                     .prefixCacheNameWith("myprefix::")
                     .disableCachingNullValues()
             ))

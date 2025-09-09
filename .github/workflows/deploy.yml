@@ -32,7 +32,7 @@ jobs:
           java-version: 21
           distribution: temurin
 
-      - name: Installerer cosign
+      - name: Installer cosign
         uses: sigstore/cosign-installer@main
         with:
           cosign-release: v2.4.1

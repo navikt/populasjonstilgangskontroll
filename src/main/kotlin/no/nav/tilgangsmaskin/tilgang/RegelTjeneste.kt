@@ -59,7 +59,7 @@ class RegelTjeneste(
     @WithSpan
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): BulkRespons {
         val (respons, elapsedTime) = measureTimedValue {
-            log.debug("Kjører bulk regler for {} med {} identer", ansattId, idOgType.size)
+            log.debug("Kjører bulk regler for {} med {} ident(er)", ansattId, idOgType.size)
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val brukere = idOgType.brukerOgRegelsett()
             val resultater = motor.bulkRegler(ansatt, brukere)

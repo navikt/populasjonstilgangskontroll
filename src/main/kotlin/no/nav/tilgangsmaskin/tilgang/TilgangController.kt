@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
-import no.nav.boot.conditionals.EnvUtil
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -43,7 +42,6 @@ class TilgangController(
     private val teller: TokenTypeTeller) {
 
     private val log = getLogger(javaClass)
-
 
     @PostMapping("komplett")
     @ResponseStatus(NO_CONTENT)
@@ -119,8 +117,8 @@ class TilgangController(
     private fun bulkOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, specs: Set<BrukerIdOgRegelsett>,uri: String) =
         with(ansattId()) {
             if (specs.isNotEmpty()) {
-                preCondition(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og $uri")
-                preCondition(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
+                sjekk(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og $uri")
+                sjekk(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
                 tell("bulk")
                 regelTjeneste.bulkRegler( this, specs)
             }
@@ -136,8 +134,8 @@ class TilgangController(
             if (!isProd) {
                 MDC.put("brukerId", brukerId)
             }
-            preCondition(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og $uri")
-            preCondition(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
+            sjekk(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og $uri")
+            sjekk(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")
             tell("single")
             if (regelType == KJERNE_REGELTYPE) {
@@ -152,7 +150,7 @@ class TilgangController(
         teller.tell(Tags.of("type",type,"token",TokenType.from(token).name.lowercase()))
 
 
-    private fun preCondition(predikat: Boolean, status: HttpStatus, message: String) {
+    private fun sjekk(predikat: Boolean, status: HttpStatus, message: String) {
         if (!predikat) throw ResponseStatusException(status,message)
     }
 }

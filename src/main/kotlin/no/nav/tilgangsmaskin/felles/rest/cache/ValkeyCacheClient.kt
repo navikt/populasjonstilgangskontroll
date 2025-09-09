@@ -24,11 +24,13 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
         }
 
     fun putOne(cache: CacheConfig, id: String, value: Any, ttl: Duration)  {
-        val key = handler.toKey(cache,id)
-        conn.sync().set(key, mapper.writeValueAsString(value))
-        if (!ttl.isZero && !ttl.isNegative) {
-            conn.sync().expire(key, ttl.seconds)
+        with(handler.toKey(cache,id)) {
+            conn.sync().set(this, mapper.writeValueAsString(value))
+            if (!ttl.isZero && !ttl.isNegative) {
+                conn.sync().expire(this, ttl.seconds)
+            }
         }
+
     }
 
     inline fun <reified T> getMany(cache: CacheConfig, ids: Set<String>)  =

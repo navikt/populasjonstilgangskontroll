@@ -49,7 +49,7 @@ class RegelMotor(
 
     @WithSpan
     fun bulkRegler(ansatt: Ansatt, brukere: Set<BrukerOgRegelsett>) =
-        (brukere.map { (bruker, type) ->
+        (brukere.map { (originalId, bruker, type) ->
             runCatching {
                 evaluer(ansatt, bruker, type.regelSett())
                 ok(bruker)

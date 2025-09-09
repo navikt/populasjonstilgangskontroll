@@ -74,12 +74,12 @@ class RegelTjeneste(
         return respons
     }
 
-    private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<BulkResultat>) = filterNot { it.brukerId in funnet.map { it.brukerId } }.toSet()
+    private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<BulkResultat>) = filterNot { it.brukerId in funnet.map { it.brukerId.verdi } }
 
     private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) =
         (oppgitt - funnet)
             .map {
-                EnkeltBulkRespons(it.brukerId, NOT_FOUND)
+                EnkeltBulkRespons(BrukerId(it.brukerId), NOT_FOUND)
             }.toSet()
 
     private fun avviste(ansatt: Ansatt, godkjente: Set<EnkeltBulkRespons>, resultater: Set<BulkResultat>, brukere: Set<BrukerOgRegelsett>) =
@@ -98,11 +98,12 @@ class RegelTjeneste(
 
 
     private fun Set<BrukerIdOgRegelsett>.brukerOgRegelsett() =
-        with(associate { it.brukerId.verdi to it.type }) {
+        with(associate { it.brukerId to it }) {
             log.debug("Slår opp {} {}", "bruker".pluralize(keys,"e"), keys.map { it.maskFnr() })
             val brukere = brukerTjeneste.brukere(keys)
-            brukere.map {
-                BrukerOgRegelsett(it, this[it.brukerId.verdi] ?: KOMPLETT_REGELTYPE)
+            brukere.map { bruker ->
+                val idOgType = this[bruker.brukerId.verdi] ?: BrukerIdOgRegelsett(bruker.brukerId.verdi)
+                BrukerOgRegelsett(idOgType.brukerId, bruker, idOgType.type)
             }.toSet()
         }
 

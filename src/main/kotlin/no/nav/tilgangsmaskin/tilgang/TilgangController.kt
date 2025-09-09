@@ -124,7 +124,7 @@ class TilgangController(
             }
             else {
                 log.debug("Ingen brukerId-er oppgitt i bulk forespørsel for {}", this)
-                BulkRespons(this)
+                AggregertBulkRespons(this)
             }
         }
 

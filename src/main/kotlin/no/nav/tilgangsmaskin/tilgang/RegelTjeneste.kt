@@ -12,8 +12,8 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.pluralize
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
-import no.nav.tilgangsmaskin.tilgang.BulkRespons.EnkeltBulkRespons
-import no.nav.tilgangsmaskin.tilgang.BulkRespons.EnkeltBulkRespons.Companion.ok
+import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
+import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Service
@@ -57,7 +57,7 @@ class RegelTjeneste(
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
     @WithSpan
-    fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): BulkRespons {
+    fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): AggregertBulkRespons {
         val (respons, elapsedTime) = measureTimedValue {
             log.debug("Kjører bulk regler for {} med {} ident(er)", ansattId, idOgType.size)
             val ansatt = ansattTjeneste.ansatt(ansattId)
@@ -66,7 +66,7 @@ class RegelTjeneste(
             val godkjente = godkjente(ansatt, resultater)
             val avviste = avviste(ansatt, godkjente, resultater, brukere)
             val ikkeFunnet = ikkeFunnet(idOgType, resultater)
-            BulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {
+            AggregertBulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {
                 log.info("Bulk respons er $it (${it.godkjente.size} godkjente, ${it.avviste.size} avviste, ${it.avviste.size} ikke funnet) for $ansattId")
             }
         }

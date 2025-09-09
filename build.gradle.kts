@@ -34,8 +34,8 @@ repositories {
 
 configurations.all {
     resolutionStrategy {
-        activateDependencyLocking()
-       // failOnNonReproducibleResolution()
+       // activateDependencyLocking()
+        failOnNonReproducibleResolution()
     }
 }
 

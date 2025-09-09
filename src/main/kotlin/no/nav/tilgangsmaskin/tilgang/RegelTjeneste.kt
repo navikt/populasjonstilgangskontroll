@@ -102,7 +102,7 @@ class RegelTjeneste(
             log.debug("Slår opp {} {}", "bruker".pluralize(keys,"e"), keys.map { it.maskFnr() })
             val brukere = brukerTjeneste.brukere(keys)
             brukere.map { bruker ->
-                val idOgType = this[bruker.brukerId.verdi] ?: this[bruker.brukerIds.aktørId?.verdi] ?: BrukerIdOgRegelsett(bruker.brukerId.verdi)
+                val idOgType = this[bruker.brukerId.verdi] ?: this[bruker.aktørId?.verdi] ?: BrukerIdOgRegelsett(bruker.brukerId.verdi)
                 BrukerOgRegelsett(idOgType.brukerId, bruker, idOgType.type)
             }.toSet()
         }

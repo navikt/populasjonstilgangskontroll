@@ -148,13 +148,13 @@ class RegelTjenesteTest {
         every {
             brukere.brukerMedNærmesteFamilie(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId.verdi) } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).aktørId(strengtFortroligAktørId).kreverMedlemskapI(UTENLANDSK).build()
         every {
-            brukere.brukere(setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).aktørId(strengtFortroligAktørId).build().brukerIds.aktørId!!.verdi))
+            brukere.brukere(setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).aktørId(strengtFortroligAktørId).build().aktørId!!.verdi))
         } returns setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).aktørId(strengtFortroligAktørId).kreverMedlemskapI(UTENLANDSK).build())
 
         overstyring.overstyr(ansattId, OverstyringData(
                 BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(
                     UTENLANDSK).build().brukerId, "Dette er en test", IMORGEN))
-        val resultater  =  regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).aktørId(strengtFortroligAktørId).build().brukerIds.aktørId!!.verdi)))
+        val resultater  =  regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).aktørId(strengtFortroligAktørId).build().aktørId!!.verdi)))
 
         assertThat(resultater.avviste.isEmpty())
         assertThat(resultater.godkjente.isEmpty())

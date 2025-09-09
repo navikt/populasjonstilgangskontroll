@@ -31,10 +31,9 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import org.springframework.data.redis.cache.RedisCacheConfiguration
-import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager.builder
+import java.time.Duration
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 @DataRedisTest
 @ContextConfiguration(classes = [TestApp::class])
@@ -101,7 +100,7 @@ class ValkeyServerTest {
         val person1 = Person(id1,aktør1, KommuneTilknytning(Kommune("0301")))
         val person2 = Person(id2, aktør2, KommuneTilknytning(Kommune("1111")))
         val keys = setOf(id1.verdi,id2.verdi)
-        client.putMany(cacheName, mapOf(id1.verdi to person1, id2.verdi to person2))
+        client.putMany(cacheName, mapOf(id1.verdi to person1, id2.verdi to person2), Duration.ofMinutes(5))
         val many = client.getMany<Person>(cacheName,setOf(id1.verdi,id2.verdi))
         assertEquals(keys, many.keys)
         assertEquals(setOf(person1, person2), many.values.toSet())

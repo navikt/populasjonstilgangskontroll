@@ -8,12 +8,12 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
 
 data class BulkRespons(val ansattId: AnsattId, val resultater: Set<EnkeltBulkRespons> = emptySet()) {
-    data class EnkeltBulkRespons(val brukerId: BrukerId, @JsonIgnore val httpStatus: HttpStatus, val detaljer: Any? = null ) {
-        constructor(e: RegelException) : this(e.bruker.brukerId, e.status,e.body)
+    data class EnkeltBulkRespons(val brukerId: String, @JsonIgnore val httpStatus: HttpStatus, val detaljer: Any? = null ) {
+        constructor(e: RegelException) : this(e.bruker.brukerId.verdi, e.status,e.body)
         val status = httpStatus.value()
 
         companion object {
-            fun ok(brukerId: BrukerId) = EnkeltBulkRespons(brukerId, NO_CONTENT)
+            fun ok(brukerId: String) = EnkeltBulkRespons(brukerId, NO_CONTENT)
         }
     }
     @JsonIgnore

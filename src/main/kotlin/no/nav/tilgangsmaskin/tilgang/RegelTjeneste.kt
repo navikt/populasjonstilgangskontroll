@@ -74,25 +74,25 @@ class RegelTjeneste(
         return respons
     }
 
-    private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<BulkResultat>) = filterNot { it.brukerId in funnet.map { it.brukerId.verdi } }
+    private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<BulkResultat>) = filterNot { it.brukerId in funnet.map { it.brukerId } }
 
     private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) =
         (oppgitt - funnet)
             .map {
-                EnkeltBulkRespons(BrukerId(it.brukerId), NOT_FOUND)
+                EnkeltBulkRespons(it.brukerId, NOT_FOUND)
             }.toSet()
 
     private fun avviste(ansatt: Ansatt, godkjente: Set<EnkeltBulkRespons>, resultater: Set<BulkResultat>, brukere: Set<BrukerOgRegelsett>) =
         resultater
             .filter { it.status == FORBIDDEN && it.brukerId !in godkjente.map { g -> g.brukerId } }
-            .map { EnkeltBulkRespons(RegelException(ansatt, brukere.finnBruker(it.brukerId), it.regel!!, status = it.status)) }
+            .map { EnkeltBulkRespons(RegelException(ansatt, brukere.finnBruker(it.bruker.brukerId), it.regel!!, status = it.status)) }
             .toSet()
 
     private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) : Set<EnkeltBulkRespons> {
 
         val (success, fail) = resultater.partition { it.status.is2xxSuccessful }
         val ids = success.map { it.brukerId } +
-                overstyringTjeneste.overstyringer(ansatt.ansattId, fail.map { it.brukerId })
+                overstyringTjeneste.overstyringer(ansatt.ansattId, fail.map { it.bruker.brukerId }).map { it.verdi }
         return ids.map(::ok).toSet()
     }
 
@@ -102,7 +102,7 @@ class RegelTjeneste(
             log.debug("Slår opp {} {}", "bruker".pluralize(keys,"e"), keys.map { it.maskFnr() })
             val brukere = brukerTjeneste.brukere(keys)
             brukere.map { bruker ->
-                val idOgType = this[bruker.brukerId.verdi] ?: BrukerIdOgRegelsett(bruker.brukerId.verdi)
+                val idOgType = this[bruker.brukerId.verdi] ?: this[bruker.brukerIds.aktørId?.verdi] ?: BrukerIdOgRegelsett(bruker.brukerId.verdi)
                 BrukerOgRegelsett(idOgType.brukerId, bruker, idOgType.type)
             }.toSet()
         }

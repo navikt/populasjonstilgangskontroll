@@ -68,7 +68,6 @@ class RegelTjeneste(
             val ikkeFunnet = ikkeFunnet(idOgType, resultater)
             BulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {
                 log.info("Bulk respons er $it (${it.godkjente.size} godkjente, ${it.avviste.size} avviste, ${it.avviste.size} ikke funnet) for $ansattId")
-
             }
         }
         log.info("Tid brukt på bulk med størrelse ${idOgType.size} for $ansattId: ${elapsedTime.inWholeMilliseconds}ms")
@@ -77,17 +76,21 @@ class RegelTjeneste(
 
     private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<BulkResultat>) = filterNot { it.brukerId in funnet.map { it.brukerId } }
 
-    private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) =
-        (oppgitt - funnet)
-            .map {
-                EnkeltBulkRespons(it.brukerId, NOT_FOUND)
-            }.toSet()
+    private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) = buildSet {
+        for (item in (oppgitt - funnet)) {
+            add(EnkeltBulkRespons(item.brukerId, NOT_FOUND))
+        }
+    }
 
     private fun avviste(ansatt: Ansatt, godkjente: Set<EnkeltBulkRespons>, resultater: Set<BulkResultat>, brukere: Set<BrukerOgRegelsett>) =
-        resultater
-            .filter { it.status == FORBIDDEN && it.brukerId !in godkjente.map { g -> g.brukerId } }
-            .map { EnkeltBulkRespons(RegelException(ansatt, brukere.finnBruker(it.bruker.brukerId), it.regel!!, status = it.status)) }
-            .toSet()
+        buildSet {
+        val godkjenteIds = buildSet { godkjente.forEach { add(it.brukerId) } }
+        for (resultat in resultater) {
+            if (resultat.status == FORBIDDEN && resultat.brukerId !in godkjenteIds) {
+                add(EnkeltBulkRespons(RegelException(ansatt, brukere.finnBruker(resultat.bruker.brukerId), resultat.regel!!, status = resultat.status)))
+            }
+        }
+    }
 
     private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) : Set<EnkeltBulkRespons> {
 

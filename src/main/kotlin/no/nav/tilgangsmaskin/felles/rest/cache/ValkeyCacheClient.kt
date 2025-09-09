@@ -43,7 +43,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                 tellOgLog(cache.name, it.size, ids.size)
             }
 
-    fun putMany(cache: CacheConfig, innslag: Map<String, Any>,  ttl: Duration? = null) {
+    fun putMany(cache: CacheConfig, innslag: Map<String, Any>,  ttl: Duration) {
         if (innslag.isEmpty()) {
             log.trace("Skal legge til 0 verdier i cache ${cache.name}, gjør ingenting")
         }
@@ -52,7 +52,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
             val valuesAsJson = keysWithPrefix.mapValues { mapper.writeValueAsString(it.value) }
             conn.sync().mset(valuesAsJson)
             log.trace("Lager {} verdier for cache {} med prefix {}", valuesAsJson.values, cache.name, cache.extraPrefix)
-            if (ttl != null && !ttl.isZero && !ttl.isNegative) {
+            if (!ttl.isZero && !ttl.isNegative) {
                 val commands = conn.sync()
                 for (key in valuesAsJson.keys) {
                     commands.expire(key, ttl.seconds)

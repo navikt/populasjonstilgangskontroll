@@ -66,12 +66,12 @@ class RegelTjeneste(
             val godkjente = godkjente(ansatt, resultater)
             val avviste = avviste(ansatt, godkjente, resultater, brukere).also {
                 if (it.isNotEmpty()) {
-                    log.warn("Fant ${it.size} av ${idOgType.size} som er avvist for $ansattId: ${it.map { it.brukerId.maskFnr() }}")
+                    log.warn("Fant ${it.size} av ${idOgType.size} som er avvist for $ansattId: $it")
                 }
             }
             val ikkeFunnet = ikkeFunnet(idOgType, resultater).also {
                 if (it.isNotEmpty()) {
-                    log.warn("Fant ikke ${it.size} av totalt ${idOgType.size}  for $ansattId: ${it.map { it.brukerId.maskFnr() }}")
+                    log.warn("Fant ikke ${it.size} av totalt ${idOgType.size}  for $ansattId: $it")
                 }
             }
             AggregertBulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {

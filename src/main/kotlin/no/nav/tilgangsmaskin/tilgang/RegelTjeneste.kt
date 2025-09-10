@@ -67,7 +67,7 @@ class RegelTjeneste(
             val godkjente = godkjente(ansatt, resultater)
             val avviste = avviste(ansatt, godkjente, resultater, brukere)
             val ikkeFunnet = ikkeFunnet(idOgType, resultater)
-            
+
             AggregertBulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {
                 log.info("Bulk respons (${it.godkjente.size} godkjent(e), ${it.avviste.size} avvist(e), ${it.avviste.size} ikke funnet) for $ansattId er $it ")
                 if (avviste.isNotEmpty()) {

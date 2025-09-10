@@ -24,7 +24,8 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
         log.debug("Bulk brukere slår opp: ${brukerIds.joinToString { it.maskFnr() }}")
         val personer =  personTjeneste.personer(brukerIds)
         log.debug("Bulk brukere slo opp {} av {} personer i PDL ({})", personer.size,brukerIds.size, personer)
-        val notFound = brukerIds - personer.map { it.brukerId.verdi }.toSet()
+        val notFound = brukerIds - (personer.map { it.brukerId.verdi }.toSet())
+        log.debug("Bulk ikke funnet {}", notFound)
         val found =  personer.map { it.brukerId }.toSet()
         if (notFound.isNotEmpty()) {
             log.warn("Bulk brukere fant ikke $notFound")

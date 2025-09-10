@@ -21,7 +21,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
             log.debug("Ingen brukere å slå opp")
             return emptySet()
         }
-        log.debug("Bulk brukere slår opp: ${brukerIds.joinToString { it.maskFnr() }}")
+        log.debug("Bulk brukere slår opp $brukerIds")
         val personer =  personTjeneste.personer(brukerIds)
         log.debug("Bulk brukere slo opp {} av {} personer i PDL ({})", personer.size,brukerIds.size, personer)
         val notFound = brukerIds - (personer.map { it.brukerId.verdi }.toSet())

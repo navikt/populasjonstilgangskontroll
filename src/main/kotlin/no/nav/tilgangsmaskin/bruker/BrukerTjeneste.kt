@@ -18,29 +18,30 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
     @WithSpan
     fun brukere(brukerIds: Set<String>) : Set<Bruker> {
         if (brukerIds.isEmpty()) {
-            log.info("Bulk ingen personer å slå opp")
+            log.debug("${"bruker".pluralize(brukerIds, ingen = "Ingen")} å slå opp")
             return emptySet()
         }
+        log.debug("Slår opp ${"bruker".pluralize(brukerIds,"e")}: ${brukerIds.joinToString { it.maskFnr() }}")
         val personer =  personTjeneste.personer(brukerIds)
         val notFound = brukerIds - personer.map { it.brukerId.verdi }.toSet()
         val found =  personer.map { it.brukerId }.toSet()
         if (notFound.isNotEmpty()) {
-            log.warn("Bulk fant ikke ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
+            log.warn("Fant ikke ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
         }
         if (found.isNotEmpty()) {
-            log.info("Bulk slo opp ${found.size} person(er) av totalt ${brukerIds.size}")
+            log.trace("Bulk slo opp  ${"person".pluralize(found)} ${found.joinToString { it.verdi.maskFnr() }}")
         }
 
         return found.let { p ->
             if (p.isNotEmpty()) {
-                log.trace("Bulk slår opp {} for {}", "skjerming".pluralize(p), p)
+                log.trace("Bulk slår opp ${"skjerming".pluralize(p)} for $p")
                 val skjerminger = skjermingTjeneste.skjerminger(p)
                 log.trace("Bulk slo opp ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
                 personer.map {
                     tilBruker(it, skjerminger[it.brukerId] ?: false)
                 }
             } else {
-                log.debug("Bulk ${"skjerming".pluralize(p, ingen = "Ingen")} å slå opp")
+                log.debug("${"skjerming".pluralize(p, ingen = "Ingen")} å slå opp")
                 emptyList()
             }.toSet()
         }

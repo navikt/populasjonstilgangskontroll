@@ -57,11 +57,11 @@ class PdlRestClientAdapter(
         }
 
         return  mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, ids))
-            .mapValues {
-                    (_, pdlRespons) -> pdlRespons?.let(::tilPerson)
-            }
             .filterValues {
                 it != null
+            }
+            .mapValues {
+                    (_, pdlRespons) -> pdlRespons?.let(::tilPerson)
             }
             .mapValues {
                 it.value!!

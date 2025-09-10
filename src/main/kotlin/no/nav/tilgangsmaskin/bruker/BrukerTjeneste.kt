@@ -21,7 +21,6 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
             log.debug("${"bruker".pluralize(brukerIds, ingen = "Ingen")} å slå opp")
             return emptySet()
         }
-        log.debug("Slår opp ${"bruker".pluralize(brukerIds,"e")}: ${brukerIds.joinToString { it.maskFnr() }}")
         val personer =  personTjeneste.personer(brukerIds)
         val notFound = brukerIds - personer.map { it.brukerId.verdi }.toSet()
         val found =  personer.map { it.brukerId }.toSet()
@@ -29,7 +28,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
             log.warn("Fant ikke ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
         }
         if (found.isNotEmpty()) {
-            log.trace("Bulk slo opp  ${"person".pluralize(found)} ${found.joinToString { it.verdi.maskFnr() }}")
+            log.info("Bulk slo opp ${found.size} person(er) av totalt ${brukerIds.size}")
         }
 
         return found.let { p ->

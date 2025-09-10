@@ -26,7 +26,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
         val notFound = brukerIds - personer.map { it.brukerId.verdi }.toSet()
         val found =  personer.map { it.brukerId }.toSet()
         if (notFound.isNotEmpty()) {
-            log.debug("Fant ikke ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
+            log.warn("Fant ikke ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
         }
         if (found.isNotEmpty()) {
             log.trace("Bulk slo opp  ${"person".pluralize(found)} ${found.joinToString { it.verdi.maskFnr() }}")

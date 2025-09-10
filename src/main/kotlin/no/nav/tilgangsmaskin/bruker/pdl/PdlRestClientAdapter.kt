@@ -34,6 +34,7 @@ class PdlRestClientAdapter(
     fun personer(ids: Set<String>) : Set<Person> {
         val fraCache = fraCache(ids)
         if (fraCache.size == ids.size) {
+            log.trace("Bulk fant alt i cache for ${ids.size} ident(er) $fraCache")
             return fraCache.values.toSet()
         }
         val fraRest = fraRest(ids  - fraCache.keys)

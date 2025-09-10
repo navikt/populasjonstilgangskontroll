@@ -18,7 +18,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
     @WithSpan
     fun brukere(brukerIds: Set<String>) : Set<Bruker> {
         if (brukerIds.isEmpty()) {
-            log.debug("${"bruker".pluralize(brukerIds, ingen = "Ingen")} å slå opp")
+            log.debug("Ingen brukere å slå opp")
             return emptySet()
         }
         log.debug("Bulk brukere slår opp: ${brukerIds.joinToString { it.maskFnr() }}")

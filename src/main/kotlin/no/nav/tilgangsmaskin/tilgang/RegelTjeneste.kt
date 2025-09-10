@@ -14,6 +14,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
+import org.jboss.logging.MDC
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Service
@@ -67,11 +68,13 @@ class RegelTjeneste(
             val avviste = avviste(ansatt, godkjente, resultater, brukere).also {
                 if (it.isNotEmpty()) {
                     log.warn("Fant ${it.size} av ${idOgType.size} som er avvist for $ansattId: $it")
+                    MDC.put("avviste",it.toString())
                 }
             }
             val ikkeFunnet = ikkeFunnet(idOgType, resultater).also {
                 if (it.isNotEmpty()) {
                     log.warn("Fant ikke ${it.size} av totalt ${idOgType.size}  for $ansattId: $it")
+                    MDC.put("ikkeFunnet",it.toString())
                 }
             }
             AggregertBulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {

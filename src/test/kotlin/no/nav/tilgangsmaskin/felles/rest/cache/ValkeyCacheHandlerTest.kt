@@ -34,31 +34,25 @@ class ValkeyCacheKeyHandlerTest {
     @Test
     @DisplayName("toKey adds prefix and key")
     fun toKey_addsPrefixAndKey() {
-        val result = handler.toKey(UTEN_EXTRA, key)
-        assertEquals("$prefix$key", result)
+        assertEquals("$prefix$key", handler.toKey(UTEN_EXTRA, key))
     }
 
     @Test
     @DisplayName("toKey adds extraPrefix when provided")
     fun toKey_addsExtraPrefix() {
-        val result = handler.toKey(MED_EXTRA, key)
-        assertEquals("$prefix${MED_EXTRA.extraPrefix}:$key", result)
+        assertEquals("$prefix${MED_EXTRA.extraPrefix}:$key", handler.toKey(MED_EXTRA, key))
     }
 
     @Test
     @DisplayName("fromKey removes prefix and extraPrefix")
     fun fromKey_removesPrefixAndExtraPrefix() {
-        val fullKey = "$prefix${MED_EXTRA.extraPrefix}:$key"
-        val result = handler.fromKey(MED_EXTRA, fullKey)
-        assertEquals(key, result)
+        assertEquals(key, handler.fromKey(MED_EXTRA, "${prefix}${MED_EXTRA.extraPrefix}:${key}"))
     }
 
     @Test
     @DisplayName("fromKey removes only prefix when extraPrefix is null")
     fun fromKey_removesOnlyPrefix() {
-        val fullKey = "$prefix$key"
-        val result = handler.fromKey(UTEN_EXTRA, fullKey)
-        assertEquals(key, result)
+        assertEquals(key, handler.fromKey(UTEN_EXTRA, "${prefix}${key}"))
     }
 
     @Test

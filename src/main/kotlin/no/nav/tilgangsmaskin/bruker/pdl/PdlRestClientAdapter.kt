@@ -37,7 +37,7 @@ class PdlRestClientAdapter(
             return fraCache.values.toSet()
         }
         val fraRest = fraRest(ids  - fraCache.keys)
-        log.trace("Bulk hentet ${fraRest.size} person(er) fra rest for ${ids.size} ident(er)")
+        log.trace("Bulk fant ${fraRest.size} person(er) fra rest for ${ids.size} ident(er)")
         cache.putMany(PDL_CACHE, fraRest, cf.varighet)
         return (fraRest.values + fraCache.values).toSet()
     }
@@ -48,7 +48,7 @@ class PdlRestClientAdapter(
             return emptyMap()
         }
         val innslag = cache.getMany<Person>(PDL_CACHE, ids)
-        log.trace("Bulk hentet ${innslag.size} person(er) fra cache for ${ids.size} ident(er)")
+        log.trace("Bulk fant ${innslag.size} person(er) fra cache for ${ids.size} ident(er)")
         return innslag
     }
 

@@ -67,7 +67,7 @@ class RegelTjeneste(
             val avviste = avviste(ansatt, godkjente, resultater, brukere)
             val ikkeFunnet = ikkeFunnet(idOgType, resultater)
             AggregertBulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {
-                log.info("Bulk respons er $it (${it.godkjente.size} godkjente, ${it.avviste.size} avviste, ${it.avviste.size} ikke funnet) for $ansattId")
+                log.info("Bulk respons (${it.godkjente.size} godkjent(e), ${it.avviste.size} avvist(e), ${it.avviste.size} ikke funnet) for $ansattId er $it ")
             }
         }
         log.info("Tid brukt på bulk med størrelse ${idOgType.size} for $ansattId: ${elapsedTime.inWholeMilliseconds}ms")

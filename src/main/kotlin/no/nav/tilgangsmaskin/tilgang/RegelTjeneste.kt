@@ -64,10 +64,24 @@ class RegelTjeneste(
             val brukere = idOgType.brukerOgRegelsett()
             val resultater = motor.bulkRegler(ansatt, brukere)
             val godkjente = godkjente(ansatt, resultater)
-            val avviste = avviste(ansatt, godkjente, resultater, brukere)
-            val ikkeFunnet = ikkeFunnet(idOgType, resultater)
+            val avviste = avviste(ansatt, godkjente, resultater, brukere).also {
+                if (it.isNotEmpty()) {
+                    log.warn("Fant ${it.size} av ${idOgType.size} som er avvist for $ansattId: ${it.map { it.brukerId.maskFnr() }}")
+                }
+            }
+            val ikkeFunnet = ikkeFunnet(idOgType, resultater).also {
+                if (it.isNotEmpty()) {
+                    log.warn("Fant ikke ${it.size} av totalt ${idOgType.size}  for $ansattId: ${it.map { it.brukerId.maskFnr() }}")
+                }
+            }
             AggregertBulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {
                 log.info("Bulk respons (${it.godkjente.size} godkjent(e), ${it.avviste.size} avvist(e), ${it.avviste.size} ikke funnet) for $ansattId er $it ")
+                if (avviste.isNotEmpty()) {
+                    log.warn("Avviste $avviste")
+                }
+                if (ikkeFunnet.isNotEmpty()) {
+                    log.warn("Ikke funnet $ikkeFunnet")
+                }
             }
         }
         log.info("Tid brukt på bulk med størrelse ${idOgType.size} for $ansattId: ${elapsedTime.inWholeMilliseconds}ms")

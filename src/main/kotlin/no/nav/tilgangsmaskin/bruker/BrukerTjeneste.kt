@@ -21,28 +21,28 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
             log.debug("${"bruker".pluralize(brukerIds, ingen = "Ingen")} å slå opp")
             return emptySet()
         }
-        log.debug("Bulk slår opp ${"bruker".pluralize(brukerIds,"e")}: ${brukerIds.joinToString { it.maskFnr() }}")
+        log.debug("Bulk brukere slår opp: ${brukerIds.joinToString { it.maskFnr() }}")
         val personer =  personTjeneste.personer(brukerIds)
-        log.debug("Bulk slo opp {} av {} personer i PDL ({})", personer.size,brukerIds.size, personer)
+        log.debug("Bulk brukere slo opp {} av {} personer i PDL ({})", personer.size,brukerIds.size, personer)
         val notFound = brukerIds - personer.map { it.brukerId.verdi }.toSet()
         val found =  personer.map { it.brukerId }.toSet()
         if (notFound.isNotEmpty()) {
-            log.warn("Bulk fant ikke ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
+            log.warn("Bulk brukere fant ikke $notFound")
         }
         if (found.isNotEmpty()) {
-            log.trace("Bulk slo opp  ${"person".pluralize(found)} ${found.joinToString { it.verdi.maskFnr() }}")
+            log.trace("Bulk brukere slo opp {}", found)
         }
 
         return found.let { p ->
             if (p.isNotEmpty()) {
-                log.trace("Bulk slår opp {} for {}", "skjerming".pluralize(p), p)
+                log.trace("Bulk skjerming slår opp {} for {}", "skjerming".pluralize(p), p)
                 val skjerminger = skjermingTjeneste.skjerminger(p)
-                log.trace("Bulk slo opp ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
+                log.trace("Bulk skjerming slo opp ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
                 personer.map {
                     tilBruker(it, skjerminger[it.brukerId] ?: false)
                 }
             } else {
-                log.debug("${"skjerming".pluralize(p, ingen = "Ingen")} å slå opp")
+                log.debug("Bulk skjerming ingen å slå opp")
                 emptyList()
             }.toSet()
         }

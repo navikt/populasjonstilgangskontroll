@@ -27,7 +27,7 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
             return fraCache.mapKeys { BrukerId(it.key) }
         }
         val fraRest = fraRest(ids - fraCache.keys)
-        cache.putMany(SKJERMING_CACHE, fraRest)
+        cache.putMany(SKJERMING_CACHE, fraRest, cf.varighet)
         tell(false)
         return (fraRest + fraCache).mapKeys {  BrukerId(it.key) }
     }

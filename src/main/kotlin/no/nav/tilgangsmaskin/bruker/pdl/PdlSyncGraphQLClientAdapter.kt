@@ -11,6 +11,7 @@ import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.graphql.client.GraphQlClient
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.TEXT_PLAIN
@@ -45,7 +46,7 @@ class PdlSyncGraphQLClientAdapter(
                 }
             }.toSet()
         }.getOrElse {
-            if (it is IrrecoverableRestException && it.statusCode == HttpStatus.NOT_FOUND) {
+            if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {
                 log.trace("Fant ingen partnere for $ident")
                 return emptySet<Familie.FamilieMedlem>()
             }

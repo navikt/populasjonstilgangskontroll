@@ -29,6 +29,7 @@ data class BrukerBuilder(
     var barn: Set<FamilieMedlem> = emptySet(),
     var partnere: Set<FamilieMedlem> = emptySet(),
     var dødsdato: LocalDate? = null) {
+    fun aktørId(aktørId: AktørId) = apply { this.aktørId = aktørId }
     fun gt(gt: GeografiskTilknytning) = apply { this.gt = gt }
     fun kreverMedlemskapI(vararg grupper: GlobalGruppe) = apply { this.grupper = setOf(*grupper) }
     fun barn(barn: Set<BrukerId>) = apply { this.barn = barn.tilFamilieMedlemmer(BARN) }

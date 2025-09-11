@@ -32,12 +32,14 @@ class PdlRestClientAdapter(
 
     @WithSpan
     fun personer(ids: Set<String>) : Set<Person> {
-        val fraCache = fraCache( ids)
+        val fraCache = fraCache(ids)
         if (fraCache.size == ids.size) {
+            log.trace("Bulk fant alt i cache for ${ids.size} ident(er) $fraCache")
             return fraCache.values.toSet()
         }
         val fraRest = fraRest(ids  - fraCache.keys)
-        cache.putMany(PDL_CACHE, fraRest, EXTRA)
+        log.trace("Bulk fant ${fraRest.size} person(er) fra rest for ${ids.size} ident(er)")
+        cache.putMany(PDL_CACHE, fraRest, cf.varighet)
         return (fraRest.values + fraCache.values).toSet()
     }
 
@@ -47,7 +49,7 @@ class PdlRestClientAdapter(
             return emptyMap()
         }
         val innslag = cache.getMany<Person>(PDL_CACHE, ids)
-        log.trace("Hentet ${innslag.size} person(er) fra cache for ${ids.size} ident(er)")
+        log.trace("Bulk fant ${innslag.size} person(er) fra cache for ${ids.size} ident(er)")
         return innslag
     }
 
@@ -57,11 +59,11 @@ class PdlRestClientAdapter(
         }
 
         return  mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, ids))
-            .mapValues {
-                    (_, pdlRespons) -> pdlRespons?.let(::tilPerson)
-            }
             .filterValues {
                 it != null
+            }
+            .mapValues {
+                    (_, pdlRespons) -> pdlRespons?.let(::tilPerson)
             }
             .mapValues {
                 it.value!!

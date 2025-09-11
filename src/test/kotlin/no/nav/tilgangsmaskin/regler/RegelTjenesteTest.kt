@@ -60,7 +60,7 @@ class RegelTjenesteTest {
     private val fortroligBrukerId = BrukerId("08526835672")
     private val vanligBrukerId = BrukerId("08526835670")
     private val ansattId = AnsattId("Z999999")
-
+    private val dnr = BrukerId("12345678910")
 
     @Autowired
     private lateinit var repo: OverstyringRepository
@@ -141,6 +141,25 @@ class RegelTjenesteTest {
         assertThat(resultater.avviste).hasSize(2)
         assertThat(resultater.godkjente).isEmpty()
         assertThat(resultater.ukjente).isEmpty()
+    }
+    @Test
+    @DisplayName("Verifiser at et dnr som senere har blitt erstattet med et fnr, ikke avvises")
+    fun dnr() {
+        every {
+            brukere.brukerMedNærmesteFamilie(BrukerBuilder(dnr).build().brukerId.verdi)
+        } returns BrukerBuilder(vanligBrukerId).historiske(setOf(dnr)).build()
+        assertThatCode {
+            regler.kompletteRegler(ansattId, dnr.verdi)
+        }.doesNotThrowAnyException()
+    }
+    @Test
+    @DisplayName("Verifiser at et dnr som senere har blitt erstattet med et fnr, ikke avvises i bulk")
+    fun dnrBulk() {
+       every {
+            brukere.brukere(setOf(dnr.verdi))
+        } returns setOf(BrukerBuilder(vanligBrukerId).historiske(setOf(dnr)).build())
+        val resultat = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(dnr.verdi)))
+        assertThat(resultat.godkjente.isNotEmpty())
     }
 
     @Test

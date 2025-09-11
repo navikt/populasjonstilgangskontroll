@@ -76,7 +76,9 @@ class RegelTjeneste(
         return respons
     }
 
-    private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<BulkResultat>) = filterNot { it.brukerId in funnet.map { it.brukerId } }
+    private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<BulkResultat>) = filterNot { brukerIdOgRegelsett ->
+        brukerIdOgRegelsett.brukerId in (funnet.map { it.bruker.historiskeIds} + funnet.map { it.brukerId })
+    }
 
     private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) = buildSet {
         for (item in (oppgitt - funnet)) {

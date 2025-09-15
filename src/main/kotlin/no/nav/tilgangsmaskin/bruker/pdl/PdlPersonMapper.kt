@@ -31,11 +31,12 @@ import org.slf4j.LoggerFactory.getLogger
 object PdlPersonMapper {
     private val log = getLogger(javaClass)
 
-    fun tilPerson(data: PdlRespons) =
+    fun tilPerson(oppslagId: String,data: PdlRespons) =
         with(data) {
 
             Person(
                 BrukerId(brukerId),
+                oppslagId,
                 AktørId(aktørId),
                 tilGeoTilknytning(geografiskTilknytning),
                 tilGraderinger(person.adressebeskyttelse),

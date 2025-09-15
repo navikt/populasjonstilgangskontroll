@@ -12,7 +12,6 @@ import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.BARN
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.FAR
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.MOR
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UdefinertTilknytning
@@ -38,7 +37,7 @@ data class BrukerBuilder(
     fun partnere(partnere: Set<BrukerId>) = apply { this.partnere = partnere.tilFamilieMedlemmer(PARTNER) }
     fun historiske(historiske: Set<BrukerId>) = apply { this.historiske = historiske }
     fun build() = Bruker(
-            BrukerIds(id, historiske, aktørId),
+            BrukerIds(id, id.verdi,historiske, aktørId),
             gt, grupper,
             Familie(setOfNotNull(mor, far), barn, søsken, partnere),
             dødsdato)

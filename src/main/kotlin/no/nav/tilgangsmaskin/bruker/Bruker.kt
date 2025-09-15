@@ -15,7 +15,9 @@ data class Bruker(
         val dødsdato: LocalDate? = null) {
 
     @JsonIgnore
-    val brukerId = brukerIds.brukerId
+    val brukerId = brukerIds.aktivBrukerId
+
+    val oppslagId = brukerIds.oppslagId
 
     @JsonIgnore
     val aktørId = brukerIds.aktørId
@@ -39,7 +41,8 @@ data class Bruker(
     val harUtenlandskBosted = geografiskTilknytning is UtenlandskTilknytning
     infix fun kreverMedlemskapI(gruppe: GlobalGruppe) = gruppe in påkrevdeGrupper
 
-    data class BrukerIds(val brukerId: BrukerId,
+    data class BrukerIds(val aktivBrukerId: BrukerId,
+                         val oppslagId: String,
                          val historiskeIds: Set<BrukerId> = emptySet(),
                          val aktørId: AktørId? = null)
 

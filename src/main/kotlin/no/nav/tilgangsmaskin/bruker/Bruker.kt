@@ -42,7 +42,7 @@ data class Bruker(
     infix fun kreverMedlemskapI(gruppe: GlobalGruppe) = gruppe in påkrevdeGrupper
 
     data class BrukerIds(val aktivBrukerId: BrukerId,
-                         val oppslagId: String,
+                         val oppslagId: String = aktivBrukerId.verdi,
                          val historiskeIds: Set<BrukerId> = emptySet(),
                          val aktørId: AktørId? = null)
 

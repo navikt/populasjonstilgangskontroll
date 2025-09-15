@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Component
 import io.opentelemetry.instrumentation.annotations.WithSpan
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 
 @Component
 class RegelMotor(
@@ -49,13 +50,14 @@ class RegelMotor(
 
     @WithSpan
     fun bulkRegler(ansatt: Ansatt, brukere: Set<BrukerOgRegelsett>) =
-        (brukere.map { (originalId, bruker, type) ->
+        (brukere.map { (bruker, type) ->
             runCatching {
+                logger.trace("Evaluerer ${bruker.oppslagId.maskFnr()}")
                 evaluer(ansatt, bruker, type.regelSett())
-                ok(originalId,bruker)
+                ok(bruker)
             }.getOrElse {
                 if (it is RegelException) {
-                    avvist(originalId, bruker,it)
+                    avvist(bruker,it)
                 } else throw it
             }
         }.toSet()).also {
@@ -77,8 +79,8 @@ class RegelMotor(
 
 data class BulkResultat(val brukerId: String, val bruker: Bruker,val status: HttpStatus, val regel: Regel? = null) {
     companion object {
-        fun ok(brukerId: String, bruker: Bruker) = BulkResultat(brukerId, bruker,NO_CONTENT)
-        fun avvist(brukerId: String, bruker: Bruker,e: RegelException) = BulkResultat(brukerId, bruker,FORBIDDEN, e.regel)
+        fun ok(bruker: Bruker) = BulkResultat(bruker.oppslagId, bruker,NO_CONTENT)
+        fun avvist(bruker: Bruker,e: RegelException) = BulkResultat(bruker.oppslagId, bruker,FORBIDDEN, e.regel)
 
     }
 }

@@ -110,8 +110,8 @@ class RegelTjeneste(
             log.debug("Slår opp {} {}", "bruker".pluralize(keys,"e"), keys.map { it.maskFnr() })
             val brukere = brukerTjeneste.brukere(keys)
             brukere.map { bruker ->
-                val idOgType = this[bruker.brukerId.verdi] ?: this[bruker.aktørId?.verdi] ?: BrukerIdOgRegelsett(bruker.brukerId.verdi)
-                BrukerOgRegelsett(idOgType.brukerId, bruker, idOgType.type)
+                val idOgType = this[bruker.oppslagId] ?: throw IllegalStateException("Bruker ${bruker.brukerId} har ikke oppslagId")
+                BrukerOgRegelsett(bruker, idOgType.type)
             }.toSet()
         }
 

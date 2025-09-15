@@ -19,6 +19,7 @@
     </appender>
 
     <springProfile name="dev">
+        <logger name="io.lettuce.core.protocol.ReconnectionHandler" level="warn"/>
         <logger name="org.springframework.cache" level="info"/>
         <logger name="org.springframework.data.redis" level="info"/>
         <logger name="no.nav.tilgangsmaskin" level="debug"/>

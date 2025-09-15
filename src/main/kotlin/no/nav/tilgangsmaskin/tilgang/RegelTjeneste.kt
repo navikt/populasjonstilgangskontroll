@@ -107,8 +107,9 @@ class RegelTjeneste(
 
     private fun Set<BrukerIdOgRegelsett>.brukerOgRegelsett() =
         with(associate { it.brukerId to it }) {
-            log.debug("Slår opp {} {}", "bruker".pluralize(keys,"e"), keys.map { it.maskFnr() })
+            log.debug("Slår opp keys $keys")
             val brukere = brukerTjeneste.brukere(keys)
+            log.debug("Fant $brukere av ${keys.size} brukere ved oppslag for keys $keys")
             brukere.map { bruker ->
                 val idOgType = this[bruker.oppslagId] ?: throw IllegalStateException("Bruker ${bruker.brukerId} har ikke oppslagId")
                 BrukerOgRegelsett(bruker, idOgType.type)

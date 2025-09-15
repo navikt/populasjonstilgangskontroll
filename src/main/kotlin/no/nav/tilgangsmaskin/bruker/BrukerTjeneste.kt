@@ -17,6 +17,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
 
     @WithSpan
     fun brukere(brukerIds: Set<String>) : Set<Bruker> {
+        log.info("Mottok bulk kall for $brukerIds")
         if (brukerIds.isEmpty()) {
             log.info("Bulk ingen personer å slå opp")
             return emptySet()
@@ -57,7 +58,9 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
     @WithSpan
     private fun brukerMedSkjerming(id: String, hentFamilie: (String) -> Person) =
         with(hentFamilie(id)) {
-            tilBruker(this, skjermingTjeneste.skjerming(brukerId))
+            tilBruker(this, skjermingTjeneste.skjerming(brukerId)).also {
+                log.trace("Bruker er {}", it)
+            }
         }
             /*
             val statuser = skjermingTjeneste.skjerminger(historiskeIds + brukerId)

@@ -27,7 +27,9 @@ data class BrukerBuilder(
     var far: FamilieMedlem? = null,
     var barn: Set<FamilieMedlem> = emptySet(),
     var partnere: Set<FamilieMedlem> = emptySet(),
+    var oppslagId: String = id.verdi,
     var dødsdato: LocalDate? = null) {
+    fun oppslagId(oppslagId: String) = apply { this.oppslagId = oppslagId }
     fun aktørId(aktørId: AktørId) = apply { this.aktørId = aktørId }
     fun gt(gt: GeografiskTilknytning) = apply { this.gt = gt }
     fun kreverMedlemskapI(vararg grupper: GlobalGruppe) = apply { this.grupper = setOf(*grupper) }
@@ -37,7 +39,7 @@ data class BrukerBuilder(
     fun partnere(partnere: Set<BrukerId>) = apply { this.partnere = partnere.tilFamilieMedlemmer(PARTNER) }
     fun historiske(historiske: Set<BrukerId>) = apply { this.historiske = historiske }
     fun build() = Bruker(
-            BrukerIds(id, id.verdi,historiske, aktørId),
+            BrukerIds(id, oppslagId,historiske, aktørId),
             gt, grupper,
             Familie(setOfNotNull(mor, far), barn, søsken, partnere),
             dødsdato)

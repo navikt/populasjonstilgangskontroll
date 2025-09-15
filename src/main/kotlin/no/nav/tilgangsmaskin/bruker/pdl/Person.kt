@@ -13,13 +13,14 @@ import java.time.LocalDate
 
 @JsonCacheable
 data class Person(
-        val brukerId: BrukerId,
-        val aktørId: AktørId,
-        val geoTilknytning: GeografiskTilknytning,
-        val graderinger: List<Gradering> = emptyList(),
-        val familie: Familie = INGEN,
-        val dødsdato: LocalDate? = null,
-        val historiskeIds: Set<BrukerId> = emptySet())  {
+    val aktivBrukerId: BrukerId,
+    val oppslagId: String,
+    val aktørId: AktørId,
+    val geoTilknytning: GeografiskTilknytning,
+    val graderinger: List<Gradering> = emptyList(),
+    val familie: Familie = INGEN,
+    val dødsdato: LocalDate? = null,
+    val historiskeIds: Set<BrukerId> = emptySet())  {
 
     @JsonIgnore
     val foreldre = familie.foreldre

@@ -33,8 +33,8 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager.builder
-import java.time.Duration
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @DataRedisTest
 @ContextConfiguration(classes = [TestApp::class])
@@ -42,7 +42,7 @@ import kotlin.test.assertEquals
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(MockKExtension::class)
 @Import(JacksonAutoConfiguration::class)
-class ValkeyClientTest {
+class ValkeyServerTest {
 
     private val cacheName = CacheConfig("testCache","extra")
 
@@ -69,7 +69,7 @@ class ValkeyClientTest {
 
         val mgr = builder(cf)
             .withInitialCacheConfigurations(mapOf(
-                cacheName.name to defaultCacheConfig()
+                cacheName.name to RedisCacheConfiguration.defaultCacheConfig()
                     .prefixCacheNameWith("myprefix::")
                     .disableCachingNullValues()
             ))
@@ -85,8 +85,8 @@ class ValkeyClientTest {
     @Test
     fun putAndGetOne() {
         val id = BrukerId("03508331575")
-        val person = Person(id, AktørId("1234567890123"), KommuneTilknytning(Kommune("0301")))
-        client.putOne(cacheName, id.verdi,person, Duration.ofMinutes(5))
+        val person = Person(id, id.verdi,AktørId("1234567890123"), KommuneTilknytning(Kommune("0301")))
+        client.putOne(cacheName, id.verdi,person)
         val one = client.getOne<Person>(cacheName,id.verdi)
         assertEquals(person, one)
     }
@@ -98,10 +98,10 @@ class ValkeyClientTest {
         val id2 = BrukerId("20478606614")
         val aktør1 = AktørId("1234567890123")
         val aktør2 = AktørId("1111111111111")
-        val person1 = Person(id1,aktør1, KommuneTilknytning(Kommune("0301")))
-        val person2 = Person(id2, aktør2, KommuneTilknytning(Kommune("1111")))
+        val person1 = Person(id1,id1.verdi,aktør1, KommuneTilknytning(Kommune("0301")))
+        val person2 = Person(id2, id2.verdi,aktør2, KommuneTilknytning(Kommune("1111")))
         val keys = setOf(id1.verdi,id2.verdi)
-        client.putMany(cacheName, mapOf(id1.verdi to person1, id2.verdi to person2), Duration.ofMinutes(5))
+        client.putMany(cacheName, mapOf(id1.verdi to person1, id2.verdi to person2))
         val many = client.getMany<Person>(cacheName,setOf(id1.verdi,id2.verdi))
         assertEquals(keys, many.keys)
         assertEquals(setOf(person1, person2), many.values.toSet())

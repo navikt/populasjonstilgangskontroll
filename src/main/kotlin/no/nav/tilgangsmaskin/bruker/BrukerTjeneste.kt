@@ -14,22 +14,34 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
     private val log = getLogger(javaClass)
 
     @WithSpan
-    fun brukere(brukerIds: Set<String>): Set<Bruker> {
+    fun brukere(brukerIds: Set<String>) : Set<Bruker> {
         if (brukerIds.isEmpty()) {
-            log.debug("Ingen brukere å slå opp")
+            log.info("Bulk ingen personer å slå opp")
             return emptySet()
         }
-        val personer = personTjeneste.personer(brukerIds)
-        log.debug("Bulk brukere slo opp {} av {} personer i PDL ({})", personer.size, brukerIds.size, personer)
-        if (personer.isEmpty()) {
-            log.debug("Bulk skjerming ingenting å slå opp")
-            return emptySet()
+        val personer =  personTjeneste.personer(brukerIds)
+        val notFound = brukerIds - personer.map { it.aktivBrukerId.verdi }.toSet()
+        val found =  personer.map { it.aktivBrukerId }.toSet()
+        if (notFound.isNotEmpty()) {
+            log.warn("Bulk fant ikke ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
         }
-        val ids = personer.map { it.brukerId }.toSet()
-        log.trace("Bulk skjerming slår opp ${ids.size} skjerminger")
-        val skjerminger = skjermingTjeneste.skjerminger(ids)
-        log.trace("Bulk skjerming slo opp ${skjerminger.size} skjerminger")
-        return personer.map { tilBruker(it, skjerminger[it.brukerId] ?: false) }.toSet()
+        if (found.isNotEmpty()) {
+            log.info("Bulk slo opp ${found.size} person(er) av totalt ${brukerIds.size}")
+        }
+
+        return found.let { p ->
+            if (p.isNotEmpty()) {
+                log.trace("Bulk slår opp {} for {}", "skjerming".pluralize(p), p)
+                val skjerminger = skjermingTjeneste.skjerminger(p)
+                log.trace("Bulk slo opp ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
+                personer.map {
+                    tilBruker(it, skjerminger[it.aktivBrukerId] ?: false)
+                }
+            } else {
+                log.debug("Bulk ${"skjerming".pluralize(p, ingen = "Ingen")} å slå opp")
+                emptyList()
+            }.toSet()
+        }
     }
 
     @WithSpan
@@ -43,7 +55,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
     @WithSpan
     private fun brukerMedSkjerming(id: String, hentFamilie: (String) -> Person) =
         with(hentFamilie(id)) {
-            tilBruker(this, skjermingTjeneste.skjerming(brukerId))
+            tilBruker(this, skjermingTjeneste.skjerming(aktivBrukerId))
         }
             /*
             val statuser = skjermingTjeneste.skjerminger(historiskeIds + brukerId)

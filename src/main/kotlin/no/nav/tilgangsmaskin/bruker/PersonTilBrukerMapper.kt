@@ -14,7 +14,7 @@ object PersonTilBrukerMapper {
     fun tilBruker(person: Person, erSkjermet: Boolean) =
         with(person) {
             Bruker(
-                    BrukerIds(brukerId, historiskeIds, aktørId),
+                    BrukerIds(aktivBrukerId, oppslagId,historiskeIds, aktørId),
                     geoTilknytning,
                     tilGruppeKrav(geoTilknytning, graderinger, erSkjermet),
                     familie,

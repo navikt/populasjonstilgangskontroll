@@ -41,7 +41,7 @@ configurations.all {
 
 dependencies {
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.19.0")
-    implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.19.0-alpha")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.20.0-alpha")
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.19.0")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.micrometer:micrometer-core")

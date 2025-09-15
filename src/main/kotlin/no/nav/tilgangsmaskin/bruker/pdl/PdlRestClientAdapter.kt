@@ -24,7 +24,7 @@ class PdlRestClientAdapter(
     @WithSpan
     fun medUtvidetFamile(id: String, partnere: Set<FamilieMedlem>) =
         with(person(id)) {
-            copy(familie = familie.copy(søsken = søsken(foreldre, aktivBrukerId.verdi), partnere = partnere))
+            copy(familie = familie.copy(søsken = søsken(foreldre, brukerId.verdi), partnere = partnere))
         }
 
     @WithSpan

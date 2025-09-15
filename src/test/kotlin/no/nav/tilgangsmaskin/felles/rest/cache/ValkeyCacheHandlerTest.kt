@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.felles.rest.cache
 
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -15,11 +15,9 @@ import org.junit.jupiter.api.DisplayName
 @ExtendWith(MockKExtension::class)
 class ValkeyCacheKeyHandlerTest {
 
-   private val key = "myKey"
-
-
-    private val MED_EXTRA = CacheConfig("testCache", "extra")
-    private val UTEN_EXTRA = CacheConfig("testCache")
+    private val key = "myKey"
+    private val UTEN_EXTRA =   CacheConfig("testCache")
+    private val MED_EXTRA = UTEN_EXTRA.copy(extraPrefix = "extra")
     private val prefix = "prefix::"
     @MockK
     private lateinit var redisConfig: RedisCacheConfiguration
@@ -34,39 +32,32 @@ class ValkeyCacheKeyHandlerTest {
     @Test
     @DisplayName("toKey adds prefix and key")
     fun toKey_addsPrefixAndKey() {
-        val result = handler.toKey(UTEN_EXTRA, key)
-        assertEquals("$prefix$key", result)
+        assertEquals("$prefix$key", handler.toKey(UTEN_EXTRA, key))
     }
 
     @Test
     @DisplayName("toKey adds extraPrefix when provided")
     fun toKey_addsExtraPrefix() {
-        val result = handler.toKey(MED_EXTRA, key)
-        assertEquals("$prefix${MED_EXTRA.extraPrefix}:$key", result)
+        assertEquals("$prefix${MED_EXTRA.extraPrefix}:$key", handler.toKey(MED_EXTRA, key))
     }
 
     @Test
     @DisplayName("fromKey removes prefix and extraPrefix")
     fun fromKey_removesPrefixAndExtraPrefix() {
-        val fullKey = "$prefix${MED_EXTRA.extraPrefix}:$key"
-        val result = handler.fromKey(MED_EXTRA, fullKey)
-        assertEquals(key, result)
+        assertEquals(key, handler.fromKey(MED_EXTRA, "${prefix}${MED_EXTRA.extraPrefix}:${key}"))
     }
 
     @Test
     @DisplayName("fromKey removes only prefix when extraPrefix is null")
     fun fromKey_removesOnlyPrefix() {
-        val fullKey = "$prefix$key"
-        val result = handler.fromKey(UTEN_EXTRA, fullKey)
-        assertEquals(key, result)
+        assertEquals(key, handler.fromKey(UTEN_EXTRA, "${prefix}${key}"))
     }
 
     @Test
     @DisplayName("throws exception if cache config is missing")
     fun throwsExceptionIfCacheConfigMissing() {
-        val handlerMissing = ValkeyCacheKeyHandler(emptyMap())
         assertThrows<IllegalStateException> {
-            handlerMissing.toKey(CacheConfig("unknown"), "key")
+            ValkeyCacheKeyHandler(emptyMap()).toKey(CacheConfig("unknown"), "key")
         }
     }
 }

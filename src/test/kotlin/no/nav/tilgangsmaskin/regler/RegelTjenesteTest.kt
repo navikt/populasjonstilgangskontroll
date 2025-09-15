@@ -17,6 +17,7 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
+import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.overstyring.*
 import no.nav.tilgangsmaskin.tilgang.RegelConfig
@@ -54,11 +55,12 @@ import kotlin.test.BeforeTest
 @ActiveProfiles(TEST)
 class RegelTjenesteTest {
 
+    private val strengtFortroligAktørId = AktørId("1234567890123")
     private val strengtFortroligBrukerId = BrukerId("08526835671")
     private val fortroligBrukerId = BrukerId("08526835672")
     private val vanligBrukerId = BrukerId("08526835670")
     private val ansattId = AnsattId("Z999999")
-
+    private val dnr = BrukerId("12345678910")
 
     @Autowired
     private lateinit var repo: OverstyringRepository
@@ -96,10 +98,8 @@ class RegelTjenesteTest {
         avdød = AvdødTeller(registry, token)
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
         every { oppfølging.enhetFor(vanligBrukerId) } returns null
-
         every { token.system } returns "test"
         every { token.clusterAndSystem } returns "cluster:test"
-
         every { token.systemNavn } returns "test"
         overstyring = OverstyringTjeneste(ansatte, brukere, OverstyringJPAAdapter(repo), motor, OverstyringTeller(registry, token))
         regler = RegelTjeneste(motor, brukere, ansatte, overstyring)
@@ -129,38 +129,51 @@ class RegelTjenesteTest {
 
     @Test
     fun bulkAvvisninger() {
-        every {
-            brukere.brukerMedNærmesteFamilie(fortroligBrukerId.verdi)
-        } returns BrukerBuilder(fortroligBrukerId).build()
 
         every {
-            brukere.brukerMedNærmesteFamilie(strengtFortroligBrukerId.verdi)
-        } returns BrukerBuilder(strengtFortroligBrukerId).build()
-
-        every {
-            brukere.brukere(setOf(strengtFortroligBrukerId.verdi, fortroligBrukerId.verdi))
-        } returns setOf(BrukerBuilder(strengtFortroligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build(),
+            brukere.brukere(setOf(strengtFortroligAktørId.verdi, fortroligBrukerId.verdi))
+        } returns setOf(BrukerBuilder(strengtFortroligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).aktørId(strengtFortroligAktørId).build(),
                 BrukerBuilder(fortroligBrukerId).kreverMedlemskapI(FORTROLIG).build())
 
         val resultater = regler.bulkRegler(ansattId,
-                    setOf(BrukerIdOgRegelsett(strengtFortroligBrukerId), BrukerIdOgRegelsett(fortroligBrukerId)))
+                    setOf(BrukerIdOgRegelsett(strengtFortroligAktørId.verdi), BrukerIdOgRegelsett(fortroligBrukerId)))
+        assertThat(resultater.avviste.map { it.brukerId }.containsAll(listOf(strengtFortroligAktørId.verdi,fortroligBrukerId.verdi)))
         assertThat(resultater.avviste).hasSize(2)
         assertThat(resultater.godkjente).isEmpty()
         assertThat(resultater.ukjente).isEmpty()
+    }
+    @Test
+    @DisplayName("Verifiser at et dnr som senere har blitt erstattet med et fnr, ikke avvises")
+    fun dnr() {
+        every {
+            brukere.brukerMedNærmesteFamilie(BrukerBuilder(dnr).build().brukerId.verdi)
+        } returns BrukerBuilder(vanligBrukerId).historiske(setOf(dnr)).build()
+        assertThatCode {
+            regler.kompletteRegler(ansattId, dnr.verdi)
+        }.doesNotThrowAnyException()
+    }
+    @Test
+    @DisplayName("Verifiser at et dnr som senere har blitt erstattet med et fnr, ikke avvises i bulk")
+    fun dnrBulk() {
+       every {
+            brukere.brukere(setOf(dnr.verdi))
+        } returns setOf(BrukerBuilder(vanligBrukerId).historiske(setOf(dnr)).build())
+        val resultat = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(dnr.verdi)))
+        assertThat(resultat.godkjente.isNotEmpty())
     }
 
     @Test
     fun bulkAvvisningerOverstyrt() {
         every {
-            brukere.brukerMedNærmesteFamilie(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId.verdi) } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
+            brukere.brukerMedNærmesteFamilie(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId.verdi) } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).aktørId(strengtFortroligAktørId).kreverMedlemskapI(UTENLANDSK).build()
         every {
-            brukere.brukere(setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId.verdi))
-        } returns setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build())
+            brukere.brukere(setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).aktørId(strengtFortroligAktørId).build().aktørId!!.verdi))
+        } returns setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).aktørId(strengtFortroligAktørId).kreverMedlemskapI(UTENLANDSK).build())
 
         overstyring.overstyr(ansattId, OverstyringData(
                 BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(
                     UTENLANDSK).build().brukerId, "Dette er en test", IMORGEN))
-        val resultater  =  regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId)))
+        val resultater  =  regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).aktørId(strengtFortroligAktørId).build().aktørId!!.verdi)))
 
         assertThat(resultater.avviste.isEmpty())
         assertThat(resultater.godkjente.isEmpty())

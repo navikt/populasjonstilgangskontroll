@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.pluralize
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 import io.opentelemetry.instrumentation.annotations.WithSpan
+import kotlin.text.get
 
 @Service
 class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjeneste: SkjermingTjeneste) {
@@ -16,34 +17,22 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
     private val log = getLogger(javaClass)
 
     @WithSpan
-    fun brukere(brukerIds: Set<String>) : Set<Bruker> {
+    fun brukere(brukerIds: Set<String>): Set<Bruker> {
         if (brukerIds.isEmpty()) {
-            log.info("Bulk ingen personer å slå opp")
+            log.debug("Ingen brukere å slå opp")
             return emptySet()
         }
-        val personer =  personTjeneste.personer(brukerIds)
-        val notFound = brukerIds - personer.map { it.brukerId.verdi }.toSet()
-        val found =  personer.map { it.brukerId }.toSet()
-        if (notFound.isNotEmpty()) {
-            log.warn("Bulk fant ikke ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
+        val personer = personTjeneste.personer(brukerIds)
+        log.debug("Bulk brukere slo opp {} av {} personer i PDL ({})", personer.size, brukerIds.size, personer)
+        if (personer.isEmpty()) {
+            log.debug("Bulk skjerming ingenting å slå opp")
+            return emptySet()
         }
-        if (found.isNotEmpty()) {
-            log.info("Bulk slo opp ${found.size} person(er) av totalt ${brukerIds.size}")
-        }
-
-        return found.let { p ->
-            if (p.isNotEmpty()) {
-                log.trace("Bulk slår opp {} for {}", "skjerming".pluralize(p), p)
-                val skjerminger = skjermingTjeneste.skjerminger(p)
-                log.trace("Bulk slo opp ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
-                personer.map {
-                    tilBruker(it, skjerminger[it.brukerId] ?: false)
-                }
-            } else {
-                log.debug("Bulk ${"skjerming".pluralize(p, ingen = "Ingen")} å slå opp")
-                emptyList()
-            }.toSet()
-        }
+        val ids = personer.map { it.brukerId }.toSet()
+        log.trace("Bulk skjerming slår opp ${ids.size} skjerminger")
+        val skjerminger = skjermingTjeneste.skjerminger(ids)
+        log.trace("Bulk skjerming slo opp ${skjerminger.size} skjerminger")
+        return personer.map { tilBruker(it, skjerminger[it.brukerId] ?: false) }.toSet()
     }
 
     @WithSpan

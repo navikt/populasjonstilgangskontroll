@@ -49,13 +49,13 @@ class RegelMotor(
 
     @WithSpan
     fun bulkRegler(ansatt: Ansatt, brukere: Set<BrukerOgRegelsett>) =
-        (brukere.map { (bruker, type) ->
+        (brukere.map { (originalId, bruker, type) ->
             runCatching {
                 evaluer(ansatt, bruker, type.regelSett())
-                ok(bruker)
+                ok(originalId,bruker)
             }.getOrElse {
                 if (it is RegelException) {
-                    avvist(bruker, it)
+                    avvist(originalId, bruker,it)
                 } else throw it
             }
         }.toSet()).also {
@@ -75,10 +75,10 @@ class RegelMotor(
 
 }
 
-data class BulkResultat(val brukerId: BrukerId, val status: HttpStatus, val regel: Regel? = null) {
+data class BulkResultat(val brukerId: String, val bruker: Bruker,val status: HttpStatus, val regel: Regel? = null) {
     companion object {
-        fun ok(bruker: Bruker) = BulkResultat(bruker.brukerId, NO_CONTENT)
-        fun avvist(bruker: Bruker, e: RegelException) = BulkResultat(bruker.brukerId, FORBIDDEN, e.regel)
+        fun ok(brukerId: String, bruker: Bruker) = BulkResultat(brukerId, bruker,NO_CONTENT)
+        fun avvist(brukerId: String, bruker: Bruker,e: RegelException) = BulkResultat(brukerId, bruker,FORBIDDEN, e.regel)
 
     }
 }

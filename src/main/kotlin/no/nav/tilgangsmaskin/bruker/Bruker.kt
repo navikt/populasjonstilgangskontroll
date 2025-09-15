@@ -18,6 +18,9 @@ data class Bruker(
     val brukerId = brukerIds.brukerId
 
     @JsonIgnore
+    val aktørId = brukerIds.aktørId
+
+    @JsonIgnore
     val historiskeIds = brukerIds.historiskeIds
 
     @JsonIgnore

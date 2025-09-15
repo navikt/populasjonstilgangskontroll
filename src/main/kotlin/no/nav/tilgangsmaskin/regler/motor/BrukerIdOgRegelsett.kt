@@ -14,9 +14,12 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
     "type": "KOMPLETT_REGELTYPE"
   }
 """)
-data class BrukerIdOgRegelsett(val brukerId: BrukerId, val type: RegelType = KOMPLETT_REGELTYPE)
+data class BrukerIdOgRegelsett(val brukerId: String, val type: RegelType = KOMPLETT_REGELTYPE) {
+    constructor(bruker: BrukerId) : this(bruker.verdi)
+}
 
-data class BrukerOgRegelsett(val bruker: Bruker, val type: RegelType = KOMPLETT_REGELTYPE)
-
-
-
+data class BrukerOgRegelsett(
+    val originalId: String,
+    val bruker: Bruker,
+    val type: RegelType = KOMPLETT_REGELTYPE
+)

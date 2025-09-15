@@ -7,6 +7,7 @@ import io.micrometer.core.instrument.Tags.of
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
+import java.time.Duration
 
 class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                         val conn: StatefulRedisConnection<String,String>,
@@ -22,8 +23,14 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
             mapper.readValue<T>(json)
         }
 
-    fun putOne(cache: CacheConfig, id: String, value: Any?)  =
-        conn.sync().set(handler.toKey(cache,id), mapper.writeValueAsString(value))
+    fun putOne(cache: CacheConfig, id: String, value: Any, ttl: Duration)  {
+        with(handler.toKey(cache,id)) {
+            conn.sync().set(this, mapper.writeValueAsString(value))
+            if (!ttl.isZero && !ttl.isNegative) {
+                conn.sync().expire(this, ttl.seconds)
+            }
+        }
+    }
 
     inline fun <reified T> getMany(cache: CacheConfig, ids: Set<String>)  =
         if (ids.isEmpty()) {
@@ -42,18 +49,22 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                 tellOgLog(cache.name, it.size, ids.size)
             }
 
-    fun putMany(cache: CacheConfig, innslag: Map<String, Any>, extraPrefix: String? = null) =
+    fun putMany(cache: CacheConfig, innslag: Map<String, Any>,  ttl: Duration) {
         if (innslag.isEmpty()) {
             log.trace("Skal legge til 0 verdier i cache ${cache.name}, gjør ingenting")
-            "OK" 
         }
         else {
-            conn.sync().mset(innslag
-                .mapKeys { handler.toKey(cache,it.key) }
-                .mapValues { mapper.writeValueAsString(it.value) }.also {
-                    log.trace("Lager {} verdier for cache {} med prefix {}", it.values, cache.name, extraPrefix)
-                })
+            val keysWithPrefix = innslag.mapKeys { handler.toKey(cache, it.key) }
+            val valuesAsJson = keysWithPrefix.mapValues { mapper.writeValueAsString(it.value) }
+            conn.sync().mset(valuesAsJson)
+            log.trace("Lager {} verdier for cache {} med prefix {}", valuesAsJson.values, cache.name, cache.extraPrefix)
+            if (!ttl.isZero && !ttl.isNegative) {
+                for (key in valuesAsJson.keys) {
+                    conn.sync().expire(key, ttl.seconds)
+                }
+            }
         }
+    }
 
     fun tellOgLog(navn: String, funnet: Int, etterspurt: Int) {
         alleTreffTeller.tell(of("name", navn, "suksess", (funnet == etterspurt).toString()))

@@ -46,12 +46,10 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
         RedisClient.create(cfg.valkeyURI)
 
     @Bean
-    fun valkeyCacheClient(client: RedisClient, handler: ValkeyCacheKeyHandler, mapper: ObjectMapper, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller): ValkeyCacheClient =
+    fun valkeyCacheClient(client: RedisClient, handler: ValkeyCacheKeyHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
         ValkeyCacheClient(handler,
             client.connect(),
-            mapper.copy().apply {
-                activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
-            },sucessTeller,teller)
+            valKeyMapper,sucessTeller,teller)
 
     @Bean
     fun cachePrefixes(cfgs: Map<String, RedisCacheConfiguration>) = cfgs.mapValues { it.value.keyPrefix}

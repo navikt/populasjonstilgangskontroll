@@ -8,15 +8,15 @@ import org.springframework.cache.annotation.Cacheable
 @RetryingOnRecoverableService
 class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL: PdlSyncGraphQLClientAdapter) {
 
-    @WithSpan("pdltjeneste.medutvidetfamile")
+    @WithSpan
     @Cacheable(cacheNames = [PDL],  key = "#root.methodName + ':' + #id")
     fun medUtvidetFamile(id: String) = adapter.medUtvidetFamile(id,graphQL.partnere(id))
 
-    @WithSpan("pdltjeneste.mednermestefamilie")
+    @WithSpan
     @Cacheable(cacheNames = [PDL],  key = "#root.methodName + ':' + #id")
     fun medNærmesteFamilie(id: String) = adapter.person(id)
 
-    @WithSpan("pdltjeneste.personer")
+    @WithSpan
     fun personer(ids: Set<String>) =  adapter.personer(ids)
 
 }

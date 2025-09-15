@@ -130,7 +130,7 @@ class DevTilgangController(
     @ResponseStatus(MULTI_STATUS)
     @BulkApiResponse
     fun bulkreglerForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>) =
-        regler.bulkRegler(ansattId, brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet())
+        regler.bulkRegler(ansattId, brukerIds.map { BrukerIdOgRegelsett(it.verdi, regelType) }.toSet())
 
     @PostMapping("skjermingadaptere")
     fun skjermingAdapter(@RequestBody brukerId: String) = skjermingAdapter.skjerming(brukerId)

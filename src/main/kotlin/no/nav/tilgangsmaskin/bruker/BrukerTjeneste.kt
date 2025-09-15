@@ -20,8 +20,8 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
             return emptySet()
         }
         val personer =  personTjeneste.personer(brukerIds)
-        val notFound = brukerIds - personer.map { it.aktivBrukerId.verdi }.toSet()
-        val found =  personer.map { it.aktivBrukerId }.toSet()
+        val notFound = brukerIds - personer.map { it.brukerId.verdi }.toSet()
+        val found =  personer.map { it.brukerId }.toSet()
         if (notFound.isNotEmpty()) {
             log.warn("Bulk fant ikke ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
         }
@@ -35,7 +35,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
                 val skjerminger = skjermingTjeneste.skjerminger(p)
                 log.trace("Bulk slo opp ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
                 personer.map {
-                    tilBruker(it, skjerminger[it.aktivBrukerId] ?: false)
+                    tilBruker(it, skjerminger[it.brukerId] ?: false)
                 }
             } else {
                 log.debug("Bulk ${"skjerming".pluralize(p, ingen = "Ingen")} å slå opp")
@@ -55,7 +55,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
     @WithSpan
     private fun brukerMedSkjerming(id: String, hentFamilie: (String) -> Person) =
         with(hentFamilie(id)) {
-            tilBruker(this, skjermingTjeneste.skjerming(aktivBrukerId))
+            tilBruker(this, skjermingTjeneste.skjerming(brukerId))
         }
             /*
             val statuser = skjermingTjeneste.skjerminger(historiskeIds + brukerId)

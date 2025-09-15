@@ -13,8 +13,8 @@ import java.time.LocalDate
 
 @JsonCacheable
 data class Person(
-    val aktivBrukerId: BrukerId,
-    val oppslagId: String,
+    val brukerId: BrukerId,
+    val oppslagId: String? = brukerId.verdi,
     val aktørId: AktørId,
     val geoTilknytning: GeografiskTilknytning,
     val graderinger: List<Gradering> = emptyList(),

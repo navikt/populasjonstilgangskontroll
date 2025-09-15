@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.felles.rest.cache
 
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -15,11 +15,9 @@ import org.junit.jupiter.api.DisplayName
 @ExtendWith(MockKExtension::class)
 class ValkeyCacheKeyHandlerTest {
 
-   private val key = "myKey"
-
-
-    private val MED_EXTRA = CacheConfig("testCache", "extra")
-    private val UTEN_EXTRA = CacheConfig("testCache")
+    private val key = "myKey"
+    private val UTEN_EXTRA =   CacheConfig("testCache")
+    private val MED_EXTRA = UTEN_EXTRA.copy(extraPrefix = "extra")
     private val prefix = "prefix::"
     @MockK
     private lateinit var redisConfig: RedisCacheConfiguration
@@ -58,9 +56,8 @@ class ValkeyCacheKeyHandlerTest {
     @Test
     @DisplayName("throws exception if cache config is missing")
     fun throwsExceptionIfCacheConfigMissing() {
-        val handlerMissing = ValkeyCacheKeyHandler(emptyMap())
         assertThrows<IllegalStateException> {
-            handlerMissing.toKey(CacheConfig("unknown"), "key")
+            ValkeyCacheKeyHandler(emptyMap()).toKey(CacheConfig("unknown"), "key")
         }
     }
 }

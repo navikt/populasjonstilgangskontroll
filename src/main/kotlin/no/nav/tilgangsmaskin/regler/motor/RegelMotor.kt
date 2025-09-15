@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.avvist
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.ok
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.KJERNE
@@ -25,13 +24,13 @@ class RegelMotor(
     private val logger: RegelMotorLogger) {
 
     @WithSpan
-    fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, komplett)
+    fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, komplett, "komplett")
 
     @WithSpan
-    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, kjerne)
+    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, kjerne, "kjerne")
 
     @WithSpan
-    private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) {
+    private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, tjenesteType: String) {
         logger.tellRegelSett(regelSett)
         regelSett.regler.forEach { regel ->
             logger.evaluerer(ansatt, bruker, regel)
@@ -40,7 +39,7 @@ class RegelMotor(
                 return@forEach
             }
             if (!regel.evaluer(ansatt, bruker)) {
-                logger.avvist(ansatt, bruker, regel)
+                logger.avvist(ansatt, bruker, regel,tjenesteType)
                 throw RegelException(ansatt, bruker, regel)
             }
         }
@@ -48,10 +47,10 @@ class RegelMotor(
     }
 
     @WithSpan
-    fun bulkRegler(ansatt: Ansatt, brukere: Set<BrukerOgRegelsett>) =
+    fun bulkRegler(ansatt: Ansatt, brukere: Set<BrukerOgRegelsett>,) =
         (brukere.map { (originalId, bruker, type) ->
             runCatching {
-                evaluer(ansatt, bruker, type.regelSett())
+                evaluer(ansatt, bruker, type.regelSett(), "bulk")
                 ok(originalId,bruker)
             }.getOrElse {
                 if (it is RegelException) {
@@ -61,7 +60,6 @@ class RegelMotor(
         }.toSet()).also {
             logger.tellBulkSize(it.size)
         }
-
 
     private fun RegelType.regelSett() =
         when (this) {

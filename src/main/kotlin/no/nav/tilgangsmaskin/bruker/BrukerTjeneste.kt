@@ -22,9 +22,10 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
         }
         val personer =  personTjeneste.personer(brukerIds)
         log.info("Bulk slo opp følgende ${personer.size} $personer fra ${brukerIds.size} $brukerIds i PDL")
-        val funnetBrukerIds = buildSet {
+        val funnetBrukerIds = buildList {
             personer.forEach { add(brukerIdForOppslagId(it.oppslagId, personer)) }
         }
+        log.info("Bulk funner ${funnetBrukerIds.size} brukerIds $funnetBrukerIds")
         if (funnetBrukerIds.size != personer.size) {
             val mangler = (brukerIds - funnetBrukerIds.map { it.verdi }.toSet()).map { it.maskFnr() }
             log.warn("Bulk fant ikke $mangler")

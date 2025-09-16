@@ -15,27 +15,26 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
 
     @WithSpan
     fun brukere(brukerIds: Set<String>) : Set<Bruker> {
-        log.info("Mottok bulk kall for $brukerIds")
+        log.info("Bulk kall for $brukerIds")
         if (brukerIds.isEmpty()) {
             log.info("Bulk ingen personer å slå opp")
             return emptySet()
         }
         val personer =  personTjeneste.personer(brukerIds)
-        log.info("Bulk Slo opp $personer fra $brukerIds i PDL")
-        val notFound = brukerIds - personer.map { it.oppslagId}.toSet()
-        val found =  personer.map { it.oppslagId }.toSet()
-        if (notFound.isNotEmpty()) {
-            log.warn("Bulk fant ikke ${"person".pluralize(notFound)}: ${notFound.joinToString { it.maskFnr() }}")
+        log.info("Bulk slo opp følgende ${personer.size} $personer fra ${brukerIds.size} $brukerIds i PDL")
+        val funnetBrukerIds = buildSet {
+            personer.forEach { add(brukerIdForOppslagId(it.oppslagId, personer)) }
         }
-        if (found.isNotEmpty()) {
-            log.info("Bulk slo opp ${found.size} person(er) av totalt ${brukerIds.size}")
+        if (funnetBrukerIds.size != personer.size) {
+            val mangler = (brukerIds - funnetBrukerIds.map { it.verdi }.toSet()).map { it.maskFnr() }
+            log.warn("Bulk fant ikke $mangler")
         }
 
-        return found.let { p ->
+        return funnetBrukerIds.let { p ->
             if (p.isNotEmpty()) {
                 log.trace("Bulk slår opp {} for {}", "skjerming".pluralize(p), p)
                 val skjerminger = skjermingTjeneste.skjerminger(p)
-                log.trace("Bulk slo opp ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.maskFnr() }}")
+                log.trace("Bulk slo opp ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
                 personer.map {
                     tilBruker(it, skjerminger[it.brukerId] ?: false)
                 }
@@ -45,6 +44,8 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
             }.toSet()
         }
     }
+
+    private fun brukerIdForOppslagId(oppslagId: String, personer: Set<Person>) = personer.first { it.oppslagId == oppslagId }.brukerId
 
     @WithSpan
     fun brukerMedNærmesteFamilie(brukerId: String) =
@@ -61,13 +62,4 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
                 log.trace("Bruker er {}", it)
             }
         }
-            /*
-            val statuser = skjermingTjeneste.skjerminger(historiskeIds + brukerId)
-            statuser.filterValues { it }.forEach { (brukerId, _) ->
-                if (brukerId.verdi != id) {
-                    log.info("Bruker $brukerId er skjermet grunnet historikk")
-                }
-            }
-            tilBruker(this, skjermingTjeneste.skjerming(this.brukerId))
-        }*/
 }

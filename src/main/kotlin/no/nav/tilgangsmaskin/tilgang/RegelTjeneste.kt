@@ -80,11 +80,12 @@ class RegelTjeneste(
         brukerIdOgRegelsett.brukerId in (funnet.map { it.bruker.historiskeIds} + funnet.map { it.brukerId })
     }
 
-    private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) = buildSet {
-        for (item in (oppgitt - funnet)) {
-            add(EnkeltBulkRespons(item.brukerId, NOT_FOUND))
+    private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) =
+        buildSet {
+            for (item in (oppgitt - funnet)) {
+                add(EnkeltBulkRespons(item.brukerId, NOT_FOUND))
+            }
         }
-    }
 
     private fun avviste(ansatt: Ansatt, godkjente: Set<EnkeltBulkRespons>, resultater: Set<BulkResultat>, brukere: Set<BrukerOgRegelsett>) =
         buildSet {
@@ -96,13 +97,14 @@ class RegelTjeneste(
         }
     }
 
-    private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) : Set<EnkeltBulkRespons> {
-
-        val (success, fail) = resultater.partition { it.status.is2xxSuccessful }
-        val ids = success.map { it.brukerId } +
-                overstyringTjeneste.overstyringer(ansatt.ansattId, fail.map { it.bruker.brukerId }).map { it.verdi }
-        return ids.map(::ok).toSet()
-    }
+    private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) =
+        buildSet {
+            val (godkjente, avviste) = resultater.partition { it.status.is2xxSuccessful }
+            godkjente.forEach { add(ok(it.brukerId)) }
+            overstyringTjeneste
+                .overstyringer(ansatt.ansattId, avviste.map { it.bruker.brukerId })
+                .forEach { add(ok(it)) }
+        }
 
 
     private fun Set<BrukerIdOgRegelsett>.brukerOgRegelsett() =

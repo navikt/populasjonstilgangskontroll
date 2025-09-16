@@ -21,6 +21,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
             return emptySet()
         }
         val personer =  personTjeneste.personer(brukerIds)
+        log.info("Bulk Slo opp $personer fra $brukerIds i PDL")
         val notFound = brukerIds - personer.map { it.brukerId.verdi }.toSet()
         val found =  personer.map { it.brukerId }.toSet()
         if (notFound.isNotEmpty()) {

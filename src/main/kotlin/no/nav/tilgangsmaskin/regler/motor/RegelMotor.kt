@@ -24,13 +24,13 @@ class RegelMotor(
     private val logger: RegelMotorLogger) {
 
     @WithSpan
-    fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, komplett, "komplett")
+    fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, komplett, TjenesteType.KOMPLETT)
 
     @WithSpan
-    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, kjerne, "kjerne")
+    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, kjerne, TjenesteType.KJERNE)
 
     @WithSpan
-    private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, tjenesteType: String) {
+    private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, tjenesteType: TjenesteType) {
         logger.tellRegelSett(regelSett)
         regelSett.regler.forEach { regel ->
             logger.evaluerer(ansatt, bruker, regel)
@@ -50,7 +50,7 @@ class RegelMotor(
     fun bulkRegler(ansatt: Ansatt, brukere: Set<BrukerOgRegelsett>,) =
         (brukere.map { (originalId, bruker, type) ->
             runCatching {
-                evaluer(ansatt, bruker, type.regelSett(), "bulk")
+                evaluer(ansatt, bruker, type.regelSett(), TjenesteType.BULK)
                 ok(originalId,bruker)
             }.getOrElse {
                 if (it is RegelException) {
@@ -79,4 +79,9 @@ data class BulkResultat(val brukerId: String, val bruker: Bruker,val status: Htt
         fun avvist(brukerId: String, bruker: Bruker,e: RegelException) = BulkResultat(brukerId, bruker,FORBIDDEN, e.regel)
 
     }
+}
+enum class TjenesteType {
+    KOMPLETT,
+    KJERNE,
+    BULK
 }

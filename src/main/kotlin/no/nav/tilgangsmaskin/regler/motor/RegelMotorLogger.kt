@@ -30,12 +30,12 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
 
     fun tellRegelSett(regelSett: RegelSett) = regeltypeTeller.tell(Tags.of("type",regelSett.beskrivelse, "system", token.system))
 
-    fun avvist(ansatt: Ansatt, bruker: Bruker, regel: Regel, tjenesteType: String) =
+    fun avvist(ansatt: Ansatt, bruker: Bruker, regel: Regel, tjenesteType: TjenesteType) =
         withMDC(BESLUTNING, regel.kode) {
             val fra =  MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
             log.warn("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for $bruker $fra")
             Secure.warn("Tilgang til ${bruker.brukerId.verdi} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} $fra")
-            avvisningTeller.tell(Tags.of("navn", regel.navn, "type", tjenesteType))
+            avvisningTeller.tell(Tags.of("navn", regel.navn, "type", tjenesteType.toString()))
         }
 
     fun ok(ansatt: Ansatt, bruker: Bruker,regelSett: RegelSett) =

@@ -2,7 +2,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 val javaVersion = JavaLanguageVersion.of(24)
 val springdocVersion = "2.8.9"
-val tokenSupportVersion = "5.0.33"
+val tokenSupportVersion = "5.0.37"
 val mockkVersion = "1.14.5"
 
 group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
@@ -12,7 +12,7 @@ plugins {
     kotlin("jvm") version "2.2.0"
     kotlin("plugin.spring") version "2.2.0"
     kotlin("plugin.jpa") version "2.2.0"
-    id("org.springframework.boot") version "4.0.0-M1"
+    id("org.springframework.boot") version "4.0.0-M3"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.cyclonedx.bom") version "2.3.1"
     id("com.google.cloud.tools.jib") version "3.4.5"

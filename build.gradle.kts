@@ -49,7 +49,7 @@ dependencies {
     implementation("io.micrometer:micrometer-tracing")
     implementation("io.opentelemetry:opentelemetry-api")
     implementation("net.logstash.logback:logstash-logback-encoder:8.1")
-    implementation("no.nav.boot:boot-conditionals:5.1.10")
+    implementation("no.nav.boot:boot-conditionals:5.1.11")
     implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
     implementation("org.apache.httpcomponents.client5:httpclient5")

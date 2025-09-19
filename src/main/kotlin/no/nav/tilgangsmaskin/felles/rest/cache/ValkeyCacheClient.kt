@@ -51,21 +51,25 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
 
     fun putMany(cache: CacheConfig, innslag: Map<String, Any>,  ttl: Duration) {
         if (innslag.isNotEmpty()) {
-            val payload = buildMap {
-                innslag.forEach { (key, value) ->
-                    put(handler.toKey(cache, key), mapper.writeValueAsString(value))
-                }
-            }
             conn.setAutoFlushCommands(false)
-            conn.async().mset(payload)
-            log.trace("Lagrer {} verdier for cache {} med prefix {}", payload.values, cache.name, cache.extraPrefix)
-            payload.keys.forEach { key ->
-                conn.async().expire(key, ttl.seconds)
+            with(payloadFor(innslag, cache)) {
+                conn.async().mset(this)
+                log.trace("Lagrer {} verdier for cache {} med prefix {}", values, cache.name, cache.extraPrefix)
+                keys.forEach { key ->
+                    conn.async().expire(key, ttl.seconds)
+                }
             }
             conn.flushCommands()
             conn.setAutoFlushCommands(true)
         }
     }
+
+    private fun payloadFor(innslag: Map<String, Any>, cache: CacheConfig)=
+        buildMap {
+            innslag.forEach { (key, value) ->
+                put(handler.toKey(cache, key), mapper.writeValueAsString(value))
+            }
+        }
 
     fun tellOgLog(navn: String, funnet: Int, etterspurt: Int) {
         alleTreffTeller.tell(of("name", navn, "suksess", (funnet == etterspurt).toString()))

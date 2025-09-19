@@ -37,6 +37,7 @@ import java.time.Duration
 import kotlin.test.assertEquals
 import org.awaitility.kotlin.await
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.SECONDS
 
 @DataRedisTest
 @ContextConfiguration(classes = [TestApp::class])
@@ -91,7 +92,7 @@ class ValkeyServerTest {
         client.putOne(cacheName, id.verdi,person, Duration.ofSeconds(1))
         val one = client.getOne<Person>(cacheName,id.verdi)
         assertEquals(person, one)
-        await.atMost(3, TimeUnit.SECONDS).until {
+        await.atMost(3, SECONDS).until {
             client.getOne<Person>(cacheName,id.verdi) == null
         }
 
@@ -112,7 +113,7 @@ class ValkeyServerTest {
         val many = client.getMany<Person>(cacheName,setOf(id1.verdi,id2.verdi))
         assertEquals(keys, many.keys)
         assertEquals(setOf(person1, person2), many.values.toSet())
-        await.atMost(3, TimeUnit.SECONDS).until {
+        await.atMost(3, SECONDS).until {
             client.getMany<Person>(cacheName,setOf(id1.verdi,id2.verdi)).isEmpty()
         }
     }

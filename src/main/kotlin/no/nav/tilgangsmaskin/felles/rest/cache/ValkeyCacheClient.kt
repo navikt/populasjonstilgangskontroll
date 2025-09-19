@@ -54,7 +54,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
     @WithSpan
     fun putMany(cache: CacheConfig, innslag: Map<String, Any>,  ttl: Duration) {
         if (innslag.isNotEmpty()) {
-            log.trace("Lagrer {} verdier for cache {} med prefix {}", innslag.size, cache.name, cache.extraPrefix)
+            log.trace("Bulk lagrer {} verdier for cache {} med prefix {}", innslag.size, cache.name, cache.extraPrefix)
             conn.apply {
                 with(payloadFor(innslag, cache)) {
                     setAutoFlushCommands(false)

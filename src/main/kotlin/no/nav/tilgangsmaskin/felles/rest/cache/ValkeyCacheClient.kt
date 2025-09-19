@@ -60,7 +60,12 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
             log.trace("Lager {} verdier for cache {} med prefix {}", valuesAsJson.values, cache.name, cache.extraPrefix)
             if (!ttl.isZero && !ttl.isNegative) {
                 for (key in valuesAsJson.keys) {
-                    conn.sync().expire(key, ttl.seconds)
+                    if (!conn.sync().expire(key, ttl.seconds)) {
+                        log.warn("Kunne ikke sette ttl på cache ${cache.name} for key $key")
+                    }
+                    else {
+                        log.trace("Satt ttl på cache ${cache.name} for key $key til ${ttl.seconds} sekunder")
+                    }
                 }
             }
         }

@@ -4,12 +4,9 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.PersonTilBrukerMapper.tilBruker
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.Person
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.pluralize
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 import io.opentelemetry.instrumentation.annotations.WithSpan
-import kotlin.text.get
 
 @Service
 class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjeneste: SkjermingTjeneste) {
@@ -37,7 +34,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
 
     @WithSpan
     fun brukerMedNærmesteFamilie(brukerId: String) =
-        brukerMedSkjerming(brukerId, personTjeneste::medNærmesteFamilie)
+        brukerMedSkjerming(brukerId, personTjeneste::medFamilie)
 
     @WithSpan
     fun brukerMedUtvidetFamilie(brukerId: String) =

@@ -54,16 +54,18 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
     @WithSpan
     fun putMany(cache: CacheConfig, innslag: Map<String, Any>,  ttl: Duration) {
         if (innslag.isNotEmpty()) {
-            conn.setAutoFlushCommands(false)
-            with(payloadFor(innslag, cache)) {
-                conn.async().mset(this)
-                log.trace("Lagrer {} verdier for cache {} med prefix {}", values.size, cache.name, cache.extraPrefix)
-                keys.forEach { key ->
-                    conn.async().expire(key, ttl.seconds)
+            log.trace("Lagrer {} verdier for cache {} med prefix {}", innslag.size, cache.name, cache.extraPrefix)
+            conn.apply {
+                with(payloadFor(innslag, cache)) {
+                    setAutoFlushCommands(false)
+                    async().mset(this)
+                    keys.forEach { key ->
+                        async().expire(key, ttl.seconds)
+                    }
                 }
+                flushCommands()
+                setAutoFlushCommands(true)
             }
-            conn.flushCommands()
-            conn.setAutoFlushCommands(true)
         }
     }
 

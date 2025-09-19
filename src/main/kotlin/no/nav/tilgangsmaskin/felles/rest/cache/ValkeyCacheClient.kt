@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.lettuce.core.api.StatefulRedisConnection
 import io.micrometer.core.instrument.Tags.of
-import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
@@ -50,29 +49,22 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                 tellOgLog(cache.name, it.size, ids.size)
             }
 
-    @WithSpan
     fun putMany(cache: CacheConfig, innslag: Map<String, Any>,  ttl: Duration) {
         if (innslag.isNotEmpty()) {
+            val keysWithPrefix = innslag.mapKeys { handler.toKey(cache, it.key) }
+            val values = keysWithPrefix.mapValues { mapper.writeValueAsString(it.value) }
             conn.setAutoFlushCommands(false)
-            with(payloadFor(innslag, cache)) {
-                conn.async().mset(this)
-                log.trace("Lagrer {} verdier for cache {} med prefix {}", values.size, cache.name, cache.extraPrefix)
-                keys.forEach { key ->
+            conn.async().mset(values)
+            log.trace("Lagrer {} verdier for cache {} med prefix {}", values.values, cache.name, cache.extraPrefix)
+            if (!ttl.isZero && !ttl.isNegative) {
+                values.keys.forEach { key ->
                     conn.async().expire(key, ttl.seconds)
                 }
-            } else {
-                log.warn("Ikke satt ttl på cache ${cache.name} for key(s) ${valuesAsJson.keys} fordi ttl er $ttl")
             }
             conn.flushCommands()
             conn.setAutoFlushCommands(true)
         }
     }
-    private fun payloadFor(innslag: Map<String, Any>, cache: CacheConfig)=
-        buildMap {
-            innslag.forEach { (key, value) ->
-                put(handler.toKey(cache, key), mapper.writeValueAsString(value))
-            }
-        }
 
     fun tellOgLog(navn: String, funnet: Int, etterspurt: Int) {
         alleTreffTeller.tell(of("name", navn, "suksess", (funnet == etterspurt).toString()))

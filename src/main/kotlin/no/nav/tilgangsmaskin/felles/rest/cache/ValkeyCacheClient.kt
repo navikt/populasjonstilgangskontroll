@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.lettuce.core.api.StatefulRedisConnection
 import io.micrometer.core.instrument.Tags.of
+import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
@@ -32,6 +33,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
         }
     }
 
+    @WithSpan
     inline fun <reified T> getMany(cache: CacheConfig, ids: Set<String>)  =
         if (ids.isEmpty()) {
             emptyMap()
@@ -49,6 +51,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                 tellOgLog(cache.name, it.size, ids.size)
             }
 
+    @WithSpan
     fun putMany(cache: CacheConfig, innslag: Map<String, Any>,  ttl: Duration) {
         if (innslag.isNotEmpty()) {
             conn.setAutoFlushCommands(false)

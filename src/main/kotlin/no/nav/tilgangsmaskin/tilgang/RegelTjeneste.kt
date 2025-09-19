@@ -80,11 +80,12 @@ class RegelTjeneste(
         brukerIdOgRegelsett.brukerId in (funnet.map { it.bruker.historiskeIds} + funnet.map { it.brukerId })
     }
 
-    private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) = buildSet {
-        for (item in (oppgitt - funnet)) {
-            add(EnkeltBulkRespons(item.brukerId, NOT_FOUND))
+    private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) =
+        buildSet {
+            for (item in (oppgitt - funnet)) {
+                add(EnkeltBulkRespons(item.brukerId, NOT_FOUND))
+            }
         }
-    }
 
     private fun avviste(ansatt: Ansatt, godkjente: Set<EnkeltBulkRespons>, resultater: Set<BulkResultat>, brukere: Set<BrukerOgRegelsett>) =
         buildSet {
@@ -96,22 +97,24 @@ class RegelTjeneste(
         }
     }
 
-    private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) : Set<EnkeltBulkRespons> {
-
-        val (success, fail) = resultater.partition { it.status.is2xxSuccessful }
-        val ids = success.map { it.brukerId } +
-                overstyringTjeneste.overstyringer(ansatt.ansattId, fail.map { it.bruker.brukerId }).map { it.verdi }
-        return ids.map(::ok).toSet()
-    }
+    private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) =
+        buildSet {
+            val (godkjente, avviste) = resultater.partition { it.status.is2xxSuccessful }
+            godkjente.forEach { add(ok(it.brukerId)) }
+            overstyringTjeneste
+                .overstyringer(ansatt.ansattId, avviste.map { it.bruker.brukerId })
+                .forEach { add(ok(it)) }
+        }
 
 
     private fun Set<BrukerIdOgRegelsett>.brukerOgRegelsett() =
         with(associate { it.brukerId to it }) {
-            log.debug("Slår opp {} {}", "bruker".pluralize(keys,"e"), keys.map { it.maskFnr() })
+            log.debug("Slår opp keys $keys")
             val brukere = brukerTjeneste.brukere(keys)
+            log.debug("Fant $brukere av ${keys.size} brukere ved oppslag for keys $keys")
             brukere.map { bruker ->
-                val idOgType = this[bruker.brukerId.verdi] ?: this[bruker.aktørId?.verdi] ?: BrukerIdOgRegelsett(bruker.brukerId.verdi)
-                BrukerOgRegelsett(idOgType.brukerId, bruker, idOgType.type)
+                val idOgType = this[bruker.oppslagId] ?: throw IllegalStateException("Bruker ${bruker.brukerId} har ikke oppslagId")
+                BrukerOgRegelsett(bruker, idOgType.type)
             }.toSet()
         }
 

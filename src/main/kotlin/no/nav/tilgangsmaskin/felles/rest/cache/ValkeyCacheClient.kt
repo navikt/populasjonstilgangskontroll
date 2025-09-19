@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.lettuce.core.api.StatefulRedisConnection
 import io.micrometer.core.instrument.Tags.of
+import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
@@ -32,6 +33,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
         }
     }
 
+    @WithSpan
     inline fun <reified T> getMany(cache: CacheConfig, ids: Set<String>)  =
         if (ids.isEmpty()) {
             emptyMap()
@@ -49,22 +51,28 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                 tellOgLog(cache.name, it.size, ids.size)
             }
 
+    @WithSpan
     fun putMany(cache: CacheConfig, innslag: Map<String, Any>,  ttl: Duration) {
-        if (innslag.isEmpty()) {
-            log.trace("Skal legge til 0 verdier i cache ${cache.name}, gjør ingenting")
-        }
-        else {
-            val keysWithPrefix = innslag.mapKeys { handler.toKey(cache, it.key) }
-            val valuesAsJson = keysWithPrefix.mapValues { mapper.writeValueAsString(it.value) }
-            conn.sync().mset(valuesAsJson)
-            log.trace("Lager {} verdier for cache {} med prefix {}", valuesAsJson.values, cache.name, cache.extraPrefix)
-            if (!ttl.isZero && !ttl.isNegative) {
-                for (key in valuesAsJson.keys) {
-                    conn.sync().expire(key, ttl.seconds)
+        if (innslag.isNotEmpty()) {
+            conn.setAutoFlushCommands(false)
+            with(payloadFor(innslag, cache)) {
+                conn.async().mset(this)
+                log.trace("Lagrer {} verdier for cache {} med prefix {}", values.size, cache.name, cache.extraPrefix)
+                keys.forEach { key ->
+                    conn.async().expire(key, ttl.seconds)
                 }
             }
+            conn.flushCommands()
+            conn.setAutoFlushCommands(true)
         }
     }
+
+    private fun payloadFor(innslag: Map<String, Any>, cache: CacheConfig)=
+        buildMap {
+            innslag.forEach { (key, value) ->
+                put(handler.toKey(cache, key), mapper.writeValueAsString(value))
+            }
+        }
 
     fun tellOgLog(navn: String, funnet: Int, etterspurt: Int) {
         alleTreffTeller.tell(of("name", navn, "suksess", (funnet == etterspurt).toString()))

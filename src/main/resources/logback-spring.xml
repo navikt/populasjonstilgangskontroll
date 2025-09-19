@@ -20,7 +20,7 @@
 
     <springProfile name="dev">
         <logger name="io.lettuce.core.protocol.ReconnectionHandler" level="warn"/>
-        <logger name="no.nav.tilgangsmaskin" level="debug"/>
+        <logger name="no.nav.tilgangsmaskin" level="trace"/>
     </springProfile>
 
     <springProfile name="local | test">

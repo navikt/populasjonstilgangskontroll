@@ -14,7 +14,7 @@ class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL
 
     @WithSpan
     @Cacheable(cacheNames = [PDL],  key = "#root.methodName + ':' + #id")
-    fun medNærmesteFamilie(id: String) = adapter.person(id)
+    fun medFamilie(id: String) = adapter.person(id)
 
     @WithSpan
     fun personer(ids: Set<String>) =  adapter.personer(ids)

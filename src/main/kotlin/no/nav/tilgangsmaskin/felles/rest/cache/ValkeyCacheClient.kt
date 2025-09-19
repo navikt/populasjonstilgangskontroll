@@ -60,6 +60,8 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                 keys.forEach { key ->
                     conn.async().expire(key, ttl.seconds)
                 }
+            } else {
+                log.warn("Ikke satt ttl på cache ${cache.name} for key(s) ${valuesAsJson.keys} fordi ttl er $ttl")
             }
             conn.flushCommands()
             conn.setAutoFlushCommands(true)

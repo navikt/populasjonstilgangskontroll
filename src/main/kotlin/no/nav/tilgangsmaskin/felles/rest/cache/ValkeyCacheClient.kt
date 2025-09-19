@@ -67,6 +67,8 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                         log.trace("Satt ttl på cache ${cache.name} for key $key til ${ttl.seconds} sekunder")
                     }
                 }
+            } else {
+                log.warn("Ikke satt ttl på cache ${cache.name} for key(s) ${valuesAsJson.keys} fordi ttl er $ttl")
             }
         }
     }

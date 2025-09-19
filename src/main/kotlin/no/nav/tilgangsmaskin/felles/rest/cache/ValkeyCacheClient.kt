@@ -56,10 +56,8 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
             conn.setAutoFlushCommands(false)
             conn.async().mset(values)
             log.trace("Lagrer {} verdier for cache {} med prefix {}", values.values, cache.name, cache.extraPrefix)
-            if (!ttl.isZero && !ttl.isNegative) {
-                values.keys.forEach { key ->
-                    conn.async().expire(key, ttl.seconds)
-                }
+            values.keys.forEach { key ->
+                conn.async().expire(key, ttl.seconds)
             }
             conn.flushCommands()
             conn.setAutoFlushCommands(true)

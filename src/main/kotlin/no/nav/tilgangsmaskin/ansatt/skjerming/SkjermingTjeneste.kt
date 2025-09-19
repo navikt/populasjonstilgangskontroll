@@ -13,9 +13,9 @@ class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
 
 
     @Cacheable(cacheNames = [SKJERMING], key = "#brukerId.verdi")
-    @WithSpan("skjermingtjeneste.skjerming")
+    @WithSpan
     fun skjerming(brukerId: BrukerId) = adapter.skjerming(brukerId.verdi)
-    @WithSpan("skjermingtjeneste.skjermingerbulk")
+    @WithSpan
     fun skjerminger(brukerIds: Set<BrukerId>) = adapter.skjerminger(brukerIds.map { it.verdi }.toSet())
 
 }

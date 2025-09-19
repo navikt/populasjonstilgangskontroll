@@ -90,7 +90,7 @@ class PdlRestClientAdapter(
 
 
     companion object {
-        private const val EXTRA = "medNærmesteFamilie"
+        private const val EXTRA = "medFamilie"
         private val PDL_CACHE = CacheConfig(PDL, EXTRA)
     }
 }

@@ -5,6 +5,7 @@ import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
+import java.time.Duration
 
 
 @ConfigurationProperties(PDL)
@@ -14,7 +15,7 @@ class PdlConfig(
     personPath: String = DEFAULT_PERSON_PATH,
     personBolkPath: String = DEFAULT_PERSON__BOLK_PATH,
     enabled: Boolean = true) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, PDL, enabled) {
-
+    
     override val navn = name
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 

@@ -50,26 +50,19 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
             }
 
     fun putMany(cache: CacheConfig, innslag: Map<String, Any>,  ttl: Duration) {
-        if (innslag.isEmpty()) {
-            log.trace("Skal legge til 0 verdier i cache ${cache.name}, gjør ingenting")
-        }
-        else {
+        if (innslag.isNotEmpty()) {
             val keysWithPrefix = innslag.mapKeys { handler.toKey(cache, it.key) }
-            val valuesAsJson = keysWithPrefix.mapValues { mapper.writeValueAsString(it.value) }
-            conn.sync().mset(valuesAsJson)
-            log.trace("Lager {} verdier for cache {} med prefix {}", valuesAsJson.values, cache.name, cache.extraPrefix)
+            val values = keysWithPrefix.mapValues { mapper.writeValueAsString(it.value) }
+            conn.setAutoFlushCommands(false)
+            conn.async().mset(values)
+            log.trace("Lagrer {} verdier for cache {} med prefix {}", values.values, cache.name, cache.extraPrefix)
             if (!ttl.isZero && !ttl.isNegative) {
-                for (key in valuesAsJson.keys) {
-                    if (!conn.sync().expire(key, ttl.seconds)) {
-                        log.warn("Kunne ikke sette ttl på cache ${cache.name} for key $key")
-                    }
-                    else {
-                        log.trace("Satt ttl på cache ${cache.name} for key $key til ${ttl.seconds} sekunder")
-                    }
+                values.keys.forEach { key ->
+                    conn.async().expire(key, ttl.seconds)
                 }
-            } else {
-                log.warn("Ikke satt ttl på cache ${cache.name} for key(s) ${valuesAsJson.keys} fordi ttl er $ttl")
             }
+            conn.flushCommands()
+            conn.setAutoFlushCommands(true)
         }
     }
 

@@ -51,12 +51,15 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
 
     fun putMany(cache: CacheConfig, innslag: Map<String, Any>,  ttl: Duration) {
         if (innslag.isNotEmpty()) {
-            val keys = innslag.mapKeys { handler.toKey(cache, it.key) }
-            val values = keys.mapValues { mapper.writeValueAsString(it.value) }
+            val payload = buildMap {
+                innslag.forEach { (key, value) ->
+                    put(handler.toKey(cache, key), mapper.writeValueAsString(value))
+                }
+            }
             conn.setAutoFlushCommands(false)
-            conn.async().mset(values)
-            log.trace("Lagrer {} verdier for cache {} med prefix {}", values.values, cache.name, cache.extraPrefix)
-            values.keys.forEach { key ->
+            conn.async().mset(payload)
+            log.trace("Lagrer {} verdier for cache {} med prefix {}", payload.values, cache.name, cache.extraPrefix)
+            payload.keys.forEach { key ->
                 conn.async().expire(key, ttl.seconds)
             }
             conn.flushCommands()

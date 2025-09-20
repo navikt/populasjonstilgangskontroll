@@ -30,14 +30,13 @@ import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
-import org.assertj.core.api.Assertions.assertThat
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import java.time.Duration
 import kotlin.test.assertEquals
 import org.awaitility.kotlin.await
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.atomic.AtomicBoolean
 
 @DataRedisTest
 @ContextConfiguration(classes = [TestApp::class])
@@ -62,8 +61,15 @@ class ValkeyServerTest {
 
     private lateinit var client: ValkeyCacheClient
 
+    private lateinit var listener: ValkeyKeyspaceRemovalListener
+
+    val eventReceived = AtomicBoolean(false)
+
     @BeforeEach
     fun setUp() {
+        every { token.system } returns "test"
+        every { token.clusterAndSystem } returns "test:dev-gcp"
+
         valkeyMapper =
             objectMapper.copy().apply {
                 activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
@@ -78,11 +84,18 @@ class ValkeyServerTest {
             ))
             .build()
         mgr.getCache(cacheName.name)
+        val redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
+        val teller = BulkCacheTeller(meterRegistry, token)
         client = ValkeyCacheClient(ValkeyCacheKeyHandler(mgr.cacheConfigurations),
-            create("redis://${redis.host}:${redis.firstMappedPort}").connect(), valkeyMapper,
-            BulkCacheSuksessTeller(meterRegistry, token),
-            BulkCacheTeller(meterRegistry,token)
+            redisClient.connect(), valkeyMapper,
+            BulkCacheSuksessTeller(meterRegistry, token), teller
         )
+        listener = object : ValkeyKeyspaceRemovalListener(teller) {
+            override fun message(channel: String, message: String) {
+                super.message(channel, message)
+                eventReceived.set(true)
+            }
+        }
     }
 
     @Test
@@ -95,11 +108,10 @@ class ValkeyServerTest {
         await.atMost(3, SECONDS).until {
             client.getOne<Person>(cacheName,id.verdi) == null
         }
-
-
     }
     @Test
     fun putAndGetMany() {
+        eventReceived.set(false)
         every { token.system }.returns("test")
         every { token.clusterAndSystem }.returns("test:dev-gcp")
         val id1 = BrukerId("03508331575")

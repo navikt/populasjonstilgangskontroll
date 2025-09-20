@@ -57,7 +57,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
     @Bean
     @Qualifier("cacheConnection")
     fun cacheConnection(client: RedisClient) = client.connect().apply {
-        sync().configSet("notify-keyspace-events", "Ex")
+      //  sync().configSet("notify-keyspace-events", "Ex")
     }
 
     @Bean

@@ -61,10 +61,6 @@ class ValkeyServerTest {
 
     private lateinit var client: ValkeyCacheClient
 
-    private lateinit var listener: ValkeyKeyspaceRemovalListener
-
-    val eventReceived = AtomicBoolean(false)
-
     @BeforeEach
     fun setUp() {
         every { token.system } returns "test"
@@ -87,14 +83,13 @@ class ValkeyServerTest {
         val redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
         val teller = BulkCacheTeller(meterRegistry, token)
         client = ValkeyCacheClient(ValkeyCacheKeyHandler(mgr.cacheConfigurations),
-            redisClient.connect(), valkeyMapper,
+            redisClient.connect().apply { sync().configSet("notify-keyspace-events", "Ex") }, valkeyMapper,
             BulkCacheSuksessTeller(meterRegistry, token), teller
         )
-        listener = object : ValkeyKeyspaceRemovalListener(teller) {
-            override fun message(channel: String, message: String) {
-                super.message(channel, message)
-                eventReceived.set(true)
-            }
+
+        redisClient.connectPubSub().apply {
+            addListener(ValkeyKeyspaceRemovalListener(teller))
+            sync().subscribe("__keyevent@0__:expired")
         }
     }
 
@@ -111,7 +106,6 @@ class ValkeyServerTest {
     }
     @Test
     fun putAndGetMany() {
-        eventReceived.set(false)
         every { token.system }.returns("test")
         every { token.clusterAndSystem }.returns("test:dev-gcp")
         val id1 = BrukerId("03508331575")

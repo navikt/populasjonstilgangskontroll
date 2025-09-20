@@ -6,6 +6,8 @@ import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.pluralize
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import io.opentelemetry.instrumentation.annotations.WithSpan
 
 @Service
@@ -33,7 +35,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
 
         return funnetBrukerIds.let { p ->
             if (p.isNotEmpty()) {
-                log.trace("Bulk slår opp {} for {}", "skjerming".pluralize(p), p)
+                log.trace("Bulk slår opp skjerming(er) for {}", p)
                 val skjerminger = skjermingTjeneste.skjerminger(p)
                 log.trace("Bulk slo opp ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
                 personer.map {

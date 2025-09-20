@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import io.lettuce.core.RedisClient
+import io.lettuce.core.api.StatefulRedisConnection
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
@@ -46,9 +48,22 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
         RedisClient.create(cfg.valkeyURI)
 
     @Bean
-    fun valkeyCacheClient(client: RedisClient, handler: ValkeyCacheKeyHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
+    fun pubSubConnection(client: RedisClient, listener: ValkeyKeyspaceRemovalListener) =
+        client.connectPubSub().apply {
+            addListener(listener)
+            async().subscribe("__keyevent@0__:expired")
+        }
+
+    @Bean
+    @Qualifier("cacheConnection")
+    fun cacheConnection(client: RedisClient) = client.connect().apply {
+        sync().configSet("notify-keyspace-events", "Ex")
+    }
+
+    @Bean
+    fun valkeyCacheClient(@Qualifier("cacheConnection") cacheConnection: StatefulRedisConnection<String,String>, handler: ValkeyCacheKeyHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
         ValkeyCacheClient(handler,
-            client.connect(),
+            cacheConnection,
             valKeyMapper,sucessTeller,teller)
 
     @Bean

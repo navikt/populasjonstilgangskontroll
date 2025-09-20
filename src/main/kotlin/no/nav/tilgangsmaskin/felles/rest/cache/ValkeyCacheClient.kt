@@ -16,6 +16,7 @@ class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
                         val alleTreffTeller: BulkCacheSuksessTeller,
                         val teller: BulkCacheTeller)  {
 
+
     val log = getLogger(javaClass)
 
 

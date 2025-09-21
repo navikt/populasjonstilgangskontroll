@@ -46,11 +46,6 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
         RedisClient.create(cfg.valkeyURI)
 
     @Bean
-    fun cacheConnection(client: RedisClient) = client.connect().apply {
-      //  sync().configSet("notify-keyspace-events", "Ex")
-    }
-
-    @Bean
     fun valkeyCacheClient(client: RedisClient, handler: ValkeyCacheKeyHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
         ValkeyCacheClient(
             client,handler,

@@ -4,13 +4,13 @@ import io.lettuce.core.pubsub.RedisPubSubAdapter
 import io.micrometer.core.instrument.Tags.of
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
-import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
  class ValkeyKeyspaceRemovalListener(private val teller: BulkCacheTeller) : RedisPubSubAdapter<String, String>() {
 
-    private val log = LoggerFactory.getLogger(ValkeyKeyspaceRemovalListener::class.java)
+    private val log = getLogger(javaClass)
 
     override fun message(channel: String, message: String) {
         if (!channel.startsWith("__keyevent@0__:expired")) {

@@ -87,10 +87,7 @@ class ValkeyServerTest {
             BulkCacheSuksessTeller(meterRegistry, token), teller
         )
 
-        redisClient.connectPubSub().apply {
-            addListener(ValkeyKeyspaceRemovalListener(redisClient,teller))
-            sync().subscribe("__keyevent@0__:expired")
-        }
+        ValkeyKeyspaceRemovalListener(redisClient,teller)
     }
 
     @Test

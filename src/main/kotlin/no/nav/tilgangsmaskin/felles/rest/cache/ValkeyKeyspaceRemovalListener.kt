@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component
 
     override fun message(channel: String, message: String) =
         if (!channel.startsWith("__keyevent@0__:expired")) {
-            log.warn("Uventet keyevent på channel $channel med message $message")
+            log.warn("Uventet hendelse på channel $channel med melding $message")
         }
         else {
             val (id, cache, method) = detaljerFra(message)

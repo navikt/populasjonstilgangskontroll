@@ -1,11 +1,9 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
 import io.lettuce.core.pubsub.RedisPubSubAdapter
-import io.lettuce.core.pubsub.RedisPubSubListener
 import io.micrometer.core.instrument.Tags.of
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
-import org.hibernate.annotations.Comment
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 

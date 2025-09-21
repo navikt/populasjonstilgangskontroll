@@ -11,10 +11,10 @@ import org.springframework.stereotype.Component
 @Component
  class ValkeyKeyspaceRemovalListener(client: RedisClient, val teller: BulkCacheTeller) : RedisPubSubAdapter<String, String>() {
     private val log = getLogger(javaClass)
-    
+
      init {
          client.connectPubSub().apply {
-             log.info("starting valkey consumer on channel '$CHANNEL'")
+             log.info("Starter Valkey hendelsesonsument på kanal '$CHANNEL'")
              addListener(this@ValkeyKeyspaceRemovalListener)
              sync().subscribe(CHANNEL)
          }

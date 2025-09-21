@@ -36,8 +36,7 @@ import org.springframework.stereotype.Component
             Triple(last(), first(), if (size > 2) this[1] else null)
         }
 
-    companion object
-    {
+    companion object {
         private const val CHANNEL = "__keyevent@0__:expired"
     }
 }

@@ -88,7 +88,7 @@ class ValkeyServerTest {
         )
 
         redisClient.connectPubSub().apply {
-            addListener(ValkeyKeyspaceRemovalListener(teller))
+            addListener(ValkeyKeyspaceRemovalListener(redisClient,teller))
             sync().subscribe("__keyevent@0__:expired")
         }
     }

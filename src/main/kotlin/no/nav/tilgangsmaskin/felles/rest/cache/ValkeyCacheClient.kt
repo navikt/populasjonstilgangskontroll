@@ -37,9 +37,12 @@ class ValkeyCacheClient(
 
     fun putOne(cache: CacheConfig, id: String, value: Any, ttl: Duration)  {
         with(handler.toKey(cache,id)) {
-            conn.sync().set(this, mapper.writeValueAsString(value))
-            if (!ttl.isZero && !ttl.isNegative) {
-                conn.sync().expire(this, ttl.seconds)
+            conn.apply {
+                setAutoFlushCommands(false)
+                async().set(this@with, mapper.writeValueAsString(value))
+                async().expire(this@with, ttl.seconds)
+                flushCommands()
+                setAutoFlushCommands(true)
             }
         }
     }

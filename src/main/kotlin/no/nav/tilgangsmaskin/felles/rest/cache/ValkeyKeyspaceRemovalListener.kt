@@ -10,15 +10,16 @@ import org.springframework.stereotype.Component
 
 @Component
  class ValkeyKeyspaceRemovalListener(client: RedisClient, val teller: BulkCacheTeller) : RedisPubSubAdapter<String, String>() {
-
+    private val log = getLogger(javaClass)
+    
      init {
          client.connectPubSub().apply {
+             log.info("starting valkey consumer on channel '$CHANNEL'")
              addListener(this@ValkeyKeyspaceRemovalListener)
-             sync().subscribe("__keyevent@0__:expired")
+             sync().subscribe(CHANNEL)
          }
      }
 
-    private val log = getLogger(javaClass)
 
     override fun message(channel: String, message: String) =
         if (!channel.startsWith("__keyevent@0__:expired")) {
@@ -34,4 +35,8 @@ import org.springframework.stereotype.Component
         with(message.split("::", ":")) {
             Triple(last(), first(), if (size > 2) this[1] else null)
         }
+
+    companion object
+    {
+        const val CHANNEL = "__keyevent@0__:expired"
 }

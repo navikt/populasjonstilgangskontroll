@@ -38,5 +38,6 @@ import org.springframework.stereotype.Component
 
     companion object
     {
-        const val CHANNEL = "__keyevent@0__:expired"
+        private const val CHANNEL = "__keyevent@0__:expired"
+    }
 }

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 
      init {
          client.connectPubSub().apply {
-             log.info("Starter Valkey hendelsesonsument på kanal '$CHANNEL'")
+             log.info("Starter Valkey hendelseskonsument på kanal '$CHANNEL'")
              addListener(this@ValkeyKeyspaceRemovalListener)
              sync().subscribe(CHANNEL)
          }

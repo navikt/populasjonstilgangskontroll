@@ -12,14 +12,15 @@ import org.springframework.stereotype.Component
 
     private val log = getLogger(javaClass)
 
-    override fun message(channel: String, message: String) {
+    override fun message(channel: String, message: String) =
         if (!channel.startsWith("__keyevent@0__:expired")) {
             log.warn("Uventet keyevent på channel $channel med message $message")
-            return
         }
-        val (id, cache, method) = detaljerFra(message)
-        teller.tell(of("cache", cache, "result", "expired", "method", method ?: "ingen"))
-        log.info("Keyspace expiry: $cache ${id.maskFnr()} $method")
+        else {
+            val (id, cache, method) = detaljerFra(message)
+            teller.tell(of("cache", cache, "result", "expired", "method", method ?: "ingen"))
+            log.info("Keyspace expiry: $cache ${id.maskFnr()} $method")
+        }
     }
 
     private fun detaljerFra(message: String) =

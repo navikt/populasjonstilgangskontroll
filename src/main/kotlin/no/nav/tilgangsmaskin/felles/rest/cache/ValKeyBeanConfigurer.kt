@@ -48,13 +48,6 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
         RedisClient.create(cfg.valkeyURI)
 
     @Bean
-    fun pubSubConnection(client: RedisClient, listener: ValkeyKeyspaceRemovalListener) =
-        client.connectPubSub().apply {
-            addListener(listener)
-            async().subscribe("__keyevent@0__:expired")
-        }
-
-    @Bean
     @Qualifier("cacheConnection")
     fun cacheConnection(client: RedisClient) = client.connect().apply {
       //  sync().configSet("notify-keyspace-events", "Ex")

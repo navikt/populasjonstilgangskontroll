@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
+import io.lettuce.core.RedisClient
 import io.lettuce.core.pubsub.RedisPubSubAdapter
 import io.micrometer.core.instrument.Tags.of
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
@@ -8,7 +9,14 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
- class ValkeyKeyspaceRemovalListener(private val teller: BulkCacheTeller) : RedisPubSubAdapter<String, String>() {
+ class ValkeyKeyspaceRemovalListener(client: RedisClient, val teller: BulkCacheTeller) : RedisPubSubAdapter<String, String>() {
+
+     init {
+         client.connectPubSub().apply {
+             addListener(this@ValkeyKeyspaceRemovalListener)
+             sync().subscribe("__keyevent@0__:expired")
+         }
+     }
 
     private val log = getLogger(javaClass)
 

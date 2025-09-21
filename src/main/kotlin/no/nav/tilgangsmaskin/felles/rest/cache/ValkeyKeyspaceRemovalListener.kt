@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component
             teller.tell(of("cache", cache, "result", "expired", "method", method ?: "ingen"))
             log.info("Keyspace expiry: $cache ${id.maskFnr()} $method")
         }
-    }
 
     private fun detaljerFra(message: String) =
         with(message.split("::", ":")) {

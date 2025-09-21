@@ -2,22 +2,32 @@ package no.nav.tilgangsmaskin.felles.rest.cache
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.lettuce.core.api.StatefulRedisConnection
+import io.lettuce.core.RedisClient
 import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
 import java.time.Duration
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 
-class ValkeyCacheClient(val handler: ValkeyCacheKeyHandler,
-                        val conn: StatefulRedisConnection<String,String>,
-                        val mapper: ObjectMapper,
-                        val alleTreffTeller: BulkCacheSuksessTeller,
-                        val teller: BulkCacheTeller)  {
-
+class ValkeyCacheClient(
+    client: RedisClient,
+    val handler: ValkeyCacheKeyHandler,
+    val mapper: ObjectMapper,
+    val alleTreffTeller: BulkCacheSuksessTeller,
+    val teller: BulkCacheTeller
+)  {
 
     val log = getLogger(javaClass)
+
+
+    val conn = client.connect().apply {
+        if (isLocalOrTest) {
+            sync().configSet("notify-keyspace-events", "Ex")
+        }
+    }
+
 
 
     inline fun <reified T> getOne(cache: CacheConfig, id: String) =

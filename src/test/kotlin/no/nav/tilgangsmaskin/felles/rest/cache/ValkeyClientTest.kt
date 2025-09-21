@@ -36,7 +36,6 @@ import java.time.Duration
 import kotlin.test.assertEquals
 import org.awaitility.kotlin.await
 import java.util.concurrent.TimeUnit.SECONDS
-import java.util.concurrent.atomic.AtomicBoolean
 
 @DataRedisTest
 @ContextConfiguration(classes = [TestApp::class])
@@ -82,8 +81,9 @@ class ValkeyServerTest {
         mgr.getCache(cacheName.name)
         val redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
         val teller = BulkCacheTeller(meterRegistry, token)
-        client = ValkeyCacheClient(ValkeyCacheKeyHandler(mgr.cacheConfigurations),
-            redisClient.connect().apply { sync().configSet("notify-keyspace-events", "Ex") }, valkeyMapper,
+        client = ValkeyCacheClient(
+            redisClient,
+            ValkeyCacheKeyHandler(mgr.cacheConfigurations), valkeyMapper,
             BulkCacheSuksessTeller(meterRegistry, token), teller
         )
 

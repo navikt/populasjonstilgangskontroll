@@ -4,13 +4,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import io.lettuce.core.RedisClient
-import io.lettuce.core.api.StatefulRedisConnection
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
@@ -44,20 +42,20 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             .build()
 
     @Bean
-    fun valkeyClient(cfg: ValKeyConfig): RedisClient =
+    fun valkeyClient(cfg: ValKeyConfig) =
         RedisClient.create(cfg.valkeyURI)
 
     @Bean
-    @Qualifier("cacheConnection")
     fun cacheConnection(client: RedisClient) = client.connect().apply {
       //  sync().configSet("notify-keyspace-events", "Ex")
     }
 
     @Bean
-    fun valkeyCacheClient(@Qualifier("cacheConnection") cacheConnection: StatefulRedisConnection<String,String>, handler: ValkeyCacheKeyHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
-        ValkeyCacheClient(handler,
-            cacheConnection,
-            valKeyMapper,sucessTeller,teller)
+    fun valkeyCacheClient(client: RedisClient, handler: ValkeyCacheKeyHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
+        ValkeyCacheClient(
+            client,handler,
+            valKeyMapper, sucessTeller, teller
+        )
 
     @Bean
     fun cachePrefixes(cfgs: Map<String, RedisCacheConfiguration>) = cfgs.mapValues { it.value.keyPrefix}

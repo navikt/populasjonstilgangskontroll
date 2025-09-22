@@ -57,7 +57,8 @@ class ValkeyClientTest {
 
     @Autowired
     private lateinit var cf: RedisConnectionFactory
-
+    private lateinit var person1:  Person
+    private lateinit var person2:  Person
     private lateinit var client: ValkeyCacheClient
 
     @BeforeEach
@@ -88,36 +89,35 @@ class ValkeyClientTest {
             BulkCacheSuksessTeller(meterRegistry, token), teller
         )
         ValkeyKeyspaceRemovalListener(redisClient, handler,teller)
+        val id1 = BrukerId("03508331575")
+        val id2 = BrukerId("20478606614")
+        val aktør1 = AktørId("1234567890123")
+        val aktør2 = AktørId("1111111111111")
+        person1 = Person(id1,id1.verdi,aktør1, KommuneTilknytning(Kommune("0301")))
+        person2 = Person(id2, id2.verdi,aktør2, KommuneTilknytning(Kommune("1111")))
     }
 
     @Test
     fun putAndGetOne() {
-        val id = BrukerId("03508331575")
-        val person = Person(id, id.verdi,AktørId("1234567890123"), KommuneTilknytning(Kommune("0301")))
-        client.putOne(cacheName, id.verdi,person, Duration.ofSeconds(1))
-        val one = client.getOne<Person>(cacheName,id.verdi)
-        assertEquals(person, one)
+        client.putOne(cacheName, person1.brukerId.verdi,person1, Duration.ofSeconds(1))
+        val one = client.getOne<Person>(cacheName,person1.brukerId.verdi)
+        assertEquals(person1, one)
         await.atMost(3, SECONDS).until {
-            client.getOne<Person>(cacheName,id.verdi) == null
+            client.getOne<Person>(cacheName,person1.brukerId.verdi) == null
         }
     }
     @Test
     fun putAndGetMany() {
         every { token.system }.returns("test")
         every { token.clusterAndSystem }.returns("test:dev-gcp")
-        val id1 = BrukerId("03508331575")
-        val id2 = BrukerId("20478606614")
-        val aktør1 = AktørId("1234567890123")
-        val aktør2 = AktørId("1111111111111")
-        val person1 = Person(id1,id1.verdi,aktør1, KommuneTilknytning(Kommune("0301")))
-        val person2 = Person(id2, id2.verdi,aktør2, KommuneTilknytning(Kommune("1111")))
-        val keys = setOf(id1.verdi,id2.verdi)
-        client.putMany(cacheName, mapOf(id1.verdi to person1, id2.verdi to person2), Duration.ofSeconds(1))
-        val many = client.getMany<Person>(cacheName,setOf(id1.verdi,id2.verdi))
-        assertEquals(keys, many.keys)
+
+        val ids = setOf(person1.brukerId.verdi,person2.brukerId.verdi)
+        client.putMany(cacheName, mapOf(person1.brukerId.verdi to person1, person2.brukerId.verdi to person2), Duration.ofSeconds(1))
+        val many = client.getMany<Person>(cacheName,ids)
+        assertEquals(ids, many.keys)
         assertEquals(setOf(person1, person2), many.values.toSet())
         await.atMost(3, SECONDS).until {
-            client.getMany<Person>(cacheName,setOf(id1.verdi,id2.verdi)).isEmpty()
+            client.getMany<Person>(cacheName,ids).isEmpty()
         }
     }
 

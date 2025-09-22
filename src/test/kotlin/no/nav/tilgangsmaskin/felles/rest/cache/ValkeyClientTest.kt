@@ -36,6 +36,7 @@ import java.time.Duration
 import kotlin.test.assertEquals
 import org.awaitility.kotlin.await
 import java.util.concurrent.TimeUnit.SECONDS
+import org.assertj.core.api.Assertions.assertThat
 
 @DataRedisTest
 @ContextConfiguration(classes = [TestApp::class])
@@ -116,6 +117,7 @@ class ValkeyClientTest {
         val many = client.getMany<Person>(cacheName,ids)
         assertEquals(ids, many.keys)
         assertEquals(setOf(person1, person2), many.values.toSet())
+        assertThat(client.getAll(cacheName.name).containsAll(ids))
         await.atMost(3, SECONDS).until {
             client.getMany<Person>(cacheName,ids).isEmpty()
         }

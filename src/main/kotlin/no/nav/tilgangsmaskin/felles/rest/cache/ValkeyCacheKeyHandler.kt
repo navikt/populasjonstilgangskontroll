@@ -8,19 +8,26 @@ import org.springframework.stereotype.Component
 class ValkeyCacheKeyHandler(val configs: Map<String, RedisCacheConfiguration>) {
     private val log = getLogger(javaClass)
 
-    fun toKey(cache: CacheConfig, key: String) =
-        ("${prefixFor(cache)}${cache.extraPrefix?.let { "$it:" } ?: ""}$key").also {
-            log.trace("La til prefix for cache {}: {} -> {}", cache, key, it)
-        }
+    fun toKey(cache: CacheConfig, key: String): String {
+        val prefix = prefixFor(cache)
+        val extra = cache.extraPrefix?.let { "$it:" } ?: ""
+        return "$prefix::$extra$key"
+    }
 
-    fun fromKey(cache: CacheConfig, key: String)  =
-        key.removePrefix("${prefixFor(cache)}${cache.extraPrefix?.let { "$it:" } ?: ""}").also {
-            log.trace("Fjernet prefix for cache {}: {} -> {}",  cache, key, it)
-        }
+    fun fromKey(key: String): String {
+        val (cache, _, id) = detaljerFra(key)
+        log.trace("Fjernet prefix for  {}: {} -> {}", cache, key, id)
+        return id
+    }
 
     private fun prefixFor(cache: CacheConfig): String =
         configs[cache.name]?.getKeyPrefixFor(cache.name)
             ?: throw IllegalStateException("Har ingen cache med navn ${cache.name}")
+
+    fun detaljerFra(key: String) =
+        with(key.split("::", ":")) {
+            Triple(first(), if (size > 2) this[1] else null,last() )
+        }
 }
 
  data class CacheConfig(val name: String, val extraPrefix: String? = null)

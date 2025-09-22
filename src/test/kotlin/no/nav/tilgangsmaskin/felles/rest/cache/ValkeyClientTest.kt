@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(MockKExtension::class)
 @Import(JacksonAutoConfiguration::class)
-class ValkeyServerTest {
+class ValkeyClientTest {
 
     private val cacheName = CacheConfig("testCache","extra")
 
@@ -81,13 +81,12 @@ class ValkeyServerTest {
         mgr.getCache(cacheName.name)
         val redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
         val teller = BulkCacheTeller(meterRegistry, token)
+        val handler = ValkeyCacheKeyHandler(mgr.cacheConfigurations)
         client = ValkeyCacheClient(
             redisClient,
-            ValkeyCacheKeyHandler(mgr.cacheConfigurations), valkeyMapper,
+            handler, valkeyMapper,
             BulkCacheSuksessTeller(meterRegistry, token), teller
         )
-
-        ValkeyKeyspaceRemovalListener(redisClient,teller)
     }
 
     @Test

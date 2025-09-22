@@ -60,7 +60,7 @@ class ValkeyCacheClient(
                 it.hasValue()
             }
             .associate {
-                handler.fromKey(cache, it.key) to mapper.readValue<T>(it.value)
+                handler.fromKey(it.key) to mapper.readValue<T>(it.value)
             }.also {
                 tellOgLog(cache.name, it.size, ids.size)
             }

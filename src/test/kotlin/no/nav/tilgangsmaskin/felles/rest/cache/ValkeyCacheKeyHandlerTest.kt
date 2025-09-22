@@ -18,39 +18,38 @@ class ValkeyCacheKeyHandlerTest {
     private val key = "myKey"
     private val UTEN_EXTRA =   CacheConfig("testCache")
     private val MED_EXTRA = UTEN_EXTRA.copy(extraPrefix = "extra")
-    private val prefix = "prefix::"
     @MockK
     private lateinit var redisConfig: RedisCacheConfiguration
     private lateinit var handler: ValkeyCacheKeyHandler
 
     @BeforeEach
     fun setUp() {
-        every { redisConfig.getKeyPrefixFor(MED_EXTRA.name) } returns prefix
+        every { redisConfig.getKeyPrefixFor(MED_EXTRA.name) } returns MED_EXTRA.name
         handler = ValkeyCacheKeyHandler(mapOf(MED_EXTRA.name to redisConfig))
     }
 
     @Test
     @DisplayName("toKey adds prefix and key")
     fun toKey_addsPrefixAndKey() {
-        assertEquals("$prefix$key", handler.toKey(UTEN_EXTRA, key))
+        assertEquals("${UTEN_EXTRA.name}::$key", handler.toKey(UTEN_EXTRA, key))
     }
 
     @Test
     @DisplayName("toKey adds extraPrefix when provided")
     fun toKey_addsExtraPrefix() {
-        assertEquals("$prefix${MED_EXTRA.extraPrefix}:$key", handler.toKey(MED_EXTRA, key))
+        assertEquals("${MED_EXTRA.name}::${MED_EXTRA.extraPrefix}:$key", handler.toKey(MED_EXTRA, key))
     }
 
     @Test
     @DisplayName("fromKey removes prefix and extraPrefix")
     fun fromKey_removesPrefixAndExtraPrefix() {
-        assertEquals(key, handler.fromKey(MED_EXTRA, "${prefix}${MED_EXTRA.extraPrefix}:${key}"))
+        assertEquals(key, handler.fromKey(handler.toKey(MED_EXTRA, key)))
     }
 
     @Test
     @DisplayName("fromKey removes only prefix when extraPrefix is null")
     fun fromKey_removesOnlyPrefix() {
-        assertEquals(key, handler.fromKey(UTEN_EXTRA, "${prefix}${key}"))
+        assertEquals(key, handler.fromKey( handler.toKey(UTEN_EXTRA, key)))
     }
 
     @Test

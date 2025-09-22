@@ -33,11 +33,9 @@ class NomDBOpprydder(registry: MeterRegistry, private val nom: NomTjeneste) : Ab
     }
 }
 
-abstract class AbstractLederUtvelger {
+abstract class AbstractLederUtvelger(var erLeder: Boolean = false) {
     protected val hostname = InetAddress.getLocalHost().hostName
-    protected var erLeder: Boolean = false
-
-    protected fun doHandleLeaderChange(event: LeaderChangedEvent)  = Unit
+    protected fun doHandleLeaderChange()  = Unit
 
     private val log = getLogger(javaClass)
 
@@ -46,7 +44,7 @@ abstract class AbstractLederUtvelger {
         erLeder = event.leder == hostname
         if (erLeder) {
             log.info("Denne instansen ($hostname) er nå leder")
-            doHandleLeaderChange(event)
+            doHandleLeaderChange()
         }
     }
 }

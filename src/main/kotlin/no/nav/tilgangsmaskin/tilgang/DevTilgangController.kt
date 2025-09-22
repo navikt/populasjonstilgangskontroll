@@ -63,7 +63,7 @@ class DevTilgangController(
     fun cachePersoner(@RequestBody  navIds: Set<String>) = cache.getMany<Person>(CacheConfig(PDL),navIds)
 
     @GetMapping("cache/keys/{cacheName}")
-    fun keys(@PathVariable  cacheName: String) = cache.getAll(cacheName)
+    fun keys(@PathVariable cacheName: String) = cache.getAll(cacheName)
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.partnere(id)

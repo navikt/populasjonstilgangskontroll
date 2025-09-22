@@ -48,7 +48,7 @@ class ValkeyCacheClient(
     @WithSpan
     fun getAll(cache: String) =
         conn.sync().keys("$cache::*").map {
-            handler::fromKey
+            handler.fromKey(it)
         }.also {
             log.info("Fant ${it.size} nøkler i cache $cache")
         }

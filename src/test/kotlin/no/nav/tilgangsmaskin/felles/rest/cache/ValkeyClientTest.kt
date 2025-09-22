@@ -55,6 +55,8 @@ class ValkeyClientTest {
     @MockkBean
     private lateinit var token: Token
 
+    private lateinit var listener: ValkeyKeyspaceRemovalListener
+
     @Autowired
     private lateinit var cf: RedisConnectionFactory
     private lateinit var person1:  Person
@@ -88,7 +90,7 @@ class ValkeyClientTest {
             handler, valkeyMapper,
             BulkCacheSuksessTeller(meterRegistry, token), teller
         )
-        ValkeyKeyspaceRemovalListener(redisClient, handler,teller)
+        listener = ValkeyKeyspaceRemovalListener(redisClient, handler,teller)
         val id1 = BrukerId("03508331575")
         val id2 = BrukerId("20478606614")
         person1 = Person(id1,id1.verdi, AktørId("1234567890123"), KommuneTilknytning(Kommune("0301")))
@@ -116,6 +118,12 @@ class ValkeyClientTest {
         assertThat(client.getAll(cacheName.name)).containsExactlyInAnyOrderElementsOf(ids)
         await.atMost(3, SECONDS).until {
             client.getMany<Person>(cacheName,ids).isEmpty()
+        }
+        await.atMost(3, SECONDS).until {
+            client.getMany<Person>(cacheName,ids).isEmpty()
+        }
+        await.atMost(3, SECONDS).until {
+            listener.fjernet.get() == 2
         }
     }
 

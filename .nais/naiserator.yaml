@@ -8,7 +8,7 @@ metadata:
 spec:
   valkey:
     - instance: {{nais.cluster.cache}}
-      access: readwrite
+      access: admin
   leaderElection: true
   kafka:
     pool: nav-{{nais.cluster.type}}

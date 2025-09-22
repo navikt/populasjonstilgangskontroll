@@ -5,7 +5,7 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.stereotype.Component
 
 @Component
-class ValkeyCacheKeyHandler(val configs: Map<String, RedisCacheConfiguration>) {
+class ValkeyCacheKeyMapper(val configs: Map<String, RedisCacheConfiguration>) {
     private val log = getLogger(javaClass)
 
     fun toKey(cache: CacheConfig, key: String): String {

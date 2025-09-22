@@ -20,12 +20,12 @@ class ValkeyCacheKeyHandlerTest {
     private val MED_EXTRA = UTEN_EXTRA.copy(extraPrefix = "extra")
     @MockK
     private lateinit var redisConfig: RedisCacheConfiguration
-    private lateinit var handler: ValkeyCacheKeyHandler
+    private lateinit var handler: ValkeyCacheKeyMapper
 
     @BeforeEach
     fun setUp() {
         every { redisConfig.getKeyPrefixFor(MED_EXTRA.name) } returns MED_EXTRA.name
-        handler = ValkeyCacheKeyHandler(mapOf(MED_EXTRA.name to redisConfig))
+        handler = ValkeyCacheKeyMapper(mapOf(MED_EXTRA.name to redisConfig))
     }
 
     @Test
@@ -56,7 +56,7 @@ class ValkeyCacheKeyHandlerTest {
     @DisplayName("throws exception if cache config is missing")
     fun throwsExceptionIfCacheConfigMissing() {
         assertThrows<IllegalStateException> {
-            ValkeyCacheKeyHandler(emptyMap()).toKey(CacheConfig("unknown"), "key")
+            ValkeyCacheKeyMapper(emptyMap()).toKey(CacheConfig("unknown"), "key")
         }
     }
 }

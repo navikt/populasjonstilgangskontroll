@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
- class ValkeyKeyspaceRemovalListener(client: RedisClient, private val handler: ValkeyCacheKeyHandler,val teller: BulkCacheTeller) : RedisPubSubAdapter<String, String>() {
+ class ValkeyKeyspaceRemovalListener(client: RedisClient, private val mapper: ValkeyCacheKeyMapper, val teller: BulkCacheTeller) : RedisPubSubAdapter<String, String>() {
     private val log = getLogger(javaClass)
 
      init {
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component
             log.warn("Uventet hendelse på channel $channel med melding $message")
         }
         else {
-            val (cache, method, id) = handler.detaljerFra(message)
+            val (cache, method, id) = mapper.detaljerFra(message)
             teller.tell(of("cache", cache, "result", "expired", "method", method ?: "ingen"))
             log.info("Keyspace expiry: $cache ${id.maskFnr()} $method")
         }

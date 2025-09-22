@@ -82,7 +82,7 @@ class ValkeyClientTest {
         mgr.getCache(cacheName.name)
         val redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
         val teller = BulkCacheTeller(meterRegistry, token)
-        val handler = ValkeyCacheKeyHandler(mgr.cacheConfigurations)
+        val handler = ValkeyCacheKeyMapper(mgr.cacheConfigurations)
         client = ValkeyCacheClient(
             redisClient,
             handler, valkeyMapper,

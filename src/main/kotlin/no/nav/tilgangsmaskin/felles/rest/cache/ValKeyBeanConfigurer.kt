@@ -46,7 +46,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
         RedisClient.create(cfg.valkeyURI)
 
     @Bean
-    fun valkeyCacheClient(client: RedisClient, handler: ValkeyCacheKeyHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
+    fun valkeyCacheClient(client: RedisClient, handler: ValkeyCacheKeyMapper, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
         ValkeyCacheClient(
             client,handler,
             valKeyMapper, sucessTeller, teller

@@ -13,7 +13,7 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocal
 
 class ValkeyCacheClient(
     client: RedisClient,
-    val handler: ValkeyCacheKeyHandler,
+    val keyMapper: ValkeyCacheKeyMapper,
     val mapper: ObjectMapper,
     val alleTreffTeller: BulkCacheSuksessTeller,
     val teller: BulkCacheTeller
@@ -29,12 +29,12 @@ class ValkeyCacheClient(
     }
 
     inline fun <reified T> getOne(cache: CacheConfig, id: String) =
-        conn.sync().get(handler.toKey(cache,id))?.let { json ->
+        conn.sync().get(keyMapper.toKey(cache,id))?.let { json ->
             mapper.readValue<T>(json)
         }
 
     fun putOne(cache: CacheConfig, id: String, value: Any, ttl: Duration)  {
-        with(handler.toKey(cache,id)) {
+        with(keyMapper.toKey(cache,id)) {
             conn.apply {
                 setAutoFlushCommands(false)
                 async().set(this@with, mapper.writeValueAsString(value))
@@ -48,7 +48,7 @@ class ValkeyCacheClient(
     @WithSpan
     fun getAll(cache: String) =
         conn.sync().keys("$cache::*").map {
-            handler.fromKey(it)
+            keyMapper.fromKey(it)
         }.also {
             log.info("Fant ${it.size} nøkler i cache $cache")
         }
@@ -60,13 +60,13 @@ class ValkeyCacheClient(
         }
         else conn.sync()
             .mget(*ids.map {
-                    id -> handler.toKey(cache,id)}.toTypedArray<String>()
+                    id -> keyMapper.toKey(cache,id)}.toTypedArray<String>()
             )
             .filter {
                 it.hasValue()
             }
             .associate {
-                handler.fromKey(it.key) to mapper.readValue<T>(it.value)
+                keyMapper.fromKey(it.key) to mapper.readValue<T>(it.value)
             }.also {
                 tellOgLog(cache.name, it.size, ids.size)
             }
@@ -92,7 +92,7 @@ class ValkeyCacheClient(
     private fun payloadFor(innslag: Map<String, Any>, cache: CacheConfig)=
         buildMap {
             innslag.forEach { (key, value) ->
-                put(handler.toKey(cache, key), mapper.writeValueAsString(value))
+                put(keyMapper.toKey(cache, key), mapper.writeValueAsString(value))
             }
         }
 

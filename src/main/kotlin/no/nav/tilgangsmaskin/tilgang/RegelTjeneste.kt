@@ -63,7 +63,9 @@ class RegelTjeneste(
             log.debug("Kjører bulk regler for {} med {} ident(er)", ansattId, idOgType.size)
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val brukere = idOgType.brukerOgRegelsett()
-            val resultater = motor.bulkRegler(ansatt, brukere)
+            val resultater = motor.bulkRegler(ansatt, brukere).also {
+                log.debug("Bulk resultater {}", it)
+            }
             val godkjente = godkjente(ansatt, resultater)
             val avviste = avviste(ansatt, godkjente, resultater, brukere)
             val ikkeFunnet = ikkeFunnet(idOgType, resultater)

@@ -52,7 +52,7 @@ class RegelMotor(
     fun bulkRegler(ansatt: Ansatt, brukere: Set<BrukerOgRegelsett>) =
         (brukere.map { (bruker, type) ->
             runCatching {
-                logger.trace("Evaluerer ${bruker.oppslagId.maskFnr()}")
+                logger.trace("Bulk evaluerer ${bruker.oppslagId.maskFnr()}")
                 evaluer(ansatt, bruker, type.regelSett())
                 ok(bruker)
             }.getOrElse {

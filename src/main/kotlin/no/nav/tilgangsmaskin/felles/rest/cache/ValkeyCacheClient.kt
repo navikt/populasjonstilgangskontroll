@@ -23,9 +23,9 @@ class ValkeyCacheClient(
 
 
     val conn = client.connect().apply {
-        if (isLocalOrTest) {
+       // if (isLocalOrTest) {
             sync().configSet("notify-keyspace-events", "Ex")
-        }
+       // }
     }
 
     @WithSpan

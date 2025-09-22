@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component
                 val (cache, method, id) = mapper.detaljerFra(message)
                 teller.tell(of("cache", cache, "result", "expired", "method", method ?: "ingen"))
                 fjernet.incrementAndGet()
-                log.info("Keyspace expiry: $cache ${id.maskFnr()} $method")
+                log.info("Innslag fjernet: $cache ${id.maskFnr()} $method")
             }
             else {
                 log.info("Ignorerer melding, er ikke leder")

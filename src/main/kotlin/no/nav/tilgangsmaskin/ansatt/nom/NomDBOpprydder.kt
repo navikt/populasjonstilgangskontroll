@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.ansatt.nom
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.felles.utils.LederUtvelger.LeaderChangedEvent
-import org.slf4j.LoggerFactory
 import org.springframework.context.event.EventListener
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -45,6 +44,9 @@ abstract class AbstractLederUtvelger(var erLeder: Boolean = false) {
         if (erLeder) {
             log.info("Denne instansen ($hostname) er nå leder")
             doHandleLeaderChange()
+        }
+        else {
+            log.info("Denne instansen ($hostname) er IKKE leder, lederen er ${event.leder}")
         }
     }
 }

@@ -28,11 +28,13 @@ class ValkeyCacheClient(
         }
     }
 
+    @WithSpan
     inline fun <reified T> getOne(cache: CacheConfig, id: String) =
         conn.sync().get(keyMapper.toKey(cache,id))?.let { json ->
             mapper.readValue<T>(json)
         }
 
+    @WithSpan
     fun putOne(cache: CacheConfig, id: String, value: Any, ttl: Duration)  {
         with(keyMapper.toKey(cache,id)) {
             conn.apply {

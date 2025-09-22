@@ -33,8 +33,13 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import java.time.Duration
+import java.util.UUID
 import org.awaitility.kotlin.await
 import java.util.concurrent.TimeUnit.SECONDS
+import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
+import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import org.assertj.core.api.Assertions.assertThat
 
 @DataRedisTest
@@ -45,7 +50,7 @@ import org.assertj.core.api.Assertions.assertThat
 @Import(JacksonAutoConfiguration::class)
 class ValkeyClientTest {
 
-    private val cacheName = CacheConfig("testCache","extra")
+    private val pdl = CacheConfig(PDL,"medFamilie")
 
     @Autowired
     private lateinit var objectMapper: ObjectMapper
@@ -54,6 +59,12 @@ class ValkeyClientTest {
 
     @MockkBean
     private lateinit var token: Token
+
+    @MockkBean
+    private lateinit var entra: EntraTjeneste
+
+    @MockkBean
+    private lateinit var oid: AnsattOidTjeneste
 
     private lateinit var listener: ValkeyKeyspaceRemovalListener
 
@@ -76,12 +87,12 @@ class ValkeyClientTest {
 
         val mgr = builder(cf)
             .withInitialCacheConfigurations(mapOf(
-                cacheName.name to RedisCacheConfiguration.defaultCacheConfig()
-                    .prefixCacheNameWith("myprefix::")
+                pdl.name to RedisCacheConfiguration.defaultCacheConfig()
+                    .prefixCacheNameWith(PDL)
                     .disableCachingNullValues()
             ))
             .build()
-        mgr.getCache(cacheName.name)
+        mgr.getCache(pdl.name)
         val redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
         val teller = BulkCacheTeller(meterRegistry, token)
         val handler = ValkeyCacheKeyMapper(mgr.cacheConfigurations)
@@ -90,37 +101,40 @@ class ValkeyClientTest {
             handler, valkeyMapper,
             BulkCacheSuksessTeller(meterRegistry, token), teller
         )
-        listener = ValkeyKeyspaceRemovalListener(redisClient, handler,teller,true)
+        listener = ValkeyKeyspaceRemovalListener(redisClient, handler,entra,oid,teller,true)
         val id1 = BrukerId("03508331575")
         val id2 = BrukerId("20478606614")
         person1 = Person(id1,id1.verdi, AktørId("1234567890123"), KommuneTilknytning(Kommune("0301")))
         person2 = Person(id2, id2.verdi, AktørId("1111111111111"), KommuneTilknytning(Kommune("1111")))
+        val gruppe1 = EntraGruppe(UUID.randomUUID(),"Gruppe1 1")
+        val gruppe2 = EntraGruppe(UUID.randomUUID(),"Gruppe2 1")
+
     }
 
     @Test
-    fun putAndGetOne() {
-        client.putOne(cacheName, person1.brukerId.verdi,person1, Duration.ofSeconds(1))
-        val one = client.getOne<Person>(cacheName,person1.brukerId.verdi)
+    fun putAndGetOnePdl() {
+        client.putOne(pdl, person1.brukerId.verdi,person1, Duration.ofSeconds(1))
+        val one = client.getOne<Person>(pdl,person1.brukerId.verdi)
         assertThat(one).isEqualTo(person1)
         await.atMost(3, SECONDS).until {
-            client.getOne<Person>(cacheName,person1.brukerId.verdi) == null
+            client.getOne<Person>(pdl,person1.brukerId.verdi) == null
         }
     }
     @Test
-    fun putAndGetMany() {
+    fun putAndGetManyPdl() {
         every { token.system }.returns("test")
         every { token.clusterAndSystem }.returns("test:dev-gcp")
 
         val ids = setOf(person1.brukerId.verdi,person2.brukerId.verdi)
-        client.putMany(cacheName, mapOf(person1.brukerId.verdi to person1, person2.brukerId.verdi to person2), Duration.ofSeconds(1))
-        val many = client.getMany<Person>(cacheName,ids)
+        client.putMany(pdl, mapOf(person1.brukerId.verdi to person1, person2.brukerId.verdi to person2), Duration.ofSeconds(1))
+        val many = client.getMany<Person>(pdl,ids)
         assertThat(many.keys).containsExactlyInAnyOrderElementsOf(ids)
-        assertThat(client.getAll(cacheName.name)).containsExactlyInAnyOrderElementsOf(ids)
+        assertThat(client.getAll(pdl.name)).containsExactlyInAnyOrderElementsOf(ids)
         await.atMost(3, SECONDS).until {
-            client.getMany<Person>(cacheName,ids).isEmpty()
+            client.getMany<Person>(pdl,ids).isEmpty()
         }
         await.atMost(3, SECONDS).until {
-            client.getMany<Person>(cacheName,ids).isEmpty()
+            client.getMany<Person>(pdl,ids).isEmpty()
         }
         await.atMost(3, SECONDS).until {
             listener.fjernet.get() == 2

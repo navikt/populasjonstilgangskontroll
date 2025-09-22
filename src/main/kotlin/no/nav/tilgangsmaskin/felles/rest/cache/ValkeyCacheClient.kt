@@ -102,6 +102,6 @@ class ValkeyCacheClient(
         alleTreffTeller.tell(of("name", navn, "suksess", (funnet == etterspurt).toString()))
         teller.tell(of("cache", navn, "result", "miss"), etterspurt - funnet)
         teller.tell(of("cache", navn, "result", "hit"), funnet)
-        log.trace("Fant $funnet verdier i cache $navn for $etterspurt id(er)")
+        log.trace("Fant $funnet verdier i cache $navn for $etterspurt identer")
     }
 }

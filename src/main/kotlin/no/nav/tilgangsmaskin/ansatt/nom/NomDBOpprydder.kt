@@ -9,27 +9,16 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.net.InetAddress
 import java.util.concurrent.TimeUnit.HOURS
+import org.slf4j.LoggerFactory.getLogger
 
 @Component
-class NomDBOpprydder(registry: MeterRegistry, private val nom: NomTjeneste)  {
+class NomDBOpprydder(registry: MeterRegistry, private val nom: NomTjeneste) : AbstractLederUtvelger() {
 
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val log = getLogger(javaClass)
 
     private val counter = Counter.builder("vaktmester.rader.fjernet")
         .description("Antall rader fjernet")
         .register(registry)
-
-    private val hostname = InetAddress.getLocalHost().hostName
-    var erLeder: Boolean = false
-
-    @EventListener(LeaderChangedEvent::class)
-    fun onApplicationEvent(event: LeaderChangedEvent) {
-        erLeder = event.leder == hostname
-        log.info("Vaktmester erLeder=$erLeder, me=$hostname, leder=${event.leder}")
-        if (erLeder) {
-            ryddOpp()
-        }
-    }
 
     @Scheduled(fixedRate = 24, timeUnit = HOURS)
     fun ryddOpp(): Int {
@@ -41,5 +30,23 @@ class NomDBOpprydder(registry: MeterRegistry, private val nom: NomTjeneste)  {
         val antall = nom.ryddOpp()
         counter.increment(antall.toDouble())
         return antall
+    }
+}
+
+abstract class AbstractLederUtvelger {
+    protected val hostname = InetAddress.getLocalHost().hostName
+    protected var erLeder: Boolean = false
+
+    protected fun doHandleLeaderChange(event: LeaderChangedEvent)  = Unit
+
+    private val log = getLogger(javaClass)
+
+    @EventListener(LeaderChangedEvent::class)
+    fun onApplicationEvent(event: LeaderChangedEvent) {
+        erLeder = event.leder == hostname
+        if (erLeder) {
+            log.info("Denne instansen ($hostname) er nå leder")
+            doHandleLeaderChange(event)
+        }
     }
 }

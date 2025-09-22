@@ -28,8 +28,6 @@ class ValkeyCacheClient(
         }
     }
 
-
-
     inline fun <reified T> getOne(cache: CacheConfig, id: String) =
         conn.sync().get(handler.toKey(cache,id))?.let { json ->
             mapper.readValue<T>(json)
@@ -46,6 +44,14 @@ class ValkeyCacheClient(
             }
         }
     }
+
+    @WithSpan
+    fun getAll(cache: String) =
+        conn.sync().keys("$cache::*").map {
+            handler::fromKey
+        }.also {
+            log.info("Fant ${it.size} nøkler i cache $cache")
+        }
 
     @WithSpan
     inline fun <reified T> getMany(cache: CacheConfig, ids: Set<String>)  =

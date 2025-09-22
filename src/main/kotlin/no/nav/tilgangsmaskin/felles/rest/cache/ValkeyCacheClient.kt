@@ -23,9 +23,9 @@ class ValkeyCacheClient(
 
 
     val conn = client.connect().apply {
-      //  if (isLocalOrTest) {
+        if (isLocalOrTest) {
             sync().configSet("notify-keyspace-events", "Ex")
-        //}
+        }
     }
 
     inline fun <reified T> getOne(cache: CacheConfig, id: String) =

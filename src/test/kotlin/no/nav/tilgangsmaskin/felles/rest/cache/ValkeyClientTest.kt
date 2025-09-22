@@ -87,6 +87,7 @@ class ValkeyClientTest {
             handler, valkeyMapper,
             BulkCacheSuksessTeller(meterRegistry, token), teller
         )
+        ValkeyKeyspaceRemovalListener(redisClient, handler,teller)
     }
 
     @Test

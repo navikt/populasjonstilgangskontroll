@@ -11,7 +11,9 @@ class ValkeyCacheKeyMapper(val configs: Map<String, RedisCacheConfiguration>) {
     fun toKey(cache: CacheConfig, key: String): String {
         val prefix = prefixFor(cache)
         val extra = cache.extraPrefix?.let { "$it:" } ?: ""
-        return "$prefix::$extra$key"
+        return "$prefix::$extra$key".also {
+            log.trace("Lagt til prefix for {}: {} -> {}", cache.name, key, it)
+        }
     }
 
     fun fromKey(key: String): String {
@@ -26,7 +28,9 @@ class ValkeyCacheKeyMapper(val configs: Map<String, RedisCacheConfiguration>) {
 
     fun detaljerFra(key: String) =
         with(key.split("::", ":")) {
-            Triple(first(), if (size > 2) this[1] else null,last() )
+            Triple(first(), if (size > 2) this[1] else null,last() ).also {
+                log.trace("Detaljer fra key {}: cache {}, extraPrefix {}, id {}", key, it.first, it.second, it.third)
+            }
         }
 }
 

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
- class ValkeyKeyspaceRemovalListener(client: RedisClient, private val mapper: ValkeyCacheKeyMapper, private val oppfrisker: EntraCacheOppfrisker, val teller: BulkCacheTeller, erLeder: Boolean = false) : AbstractLederUtvelger(erLeder), RedisPubSubListener<String, String> {
+ class ValkeyKeyspaceRemovalListener(client: RedisClient, private val oppfrisker: EntraCacheOppfrisker, val teller: BulkCacheTeller, erLeder: Boolean = false) : AbstractLederUtvelger(erLeder), RedisPubSubListener<String, String> {
     private val log = getLogger(javaClass)
 
     @Volatile
@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component
         }
         else {
             if (erLeder) {
-                with(mapper.detaljerFraHendelse(key)) {
+                with(CacheNøkkelDeler(key)) {
                     teller.tell(of("cache", cacheName, "result", "expired", "method", metode ?: "ingen"))
                     fjernet.incrementAndGet()
                     log.info("Innslag fjernet for id: $cacheName ${id.maskFnr()}")

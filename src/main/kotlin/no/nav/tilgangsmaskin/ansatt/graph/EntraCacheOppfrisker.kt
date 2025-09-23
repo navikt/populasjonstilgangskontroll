@@ -2,8 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.graph
 
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
-import no.nav.tilgangsmaskin.felles.rest.cache.DetaljerFraKey
-import org.slf4j.LoggerFactory
+import no.nav.tilgangsmaskin.felles.rest.cache.CacheNøkkelDeler
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
@@ -11,8 +10,8 @@ import org.springframework.stereotype.Component
 class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oid: AnsattOidTjeneste) {
     private val log = getLogger(javaClass)
 
-    fun oppfrisk(detaljer: DetaljerFraKey, ansattId: AnsattId) {
-       with(detaljer) {
+    fun oppfrisk(deler: CacheNøkkelDeler, ansattId: AnsattId) {
+       with(deler) {
            val oid = oid.oidFraEntra(ansattId)
            if (metode == "geoGrupper") {
                entra.geoGrupper(ansattId, oid)
@@ -20,7 +19,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oid: An
            if (metode == "geoOgGlobaleGrupper") {
                entra.geoOgGlobaleGrupper(ansattId, oid)
            }
-           log.trace("Oppfrisket $cacheName::$metode for ${ansattId.verdi} etter sletting" )
+           log.trace("Oppfrisket $key etter sletting" )
        }
     }
 }

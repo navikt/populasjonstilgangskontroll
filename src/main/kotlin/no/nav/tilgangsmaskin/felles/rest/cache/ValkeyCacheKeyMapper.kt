@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
+import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.stereotype.Component
@@ -12,28 +14,21 @@ class ValkeyCacheKeyMapper(val configs: Map<String, RedisCacheConfiguration>) {
         val prefix = prefixFor(cache)
         val extra = cache.extraPrefix?.let { "$it:" } ?: ""
         return "$prefix::$extra$key".also {
-            log.trace("Lagt til prefix for {}: {} -> {}", cache.name, key, it)
+            log.trace(CONFIDENTIAL, "Lagt til prefix for {} -> {}", key, it)
         }
     }
 
     fun fromKey(key: String): String {
-        val (cache, _, id) = detaljerFraHendelse(key)
-        log.trace("Fjernet prefix for  {}: {} -> {}", cache, key, id)
-        return id
+        val deler = CacheNøkkelDeler(key)
+        log.trace(CONFIDENTIAL,"Fjernet prefix for  {} -> {}",key, deler.id)
+        return deler.id
     }
 
     private fun prefixFor(cache: CacheConfig): String =
         configs[cache.name]?.getKeyPrefixFor(cache.name)
             ?: throw IllegalStateException("Har ingen cache med navn ${cache.name}")
 
-    fun detaljerFraHendelse(key: String) =
-        with(key.split("::", ":")) {
-            DetaljerFraKey(first(),if (size > 2) this[1] else null,last()).also {
-                log.trace("Detaljer fra key {}: cache {}, extraPrefix {}, id {}", key, it.cacheName, it.metode, it.id)
-            }
-        }
 }
 
-data class DetaljerFraKey(val cacheName: String, val metode: String?, val id: String)
 
- data class CacheConfig(val name: String, val extraPrefix: String? = null)
+data class CacheConfig(val name: String, val extraPrefix: String? = null)

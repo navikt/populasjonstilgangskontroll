@@ -99,7 +99,7 @@ class ValkeyClientTest {
             handler, valkeyMapper,
             BulkCacheSuksessTeller(meterRegistry, token), teller
         )
-        listener = ValkeyKeyspaceRemovalListener(redisClient, handler,oppfrisker, teller,true)
+        listener = ValkeyKeyspaceRemovalListener(redisClient,oppfrisker, teller,true)
         val id1 = BrukerId("03508331575")
         val id2 = BrukerId("20478606614")
         person1 = Person(id1,id1.verdi, AktørId("1234567890123"), KommuneTilknytning(Kommune("0301")))

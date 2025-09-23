@@ -5,11 +5,11 @@ import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit.HOURS
-import no.nav.tilgangsmaskin.felles.utils.AbstractLederUtvelger
+import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import org.slf4j.LoggerFactory.getLogger
 
 @Component
-class NomDBOpprydder(registry: MeterRegistry, private val nom: NomTjeneste) : AbstractLederUtvelger() {
+class NomDBOpprydder(registry: MeterRegistry, private val nom: NomTjeneste) : LeaderAware() {
 
     private val log = getLogger(javaClass)
 

@@ -4,7 +4,7 @@ import java.net.InetAddress
 import org.slf4j.LoggerFactory
 import org.springframework.context.event.EventListener
 
-abstract class AbstractLederUtvelger(var erLeder: Boolean = false) {
+abstract class LeaderAware(var erLeder: Boolean = false) {
     private val hostname = InetAddress.getLocalHost().hostName
     protected fun doHandleLeaderChange()  = Unit
 

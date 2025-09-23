@@ -21,16 +21,16 @@ import org.springframework.stereotype.Component
     var fjernet  = AtomicInteger(0)  // test only
 
      init {
-         client.connectPubSub().apply { 
-             log.info("Starter Valkey hendelseskonsument på kanal '$CHANNEL'")
+         client.connectPubSub().apply {
+             log.info("Starter Valkey hendelseskonsument på kanal '$KANAL'")
              addListener(this@ValkeyKeyspaceRemovalListener)
-             sync().subscribe(CHANNEL)
+             sync().subscribe(KANAL)
          }
      }
 
-    override fun message(channel: String, key: String) {
-        if (!channel.startsWith(CHANNEL)) {
-            log.warn("Uventet hendelse på $channel med nøkkel $key")
+    override fun message(kanal: String, key: String) {
+        if (!kanal.startsWith(KANAL)) {
+            log.warn("Uventet hendelse på $kanal med nøkkel $key")
         }
         else {
             if (erLeder) {
@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component
                     fjernet.incrementAndGet()
                     log.info("Innslag fjernet for id: $cacheName ${id.maskFnr()}")
                     if (cacheName == GRAPH) {
-                        oppfrisker.oppfrisk(this, AnsattId(id))
+                        oppfrisker.oppfrisk(this, id)
                     }
                 }
             }
@@ -54,7 +54,7 @@ import org.springframework.stereotype.Component
 
 
     companion object {
-        private const val CHANNEL = "__keyevent@0__:expired"
+        private const val KANAL = "__keyevent@0__:expired"
     }
 }
 

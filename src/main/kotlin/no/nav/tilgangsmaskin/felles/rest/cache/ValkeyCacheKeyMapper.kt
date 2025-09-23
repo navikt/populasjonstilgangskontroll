@@ -17,7 +17,7 @@ class ValkeyCacheKeyMapper(val configs: Map<String, RedisCacheConfiguration>) {
     }
 
     fun fromKey(key: String): String {
-        val (cache, _, id) = detaljerFra(key)
+        val (cache, _, id) = detaljerFraHendelse(key)
         log.trace("Fjernet prefix for  {}: {} -> {}", cache, key, id)
         return id
     }
@@ -26,7 +26,7 @@ class ValkeyCacheKeyMapper(val configs: Map<String, RedisCacheConfiguration>) {
         configs[cache.name]?.getKeyPrefixFor(cache.name)
             ?: throw IllegalStateException("Har ingen cache med navn ${cache.name}")
 
-    fun detaljerFra(key: String) =
+    fun detaljerFraHendelse(key: String) =
         with(key.split("::", ":")) {
             DetaljerFraKey(first(),if (size > 2) this[1] else null,last()).also {
                 log.trace("Detaljer fra key {}: cache {}, extraPrefix {}, id {}", key, it.cacheName, it.metode, it.id)

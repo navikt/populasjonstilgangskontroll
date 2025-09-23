@@ -34,13 +34,12 @@ import org.springframework.stereotype.Component
         }
         else {
             if (erLeder) {
-                val detaljer = mapper.detaljerFra(message)
-                with(detaljer) {
+                with(mapper.detaljerFraHendelse(message)) {
                     teller.tell(of("cache", cacheName, "result", "expired", "method", metode ?: "ingen"))
                     fjernet.incrementAndGet()
-                    log.info("Innslag fjernet: $cacheName ${id.maskFnr()} $detaljer.second")
+                    log.info("Innslag fjernet: $cacheName ${id.maskFnr()} second")
                     if (cacheName == GRAPH) {
-                        oppfrisker.oppfrisk(detaljer, AnsattId(id))
+                        oppfrisker.oppfrisk(this, AnsattId(id))
                     }
                 }
             }

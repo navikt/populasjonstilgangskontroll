@@ -28,16 +28,16 @@ import org.springframework.stereotype.Component
          }
      }
 
-    override fun message(channel: String, message: String) {
+    override fun message(channel: String, key: String) {
         if (!channel.startsWith(CHANNEL)) {
-            log.warn("Uventet hendelse på channel $channel med melding $message")
+            log.warn("Uventet hendelse på $channel med nøkkel $key")
         }
         else {
             if (erLeder) {
-                with(mapper.detaljerFraHendelse(message)) {
+                with(mapper.detaljerFraHendelse(key)) {
                     teller.tell(of("cache", cacheName, "result", "expired", "method", metode ?: "ingen"))
                     fjernet.incrementAndGet()
-                    log.info("Innslag fjernet: $cacheName ${id.maskFnr()} second")
+                    log.info("Innslag fjernet for id: $cacheName ${id.maskFnr()}")
                     if (cacheName == GRAPH) {
                         oppfrisker.oppfrisk(this, AnsattId(id))
                     }

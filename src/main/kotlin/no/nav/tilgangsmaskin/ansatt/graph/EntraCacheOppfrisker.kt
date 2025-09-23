@@ -22,12 +22,12 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oid: An
            }
        }
     }
-    private fun validerMetode(deler: CacheNøkkelDeler): KCallable<*> {
-        val metode = EntraTjeneste::class.members.firstOrNull { it.name == deler.metode }
-        require(metode != null) { "Fant ikke metode ${deler.metode} i EntraTjeneste for oppfrisking av cache ${deler.cacheName}" }
-        val params = metode.parameters.drop(1) // drop instance parameter
-        require(params[0].type.classifier == AnsattId::class) { "Argument 1 er ikke  AnsattId" }
-        require(params[1].type.classifier == UUID::class) { "Argument 2 er ikke UUID" }
-        return metode
-    }
+    private fun validerMetode(deler: CacheNøkkelDeler): KCallable<*> =
+        EntraTjeneste::class.members.firstOrNull { it.name == deler.metode }
+            ?.also { metode ->
+                val params = metode.parameters.drop(1)
+                require(params[0].type.classifier == AnsattId::class) { "Argument 1 er ikke AnsattId" }
+                require(params[1].type.classifier == UUID::class) { "Argument 2 er ikke UUID" }
+            }
+            ?: error("Fant ikke metode ${deler.metode} i EntraTjeneste for oppfrisking av cache ${deler.cacheName}")
 }

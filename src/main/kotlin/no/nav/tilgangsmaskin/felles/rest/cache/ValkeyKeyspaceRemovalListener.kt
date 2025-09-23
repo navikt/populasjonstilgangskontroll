@@ -33,7 +33,6 @@ import org.springframework.stereotype.Component
                 with(CacheNøkkelDeler(key)) {
                     teller.tell(of("cache", cacheName, "result", "expired", "method", metode ?: "ingen"))
                     fjernet.incrementAndGet()
-                    log.info("Innslag fjernet for id: $cacheName ${id.maskFnr()}")
                     oppfriskere.first { it.cacheName == cacheName }.oppfrisk(this,id)
                 }
             }

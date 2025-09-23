@@ -13,14 +13,18 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oid: An
     private val log = getLogger(javaClass)
 
     fun oppfrisk(deler: CacheNøkkelDeler, id: String) {
-       with(deler) {
-           val ansattId = AnsattId(id)
-           val oid = oid.oidFraEntra(ansattId)
-           with(validerMetode(deler)) {
-               call(entra, ansattId, oid)
-               log.trace("Oppfrisket $key med metode $name etter sletting")
-           }
-       }
+        runCatching {
+            with(deler) {
+                val ansattId = AnsattId(id)
+                val oid = oid.oidFraEntra(ansattId)
+                with(validerMetode(deler)) {
+                    call(entra, ansattId, oid)
+                    log.trace("Oppfrisket $key med metode $name etter sletting")
+                }
+            }
+        }.getOrElse {
+            log.warn("Oppfrisking av ${deler.key} med metode ${deler.metode} etter sletting feilet",it)
+        }
     }
     private fun validerMetode(deler: CacheNøkkelDeler): KCallable<*> =
         EntraTjeneste::class.members.firstOrNull { it.name == deler.metode }

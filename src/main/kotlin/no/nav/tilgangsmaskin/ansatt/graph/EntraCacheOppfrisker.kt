@@ -12,12 +12,15 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oid: An
     private val log = getLogger(javaClass)
 
     fun oppfrisk(detaljer: DetaljerFraKey, ansattId: AnsattId) {
-        if (detaljer.metode == "geoGrupper") {
-            entra.geoGrupper(ansattId, oid.oidFraEntra(ansattId))
-        }
-        if (detaljer.metode == "geoOgGlobaleGrupper") {
-            entra.geoOgGlobaleGrupper(ansattId, oid.oidFraEntra(ansattId))
-        }
-        log.trace("Oppfrisket ${detaljer.cacheName}::${detaljer.metode}  for ${ansattId.verdi} etter sletting" )
+       with(detaljer) {
+           val oid = oid.oidFraEntra(ansattId)
+           if (metode == "geoGrupper") {
+               entra.geoGrupper(ansattId, oid)
+           }
+           if (metode == "geoOgGlobaleGrupper") {
+               entra.geoOgGlobaleGrupper(ansattId, oid)
+           }
+           log.trace("Oppfrisket $cacheName::$metode for ${ansattId.verdi} etter sletting" )
+       }
     }
 }

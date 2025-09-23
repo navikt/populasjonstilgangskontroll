@@ -28,10 +28,12 @@ class ValkeyCacheKeyMapper(val configs: Map<String, RedisCacheConfiguration>) {
 
     fun detaljerFra(key: String) =
         with(key.split("::", ":")) {
-            Triple(first(), if (size > 2) this[1] else null,last() ).also {
-                log.trace("Detaljer fra key {}: cache {}, extraPrefix {}, id {}", key, it.first, it.second, it.third)
+            DetaljerFraKey(first(),if (size > 2) this[1] else null,last()).also {
+                log.trace("Detaljer fra key {}: cache {}, extraPrefix {}, id {}", key, it.cacheName, it.metode, it.id)
             }
         }
 }
+
+data class DetaljerFraKey(val cacheName: String, val metode: String?, val id: String)
 
  data class CacheConfig(val name: String, val extraPrefix: String? = null)

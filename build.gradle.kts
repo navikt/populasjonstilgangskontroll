@@ -6,7 +6,7 @@ val tokenSupportVersion = "5.0.37"
 val mockkVersion = "1.14.5"
 
 
-group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
+group = "no.nav.tilgangsmaskin.populasjonstiilgangskontroll"
 version = "1.0.1"
 
 plugins {
@@ -118,4 +118,3 @@ kotlin {
         freeCompilerArgs.add("-Xjsr305=strict")
     }
 }
-

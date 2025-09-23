@@ -1,11 +1,12 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
-import java.lang.IllegalStateException
+import java.util.UUID
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.felles.rest.cache.CacheNøkkelDeler
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
+import kotlin.reflect.KCallable
 
 @Component
 class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oid: AnsattOidTjeneste) {
@@ -15,10 +16,18 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oid: An
        with(deler) {
            val ansattId = AnsattId(id)
            val oid = oid.oidFraEntra(ansattId)
-           val method = EntraTjeneste::class.members.firstOrNull { it.name == metode }
-           method?.call(entra, ansattId, oid).also {
-               log.trace("Oppfrisket $key med metode ${method?.name}  etter sletting" )
-           } ?: throw IllegalStateException("Fant ikke metode $metode for oppfrisking av cache")
+           with(validerMetode(deler)) {
+               call(entra, ansattId, oid)
+               log.trace("Oppfrisket $key med metode $name etter sletting")
+           }
        }
+    }
+    private fun validerMetode(deler: CacheNøkkelDeler): KCallable<*> {
+        val metode = EntraTjeneste::class.members.firstOrNull { it.name == deler.metode }
+        require(metode != null) { "Fant ikke metode ${deler.metode} i EntraTjeneste for oppfrisking av cache ${deler.cacheName}" }
+        val params = metode.parameters.drop(1) // drop instance parameter
+        require(params[0].type.classifier == AnsattId::class) { "Argument 1 er ikke  AnsattId" }
+        require(params[1].type.classifier == UUID::class) { "Argument 2 er ikke UUID" }
+        return metode
     }
 }

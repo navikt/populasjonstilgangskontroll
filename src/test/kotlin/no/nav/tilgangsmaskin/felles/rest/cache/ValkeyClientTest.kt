@@ -37,6 +37,7 @@ import java.util.UUID
 import org.awaitility.kotlin.await
 import java.util.concurrent.TimeUnit.SECONDS
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
+import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
@@ -59,12 +60,9 @@ class ValkeyClientTest {
 
     @MockkBean
     private lateinit var token: Token
-
+    
     @MockkBean
-    private lateinit var entra: EntraTjeneste
-
-    @MockkBean
-    private lateinit var oid: AnsattOidTjeneste
+    private lateinit var oppfrisker: EntraCacheOppfrisker
 
     private lateinit var listener: ValkeyKeyspaceRemovalListener
 
@@ -101,7 +99,7 @@ class ValkeyClientTest {
             handler, valkeyMapper,
             BulkCacheSuksessTeller(meterRegistry, token), teller
         )
-        listener = ValkeyKeyspaceRemovalListener(redisClient, handler,entra,oid,teller,true)
+        listener = ValkeyKeyspaceRemovalListener(redisClient, handler,oppfrisker, teller,true)
         val id1 = BrukerId("03508331575")
         val id2 = BrukerId("20478606614")
         person1 = Person(id1,id1.verdi, AktørId("1234567890123"), KommuneTilknytning(Kommune("0301")))

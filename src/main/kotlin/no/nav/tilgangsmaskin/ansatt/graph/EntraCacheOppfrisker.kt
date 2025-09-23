@@ -27,11 +27,10 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oid: An
         }
     }
     private fun validerMetode(deler: CacheNøkkelDeler): KCallable<*> =
-        EntraTjeneste::class.members.firstOrNull { it.name == deler.metode }
-            ?.also { metode ->
-                val params = metode.parameters.drop(1)
+        EntraTjeneste::class.members.first { it.name == deler.metode }
+            .also {
+                val params = it.parameters.drop(1)
                 require(params[0].type.classifier == AnsattId::class) { "Argument 1 er ikke AnsattId" }
                 require(params[1].type.classifier == UUID::class) { "Argument 2 er ikke UUID" }
             }
-            ?: error("Fant ikke metode ${deler.metode} i EntraTjeneste for oppfrisking av cache ${deler.cacheName}")
 }

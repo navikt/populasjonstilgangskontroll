@@ -60,7 +60,7 @@ class ValkeyClientTest {
 
     @MockkBean
     private lateinit var token: Token
-    
+
     @MockkBean
     private lateinit var oppfrisker: EntraCacheOppfrisker
 

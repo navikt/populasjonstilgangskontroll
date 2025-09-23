@@ -4,9 +4,6 @@ import io.lettuce.core.RedisClient
 import io.lettuce.core.pubsub.RedisPubSubListener
 import io.micrometer.core.instrument.Tags.of
 import java.util.concurrent.atomic.AtomicInteger
-import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker
-import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.utils.AbstractLederUtvelger
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
@@ -14,7 +11,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
- class ValkeyKeyspaceRemovalListener(client: RedisClient, private val oppfrisker: EntraCacheOppfrisker, val teller: BulkCacheTeller, erLeder: Boolean = false) : AbstractLederUtvelger(erLeder), RedisPubSubListener<String, String> {
+ class ValkeyKeyspaceRemovalListener(client: RedisClient,  val teller: BulkCacheTeller, private vararg val oppfriskere: CacheOppfrisker,erLeder: Boolean = false) : AbstractLederUtvelger(erLeder), RedisPubSubListener<String, String> {
     private val log = getLogger(javaClass)
 
     @Volatile
@@ -38,9 +35,7 @@ import org.springframework.stereotype.Component
                     teller.tell(of("cache", cacheName, "result", "expired", "method", metode ?: "ingen"))
                     fjernet.incrementAndGet()
                     log.info("Innslag fjernet for id: $cacheName ${id.maskFnr()}")
-                    if (cacheName == GRAPH) {
-                        oppfrisker.oppfrisk(this, id)
-                    }
+                    oppfriskere.first { it.cacheName == cacheName }.oppfrisk(this,id)
                 }
             }
         }

@@ -20,13 +20,13 @@ class ValkeyCacheKeyMapper(val configs: Map<String, RedisCacheConfiguration>) {
 
     fun fromKey(key: String): String {
         val deler = CacheNøkkelDeler(key)
-        log.trace(CONFIDENTIAL,"Fjernet prefix for  {} -> {}",key, deler.id)
+        log.trace(CONFIDENTIAL,"Fjernet prefix for {} -> {}",key, deler.id)
         return deler.id
     }
 
     private fun prefixFor(cache: CacheConfig): String =
         configs[cache.name]?.getKeyPrefixFor(cache.name)
-            ?: throw IllegalStateException("Har ingen cache med navn ${cache.name}")
+            ?: throw IllegalStateException("Ingen cache med navn ${cache.name}")
 
 }
 

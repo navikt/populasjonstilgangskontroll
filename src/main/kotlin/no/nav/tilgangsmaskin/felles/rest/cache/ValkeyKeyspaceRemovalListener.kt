@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component
     var fjernet  = AtomicInteger(0)  // test only
 
      init {
-         client.connectPubSub().apply {
+         client.connectPubSub().apply { 
              log.info("Starter Valkey hendelseskonsument på kanal '$CHANNEL'")
              addListener(this@ValkeyKeyspaceRemovalListener)
              sync().subscribe(CHANNEL)

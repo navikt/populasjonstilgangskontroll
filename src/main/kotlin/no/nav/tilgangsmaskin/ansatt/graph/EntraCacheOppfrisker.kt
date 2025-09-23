@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
 import java.util.UUID
+import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.felles.rest.cache.CacheNøkkelDeler
@@ -14,16 +15,12 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oid: An
 
     fun oppfrisk(deler: CacheNøkkelDeler, id: String) {
         runCatching {
-            with(deler) {
-                val ansattId = AnsattId(id)
-                val oid = oid.oidFraEntra(ansattId)
-                with(validerMetode(deler)) {
-                    call(entra, ansattId, oid)
-                    log.trace("Oppfrisket $key med metode $name etter sletting")
-                }
+            val ansattId = AnsattId(id)
+            validerMetode(deler).call(entra,ansattId, oid.oidFraEntra(ansattId)).also {
+                log.trace(CONFIDENTIAL,"Oppfrisket ${deler.key} etter sletting")
             }
         }.getOrElse {
-            log.warn("Oppfrisking av ${deler.key} med metode ${deler.metode} etter sletting feilet",it)
+            log.warn("Oppfrisking av ${deler.key} etter sletting feilet",it)
         }
     }
     private fun validerMetode(deler: CacheNøkkelDeler): KCallable<*> =

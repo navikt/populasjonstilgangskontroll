@@ -101,8 +101,6 @@ tasks.withType<BootJar> {
 tasks.test {
     jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
     useJUnitPlatform()
-    reports {
-    }
 }
 
 java {

@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.rest.cache.CacheNøkkelDeler
 import no.nav.tilgangsmaskin.felles.rest.cache.CacheOppfrisker
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 import kotlin.reflect.KCallable
@@ -25,7 +26,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oid: An
                 }
             }
         }.getOrElse {
-            log.warn("Oppfrisking av ${deler.key} etter sletting feilet",it)
+            log.warn("Oppfrisking av ${deler.id.maskFnr()} etter sletting feilet",it)
         }
     }
     private fun validerMetode(deler: CacheNøkkelDeler): KCallable<*> =

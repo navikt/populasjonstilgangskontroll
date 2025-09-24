@@ -35,14 +35,14 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
 
         return funnetBrukerIds.let { p ->
             if (p.isNotEmpty()) {
-                log.trace("Bulk slår opp skjerming(er) for {}", p)
+                log.trace("Bulk slår opp {} skjerming(er) for {}", p.size,p)
                 val skjerminger = skjermingTjeneste.skjerminger(p)
-                log.trace("Bulk slo opp ${"skjerming".pluralize(skjerminger.keys)} for ${p.joinToString { it.verdi.maskFnr() }}")
+                log.trace("Bulk slo opp {} skjerminger  ($skjerminger) for {}", skjerminger.size, p.joinToString { it.verdi.maskFnr() })
                 personer.map {
                     tilBruker(it, skjerminger[it.brukerId] ?: false)
                 }
             } else {
-                log.debug("Bulk ${"skjerming".pluralize(p, ingen = "Ingen")} å slå opp")
+                log.debug("Bulk ingen skjwrminger å slå opp")
                 emptyList()
             }.toSet()
         }

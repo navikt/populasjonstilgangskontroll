@@ -9,12 +9,12 @@ import org.springframework.http.HttpStatus.*
 
 data class AggregertBulkRespons(val ansattId: AnsattId, val resultater: Set<EnkeltBulkRespons> = emptySet()) {
     data class EnkeltBulkRespons(val brukerId: String, @JsonIgnore val httpStatus: HttpStatus, val detaljer: Any? = null ) {
-        constructor(e: RegelException) : this(e.bruker.brukerId.verdi, e.status,e.body)
+        constructor(e: RegelException) : this(e.bruker.oppslagId, e.status,e.body)
         val status = httpStatus.value()
 
         companion object {
             fun ok(brukerId: String) = EnkeltBulkRespons(brukerId, NO_CONTENT)
-            fun ok(brukerId: BrukerId) = ok(brukerId.verdi)
+           // fun ok(brukerId: BrukerId) = ok(brukerId.verdi)
         }
     }
     @JsonIgnore

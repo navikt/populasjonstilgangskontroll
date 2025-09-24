@@ -81,6 +81,5 @@ data class BulkResultat(val bruker: Bruker,val status: HttpStatus, val regel: Re
     companion object {
         fun ok(bruker: Bruker) = BulkResultat( bruker,NO_CONTENT)
         fun avvist(bruker: Bruker,e: RegelException) = BulkResultat( bruker,FORBIDDEN, e.regel)
-
     }
 }

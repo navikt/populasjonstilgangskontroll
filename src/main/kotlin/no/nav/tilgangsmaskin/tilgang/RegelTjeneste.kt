@@ -66,8 +66,12 @@ class RegelTjeneste(
             val resultater = motor.bulkRegler(ansatt, brukere).also {
                 log.debug("Bulk resultater {}", it)
             }
-            val godkjente = godkjente(ansatt, resultater)
-            val avviste = avviste(ansatt, godkjente, resultater, brukere)
+            val godkjente = godkjente(ansatt, resultater).also {
+                log.debug("Bulk godkjente {}", it)
+            }
+            val avviste = avviste(ansatt, godkjente, resultater, brukere).also {
+                log.debug("Bulk avviste {}", it)
+            }
             val ikkeFunnet = ikkeFunnet(idOgType, resultater)
 
             AggregertBulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {
@@ -105,15 +109,15 @@ class RegelTjeneste(
             godkjente.forEach { add(ok(it.bruker.oppslagId)) }
             overstyringTjeneste
                 .overstyringer(ansatt.ansattId, avviste.map { it.bruker.brukerId })
-                .forEach { add(ok(it)) }
+                .forEach { add(ok(it.verdi)) }
         }
 
 
     private fun Set<BrukerIdOgRegelsett>.brukerOgRegelsett() =
         with(associate { it.brukerId to it }) {
-            log.debug("Slår opp keys $keys")
+            log.debug("Slår opp keys {}", keys)
             val brukere = brukerTjeneste.brukere(keys)
-            log.debug("Fant $brukere av ${keys.size} brukere ved oppslag for keys $keys")
+            log.debug("Fant {} av {} brukere ved oppslag for keys {}", brukere, keys.size, keys)
             brukere.map { bruker ->
                 val idOgType = this[bruker.oppslagId] ?: throw IllegalStateException("Bruker ${bruker.brukerId} har ikke oppslagId")
                 BrukerOgRegelsett(bruker, idOgType.type)

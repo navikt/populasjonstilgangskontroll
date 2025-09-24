@@ -10,7 +10,6 @@ import no.nav.tilgangsmaskin.felles.rest.cache.CacheOppfrisker
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
-import kotlin.reflect.KCallable
 
 @Component
 class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oid: AnsattOidTjeneste) : CacheOppfrisker {
@@ -29,7 +28,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oid: An
             log.warn("Oppfrisking av ${deler.id.maskFnr()} etter sletting feilet",it)
         }
     }
-    private fun validerMetode(deler: CacheNøkkelDeler): KCallable<*> =
+    private fun validerMetode(deler: CacheNøkkelDeler)  =
         EntraTjeneste::class.members.first { it.name == deler.metode }
             .also {
                 val params = it.parameters.drop(1)

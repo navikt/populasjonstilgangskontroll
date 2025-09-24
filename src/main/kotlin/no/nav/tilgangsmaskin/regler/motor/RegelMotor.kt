@@ -77,10 +77,10 @@ class RegelMotor(
 
 }
 
-data class BulkResultat(val brukerId: String, val bruker: Bruker,val status: HttpStatus, val regel: Regel? = null) {
+data class BulkResultat(val bruker: Bruker,val status: HttpStatus, val regel: Regel? = null) {
     companion object {
-        fun ok(bruker: Bruker) = BulkResultat(bruker.oppslagId, bruker,NO_CONTENT)
-        fun avvist(bruker: Bruker,e: RegelException) = BulkResultat(bruker.oppslagId, bruker,FORBIDDEN, e.regel)
+        fun ok(bruker: Bruker) = BulkResultat( bruker,NO_CONTENT)
+        fun avvist(bruker: Bruker,e: RegelException) = BulkResultat( bruker,FORBIDDEN, e.regel)
 
     }
 }

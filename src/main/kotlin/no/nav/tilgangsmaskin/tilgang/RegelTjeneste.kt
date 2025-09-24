@@ -79,7 +79,7 @@ class RegelTjeneste(
     }
 
     private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<BulkResultat>) = filterNot { brukerIdOgRegelsett ->
-        brukerIdOgRegelsett.brukerId in (funnet.map { it.bruker.historiskeIds} + funnet.map { it.brukerId })
+        brukerIdOgRegelsett.brukerId in (funnet.map { it.bruker.historiskeIds} + funnet.map { it.bruker.oppslagId })
     }
 
     private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) =
@@ -93,7 +93,7 @@ class RegelTjeneste(
         buildSet {
         val godkjenteIds = buildSet { godkjente.forEach { add(it.brukerId) } }
         for (resultat in resultater) {
-            if (resultat.status == FORBIDDEN && resultat.brukerId !in godkjenteIds) {
+            if (resultat.status == FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
                 add(EnkeltBulkRespons(RegelException(ansatt, brukere.finnBruker(resultat.bruker.brukerId), resultat.regel!!, status = resultat.status)))
             }
         }
@@ -102,7 +102,7 @@ class RegelTjeneste(
     private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) =
         buildSet {
             val (godkjente, avviste) = resultater.partition { it.status.is2xxSuccessful }
-            godkjente.forEach { add(ok(it.brukerId)) }
+            godkjente.forEach { add(ok(it.bruker.oppslagId)) }
             overstyringTjeneste
                 .overstyringer(ansatt.ansattId, avviste.map { it.bruker.brukerId })
                 .forEach { add(ok(it)) }

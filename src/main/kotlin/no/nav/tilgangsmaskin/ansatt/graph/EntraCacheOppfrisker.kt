@@ -17,10 +17,10 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oid: An
 
     override val cacheName = GRAPH
 
-    override fun oppfrisk(deler: CacheNøkkelDeler, id: String) {
+    override fun oppfrisk(deler: CacheNøkkelDeler) {
         runCatching {
             require(deler.cacheName == cacheName) { "Ugyldig cache ${deler.cacheName}, forventet $cacheName" }
-            val ansattId = AnsattId(id)
+            val ansattId = AnsattId(deler.key)
             validerMetode(deler).call(entra,ansattId, oid.oidFraEntra(ansattId)).also {
                 log.trace(CONFIDENTIAL,"Oppfrisket ${deler.key} etter sletting")
             }

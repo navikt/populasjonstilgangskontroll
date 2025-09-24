@@ -42,7 +42,7 @@ data class Bruker(
     val harUtenlandskBosted = geografiskTilknytning is UtenlandskTilknytning
     infix fun kreverMedlemskapI(gruppe: GlobalGruppe) = gruppe in påkrevdeGrupper
     override fun toString(): String {
-        return "Bruker(brukerIds=$brukerIds, geografiskTilknytning=$geografiskTilknytning, påkrevdeGrupper=$påkrevdeGrupper, familie=$familie, dødsdato=$dødsdato, brukerId=$brukerId, oppslagId='$oppslagId', aktørId=$aktørId, historiskeIds=$historiskeIds, foreldreOgBarn=$foreldreOgBarn, barn=$barn, søsken=$søsken, partnere=$partnere, harUkjentBosted=$harUkjentBosted, harUtenlandskBosted=$harUtenlandskBosted)"
+        return "Bruker(brukerIds=$brukerIds, geografiskTilknytning=$geografiskTilknytning, påkrevdeGrupper=$påkrevdeGrupper, dødsdato=$dødsdato, foreldreOgBarn=$foreldreOgBarn, barn=$barn, søsken=$søsken, partnere=$partnere, harUkjentBosted=$harUkjentBosted, harUtenlandskBosted=$harUtenlandskBosted)"
     }
 
 
@@ -51,7 +51,7 @@ data class Bruker(
                          val historiskeIds: Set<BrukerId> = emptySet(),
                          val aktørId: AktørId? = null) {
         override fun toString(): String {
-            return "BrukerIds(aktivBrukerId=$aktivBrukerId, oppslagId='${oppslagId.maskFnr()}', historiskeIds=${historiskeIds.map { it.verdi.maskFnr() }}, aktørId=$aktørId)"
+            return "BrukerIds(aktivBrukerId=$aktivBrukerId, oppslagId='${oppslagId.maskFnr()}', historiskeIds=$historiskeIds, aktørId=$aktørId)"
         }
     }
 }

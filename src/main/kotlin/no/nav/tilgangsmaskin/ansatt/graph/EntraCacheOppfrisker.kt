@@ -20,9 +20,10 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oid: An
     override fun oppfrisk(deler: CacheNøkkelDeler) {
         runCatching {
             require(deler.cacheName == cacheName) { "Ugyldig cache ${deler.cacheName}, forventet $cacheName" }
-            val ansattId = AnsattId(deler.key)
-            validerMetode(deler).call(entra,ansattId, oid.oidFraEntra(ansattId)).also {
-                log.trace(CONFIDENTIAL,"Oppfrisket ${deler.key} etter sletting")
+            with(AnsattId(deler.id)) {
+                validerMetode(deler).call(entra,this, oid.oidFraEntra(this)).also {
+                    log.trace(CONFIDENTIAL,"Oppfrisket ${deler.key} etter sletting")
+                }
             }
         }.getOrElse {
             log.warn("Oppfrisking av ${deler.key} etter sletting feilet",it)

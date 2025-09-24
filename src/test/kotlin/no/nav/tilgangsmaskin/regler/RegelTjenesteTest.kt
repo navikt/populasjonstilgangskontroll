@@ -137,7 +137,7 @@ class RegelTjenesteTest {
 
         val resultater = regler.bulkRegler(ansattId,
                     setOf(BrukerIdOgRegelsett(strengtFortroligAktørId.verdi), BrukerIdOgRegelsett(fortroligBrukerId)))
-        assertThat(resultater.avviste.map { it.brukerId }.containsAll(listOf(strengtFortroligAktørId.verdi,fortroligBrukerId.verdi)))
+        assertThat(resultater.avviste.map { it.oppslagId }.containsAll(listOf(strengtFortroligAktørId.verdi,fortroligBrukerId.verdi)))
         assertThat(resultater.avviste).hasSize(2)
         assertThat(resultater.godkjente).isEmpty()
         assertThat(resultater.ukjente).isEmpty()

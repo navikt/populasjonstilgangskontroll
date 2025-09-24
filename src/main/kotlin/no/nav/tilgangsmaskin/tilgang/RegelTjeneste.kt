@@ -95,7 +95,7 @@ class RegelTjeneste(
 
     private fun avviste(ansatt: Ansatt, godkjente: Set<EnkeltBulkRespons>, resultater: Set<BulkResultat>, brukere: Set<BrukerOgRegelsett>) =
         buildSet {
-        val godkjenteIds = buildSet { godkjente.forEach { add(it.brukerId) } }
+        val godkjenteIds = buildSet { godkjente.forEach { add(it.oppslagId) } }
         for (resultat in resultater) {
             if (resultat.status == FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
                 add(EnkeltBulkRespons(RegelException(ansatt, brukere.finnBruker(resultat.bruker.brukerId), resultat.regel!!, status = resultat.status)))

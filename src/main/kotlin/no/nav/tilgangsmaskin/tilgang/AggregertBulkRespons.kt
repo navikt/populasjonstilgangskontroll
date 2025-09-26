@@ -2,14 +2,13 @@ package no.nav.tilgangsmaskin.tilgang
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
 
 data class AggregertBulkRespons(val ansattId: AnsattId, val resultater: Set<EnkeltBulkRespons> = emptySet()) {
-    data class EnkeltBulkRespons(val oppslagId: String, @JsonIgnore val httpStatus: HttpStatus, val detaljer: Any? = null ) {
+    data class EnkeltBulkRespons(val brukerId: String, @JsonIgnore val httpStatus: HttpStatus, val detaljer: Any? = null ) {
         constructor(e: RegelException) : this(e.bruker.oppslagId, e.status,e.body)
         val status = httpStatus.value()
 
@@ -19,7 +18,7 @@ data class AggregertBulkRespons(val ansattId: AnsattId, val resultater: Set<Enke
         }
 
         override fun toString(): String =
-            "EnkeltBulkRespons(oppslagId='${oppslagId.maskFnr()}', httpStatus=$httpStatus, detaljer=$detaljer, status=$status)"
+            "EnkeltBulkRespons(oppslagId='${brukerId.maskFnr()}', httpStatus=$httpStatus, detaljer=$detaljer, status=$status)"
     }
     @JsonIgnore
     val ukjente = filter(NOT_FOUND)

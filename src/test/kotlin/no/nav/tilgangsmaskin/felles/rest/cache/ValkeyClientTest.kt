@@ -31,10 +31,17 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import org.springframework.data.redis.cache.RedisCacheConfiguration
-import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import java.time.Duration
-import kotlin.test.assertEquals
+import java.util.UUID
+import org.awaitility.kotlin.await
+import java.util.concurrent.TimeUnit.SECONDS
+import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
+import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
+import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
+import org.assertj.core.api.Assertions.assertThat
 
 @DataRedisTest
 @ContextConfiguration(classes = [TestApp::class])
@@ -44,7 +51,7 @@ import kotlin.test.assertEquals
 @Import(JacksonAutoConfiguration::class)
 class ValkeyClientTest {
 
-    private val cacheName = CacheConfig("testCache","extra")
+    private val pdl = CacheConfig(PDL,"medFamilie")
 
     @Autowired
     private lateinit var objectMapper: ObjectMapper
@@ -54,13 +61,22 @@ class ValkeyClientTest {
     @MockkBean
     private lateinit var token: Token
 
+    @MockkBean
+    private lateinit var oppfrisker: EntraCacheOppfrisker
+
+    private lateinit var listener: ValkeyKeyspaceRemovalListener
+
     @Autowired
     private lateinit var cf: RedisConnectionFactory
-
+    private lateinit var person1:  Person
+    private lateinit var person2:  Person
     private lateinit var client: ValkeyCacheClient
 
     @BeforeEach
     fun setUp() {
+        every { token.system } returns "test"
+        every { token.clusterAndSystem } returns "test:dev-gcp"
+
         valkeyMapper =
             objectMapper.copy().apply {
                 activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
@@ -69,42 +85,55 @@ class ValkeyClientTest {
 
         val mgr = builder(cf)
             .withInitialCacheConfigurations(mapOf(
-                cacheName.name to defaultCacheConfig()
-                    .prefixCacheNameWith("myprefix::")
+                pdl.name to RedisCacheConfiguration.defaultCacheConfig()
+                    .prefixCacheNameWith(PDL)
                     .disableCachingNullValues()
             ))
             .build()
-        mgr.getCache(cacheName.name)
-        client = ValkeyCacheClient(ValkeyCacheKeyHandler(mgr.cacheConfigurations),
-            create("redis://${redis.host}:${redis.firstMappedPort}").connect(), valkeyMapper,
-            BulkCacheSuksessTeller(meterRegistry, token),
-            BulkCacheTeller(meterRegistry,token)
+        mgr.getCache(pdl.name)
+        val redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
+        val teller = BulkCacheTeller(meterRegistry, token)
+        val handler = ValkeyCacheKeyMapper(mgr.cacheConfigurations)
+        client = ValkeyCacheClient(
+            redisClient,
+            handler, valkeyMapper,
+            BulkCacheSuksessTeller(meterRegistry, token), teller
         )
+        listener = ValkeyKeyspaceRemovalListener(redisClient, teller, oppfrisker, erLeder = true)
+        val id1 = BrukerId("03508331575")
+        val id2 = BrukerId("20478606614")
+        person1 = Person(id1,id1.verdi, AktørId("1234567890123"), KommuneTilknytning(Kommune("0301")))
+        person2 = Person(id2, id2.verdi, AktørId("1111111111111"), KommuneTilknytning(Kommune("1111")))
+        val gruppe1 = EntraGruppe(UUID.randomUUID(),"Gruppe1 1")
+        val gruppe2 = EntraGruppe(UUID.randomUUID(),"Gruppe2 1")
+
     }
 
     @Test
-    fun putAndGetOne() {
-        val id = BrukerId("03508331575")
-        val person = Person(id, AktørId("1234567890123"), KommuneTilknytning(Kommune("0301")))
-        client.putOne(cacheName, id.verdi,person, Duration.ofMinutes(5))
-        val one = client.getOne<Person>(cacheName,id.verdi)
-        assertEquals(person, one)
+    fun putAndGetOnePdl() {
+        client.putOne(pdl, person1.brukerId.verdi,person1, Duration.ofSeconds(1))
+        val one = client.getOne<Person>(pdl,person1.brukerId.verdi)
+        assertThat(one).isEqualTo(person1)
+        await.atMost(3, SECONDS).until {
+            client.getOne<Person>(pdl,person1.brukerId.verdi) == null
+        }
     }
     @Test
-    fun putAndGetMany() {
+    fun putAndGetManyPdl() {
         every { token.system }.returns("test")
         every { token.clusterAndSystem }.returns("test:dev-gcp")
-        val id1 = BrukerId("03508331575")
-        val id2 = BrukerId("20478606614")
-        val aktør1 = AktørId("1234567890123")
-        val aktør2 = AktørId("1111111111111")
-        val person1 = Person(id1,aktør1, KommuneTilknytning(Kommune("0301")))
-        val person2 = Person(id2, aktør2, KommuneTilknytning(Kommune("1111")))
-        val keys = setOf(id1.verdi,id2.verdi)
-        client.putMany(cacheName, mapOf(id1.verdi to person1, id2.verdi to person2), Duration.ofMinutes(5))
-        val many = client.getMany<Person>(cacheName,setOf(id1.verdi,id2.verdi))
-        assertEquals(keys, many.keys)
-        assertEquals(setOf(person1, person2), many.values.toSet())
+
+        val ids = setOf(person1.brukerId.verdi,person2.brukerId.verdi)
+        client.putMany(pdl, mapOf(person1.brukerId.verdi to person1, person2.brukerId.verdi to person2), Duration.ofSeconds(1))
+        val many = client.getMany<Person>(pdl,ids)
+        assertThat(many.keys).containsExactlyInAnyOrderElementsOf(ids)
+        assertThat(client.getAll(pdl.name)).containsExactlyInAnyOrderElementsOf(ids)
+        await.atMost(3, SECONDS).until {
+            client.getMany<Person>(pdl,ids).isEmpty()
+        }
+        await.atMost(3, SECONDS).until {
+            listener.fjernet.get() == 2
+        }
     }
 
     companion object {

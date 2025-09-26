@@ -19,7 +19,6 @@ data class BrukerIdOgRegelsett(val brukerId: String, val type: RegelType = KOMPL
 }
 
 data class BrukerOgRegelsett(
-    val originalId: String,
     val bruker: Bruker,
     val type: RegelType = KOMPLETT_REGELTYPE
 )

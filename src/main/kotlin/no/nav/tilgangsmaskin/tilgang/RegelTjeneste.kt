@@ -5,16 +5,13 @@ import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.pluralize
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
-import org.jboss.logging.MDC
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Service
@@ -63,9 +60,15 @@ class RegelTjeneste(
             log.debug("Kjører bulk regler for {} med {} ident(er)", ansattId, idOgType.size)
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val brukere = idOgType.brukerOgRegelsett()
-            val resultater = motor.bulkRegler(ansatt, brukere)
-            val godkjente = godkjente(ansatt, resultater)
-            val avviste = avviste(ansatt, godkjente, resultater, brukere)
+            val resultater = motor.bulkRegler(ansatt, brukere).also {
+                log.debug("Bulk resultater {}", it)
+            }
+            val godkjente = godkjente(ansatt, resultater).also {
+                log.debug("Bulk godkjente {}", it)
+            }
+            val avviste = avviste(ansatt, godkjente, resultater, brukere).also {
+                log.debug("Bulk avviste {}", it)
+            }
             val ikkeFunnet = ikkeFunnet(idOgType, resultater)
 
             AggregertBulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {
@@ -77,43 +80,48 @@ class RegelTjeneste(
     }
 
     private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<BulkResultat>) = filterNot { brukerIdOgRegelsett ->
-        brukerIdOgRegelsett.brukerId in (funnet.map { it.bruker.historiskeIds} + funnet.map { it.brukerId })
+        brukerIdOgRegelsett.brukerId in (funnet.map { it.bruker.historiskeIds} + funnet.map { it.bruker.oppslagId })
     }
 
-    private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) = buildSet {
-        for (item in (oppgitt - funnet)) {
-            add(EnkeltBulkRespons(item.brukerId, NOT_FOUND))
+    private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) =
+        buildSet {
+            for (item in (oppgitt - funnet)) {
+                add(EnkeltBulkRespons(item.brukerId, NOT_FOUND))
+            }
         }
-    }
 
     private fun avviste(ansatt: Ansatt, godkjente: Set<EnkeltBulkRespons>, resultater: Set<BulkResultat>, brukere: Set<BrukerOgRegelsett>) =
         buildSet {
         val godkjenteIds = buildSet { godkjente.forEach { add(it.brukerId) } }
         for (resultat in resultater) {
-            if (resultat.status == FORBIDDEN && resultat.brukerId !in godkjenteIds) {
-                add(EnkeltBulkRespons(RegelException(ansatt, brukere.finnBruker(resultat.bruker.brukerId), resultat.regel!!, status = resultat.status)))
+            log.trace("Bulk Sjekker overstyring for avvist {}", resultat)
+            if (resultat.status == FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
+                log.trace("Bulk resultat {} har ingen overstyring", resultat)
+                add(EnkeltBulkRespons(RegelException(ansatt, brukere.finnBruker(resultat.bruker.oppslagId), resultat.regel!!, status = resultat.status)))
             }
         }
     }
 
-    private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) : Set<EnkeltBulkRespons> {
-
-        val (success, fail) = resultater.partition { it.status.is2xxSuccessful }
-        val ids = success.map { it.brukerId } +
-                overstyringTjeneste.overstyringer(ansatt.ansattId, fail.map { it.bruker.brukerId }).map { it.verdi }
-        return ids.map(::ok).toSet()
-    }
+    private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) =
+        buildSet {
+            val (godkjente, avviste) = resultater.partition { it.status.is2xxSuccessful }
+            godkjente.forEach { add(ok(it.bruker.oppslagId)) }
+            overstyringTjeneste
+                .overstyringer(ansatt.ansattId, avviste.map { it.bruker.brukerId })
+                .forEach { add(ok(it.verdi)) }
+        }
 
 
     private fun Set<BrukerIdOgRegelsett>.brukerOgRegelsett() =
         with(associate { it.brukerId to it }) {
-            log.debug("Slår opp {} {}", "bruker".pluralize(keys,"e"), keys.map { it.maskFnr() })
+            log.debug("Slår opp keys {}", keys)
             val brukere = brukerTjeneste.brukere(keys)
+            log.debug("Fant {} av {} brukere ved oppslag for keys {}", brukere, keys.size, keys)
             brukere.map { bruker ->
-                val idOgType = this[bruker.brukerId.verdi] ?: this[bruker.aktørId?.verdi] ?: BrukerIdOgRegelsett(bruker.brukerId.verdi)
-                BrukerOgRegelsett(idOgType.brukerId, bruker, idOgType.type)
+                val idOgType = this[bruker.oppslagId] ?: throw IllegalStateException("Bruker ${bruker.brukerId} har ikke oppslagId")
+                BrukerOgRegelsett(bruker, idOgType.type)
             }.toSet()
         }
 
-    private fun Set<BrukerOgRegelsett>.finnBruker(brukerId: BrukerId)  = first { it.bruker.brukerId == brukerId }.bruker
+    private fun Set<BrukerOgRegelsett>.finnBruker(oppslagId: String)  = first { it.bruker.oppslagId == oppslagId }.bruker
 }

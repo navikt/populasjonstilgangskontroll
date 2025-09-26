@@ -42,14 +42,15 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             .build()
 
     @Bean
-    fun valkeyClient(cfg: ValKeyConfig): RedisClient =
+    fun valkeyClient(cfg: ValKeyConfig) =
         RedisClient.create(cfg.valkeyURI)
 
     @Bean
-    fun valkeyCacheClient(client: RedisClient, handler: ValkeyCacheKeyHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
-        ValkeyCacheClient(handler,
-            client.connect(),
-            valKeyMapper,sucessTeller,teller)
+    fun valkeyCacheClient(client: RedisClient, handler: ValkeyCacheKeyMapper, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
+        ValkeyCacheClient(
+            client,handler,
+            valKeyMapper, sucessTeller, teller
+        )
 
     @Bean
     fun cachePrefixes(cfgs: Map<String, RedisCacheConfiguration>) = cfgs.mapValues { it.value.keyPrefix}

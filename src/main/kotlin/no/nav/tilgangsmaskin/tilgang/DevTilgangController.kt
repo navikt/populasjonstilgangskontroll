@@ -62,6 +62,9 @@ class DevTilgangController(
     @PostMapping("cache/personer")
     fun cachePersoner(@RequestBody  navIds: Set<String>) = cache.getMany<Person>(CacheConfig(PDL),navIds)
 
+    @GetMapping("cache/keys/{cacheName}")
+    fun keys(@PathVariable cacheName: String) = cache.getAll(cacheName)
+
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.partnere(id)
 
@@ -139,7 +142,7 @@ class DevTilgangController(
     fun skjerming(@RequestBody brukerId: BrukerId) = skjerming.skjerming(brukerId)
 
     @PostMapping("skjerminger")
-    fun skjerminger(@RequestBody ids: Set<BrukerId>) = skjerming.skjerminger(ids)
+    fun skjerminger(@RequestBody ids: List<BrukerId>) = skjerming.skjerminger(ids)
 
     @PostMapping("brukere")
     fun brukere(@RequestBody @Valid @ValidId  ids: Set<String>) = brukere.brukere(ids)

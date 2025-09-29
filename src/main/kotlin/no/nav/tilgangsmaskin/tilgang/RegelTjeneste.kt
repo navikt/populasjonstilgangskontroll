@@ -61,13 +61,17 @@ class RegelTjeneste(
                 log.debug("Bulk resultater {}", it)
             }
             val godkjente = godkjente(ansatt, resultater).also {
-                log.debug("Bulk godkjente {}", it)
+                if (it.isNotEmpty()) {
+                    log.debug("Bulk godkjente oppslagId(s) {}", it.map { it.brukerId })
+                }
             }
             val avviste = avviste(ansatt, godkjente, resultater, brukere).also {
                 log.debug("Bulk avviste {}", it)
             }
             val ikkeFunnet = ikkeFunnet(idOgType, resultater).also {
-                log.debug("Bulk ikke funnet {}", it)
+                if (it.isNotEmpty()) {
+                    log.debug("Bulk ikke funnet {}", it)
+                }
             }
 
             AggregertBulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {

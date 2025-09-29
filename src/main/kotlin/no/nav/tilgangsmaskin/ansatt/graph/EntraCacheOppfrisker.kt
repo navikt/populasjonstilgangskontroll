@@ -20,7 +20,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oid: An
     override fun oppfrisk(deler: CacheNøkkelDeler) {
         runCatching {
             with(AnsattId(deler.id)) {
-                validerMetode(deler).call(entra,this, oid.oidFraEntra(this)).also {
+                valider(deler).call(entra,this, oid.oidFraEntra(this)).also {
                     log.trace(CONFIDENTIAL,"Oppfrisket ${deler.key} etter sletting")
                 }
             }
@@ -28,7 +28,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oid: An
             log.info("Oppfrisking av ${deler.id.maskFnr()} etter sletting feilet, dette er ukritisk",it)
         }
     }
-    private fun validerMetode(deler: CacheNøkkelDeler)  =
+    override fun valider(deler: CacheNøkkelDeler)  =
         EntraTjeneste::class.members.first { it.name == deler.metode }
             .also {
                 val params = it.parameters.drop(1)

@@ -11,9 +11,10 @@ class CacheExpiredEventListener( val teller: BulkCacheTeller,erLeder: Boolean = 
     @EventListener
     fun handleCacheExpired(event: CacheExpiredEvent) {
         if (erLeder) {
-            val deler = CacheNøkkelDeler(event.nøkkel)
-            oppfriskere.firstOrNull { it.cacheName == deler.cacheName }?.oppfrisk(deler).also {
-                teller.tell(of("cache", deler.cacheName, "result", "expired", "method", deler.metode ?: "ingen"))
+            with(CacheNøkkelElementer(event.nøkkel)) {
+                oppfriskere.firstOrNull { it.cacheName == cacheName }?.oppfrisk(this).also {
+                    teller.tell(of("cache", cacheName, "result", "expired", "method", metode ?: "ingen"))
+                }
             }
         }
     }

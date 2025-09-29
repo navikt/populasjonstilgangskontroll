@@ -4,6 +4,6 @@ import kotlin.reflect.KCallable
 
 interface CacheOppfrisker {
     val cacheName: String
-    fun oppfrisk(deler: CacheNøkkelDeler)
-    fun valider(deler: CacheNøkkelDeler): KCallable<*>
+    fun oppfrisk(deler: CacheNøkkelElementer)
+    fun valider(deler: CacheNøkkelElementer): KCallable<*>
 }

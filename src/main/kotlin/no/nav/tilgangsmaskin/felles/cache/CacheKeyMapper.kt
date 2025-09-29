@@ -18,7 +18,7 @@ class ValkeyCacheKeyMapper(val configs: Map<String, RedisCacheConfiguration>) {
     }
 
     fun fromKey(key: String): String {
-        val deler = CacheNøkkelDeler(key)
+        val deler = CacheNøkkelElementer(key)
         log.trace(CONFIDENTIAL,"Fjernet prefix for {} -> {}",key, deler.id)
         return deler.id
     }

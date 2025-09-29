@@ -25,7 +25,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oid: An
                 }
             }
         }.getOrElse {
-            log.warn("Oppfrisking av ${deler.id.maskFnr()} etter sletting feilet",it)
+            log.info("Oppfrisking av ${deler.id.maskFnr()} etter sletting feilet, dette er ukritisk",it)
         }
     }
     private fun validerMetode(deler: CacheNøkkelDeler)  =

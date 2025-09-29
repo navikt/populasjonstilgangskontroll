@@ -42,6 +42,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import org.assertj.core.api.Assertions.assertThat
+import org.springframework.context.ApplicationEventPublisher
 
 @DataRedisTest
 @ContextConfiguration(classes = [TestApp::class])
@@ -61,8 +62,8 @@ class ValkeyClientTest {
     @MockkBean
     private lateinit var token: Token
 
-    @MockkBean
-    private lateinit var oppfrisker: EntraCacheOppfrisker
+    @Autowired
+    lateinit var eventPublisher: ApplicationEventPublisher
 
     private lateinit var listener: ValkeyKeyspaceRemovalListener
 
@@ -99,7 +100,7 @@ class ValkeyClientTest {
             handler, valkeyMapper,
             BulkCacheSuksessTeller(meterRegistry, token), teller
         )
-        listener = ValkeyKeyspaceRemovalListener(redisClient, teller, oppfrisker, erLeder = true)
+        listener = ValkeyKeyspaceRemovalListener(redisClient, eventPublisher)
         val id1 = BrukerId("03508331575")
         val id2 = BrukerId("20478606614")
         person1 = Person(id1,id1.verdi, AktørId("1234567890123"), KommuneTilknytning(Kommune("0301")))

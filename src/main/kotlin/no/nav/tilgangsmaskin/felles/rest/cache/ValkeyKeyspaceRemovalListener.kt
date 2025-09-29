@@ -1,17 +1,19 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
 import io.lettuce.core.RedisClient
+import io.lettuce.core.pubsub.RedisPubSubAdapter
 import io.lettuce.core.pubsub.RedisPubSubListener
 import io.micrometer.core.instrument.Tags.of
 import java.util.concurrent.atomic.AtomicInteger
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.context.ApplicationEvent
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 
 @Component
- class ValkeyKeyspaceRemovalListener(client: RedisClient,  val teller: BulkCacheTeller, private vararg val oppfriskere: CacheOppfrisker,erLeder: Boolean = false) : LeaderAware(erLeder), RedisPubSubListener<String, String> {
+ class ValkeyKeyspaceRemovalListener(client: RedisClient, private val eventPublisher: ApplicationEventPublisher) :  RedisPubSubAdapter<String, String>() {
     private val log = getLogger(javaClass)
 
     @Volatile
@@ -24,30 +26,19 @@ import org.springframework.stereotype.Component
          }
      }
 
-    override fun message(kanal: String, key: String) {
+    override fun message(kanal: String, nøkkel: String) {
         if (!kanal.startsWith(KANAL)) {
-            log.warn("Uventet hendelse på $kanal med nøkkel $key")
+            log.warn("Uventet hendelse på $kanal med nøkkel $nøkkel")
         }
         else {
-            if (erLeder) {
-                with(CacheNøkkelDeler(key)) {
-                    teller.tell(of("cache", cacheName, "result", "expired", "method", metode ?: "ingen"))
-                    fjernet.incrementAndGet()
-                    oppfriskere.firstOrNull { it.cacheName == cacheName }?.oppfrisk(this)
-                }
-            }
+            fjernet.incrementAndGet()
+            eventPublisher.publishEvent(CacheExpiredEvent(nøkkel))
         }
     }
-
-    override fun message(pattern: String?, channel: String?, message: String?) {}
-    override fun subscribed(channel: String?, count: Long) {}
-    override fun psubscribed(pattern: String?, count: Long) {}
-    override fun unsubscribed(channel: String?, count: Long) {}
-    override fun punsubscribed(pattern: String?, count: Long) {}
-
-
     companion object {
         private const val KANAL = "__keyevent@0__:expired"
     }
 }
+
+data class CacheExpiredEvent(val nøkkel: String) : ApplicationEvent(nøkkel)
 

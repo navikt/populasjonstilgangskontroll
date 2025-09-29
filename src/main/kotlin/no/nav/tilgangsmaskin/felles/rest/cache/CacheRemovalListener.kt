@@ -2,11 +2,7 @@ package no.nav.tilgangsmaskin.felles.rest.cache
 
 import io.lettuce.core.RedisClient
 import io.lettuce.core.pubsub.RedisPubSubAdapter
-import io.lettuce.core.pubsub.RedisPubSubListener
-import io.micrometer.core.instrument.Tags.of
 import java.util.concurrent.atomic.AtomicInteger
-import no.nav.tilgangsmaskin.felles.utils.LeaderAware
-import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationEventPublisher

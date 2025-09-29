@@ -25,9 +25,9 @@ import org.springframework.data.redis.serializer.StringRedisSerializer
 @Configuration(proxyBeanMethods = true)
 @EnableCaching
 @ConditionalOnGCP
-class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
-                           mapper: ObjectMapper,
-                           private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
+class CacheBeanConfigurer(private val cf: RedisConnectionFactory,
+                          mapper: ObjectMapper,
+                          private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
     private val valKeyMapper =
         mapper.copy().apply {
@@ -47,7 +47,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
 
     @Bean
     fun valkeyCacheClient(client: RedisClient, handler: ValkeyCacheKeyMapper, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
-        ValkeyCacheClient(
+        CacheClient(
             client,handler,
             valKeyMapper, sucessTeller, teller
         )
@@ -56,7 +56,7 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
     fun cachePrefixes(cfgs: Map<String, RedisCacheConfiguration>) = cfgs.mapValues { it.value.keyPrefix}
 
     @Bean
-    fun valKeyHealthIndicator(adapter: ValKeyCacheAdapter)  =
+    fun valKeyHealthIndicator(adapter: CacheAdapter)  =
         PingableHealthIndicator(adapter)
 
     @Bean

@@ -22,7 +22,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
-import no.nav.tilgangsmaskin.felles.rest.cache.ValkeyCacheClient
+import no.nav.tilgangsmaskin.felles.rest.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -52,7 +52,7 @@ class DevTilgangController(
     private val pip: PdlRestClientAdapter,
     private val nom: NomTjeneste,
     private val pdl: PDLTjeneste,
-    private val cache: ValkeyCacheClient) {
+    private val cache: CacheClient) {
 
     private  val log = getLogger(javaClass)
 

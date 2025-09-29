@@ -36,10 +36,7 @@ import java.time.Duration
 import java.util.UUID
 import org.awaitility.kotlin.await
 import java.util.concurrent.TimeUnit.SECONDS
-import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
-import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
-import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import org.assertj.core.api.Assertions.assertThat
 import org.springframework.context.ApplicationEventPublisher
@@ -71,7 +68,7 @@ class ValkeyClientTest {
     private lateinit var cf: RedisConnectionFactory
     private lateinit var person1:  Person
     private lateinit var person2:  Person
-    private lateinit var client: ValkeyCacheClient
+    private lateinit var client: CacheClient
 
     @BeforeEach
     fun setUp() {
@@ -95,7 +92,7 @@ class ValkeyClientTest {
         val redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
         val teller = BulkCacheTeller(meterRegistry, token)
         val handler = ValkeyCacheKeyMapper(mgr.cacheConfigurations)
-        client = ValkeyCacheClient(
+        client = CacheClient(
             redisClient,
             handler, valkeyMapper,
             BulkCacheSuksessTeller(meterRegistry, token), teller

@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest.cache
 
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.stereotype.Component

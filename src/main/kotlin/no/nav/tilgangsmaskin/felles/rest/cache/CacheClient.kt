@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory.getLogger
 import java.time.Duration
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 
-class ValkeyCacheClient(
+class CacheClient(
     client: RedisClient,
     val keyMapper: ValkeyCacheKeyMapper,
     val mapper: ObjectMapper,

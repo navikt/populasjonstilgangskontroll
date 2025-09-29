@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component
 @Component
 class CacheExpiredEventListener( val teller: BulkCacheTeller,erLeder: Boolean = true,private vararg val oppfriskere: CacheOppfrisker) :LeaderAware(erLeder){
     @EventListener
-    fun handleCacheExpired(event: CacheExpiredEvent) {
+    fun cacheInnslagFjernet(hendelse: CacheExpiredEvent) {
         if (erLeder) {
-            with(CacheNøkkelElementer(event.nøkkel)) {
+            with(CacheNøkkelElementer(hendelse.nøkkel)) {
                 oppfriskere.firstOrNull { it.cacheName == cacheName }?.oppfrisk(this).also {
                     teller.tell(of("cache", cacheName, "result", "expired", "method", metode ?: "ingen"))
                 }

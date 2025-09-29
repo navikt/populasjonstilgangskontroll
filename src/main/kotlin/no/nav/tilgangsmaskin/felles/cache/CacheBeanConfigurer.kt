@@ -42,7 +42,7 @@ class CacheBeanConfigurer(private val cf: RedisConnectionFactory,
             .build()
 
     @Bean
-    fun valkeyClient(cfg: ValKeyConfig) =
+    fun valkeyClient(cfg: CacheConfig) =
         RedisClient.create(cfg.valkeyURI)
 
     @Bean

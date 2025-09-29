@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedClass
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector
 import com.fasterxml.jackson.databind.jsontype.impl.StdTypeResolverBuilder
 import com.fasterxml.jackson.databind.module.SimpleModule
+import java.lang.annotation.Inherited
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 
@@ -17,7 +18,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
     Mapper brukt for serialiserig av cache innslag i ValKey må da endres til NON_FINAL_AND_ENUMS, og alle mulig cachebare klasser må transitivt annoteres
  */
 @ConditionalOnProperty("valkey.json.enabled", havingValue = "true")  // TODO Registrer manuelt foreløpig
-class JsonCacheableModule : SimpleModule() {
+class CacheModule : SimpleModule() {
 
     private val log = getLogger(javaClass)
 
@@ -36,3 +37,9 @@ class JsonCacheableModule : SimpleModule() {
         })
     }
 }
+
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+@Inherited
+@MustBeDocumented
+annotation class JsonCacheable

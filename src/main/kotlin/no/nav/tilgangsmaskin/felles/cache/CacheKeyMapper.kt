@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 class ValkeyCacheKeyMapper(val configs: Map<String, RedisCacheConfiguration>) {
     private val log = getLogger(javaClass)
 
-    fun toKey(cache: CacheConfig, key: String): String {
+    fun toKey(cache: CachableConfig, key: String): String {
         val prefix = prefixFor(cache)
         val extra = cache.extraPrefix?.let { "$it:" } ?: ""
         return "$prefix::$extra$key".also {
@@ -23,11 +23,11 @@ class ValkeyCacheKeyMapper(val configs: Map<String, RedisCacheConfiguration>) {
         return deler.id
     }
 
-    private fun prefixFor(cache: CacheConfig): String =
+    private fun prefixFor(cache: CachableConfig): String =
         configs[cache.name]?.getKeyPrefixFor(cache.name)
             ?: throw IllegalStateException("Ingen cache med navn ${cache.name}")
 
 }
 
 
-data class CacheConfig(val name: String, val extraPrefix: String? = null)
+data class CachableConfig(val name: String, val extraPrefix: String? = null)

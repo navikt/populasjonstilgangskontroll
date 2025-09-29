@@ -15,7 +15,7 @@ import org.assertj.core.api.Assertions.*
 class ValkeyCacheKeyHandlerTest {
 
     private val key = "01011111111"
-    private val UTEN_EXTRA =   CacheConfig(PDL)
+    private val UTEN_EXTRA =   CachableConfig(PDL)
     private val MED_EXTRA = UTEN_EXTRA.copy(extraPrefix = "medFamilie")
     @MockK
     private lateinit var redisConfig: RedisCacheConfiguration
@@ -55,7 +55,7 @@ class ValkeyCacheKeyHandlerTest {
     @DisplayName("kaster exception hvis cache config mangler")
     fun kasterExceptionHvisCacheConfigMangler() {
         assertThatThrownBy {
-            ValkeyCacheKeyMapper(emptyMap()).toKey(CacheConfig("unknown"), "key")
+            ValkeyCacheKeyMapper(emptyMap()).toKey(CachableConfig("unknown"), "key")
         }.isInstanceOf(IllegalStateException::class.java)
     }
 }

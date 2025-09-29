@@ -29,13 +29,13 @@ class CacheClient(
     }
 
     @WithSpan
-    inline fun <reified T> getOne(cache: CacheConfig, id: String) =
+    inline fun <reified T> getOne(cache: CachableConfig, id: String) =
         conn.sync().get(keyMapper.toKey(cache,id))?.let { json ->
             mapper.readValue<T>(json)
         }
 
     @WithSpan
-    fun putOne(cache: CacheConfig, id: String, value: Any, ttl: Duration)  {
+    fun putOne(cache: CachableConfig, id: String, value: Any, ttl: Duration)  {
         with(keyMapper.toKey(cache,id)) {
             conn.apply {
                 setAutoFlushCommands(false)
@@ -56,7 +56,7 @@ class CacheClient(
         }
 
     @WithSpan
-    inline fun <reified T> getMany(cache: CacheConfig, ids: Set<String>)  =
+    inline fun <reified T> getMany(cache: CachableConfig, ids: Set<String>)  =
         if (ids.isEmpty()) {
             emptyMap()
         }
@@ -74,7 +74,7 @@ class CacheClient(
             }
 
     @WithSpan
-    fun putMany(cache: CacheConfig, innslag: Map<String, Any>,  ttl: Duration) {
+    fun putMany(cache: CachableConfig, innslag: Map<String, Any>, ttl: Duration) {
         if (innslag.isNotEmpty()) {
             log.trace("Bulk lagrer {} verdier for cache {} med prefix {}", innslag.size, cache.name, cache.extraPrefix)
             conn.apply {
@@ -91,7 +91,7 @@ class CacheClient(
         }
     }
 
-    private fun payloadFor(innslag: Map<String, Any>, cache: CacheConfig)=
+    private fun payloadFor(innslag: Map<String, Any>, cache: CachableConfig)=
         buildMap {
             innslag.forEach { (key, value) ->
                 put(keyMapper.toKey(cache, key), mapper.writeValueAsString(value))

@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
 import org.springframework.http.MediaType.*
 import org.springframework.web.bind.annotation.*
-import no.nav.tilgangsmaskin.felles.cache.CacheConfig
+import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 
 
 @UnprotectedRestController(value = ["/${DEV}"])
@@ -57,10 +57,10 @@ class DevTilgangController(
     private  val log = getLogger(javaClass)
 
     @PostMapping("cache/skjerminger")
-    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cache.getMany<Boolean>(CacheConfig(SKJERMING),navIds)
+    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cache.getMany<Boolean>(CachableConfig(SKJERMING),navIds)
 
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<String>) = cache.getMany<Person>(CacheConfig(PDL),navIds)
+    fun cachePersoner(@RequestBody  navIds: Set<String>) = cache.getMany<Person>(CachableConfig(PDL),navIds)
 
     @GetMapping("cache/keys/{cacheName}")
     fun keys(@PathVariable cacheName: String) = cache.getAll(cacheName)

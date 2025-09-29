@@ -49,7 +49,7 @@ import org.springframework.context.ApplicationEventPublisher
 @Import(JacksonAutoConfiguration::class)
 class ValkeyClientTest {
 
-    private val pdl = CacheConfig(PDL,"medFamilie")
+    private val pdl = CachableConfig(PDL,"medFamilie")
 
     @Autowired
     private lateinit var objectMapper: ObjectMapper

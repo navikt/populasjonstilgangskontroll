@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.rest.cache
+package no.nav.tilgangsmaskin.felles.cache
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
 import com.fasterxml.jackson.databind.ObjectMapper

@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.rest.cache
+package no.nav.tilgangsmaskin.felles.cache
 
 data class CacheNøkkelDeler(val key: String) {
     private val deler = key.split("::", ":")

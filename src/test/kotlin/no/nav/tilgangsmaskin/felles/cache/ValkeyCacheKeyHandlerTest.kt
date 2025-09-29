@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.rest.cache
+package no.nav.tilgangsmaskin.felles.cache
 
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension

@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.rest.cache
+package no.nav.tilgangsmaskin.felles.cache
 
 import io.lettuce.core.RedisClient
 import io.lettuce.core.pubsub.RedisPubSubAdapter

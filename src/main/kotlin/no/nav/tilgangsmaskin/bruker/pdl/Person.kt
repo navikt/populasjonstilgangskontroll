@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.bruker.Familie.Companion.INGEN
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.*
-import no.nav.tilgangsmaskin.felles.rest.cache.JsonCacheable
+import no.nav.tilgangsmaskin.felles.cache.JsonCacheable
 import java.time.LocalDate
 
 @JsonCacheable

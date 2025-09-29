@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.bruker
 
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.*
-import no.nav.tilgangsmaskin.felles.rest.cache.JsonCacheable
+import no.nav.tilgangsmaskin.felles.cache.JsonCacheable
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
 
 

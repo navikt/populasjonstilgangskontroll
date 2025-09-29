@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.rest.cache
+package no.nav.tilgangsmaskin.felles.cache
 
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import org.slf4j.LoggerFactory.getLogger

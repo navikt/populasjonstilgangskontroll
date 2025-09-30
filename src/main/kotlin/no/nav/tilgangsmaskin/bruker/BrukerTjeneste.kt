@@ -17,7 +17,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
 
     @WithSpan
     fun brukere(brukerIds: Set<String>) : Set<Bruker> {
-        log.info("Bulk kall for $brukerIds")
+        log.info("Bulk kall for ${brukerIds.size} brukerIds")
         if (brukerIds.isEmpty()) {
             log.info("Bulk ingen personer å slå opp")
             return emptySet()
@@ -27,7 +27,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
         val funnetBrukerIds = buildList {
             personer.forEach { add(brukerIdForOppslagId(it.oppslagId, personer)) }
         }
-        log.info("Bulk funnet ${funnetBrukerIds.size} brukerIds $funnetBrukerIds")
+        log.info("Bulk fant ${funnetBrukerIds.size} brukerIds")
         if (funnetBrukerIds.size != personer.size) {
             val mangler = (brukerIds - funnetBrukerIds.map { it.verdi }.toSet()).map { it.maskFnr() }
             log.warn("Bulk fant ikke $mangler")
@@ -42,7 +42,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
                     tilBruker(it, skjerminger[it.brukerId] ?: false)
                 }
             } else {
-                log.debug("Bulk ingen skjwrminger å slå opp")
+                log.debug("Bulk ingen skjerminger å slå opp")
                 emptyList()
             }.toSet()
         }

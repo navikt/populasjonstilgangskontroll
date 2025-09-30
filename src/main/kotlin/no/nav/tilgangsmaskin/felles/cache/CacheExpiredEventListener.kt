@@ -16,10 +16,11 @@ class CacheExpiredEventListener( val teller: BulkCacheTeller,erLeder: Boolean = 
     fun cacheInnslagFjernet(hendelse: CacheExpiredEvent) {
         log.info("Cache-innslag utløpt: ${hendelse.nøkkel} - erLeder $erLeder")
         if (erLeder) {
-            with(CacheNøkkelElementer(hendelse.nøkkel)) {
-                oppfriskere.firstOrNull { it.cacheName == cacheName }?.oppfrisk(this).also {
-                    teller.tell(of("cache", cacheName, "result", "expired", "method", metode ?: "ingen"))
-                }
+            val elementer = CacheNøkkelElementer(hendelse.nøkkel)
+            oppfriskere.firstOrNull { it.cacheName == elementer.cacheName }?.run {
+                oppfrisk(elementer)
+                log.info("Cache-innslag oppfrisket av ${this.javaClass.simpleName}")
+                teller.tell(of("cache", elementer.cacheName, "result", "expired", "method", elementer.metode ?: "ingen"))
             }
         }
     }

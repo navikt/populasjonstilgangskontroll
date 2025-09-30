@@ -4,5 +4,5 @@ import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelMapper.CacheNøkkelElement
 
 interface CacheOppfrisker {
     val cacheName: String
-    fun oppfrisk(deler: CacheNøkkelElementer)
+    fun oppfrisk(elementer: CacheNøkkelElementer)
 }

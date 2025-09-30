@@ -6,13 +6,15 @@ val tokenSupportVersion = "5.0.37"
 val mockkVersion = "1.14.5"
 
 
-group = "no.nav.tilgangsmaskin.populasjonstiilgangskontroll"
+
+group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
 version = "1.0.1"
 
 plugins {
-    kotlin("jvm") version "2.2.20"
-    kotlin("plugin.spring") version "2.2.20"
-    kotlin("plugin.jpa") version "2.2.20"
+    val kotlinVersion = "2.2.20"
+    kotlin("jvm") version kotlinVersion
+    kotlin("plugin.spring") version kotlinVersion
+    kotlin("plugin.jpa") version kotlinVersion
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.cyclonedx.bom") version "3.0.0-alpha-1"

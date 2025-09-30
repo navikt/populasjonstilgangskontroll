@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
+import java.time.Duration
 
 @ConfigurationProperties(GRAPH)
 class EntraConfig(
@@ -14,6 +15,9 @@ class EntraConfig(
     pingPath: String = DEFAULT_PING_PATH,
     private val size: Int = DEFAULT_BATCH_SIZE,
     enabled: Boolean = true) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
+
+    override val navn = name
+    override val varighet = Duration.ofHours(3)
 
     @WithSpan
     fun userURI(navIdent: String) = builder().apply {
@@ -37,7 +41,6 @@ class EntraConfig(
         queryParam(PARAM_NAME_TOP, size)
         queryParam(PARAM_NAME_FILTER, filter)
     }.build(ansattId)
-    override val navn = name
 
     private fun uuidsFormatted() = GlobalGruppe.uuids().joinToString(separator ="','" , prefix = "'", postfix = "'")
 

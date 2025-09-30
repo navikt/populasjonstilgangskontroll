@@ -18,8 +18,7 @@ import kotlin.reflect.KCallable
 @RetryingOnRecoverableService
 @Timed(value = "entra", histogram = true)
 class EntraTjeneste(private val adapter: EntraRestClientAdapter, private val resolver: AnsattOidTjeneste) : CacheOppfrisker {
-
-    override val cacheName: String = GRAPH
+    override val cacheName = GRAPH
     private val log = getLogger(javaClass)
 
     @Cacheable(cacheNames = [GRAPH],  key = "#root.methodName + ':' + #ansattId.verdi")

@@ -47,7 +47,7 @@ import org.springframework.context.ApplicationEventPublisher
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(MockKExtension::class)
 @Import(JacksonAutoConfiguration::class)
-class ValkeyClientTest {
+class CacheClientTest {
 
     private val pdl = CachableConfig(PDL,"medFamilie")
 
@@ -62,7 +62,7 @@ class ValkeyClientTest {
     @Autowired
     lateinit var eventPublisher: ApplicationEventPublisher
 
-    private lateinit var listener: ValkeyKeyspaceRemovalListener
+    private lateinit var listener: CacheRemovalListener
 
     @Autowired
     private lateinit var cf: RedisConnectionFactory
@@ -91,13 +91,13 @@ class ValkeyClientTest {
         mgr.getCache(pdl.name)
         val redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
         val teller = BulkCacheTeller(meterRegistry, token)
-        val handler = ValkeyCacheKeyMapper(mgr.cacheConfigurations)
+        val handler = CacheNøkkelMapper(mgr.cacheConfigurations)
         client = CacheClient(
             redisClient,
             handler, valkeyMapper,
             BulkCacheSuksessTeller(meterRegistry, token), teller
         )
-        listener = ValkeyKeyspaceRemovalListener(redisClient, eventPublisher)
+        listener = CacheRemovalListener(redisClient, eventPublisher)
         val id1 = BrukerId("03508331575")
         val id2 = BrukerId("20478606614")
         person1 = Person(id1,id1.verdi, AktørId("1234567890123"), KommuneTilknytning(Kommune("0301")))

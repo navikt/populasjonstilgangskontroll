@@ -8,12 +8,10 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.RetryingOnRecoverableService
 import org.springframework.cache.annotation.Cacheable
 import java.util.UUID
-import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
-import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelElementer
+import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelMapper.CacheNøkkelElementer
 import no.nav.tilgangsmaskin.felles.cache.CacheOppfrisker
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
-import kotlin.reflect.KCallable
 
 @RetryingOnRecoverableService
 @Timed(value = "entra", histogram = true)

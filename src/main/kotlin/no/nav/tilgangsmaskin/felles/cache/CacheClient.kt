@@ -13,7 +13,7 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocal
 
 class CacheClient(
     client: RedisClient,
-    val keyMapper: ValkeyCacheKeyMapper,
+    val keyMapper: CacheNøkkelMapper,
     val mapper: ObjectMapper,
     val alleTreffTeller: BulkCacheSuksessTeller,
     val teller: BulkCacheTeller
@@ -30,13 +30,13 @@ class CacheClient(
 
     @WithSpan
     inline fun <reified T> getOne(cache: CachableConfig, id: String) =
-        conn.sync().get(keyMapper.toKey(cache,id))?.let { json ->
+        conn.sync().get(keyMapper.tilNøkkel(cache,id))?.let { json ->
             mapper.readValue<T>(json)
         }
 
     @WithSpan
     fun putOne(cache: CachableConfig, id: String, value: Any, ttl: Duration)  {
-        with(keyMapper.toKey(cache,id)) {
+        with(keyMapper.tilNøkkel(cache,id)) {
             conn.apply {
                 setAutoFlushCommands(false)
                 async().set(this@with, mapper.writeValueAsString(value))
@@ -50,7 +50,7 @@ class CacheClient(
     @WithSpan
     fun getAll(cache: String) =
         conn.sync().keys("$cache::*").map {
-            keyMapper.fromKey(it)
+            keyMapper.fraNøkkel(it)
         }.also {
             log.info("Fant ${it.size} nøkler i cache $cache")
         }
@@ -62,13 +62,13 @@ class CacheClient(
         }
         else conn.sync()
             .mget(*ids.map {
-                    id -> keyMapper.toKey(cache,id)}.toTypedArray<String>()
+                    id -> keyMapper.tilNøkkel(cache,id)}.toTypedArray<String>()
             )
             .filter {
                 it.hasValue()
             }
             .associate {
-                keyMapper.fromKey(it.key) to mapper.readValue<T>(it.value)
+                keyMapper.fraNøkkel(it.key) to mapper.readValue<T>(it.value)
             }.also {
                 tellOgLog(cache.name, it.size, ids.size)
             }
@@ -94,7 +94,7 @@ class CacheClient(
     private fun payloadFor(innslag: Map<String, Any>, cache: CachableConfig)=
         buildMap {
             innslag.forEach { (key, value) ->
-                put(keyMapper.toKey(cache, key), mapper.writeValueAsString(value))
+                put(keyMapper.tilNøkkel(cache, key), mapper.writeValueAsString(value))
             }
         }
 

@@ -9,7 +9,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 
 @Component
- class ValkeyKeyspaceRemovalListener(client: RedisClient, private val eventPublisher: ApplicationEventPublisher) :  RedisPubSubAdapter<String, String>() {
+ class CacheRemovalListener(client: RedisClient, private val eventPublisher: ApplicationEventPublisher) :  RedisPubSubAdapter<String, String>() {
     private val log = getLogger(javaClass)
 
     @Volatile
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component
 
      init {
          client.connectPubSub().apply {
-             addListener(this@ValkeyKeyspaceRemovalListener)
+             addListener(this@CacheRemovalListener)
              sync().subscribe(KANAL)
          }
      }

@@ -32,7 +32,7 @@ class PdlRestClientAdapter(
 
     @WithSpan
     fun personer(ids: Set<String>) : Set<Person> {
-        val fraCache = fraCache( ids)
+        val fraCache = fraCache(ids)
         if (fraCache.size == ids.size) {
             return fraCache.values.toSet()
         }

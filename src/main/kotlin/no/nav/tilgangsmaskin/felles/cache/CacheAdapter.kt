@@ -11,10 +11,10 @@ import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.stereotype.Component
 
 @Component
-class CacheAdapter(private val handler: ValkeyCacheKeyMapper, private val cf: RedisConnectionFactory, cfg: CacheConfig, private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
+class CacheAdapter(private val handler: CacheNøkkelMapper, private val cf: RedisConnectionFactory, cfg: CacheConfig, private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
 
     override val pingEndpoint  =  "${cfg.host}:${cfg.port}"
-    override val name = "ValKey Cache"
+    override val name = "Cache"
 
     override fun ping() =
         cf.connection.use {

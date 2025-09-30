@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import kotlin.reflect.KCallable
+import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelMapper.CacheNøkkelElementer
 
 interface CacheOppfrisker {
     val cacheName: String

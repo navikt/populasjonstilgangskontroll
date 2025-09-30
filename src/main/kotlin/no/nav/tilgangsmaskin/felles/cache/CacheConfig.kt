@@ -7,7 +7,7 @@ import java.net.URI
 
 @ConfigurationProperties(VALKEY)
 data class CacheConfig(val username: String, val password: String, val host: String, val port: String, val uri: URI) {
-    val valkeyURI = RedisURI.Builder
+    val cacheURI = RedisURI.Builder
         .redis(host, port.toInt())
         .withSsl(true)
         .withAuthentication(username, password)

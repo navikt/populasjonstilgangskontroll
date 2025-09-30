@@ -29,7 +29,7 @@ class CacheBeanConfigurer(private val cf: RedisConnectionFactory,
                           mapper: ObjectMapper,
                           private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
-    private val valKeyMapper =
+    private val cacheMapper =
         mapper.copy().apply {
             activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
         }
@@ -42,21 +42,21 @@ class CacheBeanConfigurer(private val cf: RedisConnectionFactory,
             .build()
 
     @Bean
-    fun valkeyClient(cfg: CacheConfig) =
-        RedisClient.create(cfg.valkeyURI)
+    fun redisClient(cfg: CacheConfig) =
+        RedisClient.create(cfg.cacheURI)
 
     @Bean
-    fun valkeyCacheClient(client: RedisClient, handler: ValkeyCacheKeyMapper, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
+    fun cacheClient(client: RedisClient, handler: CacheNøkkelMapper, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
         CacheClient(
             client,handler,
-            valKeyMapper, sucessTeller, teller
+            cacheMapper, sucessTeller, teller
         )
 
     @Bean
     fun cachePrefixes(cfgs: Map<String, RedisCacheConfiguration>) = cfgs.mapValues { it.value.keyPrefix}
 
     @Bean
-    fun valKeyHealthIndicator(adapter: CacheAdapter)  =
+    fun cacheHealthIndicator(adapter: CacheAdapter)  =
         PingableHealthIndicator(adapter)
 
     @Bean
@@ -66,7 +66,7 @@ class CacheBeanConfigurer(private val cf: RedisConnectionFactory,
         defaultCacheConfig()
             .entryTtl(cfg.varighet)
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))
-            .serializeValuesWith(fromSerializer(GenericJackson2JsonRedisSerializer(valKeyMapper)))
+            .serializeValuesWith(fromSerializer(GenericJackson2JsonRedisSerializer(cacheMapper)))
             .apply {
                 if (!cfg.cacheNulls) disableCachingNullValues()
             }

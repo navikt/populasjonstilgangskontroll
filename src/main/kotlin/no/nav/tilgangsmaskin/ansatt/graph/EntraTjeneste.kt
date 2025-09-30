@@ -34,10 +34,9 @@ class EntraTjeneste(private val adapter: EntraRestClientAdapter, private val res
 
     override fun oppfrisk(deler: CacheNøkkelElementer) {
         runCatching {
-            with(AnsattId(deler.id)) {
-                valider(deler).call(this@EntraTjeneste,this, resolver.oidFraEntra(this)).also {
-                    log.trace(CONFIDENTIAL,"Oppfrisket ${deler.key} etter sletting")
-                }
+            val ansattId = AnsattId(deler.id)
+            valider(deler).call(this,ansattId, resolver.oidFraEntra(ansattId)).also {
+                log.trace("Oppfrisket ${deler.id.maskFnr()} etter sletting")
             }
         }.getOrElse {
             log.info("Oppfrisking av ${deler.id.maskFnr()} etter sletting feilet, dette er ikke kritisk",it)

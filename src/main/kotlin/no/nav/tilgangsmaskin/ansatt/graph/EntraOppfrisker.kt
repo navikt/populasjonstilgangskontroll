@@ -19,7 +19,7 @@ class EntraOppfrisker(private val oidTjeneste: AnsattOidTjeneste) : CacheOppfris
         runCatching {
             log.info("Oppfrisking ${elementer.nøkkel}")
             val ansattId = AnsattId(elementer.id)
-            valider(elementer).call(this,ansattId, oidTjeneste.oidFraEntra(ansattId)).also {
+            valider(elementer).call(ansattId, oidTjeneste.oidFraEntra(ansattId)).also {
                 log.info("Oppfrisking ${elementer.nøkkel} OK")
             }
         }.getOrElse {

@@ -9,21 +9,21 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
-class EntraOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste: AnsattOidTjeneste) : CacheOppfrisker {
+class EntraOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste: AnsattOidTjeneste) : CacheOppfrisker{
 
     override val cacheName: String = GRAPH
     private val log = getLogger(javaClass)
 
-    override fun oppfrisk(elementer: CacheNøkkelElementer) {
-        runCatching {
-            val ansattId = AnsattId(elementer.id)
-            when (elementer.metode) {
-                "geoOgGlobaleGrupper" -> entra.geoOgGlobaleGrupper(ansattId, oidTjeneste.oidFraEntra(ansattId))
-                "geoGrupper" -> entra.geoGrupper(ansattId, oidTjeneste.oidFraEntra(ansattId))
-                else -> throw IllegalArgumentException("Ukjent metode ${elementer.metode} i nøkkel ${elementer.nøkkel}")
+    override fun oppfqrisk(elementer: CacheNøkkelElementer) {
+            runCatching {
+                val ansattId = AnsattId(elementer.id)
+                when (elementer.metode) {
+                    "geoOgGlobaleGrupper" -> entra.geoOgGlobaleGrupper(ansattId, oidTjeneste.oidFraEntra(ansattId))
+                    "geoGrupper" -> entra.geoGrupper(ansattId, oidTjeneste.oidFraEntra(ansattId))
+                    else -> throw IllegalArgumentException("Ukjent metode ${elementer.metode} i nøkkel ${elementer.nøkkel}")
+                }
+            }.getOrElse {
+                log.info("Oppfrisking av ${elementer.nøkkel} etter sletting feilet, dette er ikke kritisk",it)
             }
-        }.getOrElse {
-            log.info("Oppfrisking av ${elementer.nøkkel} etter sletting feilet, dette er ikke kritisk",it)
         }
-    }
 }

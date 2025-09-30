@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
-import java.util.UUID
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
@@ -10,7 +9,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
-class EntraOppfrisker(private val oidTjeneste: AnsattOidTjeneste) : CacheOppfrisker {
+class EntraOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste: AnsattOidTjeneste) : CacheOppfrisker {
 
     override val cacheName: String = GRAPH
     private val log = getLogger(javaClass)
@@ -19,19 +18,14 @@ class EntraOppfrisker(private val oidTjeneste: AnsattOidTjeneste) : CacheOppfris
         runCatching {
             log.info("Oppfrisking ${elementer.nøkkel}")
             val ansattId = AnsattId(elementer.id)
-            valider(elementer).call(ansattId, oidTjeneste.oidFraEntra(ansattId)).also {
-                log.info("Oppfrisking ${elementer.nøkkel} OK")
+            when (elementer.metode) {
+                "geoOgGlobaleGrupper" -> entra.geoOgGlobaleGrupper(ansattId, oidTjeneste.oidFraEntra(ansattId))
+                "geoGrupper" -> entra.geoGrupper(ansattId, oidTjeneste.oidFraEntra(ansattId))
+                else -> throw IllegalArgumentException("Ukjent metode ${elementer.metode} i nøkkel ${elementer.nøkkel}")
             }
+            log.info("Oppfrisking ${elementer.nøkkel} OK")
         }.getOrElse {
             log.info("Oppfrisking av ${elementer.nøkkel} etter sletting feilet, dette er ikke kritisk",it)
         }
     }
-    private fun valider(deler: CacheNøkkelElementer)  =
-        EntraTjeneste::class.members.first { it.name == deler.metode }
-            .also {
-                val params = it.parameters.drop(1)
-                require(params[0].type.classifier == AnsattId::class) { "Argument 1 er ikke AnsattId" }
-                require(params[1].type.classifier == UUID::class) { "Argument 2 er ikke UUID" }
-            }
-
 }

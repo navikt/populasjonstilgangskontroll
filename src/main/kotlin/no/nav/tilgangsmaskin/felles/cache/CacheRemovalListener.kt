@@ -28,7 +28,6 @@ import org.springframework.stereotype.Component
         }
         else {
             fjernet.incrementAndGet()
-            log.info("Cache-innslag utløpt: publiserer hendelse for nøkkel $nøkkel")
             eventPublisher.publishEvent(CacheExpiredEvent(nøkkel))
         }
     }

@@ -16,14 +16,12 @@ class EntraOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste:
 
     override fun oppfrisk(elementer: CacheNøkkelElementer) {
         runCatching {
-            log.info("Oppfrisking ${elementer.nøkkel}")
             val ansattId = AnsattId(elementer.id)
             when (elementer.metode) {
                 "geoOgGlobaleGrupper" -> entra.geoOgGlobaleGrupper(ansattId, oidTjeneste.oidFraEntra(ansattId))
                 "geoGrupper" -> entra.geoGrupper(ansattId, oidTjeneste.oidFraEntra(ansattId))
                 else -> throw IllegalArgumentException("Ukjent metode ${elementer.metode} i nøkkel ${elementer.nøkkel}")
             }
-            log.info("Oppfrisking ${elementer.nøkkel} OK")
         }.getOrElse {
             log.info("Oppfrisking av ${elementer.nøkkel} etter sletting feilet, dette er ikke kritisk",it)
         }

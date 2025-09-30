@@ -21,7 +21,7 @@ class CacheExpiredEventListener( val teller: BulkCacheTeller,erLeder: Boolean = 
                 oppfrisk(elementer)
                 log.info("Cache-innslag oppfrisket av ${this.javaClass.simpleName}")
                 teller.tell(of("cache", elementer.cacheName, "result", "expired", "method", elementer.metode ?: "ingen"))
-            }
+            } ?: log.warn("Ingen oppfrisker for cache ${elementer.cacheName}, nøkkel ${hendelse.nøkkel}")
         }
     }
 }

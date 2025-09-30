@@ -28,14 +28,15 @@ import org.springframework.stereotype.Component
         }
         else {
             fjernet.incrementAndGet()
-            log.info("Cache-innslag utløpt: publiserer hendlese for nøkkel $nøkkel")
+            log.info("Cache-innslag utløpt: publiserer hendelse for nøkkel $nøkkel")
             eventPublisher.publishEvent(CacheExpiredEvent(nøkkel))
         }
     }
     companion object {
         private const val KANAL = "__keyevent@0__:expired"
     }
+    data class CacheExpiredEvent(val nøkkel: String) : ApplicationEvent(nøkkel)
 }
 
-data class CacheExpiredEvent(val nøkkel: String) : ApplicationEvent(nøkkel)
+
 

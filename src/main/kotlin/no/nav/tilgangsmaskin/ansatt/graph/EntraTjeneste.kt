@@ -10,7 +10,6 @@ import org.springframework.cache.annotation.Cacheable
 import java.util.UUID
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelMapper.CacheNøkkelElementer
 import no.nav.tilgangsmaskin.felles.cache.CacheOppfrisker
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 
 @RetryingOnRecoverableService
@@ -29,14 +28,14 @@ class EntraTjeneste(private val adapter: EntraRestClientAdapter, private val res
 
 
 
-    override fun oppfrisk(deler: CacheNøkkelElementer) {
+    override fun oppfrisk(elementer: CacheNøkkelElementer) {
         runCatching {
-            val ansattId = AnsattId(deler.id)
-            valider(deler).call(this,ansattId, resolver.oidFraEntra(ansattId)).also {
-                log.trace("Oppfrisket ${deler.id.maskFnr()} etter sletting")
+            val ansattId = AnsattId(elementer.id)
+            valider(elementer).call(this,ansattId, resolver.oidFraEntra(ansattId)).also {
+                log.info("Oppfrisking ${elementer.nøkkel} etter sletting")
             }
         }.getOrElse {
-            log.info("Oppfrisking av ${deler.id.maskFnr()} etter sletting feilet, dette er ikke kritisk",it)
+            log.info("Oppfrisking av ${elementer.nøkkel} etter sletting feilet, dette er ikke kritisk",it)
         }
     }
      private fun valider(deler: CacheNøkkelElementer)  =

@@ -27,8 +27,8 @@ class CacheNøkkelMapper(val configs: Map<String, RedisCacheConfiguration>) {
         configs[cache.name]?.getKeyPrefixFor(cache.name)
             ?: throw IllegalStateException("Ingen cache med navn ${cache.name}")
 
-    data class CacheNøkkelElementer(val key: String) {
-        private val deler = key.split("::", ":")
+    data class CacheNøkkelElementer(val nøkkel: String) {
+        private val deler = nøkkel.split("::", ":")
         val cacheName = deler.first()
         val metode = if (deler.size > 2) deler[1] else null
         val id = deler.last()

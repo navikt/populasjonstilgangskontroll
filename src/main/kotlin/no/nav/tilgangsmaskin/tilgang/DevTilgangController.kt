@@ -22,7 +22,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
-import no.nav.tilgangsmaskin.felles.rest.cache.ValkeyCacheClient
+import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
 import org.springframework.http.MediaType.*
 import org.springframework.web.bind.annotation.*
-import no.nav.tilgangsmaskin.felles.rest.cache.CacheConfig
+import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 
 
 @UnprotectedRestController(value = ["/${DEV}"])
@@ -52,15 +52,18 @@ class DevTilgangController(
     private val pip: PdlRestClientAdapter,
     private val nom: NomTjeneste,
     private val pdl: PDLTjeneste,
-    private val cache: ValkeyCacheClient) {
+    private val cache: CacheClient) {
 
     private  val log = getLogger(javaClass)
 
     @PostMapping("cache/skjerminger")
-    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cache.getMany<Boolean>(CacheConfig(SKJERMING),navIds)
+    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cache.getMany<Boolean>(CachableConfig(SKJERMING),navIds)
 
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<String>) = cache.getMany<Person>(CacheConfig(PDL),navIds)
+    fun cachePersoner(@RequestBody  navIds: Set<String>) = cache.getMany<Person>(CachableConfig(PDL),navIds)
+
+    @GetMapping("cache/keys/{cacheName}")
+    fun keys(@PathVariable cacheName: String) = cache.getAll(cacheName)
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.partnere(id)
@@ -139,7 +142,7 @@ class DevTilgangController(
     fun skjerming(@RequestBody brukerId: BrukerId) = skjerming.skjerming(brukerId)
 
     @PostMapping("skjerminger")
-    fun skjerminger(@RequestBody ids: Set<BrukerId>) = skjerming.skjerminger(ids)
+    fun skjerminger(@RequestBody ids: List<BrukerId>) = skjerming.skjerminger(ids)
 
     @PostMapping("brukere")
     fun brukere(@RequestBody @Valid @ValidId  ids: Set<String>) = brukere.brukere(ids)

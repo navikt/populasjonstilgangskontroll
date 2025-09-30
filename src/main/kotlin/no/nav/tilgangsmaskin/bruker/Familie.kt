@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.bruker
 
-import no.nav.tilgangsmaskin.felles.rest.cache.JsonCacheable
+import no.nav.tilgangsmaskin.felles.cache.JsonCacheable
 
 @JsonCacheable
 data class Familie(

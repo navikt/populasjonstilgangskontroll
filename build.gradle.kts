@@ -6,16 +6,16 @@ val tokenSupportVersion = "5.0.37"
 val mockkVersion = "1.14.5"
 
 
-group = "no.nav.tilgangsmaskin.populasjonstrilgangskontroll"
+group = "no.nav.tilgangsmaskin.populasjonstiilgangskontroll"
 version = "1.0.1"
 
 plugins {
-    kotlin("jvm") version "1.9.25"
-    kotlin("plugin.spring") version "1.9.25"
-    kotlin("plugin.jpa") version "1.9.25"
+    kotlin("jvm") version "2.2.20"
+    kotlin("plugin.spring") version "2.2.20"
+    kotlin("plugin.jpa") version "2.2.20"
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
-    id("org.cyclonedx.bom") version "2.3.1"
+    id("org.cyclonedx.bom") version "3.0.0-alpha-1"
     id("com.google.cloud.tools.jib") version "3.4.5"
     application
 }
@@ -34,7 +34,6 @@ repositories {
 
 configurations.all {
     resolutionStrategy {
-       // activateDependencyLocking()
         failOnNonReproducibleResolution()
     }
 }
@@ -42,7 +41,6 @@ configurations.all {
 dependencies {
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.20.1")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.20.1-alpha")
-    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.20.1")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.micrometer:micrometer-core")
     implementation("io.micrometer:micrometer-registry-prometheus")
@@ -78,6 +76,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
+    testImplementation("org.awaitility:awaitility-kotlin:4.2.2")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
@@ -100,8 +99,6 @@ tasks.withType<BootJar> {
 tasks.test {
     jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
     useJUnitPlatform()
-    reports {
-    }
 }
 
 java {
@@ -117,4 +114,3 @@ kotlin {
         freeCompilerArgs.add("-Xjsr305=strict")
     }
 }
-

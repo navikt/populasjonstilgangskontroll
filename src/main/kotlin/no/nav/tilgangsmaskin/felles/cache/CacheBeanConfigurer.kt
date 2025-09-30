@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.rest.cache
+package no.nav.tilgangsmaskin.felles.cache
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -25,9 +25,9 @@ import org.springframework.data.redis.serializer.StringRedisSerializer
 @Configuration(proxyBeanMethods = true)
 @EnableCaching
 @ConditionalOnGCP
-class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
-                           mapper: ObjectMapper,
-                           private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
+class CacheBeanConfigurer(private val cf: RedisConnectionFactory,
+                          mapper: ObjectMapper,
+                          private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
     private val valKeyMapper =
         mapper.copy().apply {
@@ -42,20 +42,21 @@ class ValKeyBeanConfigurer(private val cf: RedisConnectionFactory,
             .build()
 
     @Bean
-    fun valkeyClient(cfg: ValKeyConfig): RedisClient =
+    fun valkeyClient(cfg: CacheConfig) =
         RedisClient.create(cfg.valkeyURI)
 
     @Bean
-    fun valkeyCacheClient(client: RedisClient, handler: ValkeyCacheKeyHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
-        ValkeyCacheClient(handler,
-            client.connect(),
-            valKeyMapper,sucessTeller,teller)
+    fun valkeyCacheClient(client: RedisClient, handler: ValkeyCacheKeyMapper, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
+        CacheClient(
+            client,handler,
+            valKeyMapper, sucessTeller, teller
+        )
 
     @Bean
     fun cachePrefixes(cfgs: Map<String, RedisCacheConfiguration>) = cfgs.mapValues { it.value.keyPrefix}
 
     @Bean
-    fun valKeyHealthIndicator(adapter: ValKeyCacheAdapter)  =
+    fun valKeyHealthIndicator(adapter: CacheAdapter)  =
         PingableHealthIndicator(adapter)
 
     @Bean

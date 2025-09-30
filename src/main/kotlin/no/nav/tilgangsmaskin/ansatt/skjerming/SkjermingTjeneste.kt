@@ -16,6 +16,6 @@ class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
     @WithSpan("skjermingtjeneste.skjerming")
     fun skjerming(brukerId: BrukerId) = adapter.skjerming(brukerId.verdi)
     @WithSpan("skjermingtjeneste.skjermingerbulk")
-    fun skjerminger(brukerIds: Set<BrukerId>) = adapter.skjerminger(brukerIds.map { it.verdi }.toSet())
+    fun skjerminger(brukerIds: List<BrukerId>) = adapter.skjerminger(brukerIds.map { it.verdi }.toSet())
 
 }

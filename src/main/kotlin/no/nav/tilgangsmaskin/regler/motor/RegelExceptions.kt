@@ -26,14 +26,14 @@ class RegelException(val ansatt: Ansatt,
         title = regel.kode
         type = TYPE_URI
         instance = URI.create("${ansatt.ansattId.verdi}/${bruker.brukerId.verdi}")
-        properties = entries(bruker.brukerId, ansatt.ansattId, regel)
+        properties = entries(bruker.oppslagId, ansatt.ansattId, regel)
     }, null, messageCode, arguments) {
     constructor(messageCode: String, arguments: Array<String>,  status: HttpStatus = FORBIDDEN, e: RegelException) : this(
             e.ansatt, e.bruker, e.regel, status,messageCode, arguments)
 }
 
-private fun entries(brukerId: BrukerId, ansattId: AnsattId, regel: Regel) = mapOf(
-        "brukerIdent" to brukerId.verdi,
+private fun entries(oppslagId: String, ansattId: AnsattId, regel: Regel) = mapOf(
+        "brukerIdent" to oppslagId,
         "navIdent" to ansattId.verdi,
         "begrunnelse" to regel.begrunnelse,
         "traceId" to Span.current().spanContext.traceId,

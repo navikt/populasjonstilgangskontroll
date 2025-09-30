@@ -8,18 +8,19 @@ import no.nav.tilgangsmaskin.bruker.Familie.Companion.INGEN
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.*
-import no.nav.tilgangsmaskin.felles.rest.cache.JsonCacheable
+import no.nav.tilgangsmaskin.felles.cache.JsonCacheable
 import java.time.LocalDate
 
 @JsonCacheable
 data class Person(
-        val brukerId: BrukerId,
-        val aktørId: AktørId,
-        val geoTilknytning: GeografiskTilknytning,
-        val graderinger: List<Gradering> = emptyList(),
-        val familie: Familie = INGEN,
-        val dødsdato: LocalDate? = null,
-        val historiskeIds: Set<BrukerId> = emptySet())  {
+    val brukerId: BrukerId,
+    val oppslagId: String = brukerId.verdi,
+    val aktørId: AktørId,
+    val geoTilknytning: GeografiskTilknytning,
+    val graderinger: List<Gradering> = emptyList(),
+    val familie: Familie = INGEN,
+    val dødsdato: LocalDate? = null,
+    val historiskeIds: Set<BrukerId> = emptySet())  {
 
     @JsonIgnore
     val foreldre = familie.foreldre

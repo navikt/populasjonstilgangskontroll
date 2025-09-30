@@ -132,7 +132,12 @@ class TilgangController(
         with(brukerId.trim('"')) {
             log.trace("Kjører {} regler for {} og {}", regelType, ansattId(), this)
             if (!isProd) {
-                MDC.put("brukerId", brukerId)
+                if (brukerId.length == 11) {
+                    MDC.put("brukerId", brukerId.take(10) + "X" + brukerId.takeLast(1))
+                }
+                else {
+                    MDC.put("brukerId", brukerId)
+                }
             }
             sjekk(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og $uri")
             sjekk(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),

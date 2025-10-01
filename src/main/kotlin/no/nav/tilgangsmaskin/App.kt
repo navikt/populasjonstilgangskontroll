@@ -64,20 +64,3 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, pr
         }
     }
 }
-
-@Component
-class ShutdownAwareEventListener : ApplicationListener<ContextClosedEvent> {
-
-    private val log = getLogger(javaClass)
-
-
-
-    override fun onApplicationEvent(event: ContextClosedEvent) {
-        log.info("Mottok ContextClosedEvent, setter shuttingDown til true")
-        shuttingDown.set(true)
-    }
-
-    companion object {
-        val shuttingDown = AtomicBoolean(false)
-    }
-}

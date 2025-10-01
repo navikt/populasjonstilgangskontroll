@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
-import no.nav.tilgangsmaskin.ShutdownAwareEventListener
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
@@ -17,10 +16,6 @@ class EntraOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste:
 
     override fun oppfrisk(elementer: CacheNøkkelElementer) {
             runCatching {
-                if (ShutdownAwareEventListener.shuttingDown.get()) {
-                    log.info("Shutdown pågår. Oppfrisking av ${elementer.nøkkel} kansellert")
-                    return
-                }
                 val ansattId = AnsattId(elementer.id)
                 when (elementer.metode) {
                     "geoOgGlobaleGrupper" -> entra.geoOgGlobaleGrupper(ansattId, oidTjeneste.oidFraEntra(ansattId))

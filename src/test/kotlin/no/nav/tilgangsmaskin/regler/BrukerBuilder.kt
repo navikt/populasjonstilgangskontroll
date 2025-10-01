@@ -9,7 +9,6 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.*
 import no.nav.tilgangsmaskin.bruker.Bruker.BrukerIds
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.BARN
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.FAR
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
@@ -19,8 +18,8 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UdefinertTilknytning
 data class BrukerBuilder(
     val id: BrukerId,
     var gt: GeografiskTilknytning = UdefinertTilknytning(),
-    var historiske: Set<BrukerId> = emptySet(),
-    var aktørId: AktørId? = null,
+    var historiskeIds: Set<BrukerId> = emptySet(),
+    var aktørId: AktørId = AktørId("0000000000000"),
     var grupper: Set<GlobalGruppe> = emptySet(),
     var søsken: Set<FamilieMedlem> = emptySet(),
     var mor: FamilieMedlem? = null,
@@ -33,24 +32,19 @@ data class BrukerBuilder(
     fun aktørId(aktørId: AktørId) = apply { this.aktørId = aktørId }
     fun gt(gt: GeografiskTilknytning) = apply { this.gt = gt }
     fun kreverMedlemskapI(vararg grupper: GlobalGruppe) = apply { this.grupper = setOf(*grupper) }
-    fun barn(barn: Set<BrukerId>) = apply { this.barn = barn.tilFamilieMedlemmer(BARN) }
-    fun far(far: BrukerId?) = apply { this.far = far?.tilFamilieMedlem(FAR) }
-    fun søsken(søsken: Set<BrukerId>) = apply { this.søsken = søsken.tilFamilieMedlemmer(SØSKEN) }
-    fun partnere(partnere: Set<BrukerId>) = apply { this.partnere = partnere.tilFamilieMedlemmer(PARTNER) }
-    fun historiske(historiske: Set<BrukerId>) = apply { this.historiske = historiske }
+    fun barn(barn: Set<BrukerId>) = apply { this.barn = buildSet { barn.forEach { add(FamilieMedlem(it, BARN)) } } }
+    fun far(far: BrukerId?) = apply { this.far = far?.let { FamilieMedlem(it, FAR) } }
+    fun søsken(søsken: Set<BrukerId>) = apply { this.søsken = buildSet { søsken.forEach { add(FamilieMedlem(it, SØSKEN)) } } }
+    fun partnere(partnere: Set<BrukerId>) = apply { this.partnere = buildSet { partnere.forEach { add(FamilieMedlem(it, PARTNER)) } } }
+    fun historiske(historiskeIds: Set<BrukerId>) = apply { this.historiskeIds = historiskeIds }
     fun build() = Bruker(
-            BrukerIds(id, oppslagId,historiske, aktørId),
+            BrukerIds(id, oppslagId,historiskeIds, aktørId),
             gt, grupper,
             Familie(setOfNotNull(mor, far), barn, søsken, partnere),
             dødsdato)
 
-
-    private fun Set<BrukerId>.tilFamilieMedlemmer(relasjon: FamilieRelasjon) =
-        map { FamilieMedlem(it, relasjon) }.toSet()
-
-    private fun BrukerId.tilFamilieMedlem(relasjon: FamilieRelasjon) =
-        FamilieMedlem(this, relasjon)
 }
+
 
 data class AnsattBuilder(
         val id: AnsattId,
@@ -59,7 +53,7 @@ data class AnsattBuilder(
         var oid: UUID = UUID.randomUUID(),
         var bruker: Bruker? = null) {
 
-    fun medMedlemskapI(vararg grupper: GlobalGruppe) = apply { this.grupper += grupper.map { it.entraGruppe }.toSet() }
+    fun medMedlemskapI(vararg grupper: GlobalGruppe) = apply { this.grupper += setOf(*grupper).map { it.entraGruppe } }
     fun medMedlemskapI(vararg grupper: EntraGruppe) = apply { this.grupper += setOf(*grupper) }
     fun bruker(bruker: Bruker?) = apply { bruker?.let { this.bruker = it } }
     fun build() = Ansatt(id, bruker, grupper)

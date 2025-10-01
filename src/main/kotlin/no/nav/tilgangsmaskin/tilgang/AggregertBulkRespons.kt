@@ -18,7 +18,7 @@ data class AggregertBulkRespons(val ansattId: AnsattId, val resultater: Set<Enke
         }
 
         override fun toString(): String =
-            "EnkeltBulkRespons(oppslagId='${brukerId.maskFnr()}', httpStatus=$httpStatus, detaljer=$detaljer, status=$status)"
+            "${javaClass.simpleName}(oppslagId='${brukerId.maskFnr()}', httpStatus=$httpStatus, detaljer=$detaljer, status=$status)"
     }
     @JsonIgnore
     val ukjente = filter(NOT_FOUND)
@@ -30,5 +30,5 @@ data class AggregertBulkRespons(val ansattId: AnsattId, val resultater: Set<Enke
     private fun filter(status: HttpStatus) = resultater.filter { it.httpStatus == status }.toSet()
 
     override fun toString(): String =
-        "AggregertBulkRespons(ansattId=$ansattId, resultater=$resultater)"
+        "${javaClass.simpleName}(ansattId=$ansattId, resultater=$resultater)"
 }

@@ -22,6 +22,7 @@ class EntraOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste:
                     "geoGrupper" -> entra.geoGrupper(ansattId, oidTjeneste.oidFraEntra(ansattId))
                     else -> throw IllegalArgumentException("Ukjent metode ${elementer.metode} i nøkkel ${elementer.nøkkel}")
                 }
+                log.info("Oppfrisking av ${elementer.nøkkel} OK")
             }.getOrElse {
                 log.info("Oppfrisking av ${elementer.nøkkel} etter sletting feilet, dette er ikke kritisk",it)
             }

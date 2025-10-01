@@ -12,5 +12,5 @@ data class NomHendelse(
         val sluttdato: LocalDate?) {
 
     override fun toString() =
-        "NomHendelse(personident=${personident.maskFnr()}, navident=$navident, startdato=$startdato, sluttdato=$sluttdato)"
+        "${javaClass.simpleName} (personident=${personident.maskFnr()}, navident=$navident, startdato=$startdato, sluttdato=$sluttdato)"
 }

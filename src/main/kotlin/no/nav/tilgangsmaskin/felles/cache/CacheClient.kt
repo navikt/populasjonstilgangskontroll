@@ -91,7 +91,7 @@ class CacheClient(
         }
     }
 
-    private fun payloadFor(innslag: Map<String, Any>, cache: CachableConfig)=
+    private fun payloadFor(innslag: Map<String, Any>, cache: CachableConfig) =
         buildMap {
             innslag.forEach { (key, value) ->
                 put(keyMapper.tilNøkkel(cache, key), mapper.writeValueAsString(value))

@@ -23,9 +23,6 @@ class CacheExpiredEventListener( val teller: BulkCacheTeller,erLeder: Boolean = 
                 teller.tell(of("cache", elementer.cacheName, "result", "expired", "method", elementer.metode ?: "ingen"))
             }
         }
-        else {
-            log.trace("Ignorerer cache expired event for ${hendelse.nøkkel} siden denne instansen ikke er leder")
-        }
     }
 
     override fun start() { running = true }

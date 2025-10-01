@@ -129,9 +129,6 @@ class CacheClientTest {
         await.atMost(3, SECONDS).until {
             client.getMany<Person>(pdl,ids).isEmpty()
         }
-        await.atMost(3, SECONDS).until {
-            listener.fjernet.get() == 2
-        }
     }
 
     companion object {

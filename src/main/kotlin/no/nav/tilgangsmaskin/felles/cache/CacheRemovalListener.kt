@@ -12,9 +12,6 @@ import org.springframework.stereotype.Component
  class CacheRemovalListener(client: RedisClient, private val eventPublisher: ApplicationEventPublisher) :  RedisPubSubAdapter<String, String>() {
     private val log = getLogger(javaClass)
 
-    @Volatile
-    var fjernet  = AtomicInteger(0)  // test only
-
      init {
          client.connectPubSub().apply {
              addListener(this@CacheRemovalListener)
@@ -27,7 +24,6 @@ import org.springframework.stereotype.Component
             log.warn("Uventet hendelse på $kanal med nøkkel $nøkkel")
         }
         else {
-            fjernet.incrementAndGet()
             eventPublisher.publishEvent(CacheExpiredEvent(nøkkel))
         }
     }

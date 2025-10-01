@@ -39,7 +39,7 @@ class RegelTjeneste(
                     log.trace("Overstyring registrert for {} og {}", ansattId, brukerId.maskFnr(), it)
                 }
                 else {
-                    log.warn("Feil ved kjøring av komplette regler for $ansattId og ${brukerId.maskFnr()}", it)
+                    log.trace("Tilgang avvist ved kjøring av komplette regler for {} og {}", ansattId, brukerId.maskFnr(), it)
                     throw it
                 }
             }

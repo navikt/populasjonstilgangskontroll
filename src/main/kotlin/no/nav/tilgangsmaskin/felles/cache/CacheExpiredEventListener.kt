@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import io.micrometer.core.instrument.Tags.of
-import java.util.concurrent.atomic.AtomicBoolean
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelMapper.CacheNøkkelElementer
 import no.nav.tilgangsmaskin.felles.cache.CacheRemovalListener.CacheExpiredEvent
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware

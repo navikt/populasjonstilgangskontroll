@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin
 
+import java.util.concurrent.atomic.AtomicBoolean
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import no.nav.tilgangsmaskin.felles.cache.CacheAdapter
@@ -7,6 +8,7 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.profiler
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.local
 import no.nav.tilgangsmaskin.regler.motor.RegelSett
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.SpringBootVersion
 import org.springframework.boot.actuate.info.Info.Builder
 import org.springframework.boot.actuate.info.InfoContributor
@@ -14,7 +16,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
 import org.springframework.cache.annotation.EnableCaching
+import org.springframework.context.ApplicationListener
 import org.springframework.context.ConfigurableApplicationContext
+import org.springframework.context.event.ContextClosedEvent
 import org.springframework.core.SpringVersion
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.retry.annotation.EnableRetry
@@ -58,5 +62,22 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, pr
                 builder.withDetail(it.beskrivelse, it.regler.map { "(${it.javaClass.simpleName}) ${it.kortNavn}" })
             }
         }
+    }
+}
+
+@Component
+class ShutdownAwareEventListener : ApplicationListener<ContextClosedEvent> {
+
+    private val log = getLogger(javaClass)
+
+
+
+    override fun onApplicationEvent(event: ContextClosedEvent) {
+        log.info("Mottok ContextClosedEvent, setter shuttingDown til true")
+        shuttingDown.set(true)
+    }
+
+    companion object {
+        val shuttingDown = AtomicBoolean(false)
     }
 }

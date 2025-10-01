@@ -75,7 +75,8 @@ class RegelTjeneste(
             }
 
             AggregertBulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {
-                log.info("Bulk respons (${it.godkjente.size} godkjent(e), ${it.avviste.size} avvist(e), ${it.avviste.size} ikke funnet) for $ansattId er $it ")
+                log.debug("Bulk respons ({} godkjent(e), {} avvist(e), {} ikke funnet) for {} er {} ", it.godkjente.size, it.avviste.size,
+                    it.ukjente.size, ansattId, it)
             }
         }
         log.info("Tid brukt på bulk med størrelse ${idOgType.size} for $ansattId: ${elapsedTime.inWholeMilliseconds}ms")

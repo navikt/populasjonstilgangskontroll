@@ -17,7 +17,6 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
 
     @WithSpan
     fun brukere(brukerIds: Set<String>) : Set<Bruker> {
-        log.info("Bulk kall for ${brukerIds.size} brukerId(s)")
         if (brukerIds.isEmpty()) {
             log.info("Bulk ingen personer å slå opp")
             return emptySet()

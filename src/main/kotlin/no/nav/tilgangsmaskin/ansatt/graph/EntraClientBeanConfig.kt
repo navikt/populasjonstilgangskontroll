@@ -26,5 +26,4 @@ class EntraClientBeanConfig {
     companion object {
         private val HEADER_CONSISTENCY_LEVEL = "ConsistencyLevel" to "eventual"
     }
-
 }

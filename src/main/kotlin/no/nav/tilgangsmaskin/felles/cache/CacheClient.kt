@@ -13,11 +13,9 @@ import org.slf4j.LoggerFactory.getLogger
 import java.time.Duration
 import no.nav.tilgangsmaskin.felles.RetryingWhenRecoverable
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
-import org.springframework.stereotype.Service
 import org.springframework.web.client.ResourceAccessException
 
 @RetryingWhenRecoverable([ConnectException::class, RedisException::class, ResourceAccessException::class])
-@Service
 class CacheClient(
     client: RedisClient,
     val nøkkelMapper: CacheNøkkelMapper,

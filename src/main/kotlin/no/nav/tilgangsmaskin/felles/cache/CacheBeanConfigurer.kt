@@ -44,7 +44,11 @@ class CacheBeanConfigurer(private val cf: RedisConnectionFactory,
     @Bean
     fun redisClient(cfg: CacheConfig) =
         RedisClient.create(cfg.cacheURI)
-    
+
+    @Bean
+    fun cacheClient(redisClient: RedisClient, handler: CacheNøkkelMapper, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
+        CacheClient(redisClient,handler, cacheMapper, sucessTeller, teller)
+
     @Bean
     fun cachePrefixes(cfgs: Map<String, RedisCacheConfiguration>) = cfgs.mapValues { it.value.keyPrefix}
 

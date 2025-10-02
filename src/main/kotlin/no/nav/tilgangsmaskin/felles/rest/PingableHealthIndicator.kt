@@ -40,3 +40,4 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
         const val ENDPOINT = "endpoint"
     }
 }
+

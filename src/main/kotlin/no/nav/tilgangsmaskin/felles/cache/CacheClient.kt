@@ -16,9 +16,9 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocal
 import org.springframework.web.client.ResourceAccessException
 
 @RetryingWhenRecoverable([ConnectException::class, RedisException::class, ResourceAccessException::class])
-class CacheClient(
+open class CacheClient(
     client: RedisClient,
-    val keyMapper: CacheNøkkelMapper,
+    val nøkkelMapper: CacheNøkkelMapper,
     val mapper: ObjectMapper,
     val alleTreffTeller: BulkCacheSuksessTeller,
     val teller: BulkCacheTeller
@@ -35,13 +35,13 @@ class CacheClient(
 
     @WithSpan
     inline fun <reified T> getOne(cache: CachableConfig, id: String) =
-        conn.sync().get(keyMapper.tilNøkkel(cache,id))?.let { json ->
+        conn.sync().get(nøkkelMapper.tilNøkkel(cache,id))?.let { json ->
             mapper.readValue<T>(json)
         }
 
     @WithSpan
     fun putOne(cache: CachableConfig, id: String, value: Any, ttl: Duration)  {
-        with(keyMapper.tilNøkkel(cache,id)) {
+        with(nøkkelMapper.tilNøkkel(cache,id)) {
             conn.apply {
                 setAutoFlushCommands(false)
                 async().set(this@with, mapper.writeValueAsString(value))
@@ -55,7 +55,7 @@ class CacheClient(
     @WithSpan
     fun getAll(cache: String) =
         conn.sync().keys("$cache::*").map {
-            keyMapper.fraNøkkel(it)
+            nøkkelMapper.fraNøkkel(it)
         }.also {
             log.info("Fant ${it.size} nøkler i cache $cache")
         }
@@ -67,13 +67,13 @@ class CacheClient(
         }
         else conn.sync()
             .mget(*ids.map {
-                    id -> keyMapper.tilNøkkel(cache,id)}.toTypedArray<String>()
+                    id -> nøkkelMapper.tilNøkkel(cache,id)}.toTypedArray<String>()
             )
             .filter {
                 it.hasValue()
             }
             .associate {
-                keyMapper.fraNøkkel(it.key) to mapper.readValue<T>(it.value)
+                nøkkelMapper.fraNøkkel(it.key) to mapper.readValue<T>(it.value)
             }.also {
                 tellOgLog(cache.name, it.size, ids.size)
             }
@@ -99,7 +99,7 @@ class CacheClient(
     private fun payloadFor(innslag: Map<String, Any>, cache: CachableConfig) =
         buildMap {
             innslag.forEach { (key, value) ->
-                put(keyMapper.tilNøkkel(cache, key), mapper.writeValueAsString(value))
+                put(nøkkelMapper.tilNøkkel(cache, key), mapper.writeValueAsString(value))
             }
         }
 

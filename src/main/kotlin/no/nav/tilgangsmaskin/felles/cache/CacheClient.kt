@@ -3,14 +3,19 @@ package no.nav.tilgangsmaskin.felles.cache
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.lettuce.core.RedisClient
+import io.lettuce.core.RedisException
 import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
+import java.net.ConnectException
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
 import java.time.Duration
+import no.nav.tilgangsmaskin.felles.RetryingWhenRecoverable
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
+import org.springframework.web.client.ResourceAccessException
 
+@RetryingWhenRecoverable([ConnectException::class, RedisException::class, ResourceAccessException::class])
 class CacheClient(
     client: RedisClient,
     val keyMapper: CacheNøkkelMapper,

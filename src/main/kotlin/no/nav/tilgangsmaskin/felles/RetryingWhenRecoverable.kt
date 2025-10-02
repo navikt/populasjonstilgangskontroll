@@ -17,7 +17,7 @@ import kotlin.reflect.KClass
 @Retention(RUNTIME)
 @Inherited
 @MustBeDocumented
-annotation class RetryingOnRecoverable(
+annotation class RetryingWhenRecoverable(
     @get:AliasFor(annotation = Retryable::class) val value: Array<KClass<out Throwable>> = [RecoverableRestException::class],
     @get:AliasFor(annotation = Retryable::class) val maxAttempts: Int = 3,
     @get:AliasFor(annotation = Retryable::class) val listeners: Array<String> = [FELLES_RETRY_LISTENER],

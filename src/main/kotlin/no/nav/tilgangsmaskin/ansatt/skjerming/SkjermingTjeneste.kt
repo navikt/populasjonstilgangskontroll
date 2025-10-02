@@ -3,12 +3,12 @@ package no.nav.tilgangsmaskin.ansatt.skjerming
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.RetryingOnRecoverable
+import no.nav.tilgangsmaskin.felles.RetryingWhenRecoverable
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 
-@RetryingOnRecoverable
+@RetryingWhenRecoverable
 @Service
 class SkjermingTjeneste(private val adapter: SkjermingRestClientAdapter) {
 

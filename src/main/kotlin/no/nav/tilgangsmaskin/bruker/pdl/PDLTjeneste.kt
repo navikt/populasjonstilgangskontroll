@@ -2,10 +2,12 @@ package no.nav.tilgangsmaskin.bruker.pdl
 
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
-import no.nav.tilgangsmaskin.felles.RetryingOnRecoverableService
+import no.nav.tilgangsmaskin.felles.RetryingOnRecoverable
+import org.springframework.stereotype.Service
 import org.springframework.cache.annotation.Cacheable
 
-@RetryingOnRecoverableService
+@RetryingOnRecoverable
+@Service
 class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL: PdlSyncGraphQLClientAdapter) {
 
     @WithSpan

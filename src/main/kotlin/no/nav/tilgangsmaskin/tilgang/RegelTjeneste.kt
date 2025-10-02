@@ -27,6 +27,7 @@ class RegelTjeneste(
     private val overstyringTjeneste: OverstyringTjeneste) {
     private val log = getLogger(javaClass)
 
+    @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "komplett"])
     @WithSpan
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
@@ -46,11 +47,12 @@ class RegelTjeneste(
         }
         log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
     }
-
+    @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])
     @WithSpan
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
         motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedNærmesteFamilie(brukerId))
 
+    @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
     @WithSpan
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): AggregertBulkRespons {
         val (respons, elapsedTime) = measureTimedValue {

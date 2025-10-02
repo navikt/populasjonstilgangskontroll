@@ -4,13 +4,13 @@ import io.micrometer.core.instrument.Tags.of
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelMapper.CacheNøkkelElementer
 import no.nav.tilgangsmaskin.felles.cache.CacheRemovalListener.CacheExpiredEvent
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
-import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
+import no.nav.tilgangsmaskin.regler.motor.CacheOppfriskerTeller
 import org.springframework.context.SmartLifecycle
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
 @Component
-class CacheExpiredEventListener( val teller: BulkCacheTeller,erLeder: Boolean = true,private vararg val oppfriskere: CacheOppfrisker) :LeaderAware(erLeder), SmartLifecycle {
+class CacheExpiredEventListener(val teller: CacheOppfriskerTeller, erLeder: Boolean = true, private vararg val oppfriskere: CacheOppfrisker) :LeaderAware(erLeder), SmartLifecycle {
     private var running = false
     @EventListener
     fun cacheInnslagFjernet(hendelse: CacheExpiredEvent) {

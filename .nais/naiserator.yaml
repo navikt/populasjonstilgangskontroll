@@ -41,7 +41,7 @@ spec:
     enabled: true
     path: /monitoring/prometheus
   readiness:
-    path: /monitoring/health/readiness
+    path: /monitoring/health/health
     initialDelay: 30
   liveness:
     path: /monitoring/health/liveness

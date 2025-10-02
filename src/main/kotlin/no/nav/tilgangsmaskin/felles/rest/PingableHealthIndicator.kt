@@ -7,15 +7,22 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
 
     override fun health() =
         runCatching {
+            if (!pingable.isEnabled) {
+                return disabled()
+            }
             pingable.ping()
             up()
         }.getOrElse(::down)
+
+    private fun disabled() =
+        Health.outOfService()
+            .withDetail(ENDPOINT, pingable.pingEndpoint)
+            .build()
 
     private fun up() =
         with(pingable) {
             Health.up()
                 .withDetail(ENDPOINT, pingEndpoint)
-                .apply { if (!isEnabled) withDetail("enabled", "false") }
                 .build()
         }
 
@@ -33,3 +40,4 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
         const val ENDPOINT = "endpoint"
     }
 }
+

@@ -186,6 +186,8 @@ graph:
   base-uri: https://graph.microsoft.com/v1.0/
 nom:
   topic: org.nom.api-ressurs-state-v4
+oppfolging:
+  enabled: false
 valkey:
   username: ${valkey.username.${nais.cluster.cache}}
   password: ${valkey.password.${nais.cluster.cache}}

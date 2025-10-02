@@ -6,7 +6,7 @@ import org.springframework.boot.actuate.health.StatusAggregator
 import org.springframework.stereotype.Component
 
 @Component
-class IgnoreOutOfServiceStatusAggregator : StatusAggregator {
+class OutOfServiceIgnoringStatusAggregator : StatusAggregator {
     override fun getAggregateStatus(statuses: Set<Status>): Status {
         val filtered = statuses.filter { it != OUT_OF_SERVICE }
         return when {

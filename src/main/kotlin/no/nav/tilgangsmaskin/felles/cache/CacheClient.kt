@@ -15,7 +15,7 @@ import no.nav.tilgangsmaskin.felles.RetryingWhenRecoverable
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 import org.springframework.web.client.ResourceAccessException
 
-@RetryingWhenRecoverable([ConnectException::class, RedisException::class, ResourceAccessException::class])
+//@RetryingWhenRecoverable([ConnectException::class, RedisException::class, ResourceAccessException::class])
 class CacheClient(
     client: RedisClient,
     val nøkkelMapper: CacheNøkkelMapper,

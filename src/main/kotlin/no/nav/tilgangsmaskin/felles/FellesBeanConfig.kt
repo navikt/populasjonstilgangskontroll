@@ -34,6 +34,7 @@ import org.springframework.web.servlet.config.annotation.ContentNegotiationConfi
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import java.util.function.Function
+import org.springframework.boot.actuate.audit.InMemoryAuditEventRepository
 
 
 @Configuration
@@ -89,6 +90,11 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     @Bean
     @ConditionalOnNotProd
     fun traceRepository() = InMemoryHttpExchangeRepository()
+
+    @Bean
+    @ConditionalOnNotProd
+    fun auditRepository() = InMemoryAuditEventRepository()
+
 
     @Bean
     @ConditionalOnNotProd

@@ -122,6 +122,11 @@
       "name": "historisk-helt-backend",
       "namespace": "historisk",
       "cluster": "prod-gcp"
+    },
+    {
+      "name": "superhelt",
+      "namespace": "historisk",
+      "cluster": "prod-gcp"
     }
 
   ],

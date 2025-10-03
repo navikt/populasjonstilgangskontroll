@@ -215,6 +215,11 @@
       "name": "melosys-q1",
       "namespace": "teammelosys",
       "cluster": "dev-fss"
+    },
+    {
+      "name": "superhelt",
+      "namespace": "historisk",
+      "cluster": "dev-gcp"
     }
   ],
   "nais": {

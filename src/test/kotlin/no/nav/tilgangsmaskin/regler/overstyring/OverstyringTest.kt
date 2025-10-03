@@ -10,6 +10,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
@@ -40,7 +41,7 @@ import kotlin.test.Test
 
 @DataJpaTest
 @EnableConfigurationProperties(RegelConfig::class)
-@ContextConfiguration(classes = [RegelMotor::class, RegelMotorLogger::class, OverstyringJPAAdapter::class, RegelBeanConfig::class, TestApp::class])
+@ContextConfiguration(classes = [RegelMotor::class, Auditor::class,RegelMotorLogger::class, OverstyringJPAAdapter::class, RegelBeanConfig::class, TestApp::class])
 @ExtendWith(MockKExtension::class)
 @EnableJpaAuditing
 @ActiveProfiles(TEST)

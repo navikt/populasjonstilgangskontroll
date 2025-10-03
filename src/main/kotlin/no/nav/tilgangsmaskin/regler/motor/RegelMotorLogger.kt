@@ -6,8 +6,8 @@ import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
+import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withMDC
-import no.nav.tilgangsmaskin.felles.utils.Secure
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component
 import no.nav.tilgangsmaskin.tilgang.Token
 
 @Component
-class RegelMotorLogger(private val registry: MeterRegistry, private val token: Token) {
+class RegelMotorLogger(private val registry: MeterRegistry, private val token: Token, private val auditor: Auditor) {
 
     private val log = getLogger(javaClass)
     private val avvisningTeller = AvvisningTeller(registry, token)
@@ -35,7 +35,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         withMDC(BESLUTNING, regel.kode) {
             val fra =  MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
             log.warn("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for $bruker $fra")
-            Secure.warn("Tilgang til ${bruker.oppslagId} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} $fra")
+            auditor.warn("Tilgang til ${bruker.oppslagId} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} $fra")
             avvisningTeller.tell(Tags.of("navn", regel.navn))
         }
 
@@ -43,7 +43,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         withMDC(BESLUTNING, OK) {
             val fra = MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
             log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} $fra")
-            Secure.info("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} $fra")
+            auditor.info("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} $fra")
         }
 
     fun info(message: String) = log.info(message)

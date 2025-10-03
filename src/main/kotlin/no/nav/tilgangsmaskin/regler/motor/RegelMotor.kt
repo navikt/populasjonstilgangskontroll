@@ -19,8 +19,8 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 
 @Component
 class RegelMotor(
-    @Qualifier(KJERNE) private val kjerne: RegelSett,
-    @Qualifier(KOMPLETT) private val komplett: RegelSett,
+    @param:Qualifier(KJERNE) private val kjerne: RegelSett,
+    @param:Qualifier(KOMPLETT) private val komplett: RegelSett,
 
     private val cfg: RegelConfig,
     private val logger: RegelMotorLogger) {

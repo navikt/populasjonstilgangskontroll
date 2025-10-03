@@ -18,6 +18,7 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.AktørId
+import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.overstyring.*
 import no.nav.tilgangsmaskin.tilgang.RegelConfig
@@ -48,7 +49,7 @@ import kotlin.test.BeforeTest
 @EnableJpaAuditing
 @TestPropertySource(locations = ["classpath:test.properties"])
 @EnableConfigurationProperties(value= [RegelConfig::class, GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [TestApp::class])
+@ContextConfiguration(classes = [TestApp::class, Auditor::class])
 @ExtendWith(MockKExtension::class)
 @AutoConfigureObservability
 @Testcontainers
@@ -73,7 +74,6 @@ class RegelTjenesteTest {
 
     @MockkBean
     private lateinit var oppfølging: OppfølgingTjeneste
-
 
     @Autowired
     private lateinit var motor: RegelMotor

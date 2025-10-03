@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
-class EntraOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste: AnsattOidTjeneste) : CacheOppfrisker{
+class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste: AnsattOidTjeneste) : CacheOppfrisker{
 
     override val cacheName: String = GRAPH
     private val log = getLogger(javaClass)
@@ -20,7 +20,7 @@ class EntraOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste:
                 when (elementer.metode) {
                     "geoOgGlobaleGrupper" -> entra.geoOgGlobaleGrupper(ansattId, oidTjeneste.oidFraEntra(ansattId))
                     "geoGrupper" -> entra.geoGrupper(ansattId, oidTjeneste.oidFraEntra(ansattId))
-                    else -> throw IllegalArgumentException("Ukjent metode ${elementer.metode} i nøkkel ${elementer.nøkkel}")
+                    else -> error("Ukjent metode ${elementer.metode} i nøkkel ${elementer.nøkkel}")
                 }
                 log.info("Oppfrisking av ${elementer.nøkkel} OK")
             }.getOrElse {

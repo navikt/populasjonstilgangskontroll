@@ -29,7 +29,7 @@ class CacheClient(
 
     val conn = client.connect().apply {
         if (isLocalOrTest) {
-            sync().configSet("notify-keyspace-events", "Ex")
+            sync().configSet("notify-keyspace-events", "Exd")
         }
     }
 

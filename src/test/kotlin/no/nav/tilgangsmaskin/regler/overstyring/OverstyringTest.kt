@@ -100,9 +100,9 @@ internal class OverstyringTest {
     fun testOverstyringGyldig() {
         val bruker = BrukerBuilder(vanligBrukerId).build()
         every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Denne er gammel", IGÅR))
-        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Denne er ny", IMORGEN))
-        assertThat(overstyring.erOverstyrt(ansattId, vanligBrukerId)).isTrue
+        overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er gammel", IGÅR))
+        overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er ny", IMORGEN))
+        assertThat(overstyring.erOverstyrt(ansattId, bruker.brukerId)).isTrue
     }
 
     @Test
@@ -110,8 +110,8 @@ internal class OverstyringTest {
     fun testOverstyringUtgått() {
         val bruker = BrukerBuilder(vanligBrukerId).build()
         every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Denne er ny", IGÅR))
-        assertThat(overstyring.erOverstyrt(ansattId, vanligBrukerId)).isFalse
+        overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er ny", IGÅR))
+        assertThat(overstyring.erOverstyrt(ansattId, bruker.brukerId)).isFalse
     }
 
     @Test
@@ -119,7 +119,7 @@ internal class OverstyringTest {
     fun testOverstyringUtenDBInnslag() {
         val bruker = BrukerBuilder(vanligBrukerId).build()
         every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-        assertThat(overstyring.erOverstyrt(ansattId, vanligBrukerId)).isFalse
+        assertThat(overstyring.erOverstyrt(ansattId, bruker.brukerId)).isFalse
     }
 
     companion object {

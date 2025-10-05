@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component
             log.warn("Uventet hendelse på $kanal med nøkkel $nøkkel")
         }
         else {
-            eventPublisher.publishEvent(CacheExpiredEvent(nøkkel))
+           // eventPublisher.publishEvent(CacheExpiredEvent(nøkkel))
         }
     }
     companion object {

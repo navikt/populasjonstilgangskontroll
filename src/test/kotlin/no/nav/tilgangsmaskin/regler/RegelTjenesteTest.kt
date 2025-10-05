@@ -136,7 +136,7 @@ class RegelTjenesteTest {
                 BrukerBuilder(fortroligBrukerId).kreverMedlemskapI(FORTROLIG).build())
 
         val resultater = regler.bulkRegler(ansattId,
-                    setOf(BrukerIdOgRegelsett(strengtFortroligAktørId.verdi), BrukerIdOgRegelsett(fortroligBrukerId)))
+                    setOf(BrukerIdOgRegelsett(strengtFortroligAktørId.verdi), BrukerIdOgRegelsett(fortroligBrukerId.verdi)))
         assertThat(resultater.avviste.map { it.brukerId }.containsAll(listOf(strengtFortroligAktørId.verdi,fortroligBrukerId.verdi)))
         assertThat(resultater.avviste).hasSize(2)
         assertThat(resultater.godkjente).isEmpty()

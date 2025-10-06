@@ -18,6 +18,10 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
                     responseCode = "204",
                     description = "Tilgang ble godkjent"),
             ApiResponse(
+                responseCode = "404",
+                description = "Identen ble ikke funnet i de bakenforliggende systemene",
+            ),
+            ApiResponse(
                     responseCode = "403",
                     description = "Tilgang ble avvist",
                     content = [Content(

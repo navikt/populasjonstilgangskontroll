@@ -69,7 +69,7 @@ jobs:
           report_paths: '**/build/test-results/test/TEST-*.xml'
 
       - name: Generate and submit dependency graph
-        uses: gradle/actions/dependency-submission@v4
+        uses: gradle/actions/dependency-submission@v5
 
       - name: Attest and sign
         uses: nais/attest-sign@v1.5.20

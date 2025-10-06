@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.ansatt.graph
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
-import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelMapper.CacheNøkkelElementer
+import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelHandler.CacheNøkkelElementer
 import no.nav.tilgangsmaskin.felles.cache.CacheOppfrisker
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component

@@ -62,13 +62,13 @@ class CacheClient(
         }
 
     @WithSpan
-    inline fun <reified T> getMany(cache: CachableConfig, ids: Set<Identifikator>)  =
+    inline fun <reified T> getMany(cache: CachableConfig, ids: Set<String>)  =
         if (ids.isEmpty()) {
             emptyMap()
         }
         else conn.sync()
             .mget(*ids.map {
-                    id -> nøkkelMapper.tilNøkkel(cache,id.verdi)}.toTypedArray<String>()
+                    id -> nøkkelMapper.tilNøkkel(cache,id)}.toTypedArray<String>()
             )
             .filter {
                 it.hasValue()

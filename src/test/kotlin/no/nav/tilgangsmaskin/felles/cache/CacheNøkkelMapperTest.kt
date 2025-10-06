@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import org.junit.jupiter.api.Test
@@ -24,7 +25,7 @@ class CacheNøkkelMapperTest {
     @BeforeEach
     fun setUp() {
         every { redisConfig.getKeyPrefixFor(MED_EXTRA.name) } returns MED_EXTRA.name
-        handler = CacheNøkkelMapper(mapOf(MED_EXTRA.name to redisConfig))
+        handler = CacheNøkkelMapper(mapOf(MED_EXTRA.name to redisConfig), jacksonObjectMapper())
     }
 
     @Test
@@ -55,7 +56,7 @@ class CacheNøkkelMapperTest {
     @DisplayName("kaster exception hvis cache config mangler")
     fun kasterExceptionHvisCacheConfigMangler() {
         assertThatThrownBy {
-            CacheNøkkelMapper(emptyMap()).tilNøkkel(CachableConfig("unknown"), "key")
+            CacheNøkkelMapper(emptyMap(), jacksonObjectMapper()).tilNøkkel(CachableConfig("unknown"), "key")
         }.isInstanceOf(IllegalStateException::class.java)
     }
 }

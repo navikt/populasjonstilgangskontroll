@@ -91,11 +91,9 @@ class CacheClientTest {
         mgr.getCache(pdl.name)
         val redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
         val teller = BulkCacheTeller(meterRegistry, token)
-        val handler = CacheNøkkelMapper(mgr.cacheConfigurations)
+        val handler = CacheNøkkelMapper(mgr.cacheConfigurations, valkeyMapper)
         client = CacheClient(
-            redisClient,
-            handler, valkeyMapper,
-            BulkCacheSuksessTeller(meterRegistry, token), teller
+            redisClient, handler, BulkCacheSuksessTeller(meterRegistry, token), teller
         )
         listener = CacheRemovalListener(redisClient, eventPublisher)
         val id1 = BrukerId("03508331575")

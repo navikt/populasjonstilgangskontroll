@@ -13,7 +13,6 @@ import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.nonLockingRedisCacheWriter
@@ -25,8 +24,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer
 @Configuration(proxyBeanMethods = true)
 @EnableCaching
 @ConditionalOnGCP
-class CacheBeanConfigurer(private val cf: RedisConnectionFactory,
-                          mapper: ObjectMapper,
+class CacheBeanConfigurer(private val cf: RedisConnectionFactory, mapper: ObjectMapper,
                           private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
     private val cacheMapper =
@@ -46,18 +44,15 @@ class CacheBeanConfigurer(private val cf: RedisConnectionFactory,
         RedisClient.create(cfg.cacheURI)
 
     @Bean
-    fun cacheClient(redisClient: RedisClient, handler: CacheNøkkelMapper, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
-        CacheClient(redisClient,handler, cacheMapper, sucessTeller, teller)
+    fun cacheClient(redisClient: RedisClient,mgr: RedisCacheManager, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
+        CacheClient(redisClient, CacheNøkkelMapper(mgr.cacheConfigurations,cacheMapper), sucessTeller, teller)
 
-    @Bean
-    fun cachePrefixes(cfgs: Map<String, RedisCacheConfiguration>) = cfgs.mapValues { it.value.keyPrefix}
+    //@Bean
+    fun cachePrefixes(mgr: RedisCacheManager,) = mgr.cacheConfigurations.mapValues { it.value.keyPrefix}
 
     @Bean
     fun cacheHealthIndicator(adapter: CacheAdapter)  =
         PingableHealthIndicator(adapter)
-
-    @Bean
-    fun cacheConfigurations(mgr: RedisCacheManager)  = mgr.cacheConfigurations
 
     private fun cacheConfig(cfg: CachableRestConfig) =
         defaultCacheConfig()

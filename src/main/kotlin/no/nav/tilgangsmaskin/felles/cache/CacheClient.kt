@@ -11,6 +11,7 @@ import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
 import java.time.Duration
+import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.RetryingWhenRecoverable
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 import org.springframework.web.client.ResourceAccessException
@@ -61,13 +62,13 @@ class CacheClient(
         }
 
     @WithSpan
-    inline fun <reified T> getMany(cache: CachableConfig, ids: Set<String>)  =
+    inline fun <reified T> getMany(cache: CachableConfig, ids: Set<Identifikator>)  =
         if (ids.isEmpty()) {
             emptyMap()
         }
         else conn.sync()
             .mget(*ids.map {
-                    id -> nøkkelMapper.tilNøkkel(cache,id)}.toTypedArray<String>()
+                    id -> nøkkelMapper.tilNøkkel(cache,id.verdi)}.toTypedArray<String>()
             )
             .filter {
                 it.hasValue()

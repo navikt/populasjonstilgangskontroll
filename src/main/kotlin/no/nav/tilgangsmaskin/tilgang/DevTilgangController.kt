@@ -60,7 +60,7 @@ class DevTilgangController(
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cache.getMany<Boolean>(CachableConfig(SKJERMING),navIds)
 
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<String>) = cache.getMany<Person>(CachableConfig(PDL),navIds)
+    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cache.getMany<Person>(CachableConfig(PDL),navIds)
 
     @GetMapping("cache/keys/{cacheName}")
     fun keys(@PathVariable cacheName: String) = cache.getAll(cacheName)

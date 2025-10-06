@@ -12,7 +12,7 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocal
 //@RetryingWhenRecoverable([ConnectException::class, RedisException::class, ResourceAccessException::class])
 class CacheClient(
     client: RedisClient,
-    val mapper: CacheNøkkelMapper,
+    val mapper: CacheNøkkelHandler,
     val alleTreffTeller: BulkCacheSuksessTeller,
     val teller: BulkCacheTeller
 )  {

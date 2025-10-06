@@ -6,9 +6,8 @@ import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 
-class CacheNøkkelMapper(val configs: Map<String, RedisCacheConfiguration>,  val mapper: ObjectMapper) {
+class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration>, val mapper: ObjectMapper) {
     private val log = getLogger(javaClass)
-
 
     inline fun <reified T> fraJson(json: String): T =
         mapper.readValue(json)

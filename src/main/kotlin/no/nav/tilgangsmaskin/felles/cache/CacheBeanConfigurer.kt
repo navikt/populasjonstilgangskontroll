@@ -44,11 +44,11 @@ class CacheBeanConfigurer(private val cf: RedisConnectionFactory, mapper: Object
         RedisClient.create(cfg.cacheURI)
 
     @Bean
-    fun cacheClient(redisClient: RedisClient,mgr: RedisCacheManager, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
-        CacheClient(redisClient, CacheNøkkelMapper(mgr.cacheConfigurations,cacheMapper), sucessTeller, teller)
+    fun cacheClient(redisClient: RedisClient,handler: CacheNøkkelHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
+        CacheClient(redisClient, handler, sucessTeller, teller)
 
-    //@Bean
-    fun cachePrefixes(mgr: RedisCacheManager,) = mgr.cacheConfigurations.mapValues { it.value.keyPrefix}
+    @Bean
+    fun cacheNøkkelHandler(mgr: RedisCacheManager) = CacheNøkkelHandler(mgr.cacheConfigurations,cacheMapper)
 
     @Bean
     fun cacheHealthIndicator(adapter: CacheAdapter)  =

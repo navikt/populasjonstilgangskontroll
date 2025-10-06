@@ -13,19 +13,19 @@ import org.junit.jupiter.api.DisplayName
 import org.assertj.core.api.Assertions.*
 
 @ExtendWith(MockKExtension::class)
-class CacheNøkkelMapperTest {
+class CacheNøkkelHandlerTest {
 
     private val key = "01011111111"
     private val UTEN_EXTRA =   CachableConfig(PDL)
     private val MED_EXTRA = UTEN_EXTRA.copy(extraPrefix = "medFamilie")
     @MockK
     private lateinit var redisConfig: RedisCacheConfiguration
-    private lateinit var handler: CacheNøkkelMapper
+    private lateinit var handler: CacheNøkkelHandler
 
     @BeforeEach
     fun setUp() {
         every { redisConfig.getKeyPrefixFor(MED_EXTRA.name) } returns MED_EXTRA.name
-        handler = CacheNøkkelMapper(mapOf(MED_EXTRA.name to redisConfig), jacksonObjectMapper())
+        handler = CacheNøkkelHandler(mapOf(MED_EXTRA.name to redisConfig), jacksonObjectMapper())
     }
 
     @Test
@@ -56,7 +56,7 @@ class CacheNøkkelMapperTest {
     @DisplayName("kaster exception hvis cache config mangler")
     fun kasterExceptionHvisCacheConfigMangler() {
         assertThatThrownBy {
-            CacheNøkkelMapper(emptyMap(), jacksonObjectMapper()).tilNøkkel(CachableConfig("unknown"), "key")
+            CacheNøkkelHandler(emptyMap(), jacksonObjectMapper()).tilNøkkel(CachableConfig("unknown"), "key")
         }.isInstanceOf(IllegalStateException::class.java)
     }
 }

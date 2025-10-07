@@ -13,8 +13,8 @@ class OppfølgingConfig(baseUri: URI = DEFAULT_URI, pingPath: String = DEFAULT_P
     override val varighet = Duration.ofHours(12)
     override val navn = OPPFØLGING
     companion object {
-        private val DEFAULT_URI = URI.create("http://www.todo.com") // TODO
-        private const val DEFAULT_PING_PATH = "/internal/health/liveness"
+        private val DEFAULT_URI = URI.create("http://ao-oppfolgingskontor/api/tilgang/brukers-kontor-bulk")
+        private const val DEFAULT_PING_PATH = "/isAlive"
         const val OPPFØLGING = "oppfolging"
     }
 }

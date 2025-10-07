@@ -10,7 +10,7 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPF
 class OppfølgingTjeneste(private val adapter: OppfølgingRestClientAdapter) {
 
     @Cacheable(cacheNames = [OPPFØLGING],key = "#brukerId.verdi")
-    fun enhetFor(brukerId: BrukerId): Any {
+    fun enhetFor(brukerId: BrukerId): Any? {
         return adapter.enhetFor(brukerId.verdi)
     }
 }

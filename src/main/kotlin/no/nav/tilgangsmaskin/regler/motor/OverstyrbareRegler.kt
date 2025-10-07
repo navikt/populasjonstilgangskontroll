@@ -18,7 +18,7 @@ class GeografiskRegel(private val oppfølging: OppfølgingTjeneste) : GlobalGrup
         godtaHvis {
             ansatt erMedlemAv NASJONAL
                     || ansatt kanBehandle bruker.geografiskTilknytning
-                    || ansatt tilhører oppfølging.enhetFor(bruker.brukerId)
+                //    || ansatt tilhører oppfølging.enhetFor(bruker.brukerId)
         }
 }
 

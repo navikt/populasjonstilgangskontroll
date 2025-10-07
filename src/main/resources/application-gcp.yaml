@@ -196,6 +196,7 @@ graph:
   base-uri: https://graph.microsoft.com/v1.0/
 nom:
   topic: org.nom.api-ressurs-state-v4
+
 oppfolging:
   scope: "api://${nais.cluster.type}-gcp.dab.ao-oppfolgingskontor/.default"
   enabled: true

@@ -129,6 +129,15 @@ no.nav.security.jwt:
   client:
     registration:
 
+      ao-oppfolgingskontor:
+        token-endpoint-url: ${azure.openid.config.token.endpoint}
+        grant-type: client_credentials
+        scope: ${oppfolgingskontor.scope}
+        authentication:
+          client-id: ${azure.app.client.id}
+          client-jwk: ${azure.app.jwk}
+          client-auth-method: private_key_jwt
+
       pdl-api:
         token-endpoint-url: ${azure.openid.config.token.endpoint}
         grant-type: client_credentials
@@ -188,7 +197,8 @@ graph:
 nom:
   topic: org.nom.api-ressurs-state-v4
 oppfolging:
-  enabled: false
+  scope: "api://${nais.cluster.type}-gcp.dab.ao-oppfolgingskontor/.default"
+  enabled: true
 valkey:
   username: ${valkey.username.${nais.cluster.cache}}
   password: ${valkey.password.${nais.cluster.cache}}

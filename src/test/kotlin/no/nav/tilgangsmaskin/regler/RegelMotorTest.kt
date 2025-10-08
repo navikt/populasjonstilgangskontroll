@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.regler
 import com.ninjasquad.springmockk.MockkBean
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
-import io.mockk.verify
 import java.util.*
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.TestApp
@@ -40,7 +39,6 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
-import kotlin.math.E
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -236,7 +234,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Ansatt uten tilgang som samme GT som bruker kan ikke behandle denne")
         fun geoAvslått() {
-            every { oppfølging.enhetFor(any()) } returns enhet
+            every { oppfølging.enheterFor(any()) } returns enhet
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
             forventAvvistAv<GeografiskRegel>(ansatt, bruker)
@@ -245,7 +243,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Ansatt uten Nasjonal tilgang og uten GT kan likevel behandle om den har tilgang til brukerens oppfølgingsenhet")
         fun geoOppfølgingsEnhet() {
-            every { oppfølging.enhetFor(any()) } returns enhet
+            every { oppfølging.enheterFor(any()) } returns enhet
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(oppfølgingGruppe).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
            // assertThat(ansatt kanBehandle bruker).isTrue

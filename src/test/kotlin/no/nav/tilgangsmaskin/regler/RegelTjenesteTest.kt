@@ -99,7 +99,7 @@ class RegelTjenesteTest {
         avvisningTeller = AvvisningTeller(registry, token)
         avdød = AvdødTeller(registry, token)
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-        every { oppfølging.enhetFor(listOf(Identifikator(vanligBrukerId.verdi))) } returns Enhetsnummer("1234")
+        every { oppfølging.enheterFor(listOf(Identifikator(vanligBrukerId.verdi))) } returns Enhetsnummer("1234")
         every { token.system } returns "test"
         every { token.clusterAndSystem } returns "cluster:test"
         every { token.systemNavn } returns "test"

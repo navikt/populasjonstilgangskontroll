@@ -13,8 +13,13 @@ class OppfølgingRestClientAdapter(@Qualifier(OPPFØLGING) restClient: RestClien
     AbstractRestClientAdapter(restClient, cf) {
     fun enheterFor(ids: List<String>) =
         post<List<Any>>(cf.baseUri, Identer(ids)).also {
-            log.info("Oppfølging returnerte respons $it for ${ids.size} identer")
-        }//.map {
+            log.info("Oppfølging returnerte ${it.size} identer")
+        }.also {
+            it.forEach { e ->
+                log.info("Oppfølging element: e ${e.javaClass}")
+            }
+        }
+//.map {
           //  OppfølgingsEnhet(Identifikator(it.ident), Enhetsnummer(it.kontorId))
         //}
 }

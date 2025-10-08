@@ -13,8 +13,8 @@ class OppfølgingRestClientAdapter(@Qualifier(OPPFØLGING) restClient: RestClien
     AbstractRestClientAdapter(restClient, cf) {
     fun enheterFor(ids: List<String>) =
         post<List<Map<Any,Any>>>(cf.baseUri, Identer(ids)).map {
-            OppfølgingsEnhet(it["ident"] as String, (it["kontorId"] as String?)?.let { Enhetsnummer(it) })
+            OppfølgingsEnhet(Identifikator(it["ident"] as String), (it["kontorId"] as String?)?.let { Enhetsnummer(it) })
         }
 }
-data class OppfølgingsEnhet(val ident: String, val enhet: Enhetsnummer? = null)
+data class OppfølgingsEnhet(val ident: Identifikator, val enhet: Enhetsnummer? = null)
 private data class Identer(val identer: List<String>)

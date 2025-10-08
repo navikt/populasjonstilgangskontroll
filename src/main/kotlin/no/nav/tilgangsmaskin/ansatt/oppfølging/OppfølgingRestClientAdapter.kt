@@ -10,6 +10,6 @@ import org.springframework.web.client.RestClient
 @Component
 class OppfølgingRestClientAdapter(@Qualifier(OPPFØLGING) restClient: RestClient, val cf: OppfølgingConfig) :
     AbstractRestClientAdapter(restClient, cf) {
-    fun enhetFor(id: String) =
-         post<Any>(cf.baseUri, listOf(id))
+    fun enhetFor(id: List<String>) =
+         post<Any>(cf.baseUri, id)
 }

@@ -16,7 +16,7 @@ class OppfølgingRestClientAdapter(@Qualifier(OPPFØLGING) restClient: RestClien
             log.info("Oppfølging returnerte ${it.size} identer")
         }.also {
             it.forEach { e ->
-                log.info("Oppfølging element: e ${e.javaClass}")
+                log.info("Oppfølging element: $e ${e.javaClass}")
             }
         }
 //.map {

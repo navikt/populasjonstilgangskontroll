@@ -15,16 +15,12 @@ class OppfølgingRestClientAdapter(@Qualifier(OPPFØLGING) restClient: RestClien
         post<List<Map<Any,Any>>>(cf.baseUri, Identer(ids)).also {
             log.info("Oppfølging returnerte ${it.size} identer")
         }.map {
-            EnhetRespons(
+            OppfølgingsEnhet(
                 ident = it["ident"] as String,
-                httpStatus = (it["httpStatus"] as Int?) ?: 200,
-                kontorId = (it["kontorId"] as String?) ?: ""
+                enhet = (it["kontorId"] as String?)?.let { Enhetsnummer(it) }
             )
         }
-//.map {
-          //  OppfølgingsEnhet(Identifikator(it.ident), Enhetsnummer(it.kontorId))
-        //}
 }
     data class OppfølgingsEnhet(val ident: String, val enhet: Enhetsnummer? = null)
     private data class Identer(val identer: List<String>)
-    data class EnhetRespons(val ident: String, val httpStatus: Int?, val kontorId: String)
+    data class EnhetRespons(val ident: String, val httpStatus: Int?, val kontorId: String?)

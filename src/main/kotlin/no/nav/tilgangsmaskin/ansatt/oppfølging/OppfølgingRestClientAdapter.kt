@@ -12,12 +12,12 @@ import org.springframework.web.client.RestClient
 class OppfølgingRestClientAdapter(@Qualifier(OPPFØLGING) restClient: RestClient, val cf: OppfølgingConfig) :
     AbstractRestClientAdapter(restClient, cf) {
     fun enheterFor(ids: List<String>) =
-        post<Any>(cf.baseUri, Identer(ids)).also {
+        post<List<EnhetRespons>>(cf.baseUri, Identer(ids)).also {
             log.info("Oppfølging returnerte respons $it for ${ids.size} identer")
         }//.map {
           //  OppfølgingsEnhet(Identifikator(it.ident), Enhetsnummer(it.kontorId))
         //}
 }
-    data class OppfølgingsEnhet(val ident: Identifikator, val enhet: Enhetsnummer? = null)
+    data class OppfølgingsEnhet(val ident: String, val enhet: Enhetsnummer? = null)
     private data class Identer(val identer: List<String>)
     data class EnhetRespons(val ident: String, val httpStatus: Int?, val kontorId: String)

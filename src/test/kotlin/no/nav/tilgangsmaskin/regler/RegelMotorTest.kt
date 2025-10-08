@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.regler
 import com.ninjasquad.springmockk.MockkBean
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
+import io.mockk.verify
 import java.util.*
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.TestApp
@@ -33,7 +34,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
-import org.mockito.Mockito.verify
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
@@ -202,7 +202,6 @@ class RegelMotorTest {
     inner class GeoTester {
 
         private val enhet = Enhetsnummer("4242")
-        private val oppfølgingsEnhet = OppfølgingsEnhet(Identifikator(brukerId.verdi), enhet)
         private val enhetGruppe = EntraGruppe(UUID.randomUUID(), "XXX_GEO_${enhet.verdi}")
         private val oppfølgingGruppe = EntraGruppe(UUID.randomUUID(), "XXX_ENHET_${enhet.verdi}")
 
@@ -213,7 +212,7 @@ class RegelMotorTest {
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(NASJONAL).build()
             val bruker = BrukerBuilder(brukerId).build()
             assertThat(ansatt kanBehandle bruker).isTrue
-         //  verify(exactly = 0) { oppfølging.enheterFor(brukerId) }
+            verify(exactly = 0) { oppfølging.enhetFor(brukerId.verdi) }
 
         }
 
@@ -231,27 +230,27 @@ class RegelMotorTest {
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).medMedlemskapI(SKJERMING).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune(enhet.verdi))).build()
             assertThat(ansatt kanBehandle bruker).isTrue
-            //verify(exactly = 0) { oppfølging.enhetFor(brukerId) }
+            verify(exactly = 0) { oppfølging.enhetFor(brukerId.verdi) }
 
         }
 
         @Test
         @DisplayName("Ansatt uten tilgang som samme GT som bruker kan ikke behandle denne")
         fun geoAvslått() {
-         //   every { oppfølging.enheterFor(any()) } returns enhet
+            every { oppfølging.enhetFor(any()) } returns enhet
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
             forventAvvistAv<GeografiskRegel>(ansatt, bruker)
-            //verify(exactly = 1) { oppfølging.enhetFor(brukerId) }
+            verify(exactly = 1) { oppfølging.enhetFor(brukerId.verdi) }
         }
         @Test
         @DisplayName("Ansatt uten Nasjonal tilgang og uten GT kan likevel behandle om den har tilgang til brukerens oppfølgingsenhet")
         fun geoOppfølgingsEnhet() {
-           // every { oppfølging.enheterFor(any()) } returns enhet
+           every { oppfølging.enhetFor(any()) } returns enhet
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(oppfølgingGruppe).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
-           // assertThat(ansatt kanBehandle bruker).isTrue
-           // verify(exactly = 1) { oppfølging.enhetFor(brukerId) }
+            assertThat(ansatt kanBehandle bruker).isTrue
+            verify(exactly = 1) { oppfølging.enhetFor(brukerId.verdi) }
         }
     }
 

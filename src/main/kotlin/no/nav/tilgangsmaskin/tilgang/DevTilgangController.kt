@@ -59,7 +59,7 @@ class DevTilgangController(
     private  val log = getLogger(javaClass)
 
     @PostMapping("oppfolging/single")
-    fun oppfolgingEnhet(@RequestBody  brukerId: BrukerId) = oppfølging.enhetFor(brukerId)
+    fun oppfolgingEnhet(@RequestBody  brukerIds: List<Identifikator>) = oppfølging.enhetFor(brukerIds)
 
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cache.getMany<Boolean>(CachableConfig(SKJERMING),navIds)

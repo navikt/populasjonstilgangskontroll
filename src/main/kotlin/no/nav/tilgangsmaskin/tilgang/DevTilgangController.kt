@@ -59,7 +59,7 @@ class DevTilgangController(
     private  val log = getLogger(javaClass)
 
     @PostMapping("oppfolging/bulk")
-    fun oppfolgingEnheter(@RequestBody  brukerIds: List<Identifikator>) = oppfølging.enheterFor(brukerIds)
+    fun oppfolgingEnheter(@RequestBody brukerIds: List<String>) = oppfølging.enheterFor(brukerIds)
 
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cache.getMany<Boolean>(CachableConfig(SKJERMING),navIds)
@@ -73,7 +73,7 @@ class DevTilgangController(
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.partnere(id)
 
-    @PostMapping("brukeridentifikator", consumes = [APPLICATION_JSON_VALUE, TEXT_PLAIN_VALUE])
+    @PostMapping("brukeridentifikator")
     fun brukerIdentifikator(@RequestBody id: Identifikator) = brukere.brukerMedUtvidetFamilie(id.verdi)
 
     @GetMapping("bruker/{id}")

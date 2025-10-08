@@ -9,6 +9,7 @@ import org.springframework.web.client.RestClient
 @Component
 class OppfølgingRestClientAdapter(@Qualifier(OPPFØLGING) restClient: RestClient, val cf: OppfølgingConfig) :
     AbstractRestClientAdapter(restClient, cf) {
-    fun enheterFor(id: List<String>) =
-         post<Any>(cf.baseUri, id)
-}
+    fun enheterFor(ids: List<String>) =
+         post<Any>(cf.baseUri, Identer(ids))
+
+    private data class Identer(val identer: List<String>)}

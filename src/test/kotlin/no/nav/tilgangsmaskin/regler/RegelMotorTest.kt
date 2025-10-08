@@ -246,7 +246,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Ansatt uten Nasjonal tilgang og uten GT kan likevel behandle om den har tilgang til brukerens oppfølgingsenhet")
         fun geoOppfølgingsEnhet() {
-           every { oppfølging.enhetFor(any()) } returns enhet
+           every { oppfølging.enhetFor(brukerId.verdi) } returns enhet
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(oppfølgingGruppe).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
             assertThat(ansatt kanBehandle bruker).isTrue

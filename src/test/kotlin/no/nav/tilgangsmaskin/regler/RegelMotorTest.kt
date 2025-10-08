@@ -235,9 +235,9 @@ class RegelMotorTest {
         }
 
         @Test
-        @DisplayName("Ansatt uten tilgang som samme GT som bruker kan ikke behandle denne")
+        @DisplayName("Ansatt uten tilgang som samme GT som bruker og uten tilgang til oppfølgingsenhet kan ikke behandle denne")
         fun geoAvslått() {
-            every { oppfølging.enhetFor(any()) } returns enhet
+            every { oppfølging.enhetFor(any()) } returns null
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
             forventAvvistAv<GeografiskRegel>(ansatt, bruker)

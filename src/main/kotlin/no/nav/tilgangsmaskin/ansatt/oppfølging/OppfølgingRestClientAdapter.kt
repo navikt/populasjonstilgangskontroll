@@ -14,10 +14,12 @@ class OppfølgingRestClientAdapter(@Qualifier(OPPFØLGING) restClient: RestClien
     fun enheterFor(ids: List<String>) =
         post<List<Map<Any,Any>>>(cf.baseUri, Identer(ids)).also {
             log.info("Oppfølging returnerte ${it.size} identer")
-        }.also {
-            it.forEach { e ->
-                log.info("Oppfølging element: ${e.entries} ${e.javaClass}")
-            }
+        }.map {
+            EnhetRespons(
+                ident = it["ident"] as String,
+                httpStatus = (it["httpStatus"] as Int?) ?: 200,
+                kontorId = (it["kontorId"] as String?) ?: ""
+            )
         }
 //.map {
           //  OppfølgingsEnhet(Identifikator(it.ident), Enhetsnummer(it.kontorId))

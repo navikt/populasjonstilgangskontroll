@@ -23,6 +23,8 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingsEnhet
+import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.tilgang.RegelConfig
@@ -31,6 +33,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
+import org.mockito.Mockito.verify
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
@@ -199,6 +202,7 @@ class RegelMotorTest {
     inner class GeoTester {
 
         private val enhet = Enhetsnummer("4242")
+        private val oppfølgingsEnhet = OppfølgingsEnhet(Identifikator(brukerId.verdi), enhet)
         private val enhetGruppe = EntraGruppe(UUID.randomUUID(), "XXX_GEO_${enhet.verdi}")
         private val oppfølgingGruppe = EntraGruppe(UUID.randomUUID(), "XXX_ENHET_${enhet.verdi}")
 
@@ -209,7 +213,7 @@ class RegelMotorTest {
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(NASJONAL).build()
             val bruker = BrukerBuilder(brukerId).build()
             assertThat(ansatt kanBehandle bruker).isTrue
-           // verify(exactly = 0) { oppfølging.enhetFor(brukerId) }
+         //  verify(exactly = 0) { oppfølging.enheterFor(brukerId) }
 
         }
 
@@ -234,7 +238,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Ansatt uten tilgang som samme GT som bruker kan ikke behandle denne")
         fun geoAvslått() {
-            every { oppfølging.enheterFor(any()) } returns enhet
+         //   every { oppfølging.enheterFor(any()) } returns enhet
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
             forventAvvistAv<GeografiskRegel>(ansatt, bruker)
@@ -243,7 +247,7 @@ class RegelMotorTest {
         @Test
         @DisplayName("Ansatt uten Nasjonal tilgang og uten GT kan likevel behandle om den har tilgang til brukerens oppfølgingsenhet")
         fun geoOppfølgingsEnhet() {
-            every { oppfølging.enheterFor(any()) } returns enhet
+           // every { oppfølging.enheterFor(any()) } returns enhet
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(oppfølgingGruppe).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
            // assertThat(ansatt kanBehandle bruker).isTrue

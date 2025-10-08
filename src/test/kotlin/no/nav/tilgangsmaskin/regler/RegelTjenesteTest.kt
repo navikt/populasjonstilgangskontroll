@@ -17,6 +17,7 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingsEnhet
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Identifikator
@@ -99,7 +100,7 @@ class RegelTjenesteTest {
         avvisningTeller = AvvisningTeller(registry, token)
         avdød = AvdødTeller(registry, token)
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-        every { oppfølging.enheterFor(listOf(vanligBrukerId.verdi)) } returns Enhetsnummer("1234")
+        every { oppfølging.enheterFor(listOf(vanligBrukerId.verdi)) } returns listOf(OppfølgingsEnhet(Identifikator(vanligBrukerId.verdi), Enhetsnummer("1234")))
         every { token.system } returns "test"
         every { token.clusterAndSystem } returns "cluster:test"
         every { token.systemNavn } returns "test"

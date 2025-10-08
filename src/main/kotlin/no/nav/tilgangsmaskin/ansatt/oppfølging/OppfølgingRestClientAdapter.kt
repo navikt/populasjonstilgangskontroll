@@ -21,5 +21,3 @@ class OppfølgingRestClientAdapter(@Qualifier(OPPFØLGING) restClient: RestClien
     data class OppfølgingsEnhet(val ident: Identifikator, val enhet: Enhetsnummer? = null)
     private data class Identer(val identer: List<String>)
     private data class EnhetRespons(val ident: String, val httpStatus: String?, val kontorId: String)
-
-}

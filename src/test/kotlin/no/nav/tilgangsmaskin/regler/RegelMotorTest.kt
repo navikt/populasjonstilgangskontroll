@@ -202,7 +202,7 @@ class RegelMotorTest {
     inner class GeoTester {
 
         private val enhet = Enhetsnummer("4242")
-        private val oppfølgingsEnhet = OppfølgingsEnhet(brukerId.verdi, enhet)
+        private val oppfølgingsEnhet = OppfølgingsEnhet(Identifikator(brukerId.verdi), enhet)
         private val enhetGruppe = EntraGruppe(UUID.randomUUID(), "XXX_GEO_${enhet.verdi}")
         private val oppfølgingGruppe = EntraGruppe(UUID.randomUUID(), "XXX_ENHET_${enhet.verdi}")
 

@@ -1,19 +1,17 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
-import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
+import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.Identifikator
 
 @Service
 class OppfølgingTjeneste(private val adapter: OppfølgingRestClientAdapter) {
 
-    @Cacheable(cacheNames = [OPPFØLGING],key = "#brukerId.verdi")
-    fun enhetFor(brukerId: BrukerId): Enhetsnummer? {
-        // TODO implementer kall til oppfølging
-        return null
-    }
+    @Cacheable(cacheNames = [OPPFØLGING],key = "#brukerId")
+    fun enhetFor(brukerId: String) =
+        adapter.enheterFor(listOf(brukerId)).firstOrNull()?.enhet
 }
 
 

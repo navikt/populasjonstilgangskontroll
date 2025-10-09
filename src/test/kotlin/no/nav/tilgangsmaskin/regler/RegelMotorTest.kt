@@ -200,8 +200,8 @@ class RegelMotorTest {
     inner class GeoTester {
 
         private val enhet = Enhetsnummer("4242")
-        private val enhetGruppe = EntraGruppe(UUID.randomUUID(), "XXX_GEO_${enhet.verdi}")
-        private val oppfølgingGruppe = EntraGruppe(UUID.randomUUID(), "XXX_ENHET_${enhet.verdi}")
+        private val enhetGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_${enhet.verdi}")
+        private val oppfølgingGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-ENHET_${enhet.verdi}")
 
 
         @Test
@@ -210,7 +210,7 @@ class RegelMotorTest {
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(NASJONAL).build()
             val bruker = BrukerBuilder(brukerId).build()
             assertThat(ansatt kanBehandle bruker).isTrue
-            verify(exactly = 0) { oppfølging.enhetFor(brukerId) }
+            verify(exactly = 0) { oppfølging.enhetFor(brukerId.verdi) }
 
         }
 
@@ -228,27 +228,27 @@ class RegelMotorTest {
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).medMedlemskapI(SKJERMING).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune(enhet.verdi))).build()
             assertThat(ansatt kanBehandle bruker).isTrue
-            verify(exactly = 0) { oppfølging.enhetFor(brukerId) }
+            verify(exactly = 0) { oppfølging.enhetFor(brukerId.verdi) }
 
         }
 
         @Test
-        @DisplayName("Ansatt uten tilgang som samme GT som bruker kan ikke behandle denne")
+        @DisplayName("Ansatt uten tilgang som samme GT som bruker og uten tilgang til oppfølgingsenhet kan ikke behandle denne")
         fun geoAvslått() {
-            every { oppfølging.enhetFor(brukerId) } returns null
+            every { oppfølging.enhetFor(any()) } returns null
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
             forventAvvistAv<GeografiskRegel>(ansatt, bruker)
-            verify(exactly = 1) { oppfølging.enhetFor(brukerId) }
+            verify(exactly = 1) { oppfølging.enhetFor(brukerId.verdi) }
         }
         @Test
         @DisplayName("Ansatt uten Nasjonal tilgang og uten GT kan likevel behandle om den har tilgang til brukerens oppfølgingsenhet")
         fun geoOppfølgingsEnhet() {
-            every { oppfølging.enhetFor(brukerId) } returns enhet
+           every { oppfølging.enhetFor(brukerId.verdi) } returns enhet
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(oppfølgingGruppe).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
             assertThat(ansatt kanBehandle bruker).isTrue
-            verify(exactly = 1) { oppfølging.enhetFor(brukerId) }
+            verify(exactly = 1) { oppfølging.enhetFor(brukerId.verdi) }
         }
     }
 
@@ -396,10 +396,9 @@ class RegelMotorTest {
     }
 
     private inline fun <reified T : Regel> forventAvvistAv(ansatt: Ansatt, bruker: Bruker) {
-        val regel = assertThrows<RegelException> {
+        assertInstanceOf<T>(assertThrows<RegelException> {
             regelMotor.kompletteRegler(ansatt, bruker)
-        }.regel
-        assertInstanceOf<T>(regel)
+        }.regel)
     }
 
     private infix fun Ansatt.kanBehandle(bruker: Bruker): Boolean {

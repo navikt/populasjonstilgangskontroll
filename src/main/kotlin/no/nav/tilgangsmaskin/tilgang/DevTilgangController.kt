@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
@@ -49,12 +50,16 @@ class DevTilgangController(
     private val ansatte: AnsattTjeneste,
     private val regler: RegelTjeneste,
     private val overstyring: OverstyringTjeneste,
+    private val oppfølging: OppfølgingTjeneste,
     private val pip: PdlRestClientAdapter,
     private val nom: NomTjeneste,
     private val pdl: PDLTjeneste,
     private val cache: CacheClient) {
 
     private  val log = getLogger(javaClass)
+
+    @PostMapping("oppfolging/bulk")
+    fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)
 
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cache.getMany<Boolean>(CachableConfig(SKJERMING),navIds)
@@ -68,7 +73,7 @@ class DevTilgangController(
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.partnere(id)
 
-    @PostMapping("brukeridentifikator", consumes = [APPLICATION_JSON_VALUE, TEXT_PLAIN_VALUE])
+    @PostMapping("brukeridentifikator")
     fun brukerIdentifikator(@RequestBody id: Identifikator) = brukere.brukerMedUtvidetFamilie(id.verdi)
 
     @GetMapping("bruker/{id}")

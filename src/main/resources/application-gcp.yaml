@@ -113,6 +113,7 @@ spring:
       idle-timeout: 600000
       connection-test-query: SELECT 1
       maximum-pool-size: ${db.poolsize}
+    type: org.springframework.jdbc.datasource.SimpleDriverDataSource
   main:
     banner-mode: off
   jackson:
@@ -127,6 +128,15 @@ no.nav.security.jwt:
       accepted_audience: ${azure.app.client.id}
   client:
     registration:
+
+      ao-oppfolgingskontor:
+        token-endpoint-url: ${azure.openid.config.token.endpoint}
+        grant-type: client_credentials
+        scope: ${oppfolging.scope}
+        authentication:
+          client-id: ${azure.app.client.id}
+          client-jwk: ${azure.app.jwk}
+          client-auth-method: private_key_jwt
 
       pdl-api:
         token-endpoint-url: ${azure.openid.config.token.endpoint}
@@ -186,8 +196,9 @@ graph:
   base-uri: https://graph.microsoft.com/v1.0/
 nom:
   topic: org.nom.api-ressurs-state-v4
+
 oppfolging:
-  enabled: false
+  scope: "api://${nais.cluster.type}-gcp.dab.ao-oppfolgingskontor/.default"
 valkey:
   username: ${valkey.username.${nais.cluster.cache}}
   password: ${valkey.password.${nais.cluster.cache}}

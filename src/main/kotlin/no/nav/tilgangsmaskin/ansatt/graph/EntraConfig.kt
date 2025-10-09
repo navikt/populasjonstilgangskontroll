@@ -19,7 +19,6 @@ class EntraConfig(
     override val navn = name
     override val varighet = Duration.ofHours(3)
 
-    @WithSpan
     fun userURI(navIdent: String) = builder().apply {
         path(USERS_PATH)
         queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_USER)
@@ -27,7 +26,6 @@ class EntraConfig(
         queryParam(PARAM_NAME_COUNT, "true")
     }.build()
 
-    @WithSpan
      fun grupperURI(ansattId: String, isCCF: Boolean) = if (isCCF) ccUri(ansattId) else oboUri(ansattId)
 
     private fun oboUri(ansattId: String) = query(ansattId,GEO_PREFIX)

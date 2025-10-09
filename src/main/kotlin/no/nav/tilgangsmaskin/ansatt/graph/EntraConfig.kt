@@ -19,7 +19,6 @@ class EntraConfig(
     override val navn = name
     override val varighet = Duration.ofHours(3)
 
-    @WithSpan
     fun userURI(navIdent: String) = builder().apply {
         path(USERS_PATH)
         queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_USER)
@@ -27,12 +26,15 @@ class EntraConfig(
         queryParam(PARAM_NAME_COUNT, "true")
     }.build()
 
-    @WithSpan
-     fun grupperURI(ansattId: String, isCCF: Boolean) = if (isCCF) ccUri(ansattId) else oboUri(ansattId)
+    fun temaURI(oid: String) = ccTemaUri(oid)
 
-    private fun oboUri(ansattId: String) = query(ansattId,GEO_PREFIX)
+    fun grupperURI(oid: String, isCCF: Boolean) = if (isCCF) ccUri(oid) else oboUri(oid)
 
-    private fun ccUri(ansattId: String) = query(ansattId,"id in(${uuidsFormatted()}) or $GEO_PREFIX")
+    private fun ccTemaUri(oid: String) = query(oid,TEMA_PREFIX)
+
+    private fun oboUri(oid: String) = query(oid,GEO_PREFIX)
+
+    private fun ccUri(oid: String) = query(oid,"id in(${uuidsFormatted()}) or $GEO_PREFIX")
 
     private fun query(ansattId: String, filter: String) = builder().apply {
         path(GRUPPER_PATH)
@@ -47,6 +49,7 @@ class EntraConfig(
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
+        const val TEMA_PREFIX = "startswith(displayName,'0000-GA-TEMA') "
         const val GEO_PREFIX = "startswith(displayName,'0000-GA-GEO') or startswith(displayName,'0000-GA-ENHET') "
         const val GRAPH = "graph"
         private const val DEFAULT_BATCH_SIZE = 250

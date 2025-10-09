@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.regler.motor
 
+import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.*
 import no.nav.tilgangsmaskin.bruker.Bruker
@@ -15,13 +16,14 @@ interface OverstyrbarRegel : Regel
 
 @Component
 @Order(LOWEST_PRECEDENCE)
-class GeografiskRegel(private val oppfølging: OppfølgingTjeneste) : GlobalGruppeRegel(NASJONAL), OverstyrbarRegel {
+class GeografiskRegel(private val oppfølging: OppfølgingTjeneste,private val teller: OppfølgingskontorTeller) : GlobalGruppeRegel(NASJONAL), OverstyrbarRegel {
     protected val log = getLogger(javaClass)
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         godtaHvis {
             ansatt erMedlemAv NASJONAL
                     || ansatt kanBehandle bruker.geografiskTilknytning
                     || (ansatt tilhører oppfølging.enhetFor(bruker.oppslagId)).also {
+                        teller.tell(Tags.of("resultat", "$it"))
                         if (it) {
                             log.info("Ansatt ${ansatt.ansattId.verdi} kan behandle bruker ${bruker.oppslagId.maskFnr()} via oppfølgingsenhet")
                         }

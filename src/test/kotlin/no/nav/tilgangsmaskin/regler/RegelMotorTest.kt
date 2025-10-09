@@ -24,8 +24,6 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingsEnhet
-import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.tilgang.RegelConfig
@@ -202,8 +200,8 @@ class RegelMotorTest {
     inner class GeoTester {
 
         private val enhet = Enhetsnummer("4242")
-        private val enhetGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO-${enhet.verdi}")
-        private val oppfølgingGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-ENHET-${enhet.verdi}")
+        private val enhetGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_${enhet.verdi}")
+        private val oppfølgingGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-ENHET_${enhet.verdi}")
 
 
         @Test
@@ -398,10 +396,9 @@ class RegelMotorTest {
     }
 
     private inline fun <reified T : Regel> forventAvvistAv(ansatt: Ansatt, bruker: Bruker) {
-        val regel = assertThrows<RegelException> {
+        assertInstanceOf<T>(assertThrows<RegelException> {
             regelMotor.kompletteRegler(ansatt, bruker)
-        }.regel
-        assertInstanceOf<T>(regel)
+        }.regel)
     }
 
     private infix fun Ansatt.kanBehandle(bruker: Bruker): Boolean {

@@ -6,7 +6,9 @@ import jakarta.validation.Valid
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
@@ -32,9 +34,7 @@ import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
 import no.nav.tilgangsmaskin.tilgang.BulkApiResponse
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
-import org.springframework.http.MediaType.*
 import org.springframework.web.bind.annotation.*
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 
@@ -49,14 +49,14 @@ class DevTilgangController(
     private val brukere: BrukerTjeneste,
     private val ansatte: AnsattTjeneste,
     private val regler: RegelTjeneste,
+    private val entra: EntraTjeneste,
     private val overstyring: OverstyringTjeneste,
     private val oppfølging: OppfølgingTjeneste,
     private val pip: PdlRestClientAdapter,
+    private val oid: AnsattOidTjeneste,
     private val nom: NomTjeneste,
     private val pdl: PDLTjeneste,
     private val cache: CacheClient) {
-
-    private  val log = getLogger(javaClass)
 
     @PostMapping("oppfolging/bulk")
     fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)
@@ -84,6 +84,9 @@ class DevTilgangController(
 
     @GetMapping("person/pip/{id}")
     fun pip(@PathVariable @Valid @ValidId id: String) = pip.person(id)
+
+    @GetMapping("ansatt/enheter/{ansattId}")
+    fun enheter(@PathVariable ansattId: AnsattId) = entra.geoOgGlobaleGrupper(ansattId, oid.oidFraEntra(ansattId)).filter { it.displayName.contains("ENHET") }
 
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)

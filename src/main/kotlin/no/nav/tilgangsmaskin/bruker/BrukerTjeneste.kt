@@ -22,7 +22,6 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
             return emptySet()
         }
         val personer =  personTjeneste.personer(brukerIds)
-        log.info("Bulk slo opp ${personer.size} av ${brukerIds.size} i PDL")
         val funnetBrukerIds = buildList {
             personer.forEach { add(brukerIdForOppslagId(it.oppslagId, personer)) }
         }

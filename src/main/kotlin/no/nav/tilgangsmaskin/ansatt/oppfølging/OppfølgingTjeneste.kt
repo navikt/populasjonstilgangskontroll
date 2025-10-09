@@ -9,12 +9,9 @@ import no.nav.tilgangsmaskin.bruker.Identifikator
 @Service
 class OppfølgingTjeneste(private val adapter: OppfølgingRestClientAdapter) {
 
-
+    @Cacheable(cacheNames = [OPPFØLGING],key = "#brukerId")
     fun enhetFor(brukerId: String) =
         adapter.enheterFor(listOf(brukerId)).firstOrNull()?.enhet
-   // @Cacheable(cacheNames = [OPPFØLGING],key = "#brukerId.verdi")
-    fun enheterFor(brukerIds: List<String>) =
-         adapter.enheterFor(brukerIds).map { it.enhet }
 }
 
 

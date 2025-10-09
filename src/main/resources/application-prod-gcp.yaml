@@ -15,3 +15,5 @@ management:
     web:
       exposure:
         include: '*'
+oppfolging:
+  enabled: false

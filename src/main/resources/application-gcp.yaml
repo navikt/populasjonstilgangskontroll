@@ -199,7 +199,6 @@ nom:
 
 oppfolging:
   scope: "api://${nais.cluster.type}-gcp.dab.ao-oppfolgingskontor/.default"
-  enabled: true
 valkey:
   username: ${valkey.username.${nais.cluster.cache}}
   password: ${valkey.password.${nais.cluster.cache}}

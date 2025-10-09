@@ -88,6 +88,9 @@ class DevTilgangController(
     @GetMapping("ansatt/enheter/{ansattId}")
     fun enheter(@PathVariable ansattId: AnsattId) = entra.geoOgGlobaleGrupper(ansattId, oid.oidFraEntra(ansattId)).filter { it.displayName.contains("ENHET") }
 
+    @GetMapping("ansatt/tema/{ansattId}")
+    fun tema(@PathVariable ansattId: AnsattId) = entra.tema(ansattId, oid.oidFraEntra(ansattId))
+
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)
 

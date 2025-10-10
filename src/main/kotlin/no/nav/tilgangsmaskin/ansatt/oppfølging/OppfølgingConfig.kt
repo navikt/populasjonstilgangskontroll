@@ -6,7 +6,6 @@ import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.time.Duration
 import java.net.URI
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.DEFAULT_SKJERMING_PATH
 
 @ConfigurationProperties(OPPFØLGING)
 class OppfølgingConfig(baseUri: URI = DEFAULT_BASE_URI, bulkPath : String = DEFAULT_BULK_PATH, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, OPPFØLGING, enabled), CachableRestConfig {

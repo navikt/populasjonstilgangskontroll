@@ -14,7 +14,7 @@ class OppfølgingRestClientAdapter(@Qualifier(OPPFØLGING) restClient: RestClien
     AbstractRestClientAdapter(restClient, cf) {
     fun enheterFor(ids: List<String>) =
         if (cf.isEnabled){
-            post<List<Map<Any,Any>>>(cf.baseUri, Identer(ids)).map {
+            post<List<Map<Any,Any>>>(cf.bulkUri, Identer(ids)).map {
                 OppfølgingsEnhet(Identifikator(it["ident"] as String), (it["kontorId"] as String?)?.let { Enhetsnummer(it) })
             }
         }

@@ -5,7 +5,6 @@ import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
@@ -34,20 +33,23 @@ class RegelTjeneste(
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
-            val bruker  = bruker(brukerId)
-            bruker?.let { b ->
+            bruker(brukerId)?.let { b ->
                 runCatching {
                     motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), b)
                 }.getOrElse {
                     if (overstyringTjeneste.erOverstyrt(ansattId, b.brukerId) && it is RegelException) {
                         log.trace("Overstyring registrert for {} og {}", ansattId, brukerId.maskFnr(), it)
-                    }
-                    else {
-                        log.trace("Tilgang avvist ved kjøring av komplette regler for {} og {}", ansattId, brukerId.maskFnr(), it)
+                    } else {
+                        log.trace(
+                            "Tilgang avvist ved kjøring av komplette regler for {} og {}",
+                            ansattId,
+                            brukerId.maskFnr(),
+                            it
+                        )
                         throw it
                     }
                 }
-            } ?: log.info("Komplette regler ikke kjørt for $ansattId og ${brukerId.maskFnr()} da bruker ikke ble funnet")
+            } ?: log.info("Komplette regler ikke kjørt for $ansattId og ${brukerId.maskFnr()} da bruker ikke ble funnet, tilgang likevel gitt")
         }
         log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
     }

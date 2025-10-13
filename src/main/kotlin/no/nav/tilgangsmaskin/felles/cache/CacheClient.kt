@@ -34,15 +34,7 @@ class CacheClient(
 
     @WithSpan
     fun putOne(cache: CachableConfig, id: String, value: Any, ttl: Duration)  {
-        with(mapper.tilNøkkel(cache,id)) {
-            conn.apply {
-                setAutoFlushCommands(false)
-                async().set(this@with, mapper.tilJson(value))
-                async().expire(this@with, ttl.seconds)
-                flushCommands()
-                setAutoFlushCommands(true)
-            }
-        }
+        conn.async().setex(mapper.tilNøkkel(cache,id), ttl.seconds,mapper.tilJson(value))
     }
 
     @WithSpan

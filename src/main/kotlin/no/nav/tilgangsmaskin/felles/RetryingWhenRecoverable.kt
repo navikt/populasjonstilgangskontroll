@@ -6,6 +6,7 @@ import org.springframework.core.annotation.AliasFor
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
 import java.lang.annotation.Inherited
+import org.springframework.web.client.ResourceAccessException
 import kotlin.annotation.AnnotationRetention.RUNTIME
 import kotlin.annotation.AnnotationTarget.CLASS
 import kotlin.annotation.AnnotationTarget.FUNCTION
@@ -18,7 +19,7 @@ import kotlin.reflect.KClass
 @Inherited
 @MustBeDocumented
 annotation class RetryingWhenRecoverable(
-    @get:AliasFor(annotation = Retryable::class) val value: Array<KClass<out Throwable>> = [RecoverableRestException::class],
+    @get:AliasFor(annotation = Retryable::class) val value: Array<KClass<out Throwable>> = [RecoverableRestException::class, ResourceAccessException::class],
     @get:AliasFor(annotation = Retryable::class) val maxAttempts: Int = 3,
     @get:AliasFor(annotation = Retryable::class) val listeners: Array<String> = [FELLES_RETRY_LISTENER],
     @get:AliasFor(annotation = Retryable::class) val backoff: Backoff = Backoff(delay = 1000))

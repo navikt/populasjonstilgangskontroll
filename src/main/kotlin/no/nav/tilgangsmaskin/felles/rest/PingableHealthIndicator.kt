@@ -16,7 +16,7 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
             pingable.ping()
             up()
         }.getOrElse {
-            log.warn("Kunne ikke pinge ${pingable.ping()}", it)
+            log.warn("Kunne ikke pinge ${pingable.pingEndpoint}", it)
             down(it)
         }
 

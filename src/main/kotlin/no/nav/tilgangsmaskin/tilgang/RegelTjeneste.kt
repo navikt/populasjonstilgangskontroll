@@ -5,7 +5,9 @@ import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
@@ -32,21 +34,36 @@ class RegelTjeneste(
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
-            val bruker = brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
-            runCatching {
-                motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
-            }.getOrElse {
-                if (overstyringTjeneste.erOverstyrt(ansattId, bruker.brukerId) && it is RegelException) {
-                    log.trace("Overstyring registrert for {} og {}", ansattId, brukerId.maskFnr(), it)
+            val bruker  = bruker(brukerId)
+            bruker?.let { b ->
+                runCatching {
+                    motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), b)
+                }.getOrElse {
+                    if (overstyringTjeneste.erOverstyrt(ansattId, b.brukerId) && it is RegelException) {
+                        log.trace("Overstyring registrert for {} og {}", ansattId, brukerId.maskFnr(), it)
+                    }
+                    else {
+                        log.trace("Tilgang avvist ved kjøring av komplette regler for {} og {}", ansattId, brukerId.maskFnr(), it)
+                        throw it
+                    }
                 }
-                else {
-                    log.trace("Tilgang avvist ved kjøring av komplette regler for {} og {}", ansattId, brukerId.maskFnr(), it)
-                    throw it
-                }
-            }
+            } ?: log.info("Komplette regler ikke kjørt for $ansattId og ${brukerId.maskFnr()} da bruker ikke ble funnet")
         }
         log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
     }
+
+    private fun bruker(brukerId: String) = runCatching {
+        brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
+    }.getOrElse {
+        if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {
+            log.info("Fant ikke bruker for ${brukerId.maskFnr()}", it)
+            null
+        } else {
+            log.warn("Feil ved oppslag av bruker for ${brukerId.maskFnr()}", it)
+            throw it
+        }
+    }
+
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])
     @WithSpan
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =

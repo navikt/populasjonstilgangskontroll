@@ -58,7 +58,6 @@ class RegelTjeneste(
         brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
     }.getOrElse {
         if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {
-            log.info("Fant ikke bruker for ${brukerId.maskFnr()}", it)
             null
         } else {
             log.warn("Feil ved oppslag av bruker for ${brukerId.maskFnr()}", it)

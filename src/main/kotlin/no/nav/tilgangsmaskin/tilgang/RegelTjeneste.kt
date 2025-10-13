@@ -68,8 +68,10 @@ class RegelTjeneste(
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])
     @WithSpan
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
-        motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedNærmesteFamilie(brukerId))
-
+        bruker(brukerId)?.let { bruker ->
+            motor.kjerneregler(ansattTjeneste.ansatt(ansattId), bruker)
+        } ?: log.info("Kjerneregler ikke kjørt for $ansattId og ${brukerId.maskFnr()} da bruker ikke ble funnet, tilgang likevel gitt")
+    
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
     @WithSpan
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): AggregertBulkRespons {

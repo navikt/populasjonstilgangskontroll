@@ -33,19 +33,14 @@ class RegelTjeneste(
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
-            bruker(brukerId)?.let { b ->
+            bruker(brukerId)?.let { bruker ->
                 runCatching {
-                    motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), b)
+                    motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
                 }.getOrElse {
-                    if (overstyringTjeneste.erOverstyrt(ansattId, b.brukerId) && it is RegelException) {
+                    if (overstyringTjeneste.erOverstyrt(ansattId, bruker.brukerId) && it is RegelException) {
                         log.trace("Overstyring registrert for {} og {}", ansattId, brukerId.maskFnr(), it)
                     } else {
-                        log.trace(
-                            "Tilgang avvist ved kjøring av komplette regler for {} og {}",
-                            ansattId,
-                            brukerId.maskFnr(),
-                            it
-                        )
+                        log.trace("Tilgang avvist ved kjøring av komplette regler for {} og {}", ansattId, brukerId.maskFnr(), it)
                         throw it
                     }
                 }
@@ -71,7 +66,7 @@ class RegelTjeneste(
         bruker(brukerId)?.let { bruker ->
             motor.kjerneregler(ansattTjeneste.ansatt(ansattId), bruker)
         } ?: log.info("Kjerneregler ikke kjørt for $ansattId og ${brukerId.maskFnr()} da bruker ikke ble funnet, tilgang likevel gitt")
-    
+
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
     @WithSpan
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): AggregertBulkRespons {

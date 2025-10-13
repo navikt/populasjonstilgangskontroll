@@ -107,7 +107,7 @@ class RegelTjeneste(
     private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) =
         buildSet {
             for (item in (oppgitt - funnet)) {
-                add(EnkeltBulkRespons(item.brukerId, NOT_FOUND))
+                add(ok(item.brukerId))
             }
         }
 

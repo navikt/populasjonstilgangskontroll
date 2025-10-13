@@ -48,7 +48,8 @@ class CacheBeanConfigurer(private val cf: RedisConnectionFactory, mapper: Object
         CacheClient(redisClient, handler, sucessTeller, teller)
 
     @Bean
-    fun cacheNøkkelHandler(mgr: RedisCacheManager) = CacheNøkkelHandler(mgr.cacheConfigurations,cacheMapper)
+    fun cacheNøkkelHandler(mgr: RedisCacheManager) =
+        CacheNøkkelHandler(mgr.cacheConfigurations,cacheMapper)
 
     @Bean
     fun cacheHealthIndicator(adapter: CacheAdapter)  =

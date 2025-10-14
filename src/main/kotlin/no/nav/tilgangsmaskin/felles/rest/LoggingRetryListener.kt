@@ -6,7 +6,7 @@ import org.springframework.retry.RetryContext
 import org.springframework.retry.RetryListener
 import kotlin.reflect.full.declaredFunctions
 
-class FellesRetryListener : RetryListener {
+class LoggingRetryListener : RetryListener {
 
     private val log = getLogger(javaClass)
     override fun <T : Any, E : Throwable> onSuccess(context: RetryContext, callback: RetryCallback<T, E>, result: T?) {

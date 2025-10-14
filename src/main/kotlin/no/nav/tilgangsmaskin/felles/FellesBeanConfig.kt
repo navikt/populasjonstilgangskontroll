@@ -11,7 +11,7 @@ import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
-import no.nav.tilgangsmaskin.felles.rest.FellesRetryListener
+import no.nav.tilgangsmaskin.felles.rest.LoggingRetryListener
 import no.nav.tilgangsmaskin.felles.rest.LoggingRequestInterceptor
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.aspectj.lang.ProceedingJoinPoint
@@ -74,7 +74,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
         TimedAspect(meterRegistry, Function { pjp -> Tags.of("cluster", token.cluster, "method", pjp.signature.name, "client", token.systemNavn) })
 
     @Bean
-    fun fellesRetryListener() = FellesRetryListener()
+    fun fellesRetryListener() = LoggingRetryListener()
 
     @Bean
     @ConditionalOnNotProd

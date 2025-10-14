@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.felles
 
-import no.nav.tilgangsmaskin.felles.rest.FellesRetryListener.Companion.FELLES_RETRY_LISTENER
+import no.nav.tilgangsmaskin.felles.rest.LoggingRetryListener.Companion.FELLES_RETRY_LISTENER
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import org.springframework.core.annotation.AliasFor
 import org.springframework.retry.annotation.Backoff

@@ -6,7 +6,7 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import java.net.URI
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.rest.FellesRetryListener
+import no.nav.tilgangsmaskin.felles.rest.LoggingRetryListener
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
@@ -27,7 +27,7 @@ import kotlin.test.Test
 @ExtendWith(MockKExtension::class)
 @EnableRetry
 @ActiveProfiles(TEST)
-@SpringBootTest(classes = [FellesRetryListener::class])
+@SpringBootTest(classes = [LoggingRetryListener::class])
 internal class SkjermingRetryTest {
 
     private val vanligBrukerId = BrukerId("08526835670")

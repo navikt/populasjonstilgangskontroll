@@ -7,6 +7,7 @@ import jakarta.validation.Payload
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import org.slf4j.LoggerFactory.getLogger
 import java.time.LocalDate
+import java.time.LocalDate.now
 import kotlin.reflect.KClass
 
 @MustBeDocumented
@@ -34,7 +35,7 @@ class OverstyringValidator : ConstraintValidator<ValidOverstyring, OverstyringDa
     }
 
     private fun gyldigDato(verdi: LocalDate) =
-        verdi.isAfter(LocalDate.now()) && verdi.isBefore(LocalDate.now().plusMonths(3))
+        verdi.isAfter(now()) && verdi.isBefore(now().plusMonths(3))
             .also {
                 if (!it) log.warn("Overstyring med gyldig til $verdi er ugyldig, må være fra nå og maks 3 måneder frem i tid")
             }

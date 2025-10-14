@@ -8,9 +8,9 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedClass
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector
 import com.fasterxml.jackson.databind.jsontype.impl.StdTypeResolverBuilder
 import com.fasterxml.jackson.databind.module.SimpleModule
-import java.lang.annotation.Inherited
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import java.lang.annotation.Inherited
 
 /**
     Denne modulen konfigurerer Jackson til å serialisere classes annotatert med  @JsonCacheable, slik at de inkluderer typeinformasjon i JSON-representasjonen.

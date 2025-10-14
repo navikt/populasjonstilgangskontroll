@@ -2,11 +2,11 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
-import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.stereotype.Component
-import java.util.concurrent.TimeUnit.HOURS
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.stereotype.Component
+import java.util.concurrent.TimeUnit.*
 
 @Component
 class NomDBOpprydder(registry: MeterRegistry, private val nom: NomTjeneste) : LeaderAware() {

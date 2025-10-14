@@ -7,7 +7,9 @@ import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.Companion.INGEN
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
-import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.*
+import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
+import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.felles.cache.JsonCacheable
 import java.time.LocalDate
 

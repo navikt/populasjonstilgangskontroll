@@ -1,14 +1,13 @@
 package no.nav.tilgangsmaskin.bruker
 
+import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.PersonTilBrukerMapper.tilBruker
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.Person
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.pluralize
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
-import io.opentelemetry.instrumentation.annotations.WithSpan
 
 @Service
 class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjeneste: SkjermingTjeneste) {

@@ -1,7 +1,11 @@
 package no.nav.tilgangsmaskin.felles.utils.extensions
 
-import java.time.*
+import java.time.Instant
 import java.time.Instant.now
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.Period
+import java.time.ZoneId
 import java.time.ZoneId.systemDefault
 import java.time.format.DateTimeFormatter
 import kotlin.time.Duration

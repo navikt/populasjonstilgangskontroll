@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.felles.utils
 
-import java.net.InetAddress
 import org.slf4j.LoggerFactory
 import org.springframework.context.event.EventListener
+import java.net.InetAddress
 
 abstract class LeaderAware(var erLeder: Boolean = false) {
     private val hostname = InetAddress.getLocalHost().hostName

@@ -1,6 +1,10 @@
 package no.nav.tilgangsmaskin.bruker
 
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.*
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.BYDEL
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.KOMMUNE
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.UDEFINERT
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.UKJENT_BOSTED
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.UTLAND
 import no.nav.tilgangsmaskin.felles.cache.JsonCacheable
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
 

@@ -4,8 +4,8 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPF
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
-import java.time.Duration
 import java.net.URI
+import java.time.Duration
 
 @ConfigurationProperties(OPPFØLGING)
 class OppfølgingConfig(baseUri: URI = DEFAULT_BASE_URI, bulkPath : String = DEFAULT_BULK_PATH, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, OPPFØLGING, enabled), CachableRestConfig {

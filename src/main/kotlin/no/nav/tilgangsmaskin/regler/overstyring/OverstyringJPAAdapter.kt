@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.regler.overstyring
 
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import org.springframework.stereotype.Component
 import java.time.ZoneId.systemDefault
-import no.nav.tilgangsmaskin.bruker.BrukerId
 
 @Component
 class OverstyringJPAAdapter(private val repository: OverstyringRepository) {

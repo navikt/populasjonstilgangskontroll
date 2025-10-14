@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import io.lettuce.core.RedisClient
 import io.lettuce.core.pubsub.RedisPubSubAdapter
-import java.util.concurrent.atomic.AtomicInteger
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationEventPublisher

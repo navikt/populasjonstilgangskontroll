@@ -5,8 +5,8 @@ import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import org.springframework.core.annotation.AliasFor
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
-import java.lang.annotation.Inherited
 import org.springframework.web.client.ResourceAccessException
+import java.lang.annotation.Inherited
 import kotlin.annotation.AnnotationRetention.RUNTIME
 import kotlin.annotation.AnnotationTarget.CLASS
 import kotlin.annotation.AnnotationTarget.FUNCTION

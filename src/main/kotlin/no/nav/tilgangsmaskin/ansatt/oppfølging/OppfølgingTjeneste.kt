@@ -1,10 +1,8 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
-import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.bruker.Identifikator
 
 @Service
 class OppfølgingTjeneste(private val adapter: OppfølgingRestClientAdapter) {
@@ -13,8 +11,3 @@ class OppfølgingTjeneste(private val adapter: OppfølgingRestClientAdapter) {
     fun enhetFor(brukerId: String) =
         adapter.enheterFor(listOf(brukerId)).firstOrNull()?.enhet
 }
-
-
-
-
-

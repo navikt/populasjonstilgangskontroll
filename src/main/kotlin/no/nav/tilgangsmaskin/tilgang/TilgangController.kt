@@ -24,7 +24,12 @@ import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
 import org.jboss.logging.MDC
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.ACCEPTED
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.FORBIDDEN
+import org.springframework.http.HttpStatus.MULTI_STATUS
+import org.springframework.http.HttpStatus.NO_CONTENT
+import org.springframework.http.HttpStatus.PAYLOAD_TOO_LARGE
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

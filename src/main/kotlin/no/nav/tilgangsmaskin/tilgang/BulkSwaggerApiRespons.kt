@@ -53,7 +53,7 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
                            }
                        ]
                    }"""))])])
-annotation class BulkApiResponse
+annotation class BulkSwaggerApiRespons
 private data class BulkSwaggerResultater(val ansattId: String, val resultater: List<BulkSwaggerResultat>) {
     data class BulkSwaggerResultat(val brukerId: String, val status: Int, val detaljer: BulkSwaggerDetaljer? = null) {
         data class BulkSwaggerDetaljer(val type: String, val title: AvvisningsKode, val status: Int, val instance: String,

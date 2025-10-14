@@ -31,7 +31,7 @@ import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
-import no.nav.tilgangsmaskin.tilgang.BulkApiResponse
+import no.nav.tilgangsmaskin.tilgang.BulkSwaggerApiRespons
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
 import org.springframework.http.HttpStatus.ACCEPTED
@@ -138,13 +138,13 @@ class DevTilgangController(
 
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(MULTI_STATUS)
-    @BulkApiResponse
+    @BulkSwaggerApiRespons
     fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody specs: Set<BrukerIdOgRegelsett>) =
         regler.bulkRegler( ansattId, specs)
 
     @PostMapping("bulk/{ansattId}/{regelType}")
     @ResponseStatus(MULTI_STATUS)
-    @BulkApiResponse
+    @BulkSwaggerApiRespons
     fun bulkreglerForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody brukerIds: Set<BrukerId>) =
         regler.bulkRegler(ansattId, brukerIds.map { BrukerIdOgRegelsett(it.verdi, regelType) }.toSet())
 

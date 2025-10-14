@@ -6,6 +6,8 @@ import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
+import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
@@ -24,7 +26,8 @@ class RegelTjeneste(
     private val motor: RegelMotor,
     private val brukerTjeneste: BrukerTjeneste,
     private val ansattTjeneste: AnsattTjeneste,
-    private val overstyringTjeneste: OverstyringTjeneste) {
+    private val overstyringTjeneste: OverstyringTjeneste,
+    private val auditor: Auditor = Auditor()) {
     private val log = getLogger(javaClass)
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "komplett"])
@@ -32,25 +35,40 @@ class RegelTjeneste(
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
-            val bruker = brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
-            runCatching {
-                motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
-            }.getOrElse {
-                if (overstyringTjeneste.erOverstyrt(ansattId, bruker.brukerId) && it is RegelException) {
-                    log.trace("Overstyring registrert for {} og {}", ansattId, brukerId.maskFnr(), it)
+            bruker(brukerId)?.let { bruker ->
+                runCatching {
+                    motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
+                }.getOrElse {
+                    if (overstyringTjeneste.erOverstyrt(ansattId, bruker.brukerId) && it is RegelException) {
+                        log.trace("Overstyring registrert for {} og {}", ansattId, brukerId.maskFnr(), it)
+                    } else {
+                        log.trace("Tilgang avvist ved kjøring av komplette regler for {} og {}", ansattId, brukerId.maskFnr(), it)
+                        throw it
+                    }
                 }
-                else {
-                    log.trace("Tilgang avvist ved kjøring av komplette regler for {} og {}", ansattId, brukerId.maskFnr(), it)
-                    throw it
-                }
-            }
+            } ?: log.info("Komplette regler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
         }
         log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
     }
+
+    private fun bruker(brukerId: String) = runCatching {
+        brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
+    }.getOrElse {
+        if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {
+            auditor.info("404: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
+            null
+        } else {
+            log.warn("Feil ved oppslag av bruker for ${brukerId.maskFnr()}", it)
+            throw it
+        }
+    }
+
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])
     @WithSpan
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
-        motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedNærmesteFamilie(brukerId))
+        bruker(brukerId)?.let { bruker ->
+            motor.kjerneregler(ansattTjeneste.ansatt(ansattId), bruker)
+        } ?: log.info("Kjerneregler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
     @WithSpan
@@ -72,6 +90,7 @@ class RegelTjeneste(
             }
             val ikkeFunnet = ikkeFunnet(idOgType, resultater).also {
                 if (it.isNotEmpty()) {
+                    auditor.info("404: Brukere med identer ${it.map { ident -> ident.brukerId }} ikke funnet i PDL ved oppslag")
                     log.debug("Bulk ikke funnet {}", it)
                 }
             }
@@ -92,7 +111,7 @@ class RegelTjeneste(
     private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) =
         buildSet {
             for (item in (oppgitt - funnet)) {
-                add(EnkeltBulkRespons(item.brukerId, NOT_FOUND))
+                add(ok(item.brukerId))
             }
         }
 

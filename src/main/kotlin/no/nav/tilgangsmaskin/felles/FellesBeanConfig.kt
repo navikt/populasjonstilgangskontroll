@@ -12,6 +12,7 @@ import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenRespons
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.FellesRetryListener
+import no.nav.tilgangsmaskin.felles.rest.LoggingRequestInterceptor
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
@@ -57,27 +58,15 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 
     @Bean
-    fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor) = RestClientCustomizer { c ->
+    fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor, loggingInterceptor: LoggingRequestInterceptor) = RestClientCustomizer { c ->
         c.requestFactory(HttpComponentsClientHttpRequestFactory().apply {
             setConnectTimeout(2000)
             setReadTimeout(2000)
         })
         c.requestInterceptors {
             it.addFirst(interceptor)
-            it.add(headerLoggingInterceptor())
+            it.add(loggingInterceptor)
         }
-    }
-
-    private fun headerLoggingInterceptor() = ClientHttpRequestInterceptor { request, body, next ->
-        log.trace("Headers: {}", request.headers)
-        if (!body.isEmpty()) {
-            log.debug("Body for {} {} : {} ",request.method, request.uri,String(body))
-        }
-        val response = next.execute(request, body)
-        if (!response.statusCode.is2xxSuccessful) {
-            log.debug("Response status for {} {}: {}", request.method, request.uri, response.statusCode)
-        }
-        response
     }
 
     @Bean
@@ -130,3 +119,4 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             }
     }
 }
+

@@ -22,6 +22,5 @@ class ConsumerAwareHandlerInterceptor(private val token: Token, private val regi
         private const val METRIC = "http_requests_by_remote_system"
         const val CONSUMER_ID = "consumerId"
         const val USER_ID = "userId"
-        const val BRUKERID = "brukerId"
     }
 }

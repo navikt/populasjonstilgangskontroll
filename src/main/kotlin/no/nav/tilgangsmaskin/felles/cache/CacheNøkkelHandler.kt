@@ -33,12 +33,6 @@ class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration>, val
         configs[cache.name]?.getKeyPrefixFor(cache.name)
             ?: throw IllegalStateException("Ingen cache med navn ${cache.name}")
 
-    data class CacheNøkkelElementer(val nøkkel: String) {
-        private val elementer = nøkkel.split("::", ":")
-        val cacheName = elementer.first()
-        val metode = if (elementer.size > 2) elementer[1] else null
-        val id = elementer.last()
-    }
 }
 
 data class CachableConfig(val name: String, val extraPrefix: String? = null)

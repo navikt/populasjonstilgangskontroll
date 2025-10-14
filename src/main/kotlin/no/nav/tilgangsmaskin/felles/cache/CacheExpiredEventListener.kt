@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import io.micrometer.core.instrument.Tags.of
-import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelHandler.CacheNøkkelElementer
 import no.nav.tilgangsmaskin.felles.cache.CacheRemovalListener.CacheExpiredEvent
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import no.nav.tilgangsmaskin.regler.motor.CacheOppfriskerTeller

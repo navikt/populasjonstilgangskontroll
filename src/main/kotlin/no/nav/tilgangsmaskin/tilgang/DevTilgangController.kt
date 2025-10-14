@@ -23,7 +23,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.Person
-import no.nav.tilgangsmaskin.felles.rest.ValidId
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
@@ -71,19 +70,19 @@ class DevTilgangController(
     fun keys(@PathVariable cacheName: String) = cache.getAll(cacheName)
 
     @GetMapping("sivilstand/{id}")
-    fun sivilstand(@PathVariable @Valid @ValidId id: String) = graphql.partnere(id)
+    fun sivilstand(@PathVariable  id: String) = graphql.partnere(id)
 
     @PostMapping("brukeridentifikator")
     fun brukerIdentifikator(@RequestBody id: Identifikator) = brukere.brukerMedUtvidetFamilie(id.verdi)
 
     @GetMapping("bruker/{id}")
-    fun bruker(@PathVariable @Valid @ValidId id: String) = brukere.brukerMedUtvidetFamilie(id)
+    fun bruker(@PathVariable id: String) = brukere.brukerMedUtvidetFamilie(id)
 
     @GetMapping("person/{id}")
-    fun person(@PathVariable @Valid @ValidId id: String) = pdl.medUtvidetFamile(id)
+    fun person(@PathVariable id: String) = pdl.medUtvidetFamile(id)
 
     @GetMapping("person/pip/{id}")
-    fun pip(@PathVariable @Valid @ValidId id: String) = pip.person(id)
+    fun pip(@PathVariable id: String) = pip.person(id)
 
     @GetMapping("ansatt/enheter/{ansattId}")
     fun enheter(@PathVariable ansattId: AnsattId) = entra.geoOgGlobaleGrupper(ansattId, oid.oidFraEntra(ansattId)).filter { it.displayName.contains("ENHET") }
@@ -101,13 +100,13 @@ class DevTilgangController(
     @GetMapping("komplett/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
-    fun kompletteRegler(@PathVariable ansattId: AnsattId, @PathVariable @Valid @ValidId brukerId: String) =
+    fun kompletteRegler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: String) =
         regler.kompletteRegler(ansattId, brukerId.trim('"'))
 
     @GetMapping("kjerne/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
-    fun kjerneregler(@PathVariable ansattId: AnsattId, @PathVariable @Valid @ValidId brukerId: String) =
+    fun kjerneregler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: String) =
         regler.kjerneregler(ansattId, brukerId.trim('"'))
 
     @PostMapping("overstyr/{ansattId}")
@@ -134,13 +133,13 @@ class DevTilgangController(
     @PostMapping("bulk/{ansattId}")
     @ResponseStatus(MULTI_STATUS)
     @BulkApiResponse
-    fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody @Valid @ValidId specs: Set<BrukerIdOgRegelsett>) =
+    fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody specs: Set<BrukerIdOgRegelsett>) =
         regler.bulkRegler( ansattId, specs)
 
     @PostMapping("bulk/{ansattId}/{regelType}")
     @ResponseStatus(MULTI_STATUS)
     @BulkApiResponse
-    fun bulkreglerForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody @Valid @ValidId brukerIds: Set<BrukerId>) =
+    fun bulkreglerForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody brukerIds: Set<BrukerId>) =
         regler.bulkRegler(ansattId, brukerIds.map { BrukerIdOgRegelsett(it.verdi, regelType) }.toSet())
 
     @PostMapping("skjermingadaptere")
@@ -153,5 +152,5 @@ class DevTilgangController(
     fun skjerminger(@RequestBody ids: List<BrukerId>) = skjerming.skjerminger(ids)
 
     @PostMapping("brukere")
-    fun brukere(@RequestBody @Valid @ValidId  ids: Set<String>) = brukere.brukere(ids)
+    fun brukere(@RequestBody ids: Set<String>) = brukere.brukere(ids)
 }

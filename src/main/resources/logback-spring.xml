@@ -35,6 +35,7 @@
             </layout>
         </appender>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
+        <logger name="no.nav.tilgangsmaskin.felles.FellesBeanConfig" level="info"/>
     </springProfile>
 
     <springProfile name="prod">

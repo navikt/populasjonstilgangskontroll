@@ -2,22 +2,15 @@ package no.nav.tilgangsmaskin.ansatt.oppfølging
 
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelHandler.CacheNøkkelElementer
-import no.nav.tilgangsmaskin.felles.cache.CacheOppfrisker
-import org.slf4j.LoggerFactory.getLogger
+import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOppfrisker
 import org.springframework.stereotype.Component
 
 @Component
-class OppfølgingCacheOppfrisker(private val oppfølging: OppfølgingTjeneste) : CacheOppfrisker {
+class OppfølgingCacheOppfrisker(private val oppfølging: OppfølgingTjeneste) : AbstractCacheOppfrisker() {
 
     override val cacheName: String = OPPFØLGING
-    private val log = getLogger(javaClass)
 
-    override fun oppfrisk(nøkkelElementer: CacheNøkkelElementer) {
-            runCatching {
-                oppfølging.enhetFor(nøkkelElementer.id)
-                log.info("Oppfrisking av ${nøkkelElementer.nøkkel} OK")
-            }.getOrElse {
-                log.info("Oppfrisking av ${nøkkelElementer.nøkkel} etter sletting feilet, dette er ikke kritisk",it)
-            }
-        }
+    override fun doOppfrisk(nøkkelElementer: CacheNøkkelElementer) {
+        oppfølging.enhetFor(nøkkelElementer.id)
+    }
 }

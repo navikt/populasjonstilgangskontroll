@@ -24,8 +24,8 @@ import org.springframework.data.redis.serializer.StringRedisSerializer
 @Configuration(proxyBeanMethods = true)
 @EnableCaching
 @ConditionalOnGCP
-class CacheBeanConfigurer(private val cf: RedisConnectionFactory, mapper: ObjectMapper,
-                          private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
+class CacheBeanConfig(private val cf: RedisConnectionFactory, mapper: ObjectMapper,
+                      private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
     private val cacheMapper =
         mapper.copy().apply {

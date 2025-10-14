@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
+import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
@@ -25,7 +26,8 @@ class RegelTjeneste(
     private val motor: RegelMotor,
     private val brukerTjeneste: BrukerTjeneste,
     private val ansattTjeneste: AnsattTjeneste,
-    private val overstyringTjeneste: OverstyringTjeneste) {
+    private val overstyringTjeneste: OverstyringTjeneste,
+    private val auditor: Auditor = Auditor()) {
     private val log = getLogger(javaClass)
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "komplett"])
@@ -44,7 +46,7 @@ class RegelTjeneste(
                         throw it
                     }
                 }
-            } ?: log.info("Komplette regler ikke kjørt for $ansattId og ${brukerId.maskFnr()} da bruker ikke ble funnet, tilgang likevel gitt")
+            } ?: log.info("Komplette regler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
         }
         log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
     }
@@ -53,6 +55,7 @@ class RegelTjeneste(
         brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
     }.getOrElse {
         if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {
+            auditor.info("404: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
             null
         } else {
             log.warn("Feil ved oppslag av bruker for ${brukerId.maskFnr()}", it)
@@ -65,7 +68,7 @@ class RegelTjeneste(
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
         bruker(brukerId)?.let { bruker ->
             motor.kjerneregler(ansattTjeneste.ansatt(ansattId), bruker)
-        } ?: log.info("Kjerneregler ikke kjørt for $ansattId og ${brukerId.maskFnr()} da bruker ikke ble funnet, tilgang likevel gitt")
+        } ?: log.info("Kjerneregler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
     @WithSpan
@@ -87,6 +90,7 @@ class RegelTjeneste(
             }
             val ikkeFunnet = ikkeFunnet(idOgType, resultater).also {
                 if (it.isNotEmpty()) {
+                    auditor.info("404: Brukere med identer ${it.map { ident -> ident.brukerId }} ikke funnet i PDL ved oppslag")
                     log.debug("Bulk ikke funnet {}", it)
                 }
             }

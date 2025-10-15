@@ -90,6 +90,12 @@ spring:
                 headers: false
   data:
     redis:
+      lettuce:
+        pool:
+          enabled: true
+          max-active: 24
+          max-idle: 24
+
       host: ${valkey.host}
       port: ${valkey.port}
       connect-timeout: 10s

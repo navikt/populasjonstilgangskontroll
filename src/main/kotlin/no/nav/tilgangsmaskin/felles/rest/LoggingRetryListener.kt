@@ -32,6 +32,6 @@ class LoggingRetryListener : RetryListener {
             }
         }
 
-        const val FELLES_RETRY_LISTENER = "fellesRetryListener"
+        const val LOGGING_RETRY_LISTENER = "loggingRetryListener"
     }
 }

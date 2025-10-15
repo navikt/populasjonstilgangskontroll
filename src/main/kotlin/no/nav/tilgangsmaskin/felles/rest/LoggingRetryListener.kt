@@ -5,7 +5,7 @@ import org.springframework.retry.RetryCallback
 import org.springframework.retry.RetryContext
 import org.springframework.retry.RetryListener
 import kotlin.reflect.full.declaredFunctions
-
+@Component
 class LoggingRetryListener : RetryListener {
 
     private val log = getLogger(javaClass)

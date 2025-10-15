@@ -98,6 +98,13 @@ spring:
       password: ${valkey.password}
       ssl:
         enabled: true
+      jedis:
+        pool:
+          max-active: 8 # Maximum number of active connections
+          max-idle: 8   # Maximum number of idle connections
+          min-idle: 0   # Minimum number of idle connections
+          max-wait: 50ms
+          enabled: true
   cache:
     type: redis
   mvc:

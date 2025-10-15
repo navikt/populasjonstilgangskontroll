@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import io.micrometer.core.instrument.Tags.of
-import no.nav.tilgangsmaskin.felles.cache.CacheRemovalListener.CacheExpiredEvent
+import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetHendelse
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import no.nav.tilgangsmaskin.regler.motor.CacheOppfriskerTeller
 import org.springframework.context.SmartLifecycle
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 class CacheExpiredEventListener(val teller: CacheOppfriskerTeller, erLeder: Boolean = true, private vararg val oppfriskere: CacheOppfrisker) :LeaderAware(erLeder), SmartLifecycle {
     private var running = false
     @EventListener
-    fun cacheInnslagFjernet(hendelse: CacheExpiredEvent) {
+    fun cacheInnslagFjernet(hendelse: CacheInnslagFjernetHendelse) {
         if (erLeder && isRunning()) {
             val elementer = CacheNøkkelElementer(hendelse.nøkkel)
             oppfriskere.firstOrNull { it.cacheName == elementer.cacheName }?.run {

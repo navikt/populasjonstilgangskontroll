@@ -8,12 +8,12 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 
 @Component
- class CacheRemovalListener(client: RedisClient, private val eventPublisher: ApplicationEventPublisher) :  RedisPubSubAdapter<String, String>() {
+ class CacheElementUtløptLytter(client: RedisClient, private val publiserer: ApplicationEventPublisher) :  RedisPubSubAdapter<String, String>() {
     private val log = getLogger(javaClass)
 
      init {
          client.connectPubSub().apply {
-             addListener(this@CacheRemovalListener)
+             addListener(this@CacheElementUtløptLytter)
              sync().subscribe(KANAL)
          }
      }
@@ -23,13 +23,13 @@ import org.springframework.stereotype.Component
             log.warn("Uventet hendelse på $kanal med nøkkel $nøkkel")
         }
         else {
-            eventPublisher.publishEvent(CacheExpiredEvent(nøkkel))
+            publiserer.publishEvent(CacheInnslagFjernetHendelse(nøkkel))
         }
     }
     companion object {
         private const val KANAL = "__keyevent@0__:expired"
     }
-    data class CacheExpiredEvent(val nøkkel: String) : ApplicationEvent(nøkkel)
+    data class CacheInnslagFjernetHendelse(val nøkkel: String) : ApplicationEvent(nøkkel)
 }
 
 

@@ -62,7 +62,7 @@ class CacheClientTest {
     @Autowired
     lateinit var eventPublisher: ApplicationEventPublisher
 
-    private lateinit var listener: CacheRemovalListener
+    private lateinit var listener: CacheElementUtløptLytter
 
     @Autowired
     private lateinit var cf: RedisConnectionFactory
@@ -95,7 +95,7 @@ class CacheClientTest {
         client = CacheClient(
             redisClient, handler, BulkCacheSuksessTeller(meterRegistry, token), teller
         )
-        listener = CacheRemovalListener(redisClient, eventPublisher)
+        listener = CacheElementUtløptLytter(redisClient, eventPublisher)
         val id1 = BrukerId("03508331575")
         val id2 = BrukerId("20478606614")
         person1 = Person(id1,id1.verdi, AktørId("1234567890123"), KommuneTilknytning(Kommune("0301")))

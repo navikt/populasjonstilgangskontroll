@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import no.nav.tilgangsmaskin.felles.rest.LoggingRetryListener.Companion.LOGGING_RETRY_LISTENER
 import org.springframework.core.annotation.AliasFor
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
@@ -15,5 +16,5 @@ import kotlin.reflect.KClass
 annotation class RetryingWhenRecoverable(
     @get:AliasFor(annotation = Retryable::class) val value: Array<KClass<out Throwable>> = [RecoverableRestException::class, ResourceAccessException::class],
     @get:AliasFor(annotation = Retryable::class) val maxAttempts: Int = 3,
-    @get:AliasFor(annotation = Retryable::class) val listeners: Array<String> = [LoggingRetryListener.LOGGING_RETRY_LISTENER],
+    @get:AliasFor(annotation = Retryable::class) val listeners: Array<String> = [LOGGING_RETRY_LISTENER],
     @get:AliasFor(annotation = Retryable::class) val backoff: Backoff = Backoff(delay = 1000))

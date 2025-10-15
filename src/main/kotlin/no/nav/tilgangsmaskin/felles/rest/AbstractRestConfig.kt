@@ -7,7 +7,8 @@ abstract class AbstractRestConfig(
         val baseUri: URI,
         private val pingPath: String = "",
         val name: String,
-        val isEnabled: Boolean = true) {
+        val isEnabled: Boolean = true,
+        val refresh: Boolean = true) {
 
     protected fun builder() = DefaultUriBuilderFactory("$baseUri").builder()
 

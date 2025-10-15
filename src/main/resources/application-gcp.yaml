@@ -192,12 +192,14 @@ skjerming:
   base-uri: "http://skjermede-personer-pip.nom"
   scope: "api://${nais.cluster.type}-gcp.nom.skjermede-personer-pip/.default"
 graph:
+  refresh: false
   scope: https://graph.microsoft.com/.default
   base-uri: https://graph.microsoft.com/v1.0/
 nom:
   topic: org.nom.api-ressurs-state-v4
 
 oppfolging:
+  refresh: false
   scope: "api://${nais.cluster.type}-gcp.dab.ao-oppfolgingskontor/.default"
 valkey:
   username: ${valkey.username.${nais.cluster.cache}}

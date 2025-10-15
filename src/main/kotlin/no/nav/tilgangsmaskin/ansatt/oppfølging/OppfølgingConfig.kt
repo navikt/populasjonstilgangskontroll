@@ -8,7 +8,7 @@ import java.net.URI
 import java.time.Duration
 
 @ConfigurationProperties(OPPFØLGING)
-class OppfølgingConfig(baseUri: URI = DEFAULT_BASE_URI, bulkPath : String = DEFAULT_BULK_PATH, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, OPPFØLGING, enabled), CachableRestConfig {
+class OppfølgingConfig(baseUri: URI = DEFAULT_BASE_URI, bulkPath : String = DEFAULT_BULK_PATH, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true, refresh: Boolean = true) : AbstractRestConfig(baseUri, pingPath, OPPFØLGING, enabled, refresh), CachableRestConfig {
 
     override val varighet = Duration.ofHours(12)
     override val navn = OPPFØLGING

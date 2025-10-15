@@ -2,10 +2,13 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import org.slf4j.LoggerFactory.getLogger
 
-abstract class AbstractCacheOppfrisker : CacheOppfrisker {
+abstract class AbstractCacheOppfrisker(private val enabled: Boolean) : CacheOppfrisker {
     private val log = getLogger(javaClass)
 
     final override fun oppfrisk(nøkkelElementer: CacheNøkkelElementer) {
+        if (!enabled) {
+            return
+        }
         runCatching {
             doOppfrisk(nøkkelElementer)
             log.info("Oppfrisking av ${nøkkelElementer.nøkkel} OK")

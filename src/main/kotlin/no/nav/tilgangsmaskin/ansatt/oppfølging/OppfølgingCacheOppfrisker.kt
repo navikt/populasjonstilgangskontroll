@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOppfrisker
 import org.springframework.stereotype.Component
 
 @Component
-class OppfølgingCacheOppfrisker(private val oppfølging: OppfølgingTjeneste) : AbstractCacheOppfrisker() {
+class OppfølgingCacheOppfrisker(private val oppfølging: OppfølgingTjeneste, cfg: OppfølgingConfig) : AbstractCacheOppfrisker(cfg.refresh) {
 
     override val cacheName: String = OPPFØLGING
 

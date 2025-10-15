@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOppfrisker
 import org.springframework.stereotype.Component
 
 @Component
-class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste: AnsattOidTjeneste) : AbstractCacheOppfrisker() {
+class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste: AnsattOidTjeneste, cfg: EntraConfig) : AbstractCacheOppfrisker(cfg.refresh) {
 
     override val cacheName: String = GRAPH
 

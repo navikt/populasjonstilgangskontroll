@@ -20,6 +20,7 @@
 
     <springProfile name="dev">
         <logger name="io.lettuce.core.protocol.ReconnectionHandler" level="warn"/>
+        <logger name="io.lettuce.core.protocol.ConnectionWatchdog" level="warn"/>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
     </springProfile>
 
@@ -35,7 +36,6 @@
             </layout>
         </appender>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
-        <logger name="no.nav.tilgangsmaskin.felles.rest.LoggingRequestInterceptor" level="info"/>
     </springProfile>
 
     <springProfile name="prod">

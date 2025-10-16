@@ -90,6 +90,8 @@ spring:
                 headers: false
   data:
     redis:
+      repositories:
+            enabled: false
       lettuce:
         pool:
           enabled: true

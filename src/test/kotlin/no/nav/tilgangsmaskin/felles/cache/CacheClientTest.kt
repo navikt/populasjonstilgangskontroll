@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
+import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisClient.create
+import io.lettuce.core.api.StatefulRedisConnection
+import io.lettuce.core.support.ConnectionPoolSupport
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
@@ -38,6 +41,7 @@ import org.awaitility.kotlin.await
 import java.util.concurrent.TimeUnit.SECONDS
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig
 import org.assertj.core.api.Assertions.assertThat
 import org.springframework.context.ApplicationEventPublisher
 
@@ -92,8 +96,14 @@ class CacheClientTest {
         val redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
         val teller = BulkCacheTeller(meterRegistry, token)
         val handler = CacheNøkkelHandler(mgr.cacheConfigurations, valkeyMapper)
+        val pool =  ConnectionPoolSupport.createGenericObjectPool(
+            { redisClient.connect() },
+            GenericObjectPoolConfig<StatefulRedisConnection<String, String>>().apply {
+                maxTotal = 10 // Set max pool size
+            }
+        )
         client = CacheClient(
-            redisClient, handler, BulkCacheSuksessTeller(meterRegistry, token), teller
+            pool, handler, BulkCacheSuksessTeller(meterRegistry, token), teller
         )
         listener = CacheElementUtløptLytter(redisClient, eventPublisher)
         val id1 = BrukerId("03508331575")

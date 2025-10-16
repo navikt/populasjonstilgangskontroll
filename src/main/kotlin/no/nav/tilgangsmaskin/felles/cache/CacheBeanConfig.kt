@@ -4,11 +4,15 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import io.lettuce.core.RedisClient
+import io.lettuce.core.api.StatefulRedisConnection
+import io.lettuce.core.support.ConnectionPoolSupport
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
+import org.apache.commons.pool2.impl.GenericObjectPool
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
@@ -40,12 +44,20 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory, mapper: ObjectMapp
             .build()
 
     @Bean
+    fun cachePool(client: RedisClient) = ConnectionPoolSupport.createGenericObjectPool(
+        { client.connect() },
+        GenericObjectPoolConfig<StatefulRedisConnection<String, String>>().apply {
+            maxTotal = 10 // Set max pool size
+        }
+    )
+
+    @Bean
     fun redisClient(cfg: CacheConfig) =
         RedisClient.create(cfg.cacheURI)
 
     @Bean
-    fun cacheClient(redisClient: RedisClient,handler: CacheNøkkelHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
-        CacheClient(redisClient, handler, sucessTeller, teller)
+    fun cacheClient(pool: GenericObjectPool<StatefulRedisConnection<String,String>>,handler: CacheNøkkelHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
+        CacheClient(pool, handler, sucessTeller, teller)
 
     @Bean
     fun cacheNøkkelHandler(mgr: RedisCacheManager) =

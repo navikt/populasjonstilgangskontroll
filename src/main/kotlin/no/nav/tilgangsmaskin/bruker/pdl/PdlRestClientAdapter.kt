@@ -42,6 +42,7 @@ class PdlRestClientAdapter(
     }
 
 
+    @WithSpan
     private fun fraCache(ids: Set<String>) : Map<String,Person>{
         if (ids.isEmpty()) {
             return emptyMap()
@@ -51,6 +52,7 @@ class PdlRestClientAdapter(
         return innslag
     }
 
+    @WithSpan
     private fun fraRest(ids: Set<String>) : Map<String,Person> {
         if (ids.isEmpty()) {
             return emptyMap()
@@ -72,6 +74,7 @@ class PdlRestClientAdapter(
     }
 
 
+    @WithSpan
     private fun søsken(foreldre: Set<FamilieMedlem>, ansattBrukerId: String): Set<FamilieMedlem> =
         personer(foreldre.map { it.brukerId.verdi }.toSet())
             .asSequence()

@@ -1,6 +1,8 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
@@ -14,7 +16,7 @@ class LoggingRequestInterceptor : ClientHttpRequestInterceptor {
         if (request.uri.path.contains("monitoring")) {
             return execution.execute(request, body)
         }
-        log.trace("Headers: {}", request.headers)
+        log.trace("Headers: {}", request.headers.filter { !it.key.contains(AUTHORIZATION) })
         if (!body.isEmpty()) {
             log.debug("Body for {} {} : {} ",request.method, request.uri,String(body))
         }

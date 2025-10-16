@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component
 class LoggingRequestInterceptor : ClientHttpRequestInterceptor {
     private val log = getLogger(javaClass)
     override fun intercept(request: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
+        if (request.uri.path.contains("monitoring")) {
+            return execution.execute(request, body)
+        }
         log.trace("Headers: {}", request.headers)
         if (!body.isEmpty()) {
             log.debug("Body for {} {} : {} ",request.method, request.uri,String(body))

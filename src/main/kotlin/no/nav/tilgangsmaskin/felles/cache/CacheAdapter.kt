@@ -39,8 +39,8 @@ class CacheAdapter(private val handler: CacheNøkkelHandler, private val cf: Red
         registry.gauge("redis.pool.idle", pool) { it.numIdle.toDouble() }
         registry.gauge("redis.pool.waiters", pool) { it.numWaiters.toDouble() }
         registry.gauge("redis.pool.max", pool) { it.maxTotal.toDouble() }
-        registry.gauge("redis.pool.mean_borrow_wait", pool) { it.meanBorrowWaitDuration.seconds.toDouble() }
-        registry.gauge("redis.pool.mean_active_time", pool) { it.meanActiveDuration.seconds.toDouble() }
+        registry.gauge("redis.pool.mean_borrow_wait_millis", pool) { it.meanBorrowWaitDuration.toMillis().toDouble() }
+        registry.gauge("redis.pool.mean_active_time_millis", pool) { it.meanActiveDuration.toMillis().toDouble() }
     }
 
     private fun cacheSize(prefix: String) =

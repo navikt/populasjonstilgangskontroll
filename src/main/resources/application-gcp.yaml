@@ -90,11 +90,6 @@ spring:
                 headers: false
   data:
     redis:
-      jedis:
-        pool:
-          enabled: true
-          max-active: 24
-          max-idle: 24
       repositories:
             enabled: false
       lettuce:

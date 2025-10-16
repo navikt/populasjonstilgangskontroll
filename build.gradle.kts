@@ -41,7 +41,6 @@ configurations.all {
 }
 
 dependencies {
-    implementation("redis.clients:jedis:7.0.0")
     implementation("org.apache.commons:commons-pool2:2.12.1")
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.20.1")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.20.1-alpha")

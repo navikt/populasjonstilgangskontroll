@@ -28,9 +28,13 @@ sealed class GeografiskTilknytning(type: Type) {
     }
 
     @JsonCacheable
-    data class KommuneTilknytning(val kommune: Kommune) : GeografiskTilknytning(KOMMUNE)
+    data class KommuneTilknytning(val kommune: Kommune) : GeografiskTilknytning(KOMMUNE){
+        override fun toString() = "${javaClass.simpleName} (kommune=${kommune.verdi})"
+    }
     @JsonCacheable
-    data class BydelTilknytning(val bydel: Bydel) : GeografiskTilknytning(BYDEL)
+    data class BydelTilknytning(val bydel: Bydel) : GeografiskTilknytning(BYDEL) {
+        override fun toString() = "${javaClass.simpleName} (bydel=${bydel.verdi})"
+    }
     @JsonCacheable
     class UkjentBosted : GeografiskTilknytning(UKJENT_BOSTED) {
         override fun equals(other: Any?) = other is UkjentBosted

@@ -123,6 +123,7 @@ class TilgangController(
     private fun bulkOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, specs: Set<BrukerIdOgRegelsett>,uri: String) =
         with(ansattId()) {
             if (specs.isNotEmpty()) {
+                MDC.put(USER_ID, ansattId().verdi)
                 sjekk(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og $uri")
                 sjekk(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
                 tell("bulk")

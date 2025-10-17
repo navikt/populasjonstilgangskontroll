@@ -35,7 +35,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         withMDC(BESLUTNING, regel.kode) {
             val fra =  MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
             log.warn("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for ${bruker.brukerId} $fra")
-            auditor.warn("Tilgang til ${bruker.oppslagId} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} $fra")
+            auditor.warn("Tilgang til ${bruker.oppslagId} avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId}  ${bruker.geografiskTilknytning}  ${ansatt.grupper} $fra")
             avvisningTeller.tell(Tags.of("navn", regel.navn))
         }
 

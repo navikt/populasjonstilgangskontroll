@@ -36,7 +36,7 @@ class UkjentBostedRegel : GlobalGruppeRegel(UKJENT_BOSTED), OverstyrbarRegel {
         }
 }
 
-//@Component
+@Component
 @Order(LOWEST_PRECEDENCE - 2)
 class UtlandRegel : GlobalGruppeRegel(UTENLANDSK), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =

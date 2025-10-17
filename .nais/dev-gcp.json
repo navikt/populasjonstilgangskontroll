@@ -167,9 +167,14 @@
       "cluster": "dev-gcp"
     },
     {
-      "name": "oh-tilgangskontroll",
+      "name": "oppgave-q0",
       "namespace": "oppgavehandtering",
-      "cluster": "dev-gcp"
+      "cluster": "dev-fss"
+    },
+    {
+      "name": "oppgave-q1",
+      "namespace": "oppgavehandtering",
+      "cluster": "dev-fss"
     },
     {
       "name": "oppgave",

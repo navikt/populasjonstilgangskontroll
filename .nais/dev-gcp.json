@@ -34,11 +34,6 @@
     {
       "name": "aareg-tilgangskontroll-q2",
       "namespace": "arbeidsforhold",
-      "cluster": "dev-fss"
-    },
-    {
-      "name": "aareg-tilgangskontroll-q2",
-      "namespace": "arbeidsforhold",
       "cluster": "dev-gcp"
     },
     {
@@ -225,6 +220,11 @@
       "name": "superhelt",
       "namespace": "historisk",
       "cluster": "dev-gcp"
+    },
+    {
+      "name": "histark-core-api",
+      "namespace": "histark",
+      "cluster": "dev-fss"
     }
   ],
   "nais": {

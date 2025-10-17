@@ -132,6 +132,11 @@
       "name": "aareg-tilgangskontroll",
       "namespace": "arbeidsforhold",
       "cluster": "prod-gcp"
+    },
+    {
+      "name": "histark-core-api",
+      "namespace": "histark",
+      "cluster": "prod-fss"
     }
 
   ],

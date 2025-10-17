@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution

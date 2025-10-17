@@ -13,7 +13,6 @@ import org.springframework.web.servlet.HandlerInterceptor
 class ConsumerAwareHandlerInterceptor(private val token: Token, private val registry: MeterRegistry) : HandlerInterceptor {
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-        MDC.put(USER_ID, token.ansattId?.verdi ?: "N/A")
         MDC.put(CONSUMER_ID, token.systemAndNs)
         registry.counter(METRIC, Tags.of("remote_system",token.systemNavn)).increment()
         return true

@@ -127,6 +127,11 @@
       "name": "superhelt",
       "namespace": "historisk",
       "cluster": "prod-gcp"
+    },
+    {
+      "name": "aareg-tilgangskontroll",
+      "namespace": "arbeidsforhold",
+      "cluster": "prod-gcp"
     }
 
   ],

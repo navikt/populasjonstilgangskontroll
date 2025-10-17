@@ -37,6 +37,11 @@
       "cluster": "dev-fss"
     },
     {
+      "name": "aareg-tilgangskontroll-q2",
+      "namespace": "arbeidsforhold",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "nav-persondata-api",
       "namespace": "holmes",
       "cluster": "dev-gcp"

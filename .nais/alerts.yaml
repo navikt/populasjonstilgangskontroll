@@ -1,0 +1,19 @@
+apiVersion: "monitoring.coreos.com/v1"
+kind: "PrometheusRule"
+metadata:
+  name: "warnings"
+  namespace: "tilgangsmaskin"
+  labels:
+    team: "tilgangsmaskin"
+spec:
+  groups:
+    - name: "tilgangsmaskin  alerts"
+      rules:
+        - alert: "[tilgangsmaskin] Forhøyede feilrater"
+          expr: sum(round(increase(logback_events_total{app="populasjonstilgangskontroll", level="warn"}[2m]))) > 10
+          for: 3m
+          annotations:
+            action: "Sjekk loggene for å se hvorfor det er så mye feil"
+          labels:
+            namespace: "tilgangsmaskin"
+            severity: warning

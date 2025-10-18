@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 
 @Component
 class LederUtvelger(private val builder: WebClient.Builder,
-                    @Value("\${elector.sse.url}") private val uri: URI,
+                    @param:Value("\${elector.sse.url}") private val uri: URI,
                     private val publisher: ApplicationEventPublisher) {
 
     @EventListener(ApplicationReadyEvent::class)

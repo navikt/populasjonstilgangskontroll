@@ -25,17 +25,17 @@ class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: 
 
     private fun grupperForCC(ansattId: AnsattId) =
         entra.geoOgGlobaleGrupper(ansattId, oid.oidFraEntra(ansattId)).also {
-            log.info("CC-flow: $ansattId slo opp globale og GEO-grupper i Entra")
+            log.trace("CC-flow: {} slo opp globale og GEO-grupper i Entra", ansattId)
         }
 
     private fun grupperForObo(ansattId: AnsattId) = with(token.globaleGrupper()) {
         if (girNasjonalTilgang()) {
             this.also {
-                log.info("OBO-flow: $ansattId har nasjonal tilgang, slo *ikke* opp GEO-grupper i Entra")
+                log.trace("OBO-flow: {} har nasjonal tilgang, slo *ikke* opp GEO-grupper i Entra", ansattId)
             }
         } else {
             (this + entra.geoGrupper(ansattId, token.oid!!)).also {
-                log.info("OBO-flow: $ansattId har ikke nasjonal tilgang, slo opp GEO-grupper i Entra")
+                log.trace("OBO-flow: {} har ikke nasjonal tilgang, slo opp GEO-grupper i Entra", ansattId)
             }
         }
     }
@@ -45,7 +45,7 @@ class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: 
         } else {
             log.info("Intet token i dev/local for $ansattId, slår opp globale og GEO-grupper i Entra")
             entra.geoOgGlobaleGrupper(ansattId, oid.oidFraEntra(ansattId)).also {
-                log.info("Uautentisert: $ansattId slo opp $it i Entra for $ansattId")
+                log.trace("Uautentisert: $ansattId slo opp $it i Entra for $ansattId")
             }
         }
 }

@@ -17,7 +17,7 @@ class LoggingRetryListener : RetryListener {
     }
 
     override fun <T : Any, E : Throwable> onError(ctx: RetryContext, callback: RetryCallback<T, E>, e: Throwable) {
-        log.warn("'${method(ctx)}' feilet på forsøk ${ctx.retryCount} ", ctx.lastThrowable)
+        log.info("'${method(ctx)}' feilet på forsøk ${ctx.retryCount} ", ctx.lastThrowable)
     }
 
     companion object {

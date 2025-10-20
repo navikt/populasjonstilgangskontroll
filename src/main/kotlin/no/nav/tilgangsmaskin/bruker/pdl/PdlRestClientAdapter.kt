@@ -31,34 +31,34 @@ class PdlRestClientAdapter(
     fun person(oppslagId: String) = tilPerson(oppslagId,get<PdlRespons>(cf.personURI, mapOf("ident" to oppslagId)))
 
     @WithSpan
-    fun personer(ids: Set<String>) : Set<Person> {
-        val fraCache = fraCache(ids)
-        if (fraCache.size == ids.size) {
+    fun personer(identer: Set<String>) : Set<Person> {
+        val fraCache = fraCache(identer)
+        if (fraCache.size == identer.size) {
             return fraCache.values.toSet()
         }
-        val fraRest = fraRest(ids  - fraCache.keys)
+        val fraRest = fraRest(identer  - fraCache.keys)
         cache.putMany(PDL_CACHE, fraRest,cf.varighet)
         return (fraRest.values + fraCache.values).toSet()
     }
 
 
     @WithSpan
-    private fun fraCache(ids: Set<String>) : Map<String,Person>{
-        if (ids.isEmpty()) {
+    private fun fraCache(identer: Set<String>) : Map<String,Person>{
+        if (identer.isEmpty()) {
             return emptyMap()
         }
-        val innslag = cache.getMany<Person>(PDL_CACHE, ids)
-        log.trace("Hentet ${innslag.size} person(er) fra cache for ${ids.size} ident(er)")
+        val innslag = cache.getMany<Person>(PDL_CACHE, identer)
+        log.trace("Hentet ${innslag.size} person(er) fra cache for ${identer.size} ident(er)")
         return innslag
     }
 
     @WithSpan
-    private fun fraRest(ids: Set<String>) : Map<String,Person> {
-        if (ids.isEmpty()) {
+    private fun fraRest(identer: Set<String>) : Map<String,Person> {
+        if (identer.isEmpty()) {
             return emptyMap()
         }
 
-        return  mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, ids))
+        return  mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, identer))
             .mapValues {
                     (oppslagId, pdlRespons) -> pdlRespons?.let{ tilPerson(oppslagId, it) }
             }
@@ -69,7 +69,7 @@ class PdlRestClientAdapter(
                 it.value!!
             }
             .also {
-                log.trace("Hentet ${it.size} person(er) fra REST for ${ids.size} ident(er)")
+                log.trace("Hentet ${it.size} person(er) fra REST for ${identer.size} ident(er)")
             }
     }
 
@@ -95,7 +95,3 @@ class PdlRestClientAdapter(
         private val PDL_CACHE = CachableConfig(PDL, EXTRA)
     }
 }
-
-
-
-

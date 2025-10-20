@@ -10,7 +10,7 @@ spec:
     - name: "tilgangsmaskin  alerts"
       rules:
         - alert: "[tilgangsmaskin] Forhøyede feilrater"
-          expr: sum(round(increase(logback_events_total{app="populasjonstilgangskontroll", level="warn"}[2m]))) > 10
+          expr: sum(round(increase(logback_events_total{app="populasjonstilgangskontroll", level="warn"}[2m]))) > 20
           for: 3m
           annotations:
             action: "Sjekk loggene for å se hvorfor det er så mye feil"

@@ -43,13 +43,13 @@ class CacheNøkkelHandlerTest {
     @Test
     @DisplayName("fraNøkkel fjerner prefiks og ekstraPrefiks")
     fun fromKey_fjernerPrefiksOgEkstraPrefiks() {
-        assertThat(handler.fraNøkkel(handler.tilNøkkel(MED_EXTRA, key))).isEqualTo(key)
+        assertThat(handler.idFraNøkkel(handler.tilNøkkel(MED_EXTRA, key))).isEqualTo(key)
     }
 
     @Test
     @DisplayName("fraNøkkel fjerner kun prefiks når ekstraPrefiks er null")
     fun fromKey_fjernerKunPrefiksNarEkstraPrefiksErNull() {
-        assertThat(handler.fraNøkkel(handler.tilNøkkel(UTEN_EXTRA, key))).isEqualTo(key)
+        assertThat(handler.idFraNøkkel(handler.tilNøkkel(UTEN_EXTRA, key))).isEqualTo(key)
     }
 
     @Test

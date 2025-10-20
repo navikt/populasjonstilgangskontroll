@@ -15,7 +15,7 @@
   },
   "db": {
     "poolsize": "2",
-    "type": "POSTGRES_17",
+    "type": "POSTGRES_18  ",
     "tier": "db-f1-micro",
     "name": "tilgangsmaskin"
   },

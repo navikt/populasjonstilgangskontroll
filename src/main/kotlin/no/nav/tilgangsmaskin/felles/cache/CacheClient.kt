@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import io.lettuce.core.RedisClient
 import io.lettuce.core.api.StatefulRedisConnection
 import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
@@ -14,7 +13,7 @@ import kotlin.use
 
 class CacheClient(
     val pool: GenericObjectPool<StatefulRedisConnection<String,String>>,
-    val mapper: CacheNøkkelHandler,
+    val handler: CacheNøkkelHandler,
     val alleTreffTeller: BulkCacheSuksessTeller,
     val teller: BulkCacheTeller
 )  {
@@ -32,15 +31,15 @@ class CacheClient(
     @WithSpan
     inline fun <reified T> getOne(cache: CachableConfig, id: String) =
         pool.borrowObject().use { conn ->
-            conn.sync().get(mapper.tilNøkkel(cache,id))?.let { json ->
-                mapper.fraJson<T>(json)
+            conn.sync().get(handler.tilNøkkel(cache,id))?.let { json ->
+                handler.fraJson<T>(json)
             }
         }
 
     @WithSpan
     fun putOne(cache: CachableConfig, id: String, value: Any, ttl: Duration)  {
         pool.borrowObject().use { conn ->
-            conn.async().setex(mapper.tilNøkkel(cache,id), ttl.seconds,mapper.tilJson(value))
+            conn.async().setex(handler.tilNøkkel(cache,id), ttl.seconds,handler.tilJson(value))
         }
     }
 
@@ -48,7 +47,7 @@ class CacheClient(
     fun getAll(cache: String) =
         pool.borrowObject().use { conn ->
             conn.sync().keys("$cache::*").map {
-                mapper.fraNøkkel(it)
+                handler.idFraNøkkel(it)
             }.also {
                 log.info("Fant ${it.size} nøkler i cache $cache")
             }
@@ -62,13 +61,13 @@ class CacheClient(
         else  pool.borrowObject().use { conn ->
             conn.sync()
                 .mget(*ids.map {
-                        id -> mapper.tilNøkkel(cache,id)}.toTypedArray<String>()
+                        id -> handler.tilNøkkel(cache,id)}.toTypedArray<String>()
                 )
                 .filter {
                     it.hasValue()
                 }
                 .associate {
-                    mapper.fraNøkkel(it.key) to mapper.fraJson<T>(it.value)
+                    handler.idFraNøkkel(it.key) to handler.fraJson<T>(it.value)
                 }.also {
                     tellOgLog(cache.name, it.size, ids.size)
                 }
@@ -97,7 +96,7 @@ class CacheClient(
     private fun payloadFor(innslag: Map<String, Any>, cache: CachableConfig) =
         buildMap {
             innslag.forEach { (key, value) ->
-                put(mapper.tilNøkkel(cache, key), mapper.tilJson(value))
+                put(handler.tilNøkkel(cache, key), handler.tilJson(value))
             }
         }
 

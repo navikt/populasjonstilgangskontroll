@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
-import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisClient.create
 import io.lettuce.core.api.StatefulRedisConnection
 import io.lettuce.core.support.ConnectionPoolSupport
@@ -43,12 +42,13 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import org.springframework.context.ApplicationEventPublisher
 
 @DataRedisTest
 @ContextConfiguration(classes = [TestApp::class])
 @Testcontainers
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestInstance(PER_CLASS)
 @ExtendWith(MockKExtension::class)
 @Import(JacksonAutoConfiguration::class)
 class CacheClientTest {

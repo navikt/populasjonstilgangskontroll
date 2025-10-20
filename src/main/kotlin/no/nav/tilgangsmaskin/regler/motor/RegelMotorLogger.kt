@@ -20,6 +20,8 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
     private val log = getLogger(javaClass)
     private val avvisningTeller = AvvisningTeller(registry, token)
     private val regeltypeTeller = RegeltypeTeller(registry, token)
+    private val evalueringTeller = EvalueringTeller(registry, token)
+
     private fun  bulkHistogram() =  DistributionSummary
         .builder("bulk.histogram")
         .description("Histogram av bulk-størrelse")
@@ -36,6 +38,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
             val fra =  MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
             log.info("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for ${bruker.brukerId} $fra")
             auditor.info("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId}  med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' $fra")
+            evalueringTeller.tell(Tags.of("navn", regel.navn,"resultat", "avvist"))
             avvisningTeller.tell(Tags.of("navn", regel.navn))
         }
 
@@ -43,17 +46,17 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         withMDC(BESLUTNING, OK) {
             val fra = MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
             log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} $fra")
+            evalueringTeller.tell(Tags.of("resultat", "ok"))
             auditor.info("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} $fra")
         }
 
     fun info(message: String) = log.info(message)
 
-    fun warn(message: String, e: Throwable? = null) = log.warn(message,e)
-
     fun trace(message: String) = log.trace(message)
 
-    fun evaluerer(ansatt: Ansatt, bruker: Bruker, regel: Regel) =
+    fun evaluerer(ansatt: Ansatt, bruker: Bruker, regel: Regel)  {
         log.trace("Evaluerer regel: '{}' for {}  og {}", regel.kortNavn, ansatt.ansattId, bruker.oppslagId.maskFnr())
+    }
 
     fun tellBulkSize(size: Int) =   bulkHistogram().record(size.toDouble())
 

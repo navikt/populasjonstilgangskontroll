@@ -2,11 +2,9 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 
 class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration>, val mapper: ObjectMapper) {
-    private val log = getLogger(javaClass)
 
     inline fun <reified T> fraJson(json: String): T =
         mapper.readValue(json)

@@ -45,6 +45,8 @@
             <OnMatch>DENY</OnMatch>
         </turboFilter>
         <logger name="no.nav.tilgangsmaskin" level="info"/>
+        <logger name="io.micrometer.prometheusmetrics.PrometheusMeterRegistry" level="error"/>
+        <logger name="org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration" level="error"/>
     </springProfile>
 
     <logger name="secureLog" level="info" additivity="false">

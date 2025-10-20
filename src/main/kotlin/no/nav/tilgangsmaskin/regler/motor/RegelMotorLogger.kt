@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.regler.motor
 import io.micrometer.core.instrument.DistributionSummary
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
+import io.micrometer.core.instrument.Tags.empty
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
@@ -33,12 +34,12 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
 
     fun tellRegelSett(regelSett: RegelSett) = regeltypeTeller.tell(Tags.of("type",regelSett.beskrivelse, "system", token.system))
 
-    fun avvist(ansatt: Ansatt, bruker: Bruker, regel: Regel) =
+    fun avvist(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, regel: Regel) =
         withMDC(BESLUTNING, regel.kode) {
             val fra =  MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
             log.info("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for ${bruker.brukerId} $fra")
             auditor.info("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId}  med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' $fra")
-            evalueringTeller.tell(Tags.of("navn", regel.navn,"resultat", "avvist"))
+            evaluering("avvist", regelSett, Tags.of("navn", regel.navn))
             avvisningTeller.tell(Tags.of("navn", regel.navn))
         }
 
@@ -46,9 +47,12 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         withMDC(BESLUTNING, OK) {
             val fra = MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
             log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} $fra")
-            evalueringTeller.tell(Tags.of("resultat", "ok"))
+            evaluering("ok", regelSett)
             auditor.info("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} $fra")
         }
+
+    private fun evaluering(status: String, regelSett: RegelSett, tags: Tags = empty()) =
+        evalueringTeller.tell(Tags.of("resultat", status,"type",regelSett.beskrivelse,"system", token.system).and(tags))
 
     fun info(message: String) = log.info(message)
 

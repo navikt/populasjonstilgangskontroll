@@ -44,7 +44,7 @@ class RegelMotor(
                 return@forEach
             }
             if (!regel.evaluer(ansatt, bruker)) {
-                logger.avvist(ansatt, bruker, regel)
+                logger.avvist(ansatt, bruker, regelSett, regel)
                 throw RegelException(ansatt, bruker, regel)
             }
         }

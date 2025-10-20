@@ -39,7 +39,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
             val fra =  MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
             log.info("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for ${bruker.brukerId} $fra")
             auditor.info("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId}  med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' $fra")
-            evaluering("avvist", regelSett, Tags.of("navn", regel.navn))
+            tellEvaluering(AVVIST, regelSett, Tags.of("navn", regel.navn))
             avvisningTeller.tell(Tags.of("navn", regel.navn))
         }
 
@@ -47,11 +47,11 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         withMDC(BESLUTNING, OK) {
             val fra = MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
             log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} $fra")
-            evaluering("ok", regelSett)
+            tellEvaluering(OK, regelSett)
             auditor.info("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} $fra")
         }
 
-    private fun evaluering(status: String, regelSett: RegelSett, tags: Tags = empty()) =
+    private fun tellEvaluering(status: String, regelSett: RegelSett, tags: Tags = empty()) =
         evalueringTeller.tell(Tags.of("resultat", status,"type",regelSett.beskrivelse,"system", token.system).and(tags))
 
     fun info(message: String) = log.info(message)
@@ -67,6 +67,8 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
     companion object   {
         private const val BESLUTNING = "beslutning"
         private const val OK = "TILGANG_OK"
+        private const val AVVIST = "TILGANG_AVVIST"
+
     }
 }
 

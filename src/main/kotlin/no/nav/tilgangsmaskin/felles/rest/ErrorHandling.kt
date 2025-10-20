@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ProblemDetail.forStatusAndDetail
 import org.springframework.http.client.ClientHttpResponse
@@ -18,11 +19,19 @@ class DefaultRestErrorHandler : ErrorHandler {
     private val log = getLogger(javaClass)
 
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
-        if (res.statusCode.is4xxClientError) throw IrrecoverableRestException(res.statusCode, req.uri, res.statusText).also {
-            log.warn("Irrecoverable exception etter ${res.statusCode.value()} fra ${req.uri}")
-        }
-        else throw RecoverableRestException(res.statusCode, req.uri, res.statusText).also {
-            log.warn("Recoverable exception etter ${res.statusCode.value()} fra ${req.uri}")
+        when {
+            res.statusCode == NOT_FOUND -> {
+                log.info("Irrecoverable exception etter ${res.statusCode.value()} fra ${req.uri}")
+                throw IrrecoverableRestException(res.statusCode, req.uri, res.statusText)
+            }
+            res.statusCode.is4xxClientError -> {
+                log.warn("Irrecoverable exception etter ${res.statusCode.value()} fra ${req.uri}")
+                throw IrrecoverableRestException(res.statusCode, req.uri, res.statusText)
+            }
+            else -> {
+                log.warn("Recoverable exception etter ${res.statusCode.value()} fra ${req.uri}")
+                throw RecoverableRestException(res.statusCode, req.uri, res.statusText)
+            }
         }
     }
 }

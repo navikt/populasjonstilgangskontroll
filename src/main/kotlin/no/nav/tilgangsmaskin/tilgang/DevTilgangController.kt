@@ -11,6 +11,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
@@ -57,11 +58,15 @@ class DevTilgangController(
     private val entra: EntraTjeneste,
     private val overstyring: OverstyringTjeneste,
     private val oppfølging: OppfølgingTjeneste,
+    private val oppfølgingAdapter: OppfølgingRestClientAdapter,
     private val pip: PdlRestClientAdapter,
     private val oid: AnsattOidTjeneste,
     private val nom: NomTjeneste,
     private val pdl: PDLTjeneste,
     private val cache: CacheClient) {
+
+    @GetMapping("oppfolging/ping")
+    fun ping() = oppfølgingAdapter.ping()
 
     @PostMapping("oppfolging/bulk")
     fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)

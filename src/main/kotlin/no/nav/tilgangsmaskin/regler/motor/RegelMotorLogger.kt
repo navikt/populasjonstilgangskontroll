@@ -51,10 +51,9 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
 
     private fun konsument(): String = MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
 
-    private fun tellEvaluering(resultat: String, regelSett: RegelSett, tags: Tags = empty()) = Unit
-       /* evalueringTeller.tell(Tags.of("resultat", status,"type",regelSett.beskrivelse).and(tags))*/.also {
-            log.info("Teller evaluering med resultat '$resultat'")
-            registry.get("evaluering.resultat").tags("resultat", resultat,"type",regelSett.beskrivelse).tags(tags).counter().increment()
+    private fun tellEvaluering(status: String, regelSett: RegelSett, tags: Tags = empty()) =
+        evalueringTeller.tell(Tags.of("resultat", status,"type",regelSett.beskrivelse).and(tags)).also {
+            log.info("Teller evaluering med resultat '$status'")
         }
 
     private fun info(message: String) = log.info(message)

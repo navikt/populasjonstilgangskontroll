@@ -13,13 +13,11 @@ abstract class AbstractTeller(
 
 
     open fun tell(tags: Tags, n:Int=1) =
-        with(tags
-            .and("system", token.system)
-            .and("clustersystem", token.clusterAndSystem)) {
-            Counter.builder(navn)
-                .description(beskrivelse)
-                .tags(this)
-                .register(registry)
-                .increment(n.toDouble())
-        }
+        Counter.builder(navn)
+            .description(beskrivelse)
+            .tags(tags
+                .and("system", token.system)
+                .and("clustersystem", token.clusterAndSystem))
+            .register(registry)
+            .increment(n.toDouble())
 }

@@ -14,7 +14,7 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
                 log.info("Ping til ${pingable.pingEndpoint} er deaktivert")
                 return disabled()
             }
-            log.info("Pinger ${pingable.pingEndpoint}")s
+            log.info("Pinger ${pingable.pingEndpoint}")
             pingable.ping()
             up()
         }.getOrElse {

@@ -46,6 +46,7 @@ import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.function.Function
+import kotlin.math.log
 import kotlin.text.Charsets.UTF_8
 
 
@@ -159,7 +160,7 @@ class LoggingRequestInterceptor : ClientHttpRequestInterceptor {
     class BufferingClientHttpResponse(private val res: ClientHttpResponse) : ClientHttpResponse by res {
         private val bodyBytes = res.body.readBytes()
         override fun getBody() = ByteArrayInputStream(bodyBytes)
-        fun getBodyAsString(charset: Charset) = bodyBytes.toString(charset)
+        fun getBodyAsString(charset: Charset) = runCatching { bodyBytes.toString(charset) }.getOrNull()
         @Deprecated("Deprecated in Java")
         override fun getRawStatusCode() = res.rawStatusCode
     }

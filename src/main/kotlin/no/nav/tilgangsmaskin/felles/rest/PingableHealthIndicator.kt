@@ -11,8 +11,10 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
     override fun health() =
         runCatching {
             if (!pingable.isEnabled) {
+                log.info("Ping til ${pingable.pingEndpoint} er deaktivert")
                 return disabled()
             }
+            log.info("Pinger ${pingable.pingEndpoint}")s
             pingable.ping()
             up()
         }.getOrElse {

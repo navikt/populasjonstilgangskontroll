@@ -6,7 +6,10 @@ import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.Timer
+import jakarta.servlet.FilterChain
+import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
@@ -17,6 +20,7 @@ import no.nav.tilgangsmaskin.tilgang.Token
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
+import org.slf4j.LoggerFactory
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.actuate.audit.InMemoryAuditEventRepository
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
@@ -32,9 +36,11 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.stereotype.Component
+import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import org.springframework.web.util.ContentCachingResponseWrapper
 import java.util.function.Function
 
 
@@ -120,3 +126,36 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 }
 
+
+class CustomResponseWrapper(response: HttpServletResponse) : ContentCachingResponseWrapper(response) {
+
+    fun getContentAsString(characterEncoding: String): String? =
+        try {
+            String(getContentAsByteArray(), charset(characterEncoding))
+        } catch (e: java.io.UnsupportedEncodingException) {
+            null
+        }
+}
+
+@Component
+class ResponseLoggingFilter : OncePerRequestFilter() {
+
+    private val log = getLogger(ResponseLoggingFilter::class.java)
+
+    @Throws(ServletException::class, java.io.IOException::class)
+    override fun doFilterInternal(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        filterChain: FilterChain
+    ) {
+        val responseWrapper = CustomResponseWrapper(response)
+        filterChain.doFilter(request, responseWrapper)
+
+        val responseBodyString = responseWrapper.getContentAsString(response.characterEncoding)
+
+        log.info("Response Status: {}", responseWrapper.status)
+        log.info("Response Body: {}", responseBodyString)
+
+        responseWrapper.copyBodyToResponse()
+    }
+}

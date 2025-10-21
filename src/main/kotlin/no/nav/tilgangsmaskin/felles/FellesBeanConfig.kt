@@ -14,7 +14,6 @@ import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenRespons
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.LoggingRetryListener
-import no.nav.tilgangsmaskin.felles.rest.LoggingRequestInterceptor
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
@@ -30,8 +29,12 @@ import org.springframework.boot.web.client.RestClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
+import org.springframework.http.HttpHeaders.AUTHORIZATION
+import org.springframework.http.HttpRequest
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
+import org.springframework.http.client.ClientHttpResponse
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
@@ -39,7 +42,11 @@ import org.springframework.web.servlet.config.annotation.ContentNegotiationConfi
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.util.ContentCachingResponseWrapper
+import java.io.ByteArrayInputStream
+import java.io.InputStream
+import java.nio.charset.Charset
 import java.util.function.Function
+import kotlin.text.Charsets.UTF_8
 
 
 @Configuration
@@ -128,16 +135,32 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 @ConditionalOnNotProd
 class ResponseLoggingFilter : OncePerRequestFilter() {
 
-    private val log = getLogger(ResponseLoggingFilter::class.java)
+    private val log = getLogger(javaClass)
     override fun doFilterInternal(req: HttpServletRequest, res: HttpServletResponse, chain: FilterChain) =
         with(CustomResponseWrapper(res)) {
             chain.doFilter(req, this)
-            log.info("Response status {} med body: {} fra {}",status,getContentAsString(res.characterEncoding), req.requestURI)
+            log.trace("Response status {} med body: {} fra {}",status,getContentAsString(res.characterEncoding), req.requestURI)
             copyBodyToResponse()
         }
     private class CustomResponseWrapper(response: HttpServletResponse) : ContentCachingResponseWrapper(response) {
 
         fun getContentAsString(characterEncoding: String) =
             runCatching { String(contentAsByteArray, charset(characterEncoding)) }.getOrNull()
+    }
+}
+
+@Component
+class LoggingRequestInterceptor : ClientHttpRequestInterceptor {
+    private val log = getLogger(javaClass)
+    override fun intercept(req: HttpRequest, body: ByteArray, exec: ClientHttpRequestExecution) =
+        BufferingClientHttpResponse(exec.execute(req, body)).also {
+            log.debug("Response {} fra {} med status {}", it.getBodyAsString(UTF_8),  req.uri, it.statusCode)
+        }
+    class BufferingClientHttpResponse(private val res: ClientHttpResponse) : ClientHttpResponse by res {
+        private val bodyBytes = res.body.readBytes()
+        override fun getBody() = ByteArrayInputStream(bodyBytes)
+        fun getBodyAsString(charset: Charset) = bodyBytes.toString(charset)
+        @Deprecated("Deprecated in Java")
+        override fun getRawStatusCode() = res.rawStatusCode
     }
 }

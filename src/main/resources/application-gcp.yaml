@@ -121,7 +121,6 @@ spring:
       idle-timeout: 600000
       connection-test-query: SELECT 1
       maximum-pool-size: ${db.poolsize}
-    type: org.springframework.jdbc.datasource.SimpleDriverDataSource
   main:
     banner-mode: off
   jackson:

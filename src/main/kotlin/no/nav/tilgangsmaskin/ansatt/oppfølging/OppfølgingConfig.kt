@@ -18,7 +18,7 @@ class OppfølgingConfig(baseUri: URI = DEFAULT_BASE_URI, bulkPath : String = DEF
     companion object {
         private val DEFAULT_BULK_PATH = "/api/tilgang/brukers-kontor-bulk"
         private val DEFAULT_BASE_URI = URI.create("http://ao-oppfolgingskontor.dab")
-        private const val DEFAULT_PING_PATH = "/isAlive"
+        private const val DEFAULT_PING_PATH = "/isReady"
         const val OPPFØLGING = "oppfolging"
     }
 }

@@ -10,6 +10,7 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
@@ -155,7 +156,7 @@ class LoggingRequestInterceptor : ClientHttpRequestInterceptor {
     private val log = getLogger(javaClass)
     override fun intercept(req: HttpRequest, body: ByteArray, exec: ClientHttpRequestExecution) =
         BufferingClientHttpResponse(exec.execute(req, body)).also {
-            log.debug("Response {} fra {} med status {}", it.getBodyAsString(UTF_8),  req.uri, it.statusCode)
+            log.debug(CONFIDENTIAL,"Response {} fra {} med status {}", it.getBodyAsString(UTF_8),  req.uri, it.statusCode)
         }
     class BufferingClientHttpResponse(private val res: ClientHttpResponse) : ClientHttpResponse by res {
         private val bodyBytes = res.body.readBytes()

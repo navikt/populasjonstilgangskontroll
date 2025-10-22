@@ -38,14 +38,14 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         withMDC(BESLUTNING, regel.kode) {
             info("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for ${bruker.brukerId} ${konsument()}")
             auditor.info("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId}  med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' ${konsument()}")
-            evalueringTeller.tell(Tags.of("resultat", AVVIST, "type", regelSett.beskrivelse))
+            evalueringTeller.tell(Tags.of("resultat", AVVIST, "type", regelSett.beskrivelse,"regel",regel.navn))
             avvisningTeller.tell(Tags.of("navn", regel.navn))
         }
 
     fun ok(ansatt: Ansatt, bruker: Bruker,regelSett: RegelSett) =
         withMDC(BESLUTNING, OK) {
             info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} ${konsument()}")
-            evalueringTeller.tell(Tags.of("resultat", OK, "type", regelSett.beskrivelse).and(empty()))
+            evalueringTeller.tell(Tags.of("resultat", OK, "type", regelSett.beskrivelse))
             auditor.info("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} ${konsument()}")
         }
 

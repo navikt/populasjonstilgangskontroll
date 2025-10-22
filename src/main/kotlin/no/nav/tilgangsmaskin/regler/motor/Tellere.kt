@@ -29,9 +29,6 @@ class EvalueringTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "evaluering.resultat", "Evalueringsresultat")
 
 @Component
-class RegeltypeTeller(registry: MeterRegistry, token: Token) :
-    AbstractTeller(registry, token, "type.konsument", "Regeltype pr konsument")
-@Component
 class BulkCacheTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "bulk.cache", "Hits/misses for bulk")
 

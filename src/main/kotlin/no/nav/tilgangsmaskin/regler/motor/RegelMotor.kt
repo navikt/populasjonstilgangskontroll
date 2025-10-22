@@ -36,7 +36,6 @@ class RegelMotor(
 
     @WithSpan
     private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) {
-        logger.tellRegelSett(regelSett)
         regelSett.regler.forEach { regel ->
             logger.evaluerer(ansatt, bruker, regel)
             if (!cfg.isEnabled(regel.navn)) {

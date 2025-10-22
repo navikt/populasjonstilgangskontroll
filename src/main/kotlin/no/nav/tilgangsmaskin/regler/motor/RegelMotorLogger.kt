@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.regler.motor
 import io.micrometer.core.instrument.DistributionSummary
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
-import io.micrometer.core.instrument.Tags.empty
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
@@ -19,8 +18,6 @@ import org.springframework.stereotype.Component
 class RegelMotorLogger(private val registry: MeterRegistry, private val token: Token, private val auditor: Auditor) {
 
     private val log = getLogger(javaClass)
-    private val avvisningTeller = AvvisningTeller(registry, token)
-    private val regeltypeTeller = RegeltypeTeller(registry, token)
     private val evalueringTeller = EvalueringTeller(registry, token)
 
     private fun  bulkHistogram() =  DistributionSummary
@@ -32,14 +29,12 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         .serviceLevelObjectives(1.0,2.0,5.0,10.0, 20.0, 50.0, 100.0)
         .register(registry)
 
-    fun tellRegelSett(regelSett: RegelSett) = regeltypeTeller.tell(Tags.of("type",regelSett.beskrivelse))
 
     fun avvist(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, regel: Regel) =
         withMDC(BESLUTNING, regel.kode) {
             info("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for ${bruker.brukerId} ${konsument()}")
-            auditor.info("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId}  med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' ${konsument()}")
+            auditor.info("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' ${konsument()}")
             evalueringTeller.tell(Tags.of("resultat", AVVIST, "type", regelSett.beskrivelse,"regel",regel.navn))
-            avvisningTeller.tell(Tags.of("navn", regel.navn))
         }
 
     fun ok(ansatt: Ansatt, bruker: Bruker,regelSett: RegelSett) =
@@ -50,8 +45,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         }
 
     private fun konsument(): String = MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
-
-
+    
     private fun info(message: String) = log.info(message)
 
     fun trace(message: String) = log.trace(message)

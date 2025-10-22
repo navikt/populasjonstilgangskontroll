@@ -91,13 +91,13 @@ class RegelTjenesteTest {
 
     private lateinit var regler: RegelTjeneste
 
-    private lateinit var avvisningTeller : AvvisningTeller
+    private lateinit var evalueringTeller: EvalueringTeller
     private lateinit var avdød: AvdødTeller
 
 
     @BeforeTest
     fun before() {
-        avvisningTeller = AvvisningTeller(registry, token)
+        evalueringTeller = EvalueringTeller(registry, token)
         avdød = AvdødTeller(registry, token)
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
         every { oppfølging.enhetFor(vanligBrukerId.verdi) } returns Enhetsnummer("1234")

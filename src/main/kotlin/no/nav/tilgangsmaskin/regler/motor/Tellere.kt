@@ -20,11 +20,6 @@ class OverstyringTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "overstyring.forsøk", "Overstyringsforsøk pr resultat")
 
 @Component
-@Deprecated("Bruk EvalueringTeller i stedet")
-class AvvisningTeller(registry: MeterRegistry, token: Token) :
-    AbstractTeller(registry, token, "avvist.regel", "Avvisningsbegrunnelse pr regel")
-
-@Component
 class EvalueringTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "evaluering.resultat", "Evalueringsresultat")
 

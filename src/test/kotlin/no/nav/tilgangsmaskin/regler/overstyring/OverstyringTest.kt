@@ -16,7 +16,7 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.motor.AvvisningTeller
+import no.nav.tilgangsmaskin.regler.motor.EvalueringTeller
 import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
 import no.nav.tilgangsmaskin.regler.motor.RegelBeanConfig
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
@@ -61,9 +61,6 @@ internal class OverstyringTest {
 
     @MockkBean
     private lateinit var token: Token
-
-    @MockkBean
-    private lateinit var teller: AvvisningTeller
 
     @MockK
     private lateinit var ansatte: AnsattTjeneste

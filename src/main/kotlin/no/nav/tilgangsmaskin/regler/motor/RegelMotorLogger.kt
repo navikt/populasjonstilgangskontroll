@@ -31,7 +31,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
     fun avvist(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, regel: Regel) =
         withMDC(BESLUTNING, regel.kode) {
             log.info("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for ${bruker.brukerId} ${konsument()}")
-            teller.info("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' ${konsument()}")
+            teller.audit("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' ${konsument()}")
             teller.tell(Tags.of(RESULTAT, AVVIST, "type", regelSett.beskrivelse,"regel",regel.navn))
         }
 
@@ -39,7 +39,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         withMDC(BESLUTNING, OK) {
             log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} ${konsument()}")
             teller.tell(Tags.of(RESULTAT, OK, "type", regelSett.beskrivelse,"regel","-"))
-            teller.info("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} ${konsument()}")
+            teller.audit("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} ${konsument()}")
         }
 
     private fun konsument(): String = MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"

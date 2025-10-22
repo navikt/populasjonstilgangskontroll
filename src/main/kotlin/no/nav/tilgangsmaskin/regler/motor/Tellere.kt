@@ -21,7 +21,7 @@ class OverstyringTeller(registry: MeterRegistry, token: Token) :
 @Component
 class EvalueringTeller(registry: MeterRegistry, token: Token, private val auditor: Auditor = Auditor()) :
     AbstractTeller(registry, token, "evaluering.resultat", "Evalueringsresultat")  {
-    fun info(message: String) = auditor.info(message)
+    fun audit(message: String) = auditor.info(message)
     }
 
 @Component

@@ -34,13 +34,13 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         withMDC(BESLUTNING, regel.kode) {
             info("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for ${bruker.brukerId} ${konsument()}")
             auditor.info("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' ${konsument()}")
-            evalueringTeller.tell(Tags.of("resultat", AVVIST, "type", regelSett.beskrivelse,"regel",regel.navn))
+            evalueringTeller.tell(Tags.of(RESULTAT, AVVIST, "type", regelSett.beskrivelse,"regel",regel.navn))
         }
 
     fun ok(ansatt: Ansatt, bruker: Bruker,regelSett: RegelSett) =
         withMDC(BESLUTNING, OK) {
             info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} ${konsument()}")
-            evalueringTeller.tell(Tags.of("resultat", OK, "type", regelSett.beskrivelse,"regel","-"))
+            evalueringTeller.tell(Tags.of(RESULTAT, OK, "type", regelSett.beskrivelse,"regel","-"))
             auditor.info("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} ${konsument()}")
         }
 
@@ -57,6 +57,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
     fun tellBulkSize(size: Int) =   bulkHistogram().record(size.toDouble())
 
     companion object   {
+        private const val RESULTAT = "resultat"
         private const val BESLUTNING = "beslutning"
         private const val OK = "TILGANG_OK"
         private const val AVVIST = "TILGANG_AVVIST"

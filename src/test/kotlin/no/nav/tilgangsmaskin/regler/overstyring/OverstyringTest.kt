@@ -41,7 +41,7 @@ import kotlin.test.Test
 
 @DataJpaTest
 @EnableConfigurationProperties(RegelConfig::class)
-@ContextConfiguration(classes = [RegelMotor::class, Auditor::class,RegelMotorLogger::class, OverstyringJPAAdapter::class, RegelBeanConfig::class, TestApp::class])
+@ContextConfiguration(classes = [RegelMotor::class, Auditor::class,RegelMotorLogger::class, EvalueringTeller::class, OverstyringJPAAdapter::class, RegelBeanConfig::class, TestApp::class])
 @ExtendWith(MockKExtension::class)
 @EnableJpaAuditing
 @ActiveProfiles(TEST)

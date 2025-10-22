@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.DistributionSummary
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.Tags.empty
+import io.micrometer.core.instrument.Tags.of
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
@@ -38,21 +39,27 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         withMDC(BESLUTNING, regel.kode) {
             info("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for ${bruker.brukerId} ${konsument()}")
             auditor.info("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId}  med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' ${konsument()}")
-            tellEvaluering(AVVIST, regelSett, Tags.of("navn", regel.navn))
+            val t = of("resultat", AVVIST, "type", regelSett.beskrivelse).and(Tags.of("regel", regel.navn))
+            evalueringTeller.tell(t).also {
+                log.info("Teller evaluering med tags $t")
+            }
             avvisningTeller.tell(Tags.of("navn", regel.navn))
         }
 
     fun ok(ansatt: Ansatt, bruker: Bruker,regelSett: RegelSett) =
         withMDC(BESLUTNING, OK) {
             info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} ${konsument()}")
-           // tellEvaluering(OK, regelSett)
+            val t = of("resultat", OK, "type", regelSett.beskrivelse).and(empty())
+            evalueringTeller.tell(t).also {
+                log.info("Teller evaluering med tags $t")
+            }
             auditor.info("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} ${konsument()}")
         }
 
     private fun konsument(): String = MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
 
-    private fun tellEvaluering(status: String, regelSett: RegelSett, tags: Tags = empty()) {
-       val t = Tags.of("resultat", status,"type",regelSett.beskrivelse).and(tags)
+    private fun tellEvaluering(resultat: String, regelSett: RegelSett, tags: Tags = empty()) {
+       val t = Tags.of("resultat", resultat,"type",regelSett.beskrivelse).and(tags)
         evalueringTeller.tell(t).also {
             log.info("Teller evaluering med tags $t")
         }

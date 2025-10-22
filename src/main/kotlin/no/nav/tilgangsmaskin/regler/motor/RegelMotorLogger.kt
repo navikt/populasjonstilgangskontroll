@@ -45,18 +45,12 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
     fun ok(ansatt: Ansatt, bruker: Bruker,regelSett: RegelSett) =
         withMDC(BESLUTNING, OK) {
             info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} ${konsument()}")
-            evalueringTeller.tell(Tags.of("resultat", OK, "type", regelSett.beskrivelse))
+            evalueringTeller.tell(Tags.of("resultat", OK, "type", regelSett.beskrivelse,"regel","-"))
             auditor.info("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} ${konsument()}")
         }
 
     private fun konsument(): String = MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
 
-    private fun tellEvaluering(resultat: String, regelSett: RegelSett, tags: Tags = empty()) {
-       val t = Tags.of("resultat", resultat,"type",regelSett.beskrivelse).and(tags)
-        evalueringTeller.tell(t).also {
-            log.info("Teller evaluering med tags $t")
-        }
-    }
 
     private fun info(message: String) = log.info(message)
 

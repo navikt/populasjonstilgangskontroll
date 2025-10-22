@@ -45,7 +45,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
     fun ok(ansatt: Ansatt, bruker: Bruker,regelSett: RegelSett) =
         withMDC(BESLUTNING, OK) {
             info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} ${konsument()}")
-            tellEvaluering(OK, regelSett)
+           // tellEvaluering(OK, regelSett)
             auditor.info("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} ${konsument()}")
         }
 
@@ -54,7 +54,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
     private fun tellEvaluering(status: String, regelSett: RegelSett, tags: Tags = empty()) {
        val t = Tags.of("resultat", status,"type",regelSett.beskrivelse).and(tags)
         evalueringTeller.tell(t).also {
-            log.info("Teller evaluering med resultat '$status' og tags $t")
+            log.info("Teller evaluering med tags $t")
         }
     }
 

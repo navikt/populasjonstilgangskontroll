@@ -6,7 +6,6 @@ import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.Timer
-import io.micrometer.core.instrument.config.MeterFilter
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
@@ -15,7 +14,6 @@ import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.LoggingRetryListener
 import no.nav.tilgangsmaskin.felles.rest.LoggingRequestInterceptor
 import no.nav.tilgangsmaskin.tilgang.Token
-import no.nav.tilgangsmaskin.tilgang.TokenType
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
@@ -70,7 +68,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             it.add(loggingInterceptor)
         }
     }
-    
+
     @Bean
     fun clusterAddingTimedAspect(meterRegistry: MeterRegistry, token: Token) =
         TimedAspect(meterRegistry,Function   { pjp -> Tags.of("cluster", token.cluster, "method", pjp.signature.name, "client", token.systemNavn) })

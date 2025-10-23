@@ -70,10 +70,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             it.add(loggingInterceptor)
         }
     }
-
-    @Bean
-    fun counterCustomizer(token: Token) = MeterFilter.commonTags(Tags.of("flow",TokenType.from(token).name))
-
+    
     @Bean
     fun clusterAddingTimedAspect(meterRegistry: MeterRegistry, token: Token) =
         TimedAspect(meterRegistry,Function   { pjp -> Tags.of("cluster", token.cluster, "method", pjp.signature.name, "client", token.systemNavn) })

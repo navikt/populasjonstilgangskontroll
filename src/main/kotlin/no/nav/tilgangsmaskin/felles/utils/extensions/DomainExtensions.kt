@@ -1,5 +1,8 @@
 package no.nav.tilgangsmaskin.felles.utils.extensions
 
+import no.nav.tilgangsmaskin.bruker.AktørId.Companion.AKTØRID_LENGTH
+import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
 import org.slf4j.MDC
 
 
@@ -11,13 +14,10 @@ object DomainExtensions {
 
     fun String.upcase() = this.replaceFirstChar { it.uppercaseChar() }
     fun String.maskFnr() =
-        if (length == 11) replaceRange(6, 11, "*****")
-        else if (length == 13)  replaceRange(6, 11, "*******") else this
-    fun String.pluralize(items: Collection<Any>, suffix: String = "er", ingen: String = "ingen"): String =
-        when (items.size) {
-            0 -> "$ingen $this$suffix"
-            1 -> this
-            else -> "${items.size} $this$suffix"
+        when (length) {
+            BRUKERID_LENGTH -> replaceRange(6, BRUKERID_LENGTH, "*****")
+            AKTØRID_LENGTH -> replaceRange(6, AKTØRID_LENGTH, "*******")
+            else -> this
         }
 
     inline fun <T> withMDC(key: String, value: String, block: () -> T) =

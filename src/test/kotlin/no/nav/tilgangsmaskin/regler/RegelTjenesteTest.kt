@@ -104,6 +104,8 @@ class RegelTjenesteTest {
         every { token.system } returns "test"
         every { token.clusterAndSystem } returns "cluster:test"
         every { token.systemNavn } returns "test"
+        every { token.erObo } returns false
+        every { token.erCC } returns true
         overstyring = OverstyringTjeneste(ansatte, brukere, OverstyringJPAAdapter(repo), motor, OverstyringTeller(registry, token))
         regler = RegelTjeneste(motor, brukere, ansatte, overstyring)
     }

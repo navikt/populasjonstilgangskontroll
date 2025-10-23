@@ -75,6 +75,8 @@ class RegelMotorTest {
     @BeforeTest
     fun before() {
         every { token.system } returns "test"
+        every { token.erObo } returns false
+        every { token.erCC } returns true
         every { token.systemNavn } returns "test"
         every { token.clusterAndSystem } returns "cluster:test"
 

@@ -47,7 +47,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory, mapper: ObjectMapp
     fun cachePool(client: RedisClient) = ConnectionPoolSupport.createGenericObjectPool(
         { client.connect() },
         GenericObjectPoolConfig<StatefulRedisConnection<String, String>>().apply {
-            maxTotal = 10 // Set max pool size
+            maxTotal = 32 // Set max pool size
         }
     )
 

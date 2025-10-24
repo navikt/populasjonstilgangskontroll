@@ -56,8 +56,8 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory, mapper: ObjectMapp
         RedisClient.create(cfg.cacheURI)
 
     @Bean
-    fun cacheClient(pool: GenericObjectPool<StatefulRedisConnection<String,String>>,handler: CacheNøkkelHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
-        CacheClient(pool, handler, sucessTeller, teller)
+    fun cacheClient(client: RedisClient,handler: CacheNøkkelHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
+        CacheClient(client, handler, sucessTeller, teller)
 
     @Bean
     fun cacheNøkkelHandler(mgr: RedisCacheManager) =

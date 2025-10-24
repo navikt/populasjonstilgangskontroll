@@ -6,13 +6,12 @@ import io.micrometer.core.instrument.binder.MeterBinder
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.format
-import org.apache.commons.pool2.impl.GenericObjectPool
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.stereotype.Component
 
 @Component
-class CacheAdapter(private val handler: CacheNøkkelHandler, private val cf: RedisConnectionFactory, cfg: CacheConfig, private val pool: GenericObjectPool<*>, private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
+class CacheAdapter(private val handler: CacheNøkkelHandler, private val cf: RedisConnectionFactory, cfg: CacheConfig, private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
 
     override val pingEndpoint  =  "${cfg.host}:${cfg.port}"
     override val name = "Cache"
@@ -35,12 +34,6 @@ class CacheAdapter(private val handler: CacheNøkkelHandler, private val cf: Red
                 cacheSize((handler.configs[cfg.navn]!!.getKeyPrefixFor(cfg.navn)))
             }
         }
-        registry.gauge("redis.pool.active", pool) { it.numActive.toDouble() }
-        registry.gauge("redis.pool.idle", pool) { it.numIdle.toDouble() }
-        registry.gauge("redis.pool.waiters", pool) { it.numWaiters.toDouble() }
-        registry.gauge("redis.pool.max", pool) { it.maxTotal.toDouble() }
-        registry.gauge("redis.pool.mean_borrow_wait_millis", pool) { it.meanBorrowWaitDuration.toMillis().toDouble() }
-        registry.gauge("redis.pool.mean_active_time_millis", pool) { it.meanActiveDuration.toMillis().toDouble() }
     }
 
     private fun cacheSize(prefix: String) =

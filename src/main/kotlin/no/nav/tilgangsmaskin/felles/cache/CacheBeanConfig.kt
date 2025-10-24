@@ -4,15 +4,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import io.lettuce.core.RedisClient
-import io.lettuce.core.api.StatefulRedisConnection
-import io.lettuce.core.support.ConnectionPoolSupport
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
-import org.apache.commons.pool2.impl.GenericObjectPool
-import org.apache.commons.pool2.impl.GenericObjectPoolConfig
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
@@ -42,14 +38,6 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory, mapper: ObjectMapp
             .withInitialCacheConfigurations(cfgs.associate { it.navn to cacheConfig(it) })
             .enableStatistics()
             .build()
-
-    @Bean
-    fun cachePool(client: RedisClient) = ConnectionPoolSupport.createGenericObjectPool(
-        { client.connect() },
-        GenericObjectPoolConfig<StatefulRedisConnection<String, String>>().apply {
-            maxTotal = 32 // Set max pool size
-        }
-    )
 
     @Bean
     fun redisClient(cfg: CacheConfig) =

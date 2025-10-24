@@ -122,6 +122,11 @@
       "cluster": "dev-gcp"
     },
     {
+      "name": "gosys-oppgavebehandling-api-q1",
+      "namespace": "oppgavehandtering",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "veilarbvedtaksstotte",
       "namespace": "obo",
       "cluster": "dev-gcp"

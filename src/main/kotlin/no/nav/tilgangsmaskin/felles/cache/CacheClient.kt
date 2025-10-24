@@ -17,6 +17,7 @@ class CacheClient(
 )  {
     
     val conn = client.connect().apply {
+        timeout = Duration.ofSeconds(30)
         if (isLocalOrTest) {
             sync().configSet("notify-keyspace-events", "Exd")
         }

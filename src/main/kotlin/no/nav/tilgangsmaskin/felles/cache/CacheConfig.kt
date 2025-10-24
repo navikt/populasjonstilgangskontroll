@@ -12,7 +12,6 @@ data class CacheConfig(val username: String, val password: String, val host: Str
         .redis(host, port.toInt())
         .withSsl(true)
         .withAuthentication(username, password)
-        .withTimeout(Duration.ofSeconds(30))
         .build()
 }
 

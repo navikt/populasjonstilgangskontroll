@@ -103,7 +103,7 @@ class CacheClientTest {
             }
         )
         client = CacheClient(
-            pool, handler, BulkCacheSuksessTeller(meterRegistry, token), teller
+            redisClient, handler, BulkCacheSuksessTeller(meterRegistry, token), teller
         )
         listener = CacheElementUtløptLytter(redisClient, eventPublisher)
         val id1 = BrukerId("03508331575")

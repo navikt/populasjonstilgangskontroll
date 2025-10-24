@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.felles.utils.extensions
 
 import no.nav.tilgangsmaskin.bruker.AktørId.Companion.AKTØRID_LENGTH
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
 import org.slf4j.MDC
 

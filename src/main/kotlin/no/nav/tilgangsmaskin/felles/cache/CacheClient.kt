@@ -1,64 +1,56 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import io.lettuce.core.api.StatefulRedisConnection
+import io.lettuce.core.RedisClient
 import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
-import org.apache.commons.pool2.impl.GenericObjectPool
 import org.slf4j.LoggerFactory.getLogger
 import java.time.Duration
-import kotlin.use
 
 class CacheClient(
-    val pool: GenericObjectPool<StatefulRedisConnection<String,String>>,
+    client: RedisClient,
     val handler: CacheNøkkelHandler,
     val alleTreffTeller: BulkCacheSuksessTeller,
     val teller: BulkCacheTeller
 )  {
-
-    val log = getLogger(javaClass)
-
-    init {
+    
+    val conn = client.connect().apply {
         if (isLocalOrTest) {
-            pool.borrowObject().use { conn ->
-                conn.sync().configSet("notify-keyspace-events", "Exd")
-            }
+            sync().configSet("notify-keyspace-events", "Exd")
         }
     }
 
+    val log = getLogger(javaClass)
+
+
     @WithSpan
     inline fun <reified T> getOne(cache: CachableConfig, id: String) =
-        pool.borrowObject().use { conn ->
             conn.sync().get(handler.tilNøkkel(cache,id))?.let { json ->
                 handler.fraJson<T>(json)
-            }
         }
 
     @WithSpan
     fun putOne(cache: CachableConfig, id: String, value: Any, ttl: Duration)  {
-        pool.borrowObject().use { conn ->
             conn.async().setex(handler.tilNøkkel(cache,id), ttl.seconds,handler.tilJson(value))
-        }
     }
 
     @WithSpan
     fun getAll(cache: String) =
-        pool.borrowObject().use { conn ->
             conn.sync().keys("$cache::*").map {
                 handler.idFraNøkkel(it)
             }.also {
                 log.info("Fant ${it.size} nøkler i cache $cache")
             }
-        }
+
 
     @WithSpan
     inline fun <reified T> getMany(cache: CachableConfig, ids: Set<String>)  =
         if (ids.isEmpty()) {
             emptyMap()
         }
-        else  pool.borrowObject().use { conn ->
+        else  {
             conn.sync()
                 .mget(*ids.map {
                         id -> handler.tilNøkkel(cache,id)}.toTypedArray<String>()
@@ -77,7 +69,6 @@ class CacheClient(
     fun putMany(cache: CachableConfig, innslag: Map<String, Any>, ttl: Duration) {
         if (innslag.isNotEmpty()) {
             log.trace("Bulk lagrer {} verdier for cache {} med prefix {}", innslag.size, cache.name, cache.extraPrefix)
-            pool.borrowObject().use { conn ->
                 conn.apply {
                     with(payloadFor(innslag, cache)) {
                         setAutoFlushCommands(false)
@@ -89,7 +80,6 @@ class CacheClient(
                     flushCommands()
                     setAutoFlushCommands(true)
                 }
-            }
         }
     }
 

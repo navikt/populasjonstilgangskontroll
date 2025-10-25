@@ -24,6 +24,11 @@
   },
   "inbound": [
     {
+      "name": "infotrygd-hentsaksliste-backend",
+      "namespace": "infotrygd",
+      "cluster": "prod-fss"
+    },
+    {
       "name": "tiltakspenger-saksbehandling-api",
       "namespace": "tpts",
       "cluster": "prod-gcp"

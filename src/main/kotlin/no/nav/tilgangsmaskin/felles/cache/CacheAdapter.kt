@@ -30,9 +30,9 @@ class CacheAdapter(private val handler: CacheNøkkelHandler, private val cf: Red
 
     override fun bindTo(registry: MeterRegistry) {
         cfgs.forEach { cfg ->
-            registry.gauge("cache.size", Tags.of("navn", cfg.navn), cf) {
-                cacheSize((handler.configs[cfg.navn]!!.getKeyPrefixFor(cfg.navn)))
-            }
+           // registry.gauge("cache.size", Tags.of("navn", cfg.navn), cf) {
+           //     cacheSize((handler.configs[cfg.navn]!!.getKeyPrefixFor(cfg.navn)))
+           // }
         }
     }
 

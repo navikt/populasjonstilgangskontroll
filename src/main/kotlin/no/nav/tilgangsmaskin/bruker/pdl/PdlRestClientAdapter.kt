@@ -37,7 +37,7 @@ class PdlRestClientAdapter(
         if (fraCache.size == identer.size) {
             return fraCache.values.toSet()
         }
-       
+
         val fraRest = fraRest(identer  - fraCache.keys)
         */
         val fraRest = fraRest(identer)

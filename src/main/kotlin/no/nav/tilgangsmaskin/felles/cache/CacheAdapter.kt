@@ -6,7 +6,6 @@ import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.format
 import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.stereotype.Component
 
 @Component

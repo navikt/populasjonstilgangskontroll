@@ -104,7 +104,7 @@ class CacheClient(
     local count = 0
     local prefix = ARGV[1]
     repeat
-    local result = redis.call("SCAN", cursor, "MATCH", prefix .. "*", "COUNT", 1000)
+    local result = redis.call("SCAN", cursor, "MATCH", prefix .. "*", "COUNT", 10000)
     cursor = result[1]
     local keys = result[2]
     count = count + #keys

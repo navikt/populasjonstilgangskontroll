@@ -26,7 +26,7 @@ class CacheAdapter(private val handler: CacheNøkkelHandler, private val cf: Red
             }
         }
 
-    fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}" }
+   // fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}" }
 
     override fun bindTo(registry: MeterRegistry) {
         cfgs.forEach { cfg ->

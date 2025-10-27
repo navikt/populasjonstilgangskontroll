@@ -4,6 +4,7 @@ import io.lettuce.core.RedisClient
 import io.lettuce.core.ScriptOutputType.INTEGER
 import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
+import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
@@ -15,7 +16,7 @@ class CacheClient(
     val handler: CacheNøkkelHandler,
     val alleTreffTeller: BulkCacheSuksessTeller,
     val teller: BulkCacheTeller
-)  {
+)  : LeaderAware(){
     
     val conn = client.connect().apply {
         timeout = Duration.ofSeconds(30)
@@ -99,7 +100,8 @@ class CacheClient(
         log.trace("Fant $funnet verdier i cache $navn for $etterspurt identer")
     }
 
-    fun count(prefix: String) : Int {
+    fun size(prefix: String) : Double {
+      if (erLeder) {
         val script = """local cursor = "0"
     local count = 0
     local prefix = ARGV[1]
@@ -111,7 +113,8 @@ class CacheClient(
     until cursor == "0"
     return count
     """.trimIndent()
-        return conn.sync().eval(script, INTEGER, emptyArray(), prefix)
-
+        return conn.sync().eval<Int>(script, INTEGER, emptyArray(), prefix).toDouble()
+    }
+        else return 0.toDouble()
     }
 }

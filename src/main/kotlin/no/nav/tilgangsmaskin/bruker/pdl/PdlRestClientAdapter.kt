@@ -32,13 +32,20 @@ class PdlRestClientAdapter(
 
     @WithSpan
     fun personer(identer: Set<String>) : Set<Person> {
+        /*
         val fraCache = fraCache(identer)
         if (fraCache.size == identer.size) {
             return fraCache.values.toSet()
         }
+       
         val fraRest = fraRest(identer  - fraCache.keys)
-        cache.putMany(PDL_CACHE, fraRest,cf.varighet)
-        return (fraRest.values + fraCache.values).toSet()
+        */
+        val fraRest = fraRest(identer)
+
+        //cache.putMany(PDL_CACHE, fraRest,cf.varighet)
+        //return (fraRest.values + fraCache.values).toSet()
+        return (fraRest.values).toSet()
+
     }
 
 

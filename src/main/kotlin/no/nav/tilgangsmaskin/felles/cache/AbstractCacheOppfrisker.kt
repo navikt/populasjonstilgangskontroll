@@ -9,9 +9,9 @@ abstract class AbstractCacheOppfrisker : CacheOppfrisker {
     final override fun oppfrisk(nøkkelElementer: CacheNøkkelElementer) {
         runCatching {
             doOppfrisk(nøkkelElementer)
-            log.info("Oppfrisking av ${nøkkelElementer.nøkkel.maskFnr()} OK")
+            log.info("Oppfrisking av ${nøkkelElementer.cacheName}::${nøkkelElementer.id.maskFnr()} OK")
         }.getOrElse {
-            log.info("Oppfrisking av ${nøkkelElementer.nøkkel.maskFnr()} etter sletting feilet, dette er ikke kritisk", it)
+            log.info("Oppfrisking av ${nøkkelElementer.nøkkel} etter sletting feilet, dette er ikke kritisk", it)
         }
     }
 

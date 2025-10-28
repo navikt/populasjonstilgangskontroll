@@ -45,7 +45,7 @@ class CacheAdapter( private val handler: CacheNøkkelHandler,private val client:
                             client.cacheSize(handler.configs[cfg.navn]!!.getKeyPrefixFor(cfg.navn))
                         }
                     } catch (e: TimeoutCancellationException) {
-                        log.warn("Timeout ved henting av cache size for ${cfg.navn}")
+                        log.warn("Timeout ved henting av cache size for ${cfg.navn}",e)
                         0.toDouble()
                     }
                 }

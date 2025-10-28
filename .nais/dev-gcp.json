@@ -19,12 +19,6 @@
     "tier": "db-f1-micro",
     "name": "tilgangsmaskin"
   },
-  "db-flags": {
-    "pgaudit": {
-      "enabled": "off",
-      "logtype": "write"
-    }
-  },
   "inbound": [
     {
       "name": "infotrygd-hentsaksliste-backend",

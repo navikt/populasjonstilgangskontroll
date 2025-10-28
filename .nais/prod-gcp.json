@@ -16,12 +16,6 @@
     "tier": "db-custom-2-3840",
     "name": "tilgangsmaskin"
   },
-  "db-flags": {
-    "pgaudit": {
-      "enabled": "on",
-      "logtype": "write"
-    }
-  },
   "inbound": [
     {
       "name": "infotrygd-hentsaksliste-backend",

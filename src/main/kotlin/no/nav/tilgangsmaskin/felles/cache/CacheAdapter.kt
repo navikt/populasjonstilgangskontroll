@@ -13,7 +13,9 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.stereotype.Component
 import java.time.Duration
+import kotlin.system.measureTimeMillis
 import kotlin.text.get
+import kotlin.text.toDouble
 
 @Component
 class CacheAdapter( private val handler: CacheNøkkelHandler,private val client: CacheClient,private val cf: RedisConnectionFactory, cfg: CacheConfig, private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
@@ -41,12 +43,17 @@ class CacheAdapter( private val handler: CacheNøkkelHandler,private val client:
             registry.gauge("cache.size", Tags.of("navn", cfg.navn), cf) {
                 runBlocking {
                     try {
-                        withTimeout(Duration.ofSeconds(1).toMillis()) {
-                            client.cacheSize(handler.configs[cfg.navn]!!.getKeyPrefixFor(cfg.navn))
+                        var size = 0.0
+                        val timeUsed = measureTimeMillis {
+                            size = withTimeout(Duration.ofSeconds(1).toMillis()) {
+                                client.cacheSize(handler.configs[cfg.navn]!!.getKeyPrefixFor(cfg.navn)).toDouble()
+                            }
                         }
+                        log.info("cache størrelse oppslag tok ${timeUsed}ms for ${cfg.navn}")
+                        size
                     } catch (e: TimeoutCancellationException) {
-                        log.warn("Timeout ved henting av cache size for ${cfg.navn}",e)
-                        0.toDouble()
+                        log.warn("Timeout ved henting av cache size for ${cfg.navn}", e)
+                        0.0
                     }
                 }
             }

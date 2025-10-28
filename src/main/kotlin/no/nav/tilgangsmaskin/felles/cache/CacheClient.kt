@@ -100,7 +100,7 @@ class CacheClient(
         log.trace("Fant $funnet verdier i cache $navn for $etterspurt identer")
     }
 
-    fun size(prefix: String) : Double {
+    fun cacheSize(prefix: String) : Double {
       if (erLeder) {
         val script = """local cursor = "0"
     local count = 0

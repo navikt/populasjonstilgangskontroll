@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 
 abstract class AbstractCacheOppfrisker : CacheOppfrisker {
@@ -8,9 +9,9 @@ abstract class AbstractCacheOppfrisker : CacheOppfrisker {
     final override fun oppfrisk(nøkkelElementer: CacheNøkkelElementer) {
         runCatching {
             doOppfrisk(nøkkelElementer)
-            log.info("Oppfrisking av ${nøkkelElementer.nøkkel} OK")
+            log.info("Oppfrisking av ${nøkkelElementer.nøkkel.maskFnr()} OK")
         }.getOrElse {
-            log.info("Oppfrisking av ${nøkkelElementer.nøkkel} etter sletting feilet, dette er ikke kritisk", it)
+            log.info("Oppfrisking av ${nøkkelElementer.nøkkel.maskFnr()} etter sletting feilet, dette er ikke kritisk", it)
         }
     }
 

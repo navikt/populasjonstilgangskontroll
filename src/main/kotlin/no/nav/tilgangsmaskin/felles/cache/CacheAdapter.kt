@@ -54,7 +54,6 @@ class CacheAdapter( private val handler: CacheNøkkelHandler,private val client:
     }
 
 
-
     companion object {
         const val VALKEY = "valkey"
     }

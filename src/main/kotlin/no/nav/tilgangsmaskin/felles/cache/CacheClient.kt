@@ -4,12 +4,15 @@ import io.lettuce.core.RedisClient
 import io.lettuce.core.ScriptOutputType.INTEGER
 import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
 import java.time.Duration
+import kotlin.time.measureTime
 
 class CacheClient(
     client: RedisClient,
@@ -100,21 +103,39 @@ class CacheClient(
         log.trace("Fant $funnet verdier i cache $navn for $etterspurt identer")
     }
 
-    fun cacheSize(prefix: String) : Double {
-      if (erLeder) {
-        val script = """local cursor = "0"
+    fun cacheStørrelse(prefix: String): Double {
+        if (!erLeder) return 0.0
+        return runBlocking {
+            runCatching {
+                var size = 0.0
+                val timeUsed = measureTime {
+                    size = withTimeout(Duration.ofSeconds(1).toMillis()) {
+                        conn.sync().eval<Int>(CACHE_SIZE_SCRIPT, INTEGER, emptyArray(), prefix).toDouble()
+                    }
+                }
+                log.info("Cache størrelse oppslag fant størrelse ${size.toLong()} på ${timeUsed.inWholeMilliseconds}ms for cache $prefix")
+                size
+            }.getOrElse { e ->
+                log.warn("Feil ved henting av størrelse for $prefix", e)
+                0.0
+            }
+        }
+    }
+
+
+
+    companion object {
+        private const val CACHE_SIZE_SCRIPT = """
+    local cursor = "0"
     local count = 0
     local prefix = ARGV[1]
     repeat
-    local result = redis.call("SCAN", cursor, "MATCH", prefix .. "*", "COUNT", 10000)
-    cursor = result[1]
-    local keys = result[2]
-    count = count + #keys
+        local result = redis.call("SCAN", cursor, "MATCH", prefix .. "*", "COUNT", 10000)
+        cursor = result[1]
+        local keys = result[2]
+        count = count + #keys
     until cursor == "0"
     return count
-    """.trimIndent()
-        return conn.sync().eval<Int>(script, INTEGER, emptyArray(), prefix).toDouble()
-    }
-        else return 0.toDouble()
+"""
     }
 }

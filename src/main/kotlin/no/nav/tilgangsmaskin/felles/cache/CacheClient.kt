@@ -18,6 +18,7 @@ import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.toTypedArray
 import kotlin.time.measureTime
+import kotlin.time.measureTimedValue
 
 class CacheClient(
     client: RedisClient,
@@ -132,17 +133,16 @@ class CacheClient(
         if (!erLeder)  emptyMap()
         else runBlocking {
             runCatching {
-                var result = emptyList<String>()
-                val timeUsed = measureTime {
-                    result = conn.sync().eval(
+                val (result, varighet) = measureTimedValue<List<String>> {
+                     conn.sync().eval(
                         CACHE_SIZES_SCRIPT,
                         MULTI,
                         emptyArray(),
                         *prefixes)
                 }
-                val prefixCounts = result.chunked(2).associate { (prefix, size) -> prefix to size.toLong() }
-                log.info("Cache størrelse oppslag fant $prefixCounts på ${timeUsed.inWholeMilliseconds}ms")
-                prefixCounts
+                val prCache = result.chunked(2).associate { (prefix, size) -> prefix to size.toLong() }
+                log.info("Cache størrelse oppslag fant $prCache på ${varighet.inWholeMilliseconds}ms")
+                prCache
             }.getOrElse { e ->
                 log.warn("Feil ved henting av størrelser for ${prefixes.toList()}", e)
                 emptyMap()

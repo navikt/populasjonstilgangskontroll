@@ -114,14 +114,13 @@ class CacheClient(
         if (!erLeder) return 0.0
         return runBlocking {
             runCatching {
-                var size = 0.0
-                val timeUsed = measureTime {
-                    size = withTimeout(Duration.ofSeconds(1).toMillis()) {
+                val (størrelse, varighet) = measureTimedValue<Double> {
+                    withTimeout(Duration.ofSeconds(1).toMillis()) {
                         conn.sync().eval<Int>(CACHE_SIZE_SCRIPT, INTEGER, emptyArray(), prefix).toDouble()
                     }
                 }
-                log.info("Cache størrelse oppslag fant størrelse ${size.toLong()} på ${timeUsed.inWholeMilliseconds}ms for cache $prefix")
-                size
+                log.info("Cache størrelse $prefix oppslag fant størrelse ${størrelse.toLong()} på ${varighet.inWholeMilliseconds}ms")
+                størrelse
             }.getOrElse { e ->
                 log.warn("Feil ved henting av størrelse for $prefix", e)
                 0.0
@@ -133,7 +132,7 @@ class CacheClient(
         if (!erLeder) emptyMap()
         else runBlocking {
             runCatching {
-                val (result, varighet) = measureTimedValue<List<String>> {
+                val (størrelser, varighet) = measureTimedValue<List<String>> {
                     withTimeout(Duration.ofSeconds(1).toMillis()) {
                         conn.sync().eval(
                             CACHE_SIZES_SCRIPT,
@@ -143,7 +142,7 @@ class CacheClient(
                         )
                     }
                 }
-                val prCache = result.chunked(2).associate { (prefix, size) -> prefix to size.toLong() }
+                val prCache = størrelser.chunked(2).associate { (cacheNavn, størrelse) -> cacheNavn to størrelse.toLong() }
                 log.info("Cache størrelser oppslag fant $prCache på ${varighet.inWholeMilliseconds}ms")
                 prCache
             }.getOrElse { e ->

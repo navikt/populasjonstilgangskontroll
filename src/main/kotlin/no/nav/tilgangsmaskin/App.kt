@@ -44,7 +44,7 @@ fun main(args: Array<String>) {
 }
 
 @Component
-class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, private  val cache: CacheClient, vararg val regelsett: RegelSett) :
+class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, private  val cache: CacheClient,private  val adapter: CacheAdapter, vararg val regelsett: RegelSett) :
     InfoContributor {
 
     override fun contribute(builder: Builder) {
@@ -57,6 +57,7 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, pr
                     "Java vendor" to environment.getProperty("java.vm.vendor"),
                     "Client ID" to environment.getProperty("azure.app.client.id"),
                     "Name" to environment.getProperty("spring.application.name"),
+                    "cache1" to adapter.cacheStørrelser(),
                     "caches" to cache.cacheStørrelser(PDL,NOM,GRAPH,SKJERMING,ENTRA_OID),
                     "Spring Boot version" to SpringBootVersion.getVersion(),
                     "Spring Framework version" to SpringVersion.getVersion()))

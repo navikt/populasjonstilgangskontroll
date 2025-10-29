@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import io.micrometer.core.instrument.MeterRegistry
-import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
@@ -28,7 +27,7 @@ class CacheAdapter( private val handler: CacheNøkkelHandler,private val client:
             }
         }
 
-    fun cacheSizes() =
+    fun cacheStørrelser() =
         cfgs.associate {
             it.navn to "${client.cacheStørrelse(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}"
         }

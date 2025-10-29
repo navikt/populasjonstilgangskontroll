@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component
 @Component
 class CacheAdapter( private val client: CacheClient,private val cf: RedisConnectionFactory, cfg: CacheConfig, private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
 
+
     private val log = getLogger(javaClass)
 
     override val pingEndpoint  =  "${cfg.host}:${cfg.port}"
@@ -29,7 +30,8 @@ class CacheAdapter( private val client: CacheClient,private val cf: RedisConnect
 
     override fun bindTo(registry: MeterRegistry) {
         client.cacheStørrelser().forEach { (navn, størrelse) ->
-           registry.gauge("cache.size", Tags.of("navn", navn), cf) {
+            log.info("GAUGE $navn $størrelse")
+            registry.gauge("cache.size", Tags.of("navn", navn), cf) {
                størrelse.toDouble()
            }
         }

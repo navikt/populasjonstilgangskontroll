@@ -39,6 +39,7 @@ import java.util.UUID
 import org.awaitility.kotlin.await
 import java.util.concurrent.TimeUnit.SECONDS
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig
 import org.assertj.core.api.Assertions.assertThat
@@ -96,15 +97,8 @@ class CacheClientTest {
         val redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
         val teller = BulkCacheTeller(meterRegistry, token)
         val handler = CacheNøkkelHandler(mgr.cacheConfigurations, valkeyMapper)
-        val pool =  ConnectionPoolSupport.createGenericObjectPool(
-            { redisClient.connect() },
-            GenericObjectPoolConfig<StatefulRedisConnection<String, String>>().apply {
-                maxTotal = 10 // Set max pool size
-            }
-        )
         client = CacheClient(
-            redisClient, handler, BulkCacheSuksessTeller(meterRegistry, token), teller
-        )
+            redisClient, handler, BulkCacheSuksessTeller(meterRegistry, token), teller, emptyList())
         listener = CacheElementUtløptLytter(redisClient, eventPublisher)
         val id1 = BrukerId("03508331575")
         val id2 = BrukerId("20478606614")

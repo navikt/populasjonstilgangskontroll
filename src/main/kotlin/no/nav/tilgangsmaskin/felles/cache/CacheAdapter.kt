@@ -3,14 +3,13 @@ package no.nav.tilgangsmaskin.felles.cache
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
-import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.stereotype.Component
 
 @Component
-class CacheAdapter( private val client: CacheClient,private val cf: RedisConnectionFactory, cfg: CacheConfig, private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
+class CacheAdapter( private val client: CacheClient,private val cf: RedisConnectionFactory, cfg: CacheConfig) : Pingable, MeterBinder {
 
 
     private val log = getLogger(javaClass)
@@ -29,6 +28,7 @@ class CacheAdapter( private val client: CacheClient,private val cf: RedisConnect
         }
 
     override fun bindTo(registry: MeterRegistry) {
+        log.info("GAUGE")
         client.cacheStørrelser().forEach { (navn, størrelse) ->
             log.info("GAUGE $navn $størrelse")
             registry.gauge("cache.size", Tags.of("navn", navn), cf) {

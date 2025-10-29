@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMIN
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.felles.cache.CacheAdapter
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
+import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.profiler
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.local
@@ -44,7 +45,7 @@ fun main(args: Array<String>) {
 }
 
 @Component
-class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, private  val cache: CacheClient,private  val adapter: CacheAdapter, vararg val regelsett: RegelSett) :
+class StartupInfoContributor(private val ctx: ConfigurableApplicationContext,private  val client: CacheClient, private  val cfgs: List<CachableRestConfig>,vararg val regelsett: RegelSett) :
     InfoContributor {
 
     override fun contribute(builder: Builder) {
@@ -57,8 +58,7 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, pr
                     "Java vendor" to environment.getProperty("java.vm.vendor"),
                     "Client ID" to environment.getProperty("azure.app.client.id"),
                     "Name" to environment.getProperty("spring.application.name"),
-                    "cache1" to adapter.cacheStørrelser(),
-                    "caches" to cache.cacheStørrelser(PDL,NOM,GRAPH,SKJERMING,ENTRA_OID),
+                    "caches" to client.cacheStørrelser(),
                     "Spring Boot version" to SpringBootVersion.getVersion(),
                     "Spring Framework version" to SpringVersion.getVersion()))
             regelsett.forEach {

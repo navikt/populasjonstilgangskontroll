@@ -1,12 +1,12 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import io.lettuce.core.RedisClient
-import io.lettuce.core.ScriptOutputType.INTEGER
 import io.lettuce.core.ScriptOutputType.MULTI
 import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
+import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
@@ -17,16 +17,17 @@ import kotlin.collections.chunked
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.toTypedArray
-import kotlin.text.chunked
-import kotlin.time.measureTime
 import kotlin.time.measureTimedValue
 
 class CacheClient(
     client: RedisClient,
     val handler: CacheNøkkelHandler,
     val alleTreffTeller: BulkCacheSuksessTeller,
-    val teller: BulkCacheTeller
+    val teller: BulkCacheTeller,
+    cfgs: List<CachableRestConfig>
 )  : LeaderAware(){
+
+    private val caches = cfgs.map { it.navn }.toTypedArray()
     
     val conn = client.connect().apply {
         timeout = Duration.ofSeconds(30)
@@ -110,25 +111,7 @@ class CacheClient(
         log.trace("Fant $funnet verdier i cache $navn for $etterspurt identer")
     }
 
-    fun cacheStørrelse(prefix: String): Double {
-        if (!erLeder) return 0.0
-        return runBlocking {
-            runCatching {
-                val (størrelse, varighet) = measureTimedValue<Double> {
-                    withTimeout(Duration.ofSeconds(1).toMillis()) {
-                        conn.sync().eval<Int>(CACHE_SIZE_SCRIPT, INTEGER, emptyArray(), prefix).toDouble()
-                    }
-                }
-                log.info("Cache størrelse $prefix oppslag fant størrelse ${størrelse.toLong()} på ${varighet.inWholeMilliseconds}ms")
-                størrelse
-            }.getOrElse { e ->
-                log.warn("Feil ved henting av størrelse for $prefix", e)
-                0.0
-            }
-        }
-    }
-
-    fun cacheStørrelser(vararg prefixes: String) =
+    fun cacheStørrelser() =
         if (!erLeder) emptyMap()
         else runBlocking {
             runCatching {
@@ -138,7 +121,7 @@ class CacheClient(
                             CACHE_SIZES_SCRIPT,
                             MULTI,
                             emptyArray(),
-                            *prefixes
+                            *caches
                         )
                     }
                 }
@@ -146,7 +129,7 @@ class CacheClient(
                 log.info("Cache størrelser oppslag fant $prCache på ${varighet.inWholeMilliseconds}ms")
                 prCache
             }.getOrElse { e ->
-                log.warn("Feil ved henting av størrelser for ${prefixes.toList()}", e)
+                log.warn("Feil ved henting av størrelser for $caches", e)
                 emptyMap()
             }
         }
@@ -154,18 +137,6 @@ class CacheClient(
 
 
     companion object {
-        private const val CACHE_SIZE_SCRIPT = """
-    local cursor = "0"
-    local count = 0
-    local prefix = ARGV[1]
-    repeat
-        local result = redis.call("SCAN", cursor, "MATCH", prefix .. "*", "COUNT", 10000)
-        cursor = result[1]
-        local keys = result[2]
-        count = count + #keys
-    until cursor == "0"
-    return count
-"""
 
         private const val CACHE_SIZES_SCRIPT = """
 local results = {}

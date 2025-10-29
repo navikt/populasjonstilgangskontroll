@@ -72,8 +72,8 @@ class DevTilgangController(
     @PostMapping("cache/personer")
     fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cache.getMany<Person>(CachableConfig(PDL),navIds.map { it.verdi }.toSet())
 
-    @GetMapping("cache/count/{prefix}")
-    fun size(@PathVariable prefix: String) = cache.cacheStørrelse(prefix)
+    @GetMapping("cache/count")
+    fun size() = cache.cacheStørrelser()
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable  id: String) = graphql.partnere(id)

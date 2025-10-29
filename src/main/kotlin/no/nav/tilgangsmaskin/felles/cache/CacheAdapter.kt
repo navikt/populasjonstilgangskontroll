@@ -3,15 +3,16 @@ package no.nav.tilgangsmaskin.felles.cache
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
-import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.format
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.stereotype.Component
 
 @Component
-class CacheAdapter(private val handler: CacheNøkkelHandler, private val cf: RedisConnectionFactory, cfg: CacheConfig, private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {
+class CacheAdapter( private val client: CacheClient,private val cf: RedisConnectionFactory, cfg: CacheConfig) : Pingable, MeterBinder {
+
+
+    private val log = getLogger(javaClass)
 
     override val pingEndpoint  =  "${cfg.host}:${cfg.port}"
     override val name = "Cache"
@@ -26,28 +27,15 @@ class CacheAdapter(private val handler: CacheNøkkelHandler, private val cf: Red
             }
         }
 
-   // fun cacheSizes() = cfgs.associate { it.navn to "${cacheSize(it.navn).toLong()} innslag, ttl: ${it.varighet.format()}" }
-
     override fun bindTo(registry: MeterRegistry) {
-        cfgs.forEach { cfg ->
-           // registry.gauge("cache.size", Tags.of("navn", cfg.navn), cf) {
-           //     cacheSize((handler.configs[cfg.navn]!!.getKeyPrefixFor(cfg.navn)))
-           // }
+        log.info("GAUGE")
+        client.cacheStørrelser().forEach { (navn, størrelse) ->
+            log.info("GAUGE $navn $størrelse")
+            registry.gauge("cache.size", Tags.of("navn", navn), cf) {
+               størrelse.toDouble()
+           }
         }
     }
-
-    private fun cacheSize(prefix: String) =
-        cf.connection.use {
-            it.keyCommands()
-                .scan(scanOptions()
-                    .match("$prefix*")
-                    .count(10000)
-                    .build())
-                .asSequence()
-                .count()
-                .toDouble()
-        }
-
 
     companion object {
         const val VALKEY = "valkey"

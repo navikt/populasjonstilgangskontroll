@@ -3,18 +3,12 @@ package no.nav.tilgangsmaskin.felles.cache
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.binder.MeterBinder
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeout
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.format
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.stereotype.Component
-import java.time.Duration
-import kotlin.system.measureTimeMillis
-import kotlin.text.get
 
 @Component
 class CacheAdapter( private val handler: CacheNøkkelHandler,private val client: CacheClient,private val cf: RedisConnectionFactory, cfg: CacheConfig, private vararg val cfgs: CachableRestConfig) : Pingable, MeterBinder {

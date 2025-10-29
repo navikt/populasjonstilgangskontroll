@@ -2,7 +2,13 @@ package no.nav.tilgangsmaskin
 
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
+import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste.Companion.ENTRA_OID
+import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
+import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.felles.cache.CacheAdapter
+import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.profiler
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.local
@@ -38,7 +44,7 @@ fun main(args: Array<String>) {
 }
 
 @Component
-class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, private  val cache: CacheAdapter, vararg val regelsett: RegelSett) :
+class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, private  val cache: CacheClient, vararg val regelsett: RegelSett) :
     InfoContributor {
 
     override fun contribute(builder: Builder) {
@@ -51,7 +57,7 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, pr
                     "Java vendor" to environment.getProperty("java.vm.vendor"),
                     "Client ID" to environment.getProperty("azure.app.client.id"),
                     "Name" to environment.getProperty("spring.application.name"),
-                    cache.name to cache.cacheSizes(),
+                    "caches" to cache.cacheStørrelser(PDL,NOM,GRAPH,SKJERMING,ENTRA_OID),
                     "Spring Boot version" to SpringBootVersion.getVersion(),
                     "Spring Framework version" to SpringVersion.getVersion()))
             regelsett.forEach {

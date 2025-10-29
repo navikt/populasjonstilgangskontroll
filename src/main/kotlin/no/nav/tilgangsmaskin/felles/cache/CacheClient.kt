@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import io.lettuce.core.RedisClient
 import io.lettuce.core.ScriptOutputType.INTEGER
+import io.lettuce.core.ScriptOutputType.MULTI
 import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import kotlinx.coroutines.runBlocking
@@ -12,6 +13,10 @@ import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
 import java.time.Duration
+import kotlin.collections.chunked
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.toTypedArray
 import kotlin.time.measureTime
 
 class CacheClient(
@@ -122,6 +127,27 @@ class CacheClient(
         }
     }
 
+    fun cacheStørrelser(vararg prefixes: String) =
+
+        if (!erLeder)  emptyMap()
+        else runBlocking {
+            runCatching {
+                var result = emptyList<String>()
+                val timeUsed = measureTime {
+                    val result: List<String> = conn.sync().eval(
+                        CACHE_SIZES_SCRIPT,
+                        MULTI,
+                        emptyArray(),
+                        *prefixes)
+                }
+                val prefixCounts = result.chunked(2).associate { (prefix, size) -> prefix to size.toLong() }
+                log.info("Cache størrelse oppslag fant $prefixCounts på ${timeUsed.inWholeMilliseconds}ms")
+                prefixCounts
+            }.getOrElse { e ->
+                log.warn("Feil ved henting av størrelser for ${prefixes.toList()}", e)
+                emptyMap()
+            }
+        }
 
 
     companion object {
@@ -136,6 +162,24 @@ class CacheClient(
         count = count + #keys
     until cursor == "0"
     return count
+"""
+
+        private const val CACHE_SIZES_SCRIPT = """
+local results = {}
+for i = 1, #ARGV do
+    local prefix = ARGV[i]
+    local cursor = "0"
+    local count = 0
+    repeat
+        local result = redis.call("SCAN", cursor, "MATCH", prefix .. "*", "COUNT", 10000)
+        cursor = result[1]
+        local keys = result[2]
+        count = count + #keys
+    until cursor == "0"
+    table.insert(results, prefix)
+    table.insert(results, tostring(count))
+end
+return results
 """
     }
 }

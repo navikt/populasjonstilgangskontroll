@@ -112,8 +112,12 @@ class CacheClient(
     }
 
     fun cacheStørrelser() =
-        if (!erLeder) emptyMap()
+        if (!erLeder) {
+            log.info("Er IKKE leder")
+            emptyMap()
+        }
         else runBlocking {
+            log.info("ER leder")
             runCatching {
                 log.info("Henter størrelser for caches: ${caches.joinToString(",")}")
                 val (størrelser, varighet) = measureTimedValue<List<String>> {

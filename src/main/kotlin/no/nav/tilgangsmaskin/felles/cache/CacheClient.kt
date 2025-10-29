@@ -17,6 +17,7 @@ import kotlin.collections.chunked
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.toTypedArray
+import kotlin.text.chunked
 import kotlin.time.measureTime
 import kotlin.time.measureTimedValue
 
@@ -129,16 +130,18 @@ class CacheClient(
     }
 
     fun cacheStørrelser(vararg prefixes: String) =
-
-        if (!erLeder)  emptyMap()
+        if (!erLeder) emptyMap()
         else runBlocking {
             runCatching {
                 val (result, varighet) = measureTimedValue<List<String>> {
-                     conn.sync().eval(
-                        CACHE_SIZES_SCRIPT,
-                        MULTI,
-                        emptyArray(),
-                        *prefixes)
+                    withTimeout(Duration.ofSeconds(1).toMillis()) {
+                        conn.sync().eval(
+                            CACHE_SIZES_SCRIPT,
+                            MULTI,
+                            emptyArray(),
+                            *prefixes
+                        )
+                    }
                 }
                 val prCache = result.chunked(2).associate { (prefix, size) -> prefix to size.toLong() }
                 log.info("Cache størrelser oppslag fant $prCache på ${varighet.inWholeMilliseconds}ms")
@@ -148,6 +151,7 @@ class CacheClient(
                 emptyMap()
             }
         }
+
 
 
     companion object {

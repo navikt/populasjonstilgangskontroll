@@ -115,6 +115,7 @@ class CacheClient(
         if (!erLeder) emptyMap()
         else runBlocking {
             runCatching {
+                log.info("Henter størrelser for caches: ${caches.joinToString(",")}")
                 val (størrelser, varighet) = measureTimedValue<List<String>> {
                     withTimeout(Duration.ofSeconds(1).toMillis()) {
                         conn.sync().eval(

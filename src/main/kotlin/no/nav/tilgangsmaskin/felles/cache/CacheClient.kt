@@ -134,7 +134,7 @@ class CacheClient(
             runCatching {
                 var result = emptyList<String>()
                 val timeUsed = measureTime {
-                    val result: List<String> = conn.sync().eval(
+                    result = conn.sync().eval(
                         CACHE_SIZES_SCRIPT,
                         MULTI,
                         emptyArray(),

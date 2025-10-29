@@ -141,7 +141,7 @@ class CacheClient(
                         *prefixes)
                 }
                 val prCache = result.chunked(2).associate { (prefix, size) -> prefix to size.toLong() }
-                log.info("Cache størrelse oppslag fant $prCache på ${varighet.inWholeMilliseconds}ms")
+                log.info("Cache størrelser oppslag fant $prCache på ${varighet.inWholeMilliseconds}ms")
                 prCache
             }.getOrElse { e ->
                 log.warn("Feil ved henting av størrelser for ${prefixes.toList()}", e)

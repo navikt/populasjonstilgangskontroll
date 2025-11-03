@@ -72,7 +72,7 @@ jobs:
         uses: gradle/actions/dependency-submission@v5
 
       - name: Attest and sign
-        uses: nais/attest-sign@v1.5.20
+        uses: nais/attest-sign@v1.5.22
         with:
           image_ref: ${{env.IMAGE}}@${{env.DIGEST}}
           sbom: build/reports/application.cdx.json

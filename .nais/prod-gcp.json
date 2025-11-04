@@ -16,6 +16,12 @@
     "tier": "db-custom-2-3840",
     "name": "tilgangsmaskin"
   },
+  "db-flags": {
+    "pgaudit": {
+      "enabled": "on",
+      "logtype": "ddl,role,write"
+    }
+  },
   "inbound": [
     {
       "name": "modia-soknadsstatus-api",

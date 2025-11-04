@@ -18,6 +18,11 @@
   },
   "inbound": [
     {
+      "name": "modia-soknadsstatus-api",
+      "namespace": "personoversikt",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "infotrygd-hentsaksliste-backend",
       "namespace": "infotrygd",
       "cluster": "prod-fss"

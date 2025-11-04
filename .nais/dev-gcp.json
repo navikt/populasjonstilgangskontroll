@@ -21,6 +21,11 @@
   },
   "inbound": [
     {
+      "name": "modia-soknadsstatus-api",
+      "namespace": "personoversikt",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "infotrygd-hentsaksliste-backend",
       "namespace": "infotrygd",
       "cluster": "dev-fss"

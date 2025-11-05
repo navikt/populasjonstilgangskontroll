@@ -10,7 +10,7 @@ import org.springframework.web.client.RestClient
 
 @Component
 class OppfølgingRestClientAdapter(@Qualifier(OPPFØLGING) restClient: RestClient, val cf: OppfølgingConfig) :
-    AbstractRestClientAdapter(restClient, cf) {
+    AbstractRestClientAdapter(restClient, cf, pingRestClient = RestClient.builder().baseUrl(cf.pingEndpoint).build()) {
     fun enheterFor(ids: List<String>) =
         if (cf.isEnabled){
             post<List<Map<Any,Any>>>(cf.bulkUri, Identer(ids)).map {

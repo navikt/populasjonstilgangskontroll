@@ -11,13 +11,14 @@ import java.net.URI
 abstract class AbstractRestClientAdapter(
         protected val restClient: RestClient,
         val cfg: AbstractRestConfig,
-        protected val errorHandler: ErrorHandler = DefaultRestErrorHandler()) : Pingable {
+        protected val errorHandler: ErrorHandler = DefaultRestErrorHandler(),
+        private val pingRestClient: RestClient = restClient) : Pingable {
 
     protected val log = getLogger(javaClass)
-    override fun ping() = if (cfg.isEnabled) get<Any>(cfg.pingEndpoint) else "disabled"
+    override fun ping() = if (cfg.isEnabled) get<Any>(cfg.pingEndpoint,client = pingRestClient) else "disabled"
 
-    protected inline fun <reified T> get(uri: URI, headers: Map<String, String> = emptyMap()) =
-        restClient.get()
+    protected inline fun <reified T> get(uri: URI, headers: Map<String, String> = emptyMap(),client: RestClient = restClient) =
+        client.get()
             .uri(uri)
             .accept(APPLICATION_JSON)
             .headers { it.setAll(headers) }
@@ -25,8 +26,8 @@ abstract class AbstractRestClientAdapter(
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
             .body(T::class.java) ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
 
-    protected inline fun <reified T> post(uri: URI, body: Any, headers: Map<String, String> = emptyMap()) =
-        restClient
+    protected inline fun <reified T> post(uri: URI, body: Any, headers: Map<String, String> = emptyMap(),client: RestClient = restClient) =
+        client
             .post()
             .uri(uri)
             .headers { it.setAll(headers) }

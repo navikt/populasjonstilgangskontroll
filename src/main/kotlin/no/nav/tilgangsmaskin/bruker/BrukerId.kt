@@ -26,7 +26,7 @@ data class BrukerId(@JsonValue val verdi: String) {
            // if (isProd || verdi.endsWith("9096")) {
                 require(mod11(this, W1) == this[9] - '0') { "Første kontrollsiffer  ${this[9]} ikke validert" }
                 require(mod11(this, W2) == this[10] - '0') { "Andre kontrollsiffer  ${this[10]} ikke validert" }
-        //xs    }
+        //    }
         }
     }
 

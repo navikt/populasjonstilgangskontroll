@@ -245,6 +245,11 @@
       "name": "histark-core-api",
       "namespace": "histark",
       "cluster": "dev-fss"
+    },
+    {
+      "name": "kabal-api",
+      "namespace": "klage",
+      "cluster": "dev-gcp"
     }
   ],
   "nais": {

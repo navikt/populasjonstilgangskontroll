@@ -147,6 +147,11 @@
       "name": "histark-core-api",
       "namespace": "histark",
       "cluster": "prod-fss"
+    },
+    {
+      "name": "kabal-api",
+      "namespace": "klage",
+      "cluster": "prod-gcp"
     }
 
   ],

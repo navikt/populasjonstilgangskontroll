@@ -23,6 +23,8 @@ class EntraTjeneste(private val adapter: EntraRestClientAdapter, private val res
     @WithSpan
     fun geoGrupper(ansattId: AnsattId, oid: UUID) = adapter.grupper(oid.toString(), false)
 
+    val erOppfriskbar = adapter.erOppfriskBar
+
     override fun toString() = "${javaClass.simpleName} [adapter=$adapter resolver=$resolver]"
 }
 

@@ -9,13 +9,14 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.RestClient.Builder
 
 @Configuration
 class EntraClientBeanConfig {
 
     @Bean
     @Qualifier(GRAPH)
-    fun prodGraphRestClient(b: RestClient.Builder, cfg: EntraConfig) =
+    fun prodGraphRestClient(b: Builder, cfg: EntraConfig) =
         b.baseUrl(cfg.baseUri)
             .requestInterceptors {
                 it.add(headerAddingRequestInterceptor(HEADER_CONSISTENCY_LEVEL))
@@ -25,7 +26,7 @@ class EntraClientBeanConfig {
     @Bean
     @Qualifier(PROXY)
     @ConditionalOnNotProd
-    fun devGraphRestClient(b: RestClient.Builder, cfg: EntraProxyConfig) =
+    fun devGraphRestClient(b: Builder, cfg: EntraProxyConfig) =
         b.baseUrl(cfg.baseUri).build()
 
 

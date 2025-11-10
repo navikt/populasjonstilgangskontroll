@@ -72,7 +72,6 @@ class DevTilgangController(
     @GetMapping("proxy/tema/{tema}")
     fun tema(@PathVariable  tema: String) = proxy.tema(tema)
 
-
     @PostMapping("oppfolging/bulk")
     fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)
 

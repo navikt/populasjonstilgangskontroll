@@ -21,7 +21,7 @@ management:
 oppfolging:
   enabled: true
 
-  no:
+no:
     nav:
       security:
         jwt:

@@ -12,11 +12,11 @@ import org.springframework.web.client.RestClient
 class EntraProxyRestClientAdapter(@Qualifier(PROXY) restClient: RestClient, val cf: EntraProxyConfig) :
     AbstractRestClientAdapter(restClient, cf) {
 
-    fun tema(ansattId: String) =
-        get<Any>(cf.temaURI(ansattId))
+    fun tema(tema: String) =
+        get<Set<String>>(cf.temaURI(tema))
 
     fun enhet(enhet: String) =
-        get<Any>(cf.enhetURI(enhet))
+        get<Set<String>>(cf.enhetURI(enhet))
 
     override fun toString() = "${javaClass.simpleName} [client=$restClient, config=$cf, errorHandler=$errorHandler]"
 

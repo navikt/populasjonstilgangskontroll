@@ -191,7 +191,7 @@ no.nav.security.jwt:
           client-auth-method: private_key_jwt
 
 proxy:
-    scope: "api://${nais.cluster.type}-gcp.sikkerhetstjenesten.entraproxy/.default"
+    scope: "api://${nais.cluster.type}-gcp.sikkerhetstjenesten.entra-proxy/.default"
 
 springdoc:
   swagger-ui:

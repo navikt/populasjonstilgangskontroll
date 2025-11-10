@@ -181,7 +181,7 @@ no.nav.security.jwt:
           client-jwk: ${azure.app.jwk}
           client-auth-method: private_key_jwt
 
-      entraproxy:
+      entra-proxy:
         token-endpoint-url: ${azure.openid.config.token.endpoint}
         grant-type: client_credentials
         scope: ${proxy.scope}

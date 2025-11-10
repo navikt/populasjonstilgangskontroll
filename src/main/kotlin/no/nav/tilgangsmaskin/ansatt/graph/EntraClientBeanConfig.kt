@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.ansatt.graph
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
+import no.nav.tilgangsmaskin.ansatt.graph.EntraProxyConfig.Companion.PROXY
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.springframework.beans.factory.annotation.Qualifier
@@ -25,7 +26,7 @@ class EntraClientBeanConfig {
 
 
     @Bean
-    @Qualifier(GRAPH)
+    @Qualifier(PROXY)
     @ConditionalOnNotProd
     fun devGraphRestClient(b: RestClient.Builder, cfg: EntraProxyConfig) =
         b.baseUrl(cfg.baseUri).build()

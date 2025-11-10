@@ -11,7 +11,7 @@ class EntraProxyConfig(baseUri: URI = DEFAULT_BASE_URI,
                        enabled: Boolean = true)  : AbstractRestConfig(baseUri, pingPath, PROXY, enabled) {
 
     companion object {
-        private  val DEFAULT_BASE_URI = URI.create("http://entraproxy.sikkerhetstjenesten")
+        private  val DEFAULT_BASE_URI = URI.create("http://entra-proxy.sikkerhetstjenesten")
         private const val PREFIX = "/api/v1/"
         const val DEFAULT_PING_PATH = "/monitoring/health/liveness"
         const val PROXY = "proxy"

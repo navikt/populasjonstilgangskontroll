@@ -50,7 +50,7 @@ class TilgangController(
 
     private val log = getLogger(javaClass)
 
-    @PostMapping("komplett")
+    @PostMapping("komplett",consumes = [APPLICATION_JSON_VALUE])
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter OBO-token")
@@ -62,21 +62,21 @@ class TilgangController(
     @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter CCF-token")
     fun kompletteReglerCCF(@PathVariable ansattId: AnsattId,@RequestBody brukerId: String,request: HttpServletRequest) = enkeltOppslag({ansattId}, {token.erCC}, brukerId, KOMPLETT_REGELTYPE, request.requestURI)
 
-    @PostMapping("kjerne")
+    @PostMapping("kjerne",consumes = [APPLICATION_JSON_VALUE])
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et kjerneregelsett for en bruker, forutsetter OBO-token")
     fun kjerneregler(@RequestBody brukerId: String, request: HttpServletRequest) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KJERNE_REGELTYPE, request.requestURI)
 
 
-    @PostMapping("/ccf/kjerne/{ansattId}")
+    @PostMapping("/ccf/kjerne/{ansattId}",consumes = [APPLICATION_JSON_VALUE])
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter CCF-token")
     fun kjerneReglerCCF(@PathVariable ansattId: AnsattId,@RequestBody brukerId: String,request: HttpServletRequest) = enkeltOppslag({ansattId}, {token.erCC}, brukerId, KJERNE_REGELTYPE,request.requestURI)
 
 
-    @PostMapping("overstyr")
+    @PostMapping("overstyr",consumes = [APPLICATION_JSON_VALUE])
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse
     @Operation(summary = "Overstyr regler for en bruker",
@@ -85,8 +85,8 @@ class TilgangController(
     Overstyring vil gjelde frem til og med utløpsdatoen.""")
     fun overstyr(@RequestBody @Valid @ValidOverstyring data: OverstyringData) = overstyringTjeneste.overstyr(token.ansattId!!, data)
 
-    @PostMapping("bulk/obo")
-    @ResponseStatus(MULTI_STATUS)
+    @PostMapping("bulk/obo",consumes = [APPLICATION_JSON_VALUE])
+    @ResponseStatus(MULTI_STATUS,)
     @BulkSwaggerApiRespons
     @Operation(summary = "Kjør bulkregler for en ansatt",
         description = "Dette endepunktet er kun tilgjengelig for obo flow. " +
@@ -94,7 +94,7 @@ class TilgangController(
     fun bulkOBO(@RequestBody  specs: Set<BrukerIdOgRegelsett>,request: HttpServletRequest) =
         bulkOppslag({token.ansattId!!},{token.erObo}, specs,request.requestURI)
 
-    @PostMapping("bulk/obo/{regelType}")
+    @PostMapping("bulk/obo/{regelType}",consumes = [APPLICATION_JSON_VALUE])
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = "Kjør bulkregler for en ansatt",
@@ -103,7 +103,7 @@ class TilgangController(
     fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>,request: HttpServletRequest) =
         bulkOppslag({token.ansattId!!},{token.erObo},brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet(),request.requestURI)
 
-    @PostMapping("bulk/ccf/{ansattId}")
+    @PostMapping("bulk/ccf/{ansattId}",consumes = [APPLICATION_JSON_VALUE])
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = "Kjør bulkregler for en ansatt",
@@ -112,7 +112,7 @@ class TilgangController(
     fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody specs: Set<BrukerIdOgRegelsett>,request: HttpServletRequest) =
         bulkOppslag({ansattId},{token.erCC}, specs,request.requestURI)
 
-    @PostMapping("bulk/ccf/{ansattId}/{regelType}")
+    @PostMapping("bulk/ccf/{ansattId}/{regelType}",consumes = [APPLICATION_JSON_VALUE])
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = "Kjør bulkregler for en ansatt",

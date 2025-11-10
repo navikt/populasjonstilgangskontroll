@@ -78,7 +78,6 @@ spec:
       rules:
         - application: entra-proxy
           namespace: sikkerhetstjenesten
-        - namespace: nom
         - application: skjermede-personer-pip
           namespace: nom
         - application: ao-oppfolgingskontor

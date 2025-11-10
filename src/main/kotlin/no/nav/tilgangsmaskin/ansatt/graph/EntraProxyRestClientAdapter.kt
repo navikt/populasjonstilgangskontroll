@@ -13,10 +13,10 @@ class EntraProxyRestClientAdapter(@Qualifier(PROXY) restClient: RestClient, val 
     AbstractRestClientAdapter(restClient, cf) {
 
     fun tema(tema: String) =
-        get<Set<String>>(cf.temaURI(tema))
+        get<Set<Any>>(cf.temaURI(tema))
 
     fun enhet(enhet: String) =
-        get<Set<String>>(cf.enhetURI(enhet))
+        get<Set<Any>>(cf.enhetURI(enhet))
 
     override fun toString() = "${javaClass.simpleName} [client=$restClient, config=$cf, errorHandler=$errorHandler]"
 

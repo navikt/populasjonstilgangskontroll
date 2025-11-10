@@ -8,6 +8,7 @@ import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.ansatt.graph.EntraProxyRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
@@ -61,7 +62,16 @@ class DevTilgangController(
     private val oid: AnsattOidTjeneste,
     private val nom: NomTjeneste,
     private val pdl: PDLTjeneste,
+    private val proxy: EntraProxyRestClientAdapter,
     private val cache: CacheClient) {
+
+
+    @GetMapping("proxy/enhet{enhet}")
+    fun enhet(@PathVariable  enhet: String) = proxy.enhet(enhet)
+
+    @GetMapping("proxy/tema{tema}")
+    fun tema(@PathVariable  tema: String) = proxy.tema(tema)
+    
 
     @PostMapping("oppfolging/bulk")
     fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)

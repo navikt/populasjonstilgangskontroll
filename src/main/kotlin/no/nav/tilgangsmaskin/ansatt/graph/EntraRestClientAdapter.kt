@@ -2,16 +2,18 @@ package no.nav.tilgangsmaskin.ansatt.graph
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import java.util.*
 
 @Component
 class EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: EntraConfig) :
-    AbstractRestClientAdapter(restClient, cf) {
+AbstractRestClientAdapter(restClient, cf) {
 
     fun oidFraEntra(ansattId: String) =
         get<EntraSaksbehandlerRespons>(cf.userURI(ansattId)).oids.single().id
@@ -34,3 +36,4 @@ class EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: E
     override fun toString() = "${javaClass.simpleName} [client=$restClient, config=$cf, errorHandler=$errorHandler]"
 
 }
+

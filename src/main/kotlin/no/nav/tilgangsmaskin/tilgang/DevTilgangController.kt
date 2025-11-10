@@ -66,10 +66,10 @@ class DevTilgangController(
     private val cache: CacheClient) {
 
 
-    @GetMapping("proxy/enhet{enhet}")
+    @GetMapping("proxy/enhet/{enhet}")
     fun enhet(@PathVariable  enhet: String) = proxy.enhet(enhet)
 
-    @GetMapping("proxy/tema{tema}")
+    @GetMapping("proxy/tema/{tema}")
     fun tema(@PathVariable  tema: String) = proxy.tema(tema)
 
 

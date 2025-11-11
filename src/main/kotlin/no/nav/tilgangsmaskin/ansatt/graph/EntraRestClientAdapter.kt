@@ -13,6 +13,8 @@ import java.util.*
 class EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: EntraConfig) :
     AbstractRestClientAdapter(restClient, cf) {
 
+    val erOppfriskBar = cf.oppfriskbar
+
     fun oidFraEntra(ansattId: String) =
         get<EntraSaksbehandlerRespons>(cf.userURI(ansattId)).oids.single().id
 

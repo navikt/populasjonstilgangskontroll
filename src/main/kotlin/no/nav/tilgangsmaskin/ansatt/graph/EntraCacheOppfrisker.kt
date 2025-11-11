@@ -15,12 +15,14 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
     override val cacheName: String = GRAPH
 
     override fun doOppfrisk(nøkkelElementer: CacheNøkkelElementer) {
-        val ansattId = AnsattId(nøkkelElementer.id)
-        MDC.put(USER_ID, ansattId.verdi)
-        when (nøkkelElementer.metode) {
-            "geoOgGlobaleGrupper" -> entra.geoOgGlobaleGrupper(ansattId, oidTjeneste.oidFraEntra(ansattId))
-            "geoGrupper" -> entra.geoGrupper(ansattId, oidTjeneste.oidFraEntra(ansattId))
-            else -> error("Ukjent metode ${nøkkelElementer.metode} i nøkkel ${nøkkelElementer.nøkkel}")
+        if (entra.erOppfriskbar) {
+            val ansattId = AnsattId(nøkkelElementer.id)
+            MDC.put(USER_ID, ansattId.verdi)
+            when (nøkkelElementer.metode) {
+                "geoOgGlobaleGrupper" -> entra.geoOgGlobaleGrupper(ansattId, oidTjeneste.oidFraEntra(ansattId))
+                "geoGrupper" -> entra.geoGrupper(ansattId, oidTjeneste.oidFraEntra(ansattId))
+                else -> error("Ukjent metode ${nøkkelElementer.metode} i nøkkel ${nøkkelElementer.nøkkel}")
+            }
         }
     }
 }

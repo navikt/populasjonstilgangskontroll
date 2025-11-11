@@ -13,7 +13,8 @@ class EntraConfig(
     baseUri: URI,
     pingPath: String = DEFAULT_PING_PATH,
     private val size: Int = DEFAULT_BATCH_SIZE,
-    enabled: Boolean = true) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
+    enabled: Boolean = true,
+    val oppfriskbar: Boolean = true) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
 
     override val navn = name
     override val varighet = Duration.ofHours(3)

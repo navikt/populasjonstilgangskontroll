@@ -25,8 +25,10 @@ class CacheClient(
 
     val log = getLogger(javaClass)
 
+     fun  deleteOne(key: String) = conn.sync().del(key)
 
-    @WithSpan
+
+        @WithSpan
     inline fun <reified T> getOne(cache: CachableConfig, id: String) =
             conn.sync().get(handler.tilNøkkel(cache,id))?.let { json ->
                 handler.fraJson<T>(json)

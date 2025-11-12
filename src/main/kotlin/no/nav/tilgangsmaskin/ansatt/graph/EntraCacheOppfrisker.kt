@@ -34,6 +34,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
         MDC.put(USER_ID, ansattId.verdi)
         val oid  = oidTjeneste.oidFraEntra(ansattId)
         runCatching {
+            log.trace("Oppfrisk med id {} og metode {}", oid,metode)
             invoke(metode, oid, ansattId)
         }.getOrElse {
             if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {

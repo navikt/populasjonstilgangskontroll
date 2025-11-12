@@ -8,6 +8,7 @@ import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOppfrisker
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
+import no.nav.tilgangsmaskin.regler.motor.OppfriskingTeller
 import org.jboss.logging.MDC
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.stereotype.Component
@@ -16,7 +17,7 @@ import java.util.UUID
 import kotlin.getOrElse
 
 @Component
-class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste: AnsattOidTjeneste, private val cache: CacheClient) : AbstractCacheOppfrisker() {
+class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste: AnsattOidTjeneste, private val cache: CacheClient, private val teller: OppfriskingTeller) : AbstractCacheOppfrisker() {
 
     override val cacheName: String = GRAPH
 
@@ -38,8 +39,8 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
             if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {
                 log.info("Ansatt ${ansattId.verdi} med oid $oid ikke funnet i Entra, sletter og refresher cache entry ${elementer.nøkkel}")
                 cache.delete(elementer.nøkkel)
-                oid = oidTjeneste.oidFraEntra(ansattId)
-                invoke(metode, oid, ansattId)
+                invoke(metode, oidTjeneste.oidFraEntra(ansattId), ansattId)
+                teller.tell()
             }
             else {
                 loggOppfriskingFeilet(elementer, it)

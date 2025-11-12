@@ -32,7 +32,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
     private fun oppfriskMedMetode(elementer: CacheNøkkelElementer, metode: Method) {
         val ansattId = AnsattId(elementer.id)
         MDC.put(USER_ID, ansattId.verdi)
-        var oid  = oidTjeneste.oidFraEntra(ansattId)
+        val oid  = oidTjeneste.oidFraEntra(ansattId)
         runCatching {
             invoke(metode, oid, ansattId)
         }.getOrElse {

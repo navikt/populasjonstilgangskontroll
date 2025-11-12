@@ -23,24 +23,24 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
 
     override fun doOppfrisk(elementer: CacheNøkkelElementer) {
         when (elementer.metode) {
-            GEO -> oppfriskMedMetode(elementer,GEO_METODE)
-            GEO_OG_GLOBALE -> oppfriskMedMetode(elementer,GEO_OG_GLOBALE_METODE)
+            GEO -> oppfriskMedMetode(elementer,GEO)
+            GEO_OG_GLOBALE -> oppfriskMedMetode(elementer,GEO_OG_GLOBALE)
             else -> error("Ukjent metode ${elementer.metode} i nøkkel ${elementer.nøkkel}")
         }
     }
 
-    private fun oppfriskMedMetode(elementer: CacheNøkkelElementer, metode: Method) {
+    private fun oppfriskMedMetode(elementer: CacheNøkkelElementer, metode: String) {
         val ansattId = AnsattId(elementer.id)
         MDC.put(USER_ID, ansattId.verdi)
         val oid  = oidTjeneste.oidFraEntra(ansattId)
         runCatching {
             log.trace("Oppfrisk med id {} og metode {}", oid,metode)
-            invoke(metode, oid, ansattId)
+            invoke(metode, ansattId, oid)
         }.getOrElse {
             if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {
                 log.info("Ansatt ${ansattId.verdi} med oid $oid ikke funnet i Entra, sletter og refresher cache entry ${elementer.nøkkel}")
                 cache.delete(elementer.nøkkel)
-                invoke(metode, oidTjeneste.oidFraEntra(ansattId), ansattId)
+                invoke(metode, ansattId, oid)
                 teller.tell()
             }
             else {
@@ -48,13 +48,17 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
             }
         }
     }
-    private fun invoke(metode: Method, oid: UUID, ansattId: AnsattId) =
-        metode.invoke(entra, ansattId, oid)
+
+    private fun invoke(metode: String, ansattId: AnsattId, oid: UUID) {
+        when (metode) {
+            GEO -> entra.geoGrupper(ansattId, oid)
+            GEO_OG_GLOBALE -> entra.geoOgGlobaleGrupper(ansattId, oid)
+            else -> error("Ukjent metode $metode")
+        }
+    }
 
     companion object {
         private const val GEO = "geoGrupper"
         private const val GEO_OG_GLOBALE = "geoOgGlobaleGrupper"
-        private val GEO_METODE = EntraTjeneste::class.java.getMethod(GEO, AnsattId::class.java, UUID::class.java)
-        private val GEO_OG_GLOBALE_METODE = EntraTjeneste::class.java.getMethod(GEO_OG_GLOBALE, AnsattId::class.java, UUID::class.java)
     }
 }

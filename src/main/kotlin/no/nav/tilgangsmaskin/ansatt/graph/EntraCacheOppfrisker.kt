@@ -41,6 +41,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
                 log.info("Ansatt {} med oid {} ikke funnet i Entra, sletter og refresher cache entry {}", ansattId.verdi, oid, nøkkel)
                 cache.delete(nøkkel)
                 val nyoid = oidTjeneste.oidFraEntra(ansattId)
+                log.info("Refreshet oid for ansatt {} er {}", ansattId.verdi, nyoid)
                 invoke(metode, ansattId, nyoid)
                 teller.tell()
             }

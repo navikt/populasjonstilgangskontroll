@@ -12,7 +12,6 @@ import no.nav.tilgangsmaskin.regler.motor.OppfriskingTeller
 import org.jboss.logging.MDC
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.stereotype.Component
-import java.lang.reflect.Method
 import java.util.UUID
 import kotlin.getOrElse
 
@@ -34,13 +33,13 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
         MDC.put(USER_ID, ansattId.verdi)
         val oid  = oidTjeneste.oidFraEntra(ansattId)
         runCatching {
-            log.trace("Oppfrisk med id {} og metode {}", oid,metode)
+            log.trace("Oppfrisk med ansatt ${ansattId.verdi}, id {} og metode {}", oid,metode)
             invoke(metode, ansattId, oid)
         }.getOrElse {
             if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {
                 log.info("Ansatt ${ansattId.verdi} med oid $oid ikke funnet i Entra, sletter og refresher cache entry ${elementer.nøkkel}")
-                cache.delete(elementer.nøkkel)
-                invoke(metode, ansattId, oid)
+                cache.delete("entraoid:: " + elementer.id)
+                invoke(metode, ansattId, oidTjeneste.oidFraEntra(ansattId))
                 teller.tell()
             }
             else {

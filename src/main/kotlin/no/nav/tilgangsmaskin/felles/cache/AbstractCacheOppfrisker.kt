@@ -8,12 +8,12 @@ abstract class AbstractCacheOppfrisker : CacheOppfrisker {
 
     protected abstract fun doOppfrisk(elementer: CacheNøkkelElementer)
 
-    final override fun oppfrisk(nøkkelElementer: CacheNøkkelElementer) {
+    final override fun oppfrisk(elementer: CacheNøkkelElementer) {
         runCatching {
-            doOppfrisk(nøkkelElementer)
-            log.info("Oppfrisking av ${nøkkelElementer.cacheName}::${nøkkelElementer.id.maskFnr()} OK")
+            doOppfrisk(elementer)
+            log.info("Oppfrisking av ${elementer.cacheName}::${elementer.id.maskFnr()} OK")
         }.getOrElse {
-            loggOppfriskingFeilet(nøkkelElementer, it)
+            loggOppfriskingFeilet(elementer, it)
         }
     }
   protected fun loggOppfriskingFeilet(elementer: CacheNøkkelElementer, feil: Throwable) {

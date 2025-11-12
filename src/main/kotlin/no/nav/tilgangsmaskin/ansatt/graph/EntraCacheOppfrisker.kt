@@ -26,7 +26,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
         when (elementer.metode) {
             GEO -> oppfriskMedMetode(elementer,GEO)
             GEO_OG_GLOBALE -> oppfriskMedMetode(elementer,GEO_OG_GLOBALE)
-            else -> error("Ukjent metode ${elementer.metode} i nøkkel ${elementer.nøkkel}")
+            else -> log.warn("Ukjent metode ${elementer.metode} i nøkkel ${elementer.nøkkel}")
         }
     }
 
@@ -38,7 +38,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
             invoke(metode, ansattId, oid)
         }.getOrElse {
             if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {
-                log.info("Ansatt {} med oid {} ikke funnet i Entra, sletter og refresher cache entry", ansattId.verdi, oid)
+                log.warn("Ansatt {} med oid {} ikke funnet i Entra, sletter og refresher cache entry", ansattId.verdi, oid)
                 cache.delete(OID_CACHE,elementer.id)
                 val nyoid = oidTjeneste.oidFraEntra(ansattId)
                 log.info("Refresh oid OK for ansatt {}, ny verdi er {}", ansattId.verdi, nyoid)

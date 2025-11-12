@@ -39,7 +39,9 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
             if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {
                 log.info("Ansatt ${ansattId.verdi} med oid $oid ikke funnet i Entra, sletter og refresher cache entry entraoid::${elementer.id}")
                 cache.delete("entraoid:: " + elementer.id)
-                oidTjeneste.oidFraEntra(ansattId)
+                val nyoid = oidTjeneste.oidFraEntra(ansattId)
+                log.trace("Refreshet oid for ansatt {} er {}", ansattId.verdi, nyoid)
+                invoke(metode, ansattId, nyoid)
                 teller.tell()
             }
             else {

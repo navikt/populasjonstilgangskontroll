@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.graph
 
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
+import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste.Companion.ENTRA_OID
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelElementer
 import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOppfrisker
@@ -33,17 +34,13 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
         MDC.put(USER_ID, ansattId.verdi)
         val oid  = oidTjeneste.oidFraEntra(ansattId)
         runCatching {
-            log.trace("Oppfrisk med ansatt ${ansattId.verdi}, id {} og metode {}", oid,metode)
             invoke(metode, ansattId, oid)
         }.getOrElse {
             if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {
-                var nøkkel = "entraoid::${elementer.id}"
-                log.info("Ansatt ${ansattId.verdi} med oid $oid ikke funnet i Entra, sletter og refresher cache entry $nøkkel")
-                cache.delete(nøkkel).also {
-                    log.trace("Sletting status $it  for nøkkel $nøkkel")
-                }
+                val nøkkel = "$ENTRA_OID::${elementer.id}"
+                log.info("Ansatt {} med oid {} ikke funnet i Entra, sletter og refresher cache entry {}", ansattId.verdi, oid, nøkkel)
+                cache.delete(nøkkel)
                 val nyoid = oidTjeneste.oidFraEntra(ansattId)
-                log.trace("Refreshet oid for ansatt {} er {}", ansattId.verdi, nyoid)
                 invoke(metode, ansattId, nyoid)
                 teller.tell()
             }
@@ -57,7 +54,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
         when (metode) {
             GEO -> entra.geoGrupper(ansattId, oid)
             GEO_OG_GLOBALE -> entra.geoOgGlobaleGrupper(ansattId, oid)
-            else -> error("Ukjent metode $metode")
+            else -> log.warn("Ukjent metode $metode for ansatt ${ansattId.verdi} og oid $oid")
         }
     }
 

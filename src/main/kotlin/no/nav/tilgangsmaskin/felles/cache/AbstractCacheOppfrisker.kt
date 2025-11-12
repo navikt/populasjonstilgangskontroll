@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory.getLogger
 abstract class AbstractCacheOppfrisker : CacheOppfrisker {
     protected val log = getLogger(javaClass)
 
-    protected abstract fun doOppfrisk(nøkkelElementer: CacheNøkkelElementer)
+    protected abstract fun doOppfrisk(elementer: CacheNøkkelElementer)
 
     final override fun oppfrisk(nøkkelElementer: CacheNøkkelElementer) {
         runCatching {
@@ -16,14 +16,14 @@ abstract class AbstractCacheOppfrisker : CacheOppfrisker {
             loggOppfriskingFeilet(nøkkelElementer, it)
         }
     }
-  protected fun loggOppfriskingFeilet(nøkkelElementer: CacheNøkkelElementer, feil: Throwable) {
-        log.warn("Oppfrisking av ${nøkkelElementer.cacheName}::${nøkkelElementer.id.maskFnr()} feilet", feil)
+  protected fun loggOppfriskingFeilet(elementer: CacheNøkkelElementer, feil: Throwable) {
+        log.warn("Oppfrisking av ${elementer.cacheName}::${elementer.id.maskFnr()} feilet", feil)
     }
 }
 
 interface CacheOppfrisker {
     val cacheName: String
-    fun oppfrisk(nøkkelElementer: CacheNøkkelElementer)
+    fun oppfrisk(elementer: CacheNøkkelElementer)
 }
 
 data class CacheNøkkelElementer(val nøkkel: String) {

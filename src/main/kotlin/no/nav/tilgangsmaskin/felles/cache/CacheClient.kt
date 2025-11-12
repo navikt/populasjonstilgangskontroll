@@ -25,7 +25,7 @@ class CacheClient(
 
     val log = getLogger(javaClass)
 
-     fun  deleteOne(key: String) = conn.sync().del(key)
+     fun  delete(vararg keys: String) = conn.sync().del(*keys)
 
 
         @WithSpan

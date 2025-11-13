@@ -10,7 +10,7 @@ class OppfølgingCacheOppfrisker(private val oppfølging: OppfølgingTjeneste) :
 
     override val cacheName: String = OPPFØLGING
 
-    override fun doOppfrisk(nøkkelElementer: CacheNøkkelElementer) {
-        oppfølging.enhetFor(nøkkelElementer.id)
+    override fun doOppfrisk(elementer: CacheNøkkelElementer) {
+        oppfølging.enhetFor(elementer.id)
     }
 }

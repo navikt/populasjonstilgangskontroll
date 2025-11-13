@@ -41,5 +41,9 @@ class TokenTypeTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "token.type", "Token type")
 
 @Component
-class OppfølgingskontorTeller(registry: MeterRegistry, token: Token) :
-    AbstractTeller(registry, token, "oppfolging", "Oppfølgingskontor hits/misses")
+class OppfølgingkontorTeller(registry: MeterRegistry, token: Token) :
+    AbstractTeller(registry, token, "oppfolging", "Oppfølgingkontor hits/misses")
+
+@Component
+class OppfriskingTeller(registry: MeterRegistry, token: Token) :
+    AbstractTeller(registry, token, "endringer", "Endrede user oids")

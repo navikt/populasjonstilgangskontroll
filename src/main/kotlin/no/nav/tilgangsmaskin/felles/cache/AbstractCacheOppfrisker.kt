@@ -4,23 +4,26 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 
 abstract class AbstractCacheOppfrisker : CacheOppfrisker {
-    private val log = getLogger(javaClass)
+    protected val log = getLogger(javaClass)
 
-    final override fun oppfrisk(nøkkelElementer: CacheNøkkelElementer) {
+    protected abstract fun doOppfrisk(elementer: CacheNøkkelElementer)
+
+    final override fun oppfrisk(elementer: CacheNøkkelElementer) {
         runCatching {
-            doOppfrisk(nøkkelElementer)
-            log.info("Oppfrisking av ${nøkkelElementer.cacheName}::${nøkkelElementer.id.maskFnr()} OK")
+            doOppfrisk(elementer)
+            log.info("Oppfrisking av ${elementer.cacheName}::${elementer.id.maskFnr()} OK")
         }.getOrElse {
-            log.info("Oppfrisking av ${nøkkelElementer.nøkkel} etter sletting feilet, dette er ikke kritisk", it)
+            loggOppfriskingFeilet(elementer, it)
         }
     }
-
-    protected abstract fun doOppfrisk(nøkkelElementer: CacheNøkkelElementer)
+  protected fun loggOppfriskingFeilet(elementer: CacheNøkkelElementer, feil: Throwable) {
+        log.warn("Oppfrisking av ${elementer.cacheName}::${elementer.id.maskFnr()} feilet", feil)
+    }
 }
 
 interface CacheOppfrisker {
     val cacheName: String
-    fun oppfrisk(nøkkelElementer: CacheNøkkelElementer)
+    fun oppfrisk(elementer: CacheNøkkelElementer)
 }
 
 data class CacheNøkkelElementer(val nøkkel: String) {

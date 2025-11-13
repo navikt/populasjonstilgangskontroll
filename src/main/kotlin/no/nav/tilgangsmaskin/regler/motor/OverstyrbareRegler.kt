@@ -16,7 +16,7 @@ interface OverstyrbarRegel : Regel
 
 @Component
 @Order(LOWEST_PRECEDENCE)
-class GeografiskRegel(private val oppfølging: OppfølgingTjeneste,private val teller: OppfølgingskontorTeller) : GlobalGruppeRegel(NASJONAL), OverstyrbarRegel {
+class GeografiskRegel(private val oppfølging: OppfølgingTjeneste,private val teller: OppfølgingkontorTeller) : GlobalGruppeRegel(NASJONAL), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         godtaHvis {
             ansatt erMedlemAv NASJONAL

@@ -1,9 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
-import no.nav.tilgangsmaskin.felles.cache.CacheAdapter.Companion.VALKEY
-import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus

@@ -53,6 +53,10 @@ class OverstyringEntityListener(private val token: Token) {
                 it.isAccessible = true
                 it.set(target, token.system)
             }
+            if (it.isAnnotationPresent(CreatedByAnsatt::class.java)) {
+                it.isAccessible = true
+                it.set(target, token.ansattId?.verdi ?: token.system)
+            }
         }
     }
 }

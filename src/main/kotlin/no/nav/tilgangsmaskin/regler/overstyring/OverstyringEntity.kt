@@ -40,7 +40,7 @@ class OverstyringEntity(
     var updated: Instant? = null
 
     @Column(name = "oppretter", length = 7)
-    @CreatedBy
+    @CreatedByAnsatt
     var oppretter: String? = null
 
     @Column(name = "system", length = 50)
@@ -52,3 +52,7 @@ class OverstyringEntity(
 @Target(FIELD)
 @Retention(RUNTIME)
 annotation class CreatedBySystem
+
+@Target(FIELD)
+@Retention(RUNTIME)
+annotation class CreatedByAnsatt

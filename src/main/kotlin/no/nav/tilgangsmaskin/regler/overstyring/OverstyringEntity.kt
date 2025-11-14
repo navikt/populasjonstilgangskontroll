@@ -9,13 +9,14 @@ import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
 import org.hibernate.annotations.Check
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.Instant
 import kotlin.annotation.AnnotationRetention.RUNTIME
 import kotlin.annotation.AnnotationTarget.FIELD
 
 @Entity(name = "overstyring")
 @Table(indexes = [Index(name = "idx_overstyringentity_navid", columnList = "navid, fnr")])
-@EntityListeners(OverstyringEntityListener::class)
+@EntityListeners(OverstyringEntityListener::class, AuditingEntityListener::class)
 @Check(constraints = "char_length(begrunnelse) >= 10 AND char_length(begrunnelse) <= 255")
 class OverstyringEntity(
         @Column(length = 7, nullable = false) val navid: String,

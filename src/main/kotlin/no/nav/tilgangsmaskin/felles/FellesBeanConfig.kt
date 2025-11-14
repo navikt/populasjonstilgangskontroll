@@ -19,6 +19,11 @@ import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.actuate.audit.InMemoryAuditEventRepository
+import org.springframework.boot.actuate.health.Status.DOWN
+import org.springframework.boot.actuate.health.Status.OUT_OF_SERVICE
+import org.springframework.boot.actuate.health.Status.UNKNOWN
+import org.springframework.boot.actuate.health.Status.UP
+import org.springframework.boot.actuate.health.StatusAggregator
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.Include.defaultIncludes
@@ -47,6 +52,15 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer {
         it.featuresToEnable(INCLUDE_SOURCE_IN_LOCATION)
         it.mixIns(mapOf(OAuth2AccessTokenResponse::class.java to IgnoreUnknownMixin::class.java))
+    }
+
+    @Bean
+    fun outOfServiceIgnoringStatusAggregator() = StatusAggregator {
+        when {
+            DOWN in it && OUT_OF_SERVICE !in it -> DOWN
+            UP in it && OUT_OF_SERVICE !in it -> UP
+            else -> UNKNOWN
+        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

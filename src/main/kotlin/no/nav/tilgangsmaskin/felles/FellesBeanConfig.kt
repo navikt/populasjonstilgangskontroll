@@ -16,8 +16,6 @@ import no.nav.tilgangsmaskin.tilgang.Token
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
-import org.slf4j.LoggerFactory.getLogger
-import org.springframework.boot.actuate.audit.InMemoryAuditEventRepository
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.Include.defaultIncludes
@@ -25,6 +23,7 @@ import org.springframework.boot.health.actuate.endpoint.StatusAggregator
 import org.springframework.boot.health.contributor.Status.DOWN
 import org.springframework.boot.health.contributor.Status.UP
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
+import org.springframework.boot.jackson2.autoconfigure.Jackson2ObjectMapperBuilderCustomizer
 import org.springframework.boot.restclient.RestClientCustomizer
 import org.springframework.boot.servlet.actuate.web.exchanges.HttpExchangesFilter
 import org.springframework.context.annotation.Bean
@@ -43,13 +42,15 @@ import java.util.function.Function
 @Configuration
 class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : WebMvcConfigurer {
 
-    private val log = getLogger(javaClass)
-
     @Bean
-    fun jackson3Customizer() = JsonMapperBuilderCustomizer {
+    fun jackson3Customizer() = JsonMapperBuilderCustomizer { // TODO fjern når spring boot 4
         it.addMixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
     }
 
+    @Bean
+    fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer {
+        it.mixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
+    }
     @Bean
     fun outOfServiceIgnoringStatusAggregator() = StatusAggregator {
         when {
@@ -89,10 +90,6 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     @Bean
     @ConditionalOnNotProd
     fun traceRepository() = InMemoryHttpExchangeRepository()
-
-    //@Bean
-   // @ConditionalOnNotProd
-   // fun auditRepository() = InMemoryAuditEventRepository()
 
 
     @Bean

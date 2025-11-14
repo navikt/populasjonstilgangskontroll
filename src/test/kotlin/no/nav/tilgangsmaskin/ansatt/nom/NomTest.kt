@@ -66,14 +66,14 @@ internal class NomTest {
         assertThat(nom.fnrForAnsatt(ansattId)).isNull()
     }
 
-   // @Test
+   @Test
     @DisplayName("Ansatt uten sluttdato er gyldig")
     fun ingenSluttdato() {
         nom.lagre(GYLDIG)
         assertThat(nom.fnrForAnsatt(ansattId)).isEqualTo(GYLDIG.brukerId)
     }
 
-   // @Test
+   @Test
     @DisplayName("Siste hendelse gjelder")
     fun oppdaterSamme() {
         nom.lagre(UTGÅTT)

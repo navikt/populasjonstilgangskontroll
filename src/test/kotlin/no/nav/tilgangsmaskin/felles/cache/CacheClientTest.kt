@@ -56,7 +56,7 @@ class CacheClientTest {
 
     private val pdl = CachableConfig(PDL,"medFamilie")
 
-   // @Autowired
+   // @Autowired  //TODO
     private  val objectMapper: ObjectMapper = jacksonObjectMapper()
 
     private lateinit var valkeyMapper: ObjectMapper

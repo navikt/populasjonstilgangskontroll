@@ -57,9 +57,8 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     @Bean
     fun outOfServiceIgnoringStatusAggregator() = StatusAggregator {
         when {
-            DOWN in it && OUT_OF_SERVICE !in it -> DOWN
-            UP in it && OUT_OF_SERVICE !in it -> UP
-            else -> UNKNOWN
+            DOWN in it -> DOWN
+            else -> UP
         }
     }
 

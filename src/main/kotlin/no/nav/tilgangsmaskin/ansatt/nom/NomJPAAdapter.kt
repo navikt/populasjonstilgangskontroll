@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
-import jakarta.persistence.EntityManager
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.toInstant
@@ -9,7 +8,7 @@ import java.time.Instant
 
 
 @Component
-class NomJPAAdapter(val repo: NomRepository, val entityManager: EntityManager) {
+class NomJPAAdapter(val repo: NomRepository/*, val entityManager: EntityManager*/) {
 
     fun ryddOpp() = repo.deleteByGyldigtilBefore()
 
@@ -19,13 +18,16 @@ class NomJPAAdapter(val repo: NomRepository, val entityManager: EntityManager) {
         }
 
     private fun upsert(ansattId: AnsattId, ansattFnr: BrukerId, start: Instant, slutt: Instant) =
-
+         Unit
+    /*
         entityManager.createNativeQuery(UPSERT_QUERY)
             .setParameter("navid", ansattId.verdi)
             .setParameter("fnr", ansattFnr.verdi)
             .setParameter("startdato", start)
             .setParameter("gyldigtil", slutt)
             .executeUpdate()
+
+     */
 
     fun fnrForAnsatt(ansattId: String) = repo.ansattBrukerId(ansattId)?.let(::BrukerId)
 

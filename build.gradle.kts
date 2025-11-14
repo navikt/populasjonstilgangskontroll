@@ -15,7 +15,7 @@ plugins {
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
-    id("org.springframework.boot") version "3.5.7"
+    id("org.springframework.boot") version "4.0.0-RC2"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.cyclonedx.bom") version "2.4.1"
     id("com.google.cloud.tools.jib") version "3.4.5"
@@ -41,6 +41,7 @@ configurations.all {
 }
 
 dependencies {
+    implementation("org.springframework.boot:spring-boot-testcontainers:4.0.0-RC2")
     implementation("org.apache.commons:commons-pool2:2.12.1")
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.21.0")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.21.0-alpha")
@@ -68,21 +69,26 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-graphql")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.kafka:spring-kafka")
-    implementation("org.springframework.retry:spring-retry")
     implementation("org.springframework:spring-aspects")
+    implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
+    testImplementation("org.springframework.boot:spring-boot-micrometer-metrics-test")
     testImplementation("com.redis:testcontainers-redis")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
-        exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+        exclude("org.junit.vintage","junit-vintage-engine")
     }
     testImplementation("org.awaitility:awaitility-kotlin:4.3.0")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
-    testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.testcontainers:postgresql")
+    testImplementation("org.testcontainers:junit-jupiter:1.21.3")
+    testImplementation("org.testcontainers:postgresql:1.21.3")
+    testImplementation("org.springframework.boot:spring-boot-starter-restclient-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-data-redis-test")
     testImplementation(kotlin("test"))
 }
 

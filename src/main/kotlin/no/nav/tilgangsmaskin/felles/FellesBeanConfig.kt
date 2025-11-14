@@ -19,17 +19,15 @@ import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.actuate.audit.InMemoryAuditEventRepository
-import org.springframework.boot.actuate.health.Status.DOWN
-import org.springframework.boot.actuate.health.Status.OUT_OF_SERVICE
-import org.springframework.boot.actuate.health.Status.UNKNOWN
-import org.springframework.boot.actuate.health.Status.UP
-import org.springframework.boot.actuate.health.StatusAggregator
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.Include.defaultIncludes
-import org.springframework.boot.actuate.web.exchanges.servlet.HttpExchangesFilter
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
-import org.springframework.boot.web.client.RestClientCustomizer
+import org.springframework.boot.health.actuate.endpoint.StatusAggregator
+import org.springframework.boot.health.contributor.Status.DOWN
+import org.springframework.boot.health.contributor.Status.UP
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
+import org.springframework.boot.restclient.RestClientCustomizer
+import org.springframework.boot.servlet.actuate.web.exchanges.HttpExchangesFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
@@ -49,9 +47,8 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     private val log = getLogger(javaClass)
 
     @Bean
-    fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer {
-        it.featuresToEnable(INCLUDE_SOURCE_IN_LOCATION)
-        it.mixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
+    fun jackson3Customizer() = JsonMapperBuilderCustomizer {
+        it.addMixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
     }
 
     @Bean
@@ -71,16 +68,17 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 
     @Bean
-    fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor, loggingInterceptor: LoggingRequestInterceptor) = RestClientCustomizer { c ->
-        c.requestFactory(HttpComponentsClientHttpRequestFactory().apply {
-            setConnectTimeout(2000)
-            setReadTimeout(2000)
-        })
-        c.requestInterceptors {
-            it.addFirst(interceptor)
-            it.add(loggingInterceptor)
+    fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor, loggingInterceptor: LoggingRequestInterceptor) =
+        RestClientCustomizer { c ->
+            c.requestFactory(HttpComponentsClientHttpRequestFactory().apply {
+                setConnectTimeout(2000)
+                setReadTimeout(2000)
+            })
+            c.requestInterceptors {
+                it.addFirst(interceptor)
+                it.add(loggingInterceptor)
+            }
         }
-    }
 
     @Bean
     fun clusterAddingTimedAspect(meterRegistry: MeterRegistry, token: Token) =

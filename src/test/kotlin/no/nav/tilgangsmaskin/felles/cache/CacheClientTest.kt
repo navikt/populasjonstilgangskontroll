@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.felles.cache
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
 import io.lettuce.core.RedisClient.create
@@ -21,8 +22,6 @@ import no.nav.tilgangsmaskin.tilgang.Token
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
-import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTest
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.test.context.ContextConfiguration
@@ -43,6 +42,8 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
+import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
+import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration
 import org.springframework.context.ApplicationEventPublisher
 
 @DataRedisTest
@@ -55,8 +56,8 @@ class CacheClientTest {
 
     private val pdl = CachableConfig(PDL,"medFamilie")
 
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper
+   // @Autowired
+    private  val objectMapper: ObjectMapper = jacksonObjectMapper()
 
     private lateinit var valkeyMapper: ObjectMapper
 

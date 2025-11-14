@@ -18,14 +18,14 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
-import org.springframework.retry.annotation.EnableRetry
+import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import kotlin.test.Test
 
 @ContextConfiguration(classes = [SkjermingTjeneste::class])
 @ExtendWith(MockKExtension::class)
-@EnableRetry
+@EnableResilientMethods
 @ActiveProfiles(TEST)
 @SpringBootTest(classes = [LoggingRetryListener::class])
 internal class SkjermingRetryTest {
@@ -50,7 +50,7 @@ internal class SkjermingRetryTest {
         assertThrows<RecoverableRestException> {
             tjeneste.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId)
         }
-        verify(exactly = 3) {
+        verify(exactly = 4) {
             tjeneste.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId)
         }
     }

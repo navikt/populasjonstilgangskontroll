@@ -78,6 +78,7 @@ internal class OverstyringTest {
         every { token.erObo } returns false
         every { token.erCC } returns true
         every { token.system } returns "test"
+        every { token.ansattId } returns ansattId
         every { token.systemNavn } returns "test"
         every { token.clusterAndSystem } returns "cluster:test"
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()

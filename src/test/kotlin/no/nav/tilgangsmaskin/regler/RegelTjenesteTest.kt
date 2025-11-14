@@ -102,6 +102,7 @@ class RegelTjenesteTest {
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
         every { oppfølging.enhetFor(vanligBrukerId.verdi) } returns Enhetsnummer("1234")
         every { token.system } returns "test"
+        every { token.ansattId } returns ansattId
         every { token.clusterAndSystem } returns "cluster:test"
         every { token.systemNavn } returns "test"
         every { token.erObo } returns false

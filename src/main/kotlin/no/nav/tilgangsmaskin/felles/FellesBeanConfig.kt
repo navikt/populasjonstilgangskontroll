@@ -51,7 +51,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     @Bean
     fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer {
         it.featuresToEnable(INCLUDE_SOURCE_IN_LOCATION)
-        it.mixIns(mapOf(OAuth2AccessTokenResponse::class.java to IgnoreUnknownMixin::class.java))
+        it.mixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
     }
 
     @Bean

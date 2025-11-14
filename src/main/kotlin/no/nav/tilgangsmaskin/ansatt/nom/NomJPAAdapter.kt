@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import jakarta.persistence.EntityManager
-import jakarta.persistence.PersistenceContext
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.toInstant
@@ -10,7 +9,7 @@ import java.time.Instant
 
 
 @Component
-class NomJPAAdapter(val repo: NomRepository, @PersistenceContext val entityManager: EntityManager) {
+class NomJPAAdapter(val repo: NomRepository, val entityManager: EntityManager) {
 
     fun ryddOpp() = repo.deleteByGyldigtilBefore()
 

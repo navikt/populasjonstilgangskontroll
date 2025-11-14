@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.felles
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
@@ -91,9 +90,9 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     @ConditionalOnNotProd
     fun traceRepository() = InMemoryHttpExchangeRepository()
 
-    @Bean
-    @ConditionalOnNotProd
-    fun auditRepository() = InMemoryAuditEventRepository()
+    //@Bean
+   // @ConditionalOnNotProd
+   // fun auditRepository() = InMemoryAuditEventRepository()
 
 
     @Bean

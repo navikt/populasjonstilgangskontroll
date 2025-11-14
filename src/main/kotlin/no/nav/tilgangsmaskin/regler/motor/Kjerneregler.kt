@@ -17,24 +17,19 @@ import org.springframework.stereotype.Component
 
 interface KjerneRegel : Regel
 
-@Component
-@Order(HIGHEST_PRECEDENCE)
+@OrderedComponent(HIGHEST_PRECEDENCE)
 class StrengtFortroligRegel : GlobalGruppeRegel(STRENGT_FORTROLIG), KjerneRegel
 
-@Component
-@Order(HIGHEST_PRECEDENCE + 1)
+@OrderedComponent(HIGHEST_PRECEDENCE + 1)
 class StrengtFortroligUtlandRegel : GlobalGruppeRegel(STRENGT_FORTROLIG_UTLAND), KjerneRegel
 
-@Component
-@Order(HIGHEST_PRECEDENCE + 2)
+@OrderedComponent(HIGHEST_PRECEDENCE + 2)
 class FortroligRegel : GlobalGruppeRegel(FORTROLIG), KjerneRegel
 
-@Component
-@Order(HIGHEST_PRECEDENCE + 3)
+@OrderedComponent(HIGHEST_PRECEDENCE + 3)
 class SkjermingRegel : GlobalGruppeRegel(SKJERMING), KjerneRegel
 
-@Order(HIGHEST_PRECEDENCE + 4)
-@Component
+@OrderedComponent(HIGHEST_PRECEDENCE + 4)
 class EgneDataRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis { ansatt erDenSammeSom bruker }
@@ -42,8 +37,7 @@ class EgneDataRegel : KjerneRegel {
     override val metadata = RegelMetadata(EGNEDATA)
 }
 
-@Order(HIGHEST_PRECEDENCE + 5)
-@Component
+@OrderedComponent(HIGHEST_PRECEDENCE + 5)
 class ForeldreOgBarnRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis { ansatt erForeldreEllerBarnTil bruker }
@@ -51,8 +45,7 @@ class ForeldreOgBarnRegel : KjerneRegel {
     override val metadata = RegelMetadata(FORELDREBARN)
 }
 
-@Order(HIGHEST_PRECEDENCE + 6)
-@Component
+@OrderedComponent(HIGHEST_PRECEDENCE + 6)
 class PartnerRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis { ansatt erNåværendeEllerTidligerePartnerMed bruker }
@@ -60,8 +53,7 @@ class PartnerRegel : KjerneRegel {
     override val metadata = RegelMetadata(PARTNER)
 }
 
-@Component
-@Order(HIGHEST_PRECEDENCE + 7)
+@OrderedComponent(HIGHEST_PRECEDENCE + 7)
 class SøskenRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis { ansatt erSøskenTil bruker }
@@ -69,13 +61,11 @@ class SøskenRegel : KjerneRegel {
     override val metadata = RegelMetadata(SØSKEN)
 }
 
-@Component
-@Order(HIGHEST_PRECEDENCE + 8)
+
+@OrderedComponent(HIGHEST_PRECEDENCE + 8)
 class FellesBarnRegel : KjerneRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis { ansatt harFellesBarnMed bruker }
 
     override val metadata = RegelMetadata(FELLES_BARN)
 }
-
-

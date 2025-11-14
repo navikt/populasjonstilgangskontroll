@@ -14,8 +14,7 @@ import org.springframework.stereotype.Component
 
 interface OverstyrbarRegel : Regel
 
-@Component
-@Order(LOWEST_PRECEDENCE)
+@OrderedComponent(LOWEST_PRECEDENCE)
 class GeografiskRegel(private val oppfølging: OppfølgingTjeneste,private val teller: OppfølgingkontorTeller) : GlobalGruppeRegel(NASJONAL), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         godtaHvis {
@@ -27,8 +26,7 @@ class GeografiskRegel(private val oppfølging: OppfølgingTjeneste,private val t
         }
 }
 
-@Component
-@Order(LOWEST_PRECEDENCE - 1)
+@OrderedComponent(LOWEST_PRECEDENCE - 1)
 class UkjentBostedRegel : GlobalGruppeRegel(UKJENT_BOSTED), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis {
@@ -36,8 +34,7 @@ class UkjentBostedRegel : GlobalGruppeRegel(UKJENT_BOSTED), OverstyrbarRegel {
         }
 }
 
-@Component
-@Order(LOWEST_PRECEDENCE - 2)
+@OrderedComponent(LOWEST_PRECEDENCE - 2)
 class UtlandRegel : GlobalGruppeRegel(UTENLANDSK), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis {

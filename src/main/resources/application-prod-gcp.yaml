@@ -1,19 +1,15 @@
-logging:
-    level:
-      org.springframework.data.redis: INFO
-      org.springframework.cache: INFO
 management:
   endpoint:
     env:
-      show-values: always
+      show-values: never
     configprops:
-      show-values: always
+      show-values: never
     health:
-      show-details: always
-      show-components: always
+      show-details: when_authorized
+      show-components: when_authorized
   endpoints:
     web:
       exposure:
-        include: '*'
+        include: health,info,metrics,prometheus
 oppfolging:
   enabled: false

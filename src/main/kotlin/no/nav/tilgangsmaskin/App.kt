@@ -4,6 +4,7 @@ import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import no.nav.tilgangsmaskin.felles.cache.CacheAdapter
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.profiler
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.local
 import no.nav.tilgangsmaskin.regler.motor.RegelSett
@@ -20,6 +21,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.retry.annotation.EnableRetry
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.stereotype.Component
+import kotlin.text.contains
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
@@ -44,16 +46,20 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, pr
     override fun contribute(builder: Builder) {
         with(ctx) {
             builder.withDetail(
-                "extra-info", mapOf(
+                "info", mapOf(
                     "Cluster" to ClusterUtils.current.clusterName,
                     "Startup" to startupDate.local(),
-                    "Java runtime version" to environment.getProperty("java.runtime.version"),
-                    "Java vendor" to environment.getProperty("java.vm.vendor"),
-                    "Client ID" to environment.getProperty("azure.app.client.id"),
                     "Name" to environment.getProperty("spring.application.name"),
-                    /*
+                    ))
+            if (!isProd) {
+                builder.withDetail("dev-info", mapOf(
+                    "Client ID" to environment.getProperty("azure.app.client.id"),
                     "Spring Boot version" to SpringBootVersion.getVersion(),
-                    "Spring Framework version" to SpringVersion.getVersion() */))
+                    "Spring Framework version" to SpringVersion.getVersion(),
+                    "Java runtime version" to environment.getProperty("java.runtime.version"),
+                    "Java vendor" to environment.getProperty("java.vm.vendor")
+                    ))
+            }
             regelsett.forEach {
                 builder.withDetail(it.beskrivelse, it.regler.map { "(${it.javaClass.simpleName}) ${it.kortNavn}" })
             }

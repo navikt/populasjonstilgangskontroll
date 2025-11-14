@@ -10,7 +10,6 @@ import jakarta.persistence.PreUpdate
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.stereotype.Component
 
@@ -75,11 +74,11 @@ class OverstyringEntityListener(private val token: Token) {
         setCreatedBySystem(target)
         val now = java.time.Instant.now()
         target::class.java.declaredFields.forEach {
-            if (it.isAnnotationPresent(LastModifiedDate::class.java)) {
+            if (it.isAnnotationPresent(LastModifiedDato::class.java)) {
                 it.isAccessible = true
                 it.set(target, now)
             }
-            if (it.isAnnotationPresent(CreatedDate::class.java)) {
+            if (it.isAnnotationPresent(CreatedDato::class.java)) {
                 it.isAccessible = true
                 it.set(target, now)
             }

@@ -29,11 +29,11 @@ class OverstyringEntity(
     @GeneratedValue(strategy = IDENTITY)
     val id: Long = 0
 
-    @CreatedDate
+    @CreatedDato
     @Column(nullable = false)
     var created: Instant? = null
 
-    @LastModifiedDate
+    @LastModifiedDato
     @Column(nullable = false)
     var updated: Instant? = null
 
@@ -54,3 +54,11 @@ annotation class CreatedBySystem
 @Target(FIELD)
 @Retention(RUNTIME)
 annotation class CreatedByAnsatt
+
+@Target(FIELD)
+@Retention(RUNTIME)
+annotation class CreatedDato
+
+@Target(FIELD)
+@Retention(RUNTIME)
+annotation class LastModifiedDato

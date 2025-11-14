@@ -124,6 +124,7 @@ spring:
   main:
     banner-mode: off
   jackson:
+    use-jackson2-defaults: true
     deserialization:
       fail-on-unknown-properties: true
     default-property-inclusion: non_null

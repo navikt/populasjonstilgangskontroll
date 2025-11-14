@@ -70,6 +70,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.boot:spring-boot-jackson2")
+
     implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework:spring-aspects")
     implementation("org.springframework.boot:spring-boot-starter-opentelemetry")

@@ -3,6 +3,8 @@ server:
     mbeanregistry:
       enabled: true
 management:
+  auditevents:
+    enabled: false
   metrics:
     distribution:
       percentiles-histogram:

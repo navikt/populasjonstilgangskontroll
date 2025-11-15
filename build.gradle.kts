@@ -1,8 +1,8 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 val javaVersion = JavaLanguageVersion.of(21)
-val springdocVersion = "2.8.14"
-val tokenSupportVersion = "3.0.0-SNAPSHOT"
+val springdocVersion = "3.0.0-RC1"
+val tokenSupportVersion = "3.0.1-SNAPSHOT"
 val mockkVersion = "1.14.6"
 
 
@@ -51,7 +51,7 @@ dependencies {
     implementation("org.apache.commons:commons-pool2:2.12.1")
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.21.0")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.21.0-alpha")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("tools.jackson.module:jackson-module-kotlin")
     implementation("io.micrometer:micrometer-core")
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("io.micrometer:micrometer-tracing")
@@ -61,7 +61,6 @@ dependencies {
     implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
     implementation("org.apache.httpcomponents.client5:httpclient5")
-    implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.hibernate.orm:hibernate-micrometer")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -81,7 +80,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springframework.boot:spring-boot-starter-webclient")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
-    implementation("org.springframework.boot:spring-boot-jackson2")
+    //implementation("org.springframework.boot:spring-boot-jackson2")
 
     implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework:spring-aspects")

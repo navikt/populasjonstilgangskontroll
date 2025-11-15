@@ -1,9 +1,6 @@
 package no.nav.tilgangsmaskin.felles
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.core.JsonParser
-
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
@@ -26,7 +23,6 @@ import org.springframework.boot.health.actuate.endpoint.StatusAggregator
 import org.springframework.boot.health.contributor.Status.DOWN
 import org.springframework.boot.health.contributor.Status.UP
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
-import org.springframework.boot.jackson2.autoconfigure.Jackson2ObjectMapperBuilderCustomizer
 import org.springframework.boot.restclient.RestClientCustomizer
 import org.springframework.boot.servlet.actuate.web.exchanges.HttpExchangesFilter
 import org.springframework.context.annotation.Bean
@@ -46,19 +42,12 @@ import java.util.function.Function
 @Configuration
 class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : WebMvcConfigurer {
 
-     //@Bean
+     @Bean
     fun jackson3Customizer() = JsonMapperBuilderCustomizer { // TODO fjern når spring bootz
         it.addMixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
        it.enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
     }
 
-   // @Bean
-    fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer { builder ->
-        builder.featuresToEnable(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION)
-
-        builder.modules(ParameterNamesModule())
-        builder.mixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
-    }
     @Bean
     fun outOfServiceIgnoringStatusAggregator() = StatusAggregator {
         when {

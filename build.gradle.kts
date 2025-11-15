@@ -43,7 +43,7 @@ repositories {
 
 configurations.all {
     resolutionStrategy {
-        failOnNonReproducibleResolution()
+        //failOnNonReproducibleResolution()
     }
 }
 

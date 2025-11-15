@@ -28,7 +28,14 @@ springBoot {
 repositories {
     mavenCentral()
     mavenLocal()
-
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/navikt/token-support")
+        credentials {
+            username = findProperty("gpr.user") as String
+            password = findProperty("gpr.key") as String
+        }
+    }
     maven {
         url = uri("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
     }

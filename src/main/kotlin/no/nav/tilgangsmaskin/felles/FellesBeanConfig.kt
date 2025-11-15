@@ -1,6 +1,8 @@
 package no.nav.tilgangsmaskin.felles
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.core.StreamReadFeature
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
@@ -44,12 +46,14 @@ import java.util.function.Function
 class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : WebMvcConfigurer {
 
    // @Bean
-    fun jackson3Customizer() = JsonMapperBuilderCustomizer { // TODO fjern når spring boot 4
+    fun jackson3Customizer() = JsonMapperBuilderCustomizer { // TODO fjern når spring boot
         it.addMixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
     }
 
     @Bean
     fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer { builder ->
+        builder.featuresToEnable(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION)
+
         builder.modules(ParameterNamesModule())
         builder.mixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
     }

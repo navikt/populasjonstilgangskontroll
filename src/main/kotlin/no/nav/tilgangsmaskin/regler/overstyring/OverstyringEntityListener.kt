@@ -10,6 +10,7 @@ import jakarta.persistence.PreUpdate
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.stereotype.Component
 
 @Component
@@ -18,12 +19,12 @@ class OverstyringEntityListener(private val token: Token) {
     private val log = getLogger(javaClass)
 
     @PrePersist
-    private fun lagrer(entity: OverstyringEntity) = setCreatedBySystem(entity).also {
+    private fun lagrer(entity: OverstyringEntity) = setCrested(entity).also {
         log.trace("Lagrer overstyring for ${entity.fnr.maskFnr()} i DB")
     }
 
     @PreUpdate
-    private fun oppdaterer(entity: OverstyringEntity) = setCreatedBySystem(entity).also {
+    private fun oppdaterer(entity: OverstyringEntity) = setOppdatert(entity).also {
         log.trace("Oppdaterer overstyring for ${entity.fnr.maskFnr()} i DB")
     }
 
@@ -52,6 +53,34 @@ class OverstyringEntityListener(private val token: Token) {
             if (it.isAnnotationPresent(CreatedBySystem::class.java)) {
                 it.isAccessible = true
                 it.set(target, token.system)
+            }
+            if (it.isAnnotationPresent(CreatedByAnsatt::class.java)) {
+                it.isAccessible = true
+                it.set(target, token.ansattId?.verdi ?: token.system)
+            }
+        }
+    }
+    fun setOppdatert(target: OverstyringEntity) {
+        setCreatedBySystem(target)
+        val now = java.time.Instant.now()
+        target::class.java.declaredFields.forEach {
+            if (it.isAnnotationPresent(LastModifiedDate::class.java)) {
+                it.isAccessible = true
+                it.set(target, now)
+            }
+        }
+    }
+    fun setCrested(target: OverstyringEntity) {
+        setCreatedBySystem(target)
+        val now = java.time.Instant.now()
+        target::class.java.declaredFields.forEach {
+            if (it.isAnnotationPresent(LastModifiedDato::class.java)) {
+                it.isAccessible = true
+                it.set(target, now)
+            }
+            if (it.isAnnotationPresent(CreatedDato::class.java)) {
+                it.isAccessible = true
+                it.set(target, now)
             }
         }
     }

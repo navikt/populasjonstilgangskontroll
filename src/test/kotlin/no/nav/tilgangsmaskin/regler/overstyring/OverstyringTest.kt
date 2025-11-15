@@ -28,8 +28,8 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
+import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ActiveProfiles
@@ -46,7 +46,7 @@ import kotlin.test.Test
 @EnableJpaAuditing
 @ActiveProfiles(TEST)
 @Testcontainers
-@AutoConfigureObservability
+@AutoConfigureMetrics
 internal class OverstyringTest {
 
     private val vanligBrukerId = BrukerId("08526835670")
@@ -78,6 +78,7 @@ internal class OverstyringTest {
         every { token.erObo } returns false
         every { token.erCC } returns true
         every { token.system } returns "test"
+        every { token.ansattId } returns ansattId
         every { token.systemNavn } returns "test"
         every { token.clusterAndSystem } returns "cluster:test"
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()

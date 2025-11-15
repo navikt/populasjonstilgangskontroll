@@ -18,16 +18,15 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.core.SpringVersion
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
-import org.springframework.retry.annotation.EnableRetry
+import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.stereotype.Component
-import kotlin.text.contains
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
 @EnableOAuth2Client(cacheEnabled = true)
 @EnableCaching
-@EnableRetry
+@EnableResilientMethods
 @EnableJpaAuditing
 @EnableScheduling
 @EnableJwtTokenValidation(ignore = ["org.springdoc", "org.springframework"])

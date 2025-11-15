@@ -7,11 +7,12 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClient.Builder
 import java.net.URI
 import java.time.LocalDateTime
 
 @Component
-class LederUtvelger(private val builder: WebClient.Builder,
+class LederUtvelger(private val builder: Builder,
                     @param:Value("\${elector.sse.url}") private val uri: URI,
                     private val publisher: ApplicationEventPublisher) {
 

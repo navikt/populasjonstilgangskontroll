@@ -9,9 +9,6 @@ import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
 import org.hibernate.annotations.Check
-import org.springframework.data.annotation.CreatedBy
-import org.springframework.data.annotation.CreatedDate
-import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.Instant
 import kotlin.annotation.AnnotationRetention.RUNTIME
@@ -31,16 +28,16 @@ class OverstyringEntity(
     @GeneratedValue(strategy = IDENTITY)
     val id: Long = 0
 
-    @CreatedDate
+    @CreatedDato
     @Column(nullable = false)
     var created: Instant? = null
 
-    @LastModifiedDate
+    @LastModifiedDato
     @Column(nullable = false)
     var updated: Instant? = null
 
     @Column(name = "oppretter", length = 7)
-    @CreatedBy
+    @CreatedByAnsatt
     var oppretter: String? = null
 
     @Column(name = "system", length = 50)
@@ -52,3 +49,15 @@ class OverstyringEntity(
 @Target(FIELD)
 @Retention(RUNTIME)
 annotation class CreatedBySystem
+
+@Target(FIELD)
+@Retention(RUNTIME)
+annotation class CreatedByAnsatt
+
+@Target(FIELD)
+@Retention(RUNTIME)
+annotation class CreatedDato
+
+@Target(FIELD)
+@Retention(RUNTIME)
+annotation class LastModifiedDato

@@ -35,8 +35,8 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
+import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
@@ -54,7 +54,7 @@ import kotlin.test.BeforeTest
 @EnableConfigurationProperties(value= [RegelConfig::class, GlobaleGrupperConfig::class])
 @ContextConfiguration(classes = [TestApp::class, Auditor::class])
 @ExtendWith(MockKExtension::class)
-@AutoConfigureObservability
+@AutoConfigureMetrics
 @Testcontainers
 @ActiveProfiles(TEST)
 class RegelTjenesteTest {
@@ -102,6 +102,7 @@ class RegelTjenesteTest {
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
         every { oppfølging.enhetFor(vanligBrukerId.verdi) } returns Enhetsnummer("1234")
         every { token.system } returns "test"
+        every { token.ansattId } returns ansattId
         every { token.clusterAndSystem } returns "cluster:test"
         every { token.systemNavn } returns "test"
         every { token.erObo } returns false

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 
-class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration>, val mapper: ObjectMapper) {
+class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration?>, val mapper: ObjectMapper) {
 
     inline fun <reified T> fraJson(json: String): T =
         mapper.readValue(json)

@@ -52,7 +52,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
        it.enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
     }
 
-    @Bean
+   // @Bean
     fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer { builder ->
         builder.featuresToEnable(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION)
 

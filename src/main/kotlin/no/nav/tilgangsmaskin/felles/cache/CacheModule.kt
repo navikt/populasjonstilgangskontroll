@@ -1,45 +1,36 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.CLASS
-import com.fasterxml.jackson.databind.JavaType
-import com.fasterxml.jackson.databind.cfg.MapperConfig
-import com.fasterxml.jackson.databind.introspect.AnnotatedClass
-import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector
-import com.fasterxml.jackson.databind.jsontype.impl.StdTypeResolverBuilder
-import com.fasterxml.jackson.databind.module.SimpleModule
-import org.slf4j.LoggerFactory.getLogger
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import java.lang.annotation.Inherited
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Value
+import tools.jackson.databind.module.SimpleModule
+import tools.jackson.core.Version.unknownVersion
+import tools.jackson.databind.AnnotationIntrospector
+import tools.jackson.databind.cfg.MapperConfig
+import tools.jackson.databind.introspect.Annotated
+import tools.jackson.databind.jsontype.impl.StdTypeResolverBuilder
 
 /**
-    Denne modulen konfigurerer Jackson til å serialisere classes annotatert med  @JsonCacheable, slik at de inkluderer typeinformasjon i JSON-representasjonen.
+    Denne modulen konfigurerer Jackson til å serialisere classes slik at de inkluderer typeinformasjon i JSON-representasjonen.
     Tas inn i produksjon når Jackson 3.0 er i bruke, antagelig høsten 2025.
-    Mapper brukt for serialiserig av cache innslag i ValKey må da endres til NON_FINAL_AND_ENUMS, og alle mulig cachebare klasser må transitivt annoteres
  */
-@ConditionalOnProperty("valkey.json.enabled", havingValue = "true")  // TODO Registrer manuelt foreløpig
 class CacheModule : SimpleModule() {
-
-    private val log = getLogger(javaClass)
-
     override fun setupModule(ctx: SetupContext) {
-        ctx.insertAnnotationIntrospector(object : JacksonAnnotationIntrospector() {
-            override fun findTypeResolver(config: MapperConfig<*>, ac: AnnotatedClass, baseType: JavaType) =
-                if (ac.hasAnnotation(JsonCacheable::class.java)) {
-                    log.trace("${ac.name} er annotert med @JsonCacheable, bruker JsonTypeInfo for å serialisere typeinformasjon")
-                    StdTypeResolverBuilder()
-                        .init(CLASS, null)
-                        .inclusion(PROPERTY)
-                        .typeProperty("@class")
-                } else {
-                    super.findTypeResolver(config, ac, baseType)
-                }
-        })
+        val custom = object : AnnotationIntrospector() {
+            override  fun findTypeResolverBuilder(config: MapperConfig<*>, ann: Annotated): StdTypeResolverBuilder {
+                    val value = Value.construct(
+                        CLASS,
+                        PROPERTY,
+                        "@class",
+                        null,
+                        true,
+                        true
+                    )
+                    return StdTypeResolverBuilder().init(value, null)
+            }
+            override fun version() = unknownVersion()
+        }
+        ctx.insertAnnotationIntrospector(custom)
     }
 }
-
-@Target(AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.RUNTIME)
-@Inherited
-@MustBeDocumented
-annotation class JsonCacheable

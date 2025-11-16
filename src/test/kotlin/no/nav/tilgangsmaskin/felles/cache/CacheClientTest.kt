@@ -1,50 +1,44 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
 import io.lettuce.core.RedisClient.create
-import io.lettuce.core.api.StatefulRedisConnection
-import io.lettuce.core.support.ConnectionPoolSupport
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import no.nav.tilgangsmaskin.TestApp
-import no.nav.tilgangsmaskin.bruker.pdl.Person
-import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
-import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
-import no.nav.tilgangsmaskin.tilgang.Token
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.TestInstance
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection
-import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.test.context.ContextConfiguration
-import org.testcontainers.junit.jupiter.Testcontainers
-import org.springframework.context.annotation.Import
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
-import org.springframework.data.redis.cache.RedisCacheConfiguration
-import org.springframework.data.redis.cache.RedisCacheManager.builder
-import java.time.Duration
-import java.util.UUID
-import org.awaitility.kotlin.await
-import java.util.concurrent.TimeUnit.SECONDS
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
-import org.apache.commons.pool2.impl.GenericObjectPoolConfig
+import no.nav.tilgangsmaskin.bruker.pdl.Person
+import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
+import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
+import no.nav.tilgangsmaskin.tilgang.Token
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.kotlin.await
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
+import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.annotation.Import
+import org.springframework.data.redis.cache.RedisCacheConfiguration
+import org.springframework.data.redis.cache.RedisCacheManager.builder
+import org.springframework.data.redis.connection.RedisConnectionFactory
+import org.springframework.test.context.ContextConfiguration
+import org.testcontainers.junit.jupiter.Testcontainers
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.KotlinModule.Builder
+import java.time.Duration
+import java.util.*
+import java.util.concurrent.TimeUnit.*
 
 @DataRedisTest
 @ContextConfiguration(classes = [TestApp::class])
@@ -56,10 +50,11 @@ class CacheClientTest {
 
     private val pdl = CachableConfig(PDL,"medFamilie")
 
-   // @Autowired  //TODO
-    private  val objectMapper: ObjectMapper = jacksonObjectMapper()
+    private  val valkeyMapper = JsonMapper.builder().polymorphicTypeValidator(NavPolymorphicTypeValidator()).apply {
+        addModule(Builder().build())
+        addModule(CacheModule())
+    }.build()
 
-    private lateinit var valkeyMapper: ObjectMapper
 
     @MockkBean
     private lateinit var token: Token
@@ -80,10 +75,6 @@ class CacheClientTest {
         every { token.system } returns "test"
         every { token.clusterAndSystem } returns "test:dev-gcp"
 
-        valkeyMapper =
-            objectMapper.copy().apply {
-                activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
-            }
         val meterRegistry = SimpleMeterRegistry()
 
         val mgr = builder(cf)
@@ -97,12 +88,6 @@ class CacheClientTest {
         val redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
         val teller = BulkCacheTeller(meterRegistry, token)
         val handler = CacheNøkkelHandler(mgr.cacheConfigurations, valkeyMapper)
-        val pool =  ConnectionPoolSupport.createGenericObjectPool(
-            { redisClient.connect() },
-            GenericObjectPoolConfig<StatefulRedisConnection<String, String>>().apply {
-                maxTotal = 10 // Set max pool size
-            }
-        )
         client = CacheClient(
             redisClient, handler, BulkCacheSuksessTeller(meterRegistry, token), teller
         )
@@ -111,9 +96,6 @@ class CacheClientTest {
         val id2 = BrukerId("20478606614")
         person1 = Person(id1,id1.verdi, AktørId("1234567890123"), KommuneTilknytning(Kommune("0301")))
         person2 = Person(id2, id2.verdi, AktørId("1111111111111"), KommuneTilknytning(Kommune("1111")))
-        val gruppe1 = EntraGruppe(UUID.randomUUID(),"Gruppe1 1")
-        val gruppe2 = EntraGruppe(UUID.randomUUID(),"Gruppe2 1")
-
     }
 
     @Test
@@ -145,3 +127,5 @@ class CacheClientTest {
        private val redis = RedisContainer("redis:6.2.2")
     }
 }
+
+

@@ -1,10 +1,8 @@
 package no.nav.tilgangsmaskin.bruker
 
 import com.fasterxml.jackson.annotation.JsonValue
-import no.nav.tilgangsmaskin.felles.cache.JsonCacheable
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
 
-@JsonCacheable
 data class AktørId(@JsonValue val verdi: String) {
     init {
         requireDigits(verdi, AKTØRID_LENGTH)

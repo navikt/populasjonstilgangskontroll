@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import org.junit.jupiter.api.Test
@@ -11,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.junit.jupiter.api.DisplayName
 import org.assertj.core.api.Assertions.*
+import tools.jackson.module.kotlin.jsonMapper
 
 @ExtendWith(MockKExtension::class)
 class CacheNøkkelHandlerTest {
@@ -25,7 +25,7 @@ class CacheNøkkelHandlerTest {
     @BeforeEach
     fun setUp() {
         every { redisConfig.getKeyPrefixFor(MED_EXTRA.name) } returns MED_EXTRA.name
-        handler = CacheNøkkelHandler(mapOf(MED_EXTRA.name to redisConfig), jacksonObjectMapper())
+        handler = CacheNøkkelHandler(mapOf(MED_EXTRA.name to redisConfig), jsonMapper())
     }
 
     @Test
@@ -56,7 +56,7 @@ class CacheNøkkelHandlerTest {
     @DisplayName("kaster exception hvis cache config mangler")
     fun kasterExceptionHvisCacheConfigMangler() {
         assertThatThrownBy {
-            CacheNøkkelHandler(emptyMap(), jacksonObjectMapper()).tilNøkkel(CachableConfig("unknown"), "key")
+            CacheNøkkelHandler(emptyMap(), jsonMapper()).tilNøkkel(CachableConfig("unknown"), "key")
         }.isInstanceOf(IllegalStateException::class.java)
     }
 }

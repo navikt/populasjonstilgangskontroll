@@ -69,10 +69,11 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation("org.postgresql:postgresql")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion") {
+      /*
         exclude("com.fasterxml.jackson.core",  "jackson-databind")
         exclude("com.fasterxml.jackson.dataformat",  "jackson-dataformat-yaml")
         exclude("com.fasterxml.jackson.datatype",  "jackson-datatype-jsr310")
-
+*/
     }
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-cache")
@@ -80,10 +81,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-graphql")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-web"){
-        exclude("org.springframework.boot", "spring-boot-starter-security")
-    }
-
+    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springframework.boot:spring-boot-starter-webclient")
     implementation("org.springframework.boot:spring-boot-starter-webflux")

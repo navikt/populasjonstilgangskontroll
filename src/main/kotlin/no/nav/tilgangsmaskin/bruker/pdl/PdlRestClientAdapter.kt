@@ -1,5 +1,4 @@
 package no.nav.tilgangsmaskin.bruker.pdl
-import tools.jackson.module.kotlin.readValue
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
@@ -12,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.readValue
 
 @Component
 class PdlRestClientAdapter(

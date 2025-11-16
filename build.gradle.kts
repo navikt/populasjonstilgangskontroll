@@ -61,13 +61,19 @@ dependencies {
     implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
     implementation("org.apache.httpcomponents.client5:httpclient5")
-    implementation("org.flywaydb:flyway-database-postgresql")
+    implementation("org.flywaydb:flyway-database-postgresql") {
+        exclude("com.fasterxml.jackson.core",  "jackson-databind")
+    }
     implementation("org.hibernate.orm:hibernate-micrometer")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation("org.postgresql:postgresql")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
-    implementation("org.springframework.boot:spring-boot-jackson2")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion") {
+        exclude("com.fasterxml.jackson.core",  "jackson-databind")
+        exclude("com.fasterxml.jackson.dataformat",  "jackson-dataformat-yaml")
+        exclude("com.fasterxml.jackson.datatype",  "jackson-datatype-jsr310")
+
+    }
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -75,14 +81,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-graphql")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web"){
-        exclude(group = "org.springframework.boot", module = "spring-boot-starter-security")
+        exclude("org.springframework.boot", "spring-boot-starter-security")
     }
 
     implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springframework.boot:spring-boot-starter-webclient")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
-    //implementation("org.springframework.boot:spring-boot-jackson2")
-
     implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework:spring-aspects")
     implementation("org.springframework.boot:spring-boot-starter-opentelemetry")

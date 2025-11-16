@@ -1,7 +1,5 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
-import tools.jackson.databind.ObjectMapper
 import io.lettuce.core.RedisClient
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig

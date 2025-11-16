@@ -12,8 +12,6 @@ import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.FORELDREBARN
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.PARTNER
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.SØSKEN
 import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
-import org.springframework.core.annotation.Order
-import org.springframework.stereotype.Component
 
 interface KjerneRegel : Regel
 

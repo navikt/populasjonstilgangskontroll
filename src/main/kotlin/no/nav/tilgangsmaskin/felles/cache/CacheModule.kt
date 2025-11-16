@@ -1,15 +1,14 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.CLASS
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Value
-import tools.jackson.databind.module.SimpleModule
 import tools.jackson.core.Version.unknownVersion
 import tools.jackson.databind.AnnotationIntrospector
 import tools.jackson.databind.cfg.MapperConfig
 import tools.jackson.databind.introspect.Annotated
 import tools.jackson.databind.jsontype.impl.StdTypeResolverBuilder
+import tools.jackson.databind.module.SimpleModule
 
 /**
     Denne modulen konfigurerer Jackson til å serialisere classes slik at de inkluderer typeinformasjon i JSON-representasjonen.

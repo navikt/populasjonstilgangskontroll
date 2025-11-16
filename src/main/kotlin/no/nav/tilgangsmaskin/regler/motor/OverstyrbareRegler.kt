@@ -8,8 +8,6 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
-import org.springframework.core.annotation.Order
-import org.springframework.stereotype.Component
 
 
 interface OverstyrbarRegel : Regel

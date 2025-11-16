@@ -10,8 +10,8 @@ import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
-import no.nav.tilgangsmaskin.felles.rest.LoggingRetryListener
 import no.nav.tilgangsmaskin.felles.rest.LoggingRequestInterceptor
+import no.nav.tilgangsmaskin.felles.rest.LoggingRetryListener
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
@@ -23,7 +23,6 @@ import org.springframework.boot.health.actuate.endpoint.StatusAggregator
 import org.springframework.boot.health.contributor.Status.DOWN
 import org.springframework.boot.health.contributor.Status.UP
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
-import org.springframework.boot.jackson2.autoconfigure.Jackson2ObjectMapperBuilderCustomizer
 import org.springframework.boot.restclient.RestClientCustomizer
 import org.springframework.boot.servlet.actuate.web.exchanges.HttpExchangesFilter
 import org.springframework.context.annotation.Bean
@@ -43,13 +42,8 @@ import java.util.function.Function
 @Configuration
 class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : WebMvcConfigurer {
 
-    /*
-    @Bean
-    fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer {
-        it.mixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
-    }*/
      @Bean
-    fun jackson3Customizer() = JsonMapperBuilderCustomizer { 
+    fun jackson3Customizer() = JsonMapperBuilderCustomizer {
         it.addMixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
        it.enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
     }

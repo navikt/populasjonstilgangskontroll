@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.rest
 
-import no.nav.tilgangsmaskin.felles.rest.LoggingRetryListener.Companion.LOGGING_RETRY_LISTENER
 import org.springframework.core.annotation.AliasFor
 import org.springframework.resilience.annotation.Retryable
 import org.springframework.web.client.ResourceAccessException

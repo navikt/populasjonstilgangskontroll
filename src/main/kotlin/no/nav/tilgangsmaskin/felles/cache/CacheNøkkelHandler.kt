@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import tools.jackson.module.kotlin.readValue
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.readValue
 
 class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration?>, val mapper: JsonMapper) {
 

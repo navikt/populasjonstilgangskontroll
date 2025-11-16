@@ -54,6 +54,7 @@ dependencies {
     implementation("tools.jackson.module:jackson-module-kotlin")
     implementation("io.micrometer:micrometer-core")
     implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("io.micrometer:micrometer-registry-otlp:1.16.0")
     implementation("io.micrometer:micrometer-tracing")
     implementation("io.opentelemetry:opentelemetry-api")
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")

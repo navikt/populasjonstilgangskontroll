@@ -35,6 +35,7 @@
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss} %X{Nav-CallId} [%thread] %-5level %logger{70} - %msg%n</Pattern>
             </layout>
         </appender>
+        <logger name="io.micrometer" level="trace"/>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
     </springProfile>
 

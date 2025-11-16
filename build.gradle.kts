@@ -48,6 +48,7 @@ configurations.all {
 }
 
 dependencies {
+    implementation("org.apache.commons:commons-pool2:2.12.1")
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.21.0")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.21.0-alpha")
     implementation("tools.jackson.module:jackson-module-kotlin")

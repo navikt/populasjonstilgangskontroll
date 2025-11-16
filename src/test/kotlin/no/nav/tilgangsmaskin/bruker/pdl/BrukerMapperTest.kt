@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING

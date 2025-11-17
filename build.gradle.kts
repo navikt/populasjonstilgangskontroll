@@ -86,7 +86,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework:spring-aspects")
-    implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
+    //implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
     testImplementation("org.springframework.boot:spring-boot-micrometer-metrics-test")
     testImplementation("com.redis:testcontainers-redis")
     testImplementation("com.ninja-squad:springmockk:4.0.2")

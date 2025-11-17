@@ -7,12 +7,12 @@ management:
     tracing:
       export:
         otlp:
-          transport: ${otel.exporter.otlp.protocol}
+          transport: grpc
           endpoint: ${otel.exporter.otlp.endpoint}
     logging:
       export:
         otlp:
-          transport: ${otel.exporter.otlp.protocol}
+          transport: grpc
           endpoint: ${otel.exporter.otlp.endpoint}
   auditevents:
     enabled: false

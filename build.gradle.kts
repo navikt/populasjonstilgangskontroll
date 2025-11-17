@@ -53,7 +53,6 @@ dependencies {
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.20.1-alpha")
     implementation("io.micrometer:micrometer-core")
     implementation("io.micrometer:micrometer-registry-prometheus")
-    implementation("io.micrometer:micrometer-registry-otlp")
     implementation("io.micrometer:micrometer-tracing")
     implementation("io.opentelemetry:opentelemetry-api")
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")

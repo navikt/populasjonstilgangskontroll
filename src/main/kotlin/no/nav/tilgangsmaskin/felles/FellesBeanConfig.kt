@@ -126,45 +126,11 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             .register(meterRegistry).recordCallable { joinPoint.proceed() }
     }
 
-
-    /*
-
-    @Aspect
-    @Component
-    class GrpcAspect {
-        private val log = LoggerFactory.getLogger(FellesBeanConfig::class.java)
-        @Before("execution(* io.micrometer.registry.otlp.OtlpMeterRegistry.publish())")
-        fun grpcAspect() {
-              log.info("Grpc call to OtlpMeterRegistry.publish detected")
-        }
-    }
-
-     */
-
     companion object {
         fun headerAddingRequestInterceptor(vararg verdier: Pair<String, String>) =
             ClientHttpRequestInterceptor { request, body, next ->
                 verdier.forEach { (key, value) -> request.headers.add(key, value) }
                 next.execute(request, body)
             }
-    }
-}
-
-@Configuration
-class OtlpMeterRegistryConfig {
-
-    @Bean
-    @ConditionalOnThreading(VIRTUAL)
-    fun otlpLocallyDefinedMeterRegistryVirtualThreads(
-        otlpConfig: OtlpConfig,
-        clock: Clock,
-        metricsSender: ObjectProvider<OtlpMetricsSender>
-    ): OtlpMeterRegistry {
-        val executor = VirtualThreadTaskExecutor("otlp-meter-registry-")
-        return OtlpMeterRegistry.builder(otlpConfig)
-            .clock(clock)
-            .apply { metricsSender.ifAvailable { metricsSender(it) } }
-            .threadFactory(executor.virtualThreadFactory)
-            .build()
     }
 }

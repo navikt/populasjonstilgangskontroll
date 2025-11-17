@@ -16,6 +16,8 @@ import no.nav.tilgangsmaskin.tilgang.Token
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
+import org.aspectj.lang.annotation.Before
+import org.slf4j.LoggerFactory
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.Include.defaultIncludes
@@ -113,6 +115,16 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             .tags("method", joinPoint.signature.name)
             .publishPercentileHistogram()
             .register(meterRegistry).recordCallable { joinPoint.proceed() }
+    }
+
+    @Aspect
+    @Component
+    class GrpcAspect {
+        private val log = LoggerFactory.getLogger(FellesBeanConfig::class.java)
+        @Before("execution(* io.micrometer.registry.otlp.OtlpMeterRegistry.publish())")
+        fun grpcAspect() {
+              log.info("Grpc call to OtlpMeterRegistry.publish detected")
+        }
     }
 
     companion object {

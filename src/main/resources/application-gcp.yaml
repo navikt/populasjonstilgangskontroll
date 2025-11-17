@@ -7,13 +7,13 @@ management:
     tracing:
       export:
         otlp:
-          transport: http
-          endpoint: http://opentelemetry-collector.nais-system:4318/v1/metrics
+          transport: grpc
+          endpoint: http://opentelemetry-collector.nais-system:4317/v1/metrics
     logging:
       export:
         otlp:
-          transport: http
-          endpoint: http://opentelemetry-collector.nais-system:4318/v1/metrics
+          transport: grpc
+          endpoint: http://opentelemetry-collector.nais-system:4317/v1/metrics
   auditevents:
     enabled: false
   metrics:

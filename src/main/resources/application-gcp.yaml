@@ -8,12 +8,12 @@ management:
       export:
         otlp:
           transport: grpc
-          endpoint: ${otel.exporter.otlp.endpoint}
+          endpoint: http://opentelemetry-collector.nais-system:4317/v1/metrics
     logging:
       export:
         otlp:
           transport: grpc
-          endpoint: ${otel.exporter.otlp.endpoint}
+          endpoint: http://opentelemetry-collector.nais-system:4317/v1/metrics
   auditevents:
     enabled: false
   metrics:

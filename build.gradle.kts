@@ -49,12 +49,10 @@ configurations.all {
 
 dependencies {
     implementation("org.apache.commons:commons-pool2:2.12.1")
-    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.21.0")
-    implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.21.0-alpha")
-    implementation("tools.jackson.module:jackson-module-kotlin")
-    implementation("io.micrometer:micrometer-core:1.15.5")
-    implementation("io.micrometer:micrometer-registry-otlp:1.15.5")
-    implementation("io.micrometer:micrometer-registry-prometheus:1.15.5")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.20.1-alpha")
+    implementation("io.micrometer:micrometer-core")
+    implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("io.micrometer:micrometer-tracing")
     implementation("io.opentelemetry:opentelemetry-api")
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")
@@ -94,9 +92,7 @@ dependencies {
     testImplementation("com.ninja-squad:springmockk:4.0.2")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("org.springframework.boot:spring-boot-starter-test") {
-        exclude("org.junit.vintage","junit-vintage-engine")
-    }
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.awaitility:awaitility-kotlin:4.3.0")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")

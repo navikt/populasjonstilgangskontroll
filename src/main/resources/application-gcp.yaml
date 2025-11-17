@@ -3,6 +3,11 @@ server:
     mbeanregistry:
       enabled: true
 management:
+  opentelemetry:
+    logging:
+      export:
+        otlp:
+          transport: grpc
   auditevents:
     enabled: false
   metrics:

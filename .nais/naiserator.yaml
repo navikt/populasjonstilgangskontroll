@@ -35,7 +35,7 @@ spec:
         - id: elastic
         - id: loki
     autoInstrumentation:
-      enabled: false
+      enabled: true
       runtime: java
   prometheus:
     enabled: true

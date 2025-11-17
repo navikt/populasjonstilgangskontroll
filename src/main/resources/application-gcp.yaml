@@ -4,6 +4,11 @@ server:
       enabled: true
 management:
   opentelemetry:
+    tracing:
+      export:
+        otlp:
+          transport: ${otel.exporter.otlp.protocol}
+          endpoint: ${otel.exporter.otlp.endpoint}
     logging:
       export:
         otlp:

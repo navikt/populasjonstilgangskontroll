@@ -48,13 +48,13 @@ configurations.all {
 }
 
 dependencies {
-    implementation("org.apache.commons:commons-pool2:2.12.1")
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.20.1-alpha")
+   // implementation("io.opentelemetry:opentelemetry-api")
+    implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
     implementation("io.micrometer:micrometer-core")
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("io.micrometer:micrometer-tracing")
-    implementation("io.opentelemetry:opentelemetry-api")
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")
     implementation("no.nav.boot:boot-conditionals:5.1.11")
     implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
@@ -63,7 +63,7 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql") {
         exclude("com.fasterxml.jackson.core",  "jackson-databind")
     }
-    implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
+    implementation("org.apache.commons:commons-pool2:2.12.1")
     implementation("org.hibernate.orm:hibernate-micrometer")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
@@ -87,7 +87,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework:spring-aspects")
-    //implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
     testImplementation("org.springframework.boot:spring-boot-micrometer-metrics-test")
     testImplementation("com.redis:testcontainers-redis")
     testImplementation("com.ninja-squad:springmockk:4.0.2")

@@ -117,6 +117,8 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             .register(meterRegistry).recordCallable { joinPoint.proceed() }
     }
 
+    /*
+
     @Aspect
     @Component
     class GrpcAspect {
@@ -126,6 +128,8 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
               log.info("Grpc call to OtlpMeterRegistry.publish detected")
         }
     }
+
+     */
 
     companion object {
         fun headerAddingRequestInterceptor(vararg verdier: Pair<String, String>) =

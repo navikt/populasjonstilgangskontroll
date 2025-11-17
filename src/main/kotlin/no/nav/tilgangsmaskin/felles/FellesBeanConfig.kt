@@ -113,7 +113,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
         configurer.defaultContentType(APPLICATION_JSON)
     }
 
-    /*
+
     @Aspect
     @Component
     class TimingAspect(private val meterRegistry: MeterRegistry) {
@@ -125,22 +125,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             .publishPercentileHistogram()
             .register(meterRegistry).recordCallable { joinPoint.proceed() }
     }
-*/
-    @Bean
-    @ConditionalOnThreading(VIRTUAL)
-    fun otlpLocallyDefinedMeterRegistryVirtualThreads(otlpConfig: OtlpConfig, clock: Clock,
-                                        metricsSender: ObjectProvider<OtlpMetricsSender>): OtlpMeterRegistry {
-        val executor = VirtualThreadTaskExecutor("otlp-meter-registry-")
-        return builder(otlpConfig, clock, metricsSender).threadFactory(executor.virtualThreadFactory).build()
-    }
 
-    private fun builder(otlpConfig: OtlpConfig, clock: Clock,
-                        metricsSender: ObjectProvider<OtlpMetricsSender>): OtlpMeterRegistry.Builder {
-        val builder: OtlpMeterRegistry.Builder =
-            OtlpMeterRegistry.builder(otlpConfig).clock(clock)
-        metricsSender.ifAvailable(Consumer { metricsSender: OtlpMetricsSender -> builder.metricsSender(metricsSender) })
-        return builder
-    }
 
     /*
 
@@ -165,3 +150,21 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 }
 
+@Configuration
+class OtlpMeterRegistryConfig {
+
+    @Bean
+    @ConditionalOnThreading(VIRTUAL)
+    fun otlpLocallyDefinedMeterRegistryVirtualThreads(
+        otlpConfig: OtlpConfig,
+        clock: Clock,
+        metricsSender: ObjectProvider<OtlpMetricsSender>
+    ): OtlpMeterRegistry {
+        val executor = VirtualThreadTaskExecutor("otlp-meter-registry-")
+        return OtlpMeterRegistry.builder(otlpConfig)
+            .clock(clock)
+            .apply { metricsSender.ifAvailable { metricsSender(it) } }
+            .threadFactory(executor.virtualThreadFactory)
+            .build()
+    }
+}

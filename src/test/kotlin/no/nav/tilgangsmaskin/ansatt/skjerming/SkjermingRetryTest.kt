@@ -31,7 +31,6 @@ internal class SkjermingRetryTest {
 
     private val vanligBrukerId = BrukerId("08526835670")
 
-
     private val uri = URI.create("https://www.vg.no")
 
     @MockkBean
@@ -43,9 +42,7 @@ internal class SkjermingRetryTest {
     @Test
     @DisplayName("Returner true etter at antall forsøk er oppbrukt")
     fun feilerEtterTreMislykkedeForsøk() {
-        every { adapter.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId.verdi) } throws RecoverableRestException(
-                INTERNAL_SERVER_ERROR,
-                uri)
+        every { adapter.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId.verdi) } throws RecoverableRestException(INTERNAL_SERVER_ERROR, uri)
         assertThrows<RecoverableRestException> {
             tjeneste.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId)
         }
@@ -57,10 +54,7 @@ internal class SkjermingRetryTest {
     @Test
     @DisplayName("Test retry tar seg inn etter først å ha feilet")
     fun testRetryOK() {
-        every { adapter.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId.verdi) } throws RecoverableRestException(
-                INTERNAL_SERVER_ERROR,
-                uri
-                                                                                                                         ) andThen false
+        every { adapter.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId.verdi) } throws RecoverableRestException(INTERNAL_SERVER_ERROR, uri) andThen false
         assertThat(tjeneste.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId)).isFalse
         verify(exactly = 2) {
             tjeneste.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId)
@@ -70,10 +64,7 @@ internal class SkjermingRetryTest {
     @Test
     @DisplayName("Andre exceptions fører ikke til retry, og kastes umiddlelbart videre")
     fun andreExceptions() {
-        every { adapter.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId.verdi) } throws IrrecoverableRestException(
-                INTERNAL_SERVER_ERROR,
-                uri
-                                                                                                                           )
+        every { adapter.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId.verdi) } throws IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
         assertThrows<IrrecoverableRestException> {
             tjeneste.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId)
         }

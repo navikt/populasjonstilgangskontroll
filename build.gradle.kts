@@ -50,11 +50,8 @@ configurations.all {
 dependencies {
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.20.1-alpha")
-   // implementation("io.opentelemetry:opentelemetry-api")
-    implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
     implementation("io.micrometer:micrometer-core")
     implementation("io.micrometer:micrometer-registry-prometheus")
-    implementation("io.micrometer:micrometer-tracing")
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")
     implementation("no.nav.boot:boot-conditionals:5.1.11")
     implementation("no.nav.security:token-client-spring:$tokenSupportVersion")

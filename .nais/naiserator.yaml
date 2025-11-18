@@ -118,5 +118,3 @@ spec:
       value: '{{grupper.utland}}'
     - name: DB_POOLSIZE
       value: '{{db.poolsize}}'
-    - name: OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
-      value: http://opentelemetry-collector.nais-system:4318

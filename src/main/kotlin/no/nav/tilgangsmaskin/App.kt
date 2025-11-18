@@ -4,6 +4,7 @@ import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import no.nav.tilgangsmaskin.felles.cache.CacheAdapter
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.current
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.profiler
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.local
@@ -41,14 +42,14 @@ fun main(args: Array<String>) {
 }
 
 @Component
-class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, private  val cache: CacheAdapter, vararg val regelsett: RegelSett) :
+class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, vararg val regelsett: RegelSett) :
     InfoContributor {
 
     override fun contribute(builder: Builder) {
         with(ctx) {
             builder.withDetail(
                 "info", mapOf(
-                    "Cluster" to ClusterUtils.current.clusterName,
+                    "Cluster" to current.clusterName,
                     "Startup" to startupDate.local(),
                     "Name" to environment.getProperty("spring.application.name"),
                     ))

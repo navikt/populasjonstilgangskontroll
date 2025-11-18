@@ -4,6 +4,7 @@ val javaVersion = JavaLanguageVersion.of(21)
 val springdocVersion = "3.0.0-RC1"
 val tokenSupportVersion = "6.0.0-SNAPSHOT"
 val mockkVersion = "1.14.6"
+val kotestVersion = "6.0.5"
 
 
 
@@ -97,6 +98,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-restclient-test")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
     testImplementation("org.springframework.boot:spring-boot-starter-data-redis-test")
+    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
     testImplementation(kotlin("test"))
 }
 

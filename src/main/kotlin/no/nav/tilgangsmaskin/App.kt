@@ -21,7 +21,7 @@ import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.stereotype.Component
 
-@SpringBootApplication //(exclude = [OtlpMetricsExportAutoConfiguration::class])
+@SpringBootApplication
 @ConfigurationPropertiesScan
 @EnableOAuth2Client(cacheEnabled = true)
 @EnableCaching

@@ -41,7 +41,7 @@ internal class SkjermingRetryTest {
 
     @Test
     @DisplayName("Returner true etter at antall forsøk er oppbrukt")
-    fun feilerEtterTreMislykkedeForsøk() {
+    fun feilerEtterFireMislykkedeForsøk() {
         every { adapter.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId.verdi) } throws RecoverableRestException(INTERNAL_SERVER_ERROR, uri)
         assertThrows<RecoverableRestException> {
             tjeneste.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId)

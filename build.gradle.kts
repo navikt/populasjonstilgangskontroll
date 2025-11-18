@@ -20,6 +20,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("org.cyclonedx.bom") version "2.4.1"
     id("com.google.cloud.tools.jib") version "3.4.5"
+    id("io.kotest") version "6.0.5"
     application
 }
 springBoot {

@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.regler
 
 import com.ninjasquad.springmockk.MockkBean
-import io.micrometer.core.instrument.MeterRegistry
+import io.mockk.Called
 import io.mockk.every
 import io.mockk.verify
 import java.util.*
@@ -59,9 +59,6 @@ class RegelMotorTest {
 
     @MockkBean
     lateinit var holder: TokenValidationContextHolder
-
-    @Autowired
-    private lateinit var registry: MeterRegistry
 
     @MockkBean
     private lateinit var oppfølging: OppfølgingTjeneste
@@ -212,8 +209,7 @@ class RegelMotorTest {
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(NASJONAL).build()
             val bruker = BrukerBuilder(brukerId).build()
             assertThat(ansatt kanBehandle bruker).isTrue
-            verify(exactly = 0) { oppfølging.enhetFor(brukerId.verdi) }
-
+            verify { oppfølging wasNot Called }
         }
 
         @Test
@@ -230,8 +226,7 @@ class RegelMotorTest {
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).medMedlemskapI(SKJERMING).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune(enhet.verdi))).build()
             assertThat(ansatt kanBehandle bruker).isTrue
-            verify(exactly = 0) { oppfølging.enhetFor(brukerId.verdi) }
-
+            verify { oppfølging wasNot Called }
         }
 
         @Test

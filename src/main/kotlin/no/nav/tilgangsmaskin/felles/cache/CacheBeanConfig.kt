@@ -26,7 +26,6 @@ import tools.jackson.databind.jsontype.PolymorphicTypeValidator.Validity.DENIED
 import tools.jackson.module.kotlin.KotlinModule.Builder
 
 @Configuration(proxyBeanMethods = true)
-@EnableCaching
 @ConditionalOnGCP
 class CacheBeanConfig(private val cf: RedisConnectionFactory,
                       private vararg val cfgs: CachableRestConfig) : CachingConfigurer {

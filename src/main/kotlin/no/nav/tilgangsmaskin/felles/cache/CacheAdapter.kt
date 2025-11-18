@@ -13,7 +13,7 @@ class CacheAdapter(private val cf: RedisConnectionFactory, cfg: CacheConfig, pri
 
     override fun ping() =
         cf.connection.use {
-            if (it.ping().equals("PONG", ignoreCase = true)) {
+            if (it.ping().equals(PONG, ignoreCase = true)) {
                 emptyMap<String,String>()
             }
             else {
@@ -21,6 +21,7 @@ class CacheAdapter(private val cf: RedisConnectionFactory, cfg: CacheConfig, pri
             }
         }
     companion object {
+        private const val PONG = "pong"
         const val VALKEY = "valkey"
     }
 }

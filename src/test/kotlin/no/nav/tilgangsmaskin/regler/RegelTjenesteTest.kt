@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.regler
 
 import com.ninjasquad.springmockk.MockkBean
-import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -17,10 +17,8 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingsEnhet
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
-import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.overstyring.*
@@ -43,7 +41,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.postgresql.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Testcontainers
 import kotlin.test.BeforeTest
 
@@ -69,8 +67,6 @@ class RegelTjenesteTest {
     @Autowired
     private lateinit var repo: OverstyringRepository
 
-    @Autowired
-    private lateinit var registry: MeterRegistry
 
     @MockkBean
     private lateinit var token: Token
@@ -97,6 +93,7 @@ class RegelTjenesteTest {
 
     @BeforeTest
     fun before() {
+        val registry = SimpleMeterRegistry()
         evalueringTeller = EvalueringTeller(registry, token)
         avdød = AvdødTeller(registry, token)
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
@@ -114,7 +111,9 @@ class RegelTjenesteTest {
     @Test
     @DisplayName("Verifiser at sjekk om overstyring gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang gis om overstyring er gjort")
     fun overstyringOK() {
-        every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
+        every {
+            brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi)
+        } returns BrukerBuilder(vanligBrukerId).build()
         overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
         assertThatCode {
             regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
@@ -188,9 +187,7 @@ class RegelTjenesteTest {
     }
 
     companion object {
-
-
         @ServiceConnection
-        private val postgres = PostgreSQLContainer("postgres:17")
+        private val postgres = PostgreSQLContainer("postgres:18")
     }
 }

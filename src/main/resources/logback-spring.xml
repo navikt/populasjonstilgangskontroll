@@ -19,15 +19,12 @@
     </appender>
 
     <springProfile name="dev">
-        <logger name="org.springframework.core.retry.RetryTemplate" level="trace"/>
         <logger name="io.lettuce.core.protocol.ReconnectionHandler" level="warn"/>
         <logger name="io.lettuce.core.protocol.ConnectionWatchdog" level="warn"/>
-        <logger name="io.micrometer.registry.otlp" level="trace"/>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
     </springProfile>
 
     <springProfile name="local | test">
-        <logger name="org.springframework.core.retry.RetryTemplate" level="trace"/>
         <appender name="stdout-appender" class="ch.qos.logback.core.ConsoleAppender">
             <layout class="ch.qos.logback.classic.PatternLayout">
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss} %X{Nav-CallId} [%thread] %-5level %logger{70} - %msg%n</Pattern>
@@ -38,7 +35,6 @@
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss} %X{Nav-CallId} [%thread] %-5level %logger{70} - %msg%n</Pattern>
             </layout>
         </appender>
-        <logger name="io.micrometer" level="trace"/>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
     </springProfile>
 
@@ -49,7 +45,6 @@
             <OnMatch>DENY</OnMatch>
         </turboFilter>
         <logger name="no.nav.tilgangsmaskin" level="info"/>
-        <logger name="io.micrometer.prometheusmetrics.PrometheusMeterRegistry" level="error"/>
         <logger name="org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration" level="error"/>
     </springProfile>
 

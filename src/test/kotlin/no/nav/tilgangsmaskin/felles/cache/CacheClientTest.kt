@@ -37,7 +37,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.KotlinModule.Builder
 import java.time.Duration
-import java.util.*
 import java.util.concurrent.TimeUnit.*
 
 @DataRedisTest
@@ -52,7 +51,7 @@ class CacheClientTest {
 
     private  val valkeyMapper = JsonMapper.builder().polymorphicTypeValidator(NavPolymorphicTypeValidator()).apply {
         addModule(Builder().build())
-        addModule(CacheModule())
+        addModule(JacksonTypeInfoAddingValkeyModule())
     }.build()
 
 

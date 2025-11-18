@@ -17,7 +17,12 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
+import tools.jackson.databind.DatabindContext
+import tools.jackson.databind.JavaType
 import tools.jackson.databind.json.JsonMapper
+import tools.jackson.databind.jsontype.PolymorphicTypeValidator
+import tools.jackson.databind.jsontype.PolymorphicTypeValidator.Validity.ALLOWED
+import tools.jackson.databind.jsontype.PolymorphicTypeValidator.Validity.DENIED
 import tools.jackson.module.kotlin.KotlinModule.Builder
 
 @Configuration(proxyBeanMethods = true)
@@ -29,7 +34,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
 
     private val mapper = JsonMapper.builder().polymorphicTypeValidator(NavPolymorphicTypeValidator()).apply {
         addModule(Builder().build())
-        addModule(CacheModule())
+        addModule(JacksonTypeInfoAddingValkeyModule())
     }.build()
 
     @Bean
@@ -63,4 +68,16 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             .apply {
                 if (!cfg.cacheNulls) disableCachingNullValues()
             }
+}
+
+ class NavPolymorphicTypeValidator(private vararg val allowedPrefixes: String = arrayOf("no.nav.tilgangsmaskin","java.", "kotlin.*")) : PolymorphicTypeValidator() {
+
+    override fun validateBaseType(ctx: DatabindContext, base: JavaType) = validityFor(base.rawClass.name)
+
+    override fun validateSubClassName(ctx: DatabindContext, base: JavaType, subClassName: String)  = validityFor(subClassName)
+
+    override fun validateSubType(ctx: DatabindContext, base: JavaType, subType: JavaType) = validityFor(subType.rawClass.name)
+
+    private fun validityFor(className: String) =
+        if (allowedPrefixes.any { className.startsWith(it) }) ALLOWED else DENIED
 }

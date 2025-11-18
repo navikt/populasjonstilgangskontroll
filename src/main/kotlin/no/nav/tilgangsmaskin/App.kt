@@ -2,8 +2,6 @@ package no.nav.tilgangsmaskin
 
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
-import no.nav.tilgangsmaskin.felles.cache.CacheAdapter
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.current
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.profiler
@@ -14,8 +12,6 @@ import org.springframework.boot.actuate.info.Info.Builder
 import org.springframework.boot.actuate.info.InfoContributor
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
-import org.springframework.boot.micrometer.metrics.autoconfigure.export.otlp.OtlpMetricsExportAutoConfiguration
-import org.springframework.boot.opentelemetry.autoconfigure.logging.otlp.OtlpLoggingAutoConfiguration
 import org.springframework.boot.runApplication
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.ConfigurableApplicationContext

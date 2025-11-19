@@ -66,27 +66,18 @@ class RegelTjenesteTest {
 
     @Autowired
     private lateinit var repo: OverstyringRepository
-
-
     @MockkBean
     private lateinit var token: Token
-
     @MockkBean
     private lateinit var oppfølging: OppfølgingTjeneste
-
     @Autowired
     private lateinit var motor: RegelMotor
-
     @MockK
     private lateinit var brukere: BrukerTjeneste
-
     @MockK
     private lateinit var ansatte: AnsattTjeneste
-
     private lateinit var overstyring: OverstyringTjeneste
-
     private lateinit var regler: RegelTjeneste
-
     private lateinit var evalueringTeller: EvalueringTeller
     private lateinit var avdød: AvdødTeller
 

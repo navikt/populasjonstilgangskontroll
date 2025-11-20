@@ -7,7 +7,6 @@ import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.springframework.cache.annotation.CachingConfigurer
-import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig

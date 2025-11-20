@@ -87,12 +87,8 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework:spring-aspects")
     testImplementation("org.springframework.boot:spring-boot-micrometer-metrics-test")
-    testImplementation("com.redis:testcontainers-redis")
-    testImplementation("com.ninja-squad:springmockk:4.0.2")
-    testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.awaitility:awaitility-kotlin:4.3.0")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     testImplementation("org.testcontainers:testcontainers-postgresql")
@@ -101,6 +97,10 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-data-redis-test")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+    testImplementation("org.awaitility:awaitility-kotlin:4.3.0")
+    testImplementation("com.redis:testcontainers-redis")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
+    testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation(kotlin("test"))
 }
 

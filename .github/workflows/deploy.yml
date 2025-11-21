@@ -45,6 +45,13 @@ jobs:
         with:
           team: tilgangsmaskin
 
+
+      - name: Configure Gradle for GPR
+        run: |
+          mkdir -p ~/.gradle
+          echo "gpr.user=${{ github.actor }}" >> ~/.gradle/gradle.properties
+          echo "gpr.key=${{ secrets.GITHUB_TOKEN }}" >> ~/.gradle/gradle.properties
+
       - name: Test og bygg
         id: kompiler
         run: |

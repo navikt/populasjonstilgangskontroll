@@ -20,7 +20,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
@@ -66,14 +66,14 @@ internal class NomTest {
         assertThat(nom.fnrForAnsatt(ansattId)).isNull()
     }
 
-    @Test
+   @Test
     @DisplayName("Ansatt uten sluttdato er gyldig")
     fun ingenSluttdato() {
         nom.lagre(GYLDIG)
         assertThat(nom.fnrForAnsatt(ansattId)).isEqualTo(GYLDIG.brukerId)
     }
 
-    @Test
+   @Test
     @DisplayName("Siste hendelse gjelder")
     fun oppdaterSamme() {
         nom.lagre(UTGÅTT)

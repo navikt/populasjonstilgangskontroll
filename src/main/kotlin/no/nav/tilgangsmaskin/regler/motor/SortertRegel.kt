@@ -10,4 +10,4 @@ import kotlin.annotation.AnnotationTarget.CLASS
 @Retention(RUNTIME)
 @Order
 @Component
-annotation class OrderedComponent(@get:AliasFor(annotation = Order::class, attribute = "value") val value: Int)
+annotation class SortertRegel(@get:AliasFor(annotation = Order::class, attribute = "value") val value: Int)

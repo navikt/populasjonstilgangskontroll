@@ -21,6 +21,7 @@
     <springProfile name="dev">
         <logger name="io.lettuce.core.protocol.ReconnectionHandler" level="warn"/>
         <logger name="io.lettuce.core.protocol.ConnectionWatchdog" level="warn"/>
+        <logger name="org.hibernate.orm.connections.pooling" level="warn"/>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
     </springProfile>
 
@@ -45,7 +46,9 @@
             <OnMatch>DENY</OnMatch>
         </turboFilter>
         <logger name="no.nav.tilgangsmaskin" level="info"/>
-        <logger name="io.micrometer.prometheusmetrics.PrometheusMeterRegistry" level="error"/>
+        <logger name="io.lettuce.core.protocol.ReconnectionHandler" level="warn"/>
+        <logger name="io.lettuce.core.protocol.ConnectionWatchdog" level="warn"/>
+        <logger name="org.hibernate.orm.connections.pooling" level="warn"/>
         <logger name="org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration" level="error"/>
     </springProfile>
 

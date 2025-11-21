@@ -1,7 +1,4 @@
 package no.nav.tilgangsmaskin.bruker.pdl
-
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
@@ -13,13 +10,15 @@ import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.readValue
 
 @Component
 class PdlRestClientAdapter(
     @Qualifier(PDL) restClient: RestClient,
     private val cf: PdlConfig,
     private val cache: CacheClient,
-    private val mapper: ObjectMapper) : AbstractRestClientAdapter(restClient, cf) {
+    private val mapper: JsonMapper) : AbstractRestClientAdapter(restClient, cf) {
 
     @WithSpan
     fun medUtvidetFamile(id: String, partnere: Set<FamilieMedlem>) =
@@ -40,11 +39,9 @@ class PdlRestClientAdapter(
 
         val fraRest = fraRest(identer  - fraCache.keys)
 
-        //val fraRest = fraRest(identer)
 
         cache.putMany(PDL_CACHE, fraRest,cf.varighet)
         return (fraRest.values + fraCache.values).toSet()
-        //return (fraRest.values).toSet()
 
     }
 

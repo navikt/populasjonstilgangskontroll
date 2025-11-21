@@ -1,7 +1,9 @@
 package no.nav.tilgangsmaskin.regler.motor
 
+import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.tilgangsmaskin.felles.AbstractTeller
+import io.micrometer.core.instrument.Tags
+import no.nav.tilgangsmaskin.regler.motor.AbstractTeller
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.stereotype.Component
@@ -47,3 +49,20 @@ class OppfølgingkontorTeller(registry: MeterRegistry, token: Token) :
 @Component
 class OppfriskingTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "endringer", "Endrede user oids")
+
+abstract class AbstractTeller(
+        private val registry: MeterRegistry,
+        private val token: Token,
+        private val navn: String,
+        private val beskrivelse: String) {
+
+
+    open fun tell(tags: Tags = Tags.empty(), n:Int=1) =
+        Counter.builder(navn)
+            .description(beskrivelse)
+            .tags(tags
+                .and("system", token.system)
+                .and("clustersystem", token.clusterAndSystem))
+            .register(registry)
+            .increment(n.toDouble())
+}

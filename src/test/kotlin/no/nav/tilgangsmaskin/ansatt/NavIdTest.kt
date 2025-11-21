@@ -1,32 +1,22 @@
 package no.nav.tilgangsmaskin.ansatt
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.shouldBe
 
-class NavIdTest {
-    @Test
-    @DisplayName("Gyldig ansattId OK")
-    fun validNavId() {
-        assertEquals("A123456", AnsattId("A123456").verdi)
+class NavIdTest : DescribeSpec({
+    describe("AnsattId") {
+        it("Gyldig ansattId OK") {
+            AnsattId("A123456").verdi shouldBe "A123456"
+        }
+        it("ansattId med ugyldig lengde skal kaste IllegalArgumentException") {
+            shouldThrow<IllegalArgumentException> { AnsattId("A12345") }
+        }
+        it("ansattId uten bokstav først skal kaste IllegalArgumentException") {
+            shouldThrow<IllegalArgumentException> { AnsattId("&123456") }
+        }
+        it("ansattId uten 6 tall etter første bokstav skal kaste IllegalArgumentException") {
+            shouldThrow<IllegalArgumentException> { AnsattId("A12345a") }
+        }
     }
-
-    @Test
-    @DisplayName("ansattId med ugyldig lengde skal kaste IllegalArgumentException")
-    fun lengde() {
-        assertThrows<IllegalArgumentException> { AnsattId("A12345") }
-    }
-
-    @Test
-    @DisplayName("ansattId uten bokstav først skal kaste IllegalArgumentException")
-    fun ikkeBokstav() {
-        assertThrows<IllegalArgumentException> { AnsattId("&123456") }
-    }
-
-    @Test
-    @DisplayName("ansattId uten 6 tall etter første bokstav skal kaste IllegalArgumentException")
-    fun ikke6tall() {
-        assertThrows<IllegalArgumentException> { AnsattId("A12345a") }
-    }
-}
+})

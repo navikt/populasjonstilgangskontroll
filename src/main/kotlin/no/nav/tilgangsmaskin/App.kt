@@ -12,7 +12,6 @@ import org.springframework.boot.actuate.info.Info.Builder
 import org.springframework.boot.actuate.info.InfoContributor
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
-import org.springframework.boot.info.BuildProperties
 import org.springframework.boot.runApplication
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.ConfigurableApplicationContext
@@ -39,7 +38,7 @@ fun main(args: Array<String>) {
 }
 
 @Component
-class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, vararg val regelsett: RegelSett,val buildPropereties: BuildProperties) :
+class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, vararg val regelsett: RegelSett) :
     InfoContributor {
 
     override fun contribute(builder: Builder) {
@@ -57,9 +56,6 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, va
                     "Spring Framework version" to SpringVersion.getVersion(),
                     "Java version" to environment.getProperty("java.version"),
                     "Java runtime version" to environment.getProperty("java.runtime.version"),
-                    "JDK version" to buildPropereties.get("jdk.version"),
-                    "Kotlin version" to buildPropereties.get("kotlin.version"),
-                    "JDK vendor" to buildPropereties.get("jdk.vendor"),
                     "Java vendor" to environment.getProperty("java.vm.vendor")
                     ))
             }

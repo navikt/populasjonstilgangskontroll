@@ -24,7 +24,15 @@ plugins {
     application
 }
 springBoot {
-    buildInfo()
+    buildInfo {
+        properties {
+            additional = mapOf(
+                "kotlin.version" to "2.2.20",
+                "jdk.version" to java.toolchain.languageVersion.get().toString(),
+                "jdk.vendor" to System.getProperty("java.vendor")
+            )
+        }
+    }
 }
 
 repositories {

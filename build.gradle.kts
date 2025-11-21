@@ -42,8 +42,8 @@ configurations.all {
 
 dependencies {
     implementation("org.apache.commons:commons-pool2:2.12.1")
-    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.21.0")
-    implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.21.0-alpha")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.22.0")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.22.0-alpha")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.micrometer:micrometer-core")
     implementation("io.micrometer:micrometer-registry-prometheus")
@@ -88,7 +88,7 @@ dependencies {
 
 dependencyManagement {
     imports {
-        mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.21.0")
+        mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.22.0")
     }
 }
 

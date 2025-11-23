@@ -106,5 +106,5 @@ jobs:
       VARS: .nais/${{matrix.cluster}}.json
       IMAGE: ${{needs.build.outputs.image}}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: nais/deploy/actions/deploy@v2

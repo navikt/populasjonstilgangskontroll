@@ -1,8 +1,5 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.EVERYTHING
 import io.lettuce.core.RedisClient
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
@@ -10,27 +7,33 @@ import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.springframework.cache.annotation.CachingConfigurer
-import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.nonLockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
+import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
+import tools.jackson.databind.DatabindContext
+import tools.jackson.databind.JavaType
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.databind.jsontype.PolymorphicTypeValidator
+import tools.jackson.databind.jsontype.PolymorphicTypeValidator.Validity.ALLOWED
+import tools.jackson.databind.jsontype.PolymorphicTypeValidator.Validity.DENIED
+import tools.jackson.module.kotlin.KotlinModule.Builder
 
 @Configuration(proxyBeanMethods = true)
-@EnableCaching
 @ConditionalOnGCP
-class CacheBeanConfig(private val cf: RedisConnectionFactory, mapper: ObjectMapper,
+class CacheBeanConfig(private val cf: RedisConnectionFactory,
                       private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
-    private val cacheMapper =
-        mapper.copy().apply {
-            activateDefaultTyping(polymorphicTypeValidator, EVERYTHING, PROPERTY)
-        }
+
+    private val mapper = JsonMapper.builder().polymorphicTypeValidator(NavPolymorphicTypeValidator()).apply {
+        addModule(Builder().build())
+        addModule(JacksonTypeInfoAddingValkeyModule())
+    }.build()
 
     @Bean
     override fun cacheManager()  =
@@ -49,7 +52,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory, mapper: ObjectMapp
 
     @Bean
     fun cacheNøkkelHandler(mgr: RedisCacheManager) =
-        CacheNøkkelHandler(mgr.cacheConfigurations,cacheMapper)
+        CacheNøkkelHandler(mgr.cacheConfigurations,mapper)
 
     @Bean
     fun cacheHealthIndicator(adapter: CacheAdapter)  =
@@ -59,8 +62,20 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory, mapper: ObjectMapp
         defaultCacheConfig()
             .entryTtl(cfg.varighet)
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))
-            .serializeValuesWith(fromSerializer(GenericJackson2JsonRedisSerializer(cacheMapper)))
+            .serializeValuesWith(fromSerializer(GenericJacksonJsonRedisSerializer(mapper)))
             .apply {
                 if (!cfg.cacheNulls) disableCachingNullValues()
             }
+}
+
+ class NavPolymorphicTypeValidator(private vararg val allowedPrefixes: String = arrayOf("no.nav.tilgangsmaskin","java.", "kotlin.")) : PolymorphicTypeValidator() {
+
+    override fun validateBaseType(ctx: DatabindContext, base: JavaType) = validityFor(base.rawClass.name)
+
+    override fun validateSubClassName(ctx: DatabindContext, base: JavaType, subClassName: String)  = validityFor(subClassName)
+
+    override fun validateSubType(ctx: DatabindContext, base: JavaType, subType: JavaType) = validityFor(subType.rawClass.name)
+
+    private fun validityFor(className: String) =
+        if (allowedPrefixes.any { className.startsWith(it) }) ALLOWED else DENIED
 }

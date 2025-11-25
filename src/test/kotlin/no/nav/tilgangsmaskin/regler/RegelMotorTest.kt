@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.regler
 
 import com.ninjasquad.springmockk.MockkBean
-import io.micrometer.core.instrument.MeterRegistry
+import io.mockk.Called
 import io.mockk.every
 import io.mockk.verify
 import java.util.*
@@ -34,8 +34,8 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest
+import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
+import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
@@ -48,7 +48,7 @@ import kotlin.test.Test
 @ActiveProfiles(TEST)
 @RestClientTest
 @TestPropertySource(locations = ["classpath:test.properties"])
-@AutoConfigureObservability
+@AutoConfigureMetrics
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class, RegelConfig::class])
 @ContextConfiguration(classes = [TestApp::class, Token::class, Auditor::class])
 @TestInstance(PER_CLASS)
@@ -59,9 +59,6 @@ class RegelMotorTest {
 
     @MockkBean
     lateinit var holder: TokenValidationContextHolder
-
-    @Autowired
-    private lateinit var registry: MeterRegistry
 
     @MockkBean
     private lateinit var oppfølging: OppfølgingTjeneste
@@ -212,8 +209,7 @@ class RegelMotorTest {
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(NASJONAL).build()
             val bruker = BrukerBuilder(brukerId).build()
             assertThat(ansatt kanBehandle bruker).isTrue
-            verify(exactly = 0) { oppfølging.enhetFor(brukerId.verdi) }
-
+            verify { oppfølging wasNot Called }
         }
 
         @Test
@@ -230,8 +226,7 @@ class RegelMotorTest {
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).medMedlemskapI(SKJERMING).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune(enhet.verdi))).build()
             assertThat(ansatt kanBehandle bruker).isTrue
-            verify(exactly = 0) { oppfølging.enhetFor(brukerId.verdi) }
-
+            verify { oppfølging wasNot Called }
         }
 
         @Test

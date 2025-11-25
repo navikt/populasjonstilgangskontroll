@@ -10,10 +10,8 @@ import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.STRENGT_FORTROLIG_UTLAND
-import no.nav.tilgangsmaskin.felles.cache.JsonCacheable
 import java.time.LocalDate
 
-@JsonCacheable
 data class Person(
     val brukerId: BrukerId,
     val oppslagId: String = brukerId.verdi,

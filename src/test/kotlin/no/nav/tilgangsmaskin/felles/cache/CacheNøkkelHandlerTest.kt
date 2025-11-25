@@ -1,62 +1,52 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.mockk.impl.annotations.MockK
-import io.mockk.junit5.MockKExtension
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.every
+import io.mockk.mockk
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
-import org.junit.jupiter.api.BeforeEach
 import org.springframework.data.redis.cache.RedisCacheConfiguration
-import org.junit.jupiter.api.DisplayName
-import org.assertj.core.api.Assertions.*
+import tools.jackson.module.kotlin.jsonMapper
 
-@ExtendWith(MockKExtension::class)
-class CacheNøkkelHandlerTest {
+class CacheNøkkelHandlerTest : DescribeSpec({
+    val id = "01011111111"
+    val UTEN_EXTRA = CachableConfig(PDL)
+    val MED_EXTRA = UTEN_EXTRA.copy(extraPrefix = "medFamilie")
+    val mapper = jsonMapper()
+    lateinit var redisConfig: RedisCacheConfiguration
+    lateinit var handler: CacheNøkkelHandler
 
-    private val key = "01011111111"
-    private val UTEN_EXTRA =   CachableConfig(PDL)
-    private val MED_EXTRA = UTEN_EXTRA.copy(extraPrefix = "medFamilie")
-    @MockK
-    private lateinit var redisConfig: RedisCacheConfiguration
-    private lateinit var handler: CacheNøkkelHandler
-
-    @BeforeEach
-    fun setUp() {
+    beforeTest {
+        redisConfig = mockk()
         every { redisConfig.getKeyPrefixFor(MED_EXTRA.name) } returns MED_EXTRA.name
-        handler = CacheNøkkelHandler(mapOf(MED_EXTRA.name to redisConfig), jacksonObjectMapper())
+        every { redisConfig.getKeyPrefixFor(UTEN_EXTRA.name) } returns UTEN_EXTRA.name
+        handler = CacheNøkkelHandler(
+            mapOf(
+                MED_EXTRA.name to redisConfig,
+                UTEN_EXTRA.name to redisConfig
+            ),
+            mapper
+        )
     }
 
-    @Test
-    @DisplayName("tilNøkkel legger til prefiks og nøkkel")
-    fun toKey_leggerTilPrefiksOgNokkel() {
-        assertThat(handler.tilNøkkel(UTEN_EXTRA, key)).isEqualTo("${UTEN_EXTRA.name}::$key")
+    describe("CacheNøkkelHandler") {
+        it("tilNøkkel legger til prefiks og nøkkel") {
+            handler.tilNøkkel(UTEN_EXTRA, id) shouldBe "${UTEN_EXTRA.name}::$id"
+        }
+        it("tilNøkkel legger til ekstraPrefiks hvis angitt") {
+            handler.tilNøkkel(MED_EXTRA, id) shouldBe "${MED_EXTRA.name}::${MED_EXTRA.extraPrefix}:$id"
+        }
+        it("fraNøkkel fjerner prefiks og ekstraPrefiks") {
+            handler.idFraNøkkel(handler.tilNøkkel(MED_EXTRA, id)) shouldBe id
+        }
+        it("fraNøkkel fjerner kun prefiks når ekstraPrefiks er null") {
+            handler.idFraNøkkel(handler.tilNøkkel(UTEN_EXTRA, id)) shouldBe id
+        }
+        it("kaster exception hvis cache config mangler") {
+            shouldThrow<IllegalStateException> {
+                CacheNøkkelHandler(emptyMap(), mapper).tilNøkkel(CachableConfig("unknown"), "key")
+            }
+        }
     }
-
-    @Test
-    @DisplayName("tilNøkkel legger til ekstraPrefiks hvis angitt")
-    fun toKey_leggerTilEkstraPrefiksHvisAngitt() {
-        assertThat(handler.tilNøkkel(MED_EXTRA, key)).isEqualTo("${MED_EXTRA.name}::${MED_EXTRA.extraPrefix}:$key")
-    }
-
-    @Test
-    @DisplayName("fraNøkkel fjerner prefiks og ekstraPrefiks")
-    fun fromKey_fjernerPrefiksOgEkstraPrefiks() {
-        assertThat(handler.idFraNøkkel(handler.tilNøkkel(MED_EXTRA, key))).isEqualTo(key)
-    }
-
-    @Test
-    @DisplayName("fraNøkkel fjerner kun prefiks når ekstraPrefiks er null")
-    fun fromKey_fjernerKunPrefiksNarEkstraPrefiksErNull() {
-        assertThat(handler.idFraNøkkel(handler.tilNøkkel(UTEN_EXTRA, key))).isEqualTo(key)
-    }
-
-    @Test
-    @DisplayName("kaster exception hvis cache config mangler")
-    fun kasterExceptionHvisCacheConfigMangler() {
-        assertThatThrownBy {
-            CacheNøkkelHandler(emptyMap(), jacksonObjectMapper()).tilNøkkel(CachableConfig("unknown"), "key")
-        }.isInstanceOf(IllegalStateException::class.java)
-    }
-}
+})

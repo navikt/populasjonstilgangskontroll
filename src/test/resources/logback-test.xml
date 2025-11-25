@@ -11,6 +11,7 @@
         </layout>
     </appender>
 
+    <logger name="org.springframework.core.retry.RetryTemplate" level="trace"/>
     <logger name="no.nav.tilgangsmaskin" level="trace"/>
     <logger name="secureLog" level="INFO" additivity="false">
         <appender-ref ref="secure-appender"/>

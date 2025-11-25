@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.regler
 
 import com.ninjasquad.springmockk.MockkBean
-import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -17,10 +17,8 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingsEnhet
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
-import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.overstyring.*
@@ -35,15 +33,15 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
+import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.postgresql.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Testcontainers
 import kotlin.test.BeforeTest
 
@@ -54,7 +52,7 @@ import kotlin.test.BeforeTest
 @EnableConfigurationProperties(value= [RegelConfig::class, GlobaleGrupperConfig::class])
 @ContextConfiguration(classes = [TestApp::class, Auditor::class])
 @ExtendWith(MockKExtension::class)
-@AutoConfigureObservability
+@AutoConfigureMetrics
 @Testcontainers
 @ActiveProfiles(TEST)
 class RegelTjenesteTest {
@@ -68,40 +66,31 @@ class RegelTjenesteTest {
 
     @Autowired
     private lateinit var repo: OverstyringRepository
-
-    @Autowired
-    private lateinit var registry: MeterRegistry
-
     @MockkBean
     private lateinit var token: Token
-
     @MockkBean
     private lateinit var oppfølging: OppfølgingTjeneste
-
     @Autowired
     private lateinit var motor: RegelMotor
-
     @MockK
     private lateinit var brukere: BrukerTjeneste
-
     @MockK
     private lateinit var ansatte: AnsattTjeneste
-
     private lateinit var overstyring: OverstyringTjeneste
-
     private lateinit var regler: RegelTjeneste
-
     private lateinit var evalueringTeller: EvalueringTeller
     private lateinit var avdød: AvdødTeller
 
 
     @BeforeTest
     fun before() {
+        val registry = SimpleMeterRegistry()
         evalueringTeller = EvalueringTeller(registry, token)
         avdød = AvdødTeller(registry, token)
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
         every { oppfølging.enhetFor(vanligBrukerId.verdi) } returns Enhetsnummer("1234")
         every { token.system } returns "test"
+        every { token.ansattId } returns ansattId
         every { token.clusterAndSystem } returns "cluster:test"
         every { token.systemNavn } returns "test"
         every { token.erObo } returns false
@@ -113,7 +102,9 @@ class RegelTjenesteTest {
     @Test
     @DisplayName("Verifiser at sjekk om overstyring gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang gis om overstyring er gjort")
     fun overstyringOK() {
-        every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
+        every {
+            brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi)
+        } returns BrukerBuilder(vanligBrukerId).build()
         overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
         assertThatCode {
             regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
@@ -187,9 +178,7 @@ class RegelTjenesteTest {
     }
 
     companion object {
-
-
         @ServiceConnection
-        private val postgres = PostgreSQLContainer("postgres:17")
+        private val postgres = PostgreSQLContainer("postgres:18")
     }
 }

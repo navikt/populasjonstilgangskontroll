@@ -16,7 +16,7 @@ abstract class AbstractRestClientAdapter(
     protected val log = getLogger(javaClass)
     override fun ping() = if (cfg.isEnabled) get<Any>(cfg.pingEndpoint) else "disabled"
 
-    protected inline fun <reified T> get(uri: URI, headers: Map<String, String> = emptyMap()) =
+    protected inline fun <reified T : Any> get(uri: URI, headers: Map<String, String> = emptyMap()) =
         restClient.get()
             .uri(uri)
             .accept(APPLICATION_JSON)
@@ -25,7 +25,7 @@ abstract class AbstractRestClientAdapter(
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
             .body(T::class.java) ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
 
-    protected inline fun <reified T> post(uri: URI, body: Any, headers: Map<String, String> = emptyMap()) =
+    protected inline fun <reified T : Any> post(uri: URI, body: Any, headers: Map<String, String> = emptyMap()) =
         restClient
             .post()
             .uri(uri)

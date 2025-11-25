@@ -115,11 +115,7 @@ dependencies {
 
 dependencyManagement {
     imports {
-<<<<<<< HEAD
         mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:$otelVersion")
-=======
-        mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.22.0")
->>>>>>> 84b4e10f (Bump io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations (#220))
     }
 }
 

@@ -73,7 +73,7 @@ dependencies {
     implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
     implementation("org.apache.httpcomponents.client5:httpclient5")
-    implementation("org.flywaydb:flyway-database-postgresql") 
+    implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.apache.commons:commons-pool:$poolsVersion")
     implementation("org.hibernate.orm:hibernate-micrometer")
     implementation("org.jetbrains.kotlin:kotlin-reflect")

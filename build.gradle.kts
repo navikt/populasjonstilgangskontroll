@@ -66,6 +66,9 @@ configurations.all {
 dependencies {
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$otelVersion-alpha")
+    implementation("org.apache.commons:commons-pool2:$poolsVersion")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.22.0-alpha")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.micrometer:micrometer-core")
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
@@ -112,7 +115,11 @@ dependencies {
 
 dependencyManagement {
     imports {
+<<<<<<< HEAD
         mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:$otelVersion")
+=======
+        mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.22.0")
+>>>>>>> 84b4e10f (Bump io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations (#220))
     }
 }
 

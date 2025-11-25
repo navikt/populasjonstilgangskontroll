@@ -10,7 +10,7 @@ val conditionalsVersion = "5.1.11"
 val logstashVersion = "9.0"
 val coroutinesVersion = "1.9.0"
 val poolsVersion = "2.12.1"
-val awaitilityVersion = "4.2.0"
+val awaitilityVersion = "4.3.0"
 val springMockkVersion = "4.0.2"
 
 

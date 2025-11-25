@@ -5,7 +5,13 @@ val springdocVersion = "3.0.0"
 val tokenSupportVersion = "6.0.0"
 val mockkVersion = "1.14.6"
 val kotestVersion = "6.0.5"
-
+val otelVersion = "2.22.0"
+val conditionalsVersion = "5.1.11"
+val logstashVersion = "9.0"
+val coroutinesVersion = "1.9.0"
+val poolsVersion = "2.12.1"
+val awaitilityVersion = "4.2.0"
+val springMockkVersion = "4.0.2"
 
 
 group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
@@ -59,29 +65,21 @@ configurations.all {
 
 dependencies {
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations")
-    implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.20.1-alpha")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$otelVersion-alpha")
     implementation("io.micrometer:micrometer-core")
     implementation("io.micrometer:micrometer-registry-prometheus")
-    implementation("net.logstash.logback:logstash-logback-encoder:9.0")
-    implementation("no.nav.boot:boot-conditionals:5.1.11")
+    implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
+    implementation("no.nav.boot:boot-conditionals:$conditionalsVersion")
     implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
     implementation("org.apache.httpcomponents.client5:httpclient5")
-    implementation("org.flywaydb:flyway-database-postgresql") {
-        exclude("com.fasterxml.jackson.core",  "jackson-databind")
-    }
-    implementation("org.apache.commons:commons-pool2:2.12.1")
+    implementation("org.flywaydb:flyway-database-postgresql") 
+    implementation("org.apache.commons:commons-pool:$poolsVersion")
     implementation("org.hibernate.orm:hibernate-micrometer")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     implementation("org.postgresql:postgresql")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion") {
-      /*
-        exclude("com.fasterxml.jackson.core",  "jackson-databind")
-        exclude("com.fasterxml.jackson.dataformat",  "jackson-dataformat-yaml")
-        exclude("com.fasterxml.jackson.datatype",  "jackson-datatype-jsr310")
-*/
-    }
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -105,16 +103,16 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-data-redis-test")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
-    testImplementation("org.awaitility:awaitility-kotlin:4.3.0")
+    testImplementation("org.awaitility:awaitility-kotlin:$awaitilityVersion")
     testImplementation("com.redis:testcontainers-redis")
-    testImplementation("com.ninja-squad:springmockk:4.0.2")
+    testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation(kotlin("test"))
 }
 
 dependencyManagement {
     imports {
-        mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.21.0")
+        mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:$otelVersion")
     }
 }
 

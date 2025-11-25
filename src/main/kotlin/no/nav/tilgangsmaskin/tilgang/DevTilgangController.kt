@@ -159,4 +159,10 @@ class DevTilgangController(
 
     @PostMapping("brukere")
     fun brukere(@RequestBody ids: Set<String>) = brukere.brukere(ids)
+
+    @GetMapping("version", version = "1.0")
+    fun v1() = "1.0-dev"
+
+    @GetMapping("version", version = "2.0")
+    fun v2() = "2.0-dev"
 }

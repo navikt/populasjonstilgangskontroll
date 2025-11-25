@@ -111,6 +111,10 @@ spring:
   cache:
     type: redis
   mvc:
+    apiversion:
+      default: 1.0
+      use:
+        header: API-Version
     problemdetails:
       enabled: true
   datasource:

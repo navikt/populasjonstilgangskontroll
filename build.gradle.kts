@@ -45,14 +45,6 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven {
-        name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/navikt/token-support")
-        credentials {
-            username = findProperty("gpr.user") as String?
-            password = findProperty("gpr.key") as String?
-        }
-    }
-    maven {
         url = uri("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
     }
 }
@@ -64,10 +56,8 @@ configurations.all {
 }
 
 dependencies {
-    implementation("org.apache.commons:commons-pool2:2.12.1")
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$otelVersion-alpha")
-    implementation("org.apache.commons:commons-pool2:$poolsVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.micrometer:micrometer-core")
     implementation("io.micrometer:micrometer-registry-prometheus")
@@ -77,7 +67,7 @@ dependencies {
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
     implementation("org.apache.httpcomponents.client5:httpclient5")
     implementation("org.flywaydb:flyway-database-postgresql")
-    implementation("org.apache.commons:commons-pool:$poolsVersion")
+    implementation("org.apache.commons:commons-pool2:$poolsVersion")
     implementation("org.hibernate.orm:hibernate-micrometer")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")

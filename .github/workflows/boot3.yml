@@ -1,4 +1,4 @@
-nname: Manuell kjøring på branch
+name: Manuell kjøring på branch
 
 on:
   workflow_dispatch:

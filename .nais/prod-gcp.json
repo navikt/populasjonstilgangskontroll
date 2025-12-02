@@ -24,7 +24,7 @@
   },
   "inbound": [
     {
-      "name": " sokos-skattekort",
+      "name": "sokos-skattekort",
       "namespace": "okonomi",
       "cluster": "prod-gcp"
     },

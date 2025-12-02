@@ -32,7 +32,7 @@
       "cluster": "dev-gcp"
     },
     {
-      "name": " sokos-skattekort",
+      "name": "sokos-skattekort",
       "namespace": "okonomi",
       "cluster": "dev-gcp"
     },

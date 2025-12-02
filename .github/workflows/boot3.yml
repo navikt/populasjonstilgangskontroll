@@ -1,4 +1,4 @@
-name: Manuell kjøring på branch
+name: Manuell kjøring boot3 branch
 
 on:
   workflow_dispatch:

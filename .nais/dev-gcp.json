@@ -27,6 +27,16 @@
   },
   "inbound": [
     {
+      "name": "gjenlevende-bs-sak",
+      "namespace": "etterlatte",
+      "cluster": "dev-gcp"
+    },
+    {
+      "name": " sokos-skattekort",
+      "namespace": "okonomi",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "modia-soknadsstatus-api",
       "namespace": "personoversikt",
       "cluster": "dev-gcp"

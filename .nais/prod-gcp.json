@@ -24,6 +24,11 @@
   },
   "inbound": [
     {
+      "name": " sokos-skattekort",
+      "namespace": "okonomi",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "modia-soknadsstatus-api",
       "namespace": "personoversikt",
       "cluster": "prod-gcp"

@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import no.nav.person.pdl.leesah.Personhendelse
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Component
 class PdlHendelseKonsument {
     private val log = getLogger(javaClass)
 
-    @KafkaListener(topics = [ "pdl.leesah-v1"], containerFactory = PDL)
+    @KafkaListener(topics = [ "pdl.leesah-v1"], containerFactory = "pslListenerContainerFactory")
     fun listen(hendelse: Personhendelse) {
         log.info("Mottok PDL-hendelse $hendelse" )
     }

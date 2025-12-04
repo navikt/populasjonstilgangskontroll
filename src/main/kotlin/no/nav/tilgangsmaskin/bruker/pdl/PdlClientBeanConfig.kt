@@ -74,8 +74,9 @@ class PdlClientBeanConfig {
     @Bean
     fun pdlHealthIndicator(a: PdlRestClientAdapter) = PingableHealthIndicator(a)
 
-    @Bean(PDL)
-    fun listenerContainerFactory(p : KafkaProperties, env: Environment) : ConcurrentKafkaListenerContainerFactory<String, Personhendelse> {
+    @Bean
+    @Qualifier(PDL)
+    fun pslListenerContainerFactory(p : KafkaProperties, env: Environment) : ConcurrentKafkaListenerContainerFactory<String, Personhendelse> {
         val cf = ConcurrentKafkaListenerContainerFactory<String, Personhendelse>().apply {
             containerProperties.isObservationEnabled = true
             setConsumerFactory(DefaultKafkaConsumerFactory(p.buildConsumerProperties().apply {

@@ -85,6 +85,7 @@ class PdlClientBeanConfig {
                 this["specific.avro.reader"] = "true"
                 this["schema.registry.url"] = env.getRequiredProperty("kafka.schema.registry")
                 this["basic.auth.credentials.source"] = "USER_INFO"
+                this["json.value.default.tupe"] = "no.nav.person.pdl.leesah.Personhendelse"
                 this["basic.auth.user.info"] =
                     "${env.getRequiredProperty("kafka.schema.registry.user")}:${env.getRequiredProperty("kafka.schema.registry.password")}"
             }.also {

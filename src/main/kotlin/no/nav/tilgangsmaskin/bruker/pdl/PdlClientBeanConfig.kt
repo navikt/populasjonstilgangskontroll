@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
@@ -9,10 +8,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.graphql.GraphQLErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
-import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
-import org.apache.kafka.clients.consumer.ConsumerConfig.*
-import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties
@@ -78,24 +74,22 @@ class PdlClientBeanConfig {
 
     @Bean
     @Qualifier(PDL)
-    fun pslListenerContainerFactory(p : KafkaProperties, env: Environment) : ConcurrentKafkaListenerContainerFactory<String, Personhendelse> {
-        val cf = ConcurrentKafkaListenerContainerFactory<String, Personhendelse>().apply {
-            containerProperties.isObservationEnabled = true
-            containerProperties.isLogContainerConfig = true
+    fun pdlListenerContainerFactory(p : KafkaProperties, env: Environment)  =
+        ConcurrentKafkaListenerContainerFactory<String, Personhendelse>().apply {
             setConsumerFactory(DefaultKafkaConsumerFactory(p.buildConsumerProperties().apply {
                 this[GROUP_ID_CONFIG] = "test"
                 this["specific.avro.reader"] = "true"
                 this["schema.registry.url"] = env.getRequiredProperty("kafka.schema.registry")
                 this["basic.auth.credentials.source"] = "USER_INFO"
                 this["spring.json.value.default.type"] = "no.nav.person.pdl.leesah.Personhendelse"
-                this["spring.deserializer.key.delegate.class"] = "org.apache.kafka.common.serialization.StringDeserializer"
-                this["spring.deserializer.value.delegate.class"] = "io.confluent.kafka.serializers.KafkaAvroDeserializer"
+                this["spring.deserializer.key.delegate.class"] =
+                    "org.apache.kafka.common.serialization.StringDeserializer"
+                this["spring.deserializer.value.delegate.class"] =
+                    "io.confluent.kafka.serializers.KafkaAvroDeserializer"
                 this["basic.auth.user.info"] =
                     "${env.getRequiredProperty("kafka.schema.registry.user")}:${env.getRequiredProperty("kafka.schema.registry.password")}"
             }.also {
-                log.info("CP for PDL LESAH: $it")
+                log.info("CP for PDL LEESAH: $it")
             }))
         }
-        return cf
-    }
 }

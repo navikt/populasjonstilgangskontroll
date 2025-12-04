@@ -83,7 +83,7 @@ class PdlClientBeanConfig {
             setConsumerFactory(DefaultKafkaConsumerFactory(p.buildConsumerProperties().apply {
                 this[GROUP_ID_CONFIG] = "test"
                 this["properties.specific.avro.reader"] = "true"
-                this["properties.schema.registry.url"] = env.getRequiredProperty("kafka.schema.registry")
+                this["schema.registry.url"] = env.getRequiredProperty("kafka.schema.registry")
                 this["properties.basic.auth.credentials.source"] = "USER_INFO"
                 this["properties.basic.auth.user.info"] =
                     "${env.getRequiredProperty("kafka.schema.registry.user")}:${env.getRequiredProperty("kafka.schema.registry.password")}"

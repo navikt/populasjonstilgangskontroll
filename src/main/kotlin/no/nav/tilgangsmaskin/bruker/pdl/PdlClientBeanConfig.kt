@@ -9,7 +9,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.graphql.GraphQLErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
-import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.LoggerFactory.getLogger
@@ -31,6 +30,7 @@ import org.springframework.web.client.RestClient.Builder
 
 @Configuration
 class PdlClientBeanConfig {
+    private val log = getLogger(javaClass)
 
     @Component
     @Primary
@@ -87,7 +87,9 @@ class PdlClientBeanConfig {
                     "${env.getRequiredProperty("kafka.schema.registry.user")}:${env.getRequiredProperty("kafka.schema.registry.password")}"
             }, StringDeserializer(), KafkaAvroDeserializer()))
         }
-        return cf
+        return cf.also {
+            log.info("CF er ${it.containerProperties}")
+        }
     }
 
 }

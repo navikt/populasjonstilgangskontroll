@@ -87,10 +87,10 @@ class PdlClientBeanConfig {
                 this["basic.auth.credentials.source"] = "USER_INFO"
                 this["basic.auth.user.info"] =
                     "${env.getRequiredProperty("kafka.schema.registry.user")}:${env.getRequiredProperty("kafka.schema.registry.password")}"
+            }.also {
+                log.info("CP for PDL LESAH: $it")
             }, StringDeserializer(), KafkaAvroDeserializer()))
         }
-        return cf.also {
-            log.info("CP er ${it.containerProperties.kafkaConsumerProperties} ")
-        }
+        return cf
     }
 }

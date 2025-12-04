@@ -87,10 +87,9 @@ class PdlClientBeanConfig {
                 this["specific.avro.reader"] = "true"
                 this["schema.registry.url"] = env.getRequiredProperty("kafka.schema.registry")
                 this["basic.auth.credentials.source"] = "USER_INFO"
-                this["json.value.default.type"] = "no.nav.person.pdl.leesah.Personhendelse"
-                this[KEY_DESERIALIZER_CLASS_CONFIG] = "org.apache.kafka.common.serialization.StringDeserializer"
-                this[VALUE_DESERIALIZER_CLASS_CONFIG] = "io.confluent.kafka.serializers.KafkaAvroDeserializer"
-
+                this["spring.json.value.default.type"] = "no.nav.person.pdl.leesah.Personhendelse"
+                this["spring.deserializer.key.delegate.class"] = "org.apache.kafka.common.serialization.StringDeserializer"
+                this["spring.deserializer.value.delegate.class"] = "io.confluent.kafka.serializers.KafkaAvroDeserializer"
                 this["basic.auth.user.info"] =
                     "${env.getRequiredProperty("kafka.schema.registry.user")}:${env.getRequiredProperty("kafka.schema.registry.password")}"
             }.also {

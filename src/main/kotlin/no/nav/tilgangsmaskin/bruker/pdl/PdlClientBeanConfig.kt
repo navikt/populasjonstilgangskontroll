@@ -75,15 +75,15 @@ class PdlClientBeanConfig {
     fun pdlHealthIndicator(a: PdlRestClientAdapter) = PingableHealthIndicator(a)
 
     @Bean(PDL)
-    fun fordelingListenerContainerFactory(p : KafkaProperties, env: Environment) : ConcurrentKafkaListenerContainerFactory<String, Personhendelse> {
+    fun listenerContainerFactory(p : KafkaProperties, env: Environment) : ConcurrentKafkaListenerContainerFactory<String, Personhendelse> {
         val cf = ConcurrentKafkaListenerContainerFactory<String, Personhendelse>().apply {
             containerProperties.isObservationEnabled = true
             setConsumerFactory(DefaultKafkaConsumerFactory(p.buildConsumerProperties().apply {
                 this[GROUP_ID_CONFIG] = "test"
-                this["specific.avro.reader"] = "true"
-                this["schema.registry.url"] = env.getRequiredProperty("kafka.schema.registry")
-                this["basic.auth.credentials.source"] = "USER_INFO"
-                this["basic.auth.user.info"] =
+                this["properties.specific.avro.reader"] = "true"
+                this["properties.schema.registry.url"] = env.getRequiredProperty("kafka.schema.registry")
+                this["properties.basic.auth.credentials.source"] = "USER_INFO"
+                this["properties.basic.auth.user.info"] =
                     "${env.getRequiredProperty("kafka.schema.registry.user")}:${env.getRequiredProperty("kafka.schema.registry.password")}"
             }, StringDeserializer(), KafkaAvroDeserializer()))
         }

@@ -1,10 +1,17 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 val javaVersion = JavaLanguageVersion.of(21)
-val springdocVersion = "2.8.14"
-val tokenSupportVersion = "5.0.39"
+val springdocVersion = "3.0.0"
+val tokenSupportVersion = "6.0.0"
 val mockkVersion = "1.14.6"
-
+val kotestVersion = "6.0.5"
+val otelVersion = "2.22.0"
+val conditionalsVersion = "5.1.11"
+val logstashVersion = "9.0"
+val coroutinesVersion = "1.9.0"
+val poolsVersion = "2.12.1"
+val awaitilityVersion = "4.3.0"
+val springMockkVersion = "4.0.2"
 val confluentVersion = "8.1.0"
 
 

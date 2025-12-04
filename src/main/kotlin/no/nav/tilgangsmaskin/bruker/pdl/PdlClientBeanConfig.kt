@@ -79,6 +79,7 @@ class PdlClientBeanConfig {
     fun pslListenerContainerFactory(p : KafkaProperties, env: Environment) : ConcurrentKafkaListenerContainerFactory<String, Personhendelse> {
         val cf = ConcurrentKafkaListenerContainerFactory<String, Personhendelse>().apply {
             containerProperties.isObservationEnabled = true
+            containerProperties.isLogContainerConfig = true
             setConsumerFactory(DefaultKafkaConsumerFactory(p.buildConsumerProperties().apply {
                 this[GROUP_ID_CONFIG] = "test"
                 this["properties.specific.avro.reader"] = "true"
@@ -89,8 +90,7 @@ class PdlClientBeanConfig {
             }, StringDeserializer(), KafkaAvroDeserializer()))
         }
         return cf.also {
-            log.info("CF er ${it.containerProperties}")
+            log.info("CP er ${it.containerProperties.kafkaConsumerProperties} ")
         }
     }
-
 }

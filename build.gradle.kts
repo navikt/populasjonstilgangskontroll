@@ -5,12 +5,14 @@ val springdocVersion = "2.8.14"
 val tokenSupportVersion = "5.0.39"
 val mockkVersion = "1.14.6"
 
+val confluentVersion = "8.1.0"
 
 
 group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
 version = "1.0.1"
 
 plugins {
+    id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
     val kotlinVersion = "2.2.20"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
@@ -29,7 +31,7 @@ springBoot {
 repositories {
     mavenCentral()
     mavenLocal()
-
+    maven { url = uri("https://packages.confluent.io/maven/") }
     maven {
         url = uri("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
     }
@@ -42,6 +44,7 @@ configurations.all {
 }
 
 dependencies {
+    implementation("io.confluent:kafka-avro-serializer:$confluentVersion")
     implementation("org.apache.commons:commons-pool2:2.12.1")
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.21.0")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.21.0-alpha")
@@ -98,6 +101,10 @@ application {
 }
 tasks.withType<BootJar> {
     archiveFileName = "app.jar"
+}
+
+tasks.named("compileKotlin") {
+    dependsOn("generateAvroJava")
 }
 
 tasks.test {

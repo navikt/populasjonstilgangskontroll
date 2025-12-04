@@ -1,8 +1,13 @@
-name: Build and deploy
+name: deploy vilkårlig branch
+
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to run workflow on'
+        required: true
+        default: 'sisteBoot3'
+
 jobs:
   build:
     env:
@@ -15,8 +20,13 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     steps:
-      - name: Sjekker ut kode
-        uses: actions/checkout@v6
+      - name: Sjekk ut koden
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Kjør et eksempelsteg
+        run: echo "Workflow kjører på branch ${{ github.event.inputs.branch }}"
 
       - name: Cache
         uses: actions/cache@v4
@@ -37,6 +47,7 @@ jobs:
         with:
           cosign-release: v2.4.1
 
+
       - name: Setter tag-navn
         run: echo "TAG=$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
 
@@ -45,12 +56,6 @@ jobs:
         with:
           team: tilgangsmaskin
 
-
-      - name: Configure Gradle for GPR
-        run: |
-          mkdir -p ~/.gradle
-          echo "gpr.user=${{ github.actor }}" >> ~/.gradle/gradle.properties
-          echo "gpr.key=${{ secrets.GITHUB_TOKEN }}" >> ~/.gradle/gradle.properties
 
       - name: Test og bygg
         id: kompiler
@@ -71,11 +76,12 @@ jobs:
           detailed_summary: 'true'
           report_paths: '**/build/test-results/test/TEST-*.xml'
 
+
       - name: Attest and sign
         uses: nais/attest-sign@v1.5.22
         with:
           image_ref: ${{env.IMAGE}}@${{env.DIGEST}}
-          sbom: build/reports/bom.json
+          sbom: build/reports/application.cdx.json
 
     outputs:
       image: ${{ steps.kompiler.outputs.image }}
@@ -101,3 +107,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: nais/deploy/actions/deploy@v2
+
+
+

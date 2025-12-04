@@ -5,8 +5,8 @@ management:
     configprops:
       show-values: never
     health:
-      show-details: when_authorized
-      show-components: when_authorized
+      show-details: never
+      show-components: never
   endpoints:
     web:
       exposure:

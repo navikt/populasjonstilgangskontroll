@@ -2,8 +2,7 @@ package no.nav.tilgangsmaskin
 
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
-import no.nav.tilgangsmaskin.felles.cache.CacheAdapter
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.current
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.profiler
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.local
@@ -18,16 +17,15 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.core.SpringVersion
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
-import org.springframework.retry.annotation.EnableRetry
+import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.stereotype.Component
-import kotlin.text.contains
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
 @EnableOAuth2Client(cacheEnabled = true)
 @EnableCaching
-@EnableRetry
+@EnableResilientMethods
 @EnableJpaAuditing
 @EnableScheduling
 @EnableJwtTokenValidation(ignore = ["org.springdoc", "org.springframework"])
@@ -40,14 +38,14 @@ fun main(args: Array<String>) {
 }
 
 @Component
-class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, private  val cache: CacheAdapter, vararg val regelsett: RegelSett) :
+class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, vararg val regelsett: RegelSett) :
     InfoContributor {
 
     override fun contribute(builder: Builder) {
         with(ctx) {
             builder.withDetail(
                 "info", mapOf(
-                    "Cluster" to ClusterUtils.current.clusterName,
+                    "Cluster" to current.clusterName,
                     "Startup" to startupDate.local(),
                     "Name" to environment.getProperty("spring.application.name"),
                     ))
@@ -56,6 +54,7 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, pr
                     "Client ID" to environment.getProperty("azure.app.client.id"),
                     "Spring Boot version" to SpringBootVersion.getVersion(),
                     "Spring Framework version" to SpringVersion.getVersion(),
+                    "Java version" to environment.getProperty("java.version"),
                     "Java runtime version" to environment.getProperty("java.runtime.version"),
                     "Java vendor" to environment.getProperty("java.vm.vendor")
                     ))

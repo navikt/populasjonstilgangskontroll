@@ -12,6 +12,7 @@ val coroutinesVersion = "1.9.0"
 val poolsVersion = "2.12.1"
 val awaitilityVersion = "4.3.0"
 val springMockkVersion = "4.0.2"
+val confluentVersion = "8.1.0"
 
 
 group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
@@ -19,6 +20,7 @@ version = "1.0.1"
 
 plugins {
     val kotlinVersion = "2.2.20"
+    id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
@@ -44,6 +46,7 @@ springBoot {
 repositories {
     mavenCentral()
     mavenLocal()
+    maven { url = uri("https://packages.confluent.io/maven/") }
     maven {
         url = uri("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
     }
@@ -56,6 +59,7 @@ configurations.all {
 }
 
 dependencies {
+    implementation("io.confluent:kafka-avro-serializer:$confluentVersion")
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$otelVersion-alpha")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

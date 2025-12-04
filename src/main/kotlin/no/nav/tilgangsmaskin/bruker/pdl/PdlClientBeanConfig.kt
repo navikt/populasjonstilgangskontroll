@@ -1,21 +1,29 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
+import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.graphql.GraphQLErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.boot.kafka.autoconfigure.KafkaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
+import org.springframework.core.env.Environment
 import org.springframework.graphql.client.ClientGraphQlRequest
 import org.springframework.graphql.client.HttpSyncGraphQlClient
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor.Chain
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
@@ -64,5 +72,21 @@ class PdlClientBeanConfig {
 
     @Bean
     fun pdlHealthIndicator(a: PdlRestClientAdapter) = PingableHealthIndicator(a)
+
+    @Bean(PDL)
+    fun fordelingListenerContainerFactory(p : KafkaProperties, env: Environment) : ConcurrentKafkaListenerContainerFactory<String, Personhendelse> {
+        val cf = ConcurrentKafkaListenerContainerFactory<String, Personhendelse>().apply {
+            containerProperties.isObservationEnabled = true
+            setConsumerFactory(DefaultKafkaConsumerFactory(p.buildConsumerProperties().apply {
+                this[ConsumerConfig.GROUP_ID_CONFIG] = "test"
+                this["specific.avro.reader"] = "true"
+                this["schema.registry.url"] = env.getRequiredProperty("kafka.schema.registry")
+                this["basic.auth.credentials.source"] = "USER_INFO"
+                this["basic.auth.user.info"] =
+                    "${env.getRequiredProperty("kafka.schema.registry.user")}:${env.getRequiredProperty("kafka.schema.registry.password")}"
+            }, StringDeserializer(), KafkaAvroDeserializer()))
+        }
+        return cf
+    }
 
 }

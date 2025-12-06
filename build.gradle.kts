@@ -57,6 +57,7 @@ configurations.all {
 }
 
 dependencies {
+    implementation("org.lz4:lz4-java:1.8.1")
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$otelVersion-alpha")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

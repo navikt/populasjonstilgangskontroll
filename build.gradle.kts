@@ -27,6 +27,7 @@ plugins {
     id("org.cyclonedx.bom") version "2.4.1"
     id("com.google.cloud.tools.jib") version "3.5.1"
     id("io.kotest") version "6.0.7"
+    id("com.gorylenko.gradle-git-properties") version "2.5.4"
     application
 }
 springBoot {

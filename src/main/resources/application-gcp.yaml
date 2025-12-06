@@ -47,49 +47,36 @@ spring:
   kafka:
     bootstrap-servers: ${kafka.brokers}
     properties:
-      ssl:
-        endpoint:
-          identification:
-            algorithm: ''
+        basic:
+          auth:
+            user:
+              info: ${kafka.schema.registry.user}:${kafka.schema.registry.password}
+            credentials:
+              source: USER_INFO
+        schema:
+          registry:
+            url: ${kafka.schema.registry}
+        ssl:
+          endpoint:
+            identification:
+              algorithm: ''
     security:
-      protocol: SSL
+        protocol: SSL
     ssl:
-      trust-store-location: file:${kafka.truststore.path}
-      trust-store-type: JKS
-      trust-store-password: ${kafka.credstore.password}
-      key-store-location: file:${kafka.keystore.path}
-      key-store-type: PKCS12
-      key-store-password: ${kafka.credstore.password}
-
+        trust-store-location: file:${kafka.truststore.path}
+        trust-store-type: JKS
+        trust-store-password: ${kafka.credstore.password}
+        key-store-location: file:${kafka.keystore.path}
+        key-store-type: PKCS12
+        key-store-password: ${kafka.credstore.password}
     consumer:
-      group-id: ${spring.application.name}-groupxxx
-      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
-      properties:
-        max:
-          poll:
-            records: 3
-        auto:
-          offset:
-            reset: earliest
-        spring:
-          deserializer:
-            key:
-              delegate:
-                class: org.apache.kafka.common.serialization.StringDeserializer
-            value:
-              delegate:
-                class: org.springframework.kafka.support.serializer.JsonDeserializer
-            use:
-              type:
-                headers: false
-          json:
-            value:
-              default:
-                type: no.nav.tilgangsmaskin.ansatt.nom.NomHendelse
-            use:
-              type:
-                headers: false
+        group-id: ${spring.application.name}-${env}
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+        properties:
+          specific:
+            avro:
+              reader: true
   data:
     redis:
       repositories:

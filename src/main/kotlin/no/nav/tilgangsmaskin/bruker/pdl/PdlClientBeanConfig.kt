@@ -85,6 +85,7 @@ class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
     @Bean
     fun pdlHealthIndicator(a: PdlRestClientAdapter) = PingableHealthIndicator(a)
 
+    /*
     @Bean
     fun avroConsumerFactory(): ConsumerFactory<String, Any> {
         // Start with all properties from application.yml
@@ -108,5 +109,5 @@ class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
         return ConcurrentKafkaListenerContainerFactory<String, Any>().apply {
             setConsumerFactory(avroConsumerFactory())
         }
-    }
+    }*/
 }

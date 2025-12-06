@@ -37,7 +37,7 @@ class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
     @Value("\${kafka.schema.registry}")
     private lateinit var schemaRegistryUrl: String
 
-    @Value("\${kafka.schema.registry.username}")
+    @Value("\${kafka.schema.registry.user}")
     private lateinit var schemaRegistryUsername: String
 
     @Value("\${kafka.schema.registry.password}")

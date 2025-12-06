@@ -85,7 +85,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springframework.boot:spring-boot-starter-webclient")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
-    implementation("org.springframework.boot:spring-boot-starter-kafka")
+    implementation("org.springframework.boot:spring-boot-starter-kafka") {
+        exclude("org.lz4","lz4-java")
+    }
     implementation("org.springframework:spring-aspects")
     testImplementation("org.springframework.boot:spring-boot-micrometer-metrics-test")
     testImplementation("org.junit.jupiter:junit-jupiter")

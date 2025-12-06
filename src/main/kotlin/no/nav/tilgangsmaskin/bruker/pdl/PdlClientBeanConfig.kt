@@ -1,5 +1,8 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
+import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG
+import io.confluent.kafka.serializers.KafkaAvroDeserializer
+import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
@@ -7,8 +10,11 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.graphql.GraphQLErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
+import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.kafka.autoconfigure.KafkaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
@@ -16,12 +22,26 @@ import org.springframework.graphql.client.ClientGraphQlRequest
 import org.springframework.graphql.client.HttpSyncGraphQlClient
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor.Chain
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
+import org.springframework.kafka.core.ConsumerFactory
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
 
 @Configuration
-class PdlClientBeanConfig {
+class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
+    private val log = getLogger(javaClass)
+
+    @Value("\${kafka.schema.registry}")
+    private lateinit var schemaRegistryUrl: String
+
+    @Value("\${kafka.schema.registry.user}")
+    private lateinit var schemaRegistryUsername: String
+
+    @Value("\${kafka.schema.registry.password}")
+    private lateinit var schemaRegistryPassword: String
 
     @Component
     @Primary
@@ -65,4 +85,29 @@ class PdlClientBeanConfig {
     @Bean
     fun pdlHealthIndicator(a: PdlRestClientAdapter) = PingableHealthIndicator(a)
 
+    /*
+    @Bean
+    fun avroConsumerFactory(): ConsumerFactory<String, Any> {
+        // Start with all properties from application.yml
+        val props = kafkaProperties.buildConsumerProperties().toMutableMap()
+        // Override ONLY the Avro-specific settings
+        props[GROUP_ID_CONFIG] = "${kafkaProperties.consumer.groupId}-avro"
+        props[VALUE_DESERIALIZER_CLASS] = KafkaAvroDeserializer::class.java
+        props[SCHEMA_REGISTRY_URL_CONFIG] = schemaRegistryUrl
+        props[SPECIFIC_AVRO_READER_CONFIG] = true
+        // Remove JSON-specific properties that don't apply to Avro
+        //props.remove("spring.deserializer.value.delegate.class")
+        //props.remove("spring.json.value.default.type")
+        //props.remove("spring.json.use.type.headers")
+        props["basic.auth.credentials.source"] = "USER_INFO"
+        props["basic.auth.user.info"] = "$schemaRegistryUsername:$schemaRegistryPassword"
+        return DefaultKafkaConsumerFactory(props)
+    }
+
+    @Bean
+    fun avroKafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, Any> {
+        return ConcurrentKafkaListenerContainerFactory<String, Any>().apply {
+            setConsumerFactory(avroConsumerFactory())
+        }
+    }*/
 }

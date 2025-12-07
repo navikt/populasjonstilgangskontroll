@@ -2,43 +2,28 @@ package no.nav.tilgangsmaskin.felles.rest
 
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.health.contributor.Health
-import org.springframework.boot.health.contributor.HealthIndicator
+import org.springframework.boot.health.contributor.AbstractHealthIndicator
 
-class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator {
+class PingableHealthIndicator(private val pingable: Pingable) : AbstractHealthIndicator() {
 
     private val log = getLogger(javaClass)
 
-    override fun health() =
+    override fun doHealthCheck(builder: Health.Builder) {
+        if (!pingable.isEnabled) {
+            builder.outOfService()
+                .withDetail(ENDPOINT, pingable.pingEndpoint)
+            return
+        }
         runCatching {
-            if (!pingable.isEnabled) {
-                return disabled()
-            }
             pingable.ping()
-            up()
+            builder.up()
+                .withDetail(ENDPOINT, pingable.pingEndpoint)
         }.getOrElse {
             log.warn("Kunne ikke pinge ${pingable.pingEndpoint}", it)
-            down(it)
+            builder.down(it)
+                .withDetail(ENDPOINT, pingable.pingEndpoint)
         }
-
-    private fun disabled() =
-        Health.outOfService()
-            .withDetail(ENDPOINT, pingable.pingEndpoint)
-            .build()
-
-    private fun up() =
-        with(pingable) {
-            Health.up()
-                .withDetail(ENDPOINT, pingEndpoint)
-                .build()
-        }
-
-    private fun down(e: Throwable) =
-        with(pingable) {
-            Health.down()
-                .withDetail(ENDPOINT, pingEndpoint)
-                .withException(e)
-                .build()
-        }
+    }
 
     override fun toString() = "${javaClass.simpleName} [pingable=$pingable]"
 
@@ -46,4 +31,5 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
         const val ENDPOINT = "endpoint"
     }
 }
+
 

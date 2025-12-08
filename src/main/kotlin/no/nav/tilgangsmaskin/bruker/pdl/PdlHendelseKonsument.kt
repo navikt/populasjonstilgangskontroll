@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 class PdlHendelseKonsument {
     private val log = getLogger(javaClass)
 
-    @KafkaListener(topics = [ "pdl.leesah-v1"], containerFactory = "pdlKafkaListenerContainerFactory")
+    @KafkaListener(topics = [ "pdl.leesah-v1"], containerFactory = "pdlAvroListenerContainerFactory")
     fun listen(hendelse: Personhendelse) {
         log.info("Mottok hendelse fra PDL $hendelse" )
     }

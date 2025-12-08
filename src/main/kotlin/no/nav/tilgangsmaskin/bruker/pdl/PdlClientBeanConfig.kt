@@ -18,6 +18,8 @@ import org.springframework.boot.kafka.autoconfigure.KafkaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
+import org.springframework.core.env.Environment
+import org.springframework.core.env.getRequiredProperty
 import org.springframework.graphql.client.ClientGraphQlRequest
 import org.springframework.graphql.client.HttpSyncGraphQlClient
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor
@@ -87,21 +89,22 @@ class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
 
 
     @Bean
-    fun pdlHendelseKafkaListenerContainerFactory(): ConsumerFactory<String, Any> {
+    fun pdlHendelseKafkaListenerContainerFactory(env: Environment): ConsumerFactory<String, Any> {
         val props = kafkaProperties.buildConsumerProperties().toMutableMap()
         props[GROUP_ID_CONFIG] = "pdl-avro1"
         props[VALUE_DESERIALIZER_CLASS] = KafkaAvroDeserializer::class.java
-        props[SCHEMA_REGISTRY_URL_CONFIG] = schemaRegistryUrl
+        props[SCHEMA_REGISTRY_URL_CONFIG] =  env.getRequiredProperty<String>("kafka.schema.registry")
         props[SPECIFIC_AVRO_READER_CONFIG] = true
         props["basic.auth.credentials.source"] = "USER_INFO"
-        props["basic.auth.user.info"] = "$schemaRegistryUsername:$schemaRegistryPassword"
+        props["basic.auth.user.info"] =
+            "${env.getRequiredProperty<String>("kafka.schema.registry.user")}:${env.getRequiredProperty<String>("kafka.schema.registry.password")}"
         return DefaultKafkaConsumerFactory(props)
     }
 
     @Bean
-    fun pdlKafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, Any> {
+    fun pdlAvroListenerContainerFactory(consumerFactory: ConsumerFactory<String,Any>): ConcurrentKafkaListenerContainerFactory<String, Any> {
         return ConcurrentKafkaListenerContainerFactory<String, Any>().apply {
-            setConsumerFactory(pdlHendelseKafkaListenerContainerFactory())
+            setConsumerFactory(consumerFactory)
         }
     }
 }

@@ -6,6 +6,7 @@ import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.SCHEMA_REGI
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG
 import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.STRENGT_FORTROLIG
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.STRENGT_FORTROLIG_UTLAND
@@ -107,10 +108,10 @@ class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
     fun graderingFilterStrategy() = RecordFilterStrategy<String, Personhendelse> {
         it.value().adressebeskyttelse.gradering !in listOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND) || it.value().personidenter.any { runCatching { BrukerId(it) }.isFailure}.also { b ->
             if (b) {
-                getLogger(javaClass).warn("Filtrerte bort PDL hendelse $it")
+                getLogger(javaClass).warn(CONFIDENTIAL,"Filtrerte bort PDL hendelse $it")
             }
             else {
-                getLogger(javaClass).info("Aksepterte PDL hendelse $it")
+                getLogger(javaClass).info(CONFIDENTIAL,"Aksepterte PDL hendelse $it")
             }
         }
     }

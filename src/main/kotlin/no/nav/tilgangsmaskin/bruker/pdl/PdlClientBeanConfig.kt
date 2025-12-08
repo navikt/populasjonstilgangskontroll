@@ -91,7 +91,7 @@ class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
         // Start with all properties from application.yml
         val props = kafkaProperties.buildConsumerProperties().toMutableMap()
         // Override ONLY the Avro-specific settings
-        props[GROUP_ID_CONFIG] = "pdl-avro"
+        props[GROUP_ID_CONFIG] = "pdl-avro1"
         props[VALUE_DESERIALIZER_CLASS] = KafkaAvroDeserializer::class.java
         props[SCHEMA_REGISTRY_URL_CONFIG] = schemaRegistryUrl
         props[SPECIFIC_AVRO_READER_CONFIG] = true

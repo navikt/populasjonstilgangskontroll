@@ -13,16 +13,15 @@ import org.springframework.stereotype.Component
 class PdlHendelseKonsument(private val client: CacheClient) {
     private val log = getLogger(javaClass)
 
-    @KafkaListener(topics = [ "pdl.leesah-v1"], containerFactory = "pdlAvroListenerContainerFactory")
+    @KafkaListener(topics = [ "pdl.leesah-v1"], containerFactory = "pdlAvroListenerContainerFactory", filter = "graderingFilterStrategy")
     fun listen(hendelse: Personhendelse) {
         log.info("Mottok hendelse fra PDL $hendelse, tømmer caches" )
-        /*
         PDL_CACHES.forEach { cache ->
             hendelse.personidenter.forEach { id ->
               client.delete(cache, id)
                 log.trace(CONFIDENTIAL, "Slettet ident {} etter hendelse: {}", id, hendelse)
             }
-        }*/
+        }
     }
 }
 

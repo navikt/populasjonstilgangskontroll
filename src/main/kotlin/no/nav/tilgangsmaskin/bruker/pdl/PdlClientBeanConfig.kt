@@ -106,7 +106,7 @@ class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
 
     @Bean
     fun graderingFilterStrategy() = RecordFilterStrategy<String, Personhendelse> {
-        it.value().adressebeskyttelse.gradering !in listOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND) || it.value().personidenter.any { runCatching { BrukerId(it) }.isFailure}.also { b ->
+        it.value().adressebeskyttelse?.gradering !in listOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND) || it.value().personidenter.any { id -> runCatching { BrukerId(id) }.isFailure}.also { b ->
             if (b) {
                 getLogger(javaClass).warn(CONFIDENTIAL,"Filtrerte bort PDL hendelse $it")
             }

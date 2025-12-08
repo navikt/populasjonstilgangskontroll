@@ -20,6 +20,7 @@ version = "1.0.1"
 
 plugins {
     val kotlinVersion = "2.2.20"
+    id("com.gorylenko.gradle-git-properties") version "2.5.4"
     id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion

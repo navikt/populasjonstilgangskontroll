@@ -88,7 +88,7 @@ class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
     @Bean
     fun pdlHendelseKafkaListenerContainerFactory(env: Environment): ConsumerFactory<String, Personhendelse> {
         val props = kafkaProperties.buildConsumerProperties().toMutableMap()
-        props[GROUP_ID_CONFIG] = "pdl-avro123"
+        props[GROUP_ID_CONFIG] = "pdl-avro1234567890"
         props[VALUE_DESERIALIZER_CLASS] = KafkaAvroDeserializer::class.java
         props[SCHEMA_REGISTRY_URL_CONFIG] =  env.getRequiredProperty<String>("kafka.schema.registry")
         props[SPECIFIC_AVRO_READER_CONFIG] = true

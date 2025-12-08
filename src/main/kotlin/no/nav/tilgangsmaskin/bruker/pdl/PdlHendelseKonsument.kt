@@ -11,6 +11,6 @@ class PdlHendelseKonsument {
 
     @KafkaListener(topics = [ "pdl.leesah-v1"])
     fun listen(hendelse: Personhendelse) {
-        log.info("Mottok PDL-hendelse $hendelse" )
+        log.info("Mottok hendelse fra PDL $hendelse" )
     }
 }

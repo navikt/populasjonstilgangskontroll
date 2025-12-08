@@ -88,17 +88,11 @@ class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
 
     @Bean
     fun pdlHendelseKafkaListenerContainerFactory(): ConsumerFactory<String, Any> {
-        // Start with all properties from application.yml
         val props = kafkaProperties.buildConsumerProperties().toMutableMap()
-        // Override ONLY the Avro-specific settings
         props[GROUP_ID_CONFIG] = "pdl-avro1"
         props[VALUE_DESERIALIZER_CLASS] = KafkaAvroDeserializer::class.java
         props[SCHEMA_REGISTRY_URL_CONFIG] = schemaRegistryUrl
         props[SPECIFIC_AVRO_READER_CONFIG] = true
-        // Remove JSON-specific properties that don't apply to Avro
-        //props.remove("spring.deserializer.value.delegate.class")
-        //props.remove("spring.json.value.default.type")
-        //props.remove("spring.json.use.type.headers")
         props["basic.auth.credentials.source"] = "USER_INFO"
         props["basic.auth.user.info"] = "$schemaRegistryUsername:$schemaRegistryPassword"
         return DefaultKafkaConsumerFactory(props)

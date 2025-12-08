@@ -105,7 +105,7 @@ class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
     }
 
     @Bean
-    fun pplKafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, Any> {
+    fun pdlKafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, Any> {
         return ConcurrentKafkaListenerContainerFactory<String, Any>().apply {
             setConsumerFactory(pdlHendelseKafkaListenerContainerFactory())
         }

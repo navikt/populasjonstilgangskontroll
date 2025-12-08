@@ -60,7 +60,9 @@ configurations.all {
 }
 
 dependencies {
-    implementation("io.confluent:kafka-avro-serializer:$confluentVersion")
+    implementation("io.confluent:kafka-avro-serializer:$confluentVersion") {
+        exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
+    }
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$otelVersion-alpha")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

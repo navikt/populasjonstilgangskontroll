@@ -118,3 +118,5 @@ spec:
       value: '{{grupper.utland}}'
     - name: DB_POOLSIZE
       value: '{{db.poolsize}}'
+    - name: JDK_JAVA_OPTIONS
+      value: "-XX:MaxRAMPercentage=60.0"

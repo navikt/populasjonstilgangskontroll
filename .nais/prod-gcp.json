@@ -169,11 +169,11 @@
     }
   },
   "mem": {
-    "min": "1600Mi",
+    "min": "1Gi",
     "max": "2Gi"
   },
   "cpu": {
-    "min": "650m"
+    "min": "40m"
   },
   "replica": {
     "min": 8,

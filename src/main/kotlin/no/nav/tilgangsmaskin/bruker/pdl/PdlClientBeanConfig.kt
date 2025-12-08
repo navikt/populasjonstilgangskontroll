@@ -109,6 +109,9 @@ class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
             if (b) {
                 getLogger(javaClass).warn("Filtrerte bort PDL hendelse $it")
             }
+            else {
+                getLogger(javaClass).info("Aksepterte PDL hendelse $it")
+            }
         }
     }
 }

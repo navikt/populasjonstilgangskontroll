@@ -99,4 +99,6 @@ class CacheClient(
         teller.tell(of("cache", navn, "result", "hit"), funnet)
         log.trace("Fant $funnet verdier i cache $navn for $etterspurt identer")
     }
+
+    fun tilNøkkel(cache: CachableConfig, id: String) = handler.tilNøkkel(cache, id)
 }

@@ -91,7 +91,7 @@ class PdlClientBeanConfig {
                 this[USER_INFO_CONFIG] = env.schemaRegistryUserInfo()
             }
         )
-    
+
     private fun Environment.schemaRegistryUrl() =
         getRequiredProperty<String>("kafka.schema.registry")
 

@@ -10,20 +10,20 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 
 @Component
-class PdlHendelseKonsument(private val client: CacheClient) {
+class PdlCacheTømmer(private val client: CacheClient) {
     private val log = getLogger(javaClass)
 
     @KafkaListener(topics = [ "pdl.leesah-v1"], containerFactory = "pdlAvroListenerContainerFactory", filter = "graderingFilterStrategy")
     fun listen(hendelse: Personhendelse) {
-        log.info("Mottok hendelse av tyoe fra PDL ${hendelse.adressebeskyttelse?.gradering?.name}, tømmer cacher" )
+        log.info("Mottok hendelse av tyoe ${hendelse.adressebeskyttelse?.gradering?.name} fra PDL, tømmer cacher" )
         PDL_CACHES.forEach { cache ->
             hendelse.personidenter.forEach { id ->
-              if (client.delete(cache, id) > 0) {
-                log.trace( "Slettet ident {} fra ${cache.name} etter hendelse av type: {}", id.maskFnr(), hendelse.adressebeskyttelse?.gradering?.name)
-              }
+                if (client.delete(cache, id) > 0) {
+                    log.trace( "Slettet nøkkel ${client.tilNøkkel(cache, id)} fra cache ${cache.name} etter hendelse av type: {}", id.maskFnr(), hendelse.adressebeskyttelse?.gradering?.name)
+                }
                 else {
-                log.trace( "Fant ikke ident {} i ${cache.name} for sletting ved hendelse av type: {}", id.maskFnr(), hendelse.adressebeskyttelse?.gradering?.name)
-              }
+                    log.trace( "Fant ikke ident {} i ${cache.name} for sletting ved hendelse av type: {}", id.maskFnr(), hendelse.adressebeskyttelse?.gradering?.name)
+                }
             }
         }
     }

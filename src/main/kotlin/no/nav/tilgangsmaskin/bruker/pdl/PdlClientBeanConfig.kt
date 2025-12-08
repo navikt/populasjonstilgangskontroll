@@ -85,13 +85,13 @@ class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
     @Bean
     fun pdlHealthIndicator(a: PdlRestClientAdapter) = PingableHealthIndicator(a)
 
-    /*
+
     @Bean
-    fun avroConsumerFactory(): ConsumerFactory<String, Any> {
+    fun pdlHendelseKafkaListenerContainerFactory(): ConsumerFactory<String, Any> {
         // Start with all properties from application.yml
         val props = kafkaProperties.buildConsumerProperties().toMutableMap()
         // Override ONLY the Avro-specific settings
-        props[GROUP_ID_CONFIG] = "${kafkaProperties.consumer.groupId}-avro"
+        props[GROUP_ID_CONFIG] = "pdl-avro"
         props[VALUE_DESERIALIZER_CLASS] = KafkaAvroDeserializer::class.java
         props[SCHEMA_REGISTRY_URL_CONFIG] = schemaRegistryUrl
         props[SPECIFIC_AVRO_READER_CONFIG] = true
@@ -105,9 +105,9 @@ class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
     }
 
     @Bean
-    fun avroKafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, Any> {
+    fun pplKafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, Any> {
         return ConcurrentKafkaListenerContainerFactory<String, Any>().apply {
-            setConsumerFactory(avroConsumerFactory())
+            setConsumerFactory(pdlHendelseKafkaListenerContainerFactory())
         }
-    }*/
+    }
 }

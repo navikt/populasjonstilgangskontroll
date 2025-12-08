@@ -6,11 +6,7 @@ import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.SCHEMA_REGI
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG
 import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.person.pdl.leesah.Personhendelse
-import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.STRENGT_FORTROLIG
-import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.STRENGT_FORTROLIG_UTLAND
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
@@ -33,14 +29,13 @@ import org.springframework.graphql.client.SyncGraphQlClientInterceptor.Chain
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
-import org.springframework.kafka.listener.adapter.RecordFilterStrategy
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
 
 @Configuration
-class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
+class PdlClientBeanConfig {
 
     @Component
     @Primary
@@ -84,34 +79,28 @@ class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
     @Bean
     fun pdlHealthIndicator(a: PdlRestClientAdapter) = PingableHealthIndicator(a)
 
-
     @Bean
-    fun pdlHendelseKafkaListenerContainerFactory(env: Environment): ConsumerFactory<String, Personhendelse> {
-        val props = kafkaProperties.buildConsumerProperties().toMutableMap()
-        props[GROUP_ID_CONFIG] = "pdl-avro1234567890"
-        props[VALUE_DESERIALIZER_CLASS] = KafkaAvroDeserializer::class.java
-        props[SCHEMA_REGISTRY_URL_CONFIG] =  env.getRequiredProperty<String>("kafka.schema.registry")
-        props[SPECIFIC_AVRO_READER_CONFIG] = true
-        props[BASIC_AUTH_CREDENTIALS_SOURCE] = "USER_INFO"
-        props[USER_INFO_CONFIG] =
-            "${env.getRequiredProperty<String>("kafka.schema.registry.user")}:${env.getRequiredProperty<String>("kafka.schema.registry.password")}"
-        return DefaultKafkaConsumerFactory(props)
-    }
+    fun pdlHendelseKafkaListenerContainerFactory(props: KafkaProperties, env: Environment): ConsumerFactory<String, Personhendelse> =
+        DefaultKafkaConsumerFactory(
+            props.buildConsumerProperties().toMutableMap().apply {
+                this[GROUP_ID_CONFIG] = "pdl-avro1234567"
+                this[VALUE_DESERIALIZER_CLASS] = KafkaAvroDeserializer::class.java
+                this[SCHEMA_REGISTRY_URL_CONFIG] = env.schemaRegistryUrl()
+                this[SPECIFIC_AVRO_READER_CONFIG] = true
+                this[BASIC_AUTH_CREDENTIALS_SOURCE] = "USER_INFO"
+                this[USER_INFO_CONFIG] = env.schemaRegistryUserInfo()
+            }
+        )
+    
+    private fun Environment.schemaRegistryUrl() =
+        getRequiredProperty<String>("kafka.schema.registry")
+
+    private fun Environment.schemaRegistryUserInfo() =
+        "${getRequiredProperty<String>("kafka.schema.registry.user")}:${getRequiredProperty<String>("kafka.schema.registry.password")}"
 
     @Bean
     fun pdlAvroListenerContainerFactory(consumerFactory: ConsumerFactory<String, Personhendelse>) =
          ConcurrentKafkaListenerContainerFactory<String, Personhendelse>().apply {
             setConsumerFactory(consumerFactory)
     }
-
-    @Bean
-    fun graderingFilterStrategy() = RecordFilterStrategy<String, Personhendelse> {
-        if (it.value().adressebeskyttelse?.gradering !in listOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND)) {
-            getLogger(javaClass).warn(CONFIDENTIAL,"Filtrerte bort PDL hendelse $it")
-            true
-        } else {
-            getLogger(javaClass).info(CONFIDENTIAL,"Aksepterte PDL hendelse $it")
-            false
-            }
-        }
 }

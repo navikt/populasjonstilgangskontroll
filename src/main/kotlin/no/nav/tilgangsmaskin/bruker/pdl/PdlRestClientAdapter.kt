@@ -39,10 +39,8 @@ class PdlRestClientAdapter(
 
         val fraRest = fraRest(identer  - fraCache.keys)
 
-
         cache.putMany(MED_FAMILIE_CACHE, fraRest,cf.varighet)
         return (fraRest.values + fraCache.values).toSet()
-
     }
 
 
@@ -92,7 +90,6 @@ class PdlRestClientAdapter(
                 FamilieMedlem(it.brukerId, SØSKEN)
             }
             .toSet()
-
 
     companion object {
         private const val MED_FAMILIE = "medFamilie"

@@ -83,7 +83,7 @@ class PdlClientBeanConfig {
     fun pdlHendelseKafkaListenerContainerFactory(props: KafkaProperties, env: Environment): ConsumerFactory<String, Personhendelse> =
         DefaultKafkaConsumerFactory(
             props.buildConsumerProperties().toMutableMap().apply {
-                this[GROUP_ID_CONFIG] = "pdl-avro1234567"
+                this[GROUP_ID_CONFIG] = "pdl-avro12345"
                 this[VALUE_DESERIALIZER_CLASS] = KafkaAvroDeserializer::class.java
                 this[SCHEMA_REGISTRY_URL_CONFIG] = env.schemaRegistryUrl()
                 this[SPECIFIC_AVRO_READER_CONFIG] = true

@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.regler.motor
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
-import no.nav.tilgangsmaskin.regler.motor.AbstractTeller
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.stereotype.Component
@@ -49,6 +48,11 @@ class OppfølgingkontorTeller(registry: MeterRegistry, token: Token) :
 @Component
 class OppfriskingTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "endringer", "Endrede user oids")
+
+@Component
+class `PdlCacheTømmerTeller`(registry: MeterRegistry, token: Token) :
+    AbstractTeller(registry, token, "beskyttelse", "Cache tømming pr beskyttelsesgrad")
+
 
 abstract class AbstractTeller(
         private val registry: MeterRegistry,

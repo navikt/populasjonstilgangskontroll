@@ -6,6 +6,10 @@ import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.SCHEMA_REGI
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG
 import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.person.pdl.leesah.Personhendelse
+import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.STRENGT_FORTROLIG
+import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.STRENGT_FORTROLIG_UTLAND
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
@@ -15,7 +19,6 @@ import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -29,6 +32,7 @@ import org.springframework.graphql.client.SyncGraphQlClientInterceptor.Chain
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
+import org.springframework.kafka.listener.adapter.RecordFilterStrategy
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
@@ -36,16 +40,6 @@ import org.springframework.web.client.RestClient.Builder
 
 @Configuration
 class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
-    private val log = getLogger(javaClass)
-
-    @Value("\${kafka.schema.registry}")
-    private lateinit var schemaRegistryUrl: String
-
-    @Value("\${kafka.schema.registry.user}")
-    private lateinit var schemaRegistryUsername: String
-
-    @Value("\${kafka.schema.registry.password}")
-    private lateinit var schemaRegistryPassword: String
 
     @Component
     @Primary
@@ -91,7 +85,7 @@ class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
 
 
     @Bean
-    fun pdlHendelseKafkaListenerContainerFactory(env: Environment): ConsumerFactory<String, Any> {
+    fun pdlHendelseKafkaListenerContainerFactory(env: Environment): ConsumerFactory<String, Personhendelse> {
         val props = kafkaProperties.buildConsumerProperties().toMutableMap()
         props[GROUP_ID_CONFIG] = "pdl-avro1"
         props[VALUE_DESERIALIZER_CLASS] = KafkaAvroDeserializer::class.java
@@ -104,9 +98,13 @@ class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
     }
 
     @Bean
-    fun pdlAvroListenerContainerFactory(consumerFactory: ConsumerFactory<String,Any>): ConcurrentKafkaListenerContainerFactory<String, Any> {
-        return ConcurrentKafkaListenerContainerFactory<String, Any>().apply {
+    fun pdlAvroListenerContainerFactory(consumerFactory: ConsumerFactory<String, Personhendelse>) =
+         ConcurrentKafkaListenerContainerFactory<String, Personhendelse>().apply {
             setConsumerFactory(consumerFactory)
-        }
+    }
+
+    @Bean
+    fun graderingFilterStrategy() = RecordFilterStrategy<String, Personhendelse> {
+        it.value().adressebeskyttelse.gradering !in listOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND) || it.value().personidenter.any { runCatching { BrukerId(it) }.isFailure}
     }
 }

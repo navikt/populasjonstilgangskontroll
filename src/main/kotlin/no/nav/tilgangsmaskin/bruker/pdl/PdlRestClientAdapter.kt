@@ -40,7 +40,7 @@ class PdlRestClientAdapter(
         val fraRest = fraRest(identer  - fraCache.keys)
 
 
-        cache.putMany(PDL_CACHE, fraRest,cf.varighet)
+        cache.putMany(MED_FAMILIE_CACHE, fraRest,cf.varighet)
         return (fraRest.values + fraCache.values).toSet()
 
     }
@@ -51,7 +51,7 @@ class PdlRestClientAdapter(
         if (identer.isEmpty()) {
             return emptyMap()
         }
-        val innslag = cache.getMany<Person>(PDL_CACHE, identer)
+        val innslag = cache.getMany<Person>(MED_FAMILIE_CACHE, identer)
         log.trace("Hentet ${innslag.size} person(er) fra cache for ${identer.size} ident(er)")
         return innslag
     }
@@ -95,7 +95,10 @@ class PdlRestClientAdapter(
 
 
     companion object {
-        private const val EXTRA = "medFamilie"
-        private val PDL_CACHE = CachableConfig(PDL, EXTRA)
+        private const val MED_FAMILIE = "medFamilie"
+        private const val MED_UTVIDET_FAMILIE = "medUtvidetFamilie"
+        private val  MED_FAMILIE_CACHE = CachableConfig(PDL,MED_FAMILIE)
+        private val  MED_UTVIDET_FAMILIE_CACHE = CachableConfig(PDL,MED_UTVIDET_FAMILIE)
+        val PDL_CACHES  = listOf(MED_FAMILIE_CACHE,MED_UTVIDET_FAMILIE_CACHE)
     }
 }

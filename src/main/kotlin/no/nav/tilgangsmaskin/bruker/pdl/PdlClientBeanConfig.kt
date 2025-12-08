@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
+import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE
+import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.USER_INFO_CONFIG
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG
@@ -95,8 +97,8 @@ class PdlClientBeanConfig(private val kafkaProperties: KafkaProperties) {
         props[VALUE_DESERIALIZER_CLASS] = KafkaAvroDeserializer::class.java
         props[SCHEMA_REGISTRY_URL_CONFIG] =  env.getRequiredProperty<String>("kafka.schema.registry")
         props[SPECIFIC_AVRO_READER_CONFIG] = true
-        props["basic.auth.credentials.source"] = "USER_INFO"
-        props["basic.auth.user.info"] =
+        props[BASIC_AUTH_CREDENTIALS_SOURCE] = "USER_INFO"
+        props[USER_INFO_CONFIG] =
             "${env.getRequiredProperty<String>("kafka.schema.registry.user")}:${env.getRequiredProperty<String>("kafka.schema.registry.password")}"
         return DefaultKafkaConsumerFactory(props)
     }

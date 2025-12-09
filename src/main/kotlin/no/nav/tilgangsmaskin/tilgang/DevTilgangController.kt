@@ -36,6 +36,7 @@ import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.BulkSwaggerApiRespons
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.MULTI_STATUS
 import org.springframework.http.HttpStatus.NO_CONTENT
@@ -65,6 +66,9 @@ class DevTilgangController(
     private val pdl: PDLTjeneste,
     private val cacheClient: CacheClient) {
 
+    private val log = getLogger(javaClass)
+
+
     @PostMapping("oppfolging/bulk")
     fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)
 
@@ -72,10 +76,13 @@ class DevTilgangController(
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(CachableConfig(SKJERMING),navIds)
 
    @PostMapping("cache/{cache}/{id}/clear")
-   fun cacheClear(@PathVariable @Schema(description = "Cache namer", enumAsRef = true)
+   fun cacheClear(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
                    cache: Caches, @PathVariable id: String) {
        Caches.entries.first { it == cache }.caches.firstOrNull()?.let {
-           cacheClient.delete(it, id = id)
+           log.info("Sletter cache for ${it.name} og id $id")
+           cacheClient.delete(it, id = id).also { antall ->
+                log.info("Sletting status $antall for  $id i cache ${it.name}")
+           }
        }
    }
 

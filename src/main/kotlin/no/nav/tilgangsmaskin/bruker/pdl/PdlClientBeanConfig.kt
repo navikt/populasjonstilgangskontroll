@@ -80,7 +80,7 @@ class PdlClientBeanConfig {
     fun pdlHealthIndicator(a: PdlRestClientAdapter) = PingableHealthIndicator(a)
 
     @Bean
-    fun pdlHendelseKafkaListenerContainerFactory(props: KafkaProperties, env: Environment): ConsumerFactory<String, Personhendelse> =
+    fun pdlHendelseKafkaListenerConsumerFactory(props: KafkaProperties, env: Environment): ConsumerFactory<String, Personhendelse> =
         DefaultKafkaConsumerFactory(
             props.buildConsumerProperties().toMutableMap().apply {
                 this[GROUP_ID_CONFIG] = "pdl-avro12345"

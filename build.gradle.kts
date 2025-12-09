@@ -11,7 +11,7 @@ val logstashVersion = "9.0"
 val coroutinesVersion = "1.9.0"
 val poolsVersion = "2.12.1"
 val awaitilityVersion = "4.3.0"
-val springMockkVersion = "4.0.2"
+val springMockkVersion = "5.0.1"
 val confluentVersion = "8.1.0"
 
 

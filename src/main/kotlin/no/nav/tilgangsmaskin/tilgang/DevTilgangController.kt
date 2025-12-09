@@ -79,9 +79,9 @@ class DevTilgangController(
    fun cacheClear(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
                    cache: Caches, @PathVariable id: String) {
        Caches.entries.first { it == cache }.caches.first().let {
-           log.info("Sletter cache for ${it.name} og id $id")
+           log.info("Sletter cache for $it og id $id")
            cacheClient.delete(it, id = id).also { antall ->
-                log.info("Sletting status $antall for  $id i cache ${it.name}")
+                log.info("Sletting status $antall for  $id i cache $it")
            }
        }
    }

@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.bruker.pdl
 
 
 import io.micrometer.core.instrument.Tags
+import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter.Companion.PDL_CACHES
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.UGRADERT
@@ -20,16 +21,16 @@ class PdlCacheTømmer(private val client: CacheClient, private val teller: `PdlC
 
     @KafkaListener(topics = [ "pdl.leesah-v1"], containerFactory = "pdlAvroListenerContainerFactory", filter = "graderingFilterStrategy")
     fun listen(hendelse: Personhendelse) {
-        log.info("Mottok hendelse av tyoe ${hendelse.adressebeskyttelse?.gradering?.name} fra PDL, tømmer cacher" )
+        log.info("Mottok hendelse av tyoe ${Personhendelse::class.simpleName} fra PDL, tømmer cacher" )
         PDL_CACHES.forEach { cache ->
             hendelse.personidenter.forEach { id ->
                 if (client.delete(cache, id) > 0) {
                     teller.tell(Tags.of("cache", cache.name, "gradering",
                         hendelse.adressebeskyttelse?.gradering?.name?.lowercase(getDefault()) ?: UGRADERT.name.lowercase(getDefault())))
-                    log.trace( "Slettet nøkkel ${client.tilNøkkel(cache, id)} fra cache ${cache.name} etter hendelse av type: {}", id.maskFnr(), hendelse.adressebeskyttelse?.gradering?.name)
+                    log.trace(CONFIDENTIAL,"Slettet nøkkel ${client.tilNøkkel(cache, id)} fra cache ${cache.name} etter hendelse av type: {}", id.maskFnr(), Personhendelse::class.simpleName)
                 }
                 else {
-                    log.trace( "Fant ikke ident {} i ${cache.name} for sletting ved hendelse av type: {}", id.maskFnr(), hendelse.adressebeskyttelse?.gradering?.name)
+                    log.trace( CONFIDENTIAL,"Fant ikke ident {} i ${cache.name} for sletting ved hendelse av type: {}", id.maskFnr(), Personhendelse::class.simpleName)
                 }
             }
         }

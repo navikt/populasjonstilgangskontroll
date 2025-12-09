@@ -44,7 +44,7 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
             cache.getMany<Boolean>(SKJERMING_CACHE, ids)
 
     companion object {
-        private val SKJERMING_CACHE = CachableConfig(SKJERMING)
+         val SKJERMING_CACHE = CachableConfig(SKJERMING)
     }
 }
 

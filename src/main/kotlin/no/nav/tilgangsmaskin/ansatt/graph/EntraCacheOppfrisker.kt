@@ -4,6 +4,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste.Companion.ENTRA_OID
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
+import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOppfrisker
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
@@ -38,7 +39,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
         }.getOrElse {
             if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {
                 log.warn("Ansatt {} med oid {} ikke funnet i Entra, sletter og refresher cache entry", ansattId.verdi, oid)
-                cache.delete(OID_CACHE,elementer.id)
+                cache.delete(OID_CACHE,id = elementer.id)
                 val nyoid = oidTjeneste.oidFraEntra(ansattId)
                 log.info("Refresh oid OK for ansatt {}, ny verdi er {}", ansattId.verdi, nyoid)
                 invoke(metode, ansattId, nyoid)
@@ -59,7 +60,6 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
     }
 
     companion object {
-        private val OID_CACHE = CachableConfig(ENTRA_OID)
         private const val GEO = "geoGrupper"
         private const val GEO_OG_GLOBALE = "geoOgGlobaleGrupper"
     }

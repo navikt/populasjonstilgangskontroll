@@ -78,10 +78,9 @@ class DevTilgangController(
    @PostMapping("cache/{cache}/{id}/clear")
    fun cacheClear(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
                    cache: Caches, @PathVariable id: String) {
-       Caches.entries.first { it == cache }.caches.first().let {
-           log.info("Sletter cache for $it og id $id")
-           cacheClient.delete(it, id = id).also { antall ->
-                log.info("Sletting status $antall for  $id i cache $it")
+       Caches.entries.first { it.name == cache.name }.caches.let {
+           cacheClient.delete(*it, id = id).also { antall ->
+               log.info("Sletting status $antall for  $id i cache(s) $it")
            }
        }
    }

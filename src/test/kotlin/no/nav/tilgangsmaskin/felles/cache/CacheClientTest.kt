@@ -115,7 +115,7 @@ class CacheClientTest {
         client.putMany(PDL_MED_FAMILIE_CACHE, mapOf(person1.brukerId.verdi to person1, person2.brukerId.verdi to person2), Duration.ofSeconds(1))
         val many = client.getMany<Person>(PDL_MED_FAMILIE_CACHE,ids)
         assertThat(many.keys).containsExactlyInAnyOrderElementsOf(ids)
-        assertThat(client.getAllKeys(PDL_MED_FAMILIE_CACHE.name)).containsExactlyInAnyOrderElementsOf(ids)
+        assertThat(client.getAllKeys(PDL_MED_FAMILIE_CACHE)).containsExactlyInAnyOrderElementsOf(ids)
         await.atMost(3, SECONDS).until {
             client.getMany<Person>(PDL_MED_FAMILIE_CACHE,ids).isEmpty()
         }

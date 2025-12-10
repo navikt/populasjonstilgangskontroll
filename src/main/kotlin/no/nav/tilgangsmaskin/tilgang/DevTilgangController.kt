@@ -80,7 +80,7 @@ class DevTilgangController(
                    cache: Caches, @PathVariable id: String) {
        Caches.entries.first { it.name == cache.name }.caches.let {
            cacheClient.delete(*it, id = id).also { antall ->
-               log.info("Sletting status $antall for  $id i cache(s) $it")
+               log.info("Sletting status $antall for  $id i cache(s) ${it.map { it.name }}")
            }
        }
    }

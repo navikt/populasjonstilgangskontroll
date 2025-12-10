@@ -20,8 +20,8 @@ class CacheNøkkelHandlerTest : DescribeSpec({
 
     beforeTest {
         redisConfig = mockk()
-        every { redisConfig.getKeyPrefixFor(PDL_MED_FAMILIE_CACHE.name) } returns PdlRestClientAdapter.Companion.PDL_MED_FAMILIE_CACHE.name
-        every { redisConfig.getKeyPrefixFor(OID_CACHE.name) } returns EntraConfig.Companion.OID_CACHE.name
+        every { redisConfig.getKeyPrefixFor(PDL_MED_FAMILIE_CACHE.name) } returns PDL_MED_FAMILIE_CACHE.name + "::"
+        every { redisConfig.getKeyPrefixFor(OID_CACHE.name) } returns OID_CACHE.name  + "::"
         handler = CacheNøkkelHandler(
             mapOf(
                 PDL_MED_FAMILIE_CACHE.name to redisConfig,

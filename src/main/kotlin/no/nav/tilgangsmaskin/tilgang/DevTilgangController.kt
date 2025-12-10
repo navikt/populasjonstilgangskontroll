@@ -80,7 +80,7 @@ class DevTilgangController(
                    cache: Caches, @PathVariable id: String) {
        Caches.entries.first { it.name == cache.name }.caches.let { c ->
            cacheClient.delete(*c, id = id).also { antall ->
-               log.info("Sletting status $antall for $id i ${c.size} cache(s) for cache navn ${cache.name}" )
+               log.info("Sletting status $antall for $id i ${c.size} cache(s) for cache '${cache.name.lowercase()}'" )
            }
        }
    }
@@ -88,8 +88,12 @@ class DevTilgangController(
     @PostMapping("cache/personer")
     fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany<Person>(CachableConfig(PDL),navIds.map { it.verdi }.toSet())
 
-    @GetMapping("cache/keys/{cacheName}")
-    fun keys(@PathVariable cacheName: String) = cacheClient.getAll(cacheName)
+    @GetMapping("cache/keys/{cache}")
+    fun keys(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
+             cache: Caches) =
+        Caches.entries.first { it.name == cache.name }.caches.flatMap {
+            cacheClient.getAllKeys(it)
+        }.toSet()
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable  id: String) = graphql.partnere(id)

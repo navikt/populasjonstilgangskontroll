@@ -15,7 +15,9 @@ class CacheClient(
     val alleTreffTeller: BulkCacheSuksessTeller,
     val teller: BulkCacheTeller
 )  {
-    
+
+    private val log = getLogger(javaClass)
+
     val conn = client.connect().apply {
         timeout = Duration.ofSeconds(30)
         if (isLocalOrTest) {
@@ -23,17 +25,12 @@ class CacheClient(
         }
     }
 
-    val log = getLogger(javaClass)
 
     @WithSpan
-    fun delete(vararg caches: CachableConfig, id: String) : Long {
-        caches.forEach {
-            log.info("Deleting from $it for id {} {}", id,handler.tilNøkkel(it,id))
-        }
-        return caches.sumOf {
+    fun delete(vararg caches: CachableConfig, id: String) =
+        caches.sumOf {
                 cache -> conn.sync().del(handler.tilNøkkel(cache, id))
         }
-    }
 
     @WithSpan
     inline fun <reified T> getOne(cache: CachableConfig, id: String) =
@@ -47,11 +44,11 @@ class CacheClient(
     }
 
     @WithSpan
-    fun getAll(cache: String) =
-            conn.sync().keys("$cache::*").map {
+    fun getAllKeys(cache: CachableConfig) =
+            conn.sync().keys("${cache.name}::*").map {
                 handler.idFraNøkkel(it)
             }.also {
-                log.info("Fant ${it.size} nøkler i cache $cache")
+                log.info("Fant ${it.size} nøkler i cache ${cache.name}")
             }
 
 

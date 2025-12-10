@@ -33,7 +33,7 @@ class CacheNøkkelHandlerTest : DescribeSpec({
 
     describe("CacheNøkkelHandler") {
         it("tilNøkkel legger til prefiks og nøkkel") {
-            handler.tilNøkkel(CacheClientOID_CACHE, id) shouldBe "${OID_CACHE.name}::$id"
+            handler.tilNøkkel(OID_CACHE, id) shouldBe "${OID_CACHE.name}::$id"
         }
         it("tilNøkkel legger til ekstraPrefiks hvis angitt") {
             handler.tilNøkkel(PDL_MED_FAMILIE_CACHE, id) shouldBe "${PdlRestClientAdapter.PDL_MED_FAMILIE_CACHE.name}::${PDL_MED_FAMILIE_CACHE.extraPrefix}:$id"

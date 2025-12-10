@@ -26,8 +26,13 @@ class CacheClient(
     val log = getLogger(javaClass)
 
     @WithSpan
-    fun delete(vararg caches: CachableConfig, id: String) = caches.sumOf {
-        cache -> conn.sync().del(handler.tilNøkkel(cache, id).also { log.info("Nøkkel er $it") })
+    fun delete(vararg caches: CachableConfig, id: String) : Long {
+        caches.forEach {
+            log.info("Deleting from $it for id {} {}", id,handler.tilNøkkel(it,id))
+        }
+        return caches.sumOf {
+                cache -> conn.sync().del(handler.tilNøkkel(cache, id))
+        }
     }
 
     @WithSpan

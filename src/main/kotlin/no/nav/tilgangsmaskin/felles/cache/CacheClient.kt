@@ -45,11 +45,11 @@ class CacheClient(
 
     @WithSpan
     fun getAllKeys(cache: CachableConfig) =
-            conn.sync().keys("${cache.name}::*").map {
-                handler.idFraNøkkel(it)
-            }.also {
-                log.info("Fant ${it.size} nøkler i cache ${cache.name}")
-            }
+            conn.sync().keys("${cache.name}::*")//.map {
+              //  handler.idFraNøkkel(it)
+           // }.also {
+            //    log.info("Fant ${it.size} nøkler i cache ${cache.name}")
+            //}
 
 
     @WithSpan

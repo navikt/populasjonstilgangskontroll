@@ -98,7 +98,7 @@ class DevTilgangController(
              cache: Caches) =
         Caches.entries.first { it.name == cache.name }.caches.flatMap {
             cacheClient.getAllKeys(it)
-        }.toSet()
+        }.toSortedSet()
 
     @GetMapping("cache/{cache}/{id}")
     fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)

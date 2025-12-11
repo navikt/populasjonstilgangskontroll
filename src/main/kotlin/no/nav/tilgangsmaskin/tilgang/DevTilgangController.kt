@@ -95,7 +95,7 @@ class DevTilgangController(
             cacheClient.getAllKeys(it)
         }.toSet()
 
-    @GetMapping("cache/keys/{cache}/{id}")
+    @GetMapping("cache/{cache}/{id}")
     fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
             cache: Caches, id: String) =
         Caches.entries.first { it.name == cache.name }.caches
@@ -186,5 +186,5 @@ class DevTilgangController(
 
     @PostMapping("brukere")
     fun brukere(@RequestBody ids: Set<String>) = brukere.brukere(ids)
-    
+
 }

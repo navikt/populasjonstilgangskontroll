@@ -95,6 +95,13 @@ class DevTilgangController(
             cacheClient.getAllKeys(it)
         }.toSet()
 
+    @GetMapping("cache/keys/{cache}/{id}")
+    fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
+            cache: Caches, id: String) =
+        Caches.entries.first { it.name == cache.name }.caches
+            .mapNotNull { cacheClient.getOne(it, id) }
+            .toSet()
+
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable  id: String) = graphql.partnere(id)
 
@@ -179,4 +186,5 @@ class DevTilgangController(
 
     @PostMapping("brukere")
     fun brukere(@RequestBody ids: Set<String>) = brukere.brukere(ids)
+    
 }

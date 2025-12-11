@@ -108,9 +108,6 @@ class CacheClientTest {
     }
     @Test
     fun putAndGetManyPdl() {
-        every { token.system }.returns("test")
-        every { token.clusterAndSystem }.returns("test:dev-gcp")
-
         val ids = setOf(person1.brukerId.verdi,person2.brukerId.verdi)
         client.putMany(PDL_MED_FAMILIE_CACHE, mapOf(person1.brukerId.verdi to person1, person2.brukerId.verdi to person2), Duration.ofSeconds(1))
         val many = client.getMany<Person>(PDL_MED_FAMILIE_CACHE,ids)

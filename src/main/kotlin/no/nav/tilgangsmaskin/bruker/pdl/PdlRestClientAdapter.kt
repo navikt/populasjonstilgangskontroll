@@ -3,8 +3,8 @@ import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
-import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
@@ -92,10 +92,8 @@ class PdlRestClientAdapter(
             .toSet()
 
     companion object {
-        private const val MED_FAMILIE = "medFamilie"
+        const val MED_FAMILIE = "medFamilie"
          const val MED_UTVIDET_FAMILIE = "medUtvidetFamilie"
-         val  PDL_MED_FAMILIE_CACHE = CachableConfig(PDL,MED_FAMILIE)
-         val  PDL_MED_UTVIDET_FAMILIE_CACHE = CachableConfig(PDL,MED_UTVIDET_FAMILIE)
-        val PDL_CACHES  = listOf(PDL_MED_FAMILIE_CACHE,PDL_MED_UTVIDET_FAMILIE_CACHE)
+
     }
 }

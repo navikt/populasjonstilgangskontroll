@@ -4,7 +4,7 @@ package no.nav.tilgangsmaskin.bruker.pdl
 import io.micrometer.core.instrument.Tags
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.person.pdl.leesah.Personhendelse
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter.Companion.PDL_CACHES
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.UGRADERT
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
@@ -12,7 +12,6 @@ import no.nav.tilgangsmaskin.regler.motor.`PdlCacheTømmerTeller`
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
-import java.util.Locale
 import java.util.Locale.getDefault
 
 @Component

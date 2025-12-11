@@ -5,10 +5,8 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.OID_CACHE
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter.Companion.PDL_MED_FAMILIE_CACHE
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import tools.jackson.module.kotlin.jsonMapper
 
@@ -36,7 +34,7 @@ class CacheNøkkelHandlerTest : DescribeSpec({
             handler.tilNøkkel(OID_CACHE, id) shouldBe "${OID_CACHE.name}::$id"
         }
         it("tilNøkkel legger til ekstraPrefiks hvis angitt") {
-            handler.tilNøkkel(PDL_MED_FAMILIE_CACHE, id) shouldBe "${PdlRestClientAdapter.PDL_MED_FAMILIE_CACHE.name}::${PDL_MED_FAMILIE_CACHE.extraPrefix}:$id"
+            handler.tilNøkkel(PDL_MED_FAMILIE_CACHE, id) shouldBe "${PDL_MED_FAMILIE_CACHE.name}::${PDL_MED_FAMILIE_CACHE.extraPrefix}:$id"
         }
         it("fraNøkkel fjerner prefiks og ekstraPrefiks") {
             handler.idFraNøkkel(handler.tilNøkkel(PDL_MED_FAMILIE_CACHE, id)) shouldBe id

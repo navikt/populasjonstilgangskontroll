@@ -40,6 +40,9 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.MULTI_STATUS
 import org.springframework.http.HttpStatus.NO_CONTENT
+import org.springframework.http.ResponseEntity
+import org.springframework.http.ResponseEntity.noContent
+import org.springframework.http.ResponseEntity.status
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -75,13 +78,15 @@ class DevTilgangController(
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(CachableConfig(SKJERMING),navIds)
 
-   @PostMapping("cache/{cache}/{id}/clear")
-   fun cacheClear(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-                   cache: Caches, @PathVariable id: String) {
+   @PostMapping("cache/{cache}/{id}/slett")
+   fun slettIdFraCache(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
+                   cache: Caches, @PathVariable id: String) : ResponseEntity<Unit> {
        Caches.entries.first { it.name == cache.name }.caches.let { c ->
-           cacheClient.delete(*c, id = id).also { antall ->
+           val antall = cacheClient.delete(*c, id = id).also { antall ->
                log.info("Sletting status $antall for $id i ${c.size} cache(s) for cache '${cache.name.lowercase()}'" )
            }
+           return if (antall > 0) noContent().build()
+           else  status(410).build()
        }
    }
 

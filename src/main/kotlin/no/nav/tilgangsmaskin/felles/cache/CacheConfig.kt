@@ -23,5 +23,9 @@ enum class Caches(vararg val  caches: CachableConfig) {
     SKJERMING(SKJERMING_CACHE),
     OID(OID_CACHE),
     NOM(NOM_CACHE),
-    GRAPH(*ENTRA_CACHES.toTypedArray())
+    GRAPH(*ENTRA_CACHES.toTypedArray());
+
+    companion object {
+        fun forNavn(navn: String) = entries.first { it.name == navn }.caches
+    }
 }

@@ -81,7 +81,8 @@ class DevTilgangController(
    @PostMapping("cache/{cache}/{id}/slett")
    fun slettIdFraCache(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
                    cache: Caches, @PathVariable id: String) : ResponseEntity<Unit> {
-       Caches.entries.first { it.name == cache.name }.caches.let { c ->
+
+       Caches.forNavn(cache.name).let { c ->
            val antall = cacheClient.delete(*c, id = id).also { antall ->
                log.info("Sletting status $antall for $id i ${c.size} cache(s) for cache '${cache.name.lowercase()}'" )
            }
@@ -96,14 +97,14 @@ class DevTilgangController(
     @GetMapping("cache/keys/{cache}")
     fun keys(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
              cache: Caches) =
-        Caches.entries.first { it.name == cache.name }.caches.flatMap {
+        Caches.forNavn(cache.name).flatMap {
             cacheClient.getAllKeys(it)
         }.toSortedSet()
 
     @GetMapping("cache/{cache}/{id}")
     fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
             cache: Caches, id: String) =
-        Caches.entries.first { it.name == cache.name }.caches
+        Caches.forNavn(cache.name)
             .mapNotNull { cacheClient.getOne(it, id) }
             .toSet()
 

@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withMDC
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BrukerOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat
@@ -52,7 +53,9 @@ class RegelTjeneste(
                 }
             } ?: log.info("Komplette regler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
         }
-        log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
+        withMDC(ENKELT_OPPSLAG) {
+            log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
+        }
     }
 
     private fun bruker(brukerId: String) = runCatching {
@@ -104,7 +107,9 @@ class RegelTjeneste(
                     it.ukjente.size, ansattId, it)
             }
         }
-        log.info("Tid brukt på bulk med størrelse ${idOgType.size} for $ansattId: ${elapsedTime.inWholeMilliseconds}ms")
+        withMDC(BULK_OPPSLAG) {
+           log.info("Tid brukt på bulk med størrelse ${idOgType.size} for $ansattId: ${elapsedTime.inWholeMilliseconds}ms")
+        }
         return respons
     }
 
@@ -152,4 +157,13 @@ class RegelTjeneste(
         }
 
     private fun Set<BrukerOgRegelsett>.finnBruker(oppslagId: String)  = first { it.bruker.oppslagId == oppslagId }.bruker
+
+    companion object {
+        private const val BULK = "bulk"
+        private const val ENKELT = "enkelt"
+        private const val OPPSLAGTYPE = "oppslagtype"
+        private val BULK_OPPSLAG = Pair(OPPSLAGTYPE, BULK)
+        private val ENKELT_OPPSLAG = Pair(OPPSLAGTYPE, ENKELT)
+
+    }
 }

@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
+import org.springframework.cache.CacheManager
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Import
 import org.springframework.data.redis.cache.RedisCacheConfiguration
@@ -57,6 +58,9 @@ class CacheClientTest {
 
     @MockkBean
     private lateinit var token: Token
+
+    @MockkBean
+    private lateinit var manager: CacheManager
 
     @Autowired
     lateinit var eventPublisher: ApplicationEventPublisher
@@ -88,7 +92,7 @@ class CacheClientTest {
         val teller = BulkCacheTeller(meterRegistry, token)
         val handler = CacheNøkkelHandler(mgr.cacheConfigurations, valkeyMapper)
         client = CacheClient(
-            redisClient, handler, BulkCacheSuksessTeller(meterRegistry, token), teller
+            redisClient, handler, BulkCacheSuksessTeller(meterRegistry, token), teller, manager
         )
         listener = CacheElementUtløptLytter(redisClient, eventPublisher)
         val id1 = BrukerId("03508331575")

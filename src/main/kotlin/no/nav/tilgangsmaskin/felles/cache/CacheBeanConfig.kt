@@ -14,9 +14,11 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCache
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.nonLockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
+import org.springframework.data.repository.CrudRepository
 import tools.jackson.databind.DatabindContext
 import tools.jackson.databind.JavaType
 import tools.jackson.databind.json.JsonMapper
@@ -27,6 +29,7 @@ import tools.jackson.module.kotlin.KotlinModule.Builder
 
 @Configuration(proxyBeanMethods = true)
 @ConditionalOnGCP
+@EnableRedisRepositories("no.nav.tilgangsmaskin.felles.cache")
 class CacheBeanConfig(private val cf: RedisConnectionFactory,
                       private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
@@ -80,3 +83,5 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
     private fun validityFor(className: String) =
         if (allowedPrefixes.any { className.startsWith(it) }) ALLOWED else DENIED
 }
+
+interface RedisRepository : CrudRepository<String, Any> {}

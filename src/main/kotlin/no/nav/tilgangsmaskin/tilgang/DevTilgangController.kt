@@ -27,6 +27,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.cache.Caches
+import no.nav.tilgangsmaskin.felles.cache.RedisRepository
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
@@ -67,6 +68,7 @@ class DevTilgangController(
     private val oid: AnsattOidTjeneste,
     private val nom: NomTjeneste,
     private val pdl: PDLTjeneste,
+    private val redis: RedisRepository,
     private val cacheClient: CacheClient) {
 
     private val log = getLogger(javaClass)
@@ -78,17 +80,11 @@ class DevTilgangController(
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(CachableConfig(SKJERMING),navIds)
 
-    /*
-    @PostMapping("cache/evict/{cache}/{id}")
-    fun cacheEvict(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-                   cache: Caches, @PathVariable  id: String) : ResponseEntity<Unit> {
-        Caches.forNavn(cache.name).let { c ->
-            val  antall = cacheClient.deleteUsingManager(id,*c)
-            return if (antall > 0) noContent().build()
-            else  status(410).build()
-        }
-    }
-    */
+
+    @PostMapping("cache/count")
+    fun count() =
+        redis.count()
+
 
    @PostMapping("cache/{cache}/{id}/slett")
    fun slettIdFraCache(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)

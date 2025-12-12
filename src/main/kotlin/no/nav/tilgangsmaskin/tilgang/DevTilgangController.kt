@@ -78,8 +78,15 @@ class DevTilgangController(
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(CachableConfig(SKJERMING),navIds)
 
-    @PostMapping("cache/evict/{id}")
-    fun cacheEvict(@PathVariable  id: String) = pdl.medFamilieEvict(id)
+    @PostMapping("cache/evict/{cache}/{id}")
+    fun cacheEvict(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
+                   cache: Caches, @PathVariable  id: String) : ResponseEntity<Unit> {
+        Caches.forNavn(cache.name).let { c ->
+            val  antall = cacheClient.deleteUsingManager(id,*c)
+            return if (antall > 0) noContent().build()
+            else  status(410).build()
+        }
+    }
 
    @PostMapping("cache/{cache}/{id}/slett")
    fun slettIdFraCache(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)

@@ -7,13 +7,15 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocal
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.cache.CacheManager
 import java.time.Duration
 
 class CacheClient(
     client: RedisClient,
     val handler: CacheNøkkelHandler,
     val alleTreffTeller: BulkCacheSuksessTeller,
-    val teller: BulkCacheTeller
+    val teller: BulkCacheTeller,
+    val manager: CacheManager
 )  {
 
     private val log = getLogger(javaClass)
@@ -24,6 +26,12 @@ class CacheClient(
             sync().configSet("notify-keyspace-events", "Exd")
         }
     }
+
+    @WithSpan
+    fun deleteUsingManager(id: String,vararg caches: CachableConfig) =
+        caches.count { cache ->
+            manager.getCache(cache.name)?.evictIfPresent(handler.tilNøkkel(cache, id)) == true
+        }
 
 
     @WithSpan
@@ -45,11 +53,7 @@ class CacheClient(
 
     @WithSpan
     fun getAllKeys(cache: CachableConfig) =
-            conn.sync().keys("${cache.name}::*")/*.map {
-                handler.idFraNøkkel(it)
-            }.also {
-                log.info("Fant ${it.size} nøkler i cache ${cache.name}")
-            }*/
+            conn.sync().keys("${cache.name}::*")
 
 
     @WithSpan

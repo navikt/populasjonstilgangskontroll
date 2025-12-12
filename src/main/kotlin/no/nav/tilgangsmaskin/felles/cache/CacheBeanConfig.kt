@@ -18,7 +18,6 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
-import org.springframework.data.repository.CrudRepository
 import tools.jackson.databind.DatabindContext
 import tools.jackson.databind.JavaType
 import tools.jackson.databind.json.JsonMapper
@@ -84,4 +83,3 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
         if (allowedPrefixes.any { className.startsWith(it) }) ALLOWED else DENIED
 }
 
-interface RedisRepository : CrudRepository<String, Any> {}

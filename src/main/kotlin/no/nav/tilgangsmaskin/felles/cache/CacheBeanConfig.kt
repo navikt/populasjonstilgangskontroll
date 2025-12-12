@@ -49,7 +49,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
 
     @Bean
     fun cacheClient(client: RedisClient,handler: CacheNøkkelHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller,manager: CacheManager) =
-        CacheClient(client, handler, sucessTeller, teller, manager)
+        CacheClient(client, handler, sucessTeller, teller,/* manager*/)
 
     @Bean
     fun cacheNøkkelHandler(mgr: RedisCacheManager) =

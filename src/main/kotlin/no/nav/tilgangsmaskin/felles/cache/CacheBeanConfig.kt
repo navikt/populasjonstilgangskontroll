@@ -28,7 +28,7 @@ import tools.jackson.module.kotlin.KotlinModule.Builder
 
 @Configuration(proxyBeanMethods = true)
 @ConditionalOnGCP
-@EnableRedisRepositories("no.nav.tilgangsmaskin.felles.cache")
+@EnableRedisRepositories
 class CacheBeanConfig(private val cf: RedisConnectionFactory,
                       private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 

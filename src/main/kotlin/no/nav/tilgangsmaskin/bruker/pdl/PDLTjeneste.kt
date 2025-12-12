@@ -19,7 +19,7 @@ class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL
     @Cacheable(cacheNames = [PDL],  key = "#root.methodName + ':' + #id")
     fun medFamilie(id: String) = adapter.person(id)
 
-    @CacheEvict(cacheNames = [PDL], key = "#root.methodName.replace('Evict', '') + ':' + #id")
+    @CacheEvict(cacheNames = [PDL], key = "'medFamilie:' + #id")
     fun medFamilieEvict(id: String) = Unit
 
     @WithSpan

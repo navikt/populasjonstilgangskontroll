@@ -17,6 +17,8 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.core.SpringVersion
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories
 import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.stereotype.Component
@@ -28,6 +30,8 @@ import org.springframework.stereotype.Component
 @EnableResilientMethods
 @EnableJpaAuditing
 @EnableScheduling
+@EnableJpaRepositories
+@EnableRedisRepositories
 @EnableJwtTokenValidation(ignore = ["org.springdoc", "org.springframework"])
 class App
 

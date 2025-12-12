@@ -15,7 +15,7 @@ class CacheClient(
     val handler: CacheNøkkelHandler,
     val alleTreffTeller: BulkCacheSuksessTeller,
     val teller: BulkCacheTeller,
-    val manager: CacheManager
+  //  val manager: CacheManager
 )  {
 
     private val log = getLogger(javaClass)
@@ -27,13 +27,14 @@ class CacheClient(
         }
     }
 
+    /*
     @WithSpan
     fun deleteUsingManager(id: String,vararg caches: CachableConfig) =
         caches.count { cache ->
             manager.getCache(cache.name)?.evictIfPresent(handler.tilNøkkel(cache, id)) == true
         }
 
-
+*/
     @WithSpan
     fun delete(vararg caches: CachableConfig, id: String) =
         caches.sumOf {

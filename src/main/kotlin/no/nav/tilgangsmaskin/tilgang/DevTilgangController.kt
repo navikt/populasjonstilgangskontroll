@@ -78,6 +78,7 @@ class DevTilgangController(
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(CachableConfig(SKJERMING),navIds)
 
+    /*
     @PostMapping("cache/evict/{cache}/{id}")
     fun cacheEvict(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
                    cache: Caches, @PathVariable  id: String) : ResponseEntity<Unit> {
@@ -87,6 +88,7 @@ class DevTilgangController(
             else  status(410).build()
         }
     }
+    */
 
    @PostMapping("cache/{cache}/{id}/slett")
    fun slettIdFraCache(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)

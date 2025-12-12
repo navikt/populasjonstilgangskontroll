@@ -53,7 +53,7 @@ class OverstyringTjeneste(
             motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi))
             adapter.overstyr(ansattId.verdi, data).also {
                 teller.tell(Tags.of("overstyrt", "true"))
-                log.info("Overstyring  til ${data.gyldigtil} ble registret for $ansattId og ${data.brukerId}")
+                log.info("Overstyring til ${data.gyldigtil} ble registret for $ansattId og ${data.brukerId}")
             }
             true
         }.getOrElse {

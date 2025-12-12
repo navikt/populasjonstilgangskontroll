@@ -62,7 +62,7 @@ class OverstyringTjeneste(
                     OVERSTYRING_MESSAGE_CODE,
                     arrayOf(it.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
                     e = it).also {
-                    log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}")
+                    log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}",it)
                     teller.tell(Tags.of("kortnavn", it.regel.kortNavn, "overstyrt", false.toString()))
                 }
                 else -> throw it

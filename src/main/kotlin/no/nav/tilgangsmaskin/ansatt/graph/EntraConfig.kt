@@ -1,7 +1,9 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
+import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste.Companion.ENTRA_OID
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
+import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -56,5 +58,8 @@ class EntraConfig(
         private const val PARAM_VALUE_SELECT_GROUPS = "id,displayName"
         private const val DEFAULT_PING_PATH = "/organization"
         private const val PARAM_NAME_TOP = "\$top"
+        val ENTRA_CACHES = listOf(CachableConfig(GRAPH,"geoGrupper"), CachableConfig(GRAPH,"geoOgGlobaleGrupper"))
+        val OID_CACHE = CachableConfig(ENTRA_OID)
+
     }
 }

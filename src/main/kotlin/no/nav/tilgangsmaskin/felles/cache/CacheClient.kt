@@ -7,15 +7,19 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocal
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.cache.CacheManager
 import java.time.Duration
 
 class CacheClient(
     client: RedisClient,
     val handler: CacheNøkkelHandler,
     val alleTreffTeller: BulkCacheSuksessTeller,
-    val teller: BulkCacheTeller
+    val teller: BulkCacheTeller,
+  //  val manager: CacheManager
 )  {
-    
+
+    private val log = getLogger(javaClass)
+
     val conn = client.connect().apply {
         timeout = Duration.ofSeconds(30)
         if (isLocalOrTest) {
@@ -23,10 +27,19 @@ class CacheClient(
         }
     }
 
-    val log = getLogger(javaClass)
-
+    /*
     @WithSpan
-    fun delete(cache: CachableConfig, id: String) = conn.sync().del(handler.tilNøkkel(cache, id))
+    fun deleteUsingManager(id: String,vararg caches: CachableConfig) =
+        caches.count { cache ->
+            manager.getCache(cache.name)?.evictIfPresent(handler.tilNøkkel(cache, id)) == true
+        }
+
+*/
+    @WithSpan
+    fun delete(vararg caches: CachableConfig, id: String) =
+        caches.sumOf {
+                cache -> conn.sync().del(handler.tilNøkkel(cache, id))
+        }
 
     @WithSpan
     inline fun <reified T> getOne(cache: CachableConfig, id: String) =
@@ -40,12 +53,8 @@ class CacheClient(
     }
 
     @WithSpan
-    fun getAll(cache: String) =
-            conn.sync().keys("$cache::*").map {
-                handler.idFraNøkkel(it)
-            }.also {
-                log.info("Fant ${it.size} nøkler i cache $cache")
-            }
+    fun getAllKeys(cache: CachableConfig) =
+            conn.sync().keys("${cache.name}::*")
 
 
     @WithSpan
@@ -99,4 +108,6 @@ class CacheClient(
         teller.tell(of("cache", navn, "result", "hit"), funnet)
         log.trace("Fant $funnet verdier i cache $navn for $etterspurt identer")
     }
+
+    fun tilNøkkel(cache: CachableConfig, id: String) = handler.tilNøkkel(cache, id)
 }

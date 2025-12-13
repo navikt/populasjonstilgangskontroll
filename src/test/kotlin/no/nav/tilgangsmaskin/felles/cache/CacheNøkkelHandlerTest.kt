@@ -5,26 +5,25 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
+import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.OID_CACHE
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import tools.jackson.module.kotlin.jsonMapper
 
 class CacheNøkkelHandlerTest : DescribeSpec({
     val id = "01011111111"
-    val UTEN_EXTRA = CachableConfig(PDL)
-    val MED_EXTRA = UTEN_EXTRA.copy(extraPrefix = "medFamilie")
     val mapper = jsonMapper()
     lateinit var redisConfig: RedisCacheConfiguration
     lateinit var handler: CacheNøkkelHandler
 
     beforeTest {
         redisConfig = mockk()
-        every { redisConfig.getKeyPrefixFor(MED_EXTRA.name) } returns MED_EXTRA.name
-        every { redisConfig.getKeyPrefixFor(UTEN_EXTRA.name) } returns UTEN_EXTRA.name
+        every { redisConfig.getKeyPrefixFor(PDL_MED_FAMILIE_CACHE.name) } returns PDL_MED_FAMILIE_CACHE.name + "::"
+        every { redisConfig.getKeyPrefixFor(OID_CACHE.name) } returns OID_CACHE.name  + "::"
         handler = CacheNøkkelHandler(
             mapOf(
-                MED_EXTRA.name to redisConfig,
-                UTEN_EXTRA.name to redisConfig
+                PDL_MED_FAMILIE_CACHE.name to redisConfig,
+                OID_CACHE.name to redisConfig
             ),
             mapper
         )
@@ -32,16 +31,16 @@ class CacheNøkkelHandlerTest : DescribeSpec({
 
     describe("CacheNøkkelHandler") {
         it("tilNøkkel legger til prefiks og nøkkel") {
-            handler.tilNøkkel(UTEN_EXTRA, id) shouldBe "${UTEN_EXTRA.name}::$id"
+            handler.tilNøkkel(OID_CACHE, id) shouldBe "${OID_CACHE.name}::$id"
         }
         it("tilNøkkel legger til ekstraPrefiks hvis angitt") {
-            handler.tilNøkkel(MED_EXTRA, id) shouldBe "${MED_EXTRA.name}::${MED_EXTRA.extraPrefix}:$id"
+            handler.tilNøkkel(PDL_MED_FAMILIE_CACHE, id) shouldBe "${PDL_MED_FAMILIE_CACHE.name}::${PDL_MED_FAMILIE_CACHE.extraPrefix}:$id"
         }
         it("fraNøkkel fjerner prefiks og ekstraPrefiks") {
-            handler.idFraNøkkel(handler.tilNøkkel(MED_EXTRA, id)) shouldBe id
+            handler.idFraNøkkel(handler.tilNøkkel(PDL_MED_FAMILIE_CACHE, id)) shouldBe id
         }
         it("fraNøkkel fjerner kun prefiks når ekstraPrefiks er null") {
-            handler.idFraNøkkel(handler.tilNøkkel(UTEN_EXTRA, id)) shouldBe id
+            handler.idFraNøkkel(handler.tilNøkkel(OID_CACHE, id)) shouldBe id
         }
         it("kaster exception hvis cache config mangler") {
             shouldThrow<IllegalStateException> {

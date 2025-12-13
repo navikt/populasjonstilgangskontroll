@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
+import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -13,6 +14,7 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCache
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.nonLockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
@@ -47,8 +49,8 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
         RedisClient.create(cfg.cacheURI)
 
     @Bean
-    fun cacheClient(client: RedisClient,handler: CacheNøkkelHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
-        CacheClient(client, handler, sucessTeller, teller)
+    fun cacheClient(client: RedisClient,handler: CacheNøkkelHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller,manager: CacheManager) =
+        CacheClient(client, handler, sucessTeller, teller,/* manager*/)
 
     @Bean
     fun cacheNøkkelHandler(mgr: RedisCacheManager) =
@@ -79,3 +81,4 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
     private fun validityFor(className: String) =
         if (allowedPrefixes.any { className.startsWith(it) }) ALLOWED else DENIED
 }
+

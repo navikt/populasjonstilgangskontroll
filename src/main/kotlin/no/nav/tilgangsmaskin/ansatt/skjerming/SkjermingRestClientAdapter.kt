@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.IDENT
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.IDENTER
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
@@ -43,9 +44,6 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
     private fun fraCache(ids: Set<String>) =
             cache.getMany<Boolean>(SKJERMING_CACHE, ids)
 
-    companion object {
-        private val SKJERMING_CACHE = CachableConfig(SKJERMING)
-    }
 }
 
 

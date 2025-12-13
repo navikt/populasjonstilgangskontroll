@@ -26,4 +26,6 @@ interface OverstyringRepository : JpaRepository<OverstyringEntity, Long> {
     fun gjeldendeOverstyringer(
         @Param("ansattId") ansattId: String,
         @Param("brukerIds") brukerIds: List<String>): List<OverstyringEntity>
+
+    fun antallAktiveOverstyringer(): Long = 0L
 }

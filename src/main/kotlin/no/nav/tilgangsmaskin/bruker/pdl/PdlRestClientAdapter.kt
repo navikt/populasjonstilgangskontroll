@@ -3,8 +3,8 @@ import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
-import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
@@ -39,10 +39,8 @@ class PdlRestClientAdapter(
 
         val fraRest = fraRest(identer  - fraCache.keys)
 
-
-        cache.putMany(PDL_CACHE, fraRest,cf.varighet)
+        cache.putMany(PDL_MED_FAMILIE_CACHE, fraRest,cf.varighet)
         return (fraRest.values + fraCache.values).toSet()
-
     }
 
 
@@ -51,7 +49,7 @@ class PdlRestClientAdapter(
         if (identer.isEmpty()) {
             return emptyMap()
         }
-        val innslag = cache.getMany<Person>(PDL_CACHE, identer)
+        val innslag = cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, identer)
         log.trace("Hentet ${innslag.size} person(er) fra cache for ${identer.size} ident(er)")
         return innslag
     }
@@ -93,9 +91,9 @@ class PdlRestClientAdapter(
             }
             .toSet()
 
-
     companion object {
-        private const val EXTRA = "medFamilie"
-        private val PDL_CACHE = CachableConfig(PDL, EXTRA)
+        const val MED_FAMILIE = "medFamilie"
+         const val MED_UTVIDET_FAMILIE = "medUtvidetFamilie"
+
     }
 }

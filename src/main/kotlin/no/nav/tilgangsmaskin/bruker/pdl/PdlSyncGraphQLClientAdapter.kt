@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.bruker.pdl
 import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
 import no.nav.tilgangsmaskin.felles.graphql.AbstractSyncGraphQLAdapter
@@ -41,13 +42,13 @@ class PdlSyncGraphQLClientAdapter(
         runCatching {
             query<Partnere>(SIVILSTAND_QUERY, ident(ident)).sivilstand.mapNotNull {
                 it.relatertVedSivilstand?.let { brukerId ->
-                    Familie.FamilieMedlem(BrukerId(brukerId), tilPartner(it.type))
+                    FamilieMedlem(BrukerId(brukerId), tilPartner(it.type))
                 }
             }.toSet()
         }.getOrElse {
             if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {
                 log.trace("Fant ingen partnere for $ident")
-                return emptySet<Familie.FamilieMedlem>()
+                return emptySet<FamilieMedlem>()
             }
             else throw it
         }

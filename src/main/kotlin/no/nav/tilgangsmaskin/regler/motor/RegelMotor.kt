@@ -52,17 +52,21 @@ class RegelMotor(
 
     @WithSpan
     fun bulkRegler(ansatt: Ansatt, brukere: Set<BrukerOgRegelsett>) =
-        (brukere.map { (bruker, type) ->
-            runCatching {
-                logger.trace("Bulk evaluerer ${bruker.oppslagId.maskFnr()}")
-                evaluer(ansatt, bruker, type.regelSett())
-                ok(bruker)
-            }.getOrElse {
-                if (it is RegelException) {
-                    avvist(bruker,it)
-                } else throw it
+        buildSet {
+            val n = brukere.size
+            brukere.forEachIndexed { index, (bruker, type) ->
+                val resultat = runCatching {
+                    logger.trace("Bulk evaluerer #$index/$n: ${bruker.oppslagId.maskFnr()}")
+                    evaluer(ansatt, bruker, type.regelSett())
+                    ok(bruker)
+                }.getOrElse {
+                    if (it is RegelException) {
+                        avvist(bruker, it)
+                    } else throw it
+                }
+                add(resultat)
             }
-        }.toSet()).also {
+        }.also {
             logger.tellBulkSize(it.size)
         }
 

@@ -17,6 +17,7 @@ class EntraConfig(
     private val size: Int = DEFAULT_BATCH_SIZE,
     enabled: Boolean = true) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
 
+    override val caches = ENTRA_CACHES
     override val navn = name
     override val varighet = Duration.ofHours(3)
 

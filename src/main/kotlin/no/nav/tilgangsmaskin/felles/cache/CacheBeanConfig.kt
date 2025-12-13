@@ -6,10 +6,12 @@ import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
+import org.springframework.beans.factory.BeanRegistrarDsl
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Import
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.nonLockingRedisCacheWriter
@@ -80,3 +82,20 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
     private fun validityFor(className: String) =
         if (allowedPrefixes.any { className.startsWith(it) }) ALLOWED else DENIED
 }
+
+
+@Configuration
+@Import(CacheConfigBeanRegistrationsConfiguration.MyBeanRegistrar::class)
+class CacheConfigBeanRegistrationsConfiguration {
+    class MyBeanRegistrar(private vararg val cfgs: CachableRestConfig) : BeanRegistrarDsl({
+        registerBean {
+            AllCaches(buildMap {
+                cfgs.forEach {
+                    put( it.navn, it.caches)
+                }
+            })
+        }
+    })
+}
+
+class AllCaches(val map: Map<String,List<CachableConfig>>)

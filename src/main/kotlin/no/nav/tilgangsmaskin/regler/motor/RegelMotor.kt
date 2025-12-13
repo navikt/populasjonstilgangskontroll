@@ -56,7 +56,7 @@ class RegelMotor(
             val n = brukere.size
             brukere.forEachIndexed { index, (bruker, type) ->
                 val resultat = runCatching {
-                    logger.trace("Bulk evaluerer #$index/$n: ${bruker.oppslagId.maskFnr()}")
+                    logger.trace("Bulk evaluerer #${index + 1}/$n: ${bruker.oppslagId.maskFnr()}")
                     evaluer(ansatt, bruker, type.regelSett())
                     ok(bruker)
                 }.getOrElse {

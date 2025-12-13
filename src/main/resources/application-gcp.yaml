@@ -69,21 +69,10 @@ spring:
         "[max.poll.records]": 3
         "[auto.offset.reset]": earliest
         "[spring.json.use.type.headers]": false
-        spring:
-          deserializer:
-            key:
-              delegate:
-                class: org.apache.kafka.common.serialization.StringDeserializer
-            value:
-              delegate:
-                class: org.springframework.kafka.support.serializer.JsonDeserializer
-            use:
-              type:
-                headers: false
-          json:
-            value:
-              default:
-                type: no.nav.tilgangsmaskin.ansatt.nom.NomHendelse
+        "[spring.json.value.default.type]": no.nav.tilgangsmaskin.ansatt.nom.NomHendelse
+        "[spring.deserializer.use.type.headers]": false
+        "[spring.deserializer.key.delegate.class]": org.apache.kafka.common.serialization.StringDeserializer
+        "[spring.deserializer.value.delegate.class]": org.springframework.kafka.support.serializer.JsonDeserializer
   data:
     redis:
       repositories:

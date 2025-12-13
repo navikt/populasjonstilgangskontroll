@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.Tilgang
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import no.nav.boot.conditionals.ConditionalOnNotProd
@@ -25,6 +26,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
+import no.nav.tilgangsmaskin.felles.cache.Caches
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
@@ -34,9 +36,13 @@ import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.BulkSwaggerApiRespons
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.MULTI_STATUS
 import org.springframework.http.HttpStatus.NO_CONTENT
+import org.springframework.http.ResponseEntity
+import org.springframework.http.ResponseEntity.noContent
+import org.springframework.http.ResponseEntity.status
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -61,19 +67,58 @@ class DevTilgangController(
     private val oid: AnsattOidTjeneste,
     private val nom: NomTjeneste,
     private val pdl: PDLTjeneste,
-    private val cache: CacheClient) {
+    private val cacheClient: CacheClient) {
+
+    private val log = getLogger(javaClass)
+
 
     @PostMapping("oppfolging/bulk")
     fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)
 
     @PostMapping("cache/skjerminger")
-    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cache.getMany<Boolean>(CachableConfig(SKJERMING),navIds)
+    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(CachableConfig(SKJERMING),navIds)
+
+    /*
+    @PostMapping("cache/evict/{cache}/{id}")
+    fun cacheEvict(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
+                   cache: Caches, @PathVariable  id: String) : ResponseEntity<Unit> {
+        Caches.forNavn(cache.name).let { c ->
+            val  antall = cacheClient.deleteUsingManager(id,*c)
+            return if (antall > 0) noContent().build()
+            else  status(410).build()
+        }
+    }
+    */
+
+   @PostMapping("cache/{cache}/{id}/slett")
+   fun slettIdFraCache(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
+                   cache: Caches, @PathVariable id: String) : ResponseEntity<Unit> {
+
+       Caches.forNavn(cache.name).let { c ->
+           val antall = cacheClient.delete(*c, id = id).also { antall ->
+               log.info("Sletting status $antall for $id i ${c.size} cache(s) for cache '${cache.name.lowercase()}'" )
+           }
+           return if (antall > 0) noContent().build()
+           else  status(410).build()
+       }
+   }
 
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cache.getMany<Person>(CachableConfig(PDL),navIds.map { it.verdi }.toSet())
+    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany<Person>(CachableConfig(PDL),navIds.map { it.verdi }.toSet())
 
-    @GetMapping("cache/keys/{cacheName}")
-    fun keys(@PathVariable cacheName: String) = cache.getAll(cacheName)
+    @GetMapping("cache/keys/{cache}")
+    fun keys(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
+             cache: Caches) =
+        Caches.forNavn(cache.name).flatMap {
+            cacheClient.getAllKeys(it)
+        }.toSortedSet()
+
+    @GetMapping("cache/{cache}/{id}")
+    fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
+            cache: Caches, id: String) =
+        Caches.forNavn(cache.name)
+            .mapNotNull { cacheClient.getOne(it, id) }
+            .toSet()
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable  id: String) = graphql.partnere(id)
@@ -159,4 +204,5 @@ class DevTilgangController(
 
     @PostMapping("brukere")
     fun brukere(@RequestBody ids: Set<String>) = brukere.brukere(ids)
+
 }

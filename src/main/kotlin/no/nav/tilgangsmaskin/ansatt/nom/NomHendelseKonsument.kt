@@ -11,7 +11,11 @@ import java.time.LocalDate.EPOCH
 @Component
 class NomHendelseKonsument(private val nom: NomTjeneste, private val logger: NomHendelseLogger) {
 
-    @KafkaListener(topics = ["#{'\${nom.topic}'}"], concurrency = "1", batch = "true", filter = "fnrFilterStrategy")
+    @KafkaListener(
+        topics = [$$"${nom.topic}"],
+        properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.nom.NomHendelse"],
+        groupId = $$"${spring.application.name}-nom",
+        filter = "fnrFilterStrategy")
     fun listen(hendelser: List<NomHendelse>) {
         logger.start(hendelser)
         hendelser.forEach { hendelse ->

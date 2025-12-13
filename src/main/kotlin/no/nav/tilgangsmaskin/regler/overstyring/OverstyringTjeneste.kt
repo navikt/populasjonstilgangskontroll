@@ -53,7 +53,7 @@ class OverstyringTjeneste(
             motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi))
             adapter.overstyr(ansattId.verdi, data).also {
                 teller.tell(Tags.of("overstyrt", "true"))
-                log.info("Overstyring  til ${data.gyldigtil} ble registret for $ansattId og ${data.brukerId}")
+                log.info("Overstyring til og med ${data.gyldigtil} ble registret for $ansattId og ${data.brukerId}")
             }
             true
         }.getOrElse {
@@ -62,7 +62,7 @@ class OverstyringTjeneste(
                     OVERSTYRING_MESSAGE_CODE,
                     arrayOf(it.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
                     e = it).also {
-                    log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}")
+                    log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}",it)
                     teller.tell(Tags.of("kortnavn", it.regel.kortNavn, "overstyrt", false.toString()))
                 }
                 else -> throw it

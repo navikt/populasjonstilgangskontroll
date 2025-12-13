@@ -66,12 +66,9 @@ spring:
       key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
-        max:
-          poll:
-            records: 3
-        auto:
-          offset:
-            reset: earliest
+        "[max.poll.records]": 3
+        "[auto.offset.reset]": earliest
+        "[spring.json.use.type.headers]": false
         spring:
           deserializer:
             key:
@@ -87,9 +84,6 @@ spring:
             value:
               default:
                 type: no.nav.tilgangsmaskin.ansatt.nom.NomHendelse
-            use:
-              type:
-                headers: false
   data:
     redis:
       repositories:

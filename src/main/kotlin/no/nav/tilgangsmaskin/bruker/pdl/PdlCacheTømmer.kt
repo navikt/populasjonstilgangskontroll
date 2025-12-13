@@ -18,7 +18,10 @@ import java.util.Locale.getDefault
 class PdlCacheTømmer(private val client: CacheClient, private val teller: `PdlCacheTømmerTeller`) {
     private val log = getLogger(javaClass)
 
-    @KafkaListener(topics = [ "pdl.leesah-v1"], containerFactory = "pdlAvroListenerContainerFactory", filter = "graderingFilterStrategy")
+    @KafkaListener(
+        topics = [ "pdl.leesah-v1"],
+        containerFactory = "pdlAvroListenerContainerFactory",
+        filter = "graderingFilterStrategy")
     fun listen(hendelse: Personhendelse) {
         log.info("Mottok hendelse av tyoe ${Personhendelse::class.simpleName} fra PDL, tømmer cacher" )
         PDL_CACHES.forEach { cache ->

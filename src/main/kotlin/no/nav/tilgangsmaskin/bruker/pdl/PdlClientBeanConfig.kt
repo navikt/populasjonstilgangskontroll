@@ -13,6 +13,8 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.graphql.GraphQLErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUrl
+import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUserInfo
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
@@ -91,12 +93,6 @@ class PdlClientBeanConfig {
                 this[USER_INFO_CONFIG] = env.schemaRegistryUserInfo()
             }
         )
-
-    private fun Environment.schemaRegistryUrl() =
-        getRequiredProperty<String>("kafka.schema.registry")
-
-    private fun Environment.schemaRegistryUserInfo() =
-        "${getRequiredProperty<String>("kafka.schema.registry.user")}:${getRequiredProperty<String>("kafka.schema.registry.password")}"
 
     @Bean
     fun pdlAvroListenerContainerFactory(consumerFactory: ConsumerFactory<String, Personhendelse>) =

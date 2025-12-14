@@ -63,6 +63,7 @@ dependencies {
     implementation("io.confluent:kafka-avro-serializer:$confluentVersion") {
         exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
     }
+    implementation("at.yawk.lz4:lz4-java:1.10.1") // fjernes ved neste release av org.apache.kafka:kafka-clients
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$otelVersion-alpha")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -108,6 +109,16 @@ dependencies {
     testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation(kotlin("test"))
+}
+
+configurations.configureEach {
+    resolutionStrategy {
+        capabilitiesResolution {
+            withCapability("org.lz4:lz4-java") {
+                select(candidates.first { (it.id as ModuleComponentIdentifier).group == "at.yawk.lz4" })
+            }
+        }
+    }
 }
 
 dependencyManagement {

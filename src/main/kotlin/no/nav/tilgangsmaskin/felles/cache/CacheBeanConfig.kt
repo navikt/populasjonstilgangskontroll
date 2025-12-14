@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import io.lettuce.core.RedisClient
 import no.nav.boot.conditionals.ConditionalOnGCP
+import no.nav.tilgangsmaskin.felles.cache.CacheConfigBeanRegistrationsConfiguration.MyBeanRegistrar
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
@@ -85,7 +86,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
 
 
 @Configuration
-@Import(CacheConfigBeanRegistrationsConfiguration.MyBeanRegistrar::class)
+@Import(MyBeanRegistrar::class)
 class CacheConfigBeanRegistrationsConfiguration {
     class MyBeanRegistrar(private vararg val cfgs: CachableRestConfig) : BeanRegistrarDsl({
         registerBean {

@@ -12,6 +12,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
+import org.springframework.cache.CacheManager
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Import
 import org.springframework.data.redis.cache.RedisCacheConfiguration
@@ -47,7 +49,6 @@ import java.util.concurrent.TimeUnit.*
 @Import(JacksonAutoConfiguration::class)
 class CacheClientTest {
 
-    private val pdl = CachableConfig(PDL,"medFamilie")
 
     private  val valkeyMapper = JsonMapper.builder().polymorphicTypeValidator(NavPolymorphicTypeValidator()).apply {
         addModule(Builder().build())
@@ -58,6 +59,10 @@ class CacheClientTest {
     @MockkBean
     private lateinit var token: Token
 
+    /*
+    @MockkBean
+    private lateinit var manager: CacheManager
+*/
     @Autowired
     lateinit var eventPublisher: ApplicationEventPublisher
 
@@ -78,17 +83,17 @@ class CacheClientTest {
 
         val mgr = builder(cf)
             .withInitialCacheConfigurations(mapOf(
-                pdl.name to RedisCacheConfiguration.defaultCacheConfig()
+                PDL_MED_FAMILIE_CACHE.name to RedisCacheConfiguration.defaultCacheConfig()
                     .prefixCacheNameWith(PDL)
                     .disableCachingNullValues()
             ))
             .build()
-        mgr.getCache(pdl.name)
+        mgr.getCache(PDL_MED_FAMILIE_CACHE.name)
         val redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
         val teller = BulkCacheTeller(meterRegistry, token)
         val handler = CacheNøkkelHandler(mgr.cacheConfigurations, valkeyMapper)
         client = CacheClient(
-            redisClient, handler, BulkCacheSuksessTeller(meterRegistry, token), teller
+            redisClient, handler, BulkCacheSuksessTeller(meterRegistry, token), teller, /*manager*/
         )
         listener = CacheElementUtløptLytter(redisClient, eventPublisher)
         val id1 = BrukerId("03508331575")
@@ -99,25 +104,23 @@ class CacheClientTest {
 
     @Test
     fun putAndGetOnePdl() {
-        client.putOne(pdl, person1.brukerId.verdi,person1, Duration.ofSeconds(1))
-        val one = client.getOne<Person>(pdl,person1.brukerId.verdi)
+        client.putOne(PDL_MED_FAMILIE_CACHE, person1.brukerId.verdi,person1, Duration.ofSeconds(1))
+        val one = client.getOne<Person>(PDL_MED_FAMILIE_CACHE,person1.brukerId.verdi)
         assertThat(one).isEqualTo(person1)
         await.atMost(3, SECONDS).until {
-            client.getOne<Person>(pdl,person1.brukerId.verdi) == null
+            client.getOne<Person>(PDL_MED_FAMILIE_CACHE,person1.brukerId.verdi) == null
         }
     }
     @Test
     fun putAndGetManyPdl() {
-        every { token.system }.returns("test")
-        every { token.clusterAndSystem }.returns("test:dev-gcp")
-
         val ids = setOf(person1.brukerId.verdi,person2.brukerId.verdi)
-        client.putMany(pdl, mapOf(person1.brukerId.verdi to person1, person2.brukerId.verdi to person2), Duration.ofSeconds(1))
-        val many = client.getMany<Person>(pdl,ids)
+        client.putMany(PDL_MED_FAMILIE_CACHE, mapOf(person1.brukerId.verdi to person1, person2.brukerId.verdi to person2), Duration.ofSeconds(1))
+        val many = client.getMany<Person>(PDL_MED_FAMILIE_CACHE,ids)
         assertThat(many.keys).containsExactlyInAnyOrderElementsOf(ids)
-        assertThat(client.getAll(pdl.name)).containsExactlyInAnyOrderElementsOf(ids)
+        val nøkler = client.getAllKeys(PDL_MED_FAMILIE_CACHE).map { CacheNøkkelElementer(it).id }
+        assertThat(nøkler).containsExactlyInAnyOrderElementsOf(ids)
         await.atMost(3, SECONDS).until {
-            client.getMany<Person>(pdl,ids).isEmpty()
+            client.getMany<Person>(PDL_MED_FAMILIE_CACHE,ids).isEmpty()
         }
     }
 

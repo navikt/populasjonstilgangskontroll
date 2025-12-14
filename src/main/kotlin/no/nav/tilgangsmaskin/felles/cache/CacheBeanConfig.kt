@@ -2,13 +2,17 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import io.lettuce.core.RedisClient
 import no.nav.boot.conditionals.ConditionalOnGCP
+import no.nav.tilgangsmaskin.felles.cache.CacheConfigBeanRegistrationsConfiguration.MyBeanRegistrar
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
+import org.springframework.beans.factory.BeanRegistrarDsl
+import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Import
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.nonLockingRedisCacheWriter
@@ -47,8 +51,8 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
         RedisClient.create(cfg.cacheURI)
 
     @Bean
-    fun cacheClient(client: RedisClient,handler: CacheNøkkelHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller) =
-        CacheClient(client, handler, sucessTeller, teller)
+    fun cacheClient(client: RedisClient,handler: CacheNøkkelHandler, sucessTeller: BulkCacheSuksessTeller, teller: BulkCacheTeller,manager: CacheManager) =
+        CacheClient(client, handler, sucessTeller, teller,/* manager*/)
 
     @Bean
     fun cacheNøkkelHandler(mgr: RedisCacheManager) =
@@ -79,3 +83,20 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
     private fun validityFor(className: String) =
         if (allowedPrefixes.any { className.startsWith(it) }) ALLOWED else DENIED
 }
+
+
+@Configuration
+@Import(MyBeanRegistrar::class)
+class CacheConfigBeanRegistrationsConfiguration {
+    class MyBeanRegistrar(private vararg val cfgs: CachableRestConfig) : BeanRegistrarDsl({
+        registerBean {
+            AllCaches(buildMap {
+                cfgs.forEach {
+                    put( it.navn, it.caches)
+                }
+            })
+        }
+    })
+}
+
+class AllCaches(val map: Map<String,List<CachableConfig>>)

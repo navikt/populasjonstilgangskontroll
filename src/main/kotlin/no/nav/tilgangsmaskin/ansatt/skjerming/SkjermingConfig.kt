@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
+import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -16,6 +17,7 @@ class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH,
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
     override val navn = name
+    override val caches = listOf(SKJERMING_CACHE)
 
     companion object {
         const val SKJERMING = "skjerming"
@@ -24,5 +26,6 @@ class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH,
         private const val DEFAULT_PING_PATH = "internal/health/liveness"
         private const val DEFAULT_SKJERMING_PATH = "skjermet"
         private const val DEFAULT_SKJERMING_BULK_PATH = "skjermetBulk"
+        val SKJERMING_CACHE = CachableConfig(SKJERMING)
     }
 }

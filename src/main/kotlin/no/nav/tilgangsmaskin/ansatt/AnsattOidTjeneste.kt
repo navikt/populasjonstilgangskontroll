@@ -1,6 +1,8 @@
 package no.nav.tilgangsmaskin.ansatt
 
+import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.EntraRestClientAdapter
+import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component
@@ -15,6 +17,7 @@ class AnsattOidTjeneste(private val adapter: EntraRestClientAdapter) : CachableR
 
     override val varighet = Duration.ofDays(365)  // Godt nok, blås i skuddår
     override val navn = ENTRA_OID
+    override val caches = listOf(OID_CACHE)
 
     companion object {
         const val ENTRA_OID = "entraoid"

@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
+import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 
@@ -9,8 +10,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 class NomConfig(val topic: String): CachableRestConfig {
     override val navn = NOM
     override val cacheNulls=true
+    override val caches = listOf(NOM_CACHE)
 
     companion object {
         const val NOM = "nom"
+        val NOM_CACHE = CachableConfig(NOM)
     }
 }

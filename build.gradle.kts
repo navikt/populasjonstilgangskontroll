@@ -26,7 +26,7 @@ plugins {
     kotlin("plugin.jpa") version kotlinVersion
     id("org.springframework.boot") version "4.0.0"
     id("io.spring.dependency-management") version "1.1.7"
-    id("org.cyclonedx.bom") version "2.4.1"
+    id("org.cyclonedx.bom") version "3.0.0"
     id("com.google.cloud.tools.jib") version "3.5.2"
     id("io.kotest") version "6.0.7"
     id("com.gorylenko.gradle-git-properties") version "2.5.4"

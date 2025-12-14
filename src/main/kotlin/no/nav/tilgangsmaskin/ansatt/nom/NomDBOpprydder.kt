@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
-import io.micrometer.core.instrument.Counter
+import io.micrometer.core.instrument.Counter.builder
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import org.slf4j.LoggerFactory.getLogger
@@ -13,7 +13,10 @@ class NomDBOpprydder(registry: MeterRegistry, private val nom: NomTjeneste) : Le
 
     private val log = getLogger(javaClass)
 
-    private val counter = Counter.builder("vaktmester.rader.fjernet")
+    private val antallKall = builder("vaktmester.kall")
+        .description("Antall ganger kalt")
+        .register(registry)
+    private val counter = builder("vaktmester.rader.fjernet")
         .description("Antall rader fjernet")
         .register(registry)
 
@@ -25,6 +28,7 @@ class NomDBOpprydder(registry: MeterRegistry, private val nom: NomTjeneste) : Le
         }
         log.info("Vaktmester rydder opp i Nom-databasen")
         val antall = nom.ryddOpp()
+        antallKall.increment()
         counter.increment(antall.toDouble())
         return antall
     }

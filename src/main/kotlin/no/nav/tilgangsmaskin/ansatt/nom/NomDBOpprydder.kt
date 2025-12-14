@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 import io.micrometer.core.instrument.Counter.builder
 import io.micrometer.core.instrument.MeterRegistry
+import jakarta.annotation.PostConstruct
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.scheduling.annotation.Scheduled
@@ -20,6 +21,7 @@ class NomDBOpprydder(registry: MeterRegistry, private val nom: NomTjeneste) : Le
         .description("Antall rader fjernet")
         .register(registry)
 
+    @PostConstruct
     @Scheduled(fixedRate = 24, timeUnit = HOURS)
     fun ryddOpp(): Int {
         if (!erLeder) {

@@ -6,7 +6,7 @@ import java.net.InetAddress
 
 abstract class LeaderAware(var erLeder: Boolean = false) {
     private val hostname = InetAddress.getLocalHost().hostName
-    protected fun doHandleLeaderChange()  = Unit
+    protected open fun doHandleLeaderChange()  = Unit
 
     private val log = LoggerFactory.getLogger(javaClass)
 

@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.*
 
 @Component
@@ -21,8 +22,11 @@ class NomDBOpprydder(registry: MeterRegistry, private val nom: NomTjeneste) : Le
         .description("Antall rader fjernet")
         .register(registry)
 
-    @PostConstruct
-    @Scheduled(fixedRate = 10, timeUnit = MINUTES)
+    override fun doHandleLeaderChange() {
+        ryddOpp()
+    }
+
+    @Scheduled(fixedRate = 24, timeUnit = HOURS)
     fun ryddOpp(): Int {
         if (!erLeder) {
             log.info("Vaktmester er ikke leder, hopper over rydding i Nom-databasen")

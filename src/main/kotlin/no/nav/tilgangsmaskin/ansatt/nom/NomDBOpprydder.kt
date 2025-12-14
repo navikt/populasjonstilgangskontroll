@@ -22,7 +22,7 @@ class NomDBOpprydder(registry: MeterRegistry, private val nom: NomTjeneste) : Le
         .register(registry)
 
     @PostConstruct
-    @Scheduled(fixedRate = 24, timeUnit = HOURS)
+    @Scheduled(fixedRate = 10, timeUnit = MINUTES)
     fun ryddOpp(): Int {
         if (!erLeder) {
             log.info("Vaktmester er ikke leder, hopper over rydding i Nom-databasen")

@@ -49,7 +49,7 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
                            },
                            {
                              "brukerId": "01011111111",
-                             "status": 404
+                             "status": 204
                            }
                        ]
                    }"""))])])

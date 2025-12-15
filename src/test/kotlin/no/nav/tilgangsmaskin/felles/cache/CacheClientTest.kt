@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
-import org.springframework.cache.CacheManager
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Import
 import org.springframework.data.redis.cache.RedisCacheConfiguration

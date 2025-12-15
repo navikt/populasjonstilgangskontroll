@@ -28,7 +28,7 @@ class PdlCacheTømmer(private val client: CacheClient, private val teller: PdlCa
             hendelse.personidenter.forEach { id ->
                 if (client.delete(cache, id = id) > 0) {
                     teller.tell(Tags.of("cache", cache.name, "gradering",
-                        hendelse.adressebeskyttelse?.gradering?.name?.lowercase(getDefault()) ?: UGRADERT.name.lowercase(getDefault())))
+                        hendelse.adressebeskyttelse?.gradering?.name?.lowercase(getDefault()) ?: UGRADERT.name.lowercase(getDefault()),"type",hendelse.endringstype?.name ?: "N/A"))
                     log.trace(CONFIDENTIAL,"Slettet nøkkel ${client.tilNøkkel(cache, id)} fra cache ${cache.name} etter hendelse av type: {}", id.maskFnr(), Personhendelse::class.simpleName)
                     log.info("Slettet innslag fra cache ${cache.name} etter hendelse av type: {}", hendelse.adressebeskyttelse?.gradering)
                 }

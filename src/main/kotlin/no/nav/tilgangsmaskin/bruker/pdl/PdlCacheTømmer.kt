@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component
 import java.util.Locale.getDefault
 
 @Component
-class PdlCacheTømmer(private val client: CacheClient, private val teller: `PdlCacheTømmerTeller`) {
+class PdlCacheTømmer(private val client: CacheClient, private val teller: PdlCacheTømmerTeller) {
     private val log = getLogger(javaClass)
 
     @KafkaListener(
@@ -23,13 +23,14 @@ class PdlCacheTømmer(private val client: CacheClient, private val teller: `PdlC
         containerFactory = "pdlAvroListenerContainerFactory",
         filter = "graderingFilterStrategy")
     fun listen(hendelse: Personhendelse) {
-        log.info("Mottok hendelse av tyoe ${Personhendelse::class.simpleName} fra PDL, tømmer cacher" )
+        log.info("Mottok hendelse av tyoe ${hendelse.adressebeskyttelse?.gradering} fra PDL, tømmer cacher" )
         PDL_CACHES.forEach { cache ->
             hendelse.personidenter.forEach { id ->
                 if (client.delete(cache, id = id) > 0) {
                     teller.tell(Tags.of("cache", cache.name, "gradering",
                         hendelse.adressebeskyttelse?.gradering?.name?.lowercase(getDefault()) ?: UGRADERT.name.lowercase(getDefault())))
                     log.trace(CONFIDENTIAL,"Slettet nøkkel ${client.tilNøkkel(cache, id)} fra cache ${cache.name} etter hendelse av type: {}", id.maskFnr(), Personhendelse::class.simpleName)
+                    log.info("Slettet innslag fra cache ${cache.name} etter hendelse av type: {}", hendelse.adressebeskyttelse?.gradering)
                 }
                 else {
                     log.trace( CONFIDENTIAL,"Fant ikke ident {} i ${cache.name} for sletting ved hendelse av type: {}", id.maskFnr(), Personhendelse::class.simpleName)

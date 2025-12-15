@@ -7,16 +7,13 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocal
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.cache.CacheManager
 import java.time.Duration
 
 class CacheClient(
     client: RedisClient,
     val handler: CacheNøkkelHandler,
     val alleTreffTeller: BulkCacheSuksessTeller,
-    val teller: BulkCacheTeller,
-  //  val manager: CacheManager
-)  {
+    val teller: BulkCacheTeller)  {
 
     private val log = getLogger(javaClass)
 
@@ -27,14 +24,6 @@ class CacheClient(
         }
     }
 
-    /*
-    @WithSpan
-    fun deleteUsingManager(id: String,vararg caches: CachableConfig) =
-        caches.count { cache ->
-            manager.getCache(cache.name)?.evictIfPresent(handler.tilNøkkel(cache, id)) == true
-        }
-
-*/
     @WithSpan
     fun delete(vararg caches: CachableConfig, id: String) =
         caches.sumOf {

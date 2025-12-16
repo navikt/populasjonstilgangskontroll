@@ -19,7 +19,6 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository) {
             aktoerid = hendelse.aktorId.verdi
             startTidspunkt = hendelse.startTidspunkt
             kontor = hendelse.kontor!!.kontorId.verdi
-            sluttTidspunkt = hendelse.sluttTidspunkt
         })
 
     fun enhetFor(id: String) =

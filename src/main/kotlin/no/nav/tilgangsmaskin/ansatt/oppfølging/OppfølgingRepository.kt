@@ -13,7 +13,7 @@ interface OppfølgingRepository: JpaRepository<OppfølgingEntity, UUID>  {
     fun findByAktoerid(id: String): OppfølgingEntity?
 
     @Modifying
-    @Query("DELETE FROM OppfølgingEntity e WHERE e.id = :id")
+    @Query("DELETE FROM OppfølgingEntity o WHERE o.id = :id")
     fun deleteByUUID(id: UUID): Int
 
 }

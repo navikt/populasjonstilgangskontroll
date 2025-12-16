@@ -12,7 +12,7 @@ val coroutinesVersion = "1.9.0"
 val poolsVersion = "2.12.1"
 val awaitilityVersion = "4.3.0"
 val springMockkVersion = "5.0.1"
-val confluentVersion = "8.1.0"
+val confluentVersion = "8.1.1"
 
 
 group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"

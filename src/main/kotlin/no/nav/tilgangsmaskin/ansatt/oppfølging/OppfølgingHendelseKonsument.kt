@@ -10,19 +10,19 @@ import org.springframework.stereotype.Component
 import kotlin.jvm.javaClass
 
 @Component
-class OppfølgingHendelseKonsument(private val tjeneste: OppfølgingTjeneste) {
+class OppfølgingHendelseKonsument(private val `oppfølging`: OppfølgingTjeneste) {
     private val log = getLogger(javaClass)
 
     @KafkaListener(
         topics = ["poao.siste-oppfolgingsperiode-v2"],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
-        groupId = "$OPPFØLGING-hendelse-konsument")
+        groupId = "$OPPFØLGING-hendelse")
     fun listen(hendelse: OppfølgingHendelse) {
         log.info("Mottok oppfølginghendelse: $hendelse")
         when (val type = hendelse.sisteEndringsType) {
             OPPFOLGING_AVSLUTTET ->  {
                 log.info("Sletter oppfølging ${hendelse.oppfolgingsperiodeUuid}")
-                tjeneste.slett(hendelse.oppfolgingsperiodeUuid)
+                `oppfølging`.slett(hendelse.oppfolgingsperiodeUuid)
             }
             ARBEIDSOPPFOLGINGSKONTOR_ENDRET,
             OPPFOLGING_STARTET -> log.info("Ignorerer foreløpig lagring av oppfølginghendelse av type $type")

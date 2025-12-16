@@ -7,7 +7,7 @@ import java.util.UUID
 
 interface OppfølgingRepository: JpaRepository<OppfølgingEntity, UUID>  {
     @Modifying
-    @Query("update OppfølgingEntity o set o.kontor = :kontor where o.id = :id")
+    @Query("UPDATE OppfølgingEntity o SET o.kontor = :kontor WHERE o.id = :id")
     fun updateKontorById(id: UUID, kontor: String): Int
     fun findByBrukerid(id: String): OppfølgingEntity?
     fun findByAktoerid(id: String): OppfølgingEntity?

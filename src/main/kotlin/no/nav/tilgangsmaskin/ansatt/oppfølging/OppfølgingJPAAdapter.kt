@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.ansatt.`oppfølging`
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import org.springframework.stereotype.Component
 import java.util.UUID
+import kotlin.math.E
 
 @Component
 class OppfølgingJPAAdapter(private val repository: OppfølgingRepository) {
@@ -29,4 +30,7 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository) {
             kontor = hendelse.kontor!!.kontorId.verdi
             sluttTidspunkt = hendelse.sluttTidspunkt
         })
+
+    fun finnEnhetFor(brukerId: String) =
+        repository.findByBrukerid(brukerId)?.kontor?.let(::Enhetsnummer)
 }

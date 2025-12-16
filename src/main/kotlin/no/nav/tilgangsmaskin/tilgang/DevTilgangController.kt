@@ -47,6 +47,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 
 
@@ -75,20 +76,12 @@ class DevTilgangController(
     @PostMapping("oppfolging/bulk")
     fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)
 
+    @GetMapping("oppfolging/db")
+    fun oppfolgingEnhetDb(@RequestParam brukerId: BrukerId) = oppfølging.dbEnhetFor(brukerId)
+
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(CachableConfig(SKJERMING),navIds)
 
-    /*
-    @PostMapping("cache/evict/{cache}/{id}")
-    fun cacheEvict(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-                   cache: Caches, @PathVariable  id: String) : ResponseEntity<Unit> {
-        Caches.forNavn(cache.name).let { c ->
-            val  antall = cacheClient.deleteUsingManager(id,*c)
-            return if (antall > 0) noContent().build()
-            else  status(410).build()
-        }
-    }
-    */
 
    @PostMapping("cache/{cache}/{id}/slett")
    fun slettIdFraCache(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)

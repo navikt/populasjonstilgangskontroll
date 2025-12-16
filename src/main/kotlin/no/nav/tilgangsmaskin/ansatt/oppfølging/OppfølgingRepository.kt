@@ -9,6 +9,7 @@ interface OppfølgingRepository: JpaRepository<OppfølgingEntity, UUID>  {
     @Modifying
     @Query("update OppfølgingEntity o set o.kontor = :kontor where o.id = :id")
     fun updateKontorById(id: UUID, kontor: String): Int
+    fun findByBrukerid(id: String): OppfølgingEntity?
 
 }
 

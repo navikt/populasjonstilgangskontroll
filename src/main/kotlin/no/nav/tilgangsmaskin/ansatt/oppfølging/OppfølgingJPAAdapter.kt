@@ -7,14 +7,6 @@ import java.util.UUID
 @Component
 class OppfølgingJPAAdapter(private val repository: OppfølgingRepository) {
 
-    fun lagre(oppfølging: OppfølgingHendelse) = repository.save(OppfølgingEntity(oppfølging.oppfolgingsperiodeUuid).apply {
-        brukerid = oppfølging.ident.verdi
-        aktoerid = oppfølging.aktorId.verdi
-        startTidspunkt = oppfølging.startTidspunkt
-        kontor = oppfølging.kontor!!.kontorId.verdi
-        sluttTidspunkt = oppfølging.sluttTidspunkt
-    })
-
     fun slett(id: UUID) =
         repository.deleteById(id)
 
@@ -30,6 +22,7 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository) {
             sluttTidspunkt = hendelse.sluttTidspunkt
         })
 
-    fun enhetFor(brukerId: String) =
-        repository.findByBrukerid(brukerId)?.kontor?.let(::Enhetsnummer)
+    fun enhetFor(id: String) =
+        repository.findByBrukerid(id)?.kontor?.let(::Enhetsnummer) ?:
+        repository.findByAktoerId(id)?.kontor?.let(::Enhetsnummer)
 }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 @Service
 class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
 
-    @Cacheable(cacheNames = [OPPFØLGING],key = "#brukerId")
-    fun enhetFor(brukerId: String) =
-        db.enhetFor(brukerId)
+    @Cacheable(cacheNames = [OPPFØLGING],key = "#id")
+    fun enhetFor(id: String) =
+        db.enhetFor(id)
 }

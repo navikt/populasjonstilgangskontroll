@@ -13,7 +13,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info,metrics,prometheus,caches
   httpexchanges:
     recording:
       enabled: true

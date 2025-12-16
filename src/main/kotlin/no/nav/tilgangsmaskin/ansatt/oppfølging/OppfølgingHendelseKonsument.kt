@@ -30,21 +30,24 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingJPAAdapte
 
     private fun oppfølgingRegistrert(hendelse: OppfølgingHendelse) {
         with(hendelse) {
-            log.info("Oppfølging registrert $oppfolgingsperiodeUuid $this")
-            oppfølging.startOppfølging(this.oppfolgingsperiodeUuid,ident, aktorId, startTidspunkt,kontor!!.kontorId)
+            log.info("Oppfølging registrert for $oppfolgingsperiodeUuid  grunnet hendelse $this")
+            oppfølging.startOppfølging(oppfolgingsperiodeUuid,ident, aktorId, startTidspunkt,kontor!!.kontorId)
         }
-
     }
     private fun kontorEndret(hendelse: OppfølgingHendelse) {
-        log.info("Oppfølging kontor endret ${hendelse.oppfolgingsperiodeUuid} $hendelse")
-        oppfølging.oppdaterKontor(hendelse.oppfolgingsperiodeUuid, hendelse.kontor!!.kontorId).also {
-            if (it > 0) log.info("Oppfølging kontor  endret til ${hendelse.kontor.kontorId} for ${hendelse.oppfolgingsperiodeUuid}")
+        with(hendelse) {
+            log.info("Oppfølging kontor endret for $oppfolgingsperiodeUuid grunnet hendelse $this")
+            oppfølging.oppdaterKontor(oppfolgingsperiodeUuid, kontor!!.kontorId).also {
+                if (it > 0) log.info("Oppfølging kontor  endret til ${kontor.kontorId} for $oppfolgingsperiodeUuid")
+            }
         }
     }
     private fun oppfølgingAvsluttet(hendelse: OppfølgingHendelse) {
-        log.info("Oppfølging avsluttet ${hendelse.oppfolgingsperiodeUuid} $hendelse")
-        oppfølging.avsluttOppfølging(hendelse.oppfolgingsperiodeUuid).also {
-            if (it > 0) log.info("Oppfølging avsluttet OK for ${hendelse.oppfolgingsperiodeUuid}")
+        with(hendelse) {
+            log.info("Oppfølging avsluttet for $oppfolgingsperiodeUuid grunnet hendelse $this")
+            oppfølging.avsluttOppfølging(oppfolgingsperiodeUuid).also {
+                if (it > 0) log.info("Oppfølging avsluttet OK for $oppfolgingsperiodeUuid")
+            }
         }
     }
 }

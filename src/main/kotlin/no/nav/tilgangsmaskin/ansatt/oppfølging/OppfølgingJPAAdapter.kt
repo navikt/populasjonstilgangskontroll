@@ -24,5 +24,5 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository) {
 
     fun enhetFor(id: String) =
         repository.findByBrukerid(id)?.kontor?.let(::Enhetsnummer) ?:
-        repository.findByAktoerId(id)?.kontor?.let(::Enhetsnummer)
+        repository.findByAktoerid(id)?.kontor?.let(::Enhetsnummer)
 }

@@ -17,9 +17,9 @@ class OppfølgingTjeneste(private val adapter: OppfølgingRestClientAdapter, pri
         db.slett(id)
 
     fun oppdater(id: UUID, kontor: Kontor) =
-        db.oppdater(kontor.kontorId, id)
+        db.oppdater(id, kontor.kontorId)
 
 
     fun start(hendelse: OppfølgingHendelse) =
-        db.oppdater(kontor.kontorId, id)
+        db.oppdater(hendelse.oppfolgingsperiodeUuid, hendelse.kontor.kontorId)
 }

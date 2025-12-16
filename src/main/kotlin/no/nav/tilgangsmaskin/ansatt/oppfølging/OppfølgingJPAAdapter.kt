@@ -18,7 +18,7 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository) {
     fun slett(id: UUID) =
         repository.deleteById(id)
 
-    fun oppdater(enhetsnummer: Enhetsnummer, id: UUID) =
+    fun oppdater(id: UUID, enhetsnummer: Enhetsnummer) =
         repository.updateKontorById(id,enhetsnummer.verdi)
 
     fun start(hendelse: OppfølgingHendelse) =

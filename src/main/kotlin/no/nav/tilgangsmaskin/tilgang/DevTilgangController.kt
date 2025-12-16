@@ -11,6 +11,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
+import no.nav.tilgangsmaskin.ansatt.nom.NomJPAAdapter
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
@@ -66,7 +67,7 @@ class DevTilgangController(
     private val oppfølging: OppfølgingTjeneste,
     private val pip: PdlRestClientAdapter,
     private val oid: AnsattOidTjeneste,
-    private val nom: NomTjeneste,
+    private val nom: NomJPAAdapter,
     private val pdl: PDLTjeneste,
     private val cacheClient: CacheClient) {
 
@@ -77,7 +78,7 @@ class DevTilgangController(
     fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)
 
     @GetMapping("oppfolging/db")
-    fun oppfolgingEnhetDb(@RequestParam brukerId: BrukerId) = oppfølging.dbEnhetFor(brukerId)
+    fun oppfolgingEnhetDb(@RequestParam brukerId: BrukerId) = oppfølging.enhetFor(brukerId.verdi)
 
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(CachableConfig(SKJERMING),navIds)
@@ -139,7 +140,7 @@ class DevTilgangController(
         description = """Funksjon for å opprette relasjon mellom nav-ident og fnrslik  at oppslag på egne data og familierelasjoner kan testes """)
     @PostMapping("ansatt/{ansattId}/{brukerId}")
     fun nom(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
-        nom.lagre(NomAnsattData(ansattId, brukerId))
+        nom.upsert(NomAnsattData(ansattId, brukerId))
 
     @GetMapping("komplett/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)

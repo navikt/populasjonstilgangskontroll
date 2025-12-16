@@ -22,23 +22,27 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingJPAAdapte
 
     fun listen(hendelse: OppfølgingHendelse) {
         when (hendelse.sisteEndringsType) {
-            OPPFOLGING_STARTET -> start(hendelse)
-            ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> endre(hendelse)
-            OPPFOLGING_AVSLUTTET -> avslutt(hendelse)
+            OPPFOLGING_STARTET -> oppfølgingRegistrert(hendelse)
+            ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> kontorEndret(hendelse)
+            OPPFOLGING_AVSLUTTET -> oppfølgingAvsluttet(hendelse)
         }
     }
 
-    private fun start(hendelse: OppfølgingHendelse) {
-        log.info("Starter oppfølging ${hendelse.oppfolgingsperiodeUuid} $hendelse")
+    private fun oppfølgingRegistrert(hendelse: OppfølgingHendelse) {
+        log.info("Oppfølging registrert ${hendelse.oppfolgingsperiodeUuid} $hendelse")
         oppfølging.start(hendelse)
     }
-    private fun endre(hendelse: OppfølgingHendelse) {
-        log.info("Endrer oppfølging ${hendelse.oppfolgingsperiodeUuid} $hendelse")
-        oppfølging.oppdater(hendelse.oppfolgingsperiodeUuid, hendelse.kontor!!.kontorId.verdi)
+    private fun kontorEndret(hendelse: OppfølgingHendelse) {
+        log.info("Oppfølging kontor endret ${hendelse.oppfolgingsperiodeUuid} $hendelse")
+        oppfølging.oppdater(hendelse.oppfolgingsperiodeUuid, hendelse.kontor!!.kontorId.verdi).also {
+            if (it > 0) log.info("Endret oppfølgingskontor til ${hendelse.kontor.kontorId} for ${hendelse.oppfolgingsperiodeUuid}")
+        }
     }
-    private fun avslutt(hendelse: OppfølgingHendelse) {
-        log.info("Sletter oppfølging ${hendelse.oppfolgingsperiodeUuid} $hendelse")
-        oppfølging.slett(hendelse.oppfolgingsperiodeUuid)
+    private fun oppfølgingAvsluttet(hendelse: OppfølgingHendelse) {
+        log.info("Oppfølging avsluttet ${hendelse.oppfolgingsperiodeUuid} $hendelse")
+        oppfølging.slett(hendelse.oppfolgingsperiodeUuid).also {
+            if (it > 0) log.info("Slettet oppfølging OK for ${hendelse.oppfolgingsperiodeUuid}")
+        }
     }
 }
 

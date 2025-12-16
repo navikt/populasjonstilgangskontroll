@@ -8,8 +8,7 @@ import java.util.UUID
 class OppfølgingJPAAdapter(private val repository: OppfølgingRepository) {
 
     fun slett(id: UUID) =
-        repository.deleteById(id)
-
+        repository.deleteByUUID(id)
     fun oppdater(id: UUID, enhetsnummer: String) =
         repository.updateKontorById(id,enhetsnummer)
 

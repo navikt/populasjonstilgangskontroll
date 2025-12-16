@@ -7,7 +7,7 @@ import java.time.Instant
 import java.util.UUID
 
 data class OppfølgingHendelse(
-    val kontor: Kontor,
+    val kontor: Kontor?,
     val sisteEndringsType: EndringType,
     val oppfolgingsperiodeUuid: UUID,
     val aktorId: `AktørId`,

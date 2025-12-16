@@ -17,8 +17,8 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
         topics = ["poao.siste-oppfolgingsperiode-v2"],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
         groupId = "$OPPFØLGING-hendelse2")
+
     fun listen(hendelse: OppfølgingHendelse) {
-        log.info("Mottok oppfølginghendelse ${hendelse.sisteEndringsType}: $hendelse")
         when (hendelse.sisteEndringsType) {
             OPPFOLGING_STARTET -> start(hendelse)
             ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> endre(hendelse)
@@ -27,15 +27,15 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
     }
 
     private fun start(hendelse: OppfølgingHendelse) {
-        log.info("Starter oppfølging ${hendelse.oppfolgingsperiodeUuid}")
+        log.info("Starter oppfølging ${hendelse.oppfolgingsperiodeUuid} $hendelse")
         oppfølging.start(hendelse)
     }
     private fun endre(hendelse: OppfølgingHendelse) {
-        log.info("Endrer oppfølging ${hendelse.oppfolgingsperiodeUuid}")
-        oppfølging.oppdater(hendelse.oppfolgingsperiodeUuid, hendelse.kontor)
+        log.info("Endrer oppfølging ${hendelse.oppfolgingsperiodeUuid} $hendelse")
+        oppfølging.oppdater(hendelse.oppfolgingsperiodeUuid, hendelse.kontor!!)
     }
     private fun avslutt(hendelse: OppfølgingHendelse) {
-        log.info("Sletter oppfølging ${hendelse.oppfolgingsperiodeUuid}")
+        log.info("Sletter oppfølging ${hendelse.oppfolgingsperiodeUuid} $hendelse")
         oppfølging.slett(hendelse.oppfolgingsperiodeUuid)
     }
 }

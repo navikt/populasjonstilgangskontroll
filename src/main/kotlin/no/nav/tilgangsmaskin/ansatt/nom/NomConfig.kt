@@ -5,7 +5,6 @@ import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 
-
 @ConfigurationProperties(NOM)
 class NomConfig: CachableRestConfig {
     override val navn = NOM

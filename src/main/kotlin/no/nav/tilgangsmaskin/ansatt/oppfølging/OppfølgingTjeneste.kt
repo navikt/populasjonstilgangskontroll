@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
-import no.nav.tilgangsmaskin.ansatt.oppfølging.NomConfig.Companion.OPPFØLGING
+import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.OPPFØLGING
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 

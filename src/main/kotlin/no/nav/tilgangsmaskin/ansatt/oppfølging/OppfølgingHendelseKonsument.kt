@@ -8,7 +8,7 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import kotlin.jvm.javaClass
-import no.nav.tilgangsmaskin.ansatt.oppfølging.NomConfig.Companion.OPPFØLGING
+import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.OPPFØLGING
 
 @Component
 @Transactional

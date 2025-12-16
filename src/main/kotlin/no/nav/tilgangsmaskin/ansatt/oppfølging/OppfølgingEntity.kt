@@ -42,3 +42,4 @@ class OppfølgingEntity(@NaturalId @Id val id: UUID) {
     @LastModifiedDate
     var updated: Instant? = null
 }
+

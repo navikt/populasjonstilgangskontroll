@@ -31,9 +31,6 @@ class OppfølgingEntity(@NaturalId @Id val id: UUID) {
     @Column(length = 4, nullable = false)
     var kontor: String? = null
 
-    @Column
-    var sluttTidspunkt: Instant? = null
-
     @Column(nullable = false, updatable = false)
     @CreatedDate
     var created: Instant? = null

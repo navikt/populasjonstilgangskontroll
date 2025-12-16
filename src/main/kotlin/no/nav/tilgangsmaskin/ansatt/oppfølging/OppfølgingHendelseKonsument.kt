@@ -12,7 +12,7 @@ import kotlin.jvm.javaClass
 
 @Component
 @Transactional
-class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingJPAAdapter) {
+class OppfølgingHendelseKonsument(private val db: OppfølgingJPAAdapter) {
     private val log = getLogger(javaClass)
 
     @KafkaListener(
@@ -30,14 +30,14 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingJPAAdapte
 
     private fun oppfølgingRegistrert(hendelse: OppfølgingHendelse) {
         with(hendelse) {
-            log.info("Oppfølging registrert for $oppfolgingsperiodeUuid  grunnet hendelse $this")
-            oppfølging.startOppfølging(oppfolgingsperiodeUuid,ident, aktorId, startTidspunkt,kontor!!.kontorId)
+            log.info("Oppfølging registrert for $oppfolgingsperiodeUuid grunnet hendelse $this")
+            db.startOppfølging(oppfolgingsperiodeUuid,ident, aktorId, startTidspunkt,kontor!!.kontorId)
         }
     }
     private fun kontorEndret(hendelse: OppfølgingHendelse) {
         with(hendelse) {
             log.info("Oppfølging kontor endret for $oppfolgingsperiodeUuid grunnet hendelse $this")
-            oppfølging.oppdaterKontor(oppfolgingsperiodeUuid, kontor!!.kontorId).also {
+            db.oppdaterKontor(oppfolgingsperiodeUuid, kontor!!.kontorId).also {
                 if (it > 0) log.info("Oppfølging kontor  endret til ${kontor.kontorId} for $oppfolgingsperiodeUuid")
             }
         }
@@ -45,7 +45,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingJPAAdapte
     private fun oppfølgingAvsluttet(hendelse: OppfølgingHendelse) {
         with(hendelse) {
             log.info("Oppfølging avsluttet for $oppfolgingsperiodeUuid grunnet hendelse $this")
-            oppfølging.avsluttOppfølging(oppfolgingsperiodeUuid).also {
+            db.avsluttOppfølging(oppfolgingsperiodeUuid).also {
                 if (it > 0) log.info("Oppfølging avsluttet OK for $oppfolgingsperiodeUuid")
             }
         }

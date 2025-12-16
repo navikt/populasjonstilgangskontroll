@@ -17,7 +17,7 @@ import java.util.UUID
 @Entity
 @Table(name = "oppfolging")
 @EntityListeners(AuditingEntityListener::class)
-open class OppfølgingEntity(@NaturalId @Id val id: UUID) {
+class OppfølgingEntity(@NaturalId @Id val id: UUID) {
 
     @Column(length = BRUKERID_LENGTH, nullable = false)
     var brukerid: String? = null

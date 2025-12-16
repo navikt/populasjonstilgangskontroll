@@ -19,14 +19,22 @@ class OppfølgingHendelseKonsument(private val `oppfølging`: OppfølgingTjenest
         groupId = "$OPPFØLGING-hendelse1")
     fun listen(hendelse: OppfølgingHendelse) {
         log.info("Mottok oppfølginghendelse ${hendelse.sisteEndringsType}: $hendelse")
-        when (val type = hendelse.sisteEndringsType) {
-            OPPFOLGING_AVSLUTTET ->  {
-                log.info("Sletter oppfølging ${hendelse.oppfolgingsperiodeUuid}")
-                `oppfølging`.slett(hendelse.oppfolgingsperiodeUuid)
-            }
-            ARBEIDSOPPFOLGINGSKONTOR_ENDRET,
-            OPPFOLGING_STARTET -> log.info("Ignorerer foreløpig lagring av oppfølginghendelse av type $type")
+        when (hendelse.sisteEndringsType) {
+            OPPFOLGING_STARTET -> start(hendelse)
+            ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> endre(hendelse)
+            OPPFOLGING_AVSLUTTET -> avslutt(hendelse)
         }
+    }
+
+    private fun start(hendelse: OppfølgingHendelse) {
+        log.info("Starter oppfølging ${hendelse.oppfolgingsperiodeUuid}")
+    }
+    private fun endre(hendelse: OppfølgingHendelse) {
+        log.info("Endrer oppfølging ${hendelse.oppfolgingsperiodeUuid}")
+    }
+    private fun avslutt(hendelse: OppfølgingHendelse) {
+        log.info("Sletter oppfølging ${hendelse.oppfolgingsperiodeUuid}")
+        oppfølging.slett(hendelse.oppfolgingsperiodeUuid)
     }
 }
 

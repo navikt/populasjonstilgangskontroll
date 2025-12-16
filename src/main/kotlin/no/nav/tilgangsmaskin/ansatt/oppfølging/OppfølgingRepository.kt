@@ -10,6 +10,7 @@ import org.hibernate.annotations.NaturalId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.stereotype.Component
 import java.time.Instant
 import java.util.UUID
 
@@ -40,4 +41,19 @@ class OppfølgingEntity( @NaturalId @Id val id: UUID) {
     @Column(nullable = false)
     @LastModifiedDate
     var updated: Instant? = null
+}
+
+@Component
+class OppfølgingJPAAdapter(private val repository: OppfølgingRepository) {
+
+    fun lagre(oppfølging: OppfølgingHendelse) = repository.save(OppfølgingEntity(oppfølging.oppfolgingsperiodeUuid).apply {
+        brukerid = oppfølging.ident.verdi
+        aktoerid = oppfølging.aktorId.verdi
+        startTidspunkt = oppfølging.startTidspunkt
+        kontor = oppfølging.kontor.kontorId.verdi
+        sluttTidspunkt = oppfølging.sluttTidspunkt
+    })
+
+    fun slett(id: UUID) =
+        repository.deleteById(id)
 }

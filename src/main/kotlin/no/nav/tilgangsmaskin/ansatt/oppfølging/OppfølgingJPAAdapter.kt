@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.ansatt.`oppfølging`
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import org.springframework.stereotype.Component
 import java.util.UUID
-import kotlin.math.E
 
 @Component
 class OppfølgingJPAAdapter(private val repository: OppfølgingRepository) {
@@ -19,8 +18,8 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository) {
     fun slett(id: UUID) =
         repository.deleteById(id)
 
-    fun oppdater(id: UUID, enhetsnummer: Enhetsnummer) =
-        repository.updateKontorById(id,enhetsnummer.verdi)
+    fun oppdater(id: UUID, enhetsnummer: String) =
+        repository.updateKontorById(id,enhetsnummer)
 
     fun start(hendelse: OppfølgingHendelse) =
         repository.save(OppfølgingEntity(hendelse.oppfolgingsperiodeUuid).apply {
@@ -31,6 +30,6 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository) {
             sluttTidspunkt = hendelse.sluttTidspunkt
         })
 
-    fun finnEnhetFor(brukerId: String) =
+    fun enhetFor(brukerId: String) =
         repository.findByBrukerid(brukerId)?.kontor?.let(::Enhetsnummer)
 }

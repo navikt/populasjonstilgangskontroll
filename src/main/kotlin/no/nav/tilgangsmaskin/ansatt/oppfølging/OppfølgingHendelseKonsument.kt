@@ -12,7 +12,7 @@ import kotlin.jvm.javaClass
 
 @Component
 @Transactional
-class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste) {
+class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingJPAAdapter) {
     private val log = getLogger(javaClass)
 
     @KafkaListener(
@@ -34,7 +34,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
     }
     private fun endre(hendelse: OppfølgingHendelse) {
         log.info("Endrer oppfølging ${hendelse.oppfolgingsperiodeUuid} $hendelse")
-        oppfølging.oppdater(hendelse.oppfolgingsperiodeUuid, hendelse.kontor!!)
+        oppfølging.oppdater(hendelse.oppfolgingsperiodeUuid, hendelse.kontor!!.kontorId.verdi)
     }
     private fun avslutt(hendelse: OppfølgingHendelse) {
         log.info("Sletter oppfølging ${hendelse.oppfolgingsperiodeUuid} $hendelse")

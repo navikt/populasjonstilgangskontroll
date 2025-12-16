@@ -10,7 +10,7 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-@Transactional
+@Transactional(readOnly = true)
 @Timed
 @RetryingWhenRecoverable
 @Service
@@ -18,9 +18,6 @@ class NomTjeneste(private val adapter: NomJPAAdapter) {
 
     private val log = getLogger(javaClass)
 
-    fun lagre(ansattData: NomAnsattData) = adapter.upsert(ansattData)
-
-    @Transactional(readOnly = true)
     @Cacheable(cacheNames = [NOM],  key = "#ansattId.verdi")
     @WithSpan
     fun fnrForAnsatt(ansattId: AnsattId) = adapter.fnrForAnsatt(ansattId.verdi)

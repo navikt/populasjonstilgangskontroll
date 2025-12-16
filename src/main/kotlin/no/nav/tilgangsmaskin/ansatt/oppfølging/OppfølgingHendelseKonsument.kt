@@ -10,13 +10,13 @@ import org.springframework.stereotype.Component
 import kotlin.jvm.javaClass
 
 @Component
-class OppfølgingHendelseKonsument(private val `oppfølging`: OppfølgingTjeneste) {
+class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste) {
     private val log = getLogger(javaClass)
 
     @KafkaListener(
         topics = ["poao.siste-oppfolgingsperiode-v2"],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
-        groupId = "$OPPFØLGING-hendelse1")
+        groupId = "$OPPFØLGING-hendelse2")
     fun listen(hendelse: OppfølgingHendelse) {
         log.info("Mottok oppfølginghendelse ${hendelse.sisteEndringsType}: $hendelse")
         when (hendelse.sisteEndringsType) {
@@ -28,9 +28,11 @@ class OppfølgingHendelseKonsument(private val `oppfølging`: OppfølgingTjenest
 
     private fun start(hendelse: OppfølgingHendelse) {
         log.info("Starter oppfølging ${hendelse.oppfolgingsperiodeUuid}")
+        oppfølging.start(hendelse)
     }
     private fun endre(hendelse: OppfølgingHendelse) {
         log.info("Endrer oppfølging ${hendelse.oppfolgingsperiodeUuid}")
+        oppfølging.oppdater(hendelse.oppfolgingsperiodeUuid, hendelse.kontor)
     }
     private fun avslutt(hendelse: OppfølgingHendelse) {
         log.info("Sletter oppfølging ${hendelse.oppfolgingsperiodeUuid}")

@@ -7,16 +7,18 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import kotlin.jvm.javaClass
 
 @Component
+@Transactional
 class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste) {
     private val log = getLogger(javaClass)
 
     @KafkaListener(
         topics = ["poao.siste-oppfolgingsperiode-v2"],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
-        groupId = "$OPPFØLGING-hendelse3")
+        groupId = "$OPPFØLGING-hendelse4")
 
     fun listen(hendelse: OppfølgingHendelse) {
         when (hendelse.sisteEndringsType) {

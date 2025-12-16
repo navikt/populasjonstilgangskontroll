@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.regler.overstyring
 
+import jakarta.persistence.CheckConstraint
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners

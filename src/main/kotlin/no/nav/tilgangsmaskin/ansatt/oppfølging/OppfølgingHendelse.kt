@@ -10,7 +10,7 @@ data class OppfølgingHendelse(
     val kontor: Kontor?,
     val sisteEndringsType: EndringType,
     val oppfolgingsperiodeUuid: UUID,
-    val aktorId: `AktørId`,
+    val aktorId: AktørId,
     val ident: BrukerId,
     val startTidspunkt: Instant,
     val sluttTidspunkt: Instant?, // Nullable, always null on start messages

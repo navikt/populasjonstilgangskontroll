@@ -29,12 +29,15 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingJPAAdapte
     }
 
     private fun oppfølgingRegistrert(hendelse: OppfølgingHendelse) {
-        log.info("Oppfølging registrert ${hendelse.oppfolgingsperiodeUuid} $hendelse")
-        oppfølging.startOppfølging(hendelse)
+        with(hendelse) {
+            log.info("Oppfølging registrert $oppfolgingsperiodeUuid $this")
+            oppfølging.startOppfølging(this.oppfolgingsperiodeUuid,ident, aktorId, startTidspunkt,kontor!!.kontorId)
+        }
+
     }
     private fun kontorEndret(hendelse: OppfølgingHendelse) {
         log.info("Oppfølging kontor endret ${hendelse.oppfolgingsperiodeUuid} $hendelse")
-        oppfølging.oppdaterKontor(hendelse.oppfolgingsperiodeUuid, hendelse.kontor!!.kontorId.verdi).also {
+        oppfølging.oppdaterKontor(hendelse.oppfolgingsperiodeUuid, hendelse.kontor!!.kontorId).also {
             if (it > 0) log.info("Oppfølging kontor  endret til ${hendelse.kontor.kontorId} for ${hendelse.oppfolgingsperiodeUuid}")
         }
     }

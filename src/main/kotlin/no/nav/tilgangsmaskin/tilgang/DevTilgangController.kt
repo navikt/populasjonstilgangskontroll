@@ -78,7 +78,7 @@ class DevTilgangController(
     fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)
 
     @GetMapping("oppfolging/db")
-    fun oppfolgingEnhetDb(@RequestParam brukerId: BrukerId) = oppfølging.enhetFor(brukerId.verdi)
+    fun oppfolgingEnhetDb(@RequestParam id: String) = oppfølging.enhetFor(id)
 
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(CachableConfig(SKJERMING),navIds)

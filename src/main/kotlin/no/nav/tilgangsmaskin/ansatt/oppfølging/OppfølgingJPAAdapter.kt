@@ -7,12 +7,12 @@ import java.util.UUID
 @Component
 class OppfølgingJPAAdapter(private val repository: OppfølgingRepository) {
 
-    fun slett(id: UUID) =
+    fun `avsluttOppfølging`(id: UUID) =
         repository.deleteByUUID(id)
-    fun oppdater(id: UUID, enhetsnummer: String) =
+    fun oppdaterKontor(id: UUID, enhetsnummer: String) =
         repository.updateKontorById(id,enhetsnummer)
 
-    fun start(hendelse: OppfølgingHendelse) =
+    fun `startOppfølging`(hendelse: OppfølgingHendelse) =
         repository.save(OppfølgingEntity(hendelse.oppfolgingsperiodeUuid).apply {
             brukerid = hendelse.ident.verdi
             aktoerid = hendelse.aktorId.verdi

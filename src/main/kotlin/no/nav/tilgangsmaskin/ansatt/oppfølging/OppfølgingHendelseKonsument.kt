@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
@@ -12,7 +13,7 @@ class `OppfølgingHendelseKonsument` {
     @KafkaListener(
         topics = ["poao.siste-oppfolgingsperiode-v2"],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
-        groupId = $$"${spring.application.name}-opp")
+        groupId = OPPFØLGING)
     fun listen(hendelse: OppfølgingHendelse) {
         log.info("Mottok oppfølginghendelse: $hendelse")
     }

@@ -21,7 +21,7 @@ class NomTjeneste(private val adapter: NomJPAAdapter) {
     @Cacheable(cacheNames = [NOM],  key = "#ansattId.verdi")
     @WithSpan
     fun fnrForAnsatt(ansattId: AnsattId) = adapter.fnrForAnsatt(ansattId.verdi)
-    
+
     @Transactional
     fun ryddOpp() = adapter.ryddOpp().also {
         if (it > 0) log.info("Vaktmester ryddet opp $it rad(er) med utgått informasjon om ansatte som ikke lenger jobber i Nav")

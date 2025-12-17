@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 import java.time.Instant
 import java.util.UUID
@@ -11,33 +12,32 @@ import java.util.UUID
 @Component
 class OppfølgingJPAAdapter(private val repository: OppfølgingRepository,val entityManager: EntityManager) {
 
-    fun avsluttOppfølging(id: UUID) =
-        repository.deleteByUUID(id)
+    private val log = getLogger(javaClass)
 
-    fun oppdaterKontor(id: UUID,brukerId: BrukerId, aktørId: AktørId, start: Instant, enhetsnummer: Enhetsnummer) =
-        upsert(id,brukerId, aktørId, start, enhetsnummer)
-    /*
-    fun oppdaterKontor(id: UUID, enhetsnummer: Enhetsnummer) =
-        repository.updateKontorById(id,enhetsnummer.verdi)
-*/
-    fun startOppfølging(id: UUID,brukerId: BrukerId, aktørId: AktørId, start: Instant, enhetsnummer: Enhetsnummer) =
-        upsert(id,brukerId, aktørId, start, enhetsnummer)
-        /*repository.save(OppfølgingEntity(id).apply {
-            brukerid = brukerId.verdi
-            aktoerid = aktørId.verdi
-            startTidspunkt = start
-            kontor = enhetsnummer.verdi
-        })*/
+    fun avsluttOppfølging(id: UUID)  =
+         repository.deleteByUUID(id).also {
+            log.info("Oppfølging avsluttet for $id")
+        }
 
-    private fun upsert(id: UUID,brukerId: BrukerId, aktørId: AktørId, start: Instant, enhetsnummer: Enhetsnummer) =
+    fun oppdaterKontor(id: UUID, brukerId: BrukerId, aktørId: AktørId, start: Instant, kontor: Enhetsnummer) =
+         upsert(id,brukerId, aktørId, start, kontor).also {
+            log.info("Oppfølging kontor endret til ${kontor.verdi} for $id")
+        }
+
+    fun startOppfølging(id: UUID, brukerId: BrukerId, aktørId: AktørId, start: Instant, kontor: Enhetsnummer) =
+         upsert(id,brukerId, aktørId, start, kontor).also {
+            log.info("Oppfølging registrert for $id")
+        }
+
+
+    private fun upsert(id: UUID,brukerId: BrukerId, aktørId: AktørId, start: Instant, kontor: Enhetsnummer) =
         entityManager.createNativeQuery(UPSERT_QUERY)
             .setParameter("id", id)
             .setParameter("brukerid", brukerId.verdi)
             .setParameter("aktoerid", aktørId.verdi)
             .setParameter("startdato", start)
-            .setParameter("kontor", enhetsnummer.verdi)
+            .setParameter("kontor", kontor.verdi)
             .executeUpdate()
-
 
     fun enhetFor(id: String) =
         repository.findByBrukerid(id)?.kontor?.let(::Enhetsnummer) ?:

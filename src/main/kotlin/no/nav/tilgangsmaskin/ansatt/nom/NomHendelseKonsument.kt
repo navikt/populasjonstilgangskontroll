@@ -1,15 +1,17 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM_CACHE
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 import java.time.LocalDate.EPOCH
 
 @Component
-class NomHendelseKonsument(private val nom: NomJPAAdapter, private val logger: NomHendelseLogger) {
+class NomHendelseKonsument(private val nom: NomJPAAdapter, private val cache: CacheClient,private val logger: NomHendelseLogger) {
 
     @KafkaListener(
         topics = ["org.nom.api-ressurs-state-v4"],
@@ -29,6 +31,7 @@ class NomHendelseKonsument(private val nom: NomJPAAdapter, private val logger: N
                     )
                 )
             }.onSuccess {
+                cache.delete(NOM_CACHE, id = hendelse.navident)
                 logger.ok(hendelse.navident, hendelse.personident)
             }.onFailure {
                 logger.feilet(hendelse.navident, hendelse.personident, it)

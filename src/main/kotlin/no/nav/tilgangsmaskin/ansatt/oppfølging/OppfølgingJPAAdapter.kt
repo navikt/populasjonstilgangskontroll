@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Caching
 import org.springframework.stereotype.Component
 import java.time.Instant
 import java.util.UUID
@@ -35,7 +36,13 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository,val en
         repository.findByBrukerid(id)?.kontor?.let(::Enhetsnummer) ?:
         repository.findByAktoerid(id)?.kontor?.let(::Enhetsnummer)
 
-    private fun upsert(id: UUID, brukerId: BrukerId, aktørId: AktørId, start: Instant, kontor: Enhetsnummer) =
+    @Caching(
+        evict = [
+            CacheEvict(cacheNames = [OPPFØLGING], key = "#brukerId.verdi"),
+            CacheEvict(cacheNames = [OPPFØLGING], key = "#aktørId.verdi")
+        ]
+    )
+     fun upsert(id: UUID, brukerId: BrukerId, aktørId: AktørId, start: Instant, kontor: Enhetsnummer) =
         entityManager.createNativeQuery(UPSERT_QUERY)
             .setParameter("id", id)
             .setParameter("brukerid", brukerId.verdi)

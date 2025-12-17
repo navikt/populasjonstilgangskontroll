@@ -18,7 +18,7 @@ class OppfølgingHendelseKonsument(private val db: OppfølgingJPAAdapter) {
     @KafkaListener(
         topics = ["poao.siste-oppfolgingsperiode-v2"],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
-        groupId = OPPFØLGING)
+        groupId = OPPFØLGING + "xxx")
 
     fun listen(hendelse: OppfølgingHendelse) {
         when (hendelse.sisteEndringsType) {
@@ -37,8 +37,8 @@ class OppfølgingHendelseKonsument(private val db: OppfølgingJPAAdapter) {
     private fun kontorEndret(hendelse: OppfølgingHendelse) {
         with(hendelse) {
             log.info("Oppfølging kontor endret for $oppfolgingsperiodeUuid grunnet hendelse $this")
-            db.oppdaterKontor(oppfolgingsperiodeUuid, kontor!!.kontorId).also {
-                if (it > 0) log.info("Oppfølging kontor  endret til ${kontor.kontorId} for $oppfolgingsperiodeUuid")
+            db.oppdaterKontor(oppfolgingsperiodeUuid,ident, aktorId, startTidspunkt,kontor!!.kontorId).also {
+                if (it > 0) log.info("Oppfølging kontor endret til ${kontor.kontorId} for $oppfolgingsperiodeUuid")
             }
         }
     }

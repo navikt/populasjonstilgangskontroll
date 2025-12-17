@@ -35,7 +35,7 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository,val en
         repository.findByBrukerid(id)?.kontor?.let(::Enhetsnummer) ?:
         repository.findByAktoerid(id)?.kontor?.let(::Enhetsnummer)
 
-    public fun upsert(id: UUID, brukerId: BrukerId, aktørId: AktørId, start: Instant, kontor: Enhetsnummer) =
+    private fun upsert(id: UUID, brukerId: BrukerId, aktørId: AktørId, start: Instant, kontor: Enhetsnummer) =
         entityManager.createNativeQuery(UPSERT_QUERY)
             .setParameter("id", id)
             .setParameter("brukerid", brukerId.verdi)

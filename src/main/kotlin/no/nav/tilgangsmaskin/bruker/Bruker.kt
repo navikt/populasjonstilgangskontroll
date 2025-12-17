@@ -13,7 +13,8 @@ data class Bruker(
         val geografiskTilknytning: GeografiskTilknytning,
         val påkrevdeGrupper: Set<GlobalGruppe> = emptySet(),
         val familie: Familie = INGEN,
-        val dødsdato: LocalDate? = null) {
+        val dødsdato: LocalDate? = null,
+        val oppfølgingsKontor: Enhetsnummer? = null) {
 
     @JsonIgnore
     val brukerId = brukerIds.aktivBrukerId
@@ -42,7 +43,7 @@ data class Bruker(
     val harUtenlandskBosted = geografiskTilknytning is UtenlandskTilknytning
     infix fun kreverMedlemskapI(gruppe: GlobalGruppe) = gruppe in påkrevdeGrupper
 
-    override fun toString()  = "${javaClass.simpleName}(brukerIds=$brukerIds, geografiskTilknytning=$geografiskTilknytning, påkrevdeGrupper=$påkrevdeGrupper, dødsdato=$dødsdato, foreldreOgBarn=$foreldreOgBarn, barn=$barn, søsken=$søsken, partnere=$partnere, harUkjentBosted=$harUkjentBosted, harUtenlandskBosted=$harUtenlandskBosted)"
+    override fun toString()  = "${javaClass.simpleName}(brukerIds=$brukerIds, geografiskTilknytning=$geografiskTilknytning, påkrevdeGrupper=$påkrevdeGrupper, dødsdato=$dødsdato, foreldreOgBarn=$foreldreOgBarn, barn=$barn, søsken=$søsken, partnere=$partnere, harUkjentBosted=$harUkjentBosted, harUtenlandskBosted=$harUtenlandskBosted), oppfølgingsKontor=$oppfølgingsKontor"
 
 
     data class BrukerIds(val aktivBrukerId: BrukerId,

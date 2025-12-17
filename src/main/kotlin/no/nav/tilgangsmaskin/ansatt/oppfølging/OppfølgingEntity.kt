@@ -5,6 +5,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 import no.nav.tilgangsmaskin.bruker.AktørId.Companion.AKTØRID_LENGTH
 import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
 import org.hibernate.annotations.NaturalId
@@ -15,7 +16,10 @@ import java.time.Instant
 import java.util.UUID
 
 @Entity
-@Table(name = "oppfolging")
+@Table(name = "oppfolging",  uniqueConstraints = [
+    UniqueConstraint(name = "uc_oppfølgingentity_aktoerid", columnNames = ["aktoerid"]),
+    UniqueConstraint(name = "uc_oppfølgingentity_brukerid", columnNames = ["brukerid"])
+])
 @EntityListeners(AuditingEntityListener::class)
 class OppfølgingEntity(@NaturalId @Id val id: UUID) {
 

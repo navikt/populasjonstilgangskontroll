@@ -29,6 +29,9 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository,val en
             log.info("Oppfølging registrert for $id")
         }
 
+    fun enhetFor(id: String) =
+        repository.findByBrukerid(id)?.kontor?.let(::Enhetsnummer) ?:
+        repository.findByAktoerid(id)?.kontor?.let(::Enhetsnummer)
 
     private fun upsert(id: UUID,brukerId: BrukerId, aktørId: AktørId, start: Instant, kontor: Enhetsnummer) =
         entityManager.createNativeQuery(UPSERT_QUERY)
@@ -38,10 +41,6 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository,val en
             .setParameter("startdato", start)
             .setParameter("kontor", kontor.verdi)
             .executeUpdate()
-
-    fun enhetFor(id: String) =
-        repository.findByBrukerid(id)?.kontor?.let(::Enhetsnummer) ?:
-        repository.findByAktoerid(id)?.kontor?.let(::Enhetsnummer)
 
     companion object {
         private const val UPSERT_QUERY = """

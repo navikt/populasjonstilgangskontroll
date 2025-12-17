@@ -1,10 +1,12 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
 import jakarta.persistence.EntityManager
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.stereotype.Component
 import java.time.Instant
 import java.util.UUID
@@ -33,7 +35,7 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository,val en
         repository.findByBrukerid(id)?.kontor?.let(::Enhetsnummer) ?:
         repository.findByAktoerid(id)?.kontor?.let(::Enhetsnummer)
 
-    private fun upsert(id: UUID,brukerId: BrukerId, aktørId: AktørId, start: Instant, kontor: Enhetsnummer) =
+    public fun upsert(id: UUID, brukerId: BrukerId, aktørId: AktørId, start: Instant, kontor: Enhetsnummer) =
         entityManager.createNativeQuery(UPSERT_QUERY)
             .setParameter("id", id)
             .setParameter("brukerid", brukerId.verdi)

@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component
 import java.util.Locale.getDefault
 
 @Component
-class PdlCacheTømmer(private val teller: PdlCacheTømmerTeller, private val client: CacheClient) {
+class PdlCacheTømmer(private val teller: PdlCacheTømmerTeller, private val client: CacheClient, private val pdl: PDLTjeneste) {
     private val log = getLogger(javaClass)
 
     @KafkaListener(
@@ -28,10 +28,6 @@ class PdlCacheTømmer(private val teller: PdlCacheTømmerTeller, private val cli
         filter = "graderingFilterStrategy")
     fun listen(hendelse: Personhendelse) {
         log.info("Mottok hendelse av tyoe ${hendelse.adressebeskyttelse?.gradering} fra PDL, tømmer cacher" )
-        /*
-        hendelse.personidenter.forEach { id ->
-            evict(id, hendelse.adressebeskyttelse?.gradering ?: UGRADERT)
-        }*/
         PDL_CACHES.forEach { cache ->
             hendelse.personidenter.forEach { id ->
                 if (client.delete(cache, id = id) > 0) {
@@ -44,19 +40,15 @@ class PdlCacheTømmer(private val teller: PdlCacheTømmerTeller, private val cli
                     log.trace( CONFIDENTIAL,"Fant ikke ident {} i ${cache.name} for sletting ved hendelse av type: {}", id.maskFnr(), Personhendelse::class.simpleName)
                 }
             }
+            refresh(hendelse.personidenter)
         }
     }
-    /*
-    @Caching(
-        evict = [
-            CacheEvict(cacheNames = [PDL], key = "'medFamile:' + #id"),
-            CacheEvict(cacheNames = [PDL], key = "'medUtvidetFamile:' + #id")
-        ]
-    )
-    fun evict(id: String, gradering: Gradering) {
-        log.info("Tømmer PDL caches for id: {}", id.maskFnr())
-        teller.tell(Tags.of("cache", PDL, "gradering",
-            gradering.name.lowercase(getDefault())))
-    }*/
+    private fun refresh(identer: List<String>) {
+        identer.forEach { id ->
+            pdl.medFamilie(id)
+            pdl.medUtvidetFamile(id)
+            log.info("Oppdaterte PDL cache for identer etter hendelse fra PDL")
+        }
+    }
 }
 

@@ -57,6 +57,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
+import java.time.Instant
 import java.util.UUID
 
 
@@ -86,6 +87,7 @@ class DevTilgangController(
     private val hendelse = Personhendelse.newBuilder()
         .setHendelseId(UUID.randomUUID().toString())
         .setMaster("FREG")
+        .setOpprettet(Instant.now())
         .setTidligereHendelseId(UUID.randomUUID().toString())
         .setNavn(Navn.newBuilder().setFornavn("Ola").setMellomnavn("Mellom").setEtternavn("Nordmann").build()
         )

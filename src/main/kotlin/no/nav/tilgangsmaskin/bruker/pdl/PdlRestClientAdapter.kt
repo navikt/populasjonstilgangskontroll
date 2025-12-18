@@ -92,8 +92,7 @@ class PdlRestClientAdapter(
             .toSet()
 
     companion object {
-        const val MED_FAMILIE = "medFamilie"
-         const val MED_UTVIDET_FAMILIE = "medUtvidetFamilie"
+
 
     }
 }

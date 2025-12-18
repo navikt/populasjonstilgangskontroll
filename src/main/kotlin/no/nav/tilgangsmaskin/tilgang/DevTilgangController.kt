@@ -88,6 +88,7 @@ class DevTilgangController(
         .setHendelseId(UUID.randomUUID().toString())
         .setMaster("FREG")
         .setOpprettet(Instant.now())
+        .setOpplysningstype("TEST")
         .setTidligereHendelseId(UUID.randomUUID().toString())
         .setNavn(Navn.newBuilder().setFornavn("Ola").setMellomnavn("Mellom").setEtternavn("Nordmann").build()
         )

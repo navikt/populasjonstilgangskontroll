@@ -85,6 +85,7 @@ class DevTilgangController(
 
     private val hendelse = Personhendelse.newBuilder()
         .setHendelseId(UUID.randomUUID().toString())
+        .setMaster("FREG")
         .setTidligereHendelseId(UUID.randomUUID().toString())
         .setNavn(Navn.newBuilder().setFornavn("Ola").setMellomnavn("Mellom").setEtternavn("Nordmann").build()
         )

@@ -90,7 +90,7 @@ class DevTilgangController(
         )
         .setAdressebeskyttelse(Adressebeskyttelse.newBuilder().setGradering(STRENGT_FORTROLIG).build())
         .setEndringstype(OPPRETTET)
-        .build()
+
     @PostMapping("oppfolging/bulk")
     fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)
 
@@ -98,7 +98,7 @@ class DevTilgangController(
     fun oppfolgingEnhetDb(@RequestParam id: String) = oppfølging.enhetFor(id)
 
     @PostMapping("person/{id}")
-    fun oppfolgingHendelse(@PathVariable id: String) =
+    fun pdlHendelse(@PathVariable id: String) =
         pdlListener.listen(Personhendelse.newBuilder(hendelse)
             .setPersonidenter(listOf(id)).build())
 

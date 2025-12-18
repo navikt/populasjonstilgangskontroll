@@ -1,7 +1,10 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 
+import io.micrometer.core.instrument.Tags
 import no.nav.person.pdl.leesah.Personhendelse
+import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering
+import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.UGRADERT
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.`PdlCacheTømmerTeller`
@@ -10,6 +13,7 @@ import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Caching
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
+import java.util.Locale.getDefault
 
 @Component
 class PdlCacheTømmer(private val teller: PdlCacheTømmerTeller) {
@@ -21,7 +25,9 @@ class PdlCacheTømmer(private val teller: PdlCacheTømmerTeller) {
         filter = "graderingFilterStrategy")
     fun listen(hendelse: Personhendelse) {
         log.info("Mottok hendelse av tyoe ${hendelse.adressebeskyttelse?.gradering} fra PDL, tømmer cacher" )
-        hendelse.personidenter.forEach(::evict)
+        hendelse.personidenter.forEach { id ->
+            evict(id, hendelse.adressebeskyttelse?.gradering ?: UGRADERT)
+        }
         /*
         PDL_CACHES.forEach { cache ->
             hendelse.personidenter.forEach { id ->
@@ -49,8 +55,10 @@ class PdlCacheTømmer(private val teller: PdlCacheTømmerTeller) {
             )
         ]
     )
-    public fun evict(id: String) {
+    fun evict(id: String, gradering: Gradering) {
         log.info("Tømmer PDL caches for id: {}", id.maskFnr())
+        teller.tell(Tags.of("cache", PDL, "gradering",
+            gradering.name.lowercase(getDefault()),"type"))
     }
 }
 

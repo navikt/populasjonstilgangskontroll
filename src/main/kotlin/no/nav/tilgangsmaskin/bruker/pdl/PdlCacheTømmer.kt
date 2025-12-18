@@ -58,7 +58,7 @@ class PdlCacheTømmer(private val teller: PdlCacheTømmerTeller) {
     fun evict(id: String, gradering: Gradering) {
         log.info("Tømmer PDL caches for id: {}", id.maskFnr())
         teller.tell(Tags.of("cache", PDL, "gradering",
-            gradering.name.lowercase(getDefault()),"type"))
+            gradering.name.lowercase(getDefault())))
     }
 }
 

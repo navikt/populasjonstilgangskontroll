@@ -45,14 +45,8 @@ class PdlCacheTømmer(private val teller: PdlCacheTømmerTeller) {
     }
     @Caching(
         evict = [
-            CacheEvict(
-                cacheNames = [PDL],
-                key = "T(no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion).MED_UTVIDET_FAMILIE + ':' + #id"
-            ),
-            CacheEvict(
-                cacheNames = [PDL],
-                key = "T(no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion).MED_FAMILIE + ':' + #id"
-            )
+            CacheEvict(cacheNames = [PDL], key = "'medFamile:' + #id"),
+            CacheEvict(cacheNames = [PDL], key = "'medUtvidetFamile:' + #id")
         ]
     )
     fun evict(id: String, gradering: Gradering) {

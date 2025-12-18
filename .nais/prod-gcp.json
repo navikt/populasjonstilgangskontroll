@@ -157,6 +157,11 @@
       "name": "kabal-api",
       "namespace": "klage",
       "cluster": "prod-gcp"
+    },
+    {
+      "name": "infotrygd-hentsaksliste-backend",
+      "namespace": "infotrygd",
+      "cluster": "prod-gcp"
     }
 
   ],

@@ -275,6 +275,11 @@
       "name": "kabal-api-e2e",
       "namespace": "klage",
       "cluster": "dev-gcp"
+    },
+    {
+      "name": "infotrygd-hentsaksliste-backend",
+      "namespace": "infotrygd",
+      "cluster": "dev-gcp"
     }
   ],
   "nais": {

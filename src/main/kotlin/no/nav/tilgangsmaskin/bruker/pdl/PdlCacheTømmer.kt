@@ -2,10 +2,13 @@ package no.nav.tilgangsmaskin.bruker.pdl
 
 
 import io.micrometer.core.instrument.Tags
+import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.UGRADERT
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
+import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.`PdlCacheTømmerTeller`
 import org.slf4j.LoggerFactory.getLogger
@@ -16,7 +19,7 @@ import org.springframework.stereotype.Component
 import java.util.Locale.getDefault
 
 @Component
-class PdlCacheTømmer(private val teller: PdlCacheTømmerTeller) {
+class PdlCacheTømmer(private val teller: PdlCacheTømmerTeller, private val client: CacheClient) {
     private val log = getLogger(javaClass)
 
     @KafkaListener(
@@ -25,10 +28,10 @@ class PdlCacheTømmer(private val teller: PdlCacheTømmerTeller) {
         filter = "graderingFilterStrategy")
     fun listen(hendelse: Personhendelse) {
         log.info("Mottok hendelse av tyoe ${hendelse.adressebeskyttelse?.gradering} fra PDL, tømmer cacher" )
+        /*
         hendelse.personidenter.forEach { id ->
             evict(id, hendelse.adressebeskyttelse?.gradering ?: UGRADERT)
-        }
-        /*
+        }*/
         PDL_CACHES.forEach { cache ->
             hendelse.personidenter.forEach { id ->
                 if (client.delete(cache, id = id) > 0) {
@@ -41,8 +44,9 @@ class PdlCacheTømmer(private val teller: PdlCacheTømmerTeller) {
                     log.trace( CONFIDENTIAL,"Fant ikke ident {} i ${cache.name} for sletting ved hendelse av type: {}", id.maskFnr(), Personhendelse::class.simpleName)
                 }
             }
-        }*/
+        }
     }
+    /*
     @Caching(
         evict = [
             CacheEvict(cacheNames = [PDL], key = "'medFamile:' + #id"),
@@ -53,6 +57,6 @@ class PdlCacheTømmer(private val teller: PdlCacheTømmerTeller) {
         log.info("Tømmer PDL caches for id: {}", id.maskFnr())
         teller.tell(Tags.of("cache", PDL, "gradering",
             gradering.name.lowercase(getDefault())))
-    }
+    }*/
 }
 

@@ -4,7 +4,14 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import jakarta.websocket.server.PathParam
 import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.person.pdl.leesah.Endringstype
+import no.nav.person.pdl.leesah.Endringstype.OPPRETTET
+import no.nav.person.pdl.leesah.Personhendelse
+import no.nav.person.pdl.leesah.adressebeskyttelse.Adressebeskyttelse
+import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.STRENGT_FORTROLIG
+import no.nav.person.pdl.leesah.navn.Navn
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
@@ -12,7 +19,6 @@ import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomJPAAdapter
-import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
@@ -21,6 +27,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
+import no.nav.tilgangsmaskin.bruker.pdl.PdlCacheTømmer
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
@@ -50,6 +57,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
+import java.util.UUID
 
 
 @UnprotectedRestController(value = ["/${DEV}"])
@@ -68,17 +76,32 @@ class DevTilgangController(
     private val pip: PdlRestClientAdapter,
     private val oid: AnsattOidTjeneste,
     private val nom: NomJPAAdapter,
+    private val pdlListener: PdlCacheTømmer,
     private val pdl: PDLTjeneste,
     private val cacheClient: CacheClient) {
 
     private val log = getLogger(javaClass)
 
 
+    private val hendelse = Personhendelse.newBuilder()
+        .setHendelseId(UUID.randomUUID().toString())
+        .setTidligereHendelseId(UUID.randomUUID().toString())
+        .setNavn(Navn.newBuilder().setFornavn("Ola").setMellomnavn("Mellom").setEtternavn("Nordmann").build()
+        )
+        .setAdressebeskyttelse(Adressebeskyttelse.newBuilder().setGradering(STRENGT_FORTROLIG).build())
+        .setEndringstype(OPPRETTET)
+        .build()
     @PostMapping("oppfolging/bulk")
     fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)
 
     @GetMapping("oppfolging/db")
     fun oppfolgingEnhetDb(@RequestParam id: String) = oppfølging.enhetFor(id)
+
+    @PostMapping("person/{id}")
+    fun oppfolgingHendelse(@PathVariable id: String) =
+        pdlListener.listen(Personhendelse.newBuilder(hendelse)
+            .setPersonidenter(listOf(id)).build())
+
 
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(CachableConfig(SKJERMING),navIds)

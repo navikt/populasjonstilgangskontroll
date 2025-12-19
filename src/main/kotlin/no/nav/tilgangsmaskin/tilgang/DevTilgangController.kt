@@ -4,9 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import jakarta.websocket.server.PathParam
 import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.person.pdl.leesah.Endringstype
 import no.nav.person.pdl.leesah.Endringstype.OPPRETTET
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Adressebeskyttelse
@@ -108,7 +106,8 @@ class DevTilgangController(
 
 
     @PostMapping("cache/skjerminger")
-    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(CachableConfig(SKJERMING),navIds)
+    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(navIds,
+        CachableConfig(SKJERMING))
 
 
    @PostMapping("cache/{cache}/{id}/slett")
@@ -116,7 +115,7 @@ class DevTilgangController(
                    cache: Caches, @PathVariable id: String) : ResponseEntity<Unit> {
 
        Caches.forNavn(cache.name).let { c ->
-           val antall = cacheClient.delete(*c, id = id).also { antall ->
+           val antall = cacheClient.delete(id,*c).also { antall ->
                log.info("Sletting status $antall for $id i ${c.size} cache(s) for cache '${cache.name.lowercase()}'" )
            }
            return if (antall > 0) noContent().build()
@@ -125,7 +124,8 @@ class DevTilgangController(
    }
 
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany<Person>(CachableConfig(PDL),navIds.map { it.verdi }.toSet())
+    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany<Person>(navIds.map { it.verdi }.toSet(),
+        CachableConfig(PDL))
 
     @GetMapping("cache/keys/{cache}")
     fun keys(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
@@ -138,7 +138,7 @@ class DevTilgangController(
     fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
             cache: Caches, id: String) =
         Caches.forNavn(cache.name)
-            .mapNotNull { cacheClient.getOne(it, id) }
+            .mapNotNull { cacheClient.getOne(id, it) }
             .toSet()
 
     @GetMapping("sivilstand/{id}")

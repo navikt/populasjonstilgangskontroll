@@ -49,6 +49,6 @@ class GlideCacheClient(private val client: CompletableFuture<GlideClient>, priva
 
     override fun ping() = client.get().ping(gs("PING")).get()
 
-    override val pingEndpoint = "http://www.valkey.local/ping"
+    override val pingEndpoint = "http://www.vg.no"
     override val name = VALKEY
 }

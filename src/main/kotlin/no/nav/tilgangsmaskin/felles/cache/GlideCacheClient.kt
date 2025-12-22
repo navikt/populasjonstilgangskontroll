@@ -32,6 +32,7 @@ class GlideCacheClient(private val client: CompletableFuture<GlideClient>, priva
     override fun <T : Any> getMany( ids: Set<String>, clazz: KClass<T>,cache: CachableConfig): Map<String, T> {
         val keys = ids.map { gs(handler.tilNøkkel(cache, it)) }
         val results = client.get().mget(keys.toTypedArray()).get()
+        if (results.isEmpty()) return emptyMap()
         return ids.zip(results)
             .mapNotNull { (id, value) -> value?.let { id to handler.fraJson(it.string, clazz) } }
             .toMap()

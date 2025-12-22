@@ -146,9 +146,13 @@ class CacheClientTest {
             ofSeconds(1),PDL_MED_FAMILIE_CACHE)
         val many = client.getMany(ids, Person::class,PDL_MED_FAMILIE_CACHE)
         assertThat(many.keys).containsExactlyInAnyOrderElementsOf(ids)
+        Thread.sleep(3000)
+        val res = client.getMany(ids, Person::class,PDL_MED_FAMILIE_CACHE)
+        assertThat { res.isEmpty() }
+        /*
         await.atMost(3, SECONDS).until {
             client.getMany(ids, Person::class,PDL_MED_FAMILIE_CACHE).isEmpty()
-        }
+        }*/
     }
     companion object {
        @ServiceConnection

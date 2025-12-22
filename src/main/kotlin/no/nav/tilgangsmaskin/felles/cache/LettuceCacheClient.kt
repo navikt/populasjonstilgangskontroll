@@ -1,19 +1,23 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import io.lettuce.core.RedisClient
+import io.lettuce.core.RedisURI
 import io.micrometer.core.instrument.Tags.of
-import io.opentelemetry.instrumentation.annotations.WithSpan
+import no.nav.boot.conditionals.ConditionalOnProd
+import no.nav.tilgangsmaskin.felles.cache.CacheConfig.Companion.VALKEY
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
 import java.time.Duration
+import kotlin.reflect.KClass
 
-class CacheClient(
-    client: RedisClient,
-    val handler: CacheNøkkelHandler,
-    val alleTreffTeller: BulkCacheSuksessTeller,
-    val teller: BulkCacheTeller)  {
+
+@ConditionalOnProd
+class LettuceCacheClient(client: RedisClient, cfg: CacheConfig,
+                         private val handler: CacheNøkkelHandler,
+                         private val alleTreffTeller: BulkCacheSuksessTeller,
+                         private val teller: BulkCacheTeller)  : CacheOperations {
 
     private val log = getLogger(javaClass)
 
@@ -24,30 +28,35 @@ class CacheClient(
         }
     }
 
-    @WithSpan
-    fun delete(vararg caches: CachableConfig, id: String) =
+    override fun ping() =
+        conn.sync().ping()
+
+    override val pingEndpoint = RedisURI.Builder
+        .redis(cfg.host, cfg.port)
+        .withSsl(true)
+        .build().toURI().toString()
+
+    override val name = VALKEY
+
+    override fun delete( id: String,vararg caches: CachableConfig,) =
         caches.sumOf {
                 cache -> conn.sync().del(handler.tilNøkkel(cache, id))
         }
 
-    @WithSpan
-    inline fun <reified T> getOne(cache: CachableConfig, id: String) =
+    override fun <T : Any> getOne(id: String,clazz: KClass<T>,cache: CachableConfig, ) =
             conn.sync().get(handler.tilNøkkel(cache,id))?.let { json ->
-                handler.fraJson<T>(json)
+                handler.fraJson(json, clazz)
         }
 
-    @WithSpan
-    fun putOne(cache: CachableConfig, id: String, value: Any, ttl: Duration)  {
+    override fun putOne(id: String, value: Any, ttl: Duration,cache: CachableConfig)  {
             conn.async().setex(handler.tilNøkkel(cache,id), ttl.seconds,handler.tilJson(value))
     }
 
-    @WithSpan
     fun getAllKeys(cache: CachableConfig) =
             conn.sync().keys("${cache.name}::*")
 
 
-    @WithSpan
-    inline fun <reified T> getMany(cache: CachableConfig, ids: Set<String>)  =
+     override fun <T : Any> getMany( ids: Set<String>,clazz: KClass<T>,cache: CachableConfig)  =
         if (ids.isEmpty()) {
             emptyMap()
         }
@@ -60,14 +69,14 @@ class CacheClient(
                     it.hasValue()
                 }
                 .associate {
-                    handler.idFraNøkkel(it.key) to handler.fraJson<T>(it.value)
+                    handler.idFraNøkkel(it.key) to handler.fraJson(it.value, clazz)
                 }.also {
                     tellOgLog(cache.name, it.size, ids.size)
                 }
         }
 
-    @WithSpan
-    fun putMany(cache: CachableConfig, innslag: Map<String, Any>, ttl: Duration) {
+    override
+    fun putMany(innslag: Map<String, Any>, ttl: Duration,cache: CachableConfig, ) {
         if (innslag.isNotEmpty()) {
             log.trace("Bulk lagrer {} verdier for cache {} med prefix {}", innslag.size, cache.name, cache.extraPrefix)
                 conn.apply {
@@ -100,3 +109,4 @@ class CacheClient(
 
     fun tilNøkkel(cache: CachableConfig, id: String) = handler.tilNøkkel(cache, id)
 }
+

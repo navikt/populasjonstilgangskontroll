@@ -13,7 +13,7 @@ class GlideCacheElementUtløptLytter : MessageCallback {
     private val log = getLogger(javaClass)
 
     override fun accept(message: PubSubMessage, ctx: Any?) {
-       log.info("Innslag utløpt i cache på kanal ${message.channel} med nøkkel ${message.message}")
+       log.info("Innslag utløpt i cache på kanal ${message.channel} med nøkkel ${message.message.string}")
        // publiserer.publishEvent(CacheInnslagFjernetHendelse(message.message))
     }
 }

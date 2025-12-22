@@ -7,6 +7,7 @@ import glide.api.models.commands.SetOptions.Expiry.Seconds
 import glide.api.models.commands.SetOptions.builder
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.felles.cache.CacheConfig.Companion.VALKEY
+import java.net.URI
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
@@ -48,7 +49,6 @@ class GlideCacheClient(private val client: CompletableFuture<GlideClient>, priva
 
     override fun ping() = client.get().ping(gs("PING")).get()
 
-    override val pingEndpoint: String
-        get() = TODO("Not yet implemented")
+    override val pingEndpoint = "http://www.valkey.local/ping"
     override val name = VALKEY
 }

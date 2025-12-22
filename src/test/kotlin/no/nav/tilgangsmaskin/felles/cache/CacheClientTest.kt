@@ -3,8 +3,12 @@ package no.nav.tilgangsmaskin.felles.cache
 import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
 import glide.api.GlideClient
+import glide.api.models.GlideString.gs
+import glide.api.models.PubSubMessage
 import glide.api.models.configuration.GlideClientConfiguration
 import glide.api.models.configuration.NodeAddress
+import glide.api.models.configuration.StandaloneSubscriptionConfiguration
+import glide.api.models.configuration.StandaloneSubscriptionConfiguration.PubSubChannelMode.EXACT
 import io.lettuce.core.RedisClient.create
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
@@ -41,9 +45,7 @@ import org.springframework.data.redis.cache.RedisCacheManager.builder
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
-import tools.jackson.databind.json.JsonMapper
-import tools.jackson.module.kotlin.KotlinModule.Builder
-import java.time.Duration.*
+import java.time.Duration.ofSeconds
 import java.util.concurrent.TimeUnit.*
 
 @DataRedisTest
@@ -102,6 +104,10 @@ class CacheClientTest {
                 .host(redis.host)
                 .port(redis.firstMappedPort)
                 .build())
+             .subscriptionConfiguration(StandaloneSubscriptionConfiguration.builder()
+                 .subscription(EXACT, gs("__keyevent@0__:expired"))
+                 .callback { msg: PubSubMessage, _: Any? -> println("XXXXXX Received expired event ${msg.message.string}") }
+                 .build())
             .build()),handler)
 
     @BeforeEach

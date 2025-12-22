@@ -5,6 +5,7 @@ import glide.api.models.GlideString.gs
 import glide.api.models.configuration.BaseSubscriptionConfiguration.MessageCallback
 import glide.api.models.configuration.GlideClientConfiguration
 import glide.api.models.configuration.NodeAddress
+import glide.api.models.configuration.ServerCredentials
 import glide.api.models.configuration.StandaloneSubscriptionConfiguration
 import glide.api.models.configuration.StandaloneSubscriptionConfiguration.PubSubChannelMode.EXACT
 import io.lettuce.core.RedisClient
@@ -55,9 +56,14 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
     fun glideConfig(cfg: CacheConfig, callback: MessageCallback) =
         GlideClientConfiguration.builder()
             .address(NodeAddress.builder()
-                .host(cfg.host).
-                port(cfg.port)
+                .host(cfg.host)
+                .port(cfg.port)
                     .build())
+            .useTLS(true)
+            .credentials(ServerCredentials.builder()
+                .username(cfg.username)
+                .password(cfg.password)
+                .build())
             .subscriptionConfiguration(StandaloneSubscriptionConfiguration.builder()
                 .subscription(EXACT, gs("__keyevent@0__:expired"))
                 .callback(callback)

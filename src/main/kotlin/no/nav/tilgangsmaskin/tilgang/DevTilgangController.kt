@@ -26,6 +26,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
+import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.LettuceCacheClient
 import no.nav.tilgangsmaskin.felles.cache.Caches
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
@@ -68,7 +69,7 @@ class DevTilgangController(
     private val oid: AnsattOidTjeneste,
     private val nom: NomTjeneste,
     private val pdl: PDLTjeneste,
-    private val cacheClient: LettuceCacheClient) {
+    private val cacheClient: CacheOperations) {
 
     private val log = getLogger(javaClass)
 
@@ -95,12 +96,15 @@ class DevTilgangController(
     @PostMapping("cache/personer")
     fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany(navIds.map { it.verdi }.toSet(), Person::class,CachableConfig(PDL))
 
+    /*
     @GetMapping("cache/keys/{cache}")
     fun keys(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
              cache: Caches) =
         Caches.forNavn(cache.name).flatMap {
             cacheClient.getAllKeys(it)
         }.toSortedSet()
+
+     */
 
     @GetMapping("cache/{cache}/{id}")
     fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)

@@ -14,7 +14,7 @@ import kotlin.reflect.KClass
 @ConditionalOnNotProd
 class GlideCacheClient(private val client: CompletableFuture<GlideClient>, private val handler: CacheNøkkelHandler) : CacheOperations {
 
-    override fun delete( id: String,vararg caches: CachableConfig,) =
+    override fun delete( id: String,vararg caches: CachableConfig) =
         client.get().del(caches.map<CachableConfig, GlideString> { cache ->
             gs(handler.tilNøkkel(cache, id))
         }.toTypedArray()).get()
@@ -35,8 +35,7 @@ class GlideCacheClient(private val client: CompletableFuture<GlideClient>, priva
             .mapNotNull { (id, value) -> value?.let { id to handler.fraJson(it.string, clazz) } }
             .toMap()
     }
-    override fun putMany(innslag: Map<String, Any>,
-                         ttl: Duration,cache: CachableConfig) {
+    override fun putMany(innslag: Map<String, Any>, ttl: Duration,cache:CachableConfig) =
 
         innslag.forEach { (id, value) ->
             client.get().set(
@@ -46,7 +45,6 @@ class GlideCacheClient(private val client: CompletableFuture<GlideClient>, priva
                     .expiry(Seconds(ttl.toSeconds()))
                     .build()).get()
         }
-    }
 
     override fun ping() = client.get().ping(gs("PING")).get()
 

@@ -106,7 +106,7 @@ class CacheClientTest {
                 .build())
              .subscriptionConfiguration(StandaloneSubscriptionConfiguration.builder()
                  .subscription(EXACT, gs("__keyevent@0__:expired"))
-                 .callback { msg: PubSubMessage, _: Any? -> println("XXXXXX Received expired event ${msg.message.string}") }
+                 .callback(GlideCacheElementUtløptLytter())
                  .build())
             .build()),handler)
 

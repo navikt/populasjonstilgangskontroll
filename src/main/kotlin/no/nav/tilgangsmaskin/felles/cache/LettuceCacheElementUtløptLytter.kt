@@ -2,18 +2,17 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import io.lettuce.core.RedisClient
 import io.lettuce.core.pubsub.RedisPubSubAdapter
+import no.nav.boot.conditionals.ConditionalOnProd
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationEventPublisher
-import org.springframework.stereotype.Component
 
-@Component
- class CacheElementUtløptLytter(client: RedisClient, private val publiserer: ApplicationEventPublisher) :  RedisPubSubAdapter<String, String>() {
+@ConditionalOnProd
+ class LettuceCacheElementUtløptLytter(client: RedisClient, private val publiserer: ApplicationEventPublisher) :  RedisPubSubAdapter<String, String>() {
     private val log = getLogger(javaClass)
 
      init {
          client.connectPubSub().apply {
-             addListener(this@CacheElementUtløptLytter)
+             addListener(this@`LettuceCacheElementUtløptLytter`)
              sync().subscribe(KANAL)
          }
      }
@@ -29,7 +28,6 @@ import org.springframework.stereotype.Component
     companion object {
         private const val KANAL = "__keyevent@0__:expired"
     }
-    data class CacheInnslagFjernetHendelse(val nøkkel: String) : ApplicationEvent(nøkkel)
 }
 
 

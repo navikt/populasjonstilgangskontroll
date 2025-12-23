@@ -69,7 +69,8 @@ class DevTilgangController(
     private val nom: NomTjeneste,
     private val pdl: PDLTjeneste,
     private val lettuceClient: LettuceCacheClient,
-    private val glideClient: GlideCacheClient) {
+   // private val glideClient: GlideCacheClient
+) {
 
     private val log = getLogger(javaClass)
 
@@ -77,15 +78,18 @@ class DevTilgangController(
     @PostMapping("oppfolging/bulk")
     fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)
 
+    /*
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = glideClient.getMany(navIds, Boolean::class,SKJERMING_CACHE)
+
+     */
 
    @PostMapping("cache/{cache}/{id}/slett")
    fun slettIdFraCache(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
                    cache: Caches, @PathVariable id: String) : ResponseEntity<Unit> {
 
        Caches.forNavn(cache.name).let { c ->
-           val antall = glideClient.delete(id,*c).also { antall ->
+           val antall = lettuceClient.delete(id,*c).also { antall ->
                log.info("Sletting status $antall for $id i ${c.size} cache(s) for cache '${cache.name.lowercase()}'" )
            }
            return if (antall > 0) noContent().build()
@@ -97,9 +101,9 @@ class DevTilgangController(
     fun pingLettuce() = lettuceClient.ping()
 
     @GetMapping("cache/glide/ping")
-    fun pingGlide() = glideClient.ping()
+    fun pingGlide() = lettuceClient.ping()
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = glideClient.getMany(navIds.map { it.verdi }.toSet(), Person::class,CachableConfig(PDL))
+    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = lettuceClient.getMany(navIds.map { it.verdi }.toSet(), Person::class,CachableConfig(PDL))
 
     /*
     @GetMapping("cache/keys/{cache}")
@@ -115,7 +119,7 @@ class DevTilgangController(
     fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
             cache: Caches, id: String) =
         Caches.forNavn(cache.name)
-            .mapNotNull { glideClient.getOne(id, Any::class,it) }
+            .mapNotNull { lettuceClient.getOne(id, Any::class,it) }
             .toSet()
 
     @GetMapping("sivilstand/{id}")

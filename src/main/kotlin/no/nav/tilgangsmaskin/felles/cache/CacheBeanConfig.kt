@@ -74,8 +74,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             log.info("Create GlideClient fra $cfg")
             GlideClient.createClient(cfg).get()
         }.getOrElse {
-            log.error("Could not create GlideClient $cfg", it)
-            throw RuntimeException("Feil ved opprettelse av GlideClient mot $cfg", it)
+            log.error("Feil ved opprettelse av GlideClient mot ${cfg.credentials.username} ${cfg.credentials.password}  ${cfg.addresses.first().host} ${cfg.addresses.first().port} ${cfg.isUseTLS} (${cfg.addresses.size} adresser)", it)
         }
     @Bean
     fun cacheNøkkelHandler(mgr: RedisCacheManager) =

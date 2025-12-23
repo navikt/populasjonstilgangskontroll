@@ -70,7 +70,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
 
     @Bean
     fun glideClient(cfg: GlideClientConfiguration)  =
-        GlideClient.createClient(cfg)
+        GlideClient.createClient(cfg).get()
 
     @Bean
     fun cacheNøkkelHandler(mgr: RedisCacheManager) =

@@ -1,8 +1,10 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import glide.api.GlideClient
+import glide.api.GlideClusterClient
 import glide.api.models.GlideString.gs
 import glide.api.models.configuration.GlideClientConfiguration
+import glide.api.models.configuration.GlideClusterClientConfiguration
 import glide.api.models.configuration.NodeAddress
 import glide.api.models.configuration.ServerCredentials
 import glide.api.models.configuration.StandaloneSubscriptionConfiguration
@@ -52,7 +54,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
 
     @Bean
     fun glideConfig(cfg: CacheConfig, callback: GlideCacheElementUtløptLytter) =
-        GlideClientConfiguration.builder()
+        GlideClusterClientConfiguration.builder()
             .address(NodeAddress.builder()
                 .host(cfg.host)
                 .port(cfg.port)
@@ -69,14 +71,9 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             .build()
 
     @Bean
-    fun glideClient(cfg: GlideClientConfiguration)  =
-        runCatching {
-            log.info("Create GlideClient fra $cfg")
-            GlideClient.createClient(cfg).get()
-        }.getOrElse {
-            log.error("Feil ved opprettelse av GlideClient mot ${cfg.credentials.username} ${cfg.credentials.password}  ${cfg.addresses.first().host} ${cfg.addresses.first().port} ${cfg.isUseTLS}", it)
-            throw RuntimeException("Feil ved opprettelse av GlideClient mot ${cfg.credentials.username} ${cfg.credentials.password}  ${cfg.addresses.first().host} ${cfg.addresses.first().port} ${cfg.isUseTLS}", it)
-        }
+    fun glideClient(cfg: GlideClusterClientConfiguration)  =
+        GlideClusterClient.createClient(cfg).get()
+
     @Bean
     fun cacheNøkkelHandler(mgr: RedisCacheManager) =
         CacheNøkkelHandler(mgr.cacheConfigurations,MAPPER)

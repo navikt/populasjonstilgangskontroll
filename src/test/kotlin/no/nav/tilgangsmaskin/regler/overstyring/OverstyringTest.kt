@@ -34,8 +34,8 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Testcontainers
+import org.testcontainers.postgresql.PostgreSQLContainer
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 

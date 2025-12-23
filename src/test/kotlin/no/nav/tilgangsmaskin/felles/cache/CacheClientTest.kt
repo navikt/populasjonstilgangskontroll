@@ -4,7 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
 import glide.api.GlideClient
 import glide.api.models.GlideString.gs
-import glide.api.models.PubSubMessage
+import glide.api.models.configuration.BaseSubscriptionConfiguration.MessageCallback
 import glide.api.models.configuration.GlideClientConfiguration
 import glide.api.models.configuration.NodeAddress
 import glide.api.models.configuration.StandaloneSubscriptionConfiguration
@@ -12,6 +12,7 @@ import glide.api.models.configuration.StandaloneSubscriptionConfiguration.PubSub
 import io.lettuce.core.RedisClient.create
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
+import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.bruker.AktørId
@@ -29,6 +30,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import org.junit.jupiter.api.extension.ExtendWith
@@ -44,11 +46,9 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.test.context.ContextConfiguration
-import org.testcontainers.containers.GenericContainer
 import org.testcontainers.junit.jupiter.Testcontainers
-import org.testcontainers.utility.DockerImageName
 import java.time.Duration.ofSeconds
-import java.util.concurrent.TimeUnit.*
+import java.util.concurrent.TimeUnit.SECONDS
 
 @DataRedisTest
 @ContextConfiguration(classes = [TestApp::class])
@@ -66,7 +66,7 @@ class CacheClientTest {
     private lateinit var cacheConfig: CacheConfig
 
     @Autowired
-    lateinit var meterRegistry: MeterRegistry
+    private lateinit var meterRegistry: MeterRegistry
 
     @Autowired
     private lateinit var cf: RedisConnectionFactory
@@ -74,12 +74,12 @@ class CacheClientTest {
     private lateinit var glideClient: GlideCacheClient
     private lateinit var handler: CacheNøkkelHandler
 
-    val b1 = BrukerId("03508331575")
-    val b2 = BrukerId("20478606614")
-    val a1 = AktørId("1234567890123")
-    val a2 = AktørId("1111111111111")
-    val p1 = Person(b1,b1.verdi, a1, KommuneTilknytning(Kommune("0301")))
-    val p2 = Person(b2, b2.verdi, a2, KommuneTilknytning(Kommune("1111")))
+    private val b1 = BrukerId("03508331575")
+    private val b2 = BrukerId("20478606614")
+    private val a1 = AktørId("1234567890123")
+    private val a2 = AktørId("1111111111111")
+    private val p1 = Person(b1,b1.verdi, a1, KommuneTilknytning(Kommune("0301")))
+    private val p2 = Person(b2, b2.verdi, a2, KommuneTilknytning(Kommune("1111")))
     @BeforeAll
     fun beforeAll() {
         every { cacheConfig.host} returns "host"
@@ -122,6 +122,7 @@ class CacheClientTest {
 
     @ParameterizedTest
     @MethodSource("cacheClients")
+    @DisplayName("Sletting av cache element fungerer")
     fun delete(client: CacheOperations) {
         client.putOne( p1.brukerId.verdi,p1, ofSeconds(60),PDL_MED_FAMILIE_CACHE)
         assertThat(client.getOne(p1.brukerId.verdi, Person::class, PDL_MED_FAMILIE_CACHE)).isEqualTo(p1)
@@ -131,6 +132,7 @@ class CacheClientTest {
 
     @ParameterizedTest
     @MethodSource("cacheClients")
+@DisplayName("Timeout av cache element fungerer")
     fun putAndGetOne(client: CacheOperations) {
         client.putOne( p1.brukerId.verdi,p1, ofSeconds(1),PDL_MED_FAMILIE_CACHE)
         val one = client.getOne(p1.brukerId.verdi, Person::class,PDL_MED_FAMILIE_CACHE)
@@ -148,17 +150,21 @@ class CacheClientTest {
             ofSeconds(1),PDL_MED_FAMILIE_CACHE)
         val many = client.getMany(ids, Person::class,PDL_MED_FAMILIE_CACHE)
         assertThat(many.keys).containsExactlyInAnyOrderElementsOf(ids)
-        Thread.sleep(3000)
-        val res = client.getMany(ids, Person::class,PDL_MED_FAMILIE_CACHE)
-        assertThat { res.isEmpty() }
-        /*
         await.atMost(3, SECONDS).until {
             client.getMany(ids, Person::class,PDL_MED_FAMILIE_CACHE).isEmpty()
-        }*/
+        }
+    }
+    @ParameterizedTest
+    @MethodSource("cacheClients")
+    fun putOneGetTwo(client: CacheOperations) {
+        val ids = setOf(p1.brukerId.verdi,p2.brukerId.verdi)
+        client.putOne( p1.brukerId.verdi,p1, ofSeconds(10),PDL_MED_FAMILIE_CACHE)
+        val many = client.getMany(ids, Person::class,PDL_MED_FAMILIE_CACHE)
+        assertThat(many.keys).hasSize(1)
     }
     companion object {
        @ServiceConnection
-        private val redis = RedisContainer("redis:6.2.2")
+        private val redis = RedisContainer("valkey/valkey:9")
     }
 }
 

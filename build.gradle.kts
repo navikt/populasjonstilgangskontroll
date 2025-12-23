@@ -32,6 +32,7 @@ plugins {
     id("com.google.cloud.tools.jib") version "3.5.2"
     id("io.kotest") version "6.0.7"
     id("com.gorylenko.gradle-git-properties") version "2.5.4"
+    id("com.google.osdetector") version "1.7.3"
     application
 }
 springBoot {
@@ -62,22 +63,15 @@ configurations.all {
 }
 
 dependencies {
-    implementation("io.valkey:valkey-glide:$glideVersion") {
-        artifact {
-            classifier = "osx-aarch_64"
-        }
-    }
 
     implementation("io.valkey:valkey-glide:$glideVersion") {
         artifact {
-            classifier = "linux-x86_64"
+            classifier = osdetector.classifier
         }
     }
-// o
     implementation("io.confluent:kafka-avro-serializer:$confluentVersion") {
         exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
     }
-    implementation("io.valkey:valkey-glide:$glideVersion")
     implementation("at.yawk.lz4:lz4-java:1.10.1") // fjernes ved neste release av org.apache.kafka:kafka-clients
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$otelVersion-alpha")

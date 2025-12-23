@@ -110,7 +110,7 @@ class CacheClientTest {
                  .subscription(EXACT, gs("__keyevent@0__:expired"))
                  .callback(GlideCacheElementUtløptLytter())
                  .build())
-            .build()),handler)
+            .build()).get(),handler)
 
     @BeforeEach
     fun setUp() {

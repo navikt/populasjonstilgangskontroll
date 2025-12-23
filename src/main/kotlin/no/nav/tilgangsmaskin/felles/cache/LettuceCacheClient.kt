@@ -9,11 +9,12 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocal
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.context.annotation.Primary
 import java.time.Duration
 import kotlin.reflect.KClass
 
 
-//@ConditionalOnProd
+@Primary
 class LettuceCacheClient(client: RedisClient, cfg: CacheConfig,
                          private val handler: CacheNøkkelHandler,
                          private val alleTreffTeller: BulkCacheSuksessTeller,

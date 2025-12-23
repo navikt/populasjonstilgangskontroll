@@ -13,8 +13,6 @@ import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
-@ConditionalOnNotProd
-@Primary
 class GlideCacheClient(private val client: CompletableFuture<GlideClient>, private val handler: CacheNøkkelHandler) : CacheOperations {
 
     val theClient = client.get()

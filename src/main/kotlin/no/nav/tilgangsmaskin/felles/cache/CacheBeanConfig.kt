@@ -9,6 +9,7 @@ import glide.api.models.configuration.StandaloneSubscriptionConfiguration
 import glide.api.models.configuration.StandaloneSubscriptionConfiguration.PubSubChannelMode.EXACT
 import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisURI
+import kotlinx.coroutines.future.await
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
@@ -57,7 +58,8 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
                 .host(cfg.host)
                 .port(cfg.port)
                     .build())
-           // .useTLS(true)
+            .useTLS(true)
+            .requestTimeout(10000)
             .credentials(ServerCredentials.builder()
                 .username(cfg.username)
                 .password(cfg.password)
@@ -69,8 +71,8 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             .build()
 
     @Bean
-    fun glideClient(cfg: GlideClientConfiguration)  =
-            GlideClient.createClient(cfg).get()
+    suspend fun glideClient(cfg: GlideClientConfiguration)  =
+            GlideClient.createClient(cfg).await()
 
     @Bean
     fun cacheNøkkelHandler(mgr: RedisCacheManager) =

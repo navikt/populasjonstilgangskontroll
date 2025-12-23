@@ -13,7 +13,7 @@ import java.time.Duration
 import kotlin.reflect.KClass
 
 
-@ConditionalOnProd
+//@ConditionalOnProd
 class LettuceCacheClient(client: RedisClient, cfg: CacheConfig,
                          private val handler: CacheNøkkelHandler,
                          private val alleTreffTeller: BulkCacheSuksessTeller,

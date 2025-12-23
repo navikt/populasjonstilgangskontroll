@@ -7,13 +7,17 @@ import glide.api.models.commands.SetOptions.Expiry.Seconds
 import glide.api.models.commands.SetOptions.builder
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.felles.cache.CacheConfig.Companion.VALKEY
+import org.springframework.context.annotation.Primary
 import java.net.URI
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
 @ConditionalOnNotProd
+@Primary
 class GlideCacheClient(private val client: CompletableFuture<GlideClient>, private val handler: CacheNøkkelHandler) : CacheOperations {
+
+    val theClient = client.get()
 
     override fun delete( id: String,vararg caches: CachableConfig) =
         client.get().del(caches.map<CachableConfig, GlideString> { cache ->
@@ -48,7 +52,7 @@ class GlideCacheClient(private val client: CompletableFuture<GlideClient>, priva
                     .build()).get()
         }
 
-    override fun ping() = client.get().ping(gs("PING")).get()
+    override fun ping() = theClient.ping(gs("PING")).get()
 
     override val pingEndpoint = "http://www.vg.no"
     override val name = VALKEY

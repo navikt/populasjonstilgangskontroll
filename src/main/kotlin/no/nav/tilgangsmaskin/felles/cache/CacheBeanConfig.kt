@@ -43,7 +43,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             .build()
 
     @Bean
-    @ConditionalOnProd
+    //@ConditionalOnProd
     fun lettuceClient(cfg: CacheConfig) =
         RedisClient.create(RedisURI.Builder
             .redis(cfg.host, cfg.port)

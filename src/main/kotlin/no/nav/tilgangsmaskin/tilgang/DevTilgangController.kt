@@ -13,7 +13,6 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
@@ -26,10 +25,9 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
-import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.cache.LettuceCacheClient
 import no.nav.tilgangsmaskin.felles.cache.Caches
 import no.nav.tilgangsmaskin.felles.cache.GlideCacheClient
+import no.nav.tilgangsmaskin.felles.cache.LettuceCacheClient
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
@@ -70,7 +68,8 @@ class DevTilgangController(
     private val oid: AnsattOidTjeneste,
     private val nom: NomTjeneste,
     private val pdl: PDLTjeneste,
-    private val cacheClient: GlideCacheClient) {
+    private val lettuceClient: LettuceCacheClient,
+    private val glideClient: GlideCacheClient) {
 
     private val log = getLogger(javaClass)
 
@@ -79,14 +78,14 @@ class DevTilgangController(
     fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)
 
     @PostMapping("cache/skjerminger")
-    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany(navIds, Boolean::class,SKJERMING_CACHE)
+    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = glideClient.getMany(navIds, Boolean::class,SKJERMING_CACHE)
 
    @PostMapping("cache/{cache}/{id}/slett")
    fun slettIdFraCache(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
                    cache: Caches, @PathVariable id: String) : ResponseEntity<Unit> {
 
        Caches.forNavn(cache.name).let { c ->
-           val antall = cacheClient.delete(id,*c).also { antall ->
+           val antall = glideClient.delete(id,*c).also { antall ->
                log.info("Sletting status $antall for $id i ${c.size} cache(s) for cache '${cache.name.lowercase()}'" )
            }
            return if (antall > 0) noContent().build()
@@ -94,10 +93,13 @@ class DevTilgangController(
        }
    }
 
-    @GetMapping("cache/ping") 
-    fun ping() = cacheClient.ping()
+    @GetMapping("cache/lettuce/ping")
+    fun pingLettuce() = lettuceClient.ping()
+
+    @GetMapping("cache/glide/ping")
+    fun pingGlide() = glideClient.ping()
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany(navIds.map { it.verdi }.toSet(), Person::class,CachableConfig(PDL))
+    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = glideClient.getMany(navIds.map { it.verdi }.toSet(), Person::class,CachableConfig(PDL))
 
     /*
     @GetMapping("cache/keys/{cache}")
@@ -113,7 +115,7 @@ class DevTilgangController(
     fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
             cache: Caches, id: String) =
         Caches.forNavn(cache.name)
-            .mapNotNull { cacheClient.getOne(id, Any::class,it) }
+            .mapNotNull { glideClient.getOne(id, Any::class,it) }
             .toSet()
 
     @GetMapping("sivilstand/{id}")

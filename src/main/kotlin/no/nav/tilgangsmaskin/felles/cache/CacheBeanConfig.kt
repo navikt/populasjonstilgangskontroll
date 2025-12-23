@@ -51,7 +51,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             .build())
 
     @Bean
-    fun glideConfig(cfg: CacheConfig, callback: MessageCallback) =
+    fun glideConfig(cfg: CacheConfig, callback: GlideCacheElementUtløptLytter) =
         GlideClientConfiguration.builder()
             .address(NodeAddress.builder()
                 .host(cfg.host)

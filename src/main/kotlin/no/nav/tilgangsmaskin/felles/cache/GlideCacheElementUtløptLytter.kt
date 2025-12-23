@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 
-@ConditionalOnNotProd
+@Component
 class GlideCacheElementUtløptLytter : MessageCallback {
     private val log = getLogger(javaClass)
 

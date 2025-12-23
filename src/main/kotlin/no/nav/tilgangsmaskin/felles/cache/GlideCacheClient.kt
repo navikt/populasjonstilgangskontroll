@@ -8,11 +8,13 @@ import glide.api.models.commands.SetOptions.builder
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.felles.cache.CacheConfig.Companion.VALKEY
 import org.springframework.context.annotation.Primary
+import org.springframework.stereotype.Component
 import java.net.URI
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
+@Component
 class GlideCacheClient(private val client: GlideClient, private val handler: CacheNøkkelHandler) : CacheOperations {
 
 

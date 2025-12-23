@@ -10,11 +10,13 @@ import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.annotation.Primary
+import org.springframework.stereotype.Component
 import java.time.Duration
 import kotlin.reflect.KClass
 
 
 @Primary
+@Component
 class LettuceCacheClient(client: RedisClient, cfg: CacheConfig,
                          private val handler: CacheNøkkelHandler,
                          private val alleTreffTeller: BulkCacheSuksessTeller,

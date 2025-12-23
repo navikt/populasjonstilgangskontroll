@@ -26,6 +26,8 @@ import org.springframework.data.redis.serializer.RedisSerializationContext.Seria
 import org.springframework.data.redis.serializer.StringRedisSerializer
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.KotlinModule.Builder
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.SECONDS
 
 
 @Configuration(proxyBeanMethods = true)
@@ -71,8 +73,8 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             .build()
 
     @Bean
-    suspend fun glideClient(cfg: GlideClientConfiguration)  =
-            GlideClient.createClient(cfg).await()
+     fun glideClient(cfg: GlideClientConfiguration)  =
+            GlideClient.createClient(cfg).get(10, SECONDS)
 
     @Bean
     fun cacheNøkkelHandler(mgr: RedisCacheManager) =

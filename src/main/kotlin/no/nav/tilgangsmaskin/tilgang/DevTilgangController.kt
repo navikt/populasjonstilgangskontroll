@@ -29,6 +29,7 @@ import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.LettuceCacheClient
 import no.nav.tilgangsmaskin.felles.cache.Caches
+import no.nav.tilgangsmaskin.felles.cache.GlideCacheClient
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
@@ -69,7 +70,7 @@ class DevTilgangController(
     private val oid: AnsattOidTjeneste,
     private val nom: NomTjeneste,
     private val pdl: PDLTjeneste,
-    private val cacheClient: CacheOperations) {
+    private val cacheClient: GlideCacheClient) {
 
     private val log = getLogger(javaClass)
 
@@ -93,6 +94,8 @@ class DevTilgangController(
        }
    }
 
+    @GetMapping("cache/ping") 
+    fun ping() = cacheClient.ping()
     @PostMapping("cache/personer")
     fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany(navIds.map { it.verdi }.toSet(), Person::class,CachableConfig(PDL))
 

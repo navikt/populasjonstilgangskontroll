@@ -44,7 +44,9 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.test.context.ContextConfiguration
+import org.testcontainers.containers.GenericContainer
 import org.testcontainers.junit.jupiter.Testcontainers
+import org.testcontainers.utility.DockerImageName
 import java.time.Duration.ofSeconds
 import java.util.concurrent.TimeUnit.*
 
@@ -95,14 +97,14 @@ class CacheClientTest {
     }
 
     private fun lettuceClient(handler: CacheNøkkelHandler) = LettuceCacheClient(
-        create("redis://${redis.host}:${redis.firstMappedPort}"), cacheConfig,handler, BulkCacheSuksessTeller(meterRegistry, token),
+        create("redis://${redis.host}:${redis.redisPort}"), cacheConfig,handler, BulkCacheSuksessTeller(meterRegistry, token),
         BulkCacheTeller(meterRegistry, token))
 
     private fun glideClient(handler: CacheNøkkelHandler) =
          GlideCacheClient(GlideClient.createClient(GlideClientConfiguration.builder()
             .address(NodeAddress.builder()
                 .host(redis.host)
-                .port(redis.firstMappedPort)
+                .port(redis.redisPort)
                 .build())
              .subscriptionConfiguration(StandaloneSubscriptionConfiguration.builder()
                  .subscription(EXACT, gs("__keyevent@0__:expired"))
@@ -156,7 +158,7 @@ class CacheClientTest {
     }
     companion object {
        @ServiceConnection
-       private val redis = RedisContainer("redis:6.2.2")
+        private val redis = RedisContainer("redis:6.2.2")
     }
 }
 

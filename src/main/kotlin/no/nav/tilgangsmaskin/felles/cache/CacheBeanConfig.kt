@@ -72,7 +72,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
     fun glideClient(cfg: GlideClientConfiguration)  =
         runCatching {
             log.info("Create GlideClient fra $cfg")
-            GlideClient.createClient(cfg)
+            GlideClient.createClient(cfg).get()
         }.getOrElse {
             log.error("Could not create GlideClient $cfg", it)
             throw RuntimeException("Feil ved opprettelse av GlideClient mot $cfg", it)

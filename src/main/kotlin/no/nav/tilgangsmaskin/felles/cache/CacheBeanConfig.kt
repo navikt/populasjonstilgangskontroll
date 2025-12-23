@@ -73,10 +73,8 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
         runCatching {
             GlideClient.createClient(cfg)
         }.getOrElse {
-            throw RuntimeException("Feil ved opprettelse av GlideClient mot ${cfg.addresses}", it)
+            throw RuntimeException("Feil ved opprettelse av GlideClient mot $cfg", it)
         }
-        GlideClient.createClient(cfg).get()
-
     @Bean
     fun cacheNøkkelHandler(mgr: RedisCacheManager) =
         CacheNøkkelHandler(mgr.cacheConfigurations,MAPPER)

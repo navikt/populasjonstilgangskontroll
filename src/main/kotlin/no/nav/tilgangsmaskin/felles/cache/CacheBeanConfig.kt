@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import glide.api.GlideClient
 import glide.api.models.GlideString.gs
-import glide.api.models.configuration.BaseSubscriptionConfiguration.MessageCallback
 import glide.api.models.configuration.GlideClientConfiguration
 import glide.api.models.configuration.NodeAddress
 import glide.api.models.configuration.ServerCredentials
@@ -11,10 +10,9 @@ import glide.api.models.configuration.StandaloneSubscriptionConfiguration.PubSub
 import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisURI
 import no.nav.boot.conditionals.ConditionalOnGCP
-import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -34,6 +32,8 @@ import tools.jackson.module.kotlin.KotlinModule.Builder
 class CacheBeanConfig(private val cf: RedisConnectionFactory,
                       private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
+
+    private val log = getLogger(javaClass)
 
     @Bean
     override fun cacheManager()  =
@@ -71,8 +71,10 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
     @Bean
     fun glideClient(cfg: GlideClientConfiguration)  =
         runCatching {
+            log.info("Create GlideClient fra $cfg")
             GlideClient.createClient(cfg)
         }.getOrElse {
+            log.error("Could not create GlideClient $cfg", it)
             throw RuntimeException("Feil ved opprettelse av GlideClient mot $cfg", it)
         }
     @Bean

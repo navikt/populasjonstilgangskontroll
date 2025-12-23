@@ -62,10 +62,10 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
                 .username(cfg.username)
                 .password(cfg.password)
                 .build())
-            .subscriptionConfiguration(StandaloneSubscriptionConfiguration.builder()
+            /*.subscriptionConfiguration(StandaloneSubscriptionConfiguration.builder()
                 .subscription(EXACT, gs("__keyevent@0__:expired"))
                 .callback(callback)
-                .build())
+                .build()) */
             .build()
 
     @Bean

@@ -1,10 +1,8 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import glide.api.GlideClient
-import glide.api.GlideClusterClient
 import glide.api.models.GlideString.gs
 import glide.api.models.configuration.GlideClientConfiguration
-import glide.api.models.configuration.GlideClusterClientConfiguration
 import glide.api.models.configuration.NodeAddress
 import glide.api.models.configuration.ServerCredentials
 import glide.api.models.configuration.StandaloneSubscriptionConfiguration
@@ -54,25 +52,25 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
 
     @Bean
     fun glideConfig(cfg: CacheConfig, callback: GlideCacheElementUtløptLytter) =
-        GlideClusterClientConfiguration.builder()
+        GlideClientConfiguration.builder()
             .address(NodeAddress.builder()
                 .host(cfg.host)
                 .port(cfg.port)
                     .build())
-            .useTLS(true)
+           // .useTLS(true)
             .credentials(ServerCredentials.builder()
                 .username(cfg.username)
                 .password(cfg.password)
                 .build())
-            /*.subscriptionConfiguration(StandaloneSubscriptionConfiguration.builder()
+            .subscriptionConfiguration(StandaloneSubscriptionConfiguration.builder()
                 .subscription(EXACT, gs("__keyevent@0__:expired"))
                 .callback(callback)
-                .build()) */
+                .build())
             .build()
 
     @Bean
-    fun glideClient(cfg: GlideClusterClientConfiguration)  =
-        GlideClusterClient.createClient(cfg).get()
+    fun glideClient(cfg: GlideClientConfiguration)  =
+            GlideClient.createClient(cfg).get()
 
     @Bean
     fun cacheNøkkelHandler(mgr: RedisCacheManager) =

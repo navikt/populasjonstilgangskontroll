@@ -1,58 +1,55 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import glide.api.BaseClient.OK
 import glide.api.GlideClient
-import glide.api.models.GlideString
-import glide.api.models.GlideString.gs
+import glide.api.models.commands.SetOptions
 import glide.api.models.commands.SetOptions.Expiry.Seconds
-import glide.api.models.commands.SetOptions.builder
-import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.tilgangsmaskin.felles.cache.CacheConfig.Companion.VALKEY
-import org.springframework.context.annotation.Primary
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
-import java.net.URI
 import java.time.Duration
-import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
 @Component
-class GlideCacheClient(private val client: GlideClient, private val handler: CacheNøkkelHandler) : CacheOperations {
+@Lazy
+class GlideCacheClient(private val glide: GlideClient,cfg: CacheConfig, handler: CacheNøkkelHandler) : AbstractCacheOperations(handler, cfg) {
 
+    override fun delete(id: String,cache: CachableConfig) =
+        glide.del(arrayOf(nøkkel(id, cache))).get() == 1L
 
-    override fun delete( id: String,vararg caches: CachableConfig) =
-        client.del(caches.map<CachableConfig, GlideString> { cache ->
-            gs(handler.tilNøkkel(cache, id))
-        }.toTypedArray()).get()
+    override fun <T : Any> get(id: String, clazz: KClass<T>, cache: CachableConfig): T? =
+        glide.get(nøkkel(id, cache))?.get()?.let { json(it,clazz)}
 
-    override fun <T : Any> getOne( id: String, clazz: KClass<T>,cache: CachableConfig): T? =
-        client.get(handler.tilNøkkel(cache, id))?.get()?.let { json -> handler.fraJson(json,clazz)}
+    override fun put(id: String, verdi: Any, ttl: Duration, cache: CachableConfig) =
+        glide.set(nøkkel(id, cache), json(verdi), expiry(ttl)).get() == OK
 
-    override fun putOne( id: String, value: Any, ttl: Duration,cache: CachableConfig) {
-        client.set(handler.tilNøkkel(cache, id), handler.tilJson(value), builder()
-            .expiry(Seconds(ttl.toSeconds()))
-            .build()).get()
-    }
-
-    override fun <T : Any> getMany( ids: Set<String>, clazz: KClass<T>,cache: CachableConfig): Map<String, T> {
-        val keys = ids.map { gs(handler.tilNøkkel(cache, it)) }
-        val results = client.mget(keys.toTypedArray()).get()
-        if (results.isEmpty()) return emptyMap()
-        return ids.zip(results)
-            .mapNotNull { (id, value) -> value?.let { id to handler.fraJson(it.string, clazz) } }
-            .toMap()
-    }
-    override fun putMany(innslag: Map<String, Any>, ttl: Duration,cache:CachableConfig) =
-
-        innslag.forEach { (id, value) ->
-            client.set(
-                handler.tilNøkkel(cache, id),
-                handler.tilJson(value),
-                builder()
-                    .expiry(Seconds(ttl.toSeconds()))
-                    .build()).get()
+    override fun <T : Any> get(ids: Set<String>, clazz: KClass<T>, cache: CachableConfig)  =
+        buildMap {
+            ids.zip(glide.mget(ids.map  {
+                nøkkel(it, cache)
+            }.toTypedArray()).get()).forEach {
+                (id, verdi) -> verdi?.let {
+                    put(id, json(it, clazz))
+                }
+            }
         }
 
-    override fun ping() = client.ping(gs("PING")).get()
+    override fun put(verdier: Map<String, Any>, ttl: Duration, cache:CachableConfig)  {
+        glide.mset(buildMap {
+            verdier.forEach { (id, verdi) ->
+                put(nøkkel(id, cache), json(verdi))
+            }
+        }).get().also {
+            verdier.keys.forEach { id ->
+                glide.expire(nøkkel(id,cache), ttl.toSeconds()).get()
+            }
+        }
+    }
 
-    override val pingEndpoint = "http://www.vg.no"
-    override val name = VALKEY
+    private fun expiry(ttl: Duration)  =
+        SetOptions.builder()
+            .expiry(Seconds(ttl.toSeconds()))
+            .build()
+
+    override fun ping() =
+        glide.ping().get()
 }

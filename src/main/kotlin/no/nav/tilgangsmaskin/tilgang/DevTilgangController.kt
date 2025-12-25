@@ -13,7 +13,6 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -26,7 +25,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.cache.Caches
-import no.nav.tilgangsmaskin.felles.cache.GlideCacheClient
 import no.nav.tilgangsmaskin.felles.cache.LettuceCacheClient
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
@@ -41,9 +39,6 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.MULTI_STATUS
 import org.springframework.http.HttpStatus.NO_CONTENT
-import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.noContent
-import org.springframework.http.ResponseEntity.status
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -82,28 +77,28 @@ class DevTilgangController(
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = glideClient.getMany(navIds, Boolean::class,SKJERMING_CACHE)
 
-     */
+
 
    @PostMapping("cache/{cache}/{id}/slett")
    fun slettIdFraCache(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
                    cache: Caches, @PathVariable id: String) : ResponseEntity<Unit> {
 
-       Caches.forNavn(cache.name).let { c ->
-           val antall = lettuceClient.delete(id,*c).also { antall ->
-               log.info("Sletting status $antall for $id i ${c.size} cache(s) for cache '${cache.name.lowercase()}'" )
+       Caches.forNavn(cache.name).forEach { c ->
+           val status = lettuceClient.delete(id,c).also { antall ->
+               log.info("Sletting status $antall for $id i ${c.name} for cache '${cache.name.lowercase()}'" )
            }
-           return if (antall > 0) noContent().build()
-           else  status(410).build()
        }
+       return if (status > 0) noContent().build()
+       else  status(410).build()
    }
-
+ */
     @GetMapping("cache/lettuce/ping")
     fun pingLettuce() = lettuceClient.ping()
 
     @GetMapping("cache/glide/ping")
     fun pingGlide() = lettuceClient.ping()
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = lettuceClient.getMany(navIds.map { it.verdi }.toSet(), Person::class,CachableConfig(PDL))
+    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = lettuceClient.get(navIds.map { it.verdi }.toSet(), Person::class,CachableConfig(PDL))
 
     /*
     @GetMapping("cache/keys/{cache}")
@@ -119,7 +114,7 @@ class DevTilgangController(
     fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
             cache: Caches, id: String) =
         Caches.forNavn(cache.name)
-            .mapNotNull { lettuceClient.getOne(id, Any::class,it) }
+            .mapNotNull { lettuceClient.get(id, Any::class,it) }
             .toSet()
 
     @GetMapping("sivilstand/{id}")

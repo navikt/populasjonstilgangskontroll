@@ -26,7 +26,7 @@ class PdlCacheTømmer(private val client: CacheOperations, private val teller: P
         log.info("Mottok hendelse av tyoe ${hendelse.adressebeskyttelse?.gradering} fra PDL, tømmer cacher" )
         PDL_CACHES.forEach { cache ->
             hendelse.personidenter.forEach { id ->
-                if (client.delete(id,cache) > 0) {
+                if (client.delete(id,cache)) {
                     teller.tell(Tags.of("cache", cache.name, "gradering",
                         hendelse.adressebeskyttelse?.gradering?.name?.lowercase(getDefault()) ?: UGRADERT.name.lowercase(getDefault()),"type",hendelse.endringstype?.name ?: "N/A"))
                     log.info("Slettet innslag fra cache ${cache.name} etter hendelse av type: {}", hendelse.adressebeskyttelse?.gradering)

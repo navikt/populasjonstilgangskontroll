@@ -98,7 +98,7 @@ class DevTilgangController(
     @GetMapping("cache/glide/ping")
     fun pingGlide() = lettuceClient.ping()
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = lettuceClient.get(navIds.map { it.verdi }.toSet(), Person::class,CachableConfig(PDL))
+    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = lettuceClient.get(navIds.map { it.verdi }.toSet(), Person::class, CachableConfig(PDL))
 
     /*
     @GetMapping("cache/keys/{cache}")

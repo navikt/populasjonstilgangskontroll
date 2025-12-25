@@ -19,12 +19,12 @@ abstract class AbstractCacheOperations(private val handler: CacheNøkkelHandler,
         handler.json(verdi)
 
     protected fun <T : Any> json(verdi: String, clazz: KClass<T>) =
-        handler.json(verdi,clazz)
+        handler.json(verdi, clazz)
 
     protected fun nøkkel(id: String, cache: CachableConfig) =
         handler.nøkkel(id, cache)
 
-    protected fun id(nøkkel:String) =
+    protected fun id(nøkkel: String) =
         handler.id(nøkkel)
 
     companion object {

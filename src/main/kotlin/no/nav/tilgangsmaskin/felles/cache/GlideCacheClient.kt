@@ -11,13 +11,13 @@ import kotlin.reflect.KClass
 
 @Component
 @Lazy
-class GlideCacheClient(private val glide: GlideClient,cfg: CacheConfig, handler: CacheNøkkelHandler) : AbstractCacheOperations(handler, cfg) {
+class GlideCacheClient(private val glide: GlideClient, cfg: CacheConfig, handler: CacheNøkkelHandler) : AbstractCacheOperations(handler, cfg) {
 
-    override fun delete(id: String,cache: CachableConfig) =
+    override fun delete(id: String, cache: CachableConfig) =
         glide.del(arrayOf(nøkkel(id, cache))).get() == 1L
 
     override fun <T : Any> get(id: String, clazz: KClass<T>, cache: CachableConfig): T? =
-        glide.get(nøkkel(id, cache))?.get()?.let { json(it,clazz)}
+        glide.get(nøkkel(id, cache))?.get()?.let { json(it, clazz)}
 
     override fun put(id: String, verdi: Any, ttl: Duration, cache: CachableConfig) =
         glide.set(nøkkel(id, cache), json(verdi), expiry(ttl)).get() == OK
@@ -33,14 +33,14 @@ class GlideCacheClient(private val glide: GlideClient,cfg: CacheConfig, handler:
             }
         }
 
-    override fun put(verdier: Map<String, Any>, ttl: Duration, cache:CachableConfig)  {
+    override fun put(verdier: Map<String, Any>, ttl: Duration, cache: CachableConfig)  {
         glide.mset(buildMap {
             verdier.forEach { (id, verdi) ->
                 put(nøkkel(id, cache), json(verdi))
             }
         }).get().also {
             verdier.keys.forEach { id ->
-                glide.expire(nøkkel(id,cache), ttl.toSeconds()).get()
+                glide.expire(nøkkel(id, cache), ttl.toSeconds()).get()
             }
         }
     }

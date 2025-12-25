@@ -17,7 +17,7 @@ import kotlin.reflect.KClass
 class LettuceCacheClient(lettuce: RedisClient, cfg: CacheConfig,
                          handler: CacheNøkkelHandler,
                          private val alleTreffTeller: BulkCacheSuksessTeller,
-                         private val teller: BulkCacheTeller)  : AbstractCacheOperations(handler,cfg) {
+                         private val teller: BulkCacheTeller)  : AbstractCacheOperations(handler, cfg) {
 
 
     private val conn = lettuce.connect().apply {
@@ -40,7 +40,7 @@ class LettuceCacheClient(lettuce: RedisClient, cfg: CacheConfig,
         }
 
     override fun put(id: String, verdi: Any, ttl: Duration, cache: CachableConfig)  =
-            conn.async().setex(nøkkel(id, cache), ttl.seconds,json(verdi)).get() == "OK"
+            conn.async().setex(nøkkel(id, cache), ttl.seconds, json(verdi)).get() == "OK"
 
      override fun <T : Any> get(ids: Set<String>, clazz: KClass<T>, cache: CachableConfig)  =
         if (ids.isEmpty()) {

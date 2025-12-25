@@ -79,7 +79,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
 
     @Bean
     fun cacheNøkkelHandler(mgr: RedisCacheManager) =
-        CacheNøkkelHandler(mgr.cacheConfigurations,MAPPER)
+        CacheNøkkelHandler(mgr.cacheConfigurations, MAPPER)
 
     @Bean
     fun cacheHealthIndicator(client: CacheOperations)  =
@@ -104,4 +104,4 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
 }
 
 
-class AllCaches(val map: Map<String,List<CachableConfig>>)
+class AllCaches(val map: Map<String, List<CachableConfig>>)

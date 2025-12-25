@@ -64,7 +64,6 @@ class DevTilgangController(
     private val nom: NomTjeneste,
     private val pdl: PDLTjeneste,
     private val lettuceClient: LettuceCacheClient,
-   // private val glideClient: GlideCacheClient
 ) {
 
     private val log = getLogger(javaClass)
@@ -73,48 +72,17 @@ class DevTilgangController(
     @PostMapping("oppfolging/bulk")
     fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)
 
-    /*
-    @PostMapping("cache/skjerminger")
-    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = glideClient.getMany(navIds, Boolean::class,SKJERMING_CACHE)
-
-
-
-   @PostMapping("cache/{cache}/{id}/slett")
-   fun slettIdFraCache(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-                   cache: Caches, @PathVariable id: String) : ResponseEntity<Unit> {
-
-       Caches.forNavn(cache.name).forEach { c ->
-           val status = lettuceClient.delete(id,c).also { antall ->
-               log.info("Sletting status $antall for $id i ${c.name} for cache '${cache.name.lowercase()}'" )
-           }
-       }
-       return if (status > 0) noContent().build()
-       else  status(410).build()
-   }
- */
     @GetMapping("cache/lettuce/ping")
     fun pingLettuce() = lettuceClient.ping()
 
-    @GetMapping("cache/glide/ping")
-    fun pingGlide() = lettuceClient.ping()
     @PostMapping("cache/personer")
     fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = lettuceClient.get(navIds.map { it.verdi }.toSet(), Person::class, CachableConfig(PDL))
-
-    /*
-    @GetMapping("cache/keys/{cache}")
-    fun keys(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-             cache: Caches) =
-        Caches.forNavn(cache.name).flatMap {
-            cacheClient.getAllKeys(it)
-        }.toSortedSet()
-
-     */
 
     @GetMapping("cache/{cache}/{id}")
     fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
             cache: Caches, id: String) =
         Caches.forNavn(cache.name)
-            .mapNotNull { lettuceClient.get(id, Any::class,it) }
+            .mapNotNull { lettuceClient.get(id, Any::class, it) }
             .toSet()
 
     @GetMapping("sivilstand/{id}")

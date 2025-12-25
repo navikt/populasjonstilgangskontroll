@@ -17,14 +17,14 @@ class GlideCacheClient(private val glide: GlideClient, cfg: CacheConfig, handler
         glide.del(arrayOf(nøkkel(id, cache))).get() == 1L
 
     override fun <T : Any> get(id: String, clazz: KClass<T>, cache: CachableConfig): T? =
-        glide.get(nøkkel(id, cache))?.get()?.let { json(it, clazz)}
+        glide.get(nøkkel(id, cache))?.get()?.let { json(it, clazz) }
 
     override fun put(id: String, verdi: Any, ttl: Duration, cache: CachableConfig) =
         glide.set(nøkkel(id, cache), json(verdi), expiry(ttl)).get() == OK
 
-    override fun <T : Any> get(ids: Set<String>, clazz: KClass<T>, cache: CachableConfig)  =
+    override fun <T : Any> get(ids: Set<String>, clazz: KClass<T>, cache: CachableConfig) =
         buildMap {
-            ids.zip(glide.mget(ids.map  {
+            ids.zip(glide.mget(ids.map {
                 nøkkel(it, cache)
             }.toTypedArray()).get()).forEach {
                 (id, verdi) -> verdi?.let {
@@ -33,7 +33,7 @@ class GlideCacheClient(private val glide: GlideClient, cfg: CacheConfig, handler
             }
         }
 
-    override fun put(verdier: Map<String, Any>, ttl: Duration, cache: CachableConfig)  {
+    override fun put(verdier: Map<String, Any>, ttl: Duration, cache: CachableConfig) {
         glide.mset(buildMap {
             verdier.forEach { (id, verdi) ->
                 put(nøkkel(id, cache), json(verdi))
@@ -45,7 +45,7 @@ class GlideCacheClient(private val glide: GlideClient, cfg: CacheConfig, handler
         }
     }
 
-    private fun expiry(ttl: Duration)  =
+    private fun expiry(ttl: Duration) =
         SetOptions.builder()
             .expiry(Seconds(ttl.toSeconds()))
             .build()

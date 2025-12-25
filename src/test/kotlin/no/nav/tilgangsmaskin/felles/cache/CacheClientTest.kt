@@ -77,9 +77,9 @@ class CacheClientTest {
     private val b2 = BrukerId("20478606614")
     private val a1 = AktørId("1234567890123")
     private val a2 = AktørId("1111111111111")
-    private val p1 = Person(b1,b1.verdi, a1, KommuneTilknytning(Kommune("0301")))
+    private val p1 = Person(b1, b1.verdi, a1, KommuneTilknytning(Kommune("0301")))
     private val p2 = Person(b2, b2.verdi, a2, KommuneTilknytning(Kommune("1111")))
-    private val ids = setOf(p1.brukerId.verdi,p2.brukerId.verdi)
+    private val ids = setOf(p1.brukerId.verdi, p2.brukerId.verdi)
 
     @BeforeAll
     fun beforeAll() {
@@ -116,7 +116,7 @@ class CacheClientTest {
             .subscription(EXACT, gs("__keyevent@0__:expired"))
             .callback(GlideCacheElementUtløptLytter(publisher))
             .build())
-        .build()).get(),cacheConfig,handler)
+        .build()).get(), cacheConfig, handler)
 
     @BeforeEach
     fun setUp() {
@@ -124,15 +124,15 @@ class CacheClientTest {
         every { token.clusterAndSystem } returns "test:dev-gcp"
     }
 
-    private fun cacheClients() = listOf(lettuceClient,glideClient)
+    private fun cacheClients() = listOf(lettuceClient, glideClient)
 
     @ParameterizedTest
     @MethodSource("cacheClients")
     @DisplayName("Sletting av cache element fungerer")
     fun delete(client: CacheOperations) {
-        assertThat(client.put( p1.brukerId.verdi,p1, ofSeconds(60),PDL_MED_FAMILIE_CACHE)).isTrue()
+        assertThat(client.put(p1.brukerId.verdi, p1, ofSeconds(60), PDL_MED_FAMILIE_CACHE)).isTrue()
         assertThat(client.get(p1.brukerId.verdi, Person::class, PDL_MED_FAMILIE_CACHE)).isEqualTo(p1)
-        assertThat(client.delete(p1.brukerId.verdi,PDL_MED_FAMILIE_CACHE)).isTrue()
+        assertThat(client.delete(p1.brukerId.verdi, PDL_MED_FAMILIE_CACHE)).isTrue()
         assertThat(client.get(p1.brukerId.verdi, Person::class, PDL_MED_FAMILIE_CACHE)).isNull()
     }
 
@@ -140,29 +140,30 @@ class CacheClientTest {
     @MethodSource("cacheClients")
     @DisplayName("Timeout av cache element fungerer")
     fun putAndGetOne(client: CacheOperations) {
-        assertThat(client.put( p1.brukerId.verdi,p1, ofSeconds(1),PDL_MED_FAMILIE_CACHE)).isTrue
+        assertThat(client.put(p1.brukerId.verdi, p1, ofSeconds(1), PDL_MED_FAMILIE_CACHE)).isTrue()
         assertThat(client.get(p1.brukerId.verdi, Person::class, PDL_MED_FAMILIE_CACHE)).isEqualTo(p1)
         await.atMost(3, SECONDS).until {
-            client.get(p1.brukerId.verdi, Person::class,PDL_MED_FAMILIE_CACHE) == null
+            client.get(p1.brukerId.verdi, Person::class, PDL_MED_FAMILIE_CACHE) == null
         }
     }
 
     @ParameterizedTest
     @MethodSource("cacheClients")
-     fun putAndGetMany(client: CacheOperations) {
+    @DisplayName("Henting av flere cache elementer fungerer")
+    fun putAndGetMany(client: CacheOperations) {
         client.put(mapOf(p1.brukerId.verdi to p1, p2.brukerId.verdi to p2),
-            ofSeconds(1),PDL_MED_FAMILIE_CACHE)
-        val many = client.get(ids, Person::class,PDL_MED_FAMILIE_CACHE)
+            ofSeconds(1), PDL_MED_FAMILIE_CACHE)
+        val many = client.get(ids, Person::class, PDL_MED_FAMILIE_CACHE)
         assertThat(many.keys).containsExactlyInAnyOrderElementsOf(ids)
         await.atMost(3, SECONDS).until {
-            client.get(ids, Person::class,PDL_MED_FAMILIE_CACHE).isEmpty()
+            client.get(ids, Person::class, PDL_MED_FAMILIE_CACHE).isEmpty()
         }
     }
     @ParameterizedTest
     @MethodSource("cacheClients")
     fun putOneGetTwo(client: CacheOperations) {
-        client.put( p1.brukerId.verdi,p1, ofSeconds(10),PDL_MED_FAMILIE_CACHE)
-        val many = client.get(ids, Person::class,PDL_MED_FAMILIE_CACHE)
+        client.put(p1.brukerId.verdi, p1, ofSeconds(10), PDL_MED_FAMILIE_CACHE)
+        val many = client.get(ids, Person::class, PDL_MED_FAMILIE_CACHE)
         assertThat(many.keys).hasSize(1)
     }
     companion object {

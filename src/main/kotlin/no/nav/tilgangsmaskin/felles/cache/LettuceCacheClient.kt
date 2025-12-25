@@ -17,7 +17,7 @@ import kotlin.reflect.KClass
 class LettuceCacheClient(lettuce: RedisClient, cfg: CacheConfig,
                          handler: CacheNøkkelHandler,
                          private val alleTreffTeller: BulkCacheSuksessTeller,
-                         private val teller: BulkCacheTeller)  : AbstractCacheOperations(handler, cfg) {
+                         private val teller: BulkCacheTeller): AbstractCacheOperations(handler, cfg) {
 
 
     private val conn = lettuce.connect().apply {
@@ -34,22 +34,22 @@ class LettuceCacheClient(lettuce: RedisClient, cfg: CacheConfig,
     override fun delete(id: String, cache: CachableConfig) =
          conn.async().del(nøkkel(id, cache)).get() == 1L
 
-    override fun <T : Any> get(id: String, clazz: KClass<T>, cache: CachableConfig ) =
+    override fun <T : Any> get(id: String, clazz: KClass<T>, cache: CachableConfig) =
             conn.async().get(nøkkel(id, cache)).get()?.let { json ->
                 json(json, clazz)
         }
 
-    override fun put(id: String, verdi: Any, ttl: Duration, cache: CachableConfig)  =
+    override fun put(id: String, verdi: Any, ttl: Duration, cache: CachableConfig) =
             conn.async().setex(nøkkel(id, cache), ttl.seconds, json(verdi)).get() == "OK"
 
-     override fun <T : Any> get(ids: Set<String>, clazz: KClass<T>, cache: CachableConfig)  =
+     override fun <T : Any> get(ids: Set<String>, clazz: KClass<T>, cache: CachableConfig) =
         if (ids.isEmpty()) {
             emptyMap()
         }
         else  {
             conn.sync()
                 .mget(*ids.map {
-                        id -> nøkkel(id, cache)}.toTypedArray())
+                        id -> nøkkel(id, cache) }.toTypedArray())
                 .filter {
                     it.hasValue()
                 }

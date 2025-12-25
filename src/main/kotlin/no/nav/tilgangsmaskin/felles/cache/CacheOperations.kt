@@ -8,13 +8,13 @@ import kotlin.reflect.KClass
 interface CacheOperations : Pingable {
 
     @WithSpan
-    fun delete( id: String, cache: CachableConfig): Boolean
+    fun delete(id: String, cache: CachableConfig): Boolean
 
     @WithSpan
     fun <T : Any> get(id: String, clazz: KClass<T>, cache: CachableConfig): T?
 
     @WithSpan
-    fun put(id: String, verdi: Any, ttl: Duration, cache: CachableConfig) : Boolean
+    fun put(id: String, verdi: Any, ttl: Duration, cache: CachableConfig): Boolean
 
     @WithSpan
     fun <T : Any> get(ids: Set<String>, clazz: KClass<T>, cache: CachableConfig): Map<String, T>

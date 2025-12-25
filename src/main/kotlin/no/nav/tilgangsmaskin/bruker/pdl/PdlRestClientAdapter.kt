@@ -39,7 +39,7 @@ class PdlRestClientAdapter(
 
         val fraRest = fraRest(identer  - fraCache.keys)
 
-        cache.put( fraRest, cf.varighet, PDL_MED_FAMILIE_CACHE)
+        cache.put(fraRest, cf.varighet, PDL_MED_FAMILIE_CACHE)
         return (fraRest.values + fraCache.values).toSet()
     }
 

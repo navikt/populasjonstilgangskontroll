@@ -9,8 +9,8 @@ import glide.api.models.configuration.StandaloneSubscriptionConfiguration
 import glide.api.models.configuration.StandaloneSubscriptionConfiguration.PubSubChannelMode.EXACT
 import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisURI
-import kotlinx.coroutines.future.await
 import no.nav.boot.conditionals.ConditionalOnGCP
+import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOperations.Companion.`UTLØPT_KANAL`
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.slf4j.LoggerFactory.getLogger
@@ -67,7 +67,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
                 .password(cfg.password)
                 .build())
             .subscriptionConfiguration(StandaloneSubscriptionConfiguration.builder()
-                .subscription(EXACT, gs("__keyevent@0__:expired"))
+                .subscription(EXACT, gs(UTLØPT_KANAL))
                 .callback(callback)
                 .build())
             .build()

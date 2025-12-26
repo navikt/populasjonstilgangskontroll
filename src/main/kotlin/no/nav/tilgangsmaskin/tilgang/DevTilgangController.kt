@@ -13,7 +13,6 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -25,8 +24,8 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
-import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.cache.Caches
+import no.nav.tilgangsmaskin.felles.cache.LettuceCacheClient
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
@@ -40,9 +39,6 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.MULTI_STATUS
 import org.springframework.http.HttpStatus.NO_CONTENT
-import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.noContent
-import org.springframework.http.ResponseEntity.status
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -67,7 +63,8 @@ class DevTilgangController(
     private val oid: AnsattOidTjeneste,
     private val nom: NomTjeneste,
     private val pdl: PDLTjeneste,
-    private val cacheClient: CacheClient) {
+    private val lettuceClient: LettuceCacheClient,
+) {
 
     private val log = getLogger(javaClass)
 
@@ -75,49 +72,17 @@ class DevTilgangController(
     @PostMapping("oppfolging/bulk")
     fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)
 
-    @PostMapping("cache/skjerminger")
-    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(CachableConfig(SKJERMING),navIds)
-
-    /*
-    @PostMapping("cache/evict/{cache}/{id}")
-    fun cacheEvict(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-                   cache: Caches, @PathVariable  id: String) : ResponseEntity<Unit> {
-        Caches.forNavn(cache.name).let { c ->
-            val  antall = cacheClient.deleteUsingManager(id,*c)
-            return if (antall > 0) noContent().build()
-            else  status(410).build()
-        }
-    }
-    */
-
-   @PostMapping("cache/{cache}/{id}/slett")
-   fun slettIdFraCache(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-                   cache: Caches, @PathVariable id: String) : ResponseEntity<Unit> {
-
-       Caches.forNavn(cache.name).let { c ->
-           val antall = cacheClient.delete(*c, id = id).also { antall ->
-               log.info("Sletting status $antall for $id i ${c.size} cache(s) for cache '${cache.name.lowercase()}'" )
-           }
-           return if (antall > 0) noContent().build()
-           else  status(410).build()
-       }
-   }
+    @GetMapping("cache/lettuce/ping")
+    fun pingLettuce() = lettuceClient.ping()
 
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany<Person>(CachableConfig(PDL),navIds.map { it.verdi }.toSet())
-
-    @GetMapping("cache/keys/{cache}")
-    fun keys(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-             cache: Caches) =
-        Caches.forNavn(cache.name).flatMap {
-            cacheClient.getAllKeys(it)
-        }.toSortedSet()
+    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = lettuceClient.get(navIds.map { it.verdi }.toSet(), Person::class, CachableConfig(PDL))
 
     @GetMapping("cache/{cache}/{id}")
     fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
             cache: Caches, id: String) =
         Caches.forNavn(cache.name)
-            .mapNotNull { cacheClient.getOne(it, id) }
+            .mapNotNull { lettuceClient.get(id, Any::class, it) }
             .toSet()
 
     @GetMapping("sivilstand/{id}")

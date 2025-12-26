@@ -13,10 +13,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info,metrics,prometheus,configprops,env,beans
   httpexchanges:
     recording:
       enabled: true
 
 oppfolging:
-  enabled: true
+  enabled: false

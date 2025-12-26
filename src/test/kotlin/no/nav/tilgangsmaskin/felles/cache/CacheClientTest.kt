@@ -20,7 +20,6 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.Person
-import no.nav.tilgangsmaskin.felles.cache.CacheBeanConfig.Companion.MAPPER
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import no.nav.tilgangsmaskin.tilgang.Token
@@ -93,7 +92,7 @@ class CacheClientTest {
             )).build().apply {
                 initializeCaches()
             }
-        handler = CacheNøkkelHandler(mgr.cacheConfigurations, MAPPER)
+        handler = CacheNøkkelHandler(mgr.cacheConfigurations)
         glideClient = glideClient(handler)
         lettuceClient = lettuceClient(handler)
     }
@@ -130,9 +129,9 @@ class CacheClientTest {
     @MethodSource("cacheClients")
     @DisplayName("Sletting av cache element fungerer")
     fun delete(client: CacheOperations) {
-        assertThat(client.put(p1.brukerId.verdi, p1, ofSeconds(60), PDL_MED_FAMILIE_CACHE)).isTrue()
+        assertThat(client.put(p1.brukerId.verdi, p1, ofSeconds(60), PDL_MED_FAMILIE_CACHE)).isTrue
         assertThat(client.get(p1.brukerId.verdi, Person::class, PDL_MED_FAMILIE_CACHE)).isEqualTo(p1)
-        assertThat(client.delete(p1.brukerId.verdi, PDL_MED_FAMILIE_CACHE)).isTrue()
+        assertThat(client.delete(p1.brukerId.verdi, PDL_MED_FAMILIE_CACHE)).isTrue
         assertThat(client.get(p1.brukerId.verdi, Person::class, PDL_MED_FAMILIE_CACHE)).isNull()
     }
 
@@ -140,7 +139,7 @@ class CacheClientTest {
     @MethodSource("cacheClients")
     @DisplayName("Timeout av cache element fungerer")
     fun putAndGetOne(client: CacheOperations) {
-        assertThat(client.put(p1.brukerId.verdi, p1, ofSeconds(1), PDL_MED_FAMILIE_CACHE)).isTrue()
+        assertThat(client.put(p1.brukerId.verdi, p1, ofSeconds(1), PDL_MED_FAMILIE_CACHE)).isTrue
         assertThat(client.get(p1.brukerId.verdi, Person::class, PDL_MED_FAMILIE_CACHE)).isEqualTo(p1)
         await.atMost(3, SECONDS).until {
             client.get(p1.brukerId.verdi, Person::class, PDL_MED_FAMILIE_CACHE) == null

@@ -1,11 +1,12 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import no.nav.tilgangsmaskin.felles.cache.CacheBeanConfig.Companion.MAPPER
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import tools.jackson.databind.json.JsonMapper
 import kotlin.reflect.KClass
 
-class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration?>, val mapper: JsonMapper) {
+class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration?>, val mapper: JsonMapper = MAPPER) {
 
     private val log = getLogger(javaClass)
 
@@ -15,7 +16,7 @@ class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration?>, va
     fun json(value: Any) =
         mapper.writeValueAsString(value)
 
-    fun `nøkkel`(`nøkkel`: String, cache: CachableConfig): String {
+    fun nøkkel(nøkkel: String, cache: CachableConfig): String {
         val prefix = prefixFor(cache)
         val extra = cache.extraPrefix?.let { "$it:" } ?: ""
         return "$prefix$extra$nøkkel"

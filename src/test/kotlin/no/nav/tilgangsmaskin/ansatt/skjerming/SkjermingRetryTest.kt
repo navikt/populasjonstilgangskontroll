@@ -6,7 +6,6 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import java.net.URI
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import org.assertj.core.api.Assertions.assertThat
@@ -19,7 +18,6 @@ import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @ContextConfiguration(classes = [SkjermingTjeneste::class])
@@ -40,14 +38,10 @@ internal class SkjermingRetryTest {
     @Autowired
     lateinit var tjeneste: SkjermingTjeneste
 
-    @BeforeTest
-    fun beforeEach() {
-        every { adapter.skjerming(brukerId.verdi) } throws RecoverableRestException(INTERNAL_SERVER_ERROR, uri)
-    }
-
     @Test
     @DisplayName("Returner true etter at antall forsøk er oppbrukt")
     fun feilerEtterFireMislykkedeForsøk() {
+        every { adapter.skjerming(brukerId.verdi) } throws RecoverableRestException(INTERNAL_SERVER_ERROR, uri)
         assertThrows<RecoverableRestException> {
             tjeneste.skjerming(brukerId)
         }

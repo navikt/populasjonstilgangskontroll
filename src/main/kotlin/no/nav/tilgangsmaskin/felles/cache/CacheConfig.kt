@@ -2,9 +2,10 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import no.nav.tilgangsmaskin.felles.cache.CacheConfig.Companion.VALKEY
 import org.springframework.boot.context.properties.ConfigurationProperties
+import java.time.Duration
 
 @ConfigurationProperties(VALKEY)
-data class CacheConfig(val username: String, val password: String, val host: String, val port: Int) {
+data class CacheConfig(val username: String, val password: String, val host: String, val port: Int, val timeout: Duration = Duration.ofSeconds(5)) {
 
     companion object {
         const val VALKEY = "valkey"

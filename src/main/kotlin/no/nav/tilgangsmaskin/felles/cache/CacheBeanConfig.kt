@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import glide.api.GlideClient
 import glide.api.models.GlideString.gs
+import glide.api.models.configuration.BackoffStrategy
 import glide.api.models.configuration.GlideClientConfiguration
 import glide.api.models.configuration.NodeAddress
 import glide.api.models.configuration.ServerCredentials
@@ -26,7 +27,7 @@ import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializ
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
 import tools.jackson.databind.json.JsonMapper
-import tools.jackson.module.kotlin.KotlinModule.Builder
+import tools.jackson.module.kotlin.KotlinModule
 import java.util.concurrent.TimeUnit.SECONDS
 
 
@@ -50,6 +51,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
         RedisClient.create(RedisURI.Builder
             .redis(cfg.host, cfg.port)
             .withSsl(true)
+            .withTimeout(cfg.timeout)
             .withAuthentication(cfg.username, cfg.password)
             .build())
 
@@ -61,7 +63,10 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
                 .port(cfg.port)
                     .build())
             .useTLS(true)
-            .requestTimeout(10000)
+            .reconnectStrategy(BackoffStrategy.builder()
+                .numOfRetries(2)
+                .build())
+            .requestTimeout(cfg.timeout)
             .credentials(ServerCredentials.builder()
                 .username(cfg.username)
                 .password(cfg.password)
@@ -95,9 +100,9 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             }
 
     companion object {
-        val MAPPER = JsonMapper.builder()
+        val MAPPER: JsonMapper = JsonMapper.builder()
             .polymorphicTypeValidator(NavPolymorphicTypeValidator()).apply {
-                addModule(Builder().build())
+                addModule(KotlinModule.Builder().build())
                 addModule(JacksonTypeInfoAddingValkeyModule())
             }.build()
     }

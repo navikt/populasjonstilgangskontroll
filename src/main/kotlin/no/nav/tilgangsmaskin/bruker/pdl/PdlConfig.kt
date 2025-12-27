@@ -8,6 +8,7 @@ import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
+import java.util.UUID
 
 
 @ConfigurationProperties(PDL)
@@ -18,6 +19,7 @@ class PdlConfig(
     personBolkPath: String = DEFAULT_PERSON__BOLK_PATH,
     enabled: Boolean = true) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, PDL, enabled) {
 
+    override val clazz = Person::class
     override val caches = PDL_CACHES
     override val navn = name
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
@@ -32,7 +34,7 @@ class PdlConfig(
         private const val DEFAULT_PERSON__BOLK_PATH = "/api/v1/personBolk"
         val  PDL_MED_FAMILIE_CACHE = CachableConfig(PDL,MED_FAMILIE)
         val  PDL_MED_UTVIDET_FAMILIE_CACHE = CachableConfig(PDL,MED_UTVIDET_FAMILIE)
-        val PDL_CACHES  = listOf(PDL_MED_FAMILIE_CACHE,PDL_MED_UTVIDET_FAMILIE_CACHE)
+        val PDL_CACHES  = setOf(PDL_MED_FAMILIE_CACHE,PDL_MED_UTVIDET_FAMILIE_CACHE)
 
     }
 }

@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import tools.jackson.core.StreamReadFeature
+import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 import java.util.function.Function
 
 
@@ -44,7 +44,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
      @Bean
     fun jackson3Customizer() = JsonMapperBuilderCustomizer {
         it.addMixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
-       it.enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
+       it.enable(INCLUDE_SOURCE_IN_LOCATION)
     }
 
     @Bean

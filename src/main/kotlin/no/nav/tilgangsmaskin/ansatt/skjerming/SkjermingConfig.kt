@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
+import java.util.UUID
 
 @ConfigurationProperties(SKJERMING)
 class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH,
@@ -17,7 +18,9 @@ class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH,
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
     override val navn = name
-    override val caches = listOf(SKJERMING_CACHE)
+    override val caches = setOf(SKJERMING_CACHE)
+    override val clazz = Boolean::class
+
 
     companion object {
         const val SKJERMING = "skjerming"

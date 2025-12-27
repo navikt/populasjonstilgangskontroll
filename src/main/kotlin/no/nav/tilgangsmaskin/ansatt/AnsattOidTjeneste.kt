@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component
 import java.time.Duration
+import java.util.UUID
 
 @Component
 class AnsattOidTjeneste(private val adapter: EntraRestClientAdapter) : CachableRestConfig {
@@ -17,7 +18,8 @@ class AnsattOidTjeneste(private val adapter: EntraRestClientAdapter) : CachableR
 
     override val varighet = Duration.ofDays(365)  // Godt nok, blås i skuddår
     override val navn = ENTRA_OID
-    override val caches = listOf(OID_CACHE)
+    override val caches = setOf(OID_CACHE)
+    override val clazz = UUID::class
 
     companion object {
         const val ENTRA_OID = "entraoid"

@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.implementation
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 val javaVersion = JavaLanguageVersion.of(21)
@@ -13,6 +14,7 @@ val poolsVersion = "2.13.0"
 val awaitilityVersion = "4.3.0"
 val springMockkVersion = "5.0.1"
 val confluentVersion = "8.1.1"
+val glideVersion = "2.2.3"
 
 
 group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
@@ -30,6 +32,7 @@ plugins {
     id("com.google.cloud.tools.jib") version "3.5.2"
     id("io.kotest") version "6.0.7"
     id("com.gorylenko.gradle-git-properties") version "2.5.4"
+    id("com.google.osdetector") version "1.7.3"
     application
 }
 springBoot {
@@ -60,6 +63,12 @@ configurations.all {
 }
 
 dependencies {
+
+    implementation("io.valkey:valkey-glide:$glideVersion") {
+        artifact {
+            classifier = osdetector.classifier
+        }
+    }
     implementation("io.confluent:kafka-avro-serializer:$confluentVersion") {
         exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
     }
@@ -109,6 +118,7 @@ dependencies {
     testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation(kotlin("test"))
+    runtimeOnly("com.h2database:h2")
 }
 
 configurations.configureEach {

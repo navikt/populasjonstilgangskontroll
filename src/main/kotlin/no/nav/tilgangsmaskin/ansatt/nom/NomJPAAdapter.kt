@@ -2,10 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 import jakarta.persistence.EntityManager
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.cache.CachableConfig
-import no.nav.tilgangsmaskin.felles.cache.CacheConfig
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.toInstant
 import org.springframework.stereotype.Component
 import java.time.Instant

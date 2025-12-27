@@ -14,7 +14,6 @@ import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOperations.Companion.`UTLØPT_KANAL`
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -23,7 +22,7 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCache
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.nonLockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer
+import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
 import tools.jackson.databind.json.JsonMapper
@@ -34,10 +33,10 @@ import java.util.concurrent.TimeUnit.SECONDS
 @Configuration(proxyBeanMethods = true)
 @ConditionalOnGCP
 class CacheBeanConfig(private val cf: RedisConnectionFactory,
+                      private val mapper: JsonMapper,
                       private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
 
-    private val log = getLogger(javaClass)
 
     @Bean
     override fun cacheManager()  =
@@ -66,7 +65,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             .reconnectStrategy(BackoffStrategy.builder()
                 .numOfRetries(2)
                 .build())
-            .requestTimeout(cfg.timeout)
+            .requestTimeout(cfg.timeout.toSeconds().toInt())
             .credentials(ServerCredentials.builder()
                 .username(cfg.username)
                 .password(cfg.password)
@@ -94,7 +93,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
         defaultCacheConfig()
             .entryTtl(cfg.varighet)
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))
-            .serializeValuesWith(fromSerializer(GenericJacksonJsonRedisSerializer(MAPPER)))
+            .serializeValuesWith(fromSerializer(JacksonJsonRedisSerializer(mapper,cfg.clazz.java)))
             .apply {
                 if (!cfg.cacheNulls) disableCachingNullValues()
             }
@@ -109,4 +108,4 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
 }
 
 
-class AllCaches(val map: Map<String, List<CachableConfig>>)
+class AllCaches(val map: Map<String, Set<CachableConfig>>)

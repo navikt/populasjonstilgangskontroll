@@ -28,6 +28,6 @@ abstract class AbstractCacheOperations(private val handler: CacheNøkkelHandler,
         handler.id(nøkkel)
 
     companion object {
-         const val `UTLØPT_KANAL` = "__keyevent@0__:expired"
+         const val UTLØPT_KANAL = "__keyevent@0__:expired"
     }
 }

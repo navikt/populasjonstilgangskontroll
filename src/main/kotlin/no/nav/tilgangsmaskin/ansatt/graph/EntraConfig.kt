@@ -59,7 +59,7 @@ class EntraConfig(
         private const val PARAM_VALUE_SELECT_GROUPS = "id,displayName"
         private const val DEFAULT_PING_PATH = "/organization"
         private const val PARAM_NAME_TOP = "\$top"
-        val ENTRA_CACHES = listOf(CachableConfig(GRAPH,"geoGrupper"), CachableConfig(GRAPH,"geoOgGlobaleGrupper"))
+        val ENTRA_CACHES = setOf(CachableConfig(GRAPH,"geoGrupper"), CachableConfig(GRAPH,"geoOgGlobaleGrupper"))
         val OID_CACHE = CachableConfig(ENTRA_OID)
 
     }

@@ -66,7 +66,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             .reconnectStrategy(BackoffStrategy.builder()
                 .numOfRetries(2)
                 .build())
-            .requestTimeout(cfg.timeout)
+            .requestTimeout(cfg.timeout.toSeconds().toInt())
             .credentials(ServerCredentials.builder()
                 .username(cfg.username)
                 .password(cfg.password)

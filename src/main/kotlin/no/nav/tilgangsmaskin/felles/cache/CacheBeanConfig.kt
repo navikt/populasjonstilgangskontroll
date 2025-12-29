@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.felles.cache
 import glide.api.GlideClient
 import glide.api.models.GlideString.gs
 import glide.api.models.configuration.BackoffStrategy
+import glide.api.models.configuration.BaseSubscriptionConfiguration.MessageCallback
 import glide.api.models.configuration.GlideClientConfiguration
 import glide.api.models.configuration.NodeAddress
 import glide.api.models.configuration.ServerCredentials
@@ -56,7 +57,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             .build())
 
     @Bean
-    fun glideConfig(cfg: CacheConfig, callback: GlideCacheElementUtløptLytter) =
+    fun glideConfig(cfg: CacheConfig, callback: MessageCallback) =
         GlideClientConfiguration.builder()
             .address(NodeAddress.builder()
                 .host(cfg.host)
@@ -65,7 +66,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             .useTLS(true)
             .reconnectStrategy(BackoffStrategy.builder()
                 .exponentBase(2)
-                .factor(100)  
+                .factor(100)
                 .jitterPercent(20)
                 .numOfRetries(2)
                 .build())

@@ -12,7 +12,7 @@ class GlideCacheElementUtløptLytter(private val publiserer: ApplicationEventPub
     private val log = getLogger(javaClass)
 
     override fun accept(message: PubSubMessage, ctx: Any?) {
-        if ( !message.channel.string.startsWith(`UTLØPT_KANAL`)) {
+        if ( !message.channel.string.startsWith(UTLØPT_KANAL)) {
             log.warn("Uventet hendelse på ${message.channel} med nøkkel ${message.message.string}")
         }
         else {

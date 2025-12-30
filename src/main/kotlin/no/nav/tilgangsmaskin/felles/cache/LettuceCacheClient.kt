@@ -14,7 +14,7 @@ import kotlin.reflect.KClass
 
 @Primary
 @Component
-class LettuceCacheClient(lettuce: RedisClient, cfg: CacheConfig,
+class LettuceCacheClient(private val lettuce: RedisClient, cfg: CacheConfig,
                          handler: CacheNøkkelHandler,
                          private val alleTreffTeller: BulkCacheSuksessTeller,
                          private val teller: BulkCacheTeller): AbstractCacheOperations(handler, cfg) {
@@ -90,6 +90,11 @@ class LettuceCacheClient(lettuce: RedisClient, cfg: CacheConfig,
         teller.tell(of("cache", navn, "result", "miss"), etterspurt - funnet)
         teller.tell(of("cache", navn, "result", "hit"), funnet)
         log.trace("Fant $funnet verdier i cache $navn for $etterspurt identer")
+    }
+
+    override fun destroy() {
+        conn.close()
+        lettuce.shutdown()
     }
 }
 

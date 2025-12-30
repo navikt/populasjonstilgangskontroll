@@ -52,4 +52,8 @@ class GlideCacheClient(private val glide: GlideClient, cfg: CacheConfig, handler
 
     override fun ping() =
         glide.ping().get()
+
+    override fun destroy() {
+        glide.close()
+    }
 }

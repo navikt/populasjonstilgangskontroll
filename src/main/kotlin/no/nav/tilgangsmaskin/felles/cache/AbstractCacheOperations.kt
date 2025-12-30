@@ -2,10 +2,12 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import no.nav.tilgangsmaskin.felles.cache.CacheConfig.Companion.VALKEY
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.beans.factory.DisposableBean
 import org.springframework.web.util.UriComponentsBuilder
 import kotlin.reflect.KClass
 
-abstract class AbstractCacheOperations(private val handler: CacheNøkkelHandler, cfg: CacheConfig) : CacheOperations {
+abstract class AbstractCacheOperations(private val handler: CacheNøkkelHandler, cfg: CacheConfig) : CacheOperations,
+    DisposableBean {
     override val name = VALKEY
     override val  pingEndpoint = UriComponentsBuilder.newInstance()
         .host(cfg.host)

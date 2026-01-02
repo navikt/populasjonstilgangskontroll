@@ -137,7 +137,7 @@ class TilgangController(
             }
         }
 
-    private fun enkeltOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, brukerId: String, regelType: RegelType, uri: String) =
+    private fun enkeltOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, brukerId: String, regelType: RegelType, uri: String) : Unit =
         with(brukerId.trim('"')) {
             MDC.put(USER_ID, ansattId().verdi)
             log.trace(CONFIDENTIAL,"Kjører {} regler for {} og {}", regelType, ansattId(), this.maskFnr())

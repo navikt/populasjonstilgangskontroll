@@ -38,7 +38,7 @@ class PdlSyncGraphQLClientAdapter(
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
     }
 
-    fun partnere(ident: String) =
+    fun partnere(ident: String) : Set<FamilieMedlem> =
         runCatching {
             query<Partnere>(SIVILSTAND_QUERY, ident(ident)).sivilstand.mapNotNull {
                 it.relatertVedSivilstand?.let { brukerId ->
@@ -48,7 +48,7 @@ class PdlSyncGraphQLClientAdapter(
         }.getOrElse {
             if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {
                 log.trace("Fant ingen partnere for $ident")
-                return emptySet<FamilieMedlem>()
+                return emptySet()
             }
             else throw it
         }

@@ -5,13 +5,18 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.person.pdl.leesah.Endringstype.OPPRETTET
+import no.nav.person.pdl.leesah.Personhendelse
+import no.nav.person.pdl.leesah.adressebeskyttelse.Adressebeskyttelse
+import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.STRENGT_FORTROLIG
+import no.nav.person.pdl.leesah.navn.Navn
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
-import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
+import no.nav.tilgangsmaskin.ansatt.nom.NomJPAAdapter
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
@@ -20,6 +25,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
+import no.nav.tilgangsmaskin.bruker.pdl.PdlCacheTømmer
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
@@ -47,7 +53,10 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
+import java.time.Instant
+import java.util.UUID
 
 
 @UnprotectedRestController(value = ["/${DEV}"])
@@ -65,37 +74,48 @@ class DevTilgangController(
     private val oppfølging: OppfølgingTjeneste,
     private val pip: PdlRestClientAdapter,
     private val oid: AnsattOidTjeneste,
-    private val nom: NomTjeneste,
+    private val nom: NomJPAAdapter,
+    private val pdlListener: PdlCacheTømmer,
     private val pdl: PDLTjeneste,
     private val cacheClient: CacheClient) {
 
     private val log = getLogger(javaClass)
 
 
+    private val hendelse = Personhendelse.newBuilder()
+        .setHendelseId(UUID.randomUUID().toString())
+        .setMaster("FREG")
+        .setOpprettet(Instant.now())
+        .setOpplysningstype("TEST")
+        .setTidligereHendelseId(UUID.randomUUID().toString())
+        .setNavn(Navn.newBuilder().setFornavn("Ola").setMellomnavn("Mellom").setEtternavn("Nordmann").build()
+        )
+        .setAdressebeskyttelse(Adressebeskyttelse.newBuilder().setGradering(STRENGT_FORTROLIG).build())
+        .setEndringstype(OPPRETTET)
+
     @PostMapping("oppfolging/bulk")
     fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)
 
-    @PostMapping("cache/skjerminger")
-    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(CachableConfig(SKJERMING),navIds)
+    @GetMapping("oppfolging/db")
+    fun oppfolgingEnhetDb(@RequestParam id: String) = oppfølging.enhetFor(id)
 
-    /*
-    @PostMapping("cache/evict/{cache}/{id}")
-    fun cacheEvict(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-                   cache: Caches, @PathVariable  id: String) : ResponseEntity<Unit> {
-        Caches.forNavn(cache.name).let { c ->
-            val  antall = cacheClient.deleteUsingManager(id,*c)
-            return if (antall > 0) noContent().build()
-            else  status(410).build()
-        }
-    }
-    */
+    @PostMapping("person/{id}")
+    fun pdlHendelse(@PathVariable id: String) =
+        pdlListener.listen(Personhendelse.newBuilder(hendelse)
+            .setPersonidenter(listOf(id)).build())
+
+
+    @PostMapping("cache/skjerminger")
+    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(navIds,
+        CachableConfig(SKJERMING))
+
 
    @PostMapping("cache/{cache}/{id}/slett")
    fun slettIdFraCache(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
                    cache: Caches, @PathVariable id: String) : ResponseEntity<Unit> {
 
        Caches.forNavn(cache.name).let { c ->
-           val antall = cacheClient.delete(*c, id = id).also { antall ->
+           val antall = cacheClient.delete(id,*c).also { antall ->
                log.info("Sletting status $antall for $id i ${c.size} cache(s) for cache '${cache.name.lowercase()}'" )
            }
            return if (antall > 0) noContent().build()
@@ -104,7 +124,8 @@ class DevTilgangController(
    }
 
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany<Person>(CachableConfig(PDL),navIds.map { it.verdi }.toSet())
+    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany<Person>(navIds.map { it.verdi }.toSet(),
+        CachableConfig(PDL))
 
     @GetMapping("cache/keys/{cache}")
     fun keys(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
@@ -117,7 +138,7 @@ class DevTilgangController(
     fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
             cache: Caches, id: String) =
         Caches.forNavn(cache.name)
-            .mapNotNull { cacheClient.getOne(it, id) }
+            .mapNotNull { cacheClient.getOne(id, it) }
             .toSet()
 
     @GetMapping("sivilstand/{id}")
@@ -146,7 +167,7 @@ class DevTilgangController(
         description = """Funksjon for å opprette relasjon mellom nav-ident og fnrslik  at oppslag på egne data og familierelasjoner kan testes """)
     @PostMapping("ansatt/{ansattId}/{brukerId}")
     fun nom(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
-        nom.lagre(NomAnsattData(ansattId, brukerId))
+        nom.upsert(NomAnsattData(ansattId, brukerId))
 
     @GetMapping("komplett/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)

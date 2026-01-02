@@ -103,23 +103,25 @@ class CacheClientTest {
 
     @Test
     fun putAndGetOnePdl() {
-        client.putOne(PDL_MED_FAMILIE_CACHE, person1.brukerId.verdi,person1, Duration.ofSeconds(1))
-        val one = client.getOne<Person>(PDL_MED_FAMILIE_CACHE,person1.brukerId.verdi)
+        client.putOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, person1, Duration.ofSeconds(1))
+        val one = client.getOne<Person>(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE)
         assertThat(one).isEqualTo(person1)
         await.atMost(3, SECONDS).until {
-            client.getOne<Person>(PDL_MED_FAMILIE_CACHE,person1.brukerId.verdi) == null
+            client.getOne<Person>(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE) == null
         }
     }
     @Test
     fun putAndGetManyPdl() {
         val ids = setOf(person1.brukerId.verdi,person2.brukerId.verdi)
-        client.putMany(PDL_MED_FAMILIE_CACHE, mapOf(person1.brukerId.verdi to person1, person2.brukerId.verdi to person2), Duration.ofSeconds(1))
-        val many = client.getMany<Person>(PDL_MED_FAMILIE_CACHE,ids)
+        client.putMany(mapOf(person1.brukerId.verdi to person1, person2.brukerId.verdi to person2),
+            PDL_MED_FAMILIE_CACHE,
+            Duration.ofSeconds(1))
+        val many = client.getMany<Person>(ids, PDL_MED_FAMILIE_CACHE)
         assertThat(many.keys).containsExactlyInAnyOrderElementsOf(ids)
         val nøkler = client.getAllKeys(PDL_MED_FAMILIE_CACHE).map { CacheNøkkelElementer(it).id }
         assertThat(nøkler).containsExactlyInAnyOrderElementsOf(ids)
         await.atMost(3, SECONDS).until {
-            client.getMany<Person>(PDL_MED_FAMILIE_CACHE,ids).isEmpty()
+            client.getMany<Person>(ids, PDL_MED_FAMILIE_CACHE).isEmpty()
         }
     }
 

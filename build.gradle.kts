@@ -120,7 +120,7 @@ dependencies {
     testImplementation(kotlin("test"))
     runtimeOnly("com.h2database:h2")
 }
-/*
+
 configurations.configureEach {
     resolutionStrategy {
         capabilitiesResolution {
@@ -130,7 +130,6 @@ configurations.configureEach {
         }
     }
 }
-*/
 
 dependencyManagement {
     imports {

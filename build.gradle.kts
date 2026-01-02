@@ -110,7 +110,7 @@ dependencies {
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation(kotlin("test"))
 }
-/*
+
 configurations.configureEach {
     resolutionStrategy {
         capabilitiesResolution {
@@ -120,7 +120,6 @@ configurations.configureEach {
         }
     }
 }
-*/
 
 dependencyManagement {
     imports {

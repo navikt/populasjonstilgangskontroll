@@ -36,7 +36,7 @@ springBoot {
     buildInfo {
         properties {
             additional = mapOf(
-                "kotlin.version" to "2.2.20",
+                "kotlin.version" to "2.3.0",
                 "jdk.version" to javaVersion.asInt().toString(),
                 "jdk.vendor" to System.getProperty("java.vendor")
             )
@@ -63,7 +63,7 @@ dependencies {
     implementation("io.confluent:kafka-avro-serializer:$confluentVersion") {
         exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
     }
-    implementation("at.yawk.lz4:lz4-java:1.10.1") // fjernes ved neste release av org.apache.kafka:kafka-clients
+    implementation("at.yawk.lz4:lz4-java:1.10.2") // fjernes ved neste release av org.apache.kafka:kafka-clients
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$otelVersion-alpha")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -110,7 +110,7 @@ dependencies {
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation(kotlin("test"))
 }
-
+/*
 configurations.configureEach {
     resolutionStrategy {
         capabilitiesResolution {
@@ -120,6 +120,7 @@ configurations.configureEach {
         }
     }
 }
+*/
 
 dependencyManagement {
     imports {

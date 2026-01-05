@@ -19,6 +19,7 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
+import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.overstyring.*
@@ -88,7 +89,7 @@ class RegelTjenesteTest {
         evalueringTeller = EvalueringTeller(registry, token)
         avdød = AvdødTeller(registry, token)
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-        every { oppfølging.enhetFor(vanligBrukerId.verdi) } returns Enhetsnummer("1234")
+        every { oppfølging.enhetFor(Identifikator(vanligBrukerId.verdi)) } returns Enhetsnummer("1234")
         every { token.system } returns "test"
         every { token.ansattId } returns ansattId
         every { token.clusterAndSystem } returns "cluster:test"

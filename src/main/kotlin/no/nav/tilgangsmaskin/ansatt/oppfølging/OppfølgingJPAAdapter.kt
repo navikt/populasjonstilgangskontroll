@@ -13,7 +13,7 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository,val en
     private val log = getLogger(javaClass)
 
     fun avsluttOppfølging(id: UUID)  =
-         repository.deleteByUUID(id).also {
+         repository.deleteByUUID(id) == 1.also {
             log.info("Oppfølging avsluttet for $id")
         }
 

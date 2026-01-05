@@ -17,6 +17,3 @@ management:
   httpexchanges:
     recording:
       enabled: true
-
-oppfolging:
-  enabled: true

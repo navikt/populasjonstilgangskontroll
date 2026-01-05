@@ -25,7 +25,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
-import no.nav.tilgangsmaskin.bruker.pdl.PdlCacheTømmer
+import no.nav.tilgangsmaskin.bruker.pdl.PdlCacheOpprydder
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
@@ -75,7 +75,7 @@ class DevTilgangController(
     private val pip: PdlRestClientAdapter,
     private val oid: AnsattOidTjeneste,
     private val nom: NomJPAAdapter,
-    private val pdlListener: PdlCacheTømmer,
+    private val pdlListener: PdlCacheOpprydder,
     private val pdl: PDLTjeneste,
     private val cacheClient: CacheClient) {
 

@@ -27,7 +27,7 @@ class GraderingFilterStrategy : RecordFilterStrategy<String, Personhendelse> {
             if (resultat) {
                 log.trace(CONFIDENTIAL, "Filtrerte bort PDL hendelse {}", hendelse)
             } else {
-                log.info(CONFIDENTIAL, "Aksepterte PDL hendelse $hendelse")
+                log.info(CONFIDENTIAL, "Konsumerte PDL hendelse $hendelse")
             }
         private val UFILTRERTE_GRADERINGER = setOf(STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND, FORTROLIG)
     }

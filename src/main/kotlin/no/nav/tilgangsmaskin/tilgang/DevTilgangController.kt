@@ -12,6 +12,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomJPAAdapter
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
@@ -19,6 +20,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.PdlCacheOpprydder
@@ -52,6 +54,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import java.time.Instant
+import java.time.Instant.now
 import java.util.UUID
 
 
@@ -71,7 +74,6 @@ class DevTilgangController(
     private val pip: PdlRestClientAdapter,
     private val oid: AnsattOidTjeneste,
     private val nom: NomJPAAdapter,
-    private val pdlListener: PdlCacheOpprydder,
     private val pdl: PDLTjeneste,
     private val cacheClient: CacheClient) {
 
@@ -81,6 +83,12 @@ class DevTilgangController(
     @PostMapping("oppfolging/{uuid}/avslutt")
     fun oppfølgingAvslutt(@PathVariable uuid: UUID, @RequestBody brukerId : BrukerId) = oppfølging.avslutt(uuid, brukerId,
         AktørId("1234567890123"))
+
+    @PostMapping("oppfolging/{uuid}/kontor")
+    fun oppfølgingKOntor(@PathVariable uuid: UUID, @RequestBody brukerId : BrukerId) = oppfølging.kontorFor(uuid, brukerId,
+        AktørId("1234567890123"),
+        now(),
+        `OppfølgingHendelse`.Kontor(Enhetsnummer("0001"),"Testkontor"))
 
     @GetMapping("oppfolging/enhet")
     fun oppfolgingEnhet(@RequestParam id: String) = oppfølging.enhetFor(id)

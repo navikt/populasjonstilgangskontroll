@@ -8,13 +8,16 @@ import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.cache.annotation.Caching
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.util.UUID
 
 @Service
+@Transactional
 class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
 
     @Cacheable(cacheNames = [OPPFØLGING],key = "#id")
+    @Transactional(readOnly = true)
     fun enhetFor(id: String) =
         db.enhetFor(id)
 
@@ -24,6 +27,7 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
             CacheEvict(cacheNames = [OPPFØLGING], key = "#brukerId.verdi")
         ]
     )
+
     fun start(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId, tidspunkt: Instant, kontor: Kontor) =
         db.startOppfølging(oppfolgingsperiodeUuid,brukerId.verdi, aktorId.verdi, tidspunkt,kontor.kontorId.verdi)
 

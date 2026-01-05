@@ -5,11 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.person.pdl.leesah.Endringstype.OPPRETTET
-import no.nav.person.pdl.leesah.Personhendelse
-import no.nav.person.pdl.leesah.adressebeskyttelse.Adressebeskyttelse
-import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.STRENGT_FORTROLIG
-import no.nav.person.pdl.leesah.navn.Navn
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste

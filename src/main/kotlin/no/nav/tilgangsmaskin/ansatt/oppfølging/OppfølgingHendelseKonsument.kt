@@ -15,7 +15,7 @@ class OppfølgingHendelseKonsument(private val db: OppfølgingJPAAdapter) {
     @KafkaListener(
         topics = ["poao.siste-oppfolgingsperiode-v2"],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
-        groupId = OPPFØLGING + "xxxx")
+        groupId = OPPFØLGING + "42")
 
     fun listen(hendelse: OppfølgingHendelse) {
         when (hendelse.sisteEndringsType) {

@@ -25,8 +25,8 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
 
     @Caching(
         evict = [
-            CacheEvict(cacheNames = [OPPFØLGING], key = "#aktorId.verdi"),
-            CacheEvict(cacheNames = [OPPFØLGING], key = "#brukerId.verdi")
+            CacheEvict(cacheNames = [OPPFØLGING], key = "'${OPPFØLGING}::' + #aktorId.verdi"),
+            CacheEvict(cacheNames = [OPPFØLGING], key = "'${OPPFØLGING}::' + #brukerId.verdi")
         ]
     )
     fun start(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId, kontor: Kontor, tidspunkt: Instant = now()) =
@@ -34,8 +34,8 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
 
     @Caching(
         evict = [
-            CacheEvict(cacheNames = [OPPFØLGING], key = "#aktorId.verdi"),
-            CacheEvict(cacheNames = [OPPFØLGING], key = "#brukerId.verdi")
+            CacheEvict(cacheNames = [OPPFØLGING], key = "'${OPPFØLGING}::' + #aktorId.verdi"),
+            CacheEvict(cacheNames = [OPPFØLGING], key = "'${OPPFØLGING}::' + #brukerId.verdi")
         ]
     )
     fun kontorFor(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId, kontor: Kontor, tidspunkt: Instant = now()) =
@@ -43,8 +43,8 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
 
     @Caching(
         evict = [
-            CacheEvict(cacheNames = [OPPFØLGING], key = "#aktorId.verdi"),
-            CacheEvict(cacheNames = [OPPFØLGING], key = "#brukerId.verdi")
+            CacheEvict(cacheNames = [OPPFØLGING], key = "'${OPPFØLGING}::' + #aktorId.verdi"),
+            CacheEvict(cacheNames = [OPPFØLGING], key = "'${OPPFØLGING}::' + #brukerId.verdi")
         ]
     )
     fun avslutt(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId) =

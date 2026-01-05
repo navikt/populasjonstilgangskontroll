@@ -17,12 +17,12 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository,val en
             log.info("Oppfølging avsluttet for $id")
         }
 
-    fun oppdaterKontor(id: UUID, brukerId: String, `aktørId`: String, kontor: String, start: Instant) =
+    fun oppdaterKontor(id: UUID, brukerId: String, aktørId: String, kontor: String, start: Instant) =
          upsert(id,brukerId, aktørId, start, kontor).also {
             log.info("Oppfølging kontor endret til $kontor for $id")
         }
 
-    fun startOppfølging(id: UUID, brukerId: String, `aktørId`: String, kontor: String, start: Instant) =
+    fun startOppfølging(id: UUID, brukerId: String, aktørId: String, kontor: String, start: Instant) =
          upsert(id,brukerId, aktørId, start, kontor).also {
             log.info("Oppfølging registrert for $id")
         }

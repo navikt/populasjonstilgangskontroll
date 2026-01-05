@@ -4,6 +4,7 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPF
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.CachePut
@@ -31,7 +32,9 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
         ]
     )
     fun start(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId, kontor: Kontor, tidspunkt: Instant = now()) =
-        db.startOppfølging(oppfolgingsperiodeUuid, brukerId.verdi, aktorId.verdi, kontor.kontorId.verdi, tidspunkt)
+        kontor.kontorId.apply {
+            db.startOppfølging(oppfolgingsperiodeUuid, brukerId.verdi, aktorId.verdi, verdi, tidspunkt)
+        }
 
     @Caching(
         put = [
@@ -40,7 +43,9 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
         ]
     )
     fun kontorFor(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId, kontor: Kontor, tidspunkt: Instant = now()) =
-        db.oppdaterKontor(oppfolgingsperiodeUuid, brukerId.verdi, aktorId.verdi, kontor.kontorId.verdi, tidspunkt)
+        kontor.kontorId.apply {
+            db.oppdaterKontor(oppfolgingsperiodeUuid, brukerId.verdi, aktorId.verdi, verdi, tidspunkt)
+        }
 
     @Caching(
         evict = [

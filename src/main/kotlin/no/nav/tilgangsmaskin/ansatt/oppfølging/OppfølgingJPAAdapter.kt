@@ -22,12 +22,12 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository,val en
             log.info("Oppfølging avsluttet for $id")
         }
 
-    fun oppdaterKontor(id: UUID, brukerId: BrukerId, aktørId: AktørId, start: Instant, kontor: Enhetsnummer) =
+    fun oppdaterKontor(id: UUID, brukerId: String, aktørId: String, start: Instant, kontor: String) =
          upsert(id,brukerId, aktørId, start, kontor).also {
-            log.info("Oppfølging kontor endret til ${kontor.verdi} for $id")
+            log.info("Oppfølging kontor endret til $kontor for $id")
         }
 
-    fun startOppfølging(id: UUID, brukerId: BrukerId, aktørId: AktørId, start: Instant, kontor: Enhetsnummer) =
+    fun startOppfølging(id: UUID, brukerId: String, aktørId: String, start: Instant, kontor: String) =
          upsert(id,brukerId, aktørId, start, kontor).also {
             log.info("Oppfølging registrert for $id")
         }
@@ -42,13 +42,13 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository,val en
             CacheEvict(cacheNames = [OPPFØLGING], key = "#aktørId.verdi")
         ]
     )
-     fun upsert(id: UUID, brukerId: BrukerId, aktørId: AktørId, start: Instant, kontor: Enhetsnummer) =
+     fun upsert(id: UUID, brukerId: String, aktørId: String, start: Instant, kontor: String) =
         entityManager.createNativeQuery(UPSERT_QUERY)
             .setParameter("id", id)
-            .setParameter("brukerid", brukerId.verdi)
-            .setParameter("aktoerid", aktørId.verdi)
+            .setParameter("brukerid", brukerId)
+            .setParameter("aktoerid", aktørId)
             .setParameter("startdato", start)
-            .setParameter("kontor", kontor.verdi)
+            .setParameter("kontor", kontor)
             .executeUpdate()
 
     companion object {

@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Component
 @Transactional
-class OppfølgingHendelseKonsument(private val db: OppfølgingJPAAdapter) {
+class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste) {
 
     @KafkaListener(
         topics = ["poao.siste-oppfolgingsperiode-v2"],
@@ -27,17 +27,18 @@ class OppfølgingHendelseKonsument(private val db: OppfølgingJPAAdapter) {
 
     private fun oppfølgingRegistrert(hendelse: OppfølgingHendelse) =
         with(hendelse) {
-            db.startOppfølging(oppfolgingsperiodeUuid,ident, aktorId, startTidspunkt,kontor!!.kontorId)
+            oppfølging.start(oppfolgingsperiodeUuid,ident,aktorId,startTidspunkt,kontor!!)
         }
 
     private fun kontorEndret(hendelse: OppfølgingHendelse) =
         with(hendelse) {
-            db.oppdaterKontor(oppfolgingsperiodeUuid,ident, aktorId, startTidspunkt,kontor!!.kontorId)
+            oppfølging.kontorfor(oppfolgingsperiodeUuid,ident,aktorId,startTidspunkt,kontor!!)
         }
 
     private fun oppfølgingAvsluttet(hendelse: OppfølgingHendelse) =
-            db.avsluttOppfølging(hendelse.oppfolgingsperiodeUuid)
-
+        with(hendelse) {
+            oppfølging.avslutt(oppfolgingsperiodeUuid, ident, aktorId)
+        }
 }
 
 

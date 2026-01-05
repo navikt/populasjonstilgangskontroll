@@ -27,6 +27,11 @@
   },
   "inbound": [
     {
+      "name": "aareg-tilgangskontroll-q1",
+      "namespace": "arbeidsforhold",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "kabal-api-neon",
       "namespace": "klage",
       "cluster": "dev-gcp"

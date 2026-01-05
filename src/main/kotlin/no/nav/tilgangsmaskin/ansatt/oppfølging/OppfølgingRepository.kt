@@ -15,7 +15,6 @@ interface OppfølgingRepository: JpaRepository<OppfølgingEntity, UUID>  {
     @Modifying
     @Query("DELETE FROM OppfølgingEntity o WHERE o.id = :id")
     fun deleteByUUID(id: UUID): Int
-
 }
 
 

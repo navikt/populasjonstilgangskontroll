@@ -29,9 +29,8 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
             CacheEvict(cacheNames = [OPPFØLGING], key = "#brukerId.verdi")
         ]
     )
-
     fun start(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId, kontor: Kontor, tidspunkt: Instant = now()) =
-        db.`startOppfølging`(oppfolgingsperiodeUuid, brukerId.verdi, aktorId.verdi, kontor.kontorId.verdi, tidspunkt)
+        db.startOppfølging(oppfolgingsperiodeUuid, brukerId.verdi, aktorId.verdi, kontor.kontorId.verdi, tidspunkt)
 
     @Caching(
         evict = [

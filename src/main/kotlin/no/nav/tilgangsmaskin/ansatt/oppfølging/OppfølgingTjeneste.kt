@@ -18,7 +18,7 @@ import java.util.UUID
 @Transactional
 class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
 
-    @Cacheable(cacheNames = [OPPFØLGING],key = "#id")
+    @Cacheable(cacheNames = [OPPFØLGING],key = "#id.verdi")
     @Transactional(readOnly = true)
     fun enhetFor(id: Identifikator) =
         db.enhetFor(id.verdi)

@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.cache.annotation.Caching
 import org.springframework.stereotype.Service
@@ -24,18 +25,18 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
         db.enhetFor(id.verdi)
 
     @Caching(
-        evict = [
-            CacheEvict(cacheNames = [OPPFØLGING], key = "'${OPPFØLGING}::' + #aktorId.verdi"),
-            CacheEvict(cacheNames = [OPPFØLGING], key = "'${OPPFØLGING}::' + #brukerId.verdi")
+        put = [
+            CachePut(cacheNames = [OPPFØLGING], key = "'${OPPFØLGING}::' + #aktorId.verdi"),
+            CachePut(cacheNames = [OPPFØLGING], key = "'${OPPFØLGING}::' + #brukerId.verdi")
         ]
     )
     fun start(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId, kontor: Kontor, tidspunkt: Instant = now()) =
         db.startOppfølging(oppfolgingsperiodeUuid, brukerId.verdi, aktorId.verdi, kontor.kontorId.verdi, tidspunkt)
 
     @Caching(
-        evict = [
-            CacheEvict(cacheNames = [OPPFØLGING], key = "'${OPPFØLGING}::' + #aktorId.verdi"),
-            CacheEvict(cacheNames = [OPPFØLGING], key = "'${OPPFØLGING}::' + #brukerId.verdi")
+        put = [
+            CachePut(cacheNames = [OPPFØLGING], key = "'${OPPFØLGING}::' + #aktorId.verdi"),
+            CachePut(cacheNames = [OPPFØLGING], key = "'${OPPFØLGING}::' + #brukerId.verdi")
         ]
     )
     fun kontorFor(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId, kontor: Kontor, tidspunkt: Instant = now()) =

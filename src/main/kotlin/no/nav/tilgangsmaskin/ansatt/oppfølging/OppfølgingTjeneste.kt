@@ -24,8 +24,8 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
             CacheEvict(cacheNames = [OPPFØLGING], key = "#brukerId.verdi")
         ]
     )
-    fun start(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId, startTidspunkt: Instant, kontor: Kontor) =
-        db.startOppfølging(oppfolgingsperiodeUuid,brukerId.verdi, aktorId.verdi, startTidspunkt,kontor.kontorId.verdi)
+    fun start(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId, tidspunkt: Instant, kontor: Kontor) =
+        db.startOppfølging(oppfolgingsperiodeUuid,brukerId.verdi, aktorId.verdi, tidspunkt,kontor.kontorId.verdi)
 
     @Caching(
         evict = [
@@ -33,8 +33,8 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
             CacheEvict(cacheNames = [OPPFØLGING], key = "#brukerId.verdi")
         ]
     )
-    fun kontorfor(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId, startTidspunkt: Instant, kontor: Kontor) =
-        db.oppdaterKontor(oppfolgingsperiodeUuid,brukerId.verdi, aktorId.verdi, startTidspunkt,kontor.kontorId.verdi)
+    fun kontorFor(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId, tidspunkt: Instant, kontor: Kontor) =
+        db.oppdaterKontor(oppfolgingsperiodeUuid,brukerId.verdi, aktorId.verdi, tidspunkt,kontor.kontorId.verdi)
 
     @Caching(
         evict = [
@@ -42,6 +42,6 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
             CacheEvict(cacheNames = [OPPFØLGING], key = "#brukerId.verdi")
         ]
     )
-    fun avslutt(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId,) =
+    fun avslutt(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId) =
         db.avsluttOppfølging(oppfolgingsperiodeUuid)
 }

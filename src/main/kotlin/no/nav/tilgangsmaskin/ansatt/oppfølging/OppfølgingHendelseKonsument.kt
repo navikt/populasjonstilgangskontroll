@@ -32,7 +32,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
 
     private fun kontorEndret(hendelse: OppfølgingHendelse) =
         with(hendelse) {
-            oppfølging.kontorfor(oppfolgingsperiodeUuid,ident,aktorId,startTidspunkt,kontor!!)
+            oppfølging.kontorFor(oppfolgingsperiodeUuid,ident,aktorId,startTidspunkt,kontor!!)
         }
 
     private fun oppfølgingAvsluttet(hendelse: OppfølgingHendelse) =

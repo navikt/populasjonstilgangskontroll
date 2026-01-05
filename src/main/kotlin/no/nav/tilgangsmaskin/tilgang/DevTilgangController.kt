@@ -21,6 +21,7 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
+import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Identifikator
@@ -82,28 +83,12 @@ class DevTilgangController(
     private val log = getLogger(javaClass)
 
 
-    private val hendelse = Personhendelse.newBuilder()
-        .setHendelseId(UUID.randomUUID().toString())
-        .setMaster("FREG")
-        .setOpprettet(Instant.now())
-        .setOpplysningstype("TEST")
-        .setTidligereHendelseId(UUID.randomUUID().toString())
-        .setNavn(Navn.newBuilder().setFornavn("Ola").setMellomnavn("Mellom").setEtternavn("Nordmann").build()
-        )
-        .setAdressebeskyttelse(Adressebeskyttelse.newBuilder().setGradering(STRENGT_FORTROLIG).build())
-        .setEndringstype(OPPRETTET)
+    @PostMapping("oppfolging/{uuid}/avslutt")
+    fun oppfølgingAvslutt(@PathVariable uuid: UUID, @RequestBody brukerId : BrukerId) = oppfølging.avslutt(uuid, brukerId,
+        AktørId("1234567890123"))
 
-    @PostMapping("oppfolging/bulk")
-    fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)
-
-    @GetMapping("oppfolging/db")
-    fun oppfolgingEnhetDb(@RequestParam id: String) = oppfølging.enhetFor(id)
-
-    @PostMapping("person/{id}")
-    fun pdlHendelse(@PathVariable id: String) =
-        pdlListener.listen(Personhendelse.newBuilder(hendelse)
-            .setPersonidenter(listOf(id)).build())
-
+    @GetMapping("oppfolging/enhet")
+    fun oppfolgingEnhet(@RequestParam id: String) = oppfølging.enhetFor(id)
 
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(navIds,

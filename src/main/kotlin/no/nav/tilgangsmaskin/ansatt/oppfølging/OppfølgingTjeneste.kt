@@ -4,12 +4,14 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPF
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.Identifikator
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.cache.annotation.Caching
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
+import java.time.Instant.now
 import java.util.UUID
 
 @Service
@@ -18,8 +20,8 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
 
     @Cacheable(cacheNames = [OPPFØLGING],key = "#id")
     @Transactional(readOnly = true)
-    fun enhetFor(id: String) =
-        db.enhetFor(id)
+    fun enhetFor(id: Identifikator) =
+        db.enhetFor(id.verdi)
 
     @Caching(
         evict = [
@@ -28,8 +30,8 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
         ]
     )
 
-    fun start(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId, tidspunkt: Instant, kontor: Kontor) =
-        db.startOppfølging(oppfolgingsperiodeUuid,brukerId.verdi, aktorId.verdi, tidspunkt,kontor.kontorId.verdi)
+    fun start(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId, kontor: Kontor, tidspunkt: Instant = now()) =
+        db.`startOppfølging`(oppfolgingsperiodeUuid, brukerId.verdi, aktorId.verdi, kontor.kontorId.verdi, tidspunkt)
 
     @Caching(
         evict = [
@@ -37,8 +39,8 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
             CacheEvict(cacheNames = [OPPFØLGING], key = "#brukerId.verdi")
         ]
     )
-    fun kontorFor(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId, tidspunkt: Instant, kontor: Kontor) =
-        db.oppdaterKontor(oppfolgingsperiodeUuid,brukerId.verdi, aktorId.verdi, tidspunkt,kontor.kontorId.verdi)
+    fun kontorFor(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId, kontor: Kontor, tidspunkt: Instant = now()) =
+        db.oppdaterKontor(oppfolgingsperiodeUuid, brukerId.verdi, aktorId.verdi, kontor.kontorId.verdi, tidspunkt)
 
     @Caching(
         evict = [

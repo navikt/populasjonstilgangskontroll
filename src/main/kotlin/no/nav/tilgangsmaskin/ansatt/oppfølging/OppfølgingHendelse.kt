@@ -21,5 +21,5 @@ data class OppfølgingHendelse(
         OPPFOLGING_STARTET,
         OPPFOLGING_AVSLUTTET
     }
-    data class Kontor(val kontorId: Enhetsnummer, val kontorNavn: String)
+    data class Kontor(val kontorId: Enhetsnummer, val kontorNavn: String = "Ukjemt")
 }

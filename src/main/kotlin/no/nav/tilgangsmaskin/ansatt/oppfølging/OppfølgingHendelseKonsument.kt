@@ -27,12 +27,12 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
 
     private fun oppfølgingRegistrert(hendelse: OppfølgingHendelse) =
         with(hendelse) {
-            oppfølging.start(oppfolgingsperiodeUuid,ident,aktorId,startTidspunkt,kontor!!)
+            oppfølging.start(oppfolgingsperiodeUuid, ident, aktorId, kontor!!, startTidspunkt)
         }
 
     private fun kontorEndret(hendelse: OppfølgingHendelse) =
         with(hendelse) {
-            oppfølging.kontorFor(oppfolgingsperiodeUuid,ident,aktorId,startTidspunkt,kontor!!)
+            oppfølging.kontorFor(oppfolgingsperiodeUuid, ident, aktorId, kontor!!, startTidspunkt)
         }
 
     private fun oppfølgingAvsluttet(hendelse: OppfølgingHendelse) =

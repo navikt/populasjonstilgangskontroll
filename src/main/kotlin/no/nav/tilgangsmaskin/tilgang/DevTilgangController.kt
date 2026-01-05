@@ -12,7 +12,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomJPAAdapter
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
@@ -23,7 +23,6 @@ import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
-import no.nav.tilgangsmaskin.bruker.pdl.PdlCacheOpprydder
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
@@ -53,8 +52,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
-import java.time.Instant
-import java.time.Instant.now
 import java.util.UUID
 
 
@@ -80,18 +77,20 @@ class DevTilgangController(
     private val log = getLogger(javaClass)
 
 
-    @PostMapping("oppfolging/{uuid}/avslutt")
-    fun oppfølgingAvslutt(@PathVariable uuid: UUID, @RequestBody brukerId : BrukerId) = oppfølging.avslutt(uuid, brukerId,
-        AktørId("1234567890123"))
+    @PostMapping("oppfolging/{uuid}/{kontor}/start")
+    fun oppfølgingStart(@RequestBody identer : Identer,@PathVariable uuid: UUID, @PathVariable kontor: Enhetsnummer) =
+        oppfølging.start(uuid, identer.brukerId, identer.aktorId, Kontor(kontor))
 
-    @PostMapping("oppfolging/{uuid}/kontor")
-    fun oppfølgingKOntor(@PathVariable uuid: UUID, @RequestBody brukerId : BrukerId) = oppfølging.kontorFor(uuid, brukerId,
-        AktørId("1234567890123"),
-        now(),
-        `OppfølgingHendelse`.Kontor(Enhetsnummer("0001"),"Testkontor"))
+    @PostMapping("oppfolging/{uuid}/avslutt")
+    fun oppfølgingAvslutt(@RequestBody identer : Identer,@PathVariable uuid: UUID) = oppfølging.avslutt(uuid, identer.brukerId,
+        identer.aktorId)
+
+    @PostMapping("oppfolging/{uuid}/kontor/{kontor}")
+    fun oppfølgingKontor(@RequestBody identer : Identer,@PathVariable uuid: UUID, @PathVariable kontor: Enhetsnummer) =
+        oppfølging.kontorFor(uuid, identer.brukerId, identer.aktorId, Kontor(kontor))
 
     @GetMapping("oppfolging/enhet")
-    fun oppfolgingEnhet(@RequestParam id: String) = oppfølging.enhetFor(id)
+    fun enhetFor(@RequestParam id: Identifikator) = oppfølging.enhetFor(id)
 
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(navIds,
@@ -213,5 +212,8 @@ class DevTilgangController(
 
     @PostMapping("brukere")
     fun brukere(@RequestBody ids: Set<String>) = brukere.brukere(ids)
+
+
+    data class Identer(val brukerId: BrukerId, val aktorId: AktørId)
 
 }

@@ -2,8 +2,6 @@ package no.nav.tilgangsmaskin.ansatt.oppfølging
 
 import jakarta.persistence.EntityManager
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
-import no.nav.tilgangsmaskin.bruker.AktørId
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CacheEvict
@@ -22,12 +20,12 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository,val en
             log.info("Oppfølging avsluttet for $id")
         }
 
-    fun oppdaterKontor(id: UUID, brukerId: String, aktørId: String, start: Instant, kontor: String) =
+    fun oppdaterKontor(id: UUID, brukerId: String, `aktørId`: String, kontor: String, start: Instant) =
          upsert(id,brukerId, aktørId, start, kontor).also {
             log.info("Oppfølging kontor endret til $kontor for $id")
         }
 
-    fun startOppfølging(id: UUID, brukerId: String, aktørId: String, start: Instant, kontor: String) =
+    fun `startOppfølging`(id: UUID, brukerId: String, `aktørId`: String, kontor: String, start: Instant) =
          upsert(id,brukerId, aktørId, start, kontor).also {
             log.info("Oppfølging registrert for $id")
         }

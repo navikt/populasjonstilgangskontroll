@@ -27,6 +27,26 @@
   },
   "inbound": [
     {
+      "name": "aareg-tilgangskontroll-q1",
+      "namespace": "arbeidsforhold",
+      "cluster": "dev-gcp"
+    },
+    {
+      "name": "kabal-api-neon",
+      "namespace": "klage",
+      "cluster": "dev-gcp"
+    },
+    {
+      "name": "kabal-api-argon",
+      "namespace": "klage",
+      "cluster": "dev-gcp"
+    },
+    {
+      "name": "kabal-api-e2e",
+      "namespace": "klage",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "gjenlevende-bs-sak",
       "namespace": "etterlatte",
       "cluster": "dev-gcp"

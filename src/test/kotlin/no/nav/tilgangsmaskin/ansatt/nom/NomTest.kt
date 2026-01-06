@@ -46,40 +46,38 @@ internal class NomTest {
     private val GYLDIG = NomAnsattData(ansattId, vanligBrukerId, ALWAYS)
 
     @Autowired
-    private lateinit var adapter: NomJPAAdapter
+    private lateinit var nom: NomJPAAdapter
 
     @MockkBean
     private lateinit var token: Token
 
-    private lateinit var nom: NomTjeneste
 
     @BeforeAll
     fun setup() {
         every { token.system } returns "test"
-        nom = NomTjeneste(adapter)
     }
 
     @Test
     @DisplayName("Utgått ansatt retureres ikke")
     fun ansattIkkeLengerAnsatt() {
-        nom.lagre(UTGÅTT)
-        assertThat(nom.fnrForAnsatt(ansattId)).isNull()
+        nom.upsert(UTGÅTT)
+        assertThat(nom.fnrForAnsatt(ansattId.verdi)).isNull()
     }
 
    @Test
     @DisplayName("Ansatt uten sluttdato er gyldig")
     fun ingenSluttdato() {
-        nom.lagre(GYLDIG)
-        assertThat(nom.fnrForAnsatt(ansattId)).isEqualTo(GYLDIG.brukerId)
+        nom.upsert(GYLDIG)
+        assertThat(nom.fnrForAnsatt(ansattId.verdi)).isEqualTo(GYLDIG.brukerId)
     }
 
    @Test
     @DisplayName("Siste hendelse gjelder")
     fun oppdaterSamme() {
-        nom.lagre(UTGÅTT)
-        assertThat(nom.fnrForAnsatt(ansattId)).isNull()
-        nom.lagre(GYLDIG)
-        assertThat(nom.fnrForAnsatt(ansattId)).isEqualTo(GYLDIG.brukerId)
+        nom.upsert(UTGÅTT)
+        assertThat(nom.fnrForAnsatt(ansattId.verdi)).isNull()
+        nom.upsert(GYLDIG)
+        assertThat(nom.fnrForAnsatt(ansattId.verdi)).isEqualTo(GYLDIG.brukerId)
     }
 
     companion object {

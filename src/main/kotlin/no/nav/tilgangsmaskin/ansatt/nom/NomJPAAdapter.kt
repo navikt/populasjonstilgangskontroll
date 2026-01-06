@@ -31,7 +31,7 @@ class NomJPAAdapter(val repo: NomRepository, val entityManager: EntityManager) {
 
 
 
-    fun fnrForAnsatt(ansattId: String) = repo.ansattBrukerId(ansattId)?.let(::BrukerId)
+    fun fnrForAnsatt(ansattId: String) = repo.findFnrByNavidAndGyldigtilGreaterThanEqual(ansattId)?.let { BrukerId(it.fnr) }
 
     companion object {
         private const val UPSERT_QUERY = """

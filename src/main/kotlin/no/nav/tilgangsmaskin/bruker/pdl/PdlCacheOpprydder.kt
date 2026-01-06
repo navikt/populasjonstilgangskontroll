@@ -20,7 +20,7 @@ class PdlCacheOpprydder(private val teller: PdlCacheTømmerTeller, private val c
     private val log = getLogger(javaClass)
 
     @KafkaListener(
-        topics = [ "pdl.leesah-v1"],
+        topics = [TOPIC],
         containerFactory = "pdlAvroListenerContainerFactory",
         filter = "graderingFilterStrategy")
     fun listen(hendelse: Personhendelse) {
@@ -51,6 +51,10 @@ class PdlCacheOpprydder(private val teller: PdlCacheTømmerTeller, private val c
             pdl.medUtvidetFamile(id)
             log.info("Oppdaterte PDL cache for identer etter hendelse av type $gradering")
         }
+    }
+
+    companion object {
+        private const val TOPIC = "pdl.leesah-v1"
     }
 }
 

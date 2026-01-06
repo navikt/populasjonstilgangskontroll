@@ -5,8 +5,6 @@ import glide.api.GlideClient
 import glide.api.models.commands.SetOptions
 import glide.api.models.commands.SetOptions.Expiry.Seconds
 import no.nav.boot.conditionals.ConditionalOnNotProd
-import org.springframework.context.annotation.Lazy
-import org.springframework.stereotype.Component
 import java.time.Duration
 import kotlin.reflect.KClass
 

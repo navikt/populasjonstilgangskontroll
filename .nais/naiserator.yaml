@@ -80,8 +80,6 @@ spec:
           namespace: nais-system
         - application: skjermede-personer-pip
           namespace: nom
-        - application: ao-oppfolgingskontor
-          namespace: dab
         - application: logging
           namespace: nais-system
       external:

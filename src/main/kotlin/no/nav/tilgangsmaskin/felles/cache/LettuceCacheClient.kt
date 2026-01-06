@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import io.lettuce.core.RedisClient
 import io.micrometer.core.instrument.Tags.of
+import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
@@ -12,8 +13,7 @@ import java.time.Duration.ofSeconds
 import kotlin.reflect.KClass
 
 
-@Primary
-@Component
+@ConditionalOnProd
 class LettuceCacheClient(private val lettuce: RedisClient, cfg: CacheConfig,
                          handler: CacheNøkkelHandler,
                          private val alleTreffTeller: BulkCacheSuksessTeller,

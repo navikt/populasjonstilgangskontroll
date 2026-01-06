@@ -12,6 +12,8 @@ import glide.api.models.configuration.StandaloneSubscriptionConfiguration.PubSub
 import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisURI
 import no.nav.boot.conditionals.ConditionalOnGCP
+import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOperations.Companion.`UTLØPT_KANAL`
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
@@ -48,6 +50,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             .build()
 
     @Bean
+    @ConditionalOnProd
     fun lettuceClient(cfg: CacheConfig) =
         RedisClient.create(RedisURI.Builder
             .redis(cfg.host, cfg.port)
@@ -57,6 +60,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             .build())
 
     @Bean
+    @ConditionalOnNotProd
     fun glideConfig(cfg: CacheConfig, callback: MessageCallback) =
         GlideClientConfiguration.builder()
             .address(NodeAddress.builder()
@@ -82,7 +86,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             .build()
 
     @Bean
-    @Lazy
+    @ConditionalOnNotProd
      fun glideClient(cfg: GlideClientConfiguration)  =
             GlideClient.createClient(cfg).get(10, SECONDS)
 
@@ -91,7 +95,13 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
         CacheNøkkelHandler(mgr.cacheConfigurations)
 
     @Bean
-    fun cacheHealthIndicator(client: CacheOperations)  =
+    @ConditionalOnProd
+    fun cacheHealthIndicator(client: LettuceCacheClient)  =
+        PingableHealthIndicator(client)
+
+    @Bean
+    @ConditionalOnNotProd
+    fun glideCacheHealthIndicator(client: GlideCacheClient)  =
         PingableHealthIndicator(client)
 
     private fun cacheConfig(cfg: CachableRestConfig) =

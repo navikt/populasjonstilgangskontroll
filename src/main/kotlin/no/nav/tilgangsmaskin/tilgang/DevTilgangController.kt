@@ -11,13 +11,16 @@ import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
-import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
+import no.nav.tilgangsmaskin.ansatt.nom.NomJPAAdapter
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.bruker.Enhetsnummer
+import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
@@ -40,14 +43,13 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.MULTI_STATUS
 import org.springframework.http.HttpStatus.NO_CONTENT
-import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.noContent
-import org.springframework.http.ResponseEntity.status
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
+import java.util.*
 
 
 @UnprotectedRestController(value = ["/${DEV}"])
@@ -65,46 +67,31 @@ class DevTilgangController(
     private val oppfølging: OppfølgingTjeneste,
     private val pip: PdlRestClientAdapter,
     private val oid: AnsattOidTjeneste,
-    private val nom: NomTjeneste,
+    private val nom: NomJPAAdapter,
     private val pdl: PDLTjeneste,
     private val cacheClient: CacheClient) {
 
     private val log = getLogger(javaClass)
 
 
-    @PostMapping("oppfolging/bulk")
-    fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)
+    @PostMapping("oppfolging/{uuid}/{kontor}/registrer")
+    fun registrer(@RequestBody identer : Identer,@PathVariable uuid: UUID, @PathVariable kontor: Enhetsnummer) =
+        oppfølging.registrer(uuid, identer, Kontor(kontor))
+
+    @PostMapping("oppfolging/{uuid}/avslutt")
+    fun oppfølgingAvslutt(@RequestBody identer : Identer, @PathVariable uuid: UUID) = oppfølging.avslutt(uuid, identer)
+
+    @GetMapping("oppfolging/enhet")
+    fun enhetFor(@RequestParam id: Identifikator) = oppfølging.enhetFor(id)
 
     @PostMapping("cache/skjerminger")
-    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(CachableConfig(SKJERMING),navIds)
+    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(navIds,
+        CachableConfig(SKJERMING))
 
-    /*
-    @PostMapping("cache/evict/{cache}/{id}")
-    fun cacheEvict(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-                   cache: Caches, @PathVariable  id: String) : ResponseEntity<Unit> {
-        Caches.forNavn(cache.name).let { c ->
-            val  antall = cacheClient.deleteUsingManager(id,*c)
-            return if (antall > 0) noContent().build()
-            else  status(410).build()
-        }
-    }
-    */
-
-   @PostMapping("cache/{cache}/{id}/slett")
-   fun slettIdFraCache(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-                   cache: Caches, @PathVariable id: String) : ResponseEntity<Unit> {
-
-       Caches.forNavn(cache.name).let { c ->
-           val antall = cacheClient.delete(*c, id = id).also { antall ->
-               log.info("Sletting status $antall for $id i ${c.size} cache(s) for cache '${cache.name.lowercase()}'" )
-           }
-           return if (antall > 0) noContent().build()
-           else  status(410).build()
-       }
-   }
 
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany<Person>(CachableConfig(PDL),navIds.map { it.verdi }.toSet())
+    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany<Person>(navIds.map { it.verdi }.toSet(),
+        CachableConfig(PDL))
 
     @GetMapping("cache/keys/{cache}")
     fun keys(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
@@ -117,7 +104,7 @@ class DevTilgangController(
     fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
             cache: Caches, id: String) =
         Caches.forNavn(cache.name)
-            .mapNotNull { cacheClient.getOne(it, id) }
+            .mapNotNull { cacheClient.getOne(id, it) }
             .toSet()
 
     @GetMapping("sivilstand/{id}")
@@ -146,7 +133,11 @@ class DevTilgangController(
         description = """Funksjon for å opprette relasjon mellom nav-ident og fnrslik  at oppslag på egne data og familierelasjoner kan testes """)
     @PostMapping("ansatt/{ansattId}/{brukerId}")
     fun nom(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
-        nom.lagre(NomAnsattData(ansattId, brukerId))
+        nom.upsert(NomAnsattData(ansattId, brukerId))
+
+    @GetMapping("nom/{ansattId}")
+    fun nomFnr(@PathVariable ansattId: AnsattId) =
+        nom.fnrForAnsatt(ansattId.verdi)
 
     @GetMapping("komplett/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)

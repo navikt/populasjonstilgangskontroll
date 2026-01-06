@@ -4,9 +4,8 @@ import jakarta.persistence.EntityManager
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.cache.CachableConfig
-import no.nav.tilgangsmaskin.felles.cache.CacheConfig
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.toInstant
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.stereotype.Component
 import java.time.Instant
 
@@ -16,6 +15,7 @@ class NomJPAAdapter(val repo: NomRepository, val entityManager: EntityManager) {
 
     fun ryddOpp() = repo.deleteByGyldigtilBefore()
 
+    @CacheEvict(cacheNames = [NOM],key = "#data.ansattId.verdi")
     fun upsert(data: NomAnsattData) =
         with(data) {
             upsert(ansattId, brukerId, gyldighet.start.toInstant(), gyldighet.endInclusive.toInstant())
@@ -31,7 +31,7 @@ class NomJPAAdapter(val repo: NomRepository, val entityManager: EntityManager) {
 
 
 
-    fun fnrForAnsatt(ansattId: String) = repo.ansattBrukerId(ansattId)?.let(::BrukerId)
+    fun fnrForAnsatt(ansattId: String) = repo.findFnrByNavidAndGyldigtilGreaterThanEqual(ansattId)?.let { BrukerId(it.fnr) }
 
     companion object {
         private const val UPSERT_QUERY = """

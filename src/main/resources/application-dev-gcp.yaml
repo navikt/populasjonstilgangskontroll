@@ -13,10 +13,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: '*'
   httpexchanges:
     recording:
       enabled: true
-
-oppfolging:
-  enabled: true

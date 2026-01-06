@@ -25,19 +25,18 @@ class CacheClient(
     }
 
     @WithSpan
-    fun delete(vararg caches: CachableConfig, id: String) =
-        caches.sumOf {
-                cache -> conn.sync().del(handler.tilNøkkel(cache, id))
-        }
+    fun delete(id: String,cache: CachableConfig) =
+         conn.sync().del(handler.tilNøkkel(cache, id))
+
 
     @WithSpan
-    inline fun <reified T> getOne(cache: CachableConfig, id: String) =
+    inline fun <reified T> getOne(id: String, cache: CachableConfig) =
             conn.sync().get(handler.tilNøkkel(cache,id))?.let { json ->
                 handler.fraJson<T>(json)
         }
 
     @WithSpan
-    fun putOne(cache: CachableConfig, id: String, value: Any, ttl: Duration)  {
+    fun putOne(id: String, cache: CachableConfig, value: Any, ttl: Duration)  {
             conn.async().setex(handler.tilNøkkel(cache,id), ttl.seconds,handler.tilJson(value))
     }
 
@@ -47,7 +46,7 @@ class CacheClient(
 
 
     @WithSpan
-    inline fun <reified T> getMany(cache: CachableConfig, ids: Set<String>)  =
+    inline fun <reified T> getMany(ids: Set<String>, cache: CachableConfig)  =
         if (ids.isEmpty()) {
             emptyMap()
         }
@@ -67,7 +66,7 @@ class CacheClient(
         }
 
     @WithSpan
-    fun putMany(cache: CachableConfig, innslag: Map<String, Any>, ttl: Duration) {
+    fun putMany(innslag: Map<String, Any>, cache: CachableConfig, ttl: Duration) {
         if (innslag.isNotEmpty()) {
             log.trace("Bulk lagrer {} verdier for cache {} med prefix {}", innslag.size, cache.name, cache.extraPrefix)
                 conn.apply {

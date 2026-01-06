@@ -1,11 +1,14 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Query
 import java.time.Instant
+import java.time.Instant.now
 
 interface NomRepository : JpaRepository<NomEntity, Long> {
-    @Query("SELECT n.fnr FROM NomEntity n WHERE n.navid = :navId AND  n.gyldigtil >= CURRENT_DATE")
-    fun ansattBrukerId(navId: String): String?
-    fun deleteByGyldigtilBefore(before: Instant = Instant.now()): Int
+    fun findFnrByNavidAndGyldigtilGreaterThanEqual(navid: String, gyldigtil: Instant = now()): FnrProjection?
+    fun deleteByGyldigtilBefore(before: Instant = now()): Int
+}
+
+interface FnrProjection {
+    val fnr: String
 }

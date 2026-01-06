@@ -23,7 +23,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.core.env.Environment
-import org.springframework.core.env.getRequiredProperty
 import org.springframework.graphql.client.ClientGraphQlRequest
 import org.springframework.graphql.client.HttpSyncGraphQlClient
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor
@@ -85,7 +84,7 @@ class PdlClientBeanConfig {
     fun pdlHendelseKafkaListenerConsumerFactory(props: KafkaProperties, env: Environment): ConsumerFactory<String, Personhendelse> =
         DefaultKafkaConsumerFactory(
             props.buildConsumerProperties().toMutableMap().apply {
-                this[GROUP_ID_CONFIG] = PDL
+                this[GROUP_ID_CONFIG] = PDL + "test"
                 this[VALUE_DESERIALIZER_CLASS] = KafkaAvroDeserializer::class.java
                 this[SCHEMA_REGISTRY_URL_CONFIG] = env.schemaRegistryUrl()
                 this[SPECIFIC_AVRO_READER_CONFIG] = true

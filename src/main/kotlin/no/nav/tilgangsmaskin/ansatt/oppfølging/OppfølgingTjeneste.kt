@@ -1,13 +1,46 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
+import no.nav.tilgangsmaskin.bruker.Identer
+import no.nav.tilgangsmaskin.bruker.Identifikator
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.cache.annotation.Caching
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
+import java.time.Instant.now
+import java.util.*
 
 @Service
-class OppfølgingTjeneste(private val adapter: OppfølgingRestClientAdapter) {
+@Transactional
+class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
 
-    @Cacheable(cacheNames = [OPPFØLGING],key = "#brukerId")
-    fun enhetFor(brukerId: String) =
-        adapter.enheterFor(listOf(brukerId)).firstOrNull()?.enhet
+
+    @Cacheable(cacheNames = [OPPFØLGING],key = "#id.verdi")
+    @Transactional(readOnly = true)
+    fun enhetFor(id: Identifikator) =
+        db.enhetFor(id.verdi)
+
+    @Caching(
+        put = [
+            CachePut(cacheNames = [OPPFØLGING], key = "#identer.aktorId.verdi"),
+            CachePut(cacheNames = [OPPFØLGING], key = "#identer.brukerId.verdi")
+        ]
+    )
+    fun registrer(id: UUID, identer: Identer, kontor: Kontor, tidspunkt: Instant = now()) =
+        kontor.kontorId.apply {
+            db.registrer(id, identer.brukerId.verdi, identer.aktorId.verdi, tidspunkt, verdi)
+        }
+
+    @Caching(
+        evict = [
+            CacheEvict(cacheNames = [OPPFØLGING], key = "#identer.aktorId.verdi"),
+            CacheEvict(cacheNames = [OPPFØLGING], key = "#identer.brukerId.verdi")
+        ]
+    )
+    fun avslutt(id: UUID, identer: Identer) =
+        db.avslutt(id)
 }

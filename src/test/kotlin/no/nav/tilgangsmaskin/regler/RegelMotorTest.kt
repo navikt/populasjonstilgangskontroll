@@ -24,6 +24,7 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
+import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.tilgang.RegelConfig
@@ -236,16 +237,16 @@ class RegelMotorTest {
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
             forventAvvistAv<GeografiskRegel>(ansatt, bruker)
-            verify(exactly = 1) { oppfølging.enhetFor(brukerId.verdi) }
+            verify(exactly = 1) { oppfølging.enhetFor(Identifikator(brukerId.verdi)) }
         }
         @Test
         @DisplayName("Ansatt uten Nasjonal tilgang og uten GT kan likevel behandle om den har tilgang til brukerens oppfølgingsenhet")
         fun geoOppfølgingsEnhet() {
-           every { oppfølging.enhetFor(brukerId.verdi) } returns enhet
+           every { oppfølging.enhetFor(Identifikator(brukerId.verdi)) } returns enhet
             val ansatt = AnsattBuilder(ansattId).medMedlemskapI(oppfølgingGruppe).build()
             val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
             assertThat(ansatt kanBehandle bruker).isTrue
-            verify(exactly = 1) { oppfølging.enhetFor(brukerId.verdi) }
+            verify(exactly = 1) { oppfølging.enhetFor(Identifikator(brukerId.verdi)) }
         }
     }
 

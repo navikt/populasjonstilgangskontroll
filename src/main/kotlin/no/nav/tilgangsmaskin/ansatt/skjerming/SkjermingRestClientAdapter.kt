@@ -6,7 +6,6 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.IDENTER
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
@@ -27,7 +26,7 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
             return fraCache.mapKeys { BrukerId(it.key) }
         }
         val fraRest = fraRest(ids - fraCache.keys)
-        cache.putMany(SKJERMING_CACHE, fraRest, cf.varighet)
+        cache.putMany(fraRest, SKJERMING_CACHE, cf.varighet)
         tell(false)
         return (fraRest + fraCache).mapKeys {  BrukerId(it.key) }
     }
@@ -42,7 +41,7 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
     private fun tell(status: Boolean) =
         teller.tell(Tags.of("name", SKJERMING_CACHE.name,"suksess",status.toString()))
     private fun fraCache(ids: Set<String>) =
-            cache.getMany<Boolean>(SKJERMING_CACHE, ids)
+            cache.getMany<Boolean>(ids, SKJERMING_CACHE)
 
 }
 

@@ -1,8 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter.Companion.MED_FAMILIE
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter.Companion.MED_UTVIDET_FAMILIE
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
@@ -27,6 +25,8 @@ class PdlConfig(
 
     companion object {
         const val PDL = "pdl"
+        val MED_FAMILIE = "medFamilie"
+        val MED_UTVIDET_FAMILIE = "medUtvidetFamilie"
         private const val DEFAULT_PING_PATH = "/internal/health/liveness"
         private const val DEFAULT_PERSON_PATH = "/api/v1/person"
         private const val DEFAULT_PERSON__BOLK_PATH = "/api/v1/personBolk"

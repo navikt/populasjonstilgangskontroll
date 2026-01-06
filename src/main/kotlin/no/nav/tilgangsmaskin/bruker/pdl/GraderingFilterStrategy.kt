@@ -9,7 +9,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.listener.adapter.RecordFilterStrategy
 import org.springframework.stereotype.Component
-import kotlin.collections.contains
 
 @Component
 class GraderingFilterStrategy : RecordFilterStrategy<String, Personhendelse> {

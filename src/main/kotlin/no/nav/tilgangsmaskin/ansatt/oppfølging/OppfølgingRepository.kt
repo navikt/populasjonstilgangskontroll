@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.`oppfølging`
 
 import org.springframework.data.jpa.repository.JpaRepository
-import java.util.UUID
+import java.util.*
 
 interface OppfølgingRepository: JpaRepository<OppfølgingEntity, UUID>  {
     fun findByBrukerid(id: String): OppfølgingEntity?

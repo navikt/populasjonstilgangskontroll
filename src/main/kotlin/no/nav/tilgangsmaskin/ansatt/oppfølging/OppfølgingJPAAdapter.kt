@@ -5,33 +5,23 @@ import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 
 @Component
 class OppfølgingJPAAdapter(private val repository: OppfølgingRepository,val entityManager: EntityManager) {
 
     private val log = getLogger(javaClass)
 
-    fun avsluttOppfølging(id: UUID)  =
+    fun avslutt(id: UUID)  =
          repository.deleteById(id).also {
             log.info("Oppfølging avsluttet for $id")
-        }
-
-    fun oppdaterKontor(id: UUID, brukerId: String, aktørId: String, kontor: String, start: Instant) =
-         upsert(id,brukerId, aktørId, start, kontor).also {
-            log.info("Oppfølging kontor endret til $kontor for $id")
-        }
-
-    fun startOppfølging(id: UUID, brukerId: String, aktørId: String, kontor: String, start: Instant) =
-         upsert(id,brukerId, aktørId, start, kontor).also {
-            log.info("Oppfølging registrert for $id")
         }
 
     fun enhetFor(id: String) =
         repository.findByBrukerid(id)?.kontor?.let(::Enhetsnummer) ?:
         repository.findByAktoerid(id)?.kontor?.let(::Enhetsnummer)
 
-     private fun upsert(id: UUID, brukerId: String, aktørId: String, start: Instant, kontor: String) =
+      fun registrer(id: UUID, brukerId: String, aktørId: String, start: Instant, kontor: String) =
         entityManager.createNativeQuery(UPSERT_QUERY)
             .setParameter("id", id)
             .setParameter("brukerid", brukerId)

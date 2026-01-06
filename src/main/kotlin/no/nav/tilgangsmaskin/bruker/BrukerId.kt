@@ -52,3 +52,5 @@ data class Enhetsnummer(@JsonValue val verdi: String) {
         requireDigits(verdi, 4)
     }
 }
+
+data class Identer(val brukerId: BrukerId, val aktorId: AktørId)

@@ -23,7 +23,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.core.env.Environment
-import org.springframework.core.env.getRequiredProperty
 import org.springframework.graphql.client.ClientGraphQlRequest
 import org.springframework.graphql.client.HttpSyncGraphQlClient
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor

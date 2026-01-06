@@ -17,10 +17,10 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
-import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
+import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
@@ -52,7 +52,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
-import java.util.UUID
+import java.util.*
 
 
 @UnprotectedRestController(value = ["/${DEV}"])
@@ -77,17 +77,12 @@ class DevTilgangController(
     private val log = getLogger(javaClass)
 
 
-    @PostMapping("oppfolging/{uuid}/{kontor}/start")
-    fun oppfølgingStart(@RequestBody identer : Identer,@PathVariable uuid: UUID, @PathVariable kontor: Enhetsnummer) =
-        oppfølging.start(uuid, identer.brukerId, identer.aktorId, Kontor(kontor))
+    @PostMapping("oppfolging/{uuid}/{kontor}/registrer")
+    fun registrer(@RequestBody identer : Identer,@PathVariable uuid: UUID, @PathVariable kontor: Enhetsnummer) =
+        oppfølging.registrer(uuid, identer, Kontor(kontor))
 
     @PostMapping("oppfolging/{uuid}/avslutt")
-    fun oppfølgingAvslutt(@RequestBody identer : Identer,@PathVariable uuid: UUID) = oppfølging.avslutt(uuid, identer.brukerId,
-        identer.aktorId)
-
-    @PostMapping("oppfolging/{uuid}/kontor/{kontor}")
-    fun oppfølgingKontor(@RequestBody identer : Identer,@PathVariable uuid: UUID, @PathVariable kontor: Enhetsnummer) =
-        oppfølging.kontorFor(uuid, identer.brukerId, identer.aktorId, Kontor(kontor))
+    fun oppfølgingAvslutt(@RequestBody identer : Identer, @PathVariable uuid: UUID) = oppfølging.avslutt(uuid, identer)
 
     @GetMapping("oppfolging/enhet")
     fun enhetFor(@RequestParam id: Identifikator) = oppfølging.enhetFor(id)
@@ -212,8 +207,5 @@ class DevTilgangController(
 
     @PostMapping("brukere")
     fun brukere(@RequestBody ids: Set<String>) = brukere.brukere(ids)
-
-
-    data class Identer(val brukerId: BrukerId, val aktorId: AktørId)
 
 }

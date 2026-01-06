@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.bruker.pdl
 
 import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner

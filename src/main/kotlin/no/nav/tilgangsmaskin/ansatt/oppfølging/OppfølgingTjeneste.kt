@@ -2,9 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.oppfølging
 
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
-import no.nav.tilgangsmaskin.bruker.AktørId
-import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.bruker.Enhetsnummer
+import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.CachePut
@@ -14,11 +12,12 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.time.Instant.now
-import java.util.UUID
+import java.util.*
 
 @Service
 @Transactional
 class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
+
 
     @Cacheable(cacheNames = [OPPFØLGING],key = "#id.verdi")
     @Transactional(readOnly = true)
@@ -27,32 +26,21 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
 
     @Caching(
         put = [
-            CachePut(cacheNames = [OPPFØLGING], key = "#aktorId.verdi"),
-            CachePut(cacheNames = [OPPFØLGING], key = "#brukerId.verdi")
+            CachePut(cacheNames = [OPPFØLGING], key = "#identer.aktorId.verdi"),
+            CachePut(cacheNames = [OPPFØLGING], key = "#identer.brukerId.verdi")
         ]
     )
-    fun start(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId, kontor: Kontor, tidspunkt: Instant = now()) =
+    fun registrer(id: UUID, identer: Identer, kontor: Kontor, tidspunkt: Instant = now()) =
         kontor.kontorId.apply {
-            db.startOppfølging(oppfolgingsperiodeUuid, brukerId.verdi, aktorId.verdi, verdi, tidspunkt)
-        }
-
-    @Caching(
-        put = [
-            CachePut(cacheNames = [OPPFØLGING], key = "#aktorId.verdi"),
-            CachePut(cacheNames = [OPPFØLGING], key = "#brukerId.verdi")
-        ]
-    )
-    fun kontorFor(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId, kontor: Kontor, tidspunkt: Instant = now()) =
-        kontor.kontorId.apply {
-            db.oppdaterKontor(oppfolgingsperiodeUuid, brukerId.verdi, aktorId.verdi, verdi, tidspunkt)
+            db.registrer(id, identer.brukerId.verdi, identer.aktorId.verdi, tidspunkt, verdi)
         }
 
     @Caching(
         evict = [
-            CacheEvict(cacheNames = [OPPFØLGING], key = "#aktorId.verdi"),
-            CacheEvict(cacheNames = [OPPFØLGING], key = "#brukerId.verdi")
+            CacheEvict(cacheNames = [OPPFØLGING], key = "#identer.aktorId.verdi"),
+            CacheEvict(cacheNames = [OPPFØLGING], key = "#identer.brukerId.verdi")
         ]
     )
-    fun avslutt(oppfolgingsperiodeUuid: UUID, brukerId: BrukerId, aktorId: AktørId) =
-        db.avsluttOppfølging(oppfolgingsperiodeUuid)
+    fun avslutt(id: UUID, identer: Identer) =
+        db.avslutt(id)
 }

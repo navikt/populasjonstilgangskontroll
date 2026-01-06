@@ -135,7 +135,7 @@ class DevTilgangController(
     fun nom(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
         nom.upsert(NomAnsattData(ansattId, brukerId))
 
-    @GetMapping("ansatt/{ansattId}")
+    @GetMapping("nom/{ansattId}")
     fun nomFnr(@PathVariable ansattId: AnsattId) =
         nom.fnrForAnsatt(ansattId.verdi)
 

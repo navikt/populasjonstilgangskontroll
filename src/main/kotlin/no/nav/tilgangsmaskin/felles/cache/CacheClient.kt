@@ -25,10 +25,9 @@ class CacheClient(
     }
 
     @WithSpan
-    fun delete(id: String,vararg caches: CachableConfig) =
-        caches.sumOf {
-                cache -> conn.sync().del(handler.tilNøkkel(cache, id))
-        }
+    fun delete(id: String,cache: CachableConfig) =
+         conn.sync().del(handler.tilNøkkel(cache, id))
+
 
     @WithSpan
     inline fun <reified T> getOne(id: String, cache: CachableConfig) =

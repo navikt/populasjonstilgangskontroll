@@ -92,19 +92,6 @@ class DevTilgangController(
         CachableConfig(SKJERMING))
 
 
-   @PostMapping("cache/{cache}/{id}/slett")
-   fun slettIdFraCache(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-                   cache: Caches, @PathVariable id: String) : ResponseEntity<Unit> {
-
-       Caches.forNavn(cache.name).let { c ->
-           val antall = cacheClient.delete(id,*c).also { antall ->
-               log.info("Sletting status $antall for $id i ${c.size} cache(s) for cache '${cache.name.lowercase()}'" )
-           }
-           return if (antall > 0) noContent().build()
-           else  status(410).build()
-       }
-   }
-
     @PostMapping("cache/personer")
     fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany<Person>(navIds.map { it.verdi }.toSet(),
         CachableConfig(PDL))

@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient.Builder
+import org.springframework.web.reactive.function.client.bodyToFlux
 import java.net.URI
 import java.time.LocalDateTime
 
@@ -21,7 +22,7 @@ class LederUtvelger(private val builder: Builder,
             .get()
             .uri(uri)
             .retrieve()
-            .bodyToFlux(LederUtvelgerRespons::class.java)
+            .bodyToFlux<LederUtvelgerRespons>()
             .subscribe {
                 publisher.publishEvent(LeaderChangedEvent(this, it.name))
             }

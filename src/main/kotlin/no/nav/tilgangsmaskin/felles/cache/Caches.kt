@@ -13,7 +13,6 @@ enum class Caches(vararg val  caches: CachableConfig) {
     OID(OID_CACHE),
     OPPFØLGING(OPPFØLGING_CACHE),
     NOM(NOM_CACHE),
-    OPPFØLGING(OPPFØLGING_CACHE),
     GRAPH(*ENTRA_CACHES.toTypedArray());
 
     companion object {

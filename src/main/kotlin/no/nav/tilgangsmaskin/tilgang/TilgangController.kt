@@ -12,6 +12,7 @@ import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
+import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
@@ -55,26 +56,26 @@ class TilgangController(
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter OBO-token")
-    fun kompletteRegler(@RequestBody brukerId: String,request: HttpServletRequest) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KOMPLETT_REGELTYPE,request.requestURI)
+    fun kompletteRegler(@RequestBody ident: Identifikator,request: HttpServletRequest) = enkeltOppslag({token.ansattId!!}, {token.erObo}, ident.verdi, KOMPLETT_REGELTYPE,request.requestURI)
 
     @PostMapping("/ccf/komplett/{ansattId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter CCF-token")
-    fun kompletteReglerCCF(@PathVariable ansattId: AnsattId,@RequestBody brukerId: String,request: HttpServletRequest) = enkeltOppslag({ansattId}, {token.erCC}, brukerId, KOMPLETT_REGELTYPE, request.requestURI)
+    fun kompletteReglerCCF(@PathVariable ansattId: AnsattId,@RequestBody ident: Identifikator,request: HttpServletRequest) = enkeltOppslag({ansattId}, {token.erCC}, ident.verdi, KOMPLETT_REGELTYPE, request.requestURI)
 
     @PostMapping("kjerne")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et kjerneregelsett for en bruker, forutsetter OBO-token")
-    fun kjerneregler(@RequestBody brukerId: String, request: HttpServletRequest) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KJERNE_REGELTYPE, request.requestURI)
+    fun kjerneregler(@RequestBody ident: Identifikator, request: HttpServletRequest) = enkeltOppslag({token.ansattId!!}, {token.erObo}, ident.verdi, KJERNE_REGELTYPE, request.requestURI)
 
 
     @PostMapping("/ccf/kjerne/{ansattId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = "Evaluer et komplett regelsett for en bruker, forutsetter CCF-token")
-    fun kjerneReglerCCF(@PathVariable ansattId: AnsattId,@RequestBody brukerId: String,request: HttpServletRequest) = enkeltOppslag({ansattId}, {token.erCC}, brukerId, KJERNE_REGELTYPE,request.requestURI)
+    fun kjerneReglerCCF(@PathVariable ansattId: AnsattId,@RequestBody ident: Identifikator,request: HttpServletRequest) = enkeltOppslag({ansattId}, {token.erCC}, ident.verdi, KJERNE_REGELTYPE,request.requestURI)
 
 
     @PostMapping("overstyr")
@@ -101,8 +102,8 @@ class TilgangController(
     @Operation(summary = "Kjør bulkregler for en ansatt",
         description = "Dette endepunktet er kun tilgjengelig for obo flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er med gitt regeltype")
-    fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>,request: HttpServletRequest) =
-        bulkOppslag({token.ansattId!!},{token.erObo},brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet(),request.requestURI)
+    fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody identer: Set<Identifikator>, request: HttpServletRequest) =
+        bulkOppslag({token.ansattId!!},{token.erObo},identer.map { BrukerIdOgRegelsett(it.verdi,regelType) }.toSet(),request.requestURI)
 
     @PostMapping("bulk/ccf/{ansattId}")
     @ResponseStatus(MULTI_STATUS)
@@ -119,8 +120,8 @@ class TilgangController(
     @Operation(summary = "Kjør bulkregler for en ansatt",
         description = "Dette endepunktet er kun tilgjengelig for client credentials flow. " +
                 "Det evaluerer regler for en ansatt mot et sett av brukerId-er med gitt regeltype")
-    fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>, request: HttpServletRequest) =
-        bulkOppslag({ ansattId }, { token.erCC }, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(),request.requestURI)
+    fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody identer: Set<Identifikator>, request: HttpServletRequest) =
+        bulkOppslag({ ansattId }, { token.erCC }, identer.map { BrukerIdOgRegelsett(it.verdi, regelType) }.toSet(),request.requestURI)
 
     private fun bulkOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, specs: Set<BrukerIdOgRegelsett>,uri: String) =
         with(ansattId()) {
@@ -137,16 +138,16 @@ class TilgangController(
             }
         }
 
-    private fun enkeltOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, brukerId: String, regelType: RegelType, uri: String) : Unit =
-        with(brukerId.trim('"')) {
+    private fun enkeltOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, ident: String, regelType: RegelType, uri: String) : Unit =
+        with(ident.trim('"')) {
             MDC.put(USER_ID, ansattId().verdi)
             log.trace(CONFIDENTIAL,"Kjører {} regler for {} og {}", regelType, ansattId(), this.maskFnr())
             if (!isProd) {
-                if (brukerId.length == BRUKERID_LENGTH) {
-                    MDC.put("brukerId", brukerId.take(10) + "X" + brukerId.takeLast(1))
+                if (ident.length == BRUKERID_LENGTH) {
+                    MDC.put("brukerId", ident.take(10) + "X" + ident.takeLast(1))
                 }
                 else {
-                    MDC.put("brukerId", brukerId)
+                    MDC.put("brukerId", ident)
                 }
             }
 

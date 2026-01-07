@@ -16,23 +16,23 @@ class GlideCacheClient(private val client: CompletableFuture<GlideClient>, priva
 
     override fun delete( id: String,vararg caches: CachableConfig,) =
         client.get().del(caches.map<CachableConfig, GlideString> { cache ->
-            gs(handler.tilNøkkel(cache, id))
+            gs(handler.nøkkel(id,cache))
         }.toTypedArray()).get()
 
     override fun <T : Any> getOne( id: String, clazz: KClass<T>,cache: CachableConfig): T? =
-        client.get().get(handler.tilNøkkel(cache, id))?.get()?.let { json -> handler.fraJson(json,clazz)}
+        client.get().get(handler.nøkkel(id,cache))?.get()?.let { json -> handler.json(json,clazz)}
 
     override fun putOne( id: String, value: Any, ttl: Duration,cache: CachableConfig) {
-        client.get().set(handler.tilNøkkel(cache, id), handler.tilJson(value), builder()
+        client.get().set(handler.nøkkel(id,cache), handler.json(value), builder()
             .expiry(Seconds(ttl.toSeconds()))
             .build()).get()
     }
 
     override fun <T : Any> getMany( ids: Set<String>, clazz: KClass<T>,cache: CachableConfig): Map<String, T> {
-        val keys = ids.map { gs(handler.tilNøkkel(cache, it)) }
+        val keys = ids.map { gs(handler.nøkkel(it,cache)) }
         val results = client.get().mget(keys.toTypedArray()).get()
         return ids.zip(results)
-            .mapNotNull { (id, value) -> value?.let { id to handler.fraJson(it.string, clazz) } }
+            .mapNotNull { (id, value) -> value?.let { id to handler.json(it.string, clazz) } }
             .toMap()
     }
     override fun putMany(innslag: Map<String, Any>,
@@ -40,15 +40,15 @@ class GlideCacheClient(private val client: CompletableFuture<GlideClient>, priva
 
         innslag.forEach { (id, value) ->
             client.get().set(
-                handler.tilNøkkel(cache, id),
-                handler.tilJson(value),
+                handler.nøkkel(id,cache),
+                handler.json(value),
                 builder()
                     .expiry(Seconds(ttl.toSeconds()))
                     .build()).get()
         }
     }
 
-    override fun tilNøkkel(cache: CachableConfig, id: String) = handler.tilNøkkel(cache, id)
+    override fun tilNøkkel(cache: CachableConfig, id: String) = handler.nøkkel(id,cache)
 
 
     override fun ping() = client.get().ping(gs("PING")).get()

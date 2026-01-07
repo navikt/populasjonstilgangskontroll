@@ -62,8 +62,8 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
         CacheNøkkelHandler(mgr.cacheConfigurations,MAPPER)
 
     @Bean
-    fun cacheHealthIndicator(client: CacheOperations)  =
-        PingableHealthIndicator(client)
+    fun cacheHealthIndicator(cache: CacheOperations)  =
+        PingableHealthIndicator(cache)
 
     private fun cacheConfig(cfg: CachableRestConfig) =
         defaultCacheConfig()
@@ -75,7 +75,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             }
 
     companion object {
-         val MAPPER = JsonMapper.builder().polymorphicTypeValidator(NavPolymorphicTypeValidator()).apply {
+         val MAPPER: JsonMapper = JsonMapper.builder().polymorphicTypeValidator(NavPolymorphicTypeValidator()).apply {
             addModule(Builder().build())
             addModule(JacksonTypeInfoAddingValkeyModule())
         }.build()

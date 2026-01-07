@@ -40,16 +40,16 @@ class LettuceCacheClient(client: RedisClient, cfg: CacheConfig,
 
     override fun delete( id: String,vararg caches: CachableConfig,) =
         caches.sumOf {
-                cache -> conn.sync().del(handler.tilNøkkel(cache, id))
+                cache -> conn.sync().del(handler.nøkkel(id,cache))
         }
 
     override fun <T : Any> getOne(id: String,clazz: KClass<T>,cache: CachableConfig, ) =
-            conn.sync().get(handler.tilNøkkel(cache,id))?.let { json ->
-                handler.fraJson(json, clazz)
+            conn.sync().get(handler.nøkkel(id,cache))?.let { json ->
+                handler.json(json, clazz)
         }
 
     override fun putOne(id: String, value: Any, ttl: Duration,cache: CachableConfig)  {
-            conn.async().setex(handler.tilNøkkel(cache,id), ttl.seconds,handler.tilJson(value))
+            conn.async().setex(handler.nøkkel(id,cache), ttl.seconds,handler.json(value))
     }
 
     fun getAllKeys(cache: CachableConfig) =
@@ -63,13 +63,13 @@ class LettuceCacheClient(client: RedisClient, cfg: CacheConfig,
         else  {
             conn.sync()
                 .mget(*ids.map {
-                        id -> handler.tilNøkkel(cache,id)}.toTypedArray<String>()
+                        id -> handler.nøkkel(id,cache)}.toTypedArray<String>()
                 )
                 .filter {
                     it.hasValue()
                 }
                 .associate {
-                    handler.idFraNøkkel(it.key) to handler.fraJson(it.value, clazz)
+                    handler.id(it.key) to handler.json(it.value, clazz)
                 }.also {
                     tellOgLog(cache.name, it.size, ids.size)
                 }
@@ -96,7 +96,7 @@ class LettuceCacheClient(client: RedisClient, cfg: CacheConfig,
     private fun payloadFor(innslag: Map<String, Any>, cache: CachableConfig) =
         buildMap {
             innslag.forEach { (key, value) ->
-                put(handler.tilNøkkel(cache, key), handler.tilJson(value))
+                put(handler.nøkkel(key,cache), handler.json(value))
             }
         }
 
@@ -107,6 +107,6 @@ class LettuceCacheClient(client: RedisClient, cfg: CacheConfig,
         log.trace("Fant $funnet verdier i cache $navn for $etterspurt identer")
     }
 
-    override fun tilNøkkel(cache: CachableConfig, id: String) = handler.tilNøkkel(cache, id)
+    override fun tilNøkkel(cache: CachableConfig, id: String) = handler.nøkkel(id,cache)
 }
 

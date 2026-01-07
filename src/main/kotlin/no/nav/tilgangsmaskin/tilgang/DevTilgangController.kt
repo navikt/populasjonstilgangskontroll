@@ -74,7 +74,7 @@ class DevTilgangController(
 
 
     @PostMapping("oppfolging/bulk")
-    fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(brukerId.verdi)
+    fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(Identifikator(brukerId.verdi))
 
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany(navIds, Boolean::class,SKJERMING_CACHE)

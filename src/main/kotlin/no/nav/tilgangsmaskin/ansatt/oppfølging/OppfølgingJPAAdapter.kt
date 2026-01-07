@@ -13,7 +13,7 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository,val en
     private val log = getLogger(javaClass)
 
     fun avslutt(id: UUID)  =
-         repository.deleteById(id).also {
+        repository.deleteById(id).also {
             log.info("Oppfølging avsluttet for $id")
         }
 
@@ -21,7 +21,7 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository,val en
         repository.findByBrukerid(id)?.kontor?.let(::Enhetsnummer) ?:
         repository.findByAktoerid(id)?.kontor?.let(::Enhetsnummer)
 
-      fun registrer(id: UUID, brukerId: String, aktørId: String, start: Instant, kontor: String) =
+    fun registrer(id: UUID, brukerId: String, aktørId: String, start: Instant, kontor: String) =
         entityManager.createNativeQuery(UPSERT_QUERY)
             .setParameter("id", id)
             .setParameter("brukerid", brukerId)

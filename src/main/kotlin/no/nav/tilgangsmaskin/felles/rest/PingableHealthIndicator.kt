@@ -8,7 +8,7 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
 
     private val log = getLogger(javaClass)
 
-    override fun health() : Health  =
+    override fun health() : Health =
         runCatching {
             if (!pingable.isEnabled) {
                 return disabled()

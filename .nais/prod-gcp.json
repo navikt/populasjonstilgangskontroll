@@ -24,6 +24,11 @@
   },
   "inbound": [
     {
+      "name": "arena",
+      "namespace": "teamarenanais",
+      "cluster": "prod-fss"
+    },
+    {
       "name": "sokos-skattekort",
       "namespace": "okonomi",
       "cluster": "prod-gcp"

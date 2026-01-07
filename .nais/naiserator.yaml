@@ -90,7 +90,7 @@ spec:
            - application: '{{app.name}}'
                namespace: '{{app.namespace}}'
                cluster: '{{app.cluster}}'
-               {{/each}}
+        {{/each}}
            - application: monitoring-prometheus-blackbox-exporter
              namespace: nais-system
   env:

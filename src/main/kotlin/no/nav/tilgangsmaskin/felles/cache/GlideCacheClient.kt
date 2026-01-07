@@ -48,6 +48,9 @@ class GlideCacheClient(private val client: CompletableFuture<GlideClient>, priva
         }
     }
 
+    override fun tilNøkkel(cache: CachableConfig, id: String) = handler.tilNøkkel(cache, id)
+
+
     override fun ping() = client.get().ping(gs("PING")).get()
 
     override val pingEndpoint: String

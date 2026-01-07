@@ -21,4 +21,5 @@ interface CacheOperations : Pingable {
 
     @WithSpan
     fun putMany(innslag: Map<String, Any>, ttl: Duration,cache: CachableConfig)
+    fun tilNøkkel(cache: CachableConfig, id: String): String
 }

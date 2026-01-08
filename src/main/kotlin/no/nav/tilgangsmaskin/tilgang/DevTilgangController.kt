@@ -55,7 +55,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
-@Validated
+//@Validated
 @Tag(name = "DevTilgangController", description = "Denne kontrolleren skal kun brukes til testing")
 class DevTilgangController(
     private val graphql: PdlSyncGraphQLClientAdapter,
@@ -78,8 +78,8 @@ class DevTilgangController(
 
     @GetMapping("cache/glide/ping")
     fun ping() = glide.ping()
-    @PostMapping("oppfolging/bulk")
-    fun oppfolgingEnhet(@RequestBody @NotBlank ident: String) = oppfølging.enhetFor(Identifikator(ident))
+    @PostMapping("oppfolging/enhet")
+    fun oppfolgingEnhet(@RequestBody /*@NotBlank */ident: String) = oppfølging.enhetFor(Identifikator(ident))
 
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany(navIds, Boolean::class,SKJERMING_CACHE)

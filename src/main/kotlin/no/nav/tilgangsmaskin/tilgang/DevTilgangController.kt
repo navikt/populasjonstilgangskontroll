@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -43,6 +44,7 @@ import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.noContent
 import org.springframework.http.ResponseEntity.status
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -52,6 +54,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
+@Validated
 @Tag(name = "DevTilgangController", description = "Denne kontrolleren skal kun brukes til testing")
 class DevTilgangController(
     private val graphql: PdlSyncGraphQLClientAdapter,
@@ -73,7 +76,7 @@ class DevTilgangController(
 
 
     @PostMapping("oppfolging/bulk")
-    fun oppfolgingEnhet(@RequestBody brukerId: Identifikator) = oppfølging.enhetFor(Identifikator(brukerId.verdi))
+    fun oppfolgingEnhet(@RequestBody @NotBlank ident: String) = oppfølging.enhetFor(Identifikator(ident))
 
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany(navIds, Boolean::class,SKJERMING_CACHE)

@@ -7,8 +7,9 @@ import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOperations.CacheInnslagFj
 import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOperations.Companion.UTLØPT_KANAL
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.stereotype.Component
 
-@ConditionalOnProd
+@Component
 class LettuceCacheElementUtløptLytter(client: RedisClient, private val publiserer: ApplicationEventPublisher) :  RedisPubSubAdapter<String, String>() {
     private val log = getLogger(javaClass)
 

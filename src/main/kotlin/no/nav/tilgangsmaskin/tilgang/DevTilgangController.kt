@@ -28,6 +28,7 @@ import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.LettuceCacheClient
 import no.nav.tilgangsmaskin.felles.cache.Caches
+import no.nav.tilgangsmaskin.felles.cache.GlideCacheClient
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
@@ -68,13 +69,15 @@ class DevTilgangController(
     private val oppfølging: OppfølgingTjeneste,
     private val pip: PdlRestClientAdapter,
     private val oid: AnsattOidTjeneste,
-    private val nom: NomTjeneste,
     private val pdl: PDLTjeneste,
-    private val cacheClient: CacheOperations) {
+    private val glide: GlideCacheClient,
+    private val cacheClient: LettuceCacheClient) {
 
     private val log = getLogger(javaClass)
 
 
+    @GetMapping("cache/glide/ping")
+    fun ping() = glide.ping()
     @PostMapping("oppfolging/bulk")
     fun oppfolgingEnhet(@RequestBody @NotBlank ident: String) = oppfølging.enhetFor(Identifikator(ident))
 

@@ -20,7 +20,6 @@ import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
-import no.nav.tilgangsmaskin.regler.motor.TokenTypeTeller
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER

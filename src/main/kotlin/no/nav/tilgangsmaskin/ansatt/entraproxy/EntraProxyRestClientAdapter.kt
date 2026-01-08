@@ -24,6 +24,6 @@ class EntraProxyRestClientAdapter(@Qualifier(ENTRAPROXY) restClient: RestClient,
     override fun toString() = "${javaClass.simpleName} [client=$restClient, config=$cf, errorHandler=$errorHandler]"
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    data class Enhet(val enhetsnummer: Enhetsnummer, val navn: String = "Ukjent")
+    data class Enhet(val enhetnummer: Enhetsnummer, val navn: String = "Ukjent")
 
 }

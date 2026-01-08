@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupper
+import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
@@ -18,8 +19,11 @@ class EntraProxyRestClientAdapter(@Qualifier(ENTRAPROXY) restClient: RestClient,
     AbstractRestClientAdapter(restClient, cf) {
 
     fun enhetForAnsatt(ansattId: String) =
-        get<Any>(cf.brukerURI(ansattId))
+        get<Enhet>(cf.brukerURI(ansattId))
 
     override fun toString() = "${javaClass.simpleName} [client=$restClient, config=$cf, errorHandler=$errorHandler]"
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    data class Enhet(val enhetsnummer: Enhetsnummer, val navn: String = "Ukjent")
 
 }

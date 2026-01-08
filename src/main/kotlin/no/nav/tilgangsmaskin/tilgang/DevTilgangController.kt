@@ -11,7 +11,6 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
-import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
@@ -25,7 +24,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
-import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.LettuceCacheClient
 import no.nav.tilgangsmaskin.felles.cache.Caches
 import no.nav.tilgangsmaskin.felles.cache.GlideCacheClient
@@ -75,11 +73,8 @@ class DevTilgangController(
 
     private val log = getLogger(javaClass)
 
-
     @GetMapping("cache/glide/ping")
     fun ping() = glide.ping()
-    @PostMapping("oppfolging/enhet")
-    fun oppfolgingEnhet(@RequestBody @NotBlank ident: String) = oppfølging.enhetFor(Identifikator(ident))
 
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany(navIds, Boolean::class,SKJERMING_CACHE)
@@ -106,6 +101,9 @@ class DevTilgangController(
         Caches.forNavn(cache.name)
             .mapNotNull { cacheClient.getOne(id, Any::class,it) }
             .toSet()
+
+    @PostMapping("oppfolging/enhet")
+    fun oppfolgingEnhet(@RequestBody @NotBlank ident: String) = oppfølging.enhetFor(Identifikator(ident))
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable  id: String) = graphql.partnere(id)

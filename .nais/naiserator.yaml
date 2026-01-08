@@ -76,6 +76,8 @@ spec:
   accessPolicy:
     outbound:
       rules:
+        - application: entra-proxy
+        - namespace: sikkerhetstjenesten
         - application: opentelemetry-collector
           namespace: nais-system
         - application: skjermede-personer-pip

@@ -152,6 +152,15 @@ no.nav.security.jwt:
           client-id: ${azure.app.client.id}
           client-jwk: ${azure.app.jwk}
           client-auth-method: private_key_jwt
+
+      entra-proxy:
+        token-endpoint-url: ${azure.openid.config.token.endpoint}
+        grant-type: client_credentials
+        scope: ${entra-proxy.scope}
+        authentication:
+          client-id: ${azure.app.client.id}
+          client-jwk: ${azure.app.jwk}
+          client-auth-method: private_key_jwt
 springdoc:
   swagger-ui:
     oauth:
@@ -173,6 +182,9 @@ skjerming:
 graph:
   scope: https://graph.microsoft.com/.default
   base-uri: https://graph.microsoft.com/v1.0/
+
+entra-proxy:
+    scope: "api://${nais.cluster.type}-gcp.sikkerhetstjenesten.entra-proxy/.default"
 
 valkey:
   username: ${valkey.username.${nais.cluster.cache}}

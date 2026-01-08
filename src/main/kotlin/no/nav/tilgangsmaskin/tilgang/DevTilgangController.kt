@@ -10,6 +10,7 @@ import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
@@ -69,9 +70,13 @@ class DevTilgangController(
     private val oid: AnsattOidTjeneste,
     private val pdl: PDLTjeneste,
     private val glide: GlideCacheClient,
+    private val proxy: EntraProxyTjeneste,
     private val cacheClient: LettuceCacheClient) {
 
     private val log = getLogger(javaClass)
+
+    @GetMapping("proxy/{ansattId}")
+    fun enhet(@PathVariable ansattId: AnsattId) = proxy.enhet(ansattId)
 
     @GetMapping("cache/glide/ping")
     fun ping() = glide.ping()

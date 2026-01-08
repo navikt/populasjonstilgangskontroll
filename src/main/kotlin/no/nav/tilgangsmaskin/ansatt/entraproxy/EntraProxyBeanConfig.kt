@@ -16,7 +16,7 @@ class EntraProxyBeanConfig {
 
     @Bean
     @Qualifier(ENTRAPROXY)
-    fun graphRestClient(b: RestClient.Builder, cfg: EntraProxyConfig) =
+    fun proxyRestClient(b: RestClient.Builder, cfg: EntraProxyConfig) =
         b.baseUrl(cfg.baseUri).build()
 
     @Bean

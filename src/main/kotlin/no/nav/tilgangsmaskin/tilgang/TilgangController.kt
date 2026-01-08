@@ -46,8 +46,7 @@ import org.springframework.web.server.ResponseStatusException
 class TilgangController(
     private val regelTjeneste: RegelTjeneste,
     private val overstyringTjeneste: OverstyringTjeneste,
-    private val token: Token,
-    private val teller: TokenTypeTeller) {
+    private val token: Token) {
 
     private val log = getLogger(javaClass)
 
@@ -128,7 +127,6 @@ class TilgangController(
                 MDC.put(USER_ID, ansattId().verdi)
                 sjekk(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og $uri")
                 sjekk(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
-                tell("bulk")
                 regelTjeneste.bulkRegler( this, specs)
             }
             else {
@@ -153,7 +151,6 @@ class TilgangController(
             sjekk(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og $uri")
             sjekk(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")
-            tell("single")
             if (regelType == KJERNE_REGELTYPE) {
                 return regelTjeneste.kjerneregler(ansattId(), this)
             }
@@ -162,8 +159,6 @@ class TilgangController(
             }
         }
 
-    private fun tell(type: String) =
-        teller.tell(Tags.of("type",type,"token",TokenType.from(token).name.lowercase()))
 
 
     private fun sjekk(predikat: Boolean, status: HttpStatus, message: String) {

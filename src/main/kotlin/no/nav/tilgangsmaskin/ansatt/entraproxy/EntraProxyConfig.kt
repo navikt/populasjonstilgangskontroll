@@ -8,7 +8,7 @@ import java.net.URI
 
 @ConfigurationProperties(ENTRAPROXY)
 class EntraProxyConfig(
-    baseUri: URI = URI.create("http://entra-proxy.sikkerhetstjeneeten"),
+    baseUri: URI = URI.create("http://entra-proxy.sikkerhetstjenesten"),
     pingPath: String = DEFAULT_PING_PATH,
     enabled: Boolean = true) :  AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
 

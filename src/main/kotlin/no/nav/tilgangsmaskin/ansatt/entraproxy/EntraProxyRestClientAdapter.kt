@@ -20,7 +20,7 @@ class EntraProxyRestClientAdapter(@Qualifier(ENTRAPROXY) restClient: RestClient,
     AbstractRestClientAdapter(restClient, cf) {
 
     fun enhetForAnsatt(ansattId: String) =
-        get<ProxiedAnsatt>(cf.brukerURI(ansattId))
+        get<ProxiedAnsatt>(cf.brukerURI(ansattId)).enhet
 
     override fun toString() = "${javaClass.simpleName} [client=$restClient, config=$cf, errorHandler=$errorHandler]"
 
@@ -29,13 +29,7 @@ class EntraProxyRestClientAdapter(@Qualifier(ENTRAPROXY) restClient: RestClient,
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class ProxiedAnsatt(
         val navIdent: AnsattId,
-        val visningNavn: String,
-       // val fornavn: String,
-       // val etternavn: String,
-        val tIdent: String,
-        val epost: String,
-        val enhet: Enhet
-    ) {
+        val enhet: Enhet) {
         data class Enhet(
             val enhetnummer: Enhetsnummer,
             val navn: String

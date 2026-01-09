@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.entraproxy
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRAPROXY
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
@@ -19,11 +20,24 @@ class EntraProxyRestClientAdapter(@Qualifier(ENTRAPROXY) restClient: RestClient,
     AbstractRestClientAdapter(restClient, cf) {
 
     fun enhetForAnsatt(ansattId: String) =
-        get<Any>(cf.brukerURI(ansattId))
+        get<ProxiedAnsatt>(cf.brukerURI(ansattId))
 
     override fun toString() = "${javaClass.simpleName} [client=$restClient, config=$cf, errorHandler=$errorHandler]"
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    data class Enhet(val enhetnummer: Enhetsnummer, val navn: String = "Ukjent")
 
+
+    data class ProxiedAnsatt(
+        val navIdent: AnsattId,
+        val visningNavn: String,
+        val fornavn: String,
+        val etternavn: String,
+        val tIdent: String,
+        val epost: String,
+        val enhet: Enhet
+    ) {
+        data class Enhet(
+            val enhetnummer: String,
+            val navn: String
+        )
+    }
 }

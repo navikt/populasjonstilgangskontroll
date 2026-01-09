@@ -36,7 +36,7 @@ class EntraProxyRestClientAdapter(@Qualifier(ENTRAPROXY) restClient: RestClient,
         val enhet: Enhet
     ) {
         data class Enhet(
-            val enhetnummer: String,
+            val enhetnummer: Enhetsnummer,
             val navn: String
         )
     }

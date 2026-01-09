@@ -11,6 +11,10 @@ import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyRestClientAdapter
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyRestClientAdapter.ProxiedAnsatt
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyRestClientAdapter.ProxiedAnsatt.Enhet
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
@@ -71,6 +75,8 @@ class RegelTjenesteTest {
     private lateinit var token: Token
     @MockkBean
     private lateinit var oppfølging: OppfølgingTjeneste
+    @MockkBean
+    private lateinit var proxy: EntraProxyTjeneste
     @Autowired
     private lateinit var motor: RegelMotor
     @MockK
@@ -89,6 +95,7 @@ class RegelTjenesteTest {
         evalueringTeller = EvalueringTeller(registry, token)
         avdød = AvdødTeller(registry, token)
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
+        every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"),"Enhet")
         every { oppfølging.enhetFor(Identifikator(vanligBrukerId.verdi)) } returns Enhetsnummer("1234")
         every { token.system } returns "test"
         every { token.ansattId } returns ansattId
@@ -96,7 +103,7 @@ class RegelTjenesteTest {
         every { token.systemNavn } returns "test"
         every { token.erObo } returns false
         every { token.erCC } returns true
-        overstyring = OverstyringTjeneste(ansatte, brukere, OverstyringJPAAdapter(repo), motor, OverstyringTeller(registry, token))
+        overstyring = OverstyringTjeneste(ansatte, brukere, OverstyringJPAAdapter(repo), proxy,motor, OverstyringTeller(registry, token))
         regler = RegelTjeneste(motor, brukere, ansatte, overstyring)
     }
 

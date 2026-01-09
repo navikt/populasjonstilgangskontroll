@@ -24,7 +24,7 @@ import kotlin.annotation.AnnotationTarget.FIELD
 class OverstyringEntity(
         @Column(length = 7, nullable = false) val navid: String,
         @Column(length = 11, nullable = false) val fnr: String,
-        @Column(nullable = false) val begrunnelse: String,
+        @Column(length = 400, nullable = false) val begrunnelse: String,
         @Column(length = 6) val enhet: String,
         @Column(nullable = false) val expires: Instant) {
 

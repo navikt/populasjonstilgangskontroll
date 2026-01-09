@@ -26,11 +26,12 @@ class EntraProxyRestClientAdapter(@Qualifier(ENTRAPROXY) restClient: RestClient,
 
 
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     data class ProxiedAnsatt(
         val navIdent: AnsattId,
         val visningNavn: String,
-        val fornavn: String,
-        val etternavn: String,
+       // val fornavn: String,
+       // val etternavn: String,
         val tIdent: String,
         val epost: String,
         val enhet: Enhet

@@ -30,8 +30,8 @@ class OverstyringValidator : ConstraintValidator<ValidOverstyring, OverstyringDa
     override fun isValid(verdi: OverstyringData, context: ConstraintValidatorContext) =
         gyldigDato(verdi.gyldigtil) && gyldigLengde(verdi.begrunnelse)
 
-    private fun gyldigLengde(verdi: String) = (verdi.length in 10..255).also {
-        if (!it) log.warn("Overstyring med begrunnelse '$verdi' er ugyldig, må være mellom 10 og 255 tegn")
+    private fun gyldigLengde(verdi: String) = (verdi.length in 10..400).also {
+        if (!it) log.warn("Overstyring med begrunnelse '$verdi' er ugyldig, må være mellom 10 og 400 tegn")
     }
 
     private fun gyldigDato(verdi: LocalDate) =

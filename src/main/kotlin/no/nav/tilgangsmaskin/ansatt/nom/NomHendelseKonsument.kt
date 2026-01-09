@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 import java.time.LocalDate.EPOCH
 
 @Component
-class NomHendelseKonsument(private val nom: NomJPAAdapter, private val logger: NomHendelseLogger) {
+class NomHendelseKonsument(private val nom: NomTjeneste, private val logger: NomHendelseLogger) {
 
     @KafkaListener(
         topics = ["org.nom.api-ressurs-state-v4"],
@@ -21,7 +21,7 @@ class NomHendelseKonsument(private val nom: NomJPAAdapter, private val logger: N
         hendelser.forEach { hendelse ->
             logger.behandler(hendelse)
             runCatching {
-                nom.upsert(
+                nom.lagre(
                     NomAnsattData(
                         AnsattId(hendelse.navident),
                         BrukerId(hendelse.personident),

@@ -19,7 +19,7 @@ class EntraProxyRestClientAdapter(@Qualifier(ENTRAPROXY) restClient: RestClient,
     AbstractRestClientAdapter(restClient, cf) {
 
     fun enhetForAnsatt(ansattId: String) =
-        get<Enhet>(cf.brukerURI(ansattId))
+        get<Any>(cf.brukerURI(ansattId))
 
     override fun toString() = "${javaClass.simpleName} [client=$restClient, config=$cf, errorHandler=$errorHandler]"
 

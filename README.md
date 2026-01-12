@@ -1,5 +1,4 @@
 # Populasjonstilgangskontroll
-
 Backendsystem for å tilby tilgangskontroll basert på populasjonen.
 
 Informasjon om cacher i løsningen

@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional
 @Timed
 @RetryingWhenRecoverable
 @Service
+@Transactional
 class NomTjeneste(private val adapter: NomJPAAdapter) {
 
     private val log = getLogger(javaClass)
@@ -22,12 +23,13 @@ class NomTjeneste(private val adapter: NomJPAAdapter) {
     @WithSpan
     fun fnrForAnsatt(ansattId: AnsattId) = adapter.fnrForAnsatt(ansattId.verdi)
 
-    @Transactional
-    fun lagre(data: NomAnsattData) = adapter.upsert(data)
-
-    @Transactional
     fun ryddOpp() = adapter.ryddOpp().also {
         if (it > 0) log.info("Vaktmester ryddet opp $it rad(er) med utgått informasjon om ansatte som ikke lenger jobber i Nav")
+    }
+
+    @WithSpan
+    fun lagre(nomAnsattData: NomAnsattData) {
+        adapter.upsert(nomAnsattData)
     }
 }
 

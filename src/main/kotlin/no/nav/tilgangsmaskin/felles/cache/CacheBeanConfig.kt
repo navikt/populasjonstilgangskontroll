@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.felles.cache
 import glide.api.GlideClient
 import glide.api.models.configuration.GlideClientConfiguration
 import glide.api.models.configuration.NodeAddress
+import glide.api.models.configuration.ServerCredentials
 import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisURI
 import no.nav.boot.conditionals.ConditionalOnGCP
@@ -53,7 +54,14 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
     @Lazy
     fun glideConfig(cfg: CacheConfig) =
         GlideClientConfiguration.builder()
-            .address(NodeAddress.builder().host(cfg.host).port(cfg.port).build())
+            .address(NodeAddress.builder()
+                .host(cfg.host)
+                .port(cfg.port).build())
+            .useTLS(true)
+            .credentials(ServerCredentials.builder()
+                .username(cfg.username)
+                .password(cfg.password)
+                .build())
             .build()
     @Bean
     @ConditionalOnNotProd

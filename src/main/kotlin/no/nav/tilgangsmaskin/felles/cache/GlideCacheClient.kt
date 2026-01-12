@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import glide.api.GlideClient
+import glide.api.GlideClusterClient
 import glide.api.models.GlideString
 import glide.api.models.GlideString.gs
 import glide.api.models.commands.SetOptions.Expiry.Seconds
@@ -12,7 +13,7 @@ import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
 @Service
-class GlideCacheClient(private val client: CompletableFuture<GlideClient>, private val handler: CacheNøkkelHandler) : CacheOperations {
+class GlideCacheClient(private val client: CompletableFuture<GlideClusterClient>, private val handler: CacheNøkkelHandler) : CacheOperations {
 
     override fun delete( id: String,vararg caches: CachableConfig,) =
         client.get().del(caches.map<CachableConfig, GlideString> { cache ->

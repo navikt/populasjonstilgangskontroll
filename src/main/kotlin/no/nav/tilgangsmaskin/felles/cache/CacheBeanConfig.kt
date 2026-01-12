@@ -74,7 +74,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
     @Bean
     @ConditionalOnNotProd
     @Lazy
-    fun glideCacheClient(client: CompletableFuture<GlideClient>, handler: CacheNøkkelHandler) =
+    fun glideCacheClient(client: CompletableFuture<GlideClusterClient>, handler: CacheNøkkelHandler) =
         GlideCacheClient(client, handler)
 
         @Bean

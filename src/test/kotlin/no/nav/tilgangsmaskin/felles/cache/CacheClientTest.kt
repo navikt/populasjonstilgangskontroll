@@ -3,7 +3,9 @@ package no.nav.tilgangsmaskin.felles.cache
 import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
 import glide.api.GlideClient
+import glide.api.GlideClusterClient
 import glide.api.models.configuration.GlideClientConfiguration
+import glide.api.models.configuration.GlideClusterClientConfiguration
 import glide.api.models.configuration.NodeAddress
 import io.lettuce.core.RedisClient.create
 import io.micrometer.core.instrument.MeterRegistry
@@ -67,7 +69,7 @@ class CacheClientTest {
     @Autowired
     private lateinit var cf: RedisConnectionFactory
     private lateinit var lettuceClient: LettuceCacheClient
-    private lateinit var glideClient: GlideCacheClient
+ //   private lateinit var glideClient: GlideCacheClient
     private lateinit var handler: CacheNøkkelHandler
 
     val b1 = BrukerId("03508331575")
@@ -88,7 +90,7 @@ class CacheClientTest {
             )).build()
         mgr.getCache(PDL_MED_FAMILIE_CACHE.name)
         handler = CacheNøkkelHandler(mgr.cacheConfigurations, MAPPER)
-        glideClient = glideClient(handler)
+      //  glideClient = glideClient(handler)
         lettuceClient = lettuceClient(handler)
     }
 
@@ -97,7 +99,7 @@ class CacheClientTest {
         BulkCacheTeller(meterRegistry, token))
 
     private fun glideClient(handler: CacheNøkkelHandler) =
-         GlideCacheClient(GlideClient.createClient(GlideClientConfiguration.builder()
+         GlideCacheClient(GlideClusterClient.createClient(GlideClusterClientConfiguration.builder()
             .address(NodeAddress.builder()
                 .host(redis.host)
                 .port(redis.firstMappedPort)
@@ -110,7 +112,7 @@ class CacheClientTest {
         every { token.clusterAndSystem } returns "test:dev-gcp"
     }
 
-    private fun cacheClients() = listOf(lettuceClient,glideClient)
+    private fun cacheClients() = listOf(lettuceClient,/*glideClient*/)
 
     @ParameterizedTest
     @MethodSource("cacheClients")

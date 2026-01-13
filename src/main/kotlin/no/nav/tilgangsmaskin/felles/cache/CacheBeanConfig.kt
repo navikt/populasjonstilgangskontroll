@@ -6,12 +6,14 @@ import glide.api.models.configuration.GlideClientConfiguration
 import glide.api.models.configuration.GlideClusterClientConfiguration
 import glide.api.models.configuration.NodeAddress
 import glide.api.models.configuration.ServerCredentials
+import glide.api.models.exceptions.ConnectionException
 import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisURI
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -31,6 +33,7 @@ import tools.jackson.module.kotlin.KotlinModule.Builder
 class CacheBeanConfig(private val cf: RedisConnectionFactory,
                       private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
+    private val log = getLogger(javaClass)
 
     @Bean
     override fun cacheManager()  =
@@ -63,7 +66,21 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
     @Bean
     @ConditionalOnNotProd
     fun glideClient(cfg: GlideClusterClientConfiguration)  =
-        GlideClusterClient.createClient(cfg).get()
+       runCatching {
+           GlideClusterClient.createClient(cfg).get()
+       }.getOrElse {
+           when (it) {
+               is ConnectionException -> {
+                   log.info("✗ Connection failed: ${it.message}")
+                   log.info("\nTroubleshooting:")
+                   log.info("1. Check if nodes are reachable")
+                   log.info("2. Verify cluster is initialized: redis-cli cluster info")
+                   log.info("3. Check node addresses match cluster config")
+                   throw it
+               }
+               else -> throw it
+           }
+       }
 
     @Bean
     @ConditionalOnNotProd

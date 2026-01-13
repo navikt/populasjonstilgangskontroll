@@ -62,12 +62,7 @@ configurations.all {
 }
 
 dependencies {
-    implementation("io.netty:netty-resolver-dns-native-macos:4.2.9.Final"){
-        artifact {
-            classifier = osdetector.classifier
-        }
-    }
-
+    
     implementation("io.valkey:valkey-glide:$glideVersion") {
         artifact {
             classifier = osdetector.classifier

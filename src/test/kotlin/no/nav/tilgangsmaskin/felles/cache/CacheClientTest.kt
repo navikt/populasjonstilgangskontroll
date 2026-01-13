@@ -147,7 +147,7 @@ class CacheClientTest {
     }
     companion object {
        @ServiceConnection
-       private val redis = RedisContainer("valkey/valkey:9.0.1")
+       private val redis = RedisContainer("valkey/valkey:8.1.4")
     }
 }
 

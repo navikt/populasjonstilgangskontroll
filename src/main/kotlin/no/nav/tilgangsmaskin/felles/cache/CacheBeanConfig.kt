@@ -63,24 +63,11 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
                 .password(cfg.password)
                 .build())
             .build()
+
     @Bean
     @ConditionalOnNotProd
-    fun glideClient(cfg: GlideClusterClientConfiguration)  =
-       runCatching {
+    fun glideClient(cfg: GlideClusterClientConfiguration) =
            GlideClusterClient.createClient(cfg).get()
-       }.getOrElse {
-           when (it) {
-               is ConnectionException -> {
-                   log.info("✗ Connection failed: ${it.message}")
-                   log.info("\nTroubleshooting:")
-                   log.info("1. Check if nodes are reachable")
-                   log.info("2. Verify cluster is initialized: redis-cli cluster info")
-                   log.info("3. Check node addresses match cluster config")
-                   throw it
-               }
-               else -> throw it
-           }
-       }
 
     @Bean
     @ConditionalOnNotProd

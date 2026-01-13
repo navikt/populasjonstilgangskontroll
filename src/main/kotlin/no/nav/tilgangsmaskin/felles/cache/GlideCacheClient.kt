@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import glide.api.BaseClient
+import glide.api.GlideClient
 import glide.api.GlideClusterClient
 import glide.api.models.GlideString
 import glide.api.models.GlideString.gs
@@ -9,7 +11,7 @@ import no.nav.tilgangsmaskin.felles.cache.CacheConfig.Companion.VALKEY
 import java.time.Duration
 import kotlin.reflect.KClass
 
-class GlideCacheClient(private val client: GlideClusterClient, private val handler: CacheNøkkelHandler) : CacheOperations {
+class GlideCacheClient(private val client: BaseClient, private val handler: CacheNøkkelHandler) : CacheOperations {
 
     override fun delete( id: String,vararg caches: CachableConfig,) =
         client.del(caches.map<CachableConfig, GlideString> { cache ->
@@ -47,7 +49,11 @@ class GlideCacheClient(private val client: GlideClusterClient, private val handl
 
     override fun tilNøkkel(cache: CachableConfig, id: String) = handler.nøkkel(id,cache)
 
-    override fun ping() = client.ping().get()
+    override fun ping() = when (client) {
+        is GlideClusterClient -> client.ping().get()
+        is GlideClient -> client.ping().get()
+        else -> throw IllegalStateException("Ukjent client type ${client.javaClass.name}")
+    }
 
     override val pingEndpoint: String
         get() = TODO("Not yet implemented")

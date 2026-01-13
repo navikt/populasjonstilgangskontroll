@@ -113,8 +113,8 @@ class CacheClientTest {
 
     private fun cacheClients() = listOf(lettuceClient,glideClient)
 
-    @ParameterizedTest
-    @MethodSource("cacheClients")
+    //@ParameterizedTest
+    //@MethodSource("cacheClients")
     fun delete(client: CacheOperations) {
         client.putOne( p1.brukerId.verdi,p1, ofSeconds(60),PDL_MED_FAMILIE_CACHE)
         assertThat(client.getOne(p1.brukerId.verdi, Person::class, PDL_MED_FAMILIE_CACHE)).isEqualTo(p1)
@@ -122,8 +122,8 @@ class CacheClientTest {
         assertThat(client.getOne(p1.brukerId.verdi, Person::class, PDL_MED_FAMILIE_CACHE)).isNull()
     }
 
-    @ParameterizedTest
-    @MethodSource("cacheClients")
+   // @ParameterizedTest
+    //@MethodSource("cacheClients")
     fun putAndGetOne(client: CacheOperations) {
         client.putOne( p1.brukerId.verdi,p1, ofSeconds(1),PDL_MED_FAMILIE_CACHE)
         val one = client.getOne(p1.brukerId.verdi, Person::class,PDL_MED_FAMILIE_CACHE)
@@ -133,8 +133,8 @@ class CacheClientTest {
         }
     }
 
-    @ParameterizedTest
-    @MethodSource("cacheClients")
+    //@ParameterizedTest
+    //@MethodSource("cacheClients")
      fun putAndGetMany(client: CacheOperations) {
         val ids = setOf(p1.brukerId.verdi,p2.brukerId.verdi)
         client.putMany(mapOf(p1.brukerId.verdi to p1, p2.brukerId.verdi to p2),

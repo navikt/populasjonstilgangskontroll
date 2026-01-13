@@ -62,7 +62,7 @@ configurations.all {
 }
 
 dependencies {
-    
+
     implementation("io.valkey:valkey-glide:$glideVersion") {
         artifact {
             classifier = osdetector.classifier

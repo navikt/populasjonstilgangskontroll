@@ -69,7 +69,7 @@ class CacheClientTest {
     @Autowired
     private lateinit var cf: RedisConnectionFactory
     private lateinit var lettuceClient: LettuceCacheClient
- //   private lateinit var glideClient: GlideCacheClient
+    private lateinit var glideClient: GlideCacheClient
     private lateinit var handler: CacheNøkkelHandler
 
     val b1 = BrukerId("03508331575")
@@ -90,7 +90,7 @@ class CacheClientTest {
             )).build()
         mgr.getCache(PDL_MED_FAMILIE_CACHE.name)
         handler = CacheNøkkelHandler(mgr.cacheConfigurations, MAPPER)
-      //  glideClient = glideClient(handler)
+        glideClient = glideClient(handler)
         lettuceClient = lettuceClient(handler)
     }
 
@@ -99,7 +99,7 @@ class CacheClientTest {
         BulkCacheTeller(meterRegistry, token))
 
     private fun glideClient(handler: CacheNøkkelHandler) =
-         GlideCacheClient(GlideClusterClient.createClient(GlideClusterClientConfiguration.builder()
+         GlideCacheClient(GlideClient.createClient(GlideClientConfiguration.builder()
             .address(NodeAddress.builder()
                 .host(redis.host)
                 .port(redis.firstMappedPort)
@@ -112,7 +112,7 @@ class CacheClientTest {
         every { token.clusterAndSystem } returns "test:dev-gcp"
     }
 
-    private fun cacheClients() = listOf(lettuceClient,/*glideClient*/)
+    private fun cacheClients() = listOf(lettuceClient,glideClient)
 
     @ParameterizedTest
     @MethodSource("cacheClients")
@@ -148,7 +148,7 @@ class CacheClientTest {
     }
     companion object {
        @ServiceConnection
-       private val redis = RedisContainer("redis:6.2.2")
+       private val redis = RedisContainer("valkey/valkey:9.0.1")
     }
 }
 

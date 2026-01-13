@@ -53,7 +53,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
     @Bean
     @ConditionalOnNotProd
     fun glideConfig(cfg: CacheConfig) =
-        GlideClusterClientConfiguration.builder()
+        GlideClientConfiguration.builder()
             .address(NodeAddress.builder()
                 .host(cfg.host)
                 .port(cfg.port).build())
@@ -65,12 +65,12 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             .build()
     @Bean
     @ConditionalOnNotProd
-    fun glideClient(cfg: GlideClusterClientConfiguration)  =
-        GlideClusterClient.createClient(cfg).get()
+    fun glideClient(cfg: GlideClientConfiguration)  =
+        GlideClient.createClient(cfg).get()
 
     @Bean
     @ConditionalOnNotProd
-    fun glideCacheClient(client: GlideClusterClient, handler: CacheNøkkelHandler) =
+    fun glideCacheClient(client: GlideClient, handler: CacheNøkkelHandler) =
         GlideCacheClient(client, handler)
 
     @Bean

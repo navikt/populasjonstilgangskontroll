@@ -12,7 +12,7 @@ import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
-class GlideCacheClient(private val client: GlideClusterClient, private val handler: CacheNøkkelHandler) : CacheOperations {
+class GlideCacheClient(private val client: GlideClient, private val handler: CacheNøkkelHandler) : CacheOperations {
 
     override fun delete( id: String,vararg caches: CachableConfig,) =
         client.del(caches.map<CachableConfig, GlideString> { cache ->
@@ -49,7 +49,7 @@ class GlideCacheClient(private val client: GlideClusterClient, private val handl
     }
 
     override fun tilNøkkel(cache: CachableConfig, id: String) = handler.nøkkel(id,cache)
-    
+
     override fun ping() = client.ping().get()
 
     override val pingEndpoint: String

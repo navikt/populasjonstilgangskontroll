@@ -21,6 +21,7 @@ version = "1.0.1"
 
 plugins {
     val kotlinVersion = "2.3.0"
+    id("com.google.osdetector") version "1.7.3"
     id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
@@ -63,16 +64,9 @@ configurations.all {
 dependencies {
     implementation("io.valkey:valkey-glide:$glideVersion") {
         artifact {
-            classifier = "osx-aarch_64"
+            classifier = osdetector.classifier
         }
     }
-
-    implementation("io.valkey:valkey-glide:$glideVersion") {
-        artifact {
-            classifier = "linux-x86_64"
-        }
-    }
-// o
     implementation("io.confluent:kafka-avro-serializer:$confluentVersion") {
         exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
     }

@@ -10,13 +10,11 @@ import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisURI
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Lazy
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.nonLockingRedisCacheWriter
@@ -26,7 +24,6 @@ import org.springframework.data.redis.serializer.RedisSerializationContext.Seria
 import org.springframework.data.redis.serializer.StringRedisSerializer
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.KotlinModule.Builder
-import java.util.concurrent.CompletableFuture
 
 
 @Configuration(proxyBeanMethods = true)
@@ -53,7 +50,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
     @Bean
     @ConditionalOnNotProd
     fun glideConfig(cfg: CacheConfig) =
-        GlideClientConfiguration.builder()
+        GlideClusterClientConfiguration.builder()
             .address(NodeAddress.builder()
                 .host(cfg.host)
                 .port(cfg.port).build())
@@ -65,12 +62,12 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             .build()
     @Bean
     @ConditionalOnNotProd
-    fun glideClient(cfg: GlideClientConfiguration)  =
-        GlideClient.createClient(cfg).get()
+    fun glideClient(cfg: GlideClusterClientConfiguration)  =
+        GlideClusterClient.createClient(cfg).get()
 
     @Bean
     @ConditionalOnNotProd
-    fun glideCacheClient(client: GlideClient, handler: CacheNøkkelHandler) =
+    fun glideCacheClient(client: GlideClusterClient, handler: CacheNøkkelHandler) =
         GlideCacheClient(client, handler)
 
     @Bean

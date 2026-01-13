@@ -2,9 +2,7 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
-import glide.api.GlideClient
 import glide.api.GlideClusterClient
-import glide.api.models.configuration.GlideClientConfiguration
 import glide.api.models.configuration.GlideClusterClientConfiguration
 import glide.api.models.configuration.NodeAddress
 import io.lettuce.core.RedisClient.create
@@ -43,8 +41,7 @@ import org.springframework.data.redis.cache.RedisCacheManager.builder
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
-import tools.jackson.databind.json.JsonMapper
-import tools.jackson.module.kotlin.KotlinModule.Builder
+import java.time.Duration
 import java.time.Duration.*
 import java.util.concurrent.TimeUnit.*
 
@@ -99,11 +96,13 @@ class CacheClientTest {
         BulkCacheTeller(meterRegistry, token))
 
     private fun glideClient(handler: CacheNøkkelHandler) =
-         GlideCacheClient(GlideClient.createClient(GlideClientConfiguration.builder()
+
+         GlideCacheClient(GlideClusterClient.createClient(GlideClusterClientConfiguration.builder()
             .address(NodeAddress.builder()
                 .host(redis.host)
                 .port(redis.firstMappedPort)
                 .build())
+             .requestTimeout(10)
             .build()).get(),handler)
 
     @BeforeEach

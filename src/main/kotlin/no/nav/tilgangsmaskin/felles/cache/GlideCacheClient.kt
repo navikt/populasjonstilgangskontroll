@@ -1,18 +1,15 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import glide.api.GlideClient
 import glide.api.GlideClusterClient
 import glide.api.models.GlideString
 import glide.api.models.GlideString.gs
 import glide.api.models.commands.SetOptions.Expiry.Seconds
 import glide.api.models.commands.SetOptions.builder
 import no.nav.tilgangsmaskin.felles.cache.CacheConfig.Companion.VALKEY
-import org.springframework.stereotype.Service
 import java.time.Duration
-import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
-class GlideCacheClient(private val client: GlideClient, private val handler: CacheNøkkelHandler) : CacheOperations {
+class GlideCacheClient(private val client: GlideClusterClient, private val handler: CacheNøkkelHandler) : CacheOperations {
 
     override fun delete( id: String,vararg caches: CachableConfig,) =
         client.del(caches.map<CachableConfig, GlideString> { cache ->

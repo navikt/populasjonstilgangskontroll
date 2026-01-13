@@ -104,7 +104,7 @@ class CacheClientTest {
                 .host(redis.host)
                 .port(redis.firstMappedPort)
                 .build())
-            .build()),handler)
+            .build()).get(),handler)
 
     @BeforeEach
     fun setUp() {

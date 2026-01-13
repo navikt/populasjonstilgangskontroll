@@ -43,7 +43,6 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             .build()
 
     @Bean
-    //@ConditionalOnProd
     fun lettuceClient(cfg: CacheConfig) =
         RedisClient.create(RedisURI.Builder
             .redis(cfg.host, cfg.port)
@@ -67,17 +66,15 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             .build()
     @Bean
     @ConditionalOnNotProd
-    @Lazy
     fun glideClient(cfg: GlideClusterClientConfiguration)  =
         GlideClusterClient.createClient(cfg)
 
     @Bean
     @ConditionalOnNotProd
-    @Lazy
     fun glideCacheClient(client: CompletableFuture<GlideClusterClient>, handler: CacheNøkkelHandler) =
         GlideCacheClient(client, handler)
 
-        @Bean
+    @Bean
     fun cacheNøkkelHandler(mgr: RedisCacheManager) =
         CacheNøkkelHandler(mgr.cacheConfigurations,MAPPER)
 

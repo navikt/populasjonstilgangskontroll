@@ -12,7 +12,6 @@ import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
-@Service
 class GlideCacheClient(private val client: CompletableFuture<GlideClusterClient>, private val handler: CacheNøkkelHandler) : CacheOperations {
 
     override fun delete( id: String,vararg caches: CachableConfig,) =

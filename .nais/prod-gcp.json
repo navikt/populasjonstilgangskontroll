@@ -24,6 +24,11 @@
   },
   "inbound": [
     {
+      "name": "pensjonskalkulator-backend",
+      "namespace": "pensjonskalkulator",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "arena",
       "namespace": "teamarenanais",
       "cluster": "prod-fss"

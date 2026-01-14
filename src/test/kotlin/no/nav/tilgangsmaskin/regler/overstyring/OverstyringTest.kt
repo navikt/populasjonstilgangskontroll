@@ -8,8 +8,11 @@ import io.mockk.junit5.MockKExtension
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyRestClientAdapter.ProxiedAnsatt.Enhet
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
@@ -60,6 +63,8 @@ internal class OverstyringTest {
     private lateinit var registry: MeterRegistry
 
     @MockkBean
+    private lateinit var proxy: EntraProxyTjeneste
+    @MockkBean
     private lateinit var token: Token
 
     @MockK
@@ -81,8 +86,9 @@ internal class OverstyringTest {
         every { token.ansattId } returns ansattId
         every { token.systemNavn } returns "test"
         every { token.clusterAndSystem } returns "cluster:test"
+        every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-        overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, OverstyringTeller(registry, token))
+        overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, proxy,OverstyringTeller(registry, token))
     }
 
     @Test

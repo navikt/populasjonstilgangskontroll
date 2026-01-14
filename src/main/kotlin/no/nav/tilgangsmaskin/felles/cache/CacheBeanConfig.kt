@@ -70,11 +70,6 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
            GlideClient.createClient(cfg).get()
 
     @Bean
-    @ConditionalOnNotProd
-    fun glideCacheClient(client: GlideClusterClient, handler: CacheNøkkelHandler) =
-        GlideCacheClient(client, handler)
-
-    @Bean
     fun cacheNøkkelHandler(mgr: RedisCacheManager) =
         CacheNøkkelHandler(mgr.cacheConfigurations,MAPPER)
 

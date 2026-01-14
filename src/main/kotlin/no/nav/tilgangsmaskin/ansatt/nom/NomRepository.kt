@@ -12,3 +12,4 @@ interface NomRepository : JpaRepository<NomEntity, Long> {
 interface FnrProjection {
     val fnr: String
 }
+

@@ -7,9 +7,9 @@ import java.time.ZoneId.systemDefault
 @Component
 class OverstyringJPAAdapter(private val repository: OverstyringRepository) {
 
-    fun overstyr(ansattId: String, data: OverstyringData) =
+    fun overstyr(ansattId: String, enhet: String, data: OverstyringData) =
         with(data) {
-            repository.save(OverstyringEntity(ansattId, brukerId.verdi, begrunnelse, gyldigtil.atStartOfDay(systemDefault()).toInstant()))
+            repository.save(OverstyringEntity(ansattId, brukerId.verdi, begrunnelse, enhet,gyldigtil.atStartOfDay(systemDefault()).toInstant()))
             Unit
         }
 

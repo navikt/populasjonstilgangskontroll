@@ -46,5 +46,3 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
             oppfølging.avslutt(oppfolgingsperiodeUuid, Identer(ident, aktorId))
         }
 }
-
-

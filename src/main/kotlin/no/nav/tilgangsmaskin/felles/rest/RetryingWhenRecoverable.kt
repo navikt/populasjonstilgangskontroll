@@ -15,5 +15,7 @@ import kotlin.reflect.KClass
 @Inherited
 @MustBeDocumented
 annotation class RetryingWhenRecoverable(
-    @get:AliasFor(annotation = Retryable::class) val value: Array<KClass<out Throwable>> = [RecoverableRestException::class, ResourceAccessException::class]
-)
+    @get:AliasFor(annotation = Retryable::class) val value: Array<KClass<out Throwable>> = [RecoverableRestException::class, ResourceAccessException::class],
+    @get:AliasFor(annotation = Retryable::class) val delay: Long = 1000L,
+    @get:AliasFor(annotation = Retryable::class) val maxRetries: Long = 3
+    )

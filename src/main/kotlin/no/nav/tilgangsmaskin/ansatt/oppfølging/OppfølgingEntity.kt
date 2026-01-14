@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.ansatt.`oppfølging`
+package no.nav.tilgangsmaskin.ansatt.oppfølging
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -43,4 +43,3 @@ class OppfølgingEntity(@NaturalId @Id val id: UUID) {
     @LastModifiedDate
     var updated: Instant? = null
 }
-

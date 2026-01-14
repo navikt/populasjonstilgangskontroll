@@ -4,23 +4,20 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
-import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
-import no.nav.tilgangsmaskin.ansatt.nom.NomJPAAdapter
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
-import no.nav.tilgangsmaskin.bruker.Enhetsnummer
-import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
@@ -28,8 +25,9 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
-import no.nav.tilgangsmaskin.felles.cache.CacheClient
+import no.nav.tilgangsmaskin.felles.cache.LettuceCacheClient
 import no.nav.tilgangsmaskin.felles.cache.Caches
+import no.nav.tilgangsmaskin.felles.cache.GlideCacheClient
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
@@ -43,17 +41,20 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.MULTI_STATUS
 import org.springframework.http.HttpStatus.NO_CONTENT
+import org.springframework.http.ResponseEntity
+import org.springframework.http.ResponseEntity.noContent
+import org.springframework.http.ResponseEntity.status
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
-import java.util.*
 
 
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
+@Validated
 @Tag(name = "DevTilgangController", description = "Denne kontrolleren skal kun brukes til testing")
 class DevTilgangController(
     private val graphql: PdlSyncGraphQLClientAdapter,
@@ -67,45 +68,47 @@ class DevTilgangController(
     private val oppfølging: OppfølgingTjeneste,
     private val pip: PdlRestClientAdapter,
     private val oid: AnsattOidTjeneste,
-    private val nom: NomJPAAdapter,
     private val pdl: PDLTjeneste,
-    private val cacheClient: CacheClient) {
+    private val glide: GlideCacheClient,
+    private val proxy: EntraProxyTjeneste,
+    private val cacheClient: LettuceCacheClient) {
 
     private val log = getLogger(javaClass)
 
+    @GetMapping("proxy/{ansattId}")
+    fun enhet(@PathVariable ansattId: AnsattId) = proxy.enhet(ansattId)
 
-    @PostMapping("oppfolging/{uuid}/{kontor}/registrer")
-    fun registrer(@RequestBody identer : Identer,@PathVariable uuid: UUID, @PathVariable kontor: Enhetsnummer) =
-        oppfølging.registrer(uuid, identer, Kontor(kontor))
-
-    @PostMapping("oppfolging/{uuid}/avslutt")
-    fun oppfølgingAvslutt(@RequestBody identer : Identer, @PathVariable uuid: UUID) = oppfølging.avslutt(uuid, identer)
-
-    @GetMapping("oppfolging/enhet")
-    fun enhetFor(@RequestParam id: Identifikator) = oppfølging.enhetFor(id)
+    @GetMapping("cache/glide/ping")
+    fun ping() = glide.ping()
 
     @PostMapping("cache/skjerminger")
-    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(navIds,
-        CachableConfig(SKJERMING))
+    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany(navIds, Boolean::class,SKJERMING_CACHE)
 
+   @PostMapping("cache/{cache}/{id}/slett")
+   fun slettIdFraCache(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
+                   cache: Caches, @PathVariable id: String) : ResponseEntity<Unit> {
+
+       Caches.forNavn(cache.name).let { c ->
+           val antall = cacheClient.delete(id,*c).also { antall ->
+               log.info("Sletting status $antall for $id i ${c.size} cache(s) for cache '${cache.name.lowercase()}'" )
+           }
+           return if (antall > 0) noContent().build()
+           else  status(410).build()
+       }
+   }
 
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany<Person>(navIds.map { it.verdi }.toSet(),
-        CachableConfig(PDL))
-
-    @GetMapping("cache/keys/{cache}")
-    fun keys(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-             cache: Caches) =
-        Caches.forNavn(cache.name).flatMap {
-            cacheClient.getAllKeys(it)
-        }.toSortedSet()
+    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany(navIds.map { it.verdi }.toSet(), Person::class,CachableConfig(PDL))
 
     @GetMapping("cache/{cache}/{id}")
     fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
             cache: Caches, id: String) =
         Caches.forNavn(cache.name)
-            .mapNotNull { cacheClient.getOne(id, it) }
+            .mapNotNull { cacheClient.getOne(id, Any::class,it) }
             .toSet()
+
+    @PostMapping("oppfolging/enhet")
+    fun oppfolgingEnhet(@RequestBody @NotBlank ident: String) = oppfølging.enhetFor(Identifikator(ident))
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable  id: String) = graphql.partnere(id)
@@ -127,17 +130,6 @@ class DevTilgangController(
 
     @GetMapping("ansatt/{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)
-
-    @Operation(
-        summary= "Sette kobling mellom ansatt og fnr",
-        description = """Funksjon for å opprette relasjon mellom nav-ident og fnrslik  at oppslag på egne data og familierelasjoner kan testes """)
-    @PostMapping("ansatt/{ansattId}/{brukerId}")
-    fun nom(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
-        nom.upsert(NomAnsattData(ansattId, brukerId))
-
-    @GetMapping("nom/{ansattId}")
-    fun nomFnr(@PathVariable ansattId: AnsattId) =
-        nom.fnrForAnsatt(ansattId.verdi)
 
     @GetMapping("komplett/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)

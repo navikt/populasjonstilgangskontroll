@@ -4,6 +4,7 @@ import io.micrometer.core.annotation.Timed
 import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
@@ -26,6 +27,7 @@ class OverstyringTjeneste(
     private val ansattTjeneste: AnsattTjeneste,
     private val brukerTjeneste: BrukerTjeneste,
     private val adapter: OverstyringJPAAdapter,
+    private val proxy: EntraProxyTjeneste,
     private val motor: RegelMotor,
     private val teller: OverstyringTeller) {
 
@@ -51,7 +53,8 @@ class OverstyringTjeneste(
         runCatching {
             log.info("Sjekker kjerneregler før eventuell overstyring for $ansattId og ${data.brukerId}")
             motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi))
-            adapter.overstyr(ansattId.verdi, data).also {
+            val enhet = proxy.enhet(ansattId)
+            adapter.overstyr(ansattId.verdi, enhet.enhetnummer.verdi, data).also {
                 teller.tell(Tags.of("overstyrt", "true"))
                 log.info("Overstyring til og med ${data.gyldigtil} ble registret for $ansattId og ${data.brukerId}")
             }

@@ -14,7 +14,7 @@ class EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: E
     AbstractRestClientAdapter(restClient, cf) {
 
     fun oidFraEntra(ansattId: String) =
-        get<EntraSaksbehandlerRespons>(cf.userURI(ansattId)).oids.firstOrNull()?.id
+        get<EntraSaksbehandlerRespons>(cf.userURI(ansattId)).oids.single().id
 
     fun grupper(ansattId: String, trengerGlobaleGrupper: Boolean): Set<EntraGruppe> =
         generateSequence(get<EntraGrupper>(cf.grupperURI(ansattId,trengerGlobaleGrupper))) { bolk ->

@@ -9,6 +9,7 @@ import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomJPAAdapter
@@ -69,10 +70,13 @@ class DevTilgangController(
     private val oid: AnsattOidTjeneste,
     private val nom: NomJPAAdapter,
     private val pdl: PDLTjeneste,
+    private val proxy: EntraProxyTjeneste,
     private val cacheClient: CacheClient) {
 
     private val log = getLogger(javaClass)
 
+    @GetMapping("proxy/{ansattId}")
+    fun enhet(@PathVariable ansattId: AnsattId) = proxy.enhet(ansattId)
 
     @PostMapping("oppfolging/{uuid}/{kontor}/registrer")
     fun registrer(@RequestBody identer : Identer,@PathVariable uuid: UUID, @PathVariable kontor: Enhetsnummer) =

@@ -71,11 +71,11 @@ spec:
         extra:
           - "NAVident"
           - "azp_name"
-  secureLogs:
-    enabled: true
   accessPolicy:
     outbound:
       rules:
+        - application: entra-proxy
+          namespace: sikkerhetstjenesten
         - application: opentelemetry-collector
           namespace: nais-system
         - application: skjermede-personer-pip

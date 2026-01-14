@@ -153,6 +153,15 @@ no.nav.security.jwt:
           client-id: ${azure.app.client.id}
           client-jwk: ${azure.app.jwk}
           client-auth-method: private_key_jwt
+
+      entra-proxy:
+        token-endpoint-url: ${azure.openid.config.token.endpoint}
+        grant-type: client_credentials
+        scope: ${entra-proxy.scope}
+        authentication:
+          client-id: ${azure.app.client.id}
+          client-jwk: ${azure.app.jwk}
+          client-auth-method: private_key_jwt
 springdoc:
   swagger-ui:
     oauth:
@@ -181,4 +190,7 @@ valkey:
   uri: ${valkey.uri.${nais.cluster.cache}}
   port: ${valkey.port.${nais.cluster.cache}}
   host: ${valkey.host.${nais.cluster.cache}}
+
+entra-proxy:
+  scope: "api://${nais.cluster.type}-gcp.sikkerhetstjenesten.entra-proxy/.default"
 

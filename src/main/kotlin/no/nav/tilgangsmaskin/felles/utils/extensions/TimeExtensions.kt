@@ -1,5 +1,8 @@
 package no.nav.tilgangsmaskin.felles.utils.extensions
 
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_0_6
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_13_24
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_7_12
 import java.time.Instant
 import java.time.Instant.now
 import java.time.LocalDate
@@ -51,9 +54,16 @@ object TimeExtensions {
 
     fun LocalDate.intervallSiden() =
         when (månederSidenIdag()) {
-            in 0..6 -> "0-6"
-            in 7..12 -> "7-12"
-            in 13..24 -> "13-24"
-            else -> ">24"
+            in 0..6 -> MND_0_6
+            in 7..12 -> MND_7_12
+            in 13..24 -> MND_13_24
+            else -> MND_7_12
         }
+
+    enum class Dødsperiode(val tekst: String) {
+        MND_0_6("0-6"),
+        MND_7_12("7-12"),
+        MND_13_24("13-24"),
+        MND_OVER_24(">24")
+    }
 }

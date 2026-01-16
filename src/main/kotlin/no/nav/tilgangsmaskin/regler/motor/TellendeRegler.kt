@@ -2,7 +2,12 @@ package no.nav.tilgangsmaskin.regler.motor
 
 import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.Ansatt
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_13_24
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_OVER_24
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
@@ -24,10 +29,13 @@ interface TellendeRegel : Regel {
 
 @Component
 @Order(LOWEST_PRECEDENCE - 3)
-class AvdødBrukerRegel(private val teller: AvdødTeller) : TellendeRegel {
+class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: EntraProxyTjeneste) : TellendeRegel {
     override val predikat = { _: Ansatt, bruker: Bruker -> bruker.dødsdato != null }
 
     override fun tell(ansatt: Ansatt, bruker: Bruker) =
-        teller.tell(Tags.of("months", bruker.dødsdato!!.intervallSiden()))
+        when( val intervall = bruker.dødsdato!!.intervallSiden()) {
+            MND_13_24,MND_OVER_24 -> teller.tell(Tags.of("months", intervall.tekst, "enhet", proxy.enhet(ansatt.ansattId).enhetnummer.verdi))
+            else -> teller.tell(Tags.of("months", intervall.tekst, "enhet","N/A"))
+        }
     override val metadata = RegelMetadata(AVDØD)
 }

@@ -8,6 +8,7 @@ import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.UGRADERT
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.PdlCacheTømmerTeller
 import org.slf4j.LoggerFactory.getLogger
@@ -25,7 +26,7 @@ class PdlCacheOpprydder(private val teller: PdlCacheTømmerTeller, private val c
         filter = "graderingFilterStrategy")
     fun listen(hendelse: Personhendelse) {
         val gradering = (hendelse.adressebeskyttelse?.gradering ?: UGRADERT).name
-        val type = hendelse.endringstype?.name ?: "N/A"
+        val type = hendelse.endringstype?.name ?: UTILGJENGELIG
         PDL_CACHES.forEach { cache ->
             hendelse.personidenter.forEach { id ->
                 slett(cache, id, gradering, type)

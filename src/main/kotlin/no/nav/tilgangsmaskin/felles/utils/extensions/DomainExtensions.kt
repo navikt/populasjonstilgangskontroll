@@ -30,4 +30,6 @@ object DomainExtensions {
                 (key, _) -> MDC.remove(key)
             }
         }
+
+    const val UTILGJENGELIG = "N/A"
 }

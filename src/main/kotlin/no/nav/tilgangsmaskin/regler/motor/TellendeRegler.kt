@@ -32,10 +32,12 @@ interface TellendeRegel : Regel {
 class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: EntraProxyTjeneste) : TellendeRegel {
     override val predikat = { _: Ansatt, bruker: Bruker -> bruker.dødsdato != null }
 
-    override fun tell(ansatt: Ansatt, bruker: Bruker) =
-        when( val intervall = bruker.dødsdato!!.intervallSiden()) {
-            MND_13_24,MND_OVER_24 -> teller.tell(Tags.of("months", intervall.tekst, "enhet", proxy.enhet(ansatt.ansattId).enhetnummer.verdi))
-            else -> teller.tell(Tags.of("months", intervall.tekst, "enhet","N/A"))
-        }
+    override fun tell(ansatt: Ansatt, bruker: Bruker) {
+        val intervall = bruker.dødsdato!!.intervallSiden()
+        val enhet = if (intervall == MND_13_24 || intervall == MND_OVER_24)
+            proxy.enhet(ansatt.ansattId).enhetnummer.verdi
+        else "N/A"
+        teller.tell(Tags.of("months", intervall.tekst, "enhet", enhet))
+    }
     override val metadata = RegelMetadata(AVDØD)
 }

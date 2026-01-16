@@ -33,18 +33,21 @@ object TimeExtensions {
     fun java.time.Duration.format() = this.toKotlinDuration().format()
 
      fun Duration.format(): String {
-        val days = inWholeDays
-        val hours = inWholeHours % 24
-        val minutes = inWholeMinutes % 60
-        val seconds = inWholeSeconds % 60
+        val dager = inWholeDays
+        val timer = inWholeHours % 24
+        val minutter = inWholeMinutes % 60
+        val sekunder = inWholeSeconds % 60
 
         return buildString {
-            if (days > 0) append("$days ${if (days == 1L) "dag" else "dager"} ")
-            if (hours > 0) append("$hours ${if (hours == 1L) "time" else "timer"} ")
-            if (minutes > 0) append("$minutes ${if (minutes == 1L) "minutt" else "minutter"} ")
-            if (seconds > 0) append("$seconds ${if (seconds == 1L) "sekund" else "sekunder"}")
+            if (dager > 0) append("$dager ${pluralize(dager, "dag")} ")
+            if (timer > 0) append("$timer ${pluralize(timer, "time","timer")}")
+            if (minutter > 0) append("$minutter ${pluralize(minutter, "minutt")}  ")
+            if (sekunder > 0) append("$sekunder${pluralize(sekunder, "sekund")} ")
         }.trim()
     }
+
+    private fun pluralize(value: Long, singular: String,plural : String = singular + "er"): String =
+        if (value == 1L) singular else plural
 
     fun Long.local(fmt: String = "yyyy-MM-dd HH:mm:ss") = LocalDateTime.ofInstant(
             Instant.ofEpochMilli(this),

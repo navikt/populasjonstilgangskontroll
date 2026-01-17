@@ -16,6 +16,6 @@ class EntraProxyBeanConfig {
         b.baseUrl(cfg.baseUri).build()
 
     @Bean
-    fun proxyHealthIndicator(a: EntraProxyRestClientAdapter) =  PingableHealthIndicator(a)
+//    fun proxyHealthIndicator(a: EntraProxyRestClientAdapter) =  PingableHealthIndicator(a)
 
 }

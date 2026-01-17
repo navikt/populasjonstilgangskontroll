@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -63,6 +64,9 @@ class RegelMotorTest {
 
     @MockkBean
     private lateinit var oppfølging: OppfølgingTjeneste
+
+    @MockkBean
+    private lateinit var proxy: EntraProxyTjeneste
     
     @MockkBean
     private lateinit var token: Token

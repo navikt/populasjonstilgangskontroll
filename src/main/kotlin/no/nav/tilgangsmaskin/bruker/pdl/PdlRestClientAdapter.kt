@@ -90,9 +90,4 @@ class PdlRestClientAdapter(
                 FamilieMedlem(it.brukerId, SØSKEN)
             }
             .toSet()
-
-    companion object {
-
-
-    }
 }

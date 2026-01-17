@@ -1,5 +1,8 @@
 package no.nav.tilgangsmaskin.felles.utils.extensions
 
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_0_6
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_13_24
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_7_12
 import java.time.Instant
 import java.time.Instant.now
 import java.time.LocalDate
@@ -21,7 +24,7 @@ object TimeExtensions {
     fun Instant.diffFromNow() = java.time.Duration.between(now(), this).toKotlinDuration().format()
     fun LocalDate.toInstant(): Instant = atStartOfDay(systemDefault()).toInstant()
 
-    private fun LocalDate.månederSidenIdag() =
+     fun LocalDate.månederSidenIdag() =
         LocalDate.now().let {
             assert(isBefore(it)) { "Datoen $this er ikke før dagens dato $it" }
             Period.between(this, it).let { it.years * 12 + it.months } + if (it.dayOfMonth > dayOfMonth) 1 else 0
@@ -30,18 +33,21 @@ object TimeExtensions {
     fun java.time.Duration.format() = this.toKotlinDuration().format()
 
      fun Duration.format(): String {
-        val days = inWholeDays
-        val hours = inWholeHours % 24
-        val minutes = inWholeMinutes % 60
-        val seconds = inWholeSeconds % 60
+        val dager = inWholeDays
+        val timer = inWholeHours % 24
+        val minutter = inWholeMinutes % 60
+        val sekunder = inWholeSeconds % 60
 
         return buildString {
-            if (days > 0) append("$days ${if (days == 1L) "dag" else "dager"} ")
-            if (hours > 0) append("$hours ${if (hours == 1L) "time" else "timer"} ")
-            if (minutes > 0) append("$minutes ${if (minutes == 1L) "minutt" else "minutter"} ")
-            if (seconds > 0) append("$seconds ${if (seconds == 1L) "sekund" else "sekunder"}")
+            if (dager > 0) append("$dager ${pluralize(dager, "dag")} ")
+            if (timer > 0) append("$timer ${pluralize(timer, "time","timer")}")
+            if (minutter > 0) append("$minutter ${pluralize(minutter, "minutt")}  ")
+            if (sekunder > 0) append("$sekunder${pluralize(sekunder, "sekund")} ")
         }.trim()
     }
+
+    private fun pluralize(value: Long, singular: String,plural : String = singular + "er"): String =
+        if (value == 1L) singular else plural
 
     fun Long.local(fmt: String = "yyyy-MM-dd HH:mm:ss") = LocalDateTime.ofInstant(
             Instant.ofEpochMilli(this),
@@ -51,9 +57,16 @@ object TimeExtensions {
 
     fun LocalDate.intervallSiden() =
         when (månederSidenIdag()) {
-            in 0..6 -> "0-6"
-            in 7..12 -> "7-12"
-            in 13..24 -> "13-24"
-            else -> ">24"
+            in 0..6 -> MND_0_6
+            in 7..12 -> MND_7_12
+            in 13..24 -> MND_13_24
+            else -> MND_7_12
         }
+
+    enum class Dødsperiode(val tekst: String) {
+        MND_0_6("0-6"),
+        MND_7_12("7-12"),
+        MND_13_24("13-24"),
+        MND_OVER_24(">24")
+    }
 }

@@ -4,8 +4,6 @@ import io.micrometer.core.annotation.Timed
 import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyRestClientAdapter
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyRestClientAdapter.ProxiedAnsatt.Enhet
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste

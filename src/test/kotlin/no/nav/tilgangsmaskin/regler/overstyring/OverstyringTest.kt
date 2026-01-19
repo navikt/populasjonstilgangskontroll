@@ -8,7 +8,7 @@ import io.mockk.junit5.MockKExtension
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyRestClientAdapter.ProxiedAnsatt.Enhet
+import no.nav.tilgangsmaskin.ansatt.entraproxy.ProxiedAnsatt.Enhet
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste

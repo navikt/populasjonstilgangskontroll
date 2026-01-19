@@ -75,7 +75,6 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             .option(CONNECT_TIMEOUT_MILLIS, 5000)
             .doOnConnected { conn ->
                 conn.addHandlerLast(ReadTimeoutHandler(10))
-                conn.addHandlerLast(WriteTimeoutHandler(10))
             }))
     }
 

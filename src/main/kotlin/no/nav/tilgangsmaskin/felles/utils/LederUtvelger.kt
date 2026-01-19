@@ -32,7 +32,8 @@ class LederUtvelger(private val builder: Builder,
             .bodyToFlux<LederUtvelgerRespons>()
             .subscribe(
                 { publisher.publishEvent(LeaderChangedEvent(this, it.name)) },
-                { error -> log.warn("SSE error: ${error.message}",error) }
+                { error -> log.warn("SSE error: ${error.message}",error) },
+                { log.info("SSE avsluttet") }
             )
     }
 

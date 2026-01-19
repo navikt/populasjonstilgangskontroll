@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_13_24
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_OVER_24
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
@@ -37,15 +38,23 @@ class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: Ent
 
     override fun tell(ansatt: Ansatt, bruker: Bruker) {
         val intervall = bruker.dødsdato!!.intervallSiden()
-        val enhet = UTILGJENGELIG
-        /*    if (intervall == MND_13_24 || intervall == MND_OVER_24)
-            proxy.enhet(ansatt.ansattId).enhetnummer.verdi
-        else UTILGJENGELIG*/
+        val enhet = enhet(intervall, ansatt)
         teller.tell(Tags.of("months", intervall.tekst, "enhet", enhet))
-        /*
         if (enhet != UTILGJENGELIG)  {
             auditor.info("Ansatt ${ansatt.ansattId.verdi} i enhet $enhet fikk tilgang til forlengst avdød bruker ${bruker.brukerId.verdi}")
-        }*/
+        }
     }
+
+    private fun enhet(intervall: TimeExtensions.Dødsperiode,
+                      ansatt: Ansatt): String {
+        val enhet =
+            if (intervall == MND_13_24 || intervall == MND_OVER_24) {
+                proxy.enhet(ansatt.ansattId).enhetnummer.verdi
+            } else {
+                UTILGJENGELIG
+            }
+        return enhet
+    }
+
     override val metadata = RegelMetadata(AVDØD)
 }

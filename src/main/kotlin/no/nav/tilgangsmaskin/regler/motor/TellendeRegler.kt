@@ -37,13 +37,15 @@ class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: Ent
 
     override fun tell(ansatt: Ansatt, bruker: Bruker) {
         val intervall = bruker.dødsdato!!.intervallSiden()
-        val enhet = if (intervall == MND_13_24 || intervall == MND_OVER_24)
+        val enhet = UTILGJENGELIG
+        /*    if (intervall == MND_13_24 || intervall == MND_OVER_24)
             proxy.enhet(ansatt.ansattId).enhetnummer.verdi
-        else UTILGJENGELIG
+        else UTILGJENGELIG*/
         teller.tell(Tags.of("months", intervall.tekst, "enhet", enhet))
+        /*
         if (enhet != UTILGJENGELIG)  {
             auditor.info("Ansatt ${ansatt.ansattId.verdi} i enhet $enhet fikk tilgang til forlengst avdød bruker ${bruker.brukerId.verdi}")
-        }
+        }*/
     }
     override val metadata = RegelMetadata(AVDØD)
 }

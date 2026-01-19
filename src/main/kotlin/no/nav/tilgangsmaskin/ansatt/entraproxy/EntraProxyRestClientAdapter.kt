@@ -25,7 +25,6 @@ class EntraProxyRestClientAdapter(@Qualifier(ENTRAPROXY) restClient: RestClient,
     override fun toString() = "${javaClass.simpleName} [client=$restClient, config=$cf, errorHandler=$errorHandler]"
 
 
-
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class ProxiedAnsatt(
         val navIdent: AnsattId,

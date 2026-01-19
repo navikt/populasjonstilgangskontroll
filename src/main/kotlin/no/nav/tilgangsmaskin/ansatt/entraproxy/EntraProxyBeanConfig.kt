@@ -1,8 +1,9 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
 
-import no.nav.boot.conditionals.ConditionalOnDev
+import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRAPROXY
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -11,13 +12,16 @@ import org.springframework.web.client.RestClient.Builder
 @Configuration
 class EntraProxyBeanConfig {
 
+    protected val log = getLogger(javaClass)
+
     @Bean
     @Qualifier(ENTRAPROXY)
     fun entraProxyRestClient(b: Builder, cfg: EntraProxyConfig) =
         b.baseUrl(cfg.baseUri).build()
 
-    @ConditionalOnDev
+    @Bean
+    @ConditionalOnNotProd
     fun entraProxyHealthIndicator(a: EntraProxyRestClientAdapter) =
-        PingableHealthIndicator(a)
+        PingableHealthIndicator(a).also { log.info("XXXXXX helse XXXXXX") }
 
 }

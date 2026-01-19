@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.utils
 
-import org.slf4j.LoggerFactory
+import no.nav.tilgangsmaskin.felles.utils.LederUtvelger.LeaderChangedEvent
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.event.EventListener
 import java.net.InetAddress
 
@@ -8,10 +9,10 @@ abstract class LeaderAware(var erLeder: Boolean = false) {
     private val hostname = InetAddress.getLocalHost().hostName
     protected open fun doHandleLeaderChange()  = Unit
 
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val log = getLogger(javaClass)
 
-    @EventListener(LederUtvelger.LeaderChangedEvent::class)
-    fun onApplicationEvent(event: LederUtvelger.LeaderChangedEvent) {
+    @EventListener(LeaderChangedEvent::class)
+    fun onApplicationEvent(event: LeaderChangedEvent) {
         erLeder = event.leder == hostname
         if (erLeder) {
             log.info("Denne instansen ($hostname) er nå leder")

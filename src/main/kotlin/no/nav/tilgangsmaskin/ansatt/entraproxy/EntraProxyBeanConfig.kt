@@ -13,10 +13,11 @@ class EntraProxyBeanConfig {
 
     @Bean
     @Qualifier(ENTRAPROXY)
-    fun proxyRestClient(b: Builder, cfg: EntraProxyConfig) =
+    fun entraProxyRestClient(b: Builder, cfg: EntraProxyConfig) =
         b.baseUrl(cfg.baseUri).build()
 
-   @ConditionalOnDev
-   fun proxyHealthIndicator(a: EntraProxyRestClientAdapter) =  PingableHealthIndicator(a)
+    @ConditionalOnDev
+    fun entraProxyHealthIndicator(a: EntraProxyRestClientAdapter) =
+        PingableHealthIndicator(a)
 
 }

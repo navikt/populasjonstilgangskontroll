@@ -5,6 +5,10 @@ import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.Timer
+import io.netty.channel.ChannelOption
+import io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS
+import io.netty.handler.timeout.ReadTimeoutHandler
+import io.netty.handler.timeout.WriteTimeoutHandler
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
@@ -24,16 +28,21 @@ import org.springframework.boot.health.contributor.Status.UP
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
 import org.springframework.boot.restclient.RestClientCustomizer
 import org.springframework.boot.servlet.actuate.web.exchanges.HttpExchangesFilter
+import org.springframework.boot.webclient.WebClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import reactor.netty.http.client.HttpClient
+import reactor.netty.tcp.TcpClient
+import tcpClient
 import tools.jackson.core.StreamReadFeature
 import java.util.function.Function
 
@@ -61,6 +70,17 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     @Bean
     fun errorMessageSource() = ReloadableResourceBundleMessageSource().apply {
         setBasename("classpath:messages")
+    }
+
+    @Bean
+    fun webClientCustomizer(): WebClientCustomizer = WebClientCustomizer { builder ->
+        val httpClient = HttpClient.create()
+            .option(CONNECT_TIMEOUT_MILLIS, 5000)
+            .doOnConnected { conn ->
+                conn.addHandlerLast(ReadTimeoutHandler(10))
+                conn.addHandlerLast(WriteTimeoutHandler(10))
+            }
+        builder.clientConnector(ReactorClientHttpConnector(httpClient))
     }
 
     @Bean

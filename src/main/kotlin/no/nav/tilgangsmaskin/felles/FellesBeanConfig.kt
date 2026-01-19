@@ -5,7 +5,6 @@ import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.Timer
-import io.netty.channel.ChannelOption
 import io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS
 import io.netty.handler.timeout.ReadTimeoutHandler
 import io.netty.handler.timeout.WriteTimeoutHandler
@@ -41,8 +40,6 @@ import org.springframework.web.servlet.config.annotation.ContentNegotiationConfi
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import reactor.netty.http.client.HttpClient
-import reactor.netty.tcp.TcpClient
-import tcpClient
 import tools.jackson.core.StreamReadFeature
 import java.util.function.Function
 
@@ -73,14 +70,13 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 
     @Bean
-    fun webClientCustomizer(): WebClientCustomizer = WebClientCustomizer { builder ->
-        val httpClient = HttpClient.create()
+    fun webClientCustomizer(): WebClientCustomizer = WebClientCustomizer { c ->
+        c.clientConnector(ReactorClientHttpConnector(HttpClient.create()
             .option(CONNECT_TIMEOUT_MILLIS, 5000)
             .doOnConnected { conn ->
                 conn.addHandlerLast(ReadTimeoutHandler(10))
                 conn.addHandlerLast(WriteTimeoutHandler(10))
-            }
-        builder.clientConnector(ReactorClientHttpConnector(httpClient))
+            }))
     }
 
     @Bean

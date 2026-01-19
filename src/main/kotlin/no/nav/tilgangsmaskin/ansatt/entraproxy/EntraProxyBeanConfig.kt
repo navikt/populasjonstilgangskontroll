@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
 
-import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.boot.conditionals.ConditionalOnDev
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRAPROXY
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.springframework.beans.factory.annotation.Qualifier
@@ -16,7 +16,7 @@ class EntraProxyBeanConfig {
     fun proxyRestClient(b: Builder, cfg: EntraProxyConfig) =
         b.baseUrl(cfg.baseUri).build()
 
-   @ConditionalOnNotProd
+   @ConditionalOnDev
    fun proxyHealthIndicator(a: EntraProxyRestClientAdapter) =  PingableHealthIndicator(a)
 
 }

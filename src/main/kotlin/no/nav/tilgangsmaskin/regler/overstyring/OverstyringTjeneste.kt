@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyRestClientAdapter.Proxi
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.isBeforeNow
@@ -55,8 +56,8 @@ class OverstyringTjeneste(
         runCatching {
             log.info("Sjekker kjerneregler før eventuell overstyring for $ansattId og ${data.brukerId}")
             motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi))
-            val enhet = proxy.enhet(ansattId)
-            adapter.overstyr(ansattId.verdi, enhet.enhetnummer.verdi, data).also {
+           // val enhet = proxy.enhet(ansattId)
+            adapter.overstyr(ansattId.verdi, UTILGJENGELIG /*enhet.enhetnummer.verdi*/, data).also {
                 teller.tell(Tags.of("overstyrt", "true"))
                 log.info("Overstyring til og med ${data.gyldigtil} ble registret for $ansattId og ${data.brukerId}")
             }

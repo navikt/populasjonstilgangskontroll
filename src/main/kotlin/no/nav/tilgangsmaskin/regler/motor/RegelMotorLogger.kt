@@ -50,8 +50,8 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
 
     fun trace(message: String) = log.trace(message)
 
-    fun evaluerer(ansatt: Ansatt, bruker: Bruker, regel: Regel)  {
-        log.trace("Evaluerer regel: '{}' for {}  og {}", regel.kortNavn, ansatt.ansattId, bruker.oppslagId.maskFnr())
+    fun evaluerer(ansatt: Ansatt, bruker: Bruker, regel: Regel,type: EvalueringType)  {
+        log.trace("Evaluerer regel: '{}' for {}  og {} for {}", regel.kortNavn, ansatt.ansattId, bruker.oppslagId.maskFnr(),type.name)
     }
 
     fun tellBulkSize(size: Int) =   bulkHistogram().record(size.toDouble())

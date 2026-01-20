@@ -24,7 +24,7 @@ class EvalueringTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "evaluering.resultat", "Evalueringsresultat pr begrunnelse")
 @Component
 class EvalueringTypeTeller(registry: MeterRegistry, token: Token) :
-    AbstractTeller(registry, token, "evalueringtype.resultat", "Evalueringsresultat pr type og begrunnelse")  
+    AbstractTeller(registry, token, "evalueringtype.resultat", "Evalueringsresultat pr type og begrunnelse")
 
 @Component
 class BulkCacheTeller(registry: MeterRegistry, token: Token) :
@@ -51,7 +51,7 @@ class OppfriskingTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "endringer", "Endrede user oids")
 
 @Component
-class `PdlCacheTømmerTeller`(registry: MeterRegistry, token: Token) :
+class PdlCacheTømmerTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "beskyttelse", "Cache tømming pr beskyttelsesgrad")
 
 

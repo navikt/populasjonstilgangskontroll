@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.avvist
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.ok
+import no.nav.tilgangsmaskin.regler.motor.EvalueringType.ENKELT
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.KJERNE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.KOMPLETT
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -29,13 +30,13 @@ class RegelMotor(
     private val logger: RegelMotorLogger) {
 
     @WithSpan
-    fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, komplett)
+    fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, komplett, ENKELT)
 
     @WithSpan
-    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, kjerne)
+    fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, kjerne, ENKELT)
 
     @WithSpan
-    private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett) {
+    private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett,type: EvalueringType) {
         regelSett.regler.forEach { regel ->
             logger.evaluerer(ansatt, bruker, regel)
             if (!cfg.isEnabled(regel.navn)) {
@@ -43,21 +44,20 @@ class RegelMotor(
                 return@forEach
             }
             if (!regel.evaluer(ansatt, bruker)) {
-                logger.avvist(ansatt, bruker, regelSett, regel)
+                logger.avvist(ansatt, bruker, regelSett, regel,type)
                 throw RegelException(ansatt, bruker, regel)
             }
         }
-        logger.ok(ansatt, bruker,regelSett)
+        logger.ok(ansatt, bruker,regelSett,type)
     }
 
     @WithSpan
     fun bulkRegler(ansatt: Ansatt, brukere: Set<BrukerOgRegelsett>) =
         buildSet {
-            val n = brukere.size
             brukere.forEachIndexed { index, (bruker, type) ->
                 val resultat = runCatching {
-                    logger.trace("Bulk evaluerer #${index + 1}/$n: ${bruker.oppslagId.maskFnr()}")
-                    evaluer(ansatt, bruker, type.regelSett())
+                    logger.trace("Bulk evaluerer #${index + 1}/${brukere.size}: ${bruker.oppslagId.maskFnr()}")
+                    evaluer(ansatt, bruker, type.regelSett(), EvalueringType.BULK)
                     ok(bruker)
                 }.getOrElse {
                     if (it is RegelException) {

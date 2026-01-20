@@ -24,3 +24,8 @@ data class RegelSett(val spec: Pair<RegelType, List<Regel>>) {
         const val OVERSTYRBAR = "overstyrbart regelsett"
     }
 }
+
+enum class EvalueringType {
+    BULK,
+    ENKELT
+}

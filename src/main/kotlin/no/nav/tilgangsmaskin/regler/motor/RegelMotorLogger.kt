@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.regler.motor
 import io.micrometer.core.instrument.DistributionSummary
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
-import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
@@ -58,7 +57,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
     companion object   {
         private fun konsument(): String = MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
         private fun evaltype(type: EvalueringType) = Tag.of(EVALTYPE, type.name.lowercase())
-        private fun token(token: Token) = Tag.of("token_type", TokenType.from(token).name.lowercase())
+        private fun token(token: Token) = Tag.of(FLOW, TokenType.from(token).name.lowercase())
         private fun beskrivelse(regelsett: RegelSett) = Tag.of(BESKRIVELSE, regelsett.beskrivelse)
         private val TILGANG_AKSEPTERT = Tag.of(RESULTAT, OK)
         private val TILGANG_AVVIST = Tag.of(RESULTAT, AVVIST)

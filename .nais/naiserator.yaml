@@ -68,9 +68,6 @@ spec:
           - id: {{grupper.udefinert}}
           - id: {{grupper.fortrolig}}
           - id: {{grupper.strengt}}
-        extra:
-          - "NAVident"
-          - "azp_name"
   accessPolicy:
     outbound:
       rules:

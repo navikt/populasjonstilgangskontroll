@@ -21,9 +21,13 @@ class OverstyringTeller(registry: MeterRegistry, token: Token) :
 
 @Component
 class EvalueringTeller(registry: MeterRegistry, token: Token, private val auditor: Auditor = Auditor()) :
-    AbstractTeller(registry, token, "evaluering.resultat", "Evalueringsresultat")  {
+    AbstractTeller(registry, token, "evaluering.resultat", "Evalueringsresultat pr begrunnelse")  {
     fun audit(message: String) = auditor.info(message)
     }
+@Component
+class EvalueringTypeTeller(registry: MeterRegistry, token: Token) :
+    AbstractTeller(registry, token, "evalueringtype.resultat", "Evalueringsresultat pr type og begrunnelse")  {
+}
 
 @Component
 class BulkCacheTeller(registry: MeterRegistry, token: Token) :

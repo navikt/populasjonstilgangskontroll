@@ -15,7 +15,7 @@ import org.slf4j.MDC
 import org.springframework.stereotype.Component
 
 @Component
-class RegelMotorLogger(private val registry: MeterRegistry, private val token: Token, private val teller: EvalueringTeller) {
+class RegelMotorLogger(private val registry: MeterRegistry, private val token: Token, private val teller: EvalueringTeller,private val typeTeller: EvalueringTypeTeller) {
 
     private val log = getLogger(javaClass)
 
@@ -33,6 +33,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         withMDC(Pair(BESLUTNING, regel.kode),Pair(REGELSETT, regelSett.type.beskrivelse)) {
             log.info("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for ${bruker.brukerId} ${konsument()}")
             teller.audit("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' ${konsument()}")
+            typeTeller.tell(Tags.of(RESULTAT, AVVIST, "type", regelSett.beskrivelse,"regel",regel.navn,"flow",TokenType.from(token).name.lowercase(),TYPE, type.name.lowercase()))
             teller.tell(Tags.of(RESULTAT, AVVIST, "type", regelSett.beskrivelse,"regel",regel.navn,"flow",TokenType.from(token).name.lowercase()))
         }
 
@@ -40,6 +41,8 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         withMDC(Pair(BESLUTNING, OK),Pair(REGELSETT, regelSett.type.beskrivelse)) {
             log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} ${konsument()}")
             teller.tell(Tags.of(RESULTAT, OK, "type", regelSett.beskrivelse,"regel","-", "flow",TokenType.from(token).name.lowercase()))
+            typeTeller.tell(Tags.of(RESULTAT, OK, "type", regelSett.beskrivelse,"regel","-","flow",TokenType.from(token).name.lowercase(),TYPE, type.name.lowercase()))
+
             teller.audit("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} ${konsument()}")
         }
 
@@ -54,6 +57,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
     fun tellBulkSize(size: Int) =   bulkHistogram().record(size.toDouble())
 
     companion object   {
+        private const val TYPE = "evalueringtype"
         private const val REGELSETT = "regelsett"
         private const val RESULTAT = "resultat"
         private const val BESLUTNING = "beslutning"

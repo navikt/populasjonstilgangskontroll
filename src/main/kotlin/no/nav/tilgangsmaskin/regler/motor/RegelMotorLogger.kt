@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.Tag
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withMDC
 import no.nav.tilgangsmaskin.tilgang.Token
@@ -65,7 +66,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         private const val BESKRIVELSE = "type"
         private const val REGEL = "regel"
         private const val FLOW = "flow"
-        private const val INGEN = "-"
+        private const val INGEN = UTILGJENGELIG
         private const val EVALTYPE = "evalueringtype"
         private const val REGELSETT = "regelsett"
         private const val RESULTAT = "resultat"

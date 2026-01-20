@@ -21,10 +21,8 @@ class OverstyringTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "overstyring.forsøk", "Overstyringsforsøk pr resultat")
 
 @Component
-class EvalueringTeller(registry: MeterRegistry, token: Token, private val auditor: Auditor = Auditor()) :
-    AbstractTeller(registry, token, "evaluering.resultat", "Evalueringsresultat pr begrunnelse")  {
-    fun audit(message: String) = auditor.info(message)
-    }
+class EvalueringTeller(registry: MeterRegistry, token: Token) :
+    AbstractTeller(registry, token, "evaluering.resultat", "Evalueringsresultat pr begrunnelse")
 @Component
 class EvalueringTypeTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "evalueringtype.resultat", "Evalueringsresultat pr type og begrunnelse")  {

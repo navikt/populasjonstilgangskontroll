@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.Tag
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
+import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withMDC
@@ -16,7 +17,7 @@ import org.slf4j.MDC
 import org.springframework.stereotype.Component
 
 @Component
-class RegelMotorLogger(private val registry: MeterRegistry, private val token: Token, private val teller: EvalueringTeller,private val typeTeller: EvalueringTypeTeller) {
+class RegelMotorLogger(private val registry: MeterRegistry, private val token: Token, private val teller: EvalueringTeller,private val typeTeller: EvalueringTypeTeller, private val auditor: Auditor = Auditor()) {
 
     private val log = getLogger(javaClass)
 
@@ -33,7 +34,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
     fun avvist(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, regel: Regel,type: EvalueringType) =
         withMDC(Pair(BESLUTNING, regel.kode),Pair(REGELSETT, regelSett.type.beskrivelse)) {
             log.info("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for ${bruker.brukerId} ${konsument()}")
-            teller.audit("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' ${konsument()}")
+            auditor.info("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' ${konsument()}")
             typeTeller.tell(TILGANG_AVVIST, beskrivelse(regelSett),INGEN_REGEL,token(token),evaltype(type))
             teller.tell(TILGANG_AVVIST, beskrivelse(regelSett),INGEN_REGEL,token(token))
         }
@@ -41,7 +42,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
     fun ok(ansatt: Ansatt, bruker: Bruker,regelSett: RegelSett, type: EvalueringType) =
         withMDC(Pair(BESLUTNING, OK),Pair(REGELSETT, regelSett.type.beskrivelse)) {
             log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} ${konsument()}")
-            teller.audit("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} ${konsument()}")
+            auditor.info("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} ${konsument()}")
             teller.tell(TILGANG_AKSEPTERT, beskrivelse(regelSett),INGEN_REGEL,token(token))
             typeTeller.tell(TILGANG_AKSEPTERT, beskrivelse(regelSett),INGEN_REGEL,token(token),evaltype(type))
         }

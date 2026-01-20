@@ -20,6 +20,7 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.EvalueringTeller
+import no.nav.tilgangsmaskin.regler.motor.EvalueringTypeTeller
 import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
 import no.nav.tilgangsmaskin.regler.motor.RegelBeanConfig
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
@@ -44,7 +45,7 @@ import kotlin.test.Test
 
 @DataJpaTest
 @EnableConfigurationProperties(RegelConfig::class)
-@ContextConfiguration(classes = [RegelMotor::class, Auditor::class,RegelMotorLogger::class, EvalueringTeller::class, OverstyringJPAAdapter::class, RegelBeanConfig::class, TestApp::class])
+@ContextConfiguration(classes = [RegelMotor::class, Auditor::class,RegelMotorLogger::class, EvalueringTypeTeller::class, EvalueringTeller::class, OverstyringJPAAdapter::class, RegelBeanConfig::class, TestApp::class])
 @ExtendWith(MockKExtension::class)
 @EnableJpaAuditing
 @ActiveProfiles(TEST)

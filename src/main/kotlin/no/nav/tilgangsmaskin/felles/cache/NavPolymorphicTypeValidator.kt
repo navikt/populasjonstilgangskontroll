@@ -3,6 +3,8 @@ package no.nav.tilgangsmaskin.felles.cache
 import tools.jackson.databind.DatabindContext
 import tools.jackson.databind.JavaType
 import tools.jackson.databind.jsontype.PolymorphicTypeValidator
+import tools.jackson.databind.jsontype.PolymorphicTypeValidator.Validity.ALLOWED
+import tools.jackson.databind.jsontype.PolymorphicTypeValidator.Validity.DENIED
 
 class NavPolymorphicTypeValidator(private vararg val allowedPrefixes: String = arrayOf("no.nav.tilgangsmaskin","java.", "kotlin.")) : PolymorphicTypeValidator() {
 
@@ -13,5 +15,4 @@ class NavPolymorphicTypeValidator(private vararg val allowedPrefixes: String = a
    override fun validateSubType(ctx: DatabindContext, base: JavaType, subType: JavaType) = validityFor(subType.rawClass.name)
 
    private fun validityFor(className: String) =
-       if (allowedPrefixes.any { className.startsWith(it) }) Validity.ALLOWED else Validity.DENIED
-}
+       if (allowedPrefixes.any(className::startsWith)) ALLOWED else DENIED}

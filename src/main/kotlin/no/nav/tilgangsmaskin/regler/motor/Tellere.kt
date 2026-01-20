@@ -65,7 +65,7 @@ abstract class AbstractTeller(
     open fun tell(vararg tags: Tag, n:Int=1) =
         tell(Tags.of(*tags), n)
 
-        open fun tell(tags: Tags = Tags.empty(), n:Int=1) =
+    open fun tell(tags: Tags = Tags.empty(), n:Int=1) =
         Counter.builder(navn)
             .description(beskrivelse)
             .tags(tags

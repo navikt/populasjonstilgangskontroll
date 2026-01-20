@@ -35,8 +35,8 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         withMDC(Pair(BESLUTNING, regel.kode),Pair(REGELSETT, regelSett.type.beskrivelse)) {
             log.info("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for ${bruker.brukerId} ${konsument()}")
             auditor.info("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' ${konsument()}")
-            typeTeller.tell(TILGANG_AVVIST, beskrivelse(regelSett),INGEN_REGEL,token(token),evaltype(type))
-            teller.tell(TILGANG_AVVIST, beskrivelse(regelSett),INGEN_REGEL,token(token))
+            typeTeller.tell(TILGANG_AVVIST, beskrivelse(regelSett),regel(regel),token(token),evaltype(type))
+            teller.tell(TILGANG_AVVIST, beskrivelse(regelSett),regel(regel),token(token))
         }
 
     fun ok(ansatt: Ansatt, bruker: Bruker,regelSett: RegelSett, type: EvalueringType) =
@@ -61,6 +61,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         private fun evaltype(type: EvalueringType) = Tag.of(EVALTYPE, type.name.lowercase())
         private fun token(token: Token) = Tag.of(FLOW, TokenType.from(token).name.lowercase())
         private fun beskrivelse(regelsett: RegelSett) = Tag.of(BESKRIVELSE, regelsett.beskrivelse)
+        private fun regel(regel : Regel) = Tag.of(REGEL, regel.kortNavn)
         private val TILGANG_AKSEPTERT = Tag.of(RESULTAT, OK)
         private val TILGANG_AVVIST = Tag.of(RESULTAT, AVVIST)
         private val INGEN_REGEL = Tag.of(REGEL, INGEN)

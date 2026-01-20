@@ -22,7 +22,7 @@ import java.time.Instant
 
 
 @Component
-@Transactional
+@Transactional(readOnly = true)
 @Timed
 class OverstyringTjeneste(
     private val ansattTjeneste: AnsattTjeneste,
@@ -34,14 +34,12 @@ class OverstyringTjeneste(
 
     private val log = getLogger(javaClass)
 
-    @Transactional(readOnly = true)
     fun overstyringer(ansattId: AnsattId, brukerIds: List<BrukerId>) =
         adapter.gjeldendeOverstyringer(ansattId.verdi,brukerIds.map { it.verdi }).associate { it.first to it.second }.filter {
             erOverstyrt(ansattId,it.key,it.value)
         }
             .map { it.key }
 
-    @Transactional(readOnly = true)
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId): Boolean {
         log.info("Sjekker eventuell overstyring for $ansattId og ${brukerId.verdi.maskFnr()}")
         val overstyring = adapter.gjeldendeOverstyring(
@@ -54,24 +52,31 @@ class OverstyringTjeneste(
         runCatching {
             log.info("Sjekker kjerneregler før eventuell overstyring for $ansattId og ${data.brukerId}")
             motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi))
-           // val enhet = proxy.enhet(ansattId)
-            adapter.overstyr(ansattId.verdi, UTILGJENGELIG /*enhet.enhetnummer.verdi*/, data).also {
+            adapter.overstyr(ansattId.verdi, enhetFor(ansattId), data).also {
                 teller.tell(Tags.of("overstyrt", "true"))
                 log.info("Overstyring til og med ${data.gyldigtil} ble registret for $ansattId og ${data.brukerId}")
             }
             true
         }.getOrElse {
-            when (it) {
-                is RegelException -> throw RegelException(
-                    OVERSTYRING_MESSAGE_CODE,
-                    arrayOf(it.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
-                    e = it).also {
-                    log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}",it)
-                    teller.tell(Tags.of("kortnavn", it.regel.kortNavn, "overstyrt", false.toString()))
-                }
-                else -> throw it
-            }
+            overstyringFeilet(it, ansattId, data)
         }
+
+    private fun overstyringFeilet(t: Throwable,ansattId: AnsattId, data: OverstyringData): Nothing {
+        when (t) {
+            is RegelException -> throw RegelException(OVERSTYRING_MESSAGE_CODE,
+                arrayOf(t.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
+                e = t).also {
+                log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}", it)
+                teller.tell(Tags.of("kortnavn", it.regel.kortNavn, "overstyrt", false.toString()))
+            }
+            else -> throw t
+        }
+    }
+
+    private fun enhetFor(ansattId: AnsattId) =
+        runCatching {
+            proxy.enhet(ansattId).enhetnummer.verdi
+        }.getOrDefault(UTILGJENGELIG)
 
     private fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId, expires: Instant?) =
         when {

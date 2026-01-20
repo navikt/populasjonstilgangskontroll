@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.regler.motor
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.tilgang.Token
@@ -65,7 +66,10 @@ abstract class AbstractTeller(
         private val beskrivelse: String) {
 
 
-    open fun tell(tags: Tags = Tags.empty(), n:Int=1) =
+    open fun tell(vararg tags: Tag, n:Int=1) =
+        tell(Tags.of(*tags), n)
+
+        open fun tell(tags: Tags = Tags.empty(), n:Int=1) =
         Counter.builder(navn)
             .description(beskrivelse)
             .tags(tags

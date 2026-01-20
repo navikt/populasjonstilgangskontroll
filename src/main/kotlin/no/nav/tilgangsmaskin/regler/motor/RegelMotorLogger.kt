@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.regler.motor
 
 import io.micrometer.core.instrument.DistributionSummary
 import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
@@ -33,20 +34,18 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         withMDC(Pair(BESLUTNING, regel.kode),Pair(REGELSETT, regelSett.type.beskrivelse)) {
             log.info("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for ${bruker.brukerId} ${konsument()}")
             teller.audit("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' ${konsument()}")
-            typeTeller.tell(Tags.of(RESULTAT, AVVIST, "type", regelSett.beskrivelse,"regel",regel.navn,"flow",TokenType.from(token).name.lowercase(),TYPE, type.name.lowercase()))
-            teller.tell(Tags.of(RESULTAT, AVVIST, "type", regelSett.beskrivelse,"regel",regel.navn,"flow",TokenType.from(token).name.lowercase()))
+            typeTeller.tell(TILGANG_AVVIST, beskrivelse(regelSett),INGEN_REGEL,token(token),evaltype(type))
+            teller.tell(TILGANG_AVVIST, beskrivelse(regelSett),INGEN_REGEL,token(token))
         }
 
     fun ok(ansatt: Ansatt, bruker: Bruker,regelSett: RegelSett, type: EvalueringType) =
         withMDC(Pair(BESLUTNING, OK),Pair(REGELSETT, regelSett.type.beskrivelse)) {
             log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} ${konsument()}")
-            teller.tell(Tags.of(RESULTAT, OK, "type", regelSett.beskrivelse,"regel","-", "flow",TokenType.from(token).name.lowercase()))
-            typeTeller.tell(Tags.of(RESULTAT, OK, "type", regelSett.beskrivelse,"regel","-","flow",TokenType.from(token).name.lowercase(),TYPE, type.name.lowercase()))
-
             teller.audit("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} ${konsument()}")
+            teller.tell(TILGANG_AKSEPTERT, beskrivelse(regelSett),INGEN_REGEL,token(token))
+            typeTeller.tell(TILGANG_AKSEPTERT, beskrivelse(regelSett),INGEN_REGEL,token(token),evaltype(type))
         }
 
-    private fun konsument(): String = MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
 
     fun trace(message: String) = log.trace(message)
 
@@ -57,7 +56,18 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
     fun tellBulkSize(size: Int) =   bulkHistogram().record(size.toDouble())
 
     companion object   {
-        private const val TYPE = "evalueringtype"
+        private fun konsument(): String = MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
+        private fun evaltype(type: EvalueringType) = Tag.of(EVALTYPE, type.name.lowercase())
+        private fun token(token: Token) = Tag.of("token_type", TokenType.from(token).name.lowercase())
+        private fun beskrivelse(regelsett: RegelSett) = Tag.of(BESKRIVELSE, regelsett.beskrivelse)
+        private val TILGANG_AKSEPTERT = Tag.of(RESULTAT, OK)
+        private val TILGANG_AVVIST = Tag.of(RESULTAT, AVVIST)
+        private val INGEN_REGEL = Tag.of(REGEL, INGEN)
+        private const val BESKRIVELSE = "type"
+        private const val REGEL = "regel"
+        private const val FLOW = "flow"
+        private const val INGEN = "-"
+        private const val EVALTYPE = "evalueringtype"
         private const val REGELSETT = "regelsett"
         private const val RESULTAT = "resultat"
         private const val BESLUTNING = "beslutning"

@@ -4,7 +4,6 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Tags
-import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.stereotype.Component
 
@@ -25,8 +24,7 @@ class EvalueringTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "evaluering.resultat", "Evalueringsresultat pr begrunnelse")
 @Component
 class EvalueringTypeTeller(registry: MeterRegistry, token: Token) :
-    AbstractTeller(registry, token, "evalueringtype.resultat", "Evalueringsresultat pr type og begrunnelse")  {
-}
+    AbstractTeller(registry, token, "evalueringtype.resultat", "Evalueringsresultat pr type og begrunnelse")  
 
 @Component
 class BulkCacheTeller(registry: MeterRegistry, token: Token) :

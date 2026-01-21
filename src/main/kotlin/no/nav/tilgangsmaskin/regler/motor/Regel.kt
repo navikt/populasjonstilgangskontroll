@@ -1,8 +1,10 @@
 package no.nav.tilgangsmaskin.regler.motor
 
+import io.micrometer.core.instrument.Tag
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 
 interface Regel {
     fun evaluer(ansatt: Ansatt, bruker: Bruker): Boolean
@@ -12,8 +14,15 @@ interface Regel {
     val begrunnelse get() = metadata.begrunnelse
     val navn get() = metadata.navn
     val erOverstyrbar get() = this is OverstyrbarRegel
-    fun godtaHvis(predicate: () -> Boolean) = predicate.invoke()
-    fun avvisHvis(predicate: () -> Boolean) = !godtaHvis(predicate)
+    fun godtaHvis(predikat: () -> Boolean) = predikat.invoke()
+    fun avvisHvis(predikat: () -> Boolean) = !godtaHvis(predikat)
+
+
+    companion object {
+        private const val REGEL = "regel"
+        fun regelTag(regel: Regel) = Tag.of(REGEL, regel.kortNavn)
+        val INGEN_REGEL_TAG = Tag.of(REGEL, UTILGJENGELIG)
+    }
 }
 
 abstract class GlobalGruppeRegel(private val gruppe: GlobalGruppe) : Regel {

@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.tilgang
 
+import io.micrometer.core.instrument.Tag
 import no.nav.boot.conditionals.Cluster.LOCAL
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -33,12 +34,15 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
     val erCC get() = stringClaim(IDTYP) == APP
     val erObo get()  = !erCC && oid != null
     companion object {
+        private const val FLOW = "flow"
         const val AAD_ISSUER: String = "azuread"
         private const val APP = "app"
         private const val OID = "oid"
         private const val IDTYP = "idtyp"
         private const val AZP_NAME = "azp_name"
         private const val NAVIDENT = "NAVident"
+        fun tokenTag(token: Token) = Tag.of(FLOW, TokenType.from(token).name.lowercase())
+
     }
 }
 

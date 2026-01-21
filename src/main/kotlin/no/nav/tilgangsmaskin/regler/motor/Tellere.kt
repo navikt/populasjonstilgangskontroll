@@ -28,7 +28,7 @@ class EvalueringTypeTeller(registry: MeterRegistry, token: Token) :
 
 @Component
 class BulkCacheTeller(registry: MeterRegistry, token: Token) :
-    AbstractTeller(registry, token, "bulk.cache", "Hits/misses for bulk")
+    AbstractTeller(registry, token, "bulk.cache", "Cache treff/bom for bulk")
 
 @Component
 class CacheOppfriskerTeller(registry: MeterRegistry, token: Token) :
@@ -36,7 +36,7 @@ class CacheOppfriskerTeller(registry: MeterRegistry, token: Token) :
 
 @Component
 class BulkCacheSuksessTeller(registry: MeterRegistry, token: Token) :
-    AbstractTeller(registry, token, "bulk.cache.suksess", "Hits/misses for entire bulk")
+    AbstractTeller(registry, token, "bulk.cache.suksess", "Treff/bom for hele bulken")
 
 @Component
 class TokenTypeTeller(registry: MeterRegistry, token: Token) :
@@ -44,7 +44,7 @@ class TokenTypeTeller(registry: MeterRegistry, token: Token) :
 
 @Component
 class OppfølgingkontorTeller(registry: MeterRegistry, token: Token) :
-    AbstractTeller(registry, token, "oppfolging", "Oppfølgingkontor hits/misses")
+    AbstractTeller(registry, token, "oppfolging", "Oppfølgingkontor treff/bom")
 
 @Component
 class OppfriskingTeller(registry: MeterRegistry, token: Token) :
@@ -62,10 +62,10 @@ abstract class AbstractTeller(
         private val beskrivelse: String) {
 
 
-    open fun tell(vararg tags: Tag, n:Int=1) =
+    fun tell(vararg tags: Tag, n:Int=1) =
         tell(Tags.of(*tags), n)
 
-    open fun tell(tags: Tags = Tags.empty(), n:Int=1) =
+    fun tell(tags: Tags = Tags.empty(), n:Int=1) =
         Counter.builder(navn)
             .description(beskrivelse)
             .tags(tags

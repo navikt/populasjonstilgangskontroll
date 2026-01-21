@@ -7,11 +7,12 @@ import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
 import no.nav.tilgangsmaskin.felles.utils.Auditor
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withMDC
+import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.INGEN_REGEL_TAG
+import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.regelTag
 import no.nav.tilgangsmaskin.tilgang.Token
-import no.nav.tilgangsmaskin.tilgang.TokenType
+import no.nav.tilgangsmaskin.tilgang.Token.Companion.tokenTag
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
@@ -35,16 +36,16 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         withMDC(Pair(BESLUTNING, regel.kode),Pair(REGELSETT, regelSett.type.beskrivelse)) {
             log.info("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for ${bruker.brukerId} ${konsument()}")
             auditor.info("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' ${konsument()}")
-            typeTeller.tell(TILGANG_AVVIST, beskrivelse(regelSett),regel(regel),token(token),evaltype(type))
-            teller.tell(TILGANG_AVVIST, beskrivelse(regelSett),regel(regel),token(token))
+            typeTeller.tell(TILGANG_AVVIST_TAG, beskrivelseTag(regelSett),regelTag(regel),tokenTag(token),evaltypeTag(type))
+            teller.tell(TILGANG_AVVIST_TAG, beskrivelseTag(regelSett),regelTag(regel),tokenTag(token))
         }
 
     fun ok(ansatt: Ansatt, bruker: Bruker,regelSett: RegelSett, type: EvalueringType) =
         withMDC(Pair(BESLUTNING, OK),Pair(REGELSETT, regelSett.type.beskrivelse)) {
             log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} ${konsument()}")
             auditor.info("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} ${konsument()}")
-            teller.tell(TILGANG_AKSEPTERT, beskrivelse(regelSett),INGEN_REGEL,token(token))
-            typeTeller.tell(TILGANG_AKSEPTERT, beskrivelse(regelSett),INGEN_REGEL,token(token),evaltype(type))
+            teller.tell(TILGANG_AKSEPTERT_TAG, beskrivelseTag(regelSett),INGEN_REGEL_TAG,tokenTag(token))
+            typeTeller.tell(TILGANG_AKSEPTERT_TAG, beskrivelseTag(regelSett),INGEN_REGEL_TAG,tokenTag(token),evaltypeTag(type))
         }
 
 
@@ -58,17 +59,11 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
 
     companion object   {
         private fun konsument(): String = MDC.get(CONSUMER_ID)?.let { "fra $it" } ?: "(fra uautentisert konsument)"
-        private fun evaltype(type: EvalueringType) = Tag.of(EVALTYPE, type.name.lowercase())
-        private fun token(token: Token) = Tag.of(FLOW, TokenType.from(token).name.lowercase())
-        private fun beskrivelse(regelsett: RegelSett) = Tag.of(BESKRIVELSE, regelsett.beskrivelse)
-        private fun regel(regel : Regel) = Tag.of(REGEL, regel.kortNavn)
-        private val TILGANG_AKSEPTERT = Tag.of(RESULTAT, OK)
-        private val TILGANG_AVVIST = Tag.of(RESULTAT, AVVIST)
-        private val INGEN_REGEL = Tag.of(REGEL, INGEN)
+        private fun evaltypeTag(type: EvalueringType) = Tag.of(EVALTYPE, type.name.lowercase())
+        private fun beskrivelseTag(regelsett: RegelSett) = Tag.of(BESKRIVELSE, regelsett.beskrivelse)
+        private val TILGANG_AKSEPTERT_TAG = Tag.of(RESULTAT, OK)
+        private val TILGANG_AVVIST_TAG = Tag.of(RESULTAT, AVVIST)
         private const val BESKRIVELSE = "type"
-        private const val REGEL = "regel"
-        private const val FLOW = "flow"
-        private const val INGEN = UTILGJENGELIG
         private const val EVALTYPE = "evalueringtype"
         private const val REGELSETT = "regelsett"
         private const val RESULTAT = "resultat"

@@ -169,6 +169,11 @@
       "cluster": "prod-gcp"
     },
     {
+      "name": "klage-lookup",
+      "namespace": "klage",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "infotrygd-hentsaksliste-backend",
       "namespace": "infotrygd",
       "cluster": "prod-gcp"

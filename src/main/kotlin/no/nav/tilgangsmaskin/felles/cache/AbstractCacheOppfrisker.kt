@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import kotlin.system.measureTimeMillis
@@ -9,6 +10,7 @@ abstract class AbstractCacheOppfrisker : CacheOppfrisker {
 
     protected abstract fun doOppfrisk(elementer: CacheNøkkelElementer)
 
+    @WithSpan
     final override fun oppfrisk(elementer: CacheNøkkelElementer) {
         val duration = measureTimeMillis {
             runCatching {

@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
+import kotlin.system.measureTimeMillis
 
 abstract class AbstractCacheOppfrisker : CacheOppfrisker {
     protected val log = getLogger(javaClass)
@@ -9,12 +10,15 @@ abstract class AbstractCacheOppfrisker : CacheOppfrisker {
     protected abstract fun doOppfrisk(elementer: CacheNøkkelElementer)
 
     final override fun oppfrisk(elementer: CacheNøkkelElementer) {
-        runCatching {
-            doOppfrisk(elementer)
-            log.info("Oppfrisking av ${elementer.cacheName}::${elementer.id.maskFnr()} OK")
-        }.getOrElse {
-            loggOppfriskingFeilet(elementer, it)
+        val duration = measureTimeMillis {
+            runCatching {
+                doOppfrisk(elementer)
+                log.info("Oppfrisking av ${elementer.cacheName}::${elementer.id.maskFnr()} OK")
+            }.getOrElse {
+                loggOppfriskingFeilet(elementer, it)
+            }
         }
+        log.info("Oppfrisking tok ${duration}ms for ${elementer.cacheName}::${elementer.id.maskFnr()}")
     }
   protected fun loggOppfriskingFeilet(elementer: CacheNøkkelElementer, feil: Throwable) {
         log.warn("Oppfrisking av ${elementer.cacheName}::${elementer.id.maskFnr()} feilet", feil)

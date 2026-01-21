@@ -53,9 +53,7 @@ class RegelTjeneste(
                 }
             } ?: log.info("Komplette regler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
         }
-        withMDC(ENKELT_OPPSLAG) {
-            log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
-        }
+        log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
     }
 
     private fun bruker(brukerId: String) = runCatching {
@@ -107,9 +105,7 @@ class RegelTjeneste(
                     it.ukjente.size, ansattId, it)
             }
         }
-        withMDC(BULK_OPPSLAG) {
-           log.info("Tid brukt på bulk med størrelse ${idOgType.size} for $ansattId: ${elapsedTime.inWholeMilliseconds}ms")
-        }
+        log.info("Tid brukt på bulk med størrelse ${idOgType.size} for $ansattId: ${elapsedTime.inWholeMilliseconds}ms")
         return respons
     }
 
@@ -158,12 +154,4 @@ class RegelTjeneste(
 
     private fun Set<BrukerOgRegelsett>.finnBruker(oppslagId: String)  = first { it.bruker.oppslagId == oppslagId }.bruker
 
-    companion object {
-        private const val BULK = "bulk"
-        private const val ENKELT = "enkelt"
-        private const val OPPSLAGTYPE = "oppslagtype"
-        private val BULK_OPPSLAG = Pair(OPPSLAGTYPE, BULK)
-        private val ENKELT_OPPSLAG = Pair(OPPSLAGTYPE, ENKELT)
-
-    }
 }

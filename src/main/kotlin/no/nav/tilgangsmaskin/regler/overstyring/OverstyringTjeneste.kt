@@ -13,6 +13,7 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.isBeforeNow
 import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
+import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.INGEN_REGEL_TAG
 import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.regelTag
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.OVERSTYRING_MESSAGE_CODE
@@ -57,7 +58,7 @@ class OverstyringTjeneste(
             log.info("Sjekker kjerneregler før eventuell overstyring for $ansattId og ${data.brukerId}")
             motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi))
             adapter.overstyr(ansattId.verdi, enhetFor(ansattId), data).also {
-                teller.tell(INGEN_REGEL,OVERSTYRT)
+                teller.tell(INGEN_REGEL_TAG,OVERSTYRT)
                 log.info("Overstyring til og med ${data.gyldigtil} ble registrert for $ansattId og ${data.brukerId}")
             }
             true

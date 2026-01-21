@@ -33,7 +33,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
 
 
     fun avvist(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, regel: Regel,type: EvalueringType) =
-        withMDC(Pair(BESLUTNING, regel.kode),Pair(REGELSETT, regelSett.type.beskrivelse)) {
+        withMDC(Pair(BESLUTNING, regel.kode),Pair(REGELSETT, regelSett.type.beskrivelse),Pair(EVALTYPE, type.name)) {
             log.info("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for ${bruker.brukerId} ${konsument()}")
             auditor.info("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' ${konsument()}")
             typeTeller.tell(TILGANG_AVVIST_TAG, beskrivelseTag(regelSett),regelTag(regel),tokenTag(token),evaltypeTag(type))
@@ -41,7 +41,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
         }
 
     fun ok(ansatt: Ansatt, bruker: Bruker,regelSett: RegelSett, type: EvalueringType) =
-        withMDC(Pair(BESLUTNING, OK),Pair(REGELSETT, regelSett.type.beskrivelse)) {
+        withMDC(Pair(BESLUTNING, OK),Pair(REGELSETT, regelSett.type.beskrivelse),Pair(EVALTYPE, type.name)) {
             log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} ${konsument()}")
             auditor.info("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} ${konsument()}")
             teller.tell(TILGANG_AKSEPTERT_TAG, beskrivelseTag(regelSett),INGEN_REGEL_TAG,tokenTag(token))

@@ -11,6 +11,6 @@ class EntraProxyRestClientAdapter(@Qualifier(ENTRAPROXY) restClient: RestClient,
     AbstractRestClientAdapter(restClient, cf) {
 
     fun enhetForAnsatt(ansattId: String) =
-        get<ProxiedAnsatt>(cf.brukerURI(ansattId)).enhet
+        get<EntraProxyAnsatt>(cf.brukerURI(ansattId)).enhet
 
 }

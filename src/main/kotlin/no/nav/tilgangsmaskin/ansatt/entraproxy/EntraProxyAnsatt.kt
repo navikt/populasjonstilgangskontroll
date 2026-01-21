@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class ProxiedAnsatt(
+data class EntraProxyAnsatt(
     val navIdent: AnsattId,
     val enhet: Enhet) {
     data class Enhet(

@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.avvist
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.ok
+import no.nav.tilgangsmaskin.regler.motor.EvalueringType.BULK
 import no.nav.tilgangsmaskin.regler.motor.EvalueringType.ENKELT
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.KJERNE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.KOMPLETT
@@ -57,7 +58,7 @@ class RegelMotor(
             brukere.forEachIndexed { index, (bruker, type) ->
                 val resultat = runCatching {
                     logger.trace("Bulk evaluerer #${index + 1}/${brukere.size}: ${bruker.oppslagId.maskFnr()}")
-                    evaluer(ansatt, bruker, type.regelSett(), EvalueringType.BULK)
+                    evaluer(ansatt, bruker, type.regelSett(), BULK)
                     ok(bruker)
                 }.getOrElse {
                     if (it is RegelException) {
@@ -75,8 +76,8 @@ class RegelMotor(
         when (this) {
             KJERNE_REGELTYPE -> kjerne
             KOMPLETT_REGELTYPE -> komplett
-            OVERSTYRBAR_REGELTYPE -> komplett.regler.filter { it is OverstyrbarRegel }.let { RegelSett(OVERSTYRBAR_REGELTYPE to it) }
-            TELLENDE_REGELTYPE -> komplett.regler.filter { it is TellendeRegel }.let { RegelSett(TELLENDE_REGELTYPE to it) }
+            OVERSTYRBAR_REGELTYPE -> komplett.regler.filterIsInstance<OverstyrbarRegel>().let { RegelSett(OVERSTYRBAR_REGELTYPE to it) }
+            TELLENDE_REGELTYPE -> komplett.regler.filterIsInstance<TellendeRegel>().let { RegelSett(TELLENDE_REGELTYPE to it) }
         }
 
     override fun toString() = "${javaClass.simpleName} [kjerneregler=$kjerne,kompletteregler=$komplett]"

@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import io.micrometer.core.instrument.Tag
-import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker

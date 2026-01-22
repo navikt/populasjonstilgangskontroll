@@ -18,6 +18,9 @@ import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.regelTag
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
+import no.nav.tilgangsmaskin.tilgang.Token
+import no.nav.tilgangsmaskin.tilgang.Token.Companion.FLOW
+import no.nav.tilgangsmaskin.tilgang.TokenType
 import org.jboss.logging.MDC
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
@@ -74,7 +77,12 @@ class OverstyringTjeneste(
                 arrayOf(t.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
                 e = t).also {
                 log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}", it)
-                teller.tell(regelTag(t.regel),IKKE_OVERSTYRT)
+                teller.tell(regelTag(t.regel),IKKE_OVERSTYRT,tokenSystemTag(UTILGJENGELIG))
+            }
+            is OverstyringKlientException -> throw t.also {
+                log.warn("Overstyring feilet pga klientvalidering ${t.message} for $ansattId og ${data.brukerId}", it)
+                teller.tell(INGEN_REGEL_TAG,IKKE_OVERSTYRT,tokenSystemTag(t.system))
+
             }
             else -> throw t
         }
@@ -107,6 +115,7 @@ class OverstyringTjeneste(
         }
 
     companion object {
+        private fun tokenSystemTag(system: String) = Tag.of("system",system)
         private const val TAG = "overstyrt"
         private val OVERSTYRT = Tag.of(TAG, "true")
         private val IKKE_OVERSTYRT = Tag.of(TAG, "false")

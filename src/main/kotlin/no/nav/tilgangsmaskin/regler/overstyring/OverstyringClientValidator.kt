@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.regler.overstyring
 
-import no.nav.boot.conditionals.EnvUtil
 import no.nav.boot.conditionals.EnvUtil.isProd
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger

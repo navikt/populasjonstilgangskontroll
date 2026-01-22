@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.regler
 
 import com.ninjasquad.springmockk.MockkBean
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry
+import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -68,12 +68,15 @@ class RegelTjenesteTest {
     private val dnr = BrukerId("12345678910")
 
     @Autowired
+    private lateinit var registry: MeterRegistry
+    @Autowired
     private lateinit var repo: OverstyringRepository
     @MockkBean
     private lateinit var token: Token
     @MockkBean
     private lateinit var oppfølging: OppfølgingTjeneste
-
+    @MockkBean
+    private lateinit var validator: OverstyringKlientValidator
     @MockkBean
     private lateinit var proxy: EntraProxyTjeneste
     @Autowired
@@ -90,9 +93,10 @@ class RegelTjenesteTest {
 
     @BeforeTest
     fun before() {
-        val registry = SimpleMeterRegistry()
+        //val registry = SimpleMeterRegistry()
         evalueringTeller = EvalueringTeller(registry, token)
         avdød = AvdødTeller(registry, token)
+        every { validator.validerKlient() } returns Unit
         every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
         every { oppfølging.enhetFor(Identifikator(vanligBrukerId.verdi)) } returns Enhetsnummer("1234")
@@ -102,7 +106,7 @@ class RegelTjenesteTest {
         every { token.systemNavn } returns "test"
         every { token.erObo } returns false
         every { token.erCC } returns true
-        overstyring = OverstyringTjeneste(ansatte, brukere, OverstyringJPAAdapter(repo), motor,proxy, OverstyringTeller(registry, token))
+        overstyring = OverstyringTjeneste(ansatte, brukere, OverstyringJPAAdapter(repo), motor,proxy, validator,OverstyringTeller(registry, token))
         regler = RegelTjeneste(motor, brukere, ansatte, overstyring)
     }
 

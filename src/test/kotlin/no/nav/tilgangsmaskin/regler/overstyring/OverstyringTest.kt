@@ -57,6 +57,8 @@ internal class OverstyringTest {
     private val ansattId = AnsattId("Z999999")
     private val historiskBrukerId = BrukerId("11111111111")
 
+    @MockkBean
+    private lateinit var validator: OverstyringKlientValidator
     @Autowired
     private lateinit var motor: RegelMotor
 
@@ -81,6 +83,7 @@ internal class OverstyringTest {
 
     @BeforeTest
     fun setup() {
+        every { validator.validerKlient() } returns Unit
         every { token.erObo } returns false
         every { token.erCC } returns true
         every { token.system } returns "test"
@@ -89,7 +92,7 @@ internal class OverstyringTest {
         every { token.clusterAndSystem } returns "cluster:test"
         every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-        overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, proxy,OverstyringTeller(registry, token))
+        overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, proxy,validator,OverstyringTeller(registry, token))
     }
 
     @Test

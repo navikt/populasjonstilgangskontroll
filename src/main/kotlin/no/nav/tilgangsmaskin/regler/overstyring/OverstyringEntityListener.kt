@@ -12,6 +12,7 @@ import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.stereotype.Component
+import java.time.Instant.now
 
 @Component
 class OverstyringEntityListener(private val token: Token) {
@@ -62,17 +63,16 @@ class OverstyringEntityListener(private val token: Token) {
     }
     fun setOppdatert(target: OverstyringEntity) {
         setCreatedBySystem(target)
-        val now = java.time.Instant.now()
         target::class.java.declaredFields.forEach {
             if (it.isAnnotationPresent(LastModifiedDate::class.java)) {
                 it.isAccessible = true
-                it.set(target, now)
+                it.set(target, now())
             }
         }
     }
     fun setCrested(target: OverstyringEntity) {
         setCreatedBySystem(target)
-        val now = java.time.Instant.now()
+        val now = now()
         target::class.java.declaredFields.forEach {
             if (it.isAnnotationPresent(LastModifiedDato::class.java)) {
                 it.isAccessible = true

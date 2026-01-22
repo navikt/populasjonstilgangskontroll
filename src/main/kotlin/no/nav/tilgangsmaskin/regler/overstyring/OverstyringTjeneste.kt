@@ -34,6 +34,7 @@ class OverstyringTjeneste(
     private val adapter: OverstyringJPAAdapter,
     private val motor: RegelMotor,
     private val proxy: EntraProxyTjeneste,
+    private val validator: OverstyringKlientValidator,
     private val teller: OverstyringTeller) {
 
     private val log = getLogger(javaClass)
@@ -46,17 +47,18 @@ class OverstyringTjeneste(
 
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId): Boolean {
         log.info("Sjekker eventuell overstyring for $ansattId og ${brukerId.verdi.maskFnr()}")
-        val overstyring = adapter.gjeldendeOverstyring(
-            ansattId.verdi, brukerId.verdi,
-            brukerTjeneste.brukerMedNærmesteFamilie(brukerId.verdi).historiskeIds.map { it.verdi })?.expires
+        val overstyring = gjeldendeOverstyring(ansattId, brukerId)
         return erOverstyrt(ansattId,brukerId,overstyring)
     }
+
+
     @Transactional
     fun overstyr(ansattId: AnsattId, data: OverstyringData) =
         runCatching {
             MDC.put(USER_ID, ansattId.verdi)
             log.info("Sjekker kjerneregler før eventuell overstyring for $ansattId og ${data.brukerId}")
             motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi))
+            validator.validerKlient()
             adapter.overstyr(ansattId.verdi, enhetFor(ansattId), data).also {
                 teller.tell(INGEN_REGEL_TAG,OVERSTYRT)
                 log.info("Overstyring til og med ${data.gyldigtil} ble registrert for $ansattId og ${data.brukerId}")
@@ -77,6 +79,11 @@ class OverstyringTjeneste(
             else -> throw t
         }
     }
+    private fun gjeldendeOverstyring(ansattId: AnsattId, brukerId: BrukerId): Instant? =
+        adapter.gjeldendeOverstyring(ansattId.verdi, brukerId.verdi,
+        brukerTjeneste.brukerMedNærmesteFamilie(brukerId.verdi).historiskeIds.map {
+            it.verdi
+        })?.expires
 
     private fun enhetFor(ansattId: AnsattId) =
         runCatching {

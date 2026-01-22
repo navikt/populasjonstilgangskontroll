@@ -58,7 +58,7 @@ class RegelMotor(
             brukere.forEachIndexed { index, (bruker, type) ->
                 val resultat = runCatching {
                     logger.trace("Bulk evaluerer #${index + 1}/${brukere.size}: ${bruker.oppslagId.maskFnr()}")
-                    evaluer(ansatt, bruker, type.regelSett(), BULK)
+                    evaluer(ansatt, bruker, type.regelSett(), brukere.evalueringsType())
                     ok(bruker)
                 }.getOrElse {
                     if (it is RegelException) {
@@ -71,6 +71,7 @@ class RegelMotor(
             logger.tellBulkSize(it.size)
         }
 
+    private fun Set<BrukerOgRegelsett>.evalueringsType() = if (size == 1) ENKELT else BULK
 
     private fun RegelType.regelSett() =
         when (this) {

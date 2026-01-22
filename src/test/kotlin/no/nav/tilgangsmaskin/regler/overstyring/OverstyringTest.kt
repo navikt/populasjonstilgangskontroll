@@ -58,7 +58,7 @@ internal class OverstyringTest {
     private val historiskBrukerId = BrukerId("11111111111")
 
     @MockkBean
-    private lateinit var validator: OverstyringKlientValidator
+    private lateinit var validator: OverstyringClientValidator
     @Autowired
     private lateinit var motor: RegelMotor
 

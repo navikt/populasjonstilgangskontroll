@@ -76,7 +76,7 @@ class RegelTjenesteTest {
     @MockkBean
     private lateinit var oppfølging: OppfølgingTjeneste
     @MockkBean
-    private lateinit var validator: OverstyringKlientValidator
+    private lateinit var validator: OverstyringClientValidator
     @MockkBean
     private lateinit var proxy: EntraProxyTjeneste
     @Autowired

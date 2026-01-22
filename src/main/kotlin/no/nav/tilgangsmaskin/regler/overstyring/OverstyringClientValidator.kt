@@ -1,13 +1,11 @@
 package no.nav.tilgangsmaskin.regler.overstyring
 
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringConfig.Companion.OVERSTYRING
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 
 @Component
-class OverstyringKlientValidator(private val cfg: OverstyringConfig, private val token: Token)  {
+class OverstyringClientValidator(private val cfg: OverstyringConfig, private val token: Token)  {
     private val log = getLogger(javaClass)
 
     fun validerKlient() {
@@ -16,15 +14,9 @@ class OverstyringKlientValidator(private val cfg: OverstyringConfig, private val
            // throw IllegalStateException("System ${token.systemNavn} har ikke tilgang til overstyring, kun ${cfg.systemer.joinToString(", ")}")
         }
     }
+    class OverstyringKlientException(message: String, val system: String) : RuntimeException(message)
+
 }
 
-class OverstyringKlientException(message: String, val system: String) : RuntimeException(message)
 
 
-@ConfigurationProperties(OVERSTYRING)
-class OverstyringConfig(val systemer: Set<String> = setOf("histark","gosys")) {
-
-    companion object {
-        const val OVERSTYRING = "overstyring"
-    }
-}

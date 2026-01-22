@@ -18,9 +18,6 @@ import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.regelTag
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.tilgang.Token
-import no.nav.tilgangsmaskin.tilgang.Token.Companion.FLOW
-import no.nav.tilgangsmaskin.tilgang.TokenType
 import org.jboss.logging.MDC
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
@@ -37,7 +34,7 @@ class OverstyringTjeneste(
     private val adapter: OverstyringJPAAdapter,
     private val motor: RegelMotor,
     private val proxy: EntraProxyTjeneste,
-    private val validator: OverstyringKlientValidator,
+    private val validator: OverstyringClientValidator,
     private val teller: OverstyringTeller) {
 
     private val log = getLogger(javaClass)

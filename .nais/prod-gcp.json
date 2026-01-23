@@ -24,6 +24,11 @@
   },
   "inbound": [
     {
+      "name": "repr-api",
+      "namespace": "repr",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "pensjonskalkulator-backend",
       "namespace": "pensjonskalkulator",
       "cluster": "prod-gcp"

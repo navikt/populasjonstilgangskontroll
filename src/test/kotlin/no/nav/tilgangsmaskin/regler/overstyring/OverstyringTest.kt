@@ -83,7 +83,7 @@ internal class OverstyringTest {
 
     @BeforeTest
     fun setup() {
-        every { validator.validerKlient() } returns Unit
+        every { validator.validerKonsument() } returns Unit
         every { token.erObo } returns false
         every { token.erCC } returns true
         every { token.system } returns "test"

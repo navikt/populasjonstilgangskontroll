@@ -57,9 +57,9 @@ class OverstyringTjeneste(
     fun overstyr(ansattId: AnsattId, data: OverstyringData) =
         runCatching {
             MDC.put(USER_ID, ansattId.verdi)
+            validator.validerKonsument()
             log.info("Sjekker kjerneregler før eventuell overstyring for $ansattId og ${data.brukerId}")
             motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi))
-            validator.validerKlient()
             adapter.overstyr(ansattId.verdi, enhetFor(ansattId), data).also {
                 teller.tell(INGEN_REGEL_TAG,OVERSTYRT)
                 log.info("Overstyring til og med ${data.gyldigtil} ble registrert for $ansattId og ${data.brukerId}")

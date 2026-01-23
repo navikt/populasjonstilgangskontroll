@@ -96,7 +96,7 @@ class RegelTjenesteTest {
         //val registry = SimpleMeterRegistry()
         evalueringTeller = EvalueringTeller(registry, token)
         avdød = AvdødTeller(registry, token)
-        every { validator.validerKlient() } returns Unit
+        every { validator.validerKonsument() } returns Unit
         every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
         every { oppfølging.enhetFor(Identifikator(vanligBrukerId.verdi)) } returns Enhetsnummer("1234")

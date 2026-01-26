@@ -61,7 +61,7 @@ class CacheClientTest {
 
     @Autowired
     private lateinit var cf: RedisConnectionFactory
-    private lateinit var lettuceClient: CacheClient
+    private lateinit var lettuceClient: LettuceCacheClient
     private lateinit var handler: CacheNøkkelHandler
 
     val b1 = BrukerId("03508331575")
@@ -85,8 +85,8 @@ class CacheClientTest {
         lettuceClient = lettuceClient(handler)
     }
 
-    private fun lettuceClient(handler: CacheNøkkelHandler) = CacheClient(
-        create("redis://${redis.host}:${redis.firstMappedPort}"), cacheConfig,handler, BulkCacheSuksessTeller(meterRegistry, token),
+    private fun lettuceClient(handler: CacheNøkkelHandler) = LettuceCacheClient(
+        create("redis://${redis.host}:${redis.firstMappedPort}"), cacheConfig,handler, CacheSlotCalculator(handler),BulkCacheSuksessTeller(meterRegistry, token),
         BulkCacheTeller(meterRegistry, token))
 
     @BeforeEach

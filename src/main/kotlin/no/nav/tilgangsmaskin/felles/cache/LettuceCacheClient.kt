@@ -16,8 +16,9 @@ import kotlin.reflect.KClass
 
 @Component
 @Primary
-class CacheClient(client: RedisClient, cfg: CacheConfig,
+class LettuceCacheClient(client: RedisClient, cfg: CacheConfig,
                          private val handler: CacheNøkkelHandler,
+                         private val calculator: CacheSlotCalculator,
                          private val alleTreffTeller: BulkCacheSuksessTeller,
                          private val teller: BulkCacheTeller)  : CacheOperations, Pingable {
 
@@ -73,7 +74,7 @@ class CacheClient(client: RedisClient, cfg: CacheConfig,
         }
 
     override
-    fun putMany(innslag: Map<String, Any>, ttl: Duration,cache: CachableConfig, ) {
+    fun putMany(innslag: Map<String, Any>, ttl: Duration,cache: CachableConfig) {
         if (innslag.isNotEmpty()) {
             log.trace("Bulk lagrer {} verdier for cache {} med prefix {}", innslag.size, cache.name, cache.extraPrefix)
             conn.apply {

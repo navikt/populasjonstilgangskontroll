@@ -76,7 +76,7 @@ class LettuceCacheClient(client: RedisClient, cfg: CacheConfig,
     override
     fun putMany(innslag: Map<String, Any>, ttl: Duration,cache: CachableConfig) {
         if (innslag.isNotEmpty()) {
-            log.trace("Bulk lagrer {} verdier for cache {} med prefix {}", innslag.size, cache.name, cache.extraPrefix)
+            log.trace("Bulk lagrer {} verdier (i potensielt ${calculator.slotsFor(innslag,cache).keys.size} slots)  for cache {} med prefix {}", innslag.size, cache.name, cache.extraPrefix)
             conn.apply {
                 with(payloadFor(innslag, cache)) {
                     setAutoFlushCommands(false)

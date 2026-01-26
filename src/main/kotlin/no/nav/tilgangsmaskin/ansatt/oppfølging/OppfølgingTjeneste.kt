@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.ansatt.oppfølging
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
 import no.nav.tilgangsmaskin.bruker.Identer
-import no.nav.tilgangsmaskin.bruker.Identifikator
+import no.nav.tilgangsmaskin.bruker.BrukerIdentifikator
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
@@ -21,7 +21,7 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
 
     @Cacheable(cacheNames = [OPPFØLGING],key = "#id.verdi")
     @Transactional(readOnly = true)
-    fun enhetFor(id: Identifikator) =
+    fun enhetFor(id: BrukerIdentifikator) =
         db.enhetFor(id.verdi)
 
     @Caching(

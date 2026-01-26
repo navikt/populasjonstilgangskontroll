@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.mask
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
 
-data class Identifikator(@JsonValue val verdi: String) {
+data class BrukerIdentifikator(@JsonValue val verdi: String) {
     init {
         require(runCatching {
             AktørId(verdi)
@@ -14,6 +14,8 @@ data class Identifikator(@JsonValue val verdi: String) {
         }.isSuccess)
     }
 
+     fun somAktørId() = AktørId(verdi)
+     fun somBrukerId() = BrukerId(verdi)
     override fun toString() = verdi.mask()
 }
 

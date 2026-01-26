@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.Tilgang
 
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import no.nav.boot.conditionals.ConditionalOnNotProd
@@ -22,7 +21,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Identer
-import no.nav.tilgangsmaskin.bruker.Identifikator
+import no.nav.tilgangsmaskin.bruker.BrukerIdentifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
@@ -85,20 +84,20 @@ class DevTilgangController(
     fun oppfølgingAvslutt(@RequestBody identer : Identer, @PathVariable uuid: UUID) = oppfølging.avslutt(uuid, identer)
 
     @GetMapping("oppfolging/enhet")
-    fun enhetFor(@RequestParam id: Identifikator) = oppfølging.enhetFor(id)
+    fun enhetFor(@RequestParam id: BrukerIdentifikator) = oppfølging.enhetFor(id)
 
     @PostMapping("cache/skjerminger")
     fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany(navIds, Boolean::class,SKJERMING_CACHE)
 
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany(navIds.map { it.verdi }.toSet(), Person::class,CachableConfig(PDL))
+    fun cachePersoner(@RequestBody  navIds: Set<BrukerIdentifikator>) = cacheClient.getMany(navIds.map { it.verdi }.toSet(), Person::class,CachableConfig(PDL))
 
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable  id: String) = graphql.partnere(id)
 
     @PostMapping("brukeridentifikator")
-    fun brukerIdentifikator(@RequestBody id: Identifikator) = brukere.brukerMedUtvidetFamilie(id.verdi)
+    fun brukerIdentifikator(@RequestBody id: BrukerIdentifikator) = brukere.brukerMedUtvidetFamilie(id.verdi)
 
     @GetMapping("bruker/{id}")
     fun bruker(@PathVariable id: String) = brukere.brukerMedUtvidetFamilie(id)

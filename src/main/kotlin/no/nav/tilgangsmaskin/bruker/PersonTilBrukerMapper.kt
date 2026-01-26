@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
-import no.nav.tilgangsmaskin.bruker.Bruker.BrukerIds
+import no.nav.tilgangsmaskin.bruker.Bruker.BrukerIdentifikatorer
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UdefinertTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
@@ -18,7 +18,7 @@ object PersonTilBrukerMapper {
     fun tilBruker(person: Person, erSkjermet: Boolean) =
         with(person) {
             Bruker(
-                    BrukerIds(brukerId, oppslagId,historiskeIds, aktørId),
+                    BrukerIdentifikatorer(brukerId, oppslagId,historiskeIds, aktørId),
                     geoTilknytning,
                     tilGruppeKrav(geoTilknytning, graderinger, erSkjermet),
                     familie,

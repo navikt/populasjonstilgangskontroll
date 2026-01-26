@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import io.opentelemetry.instrumentation.annotations.WithSpan
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.mask
 import org.slf4j.LoggerFactory.getLogger
 import kotlin.system.measureTimeMillis
 
@@ -15,15 +15,15 @@ abstract class AbstractCacheOppfrisker : CacheOppfrisker {
         val duration = measureTimeMillis {
             runCatching {
                 doOppfrisk(elementer)
-                log.info("Oppfrisking av ${elementer.cacheName}::${elementer.id.maskFnr()} OK")
+                log.info("Oppfrisking av ${elementer.cacheName}::${elementer.id.mask()} OK")
             }.getOrElse {
                 loggOppfriskingFeilet(elementer, it)
             }
         }
-        log.info("Oppfrisking tok ${duration}ms for ${elementer.cacheName}::${elementer.id.maskFnr()}")
+        log.info("Oppfrisking tok ${duration}ms for ${elementer.cacheName}::${elementer.id.mask()}")
     }
   protected fun loggOppfriskingFeilet(elementer: CacheNøkkelElementer, feil: Throwable) {
-        log.warn("Oppfrisking av ${elementer.cacheName}::${elementer.id.maskFnr()} feilet", feil)
+        log.warn("Oppfrisking av ${elementer.cacheName}::${elementer.id.mask()} feilet", feil)
     }
 }
 

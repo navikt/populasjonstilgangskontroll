@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.bruker.Familie.Companion.INGEN
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.mask
 import java.time.LocalDate
 
 data class Bruker(
@@ -49,6 +49,6 @@ data class Bruker(
                          val oppslagId: String = aktivBrukerId.verdi,
                          val historiskeIds: Set<BrukerId> = emptySet(),
                          val aktørId: AktørId) {
-        override fun toString() = "${javaClass.simpleName}(aktivBrukerId=$aktivBrukerId, oppslagId='${oppslagId.maskFnr()}', historiskeIds=$historiskeIds, aktørId=$aktørId)"
+        override fun toString() = "${javaClass.simpleName}(aktivBrukerId=$aktivBrukerId, oppslagId='${oppslagId.mask()}', historiskeIds=$historiskeIds, aktørId=$aktørId)"
     }
 }

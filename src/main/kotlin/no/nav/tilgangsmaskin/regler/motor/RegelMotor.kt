@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.regler.motor
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.mask
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.avvist
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.ok
 import no.nav.tilgangsmaskin.regler.motor.EvalueringType.BULK
@@ -57,7 +57,7 @@ class RegelMotor(
         buildSet {
             brukere.forEachIndexed { index, (bruker, type) ->
                 val resultat = runCatching {
-                    logger.trace("Bulk evaluerer #${index + 1}/${brukere.size}: ${bruker.oppslagId.maskFnr()}")
+                    logger.trace("Bulk evaluerer #${index + 1}/${brukere.size}: ${bruker.oppslagId.mask()}")
                     evaluer(ansatt, bruker, type.regelSett(), brukere.evalueringsType())
                     ok(bruker)
                 }.getOrElse {

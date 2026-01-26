@@ -9,7 +9,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.mask
 import no.nav.tilgangsmaskin.regler.motor.PdlCacheTømmerTeller
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
@@ -39,11 +39,11 @@ class PdlCacheOpprydder(private val teller: PdlCacheTømmerTeller, private val c
         if (client.delete(id,cache) > 0) {
             teller.tell(Tags.of("cache", cache.name, "gradering",
                 gradering.lowercase(getDefault()),"type",type))
-            log.trace(CONFIDENTIAL,"Slettet nøkkel ${client.tilNøkkel(cache, id)} fra cache ${cache.name} etter hendelse av type: {}", id.maskFnr(), gradering)
+            log.trace(CONFIDENTIAL,"Slettet nøkkel ${client.tilNøkkel(cache, id)} fra cache ${cache.name} etter hendelse av type: {}", id.mask(), gradering)
             log.info("Slettet innslag fra cache ${cache.name} etter hendelse med gradering: {}",gradering)
         }
         else {
-            log.trace( CONFIDENTIAL,"Fant ikke ident {} i ${cache.name} for sletting ved hendelse med gradering: {}", id.maskFnr(), gradering)
+            log.trace( CONFIDENTIAL,"Fant ikke ident {} i ${cache.name} for sletting ved hendelse med gradering: {}", id.mask(), gradering)
         }
     }
     private fun refresh(identer: List<String>, gradering: String) {

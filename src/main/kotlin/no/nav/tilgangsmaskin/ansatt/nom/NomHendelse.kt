@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.mask
 import java.time.LocalDate
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -12,5 +12,5 @@ data class NomHendelse(
         val sluttdato: LocalDate?) {
 
     override fun toString() =
-        "${javaClass.simpleName} (personident=${personident.maskFnr()}, navident=$navident, startdato=$startdato, sluttdato=$sluttdato)"
+        "${javaClass.simpleName} (personident=${personident.mask()}, navident=$navident, startdato=$startdato, sluttdato=$sluttdato)"
 }

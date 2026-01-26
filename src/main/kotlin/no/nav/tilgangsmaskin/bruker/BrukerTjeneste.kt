@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.PersonTilBrukerMapper.tilBruker
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.Person
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.mask
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 
@@ -25,7 +25,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
             personer.forEach { add(brukerIdForOppslagId(it.oppslagId, personer)) }
         }
         if (funnetBrukerIds.size != personer.size) {
-            val mangler = (brukerIds - funnetBrukerIds.map { it.verdi }.toSet()).map { it.maskFnr() }
+            val mangler = (brukerIds - funnetBrukerIds.map { it.verdi }.toSet()).map { it.mask() }
             log.warn("Bulk fant ikke ${mangler.size} brukerIds")
         }
 
@@ -33,7 +33,7 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
             if (p.isNotEmpty()) {
                 log.trace("Bulk slår opp {} skjerming(er) for {}", p.size,p)
                 val skjerminger = skjermingTjeneste.skjerminger(p)
-                log.trace("Bulk slo opp {} skjerminger  ($skjerminger) for {}", skjerminger.size, p.joinToString { it.verdi.maskFnr() })
+                log.trace("Bulk slo opp {} skjerminger  ($skjerminger) for {}", skjerminger.size, p.joinToString { it.verdi.mask() })
                 personer.map {
                     tilBruker(it, skjerminger[it.brukerId] ?: false)
                 }

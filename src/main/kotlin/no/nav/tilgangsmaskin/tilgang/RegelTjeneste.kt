@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.utils.Auditor
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.mask
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BrukerOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat
@@ -38,21 +38,21 @@ class RegelTjeneste(
     @WithSpan
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
-            log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
+            log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.mask()}")
             bruker(brukerId)?.let { bruker ->
                 runCatching {
                     motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
                 }.getOrElse {
                     if (overstyringTjeneste.erOverstyrt(ansattId, bruker.brukerId) && it is RegelException) {
-                        log.trace("Overstyring registrert for {} og {}", ansattId, brukerId.maskFnr(), it)
+                        log.trace("Overstyring registrert for {} og {}", ansattId, brukerId.mask(), it)
                     } else {
-                        log.trace("Tilgang avvist ved kjøring av komplette regler for {} og {}", ansattId, brukerId.maskFnr(), it)
+                        log.trace("Tilgang avvist ved kjøring av komplette regler for {} og {}", ansattId, brukerId.mask(), it)
                         throw it
                     }
                 }
-            } ?: log.info("Komplette regler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
+            } ?: log.info("Komplette regler ikke kjørt for $ansattId og ${brukerId.mask()} siden bruker ikke ble funnet, tilgang likevel gitt")
         }
-        log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
+        log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.mask()}: ${elapsedTime.inWholeMilliseconds}ms")
     }
 
     private fun bruker(brukerId: String) = runCatching {
@@ -62,7 +62,7 @@ class RegelTjeneste(
             auditor.info("404: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
             null
         } else {
-            log.warn("Feil ved oppslag av bruker for ${brukerId.maskFnr()}", it)
+            log.warn("Feil ved oppslag av bruker for ${brukerId.mask()}", it)
             throw it
         }
     }
@@ -72,7 +72,7 @@ class RegelTjeneste(
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
         bruker(brukerId)?.let { bruker ->
             motor.kjerneregler(ansattTjeneste.ansatt(ansattId), bruker)
-        } ?: log.info("Kjerneregler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
+        } ?: log.info("Kjerneregler ikke kjørt for $ansattId og ${brukerId.mask()} siden bruker ikke ble funnet, tilgang likevel gitt")
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
     @WithSpan

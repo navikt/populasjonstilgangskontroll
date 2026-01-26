@@ -15,7 +15,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.mask
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
@@ -140,7 +140,7 @@ class TilgangController(
     private fun enkeltOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, brukerId: String, regelType: RegelType, uri: String) : Unit =
         with(brukerId.trim('"')) {
             MDC.put(USER_ID, ansattId().verdi)
-            log.trace(CONFIDENTIAL,"Kjører {} regler for {} og {}", regelType, ansattId(), this.maskFnr())
+            log.trace(CONFIDENTIAL,"Kjører {} regler for {} og {}", regelType, ansattId(), this.mask())
             if (!isProd) {
                 if (brukerId.length == BRUKERID_LENGTH) {
                     MDC.put("brukerId", brukerId.take(10) + "X" + brukerId.takeLast(1))

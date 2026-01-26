@@ -31,20 +31,20 @@ class CacheNøkkelHandlerTest : DescribeSpec({
 
     describe("CacheNøkkelHandler") {
         it("tilNøkkel legger til prefiks og nøkkel") {
-            handler.tilNøkkel(OID_CACHE, id) shouldBe "${OID_CACHE.name}::$id"
+            handler.nøkkel(id,OID_CACHE) shouldBe "${OID_CACHE.name}::$id"
         }
         it("tilNøkkel legger til ekstraPrefiks hvis angitt") {
-            handler.tilNøkkel(PDL_MED_FAMILIE_CACHE, id) shouldBe "${PDL_MED_FAMILIE_CACHE.name}::${PDL_MED_FAMILIE_CACHE.extraPrefix}:$id"
+            handler.nøkkel( id,PDL_MED_FAMILIE_CACHE) shouldBe "${PDL_MED_FAMILIE_CACHE.name}::${PDL_MED_FAMILIE_CACHE.extraPrefix}:$id"
         }
         it("fraNøkkel fjerner prefiks og ekstraPrefiks") {
-            handler.idFraNøkkel(handler.tilNøkkel(PDL_MED_FAMILIE_CACHE, id)) shouldBe id
+            handler.id(handler.nøkkel(id,PDL_MED_FAMILIE_CACHE)) shouldBe id
         }
         it("fraNøkkel fjerner kun prefiks når ekstraPrefiks er null") {
-            handler.idFraNøkkel(handler.tilNøkkel(OID_CACHE, id)) shouldBe id
+            handler.id(handler.nøkkel( id,OID_CACHE)) shouldBe id
         }
         it("kaster exception hvis cache config mangler") {
             shouldThrow<IllegalStateException> {
-                CacheNøkkelHandler(emptyMap(), mapper).tilNøkkel(CachableConfig("unknown"), "key")
+                CacheNøkkelHandler(emptyMap(), mapper).nøkkel("key",CachableConfig("unknown"))
             }
         }
     }

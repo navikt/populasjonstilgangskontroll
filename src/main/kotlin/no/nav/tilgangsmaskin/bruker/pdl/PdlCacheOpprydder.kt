@@ -7,7 +7,7 @@ import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.UGRADERT
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
-import no.nav.tilgangsmaskin.felles.cache.CacheClient
+import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.PdlCacheTømmerTeller
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component
 import java.util.Locale.*
 
 @Component
-class PdlCacheOpprydder(private val teller: PdlCacheTømmerTeller, private val client: CacheClient, private val pdl: PDLTjeneste) {
+class PdlCacheOpprydder(private val teller: PdlCacheTømmerTeller, private val client: CacheOperations, private val pdl: PDLTjeneste) {
     private val log = getLogger(javaClass)
 
     @KafkaListener(

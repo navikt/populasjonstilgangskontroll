@@ -13,7 +13,7 @@
   "db": {
     "poolsize": "8",
     "type": "POSTGRES_17",
-    "tier": "db-custom-2-3840",
+    "tier": "db-custom-1-3840",
     "name": "tilgangsmaskin"
   },
   "db-flags": {

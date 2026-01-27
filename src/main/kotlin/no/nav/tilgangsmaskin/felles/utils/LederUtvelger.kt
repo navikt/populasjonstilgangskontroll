@@ -9,9 +9,12 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient.Builder
+import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.bodyToFlux
 import reactor.core.Disposable
+import reactor.util.retry.Retry
 import java.net.URI
+import java.time.Duration
 import java.time.LocalDateTime
 import kotlin.text.get
 
@@ -30,6 +33,8 @@ class LederUtvelger(private val builder: Builder,
             .uri(uri)
             .retrieve()
             .bodyToFlux<LederUtvelgerRespons>()
+            .retryWhen(Retry.backoff(5, Duration.ofSeconds(5))
+                .doBeforeRetry { log.warn("Retrying SSE connection: ${it.failure().message}") })
             .subscribe(
                 { publisher.publishEvent(LeaderChangedEvent(this, it.name)) },
                 { error -> log.warn("SSE error: ${error.message}",error) }

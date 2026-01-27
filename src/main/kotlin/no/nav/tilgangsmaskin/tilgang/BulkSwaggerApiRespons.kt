@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.graph.EntraOidException
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
@@ -14,7 +15,10 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
 @Target(FUNCTION)
 @Retention(RUNTIME)
 @ApiResponses(
-    value = [
+    value = [ApiResponse(
+        responseCode = "404",
+        content = [Content(mediaType = APPLICATION_JSON_VALUE, schema = Schema(implementation = EntraOidException::class))],
+        description = "navident ikke funnet i Entra (gjelder kun Client Credentials Flow der navident oppgis som path-parameter)"),
         ApiResponse(
             responseCode = "413",
             description = "Mer enn 1000 id-er ble sendt i bulk"),

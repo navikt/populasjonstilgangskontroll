@@ -4,17 +4,24 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
+import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArray
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import java.util.*
 
 @Component
-class EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: EntraConfig) :
-    AbstractRestClientAdapter(restClient, cf) {
+class EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: EntraConfig) : AbstractRestClientAdapter(restClient, cf) {
 
     fun oidFraEntra(ansattId: String) =
-        get<EntraSaksbehandlerRespons>(cf.userURI(ansattId)).oids.single().id
+         with(get<EntraSaksbehandlerRespons>(cf.userURI(ansattId)).oids) {
+             log.info("Fant $size oids i Entra for $ansattId")
+            when (size) {
+                0 -> throw IllegalStateException("Fant ingen oid i Entra for $ansattId, er den fremdeles gyldig?")
+                1 -> single().id
+                else -> throw IllegalStateException("Forventet nøyaktig én oid i Entra for $ansattId, fant $size (${joinToString(", ") { it.id.toString() }})")
+            }
+    }
 
     fun grupper(ansattId: String, trengerGlobaleGrupper: Boolean): Set<EntraGruppe> =
         generateSequence(get<EntraGrupper>(cf.grupperURI(ansattId,trengerGlobaleGrupper))) { bolk ->

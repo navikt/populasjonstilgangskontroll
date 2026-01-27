@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient.Builder
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.bodyToFlux
 import reactor.core.Disposable
+import reactor.core.publisher.Mono
 import reactor.util.retry.Retry
 import java.net.URI
 import java.time.Duration
@@ -28,17 +29,20 @@ class LederUtvelger(private val builder: Builder,
 
     @EventListener(ApplicationReadyEvent::class)
     fun onApplicationReady() {
-        subscription = builder.build()
-            .get()
-            .uri(uri)
-            .retrieve()
-            .bodyToFlux<LederUtvelgerRespons>()
-            .retryWhen(Retry.backoff(5, Duration.ofSeconds(5))
-                .doBeforeRetry { log.warn("Retrying SSE connection: ${it.failure().message}") })
-            .doOnSubscribe { log.info("SSE Subscribing") }
+        subscription = Mono.delay(Duration.ofMillis(500))
+            .flatMapMany {
+                builder.build()
+                    .get()
+                    .uri(uri)
+                    .retrieve()
+                    .bodyToFlux<LederUtvelgerRespons>()
+            }
+            .retryWhen(Retry.backoff(3, Duration.ofSeconds(1))
+                .filter { it is WebClientRequestException }
+            )
             .subscribe(
                 { publisher.publishEvent(LeaderChangedEvent(this, it.name)) },
-                { error -> log.warn("SSE error: ${error.message}",error) }
+                { error -> log.warn("SSE error: ${error.message}", error) }
             )
     }
 

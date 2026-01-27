@@ -31,11 +31,3 @@ class AnsattOidTjeneste(private val adapter: EntraRestClientAdapter) : CachableR
         const val ENTRA_OID = "entraoid"
     }
 }
-
-@ControllerAdvice
-class NotFoundAdvice {
-    private val log = getLogger(javaClass)
-    @ExceptionHandler(OidException::class)
-    fun handleIllegalState(e: OidException): Nothing =
-        throw ResponseStatusException(NOT_FOUND, e.message).also { log.warn("OOPS",e) }
-}

@@ -6,7 +6,10 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArray
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.stereotype.Component
+import org.springframework.web.ErrorResponseException
 import org.springframework.web.client.RestClient
 import java.util.*
 
@@ -40,6 +43,6 @@ class EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: E
 
     override fun toString() = "${javaClass.simpleName} [client=$restClient, config=$cf, errorHandler=$errorHandler]"
 
-    class OidException(msg: String) : RuntimeException(msg)
+    class OidException(msg: String) : ErrorResponseException(NOT_FOUND)
 
 }

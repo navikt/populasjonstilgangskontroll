@@ -4,6 +4,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.EntraRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.graph.EntraRestClientAdapter.OidException
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NOT_FOUND
@@ -33,8 +34,8 @@ class AnsattOidTjeneste(private val adapter: EntraRestClientAdapter) : CachableR
 
 @ControllerAdvice
 class NotFoundAdvice {
+    private val log = getLogger(javaClass)
     @ExceptionHandler(OidException::class)
-    @ResponseBody
     fun handleIllegalState(e: OidException): Nothing =
-        throw ResponseStatusException(NOT_FOUND, e.message)
+        throw ResponseStatusException(NOT_FOUND, e.message).also { log.warn("OOPS",e) }
 }

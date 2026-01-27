@@ -20,7 +20,7 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
         content = [Content(mediaType = APPLICATION_JSON_VALUE, schema = Schema(
             example = """{
                 "detail": "Fant ingen oid for navident A222222, er den fremdeles gyldig?",
-                "instance": "/dev/bulk/A222222/KJERNE_REGELTYPE",
+                "instance": "/api/v1/bulk/A222222/KJERNE_REGELTYPE",
                 "status": 404,
                 "title": "Uventet respons fra Entra",
                 "navident": "A222222"

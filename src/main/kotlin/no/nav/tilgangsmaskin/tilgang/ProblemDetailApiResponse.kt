@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import java.net.URI
 import kotlin.annotation.AnnotationRetention.RUNTIME
@@ -14,6 +15,17 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
 @Retention(RUNTIME)
 @ApiResponses(
         value = [
+            ApiResponse(
+                responseCode = "404",
+                content = [Content(mediaType = APPLICATION_JSON_VALUE, schema = Schema(
+                    example = """{
+                "detail": "Fant ingen oid for navident A222222, er den fremdeles gyldig?",
+                "instance": "/api/v1/ccf/komplett/A222222",
+                "status": 404,
+                "title": "Uventet respons fra Entra",
+                "navident": "A222222"
+              }"""))],
+                description = "navident ikke funnet i Entra (gjelder kun Client Credentials Flow der navident oppgis som path-parameter)"),
             ApiResponse(
                     responseCode = "204",
                     description = "Tilgang ble godkjent"),

@@ -21,9 +21,9 @@ class EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: E
          with(get<EntraSaksbehandlerRespons>(cf.userURI(ansattId)).oids) {
              log.info("Fant $size oids i Entra for $ansattId")
             when (size) {
-                0 -> throw OidException(ansattId, "Fant ingen oid for $ansattId, er den fremdeles gyldig?")
+                0 -> throw OidException(ansattId, "Fant ingen oid for navident $ansattId, er den fremdeles gyldig?")
                 1 -> single().id
-                else -> throw OidException(ansattId, "Forventet nøyaktig én oid for $ansattId, fant $size (${joinToString(", ") { it.id.toString() }})")
+                else -> throw OidException(ansattId, "Forventet nøyaktig én oid for navident $ansattId, fant $size (${joinToString(", ") { it.id.toString() }})")
             }
     }
 
@@ -52,7 +52,7 @@ class EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: E
         }
 
         companion object   {
-            const val TITLE = "Ikke-forventet respons fra Entra"
+            const val TITLE = "Uventet respons fra Entra"
         }
     }
 }

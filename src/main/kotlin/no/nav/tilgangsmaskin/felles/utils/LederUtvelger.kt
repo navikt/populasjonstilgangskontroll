@@ -37,8 +37,11 @@ class LederUtvelger(private val builder: Builder,
                     .retrieve()
                     .bodyToFlux<LederUtvelgerRespons>()
             }
-            .retryWhen(Retry.backoff(3, Duration.ofSeconds(1))
-                .filter { it is WebClientRequestException }
+            .doOnSubscribe { log.info("SSE subscribe") }
+            .doOnNext { log.info("SSE next:  ${it.name} (sist oppdatert: ${it.last_update})") }
+            .retryWhen(Retry.backoff(5, Duration.ofSeconds(10))
+                .doBeforeRetry { log.info("SSE retry ${it.failure().message}") }
+                .doAfterRetry { log.info("SSE connection retry after ${it.totalRetries()} attempts") }
             )
             .subscribe(
                 { publisher.publishEvent(LeaderChangedEvent(this, it.name)) },

@@ -7,7 +7,7 @@ import jakarta.persistence.PostUpdate
 import jakarta.persistence.PrePersist
 import jakarta.persistence.PreRemove
 import jakarta.persistence.PreUpdate
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.mask
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.annotation.LastModifiedDate
@@ -21,33 +21,33 @@ class OverstyringEntityListener(private val token: Token) {
 
     @PrePersist
     private fun lagrer(entity: OverstyringEntity) = setCrested(entity).also {
-        log.trace("Lagrer overstyring for ${entity.fnr.maskFnr()} i DB")
+        log.trace("Lagrer overstyring for ${entity.fnr.mask()} i DB")
     }
 
     @PreUpdate
     private fun oppdaterer(entity: OverstyringEntity) = setOppdatert(entity).also {
-        log.trace("Oppdaterer overstyring for ${entity.fnr.maskFnr()} i DB")
+        log.trace("Oppdaterer overstyring for ${entity.fnr.mask()} i DB")
     }
 
     @PreRemove
     private fun fjerner(entity: OverstyringEntity) =
-        log.trace("Fjerner overstyring for ${entity.fnr.maskFnr()} i DB")
+        log.trace("Fjerner overstyring for ${entity.fnr.mask()} i DB")
 
     @PostPersist
     private fun lagret(entity: OverstyringEntity) =
-        log.trace("Lagret overstyring for ${entity.fnr.maskFnr()} i DB")
+        log.trace("Lagret overstyring for ${entity.fnr.mask()} i DB")
 
     @PostUpdate
     private fun oppdatert(entity: OverstyringEntity) =
-        log.trace("Oppdaterte overstyring for ${entity.fnr.maskFnr()} i DB")
+        log.trace("Oppdaterte overstyring for ${entity.fnr.mask()} i DB")
 
     @PostRemove
     private fun fjernet(entity: OverstyringEntity) =
-        log.trace("Fjernet overstyring for ${entity.fnr.maskFnr()} i DB")
+        log.trace("Fjernet overstyring for ${entity.fnr.mask()} i DB")
 
     @PostLoad
     private fun lest(entity: OverstyringEntity) =
-        log.trace("Leste overstyring for ${entity.fnr.maskFnr()} i DB")
+        log.trace("Leste overstyring for ${entity.fnr.mask()} i DB")
 
     fun setCreatedBySystem(target: OverstyringEntity) {
         target::class.java.declaredFields.forEach {

@@ -2,10 +2,10 @@ package no.nav.tilgangsmaskin.bruker
 
 import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.mask
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
 
-data class Identifikator(@JsonValue val verdi: String) {
+data class BrukerIdentifikator(@JsonValue val verdi: String) {
     init {
         require(runCatching {
             AktørId(verdi)
@@ -14,7 +14,9 @@ data class Identifikator(@JsonValue val verdi: String) {
         }.isSuccess)
     }
 
-    override fun toString() = verdi.maskFnr()
+     fun somAktørId() = AktørId(verdi)
+     fun somBrukerId() = BrukerId(verdi)
+    override fun toString() = verdi.mask()
 }
 
 data class BrukerId(@JsonValue val verdi: String) {
@@ -44,7 +46,7 @@ data class BrukerId(@JsonValue val verdi: String) {
             }
     }
 
-    override fun toString() = verdi.maskFnr()
+    override fun toString() = verdi.mask()
 }
 
 data class Enhetsnummer(@JsonValue val verdi: String) {

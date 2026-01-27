@@ -9,7 +9,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.mask
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.isBeforeNow
 import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
@@ -47,7 +47,7 @@ class OverstyringTjeneste(
             .map { it.key }
 
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId): Boolean {
-        log.info("Sjekker eventuell overstyring for $ansattId og ${brukerId.verdi.maskFnr()}")
+        log.info("Sjekker eventuell overstyring for $ansattId og ${brukerId.verdi.mask()}")
         val overstyring = gjeldendeOverstyring(ansattId, brukerId)
         return erOverstyrt(ansattId,brukerId,overstyring)
     }

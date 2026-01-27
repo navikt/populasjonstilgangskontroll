@@ -12,7 +12,7 @@ object DomainExtensions {
     }
 
     fun String.upcase() = this.replaceFirstChar { it.uppercaseChar() }
-    fun String.maskFnr() =
+    fun String.mask() =
         when (length) {
             BRUKERID_LENGTH -> replaceRange(4, BRUKERID_LENGTH, "*******")
             AKTØRID_LENGTH -> replaceRange(6, AKTØRID_LENGTH, "*******")

@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.tilgang
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.mask
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.FORBIDDEN
@@ -20,7 +20,7 @@ data class AggregertBulkRespons(val ansattId: AnsattId, val resultater: Set<Enke
         }
 
         override fun toString(): String =
-            "${javaClass.simpleName}(oppslagId='${brukerId.maskFnr()}', httpStatus=$httpStatus, detaljer=$detaljer, status=$status)"
+            "${javaClass.simpleName}(oppslagId='${brukerId.mask()}', httpStatus=$httpStatus, detaljer=$detaljer, status=$status)"
     }
     @JsonIgnore
     val ukjente = filter(NOT_FOUND)

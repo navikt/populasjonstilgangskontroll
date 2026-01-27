@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.Tilgang
 
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import no.nav.boot.conditionals.ConditionalOnNotProd
@@ -15,22 +14,21 @@ import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomJPAAdapter
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Identer
-import no.nav.tilgangsmaskin.bruker.Identifikator
+import no.nav.tilgangsmaskin.bruker.BrukerIdentifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
-import no.nav.tilgangsmaskin.felles.cache.CacheClient
-import no.nav.tilgangsmaskin.felles.cache.Caches
+import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
@@ -71,7 +69,7 @@ class DevTilgangController(
     private val nom: NomJPAAdapter,
     private val pdl: PDLTjeneste,
     private val proxy: EntraProxyTjeneste,
-    private val cacheClient: CacheClient) {
+    private val cacheClient: CacheOperations) {
 
     private val log = getLogger(javaClass)
 
@@ -86,36 +84,20 @@ class DevTilgangController(
     fun oppfølgingAvslutt(@RequestBody identer : Identer, @PathVariable uuid: UUID) = oppfølging.avslutt(uuid, identer)
 
     @GetMapping("oppfolging/enhet")
-    fun enhetFor(@RequestParam id: Identifikator) = oppfølging.enhetFor(id)
+    fun enhetFor(@RequestParam id: BrukerIdentifikator) = oppfølging.enhetFor(id)
 
     @PostMapping("cache/skjerminger")
-    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(navIds,
-        CachableConfig(SKJERMING))
-
+    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany(navIds, Boolean::class,SKJERMING_CACHE)
 
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany<Person>(navIds.map { it.verdi }.toSet(),
-        CachableConfig(PDL))
+    fun cachePersoner(@RequestBody  navIds: Set<BrukerIdentifikator>) = cacheClient.getMany(navIds.map { it.verdi }.toSet(), Person::class,CachableConfig(PDL))
 
-    @GetMapping("cache/keys/{cache}")
-    fun keys(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-             cache: Caches) =
-        Caches.forNavn(cache.name).flatMap {
-            cacheClient.getAllKeys(it)
-        }.toSortedSet()
-
-    @GetMapping("cache/{cache}/{id}")
-    fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-            cache: Caches, id: String) =
-        Caches.forNavn(cache.name)
-            .mapNotNull { cacheClient.getOne(id, it) }
-            .toSet()
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable  id: String) = graphql.partnere(id)
 
     @PostMapping("brukeridentifikator")
-    fun brukerIdentifikator(@RequestBody id: Identifikator) = brukere.brukerMedUtvidetFamilie(id.verdi)
+    fun brukerIdentifikator(@RequestBody id: BrukerIdentifikator) = brukere.brukerMedUtvidetFamilie(id.verdi)
 
     @GetMapping("bruker/{id}")
     fun bruker(@PathVariable id: String) = brukere.brukerMedUtvidetFamilie(id)

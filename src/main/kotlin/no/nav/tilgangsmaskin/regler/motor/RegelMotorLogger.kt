@@ -7,7 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
 import no.nav.tilgangsmaskin.felles.utils.Auditor
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.mask
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withMDC
 import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.INGEN_REGEL_TAG
 import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.regelTag
@@ -50,7 +50,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
     fun trace(message: String) = log.trace(message)
 
     fun evaluerer(ansatt: Ansatt, bruker: Bruker, regel: Regel,type: EvalueringType)  {
-        log.trace("Evaluerer regel: '{}' for {}  og {} for {}", regel.kortNavn, ansatt.ansattId, bruker.oppslagId.maskFnr(),type.name)
+        log.trace("Evaluerer regel: '{}' for {}  og {} for {}", regel.kortNavn, ansatt.ansattId, bruker.oppslagId.mask(),type.name)
     }
 
     fun tellBulkSize(size: Int) =   bulkHistogram().record(size.toDouble())

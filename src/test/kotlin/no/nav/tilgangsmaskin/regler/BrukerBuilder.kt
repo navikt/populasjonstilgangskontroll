@@ -7,7 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.*
-import no.nav.tilgangsmaskin.bruker.Bruker.BrukerIds
+import no.nav.tilgangsmaskin.bruker.Bruker.BrukerIdentifikatorer
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.BARN
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.FAR
@@ -38,7 +38,7 @@ data class BrukerBuilder(
     fun partnere(partnere: Set<BrukerId>) = apply { this.partnere = buildSet { partnere.forEach { add(FamilieMedlem(it, PARTNER)) } } }
     fun historiske(historiskeIds: Set<BrukerId>) = apply { this.historiskeIds = historiskeIds }
     fun build() = Bruker(
-            BrukerIds(id, oppslagId,historiskeIds, aktørId),
+            BrukerIdentifikatorer(id, oppslagId,historiskeIds, aktørId),
             gt, grupper,
             Familie(setOfNotNull(mor, far), barn, søsken, partnere),
             dødsdato)

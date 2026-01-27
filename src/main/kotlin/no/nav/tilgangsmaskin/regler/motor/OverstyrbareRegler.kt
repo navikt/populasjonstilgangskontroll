@@ -7,7 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker
-import no.nav.tilgangsmaskin.bruker.Identifikator
+import no.nav.tilgangsmaskin.bruker.BrukerIdentifikator
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 
 
@@ -19,7 +19,7 @@ class GeografiskRegel(private val oppfølging: OppfølgingTjeneste,private val t
         godtaHvis {
             ansatt erMedlemAv NASJONAL
                     || ansatt kanBehandle bruker.geografiskTilknytning
-                    || (ansatt tilhører oppfølging.enhetFor(Identifikator(bruker.oppslagId))).also {
+                    || (ansatt tilhører oppfølging.enhetFor(BrukerIdentifikator(bruker.oppslagId))).also {
                 teller.tell(Tags.of("resultat", "$it"))
             }
         }

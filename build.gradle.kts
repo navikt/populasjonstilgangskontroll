@@ -13,6 +13,7 @@ val poolsVersion = "2.13.1"
 val awaitilityVersion = "4.3.0"
 val springMockkVersion = "5.0.1"
 val confluentVersion = "8.1.1"
+val glideVersion = "2.2.3"
 
 
 group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
@@ -20,6 +21,7 @@ version = "1.0.1"
 
 plugins {
     val kotlinVersion = "2.3.0"
+    id("com.google.osdetector") version "1.7.3"
     id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
@@ -60,9 +62,15 @@ configurations.all {
 }
 
 dependencies {
+    implementation("io.valkey:valkey-glide:$glideVersion") {
+        artifact {
+            classifier = osdetector.classifier
+        }
+    }
     implementation("io.confluent:kafka-avro-serializer:$confluentVersion") {
         exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
     }
+    implementation("io.valkey:valkey-glide:${glideVersion}")
     implementation("at.yawk.lz4:lz4-java:1.10.2") // fjernes ved neste release av org.apache.kafka:kafka-clients
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$otelVersion-alpha")

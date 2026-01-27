@@ -35,6 +35,7 @@ class LederUtvelger(private val builder: Builder,
             .bodyToFlux<LederUtvelgerRespons>()
             .retryWhen(Retry.backoff(5, Duration.ofSeconds(5))
                 .doBeforeRetry { log.warn("Retrying SSE connection: ${it.failure().message}") })
+            .doOnSubscribe { log.info("SSE Subscribing") }
             .subscribe(
                 { publisher.publishEvent(LeaderChangedEvent(this, it.name)) },
                 { error -> log.warn("SSE error: ${error.message}",error) }

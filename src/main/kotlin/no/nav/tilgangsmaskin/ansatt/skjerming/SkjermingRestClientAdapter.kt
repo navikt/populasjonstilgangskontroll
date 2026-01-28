@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.IDENTER
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.cache.CacheClient
+import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import org.springframework.beans.factory.annotation.Qualifier
@@ -15,7 +15,7 @@ import org.springframework.web.client.RestClient
 
 
 @Component
-class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, private val cf: SkjermingConfig, private val cache: CacheClient, private val teller : BulkCacheSuksessTeller) : AbstractRestClientAdapter(restClient, cf) {
+class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, private val cf: SkjermingConfig, private val cache: CacheOperations, private val teller : BulkCacheSuksessTeller) : AbstractRestClientAdapter(restClient, cf) {
 
     fun skjerming(id: String) = post<Boolean>(cf.skjermingUri, mapOf(IDENT to id))
 
@@ -23,12 +23,12 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
         val fraCache = fraCache(ids)
         if (fraCache.size == ids.size) {
             tell(true)
-            return fraCache.mapKeys { BrukerId(it.key) }
+            return fraCache.mapKeys { BrukerId(it.key) }.mapValues { it.value ?: false }
         }
         val fraRest = fraRest(ids - fraCache.keys)
         cache.putMany(fraRest, SKJERMING_CACHE, cf.varighet)
         tell(false)
-        return (fraRest + fraCache).mapKeys {  BrukerId(it.key) }
+        return (fraRest + fraCache).mapKeys {  BrukerId(it.key) }.mapValues { it.value ?: false }
     }
     private fun fraRest(ids: Set<String>) =
         if (ids.isEmpty()) {
@@ -41,8 +41,5 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
     private fun tell(status: Boolean) =
         teller.tell(Tags.of("name", SKJERMING_CACHE.name,"suksess",status.toString()))
     private fun fraCache(ids: Set<String>) =
-            cache.getMany<Boolean>(ids, SKJERMING_CACHE)
-
+        cache.getMany(ids, SKJERMING_CACHE, Boolean::class)
 }
-
-

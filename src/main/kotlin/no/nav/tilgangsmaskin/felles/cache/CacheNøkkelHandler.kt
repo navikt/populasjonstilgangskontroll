@@ -4,13 +4,14 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.readValue
+import kotlin.reflect.KClass
 
 class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration?>, val mapper: JsonMapper) {
 
     private val log = getLogger(javaClass)
 
-    inline fun <reified T> fraJson(json: String): T =
-        mapper.readValue(json)
+    fun <T : Any> fraJson(json: String, clazz: KClass<T>): T =
+        mapper.readValue(json, clazz.java)
 
     fun tilJson(value: Any): String =
         mapper.writeValueAsString(value)
@@ -32,4 +33,3 @@ class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration?>, va
 }
 
 data class CachableConfig(val name: String, val extraPrefix: String? = null)
-

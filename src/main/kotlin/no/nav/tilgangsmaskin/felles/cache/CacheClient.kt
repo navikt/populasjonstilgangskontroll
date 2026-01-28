@@ -7,13 +7,14 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocal
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.stereotype.Component
 import java.time.Duration
+import kotlin.reflect.KClass
 
-open class CacheClient(
-    client: RedisClient,
-    val handler: CacheNøkkelHandler,
+@Component
+ class CacheClient(client: RedisClient, val handler: CacheNøkkelHandler,
     val alleTreffTeller: BulkCacheSuksessTeller,
-    val teller: BulkCacheTeller)  {
+    val teller: BulkCacheTeller) : CacheOperations {
 
     private val log = getLogger(javaClass)
 
@@ -26,64 +27,55 @@ open class CacheClient(
 
     //@RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
     @WithSpan
-    fun delete(id: String,cache: CachableConfig) =
-         conn.sync().del(handler.tilNøkkel(cache, id))
+    override fun delete(id: String, cache: CachableConfig) =
+        conn.sync().del(handler.tilNøkkel(cache, id))
 
 
     //@RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
     @WithSpan
-    inline fun <reified T> getOne(id: String, cache: CachableConfig) =
-            conn.sync().get(handler.tilNøkkel(cache,id))?.let { json ->
-                handler.fraJson<T>(json)
+    override fun <T : Any> getOne(id: String, cache: CachableConfig, clazz: KClass<T>): T? =
+        conn.sync().get(handler.tilNøkkel(cache, id))?.let { json ->
+            handler.fraJson(json, clazz)
         }
 
     //@RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
     @WithSpan
-    fun putOne(id: String, cache: CachableConfig, value: Any, ttl: Duration)  {
-            conn.async().setex(handler.tilNøkkel(cache,id), ttl.seconds,handler.tilJson(value))
+    override fun putOne(id: String, cache: CachableConfig, value: Any, ttl: Duration) {
+        conn.async().setex(handler.tilNøkkel(cache, id), ttl.seconds, handler.tilJson(value))
     }
 
-    @WithSpan
-    fun getAllKeys(cache: CachableConfig) =
-            conn.sync().keys("${cache.name}::*")
+     fun getAllKeys(cache: CachableConfig) =
+        conn.sync().keys("${cache.name}::*")
 
     //@RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
     @WithSpan
-    inline fun <reified T> getMany(ids: Set<String>, cache: CachableConfig)  =
+    override fun <T : Any> getMany(ids: Set<String>, cache: CachableConfig, clazz: KClass<T>): Map<String, T?> =
         if (ids.isEmpty()) {
             emptyMap()
-        }
-        else  {
+        } else {
             conn.sync()
-                .mget(*ids.map {
-                        id -> handler.tilNøkkel(cache,id)}.toTypedArray<String>()
-                )
-                .filter {
-                    it.hasValue()
-                }
-                .associate {
-                    handler.idFraNøkkel(it.key) to handler.fraJson<T>(it.value)
-                }.also {
-                    tellOgLog(cache.name, it.size, ids.size)
-                }
+                .mget(*ids.map { id -> handler.tilNøkkel(cache, id) }.toTypedArray<String>())
+                .filter { it.hasValue() }
+                .associate { handler.idFraNøkkel(it.key) to handler.fraJson(it.value, clazz) }
+                .also { tellOgLog(cache.name, it.size, ids.size) }
         }
 
     //@RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
     @WithSpan
-    fun putMany(innslag: Map<String, Any>, cache: CachableConfig, ttl: Duration) {
+    override fun putMany(innslag: Map<String, Any>, cache: CachableConfig, ttl: Duration) {
         if (innslag.isNotEmpty()) {
             log.trace("Bulk lagrer {} verdier for cache {} med prefix {}", innslag.size, cache.name, cache.extraPrefix)
-                conn.apply {
-                    with(payloadFor(innslag, cache)) {
-                        setAutoFlushCommands(false)
-                        async().mset(this)
-                        keys.forEach { key ->
-                            async().expire(key, ttl.seconds)
-                        }
+            conn.apply {
+                with(payloadFor(innslag, cache)) {
+                    setAutoFlushCommands(false)
+                    async().mset(this)
+                    keys.forEach { key ->
+                        async().expire(key, ttl.seconds)
                     }
-                    flushCommands()
-                    setAutoFlushCommands(true)
                 }
+                flushCommands()
+                setAutoFlushCommands(true)
+            }
         }
     }
 
@@ -101,5 +93,5 @@ open class CacheClient(
         log.trace("Fant $funnet verdier i cache $navn for $etterspurt identer")
     }
 
-    fun tilNøkkel(cache: CachableConfig, id: String) = handler.tilNøkkel(cache, id)
+    override fun tilNøkkel(cache: CachableConfig, id: String) = handler.tilNøkkel(cache, id)
 }

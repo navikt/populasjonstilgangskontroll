@@ -64,14 +64,14 @@ class LederUtvelger(private val builder: Builder,
                 { publisher.publishEvent(LeaderChangedEvent(this, it.name)) },
                 { error -> log.warn("SSE error: ${error.message}", error) }
             )
-        @EventListener(ContextClosedEvent::class)
-        fun onShutdown() {
-            log.info("SSE Application shutting down")
-            shuttingDown = true
-            subscription.dispose()
-        }
     }
 
+    @EventListener(ContextClosedEvent::class)
+    fun onShutdown() {
+        log.info("SSE Application shutting down")
+        shuttingDown = true
+        subscription.dispose()
+    }
 
     private data class LederUtvelgerRespons(val name: String, val last_update: LocalDateTime)
     class LeaderChangedEvent(source: Any, val leder: String) : ApplicationEvent(source)

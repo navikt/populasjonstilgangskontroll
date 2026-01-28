@@ -13,6 +13,7 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 import org.springframework.web.reactive.function.client.bodyToFlux
 import reactor.core.Disposable
 import reactor.core.publisher.Mono
+import reactor.netty.http.client.PrematureCloseException
 import reactor.util.retry.Retry
 import java.net.URI
 import java.time.Duration
@@ -37,9 +38,17 @@ class LederUtvelger(private val builder: Builder,
                     .retrieve()
                     .bodyToFlux<LederUtvelgerRespons>()
             }
+            .doOnError { error -> log.error("SSE connection failed permanently: ${error.message}", error) }
             .doOnSubscribe { log.info("SSE subscribe") }
             .doOnNext { log.info("SSE next:  ${it.name} (sist oppdatert: ${it.last_update})") }
-            .retryWhen(Retry.backoff(5, Duration.ofSeconds(10))
+            .retryWhen(
+                Retry.backoff(Long.MAX_VALUE, Duration.ofSeconds(1))
+                    .maxBackoff(Duration.ofSeconds(30))
+                    .filter { error ->
+                        error is WebClientRequestException ||
+                                error is PrematureCloseException ||
+                                error.cause is PrematureCloseException
+                    }
                 .doBeforeRetry { log.info("SSE retry ${it.failure().message}") }
                 .doAfterRetry { log.info("SSE connection retry after ${it.totalRetries()} attempts") }
             )

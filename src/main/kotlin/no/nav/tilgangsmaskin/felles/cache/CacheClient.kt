@@ -14,7 +14,7 @@ import org.springframework.resilience.annotation.Retryable
 import java.time.Duration
 
 @RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
-class CacheClient(
+open class CacheClient(
     client: RedisClient,
     val handler: CacheNøkkelHandler,
     val alleTreffTeller: BulkCacheSuksessTeller,

@@ -9,10 +9,11 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocal
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.dao.QueryTimeoutException
 import org.springframework.resilience.annotation.Retryable
 import java.time.Duration
 
-@RetryingWhenRecoverable([RedisCommandTimeoutException::class])
+@RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
 class CacheClient(
     client: RedisClient,
     val handler: CacheNøkkelHandler,

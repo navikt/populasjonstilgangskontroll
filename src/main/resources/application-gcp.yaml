@@ -83,7 +83,7 @@ spring:
       host: ${valkey.host}
       port: ${valkey.port}
       connect-timeout: 10s
-      timeout: 5s
+      timeout: 10s
       username: ${valkey.username}
       password: ${valkey.password}
       ssl:

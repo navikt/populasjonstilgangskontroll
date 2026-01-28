@@ -13,7 +13,6 @@ import org.springframework.dao.QueryTimeoutException
 import org.springframework.resilience.annotation.Retryable
 import java.time.Duration
 
-@RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
 open class CacheClient(
     client: RedisClient,
     val handler: CacheNøkkelHandler,
@@ -29,17 +28,20 @@ open class CacheClient(
         }
     }
 
+    @RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
     @WithSpan
     fun delete(id: String,cache: CachableConfig) =
          conn.sync().del(handler.tilNøkkel(cache, id))
 
 
+    @RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
     @WithSpan
     inline fun <reified T> getOne(id: String, cache: CachableConfig) =
             conn.sync().get(handler.tilNøkkel(cache,id))?.let { json ->
                 handler.fraJson<T>(json)
         }
 
+    @RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
     @WithSpan
     fun putOne(id: String, cache: CachableConfig, value: Any, ttl: Duration)  {
             conn.async().setex(handler.tilNøkkel(cache,id), ttl.seconds,handler.tilJson(value))
@@ -49,7 +51,7 @@ open class CacheClient(
     fun getAllKeys(cache: CachableConfig) =
             conn.sync().keys("${cache.name}::*")
 
-
+    @RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
     @WithSpan
     inline fun <reified T> getMany(ids: Set<String>, cache: CachableConfig)  =
         if (ids.isEmpty()) {
@@ -70,6 +72,7 @@ open class CacheClient(
                 }
         }
 
+    @RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
     @WithSpan
     fun putMany(innslag: Map<String, Any>, cache: CachableConfig, ttl: Duration) {
         if (innslag.isNotEmpty()) {

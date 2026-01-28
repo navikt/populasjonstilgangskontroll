@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.event.ContextClosedEvent
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient.Builder
@@ -28,6 +29,9 @@ class LederUtvelger(private val builder: Builder,
     protected val log = getLogger(javaClass)
     private lateinit var subscription: Disposable
 
+    @Volatile
+    private var shuttingDown = false
+
     @EventListener(ApplicationReadyEvent::class)
     fun onApplicationReady() {
         subscription = Mono.delay(Duration.ofMillis(500))
@@ -45,6 +49,10 @@ class LederUtvelger(private val builder: Builder,
                 Retry.backoff(Long.MAX_VALUE, Duration.ofSeconds(1))
                     .maxBackoff(Duration.ofSeconds(30))
                     .filter { error ->
+                        if (shuttingDown) {
+                            log.info("SSE Application shutting down, stopping retries")
+                            return@filter false
+                        }
                         error is WebClientRequestException ||
                                 error is PrematureCloseException ||
                                 error.cause is PrematureCloseException
@@ -56,12 +64,14 @@ class LederUtvelger(private val builder: Builder,
                 { publisher.publishEvent(LeaderChangedEvent(this, it.name)) },
                 { error -> log.warn("SSE error: ${error.message}", error) }
             )
+        @EventListener(ContextClosedEvent::class)
+        fun onShutdown() {
+            log.info("SSE Application shutting down")
+            shuttingDown = true
+            subscription.dispose()
+        }
     }
 
-    @PreDestroy
-    fun onShutdown() {
-        subscription.dispose()
-    }
 
     private data class LederUtvelgerRespons(val name: String, val last_update: LocalDateTime)
     class LeaderChangedEvent(source: Any, val leder: String) : ApplicationEvent(source)

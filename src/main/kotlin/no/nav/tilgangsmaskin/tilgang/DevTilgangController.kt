@@ -29,7 +29,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
-import no.nav.tilgangsmaskin.felles.cache.CacheClient
+import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.Caches
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
@@ -71,7 +71,7 @@ class DevTilgangController(
     private val nom: NomJPAAdapter,
     private val pdl: PDLTjeneste,
     private val proxy: EntraProxyTjeneste,
-    private val cacheClient: CacheClient) {
+    private val cacheClient: CacheOperations) {
 
     private val log = getLogger(javaClass)
 
@@ -89,26 +89,19 @@ class DevTilgangController(
     fun enhetFor(@RequestParam id: Identifikator) = oppfølging.enhetFor(id)
 
     @PostMapping("cache/skjerminger")
-    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(navIds,
-        CachableConfig(SKJERMING))
-
+    fun cacheSkjerminger(@RequestBody navIds: Set<String>) =
+        cacheClient.getMany(navIds, CachableConfig(SKJERMING), Boolean::class)
 
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany<Person>(navIds.map { it.verdi }.toSet(),
-        CachableConfig(PDL))
+    fun cachePersoner(@RequestBody navIds: Set<Identifikator>) =
+        cacheClient.getMany(navIds.map { it.verdi }.toSet(), CachableConfig(PDL), Person::class)
 
-    @GetMapping("cache/keys/{cache}")
-    fun keys(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-             cache: Caches) =
-        Caches.forNavn(cache.name).flatMap {
-            cacheClient.getAllKeys(it)
-        }.toSortedSet()
 
     @GetMapping("cache/{cache}/{id}")
     fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
             cache: Caches, id: String) =
         Caches.forNavn(cache.name)
-            .mapNotNull { cacheClient.getOne(id, it) }
+            .mapNotNull { cacheClient.getOne(id, it, Any::class) }
             .toSet()
 
     @GetMapping("sivilstand/{id}")

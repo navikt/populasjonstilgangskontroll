@@ -39,8 +39,8 @@ class LederUtvelger(private val builder: Builder,
                     .bodyToFlux<LederUtvelgerRespons>()
             }
             .doOnError { error -> log.error("SSE connection failed permanently: ${error.message}", error) }
-            .doOnSubscribe { log.info("SSE subscribe") }
-            .doOnNext { log.info("SSE next: $it ") }
+            .doOnSubscribe { log.trace("SSE subscribe") }
+            .doOnNext { log.trace("SSE next: {} ", it) }
             .retryWhen(
                 Retry.backoff(Long.MAX_VALUE, Duration.ofSeconds(1))
                     .maxBackoff(Duration.ofSeconds(30))
@@ -50,7 +50,7 @@ class LederUtvelger(private val builder: Builder,
                                 error.cause is PrematureCloseException
                     }
                 .doBeforeRetry { log.info("SSE retry ${it.failure().message}") }
-                .doAfterRetry { log.info("SSE connection retry after ${it.totalRetries()} attempts") }
+                .doAfterRetry { log.info("SSE connection retry after ${it.totalRetriesInARow()} attempts") }
             )
             .subscribe(
                 { publisher.publishEvent(LeaderChangedEvent(this, it.name)) },

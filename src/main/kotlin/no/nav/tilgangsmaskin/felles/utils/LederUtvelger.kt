@@ -40,7 +40,7 @@ class LederUtvelger(private val builder: Builder,
             }
             .doOnError { error -> log.error("SSE connection failed permanently: ${error.message}", error) }
             .doOnSubscribe { log.info("SSE subscribe") }
-            .doOnNext { log.info("SSE next:  ${it.name} (sist oppdatert: ${it.last_update})") }
+            .doOnNext { log.info("SSE next: $it ") }
             .retryWhen(
                 Retry.backoff(Long.MAX_VALUE, Duration.ofSeconds(1))
                     .maxBackoff(Duration.ofSeconds(30))

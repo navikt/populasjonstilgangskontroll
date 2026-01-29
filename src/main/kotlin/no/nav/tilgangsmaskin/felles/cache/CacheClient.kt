@@ -1,17 +1,21 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import io.lettuce.core.RedisClient
+import io.lettuce.core.RedisCommandTimeoutException
 import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
+import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverable
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.dao.QueryTimeoutException
 import org.springframework.stereotype.Component
 import java.time.Duration
 import kotlin.reflect.KClass
 
 @Component
+@RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
  class CacheClient(client: RedisClient, val handler: CacheNøkkelHandler,
     val alleTreffTeller: BulkCacheSuksessTeller,
     val teller: BulkCacheTeller) : CacheOperations {

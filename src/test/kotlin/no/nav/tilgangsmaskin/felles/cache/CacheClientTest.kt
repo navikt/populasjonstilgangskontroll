@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.felles.cache
 import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
 import io.lettuce.core.RedisClient.create
+import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration
+import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Import
@@ -43,6 +45,7 @@ import java.util.concurrent.TimeUnit.*
 @DataRedisTest
 @ContextConfiguration(classes = [TestApp::class])
 @Testcontainers
+@AutoConfigureMetrics
 @TestInstance(PER_CLASS)
 @ExtendWith(MockKExtension::class)
 @Import(JacksonAutoConfiguration::class)
@@ -54,14 +57,12 @@ class CacheClientTest {
         addModule(JacksonTypeInfoAddingValkeyModule())
     }.build()
 
+    @Autowired
+    private lateinit var meterRegistry:  MeterRegistry
 
     @MockkBean
     private lateinit var token: Token
 
-    /*
-    @MockkBean
-    private lateinit var manager: CacheManager
-*/
     @Autowired
     lateinit var eventPublisher: ApplicationEventPublisher
 
@@ -77,8 +78,6 @@ class CacheClientTest {
     fun setUp() {
         every { token.system } returns "test"
         every { token.clusterAndSystem } returns "test:dev-gcp"
-
-        val meterRegistry = SimpleMeterRegistry()
 
         val mgr = builder(cf)
             .withInitialCacheConfigurations(mapOf(

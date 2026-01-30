@@ -1,21 +1,15 @@
 package no.nav.tilgangsmaskin.populasjonstilgangskontroll.Tilgang
 
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
-import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
-import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomJPAAdapter
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -24,13 +18,8 @@ import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
-import no.nav.tilgangsmaskin.bruker.pdl.Person
-import no.nav.tilgangsmaskin.felles.cache.CachableConfig
-import no.nav.tilgangsmaskin.felles.cache.CacheClient
-import no.nav.tilgangsmaskin.felles.cache.Caches
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
@@ -61,21 +50,14 @@ class DevTilgangController(
     private val skjerming: SkjermingTjeneste,
     private val skjermingAdapter: SkjermingRestClientAdapter,
     private val brukere: BrukerTjeneste,
-    private val ansatte: AnsattTjeneste,
     private val regler: RegelTjeneste,
-    private val entra: EntraTjeneste,
     private val overstyring: OverstyringTjeneste,
     private val oppfølging: OppfølgingTjeneste,
     private val pip: PdlRestClientAdapter,
-    private val oid: AnsattOidTjeneste,
     private val nom: NomJPAAdapter,
-    private val pdl: PDLTjeneste,
-    private val proxy: EntraProxyTjeneste) {
+    private val pdl: PDLTjeneste) {
 
     private val log = getLogger(javaClass)
-
-    @GetMapping("proxy/{ansattId}")
-    fun enhet(@PathVariable ansattId: AnsattId) = proxy.enhet(ansattId)
 
     @PostMapping("oppfolging/{uuid}/{kontor}/registrer")
     fun registrer(@RequestBody identer : Identer,@PathVariable uuid: UUID, @PathVariable kontor: Enhetsnummer) =
@@ -104,11 +86,7 @@ class DevTilgangController(
     @GetMapping("person/pip/{id}")
     fun pip(@PathVariable id: String) = pip.person(id)
 
-    @GetMapping("ansatt/enheter/{ansattId}")
-    fun enheter(@PathVariable ansattId: AnsattId) = entra.geoOgGlobaleGrupper(ansattId, oid.oidFraEntra(ansattId)).filter { it.displayName.contains("ENHET") }
 
-    @GetMapping("ansatt/{ansattId}")
-    fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)
 
     @Operation(
         summary= "Sette kobling mellom ansatt og fnr",

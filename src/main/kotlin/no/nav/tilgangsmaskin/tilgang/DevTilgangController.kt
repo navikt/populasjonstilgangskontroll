@@ -22,17 +22,11 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
-import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
-import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
-import no.nav.tilgangsmaskin.tilgang.BulkSwaggerApiRespons
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
-import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.ACCEPTED
-import org.springframework.http.HttpStatus.MULTI_STATUS
-import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -50,7 +44,6 @@ class DevTilgangController(
     private val skjerming: SkjermingTjeneste,
     private val skjermingAdapter: SkjermingRestClientAdapter,
     private val brukere: BrukerTjeneste,
-    private val regler: RegelTjeneste,
     private val overstyring: OverstyringTjeneste,
     private val oppfølging: OppfølgingTjeneste,
     private val pip: PdlRestClientAdapter,
@@ -99,17 +92,6 @@ class DevTilgangController(
     fun nomFnr(@PathVariable ansattId: AnsattId) =
         nom.fnrForAnsatt(ansattId.verdi)
 
-    @GetMapping("komplett/{ansattId}/{brukerId}")
-    @ResponseStatus(NO_CONTENT)
-    @ProblemDetailApiResponse
-    fun kompletteRegler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: String) =
-        regler.kompletteRegler(ansattId, brukerId.trim('"'))
-
-    @GetMapping("kjerne/{ansattId}/{brukerId}")
-    @ResponseStatus(NO_CONTENT)
-    @ProblemDetailApiResponse
-    fun kjerneregler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: String) =
-        regler.kjerneregler(ansattId, brukerId.trim('"'))
 
     @PostMapping("overstyr/{ansattId}")
     @ResponseStatus(ACCEPTED)
@@ -132,17 +114,6 @@ class DevTilgangController(
     )
     fun overstyringer(@PathVariable ansattId: AnsattId, @RequestBody brukerIds: List<BrukerId>) = overstyring.overstyringer(ansattId, brukerIds)
 
-    @PostMapping("bulk/{ansattId}")
-    @ResponseStatus(MULTI_STATUS)
-    @BulkSwaggerApiRespons
-    fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody specs: Set<BrukerIdOgRegelsett>) =
-        regler.bulkRegler( ansattId, specs)
-
-    @PostMapping("bulk/{ansattId}/{regelType}")
-    @ResponseStatus(MULTI_STATUS)
-    @BulkSwaggerApiRespons
-    fun bulkreglerForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody brukerIds: Set<BrukerId>) =
-        regler.bulkRegler(ansattId, brukerIds.map { BrukerIdOgRegelsett(it.verdi, regelType) }.toSet())
 
     @PostMapping("skjermingadaptere")
     fun skjermingAdapter(@RequestBody brukerId: String) = skjermingAdapter.skjerming(brukerId)

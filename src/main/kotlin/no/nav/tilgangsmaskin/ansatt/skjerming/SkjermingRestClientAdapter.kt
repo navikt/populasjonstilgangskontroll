@@ -20,16 +20,15 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
     fun skjerming(id: String) = post<Boolean>(cf.skjermingUri, mapOf(IDENT to id))
 
     fun skjerminger(ids: Set<String>): Map<BrukerId, Boolean> {
-        val resultat = hentMedCache<Boolean>(
-            ids = ids,
-            cache = cache,
-            cacheConfig = SKJERMING_CACHE,
-            ttl = cf.varighet,
-            restUri = cf.skjermingerUri,
-            restBody = mapOf(IDENTER to ids)
-        )
-        tell(resultat.size == ids.size)
-        return resultat.mapKeys { BrukerId(it.key) }
+        val fraCache = fraCache<Boolean>(ids, cache, SKJERMING_CACHE)
+        if (fraCache.size == ids.size) {
+            tell(true)
+            return fraCache.mapKeys { BrukerId(it.key) }
+        }
+        val fraRest = fraRest<Boolean>(ids - fraCache.keys, cf.skjermingerUri, mapOf(IDENTER to ids - fraCache.keys))
+        cache.putMany(fraRest, SKJERMING_CACHE, cf.varighet)
+        tell(false)
+        return (fraRest + fraCache).mapKeys { BrukerId(it.key) }
     }
     private fun tell(status: Boolean) =
         teller.tell(Tags.of("name", SKJERMING_CACHE.name,"suksess",status.toString()))

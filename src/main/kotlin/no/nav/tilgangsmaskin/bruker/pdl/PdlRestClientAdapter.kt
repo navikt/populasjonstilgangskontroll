@@ -32,8 +32,8 @@ class PdlRestClientAdapter(
     @WithSpan
     fun personer(identer: Set<String>) : Set<Person> {
         val fraCache = fraCache<Person>(identer, cache, PDL_MED_FAMILIE_CACHE)
+        log.trace("Hentet ${fraCache.size} person(er) fra cache for ${identer.size} ident(er)")
         if (fraCache.size == identer.size) {
-            log.trace("Hentet ${fraCache.size} person(er) fra cache for ${identer.size} ident(er)")
             return fraCache.values.toSet()
         }
 

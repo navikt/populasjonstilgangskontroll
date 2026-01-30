@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.populasjonstilgangskontroll.Tilgang
+package no.nav.tilgangsmaskin.tilgang.dev
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.boot.conditionals.ConditionalOnNotProd
@@ -7,19 +7,18 @@ import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
-
-@UnprotectedRestController(value = ["/${DEV}/bruker/"])
+@UnprotectedRestController(value = ["/${ClusterConstants.DEV}/bruker/"])
 @ConditionalOnNotProd
 @Tag(name = "DevBrukerController", description = "Denne kontrolleren skal kun brukes til testing")
 class DevBrukerController(private val brukere: BrukerTjeneste,
                           private val pdl: PDLTjeneste,
-                            private val pip: PdlRestClientAdapter) {
+                          private val pip: PdlRestClientAdapter) {
 
     @GetMapping("person/pip/{id}")
     fun pip(@PathVariable id: String) = pip.person(id)

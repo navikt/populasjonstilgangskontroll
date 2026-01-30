@@ -42,7 +42,7 @@ class DevTilgangController(
     private val overstyring: OverstyringTjeneste,
     private val oppfølging: OppfølgingTjeneste,
     private val nom: NomJPAAdapter) {
-    
+
     @PostMapping("oppfolging/{uuid}/{kontor}/registrer")
     fun registrer(@RequestBody identer : Identer,@PathVariable uuid: UUID, @PathVariable kontor: Enhetsnummer) =
         oppfølging.registrer(uuid, identer, Kontor(kontor))

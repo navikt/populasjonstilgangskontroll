@@ -31,31 +31,20 @@ class PdlRestClientAdapter(
 
     @WithSpan
     fun personer(identer: Set<String>) : Set<Person> {
-
-        val fraCache = fraCache(identer)
+        val fraCache = fraCache<Person>(identer, cache, PDL_MED_FAMILIE_CACHE)
         if (fraCache.size == identer.size) {
+            log.trace("Hentet ${fraCache.size} person(er) fra cache for ${identer.size} ident(er)")
             return fraCache.values.toSet()
         }
 
-        val fraRest = fraRest(identer  - fraCache.keys)
-
+        val fraRest = hentPersonerFraRest(identer - fraCache.keys)
         cache.putMany(fraRest, PDL_MED_FAMILIE_CACHE, cf.varighet)
         return (fraRest.values + fraCache.values).toSet()
     }
 
 
     @WithSpan
-    private fun fraCache(identer: Set<String>) : Map<String,Person>{
-        if (identer.isEmpty()) {
-            return emptyMap()
-        }
-        val innslag = cache.getMany<Person>(identer, PDL_MED_FAMILIE_CACHE)
-        log.trace("Hentet ${innslag.size} person(er) fra cache for ${identer.size} ident(er)")
-        return innslag
-    }
-
-    @WithSpan
-    private fun fraRest(identer: Set<String>) : Map<String,Person> {
+    private fun hentPersonerFraRest(identer: Set<String>) : Map<String,Person> {
         if (identer.isEmpty()) {
             return emptyMap()
         }

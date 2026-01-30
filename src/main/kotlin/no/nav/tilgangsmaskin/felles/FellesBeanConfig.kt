@@ -61,7 +61,6 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 
     @Bean
     fun restClientCustomizer(
-        authorizedClientManager: OAuth2AuthorizedClientManager, 
         loggingInterceptor: LoggingRequestInterceptor
     ) = RestClientCustomizer { c ->
             c.requestFactory(HttpComponentsClientHttpRequestFactory().apply {
@@ -69,30 +68,8 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                 setReadTimeout(2000)
             })
             c.requestInterceptors {
-                it.addFirst(oauth2ClientRequestInterceptor(authorizedClientManager))
                 it.add(loggingInterceptor)
             }
-        }
-
-    private fun oauth2ClientRequestInterceptor(authorizedClientManager: OAuth2AuthorizedClientManager) =
-        ClientHttpRequestInterceptor { request, body, execution ->
-            // Extract registration ID from request attributes or use a default one
-            val registrationId = request.attributes["oauth2_registration_id"] as? String
-            
-            if (registrationId != null) {
-                val authorizeRequest = OAuth2AuthorizeRequest
-                    .withClientRegistrationId(registrationId)
-                    .principal("system")
-                    .build()
-                
-                val authorizedClient = authorizedClientManager.authorize(authorizeRequest)
-                
-                authorizedClient?.accessToken?.let { token ->
-                    request.headers.setBearerAuth(token.tokenValue)
-                }
-            }
-            
-            execution.execute(request, body)
         }
 
     @Bean

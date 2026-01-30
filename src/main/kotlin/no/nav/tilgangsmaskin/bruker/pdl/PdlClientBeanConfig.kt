@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.felles.graphql.GraphQLErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUrl
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUserInfo
+import no.nav.tilgangsmaskin.security.OAuth2RestClientInterceptor
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
@@ -31,6 +32,7 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
@@ -44,8 +46,9 @@ class PdlClientBeanConfig {
 
     @Bean
     @Qualifier(PDLGRAPH)
-    fun pdlGraphRestClient(b: Builder) =
+    fun pdlGraphRestClient(b: Builder, authorizedClientManager: OAuth2AuthorizedClientManager) =
         b.requestInterceptors {
+            it.add(OAuth2RestClientInterceptor(authorizedClientManager, "pdl-api"))
             it.add(headerAddingRequestInterceptor(BEHANDLINGSNUMMER))
         }.build()
 
@@ -60,7 +63,10 @@ class PdlClientBeanConfig {
 
     @Bean
     @Qualifier(PDL)
-    fun pdlRestClient(b: Builder) = b.build()
+    fun pdlRestClient(b: Builder, authorizedClientManager: OAuth2AuthorizedClientManager) = 
+        b.requestInterceptors {
+            it.add(OAuth2RestClientInterceptor(authorizedClientManager, "pdl-pip-api"))
+        }.build()
 
     @Bean
     @ConditionalOnNotProd

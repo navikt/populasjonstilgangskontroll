@@ -96,19 +96,20 @@ object PdlPersonMapper {
                 UtenlandskTilknytning()
             } ?: UkjentBosted()
 
-            KOMMUNE -> geo.gtKommune?.let {
+            KOMMUNE -> tilknytningEllerUkjent(geo.gtKommune, "Kommunal tilknytning uten kommunekode") {
                 KommuneTilknytning(Kommune(it.verdi))
-            } ?: UkjentBosted().also {
-                log.warn("Kommunal tilknytning uten kommunekode, antar ukjent bosted")
             }
 
-            BYDEL -> geo.gtBydel?.let {
+            BYDEL -> tilknytningEllerUkjent(geo.gtBydel, "Bydelstilknytning uten bydelskode") {
                 BydelTilknytning(Bydel(it.verdi))
-            } ?:   UkjentBosted().also {
-                log.warn("Bydelstilknytning uten bydelskode, antar ukjent bosted")
             }
 
             else -> UdefinertTilknytning()
+        }
+
+    private fun <T> tilknytningEllerUkjent(value: T?, warnMsg: String, mapper: (T) -> GeografiskTilknytning): GeografiskTilknytning =
+        value?.let(mapper) ?: UkjentBosted().also {
+            log.warn("$warnMsg, antar ukjent bosted")
         }
 
     private fun tilDødsdato(dødsfall: List<PdlDødsfall>) = dødsfall.maxByOrNull { it.doedsdato }?.doedsdato

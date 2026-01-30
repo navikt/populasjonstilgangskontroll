@@ -77,9 +77,12 @@ class RegelMotor(
         when (this) {
             KJERNE_REGELTYPE -> kjerne
             KOMPLETT_REGELTYPE -> komplett
-            OVERSTYRBAR_REGELTYPE -> komplett.regler.filterIsInstance<OverstyrbarRegel>().let { RegelSett(OVERSTYRBAR_REGELTYPE to it) }
-            TELLENDE_REGELTYPE -> komplett.regler.filterIsInstance<TellendeRegel>().let { RegelSett(TELLENDE_REGELTYPE to it) }
+            OVERSTYRBAR_REGELTYPE -> komplett.filterByType<OverstyrbarRegel>(OVERSTYRBAR_REGELTYPE)
+            TELLENDE_REGELTYPE -> komplett.filterByType<TellendeRegel>(TELLENDE_REGELTYPE)
         }
+
+    private inline fun <reified T : Regel> RegelSett.filterByType(type: RegelType): RegelSett =
+        RegelSett(type to regler.filterIsInstance<T>())
 
     override fun toString() = "${javaClass.simpleName} [kjerneregler=$kjerne,kompletteregler=$komplett]"
 

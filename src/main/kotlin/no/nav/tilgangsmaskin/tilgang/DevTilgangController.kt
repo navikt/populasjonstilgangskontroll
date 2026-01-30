@@ -70,8 +70,7 @@ class DevTilgangController(
     private val oid: AnsattOidTjeneste,
     private val nom: NomJPAAdapter,
     private val pdl: PDLTjeneste,
-    private val proxy: EntraProxyTjeneste,
-    private val cacheClient: CacheClient) {
+    private val proxy: EntraProxyTjeneste) {
 
     private val log = getLogger(javaClass)
 
@@ -88,28 +87,7 @@ class DevTilgangController(
     @GetMapping("oppfolging/enhet")
     fun enhetFor(@RequestParam id: Identifikator) = oppfølging.enhetFor(id)
 
-    @PostMapping("cache/skjerminger")
-    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(navIds,
-        CachableConfig(SKJERMING))
 
-
-    @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany<Person>(navIds.map { it.verdi }.toSet(),
-        CachableConfig(PDL))
-
-    @GetMapping("cache/keys/{cache}")
-    fun keys(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-             cache: Caches) =
-        Caches.forNavn(cache.name).flatMap {
-            cacheClient.getAllKeys(it)
-        }.toSortedSet()
-
-    @GetMapping("cache/{cache}/{id}")
-    fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-            cache: Caches, id: String) =
-        Caches.forNavn(cache.name)
-            .mapNotNull { cacheClient.getOne(id, it) }
-            .toSet()
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable  id: String) = graphql.partnere(id)

@@ -10,8 +10,6 @@ import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomJPAAdapter
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Identer
@@ -37,8 +35,6 @@ import java.util.*
 @Tag(name = "DevTilgangController", description = "Denne kontrolleren skal kun brukes til testing")
 class DevTilgangController(
     private val graphql: PdlSyncGraphQLClientAdapter,
-    private val skjerming: SkjermingTjeneste,
-    private val skjermingAdapter: SkjermingRestClientAdapter,
     private val overstyring: OverstyringTjeneste,
     private val oppfølging: OppfølgingTjeneste,
     private val nom: NomJPAAdapter) {
@@ -92,15 +88,6 @@ class DevTilgangController(
     )
     fun overstyringer(@PathVariable ansattId: AnsattId, @RequestBody brukerIds: List<BrukerId>) = overstyring.overstyringer(ansattId, brukerIds)
 
-
-    @PostMapping("skjermingadaptere")
-    fun skjermingAdapter(@RequestBody brukerId: String) = skjermingAdapter.skjerming(brukerId)
-
-    @PostMapping("skjerming")
-    fun skjerming(@RequestBody brukerId: BrukerId) = skjerming.skjerming(brukerId)
-
-    @PostMapping("skjerminger")
-    fun skjerminger(@RequestBody ids: List<BrukerId>) = skjerming.skjerminger(ids)
 
 
 }

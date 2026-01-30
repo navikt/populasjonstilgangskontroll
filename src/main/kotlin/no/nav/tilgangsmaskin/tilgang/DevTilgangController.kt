@@ -13,19 +13,15 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
-import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -43,15 +39,10 @@ class DevTilgangController(
     private val graphql: PdlSyncGraphQLClientAdapter,
     private val skjerming: SkjermingTjeneste,
     private val skjermingAdapter: SkjermingRestClientAdapter,
-    private val brukere: BrukerTjeneste,
     private val overstyring: OverstyringTjeneste,
     private val oppfølging: OppfølgingTjeneste,
-    private val pip: PdlRestClientAdapter,
-    private val nom: NomJPAAdapter,
-    private val pdl: PDLTjeneste) {
-
-    private val log = getLogger(javaClass)
-
+    private val nom: NomJPAAdapter) {
+    
     @PostMapping("oppfolging/{uuid}/{kontor}/registrer")
     fun registrer(@RequestBody identer : Identer,@PathVariable uuid: UUID, @PathVariable kontor: Enhetsnummer) =
         oppfølging.registrer(uuid, identer, Kontor(kontor))
@@ -66,19 +57,6 @@ class DevTilgangController(
 
     @GetMapping("sivilstand/{id}")
     fun sivilstand(@PathVariable  id: String) = graphql.partnere(id)
-
-    @PostMapping("brukeridentifikator")
-    fun brukerIdentifikator(@RequestBody id: Identifikator) = brukere.brukerMedUtvidetFamilie(id.verdi)
-
-    @GetMapping("bruker/{id}")
-    fun bruker(@PathVariable id: String) = brukere.brukerMedUtvidetFamilie(id)
-
-    @GetMapping("person/{id}")
-    fun person(@PathVariable id: String) = pdl.medUtvidetFamile(id)
-
-    @GetMapping("person/pip/{id}")
-    fun pip(@PathVariable id: String) = pip.person(id)
-
 
 
     @Operation(
@@ -124,7 +102,5 @@ class DevTilgangController(
     @PostMapping("skjerminger")
     fun skjerminger(@RequestBody ids: List<BrukerId>) = skjerming.skjerminger(ids)
 
-    @PostMapping("brukere")
-    fun brukere(@RequestBody ids: Set<String>) = brukere.brukere(ids)
 
 }

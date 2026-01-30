@@ -2,7 +2,6 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 val javaVersion = JavaLanguageVersion.of(25)
 val springdocVersion = "3.0.1"
-val tokenSupportVersion = "6.0.1"
 val mockkVersion = "1.14.7"
 val kotestVersion = "6.1.0"
 val otelVersion = "2.24.0"
@@ -71,8 +70,8 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
     implementation("no.nav.boot:boot-conditionals:$conditionalsVersion")
-    implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
-    implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.apache.httpcomponents.client5:httpclient5")
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.apache.commons:commons-pool2:$poolsVersion")

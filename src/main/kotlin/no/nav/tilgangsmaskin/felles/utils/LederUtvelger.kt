@@ -27,7 +27,7 @@ class LederUtvelger(private val builder: Builder,
                     private val publisher: ApplicationEventPublisher) {
 
     protected val log = getLogger(javaClass)
-    private lateinit var subscription: Disposable
+    private var subscription: Disposable? = null
 
     @Volatile
     private var shuttingDown = false
@@ -42,7 +42,7 @@ class LederUtvelger(private val builder: Builder,
                     .retrieve()
                     .bodyToFlux<LederUtvelgerRespons>()
             }
-            .doOnError { error -> log.error("SSE connection failed permanently: ${error.message}", error) }
+            .doOnError { error -> log.error("SSE connection failed permanently: \\${error.message}", error) }
             .doOnSubscribe { log.trace("SSE subscribe") }
             .doOnNext { log.trace("SSE next: {} ", it) }
             .retryWhen(
@@ -57,12 +57,12 @@ class LederUtvelger(private val builder: Builder,
                                 error is PrematureCloseException ||
                                 error.cause is PrematureCloseException
                     }
-                .doBeforeRetry { log.info("SSE retry ${it.failure().message}") }
-                .doAfterRetry { log.info("SSE connection retry after ${it.totalRetriesInARow()} attempts") }
+                .doBeforeRetry { log.info("SSE retry \\${it.failure().message}") }
+                .doAfterRetry { log.info("SSE connection retry after \\${it.totalRetriesInARow()} attempts") }
             )
             .subscribe(
                 { publisher.publishEvent(LeaderChangedEvent(this, it.name)) },
-                { error -> log.warn("SSE error: ${error.message}", error) }
+                { error -> log.warn("SSE error: \\${error.message}", error) }
             )
     }
 
@@ -70,7 +70,7 @@ class LederUtvelger(private val builder: Builder,
     fun onShutdown() {
         log.info("SSE Application shutting down")
         shuttingDown = true
-        subscription.dispose()
+        subscription?.dispose()
     }
 
     private data class LederUtvelgerRespons(val name: String, val last_update: LocalDateTime)

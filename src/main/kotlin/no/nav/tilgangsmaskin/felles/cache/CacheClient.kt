@@ -16,33 +16,30 @@ import kotlin.reflect.KClass
 
 @Component
 @RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
- class CacheClient(client: RedisClient, val handler: CacheNøkkelHandler,
-    val alleTreffTeller: BulkCacheSuksessTeller,
-    val teller: BulkCacheTeller) : CacheOperations {
+ class CacheClient(client: RedisClient, private val handler: CacheNøkkelHandler,
+    private val alleTreffTeller: BulkCacheSuksessTeller,
+    private val teller: BulkCacheTeller) : CacheOperations {
 
     private val log = getLogger(javaClass)
 
-    val conn = client.connect().apply {
+    private val conn = client.connect().apply {
         timeout = Duration.ofSeconds(30)
         if (isLocalOrTest) {
             sync().configSet("notify-keyspace-events", "Exd")
         }
     }
 
-    //@RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
     @WithSpan
     override fun delete(id: String, cache: CachableConfig) =
         conn.sync().del(handler.tilNøkkel(cache, id))
 
 
-    //@RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
     @WithSpan
     override fun <T : Any> getOne(id: String, cache: CachableConfig, clazz: KClass<T>): T? =
         conn.sync().get(handler.tilNøkkel(cache, id))?.let { json ->
             handler.fraJson(json, clazz)
         }
 
-    //@RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
     @WithSpan
     override fun putOne(id: String, cache: CachableConfig, value: Any, ttl: Duration) {
         conn.async().setex(handler.tilNøkkel(cache, id), ttl.seconds, handler.tilJson(value))
@@ -51,7 +48,6 @@ import kotlin.reflect.KClass
      fun getAllKeys(cache: CachableConfig) =
         conn.sync().keys("${cache.name}::*")
 
-    //@RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
     @WithSpan
     override fun <T : Any> getMany(ids: Set<String>, cache: CachableConfig, clazz: KClass<T>): Map<String, T?> =
         if (ids.isEmpty()) {
@@ -64,7 +60,6 @@ import kotlin.reflect.KClass
                 .also { tellOgLog(cache.name, it.size, ids.size) }
         }
 
-    //@RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
     @WithSpan
     override fun putMany(innslag: Map<String, Any>, cache: CachableConfig, ttl: Duration) {
         if (innslag.isNotEmpty()) {

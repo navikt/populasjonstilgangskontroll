@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
-import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
@@ -36,11 +35,14 @@ import org.springframework.http.HttpStatus.PAYLOAD_TOO_LARGE
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 
 @SecurityScheme(bearerFormat = "JWT", name = "bearerAuth", scheme = "bearer", type = HTTP)
-@ProtectedRestController(value = ["/api/v1"], issuer = AAD_ISSUER, claimMap = [])
+@RestController
+@RequestMapping("/api/v1")
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "TilgangController", description = "Denne kontrolleren skal brukes i produksjon")
 class TilgangController(

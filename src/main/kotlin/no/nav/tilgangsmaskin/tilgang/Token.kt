@@ -2,19 +2,19 @@ package no.nav.tilgangsmaskin.tilgang
 
 import io.micrometer.core.instrument.Tag
 import no.nav.boot.conditionals.Cluster.LOCAL
-import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class Token(private val contextHolder: TokenValidationContextHolder) {
-
+class Token {
 
     val globaleGruppeIds
         get() =
-            claimSet()?.getAsList("groups")
+            jwt()?.getClaimAsStringList("groups")
                 ?.mapNotNull { UUID.fromString(it) }
                 ?: emptyList()
 
@@ -22,8 +22,11 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
     val system get() = stringClaim(AZP_NAME)  ?: UTILGJENGELIG
     val oid get() = stringClaim(OID)?.let { UUID.fromString(it) }
     val ansattId get() = stringClaim(NAVIDENT)?.let { AnsattId(it) }
-    private fun stringClaim(name: String) = claimSet()?.getStringClaim(name)
-    private fun claimSet() = runCatching { contextHolder.getTokenValidationContext().getClaims(AAD_ISSUER) }.getOrNull()
+    private fun stringClaim(name: String) = jwt()?.getClaimAsString(name)
+    private fun jwt(): Jwt? = runCatching { 
+        SecurityContextHolder.getContext().authentication?.principal as? Jwt 
+    }.getOrNull()
+    
     val clusterAndSystem get() = system.split(":").let { parts ->
         if (parts.size == 3) "${parts[2]}:${parts[0]}" else system
     }

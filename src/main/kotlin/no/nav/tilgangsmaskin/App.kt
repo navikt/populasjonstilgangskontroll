@@ -1,7 +1,5 @@
 package no.nav.tilgangsmaskin
 
-import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
-import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.current
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.profiler
@@ -23,12 +21,10 @@ import org.springframework.stereotype.Component
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
-@EnableOAuth2Client(cacheEnabled = true)
 @EnableCaching
 @EnableResilientMethods
 @EnableJpaAuditing
 @EnableScheduling
-@EnableJwtTokenValidation(ignore = ["org.springdoc", "org.springframework"])
 class App
 
 fun main(args: Array<String>) {

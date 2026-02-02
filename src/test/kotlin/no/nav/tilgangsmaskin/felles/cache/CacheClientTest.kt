@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.felles.cache
 import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
 import io.lettuce.core.RedisClient.create
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry
+import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import no.nav.tilgangsmaskin.TestApp
@@ -27,6 +27,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration
+import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Import
@@ -43,6 +44,7 @@ import java.util.concurrent.TimeUnit.*
 @DataRedisTest
 @ContextConfiguration(classes = [TestApp::class])
 @Testcontainers
+@AutoConfigureMetrics
 @TestInstance(PER_CLASS)
 @ExtendWith(MockKExtension::class)
 @Import(JacksonAutoConfiguration::class)
@@ -53,6 +55,10 @@ class CacheClientTest {
         addModule(Builder().build())
         addModule(JacksonTypeInfoAddingValkeyModule())
     }.build()
+
+
+    @Autowired
+    private lateinit var meterRegistry:  MeterRegistry
 
     @MockkBean
     private lateinit var token: Token
@@ -72,8 +78,6 @@ class CacheClientTest {
     fun setUp() {
         every { token.system } returns "test"
         every { token.clusterAndSystem } returns "test:dev-gcp"
-
-        val meterRegistry = SimpleMeterRegistry()
 
         val mgr = builder(cf)
             .withInitialCacheConfigurations(mapOf(
@@ -99,10 +103,10 @@ class CacheClientTest {
     @Test
     fun putAndGetOnePdl() {
         client.putOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, person1, Duration.ofSeconds(1))
-        val one = client.getOne<Person>(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE)
+        val one = client.getOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, Person::class)
         assertThat(one).isEqualTo(person1)
         await.atMost(3, SECONDS).until {
-            client.getOne<Person>(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE) == null
+            client.getOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, Person::class) == null
         }
     }
     @Test
@@ -111,12 +115,12 @@ class CacheClientTest {
         client.putMany(mapOf(person1.brukerId.verdi to person1, person2.brukerId.verdi to person2),
             PDL_MED_FAMILIE_CACHE,
             Duration.ofSeconds(1))
-        val many = client.getMany<Person>(ids, PDL_MED_FAMILIE_CACHE)
+        val many = client.getMany(ids, PDL_MED_FAMILIE_CACHE, Person::class)
         assertThat(many.keys).containsExactlyInAnyOrderElementsOf(ids)
         val nøkler = client.getAllKeys(PDL_MED_FAMILIE_CACHE).map { CacheNøkkelElementer(it).id }
         assertThat(nøkler).containsExactlyInAnyOrderElementsOf(ids)
         await.atMost(3, SECONDS).until {
-            client.getMany<Person>(ids, PDL_MED_FAMILIE_CACHE).isEmpty()
+            client.getMany(ids, PDL_MED_FAMILIE_CACHE, Person::class).isEmpty()
         }
     }
 
@@ -125,5 +129,3 @@ class CacheClientTest {
        private val redis = RedisContainer("redis:6.2.2")
     }
 }
-
-

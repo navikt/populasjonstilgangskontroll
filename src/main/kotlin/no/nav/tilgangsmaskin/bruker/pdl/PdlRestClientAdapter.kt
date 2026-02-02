@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
-import no.nav.tilgangsmaskin.felles.cache.CacheClient
+import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
@@ -17,7 +17,7 @@ import tools.jackson.module.kotlin.readValue
 class PdlRestClientAdapter(
     @Qualifier(PDL) restClient: RestClient,
     private val cf: PdlConfig,
-    private val cache: CacheClient,
+    private val cache: CacheOperations,
     private val mapper: JsonMapper) : AbstractRestClientAdapter(restClient, cf) {
 
     @WithSpan
@@ -49,9 +49,9 @@ class PdlRestClientAdapter(
         if (identer.isEmpty()) {
             return emptyMap()
         }
-        val innslag = cache.getMany<Person>(identer, PDL_MED_FAMILIE_CACHE)
+        val innslag = cache.getMany(identer, PDL_MED_FAMILIE_CACHE, Person::class)
         log.trace("Hentet ${innslag.size} person(er) fra cache for ${identer.size} ident(er)")
-        return innslag
+        return innslag.filterValues { it != null }.mapValues { it.value!! }
     }
 
     @WithSpan

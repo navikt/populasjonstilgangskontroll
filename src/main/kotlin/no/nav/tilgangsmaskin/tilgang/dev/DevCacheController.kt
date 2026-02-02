@@ -27,13 +27,13 @@ class DevCacheController(
 
 
     @PostMapping("cache/skjerminger")
-    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany<Boolean>(navIds,
-        CachableConfig(SKJERMING))
+    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany(navIds,
+        CachableConfig(SKJERMING), Boolean::class)
 
 
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany<Person>(navIds.map { it.verdi }.toSet(),
-        CachableConfig(PDL))
+    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany(navIds.map { it.verdi }.toSet(),
+        CachableConfig(PDL), Person::class)
 
     @GetMapping("cache/keys/{cache}")
     fun keys(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
@@ -41,11 +41,4 @@ class DevCacheController(
         Caches.forNavn(cache.name).flatMap {
             cacheClient.getAllKeys(it)
         }.toSortedSet()
-
-    @GetMapping("cache/{cache}/{id}")
-    fun key(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)
-            cache: Caches, id: String) =
-        Caches.forNavn(cache.name)
-            .mapNotNull { cacheClient.getOne(id, it) }
-            .toSet()
 }

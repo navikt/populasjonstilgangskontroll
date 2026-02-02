@@ -46,7 +46,10 @@ import kotlin.reflect.KClass
     }
 
      fun getAllKeys(cache: CachableConfig) =
-        conn.sync().keys("${cache.name}::*")
+        if (isLocalOrTest) {
+            conn.sync().keys("${cache.name}::*")
+        }
+    else throw UnsupportedOperationException("getAllKeys is only supported in local or test environments")
 
     @WithSpan
     override fun <T : Any> getMany(ids: Set<String>, cache: CachableConfig, clazz: KClass<T>): Map<String, T?> =

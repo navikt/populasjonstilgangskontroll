@@ -4,7 +4,6 @@ import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
 import io.lettuce.core.RedisClient.create
 import io.micrometer.core.instrument.MeterRegistry
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import no.nav.tilgangsmaskin.TestApp

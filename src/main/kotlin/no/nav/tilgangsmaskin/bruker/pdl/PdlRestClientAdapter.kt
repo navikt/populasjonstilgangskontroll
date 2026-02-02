@@ -50,7 +50,7 @@ class PdlRestClientAdapter(
             return emptyMap()
         }
         val innslag = cache.getMany(identer, PDL_MED_FAMILIE_CACHE, Person::class)
-        log.trace("Hentet ${innslag.size} person(er) fra cache for ${identer.size} ident(er)")
+        log.trace("Hentet ${innslag.size} person(er) fra cache for ${identer.size} ident(er)")
         return innslag.filterValues { it != null }.mapValues { it.value!! }
     }
 

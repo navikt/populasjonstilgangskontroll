@@ -93,7 +93,6 @@ class RegelTjenesteTest {
 
     @BeforeTest
     fun before() {
-        //val registry = SimpleMeterRegistry()
         evalueringTeller = EvalueringTeller(registry, token)
         avdød = AvdødTeller(registry, token)
         every { validator.validerKonsument() } returns Unit

@@ -20,13 +20,12 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
 
     override val cacheName: String = GRAPH
 
-    override fun doOppfrisk(elementer: CacheNøkkelElementer) {
-        when (elementer.metode) {
-            GEO -> oppfriskMedMetode(elementer,GEO)
-            GEO_OG_GLOBALE -> oppfriskMedMetode(elementer,GEO_OG_GLOBALE)
-            else -> log.warn("Ukjent metode ${elementer.metode} i nøkkel ${elementer.nøkkel}")
-        }
-    }
+    override fun doOppfrisk(elementer: CacheNøkkelElementer) =
+        if (elementer.metode == GEO || elementer.metode == GEO_OG_GLOBALE)
+            oppfriskMedMetode(elementer, elementer.metode)
+        else
+            log.warn("Ukjent metode ${elementer.metode} i nøkkel ${elementer.nøkkel}")
+
 
     private fun oppfriskMedMetode(elementer: CacheNøkkelElementer, metode: String) {
         val ansattId = AnsattId(elementer.id)

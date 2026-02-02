@@ -57,8 +57,8 @@ class LederUtvelger(private val builder: Builder,
                                 error is PrematureCloseException ||
                                 error.cause is PrematureCloseException
                     }
-                .doBeforeRetry { log.info("SSE retry \\${it.failure().message}") }
-                .doAfterRetry { log.info("SSE connection retry after \\${it.totalRetriesInARow()} attempts") }
+                .doBeforeRetry { log.info("SSE retry ${it.failure().message}") }
+                .doAfterRetry { log.info("SSE connection retry after ${it.totalRetriesInARow()} attempts") }
             )
             .subscribe(
                 { publisher.publishEvent(LeaderChangedEvent(this, it.name)) },

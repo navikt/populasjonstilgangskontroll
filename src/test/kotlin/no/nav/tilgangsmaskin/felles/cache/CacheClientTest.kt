@@ -54,14 +54,9 @@ class CacheClientTest {
         addModule(JacksonTypeInfoAddingValkeyModule())
     }.build()
 
-
     @MockkBean
     private lateinit var token: Token
 
-    /*
-    @MockkBean
-    private lateinit var manager: CacheManager
-*/
     @Autowired
     lateinit var eventPublisher: ApplicationEventPublisher
 

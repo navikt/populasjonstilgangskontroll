@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.utils
 
-import jakarta.annotation.PreDestroy
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.event.ApplicationReadyEvent
@@ -11,15 +10,14 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient.Builder
 import org.springframework.web.reactive.function.client.WebClientRequestException
-import org.springframework.web.reactive.function.client.bodyToFlux
+import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.Disposable
-import reactor.core.publisher.Mono
 import reactor.netty.http.client.PrematureCloseException
-import reactor.util.retry.Retry
+import reactor.util.retry.Retry.backoff
 import java.net.URI
-import java.time.Duration
+import java.time.Duration.ofSeconds
 import java.time.LocalDateTime
-import kotlin.text.get
+import kotlin.Long.Companion.MAX_VALUE
 
 @Component
 class LederUtvelger(private val builder: Builder,
@@ -34,35 +32,33 @@ class LederUtvelger(private val builder: Builder,
 
     @EventListener(ApplicationReadyEvent::class)
     fun onApplicationReady() {
-        subscription = Mono.delay(Duration.ofMillis(500))
-            .flatMapMany {
+        subscription =
                 builder.build()
                     .get()
                     .uri(uri)
                     .retrieve()
-                    .bodyToFlux<LederUtvelgerRespons>()
-            }
-            .doOnError { error -> log.error("SSE connection failed permanently: \\${error.message}", error) }
+                    .bodyToMono<LederUtvelgerRespons>()
+            .doOnError { log.error("SSE connection feilet for godt: ${it.message}", it) }
             .doOnSubscribe { log.trace("SSE subscribe") }
             .doOnNext { log.trace("SSE next: {} ", it) }
             .retryWhen(
-                Retry.backoff(Long.MAX_VALUE, Duration.ofSeconds(1))
-                    .maxBackoff(Duration.ofSeconds(30))
-                    .filter { error ->
+                backoff(MAX_VALUE, ofSeconds(1))
+                    .maxBackoff(ofSeconds(30))
+                    .filter {
                         if (shuttingDown) {
-                            log.info("SSE Application shutting down, stopping retries")
+                            log.info("SSE shutdown, slutt med retries")
                             return@filter false
                         }
-                        error is WebClientRequestException ||
-                                error is PrematureCloseException ||
-                                error.cause is PrematureCloseException
+                        it is WebClientRequestException ||
+                                it is PrematureCloseException ||
+                                it.cause is PrematureCloseException
                     }
                 .doBeforeRetry { log.info("SSE retry ${it.failure().message}") }
-                .doAfterRetry { log.info("SSE connection retry after ${it.totalRetriesInARow()} attempts") }
+                .doAfterRetry { log.info("SSE connection retry etter ${it.totalRetriesInARow()} forsøk") }
             )
             .subscribe(
                 { publisher.publishEvent(LeaderChangedEvent(this, it.name)) },
-                { error -> log.warn("SSE error: \\${error.message}", error) }
+                { log.warn("SSE error: ${it.message}", it) }
             )
     }
 

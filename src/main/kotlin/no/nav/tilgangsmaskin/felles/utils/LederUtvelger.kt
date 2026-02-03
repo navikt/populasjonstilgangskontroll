@@ -10,6 +10,7 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient.Builder
 import org.springframework.web.reactive.function.client.WebClientRequestException
+import org.springframework.web.reactive.function.client.bodyToFlux
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.Disposable
 import reactor.netty.http.client.PrematureCloseException
@@ -37,7 +38,7 @@ class LederUtvelger(private val builder: Builder,
                     .get()
                     .uri(uri)
                     .retrieve()
-                    .bodyToMono<LederUtvelgerRespons>()
+                    .bodyToFlux<LederUtvelgerRespons>()
             .doOnError { log.error("SSE connection feilet for godt: ${it.message}", it) }
             .doOnSubscribe { log.trace("SSE subscribe") }
             .doOnNext { log.trace("SSE next: {} ", it) }

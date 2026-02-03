@@ -53,8 +53,8 @@ class LederUtvelger(private val builder: Builder,
                                 it is PrematureCloseException ||
                                 it.cause is PrematureCloseException
                     }
-                .doBeforeRetry { log.info("SSE retry ${it.failure().message}") }
-                .doAfterRetry { log.info("SSE connection retry etter ${it.totalRetriesInARow()} forsøk") }
+                .doBeforeRetry { log.info("SSE retry ${it.failure().message}",it) }
+                .doAfterRetry { log.info("SSE connection retry etter ${it.totalRetriesInARow()} forsøk", it.failure()) }
             )
             .subscribe(
                 { publisher.publishEvent(LeaderChangedEvent(this, it.name)) },

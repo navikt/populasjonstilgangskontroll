@@ -40,8 +40,8 @@ class LederUtvelger(private val builder: Builder,
                     .retrieve()
                     .bodyToFlux<LederUtvelgerRespons>()
             .doOnError { log.error("SSE connection feilet for godt: ${it.message}", it) }
-            .doOnSubscribe { log.trace("SSE subscribe") }
-            .doOnNext { log.trace("SSE next: {} ", it) }
+            .doOnSubscribe { log.info("SSE subscribe") }
+            .doOnNext { log.info("SSE next: {} ", it) }
             .retryWhen(
                 backoff(MAX_VALUE, ofSeconds(1))
                     .maxBackoff(ofSeconds(30))

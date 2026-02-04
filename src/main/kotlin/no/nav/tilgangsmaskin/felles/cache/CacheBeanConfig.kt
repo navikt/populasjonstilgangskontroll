@@ -60,5 +60,3 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             }
 }
 
-
-class AllCaches(val map: Map<String,List<CachableConfig>>)

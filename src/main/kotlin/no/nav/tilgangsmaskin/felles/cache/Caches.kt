@@ -16,6 +16,7 @@ enum class Caches(vararg val  caches: CachableConfig) {
     GRAPH(*ENTRA_CACHES.toTypedArray());
 
     companion object {
-        fun forNavn(navn: String) = entries.first { it.name == navn }.caches
+        fun forNavn(navn: String) =
+            entries.first { it.name == navn }.caches
     }
 }

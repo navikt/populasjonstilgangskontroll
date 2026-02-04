@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.felles.cache
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import tools.jackson.databind.json.JsonMapper
-import tools.jackson.module.kotlin.readValue
 import kotlin.reflect.KClass
 
 class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration?>, val mapper: JsonMapper) {

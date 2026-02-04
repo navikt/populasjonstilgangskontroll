@@ -23,13 +23,13 @@ import org.springframework.stereotype.Component
             log.warn("Uventet hendelse på $kanal med nøkkel $nøkkel")
         }
         else {
-            publiserer.publishEvent(CacheInnslagFjernetHendelse(nøkkel))
+            publiserer.publishEvent(CacheInnslagFjernetEvent(nøkkel))
         }
     }
     companion object {
         private const val KANAL = "__keyevent@0__:expired"
     }
-    data class CacheInnslagFjernetHendelse(val nøkkel: String) : ApplicationEvent(nøkkel)
+    data class CacheInnslagFjernetEvent(val nøkkel: String) : ApplicationEvent(nøkkel)
 }
 
 

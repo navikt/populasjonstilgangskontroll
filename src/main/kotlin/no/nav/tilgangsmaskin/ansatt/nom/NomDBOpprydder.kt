@@ -25,16 +25,13 @@ class NomDBOpprydder(registry: MeterRegistry, private val nom: NomTjeneste) : Le
     }
 
     @Scheduled(fixedRate = 24, timeUnit = HOURS)
-    fun ryddOpp(): Int {
-        if (!erLeder) {
-            log.info("Vaktmester er ikke leder, hopper over rydding i Nom-databasen")
-            return 0
+    fun ryddOpp() =
+        somLeder({0},"daglig opprydding i Nom-databasen") {
+            log.info("Vaktmester rydder opp i Nom-databasen")
+            val antall = nom.ryddOpp()
+            antallKall.increment()
+            counter.increment(antall.toDouble())
+            antall
         }
-        log.info("Vaktmester rydder opp i Nom-databasen")
-        val antall = nom.ryddOpp()
-        antallKall.increment()
-        counter.increment(antall.toDouble())
-        return antall
-    }
 }
 

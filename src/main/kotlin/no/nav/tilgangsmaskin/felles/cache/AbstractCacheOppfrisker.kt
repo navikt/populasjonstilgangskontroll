@@ -12,29 +12,18 @@ abstract class AbstractCacheOppfrisker : CacheOppfrisker {
 
     @WithSpan
     final override fun oppfrisk(elementer: CacheNøkkelElementer) {
-        val duration = measureTimeMillis {
+        val varighet = measureTimeMillis {
             runCatching {
                 doOppfrisk(elementer)
                 log.info("Oppfrisking av ${elementer.cacheName}::${elementer.id.maskFnr()} OK")
             }.getOrElse {
-                loggOppfriskingFeilet(elementer, it)
+                oppfriskingFeilet(elementer, it)
             }
         }
-        log.info("Oppfrisking tok ${duration}ms for ${elementer.cacheName}::${elementer.id.maskFnr()}")
+        log.info("Oppfrisking tok ${varighet}ms for ${elementer.cacheName}::${elementer.id.maskFnr()}")
     }
-  protected fun loggOppfriskingFeilet(elementer: CacheNøkkelElementer, feil: Throwable) {
-        log.warn("Oppfrisking av ${elementer.cacheName}::${elementer.id.maskFnr()} feilet", feil)
+  protected fun oppfriskingFeilet(elementer: CacheNøkkelElementer, e: Throwable) {
+        log.warn("Oppfrisking av ${elementer.cacheName}::${elementer.id.maskFnr()} feilet", e)
     }
 }
 
-interface CacheOppfrisker {
-    val cacheName: String
-    fun oppfrisk(elementer: CacheNøkkelElementer)
-}
-
-data class CacheNøkkelElementer(val nøkkel: String) {
-    private val elementer = nøkkel.split("::", ":")
-    val cacheName = elementer.first()
-    val metode = if (elementer.size > 2) elementer[1] else null
-    val id = elementer.last()
-}

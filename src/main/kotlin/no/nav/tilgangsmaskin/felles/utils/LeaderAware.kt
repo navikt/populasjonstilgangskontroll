@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.event.EventListener
 import java.net.InetAddress
 
-abstract class LeaderAware(var erLeder: Boolean = false) {
+abstract class LeaderAware(private var erLeder: Boolean = false) {
     private val hostname = InetAddress.getLocalHost().hostName
     protected open fun doHandleLeaderChange()  = Unit
 
@@ -14,12 +14,23 @@ abstract class LeaderAware(var erLeder: Boolean = false) {
     @EventListener(LeaderChangedEvent::class)
     fun onApplicationEvent(event: LeaderChangedEvent) {
         erLeder = event.leder == hostname
+        somLeder({ }, "håndtering av lederbytte") {
+            log.info("Denne instansen ($hostname) ER nå leder")
+            doHandleLeaderChange()
+        }
         if (erLeder) {
-            log.info("Denne instansen ($hostname) er nå leder")
+            log.info("Denne instansen ($hostname) ER nå leder")
             doHandleLeaderChange()
         }
         else {
             log.info("Denne instansen ($hostname) er IKKE leder, lederen er ${event.leder}")
         }
+    }
+    protected fun <T> somLeder(default: () -> T, beskrivelse : String,block: () -> T): T = if (erLeder) {
+        log.info("Kjører $beskrivelse som leder")
+        block()
+    } else {
+        log.info("Kjører ikke $beskrivelse som leder, returnerer default")
+        default()
     }
 }

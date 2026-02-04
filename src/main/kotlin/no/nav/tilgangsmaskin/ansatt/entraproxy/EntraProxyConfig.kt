@@ -14,7 +14,11 @@ class EntraProxyConfig(
 
 
     fun brukerURI(navIdent: String) = builder().apply {
-        path(USERS_PATH)
+        path(ANSATT_PATH)
+    }.build(navIdent)
+
+    fun enheterURI(navIdent: String) = builder().apply {
+        path(ENHETER_PATH)
     }.build(navIdent)
 
 
@@ -23,7 +27,8 @@ class EntraProxyConfig(
     companion object {
         private val DEFAULT_URI = URI.create("http://entra-proxy.sikkerhetstjenesten")
         const val ENTRAPROXY = "entra-proxy"
-        private const val USERS_PATH = "/api/v1/ansatt/{navIdent}"
+        private const val ANSATT_PATH = "/api/v1/ansatt/{navIdent}"
+        private const val ENHETER_PATH = "/api/v1/enhet/ansatt/{navIdent}"
         private const val DEFAULT_PING_PATH = "/monitoring/health/liveness"
     }
 }

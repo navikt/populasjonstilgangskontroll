@@ -18,9 +18,8 @@ import org.springframework.web.bind.annotation.PathVariable
 @Tag(name = "DevAnsattController", description = "Denne kontrolleren skal kun brukes til testing")
 class DevAnsattController(
     private val ansatte: AnsattTjeneste,
-    private val proxy: EntraProxyTjeneste,
-    private val oid: AnsattOidTjeneste,
-    private val entra: EntraTjeneste) {
+    private val proxy: EntraProxyTjeneste) {
+    
     @GetMapping("{ansattId}")
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)
 
@@ -28,6 +27,6 @@ class DevAnsattController(
     fun enhet(@PathVariable ansattId: AnsattId) = proxy.enhet(ansattId)
 
     @GetMapping("enheter/{ansattId}")
-    fun enheter(@PathVariable ansattId: AnsattId) = entra.geoOgGlobaleGrupper(ansattId, oid.oidFraEntra(ansattId)).filter { it.displayName.contains("ENHET") }
+    fun enheter(@PathVariable ansattId: AnsattId) = proxy.enheter(ansattId)
 
 }

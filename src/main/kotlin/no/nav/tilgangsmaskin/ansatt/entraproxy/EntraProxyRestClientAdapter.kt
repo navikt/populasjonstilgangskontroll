@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
 
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRAPROXY
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
@@ -12,5 +13,8 @@ class EntraProxyRestClientAdapter(@Qualifier(ENTRAPROXY) restClient: RestClient,
 
     fun enhetForAnsatt(ansattId: String) =
         get<EntraProxyAnsatt>(cf.brukerURI(ansattId)).enhet
+
+    fun enheterForAnsatt(ansattId: String) =
+        get<Set<Enhet>>(cf.enheterURI(ansattId))
 
 }

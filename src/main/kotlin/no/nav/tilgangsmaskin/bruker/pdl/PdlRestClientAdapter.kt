@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
+import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler.Companion.IDENTIFIKATOR
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
@@ -27,7 +28,7 @@ class PdlRestClientAdapter(
         }
 
     @WithSpan
-    fun person(oppslagId: String) = tilPerson(oppslagId,get<PdlRespons>(cf.personURI, mapOf("ident" to oppslagId)))
+    fun person(oppslagId: String) = tilPerson(oppslagId,get<PdlRespons>(cf.personURI, mapOf("ident" to oppslagId,IDENTIFIKATOR to oppslagId)))
 
     @WithSpan
     fun personer(identer: Set<String>) : Set<Person> {

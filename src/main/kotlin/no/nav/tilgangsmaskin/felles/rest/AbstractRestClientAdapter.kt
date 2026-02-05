@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler.Companion.IDENTIFIKATOR
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatusCode
@@ -21,7 +22,7 @@ abstract class AbstractRestClientAdapter(
         restClient.get()
             .uri(uri)
             .accept(APPLICATION_JSON)
-            .headers { it.setAll(headers) }
+            .headers { it.setAll(headers.filterKeys { key -> key != IDENTIFIKATOR }) }
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
             .body<T>() ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)

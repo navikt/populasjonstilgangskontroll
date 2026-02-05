@@ -12,14 +12,16 @@ class RetryLogger {
 
     @EventListener(MethodRetryEvent::class)
     fun onEvent(event: MethodRetryEvent) {
-        if (!event.isRetryAborted) {
-            return
+        if (event.isRetryAborted) {
+            when (val failure = event.failure) {
+                is NotFoundRestException -> log.info("Aborterer metode ${event.method.name}  siden ${failure.identifikator} ikke ble funnet", failure)
+
+                is IrrecoverableRestException -> log.warn("Aborterer metode ${event.method.name}", failure)
+            }
         }
-        val failure = event.failure
-        if (failure is IrrecoverableRestException && failure.status == HttpStatus.NOT_FOUND) {
-            log.info("Aborting method ${event.method.name} not found ", failure)
-        } else {
-            log.warn("Aborting method ${event.method.name}  exhausted", failure)
+        else {
+            log.info("Retry ${event.method.name} grunnet", event.failure)
         }
+
     }
 }

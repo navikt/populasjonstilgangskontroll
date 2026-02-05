@@ -16,7 +16,7 @@ class RetryLogger {
             when (val failure = event.failure) {
                 is NotFoundRestException -> log.info("Aborterer metode ${event.method.name}  siden ${failure.identifikator} ikke ble funnet", failure)
 
-                is IrrecoverableRestException -> log.warn("Aborterer metode ${event.method.name}", failure)
+                else -> log.warn("Aborterer metode ${event.method.name}", failure)
             }
         }
         else {

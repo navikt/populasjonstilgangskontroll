@@ -37,7 +37,7 @@ class DefaultRestErrorHandler : ErrorHandler {
 }
 
 open class IrrecoverableRestException(
-        status: HttpStatusCode, uri: URI, msg: String = (status as HttpStatus).reasonPhrase,
+        val status: HttpStatusCode, uri: URI, msg: String = (status as HttpStatus).reasonPhrase,
         cause: Throwable? = null) : ErrorResponseException(status, problemDetail(status, msg, uri), cause)
 
 open class RecoverableRestException(

@@ -198,7 +198,7 @@
     "max": "2Gi"
   },
   "cpu": {
-    "min": "40m"
+    "min": "90m"
   },
   "replica": {
     "min": 8,

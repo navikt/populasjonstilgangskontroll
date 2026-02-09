@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.utils
 
+import jakarta.annotation.PreDestroy
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.event.ApplicationReadyEvent
@@ -63,9 +64,16 @@ class LederUtvelger(private val builder: Builder,
             )
     }
 
+    @PreDestroy
+    fun onPreDestroy() {
+        log.info("SSE Application shutting down (PreDestroy)")
+        shuttingDown = true
+        subscription?.dispose()
+    }
+
     @EventListener(ContextClosedEvent::class)
     fun onShutdown() {
-        log.info("SSE Application shutting down")
+        log.info("SSE Application shutting down (ContextClosed)")
         shuttingDown = true
         subscription?.dispose()
     }

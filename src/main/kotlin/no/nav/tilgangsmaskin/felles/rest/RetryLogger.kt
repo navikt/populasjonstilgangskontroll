@@ -20,7 +20,7 @@ class RetryLogger {
             }
         }
         else {
-            log.info("Retry ${event.method.name} grunnet", event.failure)
+            log.info("Retry ${event.method.name} grunnet ${event.failure.javaClass.simpleName}", event.failure)
         }
 
     }

@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import no.nav.tilgangsmaskin.bruker.Identifikator
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpRequest
@@ -19,10 +20,12 @@ class DefaultRestErrorHandler : ErrorHandler {
     private val log = getLogger(javaClass)
 
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
+        val ident = req.headers.getFirst(IDENTIFIKATOR)?.let { Identifikator(it) }
+
         when {
             res.statusCode == NOT_FOUND -> {
                 log.info("Irrecoverable exception etter ${res.statusCode.value()} fra ${req.uri}")
-                throw IrrecoverableRestException(res.statusCode, req.uri, res.statusText)
+                throw NotFoundRestException(req.uri, ident)
             }
             res.statusCode.is4xxClientError -> {
                 log.warn("Irrecoverable exception etter ${res.statusCode.value()} fra ${req.uri}")
@@ -34,11 +37,20 @@ class DefaultRestErrorHandler : ErrorHandler {
             }
         }
     }
+    companion object {
+       const val IDENTIFIKATOR =  "X-Identifikator"
+    }
+
 }
 
 open class IrrecoverableRestException(
-        status: HttpStatusCode, uri: URI, msg: String = (status as HttpStatus).reasonPhrase,
+        val status: HttpStatusCode, uri: URI, msg: String = (status as HttpStatus).reasonPhrase,
         cause: Throwable? = null) : ErrorResponseException(status, problemDetail(status, msg, uri), cause)
+
+class NotFoundRestException(
+        val uri: URI,
+        val identifikator: Identifikator? = null,
+        cause: Throwable? = null) : IrrecoverableRestException(NOT_FOUND, uri, cause = cause)
 
 open class RecoverableRestException(
         status: HttpStatusCode,

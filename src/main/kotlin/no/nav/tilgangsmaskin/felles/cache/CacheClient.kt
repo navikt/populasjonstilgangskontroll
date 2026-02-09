@@ -30,7 +30,7 @@ import kotlin.reflect.KClass
     }
 
     @WithSpan
-    override fun delete(id: String, cache: CachableConfig) =
+    override fun delete(cache: CachableConfig, id: String) =
         conn.sync().del(handler.tilNøkkel(cache, id))
 
 

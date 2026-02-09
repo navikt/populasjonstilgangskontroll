@@ -4,7 +4,7 @@ import java.time.Duration
 import kotlin.reflect.KClass
 
 interface CacheOperations {
-    fun delete(id: String, cache: CachableConfig): Long
+    fun delete(cache: CachableConfig, id: String): Long
     fun <T : Any> getOne(id: String, cache: CachableConfig, clazz: KClass<T>): T?
     fun putOne(id: String, cache: CachableConfig, value: Any, ttl: Duration)
     fun <T : Any> getMany(ids: Set<String>, cache: CachableConfig, clazz: KClass<T>): Map<String, T?>

@@ -19,3 +19,4 @@ class CacheConfigBeanRegistrationsConfiguration {
         }
     })
 }
+data class AllCaches(val map: Map<String,List<CachableConfig>>)

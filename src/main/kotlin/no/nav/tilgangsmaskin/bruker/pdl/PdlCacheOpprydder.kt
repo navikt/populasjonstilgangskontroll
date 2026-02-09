@@ -36,7 +36,7 @@ class PdlCacheOpprydder(private val teller: PdlCacheTømmerTeller, private val c
     }
 
     private fun slett(cache: CachableConfig, id: String, gradering: String, type: String) {
-        if (client.delete(id,cache) > 0) {
+        if (client.delete(cache, id) > 0) {
             teller.tell(Tags.of("cache", cache.name, "gradering",
                 gradering.lowercase(getDefault()),"type",type))
             log.trace(CONFIDENTIAL,"Slettet nøkkel ${client.tilNøkkel(cache, id)} fra cache ${cache.name} etter hendelse av type: {}", id.maskFnr(), gradering)

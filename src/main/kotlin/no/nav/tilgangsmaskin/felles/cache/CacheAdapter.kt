@@ -1,12 +1,11 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Pingable
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.stereotype.Component
 
 @Component
-class CacheAdapter(private val cf: RedisConnectionFactory, cfg: CacheConfig, private vararg val cfgs: CachableRestConfig) : Pingable {
+class CacheAdapter(private val cf: RedisConnectionFactory, cfg: CacheConfig) : Pingable {
 
     override val pingEndpoint  =  "${cfg.host}:${cfg.port}"
     override val name = "Cache"

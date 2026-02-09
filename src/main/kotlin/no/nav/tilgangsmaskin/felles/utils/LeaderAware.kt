@@ -30,7 +30,7 @@ abstract class LeaderAware(private var erLeder: Boolean = false) {
         log.info("Kjører $beskrivelse som leder")
         block()
     } else {
-        log.info("Kjører ikke $beskrivelse som leder, returnerer default")
+        log.trace("Kjører ikke $beskrivelse som leder, returnerer default")
         default()
     }
 }

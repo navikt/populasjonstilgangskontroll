@@ -12,16 +12,17 @@ class RetryLogger {
 
     @EventListener(MethodRetryEvent::class)
     fun onEvent(event: MethodRetryEvent) {
-        if (event.isRetryAborted) {
-            when (val failure = event.failure) {
-                is NotFoundRestException -> log.info("Aborterer metode ${event.method.name}  siden ${failure.identifikator} ikke ble funnet", failure)
-
-                else -> log.warn("Aborterer metode ${event.method.name}", failure)
-            }
+        val failure = event.failure
+        if (failure is NotFoundRestException) {
+            log.info("Aborterer metode ${event.method.name} siden ${failure.identifikator} ikke ble funnet", failure)
         }
         else {
-            log.info("Retry ${event.method.name} grunnet ${event.failure.javaClass.simpleName}", event.failure)
+            if (event.isRetryAborted) {
+                log.warn("Aborterer metode ${event.method.name}", failure)
+            }
+            else {
+                log.warn("Feil i metode ${event.method.name}, prøver igjen", failure)
+            }
         }
-
     }
 }

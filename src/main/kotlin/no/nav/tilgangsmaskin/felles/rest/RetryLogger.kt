@@ -14,7 +14,7 @@ class RetryLogger {
     fun onEvent(event: MethodRetryEvent) {
         val failure = event.failure
         if (failure is NotFoundRestException) {
-            log.info("Aborterer metode ${event.method.name} siden ${failure.identifikator} ikke ble funnet", failure)
+            log.info("Aborterer metode ${event.method.name} siden ${failure.identifikator} ikke ble funnet på ${failure.uri}", failure)
         }
         else {
             if (event.isRetryAborted) {

@@ -32,7 +32,7 @@ class PdlConfig(
         private const val DEFAULT_PERSON__BOLK_PATH = "/api/v1/personBolk"
         val  PDL_MED_FAMILIE_CACHE = CachableConfig(PDL,MED_FAMILIE)
         val  PDL_MED_UTVIDET_FAMILIE_CACHE = CachableConfig(PDL,MED_UTVIDET_FAMILIE)
-        val PDL_CACHES  = listOf(PDL_MED_FAMILIE_CACHE,PDL_MED_UTVIDET_FAMILIE_CACHE)
+        val PDL_CACHES  = setOf(PDL_MED_FAMILIE_CACHE,PDL_MED_UTVIDET_FAMILIE_CACHE)
 
     }
 }

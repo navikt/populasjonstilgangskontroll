@@ -22,7 +22,7 @@ abstract class AbstractRestClientAdapter(
         restClient.get()
             .uri(uri)
             .accept(APPLICATION_JSON)
-            .headers { it.setAll(headers.filterKeys { key -> key != IDENTIFIKATOR }) }
+            .headers { it.setAll(headers)}
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
             .body<T>() ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)

@@ -7,5 +7,5 @@ interface CachableRestConfig {
     val varighet: Duration get() = Duration.ofHours(12)
     val navn: String
     val cacheNulls: Boolean get() = false
-     val caches: List<CachableConfig>
+     val caches: Set<CachableConfig>
 }

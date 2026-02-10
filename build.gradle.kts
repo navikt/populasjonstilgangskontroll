@@ -79,6 +79,8 @@ dependencies {
     implementation("org.hibernate.orm:hibernate-micrometer")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+    implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
+
     implementation("org.postgresql:postgresql")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
     implementation("org.springframework.boot:spring-boot-starter-flyway")

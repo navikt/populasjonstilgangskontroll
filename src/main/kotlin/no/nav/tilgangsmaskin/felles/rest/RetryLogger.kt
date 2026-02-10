@@ -16,11 +16,11 @@ class RetryLogger {
             ?: event.failure
         when {
             failure is NotFoundRestException ->
-                log.info("Aborterer metode ${event.method.name} siden ${failure.identifikator} ikke ble funnet på ${failure.uri}", failure)
+                log.info("Aborterer metode '${event.method.name}' siden ${failure.identifikator} ikke ble funnet på ${failure.uri}", failure)
             event.isRetryAborted ->
-                log.warn("Aborterer metode ${event.method.name} grunnet ${failure.javaClass.simpleName}", failure)
+                log.warn("Aborterer metode '${event.method.name}' grunnet ${failure.javaClass.simpleName}", failure)
             else ->
-                log.warn("Feil i metode ${event.method.name}, prøver igjen", failure)
+                log.warn("Feil i metode '${event.method.name}', prøver igjen", failure)
         }
     }
 }

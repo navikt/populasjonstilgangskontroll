@@ -16,8 +16,10 @@ class RetryLogger(private val auditor: Auditor) {
             ?: (event.failure.cause as? NotFoundRestException)
             ?: event.failure
         when {
-            failure is NotFoundRestException ->
+            failure is NotFoundRestException -> {
                 auditor.info("Aborterer metode '${event.method.name}' siden ${failure.identifikator?.verdi} ikke ble funnet på ${failure.uri}", failure)
+                log.info("Aborterer metode '${event.method.name}' siden ${failure.identifikator} ikke ble funnet på ${failure.uri}", failure)
+            }
             event.isRetryAborted ->
                 log.warn("Aborterer metode '${event.method.name}' grunnet ${failure.javaClass.simpleName}", failure)
             else ->

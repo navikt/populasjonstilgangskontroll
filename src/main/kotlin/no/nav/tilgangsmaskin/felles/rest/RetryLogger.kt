@@ -22,8 +22,11 @@ class RetryLogger(private val auditor: Auditor) {
             }
             event.isRetryAborted ->
                 log.warn("Aborterer metode '${event.method.name}' grunnet ${failure.javaClass.simpleName}", failure)
-            else ->
-                log.warn("Feil i metode '${event.method.name}', prøver igjen", failure)
+            else -> {
+                log.warn("Feil i metode '${event.method.name}',( ${event.source.arguments})  prøver igjen", failure)
+                log.info(event.source.arguments.toString())
+
+            }
         }
     }
 }

@@ -24,7 +24,7 @@ class DefaultRestErrorHandler : ErrorHandler {
 
         when {
             res.statusCode == NOT_FOUND -> {
-                log.info("Irrecoverable exception etter ${res.statusCode.value()} fra ${req.uri}")
+                log.info("Not found exception etter ${res.statusCode.value()} fra ${req.uri}")
                 throw NotFoundRestException(req.uri, ident)
             }
             res.statusCode.is4xxClientError -> {

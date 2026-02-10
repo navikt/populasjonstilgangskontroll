@@ -18,7 +18,7 @@ class RetryLogger {
         }
         else {
             if (event.isRetryAborted) {
-                log.warn("Aborterer metode ${event.method.name}", failure)
+                log.warn("Aborterer metode ${event.method.name} grunnet ${failure.javaClass.simpleName}", failure)
             }
             else {
                 log.warn("Feil i metode ${event.method.name}, prøver igjen", failure)

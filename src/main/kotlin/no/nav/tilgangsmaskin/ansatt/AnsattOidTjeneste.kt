@@ -16,7 +16,7 @@ class AnsattOidTjeneste(private val adapter: EntraRestClientAdapter) : CachableR
 
     override val varighet = Duration.ofDays(365)  // Godt nok, blås i skuddår
     override val navn = ENTRA_OID
-    override val caches = listOf(OID_CACHE)
+    override val caches = setOf(OID_CACHE)
 
     companion object {
         const val ENTRA_OID = "entraoid"

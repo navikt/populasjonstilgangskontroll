@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(OPPFØLGING)
 class OppfølgingConfig: CachableRestConfig {
     override val navn = OPPFØLGING
-    override val caches = listOf(OPPFØLGING_CACHE)
+    override val caches = setOf(OPPFØLGING_CACHE)
 
     companion object {
         const val OPPFØLGING = "oppfolging"

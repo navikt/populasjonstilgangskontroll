@@ -13,7 +13,7 @@ class CacheExpiredEventListener(val teller: CacheOppfriskerTeller, erLeder: Bool
     private var running = false
     @EventListener
     fun cacheInnslagFjernet(hendelse: CacheInnslagFjernetEvent) {
-        somLeder({}, "håndtering av cache innslag fjernet event") {
+        somLeder("håndtering av cache innslag ${hendelse.nøkkel} fjernet", {
             if (isRunning()) {
                 val elementer = CacheNøkkelElementer(hendelse.nøkkel)
                 oppfriskere.firstOrNull { it.cacheName == elementer.cacheName }?.run {
@@ -21,7 +21,7 @@ class CacheExpiredEventListener(val teller: CacheOppfriskerTeller, erLeder: Bool
                     teller.tell(of("cache", elementer.cacheName, "result", "expired", "method", elementer.metode ?: "ingen"))
                 }
             }
-        }
+        }) {}
     }
 
     override fun start() { running = true }

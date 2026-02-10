@@ -1,14 +1,12 @@
 package no.nav.tilgangsmaskin.felles.rest
 
-import org.slf4j.LoggerFactory
+import no.nav.tilgangsmaskin.felles.utils.Auditor
 import org.springframework.context.event.EventListener
 import org.springframework.resilience.retry.MethodRetryEvent
 import org.springframework.stereotype.Component
 
 @Component
-class RetryLogger {
-    private val log = LoggerFactory.getLogger(javaClass)
-
+class RetryLogger(private val auditor: Auditor) {
     @EventListener(MethodRetryEvent::class)
     fun onEvent(event: MethodRetryEvent) {
         val failure = (event.failure as? NotFoundRestException)
@@ -16,11 +14,11 @@ class RetryLogger {
             ?: event.failure
         when {
             failure is NotFoundRestException ->
-                log.info("Aborterer metode '${event.method.name}' siden ${failure.identifikator} ikke ble funnet på ${failure.uri}", failure)
+                auditor.info("Aborterer metode '${event.method.name}' siden ${failure.identifikator?.verdi} ikke ble funnet på ${failure.uri}", failure)
             event.isRetryAborted ->
-                log.warn("Aborterer metode '${event.method.name}' grunnet ${failure.javaClass.simpleName}", failure)
+                auditor.warn("Aborterer metode '${event.method.name}' grunnet ${failure.javaClass.simpleName}", failure)
             else ->
-                log.warn("Feil i metode '${event.method.name}', prøver igjen", failure)
+                auditor.warn("Feil i metode '${event.method.name}', prøver igjen", failure)
         }
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.client.body
+import org.springframework.web.client.requiredBody
 import java.net.URI
 
 abstract class AbstractRestClientAdapter(
@@ -25,7 +26,7 @@ abstract class AbstractRestClientAdapter(
             .headers { it.setAll(headers)}
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
-            .body<T>() ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
+            .requiredBody<T>()
 
     protected inline fun <reified T : Any> post(uri: URI, body: Any, headers: Map<String, String> = emptyMap()) =
         restClient
@@ -36,7 +37,7 @@ abstract class AbstractRestClientAdapter(
             .body(body)
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
-            .body<T>() ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
+            .requiredBody<T>()
 
     override val name = cfg.name
 

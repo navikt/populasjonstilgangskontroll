@@ -20,7 +20,7 @@ class DefaultRestErrorHandler : ErrorHandler {
     private val log = getLogger(javaClass)
 
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
-        val ident = req.headers.getFirst(IDENTIFIKATOR)?.let { Identifikator(it) }
+        val ident = req.headers.getFirst(IDENTIFIKATOR)
 
         when {
             res.statusCode == NOT_FOUND -> {
@@ -49,7 +49,7 @@ open class IrrecoverableRestException(
 
 class NotFoundRestException(
         val uri: URI,
-        val identifikator: Identifikator? = null,
+        val identifikator: String? = null,
         cause: Throwable? = null) : IrrecoverableRestException(NOT_FOUND, uri, cause = cause)
 
 open class RecoverableRestException(

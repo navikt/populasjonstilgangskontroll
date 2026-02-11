@@ -14,7 +14,7 @@ class RetryLogger {
         val failure = (event.failure as? NotFoundRestException)
             ?: (event.failure.cause as? NotFoundRestException)
             ?: event.failure
-        log.info("Retry event $event")
+        log.info("Retry event $event",event.failure)
         when {
             failure is NotFoundRestException ->
                 log.info("Ikke funnet exception fra '${event.method.name}' for [${failure.identifikator?.verdi}] på ${failure.uri}", failure)

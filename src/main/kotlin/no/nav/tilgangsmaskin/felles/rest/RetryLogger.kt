@@ -15,14 +15,12 @@ class RetryLogger {
             ?: (event.failure.cause as? NotFoundRestException)
             ?: event.failure
         when {
-            failure is NotFoundRestException -> {
+            failure is NotFoundRestException ->
                 log.info("Ikke funnet exception fra '${event.method.name}' for ${failure.identifikator?.verdi} på ${failure.uri}", failure)
-            }
             event.isRetryAborted ->
                 log.warn("Aborterer metode '${event.method.name}' grunnet ${failure.javaClass.simpleName} (${event.source.arguments.toSet()}", failure)
-            else -> {
+            else ->
                 log.warn("Feil i metode '${event.method.name}',(${event.source.arguments.toSet()})  prøver igjen", failure)
-            }
         }
     }
 }

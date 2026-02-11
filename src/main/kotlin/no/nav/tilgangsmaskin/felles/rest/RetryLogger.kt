@@ -17,7 +17,7 @@ class RetryLogger {
         log.info("Retry event $event")
         when {
             failure is NotFoundRestException ->
-                log.info("Ikke funnet exception fra '${event.method.name}' for ${failure.identifikator?.verdi} på ${failure.uri}", failure)
+                log.info("Ikke funnet exception fra '${event.method.name}' for [${failure.identifikator?.verdi}] på ${failure.uri}", failure)
             event.isRetryAborted ->
                 log.warn("Aborterer metode '${event.method.name}' grunnet ${failure.javaClass.simpleName} (${event.source.arguments.toSet()}", failure)
             else ->

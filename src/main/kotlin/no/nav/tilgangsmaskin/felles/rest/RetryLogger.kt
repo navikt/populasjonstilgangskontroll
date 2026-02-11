@@ -1,19 +1,20 @@
 package no.nav.tilgangsmaskin.felles.rest
 
-import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.event.EventListener
 import org.springframework.resilience.retry.MethodRetryEvent
 import org.springframework.stereotype.Component
 
 @Component
 class RetryLogger {
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val log = getLogger(javaClass)
 
     @EventListener(MethodRetryEvent::class)
     fun onEvent(event: MethodRetryEvent) {
         val failure = (event.failure as? NotFoundRestException)
             ?: (event.failure.cause as? NotFoundRestException)
             ?: event.failure
+        log.info("Retry event $event")
         when {
             failure is NotFoundRestException ->
                 log.info("Ikke funnet exception fra '${event.method.name}' for ${failure.identifikator?.verdi} på ${failure.uri}", failure)

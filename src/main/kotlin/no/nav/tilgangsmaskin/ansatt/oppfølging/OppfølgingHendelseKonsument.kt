@@ -1,9 +1,8 @@
-package no.nav.tilgangsmaskin.ansatt.oppfølging
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
+
 
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.ARBEIDSOPPFOLGINGSKONTOR_ENDRET
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_AVSLUTTET
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_STARTET
 import no.nav.tilgangsmaskin.bruker.Identer
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
@@ -12,14 +11,16 @@ import org.springframework.transaction.annotation.Transactional
 
 @Component
 @Transactional
-class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste) {
+class OppfølgingHendelseKonsument(private val oppfølging: `OppfølgingTjeneste`) {
 
     private val log = getLogger(javaClass)
 
     @KafkaListener(
         topics = ["poao.siste-oppfolgingsperiode-v2"],
-        properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
-        groupId = OPPFØLGING + "41")
+        properties = [
+            "spring.deserializer.value.delegate.class=org.apache.kafka.common.serialization.StringDeserializer"
+        ],
+        groupId = OPPFØLGING + "-debug")
 
     fun listen(hendelse: Any) {
         log.info("Mottok oppfølginghendelse: $hendelse")
@@ -35,7 +36,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
         }*/
     }
 
-    private fun registrer(hendelse: OppfølgingHendelse) =
+    private fun registrer(hendelse: `OppfølgingHendelse`) =
         with(hendelse) {
             oppfølging.registrer(oppfolgingsperiodeUuid,
                 Identer(ident, aktorId), kontor!!, startTidspunkt).also {

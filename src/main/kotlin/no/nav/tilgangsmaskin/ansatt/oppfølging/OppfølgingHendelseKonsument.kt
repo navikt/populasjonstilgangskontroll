@@ -19,7 +19,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
     @KafkaListener(
         topics = ["poao.siste-oppfolgingsperiode-v2"],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
-        groupId = OPPFØLGING + "42")
+        groupId = OPPFØLGING + "41")
 
     fun listen(hendelse: Any) {
         log.info("Mottok oppfølginghendelse: $hendelse")

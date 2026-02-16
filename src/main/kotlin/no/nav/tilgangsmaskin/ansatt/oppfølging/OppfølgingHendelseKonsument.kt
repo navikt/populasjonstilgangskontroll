@@ -21,7 +21,9 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
         groupId = OPPFØLGING + "42")
 
-    fun listen(hendelse: OppfølgingHendelse) {
+    fun listen(hendelse: Any) {
+        log.info("Mottok oppfølginghendelse: $hendelse")
+        /*
         when (hendelse.sisteEndringsType) {
             OPPFOLGING_STARTET -> registrer(hendelse).also {
                 log.info("Oppfølging registrert for ${hendelse.oppfolgingsperiodeUuid}")
@@ -30,7 +32,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
                 log.info("Oppfølgingskontor endret for ${hendelse.oppfolgingsperiodeUuid}")
             }
             OPPFOLGING_AVSLUTTET -> avslutt(hendelse)
-        }
+        }*/
     }
 
     private fun registrer(hendelse: OppfølgingHendelse) =

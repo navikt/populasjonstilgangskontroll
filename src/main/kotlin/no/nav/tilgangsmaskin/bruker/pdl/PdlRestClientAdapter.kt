@@ -11,8 +11,8 @@ import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler.Companion.IDENT
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import tools.jackson.core.type.TypeReference
 import tools.jackson.databind.json.JsonMapper
-import tools.jackson.module.kotlin.readValue
 
 @Component
 class PdlRestClientAdapter(
@@ -61,10 +61,8 @@ class PdlRestClientAdapter(
             return emptyMap()
         }
 
-        return  mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, identer))
-            .mapValues {
-                    (oppslagId, pdlRespons) -> pdlRespons?.let{ tilPerson(oppslagId, it) }
-            }
+        return  mapper.readValue(post<String>(cf.personerURI, identer), object : TypeReference<Map<String, PdlRespons?>>() {})
+            .mapValues { (oppslagId, pdlRespons) -> pdlRespons?.let{ tilPerson(oppslagId, it) } }
             .filterValues {
                 it != null
             }

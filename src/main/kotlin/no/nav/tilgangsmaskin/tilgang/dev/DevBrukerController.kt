@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.tilgang.dev
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
@@ -12,8 +11,11 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
-@UnprotectedRestController(value = ["/${ClusterConstants.DEV}/bruker/"])
+@RestController
+@RequestMapping("/${ClusterConstants.DEV}/bruker/")
 @ConditionalOnNotProd
 @Tag(name = "DevBrukerController", description = "Denne kontrolleren skal kun brukes til testing")
 class DevBrukerController(private val brukere: BrukerTjeneste,

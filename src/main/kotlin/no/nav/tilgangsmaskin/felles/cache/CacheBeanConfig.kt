@@ -18,7 +18,7 @@ import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializ
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
 import tools.jackson.databind.json.JsonMapper
-import tools.jackson.module.kotlin.KotlinModule.Builder
+import tools.jackson.module.kotlin.KotlinModule
 
 @Configuration(proxyBeanMethods = true)
 @ConditionalOnGCP
@@ -27,7 +27,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
 
 
     private val mapper = JsonMapper.builder().polymorphicTypeValidator(NavPolymorphicTypeValidator()).apply {
-        addModule(Builder().build())
+        addModule(KotlinModule.Builder().build())
         addModule(JacksonTypeInfoAddingValkeyModule())
     }.build()
 

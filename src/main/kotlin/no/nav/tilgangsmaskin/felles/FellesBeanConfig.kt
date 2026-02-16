@@ -1,14 +1,11 @@
 package no.nav.tilgangsmaskin.felles
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.Timer
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
-import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.LoggingRequestInterceptor
 import no.nav.tilgangsmaskin.tilgang.Token
@@ -35,7 +32,7 @@ import org.springframework.web.servlet.config.annotation.ContentNegotiationConfi
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import tools.jackson.core.StreamReadFeature
-import java.util.function.Function
+import java.util.function.Function as JFunction
 
 
 @Configuration
@@ -43,7 +40,6 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 
      @Bean
     fun jackson3Customizer() = JsonMapperBuilderCustomizer {
-        it.addMixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
        it.enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
     }
 
@@ -55,30 +51,29 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
         }
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    private interface IgnoreUnknownMixin
-
     @Bean
     fun errorMessageSource() = ReloadableResourceBundleMessageSource().apply {
         setBasename("classpath:messages")
     }
 
     @Bean
-    fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor, loggingInterceptor: LoggingRequestInterceptor) =
+    fun restClientCustomizer(oauth2Interceptor: ClientHttpRequestInterceptor, loggingInterceptor: LoggingRequestInterceptor) =
         RestClientCustomizer { c ->
             c.requestFactory(HttpComponentsClientHttpRequestFactory().apply {
                 setConnectionRequestTimeout(2000)
                 setReadTimeout(5000)
             })
             c.requestInterceptors {
-                it.addFirst(interceptor)
+                it.addFirst(oauth2Interceptor)
                 it.add(loggingInterceptor)
             }
         }
 
     @Bean
     fun clusterAddingTimedAspect(meterRegistry: MeterRegistry, token: Token) =
-        TimedAspect(meterRegistry,Function   { pjp -> Tags.of("cluster", token.cluster, "method", pjp.signature.name, "client", token.systemNavn) })
+        TimedAspect(meterRegistry, JFunction { pjp ->
+            Tags.of("cluster", token.cluster, "method", pjp.signature.name, "client", token.systemNavn)
+        })
 
     @Bean
     @ConditionalOnNotProd
@@ -104,7 +99,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     @Component
     class TimingAspect(private val meterRegistry: MeterRegistry) {
 
-        @Around("execution(* no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor.intercept(..))")
+        @Around("execution(* no.nav.tilgangsmaskin.felles.security.OAuth2ClientConfig.oauth2ClientRequestInterceptor(..))")
         fun timeMethod(joinPoint: ProceedingJoinPoint) = Timer.builder("mslogin")
             .description("Timer med histogram for mslogin")
             .tags("method", joinPoint.signature.name)

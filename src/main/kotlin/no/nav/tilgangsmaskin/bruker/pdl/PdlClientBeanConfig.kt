@@ -13,6 +13,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.graphql.GraphQLErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.security.OAuth2ClientConfig.Companion.registrationIdInterceptor
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUrl
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUserInfo
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
@@ -46,6 +47,7 @@ class PdlClientBeanConfig {
     @Qualifier(PDLGRAPH)
     fun pdlGraphRestClient(b: Builder) =
         b.requestInterceptors {
+            it.add(registrationIdInterceptor(PDLGRAPH))
             it.add(headerAddingRequestInterceptor(BEHANDLINGSNUMMER))
         }.build()
 
@@ -60,7 +62,9 @@ class PdlClientBeanConfig {
 
     @Bean
     @Qualifier(PDL)
-    fun pdlRestClient(b: Builder) = b.build()
+    fun pdlRestClient(b: Builder) =
+        b.requestInterceptor(registrationIdInterceptor(PDL))
+            .build()
 
     @Bean
     @ConditionalOnNotProd

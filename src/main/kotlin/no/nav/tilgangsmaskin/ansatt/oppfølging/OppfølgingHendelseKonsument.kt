@@ -22,7 +22,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: `OppfølgingTjeneste
         ],
         groupId = OPPFØLGING + "-debug")
 
-    fun listen(hendelse: Any) {
+    fun listen(hendelse: String) {
         log.info("Mottok oppfølginghendelse: $hendelse")
         /*
         when (hendelse.sisteEndringsType) {

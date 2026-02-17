@@ -1,8 +1,9 @@
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.*
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 
 
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse
 import no.nav.tilgangsmaskin.bruker.Identer
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
@@ -11,20 +12,20 @@ import org.springframework.transaction.annotation.Transactional
 
 @Component
 @Transactional
-class OppfølgingHendelseKonsument(private val oppfølging: `OppfølgingTjeneste`) {
+class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste) {
 
     private val log = getLogger(javaClass)
 
     @KafkaListener(
         topics = ["poao.siste-oppfolgingsperiode-v2"],
         properties = [
-            "spring.deserializer.value.delegate.class=org.apache.kafka.common.serialization.StringDeserializer"
+            "spring.json.trusted.packages=*",
+            "spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse",
+            "spring.json.use.type.headers=false"
         ],
-        groupId = OPPFØLGING + "-debug")
+        groupId = "$OPPFØLGING")
 
-    fun listen(hendelse: String) {
-        log.info("Mottok oppfølginghendelse: $hendelse")
-        /*
+    fun listen(hendelse: OppfølgingHendelse) {
         when (hendelse.sisteEndringsType) {
             OPPFOLGING_STARTET -> registrer(hendelse).also {
                 log.info("Oppfølging registrert for ${hendelse.oppfolgingsperiodeUuid}")
@@ -33,7 +34,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: `OppfølgingTjeneste
                 log.info("Oppfølgingskontor endret for ${hendelse.oppfolgingsperiodeUuid}")
             }
             OPPFOLGING_AVSLUTTET -> avslutt(hendelse)
-        }*/
+        }
     }
 
     private fun registrer(hendelse: `OppfølgingHendelse`) =

@@ -69,7 +69,7 @@ spring:
         "[spring.json.use.type.headers]": false
         "[spring.deserializer.use.type.headers]": false
         "[spring.deserializer.key.delegate.class]": org.apache.kafka.common.serialization.StringDeserializer
-        "[spring.deserializer.value.delegate.class]": org.springframework.kafka.support.serializer.JsonDeserializer
+        "[spring.deserializer.value.delegate.class]": org.apache.kafka.common.serialization.StringDeserializer
   data:
     redis:
       repositories:

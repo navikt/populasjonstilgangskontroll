@@ -17,9 +17,6 @@ class OppfølgingHendelseKonsument(private val oppfølging: `OppfølgingTjeneste
 
     @KafkaListener(
         topics = ["poao.siste-oppfolgingsperiode-v2"],
-        properties = [
-            "spring.deserializer.value.delegate.class=org.apache.kafka.common.serialization.StringDeserializer"
-        ],
         groupId = OPPFØLGING + "-debug")
 
     fun listen(hendelse: String) {

@@ -22,7 +22,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
             "spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse",
             "spring.json.use.type.headers=false"
         ],
-        groupId = "$OPPFØLGING-debug2")
+        groupId = "$OPPFØLGING-debug42")
 
     fun listen(hendelse: OppfølgingHendelse) {
         log.info("Mottok oppfølginghendelse: $hendelse")

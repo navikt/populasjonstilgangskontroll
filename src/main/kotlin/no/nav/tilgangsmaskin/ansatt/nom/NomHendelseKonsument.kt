@@ -20,7 +20,7 @@ class NomHendelseKonsument(private val nom: NomTjeneste, private val logger: Nom
             "spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.nom.NomHendelse",
             "spring.json.use.type.headers=false"
         ],
-        groupId = $$"${spring.application.name}-nom-debug2",
+        groupId = $$"${spring.application.name}-nom-debug42",
         filter = "fnrFilterStrategy")
     fun listen(hendelse: NomHendelse) =
         log.info("Mottok NomHendelse: $hendelse")

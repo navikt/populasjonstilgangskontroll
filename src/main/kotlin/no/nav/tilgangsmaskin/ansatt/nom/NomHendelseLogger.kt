@@ -18,15 +18,15 @@ class NomHendelseLogger(private val registry: MeterRegistry, private val repo: N
     }
 
     fun start(hendelser: List<NomHendelse>) {
-        log.info("Mottok ${hendelser.size} hendelse(r) from NOM")
+        log.info("Mottok ${hendelser.size} hendelse(r) fra NOM")
     }
 
     fun behandler(hendelse: NomHendelse) {
-        log.info("Behandler hendelse fro NOM: {}", hendelse)
+        log.info("Behandler hendelse fra NOM: {}", hendelse)
     }
 
     fun ferdig(hendelser: List<NomHendelse>) {
-        log.info("${hendelser.size} hendelse(r) from NOM ferdig behandlet").also {
+        log.info("${hendelser.size} hendelse(r) fra NOM ferdig behandlet").also {
             size()
         }
     }

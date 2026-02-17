@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
+import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
 import org.slf4j.LoggerFactory.getLogger
@@ -15,25 +16,15 @@ class NomHendelseKonsument(private val nom: NomTjeneste, private val logger: Nom
 
     @KafkaListener(
         topics = ["org.nom.api-ressurs-state-v4"],
-        properties = [
-            "spring.json.trusted.packages=*",
-            "spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.nom.NomHendelse",
-            "spring.json.use.type.headers=false"
-        ],
-        groupId = $$"${spring.application.name}-nom",
+        properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.nom.NomHendelse"],
+        groupId = NOM,
         filter = "fnrFilterStrategy")
     fun listen(hendelser: List<NomHendelse>) {
         logger.start(hendelser)
         hendelser.forEach { hendelse ->
             logger.behandler(hendelse)
             runCatching {
-                nom.lagre(
-                    NomAnsattData(
-                        AnsattId(hendelse.navident),
-                        BrukerId(hendelse.personident),
-                        NomAnsattPeriode(hendelse.startdato ?: EPOCH, hendelse.sluttdato ?: ALLTID)
-                    )
-                )
+                nom.lagre(ansattFra(hendelse))
             }.onSuccess {
                 logger.ok(hendelse.navident, hendelse.personident)
             }.onFailure {
@@ -42,4 +33,14 @@ class NomHendelseKonsument(private val nom: NomTjeneste, private val logger: Nom
         }
         logger.ferdig(hendelser)
     }
+
+    private fun ansattFra(hendelse: NomHendelse): NomAnsattData =
+       with(hendelse) {
+           NomAnsattData(
+               AnsattId(navident),
+               BrukerId(personident),
+               NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: ALLTID)
+           )
+       }
+
 }

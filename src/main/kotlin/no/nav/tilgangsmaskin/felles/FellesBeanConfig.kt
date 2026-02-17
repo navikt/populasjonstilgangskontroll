@@ -12,6 +12,7 @@ import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInt
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.LoggingRequestInterceptor
 import no.nav.tilgangsmaskin.tilgang.Token
+import org.apache.kafka.common.serialization.StringDeserializer
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
@@ -22,6 +23,7 @@ import org.springframework.boot.health.actuate.endpoint.StatusAggregator
 import org.springframework.boot.health.contributor.Status.DOWN
 import org.springframework.boot.health.contributor.Status.UP
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
+import org.springframework.boot.kafka.autoconfigure.DefaultKafkaConsumerFactoryCustomizer
 import org.springframework.boot.restclient.RestClientCustomizer
 import org.springframework.boot.servlet.actuate.web.exchanges.HttpExchangesFilter
 import org.springframework.context.annotation.Bean
@@ -30,11 +32,13 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import org.springframework.kafka.support.serializer.JacksonJsonDeserializer
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
+import tools.jackson.databind.json.JsonMapper
 import java.util.function.Function
 
 
@@ -46,6 +50,13 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
         it.addMixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
        it.enable(INCLUDE_SOURCE_IN_LOCATION)
     }
+
+    @Bean
+    fun kafkaConsumerFactoryCustomizer(mapper: JsonMapper) =
+        DefaultKafkaConsumerFactoryCustomizer {
+            it.setValueDeserializerSupplier { JacksonJsonDeserializer(mapper) }
+        }
+
 
     @Bean
     fun outOfServiceIgnoringStatusAggregator() = StatusAggregator {
@@ -75,6 +86,8 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                 it.add(loggingInterceptor)
             }
         }
+
+
 
     @Bean
     fun clusterAddingTimedAspect(meterRegistry: MeterRegistry, token: Token) =

@@ -9,11 +9,20 @@ spec:
   groups:
     - name: "tilgangsmaskin  alerts"
       rules:
-        - alert: "[tilgangsmaskin] Forhøyede feilrater"
+        - alert: "[tilgangsmaskin] Forhøyede feilrater (warnings)"
           expr: sum(round(increase(logback_events_total{app="populasjonstilgangskontroll", level="warn"}[2m]))) > 20
           for: 3m
           annotations:
-            action: "Sjekk loggene for å se hvorfor det er så mye feil"
+            action: "Sjekk loggene for å se hvorfor det er så mange advarsler"
           labels:
             namespace: "tilgangsmaskin"
             severity: warning
+        - alert: "[tilgangsmaskin] Forhøyede feilrater (errors"
+          expr: sum(round(increase(logback_events_total{app="populasjonstilgangskontroll", level="error"}[2m]))) > 10
+          for: 3m
+          annotations:
+            action: "Sjekk loggene for å se hvorfor det er så mange feil"
+          labels:
+            namespace: "tilgangsmaskin"
+            severity: danger
+

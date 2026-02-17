@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.bruker.pdl
 
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.USER_INFO_CONFIG
+import io.confluent.kafka.schemaregistry.client.security.basicauth.UserInfoCredentialProvider
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG
@@ -88,7 +89,7 @@ class PdlClientBeanConfig {
                 put(VALUE_DESERIALIZER_CLASS, KafkaAvroDeserializer::class.java)
                 put(SCHEMA_REGISTRY_URL_CONFIG, env.schemaRegistryUrl())
                 put(SPECIFIC_AVRO_READER_CONFIG, true)
-                put(BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO")
+                put(BASIC_AUTH_CREDENTIALS_SOURCE, USER_INFO)
                 put(USER_INFO_CONFIG, env.schemaRegistryUserInfo())
             }
         )
@@ -97,5 +98,9 @@ class PdlClientBeanConfig {
     fun pdlAvroListenerContainerFactory(consumerFactory: ConsumerFactory<String, Personhendelse>) =
          ConcurrentKafkaListenerContainerFactory<String, Personhendelse>().apply {
             setConsumerFactory(consumerFactory)
+    }
+
+    companion object {
+        private val USER_INFO = UserInfoCredentialProvider().alias()
     }
 }

@@ -11,15 +11,17 @@ import org.springframework.transaction.annotation.Transactional
 
 @Component
 @Transactional
-class OppfølgingHendelseKonsument(private val oppfølging: `OppfølgingTjeneste`) {
+class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste) {
 
     private val log = getLogger(javaClass)
 
     @KafkaListener(
         topics = ["poao.siste-oppfolgingsperiode-v2"],
-        groupId = OPPFØLGING + "-debug1")
+        properties = ["spring.json.trusted.packages=no.nav.tilgangsmaskin",
+            "spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
+        groupId = "$OPPFØLGING-debug2")
 
-    fun listen(hendelse: String) {
+    fun listen(hendelse: OppfølgingHendelse) {
         log.info("Mottok oppfølginghendelse: $hendelse")
         /*
         when (hendelse.sisteEndringsType) {

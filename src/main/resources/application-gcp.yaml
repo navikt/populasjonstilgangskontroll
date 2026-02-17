@@ -63,11 +63,14 @@ spring:
 
     consumer:
       key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+
       properties:
         "[auto.offset.reset]": earliest
         "[spring.json.use.type.headers]": false
         "[spring.json.trusted.packages]": no.nav.tilgangsmaskin
         "[spring.deserializer.key.delegate.class]": org.apache.kafka.common.serialization.StringDeserializer
+        "[spring.deserializer.value.delegate.class]": org.springframework.kafka.support.serializer.JacksonJsonDeserializer
 
   data:
     redis:

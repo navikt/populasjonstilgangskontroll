@@ -16,7 +16,6 @@ class NomHendelseKonsument(private val nom: NomTjeneste, private val logger: Nom
 
     @KafkaListener(
         topics = ["org.nom.api-ressurs-state-v4"],
-        groupId = $$"${spring.application.name}-nom",
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.nom.NomHendelse"],
         groupId = NOM,
         filter = "fnrFilterStrategy")

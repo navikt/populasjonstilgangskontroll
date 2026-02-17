@@ -1,7 +1,10 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.*
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.*
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse
 import no.nav.tilgangsmaskin.bruker.Identer
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener

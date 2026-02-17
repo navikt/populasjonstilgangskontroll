@@ -1,9 +1,7 @@
+package no.nav.tilgangsmaskin.ansatt.oppfølging
+
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.*
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
-
-
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse
 import no.nav.tilgangsmaskin.bruker.Identer
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
@@ -18,12 +16,8 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
 
     @KafkaListener(
         topics = ["poao.siste-oppfolgingsperiode-v2"],
-        properties = [
-            "spring.json.trusted.packages=*",
-            "spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse",
-            "spring.json.use.type.headers=false"
-        ],
-        groupId = "$OPPFØLGING")
+        properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
+        groupId = OPPFØLGING)
 
     fun listen(hendelse: OppfølgingHendelse) {
         when (hendelse.sisteEndringsType) {
@@ -37,7 +31,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
         }
     }
 
-    private fun registrer(hendelse: `OppfølgingHendelse`) =
+    private fun registrer(hendelse: OppfølgingHendelse) =
         with(hendelse) {
             oppfølging.registrer(oppfolgingsperiodeUuid,
                 Identer(ident, aktorId), kontor!!, startTidspunkt).also {

@@ -63,13 +63,12 @@ spring:
 
     consumer:
       key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       properties:
         "[auto.offset.reset]": earliest
         "[spring.json.use.type.headers]": false
         "[spring.deserializer.use.type.headers]": false
         "[spring.deserializer.key.delegate.class]": org.apache.kafka.common.serialization.StringDeserializer
-        "[spring.deserializer.value.delegate.class]": org.apache.kafka.common.serialization.StringDeserializer
   data:
     redis:
       repositories:

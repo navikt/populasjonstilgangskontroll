@@ -17,7 +17,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: `OppfølgingTjeneste
 
     @KafkaListener(
         topics = ["poao.siste-oppfolgingsperiode-v2"],
-        groupId = OPPFØLGING + "-debug")
+        groupId = OPPFØLGING + "-debug1")
 
     fun listen(hendelse: String) {
         log.info("Mottok oppfølginghendelse: $hendelse")

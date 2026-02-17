@@ -15,11 +15,10 @@ class NomHendelseKonsument(private val nom: NomTjeneste, private val logger: Nom
 
     @KafkaListener(
         topics = ["org.nom.api-ressurs-state-v4"],
-        groupId = $$"${spring.application.name}-nom-debug",
+        groupId = $$"${spring.application.name}-nom-debug1",
         filter = "fnrFilterStrategy")
     fun listen(hendelse: String) =
-        log.info("Mottok NomHendelse: $hendelse") {
-    }
+        log.info("Mottok NomHendelse: $hendelse")
     /*
     fun listen(hendelser: List<NomHendelse>) {
         logger.start(hendelser)

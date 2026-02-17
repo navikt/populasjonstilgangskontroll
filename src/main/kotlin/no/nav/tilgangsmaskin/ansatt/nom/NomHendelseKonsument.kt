@@ -24,13 +24,7 @@ class NomHendelseKonsument(private val nom: NomTjeneste, private val logger: Nom
         hendelser.forEach { hendelse ->
             logger.behandler(hendelse)
             runCatching {
-                nom.lagre(
-                    NomAnsattData(
-                        AnsattId(hendelse.navident),
-                        BrukerId(hendelse.personident),
-                        NomAnsattPeriode(hendelse.startdato ?: EPOCH, hendelse.sluttdato ?: ALLTID)
-                    )
-                )
+                nom.lagre(ansattFra(hendelse))
             }.onSuccess {
                 logger.ok(hendelse.navident, hendelse.personident)
             }.onFailure {
@@ -39,4 +33,14 @@ class NomHendelseKonsument(private val nom: NomTjeneste, private val logger: Nom
         }
         logger.ferdig(hendelser)
     }
+
+    private fun ansattFra(hendelse: NomHendelse): NomAnsattData =
+       with(hendelse) {
+           NomAnsattData(
+               AnsattId(navident),
+               BrukerId(personident),
+               NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: ALLTID)
+           )
+       }
+
 }

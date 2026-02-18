@@ -30,7 +30,9 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
             ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> registrer(hendelse).also {
                 log.info("Oppfølgingskontor endret for $hendelse")
             }
-            OPPFOLGING_AVSLUTTET -> avslutt(hendelse)
+            OPPFOLGING_AVSLUTTET -> avslutt(hendelse).also {
+                log.info("Oppfølging avsluttet for $hendelse")
+            }
         }
     }
 

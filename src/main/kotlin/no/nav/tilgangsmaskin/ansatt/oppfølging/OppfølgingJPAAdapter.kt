@@ -34,7 +34,7 @@ class OppfølgingJPAAdapter(private val repository: OppfølgingRepository,val en
         private const val UPSERT_QUERY = """
             INSERT INTO OPPFOLGING (id, brukerid, aktoerid, start_tidspunkt, kontor, created, updated)
             VALUES (:id, :brukerid, :aktoerid, :startdato, :kontor,  CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-            ON CONFLICT (id,brukerid,aktoerid)
+            ON CONFLICT (id)
             DO UPDATE SET
                 kontor = EXCLUDED.kontor,
                 start_tidspunkt = EXCLUDED.start_tidspunkt,

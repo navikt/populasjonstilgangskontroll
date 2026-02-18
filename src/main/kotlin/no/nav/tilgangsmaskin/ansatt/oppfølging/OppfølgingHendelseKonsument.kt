@@ -20,15 +20,15 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
     @KafkaListener(
         topics = ["poao.siste-oppfolgingsperiode-v2"],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
-        groupId = OPPFØLGING + "tests919")
+        groupId = OPPFØLGING + "jalla123")
 
     fun listen(hendelse: OppfølgingHendelse) {
         when (hendelse.sisteEndringsType) {
             OPPFOLGING_STARTET -> registrer(hendelse).also {
-                log.info("Oppfølging startet for ${hendelse.oppfolgingsperiodeUuid} (${hendelse.ident} ${hendelse.aktorId})")
+                log.info("Oppfølging startet for $hendelse")
             }
             ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> registrer(hendelse).also {
-                log.info("Oppfølgingskontor endret for ${hendelse.oppfolgingsperiodeUuid} (${hendelse.ident} ${hendelse.aktorId})")
+                log.info("Oppfølgingskontor endret for $hendelse")
             }
             OPPFOLGING_AVSLUTTET -> avslutt(hendelse)
         }

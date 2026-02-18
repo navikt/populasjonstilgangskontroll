@@ -22,8 +22,8 @@
         <logger name="io.lettuce.core.protocol.ReconnectionHandler" level="warn"/>
         <logger name="io.lettuce.core.protocol.ConnectionWatchdog" level="warn"/>
         <logger name="org.hibernate.orm.connections.pooling" level="warn"/>
-        <logger name="org.springframework.cache" level="trace" />
-        <logger name="org.apache.kafka" level="info" />
+        <logger name="org.hibernate.orm.jdbc.bind" level="trace"/>
+        <logger name="org.hibernate.sql" level="trace"/>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
     </springProfile>
 

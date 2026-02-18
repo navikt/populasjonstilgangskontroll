@@ -41,6 +41,7 @@ spring:
   jpa:
     properties:
       hibernate:
+        format_sql: true
         generate_statistics: false
   application:
     name: populasjonstilgangskontroll

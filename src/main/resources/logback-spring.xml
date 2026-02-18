@@ -39,6 +39,8 @@
             </layout>
         </appender>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
+        <logger name="org.hibernate.orm.jdbc.bind" level="trace"/>
+        <logger name="org.hibernate.sql" level="trace"/>
     </springProfile>
 
     <springProfile name="prod">

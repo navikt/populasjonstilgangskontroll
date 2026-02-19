@@ -46,7 +46,7 @@ jobs:
         - language: actions
           build-mode: none
         - language: java-kotlin
-          build-mode: manual
+          build-mode: none
         # CodeQL supports the following values keywords for 'language': 'actions', 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift'
         # Use `c-cpp` to analyze code written in C, C++ or both
         # Use 'java-kotlin' to analyze code written in Java, Kotlin or both
@@ -57,7 +57,7 @@ jobs:
         # your codebase is analyzed, see https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/codeql-code-scanning-for-compiled-languages
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v4
 
     # Add any setup steps before running the `github/codeql-action/init` action.
     # This includes steps like installing compilers or runtimes (`actions/setup-node`
@@ -84,28 +84,6 @@ jobs:
     # to build your code.
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
-    - if: matrix.build-mode == 'manual'
-      name: Install Java 25
-      uses: actions/setup-java@v5
-      with:
-        java-version: 25
-        distribution: temurin
-
-    - if: matrix.build-mode == 'manual'
-      name: Configure Gradle for GPR
-      run: |
-        mkdir -p ~/.gradle
-        echo "gpr.user=${{ github.actor }}" >> ~/.gradle/gradle.properties
-        echo "gpr.key=${{ secrets.GITHUB_TOKEN }}" >> ~/.gradle/gradle.properties
-
-    - if: matrix.build-mode == 'manual'
-      name: Build
-      shell: bash
-      run: ./gradlew classes testClasses
-      env:
-        ORG_GRADLE_PROJECT_githubUser: x-access-token
-        ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4
       with:

@@ -12,7 +12,7 @@ import org.springframework.kafka.listener.adapter.RecordFilterStrategy
 import org.springframework.stereotype.Component
 
 @Component(PDL_GRADERING_FILTER)
-class GraderingFilterStrategy : RecordFilterStrategy<String, Personhendelse> {
+class PdlGraderingFilterStrategy : RecordFilterStrategy<String, Personhendelse> {
 
     private val log = getLogger(javaClass)
 

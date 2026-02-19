@@ -3,14 +3,14 @@ package no.nav.tilgangsmaskin.bruker
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.PersonTilBrukerMapper.tilBruker
-import no.nav.tilgangsmaskin.bruker.pdl.PDLTjeneste
+import no.nav.tilgangsmaskin.bruker.pdl.PdlTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 
 @Service
-class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjeneste: SkjermingTjeneste) {
+class BrukerTjeneste(private val personTjeneste: PdlTjeneste, val skjermingTjeneste: SkjermingTjeneste) {
 
     private val log = getLogger(javaClass)
 
@@ -33,7 +33,10 @@ class BrukerTjeneste(private val personTjeneste: PDLTjeneste, val skjermingTjene
             if (p.isNotEmpty()) {
                 log.trace("Bulk slår opp {} skjerming(er) for {}", p.size,p)
                 val skjerminger = skjermingTjeneste.skjerminger(p)
-                log.trace("Bulk slo opp {} skjerminger  ($skjerminger) for {}", skjerminger.size, p.joinToString { it.verdi.maskFnr() })
+                log.trace("Bulk slo opp {} skjerminger  ({}) for {}",
+                    skjerminger.size,
+                    skjerminger,
+                    p.joinToString { it.verdi.maskFnr() })
                 personer.map {
                     tilBruker(it, skjerminger[it.brukerId] ?: false)
                 }

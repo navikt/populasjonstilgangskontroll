@@ -1,10 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.*
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.*
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse
 import no.nav.tilgangsmaskin.bruker.Identer
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
@@ -18,34 +15,32 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
     private val log = getLogger(javaClass)
 
     @KafkaListener(
-        topics = ["poao.siste-oppfolgingsperiode-v2"],
+        topics = [OPPFØLGING_TOPIC],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
         groupId = OPPFØLGING)
 
-    fun listen(hendelse: OppfølgingHendelse) {
+    fun listen(hendelse: OppfølgingHendelse) =
         when (hendelse.sisteEndringsType) {
-            OPPFOLGING_STARTET -> registrer(hendelse).also {
-                log.info("Oppfølging registrert for ${hendelse.oppfolgingsperiodeUuid}")
-            }
-            ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> registrer(hendelse).also {
-                log.info("Oppfølgingskontor endret for ${hendelse.oppfolgingsperiodeUuid}")
-            }
+            OPPFOLGING_STARTET -> registrer(hendelse, "Oppfølgingskontor satt")
+            ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> registrer(hendelse, "Oppfølgingskontor endret")
             OPPFOLGING_AVSLUTTET -> avslutt(hendelse)
         }
-    }
 
-    private fun registrer(hendelse: OppfølgingHendelse) =
+    private fun registrer(hendelse: OppfølgingHendelse, melding: String) =
         with(hendelse) {
             oppfølging.registrer(oppfolgingsperiodeUuid,
-                Identer(ident, aktorId), kontor!!, startTidspunkt).also {
-                log.info("Oppfølging kontor endret til ${kontor.kontorId.verdi} for $oppfolgingsperiodeUuid")
-            }
+                Identer(ident, aktorId), kontor!!, startTidspunkt)
+            log.info("$melding til ${kontor.kontorId.verdi} for $oppfolgingsperiodeUuid")
         }
 
     private fun avslutt(hendelse: OppfølgingHendelse) =
         with(hendelse) {
             oppfølging.avslutt(oppfolgingsperiodeUuid, Identer(ident, aktorId))
         }
+
+    companion object {
+        private const val OPPFØLGING_TOPIC = "poao.siste-oppfolgingsperiode-v2"
+    }
 }
 
 

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 
 @RetryingWhenRecoverable
 @Service
-class PDLTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL: PdlSyncGraphQLClientAdapter) {
+class PdlTjeneste(private val adapter: PdlRestClientAdapter, private val graphQL: PdlSyncGraphQLClientAdapter) {
 
     @WithSpan
     @Cacheable(cacheNames = [PDL],  key = "#root.methodName + ':' + #id")

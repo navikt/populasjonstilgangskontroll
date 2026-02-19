@@ -15,10 +15,10 @@ class NomHendelseKonsument(private val nom: NomTjeneste, private val logger: Nom
     private val log = getLogger(javaClass)
 
     @KafkaListener(
-        topics = ["org.nom.api-ressurs-state-v4"],
+        topics = [NOM_TOPIC],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.nom.NomHendelse"],
         groupId = NOM,
-        filter = "fnrFilterStrategy")
+        filter = NOM_FNR_FILTER_STRATEGY)
     fun listen(hendelser: List<NomHendelse>) {
         logger.start(hendelser)
         hendelser.forEach { hendelse ->
@@ -42,5 +42,8 @@ class NomHendelseKonsument(private val nom: NomTjeneste, private val logger: Nom
                NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: ALLTID)
            )
        }
-
+companion object {
+    const val NOM_FNR_FILTER_STRATEGY = "nomFnrFilterStrategy"
+    private const val NOM_TOPIC = "org.nom.api-ressurs-state-v4"
+}
 }

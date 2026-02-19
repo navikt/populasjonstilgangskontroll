@@ -1,10 +1,11 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 
-import io.micrometer.core.instrument.Tags
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.UGRADERT
+import no.nav.tilgangsmaskin.bruker.pdl.PdlClientBeanConfig.Companion.PDL_CONTAINER_FACTORY
+import no.nav.tilgangsmaskin.bruker.pdl.PdlClientBeanConfig.Companion.PDL_GRADERING_FILTER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
@@ -14,31 +15,31 @@ import no.nav.tilgangsmaskin.regler.motor.PdlCacheTømmerTeller
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
-import java.util.Locale.*
 
 @Component
-class PdlCacheOpprydder(private val teller: PdlCacheTømmerTeller, private val client: CacheClient, private val pdl: PDLTjeneste) {
+class PdlCacheOpprydder(private val pdl: PDLTjeneste,
+                        private val client: CacheClient,
+                        private val teller: PdlCacheTømmerTeller) {
     private val log = getLogger(javaClass)
 
     @KafkaListener(
-        topics = [TOPIC],
-        containerFactory = "pdlAvroListenerContainerFactory",
-        filter = "graderingFilterStrategy")
+        topics = [PDL_LEESAH_TOPIC],
+        containerFactory = PDL_CONTAINER_FACTORY,
+        filter = PDL_GRADERING_FILTER)
     fun listen(hendelse: Personhendelse) {
         val gradering = (hendelse.adressebeskyttelse?.gradering ?: UGRADERT).name
-        val type = hendelse.endringstype?.name ?: UTILGJENGELIG
+        val endringsType = hendelse.endringstype?.name ?: UTILGJENGELIG
         PDL_CACHES.forEach { cache ->
             hendelse.personidenter.forEach { id ->
-                slett(cache, id, gradering, type)
+                slett(cache, id, gradering, endringsType)
             }
             refresh(hendelse.personidenter, gradering)
         }
     }
 
-    private fun slett(cache: CachableConfig, id: String, gradering: String, type: String) {
+    private fun slett(cache: CachableConfig, id: String, gradering: String, endringsType: String) {
         if (client.delete(cache, id) > 0) {
-            teller.tell(Tags.of("cache", cache.name, "gradering",
-                gradering.lowercase(getDefault()),"type",type))
+            teller.tell(cache, gradering,endringsType)
             log.trace(CONFIDENTIAL,"Slettet nøkkel ${client.tilNøkkel(cache, id)} fra cache ${cache.name} etter hendelse av type: {}", id.maskFnr(), gradering)
             log.info("Slettet innslag fra cache ${cache.name} etter hendelse med gradering: {}",gradering)
         }
@@ -46,16 +47,15 @@ class PdlCacheOpprydder(private val teller: PdlCacheTømmerTeller, private val c
             log.trace( CONFIDENTIAL,"Fant ikke ident {} i ${cache.name} for sletting ved hendelse med gradering: {}", id.maskFnr(), gradering)
         }
     }
-    private fun refresh(identer: List<String>, gradering: String) {
+    private fun refresh(identer: List<String>, gradering: String) =
         identer.forEach { id ->
             pdl.medFamilie(id)
             pdl.medUtvidetFamile(id)
-            log.info("Oppdaterte PDL cache for identer etter hendelse av type $gradering")
+            log.info("Oppdaterte PDL caches for identer etter hendelse av type $gradering")
         }
-    }
 
     companion object {
-        private const val TOPIC = "pdl.leesah-v1"
+        private const val PDL_LEESAH_TOPIC = "pdl.leesah-v1"
     }
 }
 

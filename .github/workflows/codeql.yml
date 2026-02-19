@@ -46,7 +46,7 @@ jobs:
         ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
       run: |
         ./gradlew --version
-        ./gradlew clean build -x test --no-daemon
+        ./gradlew clean build -x test --no-daemon --debug
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4

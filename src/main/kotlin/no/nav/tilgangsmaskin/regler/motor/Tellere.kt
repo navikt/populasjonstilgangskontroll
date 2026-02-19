@@ -4,8 +4,11 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Tags
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
+import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.stereotype.Component
+import java.util.Locale.getDefault
 
 @Component
 class NasjonalGruppeTeller(registry: MeterRegistry, token: Token) :
@@ -52,7 +55,11 @@ class OppfriskingTeller(registry: MeterRegistry, token: Token) :
 
 @Component
 class PdlCacheTømmerTeller(registry: MeterRegistry, token: Token) :
-    AbstractTeller(registry, token, "beskyttelse", "Cache tømming pr beskyttelsesgrad")
+    AbstractTeller(registry, token, "beskyttelse", "Cache tømming pr beskyttelsesgrad") {
+    fun tell(cache: CachableConfig,gradering: String, endringsType: String) =
+        tell(Tags.of("cache", cache.name,"gradering",
+            gradering.lowercase(getDefault()),"type",endringsType))
+}
 
 
 abstract class AbstractTeller(

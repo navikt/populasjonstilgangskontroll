@@ -15,7 +15,7 @@ import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingReque
 import no.nav.tilgangsmaskin.felles.graphql.GraphQLErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUrl
-import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUserInfo
+import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.userInfo
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
@@ -89,18 +89,20 @@ class PdlClientBeanConfig {
                 put(VALUE_DESERIALIZER_CLASS, KafkaAvroDeserializer::class.java)
                 put(SCHEMA_REGISTRY_URL_CONFIG, env.schemaRegistryUrl())
                 put(SPECIFIC_AVRO_READER_CONFIG, true)
-                put(BASIC_AUTH_CREDENTIALS_SOURCE, USER_INFO)
-                put(USER_INFO_CONFIG, env.schemaRegistryUserInfo())
+                put(BASIC_AUTH_CREDENTIALS_SOURCE, CREDENTIALS_SOURCE)
+                put(USER_INFO_CONFIG, env.userInfo())
             }
         )
 
-    @Bean
+    @Bean(PDL_CONTAINER_FACTORY)
     fun pdlAvroListenerContainerFactory(consumerFactory: ConsumerFactory<String, Personhendelse>) =
          ConcurrentKafkaListenerContainerFactory<String, Personhendelse>().apply {
             setConsumerFactory(consumerFactory)
     }
 
     companion object {
-        private val USER_INFO = UserInfoCredentialProvider().alias()
+        const val PDL_GRADERING_FILTER = "pdlGraderingFilter"
+        const val PDL_CONTAINER_FACTORY = "pdlContainerFactory"
+        private val CREDENTIALS_SOURCE = UserInfoCredentialProvider().alias()
     }
 }

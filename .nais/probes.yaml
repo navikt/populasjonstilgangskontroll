@@ -12,6 +12,7 @@ spec:
   targets:
     staticConfig:
       static:
+      - http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/entraProxy
       - http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/graph
       - http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/pdl
       - http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/pdlGraph

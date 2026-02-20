@@ -39,7 +39,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
         }
 
     companion object {
-        private const val OPPFØLGING_TOPIC = "poao.siste-oppfolgingsperiode-v2"
+        private const val OPPFØLGING_TOPIC = "poao.siste-oppfolgingsperiode-v3"
     }
 }
 

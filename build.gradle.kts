@@ -63,7 +63,7 @@ dependencies {
     implementation("io.confluent:kafka-avro-serializer:$confluentVersion") {
         exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
     }
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+   // implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("at.yawk.lz4:lz4-java:1.10.2") // fjernes ved neste release av org.apache.kafka:kafka-clients
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$otelVersion-alpha")

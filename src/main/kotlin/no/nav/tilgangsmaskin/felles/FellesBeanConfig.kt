@@ -51,7 +51,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
        it.enable(INCLUDE_SOURCE_IN_LOCATION)
     }
 
-    /*
+    
     @Bean
     fun kafkaConsumerFactoryCustomizer(mapper: JsonMapper) =
         DefaultKafkaConsumerFactoryCustomizer {
@@ -59,7 +59,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                 ErrorHandlingDeserializer(JacksonJsonDeserializer(mapper))
             }
         }
-*/
+
 
     @Bean
     fun outOfServiceIgnoringStatusAggregator() = StatusAggregator {

@@ -21,9 +21,9 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
 
     fun listen(hendelse: OppfølgingHendelse) =
         when (hendelse.sisteEndringsType) {
-            OPPFOLGING_STARTET -> registrer(hendelse, "Oppfølgingskontor satt")
-            ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> registrer(hendelse, "Oppfølgingskontor endret")
-            OPPFOLGING_AVSLUTTET -> avslutt(hendelse)
+            OPPFOLGING_STARTET -> registrer(hendelse, "Oppfølging startet")
+            ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> registrer(hendelse, "Oppfølging endret")
+            OPPFOLGING_AVSLUTTET -> avslutt(hendelse,"Oppfølging avsluttet")
         }
 
     private fun registrer(hendelse: OppfølgingHendelse, melding: String) =
@@ -33,9 +33,10 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
             log.info("$melding til ${kontor.kontorId.verdi} for $oppfolgingsperiodeUuid")
         }
 
-    private fun avslutt(hendelse: OppfølgingHendelse) =
+    private fun avslutt(hendelse: OppfølgingHendelse, melding: String) =
         with(hendelse) {
             oppfølging.avslutt(oppfolgingsperiodeUuid, Identer(ident, aktorId))
+            log.info("$melding for $oppfolgingsperiodeUuid")
         }
 
     companion object {

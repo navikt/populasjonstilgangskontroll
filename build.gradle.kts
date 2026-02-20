@@ -19,7 +19,7 @@ group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
 version = "1.0.1"
 
 plugins {
-    val kotlinVersion = "2.3.10"
+    val kotlinVersion = "2.2.21"
     id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion

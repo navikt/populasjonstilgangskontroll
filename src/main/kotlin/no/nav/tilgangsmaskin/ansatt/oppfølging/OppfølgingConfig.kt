@@ -19,7 +19,9 @@ class OppfølgingConfig: CachableRestConfig {
 
     @Bean(OPPFØLGING_ERROR_HANDLER)
     fun oppfølgingErrorHandler() = KafkaListenerErrorHandler { msg, e ->
-        log.error("Feil ved prosessering av hendelse: ${(msg.payload as OppfølgingHendelse).oppfolgingsperiodeUuid}", e)
+        val hendelse = msg.payload as OppfølgingHendelse
+        log.error("Feil ved behandling av oppfølgingshendelse: ${hendelse.oppfolgingsperiodeUuid} (${hendelse.sisteEndringsType})", e)
+        null
     }
 
     companion object {

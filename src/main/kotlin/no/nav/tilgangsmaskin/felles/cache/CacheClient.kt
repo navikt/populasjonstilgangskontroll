@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisCommandTimeoutException
+import io.lettuce.core.resource.ClientResources
 import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverable
@@ -9,6 +10,7 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocal
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.QueryTimeoutException
 import org.springframework.stereotype.Component
 import java.time.Duration
@@ -18,9 +20,15 @@ import kotlin.reflect.KClass
 @RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
  class CacheClient(client: RedisClient, private val handler: CacheNøkkelHandler,
     private val alleTreffTeller: BulkCacheSuksessTeller,
-    private val teller: BulkCacheTeller) : CacheOperations {
+    private val teller: BulkCacheTeller,
+                   clientResources: ClientResources) : CacheOperations {
 
     private val log = getLogger(javaClass)
+
+
+    init {
+        log.info("Initialiserer CacheClient med  ClientResources {}", clientResources.tracing().javaClass)
+    }
 
     private val conn = client.connect().apply {
         timeout = Duration.ofSeconds(30)

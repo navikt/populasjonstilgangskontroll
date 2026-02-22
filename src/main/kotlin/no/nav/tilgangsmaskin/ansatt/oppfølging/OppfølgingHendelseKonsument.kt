@@ -18,22 +18,33 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
     @KafkaListener(
         topics = [OPPFØLGING_TOPIC],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
-        groupId = OPPFØLGING +"-debug1",
+        groupId = OPPFØLGING_GROUP_ID,
         errorHandler = OPPFØLGING_ERROR_HANDLER)
 
     fun listen(hendelse: OppfølgingHendelse) =
         when (hendelse.sisteEndringsType) {
             OPPFOLGING_STARTET -> registrer(hendelse, "Oppfølging startet")
             ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> registrer(hendelse, "Oppfølging endret")
-            OPPFOLGING_AVSLUTTET -> avslutt(hendelse,"Oppfølging avsluttet")
+            OPPFOLGING_AVSLUTTET -> avslutt(hendelse, "Oppfølging avsluttet")
         }
 
-    private fun registrer(hendelse: OppfølgingHendelse, melding: String) =
+    private fun registrer(hendelse: OppfølgingHendelse, melding: String) {
         with(hendelse) {
-            oppfølging.registrer(oppfolgingsperiodeUuid,
-                Identer(ident, aktorId), kontor!!, startTidspunkt)
-            log.info("$melding til ${kontor.kontorId.verdi} for $oppfolgingsperiodeUuid")
+            if (kontor == null) {
+                log.error("Kan ikke registrere oppfølging for $oppfolgingsperiodeUuid fordi kontor mangler")
+                return
+            }
+
+            val gyldigKontor = kontor
+            oppfølging.registrer(
+                oppfolgingsperiodeUuid,
+                Identer(ident, aktorId),
+                gyldigKontor,
+                startTidspunkt
+            )
+            log.info("$melding til ${gyldigKontor.kontorId.verdi} for $oppfolgingsperiodeUuid")
         }
+    }
 
     private fun avslutt(hendelse: OppfølgingHendelse, melding: String) =
         with(hendelse) {
@@ -43,6 +54,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
 
     companion object {
         private const val OPPFØLGING_TOPIC  = "poao.siste-oppfolgingsperiode-v3"
+        private const val OPPFØLGING_GROUP_ID = OPPFØLGING + "-debug1"
     }
 }
 

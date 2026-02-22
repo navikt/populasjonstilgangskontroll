@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.felles.cache
 import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
 import io.lettuce.core.RedisClient.create
+import io.lettuce.core.resource.DefaultClientResources
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
@@ -91,7 +92,7 @@ class CacheClientTest {
         val teller = BulkCacheTeller(meterRegistry, token)
         val handler = CacheNøkkelHandler(mgr.cacheConfigurations, valkeyMapper)
         client = CacheClient(
-            redisClient, handler, BulkCacheSuksessTeller(meterRegistry, token), teller, /*manager*/
+            redisClient, handler, BulkCacheSuksessTeller(meterRegistry, token), teller, DefaultClientResources.create()
         )
         listener = CacheElementUtløptLytter(redisClient, eventPublisher)
         val id1 = BrukerId("03508331575")

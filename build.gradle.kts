@@ -136,18 +136,15 @@ tasks.withType<BootJar> {
     archiveFileName = "app.jar"
 }
 
-tasks.test {
-    jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
-    useJUnitPlatform()
-    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
-}
-
-
-
 java {
     toolchain {
         languageVersion.set(javaVersion)
     }
+}
+
+tasks.test {
+    jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
+    useJUnitPlatform()
 }
 
 kotlin {

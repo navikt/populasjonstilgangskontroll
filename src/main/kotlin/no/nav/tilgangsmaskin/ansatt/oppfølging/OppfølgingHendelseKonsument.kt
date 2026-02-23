@@ -20,7 +20,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
         errorHandler = OPPFØLGING_ERROR_HANDLER)
 
     fun listen(hendelse: OppfølgingHendelse) =
-        when (hendelse.sisteEndringsType) {
+        when (hendelse.endringType) {
             OPPFOLGING_STARTET -> opprett(hendelse)
             ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> oppdater(hendelse)
             OPPFOLGING_AVSLUTTET -> avslutt(hendelse)
@@ -28,17 +28,17 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
 
     private fun opprett(hendelse: OppfølgingHendelse) =
         with(hendelse) {
-            oppfølging.opprett(oppfolgingsperiodeUuid, Identer(ident, aktorId), kontor!!, startTidspunkt)
+            oppfølging.opprett(id, Identer(brukerId, aktorId), kontor!!, startTidspunkt)
         }
     private fun oppdater(hendelse: OppfølgingHendelse) =
         with(hendelse) {
-            oppfølging.oppdater(oppfolgingsperiodeUuid, kontor!!, startTidspunkt)
-                ?: oppfølging.opprett(oppfolgingsperiodeUuid, Identer(ident, aktorId), kontor, startTidspunkt)
+            oppfølging.oppdater(id, kontor!!, startTidspunkt)
+                ?: oppfølging.opprett(id, Identer(brukerId, aktorId), kontor, startTidspunkt)
         }
 
     private fun avslutt(hendelse: OppfølgingHendelse) =
         with(hendelse) {
-            oppfølging.avslutt(oppfolgingsperiodeUuid, Identer(ident, aktorId))
+            oppfølging.avslutt(id, Identer(brukerId, aktorId))
         }
 
     companion object {

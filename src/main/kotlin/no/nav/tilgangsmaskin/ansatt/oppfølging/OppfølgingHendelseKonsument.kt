@@ -18,7 +18,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
     @KafkaListener(
         topics = [OPPFØLGING_TOPIC],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
-        groupId = OPPFØLGING +"-debug3",
+        groupId = OPPFØLGING +"-debug4",
         errorHandler = OPPFØLGING_ERROR_HANDLER)
 
     fun listen(hendelse: OppfølgingHendelse) =

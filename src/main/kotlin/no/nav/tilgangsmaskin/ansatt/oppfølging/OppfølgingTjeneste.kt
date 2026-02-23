@@ -4,6 +4,7 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPF
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
 import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
@@ -15,7 +16,7 @@ import java.util.*
 
 @Service
 @Transactional
-class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
+class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter){
 
 
     @Cacheable(cacheNames = [OPPFØLGING],key = "#id.verdi")
@@ -30,10 +31,13 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
         ]
     )
     fun opprett(id: UUID, identer: Identer, kontor: Kontor, tidspunkt: Instant) =
-        db.insert(id, identer.brukerId.verdi, identer.aktorId.verdi, tidspunkt, kontor.kontorId.verdi)
+        db.insert(id, identer.brukerId.verdi, identer.aktorId.verdi, tidspunkt, kontor.kontorId.verdi).also {
+            log(id, "Oppfølging startet for", kontor)
+        }
 
     fun oppdater(id: UUID, kontor: Kontor, tidspunkt: Instant) =
         db.update(id, tidspunkt, kontor.kontorId.verdi)
+            ?.also { log(id, "Oppfølging kontor endret til", kontor) }
 
     @Caching(
         evict = [
@@ -42,5 +46,13 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
         ]
     )
     fun avslutt(id: UUID, identer: Identer) =
-        db.delete(id)
+        db.delete(id).also {
+            log(id,"Oppfølging avsluttet for")
+        }
+
+    companion object {
+        private val log = getLogger(OppfølgingTjeneste::class.java)
+        private fun log(id: UUID, melding: String, kontor: Kontor? = null) =
+            log.info("$melding ${kontor?.let { "${it.kontorId} " } ?: ""}for $id")
+    }
 }

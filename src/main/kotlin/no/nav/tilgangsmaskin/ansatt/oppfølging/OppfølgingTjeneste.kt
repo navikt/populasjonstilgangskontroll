@@ -35,7 +35,13 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter){
             log(id, "Oppfølging startet for", kontor)
         }
 
-    fun oppdater(id: UUID, kontor: Kontor, tidspunkt: Instant) =
+    @Caching(
+        put = [
+            CachePut(cacheNames = [OPPFØLGING], key = "#identer.aktorId.verdi"),
+            CachePut(cacheNames = [OPPFØLGING], key = "#identer.brukerId.verdi")
+        ]
+    )
+    fun oppdater(id: UUID, identer: Identer,  kontor: Kontor, tidspunkt: Instant) =
         db.update(id, tidspunkt, kontor.kontorId.verdi)
             ?.also { log(id, "Oppfølging kontor endret til", kontor) }
 

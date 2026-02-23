@@ -32,7 +32,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
         }
     private fun oppdater(hendelse: OppfølgingHendelse) =
         with(hendelse) {
-            oppfølging.oppdater(id, kontor!!, startTidspunkt)
+            oppfølging.oppdater(id, Identer(brukerId, aktorId),kontor!!, startTidspunkt)
                 ?: oppfølging.opprett(id, Identer(brukerId, aktorId), kontor, startTidspunkt)
         }
 

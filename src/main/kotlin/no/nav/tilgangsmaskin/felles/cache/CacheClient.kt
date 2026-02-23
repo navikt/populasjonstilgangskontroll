@@ -15,7 +15,7 @@ import java.time.Duration
 import kotlin.reflect.KClass
 
 @Component
-@RetryingWhenRecoverable([RedisCommandTimeoutException::class, QueryTimeoutException::class])
+@RetryingWhenRecoverable
  class CacheClient(client: RedisClient, private val handler: CacheNøkkelHandler,
     private val alleTreffTeller: BulkCacheSuksessTeller,
     private val teller: BulkCacheTeller) : CacheOperations {

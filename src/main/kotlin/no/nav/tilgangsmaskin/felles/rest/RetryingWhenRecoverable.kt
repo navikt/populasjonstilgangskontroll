@@ -1,6 +1,8 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import io.lettuce.core.RedisCommandTimeoutException
 import org.springframework.core.annotation.AliasFor
+import org.springframework.dao.QueryTimeoutException
 import org.springframework.resilience.annotation.Retryable
 import org.springframework.web.client.ResourceAccessException
 import java.lang.annotation.Inherited
@@ -16,5 +18,5 @@ import kotlin.reflect.KClass
 @Inherited
 @MustBeDocumented
 annotation class RetryingWhenRecoverable(
-    @get:AliasFor(annotation = Retryable::class) val value: Array<KClass<out Throwable>> = [RecoverableRestException::class, SocketTimeoutException::class, ResourceAccessException::class]
+    @get:AliasFor(annotation = Retryable::class) val value: Array<KClass<out Throwable>> = [RecoverableRestException::class, SocketTimeoutException::class, ResourceAccessException::class,RedisCommandTimeoutException::class,QueryTimeoutException::class]
 )

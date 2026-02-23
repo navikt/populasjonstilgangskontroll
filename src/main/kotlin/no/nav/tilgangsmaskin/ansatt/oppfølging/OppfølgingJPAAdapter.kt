@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
-import jakarta.persistence.EntityManager
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
@@ -8,37 +7,35 @@ import java.time.Instant
 import java.util.*
 
 @Component
-class OppfølgingJPAAdapter(private val repository: OppfølgingRepository,val entityManager: EntityManager) {
+class OppfølgingJPAAdapter(private val repo: OppfølgingRepository) {
 
     private val log = getLogger(javaClass)
 
-    fun avslutt(id: UUID)  =
-         repository.deleteById(id).also {
-            log.info("Oppfølging avsluttet for $id")
+    fun enhetFor(id: String) =
+        repo.findByBrukerid(id)?.kontor?.let(::Enhetsnummer)
+            ?: repo.findByAktoerid(id)?.kontor?.let(::Enhetsnummer)
+
+    fun insert(id: UUID, brukerId: String, aktørId: String, start: Instant, kontor: String) =
+        repo.save(OppfølgingEntity(id).apply {
+            brukerid = brukerId
+            aktoerid = aktørId
+            startTidspunkt = start
+            this.kontor = kontor
+        }).also {
+            log.info("Oppfølging opprettet for $id")
         }
 
-    fun enhetFor(id: String) =
-        repository.findByBrukerid(id)?.kontor?.let(::Enhetsnummer) ?:
-        repository.findByAktoerid(id)?.kontor?.let(::Enhetsnummer)
+    fun update(id: UUID, start: Instant, kontor: String) =
+        repo.findById(id).orElseThrow()
+            ?.let { entity ->
+            entity.startTidspunkt = start
+            entity.kontor = kontor
+            repo.save(entity)
+            log.info("Oppfølging oppdatert for $id")
+        }
 
-      fun registrer(id: UUID, brukerId: String, aktørId: String, start: Instant, kontor: String) =
-        entityManager.createNativeQuery(UPSERT_QUERY)
-            .setParameter("id", id)
-            .setParameter("brukerid", brukerId)
-            .setParameter("aktoerid", aktørId)
-            .setParameter("startdato", start)
-            .setParameter("kontor", kontor)
-            .executeUpdate()
-
-    companion object {
-        private const val UPSERT_QUERY = """
-            INSERT INTO OPPFOLGING (id, brukerid, aktoerid, start_tidspunkt, kontor, created, updated)
-            VALUES (:id, :brukerid, :aktoerid, :startdato, :kontor,  CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-            ON CONFLICT (id)
-            DO UPDATE SET
-                kontor = EXCLUDED.kontor,
-                start_tidspunkt = EXCLUDED.start_tidspunkt,
-                updated = CURRENT_TIMESTAMP
-        """
-    }
+    fun delete(id: UUID) =
+        repo.deleteById(id).also {
+            log.info("Oppfølging avsluttet for $id")
+        }
 }

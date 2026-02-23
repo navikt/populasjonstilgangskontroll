@@ -11,7 +11,6 @@ import org.springframework.cache.annotation.Caching
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
-import java.time.Instant.now
 import java.util.*
 
 @Service
@@ -30,10 +29,11 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
             CachePut(cacheNames = [OPPFØLGING], key = "#identer.brukerId.verdi")
         ]
     )
-    fun registrer(id: UUID, identer: Identer, kontor: Kontor, tidspunkt: Instant = now()) =
-        kontor.kontorId.apply {
-            db.registrer(id, identer.brukerId.verdi, identer.aktorId.verdi, tidspunkt, verdi)
-        }
+    fun opprett(id: UUID, identer: Identer, kontor: Kontor, tidspunkt: Instant) =
+        db.insert(id, identer.brukerId.verdi, identer.aktorId.verdi, tidspunkt, kontor.kontorId.verdi)
+
+    fun oppdater(id: UUID, kontor: Kontor, tidspunkt: Instant) =
+        db.update(id, tidspunkt, kontor.kontorId.verdi)
 
     @Caching(
         evict = [
@@ -42,5 +42,5 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
         ]
     )
     fun avslutt(id: UUID, identer: Identer) =
-        db.avslutt(id)
+        db.delete(id)
 }

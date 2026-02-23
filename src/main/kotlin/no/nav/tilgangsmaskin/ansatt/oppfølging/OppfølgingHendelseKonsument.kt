@@ -30,17 +30,20 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
 
     private fun opprett(hendelse: OppfølgingHendelse) =
         with(hendelse) {
+            log("Oppfølging starter for",oppfolgingsperiodeUuid,kontor.kontorId.verdi)
             oppfølging.opprett(oppfolgingsperiodeUuid, Identer(ident, aktorId), kontor!!, startTidspunkt)
             log("Oppfølging startet for",oppfolgingsperiodeUuid,kontor.kontorId.verdi)
         }
     private fun oppdater(hendelse: OppfølgingHendelse) =
         with(hendelse) {
+            log("Oppfølging kontor endres til",oppfolgingsperiodeUuid,kontor.kontorId.verdi)
             oppfølging.oppdater(oppfolgingsperiodeUuid, kontor!!, startTidspunkt)
             log("Oppfølging kontor endret til",oppfolgingsperiodeUuid,kontor.kontorId.verdi)
         }
 
     private fun avslutt(hendelse: OppfølgingHendelse) =
         with(hendelse) {
+            log("Oppfølging avsluttes for",oppfolgingsperiodeUuid)
             oppfølging.avslutt(oppfolgingsperiodeUuid, Identer(ident, aktorId))
             log("Oppfølging avsluttet for",oppfolgingsperiodeUuid)
         }

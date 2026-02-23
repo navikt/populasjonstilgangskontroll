@@ -1,6 +1,7 @@
 # Populasjonstilgangskontroll
 Backendsystem for å tilby tilgangskontroll basert på populasjonen.
 
+
 Informasjon om cacher i løsningen
 
 Løsningen har flere cacher for å optimalisere ytelse og redusere belastning på underliggende systemer: 

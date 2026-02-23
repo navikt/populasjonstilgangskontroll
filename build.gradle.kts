@@ -123,7 +123,6 @@ configurations.configureEach {
         }
     }
 }
-
 dependencyManagement {
     imports {
         mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:$otelVersion")
@@ -140,7 +139,10 @@ tasks.withType<BootJar> {
 tasks.test {
     jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
 }
+
+
 
 java {
     toolchain {

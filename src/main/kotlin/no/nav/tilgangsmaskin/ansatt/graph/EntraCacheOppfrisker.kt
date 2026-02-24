@@ -8,10 +8,9 @@ import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOppfrisker
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelElementer
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
-import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
+import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.regler.motor.OppfriskingTeller
 import org.slf4j.MDC
-import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -20,27 +19,20 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
 
     override val cacheName: String = GRAPH
 
-    override fun doOppfrisk(elementer: CacheNøkkelElementer) =
-        if (elementer.metode == GEO || elementer.metode == GEO_OG_GLOBALE)
-            oppfriskMedMetode(elementer, elementer.metode)
-        else
-            log.warn("Ukjent metode ${elementer.metode} i nøkkel ${elementer.nøkkel}")
-
+    override fun doOppfrisk(elementer: CacheNøkkelElementer)  {
+        require(elementer.metode in listOf(GEO, GEO_OG_GLOBALE)) { "Ugyldig metode: ${elementer.metode}" }
+        oppfriskMedMetode(elementer, elementer.metode!!)
+    }
 
     private fun oppfriskMedMetode(elementer: CacheNøkkelElementer, metode: String) {
         val ansattId = AnsattId(elementer.id)
         MDC.put(USER_ID, ansattId.verdi)
         val oid  = oidTjeneste.oidFraEntra(ansattId)
         runCatching {
-            invoke(metode, ansattId, oid)
+            oppfrisk(ansattId, oid, metode)
         }.getOrElse {
-            if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {
-                log.warn("Ansatt {} med oid {} ikke funnet i Entra, sletter og refresher cache entry", ansattId.verdi, oid)
-                cache.delete(OID_CACHE, elementer.id)
-                val nyoid = oidTjeneste.oidFraEntra(ansattId)
-                log.info("Refresh oid OK for ansatt {}, ny verdi er {}", ansattId.verdi, nyoid)
-                invoke(metode, ansattId, nyoid)
-                teller.tell()
+            if (it is NotFoundRestException) {
+                tømOgOppfrisk(ansattId, oid, metode)
             }
             else {
                 feil(elementer, it)
@@ -48,7 +40,16 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
         }
     }
 
-    private fun invoke(metode: String, ansattId: AnsattId, oid: UUID) {
+    private fun tømOgOppfrisk(ansattId: AnsattId, oid: UUID, metode: String) {
+        log.warn("${ansattId.verdi} med oid $oid ikke funnet i Entra, sletter og oppfrisker cache innslag")
+        cache.delete(OID_CACHE, ansattId.verdi)
+        val nyoid = oidTjeneste.oidFraEntra(ansattId)
+        log.info("Oppfrisking oid OK for ${ansattId.verdi}, ny verdi er $nyoid")
+        oppfrisk(ansattId, nyoid, metode)
+        teller.tell()
+    }
+
+    private fun oppfrisk(ansattId: AnsattId, oid: UUID, metode: String) {
         when (metode) {
             GEO -> entra.geoGrupper(ansattId, oid)
             GEO_OG_GLOBALE -> entra.geoOgGlobaleGrupper(ansattId, oid)

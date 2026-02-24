@@ -43,7 +43,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
                 teller.tell()
             }
             else {
-                failure(elementer, it)
+                feil(elementer, it)
             }
         }
     }

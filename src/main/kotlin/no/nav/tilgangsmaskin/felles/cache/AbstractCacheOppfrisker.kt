@@ -16,7 +16,7 @@ abstract class AbstractCacheOppfrisker : CacheOppfrisker {
             .onFailure { feil(elementer, it) }
     }
 
-    private fun feil(elementer: CacheNøkkelElementer, e: Throwable) =
+    protected fun feil(elementer: CacheNøkkelElementer, e: Throwable) =
         log.warn("Oppfrisking av ${elementer.masked} feilet", e)
 
     private fun suksess(elementer: CacheNøkkelElementer, stopWatch: StopWatch) =

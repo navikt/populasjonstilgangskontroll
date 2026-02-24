@@ -7,5 +7,4 @@ data class CacheNøkkelElementer(val nøkkel: String) {
     val cacheName = elementer.first()
     val metode = if (elementer.size > 2) elementer[1] else null
     val id = elementer.last()
-    val masked = listOfNotNull(cacheName, metode, id.maskFnr()).joinToString("::")
-}
+    val masked = "$cacheName::${listOfNotNull(metode, id.maskFnr()).joinToString(":")}"

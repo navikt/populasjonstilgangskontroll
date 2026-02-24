@@ -1,10 +1,8 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import io.opentelemetry.instrumentation.annotations.WithSpan
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
-import kotlin.system.measureTimeMillis
-
+import org.springframework.util.StopWatch
 abstract class AbstractCacheOppfrisker : CacheOppfrisker {
     protected val log = getLogger(javaClass)
 
@@ -12,18 +10,16 @@ abstract class AbstractCacheOppfrisker : CacheOppfrisker {
 
     @WithSpan
     final override fun oppfrisk(elementer: CacheNøkkelElementer) {
-        val varighet = measureTimeMillis {
-            runCatching {
-                doOppfrisk(elementer)
-                log.info("Oppfrisking av ${elementer.cacheName}::${elementer.id.maskFnr()} OK")
-            }.getOrElse {
-                oppfriskingFeilet(elementer, it)
-            }
-        }
-        log.info("Oppfrisking tok ${varighet}ms for ${elementer.cacheName}::${elementer.id.maskFnr()}")
+        val stopWatch = StopWatch().apply { start() }
+        runCatching { doOppfrisk(elementer) }
+            .onSuccess { suksess(elementer, stopWatch) }
+            .onFailure { feil(elementer, it) }
     }
-  protected fun oppfriskingFeilet(elementer: CacheNøkkelElementer, e: Throwable) {
-        log.warn("Oppfrisking av ${elementer.cacheName}::${elementer.id.maskFnr()} feilet", e)
-    }
+    
+    private fun feil(elementer: CacheNøkkelElementer, e: Throwable) =
+        log.warn("Oppfrisking av ${elementer.masked} feilet", e)
+
+    private fun suksess(elementer: CacheNøkkelElementer, stopWatch: StopWatch) =
+        log.info("Oppfrisking av ${elementer.masked} tok ${stopWatch.totalTimeMillis}ms")
 }
 

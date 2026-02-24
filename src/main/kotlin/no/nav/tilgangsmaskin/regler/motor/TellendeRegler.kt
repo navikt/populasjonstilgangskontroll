@@ -43,13 +43,11 @@ class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: Ent
         }
     }
 
-    private fun enhet(intervall: Dødsperiode, ansatt: Ansatt)  =
+    private fun enhet(intervall: Dødsperiode, ansatt: Ansatt) =
         runCatching {
-            if (intervall == MND_13_24 || intervall == MND_OVER_24) {
-                proxy.enhet(ansatt.ansattId).enhetnummer.verdi
-            } else {
-                UTILGJENGELIG
-            }
+            intervall.takeIf { it == MND_13_24 || it == MND_OVER_24 }
+                ?.let { proxy.enhet(ansatt.ansattId).navn }
+                ?: UTILGJENGELIG
         }.getOrDefault(UTILGJENGELIG)
 
 

@@ -19,12 +19,10 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
 
     override val cacheName: String = GRAPH
 
-    override fun doOppfrisk(elementer: CacheNøkkelElementer)  {
-        require(elementer.metode in listOf(GEO, GEO_OG_GLOBALE)) { "Ugyldig metode: ${elementer.metode}" }
-        oppfriskMedMetode(elementer, elementer.metode!!)
-    }
+    override fun doOppfrisk(elementer: CacheNøkkelElementer)  =
+        oppfriskMedMetode(elementer, elementer.metode)
 
-    private fun oppfriskMedMetode(elementer: CacheNøkkelElementer, metode: String) {
+    private fun oppfriskMedMetode(elementer: CacheNøkkelElementer, metode: String?) {
         val ansattId = AnsattId(elementer.id)
         MDC.put(USER_ID, ansattId.verdi)
         val oid  = oidTjeneste.oidFraEntra(ansattId)
@@ -40,7 +38,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
         }
     }
 
-    private fun tømOgOppfrisk(ansattId: AnsattId, oid: UUID, metode: String) {
+    private fun tømOgOppfrisk(ansattId: AnsattId, oid: UUID, metode: String?) {
         log.warn("${ansattId.verdi} med oid $oid ikke funnet i Entra, sletter og oppfrisker cache innslag")
         cache.delete(OID_CACHE, ansattId.verdi)
         val nyoid = oidTjeneste.oidFraEntra(ansattId)
@@ -49,7 +47,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
         teller.tell()
     }
 
-    private fun oppfrisk(ansattId: AnsattId, oid: UUID, metode: String) {
+    private fun oppfrisk(ansattId: AnsattId, oid: UUID, metode: String?) {
         when (metode) {
             GEO -> entra.geoGrupper(ansattId, oid)
             GEO_OG_GLOBALE -> entra.geoOgGlobaleGrupper(ansattId, oid)

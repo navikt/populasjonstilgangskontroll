@@ -18,12 +18,13 @@ import kotlin.reflect.KClass
 @RetryingWhenRecoverable
  class CacheClient(client: RedisClient, private val handler: CacheNøkkelHandler,
     private val alleTreffTeller: BulkCacheSuksessTeller,
-    private val teller: BulkCacheTeller) : CacheOperations {
+    private val teller: BulkCacheTeller,
+     private val cfg: CacheConfig) : CacheOperations {
 
     private val log = getLogger(javaClass)
 
     private val conn = client.connect().apply {
-        timeout = Duration.ofSeconds(30)
+        timeout = Duration.ofSeconds(cfg.timeout.seconds)
         if (isLocalOrTest) {
             sync().configSet("notify-keyspace-events", "Exd")
         }

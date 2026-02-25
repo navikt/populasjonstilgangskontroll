@@ -90,9 +90,11 @@ class CacheClientTest {
         val redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
         val teller = BulkCacheTeller(meterRegistry, token)
         val handler = CacheNøkkelHandler(mgr.cacheConfigurations, valkeyMapper)
+
         client = CacheClient(
-            redisClient, handler, BulkCacheSuksessTeller(meterRegistry, token), teller, /*manager*/
+            redisClient, handler, BulkCacheSuksessTeller(meterRegistry, token), teller, CacheConfig("","",redis.host, redis.firstMappedPort.toString(), Duration.ofSeconds(1), Duration.ofSeconds(1))
         )
+
         listener = CacheElementUtløptLytter(redisClient, eventPublisher)
         val id1 = BrukerId("03508331575")
         val id2 = BrukerId("20478606614")

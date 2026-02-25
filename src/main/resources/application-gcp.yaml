@@ -84,8 +84,8 @@ spring:
 
       host: ${valkey.host}
       port: ${valkey.port}
-      connect-timeout: 10s
-      timeout: 10s
+      connect-timeout: ${valkey.connect-timeout}
+      timeout: ${valkey.timeout}
       username: ${valkey.username}
       password: ${valkey.password}
       ssl:
@@ -187,9 +187,10 @@ graph:
   base-uri: https://graph.microsoft.com/v1.0/
 
 valkey:
+  timeout: 5s
+  connect-timeout: 5s
   username: ${valkey.username.${nais.cluster.cache}}
   password: ${valkey.password.${nais.cluster.cache}}
-  uri: ${valkey.uri.${nais.cluster.cache}}
   port: ${valkey.port.${nais.cluster.cache}}
   host: ${valkey.host.${nais.cluster.cache}}
 

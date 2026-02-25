@@ -1,6 +1,8 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import io.lettuce.core.ClientOptions
 import io.lettuce.core.RedisClient
+import io.lettuce.core.SocketOptions
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
@@ -37,7 +39,15 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
 
     @Bean
     fun redisClient(cfg: CacheConfig) =
-        RedisClient.create(cfg.cacheURI)
+        RedisClient.create(cfg.cacheURI).apply {
+            options = ClientOptions.builder()
+                .socketOptions(
+                    SocketOptions.builder()
+                        .connectTimeout(cfg.connectTimeout)
+                        .build()
+                )
+                .build()
+        }
 
     @Bean
     fun cacheNøkkelHandler(mgr: RedisCacheManager) =

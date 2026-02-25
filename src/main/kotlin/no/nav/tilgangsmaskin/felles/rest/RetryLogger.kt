@@ -12,21 +12,37 @@ class RetryLogger {
 
     @EventListener(MethodRetryEvent::class)
     fun onEvent(event: MethodRetryEvent) {
-        val failure = (event.failure as? NotFoundRestException)
-            ?: (event.failure.cause as? NotFoundRestException)
-            ?: event.failure
-        log.info("Retry event $event",event.failure)
-        if (failure is NotFoundRestException)
-            log.info("Ikke funnet exception cause fra '${event.method.name}' for [${failure.identifikator}] på ${failure.uri} (${event.isRetryAborted}", event.failure)
-        else if (event.isRetryAborted) {
-            if (failure !is RetryException) {
-                log.warn("Aborterer metode '${event.method.name}' grunnet ${failure.javaClass.simpleName} (${event.source.arguments.toSet()}", failure) // Skjer dette noen gang? Det er vel bare 
+        val args = event.source.arguments.toSet()
+        val metode = event.method.name
+        when (val t = cause(event)) {
+            is NotFoundRestException -> logNotFound(metode, t)
+            else -> if (event.isRetryAborted) {
+                logAbort(metode, args, t)
             } else {
-                log.warn("Aborterer metode '${event.method.name}' grunnet ${failure.cause?.javaClass?.simpleName} (${event.source.arguments.toSet()}", failure.cause)
+                logRetrying(metode, args, t)
             }
         }
-        else {
-            log.warn("Feil i metode '${event.method.name}',(${event.source.arguments.toSet()})  prøver igjen", failure)
-        }
     }
+
+    private fun logRetrying(metode: String, args: Set<Any?>, t: Throwable?) =
+        log.warn("Feil i '$metode' ($args)  prøver igjen", t)
+
+
+    private fun logNotFound(metode: String, t: NotFoundRestException) =
+        log.info("NotFoundRestException fra '$metode' for [${t.identifikator}] på ${t.uri}", t)
+
+
+    private fun cause(event: MethodRetryEvent)  =
+        listOf(event.failure, event.failure.cause)
+            .filterIsInstance<NotFoundRestException>()
+            .firstOrNull()
+            ?: event.failure
+
+    private fun logAbort(method: String, args: Set<Any?>, t: Throwable) =
+        if (t !is RetryException) {
+            log.warn("Aborterer metode '$method}' grunnet ${t.javaClass.simpleName} $args", t) // Skjer dette noen gang?
+        } else {
+            log.warn("Aborterer metode '$method' grunnet ${t.cause?.javaClass?.simpleName} $args", t.cause)
+        }
+
 }

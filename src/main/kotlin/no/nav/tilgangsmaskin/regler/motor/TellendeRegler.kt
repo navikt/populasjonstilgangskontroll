@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import io.micrometer.core.instrument.Tag
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker
@@ -36,10 +35,11 @@ class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: Ent
 
     override fun tell(ansatt: Ansatt, bruker: Bruker) {
         val intervall = bruker.dødsdato!!.intervallSiden()
-        val enhet = enhet(intervall, ansatt)
-        teller.tell(månederTag(intervall),enhetTag(enhet))
-        if (enhet != UTILGJENGELIG)  {
-            auditor.info("Ansatt ${ansatt.ansattId.verdi} i enhet $enhet fikk tilgang til forlengst avdød bruker ${bruker.brukerId.verdi}")
+        with(enhet(intervall, ansatt)) {
+            teller.tell(intervall,this)
+            if (this != UTILGJENGELIG)  {
+                auditor.info("Ansatt ${ansatt.ansattId.verdi} i enhet $this fikk tilgang til forlengst avdød bruker ${bruker.brukerId.verdi}")
+            }
         }
     }
 
@@ -53,10 +53,4 @@ class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: Ent
 
     override val metadata = RegelMetadata(AVDØD)
 
-    companion object {
-        private const val ENHET = "enhet"
-        private const val MÅNEDER = "months"
-        private fun enhetTag(enhet : String) = Tag.of(ENHET,enhet)
-        private fun månederTag(periode : Dødsperiode) = Tag.of(MÅNEDER,periode.tekst)
-    }
 }

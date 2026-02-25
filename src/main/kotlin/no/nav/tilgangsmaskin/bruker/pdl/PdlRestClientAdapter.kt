@@ -21,16 +21,13 @@ class PdlRestClientAdapter(
     private val cache: CacheOperations,
     private val mapper: JsonMapper) : AbstractRestClientAdapter(restClient, cf) {
 
-    @WithSpan
     fun medUtvidetFamile(id: String, partnere: Set<FamilieMedlem>) =
         with(person(id)) {
             copy(familie = familie.copy(søsken = søsken(foreldre, brukerId.verdi), partnere = partnere))
         }
 
-    @WithSpan
     fun person(oppslagId: String) = tilPerson(oppslagId,get<PdlRespons>(cf.personURI, mapOf("ident" to oppslagId,IDENTIFIKATOR to oppslagId)))
 
-    @WithSpan
     fun personer(identer: Set<String>) : Set<Person> {
 
         val fraCache = fraCache(identer)
@@ -45,7 +42,6 @@ class PdlRestClientAdapter(
     }
 
 
-    @WithSpan
     private fun fraCache(identer: Set<String>) : Map<String,Person>{
         if (identer.isEmpty()) {
             return emptyMap()
@@ -55,7 +51,6 @@ class PdlRestClientAdapter(
         return innslag.filterValues { it != null }.mapValues { it.value!! }
     }
 
-    @WithSpan
     private fun fraRest(identer: Set<String>) : Map<String,Person> {
         if (identer.isEmpty()) {
             return emptyMap()

@@ -171,11 +171,9 @@ class CacheClientTest {
         mockServer.expect(requestTo(pdlConfig.personerURI))
             .andRespond(withSuccess(restRespons, APPLICATION_JSON))
 
-        val personer = adapter.personer(setOf(person1.brukerId.verdi, person2.brukerId.verdi))
+        var personer = adapter.personer(setOf(person1.brukerId.verdi, person2.brukerId.verdi))
 
         mockServer.verify()
-        assertThat(personer.map { it.brukerId.verdi })
-            .containsExactlyInAnyOrder(person1.brukerId.verdi, person2.brukerId.verdi)
 
         assertThat(personer).containsExactlyInAnyOrder(person1,person2)
 
@@ -183,8 +181,9 @@ class CacheClientTest {
         assertEquals(person2,cache.getOne(person2.brukerId.verdi,PDL_MED_FAMILIE_CACHE,Person::class))
 
         mockServer.reset()
-        adapter.personer(setOf(person1.brukerId.verdi, person2.brukerId.verdi))
-        mockServer.verify() // ingen forventninger registrert — feiler hvis REST faktisk ble kalt
+        personer = adapter.personer(setOf(person1.brukerId.verdi, person2.brukerId.verdi))
+        assertThat(personer).containsExactlyInAnyOrder(person1,person2)
+        mockServer.verify() 
     }
 
     companion object {

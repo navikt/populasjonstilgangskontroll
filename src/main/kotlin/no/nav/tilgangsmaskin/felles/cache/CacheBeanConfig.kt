@@ -25,10 +25,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
                       private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
 
-    private val mapper = JsonMapper.builder().polymorphicTypeValidator(NavPolymorphicTypeValidator()).apply {
-        addModule(Builder().build())
-        addModule(JacksonTypeInfoAddingValkeyModule())
-    }.build()
+
 
     @Bean
     override fun cacheManager()  =
@@ -51,7 +48,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
 
     @Bean
     fun cacheNøkkelHandler(mgr: RedisCacheManager) =
-        CacheNøkkelHandler(mgr.cacheConfigurations,mapper)
+        CacheNøkkelHandler(mgr.cacheConfigurations)
 
     @Bean
     fun cacheHealthIndicator(adapter: CacheAdapter)  =
@@ -61,9 +58,16 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
         defaultCacheConfig()
             .entryTtl(cfg.varighet)
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))
-            .serializeValuesWith(fromSerializer(GenericJacksonJsonRedisSerializer(mapper)))
+            .serializeValuesWith(fromSerializer(GenericJacksonJsonRedisSerializer(VALKEY_MAPPER)))
             .apply {
                 if (!cfg.cacheNulls) disableCachingNullValues()
             }
+
+    companion object {
+        val VALKEY_MAPPER = JsonMapper.builder().polymorphicTypeValidator(NavPolymorphicTypeValidator()).apply {
+            addModule(Builder().build())
+            addModule(JacksonTypeInfoAddingValkeyModule())
+        }.build()
+    }
 }
 

@@ -1,11 +1,12 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import no.nav.tilgangsmaskin.felles.cache.CacheBeanConfig.Companion.VALKEY_MAPPER
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import tools.jackson.databind.json.JsonMapper
 import kotlin.reflect.KClass
 
-class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration?>, val mapper: JsonMapper) {
+class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration?>, val mapper: JsonMapper = VALKEY_MAPPER) {
 
     private val log = getLogger(javaClass)
 

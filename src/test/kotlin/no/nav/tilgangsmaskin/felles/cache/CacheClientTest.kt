@@ -35,8 +35,8 @@ import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
@@ -55,8 +55,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.client.MockRestServiceServer.bindTo
 import org.testcontainers.junit.jupiter.Testcontainers
 import tools.jackson.databind.json.JsonMapper
-import tools.jackson.module.kotlin.KotlinModule.Builder
-import java.time.Duration
+import java.time.Duration.ofSeconds
 import java.util.concurrent.TimeUnit.*
 
 @DataRedisTest
@@ -67,13 +66,6 @@ import java.util.concurrent.TimeUnit.*
 @ExtendWith(MockKExtension::class)
 @Import(JacksonAutoConfiguration::class)
 class CacheClientTest {
-
-
-    private  val valkeyMapper = JsonMapper.builder().polymorphicTypeValidator(NavPolymorphicTypeValidator()).apply {
-        addModule(Builder().build())
-        addModule(JacksonTypeInfoAddingValkeyModule())
-    }.build()
-
 
     @Autowired
     private lateinit var meterRegistry: MeterRegistry
@@ -93,7 +85,7 @@ class CacheClientTest {
     private lateinit var cf: RedisConnectionFactory
     private lateinit var person1:  Person
     private lateinit var person2:  Person
-    private lateinit var cache: CacheClient
+    private lateinit var cache: CacheOperations
 
     @BeforeEach
     fun setUp() {
@@ -106,14 +98,17 @@ class CacheClientTest {
                     .prefixCacheNameWith(PDL)
                     .disableCachingNullValues()
             ))
-            .build()
-        mgr.getCache(PDL_MED_FAMILIE_CACHE.name)
+            .build().apply {
+                getCache(PDL_MED_FAMILIE_CACHE.name) // init
+            }
         val redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
-        val teller = BulkCacheTeller(meterRegistry, token)
-        val handler = CacheNøkkelHandler(mgr.cacheConfigurations, valkeyMapper)
+        val handler = CacheNøkkelHandler(mgr.cacheConfigurations)
 
         cache = CacheClient(
-            redisClient, handler, BulkCacheSuksessTeller(meterRegistry, token), teller, CacheConfig("","",redis.host, redis.firstMappedPort.toString(), Duration.ofSeconds(1), Duration.ofSeconds(1))
+            redisClient, handler, BulkCacheSuksessTeller(meterRegistry, token),
+            BulkCacheTeller(meterRegistry, token), CacheConfig("user","pw",redis.host, redis.firstMappedPort.toString(),
+                ofSeconds(1),
+                ofSeconds(1))
         )
 
         listener = CacheElementUtløptLytter(redisClient, eventPublisher)
@@ -124,8 +119,9 @@ class CacheClientTest {
     }
 
     @Test
-    fun putAndGetOnePdl() {
-        cache.putOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, person1, Duration.ofSeconds(1))
+    @DisplayName("Put og get en verdi, og verifiser at den er borte etter utløp")
+    fun putAndGetOne() {
+        cache.putOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, person1, ofSeconds(1))
         val one = cache.getOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, Person::class)
         assertThat(one).isEqualTo(person1)
         await.atMost(3, SECONDS).until {
@@ -133,21 +129,25 @@ class CacheClientTest {
         }
     }
     @Test
-    fun putAndGetManyPdl() {
+    @DisplayName("Put og get flere verdier, og verifiser at de er borte etter utløp")
+    fun putAndGetMany() {
         val ids = setOf(person1.brukerId.verdi,person2.brukerId.verdi)
         cache.putMany(mapOf(person1.brukerId.verdi to person1, person2.brukerId.verdi to person2),
             PDL_MED_FAMILIE_CACHE,
-            Duration.ofSeconds(1))
+            ofSeconds(1))
         val many = cache.getMany(ids, PDL_MED_FAMILIE_CACHE, Person::class)
         assertThat(many.keys).containsExactlyInAnyOrderElementsOf(ids)
-        val nøkler = cache.getAllKeys(PDL_MED_FAMILIE_CACHE).map { CacheNøkkelElementer(it).id }
-        assertThat(nøkler).containsExactlyInAnyOrderElementsOf(ids)
+        assertThat(person1).isEqualTo(cache.getOne(person1.brukerId.verdi,PDL_MED_FAMILIE_CACHE,Person::class))
+
+        assertThat(person2).isEqualTo(cache.getOne(person2.brukerId.verdi,PDL_MED_FAMILIE_CACHE,Person::class))
+
         await.atMost(3, SECONDS).until {
             cache.getMany(ids, PDL_MED_FAMILIE_CACHE, Person::class).isEmpty()
         }
     }
 
     @Test
+    @DisplayName("Hent personer fra cache og rest, og verifiser at cache treffer og at rest treffes ved cache miss")
     fun henterBareCacheMissFraRest() {
         val pdlBaseUri = URI.create("http://pdl")
         val restClientBuilder = RestClient.builder().baseUrl(pdlBaseUri.toString())
@@ -155,7 +155,7 @@ class CacheClientTest {
         val pdlConfig = PdlConfig(pdlBaseUri)
         val adapter = PdlRestClientAdapter(restClientBuilder.build(), pdlConfig, cache, restMapper)
 
-        cache.putOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, person1, Duration.ofSeconds(10))
+        cache.putOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, person1, ofSeconds(10))
 
         val pdlRespons = PdlRespons(
             PdlPerson(),
@@ -177,13 +177,14 @@ class CacheClientTest {
 
         assertThat(personer).containsExactlyInAnyOrder(person1,person2)
 
-        assertEquals(person1,cache.getOne(person1.brukerId.verdi,PDL_MED_FAMILIE_CACHE,Person::class))
-        assertEquals(person2,cache.getOne(person2.brukerId.verdi,PDL_MED_FAMILIE_CACHE,Person::class))
+        assertThat(person1).isEqualTo(cache.getOne(person1.brukerId.verdi,PDL_MED_FAMILIE_CACHE,Person::class))
+
+        assertThat(person2).isEqualTo(cache.getOne(person2.brukerId.verdi,PDL_MED_FAMILIE_CACHE,Person::class))
 
         mockServer.reset()
         personer = adapter.personer(setOf(person1.brukerId.verdi, person2.brukerId.verdi))
         assertThat(personer).containsExactlyInAnyOrder(person1,person2)
-        mockServer.verify() 
+        mockServer.verify()
     }
 
     companion object {

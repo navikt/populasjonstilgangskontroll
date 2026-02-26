@@ -148,8 +148,6 @@ class CacheTest {
         val mockServer = bindTo(restClientBuilder).build()
         val cfg = PdlConfig(baseUri)
         val adapter = PdlRestClientAdapter(restClientBuilder.build(), cfg, cache, mapper)
-
-
         val restRespons = mapper.writeValueAsString(mapOf(I2 to PdlRespons(
             PdlPerson(),
             PdlIdenter(listOf(
@@ -159,9 +157,9 @@ class CacheTest {
             PdlGeografiskTilknytning(KOMMUNE, GTKommune((P2.geoTilknytning as KommuneTilknytning).kommune.verdi))
         )))
 
+        cache.putOne(I1, PDL_MED_FAMILIE_CACHE, P1, ofSeconds(10))
         mockServer.expect(requestTo(cfg.personerURI))
             .andRespond(withSuccess(restRespons, APPLICATION_JSON))
-        cache.putOne(I1, PDL_MED_FAMILIE_CACHE, P1, ofSeconds(10))
         assertThat(adapter.personer(IDS)).containsExactlyInAnyOrder(P1,P2)
 
         assertThat(cache.getMany(IDS, PDL_MED_FAMILIE_CACHE, Person::class).keys).containsExactlyInAnyOrderElementsOf(IDS)

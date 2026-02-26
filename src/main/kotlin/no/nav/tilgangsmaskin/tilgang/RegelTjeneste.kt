@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
+import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
@@ -58,7 +59,7 @@ class RegelTjeneste(
     private fun bruker(brukerId: String) = runCatching {
         brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
     }.getOrElse {
-        if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {
+        if (it is NotFoundRestException) {
             auditor.info("${NOT_FOUND.name}: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
             null
         } else {
@@ -95,7 +96,7 @@ class RegelTjeneste(
             val ikkeFunnet = ikkeFunnet(idOgType, resultater).also {
                 if (it.isNotEmpty()) {
                     auditor.info("404: Brukere med identer ${it.map { ident -> ident.brukerId }} ikke funnet i PDL ved oppslag")
-                    log.debug("Bulk ikke funnet {}", it)
+                    log.debug("${it.size} bulk elementer ikke funnet")
                 }
             }
 

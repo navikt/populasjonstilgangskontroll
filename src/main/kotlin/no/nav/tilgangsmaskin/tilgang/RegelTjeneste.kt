@@ -85,25 +85,10 @@ class RegelTjeneste(
             val resultater = motor.bulkRegler(ansatt, brukere).also {
                 log.debug("Bulk resultater {}", it)
             }
-            val godkjente = godkjente(ansatt, resultater).also {
-                if (it.isNotEmpty()) {
-                    log.debug("Bulk godkjente oppslagId(s) {}", it.map { it.brukerId })
-                }
-            }
-            val avviste = avviste(ansatt, godkjente, resultater, brukere).also {
-                log.debug("Bulk avviste {}", it)
-            }
-            val ikkeFunnet = ikkeFunnet(idOgType, resultater).also {
-                if (it.isNotEmpty()) {
-                    auditor.info("404: Brukere med identer ${it.map { ident -> ident.brukerId }} ikke funnet i PDL ved oppslag")
-                    log.debug("${it.size} bulk elementer ikke funnet")
-                }
-            }
-
-            AggregertBulkRespons(ansattId, godkjente + avviste + ikkeFunnet).also {
-                log.debug("Bulk respons ({} godkjent(e), {} avvist(e), {} ikke funnet) for {} er {} ", it.godkjente.size, it.avviste.size,
-                    it.ukjente.size, ansattId, it)
-            }
+            val godkjente = godkjente(ansatt, resultater)
+            val avviste = avviste(ansatt, godkjente, resultater, brukere)
+            val ikkeFunnet = ikkeFunnet(idOgType, resultater)
+            AggregertBulkRespons(ansattId, godkjente + avviste + ikkeFunnet)
         }
         log.info("Tid brukt på bulk med størrelse ${idOgType.size} for $ansattId: ${elapsedTime.inWholeMilliseconds}ms")
         return respons
@@ -118,6 +103,11 @@ class RegelTjeneste(
             for (item in (oppgitt - funnet)) {
                 add(ok(item.brukerId))
             }
+        }.also {
+            if (it.isNotEmpty()) {
+                auditor.info("404: Brukere med identer ${it.map { ident -> ident.brukerId }} ikke funnet i PDL ved oppslag")
+                log.debug("${it.size} bulk elementer ikke funnet")
+            }
         }
 
     private fun avviste(ansatt: Ansatt, godkjente: Set<EnkeltBulkRespons>, resultater: Set<BulkResultat>, brukere: Set<BrukerOgRegelsett>) =
@@ -130,7 +120,9 @@ class RegelTjeneste(
                 add(EnkeltBulkRespons(RegelException(ansatt, brukere.finnBruker(resultat.bruker.oppslagId), resultat.regel!!, status = resultat.status)))
             }
         }
-    }
+    }.also {
+            log.debug("Bulk avviste {}", it)
+        }
 
     private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) =
         buildSet {
@@ -139,6 +131,10 @@ class RegelTjeneste(
             overstyringTjeneste
                 .overstyringer(ansatt.ansattId, avviste.map { it.bruker.brukerId })
                 .forEach { add(ok(it.verdi)) }
+        }.also {
+            if (it.isNotEmpty()) {
+                log.debug("Bulk godkjente oppslagId(s) {}", it.map { it.brukerId })
+            }
         }
 
 

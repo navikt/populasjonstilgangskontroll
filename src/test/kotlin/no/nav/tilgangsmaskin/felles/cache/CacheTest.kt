@@ -65,7 +65,7 @@ import java.util.concurrent.TimeUnit.*
 @TestInstance(PER_CLASS)
 @ExtendWith(MockKExtension::class)
 @Import(JacksonAutoConfiguration::class)
-class CacheClientTest {
+class CacheTest {
 
     @Autowired
     private lateinit var meterRegistry: MeterRegistry
@@ -149,26 +149,24 @@ class CacheClientTest {
     @Test
     @DisplayName("Hent personer fra cache og rest, og verifiser at cache treffer og at rest treffes ved cache miss")
     fun henterBareCacheMissFraRest() {
-        val pdlBaseUri = URI.create("http://pdl")
-        val restClientBuilder = RestClient.builder().baseUrl(pdlBaseUri.toString())
+        val baseUri = URI.create("http://pdl")
+        val restClientBuilder = RestClient.builder().baseUrl("$baseUri")
         val mockServer = bindTo(restClientBuilder).build()
-        val pdlConfig = PdlConfig(pdlBaseUri)
-        val adapter = PdlRestClientAdapter(restClientBuilder.build(), pdlConfig, cache, restMapper)
+        val cfg = PdlConfig(baseUri)
+        val adapter = PdlRestClientAdapter(restClientBuilder.build(), cfg, cache, restMapper)
 
         cache.putOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, person1, ofSeconds(10))
 
-        val pdlRespons = PdlRespons(
+        val restRespons = restMapper.writeValueAsString(mapOf(person2.brukerId.verdi to PdlRespons(
             PdlPerson(),
             PdlIdenter(listOf(
                 PdlIdent(person2.brukerId.verdi, false, FOLKEREGISTERIDENT),
                 PdlIdent(person2.aktørId.verdi, false, AKTORID)
             )),
             PdlGeografiskTilknytning(KOMMUNE, GTKommune((person2.geoTilknytning as KommuneTilknytning).kommune.verdi))
-        )
+        )))
 
-        val restRespons = restMapper.writeValueAsString(mapOf(person2.brukerId.verdi to pdlRespons))
-
-        mockServer.expect(requestTo(pdlConfig.personerURI))
+        mockServer.expect(requestTo(cfg.personerURI))
             .andRespond(withSuccess(restRespons, APPLICATION_JSON))
 
         var personer = adapter.personer(setOf(person1.brukerId.verdi, person2.brukerId.verdi))
@@ -177,13 +175,13 @@ class CacheClientTest {
 
         assertThat(personer).containsExactlyInAnyOrder(person1,person2)
 
-        assertThat(person1).isEqualTo(cache.getOne(person1.brukerId.verdi,PDL_MED_FAMILIE_CACHE,Person::class))
+        assertThat(cache.getOne(person1.brukerId.verdi,PDL_MED_FAMILIE_CACHE,Person::class)).isEqualTo(person1)
 
-        assertThat(person2).isEqualTo(cache.getOne(person2.brukerId.verdi,PDL_MED_FAMILIE_CACHE,Person::class))
+        assertThat(cache.getOne(person2.brukerId.verdi,PDL_MED_FAMILIE_CACHE,Person::class)).isEqualTo(person2)
 
         mockServer.reset()
-        personer = adapter.personer(setOf(person1.brukerId.verdi, person2.brukerId.verdi))
-        assertThat(personer).containsExactlyInAnyOrder(person1,person2)
+
+        assertThat(adapter.personer(setOf(person1.brukerId.verdi, person2.brukerId.verdi))).containsExactlyInAnyOrder(person1,person2)
         mockServer.verify()
     }
 

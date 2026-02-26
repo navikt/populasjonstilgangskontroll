@@ -12,7 +12,6 @@ import tools.jackson.module.kotlin.jsonMapper
 
 class CacheNøkkelHandlerTest : DescribeSpec({
     val id = "01011111111"
-    val mapper = jsonMapper()
     lateinit var redisConfig: RedisCacheConfiguration
     lateinit var handler: CacheNøkkelHandler
 
@@ -24,8 +23,7 @@ class CacheNøkkelHandlerTest : DescribeSpec({
             mapOf(
                 PDL_MED_FAMILIE_CACHE.name to redisConfig,
                 OID_CACHE.name to redisConfig
-            ),
-            mapper
+            )
         )
     }
 
@@ -44,7 +42,7 @@ class CacheNøkkelHandlerTest : DescribeSpec({
         }
         it("kaster exception hvis cache config mangler") {
             shouldThrow<IllegalStateException> {
-                CacheNøkkelHandler(emptyMap(), mapper).tilNøkkel(CachableConfig("unknown"), "key")
+                CacheNøkkelHandler(emptyMap()).tilNøkkel(CachableConfig("unknown"), "key")
             }
         }
     }

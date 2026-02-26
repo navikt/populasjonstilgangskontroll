@@ -36,6 +36,7 @@ class PdlRestClientAdapter(
             return fraCache.values.toSet()
         }
 
+        log.trace("Fant ${fraCache.size} person(er) av ${identer.size} mulige i cache")
         val fraRest = fraRest(identer  - fraCache.keys)
 
         cache.putMany(fraRest, PDL_MED_FAMILIE_CACHE, cf.varighet)
@@ -48,7 +49,6 @@ class PdlRestClientAdapter(
             return emptyMap()
         }
         val innslag = cache.getMany(identer, PDL_MED_FAMILIE_CACHE, Person::class)
-        log.trace("Hentet ${innslag.size} person(er) av ${identer.size} mulige fra ${PDL_MED_FAMILIE_CACHE.name} for ${identer.size} ident(er)")
         return innslag.filterValues { it != null }.mapValues { it.value!! }
     }
 

@@ -1,20 +1,24 @@
 package no.nav.tilgangsmaskin.ansatt.`oppfølging`
 
+import com.fasterxml.jackson.annotation.JsonAlias
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import java.time.Instant
 import java.util.*
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class OppfølgingHendelse(
+    @param:JsonAlias("oppfolgingsperiodeUuid")
+    val id: UUID,
     val kontor: Kontor?,
-    val sisteEndringsType: EndringType,
-    val oppfolgingsperiodeUuid: UUID,
+    @param:JsonAlias("sisteEndringsType")
+    val endringType: EndringType,
     val aktorId: AktørId,
-    val ident: BrukerId,
-    val startTidspunkt: Instant,
-    val sluttTidspunkt: Instant?, // Nullable, always null on start messages
-    val producerTimestamp: Instant) {
+    @param:JsonAlias("ident")
+    val brukerId: BrukerId,
+    val startTidspunkt: Instant) {
 
     enum class EndringType {
         ARBEIDSOPPFOLGINGSKONTOR_ENDRET,

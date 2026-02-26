@@ -4,7 +4,6 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING_ERROR_HANDLER
 import no.nav.tilgangsmaskin.bruker.Identer
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -13,32 +12,33 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste) {
 
-    private val log = getLogger(javaClass)
 
     @KafkaListener(
         topics = [OPPFØLGING_TOPIC],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
-        groupId = OPPFØLGING +"-debug2",
+        groupId = OPPFØLGING +"-debug6",
         errorHandler = OPPFØLGING_ERROR_HANDLER)
 
     fun listen(hendelse: OppfølgingHendelse) =
-        when (hendelse.sisteEndringsType) {
-            OPPFOLGING_STARTET -> registrer(hendelse, "Oppfølging startet")
-            ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> registrer(hendelse, "Oppfølging endret")
-            OPPFOLGING_AVSLUTTET -> avslutt(hendelse,"Oppfølging avsluttet")
+        when (hendelse.endringType) {
+            OPPFOLGING_STARTET -> opprett(hendelse)
+            ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> oppdater(hendelse)
+            OPPFOLGING_AVSLUTTET -> avslutt(hendelse)
         }
 
-    private fun registrer(hendelse: OppfølgingHendelse, melding: String) =
+    private fun opprett(hendelse: OppfølgingHendelse) =
         with(hendelse) {
-            oppfølging.registrer(oppfolgingsperiodeUuid,
-                Identer(ident, aktorId), kontor!!, startTidspunkt)
-            log.info("$melding til ${kontor.kontorId.verdi} for $oppfolgingsperiodeUuid")
+            oppfølging.opprett(id, Identer(brukerId, aktorId), kontor!!, startTidspunkt)
+        }
+    private fun oppdater(hendelse: OppfølgingHendelse) =
+        with(hendelse) {
+            oppfølging.oppdater(id, Identer(brukerId, aktorId),kontor!!, startTidspunkt)
+                ?: oppfølging.opprett(id, Identer(brukerId, aktorId), kontor, startTidspunkt)
         }
 
-    private fun avslutt(hendelse: OppfølgingHendelse, melding: String) =
+    private fun avslutt(hendelse: OppfølgingHendelse) =
         with(hendelse) {
-            oppfølging.avslutt(oppfolgingsperiodeUuid, Identer(ident, aktorId))
-            log.info("$melding for $oppfolgingsperiodeUuid")
+            oppfølging.avslutt(id, Identer(brukerId, aktorId))
         }
 
     companion object {

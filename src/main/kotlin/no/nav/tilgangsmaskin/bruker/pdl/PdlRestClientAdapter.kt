@@ -35,9 +35,9 @@ class PdlRestClientAdapter(
         if (fraCache.size == identer.size) {
             return fraCache.values.toSet()
         }
-
-        log.trace("Fant ${fraCache.size} person(er) av ${identer.size} mulige i cache")
+        log.trace("Hentet ${fraCache.size} person(er) av ${identer.size} mulige i cache")
         val fraRest = fraRest(identer  - fraCache.keys)
+        log.trace("Hentet ${fraRest.size} person(er) av ${identer.size - fraCache.keys.size} mulige fra REST")
 
         cache.putMany(fraRest, PDL_MED_FAMILIE_CACHE, cf.varighet)
         return (fraRest.values + fraCache.values).toSet()
@@ -58,8 +58,6 @@ class PdlRestClientAdapter(
         }
         else {
             tilPersoner(mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, identer)))
-                .also {
-                    log.trace("Hentet ${it.size} person(er) av ${identer.size} mulige fra REST") }
         }
 
     @WithSpan

@@ -116,27 +116,28 @@ class CacheTest {
     @Test
     @DisplayName("Put og get en verdi, og verifiser at den er borte etter utløp")
     fun putAndGetOne() {
-        cache.putOne(I1, PDL_MED_FAMILIE_CACHE, P1, ofSeconds(1))
-        val one = cache.getOne(I1, PDL_MED_FAMILIE_CACHE, Person::class)
+        cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(1))
+        val one = cache.getOne(PDL_MED_FAMILIE_CACHE,I1,  Person::class)
         assertThat(one).isEqualTo(P1)
         await.atMost(3, SECONDS).until {
-            cache.getOne(I1, PDL_MED_FAMILIE_CACHE, Person::class) == null
+            cache.getOne(PDL_MED_FAMILIE_CACHE,I1, Person::class) == null
         }
     }
     @Test
     @DisplayName("Put og get flere verdier, og verifiser at de er borte etter utløp")
     fun putAndGetMany() {
-        cache.putMany(mapOf(I1 to P1, I2 to P2),
-            PDL_MED_FAMILIE_CACHE,
+        cache.putMany(PDL_MED_FAMILIE_CACHE,
+            mapOf(I1 to P1, I2 to P2),
             ofSeconds(1))
-        val many = cache.getMany(IDS, PDL_MED_FAMILIE_CACHE, Person::class)
+        val many = cache.getMany(PDL_MED_FAMILIE_CACHE, IDS, Person::class)
         assertThat(many.keys).containsExactlyInAnyOrderElementsOf(IDS)
-        assertThat(P1).isEqualTo(cache.getOne(I1,PDL_MED_FAMILIE_CACHE,Person::class))
+        assertThat(P1).isEqualTo(cache.getOne(PDL_MED_FAMILIE_CACHE,
+            I1,Person::class))
 
-        assertThat(P2).isEqualTo(cache.getOne(I2,PDL_MED_FAMILIE_CACHE,Person::class))
+        assertThat(P2).isEqualTo(cache.getOne(PDL_MED_FAMILIE_CACHE,I2, Person::class))
 
         await.atMost(3, SECONDS).until {
-            cache.getMany(IDS, PDL_MED_FAMILIE_CACHE, Person::class).isEmpty()
+            cache.getMany(PDL_MED_FAMILIE_CACHE, IDS, Person::class).isEmpty()
         }
     }
 
@@ -157,12 +158,12 @@ class CacheTest {
             PdlGeografiskTilknytning(KOMMUNE, GTKommune((P2.geoTilknytning as KommuneTilknytning).kommune.verdi))
         )))
 
-        cache.putOne(I1, PDL_MED_FAMILIE_CACHE, P1, ofSeconds(10))
+        cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(10))
         mockServer.expect(requestTo(cfg.personerURI))
             .andRespond(withSuccess(restRespons, APPLICATION_JSON))
         assertThat(adapter.personer(IDS)).containsExactlyInAnyOrder(P1,P2)
 
-        assertThat(cache.getMany(IDS, PDL_MED_FAMILIE_CACHE, Person::class).keys).containsExactlyInAnyOrderElementsOf(IDS)
+        assertThat(cache.getMany(PDL_MED_FAMILIE_CACHE, IDS, Person::class).keys).containsExactlyInAnyOrderElementsOf(IDS)
         mockServer.verify()
 
         mockServer.reset()
@@ -174,7 +175,7 @@ class CacheTest {
             .andRespond(withSuccess(restRespons, APPLICATION_JSON))
         cache.delete(PDL_MED_FAMILIE_CACHE,I2)
         assertThat(adapter.personer(setOf(I2))).containsExactly(P2)
-        assertThat(cache.getOne(I2,PDL_MED_FAMILIE_CACHE,Person::class)).isEqualTo(P2)
+        assertThat(cache.getOne(PDL_MED_FAMILIE_CACHE,I2,Person::class)).isEqualTo(P2)
         mockServer.verify()
 
     }

@@ -27,13 +27,13 @@ class DevCacheController(
 
 
     @PostMapping("cache/skjerminger")
-    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany(navIds,
-        CachableConfig(SKJERMING), Boolean::class)
+    fun cacheSkjerminger(@RequestBody  navIds: Set<String>) = cacheClient.getMany(CachableConfig(SKJERMING),
+        navIds, Boolean::class)
 
 
     @PostMapping("cache/personer")
-    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany(navIds.map { it.verdi }.toSet(),
-        CachableConfig(PDL), Person::class)
+    fun cachePersoner(@RequestBody  navIds: Set<Identifikator>) = cacheClient.getMany(CachableConfig(PDL),
+        navIds.map { it.verdi }.toSet(), Person::class)
 
     @GetMapping("cache/keys/{cache}")
     fun keys(@PathVariable @Schema(description = "Cache navn", enumAsRef = true)

@@ -5,9 +5,9 @@ import kotlin.reflect.KClass
 
 interface CacheOperations {
     fun delete(cache: CachableConfig, id: String): Long
-    fun <T : Any> getOne(id: String, cache: CachableConfig, clazz: KClass<T>): T?
-    fun putOne(id: String, cache: CachableConfig, value: Any, ttl: Duration)
-    fun <T : Any> getMany(ids: Set<String>, cache: CachableConfig, clazz: KClass<T>): Map<String, T?>
-    fun putMany(innslag: Map<String, Any>, cache: CachableConfig, ttl: Duration)
+    fun <T : Any> getOne(cache: CachableConfig,id: String, clazz: KClass<T>): T?
+    fun putOne(cache: CachableConfig, id: String, value: Any, ttl: Duration)
+    fun <T : Any> getMany(cache: CachableConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T?>
+    fun putMany(cache: CachableConfig, innslag: Map<String, Any>, ttl: Duration)
     fun tilNøkkel(cache: CachableConfig, id: String): String
 }

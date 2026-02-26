@@ -43,7 +43,7 @@ class PdlRestClientAdapter(
             log.trace("Hentet ${fraRest.size} person(er) av ${identer.size - fraCache.keys.size} mulige fra REST")
         }
 
-        cache.putMany(fraRest, PDL_MED_FAMILIE_CACHE, cf.varighet)
+        cache.putMany(PDL_MED_FAMILIE_CACHE, fraRest, cf.varighet)
         return (fraRest.values + fraCache.values).toSet()
     }
 
@@ -52,7 +52,7 @@ class PdlRestClientAdapter(
         if (identer.isEmpty()) {
             return emptyMap()
         }
-        val innslag = cache.getMany(identer, PDL_MED_FAMILIE_CACHE, Person::class)
+        val innslag = cache.getMany(PDL_MED_FAMILIE_CACHE, identer, Person::class)
         return innslag.filterValues { it != null }.mapValues { it.value!! }
     }
 

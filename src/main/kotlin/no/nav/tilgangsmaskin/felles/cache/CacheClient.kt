@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import io.lettuce.core.RedisClient
-import io.lettuce.core.RedisCommandTimeoutException
 import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverable
@@ -9,7 +8,6 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocal
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.dao.QueryTimeoutException
 import org.springframework.stereotype.Component
 import java.time.Duration
 import kotlin.reflect.KClass
@@ -36,13 +34,13 @@ import kotlin.reflect.KClass
 
 
     @WithSpan
-    override fun <T : Any> getOne(id: String, cache: CachableConfig, clazz: KClass<T>): T? =
+    override fun <T : Any> getOne(cache: CachableConfig,id: String, clazz: KClass<T>): T? =
         conn.sync().get(handler.tilNøkkel(cache, id))?.let { json ->
             handler.fraJson(json, clazz)
         }
 
     @WithSpan
-    override fun putOne(id: String, cache: CachableConfig, value: Any, ttl: Duration) {
+    override fun putOne(cache: CachableConfig, id: String, value: Any, ttl: Duration) {
         conn.async().setex(handler.tilNøkkel(cache, id), ttl.seconds, handler.tilJson(value))
     }
 
@@ -53,7 +51,7 @@ import kotlin.reflect.KClass
     else throw UnsupportedOperationException("getAllKeys is only supported in local or test environments")
 
     @WithSpan
-    override fun <T : Any> getMany(ids: Set<String>, cache: CachableConfig, clazz: KClass<T>): Map<String, T?> =
+    override fun <T : Any> getMany(cache: CachableConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T> =
         if (ids.isEmpty()) {
             emptyMap()
         } else {
@@ -65,7 +63,7 @@ import kotlin.reflect.KClass
         }
 
     @WithSpan
-    override fun putMany(innslag: Map<String, Any>, cache: CachableConfig, ttl: Duration) {
+    override fun putMany(cache: CachableConfig, innslag: Map<String, Any>, ttl: Duration) {
         if (innslag.isNotEmpty()) {
             log.trace("Bulk lagrer {} verdier for cache {} med prefix {}", innslag.size, cache.name, cache.extraPrefix)
             conn.apply {

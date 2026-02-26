@@ -161,14 +161,11 @@ class CacheTest {
 
         mockServer.expect(requestTo(cfg.personerURI))
             .andRespond(withSuccess(restRespons, APPLICATION_JSON))
-
         cache.putOne(I1, PDL_MED_FAMILIE_CACHE, P1, ofSeconds(10))
-        val personer = adapter.personer(IDS)
+        assertThat(adapter.personer(IDS)).containsExactlyInAnyOrder(P1,P2)
 
+        assertThat(cache.getMany(IDS, PDL_MED_FAMILIE_CACHE, Person::class).keys).containsExactlyInAnyOrderElementsOf(IDS)
         mockServer.verify()
-        assertThat(personer).containsExactlyInAnyOrder(P1,P2)
-        assertThat(cache.getOne(I1,PDL_MED_FAMILIE_CACHE,Person::class)).isEqualTo(P1)
-        assertThat(cache.getOne(I2,PDL_MED_FAMILIE_CACHE,Person::class)).isEqualTo(P2)
 
         mockServer.reset()
         assertThat(adapter.personer(IDS)).containsExactlyInAnyOrder(P1,P2)
@@ -179,9 +176,8 @@ class CacheTest {
             .andRespond(withSuccess(restRespons, APPLICATION_JSON))
         cache.delete(PDL_MED_FAMILIE_CACHE,I2)
         assertThat(adapter.personer(setOf(I2))).containsExactly(P2)
-        mockServer.verify()
         assertThat(cache.getOne(I2,PDL_MED_FAMILIE_CACHE,Person::class)).isEqualTo(P2)
-
+        mockServer.verify()
 
     }
 

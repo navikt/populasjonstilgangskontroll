@@ -11,14 +11,31 @@ import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
+import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning
+import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTKommune
+import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTType.KOMMUNE
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.AKTORID
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
+import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
+import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
+import org.springframework.web.client.RestClient
+import java.net.URI
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -35,6 +52,7 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.web.client.MockRestServiceServer.bindTo
 import org.testcontainers.junit.jupiter.Testcontainers
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.KotlinModule.Builder
@@ -58,7 +76,10 @@ class CacheClientTest {
 
 
     @Autowired
-    private lateinit var meterRegistry:  MeterRegistry
+    private lateinit var meterRegistry: MeterRegistry
+
+    @Autowired
+    private lateinit var restMapper: JsonMapper
 
     @MockkBean
     private lateinit var token: Token
@@ -72,7 +93,7 @@ class CacheClientTest {
     private lateinit var cf: RedisConnectionFactory
     private lateinit var person1:  Person
     private lateinit var person2:  Person
-    private lateinit var client: CacheClient
+    private lateinit var cache: CacheClient
 
     @BeforeEach
     fun setUp() {
@@ -91,7 +112,7 @@ class CacheClientTest {
         val teller = BulkCacheTeller(meterRegistry, token)
         val handler = CacheNøkkelHandler(mgr.cacheConfigurations, valkeyMapper)
 
-        client = CacheClient(
+        cache = CacheClient(
             redisClient, handler, BulkCacheSuksessTeller(meterRegistry, token), teller, CacheConfig("","",redis.host, redis.firstMappedPort.toString(), Duration.ofSeconds(1), Duration.ofSeconds(1))
         )
 
@@ -104,26 +125,66 @@ class CacheClientTest {
 
     @Test
     fun putAndGetOnePdl() {
-        client.putOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, person1, Duration.ofSeconds(1))
-        val one = client.getOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, Person::class)
+        cache.putOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, person1, Duration.ofSeconds(1))
+        val one = cache.getOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, Person::class)
         assertThat(one).isEqualTo(person1)
         await.atMost(3, SECONDS).until {
-            client.getOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, Person::class) == null
+            cache.getOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, Person::class) == null
         }
     }
     @Test
     fun putAndGetManyPdl() {
         val ids = setOf(person1.brukerId.verdi,person2.brukerId.verdi)
-        client.putMany(mapOf(person1.brukerId.verdi to person1, person2.brukerId.verdi to person2),
+        cache.putMany(mapOf(person1.brukerId.verdi to person1, person2.brukerId.verdi to person2),
             PDL_MED_FAMILIE_CACHE,
             Duration.ofSeconds(1))
-        val many = client.getMany(ids, PDL_MED_FAMILIE_CACHE, Person::class)
+        val many = cache.getMany(ids, PDL_MED_FAMILIE_CACHE, Person::class)
         assertThat(many.keys).containsExactlyInAnyOrderElementsOf(ids)
-        val nøkler = client.getAllKeys(PDL_MED_FAMILIE_CACHE).map { CacheNøkkelElementer(it).id }
+        val nøkler = cache.getAllKeys(PDL_MED_FAMILIE_CACHE).map { CacheNøkkelElementer(it).id }
         assertThat(nøkler).containsExactlyInAnyOrderElementsOf(ids)
         await.atMost(3, SECONDS).until {
-            client.getMany(ids, PDL_MED_FAMILIE_CACHE, Person::class).isEmpty()
+            cache.getMany(ids, PDL_MED_FAMILIE_CACHE, Person::class).isEmpty()
         }
+    }
+
+    @Test
+    fun henterBareCacheMissFraRest() {
+        val pdlBaseUri = URI.create("http://pdl")
+        val restClientBuilder = RestClient.builder().baseUrl(pdlBaseUri.toString())
+        val mockServer = bindTo(restClientBuilder).build()
+        val pdlConfig = PdlConfig(pdlBaseUri)
+        val adapter = PdlRestClientAdapter(restClientBuilder.build(), pdlConfig, cache, restMapper)
+
+        cache.putOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, person1, Duration.ofSeconds(10))
+
+        val pdlRespons = PdlRespons(
+            PdlPerson(),
+            PdlIdenter(listOf(
+                PdlIdent(person2.brukerId.verdi, false, FOLKEREGISTERIDENT),
+                PdlIdent(person2.aktørId.verdi, false, AKTORID)
+            )),
+            PdlGeografiskTilknytning(KOMMUNE, GTKommune((person2.geoTilknytning as KommuneTilknytning).kommune.verdi))
+        )
+
+        val restRespons = restMapper.writeValueAsString(mapOf(person2.brukerId.verdi to pdlRespons))
+
+        mockServer.expect(requestTo(pdlConfig.personerURI))
+            .andRespond(withSuccess(restRespons, APPLICATION_JSON))
+
+        val personer = adapter.personer(setOf(person1.brukerId.verdi, person2.brukerId.verdi))
+
+        mockServer.verify()
+        assertThat(personer.map { it.brukerId.verdi })
+            .containsExactlyInAnyOrder(person1.brukerId.verdi, person2.brukerId.verdi)
+
+        assertThat(personer).containsExactlyInAnyOrder(person1,person2)
+
+        assertEquals(person1,cache.getOne(person1.brukerId.verdi,PDL_MED_FAMILIE_CACHE,Person::class))
+        assertEquals(person2,cache.getOne(person2.brukerId.verdi,PDL_MED_FAMILIE_CACHE,Person::class))
+
+        mockServer.reset()
+        adapter.personer(setOf(person1.brukerId.verdi, person2.brukerId.verdi))
+        mockServer.verify() // ingen forventninger registrert — feiler hvis REST faktisk ble kalt
     }
 
     companion object {

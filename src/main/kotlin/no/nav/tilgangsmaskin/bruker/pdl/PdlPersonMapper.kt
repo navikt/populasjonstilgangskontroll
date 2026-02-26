@@ -66,6 +66,12 @@ object PdlPersonMapper {
             )
         }
 
+    fun tilPersoner(responser: Map<String, PdlRespons?>): Map<String, Person> =
+        responser
+            .mapValues { (oppslagId, pdlRespons) -> pdlRespons?.let { tilPerson(oppslagId, it) } }
+            .filterValues { it != null }
+            .mapValues { it.value!! }
+
     fun tilPartner(type: Sivilstandstype) =
         when (type) {
             GIFT,

@@ -5,6 +5,7 @@ import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPersoner
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
 import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler.Companion.IDENTIFIKATOR
@@ -51,26 +52,15 @@ class PdlRestClientAdapter(
         return innslag.filterValues { it != null }.mapValues { it.value!! }
     }
 
-    private fun fraRest(identer: Set<String>) : Map<String,Person> {
+    private fun fraRest(identer: Set<String>) =
         if (identer.isEmpty()) {
-            return emptyMap()
+            emptyMap()
         }
-
-        return  mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, identer))
-            .mapValues {
-                    (oppslagId, pdlRespons) -> pdlRespons?.let{ tilPerson(oppslagId, it) }
-            }
-            .filterValues {
-                it != null
-            }
-            .mapValues {
-                it.value!!
-            }
-            .also {
-                log.trace("Hentet ${it.size} person(er) fra REST for ${identer.size} ident(er)")
-            }
-    }
-
+        else {
+            tilPersoner(mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, identer)))
+                .also {
+                    log.trace("Hentet ${it.size} person(er) fra REST for ${identer.size} ident(er)") }
+        }
 
     @WithSpan
     private fun søsken(foreldre: Set<FamilieMedlem>, ansattBrukerId: String): Set<FamilieMedlem> =

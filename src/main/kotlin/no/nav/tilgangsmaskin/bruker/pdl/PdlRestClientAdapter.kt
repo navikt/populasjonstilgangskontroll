@@ -59,7 +59,7 @@ class PdlRestClientAdapter(
         else {
             tilPersoner(mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, identer)))
                 .also {
-                    log.trace("Hentet ${it.size} person(er) av ${identer.size} mulige fra REST for ${identer.size} ident(er)") }
+                    log.trace("Hentet ${it.size} person(er) av ${identer.size} mulige fra REST") }
         }
 
     @WithSpan

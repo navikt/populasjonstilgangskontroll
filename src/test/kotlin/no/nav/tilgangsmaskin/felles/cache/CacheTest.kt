@@ -191,6 +191,6 @@ class CacheTest {
         private val P2 = Person(ID2, I2, A2, KommuneTilknytning(Kommune("1111")))
 
         @ServiceConnection
-       private val redis = RedisContainer("redis:6.2.2")
+        private val redis = RedisContainer("redis:6.2.2")
     }
 }

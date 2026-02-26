@@ -71,7 +71,7 @@ class CacheTest {
     private lateinit var meterRegistry: MeterRegistry
 
     @Autowired
-    private lateinit var restMapper: JsonMapper
+    private lateinit var mapper: JsonMapper
 
     @MockkBean
     private lateinit var token: Token
@@ -83,8 +83,6 @@ class CacheTest {
 
     @Autowired
     private lateinit var cf: RedisConnectionFactory
-    private lateinit var person1:  Person
-    private lateinit var person2:  Person
     private lateinit var cache: CacheOperations
 
     @BeforeEach
@@ -112,37 +110,33 @@ class CacheTest {
         )
 
         listener = CacheElementUtløptLytter(redisClient, eventPublisher)
-        val id1 = BrukerId("03508331575")
-        val id2 = BrukerId("20478606614")
-        person1 = Person(id1,id1.verdi, AktørId("1234567890123"), KommuneTilknytning(Kommune("0301")))
-        person2 = Person(id2, id2.verdi, AktørId("1111111111111"), KommuneTilknytning(Kommune("1111")))
+
     }
 
     @Test
     @DisplayName("Put og get en verdi, og verifiser at den er borte etter utløp")
     fun putAndGetOne() {
-        cache.putOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, person1, ofSeconds(1))
-        val one = cache.getOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, Person::class)
-        assertThat(one).isEqualTo(person1)
+        cache.putOne(I1, PDL_MED_FAMILIE_CACHE, P1, ofSeconds(1))
+        val one = cache.getOne(I1, PDL_MED_FAMILIE_CACHE, Person::class)
+        assertThat(one).isEqualTo(P1)
         await.atMost(3, SECONDS).until {
-            cache.getOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, Person::class) == null
+            cache.getOne(I1, PDL_MED_FAMILIE_CACHE, Person::class) == null
         }
     }
     @Test
     @DisplayName("Put og get flere verdier, og verifiser at de er borte etter utløp")
     fun putAndGetMany() {
-        val ids = setOf(person1.brukerId.verdi,person2.brukerId.verdi)
-        cache.putMany(mapOf(person1.brukerId.verdi to person1, person2.brukerId.verdi to person2),
+        cache.putMany(mapOf(I1 to P1, I2 to P2),
             PDL_MED_FAMILIE_CACHE,
             ofSeconds(1))
-        val many = cache.getMany(ids, PDL_MED_FAMILIE_CACHE, Person::class)
-        assertThat(many.keys).containsExactlyInAnyOrderElementsOf(ids)
-        assertThat(person1).isEqualTo(cache.getOne(person1.brukerId.verdi,PDL_MED_FAMILIE_CACHE,Person::class))
+        val many = cache.getMany(IDS, PDL_MED_FAMILIE_CACHE, Person::class)
+        assertThat(many.keys).containsExactlyInAnyOrderElementsOf(IDS)
+        assertThat(P1).isEqualTo(cache.getOne(I1,PDL_MED_FAMILIE_CACHE,Person::class))
 
-        assertThat(person2).isEqualTo(cache.getOne(person2.brukerId.verdi,PDL_MED_FAMILIE_CACHE,Person::class))
+        assertThat(P2).isEqualTo(cache.getOne(I2,PDL_MED_FAMILIE_CACHE,Person::class))
 
         await.atMost(3, SECONDS).until {
-            cache.getMany(ids, PDL_MED_FAMILIE_CACHE, Person::class).isEmpty()
+            cache.getMany(IDS, PDL_MED_FAMILIE_CACHE, Person::class).isEmpty()
         }
     }
 
@@ -153,40 +147,63 @@ class CacheTest {
         val restClientBuilder = RestClient.builder().baseUrl("$baseUri")
         val mockServer = bindTo(restClientBuilder).build()
         val cfg = PdlConfig(baseUri)
-        val adapter = PdlRestClientAdapter(restClientBuilder.build(), cfg, cache, restMapper)
+        val adapter = PdlRestClientAdapter(restClientBuilder.build(), cfg, cache, mapper)
 
-        cache.putOne(person1.brukerId.verdi, PDL_MED_FAMILIE_CACHE, person1, ofSeconds(10))
+        cache.putOne(I1, PDL_MED_FAMILIE_CACHE, P1, ofSeconds(10))
 
-        val restRespons = restMapper.writeValueAsString(mapOf(person2.brukerId.verdi to PdlRespons(
+        val restRespons = mapper.writeValueAsString(mapOf(I2 to PdlRespons(
             PdlPerson(),
             PdlIdenter(listOf(
-                PdlIdent(person2.brukerId.verdi, false, FOLKEREGISTERIDENT),
-                PdlIdent(person2.aktørId.verdi, false, AKTORID)
+                PdlIdent(I2, false, FOLKEREGISTERIDENT),
+                PdlIdent(A2.verdi, false, AKTORID)
             )),
-            PdlGeografiskTilknytning(KOMMUNE, GTKommune((person2.geoTilknytning as KommuneTilknytning).kommune.verdi))
+            PdlGeografiskTilknytning(KOMMUNE, GTKommune((P2.geoTilknytning as KommuneTilknytning).kommune.verdi))
         )))
 
         mockServer.expect(requestTo(cfg.personerURI))
             .andRespond(withSuccess(restRespons, APPLICATION_JSON))
 
-        var personer = adapter.personer(setOf(person1.brukerId.verdi, person2.brukerId.verdi))
+        val personer = adapter.personer(IDS)
 
         mockServer.verify()
 
-        assertThat(personer).containsExactlyInAnyOrder(person1,person2)
+        assertThat(personer).containsExactlyInAnyOrder(P1,P2)
 
-        assertThat(cache.getOne(person1.brukerId.verdi,PDL_MED_FAMILIE_CACHE,Person::class)).isEqualTo(person1)
+        assertThat(cache.getOne(I1,PDL_MED_FAMILIE_CACHE,Person::class)).isEqualTo(P1)
 
-        assertThat(cache.getOne(person2.brukerId.verdi,PDL_MED_FAMILIE_CACHE,Person::class)).isEqualTo(person2)
+        assertThat(cache.getOne(I2,PDL_MED_FAMILIE_CACHE,Person::class)).isEqualTo(P2)
 
         mockServer.reset()
 
-        assertThat(adapter.personer(setOf(person1.brukerId.verdi, person2.brukerId.verdi))).containsExactlyInAnyOrder(person1,person2)
+        assertThat(adapter.personer(IDS)).containsExactlyInAnyOrder(P1,P2)
         mockServer.verify()
+
+        mockServer.reset()
+        mockServer.expect(requestTo(cfg.personerURI))
+            .andRespond(withSuccess(restRespons, APPLICATION_JSON))
+
+        cache.delete(PDL_MED_FAMILIE_CACHE,I2)
+        assertThat(adapter.personer(setOf(I2))).containsExactly(P2)
+
+        mockServer.verify()
+
+        assertThat(cache.getOne(I2,PDL_MED_FAMILIE_CACHE,Person::class)).isEqualTo(P2)
+
+
     }
 
     companion object {
-       @ServiceConnection
+        private val A1 = AktørId("1234567890123")
+        private val A2 = AktørId("1234567890123")
+        private const val I1 = "03508331575"
+        private const val I2 = "20478606614"
+        private val IDS = setOf(I1, I2)
+        private val ID1 = BrukerId(I1)
+        private val ID2 = BrukerId(I2)
+        private val P1 = Person(ID1,I1, A1, KommuneTilknytning(Kommune("0301")))
+        private val P2 = Person(ID2, I2, A2, KommuneTilknytning(Kommune("1111")))
+
+        @ServiceConnection
        private val redis = RedisContainer("redis:6.2.2")
     }
 }

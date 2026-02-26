@@ -48,7 +48,7 @@ class PdlRestClientAdapter(
             return emptyMap()
         }
         val innslag = cache.getMany(identer, PDL_MED_FAMILIE_CACHE, Person::class)
-        log.trace("Hentet ${innslag.size} person(er) fra cache for ${identer.size} ident(er)")
+        log.trace("Hentet ${innslag.size} person(er) av ${identer.size} mulige fra ${PDL_MED_FAMILIE_CACHE.name} for ${identer.size} ident(er)")
         return innslag.filterValues { it != null }.mapValues { it.value!! }
     }
 
@@ -59,7 +59,7 @@ class PdlRestClientAdapter(
         else {
             tilPersoner(mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, identer)))
                 .also {
-                    log.trace("Hentet ${it.size} person(er) fra REST for ${identer.size} ident(er)") }
+                    log.trace("Hentet ${it.size} person(er) av ${identer.size} mulige fra REST for ${identer.size} ident(er)") }
         }
 
     @WithSpan

@@ -63,17 +63,10 @@ class PdlRestClientAdapter(
         }
 
     @WithSpan
-    private fun søsken(foreldre: Set<FamilieMedlem>, ansattBrukerId: String): Set<FamilieMedlem> =
+    private fun søsken(foreldre: Set<FamilieMedlem>, ansattBrukerId: String) =
         personer(foreldre.map { it.brukerId.verdi }.toSet())
-            .asSequence()
-            .flatMap {
-                it.barn
-            }
-            .filterNot {
-                it.brukerId.verdi == ansattBrukerId
-            }
-            .map {
-                FamilieMedlem(it.brukerId, SØSKEN)
-            }
+            .flatMap { it.barn }
+            .filterNot { it.brukerId.verdi == ansattBrukerId }
+            .map { FamilieMedlem(it.brukerId, SØSKEN) }
             .toSet()
 }

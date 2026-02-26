@@ -32,12 +32,16 @@ class PdlRestClientAdapter(
     fun personer(identer: Set<String>) : Set<Person> {
 
         val fraCache = fraCache(identer)
+        if (!fraCache.isEmpty())  {
+            log.trace("Hentet ${fraCache.size} person(er) av ${identer.size} mulige fra cache")
+        }
         if (fraCache.size == identer.size) {
             return fraCache.values.toSet()
         }
-        log.trace("Hentet ${fraCache.size} person(er) av ${identer.size} mulige i cache")
         val fraRest = fraRest(identer  - fraCache.keys)
-        log.trace("Hentet ${fraRest.size} person(er) av ${identer.size - fraCache.keys.size} mulige fra REST")
+        if (!fraRest.isEmpty()) {
+            log.trace("Hentet ${fraRest.size} person(er) av ${identer.size - fraCache.keys.size} mulige fra REST")
+        }
 
         cache.putMany(fraRest, PDL_MED_FAMILIE_CACHE, cf.varighet)
         return (fraRest.values + fraCache.values).toSet()

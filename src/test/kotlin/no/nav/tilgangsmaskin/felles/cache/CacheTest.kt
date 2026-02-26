@@ -181,7 +181,7 @@ class CacheTest {
 
     companion object {
         private val A1 = AktørId("1234567890123")
-        private val A2 = AktørId("1234567890123")
+        private val A2 = AktørId("9876543210987")
         private const val I1 = "03508331575"
         private const val I2 = "20478606614"
         private val IDS = setOf(I1, I2)

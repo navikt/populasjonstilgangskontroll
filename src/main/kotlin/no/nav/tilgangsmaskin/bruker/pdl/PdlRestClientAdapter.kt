@@ -32,7 +32,7 @@ class PdlRestClientAdapter(
     fun personer(identer: Set<String>) : Set<Person> {
 
         val fraCache = fraCache(identer)
-        if (fraCache.isNotEmpty()) {
+        if (fraCache.isNotEmpty())  {
             log.trace("Hentet ${fraCache.size} person(er) av ${identer.size} mulige fra cache")
         }
         if (fraCache.size == identer.size) {

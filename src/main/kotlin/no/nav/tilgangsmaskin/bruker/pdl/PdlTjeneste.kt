@@ -42,7 +42,7 @@ class PdlTjeneste(
     fun personer(identer: Set<String>): Set<Person> {
         val fraCache = fraCache(identer)
         if (fraCache.isNotEmpty()) {
-            log.trace("Hentet ${fraCache.size} person(er) av ${identer.size} mulige fra cache")
+            log.trace("Hentet ${fraCache.size} person(er) av ${identer.size} mulige fra CACHE")
         }
         if (fraCache.size == identer.size) return fraCache.values.toSet()
 

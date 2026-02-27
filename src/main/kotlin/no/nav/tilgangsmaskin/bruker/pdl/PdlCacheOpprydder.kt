@@ -54,7 +54,7 @@ class PdlCacheOpprydder(private val pdl: PdlTjeneste,
             log.info("Oppdaterte PDL caches for identer etter hendelse av type $gradering")
         }
 
-    companion object {
+    private companion object {
         private const val PDL_LEESAH_TOPIC = "pdl.leesah-v1"
     }
 }

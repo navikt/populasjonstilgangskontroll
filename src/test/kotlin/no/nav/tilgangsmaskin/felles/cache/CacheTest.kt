@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
+import com.redis.testcontainers.RedisContainer.DEFAULT_IMAGE_NAME
 import io.lettuce.core.RedisClient.create
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
@@ -23,7 +24,9 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.AKTORID
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson
+import io.mockk.mockk
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
+import no.nav.tilgangsmaskin.bruker.pdl.PdlTjeneste
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
@@ -47,6 +50,7 @@ import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.ApplicationListener
 import org.springframework.context.annotation.Import
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager.builder
@@ -78,6 +82,9 @@ class CacheTest {
 
     @Autowired
     lateinit var eventPublisher: ApplicationEventPublisher
+
+    @Autowired
+    private lateinit var applicationContext: org.springframework.context.ConfigurableApplicationContext
 
     private lateinit var listener: CacheElementUtløptLytter
 
@@ -111,6 +118,23 @@ class CacheTest {
 
         listener = CacheElementUtløptLytter(redisClient, eventPublisher)
 
+    }
+
+    @Test
+    @DisplayName("Verifiser at lytteren publiserer en CacheInnslagFjernetEvent når en nøkkel utløper")
+    fun listenerPublisererEventVedUtløp() {
+        val mottattNøkler = mutableListOf<String>()
+        applicationContext.addApplicationListener(
+            ApplicationListener<CacheElementUtløptLytter.CacheInnslagFjernetEvent> { event ->
+                mottattNøkler.add(event.nøkkel)
+            }
+        )
+
+        cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(1))
+
+        await.atMost(5, SECONDS).until {
+            mottattNøkler.any { it.contains(I1) }
+        }
     }
 
     @Test
@@ -148,7 +172,8 @@ class CacheTest {
         val restClientBuilder = RestClient.builder().baseUrl("$baseUri")
         val mockServer = bindTo(restClientBuilder).build()
         val cfg = PdlConfig(baseUri)
-        val adapter = PdlRestClientAdapter(restClientBuilder.build(), cfg, cache, mapper)
+        val adapter = PdlRestClientAdapter(restClientBuilder.build(), cfg, mapper)
+        val tjeneste = PdlTjeneste(adapter, mockk(relaxed = true), cache, cfg)
         val restRespons = mapper.writeValueAsString(mapOf(I2 to PdlRespons(
             PdlPerson(),
             PdlIdenter(listOf(
@@ -161,21 +186,21 @@ class CacheTest {
         cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(10))
         mockServer.expect(requestTo(cfg.personerURI))
             .andRespond(withSuccess(restRespons, APPLICATION_JSON))
-        assertThat(adapter.personer(IDS)).containsExactlyInAnyOrder(P1,P2)
+        assertThat(tjeneste.personer(IDS)).containsExactlyInAnyOrder(P1, P2)
 
         assertThat(cache.getMany(PDL_MED_FAMILIE_CACHE, IDS, Person::class).keys).containsExactlyInAnyOrderElementsOf(IDS)
         mockServer.verify()
 
         mockServer.reset()
-        assertThat(adapter.personer(IDS)).containsExactlyInAnyOrder(P1,P2)
+        assertThat(tjeneste.personer(IDS)).containsExactlyInAnyOrder(P1, P2)
         mockServer.verify()
 
         mockServer.reset()
         mockServer.expect(requestTo(cfg.personerURI))
             .andRespond(withSuccess(restRespons, APPLICATION_JSON))
-        cache.delete(PDL_MED_FAMILIE_CACHE,I2)
-        assertThat(adapter.personer(setOf(I2))).containsExactly(P2)
-        assertThat(cache.getOne(PDL_MED_FAMILIE_CACHE,I2,Person::class)).isEqualTo(P2)
+        cache.delete(PDL_MED_FAMILIE_CACHE, I2)
+        assertThat(tjeneste.personer(setOf(I2))).containsExactly(P2)
+        assertThat(cache.getOne(PDL_MED_FAMILIE_CACHE, I2, Person::class)).isEqualTo(P2)
         mockServer.verify()
 
     }
@@ -192,6 +217,6 @@ class CacheTest {
         private val P2 = Person(ID2, I2, A2, KommuneTilknytning(Kommune("1111")))
 
         @ServiceConnection
-        private val redis = RedisContainer("redis:6.2.2")
+        private val redis = RedisContainer(DEFAULT_IMAGE_NAME)
     }
 }

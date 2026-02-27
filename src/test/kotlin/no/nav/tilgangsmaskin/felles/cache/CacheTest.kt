@@ -173,7 +173,12 @@ class CacheTest {
         val mockServer = bindTo(restClientBuilder).build()
         val cfg = PdlConfig(baseUri)
         val adapter = PdlRestClientAdapter(restClientBuilder.build(), cfg, mapper)
-        val tjeneste = PdlTjeneste(adapter, mockk(relaxed = true), cache, cfg)
+        val tjeneste = PdlTjeneste(adapter, mockk(relaxed = true), cache, cfg).also { t ->
+            PdlTjeneste::class.java.getDeclaredField("self").apply {
+                isAccessible = true
+                set(t, t)
+            }
+        }
         val restRespons = mapper.writeValueAsString(mapOf(I2 to PdlRespons(
             PdlPerson(),
             PdlIdenter(listOf(

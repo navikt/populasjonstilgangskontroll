@@ -40,16 +40,16 @@ class PdlTjeneste(
 
     @WithSpan
     fun personer(identer: Set<String>): Set<Person> {
-        val fraCache = fraCache(identer)
-        if (fraCache.isNotEmpty()) {
-            log.trace("Hentet ${fraCache.size} person(er) av ${identer.size} mulige fra CACHE")
+        if (identer.isEmpty()) {
+            log.info("Bulk ingen personer å slå opp")
+            return emptySet()
         }
+        val fraCache = fraCache(identer)
+        log.trace("Hentet ${fraCache.size} person(er) av ${identer.size} mulige fra CACHE")
         if (fraCache.size == identer.size) return fraCache.values.toSet()
 
         val fraRest = adapter.personer(identer - fraCache.keys)
-        if (fraRest.isNotEmpty()) {
-            log.trace("Hentet ${fraRest.size} person(er) av ${identer.size - fraCache.size} mulige fra REST")
-        }
+        log.trace("Hentet ${fraRest.size} person(er) av ${identer.size - fraCache.size} mulige fra REST")
 
         cache.putMany(PDL_MED_FAMILIE_CACHE, fraRest, cf.varighet)
         return (fraRest.values + fraCache.values).toSet()

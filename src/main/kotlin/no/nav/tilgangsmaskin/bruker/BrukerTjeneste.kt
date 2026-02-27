@@ -15,39 +15,30 @@ class BrukerTjeneste(private val personTjeneste: PdlTjeneste, val skjermingTjene
     private val log = getLogger(javaClass)
 
     @WithSpan
-    fun brukere(brukerIds: Set<String>) : Set<Bruker> {
+    fun brukere(brukerIds: Set<String>): Set<Bruker> {
         if (brukerIds.isEmpty()) {
             log.info("Bulk ingen personer å slå opp")
             return emptySet()
         }
-        val personer =  personTjeneste.personer(brukerIds)
-        val funnetBrukerIds = buildList {
-            personer.forEach { add(brukerIdForOppslagId(it.oppslagId, personer)) }
-        }
-        if (funnetBrukerIds.size != personer.size) {
-            val mangler = (brukerIds - funnetBrukerIds.map { it.verdi }.toSet()).map { it.maskFnr() }
+        val personer = personTjeneste.personer(brukerIds)
+        if (personer.size != brukerIds.size) {
+            val mangler = (brukerIds - personer.map { it.brukerId.verdi }.toSet()).map { it.maskFnr() }
             log.warn("Bulk fant ikke ${mangler.size} brukerIds")
         }
 
-        return funnetBrukerIds.let { p ->
-            if (p.isNotEmpty()) {
-                log.trace("Bulk slår opp {} skjerming(er) for {}", p.size,p)
-                val skjerminger = skjermingTjeneste.skjerminger(p)
-                log.trace("Bulk slo opp {} skjerminger  ({}) for {}",
-                    skjerminger.size,
-                    skjerminger,
-                    p.joinToString { it.verdi.maskFnr() })
-                personer.map {
-                    tilBruker(it, skjerminger[it.brukerId] ?: false)
-                }
-            } else {
-                log.debug("Bulk ingen skjerminger å slå opp")
-                emptyList()
-            }.toSet()
+        return if (personer.isNotEmpty()) {
+            val brukerIds = personer.map { it.brukerId }
+            log.trace("Bulk slår opp {} skjerming(er) for {}", brukerIds.size, brukerIds)
+            val skjerminger = skjermingTjeneste.skjerminger(brukerIds)
+            log.trace("Bulk slo opp {} skjerminger ({}) for {}",
+                skjerminger.size, skjerminger,
+                brukerIds.joinToString { it.verdi.maskFnr() })
+            personer.map { tilBruker(it, skjerminger[it.brukerId] ?: false) }.toSet()
+        } else {
+            log.debug("Bulk ingen skjerminger å slå opp")
+            emptySet()
         }
     }
-
-    private fun brukerIdForOppslagId(oppslagId: String, personer: Set<Person>) = personer.first { it.oppslagId == oppslagId }.brukerId
 
     @WithSpan
     fun brukerMedNærmesteFamilie(brukerId: String) =

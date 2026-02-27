@@ -48,12 +48,16 @@ class PdlTjeneste(
         log.trace("Hentet ${fraCache.size} person(er) av ${identer.size} mulige fra CACHE")
         if (fraCache.size == identer.size) return fraCache.values.toSet()
 
-        val fraRest = adapter.personer(identer - fraCache.keys)
+        val fraRest = self.hentFraRest(identer - fraCache.keys)
         log.trace("Hentet ${fraRest.size} person(er) av ${identer.size - fraCache.size} mulige fra REST")
 
         cache.putMany(PDL_MED_FAMILIE_CACHE, fraRest, cf.varighet)
-        return (fraRest.values + fraCache.values).toSet()
+        return (fraCache.values + fraRest.values).toSet()
     }
+
+    @WithSpan
+    fun hentFraRest(identer: Set<String>) =
+        adapter.personer(identer)
 
     private fun fraCache(identer: Set<String>): Map<String, Person> {
         if (identer.isEmpty()) return emptyMap()

@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.felles.cache
 import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
 import com.redis.testcontainers.RedisContainer.DEFAULT_IMAGE_NAME
-import io.lettuce.core.RedisClient
+import io.lettuce.core.RedisClient.create
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
@@ -85,17 +85,15 @@ class CacheTest {
     private lateinit var token: Token
 
     @Autowired
-    lateinit var eventPublisher: ApplicationEventPublisher
+    lateinit var publisher: ApplicationEventPublisher
 
     @Autowired
     private lateinit var ctx: ConfigurableApplicationContext
 
-    private lateinit var listener: CacheElementUtløptLytter
-
     @Autowired
     private lateinit var cf: RedisConnectionFactory
     private lateinit var cache: CacheOperations
-    private lateinit var tjeneste: PdlTjeneste
+    private lateinit var pdl: PdlTjeneste
     private lateinit var mockServer: MockRestServiceServer
 
     @BeforeEach
@@ -112,7 +110,7 @@ class CacheTest {
             .build().apply {
                 getCache(PDL_MED_FAMILIE_CACHE.name) // init
             }
-        val redisClient = RedisClient.create("redis://${redis.host}:${redis.firstMappedPort}")
+        val redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
         val handler = CacheNøkkelHandler(mgr.cacheConfigurations)
 
         cache = CacheClient(
@@ -122,15 +120,12 @@ class CacheTest {
                 ofSeconds(1))
         )
 
-        listener = CacheElementUtløptLytter(redisClient, eventPublisher)
-
-        val restClientBuilder = RestClient.builder().baseUrl("${URI.create("http://pdl")}")
-        mockServer = bindTo(restClientBuilder).build().apply {
-            reset()
-        }
+        CacheElementUtløptLytter(redisClient, publisher)
+        val restClientBuilder = RestClient.builder().baseUrl("${cfg.baseUri}")
+        mockServer = bindTo(restClientBuilder).build()
 
         val adapter = PdlRestClientAdapter(restClientBuilder.build(), cfg, mapper)
-         tjeneste = PdlTjeneste(adapter, mockk(relaxed = true), cache, cfg).also { t ->
+         pdl = PdlTjeneste(adapter, mockk(relaxed = true), cache, cfg).also { t ->
             PdlTjeneste::class.java.getDeclaredField("self").apply {
                 isAccessible = true
                 set(t, t)
@@ -139,15 +134,13 @@ class CacheTest {
 
     }
 
-
-
     @Test
     @DisplayName("Put og get en verdi, og verifiser at den er borte etter utløp")
     fun putAndGetOne() {
-        putOne( P1)
-        assertThat(getOne(I1)).isEqualTo(P1)
+        putOne( P2)
+        assertThat(getOne(P2.brukerId.verdi)).isEqualTo(P2)
         await.atMost(2, SECONDS).until {
-            getOne(I1) == null
+            getOne(P2.brukerId.verdi) == null
         }
     }
     @Test
@@ -167,7 +160,7 @@ class CacheTest {
         mockServer.expect(requestTo(cfg.personerURI))
             .andRespond(withSuccess(restRespons(mapper,P2), APPLICATION_JSON))
 
-        assertThat(tjeneste.personer(IDS)).containsExactlyInAnyOrder(P1, P2)
+        assertThat(pdl.personer(IDS)).containsExactlyInAnyOrder(P1, P2)
         assertThat(getMany(IDS).keys).containsExactlyInAnyOrderElementsOf(IDS)
         mockServer.verify()
     }
@@ -176,12 +169,12 @@ class CacheTest {
     @DisplayName("Rest kalles ikke når alle er i cache, slett ett element og verifiser at rest kalles for det elementet og ikke det som fortsatt er i cache")
     fun restKallesIkkeNårAlleErICache() {
         putMany(P1, P2)
-        assertThat(tjeneste.personer(IDS)).containsExactlyInAnyOrder(P1, P2)
+        assertThat(pdl.personer(IDS)).containsExactlyInAnyOrder(P1, P2)
         mockServer.verify()
         cache.delete(PDL_MED_FAMILIE_CACHE, I2)
         mockServer.expect(requestTo(cfg.personerURI))
             .andRespond(withSuccess(restRespons(mapper,P2), APPLICATION_JSON))
-        assertThat(tjeneste.personer(IDS)).containsExactlyInAnyOrder(P1, P2)
+        assertThat(pdl.personer(IDS)).containsExactlyInAnyOrder(P1, P2)
         assertThat(getMany(IDS).keys).containsExactlyInAnyOrderElementsOf(IDS)
         mockServer.verify()
     }
@@ -234,7 +227,6 @@ class CacheTest {
         )))
         @ServiceConnection
         private val redis = RedisContainer(DEFAULT_IMAGE_NAME)
-
         private val cfg = PdlConfig(URI.create("http://pdl"))
     }
 }

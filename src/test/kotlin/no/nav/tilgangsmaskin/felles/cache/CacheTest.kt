@@ -182,6 +182,7 @@ class CacheTest {
         mockServer.expect(requestTo(cfg.personerURI))
             .andRespond(withSuccess(restRespons(mapper,P2), APPLICATION_JSON))
         assertThat(tjeneste.personer(IDS)).containsExactlyInAnyOrder(P1, P2)
+        assertThat(getMany(IDS).keys).containsExactlyInAnyOrderElementsOf(IDS)
         mockServer.verify()
     }
 
@@ -195,7 +196,7 @@ class CacheTest {
                 mottattNøkler.add(it.nøkkel)
             }
         )
-        putOne( P1)
+        putOne(P1)
         await.atMost(3, SECONDS).until {
             mottattNøkler.any { it.contains(P1.brukerId.verdi) }
         }

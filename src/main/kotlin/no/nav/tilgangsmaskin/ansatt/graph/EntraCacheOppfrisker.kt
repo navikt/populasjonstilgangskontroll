@@ -17,7 +17,7 @@ import java.util.*
 @Component
 class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste: AnsattOidTjeneste, private val cache: CacheClient, private val teller: OppfriskingTeller) : AbstractCacheOppfrisker() {
 
-    override val cacheName: String = GRAPH
+    override val cacheName = GRAPH
 
     override fun doOppfrisk(elementer: CacheNøkkelElementer)  =
         oppfriskMedMetode(elementer, elementer.metode)
@@ -47,13 +47,12 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
         teller.tell()
     }
 
-    private fun oppfrisk(ansattId: AnsattId, oid: UUID, metode: String?) {
+    private fun oppfrisk(ansattId: AnsattId, oid: UUID, metode: String?) =
         when (metode) {
             GEO -> entra.geoGrupper(ansattId, oid)
             GEO_OG_GLOBALE -> entra.geoOgGlobaleGrupper(ansattId, oid)
             else -> log.warn("Ukjent metode $metode for ${ansattId.verdi} med oid $oid")
         }
-    }
 
     companion object {
         private const val GEO = "geoGrupper"

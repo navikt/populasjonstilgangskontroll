@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(NOM)
 class NomConfig: CachableRestConfig {
     override val navn = NOM
-    override val cacheNulls=true
+    override val cacheNulls = true
     override val caches = setOf(NOM_CACHE)
 
     companion object {

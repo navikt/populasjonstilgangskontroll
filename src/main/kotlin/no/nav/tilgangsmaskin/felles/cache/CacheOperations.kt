@@ -10,4 +10,7 @@ interface CacheOperations {
     fun <T : Any> getMany(cache: CachableConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T?>
     fun putMany(cache: CachableConfig, innslag: Map<String, Any>, ttl: Duration)
     fun tilNøkkel(cache: CachableConfig, id: String): String
+    fun oput() {
+        TODO("Not yet implemented")
+    }
 }

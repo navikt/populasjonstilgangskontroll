@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.felles.cache
 import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
 import com.redis.testcontainers.RedisContainer.DEFAULT_IMAGE_NAME
-import io.lettuce.core.RedisClient.create
+import io.lettuce.core.RedisClient
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
@@ -51,14 +51,17 @@ import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfig
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationListener
+import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Import
-import org.springframework.data.redis.cache.RedisCacheConfiguration
+import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.MockRestServiceServer.bindTo
 import org.testcontainers.junit.jupiter.Testcontainers
 import tools.jackson.databind.json.JsonMapper
+import java.time.Duration
 import java.time.Duration.ofSeconds
 import java.util.concurrent.TimeUnit.*
 
@@ -84,13 +87,15 @@ class CacheTest {
     lateinit var eventPublisher: ApplicationEventPublisher
 
     @Autowired
-    private lateinit var applicationContext: org.springframework.context.ConfigurableApplicationContext
+    private lateinit var ctx: ConfigurableApplicationContext
 
     private lateinit var listener: CacheElementUtløptLytter
 
     @Autowired
     private lateinit var cf: RedisConnectionFactory
     private lateinit var cache: CacheOperations
+    private lateinit var tjeneste: PdlTjeneste
+    private lateinit var mockServer: MockRestServiceServer
 
     @BeforeEach
     fun setUp() {
@@ -99,14 +104,14 @@ class CacheTest {
 
         val mgr = builder(cf)
             .withInitialCacheConfigurations(mapOf(
-                PDL_MED_FAMILIE_CACHE.name to RedisCacheConfiguration.defaultCacheConfig()
+                PDL_MED_FAMILIE_CACHE.name to defaultCacheConfig()
                     .prefixCacheNameWith(PDL)
                     .disableCachingNullValues()
             ))
             .build().apply {
                 getCache(PDL_MED_FAMILIE_CACHE.name) // init
             }
-        val redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
+        val redisClient = RedisClient.create("redis://${redis.host}:${redis.firstMappedPort}")
         val handler = CacheNøkkelHandler(mgr.cacheConfigurations)
 
         cache = CacheClient(
@@ -118,97 +123,94 @@ class CacheTest {
 
         listener = CacheElementUtløptLytter(redisClient, eventPublisher)
 
-    }
-
-    @Test
-    @DisplayName("Verifiser at lytteren publiserer en CacheInnslagFjernetEvent når en nøkkel utløper")
-    fun listenerPublisererEventVedUtløp() {
-        val mottattNøkler = mutableListOf<String>()
-        applicationContext.addApplicationListener(
-            ApplicationListener<CacheElementUtløptLytter.CacheInnslagFjernetEvent> { event ->
-                mottattNøkler.add(event.nøkkel)
-            }
-        )
-
-        cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(1))
-
-        await.atMost(5, SECONDS).until {
-            mottattNøkler.any { it.contains(I1) }
+        val restClientBuilder = RestClient.builder().baseUrl("${URI.create("http://pdl")}")
+        mockServer = bindTo(restClientBuilder).build().apply {
+            reset()
         }
-    }
 
-    @Test
-    @DisplayName("Put og get en verdi, og verifiser at den er borte etter utløp")
-    fun putAndGetOne() {
-        cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(1))
-        val one = cache.getOne(PDL_MED_FAMILIE_CACHE,I1,  Person::class)
-        assertThat(one).isEqualTo(P1)
-        await.atMost(3, SECONDS).until {
-            cache.getOne(PDL_MED_FAMILIE_CACHE,I1, Person::class) == null
-        }
-    }
-    @Test
-    @DisplayName("Put og get flere verdier, og verifiser at de er borte etter utløp")
-    fun putAndGetMany() {
-        cache.putMany(PDL_MED_FAMILIE_CACHE,
-            mapOf(I1 to P1, I2 to P2),
-            ofSeconds(1))
-        val many = cache.getMany(PDL_MED_FAMILIE_CACHE, IDS, Person::class)
-        assertThat(many.keys).containsExactlyInAnyOrderElementsOf(IDS)
-        assertThat(P1).isEqualTo(cache.getOne(PDL_MED_FAMILIE_CACHE,
-            I1,Person::class))
-
-        assertThat(P2).isEqualTo(cache.getOne(PDL_MED_FAMILIE_CACHE,I2, Person::class))
-
-        await.atMost(3, SECONDS).until {
-            cache.getMany(PDL_MED_FAMILIE_CACHE, IDS, Person::class).isEmpty()
-        }
-    }
-
-    @Test
-    @DisplayName("Hent personer fra cache og rest, og verifiser at cache treffer og at rest treffes ved cache miss")
-    fun henterBareCacheMissFraRest() {
-        val baseUri = URI.create("http://pdl")
-        val restClientBuilder = RestClient.builder().baseUrl("$baseUri")
-        val mockServer = bindTo(restClientBuilder).build()
-        val cfg = PdlConfig(baseUri)
         val adapter = PdlRestClientAdapter(restClientBuilder.build(), cfg, mapper)
-        val tjeneste = PdlTjeneste(adapter, mockk(relaxed = true), cache, cfg).also { t ->
+         tjeneste = PdlTjeneste(adapter, mockk(relaxed = true), cache, cfg).also { t ->
             PdlTjeneste::class.java.getDeclaredField("self").apply {
                 isAccessible = true
                 set(t, t)
             }
         }
-        val restRespons = mapper.writeValueAsString(mapOf(I2 to PdlRespons(
-            PdlPerson(),
-            PdlIdenter(listOf(
-                PdlIdent(I2, false, FOLKEREGISTERIDENT),
-                PdlIdent(A2.verdi, false, AKTORID)
-            )),
-            PdlGeografiskTilknytning(KOMMUNE, GTKommune((P2.geoTilknytning as KommuneTilknytning).kommune.verdi))
-        )))
-
-        cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(10))
-        mockServer.expect(requestTo(cfg.personerURI))
-            .andRespond(withSuccess(restRespons, APPLICATION_JSON))
-        assertThat(tjeneste.personer(IDS)).containsExactlyInAnyOrder(P1, P2)
-
-        assertThat(cache.getMany(PDL_MED_FAMILIE_CACHE, IDS, Person::class).keys).containsExactlyInAnyOrderElementsOf(IDS)
-        mockServer.verify()
-
-        mockServer.reset()
-        assertThat(tjeneste.personer(IDS)).containsExactlyInAnyOrder(P1, P2)
-        mockServer.verify()
-
-        mockServer.reset()
-        mockServer.expect(requestTo(cfg.personerURI))
-            .andRespond(withSuccess(restRespons, APPLICATION_JSON))
-        cache.delete(PDL_MED_FAMILIE_CACHE, I2)
-        assertThat(tjeneste.personer(setOf(I2))).containsExactly(P2)
-        assertThat(cache.getOne(PDL_MED_FAMILIE_CACHE, I2, Person::class)).isEqualTo(P2)
-        mockServer.verify()
 
     }
+
+
+
+    @Test
+    @DisplayName("Put og get en verdi, og verifiser at den er borte etter utløp")
+    fun putAndGetOne() {
+        putOne( P1)
+        assertThat(getOne(I1)).isEqualTo(P1)
+        await.atMost(2, SECONDS).until {
+            getOne(I1) == null
+        }
+    }
+    @Test
+    @DisplayName("Put og get flere verdier, og verifiser at de er borte etter utløp")
+    fun putAndGetMany() {
+        putMany(P1, P2)
+        assertThat(getMany(IDS).keys).containsExactlyInAnyOrderElementsOf(IDS)
+        await.atMost(2, SECONDS).until {
+            getMany(IDS).isEmpty()
+        }
+    }
+
+    @Test
+    @DisplayName("Rest kalles kun for cache-misser, treff hentes fra cache")
+    fun restKallesKunForCacheMisser() {
+        putOne(P1)
+        mockServer.expect(requestTo(cfg.personerURI))
+            .andRespond(withSuccess(restRespons(mapper,P2), APPLICATION_JSON))
+
+        assertThat(tjeneste.personer(IDS)).containsExactlyInAnyOrder(P1, P2)
+        assertThat(getMany(IDS).keys).containsExactlyInAnyOrderElementsOf(IDS)
+        mockServer.verify()
+    }
+
+    @Test
+    @DisplayName("Rest kalles ikke når alle er i cache")
+    fun restKallesIkkeNårAlleErICache() {
+        putMany(P1, P2)
+        assertThat(tjeneste.personer(IDS)).containsExactlyInAnyOrder(P1, P2)
+        mockServer.verify()
+        cache.delete(PDL_MED_FAMILIE_CACHE, I2)
+        mockServer.expect(requestTo(cfg.personerURI))
+            .andRespond(withSuccess(restRespons(mapper,P2), APPLICATION_JSON))
+        assertThat(tjeneste.personer(IDS)).containsExactlyInAnyOrder(P1, P2)
+        mockServer.verify()
+    }
+    
+
+    @Test
+    @DisplayName("Verifiser at lytteren publiserer en CacheInnslagFjernetEvent når en nøkkel utløper")
+    fun listenerPublisererEventVedUtløp() {
+        val mottattNøkler = mutableListOf<String>()
+        ctx.addApplicationListener(
+            ApplicationListener<CacheElementUtløptLytter.CacheInnslagFjernetEvent> { event ->
+                mottattNøkler.add(event.nøkkel)
+            }
+        )
+
+        putOne( P1)
+        await.atMost(5, SECONDS).until {
+            mottattNøkler.any { it.contains(P1.brukerId.verdi) }
+        }
+    }
+    private fun putMany(vararg personer: Person, duration: Duration = ofSeconds(1)) =
+        cache.putMany(PDL_MED_FAMILIE_CACHE, personer.associateBy { it.brukerId.verdi }, duration)
+
+    private fun getMany(ids: Set<String>) =
+        cache.getMany(PDL_MED_FAMILIE_CACHE, ids, Person::class)
+
+    private fun putOne(person: Person, duration: Duration = ofSeconds(2)) =
+        cache.putOne(PDL_MED_FAMILIE_CACHE, person.brukerId.verdi, person, duration)
+
+    private fun getOne(id: String ) =
+        cache.getOne(PDL_MED_FAMILIE_CACHE,id,  Person::class)
 
     companion object {
         private val A1 = AktørId("1234567890123")
@@ -221,7 +223,17 @@ class CacheTest {
         private val P1 = Person(ID1,I1, A1, KommuneTilknytning(Kommune("0301")))
         private val P2 = Person(ID2, I2, A2, KommuneTilknytning(Kommune("1111")))
 
+        private fun restRespons(mapper: JsonMapper, p: Person) = mapper.writeValueAsString(mapOf(p.brukerId.verdi to PdlRespons(
+            PdlPerson(),
+            PdlIdenter(listOf(
+                PdlIdent(p.brukerId.verdi, false, FOLKEREGISTERIDENT),
+                PdlIdent(p.aktørId.verdi, false, AKTORID)
+            )),
+            PdlGeografiskTilknytning(KOMMUNE, GTKommune((p.geoTilknytning as KommuneTilknytning).kommune.verdi))
+        )))
         @ServiceConnection
         private val redis = RedisContainer(DEFAULT_IMAGE_NAME)
+
+        private val cfg = PdlConfig(URI.create("http://pdl"))
     }
 }

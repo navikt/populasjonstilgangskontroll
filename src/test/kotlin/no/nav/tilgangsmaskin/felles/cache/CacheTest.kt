@@ -172,7 +172,7 @@ class CacheTest {
     }
 
     @Test
-    @DisplayName("Rest kalles ikke når alle er i cache")
+    @DisplayName("Rest kalles ikke når alle er i cache, slett ett element og verifiser at rest kalles for det elementet og ikke det som fortsatt er i cache")
     fun restKallesIkkeNårAlleErICache() {
         putMany(P1, P2)
         assertThat(tjeneste.personer(IDS)).containsExactlyInAnyOrder(P1, P2)
@@ -183,7 +183,7 @@ class CacheTest {
         assertThat(tjeneste.personer(IDS)).containsExactlyInAnyOrder(P1, P2)
         mockServer.verify()
     }
-    
+
 
     @Test
     @DisplayName("Verifiser at lytteren publiserer en CacheInnslagFjernetEvent når en nøkkel utløper")

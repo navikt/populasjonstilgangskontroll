@@ -96,7 +96,7 @@ object PdlPersonMapper {
             UGRADERT -> Gradering.UGRADERT
         }
 
-    private fun tilGeoTilknytning(geo: PdlGeografiskTilknytning?): GeografiskTilknytning =
+     fun tilGeoTilknytning(geo: PdlGeografiskTilknytning?): GeografiskTilknytning =
         when (geo?.gtType) {
             UTLAND -> geo.gtLand?.let {
                 UtenlandskTilknytning()

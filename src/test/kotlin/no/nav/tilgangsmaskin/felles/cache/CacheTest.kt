@@ -131,7 +131,6 @@ class CacheTest {
                 set(it, it)
             }
         }
-
     }
 
     @Test
@@ -183,15 +182,15 @@ class CacheTest {
     @Test
     @DisplayName("Verifiser at lytteren publiserer en CacheInnslagFjernetEvent når en nøkkel utløper")
     fun listenerPublisererEventVedUtløp() {
-        val mottattNøkler = mutableListOf<String>()
+        val mottatt = mutableListOf<String>()
         ctx.addApplicationListener(
             ApplicationListener<CacheInnslagFjernetEvent> {
-                mottattNøkler.add(it.nøkkel)
+                mottatt.add(it.nøkkel)
             }
         )
         putOne(P1)
         await.atMost(3, SECONDS).until {
-            mottattNøkler.any { it.contains(P1.brukerId.verdi) }
+            mottatt.any { it.contains(P1.brukerId.verdi) }
         }
     }
     private fun putMany(vararg personer: Person, duration: Duration = ofSeconds(1)) =

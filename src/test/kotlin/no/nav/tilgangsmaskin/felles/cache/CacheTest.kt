@@ -33,6 +33,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.web.client.RestClient
 import java.net.URI
 import no.nav.tilgangsmaskin.bruker.pdl.Person
+import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetEvent
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import no.nav.tilgangsmaskin.tilgang.Token
@@ -190,13 +191,12 @@ class CacheTest {
     fun listenerPublisererEventVedUtløp() {
         val mottattNøkler = mutableListOf<String>()
         ctx.addApplicationListener(
-            ApplicationListener<CacheElementUtløptLytter.CacheInnslagFjernetEvent> { event ->
-                mottattNøkler.add(event.nøkkel)
+            ApplicationListener<CacheInnslagFjernetEvent> {
+                mottattNøkler.add(it.nøkkel)
             }
         )
-
         putOne( P1)
-        await.atMost(5, SECONDS).until {
+        await.atMost(3, SECONDS).until {
             mottattNøkler.any { it.contains(P1.brukerId.verdi) }
         }
     }

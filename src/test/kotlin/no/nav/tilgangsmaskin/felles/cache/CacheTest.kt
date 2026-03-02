@@ -125,10 +125,10 @@ class CacheTest {
         mockServer = bindTo(restClientBuilder).build()
 
         val adapter = PdlRestClientAdapter(restClientBuilder.build(), cfg, mapper)
-         pdl = PdlTjeneste(adapter, mockk(), cache, cfg).also { t ->
-            PdlTjeneste::class.java.getDeclaredField("self").apply {
+         pdl = PdlTjeneste(adapter, mockk(), cache, cfg).also {
+            it::class.java.getDeclaredField("self").apply {
                 isAccessible = true
-                set(t, t)
+                set(it, it)
             }
         }
 

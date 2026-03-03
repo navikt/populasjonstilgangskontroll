@@ -32,7 +32,6 @@ import org.springframework.context.ApplicationListener
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.MockRestServiceServer.bindTo
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
@@ -55,7 +54,6 @@ class PersonerCacheTest : AbstractCacheTest() {
     private lateinit var mapper: JsonMapper
 
     private lateinit var pdl: PdlTjeneste
-    private lateinit var mockServer: MockRestServiceServer
 
     override fun cacheConfigurations() = mapOf(
         PDL_MED_FAMILIE_CACHE.name to defaultCacheConfig()
@@ -149,9 +147,6 @@ class PersonerCacheTest : AbstractCacheTest() {
     companion object {
         private val A1 = AktørId("1234567890123")
         private val A2 = AktørId("9876543210987")
-        private const val I1 = "03508331575"
-        private const val I2 = "20478606614"
-        private val IDS = setOf(I1, I2)
         private val P1 = Person(BrukerId(I1), I1, A1, KommuneTilknytning(Kommune("0301")))
         private val P2 = Person(BrukerId(I2), I2, A2, KommuneTilknytning(Kommune("1111")))
         private val cfg = PdlConfig(URI.create("http://pdl"))

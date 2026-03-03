@@ -9,6 +9,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import no.nav.tilgangsmaskin.TestApp
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import no.nav.tilgangsmaskin.tilgang.Token
@@ -26,6 +27,7 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.web.client.MockRestServiceServer
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Duration.ofSeconds
 
@@ -49,6 +51,9 @@ abstract class AbstractCacheTest {
 
     protected lateinit var cache: CacheOperations
     protected lateinit var redisClient: RedisClient
+
+    protected lateinit var mockServer: MockRestServiceServer
+
 
     @BeforeEach
     fun setUpCache() {
@@ -74,9 +79,17 @@ abstract class AbstractCacheTest {
 
     protected abstract fun cacheConfigurations(): Map<String, RedisCacheConfiguration>
 
-    companion object {
+    protected companion object {
         @ServiceConnection
         val redis = RedisContainer(DEFAULT_IMAGE_NAME)
+        protected const val I1 = "03508331575"
+        protected const val I2 = "20478606614"
+        @JvmStatic
+        protected val IDS = setOf(I1, I2)
+        @JvmStatic
+        protected val ID1 = BrukerId(I1)
+        @JvmStatic
+        protected val ID2 = BrukerId(I2)
     }
 }
 

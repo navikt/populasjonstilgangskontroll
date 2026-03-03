@@ -29,7 +29,6 @@ class SkjermingerCacheTest : AbstractCacheTest() {
     private lateinit var mapper: JsonMapper
 
     private lateinit var skjerming: SkjermingTjeneste
-    private lateinit var mockServer: MockRestServiceServer
 
     override fun cacheConfigurations() = mapOf(
         SKJERMING_CACHE.name to defaultCacheConfig()
@@ -46,7 +45,7 @@ class SkjermingerCacheTest : AbstractCacheTest() {
     }
 
     @Test
-    @DisplayName("Skjerming: Rest kalles kun for cache-misser, treff hentes fra cache")
+    @DisplayName("Rest kalles kun for cache-misser, treff hentes fra cache")
     fun restKallesKunForCacheMisser() {
         putOne(ID1, false)
         mockServer.expect(requestTo(cfg.skjermingerUri))
@@ -58,17 +57,16 @@ class SkjermingerCacheTest : AbstractCacheTest() {
     }
 
     @Test
-    @DisplayName("Skjerming: Rest kalles ikke når alle er i cache")
+    @DisplayName("Rest kalles ikke når alle er i cache")
     fun restKallesIkkeNårAlleErICache() {
         putOne(ID1, false)
         putOne(ID2, true)
-
         assertThat(skjerming.skjerminger(listOf(ID1, ID2))).containsExactlyInAnyOrderEntriesOf(mapOf(ID1 to false, ID2 to true))
         mockServer.verify()
     }
 
     @Test
-    @DisplayName("Skjerming: Rest kalles igjen etter at en cache-innslag er slettet")
+    @DisplayName("Rest kalles igjen etter at en cache-innslag er slettet")
     fun restKallesIgjenEtterSlettingAvCacheInngang() {
         putOne(ID1, false)
         putOne(ID2, true)
@@ -88,11 +86,6 @@ class SkjermingerCacheTest : AbstractCacheTest() {
         cache.getMany(SKJERMING_CACHE, ids, Boolean::class)
 
     companion object {
-        private const val I1 = "03508331575"
-        private const val I2 = "20478606614"
-        private val IDS = setOf(I1, I2)
-        private val ID1 = BrukerId(I1)
-        private val ID2 = BrukerId(I2)
         private val cfg = SkjermingConfig(URI.create("http://skjerming"))
     }
 }

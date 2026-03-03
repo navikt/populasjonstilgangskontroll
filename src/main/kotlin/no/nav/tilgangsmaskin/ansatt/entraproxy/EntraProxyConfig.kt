@@ -12,7 +12,6 @@ class EntraProxyConfig(
     pingPath: String = DEFAULT_PING_PATH,
     enabled: Boolean = true) :  AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
 
-
     fun brukerURI(navIdent: String) =
         builder().apply {
             path(ANSATT_PATH)
@@ -22,7 +21,6 @@ class EntraProxyConfig(
         builder().apply {
             path(ENHETER_PATH)
         }.build(navIdent)
-
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 

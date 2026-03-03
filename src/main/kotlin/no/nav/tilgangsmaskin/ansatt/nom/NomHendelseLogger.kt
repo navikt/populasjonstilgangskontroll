@@ -13,29 +13,24 @@ class NomHendelseLogger(private val registry: MeterRegistry, private val repo: N
         size()
     }
     private val log = getLogger(javaClass)
-    fun ok(ansattId: String, brukerId: String) {
+    fun ok(ansattId: String, brukerId: String) =
         log.info("Lagret brukerId ${brukerId.maskFnr()} for $ansattId OK")
-    }
 
-    fun start(hendelser: List<NomHendelse>) {
+    fun start(hendelser: List<NomHendelse>) =
         log.info("Mottok ${hendelser.size} hendelse(r) fra NOM")
-    }
 
-    fun behandler(hendelse: NomHendelse) {
+    fun behandler(hendelse: NomHendelse) =
         log.info("Behandler hendelse fra NOM: {}", hendelse)
-    }
 
-    fun ferdig(hendelser: List<NomHendelse>) {
+    fun ferdig(hendelser: List<NomHendelse>) =
         log.info("${hendelser.size} hendelse(r) fra NOM ferdig behandlet").also {
             size()
-        }
     }
 
     private fun size() =
         registry.gauge("nom.size",repo) {
             repo.count().toDouble()
         }
-    fun feilet(ansattId: String, brukerId: String, e: Throwable) {
+    fun feilet(ansattId: String, brukerId: String, e: Throwable) =
         log.error("Kunne ikke lagre brukerId ${brukerId.maskFnr()} for $ansattId (${e.message})", e)
-    }
 }

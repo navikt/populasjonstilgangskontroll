@@ -10,8 +10,7 @@ import java.util.concurrent.TimeUnit.*
 class NomDBOpprydder(
     private val nom: NomTjeneste,
     private val antallKall: NomKallTeller,
-    private val raderFjernet: NomRaderFjernetTeller,
-) : LeaderAware() {
+    private val raderFjernet: NomRaderFjernetTeller) : LeaderAware() {
 
     private val log = getLogger(javaClass)
 

@@ -13,10 +13,9 @@ import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
 import java.time.Instant
 
 @Entity
-@Table(
-        name = "ansatte",
-        indexes = [Index(name = "idx_gyldig", columnList = "gyldigtil")],
-        uniqueConstraints = [UniqueConstraint(name = "uc_ansattentity_navid", columnNames = ["navid"])])
+@Table(name = "ansatte",
+    indexes = [Index(name = "idx_gyldig", columnList = "gyldigtil")],
+    uniqueConstraints = [UniqueConstraint(name = "uc_ansattentity_navid", columnNames = ["navid"])])
 class NomEntity(
         @Column(length = ANSATTID_LENGTH, nullable = false) val navid: String,
         @Column(length = BRUKERID_LENGTH, nullable = false) var fnr: String,

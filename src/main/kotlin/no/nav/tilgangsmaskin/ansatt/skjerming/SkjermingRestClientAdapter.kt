@@ -14,7 +14,11 @@ class SkjermingRestClientAdapter(@Qualifier(SKJERMING) restClient: RestClient, p
 
     fun skjerming(id: String) = post<Boolean>(cf.skjermingUri, mapOf(IDENT to id))
 
-    fun skjerminger(ids: Set<String>): Map<String, Boolean> =
-        if (ids.isEmpty()) emptyMap()
-        else post<Map<String, Boolean>>(cf.skjermingerUri, mapOf(IDENTER to ids))
+    fun skjerminger(ids: Set<String>) =
+        if (ids.isEmpty()) {
+            emptyMap()
+        }
+        else {
+            post<Map<String, Boolean>>(cf.skjermingerUri, mapOf(IDENTER to ids))
+        }
 }

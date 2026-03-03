@@ -23,7 +23,6 @@ class EntraProxyTjeneste(private val adapter: EntraProxyRestClientAdapter)  {
     fun enheter(ansattId: AnsattId) =
         adapter.enheterForAnsatt(ansattId.verdi)
 
-
     override fun toString() = "${javaClass.simpleName} [adapter=$adapter]"
 }
 

@@ -6,8 +6,8 @@ import io.mockk.junit5.MockKExtension
 import java.time.LocalDate.EPOCH
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.Companion.ALWAYS
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
-import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode.Companion.ALWAYS
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions

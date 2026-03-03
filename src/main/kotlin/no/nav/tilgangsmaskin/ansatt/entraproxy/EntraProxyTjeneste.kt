@@ -16,10 +16,12 @@ import java.util.*
 class EntraProxyTjeneste(private val adapter: EntraProxyRestClientAdapter)  {
 
     @WithSpan
-    fun enhet(ansattId: AnsattId) = adapter.enhetForAnsatt(ansattId.verdi)
+    fun enhet(ansattId: AnsattId) =
+        adapter.enhetForAnsatt(ansattId.verdi)
 
-    fun enheter(ansattId: AnsattId) = adapter.enheterForAnsatt(ansattId.verdi)
-
+    @WithSpan
+    fun enheter(ansattId: AnsattId) =
+        adapter.enheterForAnsatt(ansattId.verdi)
 
     override fun toString() = "${javaClass.simpleName} [adapter=$adapter]"
 }

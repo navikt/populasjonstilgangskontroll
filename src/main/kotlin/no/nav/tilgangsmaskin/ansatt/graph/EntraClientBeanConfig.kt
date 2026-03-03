@@ -21,9 +21,10 @@ class EntraClientBeanConfig {
 
 
     @Bean
-    fun graphHealthIndicator(a: EntraRestClientAdapter) =  PingableHealthIndicator(a)
+    fun graphHealthIndicator(a: EntraRestClientAdapter) =
+        PingableHealthIndicator(a)
 
-    companion object {
+    private companion object {
         private val HEADER_CONSISTENCY_LEVEL = "ConsistencyLevel" to "eventual"
     }
 }

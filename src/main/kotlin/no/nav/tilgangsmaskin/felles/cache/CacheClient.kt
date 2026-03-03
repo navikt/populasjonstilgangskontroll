@@ -44,11 +44,6 @@ import kotlin.reflect.KClass
         conn.async().setex(handler.tilNøkkel(cache, id), ttl.seconds, handler.tilJson(value))
     }
 
-     fun getAllKeys(cache: CachableConfig) =
-        if (isLocalOrTest) {
-            conn.sync().keys("${cache.name}::*")
-        }
-    else throw UnsupportedOperationException("getAllKeys is only supported in local or test environments")
 
     @WithSpan
     override fun <T : Any> getMany(cache: CachableConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T> =

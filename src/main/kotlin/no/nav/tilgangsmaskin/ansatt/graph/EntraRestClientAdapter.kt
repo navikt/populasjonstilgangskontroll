@@ -23,7 +23,7 @@ class EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: E
             }
     }
 
-    fun grupper(ansattId: String, trengerGlobaleGrupper: Boolean): Set<EntraGruppe> =
+    fun grupper(ansattId: String, trengerGlobaleGrupper: Boolean) =
         generateSequence(get<EntraGrupper>(cf.grupperURI(ansattId,trengerGlobaleGrupper))) { bolk ->
             bolk.next?.let {
                 get<EntraGrupper>(it)

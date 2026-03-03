@@ -8,18 +8,18 @@ import java.time.Instant
 import java.util.*
 
 @Component
-class OppfølgingJPAAdapter(private val repository: OppfølgingRepository,val entityManager: EntityManager) {
+class OppfølgingJPAAdapter(private val repo: OppfølgingRepository, val entityManager: EntityManager) {
 
     private val log = getLogger(javaClass)
 
     fun avslutt(id: UUID)  =
-         repository.deleteById(id).also {
+         repo.deleteById(id).also {
             log.info("Oppfølging avsluttet for $id")
         }
 
     fun enhetFor(id: String) =
-        repository.findByBrukerid(id)?.kontor?.let(::Enhetsnummer) ?:
-        repository.findByAktoerid(id)?.kontor?.let(::Enhetsnummer)
+        repo.findByBrukerid(id)?.kontor?.let(::Enhetsnummer) ?:
+        repo.findByAktoerid(id)?.kontor?.let(::Enhetsnummer)
 
       fun registrer(id: UUID, brukerId: String, aktørId: String, start: Instant, kontor: String) =
         entityManager.createNativeQuery(UPSERT_QUERY)

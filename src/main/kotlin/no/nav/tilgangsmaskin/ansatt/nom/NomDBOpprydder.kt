@@ -1,7 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
-import io.micrometer.core.instrument.Counter.builder
-import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.scheduling.annotation.Scheduled
@@ -9,16 +7,12 @@ import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit.*
 
 @Component
-class NomDBOpprydder(registry: MeterRegistry, private val nom: NomTjeneste) : LeaderAware() {
+class NomDBOpprydder(
+    private val nom: NomTjeneste,
+    private val antallKall: NomKallTeller,
+    private val raderFjernet: NomRaderFjernetTeller) : LeaderAware() {
 
     private val log = getLogger(javaClass)
-
-    private val antallKall = builder("vaktmester.kall")
-        .description("Antall ganger kalt")
-        .register(registry)
-    private val counter = builder("vaktmester.rader.fjernet")
-        .description("Antall rader fjernet")
-        .register(registry)
 
     override fun doHandleLeaderChange() {
         ryddOpp()
@@ -29,8 +23,8 @@ class NomDBOpprydder(registry: MeterRegistry, private val nom: NomTjeneste) : Le
         somLeder("daglig opprydding i Nom-databasen", {
             log.info("Vaktmester rydder opp i Nom-databasen")
             val antall = nom.ryddOpp()
-            antallKall.increment()
-            counter.increment(antall.toDouble())
+            antallKall.tell()
+            raderFjernet.tell(antall)
             antall
         }) { 0 }
 }

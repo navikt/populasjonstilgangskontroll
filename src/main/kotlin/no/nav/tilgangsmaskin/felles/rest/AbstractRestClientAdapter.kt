@@ -19,16 +19,16 @@ abstract class AbstractRestClientAdapter(
     protected val log = getLogger(javaClass)
     override fun ping() = if (cfg.isEnabled) get<Any>(cfg.pingEndpoint) else "disabled"
 
-    protected inline fun <reified T : Any> get(uri: URI, headers: Map<String, String> = emptyMap()) =
+    protected inline fun <reified T : Any> get(uri: URI, headers: Map<String, String> = emptyMap(), handler: ErrorHandler = errorHandler) =
         restClient.get()
             .uri(uri)
             .accept(APPLICATION_JSON)
             .headers { it.setAll(headers)}
             .retrieve()
-            .onStatus(HttpStatusCode::isError, errorHandler::handle)
+            .onStatus(HttpStatusCode::isError, handler::handle)
             .requiredBody<T>()
 
-    protected inline fun <reified T : Any> post(uri: URI, body: Any, headers: Map<String, String> = emptyMap()) =
+    protected inline fun <reified T : Any> post(uri: URI, body: Any, headers: Map<String, String> = emptyMap(), handler: ErrorHandler = errorHandler) =
         restClient
             .post()
             .uri(uri)
@@ -36,7 +36,7 @@ abstract class AbstractRestClientAdapter(
             .accept(APPLICATION_JSON)
             .body(body)
             .retrieve()
-            .onStatus(HttpStatusCode::isError, errorHandler::handle)
+            .onStatus(HttpStatusCode::isError, handler::handle)
             .requiredBody<T>()
 
     override val name = cfg.name

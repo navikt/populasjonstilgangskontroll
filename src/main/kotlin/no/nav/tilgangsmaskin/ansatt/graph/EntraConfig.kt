@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.graph
 
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste.Companion.ENTRA_OID
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.uuids
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
@@ -21,28 +22,34 @@ class EntraConfig(
     override val navn = name
     override val varighet = Duration.ofHours(3)
 
-    fun userURI(navIdent: String) = builder().apply {
-        path(USERS_PATH)
-        queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_USER)
-        queryParam(PARAM_NAME_FILTER, "onPremisesSamAccountName eq '$navIdent'")
-        queryParam(PARAM_NAME_COUNT, "true")
-    }.build()
+    fun userURI(navIdent: String) =
+        builder().apply {
+            path(USERS_PATH)
+            queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_USER)
+            queryParam(PARAM_NAME_FILTER, "onPremisesSamAccountName eq '$navIdent'")
+            queryParam(PARAM_NAME_COUNT, "true")
+        }.build()
 
-     fun grupperURI(ansattId: String, isCCF: Boolean) = if (isCCF) ccUri(ansattId) else oboUri(ansattId)
+     fun grupperURI(ansattId: String, isCCF: Boolean) =
+         if (isCCF) ccUri(ansattId) else oboUri(ansattId)
 
-    private fun oboUri(ansattId: String) = query(ansattId,GEO_PREFIX)
+    private fun oboUri(ansattId: String) =
+        query(ansattId,GEO_PREFIX)
 
-    private fun ccUri(ansattId: String) = query(ansattId,"id in(${uuidsFormatted()}) or $GEO_PREFIX")
+    private fun ccUri(ansattId: String) =
+        query(ansattId,"id in(${uuidsFormatted()}) or $GEO_PREFIX")
 
-    private fun query(ansattId: String, filter: String) = builder().apply {
-        path(GRUPPER_PATH)
-        queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
-        queryParam(PARAM_NAME_COUNT, "true")
-        queryParam(PARAM_NAME_TOP, size)
-        queryParam(PARAM_NAME_FILTER, filter)
-    }.build(ansattId)
+    private fun query(ansattId: String, filter: String) =
+        builder().apply {
+            path(GRUPPER_PATH)
+            queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
+            queryParam(PARAM_NAME_COUNT, "true")
+            queryParam(PARAM_NAME_TOP, size)
+            queryParam(PARAM_NAME_FILTER, filter)
+        }.build(ansattId)
 
-    private fun uuidsFormatted() = GlobalGruppe.uuids().joinToString(separator ="','" , prefix = "'", postfix = "'")
+    private fun uuidsFormatted() =
+        uuids().joinToString(separator ="','" , prefix = "'", postfix = "'")
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 

@@ -17,8 +17,6 @@ class AnsattTjeneste(private val ansatte: NomTjeneste,
                      private val resolver: AnsattGruppeResolver,
                      private val teller: NasjonalGruppeTeller) {
 
-
-
     fun ansatt(ansattId: AnsattId) =
         Ansatt(ansattId,ansattBruker(ansattId), ansattGrupper(ansattId)).also {
             tell(it erMedlemAv NASJONAL)

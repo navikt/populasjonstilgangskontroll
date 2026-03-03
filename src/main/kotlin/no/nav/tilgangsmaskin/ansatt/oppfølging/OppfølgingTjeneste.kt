@@ -18,7 +18,6 @@ import java.util.*
 @Transactional
 class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
 
-
     @Cacheable(cacheNames = [OPPFØLGING],key = "#id.verdi")
     @Transactional(readOnly = true)
     fun enhetFor(id: Identifikator) =

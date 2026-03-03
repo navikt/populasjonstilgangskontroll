@@ -285,6 +285,16 @@
       "name": "infotrygd-hentsaksliste-backend",
       "namespace": "infotrygd",
       "cluster": "dev-gcp"
+    },
+    {
+      "name": "poao-tilgang",
+      "namespace": "poao",
+      "cluster": "dev-gcp"
+    },
+    {
+      "name": "poao-tilgang",
+      "namespace": "poao",
+      "cluster": "dev-fss"
     }
   ],
   "nais": {

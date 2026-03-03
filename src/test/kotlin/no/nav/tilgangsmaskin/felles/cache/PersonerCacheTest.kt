@@ -27,12 +27,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationListener
-import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.client.MockRestServiceServer.bindTo
+import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.client.RestClient
@@ -45,15 +44,10 @@ import java.util.concurrent.TimeUnit.*
 class PersonerCacheTest : AbstractCacheTest() {
 
     @Autowired
-    lateinit var publisher: ApplicationEventPublisher
-
-    @Autowired
-    private lateinit var ctx: ConfigurableApplicationContext
-
-    @Autowired
     private lateinit var mapper: JsonMapper
 
     private lateinit var pdl: PdlTjeneste
+    private lateinit var mockServer: MockRestServiceServer
 
     override fun cacheConfigurations() = mapOf(
         PDL_MED_FAMILIE_CACHE.name to defaultCacheConfig()
@@ -63,7 +57,6 @@ class PersonerCacheTest : AbstractCacheTest() {
 
     @BeforeEach
     fun setUp() {
-        CacheElementUtløptLytter(redisClient, publisher)
         val restClientBuilder = RestClient.builder().baseUrl("${cfg.baseUri}")
         mockServer = bindTo(restClientBuilder).build()
         pdl = PdlTjeneste(PdlRestClientAdapter(restClientBuilder.build(), cfg, mapper), mockk(), cache, cfg).also {

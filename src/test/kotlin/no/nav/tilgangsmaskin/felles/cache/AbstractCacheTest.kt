@@ -22,12 +22,12 @@ import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
+import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Import
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.web.client.MockRestServiceServer
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Duration.ofSeconds
 
@@ -41,6 +41,9 @@ import java.time.Duration.ofSeconds
 abstract class AbstractCacheTest {
 
     @Autowired
+    protected lateinit var ctx: ConfigurableApplicationContext
+
+    @Autowired
     protected lateinit var meterRegistry: MeterRegistry
 
     @MockkBean
@@ -52,9 +55,6 @@ abstract class AbstractCacheTest {
     protected lateinit var cache: CacheOperations
     protected lateinit var redisClient: RedisClient
 
-    protected lateinit var mockServer: MockRestServiceServer
-
-
     @BeforeEach
     fun setUpCache() {
         every { token.system } returns "test"
@@ -63,18 +63,18 @@ abstract class AbstractCacheTest {
         val mgr = builder(cf)
             .withInitialCacheConfigurations(cacheConfigurations())
             .build().also { mgr ->
-                cacheConfigurations().keys.forEach { mgr.getCache(it) } // init
+                cacheConfigurations().keys.forEach { mgr.getCache(it) }
             }
 
         redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
-        val handler = CacheNøkkelHandler(mgr.cacheConfigurations)
 
         cache = CacheClient(
-            redisClient, handler,
+            redisClient, CacheNøkkelHandler(mgr.cacheConfigurations),
             BulkCacheSuksessTeller(meterRegistry, token),
             BulkCacheTeller(meterRegistry, token),
             CacheConfig("user", "pw", redis.host, redis.firstMappedPort.toString(), ofSeconds(1), ofSeconds(1))
         )
+        CacheElementUtløptLytter(redisClient, ctx)
     }
 
     protected abstract fun cacheConfigurations(): Map<String, RedisCacheConfiguration>

@@ -182,6 +182,16 @@
       "name": "infotrygd-hentsaksliste-backend",
       "namespace": "infotrygd",
       "cluster": "prod-gcp"
+    },
+    {
+      "name": "poao-tilgang",
+      "namespace": "poao",
+      "cluster": "prod-gcp"
+    },
+    {
+      "name": "poao-tilgang",
+      "namespace": "poao",
+      "cluster": "prod-fss"
     }
 
   ],

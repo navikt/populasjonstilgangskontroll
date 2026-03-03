@@ -7,8 +7,6 @@ import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.Timer
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
-import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.LoggingRequestInterceptor
 import no.nav.tilgangsmaskin.tilgang.Token
@@ -28,11 +26,14 @@ import org.springframework.boot.servlet.actuate.web.exchanges.HttpExchangesFilte
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
+import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
@@ -45,13 +46,11 @@ import java.util.function.Function
 @Configuration
 class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : WebMvcConfigurer {
 
-     @Bean
+    @Bean
     fun jackson3Customizer() = JsonMapperBuilderCustomizer {
-        it.addMixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
-       it.enable(INCLUDE_SOURCE_IN_LOCATION)
+        it.enable(INCLUDE_SOURCE_IN_LOCATION)
     }
 
-    
     @Bean
     fun kafkaConsumerFactoryCustomizer(mapper: JsonMapper) =
         DefaultKafkaConsumerFactoryCustomizer {
@@ -59,7 +58,6 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                 ErrorHandlingDeserializer(JacksonJsonDeserializer(mapper))
             }
         }
-
 
     @Bean
     fun outOfServiceIgnoringStatusAggregator() = StatusAggregator {
@@ -78,28 +76,39 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 
     @Bean
-    fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor, loggingInterceptor: LoggingRequestInterceptor) =
+    fun restClientCustomizer(authorizedClientManager: OAuth2AuthorizedClientManager, loggingInterceptor: LoggingRequestInterceptor) =
         RestClientCustomizer { c ->
             c.requestFactory(HttpComponentsClientHttpRequestFactory().apply {
                 setConnectionRequestTimeout(2000)
                 setReadTimeout(5000)
             })
             c.requestInterceptors {
-                it.addFirst(interceptor)
+                it.addFirst(bearerTokenInterceptor(authorizedClientManager))
                 it.add(loggingInterceptor)
             }
         }
 
-
+    private fun bearerTokenInterceptor(authorizedClientManager: OAuth2AuthorizedClientManager) =
+        ClientHttpRequestInterceptor { request, body, next ->
+            val registrationId = request.headers.getFirst("X-Registration-Id")
+                ?: return@ClientHttpRequestInterceptor next.execute(request, body)
+            val authorizeRequest = OAuth2AuthorizeRequest
+                .withClientRegistrationId(registrationId)
+                .principal("system")
+                .build()
+            val authorizedClient = authorizedClientManager.authorize(authorizeRequest)
+            val token = authorizedClient?.accessToken?.tokenValue
+            if (token != null) request.headers.set(AUTHORIZATION, "Bearer $token")
+            next.execute(request, body)
+        }
 
     @Bean
     fun clusterAddingTimedAspect(meterRegistry: MeterRegistry, token: Token) =
-        TimedAspect(meterRegistry,Function   { pjp -> Tags.of("cluster", token.cluster, "method", pjp.signature.name, "client", token.systemNavn) })
+        TimedAspect(meterRegistry, Function { pjp -> Tags.of("cluster", token.cluster, "method", pjp.signature.name, "client", token.systemNavn) })
 
     @Bean
     @ConditionalOnNotProd
     fun traceRepository() = InMemoryHttpExchangeRepository()
-
 
     @Bean
     @ConditionalOnNotProd
@@ -111,16 +120,16 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(ansattIdAddingInterceptor)
     }
+
     override fun configureContentNegotiation(configurer: ContentNegotiationConfigurer) {
         configurer.defaultContentType(APPLICATION_JSON)
     }
-
 
     @Aspect
     @Component
     class TimingAspect(private val meterRegistry: MeterRegistry) {
 
-        @Around("execution(* no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor.intercept(..))")
+        @Around("execution(* org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager.authorize(..))")
         fun timeMethod(joinPoint: ProceedingJoinPoint) = Timer.builder("mslogin")
             .description("Timer med histogram for mslogin")
             .tags("method", joinPoint.signature.name)

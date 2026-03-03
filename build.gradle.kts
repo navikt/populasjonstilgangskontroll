@@ -63,7 +63,7 @@ dependencies {
     implementation("io.confluent:kafka-avro-serializer:$confluentVersion") {
         exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
     }
-   // implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("tools.jackson.module:jackson-module-kotlin")
     implementation("at.yawk.lz4:lz4-java:1.10.2") // fjernes ved neste release av org.apache.kafka:kafka-clients
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$otelVersion-alpha")
@@ -71,8 +71,10 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
     implementation("no.nav.boot:boot-conditionals:$conditionalsVersion")
-    implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
-    implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server")
+    implementation("org.springframework.security:spring-security-oauth2-jose")
+    implementation("org.springframework.security:spring-security-oauth2-client")
     implementation("org.apache.httpcomponents.client5:httpclient5")
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.apache.commons:commons-pool2:$poolsVersion")
@@ -110,6 +112,8 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
     testImplementation("org.awaitility:awaitility-kotlin:$awaitilityVersion")
     testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
+    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.springframework.boot:spring-boot-webmvc-test")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation(kotlin("test"))
 }

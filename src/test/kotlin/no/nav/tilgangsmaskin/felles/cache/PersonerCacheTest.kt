@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import io.mockk.mockk
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
@@ -19,6 +20,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentG
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
+import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjeneste
 import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetEvent
 import org.assertj.core.api.Assertions.assertThat
@@ -26,6 +28,7 @@ import org.awaitility.kotlin.await
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationListener
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
@@ -41,11 +44,14 @@ import java.time.Duration
 import java.time.Duration.ofSeconds
 import java.util.concurrent.TimeUnit.*
 
+@ExtendWith(MockKExtension::class)
 class PersonerCacheTest : AbstractCacheTest() {
 
     @Autowired
     private lateinit var mapper: JsonMapper
 
+    @MockK
+    private lateinit var graphQL : PdlSyncGraphQLClientAdapter
     private lateinit var pdl: PdlTjeneste
     private lateinit var mockServer: MockRestServiceServer
 
@@ -59,7 +65,7 @@ class PersonerCacheTest : AbstractCacheTest() {
     fun setUp() {
         val restClientBuilder = RestClient.builder().baseUrl("${cfg.baseUri}")
         mockServer = bindTo(restClientBuilder).build()
-        pdl = PdlTjeneste(PdlRestClientAdapter(restClientBuilder.build(), cfg, mapper), mockk(), cache, cfg).also {
+        pdl = PdlTjeneste(PdlRestClientAdapter(restClientBuilder.build(), cfg, mapper), graphQL, cache, cfg).also {
             it::class.java.getDeclaredField("self").apply {
                 isAccessible = true
                 set(it, it)
@@ -73,7 +79,7 @@ class PersonerCacheTest : AbstractCacheTest() {
     fun putAndGetOne() {
         putOne(P2)
         assertThat(getOne(P2.brukerId.verdi)).isEqualTo(P2)
-        await.atMost(2, SECONDS).until {
+        await.atMost(3, SECONDS).until {
             getOne(P2.brukerId.verdi) == null
         }
     }

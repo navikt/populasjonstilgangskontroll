@@ -5,7 +5,6 @@ import io.mockk.Called
 import io.mockk.every
 import io.mockk.verify
 import java.util.*
-import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -59,8 +58,6 @@ class RegelMotorTest {
     private val brukerId = BrukerId("08526835670")
     private val ansattId = AnsattId("Z999999")
 
-    @MockkBean
-    lateinit var holder: TokenValidationContextHolder
 
     @MockkBean
     private lateinit var oppfølging: OppfølgingTjeneste

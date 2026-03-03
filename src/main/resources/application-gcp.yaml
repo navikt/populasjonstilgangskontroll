@@ -111,59 +111,42 @@ spring:
     deserialization:
       fail-on-unknown-properties: true
     default-property-inclusion: non_null
-
-no.nav.security.jwt:
-  issuer:
-    azuread:
-      discovery-url: ${azure.app.well.known.url}
-      accepted_audience: ${azure.app.client.id}
-  client:
-    registration:
-
-      pdl-api:
-        token-endpoint-url: ${azure.openid.config.token.endpoint}
-        grant-type: client_credentials
-        scope: ${pdlgraph.scope}
-        authentication:
-          client-id: ${azure.app.client.id}
-          client-jwk: ${azure.app.jwk}
-          client-auth-method: private_key_jwt
-
-      pdl-pip-api:
-        token-endpoint-url: ${azure.openid.config.token.endpoint}
-        grant-type: client_credentials
-        scope: ${pdl.scope}
-        authentication:
-          client-id: ${azure.app.client.id}
-          client-jwk: ${azure.app.jwk}
-          client-auth-method: private_key_jwt
-
-      skjermede-personer-pip:
-        token-endpoint-url: ${azure.openid.config.token.endpoint}
-        grant-type: client_credentials
-        scope: ${skjerming.scope}
-        authentication:
-          client-id: ${azure.app.client.id}
-          client-jwk: ${azure.app.jwk}
-          client-auth-method: private_key_jwt
-
-      graph:
-        token-endpoint-url: ${azure.openid.config.token.endpoint}
-        grant-type: client_credentials
-        scope: ${graph.scope}
-        authentication:
-          client-id: ${azure.app.client.id}
-          client-jwk: ${azure.app.jwk}
-          client-auth-method: private_key_jwt
-
-      entra-proxy:
-        token-endpoint-url: ${azure.openid.config.token.endpoint}
-        grant-type: client_credentials
-        scope: ${entra-proxy.scope}
-        authentication:
-          client-id: ${azure.app.client.id}
-          client-jwk: ${azure.app.jwk}
-          client-auth-method: private_key_jwt
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${azure.openid.config.issuer}
+      client:
+        registration:
+          pdl-api:
+            provider: azure
+            authorization-grant-type: client_credentials
+            scope: ${pdlgraph.scope}
+            client-id: ${azure.app.client.id}
+          pdl-pip-api:
+            provider: azure
+            authorization-grant-type: client_credentials
+            scope: ${pdl.scope}
+            client-id: ${azure.app.client.id}
+          skjermede-personer-pip:
+            provider: azure
+            authorization-grant-type: client_credentials
+            scope: ${skjerming.scope}
+            client-id: ${azure.app.client.id}
+          graph:
+            provider: azure
+            authorization-grant-type: client_credentials
+            scope: ${graph.scope}
+            client-id: ${azure.app.client.id}
+          entra-proxy:
+            provider: azure
+            authorization-grant-type: client_credentials
+            scope: ${entra-proxy.scope}
+            client-id: ${azure.app.client.id}
+        provider:
+          azure:
+            token-uri: ${azure.openid.config.token.endpoint}
+            jwk-set-uri: ${azure.openid.config.jwks_uri}
 springdoc:
   swagger-ui:
     oauth:

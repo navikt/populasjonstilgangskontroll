@@ -1,10 +1,12 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.rest.Pingable
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.stereotype.Component
 
 @Component
+@ConditionalOnGCP
 class CacheAdapter(private val cf: RedisConnectionFactory, cfg: CacheConfig) : Pingable {
 
     override val pingEndpoint  =  "${cfg.host}:${cfg.port}"
@@ -24,4 +26,3 @@ class CacheAdapter(private val cf: RedisConnectionFactory, cfg: CacheConfig) : P
         const val VALKEY = "valkey"
     }
 }
-

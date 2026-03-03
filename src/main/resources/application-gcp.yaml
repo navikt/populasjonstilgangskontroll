@@ -123,26 +123,31 @@ spring:
             authorization-grant-type: client_credentials
             scope: ${pdlgraph.scope}
             client-id: ${azure.app.client.id}
+            client-authentication-method: private_key_jwt
           pdl-pip-api:
             provider: azure
             authorization-grant-type: client_credentials
             scope: ${pdl.scope}
             client-id: ${azure.app.client.id}
+            client-authentication-method: private_key_jwt
           skjermede-personer-pip:
             provider: azure
             authorization-grant-type: client_credentials
             scope: ${skjerming.scope}
             client-id: ${azure.app.client.id}
-          graph:
+            client-authentication-method: private_key_jwt
+          ms-graph:
             provider: azure
             authorization-grant-type: client_credentials
             scope: ${graph.scope}
             client-id: ${azure.app.client.id}
+            client-authentication-method: private_key_jwt
           entra-proxy:
             provider: azure
             authorization-grant-type: client_credentials
             scope: ${entra-proxy.scope}
             client-id: ${azure.app.client.id}
+            client-authentication-method: private_key_jwt
         provider:
           azure:
             token-uri: ${azure.openid.config.token.endpoint}

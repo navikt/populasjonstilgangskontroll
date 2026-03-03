@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.utils
 
 import jakarta.annotation.PreDestroy
+import no.nav.boot.conditionals.ConditionalOnGCP
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.event.ApplicationReadyEvent
@@ -22,6 +23,7 @@ import java.time.LocalDateTime
 import kotlin.Long.Companion.MAX_VALUE
 
 @Component
+@ConditionalOnGCP
 class LederUtvelger(private val builder: Builder,
                     @param:Value("\${elector.sse.url}") private val uri: URI,
                     private val publisher: ApplicationEventPublisher) {

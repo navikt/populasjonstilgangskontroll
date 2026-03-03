@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
@@ -32,6 +31,8 @@ import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
 import org.springframework.stereotype.Component
@@ -67,26 +68,34 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
         }
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    private interface IgnoreUnknownMixin
-
     @Bean
     fun errorMessageSource() = ReloadableResourceBundleMessageSource().apply {
         setBasename("classpath:messages")
     }
 
     @Bean
+    @ConditionalOnBean(OAuth2AuthorizedClientManager::class)
     fun restClientCustomizer(authorizedClientManager: OAuth2AuthorizedClientManager, loggingInterceptor: LoggingRequestInterceptor) =
         RestClientCustomizer { c ->
-            c.requestFactory(HttpComponentsClientHttpRequestFactory().apply {
-                setConnectionRequestTimeout(2000)
-                setReadTimeout(5000)
-            })
+            c.requestFactory(requestFactory())
             c.requestInterceptors {
                 it.addFirst(bearerTokenInterceptor(authorizedClientManager))
                 it.add(loggingInterceptor)
             }
         }
+
+    @Bean
+    @ConditionalOnMissingBean(OAuth2AuthorizedClientManager::class)
+    fun localRestClientCustomizer(loggingInterceptor: LoggingRequestInterceptor) =
+        RestClientCustomizer { c ->
+            c.requestFactory(requestFactory())
+            c.requestInterceptors { it.add(loggingInterceptor) }
+        }
+
+    private fun requestFactory() = HttpComponentsClientHttpRequestFactory().apply {
+        setConnectionRequestTimeout(2000)
+        setReadTimeout(5000)
+    }
 
     private fun bearerTokenInterceptor(authorizedClientManager: OAuth2AuthorizedClientManager) =
         ClientHttpRequestInterceptor { request, body, next ->

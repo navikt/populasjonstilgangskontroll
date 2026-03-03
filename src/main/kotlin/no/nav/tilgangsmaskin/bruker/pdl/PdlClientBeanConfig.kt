@@ -47,21 +47,25 @@ class PdlClientBeanConfig {
     @Qualifier(PDLGRAPH)
     fun pdlGraphRestClient(b: Builder) =
         b.requestInterceptors {
-            it.add(headerAddingRequestInterceptor(BEHANDLINGSNUMMER))
+            it.add(headerAddingRequestInterceptor(BEHANDLINGSNUMMER, REGISTRATION_ID_PDL_GRAPH))
+        }.build()
+
+    @Bean
+    @Qualifier(PDL)
+    fun pdlRestClient(b: Builder) =
+        b.requestInterceptors {
+            it.add(headerAddingRequestInterceptor(REGISTRATION_ID_PDL_PIP))
         }.build()
 
     @Bean
     @Qualifier(PDLGRAPH)
-    fun syncPdlGraphQLClient(@Qualifier(PDLGRAPH) client: RestClient, cfg: PdlGraphQLConfig,  interceptors: List<SyncGraphQlClientInterceptor>) =
+    fun syncPdlGraphQLClient(@Qualifier(PDLGRAPH) client: RestClient, cfg: PdlGraphQLConfig, interceptors: List<SyncGraphQlClientInterceptor>) =
         HttpSyncGraphQlClient.builder(client)
             .url(cfg.baseUri)
             .interceptors {
                 it.addAll(interceptors)
             }.build()
 
-    @Bean
-    @Qualifier(PDL)
-    fun pdlRestClient(b: Builder) = b.build()
 
     @Bean
     @ConditionalOnNotProd
@@ -103,6 +107,8 @@ class PdlClientBeanConfig {
     companion object {
         const val PDL_GRADERING_FILTER = "pdlGraderingFilter"
         const val PDL_CONTAINER_FACTORY = "pdlContainerFactory"
+        private val REGISTRATION_ID_PDL_GRAPH = "X-Registration-Id" to "pdl-api"
+        private val REGISTRATION_ID_PDL_PIP = "X-Registration-Id" to "pdl-pip-api"
         private val CREDENTIALS_SOURCE = UserInfoCredentialProvider().alias()
     }
 }

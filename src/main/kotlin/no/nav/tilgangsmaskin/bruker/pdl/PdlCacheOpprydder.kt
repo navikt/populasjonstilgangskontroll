@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 
+import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.UGRADERT
@@ -17,6 +18,7 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 
 @Component
+@ConditionalOnGCP
 class PdlCacheOpprydder(private val pdl: PdlTjeneste,
                         private val client: CacheClient,
                         private val teller: PdlCacheTømmerTeller) {

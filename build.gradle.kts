@@ -75,6 +75,8 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-resource-server")
     implementation("org.springframework.security:spring-security-oauth2-jose")
     implementation("org.springframework.security:spring-security-oauth2-client")
+    developmentOnly("io.zonky.test:embedded-postgres:2.1.0")
+    compileOnly("io.zonky.test:embedded-postgres:2.1.0")
     implementation("org.apache.httpcomponents.client5:httpclient5")
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.apache.commons:commons-pool2:$poolsVersion")

@@ -1,24 +1,28 @@
 spring:
+  cache:
+    type: simple
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/default
-      client:
-        registration:
-          onbehalfof:
-            provider: azure
-            authorization-grant-type: client_credentials
-            scope: https://graph.microsoft.com/.default
-            client-id: client id
-        provider:
-          azure:
-            token-uri: https://login.microsoftonline.com/${AZURE_APP_TENANT_ID}/oauth2/v2.0/token
-spring:
-  cache:
-    type: caffeine
+          jwk-set-uri: http://localhost:9999/jwks
 
-microsoft:
-    graph:
-      url: https://graph.microsoft.com/v1.0
-      scope: https://graph.microsoft.com/.default
+graph:
+  scope: https://graph.microsoft.com/.default
+  base-uri: https://graph.microsoft.com/v1.0/
+
+pdlgraph:
+  scope: "api://dev-fss.pdl.pdl-api/.default"
+  base-uri: "http://localhost:8081/graphql"
+
+pdl:
+  scope: "api://dev-fss.pdl.pdl-pip-api/.default"
+  base-uri: "http://localhost:8081"
+
+skjerming:
+  base-uri: "http://localhost:8082"
+  scope: "api://dev-gcp.nom.skjermede-personer-pip/.default"
+
+entra-proxy:
+  scope: "api://dev-gcp.sikkerhetstjenesten.entra-proxy/.default"
+  base-uri: "http://localhost:8083"

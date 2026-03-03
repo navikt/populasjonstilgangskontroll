@@ -16,7 +16,7 @@ class EntraClientBeanConfig {
     fun graphRestClient(b: RestClient.Builder, cfg: EntraConfig) =
         b.baseUrl(cfg.baseUri)
             .requestInterceptors {
-                it.add(headerAddingRequestInterceptor(HEADER_CONSISTENCY_LEVEL))
+                it.add(headerAddingRequestInterceptor(HEADER_CONSISTENCY_LEVEL, REGISTRATION_ID))
             }.build()
 
 
@@ -26,5 +26,6 @@ class EntraClientBeanConfig {
 
     companion object {
         private val HEADER_CONSISTENCY_LEVEL = "ConsistencyLevel" to "eventual"
+        private val REGISTRATION_ID = "X-Registration-Id" to "ms-graph"
     }
 }

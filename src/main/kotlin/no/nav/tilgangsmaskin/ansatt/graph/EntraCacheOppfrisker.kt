@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
+import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
+@ConditionalOnGCP
 class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste: AnsattOidTjeneste, private val cache: CacheClient, private val teller: OppfriskingTeller) : AbstractCacheOppfrisker() {
 
     override val cacheName = GRAPH

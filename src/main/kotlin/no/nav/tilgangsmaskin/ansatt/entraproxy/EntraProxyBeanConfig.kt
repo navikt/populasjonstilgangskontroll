@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
 
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRAPROXY
+import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
@@ -13,7 +14,10 @@ class EntraProxyBeanConfig {
     @Bean
     @Qualifier(ENTRAPROXY)
     fun entraProxyRestClient(b: Builder, cfg: EntraProxyConfig) =
-        b.baseUrl(cfg.baseUri).build()
+        b.baseUrl(cfg.baseUri)
+            .requestInterceptors {
+                it.add(headerAddingRequestInterceptor("X-Registration-Id" to "entra-proxy"))
+            }.build()
 
     @Bean
     fun entraProxyHealthIndicator(a: EntraProxyRestClientAdapter) =

@@ -48,6 +48,9 @@ class RegelMotor(
                 logger.avvist(ansatt, bruker, regelSett, regel,type)
                 throw RegelException(ansatt, bruker, regel)
             }
+            else {
+                logger.godkjent(ansatt, bruker, regelSett, regel,type)
+            }
         }
         logger.ok(ansatt, bruker,regelSett,type)
     }

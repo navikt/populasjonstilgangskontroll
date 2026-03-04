@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.regler.motor.NasjonalGruppeTeller
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 
 @Service
@@ -17,9 +18,12 @@ class AnsattTjeneste(private val ansatte: NomTjeneste,
                      private val resolver: AnsattGruppeResolver,
                      private val teller: NasjonalGruppeTeller) {
 
+    private val log = getLogger(javaClass)
+
     fun ansatt(ansattId: AnsattId) =
         Ansatt(ansattId,ansattBruker(ansattId), ansattGrupper(ansattId)).also {
             tell(it erMedlemAv NASJONAL)
+            log.trace("Ansatt er {}", it)
         }
 
     private fun ansattGrupper(ansattId: AnsattId) = resolver.grupperForAnsatt(ansattId)

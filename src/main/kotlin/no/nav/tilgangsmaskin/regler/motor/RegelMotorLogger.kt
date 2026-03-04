@@ -54,7 +54,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
     }
 
     fun tellBulkSize(size: Int) =   bulkHistogram().record(size.toDouble())
-    fun godkjent(ansatt: Ansatt, bruker: Bruker, tyoe: EvalueringType, regel: Regel, type: EvalueringType) {
+    fun godkjent(ansatt: Ansatt, bruker: Bruker, regel: Regel, type: EvalueringType) {
         log.trace("Evaluert regel '{}' OK for {} for {} og {} {}", regel.kortNavn, ansatt.ansattId, bruker.oppslagId.maskFnr(), type.name,konsument())
     }
 

@@ -42,7 +42,7 @@ class RetryLogger {
         if (t !is RetryException) {
             log.warn("Aborterer metode '$method}' grunnet ${t.javaClass.simpleName} $args", t) // Skjer dette noen gang?
         } else {
-            log.warn("Aborterer metode '$method' grunnet ${t.cause?.javaClass?.simpleName} $args", t.cause)
+            log.warn("Aborterer metode '$method' grunnet ${t.cause.javaClass.simpleName} $args", t.cause)
         }
 
 }

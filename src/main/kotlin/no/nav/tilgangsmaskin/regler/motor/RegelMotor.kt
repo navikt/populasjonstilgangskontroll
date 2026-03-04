@@ -49,7 +49,7 @@ class RegelMotor(
                 throw RegelException(ansatt, bruker, regel)
             }
             else {
-                logger.godkjent(ansatt, bruker, regelSett, regel,type)
+                logger.godkjent(ansatt, bruker, regel,type)
             }
         }
         logger.ok(ansatt, bruker,regelSett,type)

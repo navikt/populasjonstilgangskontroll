@@ -59,12 +59,7 @@ class PersonerCacheTest : AbstractCacheTest() {
     fun setUp() {
         val restClientBuilder = RestClient.builder().baseUrl("${cfg.baseUri}")
         mockServer = bindTo(restClientBuilder).build()
-        pdl = PdlTjeneste(PdlRestClientAdapter(restClientBuilder.build(), cfg, mapper), mockk(), cache, cfg).also {
-            it::class.java.getDeclaredField("self").apply {
-                isAccessible = true
-                set(it, it)
-            }
-        }
+        pdl = PdlTjeneste(PdlRestClientAdapter(restClientBuilder.build(), cfg, mapper), mockk(), cache, cfg)
         IDS.forEach { cache.delete(PDL_MED_FAMILIE_CACHE, it) }
     }
 

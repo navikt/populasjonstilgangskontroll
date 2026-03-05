@@ -27,7 +27,7 @@ class SkjermingTjeneste(
     fun skjerminger(brukerIds: List<BrukerId>): Map<BrukerId, Boolean> {
         val ids = brukerIds.map { it.verdi }.toSet()
         val fraCache = fraCache(ids)
-        log.trace("Hentet ${fraCache.size} skjerming(er) av ${ids.size} mulige fra CACHE")
+        log.trace("Hentet ${fraCache.size} skjerming(er) av ${ids.size} mulige fra $SK")
         if (fraCache.size == ids.size) return fraCache.mapKeys { BrukerId(it.key) }.mapValues { it.value }
 
         val fraRest = adapter.skjerminger(ids - fraCache.keys)

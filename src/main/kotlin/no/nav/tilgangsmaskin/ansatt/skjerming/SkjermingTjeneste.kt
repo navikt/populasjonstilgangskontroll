@@ -28,12 +28,12 @@ class SkjermingTjeneste(
         val ids = brukerIds.map { it.verdi }.toSet()
         val fraCache = fraCache(ids)
         log.trace("Hentet ${fraCache.size} skjerming(er) av ${ids.size} mulige fra CACHE")
-        if (fraCache.size == ids.size) return fraCache.mapKeys { BrukerId(it.key) }.mapValues { it.value ?: false }
+        if (fraCache.size == ids.size) return fraCache.mapKeys { BrukerId(it.key) }.mapValues { it.value }
 
         val fraRest = adapter.skjerminger(ids - fraCache.keys)
         log.trace("Hentet ${fraRest.size} skjerming(er) av ${ids.size - fraCache.size} mulige fra REST")
         cache.putMany(SKJERMING_CACHE, fraRest, cf.varighet)
-        return (fraRest + fraCache).mapKeys { BrukerId(it.key) }.mapValues { it.value ?: false }
+        return (fraRest + fraCache).mapKeys { BrukerId(it.key) }.mapValues { it.value }
     }
 
     private fun fraCache(ids: Set<String>) =

@@ -3,6 +3,7 @@ Backendsystem for å tilby tilgangskontroll basert på populasjonen, også kjent
 Fagsystemer kan spørre tilgangsmaskinen om den ansatte har tilgang til brukeren, men ikke domenespesifikk tilgangskontroll (f.eks om den ansatte har tilgang til fagsystemet, eller til å godkjenne forslag til vedtak).
 
 Dokumentasjon på Confluence: https://confluence.adeo.no/spaces/TM/pages/760466828/Tilgangsmaskinen
+
 Slack-kanal: [team-tilgangsmaskinen-værsågod](https://nav-it.slack.com/archives/C07GGDP38S2)
 
 ## Swagger

@@ -23,7 +23,7 @@ class BrukerTjeneste(private val personTjeneste: PdlTjeneste, val skjermingTjene
         val personer = personTjeneste.personer(brukerIds)
         if (personer.size != brukerIds.size) {
             val mangler = (brukerIds - personer.map { it.brukerId.verdi }.toSet()).map { it.maskFnr() }
-            log.warn("Bulk fant ikke ${mangler.size} brukerIds")
+            log.trace("Bulk fant ikke ${mangler.size} brukerIds")
         }
 
         return if (personer.isNotEmpty()) {

@@ -1,12 +1,16 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import no.nav.tilgangsmaskin.TestApp
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.types.shouldBeInstanceOf
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
-import no.nav.tilgangsmaskin.bruker.AktørId
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.bruker.PersonTilBrukerMapper.tilBruker
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTKommune
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTLand
@@ -20,92 +24,52 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentG
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering.FORTROLIG
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
 
+class BrukerMapperTest : DescribeSpec({
 
-@ActiveProfiles(TEST)
-@ContextConfiguration(classes = [TestApp::class])
+    val brukerId = BrukerBuilder(BrukerId("08526835670")).build().brukerId.verdi
+    val aktorId = "1234567890123"
 
-class BrukerMapperTest {
-    
-    private val aktørId = AktørId("1234567890123")
-
-    private val vanligBrukerId = BrukerId("08526835670")
-
-    private val brukerId = BrukerBuilder(vanligBrukerId).build().brukerId.verdi
-
-    @Test
-    @DisplayName("Test at behandling av brukere med STRENGT_FORTROLIG_UTLAND  krever medlemsskap i STRENGT_FORTROLIG_GRUPPE fra ansatt og at geotilknytning er UtenlandskTilknytning")
-    fun strengtFortroligUtland() {
-        with(tilBruker(tilPerson(brukerId,pipRespons(STRENGT_FORTROLIG_UTLAND)), false)) {
-            assertThat(påkrevdeGrupper).containsExactly(GlobalGruppe.STRENGT_FORTROLIG_UTLAND)
-            assertThat(geografiskTilknytning).isInstanceOf(GeografiskTilknytning.UtenlandskTilknytning::class.java)
-        }
-    }
-
-    @Test
-    @DisplayName("Test at behandling av brukere med STRENGT_FORTROLIG vil kreve medlemsskap i STRENGT_FORTROLIG_GRUPPE for ansatt og at geotilknytning er KommuneTilknytning")
-    fun strengtFortroligKommune() {
-        with(tilBruker(tilPerson(brukerId,pipRespons(STRENGT_FORTROLIG, geoKommune())), false)) {
-            assertThat(påkrevdeGrupper).containsExactly(GlobalGruppe.STRENGT_FORTROLIG)
-            assertThat(geografiskTilknytning).isInstanceOf(KommuneTilknytning::class.java)
-        }
-    }
-
-    @Test
-    @DisplayName("Test at behandling av brukere med EGEN_ANSATT vil kreve medlemsskap i EGEN_ANSATT_GRUPPE for ansatt")
-    fun egenAnsatt() {
-        with(tilBruker(tilPerson(brukerId,pipRespons()), true)) {
-            assertThat(påkrevdeGrupper).containsExactly(SKJERMING)
-        }
-    }
-
-    @Test
-    @DisplayName("Test at behandling av brukere med EGEN_ANSATT og STRENGT_FORTROLIG vil kreve medlemsskap i EGEN_ANSATT_GRUPPE og STRENGT_FORTROLIG_GRUPPE for ansatt")
-    fun egenAnsattKode6() {
-        with(tilBruker(tilPerson(brukerId,pipRespons(STRENGT_FORTROLIG)), true)) {
-            assertThat(påkrevdeGrupper).containsExactlyInAnyOrder(
-                    SKJERMING,
-                    GlobalGruppe.STRENGT_FORTROLIG)
-        }
-    }
-
-    @Test
-    @DisplayName("Test at behandling av brukere med EGEN_ANSATT og FORTROLIG vil kreve medlemsskap i EGEN_ANSATT_GRUPPE og FORTROLIG_GRUPPE for ansatt")
-    fun egenAnsattKode7() {
-        with(tilBruker(tilPerson(brukerId,pipRespons(FORTROLIG)), true)) {
-            assertThat(påkrevdeGrupper).containsExactlyInAnyOrder(SKJERMING, GlobalGruppe.FORTROLIG)
-        }
-    }
-
-    private fun geoUtland() = PdlGeografiskTilknytning(UTLAND, gtLand = GTLand("SWE"))
-    private fun geoKommune() = PdlGeografiskTilknytning(KOMMUNE, gtKommune = GTKommune("1234"))
-
-
+    fun geoUtland() = PdlGeografiskTilknytning(UTLAND, gtLand = GTLand("SWE"))
+    fun geoKommune() = PdlGeografiskTilknytning(KOMMUNE, gtKommune = GTKommune("1234"))
 
     fun pipRespons(
-            gradering: PdlAdressebeskyttelseGradering? = null,
-            geo: PdlGeografiskTilknytning = geoUtland()
-                  ): PdlRespons {
-        val adressebeskyttelse = gradering?.let {
-            listOf(PdlAdressebeskyttelse(it))
-        } ?: emptyList()
-        return PdlRespons(
-                PdlPerson(adressebeskyttelse),
-                PdlIdenter(
-                        listOf(
-                                PdlIdent(brukerId, false, FOLKEREGISTERIDENT),
-                                PdlIdent(aktørId.verdi, false, AKTORID))),
-                geo
-                         )
+        gradering: PdlAdressebeskyttelseGradering? = null,
+        geo: PdlGeografiskTilknytning = geoUtland(),
+    ) = PdlRespons(
+        PdlPerson(gradering?.let { listOf(PdlAdressebeskyttelse(it)) } ?: emptyList()),
+        PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT), PdlIdent(aktorId, false, AKTORID))),
+        geo
+    )
+
+    describe("tilBruker") {
+
+        it("STRENGT_FORTROLIG_UTLAND krever STRENGT_FORTROLIG_UTLAND-gruppe og gir UtenlandskTilknytning") {
+            val bruker = tilBruker(tilPerson(brukerId, pipRespons(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND)), false)
+            bruker.påkrevdeGrupper shouldContainExactly setOf(STRENGT_FORTROLIG_UTLAND)
+            bruker.geografiskTilknytning.shouldBeInstanceOf<UtenlandskTilknytning>()
+        }
+
+        it("STRENGT_FORTROLIG med kommunal geo krever STRENGT_FORTROLIG-gruppe og gir KommuneTilknytning") {
+            val bruker = tilBruker(tilPerson(brukerId, pipRespons(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG, geoKommune())), false)
+            bruker.påkrevdeGrupper shouldContainExactly setOf(STRENGT_FORTROLIG)
+            bruker.geografiskTilknytning.shouldBeInstanceOf<KommuneTilknytning>()
+        }
+
+        it("skjermet bruker krever SKJERMING-gruppe") {
+            val bruker = tilBruker(tilPerson(brukerId, pipRespons()), true)
+            bruker.påkrevdeGrupper shouldContainExactly setOf(SKJERMING)
+        }
+
+        it("skjermet bruker med STRENGT_FORTROLIG krever SKJERMING og STRENGT_FORTROLIG-gruppe") {
+            val bruker = tilBruker(tilPerson(brukerId, pipRespons(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG)), true)
+            bruker.påkrevdeGrupper shouldContainExactlyInAnyOrder setOf(SKJERMING, STRENGT_FORTROLIG)
+        }
+
+        it("skjermet bruker med FORTROLIG krever SKJERMING og FORTROLIG-gruppe") {
+            val bruker = tilBruker(tilPerson(brukerId, pipRespons(PdlAdressebeskyttelseGradering.FORTROLIG)), true)
+            bruker.påkrevdeGrupper shouldContainExactlyInAnyOrder setOf(SKJERMING, FORTROLIG)
+        }
     }
-}
+})

@@ -39,14 +39,16 @@ class RegelMotor(
     @WithSpan
     private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett,type: EvalueringType) {
         regelSett.regler.forEach { regel ->
-            logger.evaluerer(ansatt, bruker, regel,type)
             if (!cfg.isEnabled(regel.navn)) {
-                logger.trace("Regel ${regel.navn} er deaktivert i konfigurasjonen, hopper over evaluering.")
+                logger.trace("Regel ${regel.navn} er deaktivert, hopper over evaluering.")
                 return@forEach
             }
             if (!regel.evaluer(ansatt, bruker)) {
                 logger.avvist(ansatt, bruker, regelSett, regel,type)
                 throw RegelException(ansatt, bruker, regel)
+            }
+            else {
+                logger.godkjent(ansatt, bruker, regel,type)
             }
         }
         logger.ok(ansatt, bruker,regelSett,type)

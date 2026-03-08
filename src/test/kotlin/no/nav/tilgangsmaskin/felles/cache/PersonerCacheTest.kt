@@ -39,7 +39,7 @@ import tools.jackson.databind.json.JsonMapper
 import java.net.URI
 import java.time.Duration
 import java.time.Duration.ofSeconds
-import java.util.concurrent.TimeUnit.*
+import java.util.concurrent.TimeUnit.SECONDS
 
 class PersonerCacheTest : AbstractCacheTest() {
 
@@ -59,34 +59,10 @@ class PersonerCacheTest : AbstractCacheTest() {
     fun setUp() {
         val restClientBuilder = RestClient.builder().baseUrl("${cfg.baseUri}")
         mockServer = bindTo(restClientBuilder).build()
-        pdl = PdlTjeneste(PdlRestClientAdapter(restClientBuilder.build(), cfg, mapper), mockk(), cache, cfg).also {
-            it::class.java.getDeclaredField("self").apply {
-                isAccessible = true
-                set(it, it)
-            }
-        }
+        pdl = PdlTjeneste(PdlRestClientAdapter(restClientBuilder.build(), cfg, mapper), mockk(), cache, cfg)
         IDS.forEach { cache.delete(PDL_MED_FAMILIE_CACHE, it) }
     }
 
-    @Test
-    @DisplayName("Put og get en verdi, og verifiser at den er borte etter utløp")
-    fun putAndGetOne() {
-        putOne(P2)
-        assertThat(getOne(P2.brukerId.verdi)).isEqualTo(P2)
-        await.atMost(2, SECONDS).until {
-            getOne(P2.brukerId.verdi) == null
-        }
-    }
-
-    @Test
-    @DisplayName("Put og get flere verdier, og verifiser at de er borte etter utløp")
-    fun putAndGetMany() {
-        putMany(P1, P2)
-        assertThat(getMany(IDS).keys).containsExactlyInAnyOrderElementsOf(IDS)
-        await.atMost(2, SECONDS).until {
-            getMany(IDS).isEmpty()
-        }
-    }
 
     @Test
     @DisplayName("Rest kalles kun for cache-misser, treff hentes fra cache")

@@ -111,6 +111,7 @@ dependencies {
     testImplementation("org.awaitility:awaitility-kotlin:$awaitilityVersion")
     testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
+    implementation("io.kotest:kotest-extensions-spring:6.1.5")
     testImplementation(kotlin("test"))
 }
 

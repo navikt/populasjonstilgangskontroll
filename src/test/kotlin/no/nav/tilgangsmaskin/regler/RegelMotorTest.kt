@@ -37,10 +37,6 @@ import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.tilgang.RegelConfig
 import no.nav.tilgangsmaskin.tilgang.Token
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatCode
-import org.junit.jupiter.api.*
-import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
@@ -49,9 +45,6 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-
 
 @Import(RegelTestConfig::class)
 @ActiveProfiles(TEST)

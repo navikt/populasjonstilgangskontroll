@@ -1,13 +1,16 @@
 package no.nav.tilgangsmaskin.ansatt.`oppfølging`
 
 import com.ninjasquad.springmockk.MockkBean
+import com.ninjasquad.springmockk.MockkSpyBean
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
+import io.mockk.verify
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING_CACHE
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjenesteTest.CacheTestConfig
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -34,7 +37,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
-import java.util.UUID
+import java.util.UUID.randomUUID
 
 @DataJpaTest
 @EnableJpaAuditing
@@ -44,36 +47,24 @@ import java.util.UUID
 @ContextConfiguration(classes = [TestApp::class, OppfølgingTjeneste::class, OppfølgingJPAAdapter::class])
 @Import(CacheTestConfig::class)
 @ApplyExtension(SpringExtension::class)
-
 class OppfølgingTjenesteTest : DescribeSpec() {
-
 
     @Configuration
     class CacheTestConfig {
-        @Bean
-        fun cacheManager(): CacheManager = ConcurrentMapCacheManager(OPPFØLGING)
-
-        @Bean
-        fun cacheOperations(cacheManager: CacheManager)  =
-            ConcurrentMapCacheOperations(cacheManager)
+        @Bean fun cacheManager(): CacheManager = ConcurrentMapCacheManager(OPPFØLGING)
+        @Bean fun cacheOperations(cacheManager: CacheManager): CacheOperations = ConcurrentMapCacheOperations(cacheManager)
     }
 
     @MockkBean private lateinit var token: Token
 
-    @Autowired private lateinit var adapter: OppfølgingJPAAdapter
+    @MockkSpyBean private lateinit var adapter: OppfølgingJPAAdapter
+    @Autowired private lateinit var tjeneste: OppfølgingTjeneste
 
     @Qualifier("cacheOperations")
     @Autowired private lateinit var cache: CacheOperations
 
-    @Autowired private lateinit var tjeneste: OppfølgingTjeneste
-
-    private val brukerId = BrukerId("08526835670")
-    private val aktørId  = AktørId("1234567890123")
-    private val kontor   = Enhetsnummer("1234")
-    private val identer  = Identer(brukerId, aktørId)
-
     @BeforeEach
-    fun clearCache(@Autowired cacheManager: CacheManager) {
+    fun setUp(@Autowired cacheManager: CacheManager) {
         cacheManager.getCache(OPPFØLGING)?.clear()
     }
 
@@ -82,24 +73,31 @@ class OppfølgingTjenesteTest : DescribeSpec() {
 
             it("returnerer null når det ikke finnes oppfølging") {
                 tjeneste.enhetFor(Identifikator(brukerId.verdi)) shouldBe null
+                verify { adapter.enhetFor(brukerId.verdi) }
             }
 
             it("cacher resultatet etter første oppslag") {
-                tjeneste.registrer(UUID.randomUUID(), identer, OppfølgingHendelse.Kontor(kontor, "Testenhet"))
+                tjeneste.registrer(randomUUID(), IDENTER, KONTOR)
                 tjeneste.enhetFor(Identifikator(brukerId.verdi))
+                verify(exactly = 0) { adapter.enhetFor(brukerId.verdi) }
                 cache.getOne(OPPFØLGING_CACHE, brukerId.verdi, Enhetsnummer::class) shouldBe kontor
+            }
+
+            it("kaller ikke adapter ved cache-treff") {
+                tjeneste.registrer(randomUUID(), IDENTER, KONTOR)
+                tjeneste.enhetFor(Identifikator(brukerId.verdi)) shouldBe kontor
             }
         }
 
         describe("registrer") {
 
             it("populerer cache for brukerId") {
-                tjeneste.registrer(UUID.randomUUID(), identer, OppfølgingHendelse.Kontor(kontor, "Testenhet"))
+                tjeneste.registrer(randomUUID(), IDENTER, KONTOR)
                 cache.getOne(OPPFØLGING_CACHE, brukerId.verdi, Enhetsnummer::class) shouldBe kontor
             }
 
             it("populerer cache for aktørId") {
-                tjeneste.registrer(UUID.randomUUID(), identer, OppfølgingHendelse.Kontor(kontor, "Testenhet"))
+                tjeneste.registrer(randomUUID(), IDENTER, KONTOR)
                 cache.getOne(OPPFØLGING_CACHE, aktørId.verdi, Enhetsnummer::class) shouldBe kontor
             }
         }
@@ -107,12 +105,12 @@ class OppfølgingTjenesteTest : DescribeSpec() {
         describe("avslutt") {
 
             it("fjerner cache-innslag for brukerId og aktørId") {
-                val id = UUID.randomUUID()
-                tjeneste.registrer(id, identer, OppfølgingHendelse.Kontor(kontor, "Testenhet"))
+                val id = randomUUID()
+                tjeneste.registrer(id, IDENTER, KONTOR)
                 cache.getOne(OPPFØLGING_CACHE, brukerId.verdi, Enhetsnummer::class) shouldBe kontor
                 cache.getOne(OPPFØLGING_CACHE, aktørId.verdi,  Enhetsnummer::class) shouldBe kontor
 
-                tjeneste.avslutt(id, identer)
+                tjeneste.avslutt(id, IDENTER)
 
                 cache.getOne(OPPFØLGING_CACHE, brukerId.verdi, Enhetsnummer::class) shouldBe null
                 cache.getOne(OPPFØLGING_CACHE, aktørId.verdi,  Enhetsnummer::class) shouldBe null
@@ -121,6 +119,11 @@ class OppfølgingTjenesteTest : DescribeSpec() {
     }
 
     companion object {
+        private val brukerId = BrukerId("08526835670")
+        private val aktørId  = AktørId("1234567890123")
+        private val kontor   = Enhetsnummer("1234")
+        private val IDENTER  = Identer(brukerId, aktørId)
+        private val KONTOR = Kontor(kontor, "Testenhet")
         @ServiceConnection
         private val postgres = PostgreSQLContainer("postgres:17")
     }

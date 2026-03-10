@@ -104,6 +104,7 @@ class OverstyringRegelTjenesteTest {
     }
 
     @Test
+    @DisplayName("Verifiser at brukere uten tilgang havner i avviste i bulk")
     fun bulkAvvisninger() {
         every {
             brukere.brukere(setOf(strengtFortroligAktørId.verdi, fortroligBrukerId.verdi))

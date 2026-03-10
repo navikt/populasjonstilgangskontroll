@@ -12,8 +12,6 @@ import io.mockk.Called
 import io.mockk.every
 import io.mockk.verify
 import java.util.*
-import no.nav.security.token.support.core.context.TokenValidationContextHolder
-import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
@@ -33,13 +31,11 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.Identifikator
-import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
-import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
@@ -47,19 +43,15 @@ import org.springframework.test.context.TestPropertySource
 
 @Import(RegelTestConfig::class)
 @ActiveProfiles(TEST)
-@RestClientTest
 @TestPropertySource(locations = ["classpath:test.properties"])
 @AutoConfigureMetrics
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [TestApp::class, Token::class, Auditor::class])
+@ContextConfiguration(classes = [RegelTestConfig::class])
 @ApplyExtension(SpringExtension::class)
 class RegelMotorTest : DescribeSpec() {
 
     private val brukerId = BrukerId("08526835670")
     private val ansattId = AnsattId("Z999999")
-
-    @MockkBean
-    lateinit var holder: TokenValidationContextHolder
 
     @MockkBean
     private lateinit var oppfølging: OppfølgingTjeneste

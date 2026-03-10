@@ -35,7 +35,6 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.regler.motor.*
-import no.nav.tilgangsmaskin.tilgang.RegelConfig
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -51,7 +50,7 @@ import org.springframework.test.context.TestPropertySource
 @RestClientTest
 @TestPropertySource(locations = ["classpath:test.properties"])
 @AutoConfigureMetrics
-@EnableConfigurationProperties(value = [GlobaleGrupperConfig::class, RegelConfig::class])
+@EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
 @ContextConfiguration(classes = [TestApp::class, Token::class, Auditor::class])
 @ApplyExtension(SpringExtension::class)
 class RegelMotorTest : DescribeSpec() {

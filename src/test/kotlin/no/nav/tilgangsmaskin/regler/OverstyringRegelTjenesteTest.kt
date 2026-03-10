@@ -25,7 +25,6 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.overstyring.*
-import no.nav.tilgangsmaskin.tilgang.RegelConfig
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.assertj.core.api.Assertions.assertThat
@@ -52,7 +51,7 @@ import kotlin.test.BeforeTest
 @DataJpaTest
 @EnableJpaAuditing
 @TestPropertySource(locations = ["classpath:test.properties"])
-@EnableConfigurationProperties(value = [RegelConfig::class, GlobaleGrupperConfig::class])
+@EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
 @ContextConfiguration(classes = [TestApp::class, Auditor::class])
 @ExtendWith(MockKExtension::class)
 @AutoConfigureMetrics

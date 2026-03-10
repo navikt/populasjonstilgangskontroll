@@ -22,6 +22,7 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Identifikator
+import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.regler.overstyring.*
@@ -46,6 +47,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
 import org.testcontainers.postgresql.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.net.URI
 import kotlin.test.BeforeTest
 
 @Import(RegelTestConfig::class)
@@ -185,6 +187,42 @@ class RegelTjenesteTest {
         assertThat(resultater.avviste.isEmpty())
         assertThat(resultater.godkjente.isEmpty())
         assertThat(resultater.godkjente).hasSize(1)
+    }
+
+    @Test
+    @DisplayName("Verifiser at kjerneregler kjøres uten unntak når bruker finnes i PDL")
+    fun kjernereglerHappyPath() {
+        every {
+            brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi)
+        } returns BrukerBuilder(vanligBrukerId).build()
+
+        assertThatCode {
+            regler.kjerneregler(ansattId, vanligBrukerId.verdi)
+        }.doesNotThrowAnyException()
+    }
+
+    @Test
+    @DisplayName("Verifiser at tilgang gis når bruker ikke finnes i PDL ved kjerneregelssjekk")
+    fun brukerIkkeFunnetIPdlKjerneregler() {
+        every {
+            brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi)
+        } throws NotFoundRestException(URI.create("http://pdl"))
+
+        assertThatCode {
+            regler.kjerneregler(ansattId, vanligBrukerId.verdi)
+        }.doesNotThrowAnyException()
+    }
+
+    @Test
+    @DisplayName("Verifiser at tilgang gis når bruker ikke finnes i PDL ved komplett regelsjekk")
+    fun brukerIkkeFunnetIPdl() {
+        every {
+            brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi)
+        } throws NotFoundRestException(URI.create(("http://pdl")))
+
+        assertThatCode {
+            regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
+        }.doesNotThrowAnyException()
     }
 
     companion object {

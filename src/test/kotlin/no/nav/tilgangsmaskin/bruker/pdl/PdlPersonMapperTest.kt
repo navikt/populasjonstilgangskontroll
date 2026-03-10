@@ -45,6 +45,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPersoner
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.AKTORID
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.NPID
@@ -61,25 +62,21 @@ class PdlPersonMapperTest : DescribeSpec({
 
     val brukerId = "08526835670"
     val aktorId = "1234567890123"
-    val barnId = BrukerId("01010112345")
-    val morId = BrukerId("01010198765")
-    val farId = BrukerId("01010154321")
+    val barn = BrukerId("01010112345")
+    val mor = BrukerId("01010198765")
+    val far = BrukerId("01010154321")
 
-    fun identer(
-        fnr: String = brukerId,
-        aktor: String = aktorId,
-        historiske: List<Pair<String, PdlIdent.PdlIdentGruppe>> = emptyList(),
-    ) = PdlIdenter(buildList {
-        add(PdlIdent(fnr, false, FOLKEREGISTERIDENT))
-        add(PdlIdent(aktor, false, AKTORID))
-        historiske.forEach { (ident, gruppe) -> add(PdlIdent(ident, true, gruppe)) }
-    })
+    fun identer(fnr: String = brukerId, aktor: String = aktorId, historiske: List<Pair<String, PdlIdentGruppe>> = emptyList()) =
+        PdlIdenter(buildList {
+            add(PdlIdent(fnr, false, FOLKEREGISTERIDENT))
+            add(PdlIdent(aktor, false, AKTORID))
+            historiske.forEach {
+                    (ident, gruppe) -> add(PdlIdent(ident, true, gruppe))
+            }
+        })
 
-    fun pdlRespons(
-        person: PdlPerson = PdlPerson(),
-        geo: PdlGeografiskTilknytning? = PdlGeografiskTilknytning(UDEFINERT),
-        identer: PdlIdenter = identer(),
-    ) = PdlRespons(person, identer, geo)
+    fun pdlRespons(person: PdlPerson = PdlPerson(), geo: PdlGeografiskTilknytning? = PdlGeografiskTilknytning(UDEFINERT), identer: PdlIdenter = identer()) =
+        PdlRespons(person, identer, geo)
 
     describe("tilGeoTilknytning") {
 
@@ -140,33 +137,33 @@ class PdlPersonMapperTest : DescribeSpec({
             PdlFamilierelasjon(ident, rolle)
 
         it("mapper MOR-relasjon til foreldre med relasjon MOR") {
-            val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(morId, PdlFamilieRelasjonRolle.MOR)))))
+            val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(mor, PdlFamilieRelasjonRolle.MOR)))))
             result.foreldre.single().let {
-                it.brukerId shouldBe morId
+                it.brukerId shouldBe mor
                 it.relasjon shouldBe MOR
             }
         }
 
         it("mapper FAR-relasjon til foreldre med relasjon FAR") {
-            val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(farId, PdlFamilieRelasjonRolle.FAR)))))
+            val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(far, PdlFamilieRelasjonRolle.FAR)))))
             result.foreldre.single().let {
-                it.brukerId shouldBe farId
+                it.brukerId shouldBe far
                 it.relasjon shouldBe FAR
             }
         }
 
         it("mapper MEDMOR-relasjon til foreldre med relasjon MOR") {
-            tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(morId, PdlFamilieRelasjonRolle.MEDMOR))))).foreldre.single().relasjon shouldBe MOR
+            tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(mor, PdlFamilieRelasjonRolle.MEDMOR))))).foreldre.single().relasjon shouldBe MOR
         }
 
         it("mapper MEDFAR-relasjon til foreldre med relasjon FAR") {
-            tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(farId, PdlFamilieRelasjonRolle.MEDFAR))))).foreldre.single().relasjon shouldBe FAR
+            tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(far, PdlFamilieRelasjonRolle.MEDFAR))))).foreldre.single().relasjon shouldBe FAR
         }
 
         it("mapper BARN-relasjon til barn") {
-            val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(barnId, PdlFamilieRelasjonRolle.BARN)))))
+            val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(barn, PdlFamilieRelasjonRolle.BARN)))))
             result.barn.single().let {
-                it.brukerId shouldBe barnId
+                it.brukerId shouldBe barn
                 it.relasjon shouldBe BARN
             }
         }
@@ -179,7 +176,7 @@ class PdlPersonMapperTest : DescribeSpec({
 
         it("kaster exception for ukjent relasjon (null rolle med ident)") {
             shouldThrow<IllegalStateException> {
-                tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(PdlFamilierelasjon(barnId, null)))))
+                tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(PdlFamilierelasjon(barn, null)))))
             }
         }
     }

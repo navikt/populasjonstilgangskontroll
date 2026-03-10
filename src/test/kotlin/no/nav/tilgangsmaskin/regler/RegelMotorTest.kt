@@ -6,7 +6,6 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.extensions.spring.SpringExtension
-import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.Called
 import io.mockk.every
@@ -28,7 +27,6 @@ import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.regler.motor.*
@@ -36,13 +34,13 @@ import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
+import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
 
 @Import(RegelTestConfig::class)
-@ActiveProfiles(TEST)
 @TestPropertySource(locations = ["classpath:test.properties"])
 @AutoConfigureMetrics
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
@@ -92,13 +90,13 @@ class RegelMotorTest : DescribeSpec() {
             it("Egen ansatt bruker med fortrolig beskyttelse kan behandles av ansatt med medlemsskap i egen ansatt gruppe som også har medlemsskap i fortrolig gruppe") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG, SKJERMING).build()
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(FORTROLIG, SKJERMING).build()
-                (ansatt kanBehandle bruker).shouldBeTrue()
+                ansatt kanBehandle bruker
             }
 
             it("Egen ansatt bruker med strengt fortrolig beskyttelse kan behandles av ansatt i egen ansatt gruppe som også har strengt fortrolig gruppe") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG, SKJERMING).build()
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG, SKJERMING).build()
-                (ansatt kanBehandle bruker).shouldBeTrue()
+                ansatt kanBehandle bruker
             }
 
             it("Egen ansatt bruker med strengt fortrolig beskyttelse kan ikke behandles av ansatt med medlemsskap i egen ansatt gruppe") {
@@ -110,8 +108,7 @@ class RegelMotorTest : DescribeSpec() {
             it("Egen ansatt bruker *kan* behandles av ansatt med medlemsskap i egen ansatt gruppe") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(SKJERMING).build()
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(SKJERMING).build()
-                regelMotor.kompletteRegler(ansatt, bruker)
-                (ansatt kanBehandle bruker).shouldBeTrue()
+                ansatt kanBehandle bruker
             }
 
             it("Egen ansatt bruker kan ikke behandles av vanlig ansatt") {
@@ -156,7 +153,7 @@ class RegelMotorTest : DescribeSpec() {
             it("Fortrolig bruker kan behandles av ansatt med medlemsskap i fortrolig gruppe") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(FORTROLIG).build()
-                (ansatt kanBehandle bruker).shouldBeTrue()
+                ansatt kanBehandle bruker
             }
         }
 
@@ -168,20 +165,20 @@ class RegelMotorTest : DescribeSpec() {
             it("Ansatt med nasjonal tilgang kan behandle vanlig bruker") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(NASJONAL).build()
                 val bruker = BrukerBuilder(brukerId).build()
-                (ansatt kanBehandle bruker).shouldBeTrue()
+                ansatt kanBehandle bruker
                 verify { oppfølging wasNot Called }
             }
 
             it("Ansatt med manglende geografisk tilknytning gruppe kan behandle bruker uten kjent geografisk tilknytning") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UKJENT_BOSTED).build()
                 val bruker = BrukerBuilder(brukerId, UkjentBosted()).kreverMedlemskapI(UKJENT_BOSTED).build()
-                (ansatt kanBehandle bruker).shouldBeTrue()
+                ansatt kanBehandle bruker
             }
 
             it("Ansatt med tilgang som samme GT som bruker kan behandle denne") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).medMedlemskapI(SKJERMING).build()
                 val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune(enhet.verdi))).build()
-                (ansatt kanBehandle bruker).shouldBeTrue()
+                ansatt kanBehandle bruker
                 verify { oppfølging wasNot Called }
             }
 
@@ -197,7 +194,7 @@ class RegelMotorTest : DescribeSpec() {
                 every { oppfølging.enhetFor(Identifikator(brukerId.verdi)) } returns enhet
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(oppfølgingGruppe).build()
                 val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
-                (ansatt kanBehandle bruker).shouldBeTrue()
+                ansatt kanBehandle bruker
                 verify(exactly = 1) { oppfølging.enhetFor(Identifikator(brukerId.verdi)) }
             }
         }
@@ -259,7 +256,7 @@ class RegelMotorTest : DescribeSpec() {
             it("Bruker med strengt fortrolig beskyttelse kan behandles av ansatt med medlemsskap i strengt fortrolig gruppe") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build()
-                (ansatt kanBehandle bruker).shouldBeTrue()
+                ansatt kanBehandle bruker
             }
         }
 
@@ -268,7 +265,7 @@ class RegelMotorTest : DescribeSpec() {
             it("Bruker med strengt fortrolig utland beskyttelse kan behandles av ansatt med medlemsskap i strengt fortrolig gruppe") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
-                (ansatt kanBehandle bruker).shouldBeTrue()
+                ansatt kanBehandle bruker
             }
 
             it("Bruker med strengt fortrolig utland beskyttelse kan ikke behandles av ansatt med medlemsskap i fortrolig gruppe") {
@@ -289,19 +286,19 @@ class RegelMotorTest : DescribeSpec() {
             it("Vanlig bruker kan behandles av ansatt med medlemsskap i strengt fortrolig gruppe") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
                 val bruker = BrukerBuilder(brukerId).build()
-                (ansatt kanBehandle bruker).shouldBeTrue()
+                ansatt kanBehandle bruker
             }
 
             it("Vanlig bruker kan behandles av ansatt med medlemsskap i fortrolig gruppe") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
                 val bruker = BrukerBuilder(brukerId).build()
-                (ansatt kanBehandle bruker).shouldBeTrue()
+                ansatt kanBehandle bruker
             }
 
             it("Vanlig bruker kan behandles av vanlig ansatt") {
                 val ansatt = AnsattBuilder(ansattId).build()
                 val bruker = BrukerBuilder(brukerId).build()
-                (ansatt kanBehandle bruker).shouldBeTrue()
+                ansatt kanBehandle bruker
             }
         }
     }
@@ -312,10 +309,13 @@ class RegelMotorTest : DescribeSpec() {
         }.regel.shouldBeInstanceOf<T>()
     }
 
-    private infix fun Ansatt.kanBehandle(bruker: Bruker): Boolean {
+    private infix fun Ansatt.kanBehandle(bruker: Bruker) {
         shouldNotThrowAny {
             regelMotor.kompletteRegler(this, bruker)
         }
-        return true
     }
 }
+
+@Configuration
+@ComponentScan("no.nav.tilgangsmaskin.regler.motor")
+class RegelTestConfig

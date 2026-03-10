@@ -9,7 +9,6 @@ import org.springframework.resilience.annotation.EnableResilientMethods
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
-//@EnableCaching
 @EnableResilientMethods
 class TestApp
 

@@ -14,34 +14,42 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.motor.EvalueringTeller
-import no.nav.tilgangsmaskin.regler.motor.EvalueringTypeTeller
+import no.nav.tilgangsmaskin.regler.RegelTestConfig
+import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
 import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
-import no.nav.tilgangsmaskin.regler.motor.RegelBeanConfig
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.regler.motor.RegelMotorLogger
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
+import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.TestPropertySource
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
 
+@Import(RegelTestConfig::class)
 @DataJpaTest
-@ContextConfiguration(classes = [RegelMotor::class,  RegelMotorLogger::class, EvalueringTypeTeller::class, EvalueringTeller::class, OverstyringJPAAdapter::class, RegelBeanConfig::class, TestApp::class])
 @EnableJpaAuditing
+@ActiveProfiles(TEST)
 @Testcontainers
 @AutoConfigureMetrics
+@TestPropertySource(locations = ["classpath:test.properties"])
+@EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
+@ContextConfiguration(classes = [TestApp::class, OverstyringJPAAdapter::class])
 @ApplyExtension(SpringExtension::class)
 internal class OverstyringTest : DescribeSpec() {
 
@@ -52,6 +60,7 @@ internal class OverstyringTest : DescribeSpec() {
     @MockkBean lateinit var validator: OverstyringClientValidator
     @MockkBean lateinit var proxy: EntraProxyTjeneste
     @MockkBean lateinit var token: Token
+    @MockkBean lateinit var oppfølging: OppfølgingTjeneste
     @Autowired lateinit var motor: RegelMotor
     @Autowired lateinit var registry: MeterRegistry
     @Autowired lateinit var adapter: OverstyringJPAAdapter

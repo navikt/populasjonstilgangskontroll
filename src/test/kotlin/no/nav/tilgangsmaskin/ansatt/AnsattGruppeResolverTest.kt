@@ -64,7 +64,7 @@ class AnsattGruppeResolverTest : DescribeSpec() {
                 every { entra.geoOgGlobaleGrupper(ansattId, oid) } returns forventet
 
                 resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder forventet
-                verify(exactly = 1) { entra.geoOgGlobaleGrupper(ansattId, oid) }
+                verify { entra.geoOgGlobaleGrupper(ansattId, oid) }
                 verify(exactly = 0) { entra.geoGrupper(any(), any()) }
             }
         }

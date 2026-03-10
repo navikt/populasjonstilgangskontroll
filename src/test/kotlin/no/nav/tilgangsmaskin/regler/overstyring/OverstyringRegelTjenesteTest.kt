@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.regler
+package no.nav.tilgangsmaskin.regler.overstyring
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.assertions.throwables.shouldNotThrowAny
@@ -16,23 +16,27 @@ import io.mockk.impl.annotations.MockK
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.utils.Auditor
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
-import no.nav.tilgangsmaskin.regler.motor.*
-import no.nav.tilgangsmaskin.regler.overstyring.*
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions
+import no.nav.tilgangsmaskin.regler.AnsattBuilder
+import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import no.nav.tilgangsmaskin.regler.RegelTestConfig
+import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
+import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
+import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
+import no.nav.tilgangsmaskin.regler.motor.RegelException
+import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
@@ -56,26 +60,35 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 @ContextConfiguration(classes = [TestApp::class, Auditor::class])
 @AutoConfigureMetrics
 @Testcontainers
-@ActiveProfiles(TEST)
+@ActiveProfiles(ClusterConstants.TEST)
 @ApplyExtension(SpringExtension::class)
 class OverstyringRegelTjenesteTest : DescribeSpec() {
 
-    private val strengtFortroligAktørId = AktørId("1234567890123")
+    private val strengtFortroligAktørId = `AktørId`("1234567890123")
     private val strengtFortroligBrukerId = BrukerId("08526835671")
     private val fortroligBrukerId = BrukerId("08526835672")
     private val vanligBrukerId = BrukerId("08526835670")
     private val ansattId = AnsattId("Z999999")
     private val dnr = BrukerId("12345678910")
 
-    @Autowired lateinit var registry: MeterRegistry
-    @Autowired lateinit var repo: OverstyringRepository
-    @MockkBean lateinit var token: Token
-    @MockkBean lateinit var oppfølging: OppfølgingTjeneste
-    @MockkBean lateinit var validator: OverstyringClientValidator
-    @MockkBean lateinit var proxy: EntraProxyTjeneste
-    @Autowired lateinit var motor: RegelMotor
-    @MockK lateinit var brukere: BrukerTjeneste
-    @MockK lateinit var ansatte: AnsattTjeneste
+    @Autowired
+    lateinit var registry: MeterRegistry
+    @Autowired
+    lateinit var repo: OverstyringRepository
+    @MockkBean
+    lateinit var token: Token
+    @MockkBean
+    lateinit var oppfølging: `OppfølgingTjeneste`
+    @MockkBean
+    lateinit var validator: OverstyringClientValidator
+    @MockkBean
+    lateinit var proxy: EntraProxyTjeneste
+    @Autowired
+    lateinit var motor: RegelMotor
+    @MockK
+    lateinit var brukere: BrukerTjeneste
+    @MockK
+    lateinit var ansatte: AnsattTjeneste
 
     init {
         lateinit var overstyring: OverstyringTjeneste
@@ -87,7 +100,7 @@ class OverstyringRegelTjenesteTest : DescribeSpec() {
 
         beforeEach {
             every { validator.validerKonsument() } returns Unit
-            every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
+            every { proxy.enhet(ansattId) } returns EntraProxyAnsatt.Enhet(Enhetsnummer("1234"), "Testenhet")
             every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
             every { oppfølging.enhetFor(Identifikator(vanligBrukerId.verdi)) } returns Enhetsnummer("1234")
             every { token.system } returns "test"
@@ -96,7 +109,8 @@ class OverstyringRegelTjenesteTest : DescribeSpec() {
             every { token.systemNavn } returns "test"
             every { token.erObo } returns false
             every { token.erCC } returns true
-            overstyring = OverstyringTjeneste(ansatte, brukere, OverstyringJPAAdapter(repo), motor, proxy, validator, OverstyringTeller(registry, token))
+            overstyring = OverstyringTjeneste(ansatte, brukere, OverstyringJPAAdapter(repo), motor, proxy, validator,
+                OverstyringTeller(registry, token))
             regler = RegelTjeneste(motor, brukere, ansatte, overstyring)
         }
 
@@ -106,11 +120,12 @@ class OverstyringRegelTjenesteTest : DescribeSpec() {
                 every {
                     brukere.brukere(setOf(strengtFortroligAktørId.verdi, fortroligBrukerId.verdi))
                 } returns setOf(
-                    BrukerBuilder(strengtFortroligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).oppslagId(strengtFortroligAktørId.verdi).aktørId(strengtFortroligAktørId).build(),
-                    BrukerBuilder(fortroligBrukerId).kreverMedlemskapI(FORTROLIG).build())
+                    BrukerBuilder(strengtFortroligBrukerId).kreverMedlemskapI(GlobalGruppe.STRENGT_FORTROLIG).oppslagId(strengtFortroligAktørId.verdi).aktørId(strengtFortroligAktørId).build(),
+                    BrukerBuilder(fortroligBrukerId).kreverMedlemskapI(GlobalGruppe.FORTROLIG).build())
 
                 val resultater = regler.bulkRegler(ansattId,
-                    setOf(BrukerIdOgRegelsett(strengtFortroligAktørId.verdi), BrukerIdOgRegelsett(fortroligBrukerId.verdi)))
+                    setOf(BrukerIdOgRegelsett(strengtFortroligAktørId.verdi),
+                        BrukerIdOgRegelsett(fortroligBrukerId.verdi)))
 
                 resultater.avviste shouldHaveSize 2
                 resultater.godkjente.shouldBeEmpty()
@@ -120,11 +135,14 @@ class OverstyringRegelTjenesteTest : DescribeSpec() {
             it("avvist bruker godkjennes når overstyring er registrert") {
                 every {
                     brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi)
-                } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
+                } returns BrukerBuilder(vanligBrukerId, GeografiskTilknytning.UtenlandskTilknytning()).kreverMedlemskapI(
+                    GlobalGruppe.UTENLANDSK).build()
                 every {
                     brukere.brukere(setOf(vanligBrukerId.verdi))
-                } returns setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build())
-                overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er en test", IMORGEN))
+                } returns setOf(BrukerBuilder(vanligBrukerId, GeografiskTilknytning.UtenlandskTilknytning()).kreverMedlemskapI(
+                    GlobalGruppe.UTENLANDSK).build())
+                overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er en test",
+                    TimeExtensions.IMORGEN))
 
                 val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
 
@@ -156,7 +174,7 @@ class OverstyringRegelTjenesteTest : DescribeSpec() {
                 every {
                     brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi)
                 } returns BrukerBuilder(vanligBrukerId).build()
-                overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
+                overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", TimeExtensions.IMORGEN))
 
                 shouldNotThrowAny { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
             }
@@ -164,7 +182,8 @@ class OverstyringRegelTjenesteTest : DescribeSpec() {
             it("tilgang gis ikke når regel avslår og ingen overstyring er registrert") {
                 every {
                     brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi)
-                } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
+                } returns BrukerBuilder(vanligBrukerId, GeografiskTilknytning.UtenlandskTilknytning()).kreverMedlemskapI(
+                    GlobalGruppe.UTENLANDSK).build()
 
                 shouldThrow<RegelException> { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
             }
@@ -186,10 +205,11 @@ class OverstyringRegelTjenesteTest : DescribeSpec() {
             it("registreres ikke når kjerneregler avslår") {
                 every {
                     brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi)
-                } returns BrukerBuilder(vanligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build()
+                } returns BrukerBuilder(vanligBrukerId).kreverMedlemskapI(GlobalGruppe.STRENGT_FORTROLIG).build()
 
                 shouldThrow<RegelException> {
-                    overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
+                    overstyring.overstyr(ansattId,
+                        OverstyringData(vanligBrukerId, "Dette er test", TimeExtensions.IMORGEN))
                 }
                 overstyring.erOverstyrt(ansattId, vanligBrukerId) shouldBe false
             }
@@ -201,6 +221,3 @@ class OverstyringRegelTjenesteTest : DescribeSpec() {
         private val postgres = PostgreSQLContainer("postgres:18")
     }
 }
-
-
-

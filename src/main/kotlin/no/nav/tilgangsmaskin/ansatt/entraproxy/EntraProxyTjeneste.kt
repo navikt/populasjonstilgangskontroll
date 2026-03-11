@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.entraproxy
 
 import io.micrometer.core.annotation.Timed
 import io.opentelemetry.instrumentation.annotations.WithSpan
+import jakarta.annotation.Generated
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
@@ -23,6 +24,7 @@ class EntraProxyTjeneste(private val adapter: EntraProxyRestClientAdapter)  {
     fun enheter(ansattId: AnsattId) =
         adapter.enheterForAnsatt(ansattId.verdi)
 
+    @Generated
     override fun toString() = "${javaClass.simpleName} [adapter=$adapter]"
 }
 

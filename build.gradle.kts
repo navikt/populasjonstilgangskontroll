@@ -167,3 +167,10 @@ kotlin {
         freeCompilerArgs.add("-Xjsr305=strict")
     }
 }
+tasks.register("printTestClasspath") {
+    doLast {
+        configurations["testRuntimeClasspath"].resolvedConfiguration.resolvedArtifacts
+            .filter { it.name.contains("spring-boot") }
+            .forEach { println(it.file) }
+    }
+}

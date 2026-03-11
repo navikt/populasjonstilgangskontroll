@@ -7,7 +7,6 @@ import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
@@ -18,21 +17,21 @@ import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
-import no.nav.tilgangsmaskin.TestApp
 
-@RestClientTest(components = [EntraProxyRestClientAdapter::class, EntraProxyBeanConfig::class])
+@RestClientTest(components = [EntraProxyRestClientAdapter::class, EntraProxyBeanConfig::class, EntraProxyTjeneste::class])
 @EnableConfigurationProperties(EntraProxyConfig::class)
 @TestPropertySource(properties = ["entra-proxy.base-uri=http://localhost"])
 @ApplyExtension(SpringExtension::class)
 class EntraProxyTjenesteTest : DescribeSpec() {
 
-    @Autowired lateinit var adapter: EntraProxyRestClientAdapter
+    @Autowired lateinit var tjeneste: EntraProxyTjeneste
     @Autowired lateinit var server: MockRestServiceServer
     @Autowired lateinit var cfg: EntraProxyConfig
 
     init {
         val ansattId = AnsattId("Z999999")
-        describe("enhetForAnsatt") {
+
+        describe("enhet") {
             it("returnerer enhet for ansatt") {
                 server.expect(requestTo(cfg.brukerURI(ansattId.verdi)))
                     .andExpect(method(GET))
@@ -46,13 +45,14 @@ class EntraProxyTjenesteTest : DescribeSpec() {
                         }
                     """.trimIndent(), APPLICATION_JSON))
 
-                val enhet = adapter.enhetForAnsatt(ansattId.verdi)
+                val enhet = tjeneste.enhet(ansattId)
+
                 enhet shouldBe Enhet(Enhetsnummer("1234"), "NAV Testkontor")
                 server.verify()
             }
         }
 
-        describe("enheterForAnsatt") {
+        describe("enheter") {
 
             it("returnerer liste av enheter for ansatt") {
                 server.expect(requestTo(cfg.enheterURI(ansattId.verdi)))
@@ -64,7 +64,7 @@ class EntraProxyTjenesteTest : DescribeSpec() {
                         ]
                     """.trimIndent(), APPLICATION_JSON))
 
-                val enheter = adapter.enheterForAnsatt(ansattId.verdi)
+                val enheter = tjeneste.enheter(ansattId)
 
                 enheter shouldBe setOf(
                     Enhet(Enhetsnummer("1234"), "NAV Testkontor"),
@@ -78,7 +78,8 @@ class EntraProxyTjenesteTest : DescribeSpec() {
                     .andExpect(method(GET))
                     .andRespond(withSuccess("[]", APPLICATION_JSON))
 
-                val enheter = adapter.enheterForAnsatt(ansattId.verdi)
+                val enheter = tjeneste.enheter(ansattId)
+
                 enheter shouldBe emptySet()
                 server.verify()
             }

@@ -9,6 +9,7 @@ jobs:
   build:
     name: build
     permissions:
+      pages: write
       checks: write
       contents: write
       id-token: write
@@ -61,11 +62,13 @@ jobs:
           ORG_GRADLE_PROJECT_githubUser: x-access-token
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Deploy coverage to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build/reports/jacoco/test/html/
+          path: build/reports/jacoco/test/html/
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v6

@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin
 
+import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.current
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component
 @EnableResilientMethods
 @EnableJpaAuditing
 @EnableScheduling
+@ConditionalOnGCP
 @EnableJwtTokenValidation(ignore = ["org.springdoc", "org.springframework"])
 class App
 

@@ -1,0 +1,88 @@
+package no.nav.tilgangsmaskin.ansatt.entraproxy
+
+import io.kotest.core.extensions.ApplyExtension
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.extensions.spring.SpringExtension
+import io.kotest.matchers.shouldBe
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
+import no.nav.tilgangsmaskin.bruker.Enhetsnummer
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
+import org.springframework.http.HttpMethod.GET
+import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.test.context.TestPropertySource
+import org.springframework.test.web.client.MockRestServiceServer
+import org.springframework.test.web.client.match.MockRestRequestMatchers.method
+import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
+import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
+import no.nav.tilgangsmaskin.TestApp
+
+@RestClientTest(components = [EntraProxyRestClientAdapter::class, EntraProxyBeanConfig::class])
+@EnableConfigurationProperties(EntraProxyConfig::class)
+@TestPropertySource(properties = ["entra-proxy.base-uri=http://localhost"])
+@ApplyExtension(SpringExtension::class)
+class EntraProxyTjenesteTest : DescribeSpec() {
+
+    @Autowired lateinit var adapter: EntraProxyRestClientAdapter
+    @Autowired lateinit var server: MockRestServiceServer
+    @Autowired lateinit var cfg: EntraProxyConfig
+
+    init {
+        val ansattId = AnsattId("Z999999")
+        describe("enhetForAnsatt") {
+            it("returnerer enhet for ansatt") {
+                server.expect(requestTo(cfg.brukerURI(ansattId.verdi)))
+                    .andExpect(method(GET))
+                    .andRespond(withSuccess("""
+                        {
+                          "navIdent": "Z999999",
+                          "enhet": {
+                            "enhetnummer": "1234",
+                            "navn": "NAV Testkontor"
+                          }
+                        }
+                    """.trimIndent(), APPLICATION_JSON))
+
+                val enhet = adapter.enhetForAnsatt(ansattId.verdi)
+                enhet shouldBe Enhet(Enhetsnummer("1234"), "NAV Testkontor")
+                server.verify()
+            }
+        }
+
+        describe("enheterForAnsatt") {
+
+            it("returnerer liste av enheter for ansatt") {
+                server.expect(requestTo(cfg.enheterURI(ansattId.verdi)))
+                    .andExpect(method(GET))
+                    .andRespond(withSuccess("""
+                        [
+                          { "enhetnummer": "1234", "navn": "NAV Testkontor" },
+                          { "enhetnummer": "5678", "navn": "NAV Annenkontor" }
+                        ]
+                    """.trimIndent(), APPLICATION_JSON))
+
+                val enheter = adapter.enheterForAnsatt(ansattId.verdi)
+
+                enheter shouldBe setOf(
+                    Enhet(Enhetsnummer("1234"), "NAV Testkontor"),
+                    Enhet(Enhetsnummer("5678"), "NAV Annenkontor")
+                )
+                server.verify()
+            }
+
+            it("returnerer tom liste når ansatt ikke har enheter") {
+                server.expect(requestTo(cfg.enheterURI(ansattId.verdi)))
+                    .andExpect(method(GET))
+                    .andRespond(withSuccess("[]", APPLICATION_JSON))
+
+                val enheter = adapter.enheterForAnsatt(ansattId.verdi)
+                enheter shouldBe emptySet()
+                server.verify()
+            }
+        }
+    }
+}
+

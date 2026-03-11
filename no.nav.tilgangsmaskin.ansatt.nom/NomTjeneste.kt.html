@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NomTjeneste.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.ansatt.nom</a> &gt; <span class="el_source">NomTjeneste.kt</span></div><h1>NomTjeneste.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.ansatt.nom
+
+import io.micrometer.core.annotation.Timed
+import io.opentelemetry.instrumentation.annotations.WithSpan
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
+import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverable
+import org.slf4j.LoggerFactory.getLogger
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+
+<span class="nc" id="L13">@Timed</span>
+@RetryingWhenRecoverable
+@Service
+@Transactional
+<span class="nc" id="L17">class NomTjeneste(private val adapter: NomJPAAdapter) {</span>
+
+<span class="nc" id="L19">    private val log = getLogger(javaClass)</span>
+
+    @Transactional(readOnly = true)
+    @Cacheable(cacheNames = [NOM],  key = &quot;#ansattId.verdi&quot;)
+    @WithSpan
+    fun fnrForAnsatt(ansattId: AnsattId) =
+<span class="nc" id="L25">        adapter.fnrForAnsatt(ansattId.verdi)</span>
+
+    fun ryddOpp() =
+<span class="nc" id="L28">        adapter.ryddOpp().also {</span>
+<span class="nc bnc" id="L29" title="All 2 branches missed.">        if (it &gt; 0) log.info(&quot;Vaktmester ryddet opp $it rad(er) med utgått informasjon om ansatte som ikke lenger jobber i Nav&quot;)</span>
+<span class="nc" id="L30">    }</span>
+
+    @WithSpan
+    fun lagre(nomAnsattData: NomAnsattData) {
+<span class="nc" id="L34">        adapter.upsert(nomAnsattData)</span>
+<span class="nc" id="L35">    }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

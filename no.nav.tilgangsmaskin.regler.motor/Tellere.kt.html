@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Tellere.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.regler.motor</a> &gt; <span class="el_source">Tellere.kt</span></div><h1>Tellere.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.regler.motor
+
+import io.micrometer.core.instrument.Counter
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Tag
+import io.micrometer.core.instrument.Tags
+import no.nav.tilgangsmaskin.felles.cache.CachableConfig
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode
+import no.nav.tilgangsmaskin.tilgang.Token
+import org.springframework.stereotype.Component
+import java.util.Locale.getDefault
+
+<span class="fc" id="L13">@Component</span>
+<span class="fc" id="L14">class NasjonalGruppeTeller(registry: MeterRegistry, token: Token) :</span>
+<span class="fc" id="L15">    AbstractTeller(registry, token, &quot;gruppe.medlemskap.nasjonal&quot;, &quot;Ansatte med og uten nasjonalt gruppemedlemsskap&quot;)</span>
+
+<span class="fc" id="L17">@Component</span>
+<span class="fc" id="L18">class AvdødTeller(registry: MeterRegistry, accessor: Token) :</span>
+<span class="fc" id="L19">    AbstractTeller(registry, accessor, &quot;dead.oppslag.total&quot;, &quot;Forsøk på å slå opp avdøde&quot;) {</span>
+    fun tell(intervall: Dødsperiode, enhet: String) =
+<span class="nc" id="L21">        tell(Tags.of(MÅNEDER, intervall.tekst, ENHET, enhet))</span>
+
+    private companion object {
+        private const val ENHET = &quot;enhet&quot;
+        private const val MÅNEDER = &quot;months&quot;
+    }
+}
+<span class="fc" id="L28">@Component</span>
+<span class="fc" id="L29">class OverstyringTeller(registry: MeterRegistry, token: Token) :</span>
+<span class="fc" id="L30">    AbstractTeller(registry, token, &quot;overstyring.forsøk&quot;, &quot;Overstyringsforsøk pr resultat&quot;)</span>
+
+<span class="fc" id="L32">@Component</span>
+<span class="fc" id="L33">class EvalueringTeller(registry: MeterRegistry, token: Token) :</span>
+<span class="fc" id="L34">    AbstractTeller(registry, token, &quot;evaluering.resultat&quot;, &quot;Evalueringsresultat pr begrunnelse&quot;)</span>
+<span class="fc" id="L35">@Component</span>
+<span class="fc" id="L36">class EvalueringTypeTeller(registry: MeterRegistry, token: Token) :</span>
+<span class="fc" id="L37">    AbstractTeller(registry, token, &quot;evalueringtype.resultat&quot;, &quot;Evalueringsresultat pr type og begrunnelse&quot;)</span>
+
+<span class="fc" id="L39">@Component</span>
+<span class="fc" id="L40">class BulkCacheTeller(registry: MeterRegistry, token: Token) :</span>
+<span class="fc" id="L41">    AbstractTeller(registry, token, &quot;bulk.cache&quot;, &quot;Cache treff/bom for bulk&quot;)</span>
+
+<span class="fc" id="L43">@Component</span>
+<span class="fc" id="L44">class CacheOppfriskerTeller(registry: MeterRegistry, token: Token) :</span>
+<span class="fc" id="L45">    AbstractTeller(registry, token, &quot;cache.oppfrisker&quot;, &quot;Antall oppfriskninger av cache etter utløp&quot;)</span>
+
+<span class="fc" id="L47">@Component</span>
+<span class="fc" id="L48">class BulkCacheSuksessTeller(registry: MeterRegistry, token: Token) :</span>
+<span class="fc" id="L49">    AbstractTeller(registry, token, &quot;bulk.cache.suksess&quot;, &quot;Treff/bom for hele bulken&quot;)</span>
+
+<span class="fc" id="L51">@Component</span>
+<span class="fc" id="L52">class TokenTypeTeller(registry: MeterRegistry, token: Token) :</span>
+<span class="fc" id="L53">    AbstractTeller(registry, token, &quot;token.type&quot;, &quot;Token type&quot;)</span>
+
+<span class="fc" id="L55">@Component</span>
+<span class="fc" id="L56">class OppfølgingkontorTeller(registry: MeterRegistry, token: Token) :</span>
+<span class="fc" id="L57">    AbstractTeller(registry, token, &quot;oppfolging&quot;, &quot;Oppfølgingkontor treff/bom&quot;)</span>
+
+<span class="fc" id="L59">@Component</span>
+<span class="fc" id="L60">class OppfriskingTeller(registry: MeterRegistry, token: Token) :</span>
+<span class="fc" id="L61">    AbstractTeller(registry, token, &quot;endringer&quot;, &quot;Endrede user oids&quot;)</span>
+
+<span class="fc" id="L63">@Component</span>
+<span class="fc" id="L64">class PdlCacheTømmerTeller(registry: MeterRegistry, token: Token) :</span>
+<span class="fc" id="L65">    AbstractTeller(registry, token, NAVN, &quot;Cache tømming pr beskyttelsesgrad&quot;) {</span>
+    fun tell(cache: CachableConfig,gradering: String, endringsType: String) =
+<span class="nc" id="L67">        tell(Tags.of(CACHE, cache.name,GRADERING ,</span>
+<span class="nc" id="L68">            gradering.lowercase(getDefault()),TYPE,endringsType))</span>
+
+    private companion object {
+        private const val GRADERING = &quot;gradering&quot;
+        private const val CACHE = &quot;cache&quot;
+        private const val TYPE = &quot;type&quot;
+        private const val NAVN = &quot;beskyttelse&quot;
+    }
+}
+
+
+<span class="fc" id="L79">abstract class AbstractTeller(</span>
+<span class="fc" id="L80">    private val registry: MeterRegistry,</span>
+<span class="fc" id="L81">    private val token: Token,</span>
+<span class="fc" id="L82">    private val navn: String,</span>
+<span class="fc" id="L83">    private val beskrivelse: String) {</span>
+
+<span class="fc" id="L85">    fun tell(vararg tags: Tag, n: Int = 1) =</span>
+<span class="fc" id="L86">        tell(Tags.of(*tags), n)</span>
+
+<span class="pc" id="L88">    fun tell(tags: Tags = Tags.empty(), n: Int = 1) =</span>
+<span class="fc" id="L89">        Counter.builder(navn)</span>
+<span class="fc" id="L90">            .description(beskrivelse)</span>
+<span class="fc" id="L91">            .tags(tags</span>
+<span class="fc" id="L92">                .and(&quot;system&quot;, token.system)</span>
+<span class="fc" id="L93">                .and(&quot;clustersystem&quot;, token.clusterAndSystem))</span>
+<span class="fc" id="L94">            .register(registry)</span>
+<span class="fc" id="L95">            .increment(n.toDouble())</span>
+}
+
+<span class="nc" id="L98">abstract class AbstractEnkelTeller(</span>
+<span class="nc" id="L99">    private val registry: MeterRegistry,</span>
+<span class="nc" id="L100">    private val navn: String,</span>
+<span class="nc" id="L101">    private val beskrivelse: String) {</span>
+
+<span class="nc" id="L103">    fun tell(n: Int = 1) =</span>
+<span class="nc" id="L104">        Counter.builder(navn)</span>
+<span class="nc" id="L105">            .description(beskrivelse)</span>
+<span class="nc" id="L106">            .register(registry)</span>
+<span class="nc" id="L107">            .increment(n.toDouble())</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

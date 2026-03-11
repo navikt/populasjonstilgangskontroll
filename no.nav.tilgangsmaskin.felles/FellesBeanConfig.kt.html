@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FellesBeanConfig.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.felles</a> &gt; <span class="el_source">FellesBeanConfig.kt</span></div><h1>FellesBeanConfig.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.felles
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import io.micrometer.core.aop.TimedAspect
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Tags
+import io.micrometer.core.instrument.Timer
+import jakarta.servlet.http.HttpServletRequest
+import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
+import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
+import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
+import no.nav.tilgangsmaskin.felles.rest.LoggingRequestInterceptor
+import no.nav.tilgangsmaskin.tilgang.Token
+import org.aspectj.lang.ProceedingJoinPoint
+import org.aspectj.lang.annotation.Around
+import org.aspectj.lang.annotation.Aspect
+import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
+import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
+import org.springframework.boot.actuate.web.exchanges.Include.defaultIncludes
+import org.springframework.boot.health.actuate.endpoint.StatusAggregator
+import org.springframework.boot.health.contributor.Status.DOWN
+import org.springframework.boot.health.contributor.Status.UP
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
+import org.springframework.boot.kafka.autoconfigure.DefaultKafkaConsumerFactoryCustomizer
+import org.springframework.boot.restclient.RestClientCustomizer
+import org.springframework.boot.servlet.actuate.web.exchanges.HttpExchangesFilter
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.support.ReloadableResourceBundleMessageSource
+import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.http.client.ClientHttpRequestInterceptor
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+import org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+import org.springframework.stereotype.Component
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
+import tools.jackson.databind.json.JsonMapper
+import java.util.function.Function
+
+
+<span class="nc" id="L45">@Configuration</span>
+<span class="nc" id="L46">class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : WebMvcConfigurer {</span>
+
+     @Bean
+<span class="nc" id="L49">    fun jackson3Customizer() = JsonMapperBuilderCustomizer {</span>
+<span class="nc" id="L50">        it.addMixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)</span>
+<span class="nc" id="L51">       it.enable(INCLUDE_SOURCE_IN_LOCATION)</span>
+<span class="nc" id="L52">    }</span>
+
+    
+    @Bean
+    fun kafkaConsumerFactoryCustomizer(mapper: JsonMapper) =
+<span class="nc" id="L57">        DefaultKafkaConsumerFactoryCustomizer {</span>
+<span class="nc" id="L58">            it.setValueDeserializerSupplier {</span>
+<span class="nc" id="L59">                ErrorHandlingDeserializer(JacksonJsonDeserializer(mapper))</span>
+            }
+<span class="nc" id="L61">        }</span>
+
+
+    @Bean
+<span class="nc" id="L65">    fun outOfServiceIgnoringStatusAggregator() = StatusAggregator {</span>
+<span class="nc" id="L66">        when {</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">            DOWN in it -&gt; DOWN</span>
+<span class="nc" id="L68">            else -&gt; UP</span>
+<span class="nc" id="L69">        }</span>
+<span class="nc" id="L70">    }</span>
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private interface IgnoreUnknownMixin
+
+    @Bean
+<span class="nc" id="L76">    fun errorMessageSource() = ReloadableResourceBundleMessageSource().apply {</span>
+<span class="nc" id="L77">        setBasename(&quot;classpath:messages&quot;)</span>
+<span class="nc" id="L78">    }</span>
+
+    @Bean
+    fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor, loggingInterceptor: LoggingRequestInterceptor) =
+<span class="nc" id="L82">        RestClientCustomizer { c -&gt;</span>
+<span class="nc" id="L83">            c.requestFactory(HttpComponentsClientHttpRequestFactory().apply {</span>
+<span class="nc" id="L84">                setConnectionRequestTimeout(2000)</span>
+<span class="nc" id="L85">                setReadTimeout(5000)</span>
+<span class="nc" id="L86">            })</span>
+<span class="nc" id="L87">            c.requestInterceptors {</span>
+<span class="nc" id="L88">                it.addFirst(interceptor)</span>
+<span class="nc" id="L89">                it.add(loggingInterceptor)</span>
+<span class="nc" id="L90">            }</span>
+<span class="nc" id="L91">        }</span>
+
+
+
+    @Bean
+    fun clusterAddingTimedAspect(meterRegistry: MeterRegistry, token: Token) =
+<span class="nc" id="L97">        TimedAspect(meterRegistry,Function   { pjp -&gt; Tags.of(&quot;cluster&quot;, token.cluster, &quot;method&quot;, pjp.signature.name, &quot;client&quot;, token.systemNavn) })</span>
+
+    @Bean
+    @ConditionalOnNotProd
+<span class="nc" id="L101">    fun traceRepository() = InMemoryHttpExchangeRepository()</span>
+
+
+    @Bean
+    @ConditionalOnNotProd
+    fun httpExchangesFilter(repository: HttpExchangeRepository) =
+<span class="nc" id="L107">        object : HttpExchangesFilter(repository, defaultIncludes()) {</span>
+<span class="nc" id="L108">            override fun shouldNotFilter(request: HttpServletRequest) = request.servletPath.contains(&quot;monitoring&quot;)</span>
+<span class="nc" id="L109">        }</span>
+
+    override fun addInterceptors(registry: InterceptorRegistry) {
+<span class="nc" id="L112">        registry.addInterceptor(ansattIdAddingInterceptor)</span>
+<span class="nc" id="L113">    }</span>
+    override fun configureContentNegotiation(configurer: ContentNegotiationConfigurer) {
+<span class="nc" id="L115">        configurer.defaultContentType(APPLICATION_JSON)</span>
+<span class="nc" id="L116">    }</span>
+
+
+<span class="nc" id="L119">    @Aspect</span>
+    @Component
+<span class="nc" id="L121">    class TimingAspect(private val meterRegistry: MeterRegistry) {</span>
+
+        @Around(&quot;execution(* no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor.intercept(..))&quot;)
+<span class="nc" id="L124">        fun timeMethod(joinPoint: ProceedingJoinPoint) = Timer.builder(&quot;mslogin&quot;)</span>
+<span class="nc" id="L125">            .description(&quot;Timer med histogram for mslogin&quot;)</span>
+<span class="nc" id="L126">            .tags(&quot;method&quot;, joinPoint.signature.name)</span>
+<span class="nc" id="L127">            .publishPercentileHistogram()</span>
+<span class="nc" id="L128">            .register(meterRegistry).recordCallable { joinPoint.proceed() }</span>
+    }
+
+    companion object {
+        fun headerAddingRequestInterceptor(vararg verdier: Pair&lt;String, String&gt;) =
+<span class="nc" id="L133">            ClientHttpRequestInterceptor { request, body, next -&gt;</span>
+<span class="nc" id="L134">                verdier.forEach { (key, value) -&gt; request.headers.add(key, value) }</span>
+<span class="nc" id="L135">                next.execute(request, body)</span>
+<span class="nc" id="L136">            }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Kjerneregler.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.regler.motor</a> &gt; <span class="el_source">Kjerneregler.kt</span></div><h1>Kjerneregler.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.regler.motor
+
+import no.nav.tilgangsmaskin.ansatt.Ansatt
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
+import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.EGNEDATA
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.FELLES_BARN
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.FORELDREBARN
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.PARTNER
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.SØSKEN
+import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
+
+<span class="nc" id="L16">interface KjerneRegel : Regel</span>
+
+<span class="fc" id="L18">@SortertRegel(HIGHEST_PRECEDENCE)</span>
+<span class="fc" id="L19">class StrengtFortroligRegel : GlobalGruppeRegel(STRENGT_FORTROLIG), KjerneRegel</span>
+
+<span class="fc" id="L21">@SortertRegel(HIGHEST_PRECEDENCE + 1)</span>
+<span class="fc" id="L22">class StrengtFortroligUtlandRegel : GlobalGruppeRegel(STRENGT_FORTROLIG_UTLAND), KjerneRegel</span>
+
+<span class="fc" id="L24">@SortertRegel(HIGHEST_PRECEDENCE + 2)</span>
+<span class="fc" id="L25">class FortroligRegel : GlobalGruppeRegel(FORTROLIG), KjerneRegel</span>
+
+<span class="fc" id="L27">@SortertRegel(HIGHEST_PRECEDENCE + 3)</span>
+<span class="fc" id="L28">class SkjermingRegel : GlobalGruppeRegel(SKJERMING), KjerneRegel</span>
+
+<span class="fc" id="L30">@SortertRegel(HIGHEST_PRECEDENCE + 4)</span>
+class EgneDataRegel : KjerneRegel {
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
+<span class="fc" id="L33">        avvisHvis { ansatt erDenSammeSom bruker }</span>
+
+<span class="fc" id="L35">    override val metadata = RegelMetadata(EGNEDATA)</span>
+}
+
+<span class="fc" id="L38">@SortertRegel(HIGHEST_PRECEDENCE + 5)</span>
+class ForeldreOgBarnRegel : KjerneRegel {
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
+<span class="fc" id="L41">        avvisHvis { ansatt erForeldreEllerBarnTil bruker }</span>
+
+<span class="fc" id="L43">    override val metadata = RegelMetadata(FORELDREBARN)</span>
+}
+
+<span class="fc" id="L46">@SortertRegel(HIGHEST_PRECEDENCE + 6)</span>
+class PartnerRegel : KjerneRegel {
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
+<span class="fc" id="L49">        avvisHvis { ansatt erNåværendeEllerTidligerePartnerMed bruker }</span>
+
+<span class="fc" id="L51">    override val metadata = RegelMetadata(PARTNER)</span>
+}
+
+<span class="fc" id="L54">@SortertRegel(HIGHEST_PRECEDENCE + 7)</span>
+class SøskenRegel : KjerneRegel {
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
+<span class="fc" id="L57">        avvisHvis { ansatt erSøskenTil bruker }</span>
+
+<span class="fc" id="L59">    override val metadata = RegelMetadata(SØSKEN)</span>
+}
+
+
+<span class="fc" id="L63">@SortertRegel(HIGHEST_PRECEDENCE + 8)</span>
+class FellesBarnRegel : KjerneRegel {
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
+<span class="fc" id="L66">        avvisHvis { ansatt harFellesBarnMed bruker }</span>
+
+<span class="fc" id="L68">    override val metadata = RegelMetadata(FELLES_BARN)</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

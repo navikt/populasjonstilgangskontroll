@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EntraConfig.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.ansatt.graph</a> &gt; <span class="el_source">EntraConfig.kt</span></div><h1>EntraConfig.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.ansatt.graph
+
+import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste.Companion.ENTRA_OID
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.uuids
+import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
+import no.nav.tilgangsmaskin.felles.cache.CachableConfig
+import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
+import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
+import org.springframework.boot.context.properties.ConfigurationProperties
+import java.net.URI
+import java.time.Duration
+
+<span class="fc" id="L14">@ConfigurationProperties(GRAPH)</span>
+<span class="fc" id="L15">class EntraConfig(</span>
+    baseUri: URI,
+<span class="fc" id="L17">    pingPath: String = DEFAULT_PING_PATH,</span>
+<span class="fc" id="L18">    private val size: Int = DEFAULT_BATCH_SIZE,</span>
+<span class="fc" id="L19">    enabled: Boolean = true) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {</span>
+
+<span class="pc" id="L21">    override val caches = ENTRA_CACHES</span>
+<span class="pc" id="L22">    override val navn = name</span>
+<span class="pc" id="L23">    override val varighet = Duration.ofHours(3)</span>
+
+    fun userURI(navIdent: String) =
+<span class="nc" id="L26">        builder().apply {</span>
+<span class="nc" id="L27">            path(USERS_PATH)</span>
+<span class="nc" id="L28">            queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_USER)</span>
+<span class="nc" id="L29">            queryParam(PARAM_NAME_FILTER, &quot;onPremisesSamAccountName eq '$navIdent'&quot;)</span>
+<span class="nc" id="L30">            queryParam(PARAM_NAME_COUNT, &quot;true&quot;)</span>
+<span class="nc" id="L31">        }.build()</span>
+
+     fun grupperURI(ansattId: String, isCCF: Boolean) =
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">         if (isCCF) ccUri(ansattId) else oboUri(ansattId)</span>
+
+    private fun oboUri(ansattId: String) =
+<span class="nc" id="L37">        query(ansattId,GEO_PREFIX)</span>
+
+    private fun ccUri(ansattId: String) =
+<span class="fc" id="L40">        query(ansattId,&quot;id in(${uuidsFormatted()}) or $GEO_PREFIX&quot;)</span>
+
+    private fun query(ansattId: String, filter: String) =
+<span class="fc" id="L43">        builder().apply {</span>
+<span class="fc" id="L44">            path(GRUPPER_PATH)</span>
+<span class="fc" id="L45">            queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)</span>
+<span class="fc" id="L46">            queryParam(PARAM_NAME_COUNT, &quot;true&quot;)</span>
+<span class="fc" id="L47">            queryParam(PARAM_NAME_TOP, size)</span>
+<span class="fc" id="L48">            queryParam(PARAM_NAME_FILTER, filter)</span>
+<span class="fc" id="L49">        }.build(ansattId)</span>
+
+    private fun uuidsFormatted() =
+<span class="fc" id="L52">        uuids().joinToString(separator =&quot;','&quot; , prefix = &quot;'&quot;, postfix = &quot;'&quot;)</span>
+
+<span class="nc" id="L54">    override fun toString() = &quot;$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]&quot;</span>
+
+    companion object {
+        const val GEO_PREFIX = &quot;startswith(displayName,'0000-GA-GEO') or startswith(displayName,'0000-GA-ENHET') &quot;
+        const val GRAPH = &quot;graph&quot;
+        private const val DEFAULT_BATCH_SIZE = 250
+        private const val USERS_PATH = &quot;/users&quot;
+        private const val GRUPPER_PATH = &quot;/users/{ansattId}/memberOf&quot;
+        private const val PARAM_NAME_SELECT = &quot;\$select&quot;
+        private const val PARAM_NAME_FILTER = &quot;\$filter&quot;
+        private const val PARAM_NAME_COUNT = &quot;\$count&quot;
+        private const val PARAM_VALUE_SELECT_USER = &quot;id&quot;
+        private const val PARAM_VALUE_SELECT_GROUPS = &quot;id,displayName&quot;
+        private const val DEFAULT_PING_PATH = &quot;/organization&quot;
+        private const val PARAM_NAME_TOP = &quot;\$top&quot;
+<span class="pc" id="L69">        val ENTRA_CACHES = setOf(CachableConfig(GRAPH,&quot;geoGrupper&quot;), CachableConfig(GRAPH,&quot;geoOgGlobaleGrupper&quot;))</span>
+<span class="fc" id="L70">        val OID_CACHE = CachableConfig(ENTRA_OID)</span>
+
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

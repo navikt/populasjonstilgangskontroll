@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EntraProxyConfig.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.ansatt.entraproxy</a> &gt; <span class="el_source">EntraProxyConfig.kt</span></div><h1>EntraProxyConfig.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.ansatt.entraproxy
+
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRAPROXY
+import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
+import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
+import org.springframework.boot.context.properties.ConfigurationProperties
+import java.net.URI
+
+<span class="nc" id="L9">@ConfigurationProperties(ENTRAPROXY)</span>
+<span class="nc" id="L10">class EntraProxyConfig(</span>
+<span class="nc" id="L11">    baseUri: URI = DEFAULT_URI,</span>
+<span class="nc" id="L12">    pingPath: String = DEFAULT_PING_PATH,</span>
+<span class="nc" id="L13">    enabled: Boolean = true) :  AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {</span>
+
+    fun brukerURI(navIdent: String) =
+<span class="nc" id="L16">        builder().apply {</span>
+<span class="nc" id="L17">            path(ANSATT_PATH)</span>
+<span class="nc" id="L18">        }.build(navIdent)</span>
+
+    fun enheterURI(navIdent: String) =
+<span class="nc" id="L21">        builder().apply {</span>
+<span class="nc" id="L22">            path(ENHETER_PATH)</span>
+<span class="nc" id="L23">        }.build(navIdent)</span>
+
+<span class="nc" id="L25">    override fun toString() = &quot;$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]&quot;</span>
+
+    companion object {
+<span class="nc" id="L28">        private val DEFAULT_URI = URI.create(&quot;http://entra-proxy.sikkerhetstjenesten&quot;)</span>
+        const val ENTRAPROXY = &quot;entra-proxy&quot;
+        private const val ANSATT_PATH = &quot;/api/v1/ansatt/{navIdent}&quot;
+        private const val ENHETER_PATH = &quot;/api/v1/enhet/ansatt/{navIdent}&quot;
+        private const val DEFAULT_PING_PATH = &quot;/monitoring/health/liveness&quot;
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

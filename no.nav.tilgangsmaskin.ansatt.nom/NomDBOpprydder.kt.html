@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NomDBOpprydder.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.ansatt.nom</a> &gt; <span class="el_source">NomDBOpprydder.kt</span></div><h1>NomDBOpprydder.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.ansatt.nom
+
+import no.nav.tilgangsmaskin.felles.utils.LeaderAware
+import org.slf4j.LoggerFactory.getLogger
+import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.stereotype.Component
+import java.util.concurrent.TimeUnit.*
+
+<span class="nc" id="L9">@Component</span>
+<span class="nc" id="L10">class NomDBOpprydder(</span>
+<span class="nc" id="L11">    private val nom: NomTjeneste,</span>
+<span class="nc" id="L12">    private val antallKall: NomKallTeller,</span>
+<span class="nc" id="L13">    private val raderFjernet: NomRaderFjernetTeller) : LeaderAware() {</span>
+
+<span class="nc" id="L15">    private val log = getLogger(javaClass)</span>
+
+    override fun doHandleLeaderChange() {
+<span class="nc" id="L18">        ryddOpp()</span>
+<span class="nc" id="L19">    }</span>
+
+    @Scheduled(fixedRate = 24, timeUnit = HOURS)
+    fun ryddOpp() =
+<span class="nc" id="L23">        somLeder(&quot;daglig opprydding i Nom-databasen&quot;, {</span>
+<span class="nc" id="L24">            log.info(&quot;Vaktmester rydder opp i Nom-databasen&quot;)</span>
+<span class="nc" id="L25">            val antall = nom.ryddOpp()</span>
+<span class="nc" id="L26">            antallKall.tell()</span>
+<span class="nc" id="L27">            raderFjernet.tell(antall)</span>
+<span class="nc" id="L28">            antall</span>
+<span class="nc" id="L29">        }) { 0 }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

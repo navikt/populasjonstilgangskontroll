@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GeografiskTilknytning.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.bruker</a> &gt; <span class="el_source">GeografiskTilknytning.kt</span></div><h1>GeografiskTilknytning.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.bruker
+
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.BYDEL
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.KOMMUNE
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.UDEFINERT
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.UKJENT_BOSTED
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.UTLAND
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
+
+
+<span class="fc" id="L11">sealed class GeografiskTilknytning(type: Type) {</span>
+<span class="fc" id="L12">    enum class Type { BYDEL, KOMMUNE, UDEFINERT, UTLAND, UKJENT_BOSTED }</span>
+
+<span class="fc" id="L14">    data class Kommune(val verdi: String) {</span>
+<span class="fc" id="L15">        init {</span>
+<span class="fc" id="L16">            requireDigits(verdi, 4)</span>
+<span class="fc" id="L17">        }</span>
+    }
+
+<span class="fc" id="L20">    data class Bydel(val verdi: String) {</span>
+<span class="fc" id="L21">        init {</span>
+<span class="fc" id="L22">            requireDigits(verdi, 6)</span>
+<span class="fc" id="L23">        }</span>
+    }
+
+<span class="fc" id="L26">    data class KommuneTilknytning(val kommune: Kommune) : GeografiskTilknytning(KOMMUNE){</span>
+<span class="fc" id="L27">        override fun toString() = &quot;${javaClass.simpleName} (kommune=${kommune.verdi})&quot;</span>
+    }
+<span class="fc" id="L29">    data class BydelTilknytning(val bydel: Bydel) : GeografiskTilknytning(BYDEL) {</span>
+<span class="nc" id="L30">        override fun toString() = &quot;${javaClass.simpleName} (bydel=${bydel.verdi})&quot;</span>
+    }
+<span class="fc" id="L32">    class UkjentBosted : GeografiskTilknytning(UKJENT_BOSTED) {</span>
+<span class="nc" id="L33">        override fun equals(other: Any?) = other is UkjentBosted</span>
+<span class="nc" id="L34">        override fun hashCode() = javaClass.hashCode()</span>
+    }
+
+<span class="fc" id="L37">    class UtenlandskTilknytning : GeografiskTilknytning(UTLAND){</span>
+<span class="nc" id="L38">        override fun equals(other: Any?) = other is UtenlandskTilknytning</span>
+<span class="fc" id="L39">        override fun hashCode() = javaClass.hashCode()</span>
+    }
+<span class="fc" id="L41">    class UdefinertTilknytning : GeografiskTilknytning(UDEFINERT) {</span>
+<span class="nc" id="L42">        override fun equals(other: Any?) = other is UdefinertTilknytning</span>
+<span class="fc" id="L43">        override fun hashCode() = javaClass.hashCode()</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NomHendelseLogger.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.ansatt.nom</a> &gt; <span class="el_source">NomHendelseLogger.kt</span></div><h1>NomHendelseLogger.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.ansatt.nom
+
+
+import io.micrometer.core.instrument.MeterRegistry
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import org.slf4j.LoggerFactory.getLogger
+import org.springframework.stereotype.Component
+
+<span class="nc" id="L9">@Component</span>
+<span class="nc" id="L10">class NomHendelseLogger(private val registry: MeterRegistry, private val repo: NomRepository) {</span>
+
+<span class="nc" id="L12">    init {</span>
+<span class="nc" id="L13">        size()</span>
+<span class="nc" id="L14">    }</span>
+<span class="nc" id="L15">    private val log = getLogger(javaClass)</span>
+    fun ok(ansattId: String, brukerId: String) =
+<span class="nc" id="L17">        log.info(&quot;Lagret brukerId ${brukerId.maskFnr()} for $ansattId OK&quot;)</span>
+
+    fun start(hendelser: List&lt;NomHendelse&gt;) =
+<span class="nc" id="L20">        log.info(&quot;Mottok ${hendelser.size} hendelse(r) fra NOM&quot;)</span>
+
+    fun behandler(hendelse: NomHendelse) =
+<span class="nc" id="L23">        log.info(&quot;Behandler hendelse fra NOM: {}&quot;, hendelse)</span>
+
+    fun ferdig(hendelser: List&lt;NomHendelse&gt;) =
+<span class="nc" id="L26">        log.info(&quot;${hendelser.size} hendelse(r) fra NOM ferdig behandlet&quot;).also {</span>
+<span class="nc" id="L27">            size()</span>
+<span class="nc" id="L28">    }</span>
+
+    private fun size() =
+<span class="nc" id="L31">        registry.gauge(&quot;nom.size&quot;,repo) {</span>
+<span class="nc" id="L32">            repo.count().toDouble()</span>
+<span class="nc" id="L33">        }</span>
+    fun feilet(ansattId: String, brukerId: String, e: Throwable) =
+<span class="nc" id="L35">        log.error(&quot;Kunne ikke lagre brukerId ${brukerId.maskFnr()} for $ansattId (${e.message})&quot;, e)</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

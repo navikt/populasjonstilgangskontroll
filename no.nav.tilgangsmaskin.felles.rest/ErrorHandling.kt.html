@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ErrorHandling.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.felles.rest</a> &gt; <span class="el_source">ErrorHandling.kt</span></div><h1>ErrorHandling.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.felles.rest
+
+import no.nav.tilgangsmaskin.bruker.Identifikator
+import org.slf4j.LoggerFactory.getLogger
+import org.springframework.context.annotation.Primary
+import org.springframework.http.HttpRequest
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatusCode
+import org.springframework.http.ProblemDetail.forStatusAndDetail
+import org.springframework.http.client.ClientHttpResponse
+import org.springframework.stereotype.Component
+import org.springframework.web.ErrorResponseException
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
+import java.net.URI
+
+<span class="fc" id="L17">@Component</span>
+@Primary
+class DefaultRestErrorHandler : ErrorHandler {
+<span class="fc" id="L20">    private val log = getLogger(javaClass)</span>
+
+    override fun handle(req: HttpRequest, res: ClientHttpResponse) {
+<span class="nc" id="L23">        val ident = req.headers.getFirst(IDENTIFIKATOR)</span>
+
+<span class="nc" id="L25">        when {</span>
+<span class="nc bnc" id="L26" title="All 2 branches missed.">            res.statusCode == NOT_FOUND -&gt; {</span>
+<span class="nc" id="L27">                log.info(&quot;Not found exception etter ${res.statusCode.value()} fra ${req.uri}&quot;)</span>
+<span class="nc" id="L28">                throw NotFoundRestException(req.uri, ident)</span>
+            }
+<span class="nc bnc" id="L30" title="All 2 branches missed.">            res.statusCode.is4xxClientError -&gt; {</span>
+<span class="nc" id="L31">                log.warn(&quot;Irrecoverable exception etter ${res.statusCode.value()} fra ${req.uri}&quot;)</span>
+<span class="nc" id="L32">                throw IrrecoverableRestException(res.statusCode, req.uri, res.statusText)</span>
+            }
+            else -&gt; {
+<span class="nc" id="L35">                log.warn(&quot;Recoverable exception etter ${res.statusCode.value()} fra ${req.uri}&quot;)</span>
+<span class="nc" id="L36">                throw RecoverableRestException(res.statusCode, req.uri, res.statusText)</span>
+            }
+        }
+    }
+    companion object {
+       const val IDENTIFIKATOR =  &quot;X-Identifikator&quot;
+    }
+
+}
+
+<span class="fc" id="L46">open class IrrecoverableRestException(</span>
+<span class="pc" id="L47">        val status: HttpStatusCode, uri: URI, msg: String = (status as HttpStatus).reasonPhrase,</span>
+<span class="fc" id="L48">        cause: Throwable? = null) : ErrorResponseException(status, problemDetail(status, msg, uri), cause)</span>
+
+<span class="fc" id="L50">class NotFoundRestException(</span>
+<span class="pc" id="L51">        val uri: URI,</span>
+<span class="pc" id="L52">        val identifikator: String? = null,</span>
+<span class="fc" id="L53">        cause: Throwable? = null) : IrrecoverableRestException(NOT_FOUND, uri, cause = cause)</span>
+
+<span class="fc" id="L55">open class RecoverableRestException(</span>
+        status: HttpStatusCode,
+        uri: URI,
+<span class="fc" id="L58">        msg: String = (status as HttpStatus).reasonPhrase,</span>
+<span class="fc" id="L59">        cause: Throwable? = null) : ErrorResponseException(status, problemDetail(status, msg, uri), cause)</span>
+
+private fun problemDetail(status: HttpStatusCode, msg: String, uri: URI) =
+<span class="fc" id="L62">    forStatusAndDetail(status, msg).apply {</span>
+<span class="fc" id="L63">        title = &quot;${status.value()}&quot;</span>
+<span class="fc" id="L64">        properties = mapOf(&quot;uri&quot; to &quot;$uri&quot;)</span>
+<span class="fc" id="L65">    }</span>
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

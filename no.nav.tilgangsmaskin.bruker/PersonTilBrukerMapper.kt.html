@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PersonTilBrukerMapper.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.bruker</a> &gt; <span class="el_source">PersonTilBrukerMapper.kt</span></div><h1>PersonTilBrukerMapper.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.bruker
+
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
+import no.nav.tilgangsmaskin.bruker.Bruker.BrukerIds
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UdefinertTilknytning
+import no.nav.tilgangsmaskin.bruker.pdl.Person
+import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
+import no.nav.tilgangsmaskin.bruker.pdl.erFortrolig
+import no.nav.tilgangsmaskin.bruker.pdl.erStrengtFortrolig
+import no.nav.tilgangsmaskin.bruker.pdl.erStrengtFortroligUtland
+
+
+object PersonTilBrukerMapper {
+    fun tilBruker(person: Person, erSkjermet: Boolean) =
+<span class="fc" id="L19">        with(person) {</span>
+<span class="fc" id="L20">            Bruker(</span>
+<span class="fc" id="L21">                    BrukerIds(brukerId, oppslagId,historiskeIds, aktørId),</span>
+<span class="fc" id="L22">                    geoTilknytning,</span>
+<span class="fc" id="L23">                    tilGruppeKrav(geoTilknytning, graderinger, erSkjermet),</span>
+<span class="fc" id="L24">                    familie,</span>
+<span class="fc" id="L25">                dødsdato)</span>
+<span class="fc" id="L26">        }</span>
+
+    private fun tilGruppeKrav(gt: GeografiskTilknytning, graderinger: List&lt;Gradering&gt;, erSkjermet: Boolean) =
+<span class="fc" id="L29">        setOfNotNull(</span>
+<span class="fc" id="L30">                when {</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">                    graderinger.erStrengtFortrolig() -&gt; STRENGT_FORTROLIG</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">                    graderinger.erStrengtFortroligUtland() -&gt; STRENGT_FORTROLIG_UTLAND</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">                    graderinger.erFortrolig() -&gt; FORTROLIG</span>
+<span class="fc" id="L34">                    else -&gt; null</span>
+                },
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">                UKJENT_BOSTED.takeIf { gt is UdefinertTilknytning },</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">                SKJERMING.takeIf { erSkjermet })</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

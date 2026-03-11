@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AnsattTjeneste.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.ansatt</a> &gt; <span class="el_source">AnsattTjeneste.kt</span></div><h1>AnsattTjeneste.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.ansatt
+
+import io.micrometer.core.annotation.Timed
+import io.micrometer.core.instrument.Tags
+import no.nav.boot.conditionals.ConditionalOnGCP
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
+import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
+import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.regler.motor.NasjonalGruppeTeller
+import org.slf4j.LoggerFactory.getLogger
+import org.springframework.stereotype.Service
+
+<span class="nc" id="L13">@Service</span>
+@Timed
+@ConditionalOnGCP
+<span class="nc" id="L16">class AnsattTjeneste(private val ansatte: NomTjeneste,</span>
+<span class="nc" id="L17">                     private val brukere: BrukerTjeneste,</span>
+<span class="nc" id="L18">                     private val resolver: AnsattGruppeResolver,</span>
+<span class="nc" id="L19">                     private val teller: NasjonalGruppeTeller) {</span>
+
+<span class="nc" id="L21">    private val log = getLogger(javaClass)</span>
+
+    fun ansatt(ansattId: AnsattId) =
+<span class="nc" id="L24">        Ansatt(ansattId,ansattBruker(ansattId), ansattGrupper(ansattId)).also {</span>
+<span class="nc" id="L25">            tell(it erMedlemAv NASJONAL)</span>
+<span class="nc" id="L26">            log.trace(&quot;Ansatt er {}&quot;, it)</span>
+<span class="nc" id="L27">        }</span>
+
+<span class="nc" id="L29">    private fun ansattGrupper(ansattId: AnsattId) = resolver.grupperForAnsatt(ansattId)</span>
+
+    private fun ansattBruker(ansattId: AnsattId) =
+<span class="nc bnc" id="L32" title="All 2 branches missed.">        ansatte.fnrForAnsatt(ansattId)?.let {</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">            runCatching { brukere.brukerMedUtvidetFamilie(it.verdi) }.getOrNull()</span>
+<span class="nc" id="L34">        }</span>
+
+<span class="nc" id="L36">    private fun tell(status: Boolean) = teller.tell(Tags.of(MEDLEM,&quot;$status&quot;))</span>
+
+    companion object {
+        private const val MEDLEM = &quot;medlem&quot;
+    }
+}
+
+
+
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

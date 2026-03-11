@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractRestClientAdapter.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.felles.rest</a> &gt; <span class="el_source">AbstractRestClientAdapter.kt</span></div><h1>AbstractRestClientAdapter.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.felles.rest
+
+import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler.Companion.IDENTIFIKATOR
+import org.slf4j.LoggerFactory.getLogger
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import org.springframework.http.HttpStatusCode
+import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.web.client.RestClient
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
+import org.springframework.web.client.body
+import org.springframework.web.client.requiredBody
+import java.net.URI
+
+<span class="fc" id="L14">abstract class AbstractRestClientAdapter(</span>
+<span class="pc" id="L15">        protected val restClient: RestClient,</span>
+<span class="fc" id="L16">        open val cfg: AbstractRestConfig,</span>
+<span class="pc" id="L17">        protected val errorHandler: ErrorHandler = DefaultRestErrorHandler()) : Pingable {</span>
+
+<span class="pc" id="L19">    protected val log = getLogger(javaClass)</span>
+<span class="nc bnc" id="L20" title="All 2 branches missed.">    override fun ping() = if (cfg.isEnabled) get&lt;Any&gt;(cfg.pingEndpoint) else &quot;disabled&quot;</span>
+
+<span class="nc" id="L22">    protected inline fun &lt;reified T : Any&gt; get(uri: URI, headers: Map&lt;String, String&gt; = emptyMap(), handler: ErrorHandler = errorHandler) =</span>
+<span class="nc" id="L23">        restClient.get()</span>
+<span class="nc" id="L24">            .uri(uri)</span>
+<span class="nc" id="L25">            .accept(APPLICATION_JSON)</span>
+<span class="nc" id="L26">            .headers { it.setAll(headers)}</span>
+<span class="nc" id="L27">            .retrieve()</span>
+<span class="nc" id="L28">            .onStatus(HttpStatusCode::isError, handler::handle)</span>
+<span class="nc" id="L29">            .requiredBody&lt;T&gt;()</span>
+
+<span class="fc" id="L31">    protected inline fun &lt;reified T : Any&gt; post(uri: URI, body: Any, headers: Map&lt;String, String&gt; = emptyMap(), handler: ErrorHandler = errorHandler) =</span>
+<span class="fc" id="L32">        restClient</span>
+<span class="fc" id="L33">            .post()</span>
+<span class="fc" id="L34">            .uri(uri)</span>
+<span class="fc" id="L35">            .headers { it.setAll(headers) }</span>
+<span class="fc" id="L36">            .accept(APPLICATION_JSON)</span>
+<span class="fc" id="L37">            .body(body)</span>
+<span class="fc" id="L38">            .retrieve()</span>
+<span class="fc" id="L39">            .onStatus(HttpStatusCode::isError, handler::handle)</span>
+<span class="fc" id="L40">            .requiredBody&lt;T&gt;()</span>
+
+<span class="pc" id="L42">    override val name = cfg.name</span>
+
+<span class="pc" id="L44">    override val pingEndpoint = &quot;${cfg.pingEndpoint}&quot;</span>
+<span class="pc" id="L45">    override val isEnabled = cfg.isEnabled</span>
+<span class="nc" id="L46">    override fun toString() = &quot;restClient=$restClient, cfg=$cfg, baseUri=${cfg.baseUri}&quot;</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

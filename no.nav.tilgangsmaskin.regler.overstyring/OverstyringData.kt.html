@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OverstyringData.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.regler.overstyring</a> &gt; <span class="el_source">OverstyringData.kt</span></div><h1>OverstyringData.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.regler.overstyring
+
+import io.swagger.v3.oas.annotations.media.Schema
+import no.nav.tilgangsmaskin.bruker.BrukerId
+import java.time.LocalDate
+
+<span class="fc" id="L7">@Schema(requiredProperties = [&quot;brukerId&quot;,&quot;begrunnelse&quot;,&quot;gyldigTil&quot;], example = &quot;&quot;&quot;</span>
+  {
+  &quot;brukerId&quot;: &quot;22420094160&quot;,
+  &quot;begrunnelse&quot;: &quot;En begrunnelse&quot;,
+  &quot;gyldigtil&quot;: &quot;2025-05-24&quot;
+}
+&quot;&quot;&quot;)
+<span class="pc" id="L14">data class OverstyringData(val brukerId: BrukerId, val begrunnelse: String,  val gyldigtil: LocalDate = LocalDate.now().plusMonths(3))</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

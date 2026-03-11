@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DevSkjermingController.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.tilgang.dev</a> &gt; <span class="el_source">DevSkjermingController.kt</span></div><h1>DevSkjermingController.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.tilgang.dev
+
+import io.swagger.v3.oas.annotations.tags.Tag
+import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.security.token.support.spring.UnprotectedRestController
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
+import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+
+
+<span class="nc" id="L14">@UnprotectedRestController(value = [&quot;/${DEV}/skjermning&quot;])</span>
+@ConditionalOnNotProd
+@Tag(name = &quot;DevTilgangController&quot;, description = &quot;Denne kontrolleren skal kun brukes til testing&quot;)
+<span class="nc" id="L17">class DevSkjermingController(</span>
+<span class="nc" id="L18">    private val skjerming: SkjermingTjeneste,</span>
+<span class="nc" id="L19">    private val skjermingAdapter: SkjermingRestClientAdapter) {</span>
+
+
+    @PostMapping(&quot;skjermingadaptere&quot;)
+<span class="nc" id="L23">    fun skjermingAdapter(@RequestBody brukerId: String) = skjermingAdapter.skjerming(brukerId)</span>
+
+    @PostMapping(&quot;skjerming&quot;)
+<span class="nc" id="L26">    fun skjerming(@RequestBody brukerId: BrukerId) = skjerming.skjerming(brukerId)</span>
+
+    @PostMapping(&quot;skjerminger&quot;)
+<span class="nc" id="L29">    fun skjerminger(@RequestBody ids: List&lt;BrukerId&gt;) = skjerming.skjerminger(ids)</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

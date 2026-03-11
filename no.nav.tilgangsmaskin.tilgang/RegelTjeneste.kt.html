@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RegelTjeneste.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.tilgang</a> &gt; <span class="el_source">RegelTjeneste.kt</span></div><h1>RegelTjeneste.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.tilgang
+
+import io.micrometer.core.annotation.Timed
+import io.opentelemetry.instrumentation.annotations.WithSpan
+import no.nav.tilgangsmaskin.ansatt.Ansatt
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
+import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
+import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
+import no.nav.tilgangsmaskin.felles.utils.Auditor
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
+import no.nav.tilgangsmaskin.regler.motor.BrukerOgRegelsett
+import no.nav.tilgangsmaskin.regler.motor.BulkResultat
+import no.nav.tilgangsmaskin.regler.motor.RegelException
+import no.nav.tilgangsmaskin.regler.motor.RegelMotor
+import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
+import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
+import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
+import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
+import org.slf4j.LoggerFactory.getLogger
+import org.springframework.http.HttpStatus.FORBIDDEN
+import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.stereotype.Service
+import kotlin.time.measureTime
+import kotlin.time.measureTimedValue
+
+<span class="fc" id="L29">@Service</span>
+<span class="fc" id="L30">class RegelTjeneste(</span>
+<span class="fc" id="L31">    private val motor: RegelMotor,</span>
+<span class="fc" id="L32">    private val brukerTjeneste: BrukerTjeneste,</span>
+<span class="fc" id="L33">    private val ansattTjeneste: AnsattTjeneste,</span>
+<span class="fc" id="L34">    private val overstyringTjeneste: OverstyringTjeneste,</span>
+<span class="fc" id="L35">    private val auditor: Auditor = Auditor()) {</span>
+<span class="fc" id="L36">    private val log = getLogger(javaClass)</span>
+
+    @Timed( value = &quot;regel_tjeneste&quot;, histogram = true, extraTags = [&quot;type&quot;, &quot;komplett&quot;])
+    @WithSpan
+    fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
+<span class="fc" id="L41">        val elapsedTime = measureTime {</span>
+<span class="fc" id="L42">            log.info(&quot;Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}&quot;)</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">            bruker(brukerId)?.let { bruker -&gt;</span>
+<span class="fc" id="L44">                runCatching {</span>
+<span class="fc" id="L45">                    motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)</span>
+<span class="pc bfc" id="L46" title="All 2 branches covered.">                }.getOrElse {</span>
+<span class="pc bpc" id="L47" title="3 of 4 branches missed.">                    if (overstyringTjeneste.erOverstyrt(ansattId, bruker.brukerId) &amp;&amp; it is RegelException) {</span>
+<span class="nc" id="L48">                        log.trace(&quot;Overstyring registrert for {} og {}&quot;, ansattId, brukerId.maskFnr(), it)</span>
+                    } else {
+<span class="fc" id="L50">                        log.trace(&quot;Tilgang avvist ved kjøring av komplette regler for {} og {}&quot;, ansattId, brukerId.maskFnr(), it)</span>
+<span class="fc" id="L51">                        throw it</span>
+                    }
+<span class="nc" id="L53">                }</span>
+<span class="fc" id="L54">            } ?: log.info(&quot;Komplette regler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt&quot;)</span>
+<span class="fc" id="L55">        }</span>
+<span class="fc" id="L56">        log.info(&quot;Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms&quot;)</span>
+<span class="fc" id="L57">    }</span>
+
+<span class="fc" id="L59">    private fun bruker(brukerId: String) = runCatching {</span>
+<span class="fc" id="L60">        brukerTjeneste.brukerMedNærmesteFamilie(brukerId)</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">    }.getOrElse {</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">        if (it is NotFoundRestException) {</span>
+<span class="fc" id="L63">            auditor.info(&quot;${NOT_FOUND.name}: Bruker med id $brukerId ikke funnet i PDL ved oppslag&quot;)</span>
+<span class="fc" id="L64">            null</span>
+        } else {
+<span class="nc" id="L66">            log.warn(&quot;Feil ved oppslag av bruker for ${brukerId.maskFnr()}&quot;, it)</span>
+<span class="nc" id="L67">            throw it</span>
+<span class="fc" id="L68">        }</span>
+<span class="fc" id="L69">    }</span>
+
+    @Timed( value = &quot;regel_tjeneste&quot;, histogram = true, extraTags = [&quot;type&quot;, &quot;kjerne&quot;])
+    @WithSpan
+    fun kjerneregler(ansattId: AnsattId, brukerId: String) =
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        bruker(brukerId)?.let { bruker -&gt;</span>
+<span class="fc" id="L75">            motor.kjerneregler(ansattTjeneste.ansatt(ansattId), bruker)</span>
+<span class="fc" id="L76">        } ?: log.info(&quot;Kjerneregler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt&quot;)</span>
+
+    @Timed( value = &quot;regel_tjeneste&quot;, histogram = true, extraTags = [&quot;type&quot;, &quot;bulk&quot;])
+    @WithSpan
+    fun bulkRegler(ansattId: AnsattId, idOgType: Set&lt;BrukerIdOgRegelsett&gt;): AggregertBulkRespons {
+<span class="fc" id="L81">        val (respons, elapsedTime) = measureTimedValue {</span>
+<span class="fc" id="L82">            log.debug(&quot;Bulk regler for {} med {} ident(er)&quot;, ansattId, idOgType.size)</span>
+<span class="fc" id="L83">            val ansatt = ansattTjeneste.ansatt(ansattId)</span>
+<span class="fc" id="L84">            val brukere = idOgType.brukerOgRegelsett()</span>
+<span class="fc" id="L85">            val resultater = motor.bulkRegler(ansatt, brukere).also {</span>
+<span class="fc" id="L86">                log.debug(&quot;Bulk resultater {}&quot;, it)</span>
+<span class="fc" id="L87">            }</span>
+<span class="fc" id="L88">            val godkjente = godkjente(ansatt, resultater)</span>
+<span class="fc" id="L89">            val avviste = avviste(ansatt, godkjente, resultater, brukere)</span>
+<span class="fc" id="L90">            val ikkeFunnet = ikkeFunnet(idOgType, resultater)</span>
+<span class="fc" id="L91">            AggregertBulkRespons(ansattId, godkjente + avviste + ikkeFunnet)</span>
+        }
+<span class="fc" id="L93">        log.info(&quot;Tid brukt på bulk med størrelse ${idOgType.size} for $ansattId: ${elapsedTime.inWholeMilliseconds}ms&quot;)</span>
+<span class="fc" id="L94">        return respons</span>
+    }
+
+<span class="fc" id="L97">    private operator fun Set&lt;BrukerIdOgRegelsett&gt;.minus(funnet: Set&lt;BulkResultat&gt;) = filterNot { brukerIdOgRegelsett -&gt;</span>
+<span class="fc" id="L98">        brukerIdOgRegelsett.brukerId in (funnet.map { it.bruker.historiskeIds} + funnet.map { it.bruker.oppslagId })</span>
+<span class="fc" id="L99">    }</span>
+
+    private fun ikkeFunnet(oppgitt: Set&lt;BrukerIdOgRegelsett&gt;, funnet: Set&lt;BulkResultat&gt;) =
+<span class="fc" id="L102">        buildSet {</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">            for (item in (oppgitt - funnet)) {</span>
+<span class="fc" id="L104">                add(ok(item.brukerId))</span>
+            }
+<span class="fc" id="L106">        }.also {</span>
+<span class="fc bfc" id="L107" title="All 4 branches covered.">            if (it.isNotEmpty()) {</span>
+<span class="fc" id="L108">                auditor.info(&quot;404: Brukere med identer ${it.map { ident -&gt; ident.brukerId }} ikke funnet i PDL ved oppslag&quot;)</span>
+<span class="fc" id="L109">                log.debug(&quot;${it.size} bulk elementer ikke funnet&quot;)</span>
+            }
+<span class="fc" id="L111">        }</span>
+
+    private fun avviste(ansatt: Ansatt, godkjente: Set&lt;EnkeltBulkRespons&gt;, resultater: Set&lt;BulkResultat&gt;, brukere: Set&lt;BrukerOgRegelsett&gt;) =
+<span class="fc" id="L114">        buildSet {</span>
+<span class="fc" id="L115">        val godkjenteIds = buildSet { godkjente.forEach { add(it.brukerId) } }</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">        for (resultat in resultater) {</span>
+<span class="fc" id="L117">            log.trace(&quot;Bulk Sjekker overstyring for avvist {}&quot;, resultat)</span>
+<span class="fc bfc" id="L118" title="All 4 branches covered.">            if (resultat.status == FORBIDDEN &amp;&amp; resultat.bruker.oppslagId !in godkjenteIds) {</span>
+<span class="fc" id="L119">                log.trace(&quot;Bulk resultat {} har ingen overstyring&quot;, resultat)</span>
+<span class="fc" id="L120">                add(EnkeltBulkRespons(RegelException(ansatt, brukere.finnBruker(resultat.bruker.oppslagId), resultat.regel!!, status = resultat.status)))</span>
+            }
+        }
+<span class="fc" id="L123">    }.also {</span>
+<span class="fc" id="L124">            log.debug(&quot;Bulk avviste {}&quot;, it)</span>
+<span class="fc" id="L125">        }</span>
+
+    private fun godkjente(ansatt: Ansatt, resultater: Set&lt;BulkResultat&gt;) =
+<span class="fc" id="L128">        buildSet {</span>
+<span class="fc" id="L129">            val (godkjente, avviste) = resultater.partition { it.status.is2xxSuccessful }</span>
+<span class="fc" id="L130">            godkjente.forEach { add(ok(it.bruker.oppslagId)) }</span>
+<span class="fc" id="L131">            overstyringTjeneste</span>
+<span class="fc" id="L132">                .overstyringer(ansatt.ansattId, avviste.map { it.bruker.brukerId })</span>
+<span class="fc" id="L133">                .forEach { add(ok(it.verdi)) }</span>
+<span class="fc" id="L134">        }.also {</span>
+<span class="fc bfc" id="L135" title="All 4 branches covered.">            if (it.isNotEmpty()) {</span>
+<span class="fc" id="L136">                log.debug(&quot;Bulk godkjente oppslagId(s) {}&quot;, it.map { it.brukerId })</span>
+            }
+<span class="fc" id="L138">        }</span>
+
+
+    private fun Set&lt;BrukerIdOgRegelsett&gt;.brukerOgRegelsett() =
+<span class="fc" id="L142">        with(associate { it.brukerId to it }) {</span>
+<span class="fc" id="L143">            val brukere = brukerTjeneste.brukere(keys)</span>
+<span class="fc" id="L144">            log.debug(&quot;Fant {} av {} brukere&quot;, brukere.size, keys.size)</span>
+<span class="fc" id="L145">            brukere.map { bruker -&gt;</span>
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">                val idOgType = this[bruker.oppslagId] ?: error(&quot;Bruker ${bruker.brukerId} har ikke oppslagId&quot;)</span>
+<span class="fc" id="L147">                BrukerOgRegelsett(bruker, idOgType.type)</span>
+<span class="fc" id="L148">            }.toSet()</span>
+<span class="fc" id="L149">        }</span>
+
+<span class="fc" id="L151">    private fun Set&lt;BrukerOgRegelsett&gt;.finnBruker(oppslagId: String)  = first { it.bruker.oppslagId == oppslagId }.bruker</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

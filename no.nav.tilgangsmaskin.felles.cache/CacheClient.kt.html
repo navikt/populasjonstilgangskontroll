@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CacheClient.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.felles.cache</a> &gt; <span class="el_source">CacheClient.kt</span></div><h1>CacheClient.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.felles.cache
+
+import io.lettuce.core.RedisClient
+import io.micrometer.core.instrument.Tags.of
+import io.opentelemetry.instrumentation.annotations.WithSpan
+import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverable
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
+import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
+import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
+import org.slf4j.LoggerFactory.getLogger
+import org.springframework.stereotype.Component
+import java.time.Duration
+import kotlin.reflect.KClass
+
+<span class="fc" id="L15">@Component</span>
+@RetryingWhenRecoverable
+<span class="fc" id="L17"> class CacheClient(client: RedisClient, private val handler: CacheNøkkelHandler,</span>
+<span class="fc" id="L18">    private val alleTreffTeller: BulkCacheSuksessTeller,</span>
+<span class="fc" id="L19">    private val teller: BulkCacheTeller,</span>
+<span class="fc" id="L20">     private val cfg: CacheConfig) : CacheOperations {</span>
+
+<span class="fc" id="L22">    private val log = getLogger(javaClass)</span>
+
+<span class="fc" id="L24">    private val conn = client.connect().apply {</span>
+<span class="fc" id="L25">        timeout = Duration.ofSeconds(cfg.timeout.seconds)</span>
+<span class="pc bpc" id="L26" title="1 of 2 branches missed.">        if (isLocalOrTest) {</span>
+<span class="fc" id="L27">            sync().configSet(&quot;notify-keyspace-events&quot;, &quot;Exd&quot;)</span>
+        }
+<span class="fc" id="L29">    }</span>
+
+    @WithSpan
+    override fun delete(cache: CachableConfig, id: String) =
+<span class="fc" id="L33">        conn.sync().del(handler.tilNøkkel(cache, id))</span>
+
+
+    @WithSpan
+    override fun &lt;T : Any&gt; getOne(cache: CachableConfig,id: String, clazz: KClass&lt;T&gt;): T? =
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        conn.sync().get(handler.tilNøkkel(cache, id))?.let { json -&gt;</span>
+<span class="fc" id="L39">            handler.fraJson(json, clazz)</span>
+<span class="fc" id="L40">        }</span>
+
+    @WithSpan
+    override fun putOne(cache: CachableConfig, id: String, value: Any, ttl: Duration) {
+<span class="fc" id="L44">        conn.async().setex(handler.tilNøkkel(cache, id), ttl.seconds, handler.tilJson(value))</span>
+<span class="fc" id="L45">    }</span>
+
+
+    @WithSpan
+    override fun &lt;T : Any&gt; getMany(cache: CachableConfig, ids: Set&lt;String&gt;, clazz: KClass&lt;T&gt;): Map&lt;String, T&gt; =
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        if (ids.isEmpty()) {</span>
+<span class="nc" id="L51">            emptyMap()</span>
+        } else {
+<span class="fc" id="L53">            conn.sync()</span>
+<span class="fc" id="L54">                .mget(*ids.map { id -&gt; handler.tilNøkkel(cache, id) }.toTypedArray&lt;String&gt;())</span>
+<span class="fc" id="L55">                .filter { it.hasValue() }</span>
+<span class="fc" id="L56">                .associate { handler.idFraNøkkel(it.key) to handler.fraJson(it.value, clazz) }</span>
+<span class="fc" id="L57">                .also { tellOgLog(cache.name, it.size, ids.size) }</span>
+<span class="fc" id="L58">        }</span>
+
+    @WithSpan
+    override fun putMany(cache: CachableConfig, innslag: Map&lt;String, Any&gt;, ttl: Duration) {
+<span class="pc bpc" id="L62" title="2 of 4 branches missed.">        if (innslag.isNotEmpty()) {</span>
+<span class="fc" id="L63">            log.trace(&quot;Bulk lagrer {} verdier for cache {} med prefix {}&quot;, innslag.size, cache.name, cache.extraPrefix)</span>
+<span class="fc" id="L64">            conn.apply {</span>
+<span class="fc" id="L65">                with(payloadFor(innslag, cache)) {</span>
+<span class="fc" id="L66">                    setAutoFlushCommands(false)</span>
+<span class="fc" id="L67">                    async().mset(this)</span>
+<span class="fc" id="L68">                    keys.forEach { key -&gt;</span>
+<span class="fc" id="L69">                        async().expire(key, ttl.seconds)</span>
+<span class="fc" id="L70">                    }</span>
+<span class="fc" id="L71">                }</span>
+<span class="fc" id="L72">                flushCommands()</span>
+<span class="fc" id="L73">                setAutoFlushCommands(true)</span>
+<span class="fc" id="L74">            }</span>
+        }
+<span class="fc" id="L76">    }</span>
+
+    private fun payloadFor(innslag: Map&lt;String, Any&gt;, cache: CachableConfig) =
+<span class="fc" id="L79">        buildMap {</span>
+<span class="fc" id="L80">            innslag.forEach { (key, value) -&gt;</span>
+<span class="fc" id="L81">                put(handler.tilNøkkel(cache, key), handler.tilJson(value))</span>
+<span class="fc" id="L82">            }</span>
+<span class="fc" id="L83">        }</span>
+
+    fun tellOgLog(navn: String, funnet: Int, etterspurt: Int) {
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        alleTreffTeller.tell(of(&quot;name&quot;, navn, &quot;suksess&quot;, (funnet == etterspurt).toString()))</span>
+<span class="fc" id="L87">        teller.tell(of(&quot;cache&quot;, navn, &quot;result&quot;, &quot;miss&quot;), etterspurt - funnet)</span>
+<span class="fc" id="L88">        teller.tell(of(&quot;cache&quot;, navn, &quot;result&quot;, &quot;hit&quot;), funnet)</span>
+<span class="fc" id="L89">        log.trace(&quot;Fant $funnet verdier i cache $navn for $etterspurt identer&quot;)</span>
+<span class="fc" id="L90">    }</span>
+
+<span class="nc" id="L92">    override fun tilNøkkel(cache: CachableConfig, id: String) = handler.tilNøkkel(cache, id)</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

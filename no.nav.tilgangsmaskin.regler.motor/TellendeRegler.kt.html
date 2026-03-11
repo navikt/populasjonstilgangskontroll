@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TellendeRegler.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.regler.motor</a> &gt; <span class="el_source">TellendeRegler.kt</span></div><h1>TellendeRegler.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.regler.motor
+
+import no.nav.tilgangsmaskin.ansatt.Ansatt
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.felles.utils.Auditor
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_13_24
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_OVER_24
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD
+import org.springframework.core.Ordered.LOWEST_PRECEDENCE
+import org.springframework.core.annotation.Order
+import org.springframework.stereotype.Component
+
+<span class="nc" id="L17">interface TellendeRegel : Regel {</span>
+    val skalTelle: (Ansatt, Bruker) -&gt; Boolean
+<span class="nc" id="L19">        get() = { _, _ -&gt; false }</span>
+<span class="nc" id="L20">    fun tell(ansatt: Ansatt, bruker: Bruker) = Unit</span>
+
+<span class="nc" id="L22">    override fun evaluer(ansatt: Ansatt, bruker: Bruker): Boolean {</span>
+<span class="pc bpc" id="L23" title="1 of 2 branches missed.">        if (skalTelle(ansatt, bruker)) {</span>
+<span class="nc" id="L24">            tell(ansatt, bruker)</span>
+        }
+<span class="fc" id="L26">        return true</span>
+<span class="nc" id="L27">    }</span>
+<span class="nc" id="L28">}</span>
+
+<span class="fc" id="L30">@Component</span>
+@Order(LOWEST_PRECEDENCE - 3)
+<span class="fc" id="L32">class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: EntraProxyTjeneste, private val auditor: Auditor = Auditor()) : TellendeRegel {</span>
+
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">    override val skalTelle = { _: Ansatt, bruker: Bruker -&gt; bruker.dødsdato != null }</span>
+
+    override fun tell(ansatt: Ansatt, bruker: Bruker) {
+<span class="nc" id="L37">        val intervall = bruker.dødsdato!!.intervallSiden()</span>
+<span class="nc" id="L38">        with(enhet(intervall, ansatt)) {</span>
+<span class="nc" id="L39">            teller.tell(intervall,this)</span>
+<span class="nc bnc" id="L40" title="All 2 branches missed.">            if (this != UTILGJENGELIG)  {</span>
+<span class="nc" id="L41">                auditor.info(&quot;Ansatt ${ansatt.ansattId.verdi} i enhet $this fikk tilgang til forlengst avdød bruker ${bruker.brukerId.verdi}&quot;)</span>
+            }
+<span class="nc" id="L43">        }</span>
+<span class="nc" id="L44">    }</span>
+
+    private fun enhet(intervall: Dødsperiode, ansatt: Ansatt) =
+<span class="nc" id="L47">        runCatching {</span>
+<span class="nc bnc" id="L48" title="All 8 branches missed.">            intervall.takeIf { it == MND_13_24 || it == MND_OVER_24 }</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">                ?.let { proxy.enhet(ansatt.ansattId).navn }</span>
+<span class="nc" id="L50">                ?: UTILGJENGELIG</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">        }.getOrDefault(UTILGJENGELIG)</span>
+
+
+<span class="fc" id="L54">    override val metadata = RegelMetadata(AVDØD)</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

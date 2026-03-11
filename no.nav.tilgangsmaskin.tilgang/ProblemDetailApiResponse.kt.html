@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProblemDetailApiResponse.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.tilgang</a> &gt; <span class="el_source">ProblemDetailApiResponse.kt</span></div><h1>ProblemDetailApiResponse.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.tilgang
+
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
+import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
+import java.net.URI
+import kotlin.annotation.AnnotationRetention.RUNTIME
+import kotlin.annotation.AnnotationTarget.FUNCTION
+
+@Target(FUNCTION)
+@Retention(RUNTIME)
+@ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = &quot;404&quot;,
+                content = [Content(mediaType = APPLICATION_JSON_VALUE, schema = Schema(
+                    example = &quot;&quot;&quot;{
+                &quot;detail&quot;: &quot;Fant ingen oid for navident A222222, er den fremdeles gyldig?&quot;,
+                &quot;instance&quot;: &quot;/api/v1/ccf/komplett/A222222&quot;,
+                &quot;status&quot;: 404,
+                &quot;title&quot;: &quot;Uventet respons fra Entra&quot;,
+                &quot;navident&quot;: &quot;A222222&quot;
+              }&quot;&quot;&quot;))],
+                description = &quot;navident ikke funnet i Entra (gjelder kun Client Credentials Flow der navident oppgis som path-parameter)&quot;),
+            ApiResponse(
+                    responseCode = &quot;204&quot;,
+                    description = &quot;Tilgang ble godkjent&quot;),
+            ApiResponse(
+                    responseCode = &quot;403&quot;,
+                    description = &quot;Tilgang ble avvist&quot;,
+                    content = [Content(
+                            mediaType = APPLICATION_PROBLEM_JSON_VALUE,
+                            schema = Schema(
+                                    implementation = ProblemDetailResponse::class,
+                                    example = &quot;&quot;&quot;{
+                        &quot;type&quot;: &quot;https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett&quot;,
+                        &quot;title&quot;: &quot;AVVIST_STRENGT_FORTROLIG_ADRESSE&quot;,
+                        &quot;status&quot;: 403,
+                        &quot;instance&quot;: &quot;Z990883/03508331575&quot;,
+                        &quot;brukerIdent&quot;: &quot;03508331575&quot;,
+                        &quot;navIdent&quot;: &quot;Z990883&quot;,
+                        &quot;traceId&quot;: &quot;444290be30ed4fdd9a849654bad9dc1b&quot;,
+                        &quot;begrunnelse&quot;: &quot;Du har ikke tilgang til brukere med strengt fortrolig adresse&quot;,
+                        &quot;kanOverstyres&quot;: false
+                    }&quot;&quot;&quot;))])])
+annotation class ProblemDetailApiResponse
+<span class="nc" id="L51">@Schema(description = &quot;Problem Detail&quot;)</span>
+<span class="nc" id="L52">internal data class ProblemDetailResponse(</span>
+<span class="nc" id="L53">        val type: URI,</span>
+<span class="nc" id="L54">        val title: AvvisningsKode,</span>
+<span class="nc" id="L55">        val status: Int,</span>
+<span class="nc" id="L56">        val instance: String,</span>
+<span class="nc" id="L57">        val brukerIdent: String,</span>
+<span class="nc" id="L58">        val navIdent: String,</span>
+<span class="nc" id="L59">        val begrunnelse: String,</span>
+<span class="nc" id="L60">        val traceId: String,</span>
+<span class="nc" id="L61">        val kanOverstyres: Boolean)</span>
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

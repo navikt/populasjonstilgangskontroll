@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OppfølgingEntity.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.ansatt.oppfølging</a> &gt; <span class="el_source">OppfølgingEntity.kt</span></div><h1>OppfølgingEntity.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.ansatt.`oppfølging`
+
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EntityListeners
+import jakarta.persistence.Id
+import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
+import no.nav.tilgangsmaskin.bruker.AktørId.Companion.AKTØRID_LENGTH
+import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
+import org.hibernate.annotations.NaturalId
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import java.time.Instant
+import java.util.*
+
+<span class="pc" id="L18">@Entity</span>
+@Table(name = &quot;oppfolging&quot;,  uniqueConstraints = [
+    UniqueConstraint(name = &quot;uc_oppfølgingentity_aktoerid&quot;, columnNames = [&quot;aktoerid&quot;]),
+    UniqueConstraint(name = &quot;uc_oppfølgingentity_brukerid&quot;, columnNames = [&quot;brukerid&quot;])
+])
+@EntityListeners(AuditingEntityListener::class)
+<span class="nc" id="L24">class OppfølgingEntity(@NaturalId @Id val id: UUID) {</span>
+
+    @Column(length = BRUKERID_LENGTH, nullable = false)
+<span class="nc" id="L27">    var brukerid: String? = null</span>
+
+    @Column(length = AKTØRID_LENGTH, nullable = false)
+<span class="nc" id="L30">    var aktoerid: String? = null</span>
+
+    @Column(nullable = false)
+<span class="nc" id="L33">    var startTidspunkt: Instant? = null</span>
+
+    @Column(length = 4, nullable = false)
+<span class="nc" id="L36">    var kontor: String? = null</span>
+
+    @Column(nullable = false, updatable = false)
+    @CreatedDate
+<span class="nc" id="L40">    var created: Instant? = null</span>
+
+    @Column(nullable = false)
+    @LastModifiedDate
+<span class="nc" id="L44">    var updated: Instant? = null</span>
+<span class="fc" id="L45">}</span>
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

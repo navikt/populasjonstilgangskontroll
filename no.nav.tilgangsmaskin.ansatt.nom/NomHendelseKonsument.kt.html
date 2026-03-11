@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NomHendelseKonsument.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.ansatt.nom</a> &gt; <span class="el_source">NomHendelseKonsument.kt</span></div><h1>NomHendelseKonsument.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.ansatt.nom
+
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
+import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
+import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
+import org.slf4j.LoggerFactory.getLogger
+import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.stereotype.Component
+import java.time.LocalDate.EPOCH
+
+<span class="nc" id="L13">@Component</span>
+<span class="nc" id="L14">class NomHendelseKonsument(private val nom: NomTjeneste, private val logger: NomHendelseLogger) {</span>
+<span class="nc" id="L15">    private val log = getLogger(javaClass)</span>
+
+    @KafkaListener(
+        topics = [NOM_TOPIC],
+        properties = [&quot;spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.nom.NomHendelse&quot;],
+        groupId = NOM,
+        filter = NOM_FNR_FILTER_STRATEGY)
+    fun listen(hendelser: List&lt;NomHendelse&gt;) {
+<span class="nc" id="L23">        logger.start(hendelser)</span>
+<span class="nc" id="L24">        hendelser.forEach { hendelse -&gt;</span>
+<span class="nc" id="L25">            logger.behandler(hendelse)</span>
+<span class="nc" id="L26">            runCatching {</span>
+<span class="nc" id="L27">                nom.lagre(ansattFra(hendelse))</span>
+<span class="nc bnc" id="L28" title="All 2 branches missed.">            }.onSuccess {</span>
+<span class="nc" id="L29">                logger.ok(hendelse.navident, hendelse.personident)</span>
+<span class="nc bnc" id="L30" title="All 2 branches missed.">            }.onFailure {</span>
+<span class="nc" id="L31">                logger.feilet(hendelse.navident, hendelse.personident, it)</span>
+<span class="nc" id="L32">            }</span>
+<span class="nc" id="L33">        }</span>
+<span class="nc" id="L34">        logger.ferdig(hendelser)</span>
+<span class="nc" id="L35">    }</span>
+
+    private fun ansattFra(hendelse: NomHendelse): NomAnsattData =
+<span class="nc" id="L38">       with(hendelse) {</span>
+<span class="nc" id="L39">           NomAnsattData(</span>
+<span class="nc" id="L40">               AnsattId(navident),</span>
+<span class="nc" id="L41">               BrukerId(personident),</span>
+<span class="nc bnc" id="L42" title="All 4 branches missed.">               NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: ALLTID)</span>
+<span class="nc" id="L43">           )</span>
+<span class="nc" id="L44">       }</span>
+companion object {
+    const val NOM_FNR_FILTER_STRATEGY = &quot;nomFnrFilterStrategy&quot;
+    private const val NOM_TOPIC = &quot;org.nom.api-ressurs-state-v4&quot;
+}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

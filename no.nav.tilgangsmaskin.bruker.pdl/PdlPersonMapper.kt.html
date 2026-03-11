@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PdlPersonMapper.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.bruker.pdl</a> &gt; <span class="el_source">PdlPersonMapper.kt</span></div><h1>PdlPersonMapper.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.bruker.pdl
+
+import no.nav.tilgangsmaskin.bruker.AktørId
+import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.Familie
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.INGEN
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.TIDLIGERE_PARTNER
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Bydel
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UdefinertTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.ENKE_ELLER_ENKEMANN
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.GIFT
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.GJENLEVENDE_PARTNER
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.REGISTRERT_PARTNER
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.SEPARERT
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.SEPARERT_PARTNER
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.SKILT
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.SKILT_PARTNER
+import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTType.BYDEL
+import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTType.KOMMUNE
+import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTType.UTLAND
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.NPID
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering.FORTROLIG
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering.UGRADERT
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlDødsfall
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.BARN
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.FAR
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.MEDFAR
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.MEDMOR
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.MOR
+import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
+import org.slf4j.LoggerFactory.getLogger
+
+object PdlPersonMapper {
+<span class="fc" id="L52">    private val log = getLogger(javaClass)</span>
+
+    fun tilPerson(oppslagId: String,data: PdlRespons) =
+<span class="fc" id="L55">        with(data) {</span>
+
+<span class="fc" id="L57">            Person(</span>
+<span class="fc" id="L58">                BrukerId(brukerId),</span>
+<span class="fc" id="L59">                oppslagId,</span>
+<span class="fc" id="L60">                AktørId(aktørId),</span>
+<span class="fc" id="L61">                tilGeoTilknytning(geografiskTilknytning),</span>
+<span class="fc" id="L62">                tilGraderinger(person.adressebeskyttelse),</span>
+<span class="fc" id="L63">                tilFamilie(person.familierelasjoner),</span>
+<span class="fc" id="L64">                tilDødsdato(person.doedsfall),</span>
+<span class="fc" id="L65">                tilHistoriskeBrukerIds(identer)</span>
+<span class="fc" id="L66">            )</span>
+<span class="fc" id="L67">        }</span>
+
+    fun tilPersoner(responser: Map&lt;String, PdlRespons?&gt;): Map&lt;String, Person&gt; =
+<span class="fc" id="L70">        responser</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">            .mapValues { (oppslagId, pdlRespons) -&gt; pdlRespons?.let { tilPerson(oppslagId, it) } }</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">            .filterValues { it != null }</span>
+<span class="fc" id="L73">            .mapValues { it.value!! }</span>
+
+    fun tilPartner(type: Sivilstandstype) =
+<span class="fc bfc" id="L76" title="All 3 branches covered.">        when (type) {</span>
+            GIFT,
+<span class="fc" id="L78">            REGISTRERT_PARTNER -&gt; PARTNER</span>
+            SKILT,
+            ENKE_ELLER_ENKEMANN,
+            SEPARERT,
+            SKILT_PARTNER,
+            GJENLEVENDE_PARTNER,
+<span class="fc" id="L84">            SEPARERT_PARTNER -&gt; TIDLIGERE_PARTNER</span>
+<span class="fc" id="L85">            else -&gt; INGEN</span>
+<span class="fc" id="L86">        }</span>
+
+    private fun tilGraderinger(beskyttelse: List&lt;PdlAdressebeskyttelse&gt;) =
+<span class="fc" id="L89">        beskyttelse.map { tilGradering(it.gradering) }</span>
+
+    private fun tilGradering(gradering: PdlAdressebeskyttelseGradering) =
+<span class="fc bfc" id="L92" title="All 4 branches covered.">        when (gradering) {</span>
+<span class="fc" id="L93">            STRENGT_FORTROLIG_UTLAND -&gt; Gradering.STRENGT_FORTROLIG_UTLAND</span>
+<span class="fc" id="L94">            STRENGT_FORTROLIG -&gt; Gradering.STRENGT_FORTROLIG</span>
+<span class="fc" id="L95">            FORTROLIG -&gt; Gradering.FORTROLIG</span>
+<span class="fc" id="L96">            UGRADERT -&gt; Gradering.UGRADERT</span>
+<span class="fc" id="L97">        }</span>
+
+     fun tilGeoTilknytning(geo: PdlGeografiskTilknytning?): GeografiskTilknytning =
+<span class="fc bfc" id="L100" title="All 6 branches covered.">        when (geo?.gtType) {</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">            UTLAND -&gt; geo.gtLand?.let {</span>
+<span class="fc" id="L102">                UtenlandskTilknytning()</span>
+<span class="fc" id="L103">            } ?: UkjentBosted()</span>
+
+<span class="fc bfc" id="L105" title="All 2 branches covered.">            KOMMUNE -&gt; geo.gtKommune?.let {</span>
+<span class="fc" id="L106">                KommuneTilknytning(Kommune(it.verdi))</span>
+<span class="fc" id="L107">            } ?: UkjentBosted().also {</span>
+<span class="fc" id="L108">                log.warn(&quot;Kommunal tilknytning uten kommunekode, antar ukjent bosted&quot;)</span>
+<span class="fc" id="L109">            }</span>
+
+<span class="fc bfc" id="L111" title="All 2 branches covered.">            BYDEL -&gt; geo.gtBydel?.let {</span>
+<span class="fc" id="L112">                BydelTilknytning(Bydel(it.verdi))</span>
+<span class="fc" id="L113">            } ?:   UkjentBosted().also {</span>
+<span class="fc" id="L114">                log.warn(&quot;Bydelstilknytning uten bydelskode, antar ukjent bosted&quot;)</span>
+<span class="fc" id="L115">            }</span>
+
+<span class="fc" id="L117">            else -&gt; UdefinertTilknytning()</span>
+<span class="fc" id="L118">        }</span>
+
+<span class="fc bfc" id="L120" title="All 2 branches covered.">    private fun tilDødsdato(dødsfall: List&lt;PdlDødsfall&gt;) = dødsfall.maxByOrNull { it.doedsdato }?.doedsdato</span>
+
+    private fun tilFamilie(relasjoner: List&lt;PdlFamilierelasjon&gt;): Familie {
+<span class="fc" id="L123">        val (foreldre, barn) = relasjoner</span>
+<span class="fc bfc" id="L124" title="All 2 branches covered.">            .mapNotNull { it.relatertPersonsIdent?.let { ident -&gt; it.relatertPersonsRolle to ident } }</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">            .partition { it.first != BARN }</span>
+<span class="fc" id="L126">        return Familie(</span>
+<span class="fc" id="L127">                foreldre.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet(),</span>
+<span class="fc" id="L128">                barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet())</span>
+    }
+
+<span class="fc" id="L131">    private fun tilHistoriskeBrukerIds(identer: PdlIdenter) = identer.identer</span>
+<span class="fc" id="L132">        .filter { it.historisk }</span>
+<span class="fc" id="L133">        .filter { it.gruppe in listOf(FOLKEREGISTERIDENT, NPID) }</span>
+<span class="fc" id="L134">        .map { (BrukerId(it.ident)) }.toSet()</span>
+
+    private fun tilRelasjon(relasjon: PdlFamilieRelasjonRolle?) =
+<span class="fc bfc" id="L137" title="All 4 branches covered.">        when (relasjon) {</span>
+<span class="fc" id="L138">            MOR, MEDMOR -&gt; FamilieRelasjon.MOR</span>
+<span class="fc" id="L139">            FAR, MEDFAR -&gt; FamilieRelasjon.FAR</span>
+<span class="fc" id="L140">            BARN -&gt; FamilieRelasjon.BARN</span>
+<span class="fc" id="L141">            else -&gt; error(&quot;Ukjent relasjon $relasjon&quot;)</span>
+<span class="fc" id="L142">        }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

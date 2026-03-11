@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractSyncGraphQLAdapter.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.felles.graphql</a> &gt; <span class="el_source">AbstractSyncGraphQLAdapter.kt</span></div><h1>AbstractSyncGraphQLAdapter.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.felles.graphql
+
+import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
+import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
+import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
+import org.springframework.graphql.client.GraphQlClient
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import org.springframework.web.client.RestClient
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
+
+<span class="nc" id="L11">abstract class AbstractSyncGraphQLAdapter(</span>
+<span class="nc" id="L12">        protected val graphQlClient: GraphQlClient, client: RestClient, cf: AbstractRestConfig,</span>
+<span class="nc" id="L13">        errorHandler: ErrorHandler, protected val graphQlErrorHandler: GraphQLErrorHandler) :</span>
+<span class="nc" id="L14">    AbstractRestClientAdapter(client, cf, errorHandler) {</span>
+
+    protected inline fun &lt;reified T : Any&gt; query(query: Pair&lt;String, String&gt;, vars: Map&lt;String, String&gt;) =
+<span class="nc" id="L17">        runCatching {</span>
+<span class="nc" id="L18">            graphQlClient</span>
+<span class="nc" id="L19">                .documentName(query.first)</span>
+<span class="nc" id="L20">                .variables(vars)</span>
+<span class="nc" id="L21">                .executeSync()</span>
+<span class="nc" id="L22">                .field(query.second)</span>
+<span class="nc" id="L23">                .toEntity(T::class.java) ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, cfg.baseUri, &quot;Fant ikke feltet ${query.second} i responsen&quot;)</span>
+<span class="nc" id="L24">        }.getOrElse {</span>
+<span class="nc" id="L25">            log.warn(&quot;Feil ved oppslag av {}&quot;, T::class.java.simpleName, it)</span>
+<span class="nc" id="L26">            graphQlErrorHandler.handle(cfg.baseUri, it)</span>
+<span class="nc" id="L27">        }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

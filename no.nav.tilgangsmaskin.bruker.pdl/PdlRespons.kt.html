@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PdlRespons.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">populasjonstilgangskontroll</a> &gt; <a href="index.source.html" class="el_package">no.nav.tilgangsmaskin.bruker.pdl</a> &gt; <span class="el_source">PdlRespons.kt</span></div><h1>PdlRespons.kt</h1><pre class="source lang-java linenums">package no.nav.tilgangsmaskin.bruker.pdl
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.AKTORID
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.NPID
+import java.time.LocalDate
+
+<span class="fc" id="L10">@JsonIgnoreProperties(ignoreUnknown = true)</span>
+<span class="pc" id="L11">data class PdlRespons(</span>
+<span class="fc" id="L12">        val person: PdlPerson,</span>
+<span class="pc" id="L13">        val identer: PdlIdenter = PdlIdenter(),</span>
+<span class="pc" id="L14">        val geografiskTilknytning: PdlGeografiskTilknytning? = null) {</span>
+
+<span class="fc bfc" id="L16" title="All 6 branches covered.">    val aktørId = identer.identer.firstOrNull { it.gruppe == AKTORID }?.ident</span>
+<span class="fc" id="L17">        ?: error(&quot;Ingen gyldig aktørid funnet&quot;)</span>
+<span class="pc bpc" id="L18" title="1 of 8 branches missed.">    val brukerId = identer.identer.firstOrNull { it.gruppe in listOf(FOLKEREGISTERIDENT, NPID) &amp;&amp; !it.historisk  }?.ident</span>
+<span class="fc" id="L19">        ?: error(&quot;Ingen gyldig identer funnet&quot;)</span>
+
+<span class="fc" id="L21">    @JsonIgnoreProperties(ignoreUnknown = true)</span>
+<span class="fc" id="L22">    data class PdlPerson(</span>
+<span class="fc" id="L23">            val adressebeskyttelse: List&lt;PdlAdressebeskyttelse&gt; = emptyList(),</span>
+<span class="fc" id="L24">            val doedsfall: List&lt;PdlDødsfall&gt; = emptyList(),</span>
+<span class="fc" id="L25">            val familierelasjoner: List&lt;PdlFamilierelasjon&gt; = emptyList()) {</span>
+
+<span class="fc" id="L27">        data class PdlAdressebeskyttelse(val gradering: PdlAdressebeskyttelseGradering) {</span>
+<span class="fc" id="L28">            enum class PdlAdressebeskyttelseGradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG, UGRADERT }</span>
+        }
+
+<span class="fc" id="L31">        data class PdlDødsfall(val doedsdato: LocalDate)</span>
+<span class="fc" id="L32">        data class PdlFamilierelasjon(</span>
+<span class="pc" id="L33">                val relatertPersonsIdent: BrukerId? = null,</span>
+<span class="pc" id="L34">                val relatertPersonsRolle: PdlFamilieRelasjonRolle? = null,</span>
+<span class="pc" id="L35">                val minRolleForPerson: PdlFamilieRelasjonRolle? = null) {</span>
+<span class="fc" id="L36">            enum class PdlFamilieRelasjonRolle { MOR, FAR, MEDMOR, MEDFAR, BARN }</span>
+        }
+    }
+
+<span class="pc" id="L40">    data class PdlIdenter(val identer: List&lt;PdlIdent&gt; = emptyList()) {</span>
+<span class="fc" id="L41">        data class PdlIdent(val ident: String, val historisk: Boolean, val gruppe: PdlIdentGruppe) {</span>
+<span class="fc" id="L42">            enum class PdlIdentGruppe { AKTORID, FOLKEREGISTERIDENT, NPID }</span>
+        }
+    }
+}
+
+
+<span class="nc" id="L48">data class Partnere(val sivilstand: Set&lt;Sivilstand&gt; = emptySet()) {</span>
+<span class="nc" id="L49">    data class Sivilstand(</span>
+<span class="nc" id="L50">            val type: Sivilstandstype,</span>
+<span class="nc" id="L51">            val relatertVedSivilstand: String?,</span>
+<span class="nc" id="L52">            val bekreftelsesdato: String?,</span>
+<span class="nc" id="L53">            val gyldigFraOgMed: String?) {</span>
+        enum class Sivilstandstype {
+<span class="fc" id="L55">            UOPPGITT,</span>
+<span class="fc" id="L56">            UGIFT,</span>
+<span class="fc" id="L57">            GIFT,</span>
+<span class="fc" id="L58">            ENKE_ELLER_ENKEMANN,</span>
+<span class="fc" id="L59">            SKILT,</span>
+<span class="fc" id="L60">            SEPARERT,</span>
+<span class="fc" id="L61">            REGISTRERT_PARTNER,</span>
+<span class="fc" id="L62">            SEPARERT_PARTNER,</span>
+<span class="fc" id="L63">            SKILT_PARTNER,</span>
+<span class="fc" id="L64">            GJENLEVENDE_PARTNER</span>
+        }
+    }
+}
+
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

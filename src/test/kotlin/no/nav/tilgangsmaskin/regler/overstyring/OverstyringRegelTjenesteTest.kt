@@ -29,6 +29,7 @@ import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.RegelTestConfig
@@ -142,7 +143,7 @@ class OverstyringRegelTjenesteTest : DescribeSpec() {
                 } returns setOf(BrukerBuilder(vanligBrukerId, GeografiskTilknytning.UtenlandskTilknytning()).kreverMedlemskapI(
                     GlobalGruppe.UTENLANDSK).build())
                 overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er en test",
-                    TimeExtensions.IMORGEN))
+                    IMORGEN))
 
                 val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
 
@@ -174,7 +175,7 @@ class OverstyringRegelTjenesteTest : DescribeSpec() {
                 every {
                     brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi)
                 } returns BrukerBuilder(vanligBrukerId).build()
-                overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", TimeExtensions.IMORGEN))
+                overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
 
                 shouldNotThrowAny { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
             }
@@ -209,7 +210,7 @@ class OverstyringRegelTjenesteTest : DescribeSpec() {
 
                 shouldThrow<RegelException> {
                     overstyring.overstyr(ansattId,
-                        OverstyringData(vanligBrukerId, "Dette er test", TimeExtensions.IMORGEN))
+                        OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
                 }
                 overstyring.erOverstyrt(ansattId, vanligBrukerId) shouldBe false
             }

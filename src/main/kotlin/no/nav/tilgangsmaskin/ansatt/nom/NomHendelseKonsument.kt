@@ -5,14 +5,12 @@ import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 import java.time.LocalDate.EPOCH
 
 @Component
 class NomHendelseKonsument(private val nom: NomTjeneste, private val logger: NomHendelseLogger) {
-    private val log = getLogger(javaClass)
 
     @KafkaListener(
         topics = [NOM_TOPIC],

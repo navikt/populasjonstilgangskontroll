@@ -6,6 +6,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.person.pdl.leesah.Endringstype
+import no.nav.person.pdl.leesah.Endringstype.OPPRETTET
 import no.nav.person.pdl.leesah.Endringstype.entries
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Adressebeskyttelse
@@ -26,11 +27,8 @@ class PdlCacheOpprydderTest : DescribeSpec({
     val client = mockk<CacheClient>()
     val opprydder = PdlCacheOpprydder(pdl, client, PdlCacheTømmerTeller(SimpleMeterRegistry(), token))
 
-    fun hendelse(
-        identer: List<String>,
-        endringstype: Endringstype = Endringstype.OPPRETTET,
-        gradering: Adressebeskyttelse? = null,
-    ) = Personhendelse("hendelse-id", identer, "PDL", Instant.now(), "PDL_HENDELSE", endringstype, null, gradering, null)
+    fun hendelse(identer: List<String>, endringstype: Endringstype = OPPRETTET,
+        gradering: Adressebeskyttelse? = null, ) = Personhendelse("hendelse-id", identer, "PDL", Instant.now(), "PDL_HENDELSE", endringstype, null, gradering, null)
 
     beforeEach {
         every { client.tilNøkkel(any(), any()) } answers { "${firstArg<Any>()}::${secondArg<String>()}" }
@@ -40,10 +38,8 @@ class PdlCacheOpprydderTest : DescribeSpec({
     describe("listen") {
 
         describe("sletting") {
-
             it("sletter fra alle PDL-cacher for alle identer i hendelsen") {
                 opprydder.listen(hendelse(listOf(I1, I2)))
-
                 PDL_CACHES.forEach { cache ->
                     listOf(I1, I2).forEach { id ->
                         verify { client.delete(cache, id) }
@@ -53,7 +49,7 @@ class PdlCacheOpprydderTest : DescribeSpec({
 
             entries.forEach { endringstype ->
                 it("behandler endringstype $endringstype") {
-                    opprydder.listen(hendelse(listOf(I1), endringstype = endringstype))
+                    opprydder.listen(hendelse(listOf(I1), endringstype))
 
                     PDL_CACHES.forEach { cache ->
                         verify { client.delete(cache, I1) }
@@ -89,7 +85,6 @@ class PdlCacheOpprydderTest : DescribeSpec({
 
             it("utfører refresh selv om ingen innslag ble slettet") {
                 opprydder.listen(hendelse(listOf(I1)))
-
                 verify { pdl.medFamilie(I1) }
                 verify { pdl.medUtvidetFamile(I1) }
             }

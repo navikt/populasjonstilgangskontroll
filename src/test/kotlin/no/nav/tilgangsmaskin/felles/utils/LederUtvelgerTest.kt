@@ -36,9 +36,9 @@ class LederUtvelgerTest : DescribeSpec({
             )
         }
         return LederUtvelger(
-            builder = WebClient.builder().exchangeFunction(exchangeFn),
-            uri = URI.create("http://elector/sse"),
-            publisher = publisher
+            WebClient.builder().exchangeFunction(exchangeFn),
+            URI.create("http://elector/sse"),
+            publisher
         )
     }
 

@@ -25,14 +25,14 @@ class OppfølgingHendelseKonsumentTest : DescribeSpec({
         kontor: Kontor? = KONTOR,
         sluttTidspunkt: Instant? = null,
     ) = OppfølgingHendelse(
-        kontor = kontor,
-        sisteEndringsType = type,
-        oppfolgingsperiodeUuid = ID,
-        aktorId = AKTOR_ID,
-        ident = BRUKER_ID,
-        startTidspunkt = START_TIDSPUNKT,
-        sluttTidspunkt = sluttTidspunkt,
-        producerTimestamp = PRODUCER_TIMESTAMP,
+        kontor,
+        type,
+        ID,
+        AKTOR_ID,
+        BRUKER_ID,
+        START_TIDSPUNKT,
+        sluttTidspunkt,
+        PRODUCER_TIMESTAMP,
     )
 
     beforeEach { clearMocks(oppfølging) }

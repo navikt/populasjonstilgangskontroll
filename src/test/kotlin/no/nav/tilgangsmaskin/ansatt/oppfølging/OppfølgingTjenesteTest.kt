@@ -37,7 +37,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
-import java.util.UUID.randomUUID
+import java.util.UUID.*
 
 @DataJpaTest
 @EnableJpaAuditing

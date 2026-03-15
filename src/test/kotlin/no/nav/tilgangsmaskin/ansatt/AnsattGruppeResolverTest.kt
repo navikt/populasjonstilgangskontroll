@@ -13,7 +13,7 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token
-import java.util.UUID
+import java.util.*
 
 class AnsattGruppeResolverTest : DescribeSpec() {
 

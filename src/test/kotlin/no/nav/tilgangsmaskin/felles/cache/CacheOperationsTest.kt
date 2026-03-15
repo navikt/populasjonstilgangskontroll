@@ -7,7 +7,7 @@ import org.awaitility.kotlin.await
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import java.time.Duration
 import java.time.Duration.ofSeconds
-import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.TimeUnit.*
 
 class CacheOperationsTest : AbstractCacheTest() {
 

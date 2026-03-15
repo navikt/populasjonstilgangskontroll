@@ -13,7 +13,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Identer
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 
 class OppfølgingHendelseKonsumentTest : DescribeSpec({
 

@@ -27,7 +27,7 @@ import java.net.InetAddress
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.*
 
 @DataJpaTest
 @EnableJpaAuditing

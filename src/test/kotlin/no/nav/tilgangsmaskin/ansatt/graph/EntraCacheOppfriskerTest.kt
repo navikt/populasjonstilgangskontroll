@@ -13,7 +13,7 @@ import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelElementer
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.regler.motor.OppfriskingTeller
 import java.net.URI
-import java.util.UUID
+import java.util.*
 
 class EntraCacheOppfriskerTest : DescribeSpec({
 

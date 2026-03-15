@@ -23,7 +23,7 @@ import tools.jackson.databind.json.JsonMapper
 import java.net.URI
 import java.time.Duration
 import java.time.Duration.ofSeconds
-import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.TimeUnit.*
 
 class SkjermingerCacheTest : AbstractCacheTest() {
 

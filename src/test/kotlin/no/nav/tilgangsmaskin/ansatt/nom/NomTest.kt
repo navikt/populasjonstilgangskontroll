@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.ansatt.nom
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
-import java.time.LocalDate.EPOCH
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.Companion.ALWAYS
@@ -27,6 +26,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.transaction.annotation.Transactional
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
+import java.time.LocalDate.EPOCH
 import kotlin.test.Test
 
 

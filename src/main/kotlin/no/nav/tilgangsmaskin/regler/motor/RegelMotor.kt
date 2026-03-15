@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.regler.motor
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.avvist
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.ok
@@ -76,6 +77,7 @@ class RegelMotor(
             TELLENDE_REGELTYPE -> komplett.regler.filterIsInstance<TellendeRegel>().let { RegelSett(TELLENDE_REGELTYPE to it) }
         }
 
+    @Generated
     override fun toString() = "${javaClass.simpleName} [kjerneregler=$kjerne,kompletteregler=$komplett]"
 
 }

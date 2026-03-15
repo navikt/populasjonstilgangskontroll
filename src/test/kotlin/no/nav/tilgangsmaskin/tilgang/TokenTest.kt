@@ -16,7 +16,7 @@ import no.nav.tilgangsmaskin.tilgang.Token.Companion.AZP_NAME
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.IDTYP
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.OID
-import java.util.UUID
+import java.util.*
 
 class TokenTest : DescribeSpec({
 

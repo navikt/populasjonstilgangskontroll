@@ -10,7 +10,6 @@ import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.Called
 import io.mockk.every
 import io.mockk.verify
-import java.util.*
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
@@ -21,16 +20,29 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.utils.LocalAuditor
-import no.nav.tilgangsmaskin.regler.motor.*
+import no.nav.tilgangsmaskin.regler.motor.EgneDataRegel
+import no.nav.tilgangsmaskin.regler.motor.FellesBarnRegel
+import no.nav.tilgangsmaskin.regler.motor.ForeldreOgBarnRegel
+import no.nav.tilgangsmaskin.regler.motor.FortroligRegel
+import no.nav.tilgangsmaskin.regler.motor.GeografiskRegel
+import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
+import no.nav.tilgangsmaskin.regler.motor.PartnerRegel
+import no.nav.tilgangsmaskin.regler.motor.Regel
+import no.nav.tilgangsmaskin.regler.motor.RegelException
+import no.nav.tilgangsmaskin.regler.motor.RegelMotor
+import no.nav.tilgangsmaskin.regler.motor.SkjermingRegel
+import no.nav.tilgangsmaskin.regler.motor.StrengtFortroligRegel
+import no.nav.tilgangsmaskin.regler.motor.StrengtFortroligUtlandRegel
+import no.nav.tilgangsmaskin.regler.motor.SøskenRegel
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -40,6 +52,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
+import java.util.*
 
 @Import(RegelTestConfig::class)
 @TestPropertySource(locations = ["classpath:test.properties"])

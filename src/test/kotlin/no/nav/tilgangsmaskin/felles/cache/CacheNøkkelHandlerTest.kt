@@ -8,7 +8,6 @@ import io.mockk.mockk
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import org.springframework.data.redis.cache.RedisCacheConfiguration
-import tools.jackson.module.kotlin.jsonMapper
 
 class CacheNøkkelHandlerTest : DescribeSpec({
     val id = "01011111111"

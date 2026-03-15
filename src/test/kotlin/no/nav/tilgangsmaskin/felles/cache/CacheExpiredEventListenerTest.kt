@@ -3,12 +3,12 @@ package no.nav.tilgangsmaskin.felles.cache
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.doubles.shouldBeExactly
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetEvent
 import no.nav.tilgangsmaskin.regler.motor.CacheOppfriskerTeller
 import no.nav.tilgangsmaskin.tilgang.Token
-import io.mockk.every
 
 class CacheExpiredEventListenerTest : DescribeSpec({
 

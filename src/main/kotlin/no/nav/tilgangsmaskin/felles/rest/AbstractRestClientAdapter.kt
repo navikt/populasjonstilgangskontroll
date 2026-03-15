@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler.Companion.IDENTIFIKATOR
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
@@ -43,6 +44,7 @@ abstract class AbstractRestClientAdapter(
 
     override val pingEndpoint = "${cfg.pingEndpoint}"
     override val isEnabled = cfg.isEnabled
+    @Generated
     override fun toString() = "restClient=$restClient, cfg=$cfg, baseUri=${cfg.baseUri}"
 
 }

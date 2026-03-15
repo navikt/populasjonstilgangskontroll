@@ -1,87 +1,140 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
-import com.ninjasquad.springmockk.MockkBean
-import io.mockk.every
-import io.mockk.junit5.MockKExtension
-import io.mockk.verify
-import java.net.URI
+import ch.qos.logback.classic.Level.INFO
+import ch.qos.logback.classic.Level.WARN
+import ch.qos.logback.classic.Logger
+import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.core.read.ListAppender
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.extensions.ApplyExtension
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.extensions.spring.SpringExtension
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
-import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
+import no.nav.tilgangsmaskin.felles.rest.RetryLogger
+import com.ninjasquad.springmockk.MockkBean
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
-import kotlin.test.Test
+import org.springframework.test.context.TestPropertySource
+import org.springframework.test.web.client.ExpectedCount.times
+import org.springframework.test.web.client.MockRestServiceServer
+import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
+import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
+import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 
-@ContextConfiguration(classes = [SkjermingTjeneste::class])
-@ExtendWith(MockKExtension::class)
+@RestClientTest(components = [SkjermingRestClientAdapter::class, SkjermingClientBeanConfig::class, SkjermingTjeneste::class, RetryLogger::class])
+@EnableConfigurationProperties(SkjermingConfig::class)
 @EnableResilientMethods
-@ActiveProfiles(TEST)
-@SpringBootTest
-internal class SkjermingRetryTest {
+@TestPropertySource(properties = ["skjerming.base-uri=http://skjerming"])
+@ApplyExtension(SpringExtension::class)
+class SkjermingRetryTest : DescribeSpec() {
 
+    @Autowired lateinit var tjeneste: SkjermingTjeneste
+    @Autowired lateinit var server: MockRestServiceServer
+    @Autowired lateinit var cfg: SkjermingConfig
 
-    private val uri = URI.create("https://www.vg.no")
+    @MockkBean lateinit var cache: CacheOperations
 
-    @MockkBean
-    lateinit var adapter: SkjermingRestClientAdapter
+    init {
+        val brukerId = BrukerId("08526835670")
 
-    @MockkBean
-    lateinit var cache: CacheOperations
+        beforeEach { server.reset() }
 
-    @MockkBean
-    lateinit var cf: SkjermingConfig
+        describe("skjerming") {
 
-    @Autowired
-    lateinit var tjeneste: SkjermingTjeneste
+            it("prøver 4 ganger og kaster RecoverableRestException når alle forsøk feiler") {
+                server.expect(times(4), requestTo(cfg.skjermingUri))
+                    .andRespond(withStatus(INTERNAL_SERVER_ERROR))
 
-    @Test
-    @DisplayName("Returner true etter at antall forsøk er oppbrukt")
-    fun feilerEtterFireMislykkedeForsøk() {
-        every { adapter.skjerming(BRUKER.brukerId.verdi) } throws RecoverableRestException(INTERNAL_SERVER_ERROR, uri)
-        assertThrows<RecoverableRestException> {
-            tjeneste.skjerming(BRUKER.brukerId)
+                shouldThrow<RecoverableRestException> {
+                    tjeneste.skjerming(brukerId)
+                }
+
+                server.verify()
+            }
+
+            it("returnerer resultat etter retry når andre forsøk lykkes") {
+                server.expect(times(1), requestTo(cfg.skjermingUri))
+                    .andRespond(withStatus(INTERNAL_SERVER_ERROR))
+                server.expect(times(1), requestTo(cfg.skjermingUri))
+                    .andRespond(withSuccess("false", APPLICATION_JSON))
+
+                tjeneste.skjerming(brukerId) shouldBe false
+
+                server.verify()
+            }
+
+            it("kaster IrrecoverableRestException uten retry") {
+                server.expect(times(1), requestTo(cfg.skjermingUri))
+                    .andRespond(withStatus(NOT_FOUND))
+
+                shouldThrow<IrrecoverableRestException> {
+                    tjeneste.skjerming(brukerId)
+                }
+
+                server.verify()
+            }
         }
-        verify(exactly = 4) {
-            tjeneste.skjerming(BRUKER.brukerId)
+
+        describe("RetryLogger") {
+
+            fun withLogCapture(block: (ListAppender<ILoggingEvent>) -> Unit): List<ILoggingEvent> {
+                val logger = LoggerFactory.getLogger(RetryLogger::class.java) as Logger
+                val appender = ListAppender<ILoggingEvent>().also { it.start() }
+                logger.addAppender(appender)
+                try {
+                    block(appender)
+                } finally {
+                    logger.detachAppender(appender)
+                }
+                return appender.list
+            }
+
+            it("logger WARN for hvert retry-forsøk ved RecoverableRestException") {
+                server.expect(times(4), requestTo(cfg.skjermingUri))
+                    .andRespond(withStatus(INTERNAL_SERVER_ERROR))
+
+                val logs = withLogCapture {
+                    shouldThrow<RecoverableRestException> { tjeneste.skjerming(brukerId) }
+                }
+
+                logs.any { e -> e.level == WARN && e.formattedMessage.contains("skjerming") } shouldBe true
+                server.verify()
+            }
+
+            it("logger WARN abort når alle retry-forsøk er brukt opp") {
+                server.expect(times(4), requestTo(cfg.skjermingUri))
+                    .andRespond(withStatus(INTERNAL_SERVER_ERROR))
+
+                val logs = withLogCapture {
+                    shouldThrow<RecoverableRestException> { tjeneste.skjerming(brukerId) }
+                }
+
+                logs.filter { e -> e.level == WARN }.last().formattedMessage shouldContain "skjerming"
+                server.verify()
+            }
+
+            it("logger INFO for NotFoundRestException uten retry") {
+                server.expect(times(1), requestTo(cfg.skjermingUri))
+                    .andRespond(withStatus(NOT_FOUND))
+
+                val logs = withLogCapture {
+                    shouldThrow<IrrecoverableRestException> { tjeneste.skjerming(brukerId) }
+                }
+
+                logs.any { e -> e.level == INFO && e.formattedMessage.contains("skjerming") } shouldBe true
+                server.verify()
+            }
         }
     }
-
-    @Test
-    @DisplayName("Test retry tar seg inn etter først å ha feilet")
-    fun testRetryOK() {
-        every { adapter.skjerming(BRUKER.brukerId.verdi) } throws RecoverableRestException(INTERNAL_SERVER_ERROR, uri) andThen false
-        assertThat(tjeneste.skjerming(BRUKER.brukerId)).isFalse
-        verify(exactly = 2) {
-            tjeneste.skjerming(BRUKER.brukerId)
-        }
-    }
-
-    @Test
-    @DisplayName("Andre exceptions fører ikke til retry, og kastes umiddlelbart videre")
-    fun andreExceptions() {
-        every { adapter.skjerming(BRUKER.brukerId.verdi) } throws IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri)
-        assertThrows<IrrecoverableRestException> {
-            tjeneste.skjerming(BrukerBuilder(vanligBrukerId).build().brukerId)
-        }
-        verify {
-            tjeneste.skjerming(BRUKER.brukerId)
-        }
-    }
-
-    companion object {
-        private val vanligBrukerId = BrukerId("08526835670")
-        private val BRUKER = BrukerBuilder(vanligBrukerId).build()
-    }
-
 }

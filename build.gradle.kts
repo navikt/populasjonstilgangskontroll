@@ -20,6 +20,7 @@ version = "1.0.1"
 
 plugins {
     val kotlinVersion = "2.3.0"
+    id("jacoco")
     id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
@@ -111,6 +112,7 @@ dependencies {
     testImplementation("org.awaitility:awaitility-kotlin:$awaitilityVersion")
     testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
+    implementation("io.kotest:kotest-extensions-spring:6.1.5")
     testImplementation(kotlin("test"))
 }
 
@@ -145,13 +147,30 @@ java {
 
 tasks.test {
     jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
+  //  jvmArgs("-javaagent:${configurations.jacocoAgent.get().asPath}")
+    jvmArgs("-Dkotlinx.coroutines.debug=off")
     useJUnitPlatform()
 }
 
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
 kotlin {
     jvmToolchain(javaVersion.asInt())
 
     compilerOptions {
         freeCompilerArgs.add("-Xjsr305=strict")
+    }
+}
+tasks.register("printTestClasspath") {
+    doLast {
+        configurations["testRuntimeClasspath"].resolvedConfiguration.resolvedArtifacts
+            .filter { it.name.contains("spring-boot") }
+            .forEach { println(it.file) }
     }
 }

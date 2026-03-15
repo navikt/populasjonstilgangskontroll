@@ -1,194 +1,123 @@
 package no.nav.tilgangsmaskin.regler
 
-import com.ninjasquad.springmockk.MockkBean
-import io.micrometer.core.instrument.MeterRegistry
+import io.kotest.assertions.throwables.shouldNotThrowAny
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.shouldBe
+import io.mockk.MockKAnnotations
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.junit5.MockKExtension
-import no.nav.tilgangsmaskin.TestApp
+import io.mockk.mockk
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
-import no.nav.tilgangsmaskin.bruker.AktørId
-import no.nav.tilgangsmaskin.bruker.Enhetsnummer
-import no.nav.tilgangsmaskin.bruker.Identifikator
-import no.nav.tilgangsmaskin.felles.utils.Auditor
-import no.nav.tilgangsmaskin.regler.motor.*
-import no.nav.tilgangsmaskin.regler.overstyring.*
-import no.nav.tilgangsmaskin.tilgang.RegelConfig
+import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
+import no.nav.tilgangsmaskin.felles.utils.LocalAuditor
+import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
+import no.nav.tilgangsmaskin.regler.motor.BulkResultat
+import no.nav.tilgangsmaskin.regler.motor.Regel
+import no.nav.tilgangsmaskin.regler.motor.RegelException
+import no.nav.tilgangsmaskin.regler.motor.RegelMotor
+import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
-import no.nav.tilgangsmaskin.tilgang.Token
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatCode
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
-import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection
-import org.springframework.context.annotation.Import
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.TestPropertySource
-import org.testcontainers.postgresql.PostgreSQLContainer
-import org.testcontainers.junit.jupiter.Testcontainers
-import kotlin.test.BeforeTest
+import java.net.URI
 
-@Import(RegelTestConfig::class)
-@DataJpaTest
-@EnableJpaAuditing
-@TestPropertySource(locations = ["classpath:test.properties"])
-@EnableConfigurationProperties(value= [RegelConfig::class, GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [TestApp::class, Auditor::class])
-@ExtendWith(MockKExtension::class)
-@AutoConfigureMetrics
-@Testcontainers
-@ActiveProfiles(TEST)
-class RegelTjenesteTest {
+class RegelTjenesteTest : DescribeSpec() {
 
-    private val strengtFortroligAktørId = AktørId("1234567890123")
-    private val strengtFortroligBrukerId = BrukerId("08526835671")
-    private val fortroligBrukerId = BrukerId("08526835672")
-    private val vanligBrukerId = BrukerId("08526835670")
-    private val ansattId = AnsattId("Z999999")
-    private val dnr = BrukerId("12345678910")
-
-    @Autowired
-    private lateinit var registry: MeterRegistry
-    @Autowired
-    private lateinit var repo: OverstyringRepository
-    @MockkBean
-    private lateinit var token: Token
-    @MockkBean
-    private lateinit var oppfølging: OppfølgingTjeneste
-    @MockkBean
-    private lateinit var validator: OverstyringClientValidator
-    @MockkBean
-    private lateinit var proxy: EntraProxyTjeneste
-    @Autowired
-    private lateinit var motor: RegelMotor
     @MockK
-    private lateinit var brukere: BrukerTjeneste
+    lateinit var motor: RegelMotor
     @MockK
-    private lateinit var ansatte: AnsattTjeneste
-    private lateinit var overstyring: OverstyringTjeneste
-    private lateinit var regler: RegelTjeneste
-    private lateinit var evalueringTeller: EvalueringTeller
-    private lateinit var avdød: AvdødTeller
+    lateinit var brukere: BrukerTjeneste
+    @MockK
+    lateinit var ansatte: AnsattTjeneste
+    @MockK
+    lateinit var overstyring: OverstyringTjeneste
 
+    init {
+        val vanligBrukerId = BrukerId("08526835670")
+        val ansattId = AnsattId("Z999999")
 
-    @BeforeTest
-    fun before() {
-        evalueringTeller = EvalueringTeller(registry, token)
-        avdød = AvdødTeller(registry, token)
-        every { validator.validerKonsument() } returns Unit
-        every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
-        every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-        every { oppfølging.enhetFor(Identifikator(vanligBrukerId.verdi)) } returns Enhetsnummer("1234")
-        every { token.system } returns "test"
-        every { token.ansattId } returns ansattId
-        every { token.clusterAndSystem } returns "cluster:test"
-        every { token.systemNavn } returns "test"
-        every { token.erObo } returns false
-        every { token.erCC } returns true
-        overstyring = OverstyringTjeneste(ansatte, brukere, OverstyringJPAAdapter(repo), motor,proxy, validator,OverstyringTeller(registry, token))
-        regler = RegelTjeneste(motor, brukere, ansatte, overstyring)
-    }
+        lateinit var regler: RegelTjeneste
 
-    @Test
-    @DisplayName("Verifiser at sjekk om overstyring gjøres om en regel som er overstyrbar avslår tilgang, og at tilgang gis om overstyring er gjort")
-    fun overstyringOK() {
-        every {
-            brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi)
-        } returns BrukerBuilder(vanligBrukerId).build()
-        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
-        assertThatCode {
-            regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
-        }.doesNotThrowAnyException()
-    }
-
-    @Test
-    @DisplayName("Verifiser at sjekk om overstyring  gjøres om en regel som er overstyrbar avslår tilgang,og at tilgang ikke gis om overstyring ikke er gjort")
-    fun ikkeOverstyrt() {
-        every {
-            brukere.brukerMedNærmesteFamilie(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId.verdi)
-        } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
-        assertThrows<RegelException> {
-            val brukerId = BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build().brukerId
-            regler.kompletteRegler(ansattId, brukerId.verdi)
+        beforeSpec {
+            MockKAnnotations.init(this@RegelTjenesteTest)
         }
-    }
 
-    @Test
-    fun bulkAvvisninger() {
+        beforeEach {
+            clearAllMocks()
+            every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
+            regler = RegelTjeneste(motor, brukere, ansatte, overstyring, LocalAuditor())
+        }
 
-        every {
-            brukere.brukere(setOf(strengtFortroligAktørId.verdi, fortroligBrukerId.verdi))
-        } returns setOf(BrukerBuilder(strengtFortroligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).oppslagId(strengtFortroligAktørId.verdi).aktørId(strengtFortroligAktørId).build(),
-                BrukerBuilder(fortroligBrukerId).kreverMedlemskapI(FORTROLIG).build())
+        describe("bulk") {
 
-        val resultater = regler.bulkRegler(ansattId,
-                    setOf(BrukerIdOgRegelsett(strengtFortroligAktørId.verdi), BrukerIdOgRegelsett(fortroligBrukerId.verdi)))
-        assertThat(resultater.avviste.map { it.brukerId }.containsAll(listOf(strengtFortroligAktørId.verdi,fortroligBrukerId.verdi)))
-        assertThat(resultater.avviste).hasSize(2)
-        assertThat(resultater.godkjente).isEmpty()
-        assertThat(resultater.ukjente).isEmpty()
-    }
-    @Test
-    @DisplayName("Verifiser at et dnr som senere har blitt erstattet med et fnr, ikke avvises")
-    fun dnr() {
-        every {
-            brukere.brukerMedNærmesteFamilie(dnr.verdi)
-        } returns BrukerBuilder(vanligBrukerId).historiske(setOf(dnr)).build()
-        assertThatCode {
-            regler.kompletteRegler(ansattId, dnr.verdi)
-        }.doesNotThrowAnyException()
-    }
-    @Test
-    @DisplayName("Verifiser at et dnr som senere har blitt erstattet med et fnr, ikke avvises i bulk")
-    fun dnrBulk() {
-       every {
-            brukere.brukere(setOf(dnr.verdi))
-        } returns setOf(BrukerBuilder(vanligBrukerId).oppslagId(dnr.verdi).historiske(setOf(dnr)).build())
-        val resultat = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(dnr.verdi)))
-        assertThat(resultat.godkjente.isNotEmpty())
-    }
+            it("avvist bruker havner i godkjente når overstyring er registrert") {
+                val funnetBruker = BrukerBuilder(vanligBrukerId).build()
+                val regelException = RegelException(AnsattBuilder(ansattId).build(), funnetBruker, mockk<Regel>(relaxed = true))
+                every { brukere.brukere(setOf(vanligBrukerId.verdi)) } returns setOf(funnetBruker)
+                every { motor.bulkRegler(any(), any()) } returns setOf(BulkResultat.avvist(funnetBruker, regelException))
+                every { overstyring.overstyringer(any(), any()) } returns listOf(vanligBrukerId)
 
-    @Test
-    fun bulkAvvisningerOverstyrt() {
-        val bruker = BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
-        every {
-            brukere.brukerMedNærmesteFamilie(bruker.oppslagId) } returns  BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).oppslagId(bruker.oppslagId).aktørId(strengtFortroligAktørId).kreverMedlemskapI(UTENLANDSK).build()
-        every {
-            brukere.brukere(setOf(strengtFortroligAktørId.verdi))
-        } returns setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).oppslagId(bruker.oppslagId).aktørId(strengtFortroligAktørId).oppslagId(strengtFortroligAktørId.verdi).kreverMedlemskapI(UTENLANDSK).build())
+                val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
 
-        overstyring.overstyr(ansattId, OverstyringData(
-                BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(
-                    UTENLANDSK).build().brukerId, "Dette er en test", IMORGEN))
-        val resultater  =  regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(strengtFortroligAktørId.verdi)))
+                resultater.godkjente.shouldBe(setOf(resultater.godkjente.single()))
+                resultater.godkjente.single().brukerId shouldBe vanligBrukerId.verdi
+                resultater.avviste.shouldBeEmpty()
+                resultater.ukjente.shouldBeEmpty()
+            }
 
-        assertThat(resultater.avviste.isEmpty())
-        assertThat(resultater.godkjente.isEmpty())
-        assertThat(resultater.godkjente).hasSize(1)
-    }
+            it("avvist bruker havner i avviste når ingen overstyring er registrert") {
+                val funnetBruker = BrukerBuilder(vanligBrukerId).build()
+                val regelException = RegelException(AnsattBuilder(ansattId).build(), funnetBruker, mockk<Regel>(relaxed = true))
+                every { brukere.brukere(setOf(vanligBrukerId.verdi)) } returns setOf(funnetBruker)
+                every { motor.bulkRegler(any(), any()) } returns setOf(BulkResultat.avvist(funnetBruker, regelException))
+                every { overstyring.overstyringer(any(), any()) } returns emptyList()
 
-    companion object {
-        @ServiceConnection
-        private val postgres = PostgreSQLContainer("postgres:18")
+                val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
+
+                resultater.avviste.single().brukerId shouldBe vanligBrukerId.verdi
+                resultater.godkjente.shouldBeEmpty()
+                resultater.ukjente.shouldBeEmpty()
+            }
+
+            it("id som ikke finnes i PDL får tilgang") {
+                val ikkeFunnetId = BrukerId("11111111111")
+                val funnetBruker = BrukerBuilder(vanligBrukerId).build()
+                every { brukere.brukere(setOf(vanligBrukerId.verdi, ikkeFunnetId.verdi)) } returns setOf(funnetBruker)
+                every { motor.bulkRegler(any(), any()) } returns setOf(BulkResultat.ok(funnetBruker))
+                every { overstyring.overstyringer(any(), any()) } returns emptyList()
+
+                val resultater = regler.bulkRegler(ansattId,
+                    setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi), BrukerIdOgRegelsett(ikkeFunnetId.verdi)))
+
+                resultater.godkjente.map { it.brukerId } shouldContainExactlyInAnyOrder
+                    listOf(vanligBrukerId.verdi, ikkeFunnetId.verdi)
+                resultater.avviste.shouldBeEmpty()
+                resultater.ukjente.shouldBeEmpty()
+            }
+        }
+
+        describe("kjerneregler") {
+
+            it("tilgang gis når bruker ikke finnes i PDL") {
+                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } throws
+                    NotFoundRestException(URI.create("http://pdl"))
+
+                shouldNotThrowAny { regler.kjerneregler(ansattId, vanligBrukerId.verdi) }
+            }
+        }
+
+        describe("kompletteRegler") {
+
+            it("tilgang gis når bruker ikke finnes i PDL") {
+                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } throws
+                    NotFoundRestException(URI.create("http://pdl"))
+
+                shouldNotThrowAny { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
+            }
+        }
     }
 }

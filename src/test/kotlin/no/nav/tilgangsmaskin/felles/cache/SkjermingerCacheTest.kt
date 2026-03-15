@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.maps.shouldContainExactly
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
@@ -7,17 +9,13 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetEvent
-import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationListener
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.web.client.MockRestServiceServer.bindTo
 import org.springframework.test.web.client.MockRestServiceServer
+import org.springframework.test.web.client.MockRestServiceServer.bindTo
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.client.RestClient
@@ -41,58 +39,53 @@ class SkjermingerCacheTest : AbstractCacheTest() {
             .disableCachingNullValues()
     )
 
-    @BeforeEach
-    fun setUp() {
-        val restClientBuilder = RestClient.builder().baseUrl("${cfg.baseUri}")
-        mockServer = bindTo(restClientBuilder).build()
-        skjerming = SkjermingTjeneste(SkjermingRestClientAdapter(restClientBuilder.build(), cfg), cache, cfg)
-        IDS.forEach { cache.delete(SKJERMING_CACHE, it) }
-    }
-
-    @Test
-    @DisplayName("Rest kalles kun for cache-misser, treff hentes fra cache")
-    fun restKallesKunForCacheMisser() {
-        putOne(ID1, false)
-        mockServer.expect(requestTo(cfg.skjermingerUri))
-            .andRespond(withSuccess(mapper.writeValueAsString(mapOf(I2 to true)), APPLICATION_JSON))
-
-        assertThat(skjerming.skjerminger(listOf(ID1, ID2))).containsExactlyInAnyOrderEntriesOf(mapOf(ID1 to false, ID2 to true))
-        assertThat(getMany(IDS).keys).containsExactlyInAnyOrderElementsOf(IDS)
-        mockServer.verify()
-    }
-
-    @Test
-    @DisplayName("Rest kalles ikke når alle er i cache")
-    fun restKallesIkkeNårAlleErICache() {
-        putOne(ID1, false)
-        putOne(ID2, true)
-        assertThat(skjerming.skjerminger(listOf(ID1, ID2))).containsExactlyInAnyOrderEntriesOf(mapOf(ID1 to false, ID2 to true))
-        mockServer.verify()
-    }
-
-    @Test
-    @DisplayName("Verifiser at lytteren publiserer en CacheInnslagFjernetEvent når en nøkkel utløper")
-    fun listenerPublisererEventVedUtløp() {
-        val mottatt = mutableListOf<CacheInnslagFjernetEvent>()
-        ctx.addApplicationListener(ApplicationListener<CacheInnslagFjernetEvent> { mottatt.add(it) })
-        putOne(ID1, false)
-        await.atMost(3, SECONDS).until {
-            mottatt.isNotEmpty()
+    init {
+        beforeEach {
+            setUpCache()
+            val restClientBuilder = RestClient.builder().baseUrl("${cfg.baseUri}")
+            mockServer = bindTo(restClientBuilder).build()
+            skjerming = SkjermingTjeneste(SkjermingRestClientAdapter(restClientBuilder.build(), cfg), cache, cfg)
+            IDS.forEach { cache.delete(SKJERMING_CACHE, it) }
         }
-    }
 
-    @Test
-    @DisplayName("Rest kalles igjen etter at en cache-innslag er slettet")
-    fun restKallesIgjenEtterSlettingAvCacheInngang() {
-        putOne(ID1, false)
-        putOne(ID2, true)
-        cache.delete(SKJERMING_CACHE, I2)
-        mockServer.expect(requestTo(cfg.skjermingerUri))
-            .andRespond(withSuccess(mapper.writeValueAsString(mapOf(I2 to true)), APPLICATION_JSON))
+        describe("skjerminger") {
 
-        assertThat(skjerming.skjerminger(listOf(ID1, ID2))).containsExactlyInAnyOrderEntriesOf(mapOf(ID1 to false, ID2 to true))
-        assertThat(getMany(IDS).keys).containsExactlyInAnyOrderElementsOf(IDS)
-        mockServer.verify()
+            it("Rest kalles kun for cache-misser, treff hentes fra cache") {
+                putOne(ID1, false)
+                mockServer.expect(requestTo(cfg.skjermingerUri))
+                    .andRespond(withSuccess(mapper.writeValueAsString(mapOf(I2 to true)), APPLICATION_JSON))
+
+                skjerming.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to false, ID2 to true)
+                getMany(IDS).keys shouldContainExactlyInAnyOrder IDS
+                mockServer.verify()
+            }
+
+            it("Rest kalles ikke når alle er i cache") {
+                putOne(ID1, false)
+                putOne(ID2, true)
+                skjerming.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to false, ID2 to true)
+                mockServer.verify()
+            }
+
+            it("Lytteren publiserer en CacheInnslagFjernetEvent når en nøkkel utløper") {
+                val mottatt = mutableListOf<CacheInnslagFjernetEvent>()
+                ctx.addApplicationListener(ApplicationListener<CacheInnslagFjernetEvent> { mottatt.add(it) })
+                putOne(ID1, false)
+                await.atMost(3, SECONDS).until { mottatt.isNotEmpty() }
+            }
+
+            it("Rest kalles igjen etter at et cache-innslag er slettet") {
+                putOne(ID1, false)
+                putOne(ID2, true)
+                cache.delete(SKJERMING_CACHE, I2)
+                mockServer.expect(requestTo(cfg.skjermingerUri))
+                    .andRespond(withSuccess(mapper.writeValueAsString(mapOf(I2 to true)), APPLICATION_JSON))
+
+                skjerming.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to false, ID2 to true)
+                getMany(IDS).keys shouldContainExactlyInAnyOrder IDS
+                mockServer.verify()
+            }
+        }
     }
 
     private fun putOne(brukerId: BrukerId, skjermet: Boolean, duration: Duration = ofSeconds(1)) =

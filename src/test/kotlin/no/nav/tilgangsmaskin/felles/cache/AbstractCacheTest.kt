@@ -3,20 +3,18 @@ package no.nav.tilgangsmaskin.felles.cache
 import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
 import com.redis.testcontainers.RedisContainer.DEFAULT_IMAGE_NAME
+import io.kotest.core.extensions.ApplyExtension
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.extensions.spring.SpringExtension
 import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisClient.create
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
-import io.mockk.junit5.MockKExtension
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import no.nav.tilgangsmaskin.tilgang.Token
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration
@@ -35,10 +33,9 @@ import java.time.Duration.ofSeconds
 @ContextConfiguration(classes = [TestApp::class])
 @Testcontainers
 @AutoConfigureMetrics
-@TestInstance(PER_CLASS)
-@ExtendWith(MockKExtension::class)
 @Import(JacksonAutoConfiguration::class)
-abstract class AbstractCacheTest {
+@ApplyExtension(SpringExtension::class)
+abstract class AbstractCacheTest : DescribeSpec() {
 
     @Autowired
     protected lateinit var ctx: ConfigurableApplicationContext
@@ -55,8 +52,7 @@ abstract class AbstractCacheTest {
     protected lateinit var cache: CacheOperations
     protected lateinit var redisClient: RedisClient
 
-    @BeforeEach
-    fun setUpCache() {
+    protected fun setUpCache() {
         every { token.system } returns "test"
         every { token.clusterAndSystem } returns "test:dev-gcp"
 
@@ -82,14 +78,11 @@ abstract class AbstractCacheTest {
     protected companion object {
         @ServiceConnection
         val redis = RedisContainer(DEFAULT_IMAGE_NAME)
-        protected const val I1 = "03508331575"
-        protected const val I2 = "20478606614"
-        @JvmStatic
-        protected val IDS = setOf(I1, I2)
-        @JvmStatic
-        protected val ID1 = BrukerId(I1)
-        @JvmStatic
-        protected val ID2 = BrukerId(I2)
+        const val I1 = "03508331575"
+        const val I2 = "20478606614"
+        val IDS = setOf(I1, I2)
+        val ID1 = BrukerId(I1)
+        val ID2 = BrukerId(I2)
     }
 }
 

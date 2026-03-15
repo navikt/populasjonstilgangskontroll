@@ -1,135 +1,131 @@
 package no.nav.tilgangsmaskin.regler.overstyring
 
 import com.ninjasquad.springmockk.MockkBean
+import io.kotest.core.extensions.ApplyExtension
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.extensions.spring.SpringExtension
+import io.kotest.matchers.shouldBe
 import io.micrometer.core.instrument.MeterRegistry
+import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.junit5.MockKExtension
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
-import no.nav.tilgangsmaskin.felles.utils.Auditor
+import no.nav.tilgangsmaskin.felles.utils.LocalAuditor
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.motor.EvalueringTeller
-import no.nav.tilgangsmaskin.regler.motor.EvalueringTypeTeller
+import no.nav.tilgangsmaskin.regler.RegelTestConfig
+import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
 import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
-import no.nav.tilgangsmaskin.regler.motor.RegelBeanConfig
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.regler.motor.RegelMotorLogger
-import no.nav.tilgangsmaskin.tilgang.RegelConfig
 import no.nav.tilgangsmaskin.tilgang.Token
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
+import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.TestPropertySource
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
-import kotlin.test.BeforeTest
-import kotlin.test.Test
 
+@Import(RegelTestConfig::class)
 @DataJpaTest
-@EnableConfigurationProperties(RegelConfig::class)
-@ContextConfiguration(classes = [RegelMotor::class, Auditor::class,RegelMotorLogger::class, EvalueringTypeTeller::class, EvalueringTeller::class, OverstyringJPAAdapter::class, RegelBeanConfig::class, TestApp::class])
-@ExtendWith(MockKExtension::class)
 @EnableJpaAuditing
 @ActiveProfiles(TEST)
 @Testcontainers
 @AutoConfigureMetrics
-internal class OverstyringTest {
+@TestPropertySource(locations = ["classpath:test.properties"])
+@EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
+@ContextConfiguration(classes = [TestApp::class, LocalAuditor::class,OverstyringJPAAdapter::class])
+@ApplyExtension(SpringExtension::class)
+internal class OverstyringTest : DescribeSpec() {
 
     private val vanligBrukerId = BrukerId("08526835670")
     private val ansattId = AnsattId("Z999999")
     private val historiskBrukerId = BrukerId("11111111111")
 
-    @MockkBean
-    private lateinit var validator: OverstyringClientValidator
-    @Autowired
-    private lateinit var motor: RegelMotor
+    @MockkBean lateinit var validator: OverstyringClientValidator
+    @MockkBean lateinit var proxy: EntraProxyTjeneste
+    @MockkBean lateinit var token: Token
+    @MockkBean lateinit var oppfølging: OppfølgingTjeneste
+    @Autowired lateinit var motor: RegelMotor
+    @Autowired lateinit var registry: MeterRegistry
+    @Autowired lateinit var adapter: OverstyringJPAAdapter
+    @MockK lateinit var ansatte: AnsattTjeneste
+    @MockK lateinit var brukere: BrukerTjeneste
 
-    @Autowired
-    private lateinit var registry: MeterRegistry
+    init {
+        lateinit var overstyring: OverstyringTjeneste
 
-    @MockkBean
-    private lateinit var proxy: EntraProxyTjeneste
-    @MockkBean
-    private lateinit var token: Token
+        beforeSpec {
+            MockKAnnotations.init(this@OverstyringTest)
+        }
 
-    @MockK
-    private lateinit var ansatte: AnsattTjeneste
+        beforeEach {
+            every { validator.validerKonsument() } returns Unit
+            every { token.erObo } returns false
+            every { token.erCC } returns true
+            every { token.system } returns "test"
+            every { token.ansattId } returns ansattId
+            every { token.systemNavn } returns "test"
+            every { token.clusterAndSystem } returns "cluster:test"
+            every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
+            every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
+            overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, proxy, validator, OverstyringTeller(registry, token))
+        }
 
-    @MockK
-    private lateinit var brukere: BrukerTjeneste
+        describe("erOverstyrt") {
 
-    @Autowired
-    private lateinit var adapter: OverstyringJPAAdapter
+            it("gyldig overstyring via historisk ident") {
+                val brukerMedHistorikk = BrukerBuilder(vanligBrukerId).historiske(setOf(historiskBrukerId)).build()
+                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns brukerMedHistorikk
+                every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns BrukerBuilder(historiskBrukerId).build()
 
-    private lateinit var overstyring: OverstyringTjeneste
+                overstyring.overstyr(ansattId, OverstyringData(historiskBrukerId, "Dette er en test", IMORGEN))
 
-    @BeforeTest
-    fun setup() {
-        every { validator.validerKonsument() } returns Unit
-        every { token.erObo } returns false
-        every { token.erCC } returns true
-        every { token.system } returns "test"
-        every { token.ansattId } returns ansattId
-        every { token.systemNavn } returns "test"
-        every { token.clusterAndSystem } returns "cluster:test"
-        every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
-        every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-        overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, proxy,validator,OverstyringTeller(registry, token))
-    }
+                overstyring.erOverstyrt(ansattId, BrukerBuilder(vanligBrukerId).build().brukerId) shouldBe true
+            }
 
-    @Test
-    @DisplayName("Gyldig overstyring via historisk ident")
-    fun testOverstyringGyldigHistorisk() {
-        val brukerMedHistorikk = BrukerBuilder(vanligBrukerId).historiske(setOf(historiskBrukerId)).build()
-        every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns brukerMedHistorikk
-        every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns BrukerBuilder(historiskBrukerId).build()
-        overstyring.overstyr(ansattId, OverstyringData(historiskBrukerId, "Dette er en test", IMORGEN))
-        assertThat(overstyring.erOverstyrt(ansattId, BrukerBuilder(vanligBrukerId).build().brukerId)).isTrue
-    }
+            it("nyeste overstyring gjelder når det finnes flere") {
+                val bruker = BrukerBuilder(vanligBrukerId).build()
+                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
 
-    @Test
-    @DisplayName("Gyldig overstyring")
-    fun testOverstyringGyldig() {
-        val bruker = BrukerBuilder(vanligBrukerId).build()
-        every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-        overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er gammel", IGÅR))
-        overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er ny", IMORGEN))
-        assertThat(overstyring.erOverstyrt(ansattId, bruker.brukerId)).isTrue
-    }
+                overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er gammel", IGÅR))
+                overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er ny", IMORGEN))
 
-    @Test
-    @DisplayName("Utgått overstyring")
-    fun testOverstyringUtgått() {
-        val bruker = BrukerBuilder(vanligBrukerId).build()
-        every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-        overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er ny", IGÅR))
-        assertThat(overstyring.erOverstyrt(ansattId, bruker.brukerId)).isFalse
-    }
+                overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe true
+            }
 
-    @Test
-    @DisplayName("Overstyring uten db innslag")
-    fun testOverstyringUtenDBInnslag() {
-        val bruker = BrukerBuilder(vanligBrukerId).build()
-        every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-        assertThat(overstyring.erOverstyrt(ansattId, bruker.brukerId)).isFalse
+            it("utgått overstyring gir ikke tilgang") {
+                val bruker = BrukerBuilder(vanligBrukerId).build()
+                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+
+                overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er utgått", IGÅR))
+
+                overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe false
+            }
+
+            it("returnerer false når ingen overstyring er registrert") {
+                val bruker = BrukerBuilder(vanligBrukerId).build()
+                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+
+                overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe false
+            }
+        }
     }
 
     companion object {

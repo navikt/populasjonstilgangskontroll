@@ -15,7 +15,6 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.OVERSTYRBAR_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.TELLENDE_REGELTYPE
-import no.nav.tilgangsmaskin.tilgang.RegelConfig
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.FORBIDDEN
@@ -26,8 +25,6 @@ import org.springframework.stereotype.Component
 class RegelMotor(
     @param:Qualifier(KJERNE) private val kjerne: RegelSett,
     @param:Qualifier(KOMPLETT) private val komplett: RegelSett,
-
-    private val cfg: RegelConfig,
     private val logger: RegelMotorLogger) {
 
     @WithSpan
@@ -39,10 +36,6 @@ class RegelMotor(
     @WithSpan
     private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett,type: EvalueringType) {
         regelSett.regler.forEach { regel ->
-            if (!cfg.isEnabled(regel.navn)) {
-                logger.trace("Regel ${regel.navn} er deaktivert, hopper over evaluering.")
-                return@forEach
-            }
             if (!regel.evaluer(ansatt, bruker)) {
                 logger.avvist(ansatt, bruker, regelSett, regel,type)
                 throw RegelException(ansatt, bruker, regel)

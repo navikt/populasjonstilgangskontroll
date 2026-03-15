@@ -6,7 +6,6 @@ import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
-import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
@@ -32,7 +31,7 @@ class RegelTjeneste(
     private val brukerTjeneste: BrukerTjeneste,
     private val ansattTjeneste: AnsattTjeneste,
     private val overstyringTjeneste: OverstyringTjeneste,
-    private val auditor: Auditor = Auditor()) {
+    private val auditor: Auditor) {
     private val log = getLogger(javaClass)
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "komplett"])

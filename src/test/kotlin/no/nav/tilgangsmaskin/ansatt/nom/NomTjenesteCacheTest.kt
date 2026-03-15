@@ -1,12 +1,10 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import com.ninjasquad.springmockk.MockkBean
-import com.ninjasquad.springmockk.MockkSpyBean
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
-import io.mockk.verify
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
@@ -33,6 +31,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
 import java.time.LocalDate
+import java.time.LocalDate.now
 
 @DataJpaTest
 @ActiveProfiles(ClusterConstants.TEST)
@@ -51,20 +50,12 @@ class NomTjenesteCacheTest : DescribeSpec() {
         fun cacheOperations(cacheManager: CacheManager): CacheOperations = ConcurrentMapCacheOperations(cacheManager)
     }
 
-    @MockkBean
-    private lateinit var token: Token
-    @MockkSpyBean
-    private lateinit var adapter: NomJPAAdapter
+    @MockkBean private lateinit var token: Token
 
-    @Autowired
-    private lateinit var tjeneste: NomTjeneste
-    @Autowired
-    private lateinit var repo: NomRepository
-    @Autowired
-    @Qualifier("cacheOperations")
-    private lateinit var cache: CacheOperations
-    @Autowired
-    lateinit var cacheManager: CacheManager
+    @Autowired private lateinit var tjeneste: NomTjeneste
+    @Autowired private lateinit var repo: NomRepository
+    @Autowired @Qualifier("cacheOperations") private lateinit var cache: CacheOperations
+    @Autowired private lateinit var cacheManager: CacheManager
 
     companion object {
         @ServiceConnection
@@ -83,7 +74,7 @@ class NomTjenesteCacheTest : DescribeSpec() {
         describe("fnrForAnsatt — cache") {
 
             it("populerer cache fra databasen ved første oppslag") {
-                adapter.upsert(NomAnsattData(ansattId, brukerId, NomAnsattPeriode(LocalDate.now(), LocalDate.now().plusYears(1))))
+                tjeneste.lagre(NomAnsattData(ansattId, brukerId, NomAnsattPeriode(now(), now().plusYears(1))))
 
                 tjeneste.fnrForAnsatt(ansattId)
 
@@ -92,7 +83,7 @@ class NomTjenesteCacheTest : DescribeSpec() {
 
             it("returnerer cachet verdi ved andre oppslag") {
                 val id = AnsattId("Z100010")
-                adapter.upsert(NomAnsattData(id, brukerId, NomAnsattPeriode(LocalDate.now(), LocalDate.now().plusYears(1))))
+                tjeneste.lagre(NomAnsattData(id, brukerId, NomAnsattPeriode(now(), now().plusYears(1))))
 
                 val first = tjeneste.fnrForAnsatt(id)
                 val second = tjeneste.fnrForAnsatt(id)
@@ -115,8 +106,8 @@ class NomTjenesteCacheTest : DescribeSpec() {
             it("ulike ansattId-er cachet separat") {
                 val annenAnsattId = AnsattId("Z888888")
                 val annenBrukerId = BrukerId("20478606614")
-                adapter.upsert(NomAnsattData(ansattId, brukerId, NomAnsattPeriode(LocalDate.now(), LocalDate.now().plusYears(1))))
-                adapter.upsert(NomAnsattData(annenAnsattId, annenBrukerId, NomAnsattPeriode(LocalDate.now(), LocalDate.now().plusYears(1))))
+                tjeneste.lagre(NomAnsattData(ansattId, brukerId, NomAnsattPeriode(now(), now().plusYears(1))))
+                tjeneste.lagre(NomAnsattData(annenAnsattId, annenBrukerId, NomAnsattPeriode(now(), now().plusYears(1))))
 
                 tjeneste.fnrForAnsatt(ansattId)
                 tjeneste.fnrForAnsatt(annenAnsattId)
@@ -126,11 +117,11 @@ class NomTjenesteCacheTest : DescribeSpec() {
             }
 
             it("evicts cache ved upsert") {
-                adapter.upsert(NomAnsattData(ansattId, brukerId, NomAnsattPeriode(LocalDate.now(), LocalDate.now().plusYears(1))))
+                tjeneste.lagre(NomAnsattData(ansattId, brukerId, NomAnsattPeriode(now(), now().plusYears(1))))
                 tjeneste.fnrForAnsatt(ansattId) // populate cache
 
                 val nyBrukerId = BrukerId("20478606614")
-                adapter.upsert(NomAnsattData(ansattId, nyBrukerId, NomAnsattPeriode(LocalDate.now(), LocalDate.now().plusYears(1))))
+                tjeneste.lagre(NomAnsattData(ansattId, nyBrukerId, NomAnsattPeriode(now(), now().plusYears(1))))
 
                 cache.getOne(NOM_CACHE, ansattId.verdi, BrukerId::class) shouldBe null
             }

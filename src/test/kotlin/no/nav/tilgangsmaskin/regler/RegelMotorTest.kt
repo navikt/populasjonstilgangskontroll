@@ -29,6 +29,7 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.Identifikator
+import no.nav.tilgangsmaskin.felles.utils.DevAuditor
 import no.nav.tilgangsmaskin.regler.motor.*
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
@@ -44,7 +45,7 @@ import org.springframework.test.context.TestPropertySource
 @TestPropertySource(locations = ["classpath:test.properties"])
 @AutoConfigureMetrics
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [RegelTestConfig::class])
+@ContextConfiguration(classes = [RegelTestConfig::class, DevAuditor::class])
 @ApplyExtension(SpringExtension::class)
 class RegelMotorTest : DescribeSpec() {
 

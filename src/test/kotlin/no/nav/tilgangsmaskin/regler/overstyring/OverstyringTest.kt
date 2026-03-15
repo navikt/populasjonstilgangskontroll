@@ -18,6 +18,7 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
+import no.nav.tilgangsmaskin.felles.utils.DevAuditor
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
@@ -49,7 +50,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 @AutoConfigureMetrics
 @TestPropertySource(locations = ["classpath:test.properties"])
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [TestApp::class, OverstyringJPAAdapter::class])
+@ContextConfiguration(classes = [TestApp::class, DevAuditor::class,OverstyringJPAAdapter::class])
 @ApplyExtension(SpringExtension::class)
 internal class OverstyringTest : DescribeSpec() {
 

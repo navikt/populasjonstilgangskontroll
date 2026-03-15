@@ -29,7 +29,7 @@ interface TellendeRegel : Regel {
 
 @Component
 @Order(LOWEST_PRECEDENCE - 3)
-class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: EntraProxyTjeneste, private val auditor: Auditor = Auditor()) : TellendeRegel {
+class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: EntraProxyTjeneste, private val auditor: Auditor) : TellendeRegel {
 
     override val skalTelle = { _: Ansatt, bruker: Bruker -> bruker.dødsdato != null }
 

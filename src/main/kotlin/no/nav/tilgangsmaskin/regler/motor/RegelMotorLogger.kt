@@ -18,7 +18,7 @@ import org.slf4j.MDC
 import org.springframework.stereotype.Component
 
 @Component
-class RegelMotorLogger(private val registry: MeterRegistry, private val token: Token, private val teller: EvalueringTypeTeller, private val auditor: Auditor = Auditor()) {
+class RegelMotorLogger(private val registry: MeterRegistry, private val token: Token, private val teller: EvalueringTypeTeller, private val auditor: Auditor) {
 
     private val log = getLogger(javaClass)
 

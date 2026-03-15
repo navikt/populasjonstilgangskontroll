@@ -101,13 +101,38 @@ class TokenTest : DescribeSpec({
     }
 
     describe("systemNavn") {
-        it("returnerer siste del av azp_name") {
+        it("returnerer siste del av azp_name når tre deler") {
             every { claims.getStringClaim(AZP_NAME) } returns "dev-gcp:team:app"
             token.systemNavn shouldBe "app"
         }
+
+        it("returnerer azp_name uendret når én del uten kolon") {
+            every { claims.getStringClaim(AZP_NAME) } returns "app"
+            token.systemNavn shouldBe "app"
+        }
+
+        it("returnerer UTILGJENGELIG når azp_name mangler") {
+            token.systemNavn shouldBe UTILGJENGELIG
+        }
     }
 
-        describe("systemAndNs") {
+    describe("cluster") {
+        it("returnerer første del av azp_name når tre deler") {
+            every { claims.getStringClaim(AZP_NAME) } returns "dev-gcp:team:app"
+            token.cluster shouldBe "dev-gcp"
+        }
+
+        it("returnerer azp_name uendret når én del uten kolon") {
+            every { claims.getStringClaim(AZP_NAME) } returns "app"
+            token.cluster shouldBe "app"
+        }
+
+        it("returnerer UTILGJENGELIG når azp_name mangler") {
+            token.cluster shouldBe UTILGJENGELIG
+        }
+    }
+
+    describe("systemAndNs") {
         it("returnerer namespace:app når azp_name er cluster:namespace:app") {
             every { claims.getStringClaim(AZP_NAME) } returns "dev-gcp:team:app"
             token.systemAndNs shouldBe "team:app"
@@ -128,12 +153,6 @@ class TokenTest : DescribeSpec({
         }
     }
 
-    describe("cluster") {
-        it("returnerer første del av azp_name") {
-            every { claims.getStringClaim(AZP_NAME) } returns "dev-gcp:team:app"
-            token.cluster shouldBe "dev-gcp"
-        }
-    }
 
     describe("clusterAndSystem") {
         it("returnerer 'app:cluster' når azp_name har tre deler") {

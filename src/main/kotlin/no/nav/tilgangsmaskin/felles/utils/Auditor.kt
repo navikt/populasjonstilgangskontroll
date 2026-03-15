@@ -18,7 +18,7 @@ class SecureAuditor : AbstractAuditor(AUDIT_LOGGER_NAME) {
 class LocalAuditor : AbstractAuditor(LocalAuditor::class.java.simpleName)
 
 abstract class AbstractAuditor(loggerName: String) : Auditor {
-    val logger = getLogger(loggerName)
+    private val logger = getLogger(loggerName)
     override fun info(message: String,t: Throwable?) = logger.info(message,t)
 }
 

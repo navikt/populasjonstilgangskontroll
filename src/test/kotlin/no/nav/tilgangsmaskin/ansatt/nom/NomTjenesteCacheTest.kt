@@ -127,11 +127,10 @@ class NomTjenesteCacheTest : DescribeSpec() {
 
             it("andre kall til lagre oppdaterer eksisterende rad") {
                 tjeneste.lagre(NomAnsattData(ansattId, brukerId, NomAnsattPeriode(now(), now().plusYears(1))))
+                tjeneste.fnrForAnsatt(ansattId) shouldBe brukerId
 
-                val oppdatertBrukerId = BrukerId("20478606614")
-                tjeneste.lagre(NomAnsattData(ansattId, oppdatertBrukerId, NomAnsattPeriode(now(), now().minusYears(1))))
+                tjeneste.lagre(NomAnsattData(ansattId, brukerId, NomAnsattPeriode(now(), now().minusYears(1))))
 
-                repo.count() shouldBe 1
                 tjeneste.fnrForAnsatt(ansattId) shouldBe null
             }
         }

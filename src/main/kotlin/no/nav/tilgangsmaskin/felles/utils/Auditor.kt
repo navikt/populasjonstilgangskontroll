@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.annotation.Fallback
 import org.springframework.stereotype.Component
 
-@Component
 @ConditionalOnGCP
 class SecureAuditor : AbstractAuditor(AUDIT_LOGGER_NAME) {
     private companion object {

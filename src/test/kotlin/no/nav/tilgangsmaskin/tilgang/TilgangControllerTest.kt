@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
 import java.time.LocalDate
 import org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
 
 class TilgangControllerTest : DescribeSpec() {
 
@@ -47,6 +48,7 @@ class TilgangControllerTest : DescribeSpec() {
         beforeEach {
             clearAllMocks()
             mockMvc = standaloneSetup(TilgangController(regelTjeneste, overstyringTjeneste, token, teller))
+                .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
                 .build()
             justRun { teller.tell(any<Tags>()) }
         }
@@ -358,6 +360,45 @@ class TilgangControllerTest : DescribeSpec() {
                     content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
                 }.andExpect {
                     status { isForbidden() }
+                }
+            }
+
+            it("returnerer 400 ved for kort begrunnelse") {
+                mockMvc.post("/api/v1/overstyr") {
+                    contentType = APPLICATION_JSON
+                    content = """{"brukerId":"$brukerId","begrunnelse":"For kort","gyldigtil":"$gyldigTil"}"""
+                }.andExpect {
+                    status { isBadRequest() }
+                }
+            }
+
+            it("returnerer 400 ved for lang begrunnelse") {
+                val langBegrunnelse = "x".repeat(401)
+                mockMvc.post("/api/v1/overstyr") {
+                    contentType = APPLICATION_JSON
+                    content = """{"brukerId":"$brukerId","begrunnelse":"$langBegrunnelse","gyldigtil":"$gyldigTil"}"""
+                }.andExpect {
+                    status { isBadRequest() }
+                }
+            }
+
+            it("returnerer 400 ved gyldigtil i fortiden") {
+                val fortid = LocalDate.now().minusDays(1)
+                mockMvc.post("/api/v1/overstyr") {
+                    contentType = APPLICATION_JSON
+                    content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$fortid"}"""
+                }.andExpect {
+                    status { isBadRequest() }
+                }
+            }
+
+            it("returnerer 400 ved gyldigtil mer enn 3 måneder frem i tid") {
+                val forLangtFremITid = LocalDate.now().plusMonths(4)
+                mockMvc.post("/api/v1/overstyr") {
+                    contentType = APPLICATION_JSON
+                    content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$forLangtFremITid"}"""
+                }.andExpect {
+                    status { isBadRequest() }
                 }
             }
         }

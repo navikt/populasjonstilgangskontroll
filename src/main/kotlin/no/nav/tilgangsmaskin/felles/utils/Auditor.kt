@@ -15,17 +15,14 @@ class SecureAuditor : AbstractAuditor(AUDIT_LOGGER_NAME) {
 
 @Fallback
 @Component
-class DevAuditor : AbstractAuditor(DevAuditor::class.java.simpleName)
+class LocalAuditor : AbstractAuditor(LocalAuditor::class.java.simpleName)
 
 abstract class AbstractAuditor(loggerName: String) : Auditor {
-    protected val logger = getLogger(loggerName)
-    override fun trace(message: String,t: Throwable?) = logger.trace(message,t)
-    override fun warn(message: String, t: Throwable?) = logger.warn(message, t)
+    val logger = getLogger(loggerName)
     override fun info(message: String,t: Throwable?) = logger.info(message,t)
 }
 
+@FunctionalInterface
 interface Auditor {
-    fun trace(message: String, t: Throwable? = null)
-    fun warn(message: String, t: Throwable? = null)
     fun info(message: String, t: Throwable? = null)
 }

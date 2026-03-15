@@ -15,7 +15,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
-import no.nav.tilgangsmaskin.felles.utils.DevAuditor
+import no.nav.tilgangsmaskin.felles.utils.LocalAuditor
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat
 import no.nav.tilgangsmaskin.regler.motor.Regel
@@ -49,7 +49,7 @@ class RegelTjenesteTest : DescribeSpec() {
         beforeEach {
             clearAllMocks()
             every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-            regler = RegelTjeneste(motor, brukere, ansatte, overstyring, DevAuditor())
+            regler = RegelTjeneste(motor, brukere, ansatte, overstyring, LocalAuditor())
         }
 
         describe("bulk") {

@@ -26,7 +26,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.Identifikator
-import no.nav.tilgangsmaskin.felles.utils.DevAuditor
+import no.nav.tilgangsmaskin.felles.utils.LocalAuditor
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
@@ -57,7 +57,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 @EnableJpaAuditing
 @TestPropertySource(locations = ["classpath:test.properties"])
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [TestApp::class,DevAuditor::class])
+@ContextConfiguration(classes = [TestApp::class,LocalAuditor::class])
 @AutoConfigureMetrics
 @Testcontainers
 @ActiveProfiles(ClusterConstants.TEST)
@@ -111,7 +111,7 @@ class OverstyringRegelTjenesteTest : DescribeSpec() {
             every { token.erCC } returns true
             overstyring = OverstyringTjeneste(ansatte, brukere, OverstyringJPAAdapter(repo), motor, proxy, validator,
                 OverstyringTeller(registry, token))
-            regler = RegelTjeneste(motor, brukere, ansatte, overstyring, DevAuditor())
+            regler = RegelTjeneste(motor, brukere, ansatte, overstyring, LocalAuditor())
         }
 
         describe("bulk") {

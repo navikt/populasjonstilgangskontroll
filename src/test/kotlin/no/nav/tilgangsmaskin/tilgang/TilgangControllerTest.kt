@@ -349,16 +349,15 @@ class TilgangControllerTest : DescribeSpec() {
                 }
             }
 
-            it("returnerer 202 også for CCF-token") {
+            it("returnerer 403 ved CCF-token") {
                 every { token.erCC } returns true
                 every { token.erObo } returns false
-                every { overstyringTjeneste.overstyr(ansattId, any()) } returns true
 
                 mockMvc.post("/api/v1/overstyr") {
                     contentType = APPLICATION_JSON
                     content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
                 }.andExpect {
-                    status { isAccepted() }
+                    status { isForbidden() }
                 }
             }
         }

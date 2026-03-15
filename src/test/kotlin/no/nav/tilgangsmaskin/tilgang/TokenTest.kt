@@ -11,6 +11,11 @@ import no.nav.security.token.support.core.jwt.JwtTokenClaims
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
+import no.nav.tilgangsmaskin.tilgang.Token.Companion.APP
+import no.nav.tilgangsmaskin.tilgang.Token.Companion.AZP_NAME
+import no.nav.tilgangsmaskin.tilgang.Token.Companion.IDTYP
+import no.nav.tilgangsmaskin.tilgang.Token.Companion.NAVIDENT
+import no.nav.tilgangsmaskin.tilgang.Token.Companion.OID
 import java.util.UUID
 
 class TokenTest : DescribeSpec({
@@ -31,12 +36,12 @@ class TokenTest : DescribeSpec({
 
     describe("erCC") {
         it("er true når idtyp er 'app'") {
-            every { claims.getStringClaim("idtyp") } returns "app"
+            every { claims.getStringClaim(IDTYP) } returns APP
             token.erCC shouldBe true
         }
 
         it("er false når idtyp ikke er 'app'") {
-            every { claims.getStringClaim("idtyp") } returns "user"
+            every { claims.getStringClaim(IDTYP) } returns "user"
             token.erCC shouldBe false
         }
 
@@ -47,13 +52,13 @@ class TokenTest : DescribeSpec({
 
     describe("erObo") {
         it("er true når oid finnes og idtyp ikke er 'app'") {
-            every { claims.getStringClaim("oid") } returns oid.toString()
+            every { claims.getStringClaim(OID) } returns oid.toString()
             token.erObo shouldBe true
         }
 
         it("er false når token er CC (idtyp=app)") {
-            every { claims.getStringClaim("idtyp") } returns "app"
-            every { claims.getStringClaim("oid") } returns oid.toString()
+            every { claims.getStringClaim(IDTYP) } returns APP
+            every { claims.getStringClaim(OID) } returns oid.toString()
             token.erObo shouldBe false
         }
 
@@ -64,7 +69,7 @@ class TokenTest : DescribeSpec({
 
     describe("ansattId") {
         it("returnerer AnsattId når NAVident finnes") {
-            every { claims.getStringClaim("NAVident") } returns "Z999999"
+            every { claims.getStringClaim(NAVIDENT) } returns "Z999999"
             token.ansattId shouldBe AnsattId("Z999999")
         }
 
@@ -75,7 +80,7 @@ class TokenTest : DescribeSpec({
 
     describe("oid") {
         it("returnerer UUID når oid finnes") {
-            every { claims.getStringClaim("oid") } returns oid.toString()
+            every { claims.getStringClaim(OID) } returns oid.toString()
             token.oid shouldBe oid
         }
 
@@ -86,7 +91,7 @@ class TokenTest : DescribeSpec({
 
     describe("system") {
         it("returnerer azp_name når den finnes") {
-            every { claims.getStringClaim("azp_name") } returns "dev-gcp:team:app"
+            every { claims.getStringClaim(AZP_NAME) } returns "dev-gcp:team:app"
             token.system shouldBe "dev-gcp:team:app"
         }
 
@@ -97,26 +102,47 @@ class TokenTest : DescribeSpec({
 
     describe("systemNavn") {
         it("returnerer siste del av azp_name") {
-            every { claims.getStringClaim("azp_name") } returns "dev-gcp:team:app"
+            every { claims.getStringClaim(AZP_NAME) } returns "dev-gcp:team:app"
             token.systemNavn shouldBe "app"
+        }
+    }
+
+        describe("systemAndNs") {
+        it("returnerer namespace:app når azp_name er cluster:namespace:app") {
+            every { claims.getStringClaim(AZP_NAME) } returns "dev-gcp:team:app"
+            token.systemAndNs shouldBe "team:app"
+        }
+
+        it("returnerer tom streng når azp_name er et enkelt ord uten kolon") {
+            every { claims.getStringClaim(AZP_NAME) } returns "app"
+            token.systemAndNs shouldBe ""
+        }
+
+        it("returnerer app når azp_name har to deler") {
+            every { claims.getStringClaim(AZP_NAME) } returns "dev-gcp:app"
+            token.systemAndNs shouldBe "app"
+        }
+
+        it("returnerer tom streng når azp_name mangler") {
+            token.systemAndNs shouldBe ""
         }
     }
 
     describe("cluster") {
         it("returnerer første del av azp_name") {
-            every { claims.getStringClaim("azp_name") } returns "dev-gcp:team:app"
+            every { claims.getStringClaim(AZP_NAME) } returns "dev-gcp:team:app"
             token.cluster shouldBe "dev-gcp"
         }
     }
 
     describe("clusterAndSystem") {
         it("returnerer 'app:cluster' når azp_name har tre deler") {
-            every { claims.getStringClaim("azp_name") } returns "dev-gcp:team:app"
+            every { claims.getStringClaim(AZP_NAME) } returns "dev-gcp:team:app"
             token.clusterAndSystem shouldBe "app:dev-gcp"
         }
 
         it("returnerer system uendret når azp_name ikke har tre deler") {
-            every { claims.getStringClaim("azp_name") } returns "app"
+            every { claims.getStringClaim(AZP_NAME) } returns "app"
             token.clusterAndSystem shouldBe "app"
         }
     }
@@ -129,6 +155,21 @@ class TokenTest : DescribeSpec({
         }
 
         it("returnerer tom liste når groups mangler") {
+            token.globaleGruppeIds shouldBe emptyList()
+        }
+
+        it("returnerer tom liste når groups er en tom liste") {
+            every { claims.getAsList("groups") } returns emptyList()
+            token.globaleGruppeIds shouldBe emptyList()
+        }
+
+        it("returnerer tom liste når claimSet er null (ingen token-kontekst)") {
+            every { validationContext.getClaims(AAD_ISSUER) } throws RuntimeException("ingen token")
+            token.globaleGruppeIds shouldBe emptyList()
+        }
+
+        it("returnerer tom liste når getAsList returnerer null") {
+            every { claims.getAsList("groups") } returns null
             token.globaleGruppeIds shouldBe emptyList()
         }
 
@@ -157,12 +198,12 @@ class TokenTest : DescribeSpec({
 
     describe("TokenType.from") {
         it("returnerer OBO for OBO-token") {
-            every { claims.getStringClaim("oid") } returns oid.toString()
+            every { claims.getStringClaim(OID) } returns oid.toString()
             TokenType.from(token) shouldBe TokenType.OBO
         }
 
         it("returnerer CCF for CC-token") {
-            every { claims.getStringClaim("idtyp") } returns "app"
+            every { claims.getStringClaim(IDTYP) } returns APP
             TokenType.from(token) shouldBe TokenType.CCF
         }
 
@@ -172,4 +213,3 @@ class TokenTest : DescribeSpec({
         }
     }
 })
-

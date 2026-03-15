@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Fallback
 import org.springframework.stereotype.Component
 
 @ConditionalOnGCP
-class SecureAuditor : AbstractAuditor("secureLog") 
+class SecureAuditor : AbstractAuditor("secureLog")
 
 @Fallback
 @Component

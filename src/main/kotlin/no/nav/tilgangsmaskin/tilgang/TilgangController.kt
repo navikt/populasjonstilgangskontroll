@@ -84,7 +84,10 @@ class TilgangController(
         description =  """Setter overstyring for en bruker, slik at den kan saksbehandles selv om tilgang opprinnelig avslås.
     BrukerId må være gyldig og finnes i PDL. Kjerneregelsettet vil bli kjørt før overstyring, og hvis de feiler vil overstyring ikke bli gjort.
     Overstyring vil gjelde frem til og med utløpsdatoen.""")
-    fun overstyr(@RequestBody @Valid @ValidOverstyring data: OverstyringData) = overstyringTjeneste.overstyr(token.ansattId!!, data)
+    fun overstyr(@RequestBody @Valid @ValidOverstyring data: OverstyringData, request: HttpServletRequest) {
+        sjekk(token.erObo, FORBIDDEN, "Mismatch mellom token type ${TokenType.from(token)} og ${request.requestURI}")
+        overstyringTjeneste.overstyr(token.ansattId!!, data)
+    }
 
     @PostMapping("bulk/obo")
     @ResponseStatus(MULTI_STATUS)

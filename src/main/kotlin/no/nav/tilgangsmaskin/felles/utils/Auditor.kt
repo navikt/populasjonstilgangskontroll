@@ -6,11 +6,7 @@ import org.springframework.context.annotation.Fallback
 import org.springframework.stereotype.Component
 
 @ConditionalOnGCP
-class SecureAuditor : AbstractAuditor(AUDIT_LOGGER_NAME) {
-    private companion object {
-        private const val AUDIT_LOGGER_NAME = "secureLog"
-    }
-}
+class SecureAuditor : AbstractAuditor("secureLog") 
 
 @Fallback
 @Component

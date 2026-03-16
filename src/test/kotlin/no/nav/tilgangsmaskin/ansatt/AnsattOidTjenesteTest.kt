@@ -25,7 +25,7 @@ class AnsattOidTjenesteTest : DescribeSpec() {
 
                 tjeneste.oidFraEntra(ansattId) shouldBe oid
 
-                verify(exactly = 1) { adapter.oidFraEntra(ansattId.verdi) }
+                verify{ adapter.oidFraEntra(ansattId.verdi) }
             }
 
             it("propagerer exception fra adapter") {

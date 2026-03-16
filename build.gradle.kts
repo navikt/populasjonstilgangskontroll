@@ -96,8 +96,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-kafka")
     implementation("org.springframework:spring-aspects")
     testImplementation("org.springframework.boot:spring-boot-micrometer-metrics-test")
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+    }
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("io.github.ss-bhatt:testcontainers-valkey:1.0.0")
     testImplementation("com.redis:testcontainers-redis")
@@ -113,7 +114,6 @@ dependencies {
     testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     implementation("io.kotest:kotest-extensions-spring:6.1.5")
-    testImplementation(kotlin("test"))
 }
 
 

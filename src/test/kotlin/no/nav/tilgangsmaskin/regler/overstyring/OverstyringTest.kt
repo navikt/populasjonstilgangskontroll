@@ -5,6 +5,7 @@ import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -58,15 +59,23 @@ internal class OverstyringTest : DescribeSpec() {
     private val ansattId = AnsattId("Z999999")
     private val historiskBrukerId = BrukerId("11111111111")
 
-    @MockkBean lateinit var validator: OverstyringClientValidator
-    @MockkBean lateinit var proxy: EntraProxyTjeneste
-    @MockkBean lateinit var token: Token
-    @MockkBean lateinit var oppfølging: OppfølgingTjeneste
-    @Autowired lateinit var motor: RegelMotor
-    @Autowired lateinit var registry: MeterRegistry
+    @MockkBean
+    lateinit var validator: OverstyringClientValidator
+    @MockkBean
+    lateinit var proxy: EntraProxyTjeneste
+    @MockkBean
+    lateinit var token: Token
+    @MockkBean
+    lateinit var oppfølging: OppfølgingTjeneste
+    @Autowired
+    lateinit var motor: RegelMotor
+    @Autowired
+    lateinit var registry: MeterRegistry
     @Autowired lateinit var adapter: OverstyringJPAAdapter
-    @MockK lateinit var ansatte: AnsattTjeneste
-    @MockK lateinit var brukere: BrukerTjeneste
+    @MockK
+    lateinit var ansatte: AnsattTjeneste
+    @MockK
+    lateinit var brukere: BrukerTjeneste
 
     init {
         lateinit var overstyring: OverstyringTjeneste
@@ -86,6 +95,28 @@ internal class OverstyringTest : DescribeSpec() {
             every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
             every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
             overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, proxy, validator, OverstyringTeller(registry, token))
+        }
+
+        describe("OverstyringEntity felter") {
+
+            it("alle felter settes når overstyring registreres") {
+                val bruker = BrukerBuilder(vanligBrukerId).build()
+                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+
+                overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+
+                val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                entity.navid shouldBe ansattId.verdi
+                entity.fnr shouldBe vanligBrukerId.verdi
+                entity.begrunnelse shouldBe "Dette er en begrunnelse"
+                entity.enhet shouldBe "1234"
+                entity.expires shouldNotBe null
+                entity.id shouldNotBe 0
+                entity.created shouldNotBe null
+                entity.updated shouldNotBe null
+                entity.oppretter shouldBe ansattId.verdi
+                entity.system shouldBe "test"
+            }
         }
 
         describe("erOverstyrt") {

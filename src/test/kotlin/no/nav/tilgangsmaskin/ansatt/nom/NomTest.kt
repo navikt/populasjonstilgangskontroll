@@ -12,10 +12,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.Companion.ALWAYS
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringEntityListener
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
@@ -26,7 +23,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 import java.time.LocalDate.EPOCH
 
 @DataJpaTest
-@ContextConfiguration(classes = [NomJPAAdapter::class, OverstyringEntityListener::class, TestApp::class])
+@ContextConfiguration(classes = [NomJPAAdapter::class, TestApp::class])
 @Testcontainers
 @ApplyExtension(SpringExtension::class)
 internal class NomTest : DescribeSpec() {

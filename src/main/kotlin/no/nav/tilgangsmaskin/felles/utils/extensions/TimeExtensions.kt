@@ -30,8 +30,6 @@ object TimeExtensions {
             Period.between(this, it).let { it.years * 12 + it.months } + if (it.dayOfMonth > dayOfMonth) 1 else 0
         }
 
-    fun java.time.Duration.format() = this.toKotlinDuration().format()
-
      fun Duration.format(): String {
         val dager = inWholeDays
         val timer = inWholeHours % 24

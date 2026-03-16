@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.utils.extensions
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_0_6
@@ -73,10 +74,10 @@ class TimeExtensionsTest : DescribeSpec({
             dato.månederSidenIdag() shouldBe 1
         }
 
-        it("legger ikke til ekstra måned når dayOfMonth i dato er større enn i dag") {
-            // idag er den 14., dato er Feb 15 → Period gir 0 måneder (ikke en hel måned siden)
-            val dato = idag.minusMonths(1).plusDays(1)
-            dato.månederSidenIdag() shouldBe 0
+        it("kaster AssertionError for dato i fremtiden") {
+            shouldThrow<AssertionError> {
+                idag.plusDays(1).månederSidenIdag()
+            }
         }
     }
 

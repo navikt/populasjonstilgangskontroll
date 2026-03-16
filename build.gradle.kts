@@ -154,6 +154,14 @@ tasks.test {
 
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude("**/tilgang/BulkSwaggerResultater*.class",
+                        "**/tilgang/BulkSwaggerApiRespons*.class")
+            }
+        })
+    )
     reports {
         xml.required = true
         html.required = true

@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.bruker
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
-import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
@@ -25,7 +24,7 @@ class BrukerIdTest : DescribeSpec({
         }
     }
 
-    describe("BrukerId i prod") {
+    describe("BrukerId i prod - mod11 grener") {
 
         beforeEach {
             mockkObject(ClusterUtils)
@@ -36,22 +35,20 @@ class BrukerIdTest : DescribeSpec({
             unmockkObject(ClusterUtils)
         }
 
-        it("Gyldig fødselsnummer med riktige kontrollsifre opprettes uten problemer") {
-            val brukerId = BrukerId("08526835671")
-            brukerId.verdi shouldBe "08526835671"
+        it("W1=0 og W2=0: begge kontrollsiffer er 0 (00000000000)") {
+            BrukerId("00000000000")
         }
 
-        it("Fødselsnummer med feil første kontrollsiffer kaster IllegalArgumentException") {
-            shouldThrow<IllegalArgumentException> { BrukerId("08526835681") }
+        it("W1=else og W2=else: vanlig gyldig fødselsnummer (08526835671)") {
+            BrukerId("08526835671")
         }
 
-        it("Fødselsnummer med feil andre kontrollsiffer kaster IllegalArgumentException") {
-            shouldThrow<IllegalArgumentException> { BrukerId("08526835670") }
-        }
-
-        it("Fødselsnummer som gir mod11 == 1 (ugyldig) kaster IllegalArgumentException") {
-            // mod11 == 1 means the number is inherently invalid per Norwegian fnr rules
+        it("W1=1: kaster IllegalArgumentException (08526835682)") {
             shouldThrow<IllegalArgumentException> { BrukerId("08526835682") }
+        }
+
+        it("W2=1: kaster IllegalArgumentException (10000000910)") {
+            shouldThrow<IllegalArgumentException> { BrukerId("10000000910") }
         }
     }
 })

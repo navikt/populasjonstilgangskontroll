@@ -6,11 +6,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import kotlin.annotation.AnnotationRetention.RUNTIME
 import kotlin.annotation.AnnotationTarget.FUNCTION
 
+@Generated
 @Target(FUNCTION)
 @Retention(RUNTIME)
 @ApiResponses(
@@ -64,6 +66,7 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
                        ]
                    }"""))])])
 annotation class BulkSwaggerApiRespons
+@Generated
 private data class BulkSwaggerResultater(val ansattId: String, val resultater: List<BulkSwaggerResultat>) {
     data class BulkSwaggerResultat(val brukerId: String, val status: Int, val detaljer: BulkSwaggerDetaljer? = null) {
         data class BulkSwaggerDetaljer(val type: String, val title: AvvisningsKode, val status: Int, val instance: String,

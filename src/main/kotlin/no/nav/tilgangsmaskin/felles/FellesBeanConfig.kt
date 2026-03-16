@@ -41,6 +41,7 @@ import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 import tools.jackson.databind.json.JsonMapper
 import java.util.function.Function
 import kotlin.annotation.AnnotationRetention.BINARY
+import kotlin.annotation.AnnotationTarget.CLASS
 import kotlin.annotation.AnnotationTarget.CONSTRUCTOR
 import kotlin.annotation.AnnotationTarget.FUNCTION
 
@@ -141,5 +142,5 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 }
 
 @Retention(BINARY)  // = CLASS in bytecode — enough for JaCoCo
-@Target(FUNCTION, CONSTRUCTOR)
+@Target(FUNCTION, CONSTRUCTOR, CLASS)
 annotation class Generated

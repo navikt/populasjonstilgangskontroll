@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
@@ -7,12 +8,16 @@ import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
 import io.mockk.verify
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.tilgang.Token
+import org.springframework.web.client.HttpClientErrorException
 import java.util.*
 
 class AnsattGruppeResolverTest : DescribeSpec() {
@@ -115,6 +120,18 @@ class AnsattGruppeResolverTest : DescribeSpec() {
 
                 resolver.grupperForAnsatt(ansattId) shouldBe setOf(geoGruppe)
                 verify { entra.geoOgGlobaleGrupper(ansattId, oid) }
+            }
+
+            it("kaster HttpClientErrorException med 401 i prod") {
+                mockkObject(ClusterUtils)
+                every { ClusterUtils.isProd } returns true
+                try {
+                    shouldThrow<HttpClientErrorException> {
+                        resolver.grupperForAnsatt(ansattId)
+                    }.statusCode.value() shouldBe 401
+                } finally {
+                    unmockkObject(ClusterUtils)
+                }
             }
         }
     }

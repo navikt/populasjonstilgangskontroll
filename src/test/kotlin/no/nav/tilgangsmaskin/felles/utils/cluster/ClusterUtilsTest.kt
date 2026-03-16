@@ -6,94 +6,61 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV_GCP
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.GCP
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.LOCAL
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.NAIS_CLUSTER_NAME
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.current
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isDev
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.profilerFor
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.DEV_GCP_CLUSTER
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.PROD_GCP_CLUSTER
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.TEST_CLUSTER
 
 class ClusterUtilsTest : DescribeSpec({
 
-    describe("ClusterUtils enum entries") {
-
-        it("TEST_CLUSTER har clusterName 'test'") {
-            ClusterUtils.TEST_CLUSTER.clusterName shouldBe TEST
-        }
-
-        it("LOCAL_CLUSTER har clusterName 'local'") {
-            ClusterUtils.LOCAL_CLUSTER.clusterName shouldBe LOCAL
-        }
-
-        it("DEV_GCP_CLUSTER har clusterName 'dev-gcp'") {
-            ClusterUtils.DEV_GCP_CLUSTER.clusterName shouldBe DEV_GCP
-        }
-
-        it("PROD_GCP_CLUSTER har clusterName 'prod-gcp'") {
-            ClusterUtils.PROD_GCP_CLUSTER.clusterName shouldBe PROD_GCP
-        }
-    }
 
     describe("isProd / isDev / isLocalOrTest") {
 
         it("isProd er true kun for PROD_GCP_CLUSTER") {
-            (ClusterUtils.current == ClusterUtils.PROD_GCP_CLUSTER) shouldBe ClusterUtils.isProd
+            (current == PROD_GCP_CLUSTER) shouldBe isProd
         }
 
         it("isDev er true kun for DEV_GCP_CLUSTER") {
-            (ClusterUtils.current == ClusterUtils.DEV_GCP_CLUSTER) shouldBe ClusterUtils.isDev
+            (current == DEV_GCP_CLUSTER) shouldBe isDev
         }
 
         it("isLocalOrTest er true når verken dev eller prod") {
-            ClusterUtils.isLocalOrTest shouldBe (!ClusterUtils.isDev && !ClusterUtils.isProd)
+            isLocalOrTest shouldBe (!isDev && !isProd)
         }
 
         it("isProd og isDev er aldri begge true") {
-            (ClusterUtils.isProd && ClusterUtils.isDev) shouldBe false
+            (isProd && isDev) shouldBe false
         }
     }
 
-    describe("profiler") {
+    describe("profilerFor") {
 
-        it("TEST_CLUSTER gir kun 'test' som profil") {
-            val profiler = ClusterUtils.TEST_CLUSTER.let {
-                when (it) {
-                    ClusterUtils.TEST_CLUSTER, ClusterUtils.LOCAL_CLUSTER -> arrayOf(it.clusterName)
-                    ClusterUtils.DEV_GCP_CLUSTER -> arrayOf(DEV, DEV_GCP, GCP)
-                    ClusterUtils.PROD_GCP_CLUSTER -> arrayOf(PROD, PROD_GCP, GCP)
-                }
-            }
+        it("TEST_CLUSTER gir ['test'] og setter system property") {
+            val profiler = profilerFor(TEST_CLUSTER)
             profiler shouldBe arrayOf(TEST)
+            System.getProperty(NAIS_CLUSTER_NAME) shouldBe TEST
         }
 
-        it("LOCAL_CLUSTER gir kun 'local' som profil") {
-            val profiler = when (ClusterUtils.LOCAL_CLUSTER) {
-                ClusterUtils.TEST_CLUSTER, ClusterUtils.LOCAL_CLUSTER -> arrayOf(ClusterUtils.LOCAL_CLUSTER.clusterName)
-                ClusterUtils.DEV_GCP_CLUSTER -> arrayOf(DEV, DEV_GCP, GCP)
-                ClusterUtils.PROD_GCP_CLUSTER -> arrayOf(PROD, PROD_GCP, GCP)
-            }
+        it("LOCAL_CLUSTER gir ['local'] og setter system property") {
+            val profiler = profilerFor(ClusterUtils.LOCAL_CLUSTER)
             profiler shouldBe arrayOf(LOCAL)
+            System.getProperty(NAIS_CLUSTER_NAME) shouldBe LOCAL
         }
 
-        it("DEV_GCP_CLUSTER gir 'dev', 'dev-gcp' og 'gcp' som profiler") {
-            val profiler = when (ClusterUtils.DEV_GCP_CLUSTER) {
-                ClusterUtils.TEST_CLUSTER, ClusterUtils.LOCAL_CLUSTER -> arrayOf(ClusterUtils.DEV_GCP_CLUSTER.clusterName)
-                ClusterUtils.DEV_GCP_CLUSTER -> arrayOf(DEV, DEV_GCP, GCP)
-                ClusterUtils.PROD_GCP_CLUSTER -> arrayOf(PROD, PROD_GCP, GCP)
-            }
-            profiler shouldBe arrayOf(DEV, DEV_GCP, GCP)
+        it("DEV_GCP_CLUSTER gir ['dev', 'dev-gcp', 'gcp']") {
+            profilerFor(DEV_GCP_CLUSTER) shouldBe arrayOf(DEV, DEV_GCP, GCP)
         }
 
-        it("PROD_GCP_CLUSTER gir 'prod', 'prod-gcp' og 'gcp' som profiler") {
-            val profiler = when (ClusterUtils.PROD_GCP_CLUSTER) {
-                ClusterUtils.TEST_CLUSTER, ClusterUtils.LOCAL_CLUSTER -> arrayOf(ClusterUtils.PROD_GCP_CLUSTER.clusterName)
-                ClusterUtils.DEV_GCP_CLUSTER -> arrayOf(DEV, DEV_GCP, GCP)
-                ClusterUtils.PROD_GCP_CLUSTER -> arrayOf(PROD, PROD_GCP, GCP)
-            }
-            profiler shouldBe arrayOf(PROD, PROD_GCP, GCP)
-        }
-
-        it("current.profiler i test-miljø inneholder kun cluster-navnet") {
-            // I test er NAIS_CLUSTER_NAME ikke satt, så current = LOCAL_CLUSTER eller TEST_CLUSTER
-            ClusterUtils.profiler.size shouldBe 1
-            ClusterUtils.profiler[0] shouldBe ClusterUtils.current.clusterName
+        it("PROD_GCP_CLUSTER gir ['prod', 'prod-gcp', 'gcp']") {
+            profilerFor(PROD_GCP_CLUSTER) shouldBe arrayOf(PROD, PROD_GCP, GCP)
         }
     }
 })

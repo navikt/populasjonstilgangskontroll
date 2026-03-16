@@ -23,12 +23,12 @@ import org.springframework.context.annotation.Import
 import org.springframework.graphql.client.HttpSyncGraphQlClient
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.http.HttpMethod.OPTIONS
+import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
-import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
@@ -128,7 +128,7 @@ class PdlSyncGraphQLClientAdapterTest : DescribeSpec() {
                 adapter.partnere("Z999999").shouldBeEmpty()
                 server.verify()
             }
-            
+
              */
 
             it("filtrerer ut sivilstand uten relatertVedSivilstand") {
@@ -138,6 +138,17 @@ class PdlSyncGraphQLClientAdapterTest : DescribeSpec() {
                 val result = adapter.partnere("Z999999")
 
                 result shouldHaveSize 1
+                server.verify()
+            }
+        }
+
+        describe("ping") {
+
+            it("ping") {
+                server.expect(requestTo(cfg.baseUri))
+                    .andExpect(method(OPTIONS))
+                    .andRespond(withSuccess())
+                adapter.ping()
                 server.verify()
             }
         }

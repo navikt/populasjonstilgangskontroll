@@ -36,6 +36,7 @@ class PdlSyncGraphQLClientAdapter(
             .accept(APPLICATION_JSON, TEXT_PLAIN)
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
+            .toBodilessEntity()
     }
 
     fun partnere(ident: String) : Set<FamilieMedlem> =

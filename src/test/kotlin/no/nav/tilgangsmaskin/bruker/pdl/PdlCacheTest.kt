@@ -2,22 +2,20 @@ package no.nav.tilgangsmaskin.bruker.pdl
 
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.mockk.mockk
-import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
+import no.nav.tilgangsmaskin.bruker.AktørId
+import no.nav.tilgangsmaskin.bruker.pdl.BrukerTilPersonMapper.tilPerson
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
 import no.nav.tilgangsmaskin.felles.cache.AbstractCacheTest
 import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetEvent
+import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.awaitility.kotlin.await
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationListener
-import org.springframework.data.redis.cache.RedisCacheConfiguration
-import org.springframework.http.MediaType
+import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.MockRestServiceServer.bindTo
@@ -28,6 +26,7 @@ import tools.jackson.databind.json.JsonMapper
 import java.net.URI
 import java.time.Duration
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.SECONDS
 
 class PdlCacheTest : AbstractCacheTest() {
 
@@ -37,8 +36,8 @@ class PdlCacheTest : AbstractCacheTest() {
     private lateinit var mockServer: MockRestServiceServer
 
     override fun cacheConfigurations() = mapOf(
-        PDL_MED_FAMILIE_CACHE.name to RedisCacheConfiguration.defaultCacheConfig()
-            .prefixCacheNameWith(PdlConfig.Companion.PDL)
+        PDL_MED_FAMILIE_CACHE.name to defaultCacheConfig()
+            .prefixCacheNameWith(PDL)
             .disableCachingNullValues()
     )
 
@@ -56,8 +55,7 @@ class PdlCacheTest : AbstractCacheTest() {
             it("Rest kalles kun for cache-misser, treff hentes fra cache") {
                 putOne(P1)
                 mockServer.expect(requestTo(cfg.personerURI))
-                    .andRespond(withSuccess(restRespons(mapper, P2),
-                        APPLICATION_JSON))
+                    .andRespond(withSuccess(PdlTestMapper.restRespons(mapper, P2), APPLICATION_JSON))
 
                 pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
                 getMany(IDS).keys shouldContainExactlyInAnyOrder IDS
@@ -70,8 +68,7 @@ class PdlCacheTest : AbstractCacheTest() {
                 mockServer.verify()
                 cache.delete(PDL_MED_FAMILIE_CACHE, I2)
                 mockServer.expect(requestTo(cfg.personerURI))
-                    .andRespond(withSuccess(restRespons(mapper, P2),
-                        APPLICATION_JSON))
+                    .andRespond(withSuccess(PdlTestMapper.restRespons(mapper, P2), APPLICATION_JSON))
                 pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
                 getMany(IDS).keys shouldContainExactlyInAnyOrder IDS
                 mockServer.verify()
@@ -84,11 +81,9 @@ class PdlCacheTest : AbstractCacheTest() {
 
             it("Lytteren publiserer en CacheInnslagFjernetEvent når en nøkkel utløper") {
                 val mottatt = mutableListOf<String>()
-                ctx.addApplicationListener(ApplicationListener<CacheInnslagFjernetEvent> {
-                    mottatt.add(it.nøkkel)
-                })
+                ctx.addApplicationListener(ApplicationListener<CacheInnslagFjernetEvent> { mottatt.add(it.nøkkel) })
                 putOne(P1)
-                await.atMost(3, TimeUnit.SECONDS).until {
+                await.atMost(3, SECONDS).until {
                     mottatt.any { it.contains(P1.brukerId.verdi) }
                 }
             }
@@ -104,30 +99,15 @@ class PdlCacheTest : AbstractCacheTest() {
     private fun putOne(person: Person, duration: Duration = Duration.ofSeconds(2)) =
         cache.putOne(PDL_MED_FAMILIE_CACHE, person.brukerId.verdi, person, duration)
 
-
     companion object {
-        private val A1 = `AktørId`("1234567890123")
-        private val A2 = `AktørId`("9876543210987")
-        private val P1 = Person(BrukerId(I1), I1, A1,
-            KommuneTilknytning(Kommune("0301")))
-        private val P2 = Person(BrukerId(I2), I2, A2,
-            KommuneTilknytning(Kommune("1111")))
         private val cfg = PdlConfig(URI.create("http://pdl"))
-
-        private fun restRespons(mapper: JsonMapper, p: Person) = mapper.writeValueAsString(
-            mapOf(p.brukerId.verdi to PdlRespons(
-                PdlRespons.PdlPerson(),
-                PdlIdenter(listOf(
-                    PdlIdent(p.brukerId.verdi,
-                        false,
-                        FOLKEREGISTERIDENT),
-                    PdlIdent(p.aktørId.verdi,
-                        false,
-                        PdlIdentGruppe.AKTORID)
-                )),
-                PdlGeografiskTilknytning(PdlGeografiskTilknytning.GTType.KOMMUNE,
-                    PdlGeografiskTilknytning.GTKommune((p.geoTilknytning as KommuneTilknytning).kommune.verdi))
-            ))
-        )
+        private val P1 = tilPerson(BrukerBuilder(BrukerId(I1))
+            .aktørId(AktørId("1234567890123"))
+            .gt(KommuneTilknytning(Kommune("0301")))
+            .build())
+        private val P2 = tilPerson(BrukerBuilder(BrukerId(I2))
+            .aktørId(AktørId("9876543210987"))
+            .gt(KommuneTilknytning(Kommune("1111")))
+            .build())
     }
 }

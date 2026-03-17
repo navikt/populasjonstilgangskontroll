@@ -11,8 +11,10 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.globaleGrupper
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
@@ -34,13 +36,14 @@ class AnsattGruppeResolverTest : DescribeSpec() {
     init {
         val nasjonalId  = UUID.randomUUID()
         val fortroligId = UUID.randomUUID()
+        val strengtId = UUID.randomUUID()
 
         beforeSpec {
             MockKAnnotations.init(this@AnsattGruppeResolverTest)
             GlobalGruppe.setIDs(mapOf(
                 "gruppe.nasjonal"   to nasjonalId,
                 "gruppe.fortrolig"  to fortroligId,
-                "gruppe.strengt"    to UUID.randomUUID(),
+                "gruppe.strengt"    to strengtId,
                 "gruppe.utland"     to UUID.randomUUID(),
                 "gruppe.udefinert"  to UUID.randomUUID(),
                 "gruppe.egenansatt" to UUID.randomUUID(),
@@ -62,6 +65,28 @@ class AnsattGruppeResolverTest : DescribeSpec() {
 
             beforeEach {
                 every { token.erCC } returns true
+            }
+
+            it("Token.globaleGrupper returnerer EntraGruppe for kjente gruppe-IDer og ignorerer ukjente") {
+                every { token.globaleGruppeIds } returns listOf(nasjonalId, fortroligId, strengtId, oid)
+
+                token.globaleGrupper() shouldContainExactlyInAnyOrder setOf(
+                    EntraGruppe(nasjonalId, NASJONAL.name),
+                    EntraGruppe(fortroligId, FORTROLIG.name),
+                    EntraGruppe(strengtId, STRENGT_FORTROLIG.name)
+                )
+            }
+
+            it("Token.globaleGrupper returnerer tomt sett når ingen av gruppe-IDene er kjente") {
+                every { token.globaleGruppeIds } returns listOf(UUID.randomUUID(), UUID.randomUUID())
+
+                token.globaleGrupper() shouldBe emptySet()
+            }
+
+            it("Token.globaleGrupper returnerer tomt sett når token ikke har noen gruppe-IDer") {
+                every { token.globaleGruppeIds } returns emptyList()
+
+                token.globaleGrupper() shouldBe emptySet()
             }
 
             it("slår opp globale og GEO-grupper i Entra") {

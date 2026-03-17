@@ -63,10 +63,15 @@ jobs:
           ORG_GRADLE_PROJECT_githubUser: x-access-token
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Prepare Pages artifact
+        run: |
+          mkdir -p build/reports/pages/jacoco
+          cp -r build/reports/jacoco/test/html/. build/reports/pages/coverage/
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build/reports/jacoco/test/html/
+          path: build/reports/pages/
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4

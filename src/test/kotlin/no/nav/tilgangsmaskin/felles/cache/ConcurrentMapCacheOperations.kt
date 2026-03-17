@@ -34,5 +34,5 @@ class ConcurrentMapCacheOperations(private val cacheManager: CacheManager) : Cac
     }
 
     // Matches CacheNøkkelHandler format: "cacheName::extraPrefix:id" or "cacheName::id"
-    override fun tilNøkkel(cache: CachableConfig, id: String) = id
+    override fun tilNøkkel(cache: CachableConfig, id: String) = cache.extraPrefix ?.let { "$it:$id"  } ?: id
 }

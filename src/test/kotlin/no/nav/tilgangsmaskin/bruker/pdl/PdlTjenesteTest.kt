@@ -11,9 +11,12 @@ import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.BrukerTilPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
+import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.pdlRespons
+import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.restRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjenesteTest.PdlTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
@@ -59,7 +62,7 @@ class PdlTjenesteTest : DescribeSpec() {
 
     @MockkBean lateinit var graphQL: PdlSyncGraphQLClientAdapter
 
-    @Autowired lateinit var tjeneste: PdlTjeneste
+    @Autowired lateinit var pdl: PdlTjeneste
     @Autowired
     lateinit var server: MockRestServiceServer
     @Autowired lateinit var cfg: PdlConfig
@@ -74,38 +77,48 @@ class PdlTjenesteTest : DescribeSpec() {
             every { graphQL.partnere(any()) } returns emptySet()
         }
 
+        describe("person") {
+            it("hentPerson kaller REST og oppdaterer cache") {
+                server.expect(requestTo(cfg.personURI))
+                    .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons( P1)), APPLICATION_JSON))
+                pdl.medFamilie(I1) shouldBe P1
+                server.verify()
+                cache.getOne(PDL_MED_FAMILIE_CACHE, I1, Person::class) shouldBe P1
+            }
+        }
+
         describe("personer") {
 
             it("REST kalles kun for cache-misser, treff hentes fra cache") {
                 cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(2))
                 server.expect(requestTo(cfg.personerURI))
-                    .andRespond(withSuccess(PdlTestMapper.restRespons(mapper, P2), APPLICATION_JSON))
-                tjeneste.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
+                    .andRespond(withSuccess(restRespons(mapper, P2), APPLICATION_JSON))
+                pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
                 server.verify()
             }
 
             it("REST kalles ikke når alle er i cache") {
                 cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(2))
                 cache.putOne(PDL_MED_FAMILIE_CACHE, I2, P2, ofSeconds(2))
-                tjeneste.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
+                pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
                 server.verify()
             }
 
             it("slett ett element og verifiser at REST kalles for det elementet") {
                 cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(2))
                 cache.putOne(PDL_MED_FAMILIE_CACHE, I2, P2, ofSeconds(2))
-                tjeneste.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
+                pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
                 cache.delete(PDL_MED_FAMILIE_CACHE, I2)
                 server.expect(requestTo(cfg.personerURI))
-                    .andRespond(withSuccess(PdlTestMapper.restRespons(mapper, P2), APPLICATION_JSON))
+                    .andRespond(withSuccess(restRespons(mapper, P2), APPLICATION_JSON))
 
-                tjeneste.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
+                pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
                 cache.getOne(PDL_MED_FAMILIE_CACHE, I2, Person::class) shouldBe P2
                 server.verify()
             }
 
             it("REST kalles ikke når settet er tomt") {
-                tjeneste.personer(emptySet()) shouldContainExactlyInAnyOrder emptyList()
+                pdl.personer(emptySet()) shouldContainExactlyInAnyOrder emptyList()
                 server.verify()
             }
         }
@@ -121,7 +134,7 @@ class PdlTjenesteTest : DescribeSpec() {
             .build())
         val P2 = tilPerson(BrukerBuilder(BrukerId(I2))
             .aktørId(AktørId("9876543210987"))
-            .gt(KommuneTilknytning(Kommune("1111")))
+            .gt(UtenlandskTilknytning())
             .build())
     }
 }

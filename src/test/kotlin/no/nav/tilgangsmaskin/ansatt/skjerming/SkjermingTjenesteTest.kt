@@ -127,6 +127,12 @@ class SkjermingTjenesteTest : DescribeSpec() {
                     server.verify()
                 }
 
+                it("kaller ikke REST når ingen identer") {
+                    val result = tjeneste.skjerminger(emptyList())
+                    result shouldBe emptyMap()
+                    server.verify()
+                }
+
                 it("lagrer REST-resultater i cache") {
                     server.expect(times(1), requestTo(cfg.skjermingerUri))
                         .andRespond(withSuccess("""{"${brukerId.verdi}":true}""", APPLICATION_JSON))

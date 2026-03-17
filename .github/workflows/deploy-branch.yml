@@ -66,7 +66,9 @@ jobs:
       - name: Prepare Pages artifact
         run: |
           mkdir -p build/reports/pages/jacoco
-          cp -r build/reports/jacoco/test/html/. build/reports/pages/coverage/
+          mkdir -p build/reports/pages/tests
+          cp -r build/reports/jacoco/test/html/. build/reports/pages/jacoco/
+          cp -r build/reports/tests/test/. build/reports/pages/tests/
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

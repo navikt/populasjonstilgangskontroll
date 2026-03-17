@@ -1,13 +1,11 @@
-package no.nav.tilgangsmaskin.felles.cache
+package no.nav.tilgangsmaskin.ansatt.skjerming
 
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.maps.shouldContainExactly
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingRestClientAdapter
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.cache.AbstractCacheTest
 import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetEvent
 import org.awaitility.kotlin.await
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,8 +20,7 @@ import org.springframework.web.client.RestClient
 import tools.jackson.databind.json.JsonMapper
 import java.net.URI
 import java.time.Duration
-import java.time.Duration.ofSeconds
-import java.util.concurrent.TimeUnit.*
+import java.util.concurrent.TimeUnit
 
 class SkjermingerCacheTest : AbstractCacheTest() {
 
@@ -53,7 +50,8 @@ class SkjermingerCacheTest : AbstractCacheTest() {
             it("Rest kalles kun for cache-misser, treff hentes fra cache") {
                 putOne(ID1, false)
                 mockServer.expect(requestTo(cfg.skjermingerUri))
-                    .andRespond(withSuccess(mapper.writeValueAsString(mapOf(I2 to true)), APPLICATION_JSON))
+                    .andRespond(withSuccess(mapper.writeValueAsString(mapOf(I2 to true)),
+                        APPLICATION_JSON))
 
                 skjerming.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to false, ID2 to true)
                 getMany(IDS).keys shouldContainExactlyInAnyOrder IDS
@@ -69,9 +67,11 @@ class SkjermingerCacheTest : AbstractCacheTest() {
 
             it("Lytteren publiserer en CacheInnslagFjernetEvent når en nøkkel utløper") {
                 val mottatt = mutableListOf<CacheInnslagFjernetEvent>()
-                ctx.addApplicationListener(ApplicationListener<CacheInnslagFjernetEvent> { mottatt.add(it) })
+                ctx.addApplicationListener(ApplicationListener<CacheInnslagFjernetEvent> {
+                    mottatt.add(it)
+                })
                 putOne(ID1, false)
-                await.atMost(3, SECONDS).until { mottatt.isNotEmpty() }
+                await.atMost(3, TimeUnit.SECONDS).until { mottatt.isNotEmpty() }
             }
 
             it("Rest kalles igjen etter at et cache-innslag er slettet") {
@@ -79,7 +79,8 @@ class SkjermingerCacheTest : AbstractCacheTest() {
                 putOne(ID2, true)
                 cache.delete(SKJERMING_CACHE, I2)
                 mockServer.expect(requestTo(cfg.skjermingerUri))
-                    .andRespond(withSuccess(mapper.writeValueAsString(mapOf(I2 to true)), APPLICATION_JSON))
+                    .andRespond(withSuccess(mapper.writeValueAsString(mapOf(I2 to true)),
+                        APPLICATION_JSON))
 
                 skjerming.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to false, ID2 to true)
                 getMany(IDS).keys shouldContainExactlyInAnyOrder IDS
@@ -88,13 +89,13 @@ class SkjermingerCacheTest : AbstractCacheTest() {
         }
     }
 
-    private fun putOne(brukerId: BrukerId, skjermet: Boolean, duration: Duration = ofSeconds(1)) =
+    private fun putOne(brukerId: BrukerId, skjermet: Boolean, duration: Duration = Duration.ofSeconds(1)) =
         cache.putOne(SKJERMING_CACHE, brukerId.verdi, skjermet, duration)
 
     private fun getMany(ids: Set<String>) =
         cache.getMany(SKJERMING_CACHE, ids, Boolean::class)
 
-    companion object {
+    private companion object {
         private val cfg = SkjermingConfig(URI.create("http://skjerming"))
     }
 }

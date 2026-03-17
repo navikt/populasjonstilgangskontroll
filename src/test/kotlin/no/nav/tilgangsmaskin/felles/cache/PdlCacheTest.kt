@@ -38,7 +38,7 @@ import java.time.Duration
 import java.time.Duration.ofSeconds
 import java.util.concurrent.TimeUnit.*
 
-class PersonerCacheTest : AbstractCacheTest() {
+class PdlCacheTest : AbstractCacheTest() {
 
     @Autowired
     private lateinit var mapper: JsonMapper

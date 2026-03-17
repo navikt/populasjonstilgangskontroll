@@ -172,6 +172,13 @@ class SkjermingTjenesteTest : DescribeSpec() {
                 server.verify()
             }
 
+            describe("config") {
+                it("navn er korrekt") {
+                    cfg.navn shouldBe cfg.name
+                    cfg.caches shouldBe setOf(SKJERMING_CACHE)
+                }
+            }
+
             describe("RetryLogger") {
 
                 fun withLogCapture(block: (ListAppender<ILoggingEvent>) -> Unit): List<ILoggingEvent> {

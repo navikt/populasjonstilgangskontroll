@@ -5,19 +5,17 @@ import ch.qos.logback.classic.Level.WARN
 import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
-import com.ninjasquad.springmockk.MockkBean
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import io.mockk.every
-import io.mockk.verify
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RetryLogger
@@ -46,22 +44,29 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 @EnableConfigurationProperties(SkjermingConfig::class)
 @EnableResilientMethods
 @TestPropertySource(properties = ["skjerming.base-uri=http://skjerming"])
-@Import(SkjermingRetryTest.CacheConfig::class)
+@Import(SkjermingTjenesteTest.CacheConfig::class)
 @ApplyExtension(SpringExtension::class)
-class SkjermingRetryTest : DescribeSpec() {
+class SkjermingTjenesteTest : DescribeSpec() {
 
     @TestConfiguration
     @EnableCaching
     class CacheConfig {
-        @Bean fun cacheManager(): CacheManager = ConcurrentMapCacheManager(SKJERMING)
+        @Bean
+        fun cacheManager(): CacheManager = ConcurrentMapCacheManager(SKJERMING)
+        @Bean
+        fun cache(cacheManager: CacheManager): CacheOperations = ConcurrentMapCacheOperations(cacheManager)
     }
 
-    @Autowired lateinit var tjeneste: SkjermingTjeneste
-    @Autowired lateinit var server: MockRestServiceServer
-    @Autowired lateinit var cfg: SkjermingConfig
-    @Autowired lateinit var cacheManager: CacheManager
-
-    @MockkBean lateinit var cache: CacheOperations
+    @Autowired
+    lateinit var tjeneste: SkjermingTjeneste
+    @Autowired
+    lateinit var server: MockRestServiceServer
+    @Autowired
+    lateinit var cfg: SkjermingConfig
+    @Autowired
+    lateinit var cacheManager: CacheManager
+    @Autowired
+    lateinit var cache: CacheOperations
 
     init {
         val brukerId = BrukerId("08526835670")
@@ -71,8 +76,6 @@ class SkjermingRetryTest : DescribeSpec() {
             server.reset()
             cacheManager.getCache(SKJERMING)?.clear()
         }
-
-        // ...existing code...
 
         describe("cache") {
 
@@ -84,7 +87,7 @@ class SkjermingRetryTest : DescribeSpec() {
 
                     tjeneste.skjerming(brukerId) shouldBe true
                     tjeneste.skjerming(brukerId) shouldBe true
-
+                    cache.getOne(SKJERMING_CACHE, brukerId.verdi, Boolean::class) shouldBe true
                     server.verify()
                 }
 
@@ -96,7 +99,8 @@ class SkjermingRetryTest : DescribeSpec() {
 
                     tjeneste.skjerming(brukerId) shouldBe true
                     tjeneste.skjerming(brukerId2) shouldBe false
-
+                    cache.getOne(SKJERMING_CACHE, brukerId.verdi, Boolean::class) shouldBe true
+                    cache.getOne(SKJERMING_CACHE, brukerId2.verdi, Boolean::class) shouldBe false
                     server.verify()
                 }
             }
@@ -104,46 +108,37 @@ class SkjermingRetryTest : DescribeSpec() {
             describe("skjerminger (CacheOperations)") {
 
                 it("henter treff fra cache og kun misser fra REST") {
-                    every { cache.getMany(SKJERMING_CACHE, setOf(brukerId.verdi, brukerId2.verdi), Boolean::class) } returns
-                        mapOf(brukerId.verdi to true, brukerId2.verdi to null)
-                    every { cache.putMany(any(), any(), any()) } returns Unit
+                    cache.putOne(SKJERMING_CACHE, brukerId.verdi, true, cfg.varighet)
                     server.expect(times(1), requestTo(cfg.skjermingerUri))
                         .andRespond(withSuccess("""{"${brukerId2.verdi}":false}""", APPLICATION_JSON))
 
                     val result = tjeneste.skjerminger(listOf(brukerId, brukerId2))
-
                     result[brukerId] shouldBe true
                     result[brukerId2] shouldBe false
                     server.verify()
                 }
 
                 it("kaller ikke REST når alle er i cache") {
-                    every { cache.getMany(SKJERMING_CACHE, setOf(brukerId.verdi), Boolean::class) } returns
-                        mapOf(brukerId.verdi to true)
-
-                    val result = tjeneste.skjerminger(listOf(brukerId))
-
+                    cache.putOne(SKJERMING_CACHE, brukerId.verdi, true, cfg.varighet)
+                    cache.putOne(SKJERMING_CACHE, brukerId2.verdi, false, cfg.varighet)
+                    val result = tjeneste.skjerminger(listOf(brukerId, brukerId2))
                     result[brukerId] shouldBe true
-                    verify(exactly = 0) { cache.putMany(any(), any(), any()) }
+                    result[brukerId2] shouldBe false
                     server.verify()
                 }
 
                 it("lagrer REST-resultater i cache") {
-                    every { cache.getMany(SKJERMING_CACHE, setOf(brukerId.verdi), Boolean::class) } returns
-                        mapOf(brukerId.verdi to null)
-                    every { cache.putMany(any(), any(), any()) } returns Unit
                     server.expect(times(1), requestTo(cfg.skjermingerUri))
                         .andRespond(withSuccess("""{"${brukerId.verdi}":true}""", APPLICATION_JSON))
 
                     tjeneste.skjerminger(listOf(brukerId))
-
-                    verify(exactly = 1) { cache.putMany(SKJERMING_CACHE, mapOf(brukerId.verdi to true), cfg.varighet) }
+                    cache.getOne(SKJERMING_CACHE, brukerId.verdi, Boolean::class) shouldBe true
                     server.verify()
                 }
             }
         }
 
-        describe("skjerming") {
+        describe("retry") {
 
             it("prøver 4 ganger og kaster RecoverableRestException når alle forsøk feiler") {
                 server.expect(times(4), requestTo(cfg.skjermingUri))
@@ -170,51 +165,51 @@ class SkjermingRetryTest : DescribeSpec() {
                 shouldThrow<IrrecoverableRestException> { tjeneste.skjerming(brukerId) }
                 server.verify()
             }
-        }
 
-        describe("RetryLogger") {
+            describe("RetryLogger") {
 
-            fun withLogCapture(block: (ListAppender<ILoggingEvent>) -> Unit): List<ILoggingEvent> {
-                val logger = LoggerFactory.getLogger(RetryLogger::class.java) as Logger
-                val appender = ListAppender<ILoggingEvent>().also { it.start() }
-                logger.addAppender(appender)
-                try {
-                    block(appender)
-                } finally {
-                    logger.detachAppender(appender)
-                }
-                return appender.list
-            }
-
-            it("logger WARN for hvert retry-forsøk ved RecoverableRestException") {
-                server.expect(times(4), requestTo(cfg.skjermingUri))
-                    .andRespond(withStatus(INTERNAL_SERVER_ERROR))
-
-                val logs = withLogCapture { shouldThrow<RecoverableRestException> { tjeneste.skjerming(brukerId) } }
-                logs.any { e -> e.level == WARN && e.formattedMessage.contains("skjerming") } shouldBe true
-                server.verify()
-            }
-
-            it("logger WARN abort når alle retry-forsøk er brukt opp") {
-                server.expect(times(4), requestTo(cfg.skjermingUri))
-                    .andRespond(withStatus(INTERNAL_SERVER_ERROR))
-
-                val logs = withLogCapture { shouldThrow<RecoverableRestException> { tjeneste.skjerming(brukerId) } }
-
-                logs.last { e -> e.level == WARN }.formattedMessage shouldContain "skjerming"
-                server.verify()
-            }
-
-            it("logger INFO for NotFoundRestException uten retry") {
-                server.expect(times(1), requestTo(cfg.skjermingUri))
-                    .andRespond(withStatus(NOT_FOUND))
-
-                val logs = withLogCapture {
-                    shouldThrow<IrrecoverableRestException> { tjeneste.skjerming(brukerId) }
+                fun withLogCapture(block: (ListAppender<ILoggingEvent>) -> Unit): List<ILoggingEvent> {
+                    val logger = LoggerFactory.getLogger(RetryLogger::class.java) as Logger
+                    val appender = ListAppender<ILoggingEvent>().also { it.start() }
+                    logger.addAppender(appender)
+                    try {
+                        block(appender)
+                    } finally {
+                        logger.detachAppender(appender)
+                    }
+                    return appender.list
                 }
 
-                logs.any { e -> e.level == INFO && e.formattedMessage.contains("skjerming") } shouldBe true
-                server.verify()
+                it("logger WARN for hvert retry-forsøk ved RecoverableRestException") {
+                    server.expect(times(4), requestTo(cfg.skjermingUri))
+                        .andRespond(withStatus(INTERNAL_SERVER_ERROR))
+
+                    val logs = withLogCapture { shouldThrow<RecoverableRestException> { tjeneste.skjerming(brukerId) } }
+                    logs.any { e -> e.level == WARN && e.formattedMessage.contains("skjerming") } shouldBe true
+                    server.verify()
+                }
+
+                it("logger WARN abort når alle retry-forsøk er brukt opp") {
+                    server.expect(times(4), requestTo(cfg.skjermingUri))
+                        .andRespond(withStatus(INTERNAL_SERVER_ERROR))
+
+                    val logs = withLogCapture { shouldThrow<RecoverableRestException> { tjeneste.skjerming(brukerId) } }
+
+                    logs.last { e -> e.level == WARN }.formattedMessage shouldContain "skjerming"
+                    server.verify()
+                }
+
+                it("logger INFO for NotFoundRestException uten retry") {
+                    server.expect(times(1), requestTo(cfg.skjermingUri))
+                        .andRespond(withStatus(NOT_FOUND))
+
+                    val logs = withLogCapture {
+                        shouldThrow<IrrecoverableRestException> { tjeneste.skjerming(brukerId) }
+                    }
+
+                    logs.any { e -> e.level == INFO && e.formattedMessage.contains("skjerming") } shouldBe true
+                    server.verify()
+                }
             }
         }
     }

@@ -158,7 +158,8 @@ tasks.jacocoTestReport {
         files(classDirectories.files.map {
             fileTree(it) {
                 exclude("**/tilgang/BulkSwaggerResultater*.class",
-                        "**/tilgang/BulkSwaggerApiRespons*.class")
+                    "**/tilgang/ProblemDetailResponse*.class",
+                    "**/tilgang/BulkSwaggerApiRespons*.class")
             }
         })
     )

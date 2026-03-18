@@ -1,6 +1,8 @@
 package no.nav.tilgangsmaskin.regler
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldNotThrowAny
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -63,10 +65,13 @@ class RegelTjenesteTest : DescribeSpec() {
 
                 val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
 
-                resultater.godkjente.shouldBe(setOf(resultater.godkjente.single()))
-                resultater.godkjente.single().brukerId shouldBe vanligBrukerId.verdi
-                resultater.avviste.shouldBeEmpty()
-                resultater.ukjente.shouldBeEmpty()
+                assertSoftly {
+                    resultater.godkjente.shouldBe(setOf(resultater.godkjente.single()))
+                    resultater.godkjente.single().brukerId shouldBe vanligBrukerId.verdi
+                    resultater.avviste.shouldBeEmpty()
+                    resultater.ukjente.shouldBeEmpty()
+                }
+
             }
 
             it("avvist bruker havner i avviste når ingen overstyring er registrert") {
@@ -97,6 +102,16 @@ class RegelTjenesteTest : DescribeSpec() {
                     listOf(vanligBrukerId.verdi, ikkeFunnetId.verdi)
                 resultater.avviste.shouldBeEmpty()
                 resultater.ukjente.shouldBeEmpty()
+            }
+
+            it("exception som ikke er RegelException kastes videre") {
+                val funnetBruker = BrukerBuilder(vanligBrukerId).build()
+                every { brukere.brukere(setOf(vanligBrukerId.verdi)) } returns setOf(funnetBruker)
+                every { motor.bulkRegler(any(), any()) } throws RuntimeException("noe gikk galt")
+
+                shouldThrow<RuntimeException> {
+                    regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
+                }
             }
         }
 

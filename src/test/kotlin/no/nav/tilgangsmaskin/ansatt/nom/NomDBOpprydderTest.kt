@@ -19,6 +19,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.util.ReflectionTestUtils
+import org.springframework.test.util.ReflectionTestUtils.setField
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -60,7 +61,7 @@ class NomDBOpprydderTest : DescribeSpec() {
         beforeEach {
             TransactionTemplate(txManager).execute { repo.deleteAll() }
             clearMocks(antallKall, raderFjernet)
-            ReflectionTestUtils.setField(opprydder, "erLeder", false)
+            setField(opprydder, "erLeder", false)
         }
 
         describe("ryddOpp") {
@@ -175,5 +176,5 @@ class NomDBOpprydderTest : DescribeSpec() {
 
     // Sets erLeder=true directly to avoid triggering doHandleLeaderChange as a side effect.
     // doHandleLeaderChange is tested separately in the "doHandleLeaderChange" describe block.
-    private fun blirLeder() = ReflectionTestUtils.setField(opprydder, "erLeder", true)
+    private fun blirLeder() = setField(opprydder, "erLeder", true)
 }

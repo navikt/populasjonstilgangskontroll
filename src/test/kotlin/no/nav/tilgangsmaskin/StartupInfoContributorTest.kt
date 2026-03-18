@@ -7,6 +7,7 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.regler.motor.EgneDataRegel
 import no.nav.tilgangsmaskin.regler.motor.Regel
 import no.nav.tilgangsmaskin.regler.motor.RegelSett
@@ -63,7 +64,7 @@ class StartupInfoContributorTest : DescribeSpec({
 
         beforeEach {
             mockkObject(ClusterUtils)
-            every { ClusterUtils.isProd } returns false
+            every { isProd } returns false
         }
 
         afterEach { unmockkObject(ClusterUtils) }
@@ -87,9 +88,10 @@ class StartupInfoContributorTest : DescribeSpec({
 
     describe("dev-info i prod") {
 
+
         beforeEach {
             mockkObject(ClusterUtils)
-            every { ClusterUtils.isProd } returns true
+            every { isProd } returns true
         }
 
         afterEach { unmockkObject(ClusterUtils) }

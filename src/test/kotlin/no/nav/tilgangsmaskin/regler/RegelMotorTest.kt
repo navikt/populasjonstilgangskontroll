@@ -45,6 +45,7 @@ import no.nav.tilgangsmaskin.regler.motor.SkjermingRegel
 import no.nav.tilgangsmaskin.regler.motor.StrengtFortroligRegel
 import no.nav.tilgangsmaskin.regler.motor.StrengtFortroligUtlandRegel
 import no.nav.tilgangsmaskin.regler.motor.SøskenRegel
+import no.nav.tilgangsmaskin.regler.motor.UkjentBostedRegel
 import no.nav.tilgangsmaskin.regler.motor.UtlandRegel
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
@@ -306,6 +307,18 @@ class RegelMotorTest : DescribeSpec() {
             it("Bruker bosatt i utlandet kan behandles av ansatt med UTENLANDSK-gruppe") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UTENLANDSK).build()
                 val bruker = BrukerBuilder(brukerId).gt(UtenlandskTilknytning()).build()
+                ansatt kanBehandle bruker
+            }
+
+            it("Bruker med ukjent bosted kan ikke behandles av ansatt uten UKJENT_BOSTED-gruppe") {
+                val ansatt = AnsattBuilder(ansattId).build()
+                val bruker = BrukerBuilder(brukerId).gt(UkjentBosted()).build()
+                forventAvvistAv<UkjentBostedRegel>(ansatt, bruker)
+            }
+
+            it("Bruker med ukjent bosted kan behandles av ansatt med UKJENT_BOSTED-gruppe") {
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UKJENT_BOSTED).build()
+                val bruker = BrukerBuilder(brukerId).gt(UkjentBosted()).build()
                 ansatt kanBehandle bruker
             }
         }

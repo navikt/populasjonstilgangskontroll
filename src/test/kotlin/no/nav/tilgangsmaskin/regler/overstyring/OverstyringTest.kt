@@ -4,6 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.extensions.spring.SpringExtension
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.micrometer.core.instrument.MeterRegistry
@@ -28,6 +29,7 @@ import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.RegelTestConfig
 import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
 import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
+import no.nav.tilgangsmaskin.regler.overstyring.OverstyringClientValidator.OverstyringKlientException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
@@ -95,6 +97,25 @@ internal class OverstyringTest : DescribeSpec() {
             every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
             every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
             overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, proxy, validator, OverstyringTeller(registry, token))
+        }
+
+        describe("overstyr") {
+
+            it("exception som ikke er RegelException kastes videre") {
+                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } throws RuntimeException("teknisk feil")
+
+                shouldThrow<RuntimeException> {
+                    overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
+                }
+            }
+
+            it("OverstyringKlientException kastes videre") {
+                every { validator.validerKonsument() } throws OverstyringKlientException("ukjent system", "ukjent-system")
+
+                shouldThrow<OverstyringKlientException> {
+                    overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
+                }
+            }
         }
 
         describe("OverstyringEntity felter") {

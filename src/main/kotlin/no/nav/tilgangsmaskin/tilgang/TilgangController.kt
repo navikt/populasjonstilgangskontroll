@@ -144,15 +144,6 @@ class TilgangController(
         with(brukerId.trim('"')) {
             MDC.put(USER_ID, ansattId().verdi)
             log.trace(CONFIDENTIAL,"Kjører {} regler for {} og {}", regelType, ansattId(), this.maskFnr())
-            if (!isProd) {
-                if (brukerId.length == BRUKERID_LENGTH) {
-                    MDC.put("brukerId", brukerId.take(10) + "X" + brukerId.takeLast(1))
-                }
-                else {
-                    MDC.put("brukerId", brukerId)
-                }
-            }
-
             sjekk(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og $uri")
             sjekk(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")

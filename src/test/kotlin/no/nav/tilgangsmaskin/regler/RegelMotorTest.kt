@@ -18,6 +18,7 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
@@ -27,6 +28,7 @@ import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.utils.LocalAuditor
 import no.nav.tilgangsmaskin.regler.motor.EgneDataRegel
@@ -43,6 +45,7 @@ import no.nav.tilgangsmaskin.regler.motor.SkjermingRegel
 import no.nav.tilgangsmaskin.regler.motor.StrengtFortroligRegel
 import no.nav.tilgangsmaskin.regler.motor.StrengtFortroligUtlandRegel
 import no.nav.tilgangsmaskin.regler.motor.SøskenRegel
+import no.nav.tilgangsmaskin.regler.motor.UtlandRegel
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -292,6 +295,18 @@ class RegelMotorTest : DescribeSpec() {
                 val ansatt = AnsattBuilder(ansattId).build()
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
                 forventAvvistAv<StrengtFortroligUtlandRegel>(ansatt, bruker)
+            }
+
+            it("Bruker bosatt i utlandet kan ikke behandles av ansatt uten UTENLANDSK-gruppe") {
+                val ansatt = AnsattBuilder(ansattId).build()
+                val bruker = BrukerBuilder(brukerId).gt(UtenlandskTilknytning()).build()
+                forventAvvistAv<UtlandRegel>(ansatt, bruker)
+            }
+
+            it("Bruker bosatt i utlandet kan behandles av ansatt med UTENLANDSK-gruppe") {
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UTENLANDSK).build()
+                val bruker = BrukerBuilder(brukerId).gt(UtenlandskTilknytning()).build()
+                ansatt kanBehandle bruker
             }
         }
 

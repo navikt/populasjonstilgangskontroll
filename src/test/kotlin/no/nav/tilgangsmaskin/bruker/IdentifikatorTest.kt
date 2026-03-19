@@ -9,6 +9,36 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 
 class BrukerIdTest : DescribeSpec({
 
+    describe("Identifikator") {
+
+        it("gyldig AktørId (13 siffer) aksepteres") {
+            Identifikator("1234567890123")
+        }
+
+        it("gyldig BrukerId (11 siffer) aksepteres når AktørId feiler") {
+            Identifikator("08526835671")
+        }
+
+        it("verdi som verken er gyldig AktørId eller BrukerId kaster IllegalArgumentException") {
+            shouldThrow<IllegalArgumentException> { Identifikator("abc") }
+        }
+    }
+
+    describe("AktørId") {
+
+        it("gyldig aktørId med 13 siffer aksepteres") {
+            AktørId("1234567890123")
+        }
+
+        it("aktørId med ikke-numeriske tegn kaster IllegalArgumentException") {
+            shouldThrow<IllegalArgumentException> { AktørId("123456789012a") }
+        }
+
+        it("aktørId med feil lengde kaster IllegalArgumentException") {
+            shouldThrow<IllegalArgumentException> { AktørId("123456789") }
+        }
+    }
+
     describe("BrukerId") {
 
         it("Gyldig Fødselsnummer skal opprettes uten problemer") {

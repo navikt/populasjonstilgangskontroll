@@ -123,6 +123,12 @@ class RegelTjenesteTest : DescribeSpec() {
 
                 shouldNotThrowAny { regler.kjerneregler(ansattId, vanligBrukerId.verdi) }
             }
+
+            it("exception fra PDL-oppslag som ikke er NotFoundRestException kastes videre") {
+                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } throws RuntimeException("PDL er nede")
+
+                shouldThrow<RuntimeException> { regler.kjerneregler(ansattId, vanligBrukerId.verdi) }
+            }
         }
 
         describe("kompletteRegler") {
@@ -132,6 +138,12 @@ class RegelTjenesteTest : DescribeSpec() {
                     NotFoundRestException(URI.create("http://pdl"))
 
                 shouldNotThrowAny { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
+            }
+
+            it("exception fra PDL-oppslag som ikke er NotFoundRestException kastes videre") {
+                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } throws RuntimeException("PDL er nede")
+
+                shouldThrow<RuntimeException> { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
             }
 
             it("exception som ikke er RegelException kastes videre, også ved overstyring") {

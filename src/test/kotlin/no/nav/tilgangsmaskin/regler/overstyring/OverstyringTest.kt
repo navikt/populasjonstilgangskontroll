@@ -119,7 +119,7 @@ internal class OverstyringTest : DescribeSpec() {
             }
         }
 
-        xdescribe("OverstyringEntity felter") {
+        describe("OverstyringEntity felter") {
 
             it("alle felter settes når overstyring registreres") {
                 val bruker = BrukerBuilder(vanligBrukerId).build()
@@ -141,7 +141,7 @@ internal class OverstyringTest : DescribeSpec() {
             }
         }
 
-        xdescribe("erOverstyrt") {
+        describe("erOverstyrt") {
 
             it("gyldig overstyring via historisk ident") {
                 val brukerMedHistorikk = BrukerBuilder(vanligBrukerId).historiske(setOf(historiskBrukerId)).build()
@@ -180,7 +180,7 @@ internal class OverstyringTest : DescribeSpec() {
             }
         }
 
-        xdescribe("OverstyringEntityListener") {
+        describe("OverstyringEntityListener") {
 
             it("setter created, updated, oppretter og system ved @PrePersist") {
                 val bruker = BrukerBuilder(vanligBrukerId).build()

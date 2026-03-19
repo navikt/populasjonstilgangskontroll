@@ -87,28 +87,13 @@ jobs:
           EOF
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v5
+        uses: actions/upload-pages-artifact@v4
         with:
           path: build/reports/pages/
 
       - name: Deploy to GitHub Pages
         id: deploy
         uses: actions/deploy-pages@v4
-
-      - name: Print Pages URL
-        run: |
-          echo "Pages URL: ${{ steps.deploy.outputs.page_url }}"
-          echo "Coverage:  ${{ steps.deploy.outputs.page_url }}jacoco/"
-          echo "Tests:     ${{ steps.deploy.outputs.page_url }}tests/"
-
-      - name: Publish Test Report
-        uses: mikepenz/action-junit-report@v6
-        if: always() # always run even if the previous step fails
-        with:
-          include_time_in_summary: 'true'
-          include_passed: 'true'
-          detailed_summary: 'true'
-          report_paths: '**/build/test-results/test/TEST-*.xml'
 
       - name: Generate and submit dependency graph
         uses: gradle/actions/dependency-submission@v5

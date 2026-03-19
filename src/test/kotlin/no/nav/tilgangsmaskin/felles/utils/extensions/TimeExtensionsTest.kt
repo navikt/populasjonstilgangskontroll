@@ -83,41 +83,33 @@ class TimeExtensionsTest : DescribeSpec({
 
     describe("intervallSiden") {
 
-        describe("in 0..6 → MND_0_6") {
             it("nedre grense: 1 dag siden (0 måneder)") {
                 idag.minusDays(1).intervallSiden() shouldBe MND_0_6
             }
             it("øvre grense: 6 måneder siden") {
                 idag.minusMonths(6).intervallSiden() shouldBe MND_0_6
             }
-        }
-
-        describe("in 7..12 → MND_7_12") {
+        
             it("nedre grense: 7 måneder siden") {
                 idag.minusMonths(7).intervallSiden() shouldBe MND_7_12
             }
             it("øvre grense: 12 måneder siden") {
                 idag.minusMonths(12).intervallSiden() shouldBe MND_7_12
             }
-        }
 
-        describe("in 13..24 → MND_13_24") {
             it("nedre grense: 13 måneder siden") {
                 idag.minusMonths(13).intervallSiden() shouldBe MND_13_24
             }
             it("øvre grense: 24 måneder siden") {
                 idag.minusMonths(24).intervallSiden() shouldBe MND_13_24
             }
-        }
 
-        describe("else (> 24) → MND_OVER_24") {
             it("25 måneder siden") {
                 idag.minusMonths(25).intervallSiden() shouldBe MND_OVER_24
             }
             it("10 år siden") {
                 idag.minusYears(10).intervallSiden() shouldBe MND_OVER_24
             }
-        }
     }
 
     describe("Dødsperiode.tekst") {

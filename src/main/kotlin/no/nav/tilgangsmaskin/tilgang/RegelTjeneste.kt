@@ -147,6 +147,9 @@ class RegelTjeneste(
             }.toSet()
         }
 
-    private fun Set<BrukerOgRegelsett>.finnBruker(oppslagId: String)  = first { it.bruker.oppslagId == oppslagId }.bruker
+    private fun Set<BrukerOgRegelsett>.finnBruker(oppslagId: String)  =
+        first {
+            it.bruker.oppslagId == oppslagId
+        }.bruker
 
 }

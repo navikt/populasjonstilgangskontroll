@@ -27,7 +27,7 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
         if (parts.size == 3) "${parts[2]}:${parts[0]}" else system
     }
 
-    val systemNavn get() = system.split(":").lastOrNull() ?: UTILGJENGELIG
+    val systemNavn get() = system.split(":").last()
     val systemAndNs get() = system.split(":").drop(1).joinToString(separator = ":")
     val cluster get() = system.split(":").first()
     val erCC get() = stringClaim(IDTYP) == APP

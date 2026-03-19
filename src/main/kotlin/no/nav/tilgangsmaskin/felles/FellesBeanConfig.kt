@@ -102,11 +102,13 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 
     @Bean
     @ConditionalOnNotProd
+    @Generated
     fun traceRepository() = InMemoryHttpExchangeRepository()
 
 
     @Bean
     @ConditionalOnNotProd
+    @Generated
     fun httpExchangesFilter(repository: HttpExchangeRepository) =
         object : HttpExchangesFilter(repository, defaultIncludes()) {
             override fun shouldNotFilter(request: HttpServletRequest) = request.servletPath.contains("monitoring")

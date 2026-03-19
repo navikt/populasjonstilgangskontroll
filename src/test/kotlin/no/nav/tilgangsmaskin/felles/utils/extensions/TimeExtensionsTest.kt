@@ -89,7 +89,7 @@ class TimeExtensionsTest : DescribeSpec({
             it("øvre grense: 6 måneder siden") {
                 idag.minusMonths(6).intervallSiden() shouldBe MND_0_6
             }
-        
+
             it("nedre grense: 7 måneder siden") {
                 idag.minusMonths(7).intervallSiden() shouldBe MND_7_12
             }

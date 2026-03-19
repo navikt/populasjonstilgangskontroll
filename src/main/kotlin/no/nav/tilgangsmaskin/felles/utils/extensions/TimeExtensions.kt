@@ -54,13 +54,15 @@ object TimeExtensions {
                                                                                  )
         .format(DateTimeFormatter.ofPattern(fmt))
 
-    fun LocalDate.intervallSiden() =
-        when (månederSidenIdag()) {
-            in 0..6 -> MND_0_6
-            in 7..12 -> MND_7_12
-            in 13..24 -> MND_13_24
+    fun LocalDate.intervallSiden(): Dødsperiode {
+        val måneder = månederSidenIdag()
+        return when {
+            måneder <= 6 -> MND_0_6
+            måneder <= 12 -> MND_7_12
+            måneder <= 24 -> MND_13_24
             else -> MND_OVER_24
         }
+    }
 
     enum class Dødsperiode(val tekst: String) {
         MND_0_6("0-6"),

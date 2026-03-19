@@ -250,6 +250,6 @@ internal class OverstyringTest : DescribeSpec() {
 
     companion object {
         @ServiceConnection
-        private val postgres = PostgreSQLContainer("postgres:17")
+        private val postgres = PostgreSQLContainer("postgres:18")
     }
 }

@@ -148,11 +148,9 @@ class TilgangController(
             sjekk(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")
             tell("single")
-            if (regelType == KJERNE_REGELTYPE) {
-                return regelTjeneste.kjerneregler(ansattId(), this)
-            }
-            if (regelType == KOMPLETT_REGELTYPE) {
-                return regelTjeneste.kompletteRegler(ansattId(), this)
+            return when (regelType) {
+                KJERNE_REGELTYPE -> regelTjeneste.kjerneregler(ansattId(), this)
+                else -> regelTjeneste.kompletteRegler(ansattId(), this)
             }
         }
 

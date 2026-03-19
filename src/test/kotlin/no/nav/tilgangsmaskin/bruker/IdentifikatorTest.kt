@@ -80,5 +80,9 @@ class BrukerIdTest : DescribeSpec({
         it("W2=1: kaster IllegalArgumentException (10000000910)") {
             shouldThrow<IllegalArgumentException> { BrukerId("10000000910") }
         }
+
+        it("W2 kontrollsiffer matcher ikke: kaster IllegalArgumentException (08526835672)") {
+            shouldThrow<IllegalArgumentException> { BrukerId("08526835672") }
+        }
     }
 })

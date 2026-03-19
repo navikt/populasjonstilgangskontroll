@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
@@ -13,12 +14,15 @@ class NomHendelseLogger(private val registry: MeterRegistry, private val repo: N
         size()
     }
     private val log = getLogger(javaClass)
+    @Generated
     fun ok(ansattId: String, brukerId: String) =
         log.info("Lagret brukerId ${brukerId.maskFnr()} for $ansattId OK")
 
+    @Generated
     fun start(hendelser: List<NomHendelse>) =
         log.info("Mottok ${hendelser.size} hendelse(r) fra NOM")
 
+    @Generated
     fun behandler(hendelse: NomHendelse) =
         log.info("Behandler hendelse fra NOM: {}", hendelse)
 

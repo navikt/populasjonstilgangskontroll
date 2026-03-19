@@ -34,6 +34,7 @@ import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.context.TestPropertySource
+import org.springframework.test.web.client.ExpectedCount.never
 import org.springframework.test.web.client.ExpectedCount.times
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
@@ -128,6 +129,9 @@ class SkjermingTjenesteTest : DescribeSpec() {
                 }
 
                 it("kaller ikke REST når ingen identer") {
+                    server.expect(never(), requestTo(cfg.skjermingerUri))
+                        .andRespond(withSuccess("{}", APPLICATION_JSON))
+
                     val result = tjeneste.skjerminger(emptyList())
                     result shouldBe emptyMap()
                     server.verify()

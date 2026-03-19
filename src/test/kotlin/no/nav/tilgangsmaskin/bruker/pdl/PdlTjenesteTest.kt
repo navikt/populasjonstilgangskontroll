@@ -35,6 +35,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.context.TestPropertySource
+import org.springframework.test.web.client.ExpectedCount.never
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
@@ -108,6 +109,9 @@ class PdlTjenesteTest : DescribeSpec() {
             it("REST kalles ikke når alle er i cache") {
                 cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(2))
                 cache.putOne(PDL_MED_FAMILIE_CACHE, I2, P2, ofSeconds(2))
+                server.expect(never(), requestTo(cfg.personerURI))
+                    .andRespond(withSuccess("[]", APPLICATION_JSON))
+
                 pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
                 server.verify()
             }
@@ -126,6 +130,9 @@ class PdlTjenesteTest : DescribeSpec() {
             }
 
             it("REST kalles ikke når settet er tomt") {
+                server.expect(never(), requestTo(cfg.personerURI))
+                    .andRespond(withSuccess("[]", APPLICATION_JSON))
+
                 pdl.personer(emptySet()) shouldContainExactlyInAnyOrder emptyList()
                 server.verify()
             }

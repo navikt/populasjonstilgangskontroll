@@ -1,4 +1,5 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+import java.lang.System.getProperty
 
 val javaVersion = JavaLanguageVersion.of(25)
 val springdocVersion = "3.0.1"
@@ -39,7 +40,7 @@ springBoot {
             additional = mapOf(
                 "kotlin.version" to "2.3.0",
                 "jdk.version" to javaVersion.asInt().toString(),
-                "jdk.vendor" to System.getProperty("java.vendor")
+                "jdk.vendor" to getProperty("java.vendor")
             )
         }
     }

@@ -9,6 +9,8 @@ import jakarta.persistence.GenerationType.IDENTITY
 import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
+import no.nav.tilgangsmaskin.ansatt.AnsattId.Companion.ANSATTID_LENGTH
+import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.Instant
 import kotlin.annotation.AnnotationRetention.RUNTIME
@@ -22,8 +24,8 @@ import kotlin.annotation.AnnotationTarget.FIELD
 )
 @EntityListeners(OverstyringEntityListener::class, AuditingEntityListener::class)
 class OverstyringEntity(
-        @Column(length = 7, nullable = false) val navid: String,
-        @Column(length = 11, nullable = false) val fnr: String,
+        @Column(length = ANSATTID_LENGTH, nullable = false) val navid: String,
+        @Column(length = BRUKERID_LENGTH, nullable = false) val fnr: String,
         @Column(length = 400, nullable = false) val begrunnelse: String,
         @Column(length = 6) val enhet: String,
         @Column(nullable = false) val expires: Instant) {

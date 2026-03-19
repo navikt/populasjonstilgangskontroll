@@ -74,6 +74,7 @@ internal class OverstyringTest : DescribeSpec() {
     @Autowired
     lateinit var registry: MeterRegistry
     @Autowired lateinit var adapter: OverstyringJPAAdapter
+    @Autowired lateinit var repository: OverstyringRepository
     @MockK
     lateinit var ansatte: AnsattTjeneste
     @MockK
@@ -176,6 +177,73 @@ internal class OverstyringTest : DescribeSpec() {
                 every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
 
                 overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe false
+            }
+        }
+
+        describe("OverstyringEntityListener") {
+
+            it("setter created, updated, oppretter og system ved @PrePersist") {
+                val bruker = BrukerBuilder(vanligBrukerId).build()
+                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+
+                overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+
+                val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                entity.created shouldNotBe null
+                entity.updated shouldNotBe null
+                entity.created shouldBe entity.updated
+                entity.oppretter shouldBe ansattId.verdi
+                entity.system shouldBe "test"
+            }
+
+            it("laster entity med korrekte felter fra database ved @PostLoad") {
+                val bruker = BrukerBuilder(vanligBrukerId).build()
+                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+
+                overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+
+                val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                val lastet = repository.findById(entity.id)
+
+                lastet.isPresent shouldBe true
+                with(lastet.get()) {
+                    navid shouldBe ansattId.verdi
+                    fnr shouldBe vanligBrukerId.verdi
+                    created shouldNotBe null
+                    updated shouldNotBe null
+                    oppretter shouldBe ansattId.verdi
+                    system shouldBe "test"
+                }
+            }
+
+            it("nullstiller system og oppretter til tokenverdi ved @PreUpdate") {
+                val bruker = BrukerBuilder(vanligBrukerId).build()
+                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+
+                overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+
+                val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                val createdFør = entity.created
+                entity.system = "ukjent-system"
+                entity.oppretter = "X000000"
+                repository.saveAndFlush(entity)
+
+                val oppdatert = repository.findById(entity.id).get()
+                oppdatert.system shouldBe "test"
+                oppdatert.oppretter shouldBe ansattId.verdi
+                oppdatert.created shouldBe createdFør
+            }
+
+            it("fjerner entity fra database ved @PreRemove og @PostRemove") {
+                val bruker = BrukerBuilder(vanligBrukerId).build()
+                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+
+                overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+
+                val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                repository.delete(entity)
+
+                repository.findById(entity.id).isPresent shouldBe false
             }
         }
     }

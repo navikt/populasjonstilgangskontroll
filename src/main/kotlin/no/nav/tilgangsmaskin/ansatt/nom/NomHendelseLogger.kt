@@ -35,6 +35,7 @@ class NomHendelseLogger(private val registry: MeterRegistry, private val repo: N
         registry.gauge("nom.size",repo) {
             repo.count().toDouble()
         }
+    @Generated
     fun feilet(ansattId: String, brukerId: String, e: Throwable) =
         log.error("Kunne ikke lagre brukerId ${brukerId.maskFnr()} for $ansattId (${e.message})", e)
 }

@@ -8,14 +8,18 @@ import io.mockk.slot
 import io.mockk.verify
 import no.nav.tilgangsmaskin.felles.utils.LederUtvelger.LeaderChangedEvent
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod.GET
 import org.springframework.http.HttpStatus.OK
 import org.springframework.http.MediaType.TEXT_EVENT_STREAM_VALUE
 import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.ExchangeFunction
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientRequestException
 import reactor.core.publisher.Mono
 import java.net.URI
 import java.time.LocalDateTime
+import java.util.concurrent.atomic.AtomicInteger
 
 class LederUtvelgerTest : DescribeSpec({
 
@@ -102,6 +106,36 @@ class LederUtvelgerTest : DescribeSpec({
             utvelger.onShutdown()
             Thread.sleep(200)
 
+            verify(exactly = 0) { publisher.publishEvent(any<LeaderChangedEvent>()) }
+        }
+    }
+
+    describe("shuttingDown filter i retryWhen") {
+
+        it("hindrer retry av WebClientRequestException når shuttingDown er true") {
+            val callCount = AtomicInteger(0)
+            val failingExchange = ExchangeFunction { _ ->
+                callCount.incrementAndGet()
+                Mono.error(
+                    WebClientRequestException(
+                        RuntimeException("connection refused"),
+                        GET,
+                        URI.create("http://elector/sse"),
+                        HttpHeaders()
+                    )
+                )
+            }
+            val utvelger = LederUtvelger(
+                WebClient.builder().exchangeFunction(failingExchange),
+                URI.create("http://elector/sse"),
+                publisher
+            )
+
+            utvelger.onPreDestroy()       // shuttingDown = true before any retry
+            utvelger.onApplicationReady() // exchange is called once, filter returns false → no retry
+            Thread.sleep(200)
+
+            callCount.get() shouldBe 1
             verify(exactly = 0) { publisher.publishEvent(any<LeaderChangedEvent>()) }
         }
     }

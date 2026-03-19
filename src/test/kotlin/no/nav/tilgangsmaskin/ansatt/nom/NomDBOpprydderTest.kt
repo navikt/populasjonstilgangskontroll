@@ -18,7 +18,6 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.util.ReflectionTestUtils
 import org.springframework.test.util.ReflectionTestUtils.setField
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
@@ -171,10 +170,7 @@ class NomDBOpprydderTest : DescribeSpec() {
                 it.created = now
                 it.updated = now
             })
-        }!!
+        }
     }
-
-    // Sets erLeder=true directly to avoid triggering doHandleLeaderChange as a side effect.
-    // doHandleLeaderChange is tested separately in the "doHandleLeaderChange" describe block.
     private fun blirLeder() = setField(opprydder, "erLeder", true)
 }

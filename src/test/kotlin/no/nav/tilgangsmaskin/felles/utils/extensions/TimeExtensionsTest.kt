@@ -83,33 +83,40 @@ class TimeExtensionsTest : DescribeSpec({
 
     describe("intervallSiden") {
 
-        it("dato 0 måneder siden gir MND_0_6") {
-            idag.minusDays(1).intervallSiden() shouldBe MND_0_6
+        describe("in 0..6 → MND_0_6") {
+            it("nedre grense: 1 dag siden (0 måneder)") {
+                idag.minusDays(1).intervallSiden() shouldBe MND_0_6
+            }
+            it("øvre grense: 6 måneder siden") {
+                idag.minusMonths(6).intervallSiden() shouldBe MND_0_6
+            }
         }
 
-        it("dato 6 måneder siden gir MND_0_6") {
-            idag.minusMonths(6).intervallSiden() shouldBe MND_0_6
+        describe("in 7..12 → MND_7_12") {
+            it("nedre grense: 7 måneder siden") {
+                idag.minusMonths(7).intervallSiden() shouldBe MND_7_12
+            }
+            it("øvre grense: 12 måneder siden") {
+                idag.minusMonths(12).intervallSiden() shouldBe MND_7_12
+            }
         }
 
-        it("dato 7 måneder siden gir MND_7_12") {
-            idag.minusMonths(7).intervallSiden() shouldBe MND_7_12
+        describe("in 13..24 → MND_13_24") {
+            it("nedre grense: 13 måneder siden") {
+                idag.minusMonths(13).intervallSiden() shouldBe MND_13_24
+            }
+            it("øvre grense: 24 måneder siden") {
+                idag.minusMonths(24).intervallSiden() shouldBe MND_13_24
+            }
         }
 
-        it("dato 12 måneder siden gir MND_7_12") {
-            idag.minusMonths(12).intervallSiden() shouldBe MND_7_12
-        }
-
-        it("dato 13 måneder siden gir MND_13_24") {
-            idag.minusMonths(13).intervallSiden() shouldBe MND_13_24
-        }
-
-        it("dato 24 måneder siden gir MND_13_24") {
-            idag.minusMonths(24).intervallSiden() shouldBe MND_13_24
-        }
-
-        it("dato over 24 måneder siden gir MND_7_12 (else-branch i when)") {
-            // NB: else-branch mapper til MND_7_12, ikke MND_OVER_24
-            idag.minusMonths(25).intervallSiden() shouldBe MND_7_12
+        describe("else (> 24) → MND_OVER_24") {
+            it("25 måneder siden") {
+                idag.minusMonths(25).intervallSiden() shouldBe MND_OVER_24
+            }
+            it("10 år siden") {
+                idag.minusYears(10).intervallSiden() shouldBe MND_OVER_24
+            }
         }
     }
 

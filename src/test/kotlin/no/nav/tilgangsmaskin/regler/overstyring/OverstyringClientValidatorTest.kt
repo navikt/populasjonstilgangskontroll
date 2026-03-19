@@ -5,7 +5,7 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringClientValidator.OverstyringKlientException
+import no.nav.tilgangsmaskin.regler.overstyring.OverstyringClientValidator.OverstyringException
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.mock.env.MockEnvironment
 
@@ -30,14 +30,14 @@ class OverstyringClientValidatorTest : DescribeSpec({
 
             it("kaster for ukjent system") {
                 every { token.systemNavn } returns "ukjent-system"
-                shouldThrow<OverstyringKlientException> {
+                shouldThrow<OverstyringException> {
                     validator(listOf("prod-gcp")).validerKonsument()
                 }
             }
 
             it("exception inneholder systemnavnet") {
                 every { token.systemNavn } returns "ukjent-system"
-                val ex = shouldThrow<OverstyringKlientException> {
+                val ex = shouldThrow<OverstyringException> {
                     validator(listOf("prod-gcp")).validerKonsument()
                 }
                 ex.system shouldBe "ukjent-system"

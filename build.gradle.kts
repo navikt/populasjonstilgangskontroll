@@ -101,7 +101,6 @@ dependencies {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
-    testImplementation("io.github.ss-bhatt:testcontainers-valkey:1.0.0")
     testImplementation("com.redis:testcontainers-redis")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     testImplementation("org.testcontainers:testcontainers-postgresql")
@@ -114,7 +113,7 @@ dependencies {
     testImplementation("org.awaitility:awaitility-kotlin:$awaitilityVersion")
     testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
-    implementation("io.kotest:kotest-extensions-spring:6.1.5")
+    testImplementation("io.kotest:kotest-extensions-spring:$kotestVersion")
 }
 
 

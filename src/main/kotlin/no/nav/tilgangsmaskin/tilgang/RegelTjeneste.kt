@@ -142,7 +142,7 @@ class RegelTjeneste(
             val brukere = brukerTjeneste.brukere(keys)
             log.debug("Fant {} av {} brukere", brukere.size, keys.size)
             brukere.map { bruker ->
-                val idOgType = this[bruker.oppslagId] ?: error("Bruker ${bruker.brukerId} har ikke oppslagId")
+                val idOgType = this[bruker.oppslagId] 
                 BrukerOgRegelsett(bruker, idOgType.type)
             }.toSet()
         }

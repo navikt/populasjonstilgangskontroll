@@ -6,6 +6,7 @@ import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable
 
 @UnprotectedRestController(value = ["/${DEV}/ansatt/"])
 @ConditionalOnNotProd
+@Generated
 @Tag(name = "DevAnsattController", description = "Denne kontrolleren skal kun brukes til testing")
 class DevAnsattController(
     private val ansatte: AnsattTjeneste,

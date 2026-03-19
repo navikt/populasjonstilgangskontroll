@@ -5,6 +5,7 @@ import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 
 @UnprotectedRestController(value = ["/${DEV}/regel/"])
 @ConditionalOnNotProd
+@Generated
 @Tag(name = "DevRegelController", description = "Denne kontrolleren skal kun brukes til testing")
 class DevRegelController(private val regler: RegelTjeneste) {
     @GetMapping("komplett/{ansattId}/{brukerId}")

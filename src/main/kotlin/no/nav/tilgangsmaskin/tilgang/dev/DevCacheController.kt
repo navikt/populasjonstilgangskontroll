@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMIN
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.Person
+import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody
 
 @UnprotectedRestController(value = ["/${DEV}/cache"])
 @ConditionalOnNotProd
+@Generated
 @Tag(name = "DevCacheController", description = "Denne kontrolleren skal kun brukes til testing")
 class DevCacheController(private val cacheClient: CacheClient) {
 

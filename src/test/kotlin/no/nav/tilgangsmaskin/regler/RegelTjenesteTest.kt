@@ -134,9 +134,11 @@ class RegelTjenesteTest : DescribeSpec() {
                 shouldNotThrowAny { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
             }
 
-            it("exception som ikke er RegelException kastes videre") {
+            it("exception som ikke er RegelException kastes videre, også ved overstyring") {
                 val funnetBruker = BrukerBuilder(vanligBrukerId).build()
                 every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns funnetBruker
+                every { overstyring.erOverstyrt(ansattId, funnetBruker.brukerId) } returns true
+
                 every { motor.kompletteRegler(any(), any()) } throws RuntimeException("noe gikk galt")
 
                 shouldThrow<RuntimeException> {

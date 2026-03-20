@@ -7,8 +7,10 @@ import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.setIDs
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.entries
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
+import no.nav.tilgangsmaskin.ansatt.graph.EntraTjenesteTest.CacheConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
@@ -30,7 +32,7 @@ import java.util.*
 
 @RestClientTest(components = [EntraRestClientAdapter::class, EntraClientBeanConfig::class, EntraTjeneste::class])
 @EnableConfigurationProperties(EntraConfig::class)
-@Import(EntraTjenesteTest.CacheConfig::class)
+@Import(CacheConfig::class)
 @TestPropertySource(properties = ["graph.base-uri=http://graph"])
 @ApplyExtension(SpringExtension::class)
 class EntraTjenesteTest : DescribeSpec() {
@@ -39,16 +41,25 @@ class EntraTjenesteTest : DescribeSpec() {
     @EnableCaching
     @EnableResilientMethods
     class CacheConfig {
-        @Bean fun cacheManager(): CacheManager = ConcurrentMapCacheManager(GRAPH)
+        @Bean
+        fun cacheManager(): CacheManager = ConcurrentMapCacheManager(GRAPH)
     }
 
-    @MockkBean @Suppress("unused")
-    lateinit var oidTjeneste: AnsattOidTjeneste
+    @MockkBean
+    @Suppress("unused")
+    private lateinit var oidTjeneste: AnsattOidTjeneste
 
-    @Autowired lateinit var tjeneste: EntraTjeneste
-    @Autowired lateinit var server: MockRestServiceServer
-    @Autowired lateinit var cfg: EntraConfig
-    @Autowired lateinit var cacheManager: CacheManager
+    @Autowired
+    private lateinit var tjeneste: EntraTjeneste
+
+    @Autowired
+    private lateinit var server: MockRestServiceServer
+
+    @Autowired
+    private lateinit var cfg: EntraConfig
+
+    @Autowired
+    private lateinit var cacheManager: CacheManager
 
     private val ansattId = AnsattId("Z999999")
     private val oid = UUID.fromString("11111111-1111-1111-1111-111111111111")
@@ -66,9 +77,13 @@ class EntraTjenesteTest : DescribeSpec() {
     init {
 
         beforeEach {
-            GlobalGruppe.setIDs(GlobalGruppe.entries.associate { it.property to UUID.randomUUID() })
+            setIDs(entries.associate { it.property to UUID.randomUUID() })
             server.reset()
             cacheManager.getCache(GRAPH)?.clear()
+        }
+
+        afterEach {
+            server.verify()
         }
 
         describe("geoGrupper") {
@@ -82,7 +97,6 @@ class EntraTjenesteTest : DescribeSpec() {
                     EntraGruppe(gruppe1, "0000-GA-GEO-$gruppe1"),
                     EntraGruppe(gruppe2, "0000-GA-GEO-$gruppe2")
                 )
-                server.verify()
             }
 
             it("returnerer tom mengde når ansatt ikke har geo-grupper") {
@@ -91,7 +105,6 @@ class EntraTjenesteTest : DescribeSpec() {
                     .andRespond(withSuccess("""{ "value": [] }""", APPLICATION_JSON))
 
                 tjeneste.geoGrupper(ansattId, oid) shouldBe emptySet()
-                server.verify()
             }
 
             it("følger paginering via @odata.nextLink") {
@@ -112,7 +125,6 @@ class EntraTjenesteTest : DescribeSpec() {
                     EntraGruppe(gruppe1, "0000-GA-GEO-$gruppe1"),
                     EntraGruppe(gruppe2, "0000-GA-GEO-$gruppe2")
                 )
-                server.verify()
             }
         }
 
@@ -127,7 +139,6 @@ class EntraTjenesteTest : DescribeSpec() {
                     EntraGruppe(gruppe1, "0000-GA-GEO-$gruppe1"),
                     EntraGruppe(gruppe2, "0000-GA-GEO-$gruppe2")
                 )
-                server.verify()
             }
 
             it("returnerer tom mengde når ansatt ikke har grupper") {
@@ -136,7 +147,6 @@ class EntraTjenesteTest : DescribeSpec() {
                     .andRespond(withSuccess("""{ "value": [] }""", APPLICATION_JSON))
 
                 tjeneste.geoOgGlobaleGrupper(ansattId, oid) shouldBe emptySet()
-                server.verify()
             }
         }
     }

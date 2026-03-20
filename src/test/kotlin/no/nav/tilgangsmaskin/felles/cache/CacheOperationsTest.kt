@@ -177,8 +177,8 @@ class CacheOperationsTest : BehaviorSpec() {
         }
 
         private data class TestData(val id: String, val navn: String, val alder: Int, val kontakt: Kontakt) {
-            data class Kontakt(val epost: String, val telefon: String, val adresse: Adresse) {
-                data class Adresse(val gate: String, val postnummer: String, val by: String)
+            internal data class Kontakt(val epost: String, val telefon: String, val adresse: Adresse) {
+                 internal data class Adresse(val gate: String, val postnummer: String, val by: String)
             }
             companion object {
                 fun of(id: String) = TestData(

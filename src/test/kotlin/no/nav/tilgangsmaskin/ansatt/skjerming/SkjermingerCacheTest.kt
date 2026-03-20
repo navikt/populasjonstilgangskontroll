@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
+import io.kotest.assertions.nondeterministic.eventually
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.maps.shouldContainExactly
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
@@ -7,7 +8,6 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMIN
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.AbstractCacheTest
 import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetEvent
-import org.awaitility.kotlin.await
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationListener
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
@@ -21,6 +21,7 @@ import tools.jackson.databind.json.JsonMapper
 import java.net.URI
 import java.time.Duration
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.seconds
 
 class SkjermingerCacheTest : AbstractCacheTest() {
 
@@ -71,7 +72,9 @@ class SkjermingerCacheTest : AbstractCacheTest() {
                     mottatt.add(it)
                 })
                 putOne(ID1, false)
-                await.atMost(3, TimeUnit.SECONDS).until { mottatt.isNotEmpty() }
+                eventually(3.seconds) {
+                    mottatt.isNotEmpty()
+                }
             }
 
             it("Rest kalles igjen etter at et cache-innslag er slettet") {

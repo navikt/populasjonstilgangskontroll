@@ -1,13 +1,14 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import io.kotest.assertions.nondeterministic.eventually
+import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import org.awaitility.kotlin.await
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import java.time.Duration
 import java.time.Duration.ofSeconds
-import java.util.concurrent.TimeUnit.*
+import kotlin.time.Duration.Companion.seconds
 
 class CacheOperationsTest : AbstractCacheTest() {
 
@@ -28,16 +29,17 @@ class CacheOperationsTest : AbstractCacheTest() {
             it("Put og get en verdi, og verifiser at den er borte etter utløp") {
                 putOne(T2)
                 getOne(T2.id) shouldBe T2
-                await.atMost(4, SECONDS).until {
-                    getOne(T2.id) == null
+
+                eventually(4.seconds) {
+                    getOne(T2.id) shouldBe null
                 }
             }
 
             it("Put og get flere verdier, og verifiser at de er borte etter utløp") {
                 putMany(T1, T2)
                 getMany(IDS).keys shouldBe IDS
-                await.atMost(4, SECONDS).until {
-                    getMany(IDS).isEmpty()
+                eventually(4.seconds) {
+                    getMany(IDS).shouldBeEmpty()
                 }
             }
 

@@ -35,7 +35,7 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
                     content = [Content(
                             mediaType = APPLICATION_PROBLEM_JSON_VALUE,
                             schema = Schema(
-                                    implementation = ProblemDetailResponse::class,
+                                    implementation = ProblemSwaggerDetailResponse::class,
                                     example = """{
                         "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
                         "title": "AVVIST_STRENGT_FORTROLIG_ADRESSE",
@@ -49,7 +49,7 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
                     }"""))])])
 annotation class ProblemDetailApiResponse
 @Schema(description = "Problem Detail")
-internal data class ProblemDetailResponse(
+internal data class ProblemSwaggerDetailResponse(
         val type: URI,
         val title: AvvisningsKode,
         val status: Int,

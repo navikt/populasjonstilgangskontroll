@@ -144,23 +144,15 @@ java {
         languageVersion.set(javaVersion)
     }
 }
-/*
-tasks.test {
-    jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
-  //  jvmArgs("-javaagent:${configurations.jacocoAgent.get().asPath}")
-    jvmArgs("-Dkotlinx.coroutines.debug=off")
-    useJUnitPlatform()
-} */
+
 tasks.named<Test>("test") {
     useJUnitPlatform()
 
     maxHeapSize = "4g"
-
     jvmArgs =
         listOf(
             "--add-opens",
             "java.base/java.util=ALL-UNNAMED",
-            //"-javaagent:${configurations.jacocoAgent.get().asPath}",
             "-Dkotlinx.coroutines.debug=off",
         )
 }
@@ -170,10 +162,7 @@ tasks.jacocoTestReport {
     classDirectories.setFrom(
         files(classDirectories.files.map {
             fileTree(it) {
-                exclude("**/tilgang/BulkSwaggerResultater*.class",
-                    "**/tilgang/dev/*.class",
-                    "**/tilgang/ProblemDetailResponse*.class",
-                    "**/tilgang/BulkSwaggerApiRespons*.class")
+                exclude("**/tilgang/*Swagger*.class", "**/tilgang/dev/*.class")
             }
         })
     )
@@ -188,12 +177,5 @@ kotlin {
 
     compilerOptions {
         freeCompilerArgs.add("-Xjsr305=strict")
-    }
-}
-tasks.register("printTestClasspath") {
-    doLast {
-        configurations["testRuntimeClasspath"].resolvedConfiguration.resolvedArtifacts
-            .filter { it.name.contains("spring-boot") }
-            .forEach { println(it.file) }
     }
 }

@@ -33,16 +33,14 @@ class BrukerMapperTest : DescribeSpec({
     val aktorId = "1234567890123"
 
     fun geoUtland() = PdlGeografiskTilknytning(UTLAND, gtLand = GTLand("SWE"))
-    fun geoKommune() = PdlGeografiskTilknytning(KOMMUNE, gtKommune = GTKommune("1234"))
+    fun geoKommune() = PdlGeografiskTilknytning(KOMMUNE, GTKommune("1234"))
 
     fun pipRespons(
         gradering: PdlAdressebeskyttelseGradering? = null,
-        geo: PdlGeografiskTilknytning = geoUtland(),
-    ) = PdlRespons(
-        PdlPerson(gradering?.let { listOf(PdlAdressebeskyttelse(it)) } ?: emptyList()),
-        PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT), PdlIdent(aktorId, false, AKTORID))),
-        geo
-    )
+        geo: PdlGeografiskTilknytning = geoUtland()) =
+        PdlRespons(PdlPerson(gradering?.let { listOf(PdlAdressebeskyttelse(it)) } ?: emptyList()),
+            PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT), PdlIdent(aktorId, false, AKTORID))),
+            geo)
 
     describe("tilBruker") {
 

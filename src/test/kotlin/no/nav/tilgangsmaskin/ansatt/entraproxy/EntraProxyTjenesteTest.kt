@@ -28,8 +28,10 @@ class EntraProxyTjenesteTest : DescribeSpec() {
     @Autowired lateinit var server: MockRestServiceServer
     @Autowired lateinit var cfg: EntraProxyConfig
 
+    private val ansattId = AnsattId("Z999999")
+
     init {
-        val ansattId = AnsattId("Z999999")
+        afterEach { server.verify() }
 
         describe("enhet") {
             it("returnerer enhet for ansatt") {
@@ -45,10 +47,7 @@ class EntraProxyTjenesteTest : DescribeSpec() {
                         }
                     """.trimIndent(), APPLICATION_JSON))
 
-                val enhet = tjeneste.enhet(ansattId)
-
-                enhet shouldBe Enhet(Enhetsnummer("1234"), "NAV Testkontor")
-                server.verify()
+                tjeneste.enhet(ansattId) shouldBe Enhet(Enhetsnummer("1234"), "NAV Testkontor")
             }
         }
 
@@ -64,13 +63,10 @@ class EntraProxyTjenesteTest : DescribeSpec() {
                         ]
                     """.trimIndent(), APPLICATION_JSON))
 
-                val enheter = tjeneste.enheter(ansattId)
-
-                enheter shouldBe setOf(
+                tjeneste.enheter(ansattId) shouldBe setOf(
                     Enhet(Enhetsnummer("1234"), "NAV Testkontor"),
                     Enhet(Enhetsnummer("5678"), "NAV Annenkontor")
                 )
-                server.verify()
             }
 
             it("returnerer tom liste når ansatt ikke har enheter") {
@@ -78,12 +74,8 @@ class EntraProxyTjenesteTest : DescribeSpec() {
                     .andExpect(method(GET))
                     .andRespond(withSuccess("[]", APPLICATION_JSON))
 
-                val enheter = tjeneste.enheter(ansattId)
-
-                enheter shouldBe emptySet()
-                server.verify()
+                tjeneste.enheter(ansattId) shouldBe emptySet()
             }
         }
     }
 }
-

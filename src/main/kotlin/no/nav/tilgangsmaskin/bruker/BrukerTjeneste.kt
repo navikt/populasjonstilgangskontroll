@@ -46,7 +46,7 @@ class BrukerTjeneste(private val personTjeneste: PdlTjeneste, val skjermingTjene
 
     @WithSpan
     fun brukerMedUtvidetFamilie(brukerId: String) =
-        brukerMedSkjerming(brukerId, personTjeneste::medUtvidetFamile)
+        brukerMedSkjerming(brukerId, personTjeneste::medUtvidetFamilie)
 
     @WithSpan
     private fun brukerMedSkjerming(id: String, hentFamilie: (String) -> Person) =

@@ -25,7 +25,7 @@ class DevBrukerController(private val brukere: BrukerTjeneste,
 
 
     @GetMapping("person/{id}")
-    fun person(@PathVariable id: String) = pdl.medUtvidetFamile(id)
+    fun person(@PathVariable id: String) = pdl.medUtvidetFamilie(id)
 
     @PostMapping("brukere")
     fun brukere(@RequestBody ids: Set<String>) = brukere.brukere(ids)

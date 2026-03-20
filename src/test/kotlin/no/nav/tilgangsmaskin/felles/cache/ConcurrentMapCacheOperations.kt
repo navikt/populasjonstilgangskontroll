@@ -33,6 +33,5 @@ class ConcurrentMapCacheOperations(private val cacheManager: CacheManager) : Cac
         innslag.forEach { (id, value) -> c.put(tilNøkkel(cache, id), value) }
     }
 
-    // Matches CacheNøkkelHandler format: "cacheName::extraPrefix:id" or "cacheName::id"
     override fun tilNøkkel(cache: CachableConfig, id: String) = cache.extraPrefix ?.let { "$it:$id"  } ?: id
 }

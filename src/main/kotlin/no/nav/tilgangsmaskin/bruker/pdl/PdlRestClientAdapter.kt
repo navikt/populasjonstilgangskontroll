@@ -30,12 +30,14 @@ class PdlRestClientAdapter(
         tilPersoner(mapper.readValue<Map<String, PdlRespons?>>(post<String>(cf.personerURI, identer)))
 
     @WithSpan
-    fun søsken(person: Person) =
-        buildSet {
+    fun søsken(person: Person): Set<FamilieMedlem> {
+        if (person.foreldre.isEmpty()) return emptySet()
+        return buildSet {
             personer(person.foreldre.map { it.brukerId.verdi }.toSet())
                 .flatMap { it.value.barn }
                 .filterNot { it.brukerId.verdi == person.brukerId.verdi }
                 .mapTo(this) { FamilieMedlem(it.brukerId, SØSKEN) }
         }
+    }
 }
 

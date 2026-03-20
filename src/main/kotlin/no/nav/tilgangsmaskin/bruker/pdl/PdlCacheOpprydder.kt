@@ -50,7 +50,7 @@ class PdlCacheOpprydder(private val pdl: PdlTjeneste,
     private fun refresh(identer: List<String>, gradering: String) =
         identer.forEach { id ->
             pdl.medFamilie(id)
-            pdl.medUtvidetFamile(id)
+            pdl.medUtvidetFamilie(id)
             log.info("Oppdaterte PDL caches for identer etter hendelse av type $gradering")
         }
 

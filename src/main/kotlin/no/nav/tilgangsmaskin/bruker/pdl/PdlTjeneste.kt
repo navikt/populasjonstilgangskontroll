@@ -21,7 +21,7 @@ class PdlTjeneste(
 
     @WithSpan
     @Cacheable(cacheNames = [PDL], key = "#root.methodName + ':' + #id")
-    fun medUtvidetFamile(id: String): Person {
+    fun medUtvidetFamilie(id: String): Person {
         val person = adapter.person(id)
         val søsken = adapter.søsken(person)
         val partnere = graphQL.partnere(id)

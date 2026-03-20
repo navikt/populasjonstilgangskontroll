@@ -13,8 +13,11 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.BrukerTilPersonMapper.tilPerson
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_UTVIDET_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.pdlRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.restRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjenesteTest.PdlTestConfig
@@ -92,6 +95,42 @@ class PdlTjenesteTest : DescribeSpec() {
                 pdl.medFamilie(I1) shouldBe P1
                 server.verify()
                 cache.getOne(PDL_MED_FAMILIE_CACHE, I1, Person::class) shouldBe P1
+            }
+        }
+
+        describe("medUtvidetFamilie") {
+
+            it("kaller REST og oppdaterer cache") {
+                server.expect(requestTo(cfg.personURI))
+                    .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
+
+                pdl.medUtvidetFamilie(I1) shouldBe P1
+                server.verify()
+                cache.getOne(PDL_MED_UTVIDET_FAMILIE_CACHE, I1, Person::class) shouldBe P1
+            }
+
+            it("REST kalles ikke ved andre kall") {
+                server.expect(requestTo(cfg.personURI))
+                    .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
+                pdl.medUtvidetFamilie(I1)
+                server.verify()
+                server.reset()
+
+                server.expect(never(), requestTo(cfg.personURI))
+                    .andRespond(withSuccess("", APPLICATION_JSON))
+                pdl.medUtvidetFamilie(I1) shouldBe P1
+                server.verify()
+            }
+
+            it("inkluderer partnere fra GraphQL") {
+                val partner = FamilieMedlem(BrukerId("12345678901"), PARTNER)
+                every { graphQL.partnere(I1) } returns setOf(partner)
+
+                server.expect(requestTo(cfg.personURI))
+                    .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
+
+                pdl.medUtvidetFamilie(I1).familie.partnere shouldBe setOf(partner)
+                server.verify()
             }
         }
 

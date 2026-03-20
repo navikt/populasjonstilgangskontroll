@@ -55,7 +55,7 @@ class PdlCacheOpprydderTest : DescribeSpec({
                         verify { client.delete(cache, I1) }
                     }
                     verify { pdl.medFamilie(I1) }
-                    verify { pdl.medUtvidetFamile(I1) }
+                    verify { pdl.medUtvidetFamilie(I1) }
                 }
             }
 
@@ -79,14 +79,14 @@ class PdlCacheOpprydderTest : DescribeSpec({
 
                 verify { pdl.medFamilie(I1) }
                 verify { pdl.medFamilie(I2) }
-                verify { pdl.medUtvidetFamile(I1) }
-                verify { pdl.medUtvidetFamile(I2) }
+                verify { pdl.medUtvidetFamilie(I1) }
+                verify { pdl.medUtvidetFamilie(I2) }
             }
 
             it("utfører refresh selv om ingen innslag ble slettet") {
                 opprydder.listen(hendelse(listOf(I1)))
                 verify { pdl.medFamilie(I1) }
-                verify { pdl.medUtvidetFamile(I1) }
+                verify { pdl.medUtvidetFamilie(I1) }
             }
         }
     }

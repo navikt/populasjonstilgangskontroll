@@ -170,7 +170,7 @@ class BrukerTjenesteTest : DescribeSpec() {
                 brukerTjeneste.brukerMedNærmesteFamilie(id1.verdi)
 
                 verify { pdl.medFamilie(id1.verdi) }
-                verify(exactly = 0) { pdl.medUtvidetFamile(any()) }
+                verify(exactly = 0) { pdl.medUtvidetFamilie(any()) }
             }
         }
 
@@ -178,7 +178,7 @@ class BrukerTjenesteTest : DescribeSpec() {
 
             it("returnerer bruker med riktig id") {
                 every {
-                    pdl.medUtvidetFamile(id1.verdi)
+                    pdl.medUtvidetFamilie(id1.verdi)
                 } returns person(id1, aktørId1)
                 every {
                     skjerming.skjerming(id1)
@@ -189,7 +189,7 @@ class BrukerTjenesteTest : DescribeSpec() {
 
             it("setter SKJERMING-gruppe når skjermet") {
                 every {
-                    pdl.medUtvidetFamile(id1.verdi)
+                    pdl.medUtvidetFamilie(id1.verdi)
                 } returns person(id1, aktørId1)
                 every {
                     skjerming.skjerming(id1)
@@ -200,7 +200,7 @@ class BrukerTjenesteTest : DescribeSpec() {
 
             it("kaller PDL medUtvidetFamile, ikke medFamilie") {
                 every {
-                    pdl.medUtvidetFamile(id1.verdi)
+                    pdl.medUtvidetFamilie(id1.verdi)
                 } returns person(id1, aktørId1)
                 every {
                     skjerming.skjerming(id1)
@@ -208,7 +208,7 @@ class BrukerTjenesteTest : DescribeSpec() {
 
                 brukerTjeneste.brukerMedUtvidetFamilie(id1.verdi)
 
-                verify{ pdl.medUtvidetFamile(id1.verdi) }
+                verify{ pdl.medUtvidetFamilie(id1.verdi) }
                 verify(exactly = 0) { pdl.medFamilie(any()) }
             }
         }

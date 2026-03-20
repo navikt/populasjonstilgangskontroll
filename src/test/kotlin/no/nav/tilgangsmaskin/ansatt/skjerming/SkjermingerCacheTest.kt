@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
 import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.maps.shouldContainExactly
@@ -23,12 +23,13 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.context.TestPropertySource
-import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.ExpectedCount.never
 import org.springframework.test.web.client.ExpectedCount.times
+import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import java.time.Duration
+import java.time.Duration.ofSeconds
 
 @RestClientTest(components = [SkjermingRestClientAdapter::class, SkjermingClientBeanConfig::class, SkjermingTjeneste::class, RetryLogger::class])
 @EnableConfigurationProperties(SkjermingConfig::class)
@@ -36,7 +37,7 @@ import java.time.Duration
 @TestPropertySource(properties = ["skjerming.base-uri=http://skjerming"])
 @Import(SkjermingerCacheTest.CacheTestConfig::class)
 @ApplyExtension(SpringExtension::class)
-class SkjermingerCacheTest : DescribeSpec() {
+class SkjermingerCacheTest : BehaviorSpec() {
 
     @TestConfiguration
     @EnableCaching
@@ -65,38 +66,43 @@ class SkjermingerCacheTest : DescribeSpec() {
         afterEach {
             mockServer.verify()
         }
-        describe("skjerminger") {
-            it("Rest kalles kun for cache-misser, treff hentes fra cache") {
-                putOne(ID1, false)
-                mockServer.expect(times(1), requestTo(cfg.skjermingerUri))
-                    .andRespond(withSuccess("""{"$I2":true}""", APPLICATION_JSON))
 
-                skjerming.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to false, ID2 to true)
-                getMany(IDS).keys shouldContainExactlyInAnyOrder IDS
+        given("skjerminger") {
+            `when`("noen identer er i cache") {
+                then("Rest kalles kun for cache-misser, treff hentes fra cache") {
+                    mockServer.expect(times(1), requestTo(cfg.skjermingerUri))
+                        .andRespond(withSuccess("""{"$I2":true}""", APPLICATION_JSON))
+                    putOne(ID1, false)
+                    skjerming.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to false, ID2 to true)
+                    getMany(IDS).keys shouldContainExactlyInAnyOrder IDS
+                }
             }
 
-            it("Rest kalles ikke når alle er i cache") {
-                putOne(ID1, false)
-                putOne(ID2, true)
-                mockServer.expect(never(), requestTo(cfg.skjermingerUri))
-                    .andRespond(withSuccess("{}", APPLICATION_JSON))
-                skjerming.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to false, ID2 to true)
+            `when`("alle identer er i cache") {
+                then("Rest kalles ikke") {
+                    putOne(ID1, false)
+                    putOne(ID2, true)
+                    mockServer.expect(never(), requestTo(cfg.skjermingerUri))
+                    skjerming.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to false, ID2 to true)
+                }
             }
 
-            it("Rest kalles igjen etter at et cache-innslag er slettet") {
-                putOne(ID1, false)
-                putOne(ID2, true)
-                cache.delete(SKJERMING_CACHE, I2)
-                mockServer.expect(times(1), requestTo(cfg.skjermingerUri))
-                    .andRespond(withSuccess("""{"$I2":true}""", APPLICATION_JSON))
+            `when`("et cache-innslag er slettet") {
+                then("Rest kalles igjen for det slettede innslaget") {
+                    putOne(ID1, false)
+                    putOne(ID2, true)
+                    cache.delete(SKJERMING_CACHE, I2)
+                    mockServer.expect(times(1), requestTo(cfg.skjermingerUri))
+                        .andRespond(withSuccess("""{"$I2":true}""", APPLICATION_JSON))
 
-                skjerming.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to false, ID2 to true)
-                getMany(IDS).keys shouldContainExactlyInAnyOrder IDS
+                    skjerming.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to false, ID2 to true)
+                    getMany(IDS).keys shouldContainExactlyInAnyOrder IDS
+                }
             }
         }
     }
 
-    private fun putOne(brukerId: BrukerId, skjermet: Boolean, duration: Duration = Duration.ofSeconds(1)) =
+    private fun putOne(brukerId: BrukerId, skjermet: Boolean, duration: Duration = ofSeconds(1)) =
         cache.putOne(SKJERMING_CACHE, brukerId.verdi, skjermet, duration)
 
     private fun getMany(ids: Set<String>) =

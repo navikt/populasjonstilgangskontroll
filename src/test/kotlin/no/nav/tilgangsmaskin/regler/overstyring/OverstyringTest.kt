@@ -4,6 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.extensions.spring.SpringExtension
+import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -128,16 +129,18 @@ internal class OverstyringTest : DescribeSpec() {
                 overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
 
                 val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
-                entity.navid shouldBe ansattId.verdi
-                entity.fnr shouldBe vanligBrukerId.verdi
-                entity.begrunnelse shouldBe "Dette er en begrunnelse"
-                entity.enhet shouldBe "1234"
-                entity.expires shouldNotBe null
-                entity.id shouldNotBe 0
-                entity.created shouldNotBe null
-                entity.updated shouldNotBe null
-                entity.oppretter shouldBe ansattId.verdi
-                entity.system shouldBe "test"
+                assertSoftly(entity) {
+                    navid shouldBe ansattId.verdi
+                    fnr shouldBe vanligBrukerId.verdi
+                    begrunnelse shouldBe "Dette er en begrunnelse"
+                    enhet shouldBe "1234"
+                    expires shouldNotBe null
+                    id shouldNotBe 0
+                    created shouldNotBe null
+                    updated shouldNotBe null
+                    oppretter shouldBe ansattId.verdi
+                    system shouldBe "test"
+                }
             }
         }
 
@@ -189,11 +192,13 @@ internal class OverstyringTest : DescribeSpec() {
                 overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
 
                 val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
-                entity.created shouldNotBe null
-                entity.updated shouldNotBe null
-                entity.created shouldBe entity.updated
-                entity.oppretter shouldBe ansattId.verdi
-                entity.system shouldBe "test"
+                assertSoftly(entity) {
+                    created shouldNotBe null
+                    updated shouldNotBe null
+                    created shouldBe updated
+                    oppretter shouldBe ansattId.verdi
+                    system shouldBe "test"
+                }
             }
 
             it("laster entity med korrekte felter fra database ved @PostLoad") {
@@ -229,9 +234,11 @@ internal class OverstyringTest : DescribeSpec() {
                 repository.saveAndFlush(entity)
 
                 val oppdatert = repository.findById(entity.id).get()
-                oppdatert.system shouldBe "test"
-                oppdatert.oppretter shouldBe ansattId.verdi
-                oppdatert.created shouldBe createdFør
+                assertSoftly(oppdatert) {
+                    system shouldBe "test"
+                    oppretter shouldBe ansattId.verdi
+                    created shouldBe createdFør
+                }
             }
 
             it("fjerner entity fra database ved @PreRemove og @PostRemove") {

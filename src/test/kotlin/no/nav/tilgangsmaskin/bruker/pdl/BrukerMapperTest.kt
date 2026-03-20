@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -47,14 +48,18 @@ class BrukerMapperTest : DescribeSpec({
 
         it("STRENGT_FORTROLIG_UTLAND krever STRENGT_FORTROLIG_UTLAND-gruppe og gir UtenlandskTilknytning") {
             val bruker = tilBruker(tilPerson(brukerId, pipRespons(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND)), false)
-            bruker.påkrevdeGrupper shouldContainExactly setOf(STRENGT_FORTROLIG_UTLAND)
-            bruker.geografiskTilknytning.shouldBeInstanceOf<UtenlandskTilknytning>()
+            assertSoftly(bruker) {
+                påkrevdeGrupper shouldContainExactly setOf(STRENGT_FORTROLIG_UTLAND)
+                geografiskTilknytning.shouldBeInstanceOf<UtenlandskTilknytning>()
+            }
         }
 
         it("STRENGT_FORTROLIG med kommunal geo krever STRENGT_FORTROLIG-gruppe og gir KommuneTilknytning") {
             val bruker = tilBruker(tilPerson(brukerId, pipRespons(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG, geoKommune())), false)
-            bruker.påkrevdeGrupper shouldContainExactly setOf(STRENGT_FORTROLIG)
-            bruker.geografiskTilknytning.shouldBeInstanceOf<KommuneTilknytning>()
+            assertSoftly(bruker) {
+                påkrevdeGrupper shouldContainExactly setOf(STRENGT_FORTROLIG)
+                geografiskTilknytning.shouldBeInstanceOf<KommuneTilknytning>()
+            }
         }
 
         it("skjermet bruker krever SKJERMING-gruppe") {

@@ -83,9 +83,11 @@ class RegelTjenesteTest : DescribeSpec() {
 
                 val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
 
-                resultater.avviste.single().brukerId shouldBe vanligBrukerId.verdi
-                resultater.godkjente.shouldBeEmpty()
-                resultater.ukjente.shouldBeEmpty()
+                assertSoftly(resultater) {
+                    avviste.single().brukerId shouldBe vanligBrukerId.verdi
+                    godkjente.shouldBeEmpty()
+                    ukjente.shouldBeEmpty()
+                }
             }
 
             it("id som ikke finnes i PDL får tilgang") {
@@ -98,10 +100,12 @@ class RegelTjenesteTest : DescribeSpec() {
                 val resultater = regler.bulkRegler(ansattId,
                     setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi), BrukerIdOgRegelsett(ikkeFunnetId.verdi)))
 
-                resultater.godkjente.map { it.brukerId } shouldContainExactlyInAnyOrder
-                    listOf(vanligBrukerId.verdi, ikkeFunnetId.verdi)
-                resultater.avviste.shouldBeEmpty()
-                resultater.ukjente.shouldBeEmpty()
+                assertSoftly(resultater) {
+                    godkjente.map { it.brukerId } shouldContainExactlyInAnyOrder
+                        listOf(vanligBrukerId.verdi, ikkeFunnetId.verdi)
+                    avviste.shouldBeEmpty()
+                    ukjente.shouldBeEmpty()
+                }
             }
 
             it("exception som ikke er RegelException kastes videre") {

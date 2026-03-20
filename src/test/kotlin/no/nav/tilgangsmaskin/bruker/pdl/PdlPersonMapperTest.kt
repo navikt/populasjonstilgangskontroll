@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.collections.shouldBeEmpty
@@ -97,9 +98,9 @@ class PdlPersonMapperTest : DescribeSpec({
         }
 
         it("mapper KOMMUNE med kode til KommuneTilknytning med riktig verdi") {
-            val result = tilGeoTilknytning(PdlGeografiskTilknytning(KOMMUNE, gtKommune = GTKommune("0301")))
-            result.shouldBeInstanceOf<KommuneTilknytning>()
-            result.kommune.verdi shouldBe "0301"
+            tilGeoTilknytning(PdlGeografiskTilknytning(KOMMUNE, gtKommune = GTKommune("0301")))
+                .shouldBeInstanceOf<KommuneTilknytning>()
+                .kommune.verdi shouldBe "0301"
         }
 
         it("mapper KOMMUNE uten kode til UkjentBosted") {
@@ -107,9 +108,9 @@ class PdlPersonMapperTest : DescribeSpec({
         }
 
         it("mapper BYDEL med kode til BydelTilknytning med riktig verdi") {
-            val result = tilGeoTilknytning(PdlGeografiskTilknytning(BYDEL, gtBydel = GTBydel("030101")))
-            result.shouldBeInstanceOf<BydelTilknytning>()
-            result.bydel.verdi shouldBe "030101"
+            tilGeoTilknytning(PdlGeografiskTilknytning(BYDEL, gtBydel = GTBydel("030101")))
+                .shouldBeInstanceOf<BydelTilknytning>()
+                .bydel.verdi shouldBe "030101"
         }
 
         it("mapper BYDEL uten kode til UkjentBosted") {
@@ -170,8 +171,10 @@ class PdlPersonMapperTest : DescribeSpec({
 
         it("mapper relasjon uten ident til ingenting") {
             val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(PdlFamilierelasjon(null, PdlFamilieRelasjonRolle.BARN)))))
-            result.barn.shouldBeEmpty()
-            result.foreldre.shouldBeEmpty()
+            assertSoftly {
+                result.barn.shouldBeEmpty()
+                result.foreldre.shouldBeEmpty()
+            }
         }
 
         it("kaster exception for ukjent relasjon (null rolle med ident)") {
@@ -261,15 +264,19 @@ class PdlPersonMapperTest : DescribeSpec({
                 )
             )
             val result = tilPersoner(responser)
-            result shouldHaveSize 2
-            result[brukerId].shouldNotBeNull().brukerId shouldBe BrukerId(brukerId)
-            result[brukerId2].shouldNotBeNull().geoTilknytning.shouldBeInstanceOf<KommuneTilknytning>()
+            assertSoftly(result) {
+                shouldHaveSize(2)
+                get(brukerId).shouldNotBeNull().brukerId shouldBe BrukerId(brukerId)
+                get(brukerId2).shouldNotBeNull().geoTilknytning.shouldBeInstanceOf<KommuneTilknytning>()
+            }
         }
 
         it("filtrerer ut null-responser") {
             val result = tilPersoner(mapOf(brukerId to pdlRespons(), "ukjent" to null))
-            result shouldHaveSize 1
-            result[brukerId].shouldNotBeNull()
+            assertSoftly(result) {
+                shouldHaveSize(1)
+                get(brukerId).shouldNotBeNull()
+            }
         }
 
         it("returnerer tom map ved ingen responser") {

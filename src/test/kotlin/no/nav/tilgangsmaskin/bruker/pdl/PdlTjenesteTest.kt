@@ -7,7 +7,6 @@ import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import io.mockk.every
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
@@ -81,7 +80,7 @@ class PdlTjenesteTest : DescribeSpec() {
 
         describe("config") {
             it("navn er korrekt") {
-                cfg.navn shouldBe cfg.name
+                cfg.navn shouldBe PDL
                 cfg.caches.size shouldBe 2
             }
         }

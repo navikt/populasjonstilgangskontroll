@@ -104,7 +104,7 @@ class CacheOperationsTest : BehaviorSpec() {
                 then("verdiene er borte fra cachen") {
                     putMany(T1, T2)
                     getMany(IDS).keys shouldBe IDS
-                    eventually(config) {
+                    eventually(TIMEOUTS) {
                         getMany(IDS).shouldBeEmpty()
                     }
                 }
@@ -139,7 +139,7 @@ class CacheOperationsTest : BehaviorSpec() {
             `when`("TTL løper ut") {
                 then("CacheInnslagFjernetEvent publiseres") {
                     putOne(T1, ofSeconds(1))
-                    eventually(config) {
+                    eventually(TIMEOUTS) {
                         receivedEvents.any { T1.id in it.nøkkel }.shouldBeTrue()
                     }
                 }
@@ -171,7 +171,7 @@ class CacheOperationsTest : BehaviorSpec() {
         val TEST_CACHE = CachableConfig("cache")
         val T1 = TestData.of(I1)
         val T2 = TestData.of(I2)
-        val config = eventuallyConfig {
+        val TIMEOUTS = eventuallyConfig {
             duration = 4.seconds
             interval = 500.milliseconds
         }

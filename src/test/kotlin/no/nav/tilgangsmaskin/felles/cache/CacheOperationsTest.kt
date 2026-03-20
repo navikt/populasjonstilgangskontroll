@@ -21,18 +21,26 @@ import io.lettuce.core.RedisClient.create
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import no.nav.tilgangsmaskin.TestApp
+import no.nav.tilgangsmaskin.felles.cache.CacheOperationsTest.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperationsTest.Companion.TestData.Kontakt.Adresse
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.getBean
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
+import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import org.springframework.data.redis.connection.RedisConnectionFactory
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Import
+import org.springframework.context.annotation.Primary
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Duration
@@ -44,64 +52,82 @@ import kotlin.time.Duration.Companion.seconds
 @ContextConfiguration(classes = [TestApp::class])
 @Testcontainers
 @AutoConfigureMetrics
+@Import(CacheTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class CacheOperationsTest : BehaviorSpec() {
 
-    @Autowired
-    private lateinit var ctx: ConfigurableApplicationContext
+    @TestConfiguration
+    class CacheTestConfig(
+        private val cf: RedisConnectionFactory,
+        private val meterRegistry: MeterRegistry,
+        private val token: Token) {
+
+        @Bean
+        @Primary
+        fun cacheConfig() =
+            CacheConfig("user", "pw", redis.host, redis.firstMappedPort.toString(), ofSeconds(1), ofSeconds(1))
+
+        @Bean
+        fun cacheManager()  =
+            builder(cf)
+                .withInitialCacheConfigurations(
+                    mapOf(TEST_CACHE.name to defaultCacheConfig()
+                        .prefixCacheNameWith(TEST_CACHE.name)
+                        .disableCachingNullValues())
+                )
+                .build()
+                .also { it.getCache(TEST_CACHE.name) }
+
+        @Bean
+        fun redisClient(cfg: CacheConfig)  =
+            create("redis://${cfg.host}:${cfg.port}")
+
+        @Bean
+        fun cacheNøkkelHandler(mgr: RedisCacheManager) =
+            CacheNøkkelHandler(mgr.cacheConfigurations)
+
+        @Bean
+        fun cacheClient(client: RedisClient, handler: CacheNøkkelHandler, cfg: CacheConfig)  =
+            CacheClient(client, handler, BulkCacheSuksessTeller(meterRegistry, token), BulkCacheTeller(meterRegistry, token), cfg)
+
+        @Bean
+        fun cacheElementUtløptLytter(client: RedisClient, publisher: ApplicationEventPublisher) =
+            CacheElementUtløptLytter(client, publisher)
+    }
 
     @Autowired
-    private lateinit var meterRegistry: MeterRegistry
+    private lateinit var ctx: ConfigurableApplicationContext
 
     @MockkBean
     private lateinit var token: Token
 
     @Autowired
-    private lateinit var cf: RedisConnectionFactory
-
     private lateinit var cache: CacheOperations
-    private lateinit var redisClient: RedisClient
-    private val receivedEvents = CopyOnWriteArrayList<CacheInnslagFjernetEvent>()
+
+    private val events = CopyOnWriteArrayList<CacheInnslagFjernetEvent>()
 
     private fun setUpCache() {
         every { token.system } returns "test"
         every { token.clusterAndSystem } returns "test:dev-gcp"
-
-        val mgr = builder(cf)
-            .withInitialCacheConfigurations(mapOf(TEST_CACHE.name to defaultCacheConfig()
-                .prefixCacheNameWith(TEST_CACHE.name)
-                .disableCachingNullValues()))
-            .build().also { mgr ->
-                mgr.getCache(TEST_CACHE.name)
-            }
-
-        redisClient = create("redis://${redis.host}:${redis.firstMappedPort}")
-
-        cache = CacheClient(
-            redisClient, CacheNøkkelHandler(mgr.cacheConfigurations),
-            BulkCacheSuksessTeller(meterRegistry, token),
-            BulkCacheTeller(meterRegistry, token),
-            CacheConfig("user", "pw", redis.host, redis.firstMappedPort.toString(), ofSeconds(1), ofSeconds(1))
-        )
-        CacheElementUtløptLytter(redisClient, ctx)
     }
 
     init {
 
         beforeSpec {
             ctx.addApplicationListener { event ->
-                if (event is CacheInnslagFjernetEvent) receivedEvents.add(event)
+                if (event is CacheInnslagFjernetEvent) events.add(event)
             }
-        }
-
-        beforeEach {
-            receivedEvents.clear()
             setUpCache()
         }
 
-        given("verdier som legges i cache med kort TTL fjernes etterhvert") {
-            `when`("TTL løper ut") {
-                then("verdiene er borte fra cachen") {
+        beforeEach {
+            events.clear()
+            ctx.getBean<RedisCacheManager>().getCache(TEST_CACHE.name)?.clear()
+        }
+
+        Given("verdier som legges i cache med kort TTL fjernes etterhvert") {
+            When("TTL løper ut") {
+                Then("verdiene er borte fra cachen") {
                     putMany(T1, T2)
                     getMany(IDS).keys shouldBe IDS
                     eventually(TIMEOUTS) {
@@ -111,9 +137,9 @@ class CacheOperationsTest : BehaviorSpec() {
             }
         }
 
-        given("en eksisterende nøkkel i cachen") {
-            `when`("delete kalles") {
-                then("returnerer 1 og verdien er fjernet fra cachen") {
+        Given("en eksisterende nøkkel i cachen") {
+            When("delete kalles") {
+                Then("returnerer 1 og verdien er fjernet fra cachen") {
                     putOne(T1)
                     assertSoftly {
                         getOne(T1.id).shouldNotBeNull()
@@ -124,9 +150,9 @@ class CacheOperationsTest : BehaviorSpec() {
             }
         }
 
-        given("en ikke-eksisterende nøkkel slettes") {
-            `when`("delete kalles") {
-                then("returnerer 0") {
+        Given("en ikke-eksisterende nøkkel slettes") {
+            When("delete kalles") {
+                Then("returnerer 0") {
                     assertSoftly {
                         getOne(T1.id).shouldBeNull()
                         cache.delete(TEST_CACHE, T1.id) shouldBe 0L
@@ -135,12 +161,12 @@ class CacheOperationsTest : BehaviorSpec() {
             }
         }
 
-        given("en nøkkel utløper i Redis") {
-            `when`("TTL løper ut") {
-                then("CacheInnslagFjernetEvent publiseres") {
+        Given("en nøkkel utløper i Redis") {
+            When("TTL løper ut") {
+                Then("CacheInnslagFjernetEvent publiseres") {
                     putOne(T1, ofSeconds(1))
                     eventually(TIMEOUTS) {
-                        receivedEvents.any { T1.id in it.nøkkel }.shouldBeTrue()
+                        events.any { T1.id in it.nøkkel }.shouldBeTrue()
                     }
                 }
             }
@@ -177,8 +203,8 @@ class CacheOperationsTest : BehaviorSpec() {
         }
 
         private data class TestData(val id: String, val navn: String, val alder: Int, val kontakt: Kontakt) {
-            internal data class Kontakt(val epost: String, val telefon: String, val adresse: Adresse) {
-                 internal data class Adresse(val gate: String, val postnummer: String, val by: String)
+            data class Kontakt(val epost: String, val telefon: String, val adresse: Adresse) {
+                data class Adresse(val gate: String, val postnummer: String, val by: String)
             }
             companion object {
                 fun of(id: String) = TestData(

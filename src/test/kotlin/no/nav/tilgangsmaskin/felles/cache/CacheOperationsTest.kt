@@ -150,7 +150,7 @@ class CacheOperationsTest : BehaviorSpec() {
             }
         }
 
-        Given("en ikke-eksisterende nøkkel slettes") {
+        Given("en ikke-eksisterende nøkkel forsøkes slettet") {
             When("delete kalles") {
                 Then("returnerer 0") {
                     assertSoftly {

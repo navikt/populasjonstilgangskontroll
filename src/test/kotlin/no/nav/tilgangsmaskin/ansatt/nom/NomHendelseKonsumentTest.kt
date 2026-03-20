@@ -17,12 +17,8 @@ class NomHendelseKonsumentTest : DescribeSpec({
     val logger = mockk<NomHendelseLogger>(relaxed = true)
     val konsument = NomHendelseKonsument(nom, logger)
 
-    fun hendelse(
-        navident: String = NAVIDENT,
-        personident: String = PERSONIDENT,
-        startdato: LocalDate? = STARTDATO,
-        sluttdato: LocalDate? = SLUTTDATO,
-    ) = NomHendelse(personident, navident, startdato, sluttdato)
+    fun hendelse(navident: String = NAVIDENT, personident: String = PERSONIDENT, startdato: LocalDate? = STARTDATO, sluttdato: LocalDate? = SLUTTDATO) =
+        NomHendelse(personident, navident, startdato, sluttdato)
 
     describe("listen") {
 
@@ -64,16 +60,13 @@ class NomHendelseKonsumentTest : DescribeSpec({
 
         it("logger start og ferdig for hele batchen") {
             val hendelser = listOf(hendelse())
-
             konsument.listen(hendelser)
-
             verify { logger.start(hendelser) }
             verify { logger.ferdig(hendelser) }
         }
 
         it("logger ok for hver vellykket hendelse") {
             konsument.listen(listOf(hendelse()))
-
             verify { logger.ok(NAVIDENT, PERSONIDENT) }
         }
 

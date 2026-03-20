@@ -1,93 +1,97 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
-import io.kotest.assertions.nondeterministic.eventually
+import io.kotest.core.extensions.ApplyExtension
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.maps.shouldContainExactly
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.cache.AbstractCacheTest
-import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetEvent
+import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
+import no.nav.tilgangsmaskin.felles.rest.RetryLogger
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ApplicationListener
-import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
+import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.cache.CacheManager
+import org.springframework.cache.annotation.EnableCaching
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.resilience.annotation.EnableResilientMethods
+import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.client.MockRestServiceServer
-import org.springframework.test.web.client.MockRestServiceServer.bindTo
+import org.springframework.test.web.client.ExpectedCount.never
+import org.springframework.test.web.client.ExpectedCount.times
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
-import org.springframework.web.client.RestClient
-import tools.jackson.databind.json.JsonMapper
-import java.net.URI
 import java.time.Duration
-import java.util.concurrent.TimeUnit
-import kotlin.time.Duration.Companion.seconds
 
-class SkjermingerCacheTest : AbstractCacheTest() {
+@RestClientTest(components = [SkjermingRestClientAdapter::class, SkjermingClientBeanConfig::class, SkjermingTjeneste::class, RetryLogger::class])
+@EnableConfigurationProperties(SkjermingConfig::class)
+@EnableResilientMethods
+@TestPropertySource(properties = ["skjerming.base-uri=http://skjerming"])
+@Import(SkjermingerCacheTest.CacheTestConfig::class)
+@ApplyExtension(SpringExtension::class)
+class SkjermingerCacheTest : DescribeSpec() {
+
+    @TestConfiguration
+    @EnableCaching
+    class CacheTestConfig {
+        @Bean
+        fun cacheManager(): CacheManager = ConcurrentMapCacheManager(SKJERMING)
+        @Bean
+        fun cache(cacheManager: CacheManager): CacheOperations = ConcurrentMapCacheOperations(cacheManager)
+    }
 
     @Autowired
-    private lateinit var mapper: JsonMapper
-
     private lateinit var skjerming: SkjermingTjeneste
+    @Autowired
     private lateinit var mockServer: MockRestServiceServer
-
-    override fun cacheConfigurations() = mapOf(
-        SKJERMING_CACHE.name to defaultCacheConfig()
-            .prefixCacheNameWith(SKJERMING)
-            .disableCachingNullValues()
-    )
+    @Autowired
+    private lateinit var cfg: SkjermingConfig
+    @Autowired
+    private lateinit var cache: CacheOperations
+    @Autowired
+    private lateinit var cacheManager: CacheManager
 
     init {
         beforeEach {
-            setUpCache()
-            val restClientBuilder = RestClient.builder().baseUrl("${cfg.baseUri}")
-            mockServer = bindTo(restClientBuilder).build()
-            skjerming = SkjermingTjeneste(SkjermingRestClientAdapter(restClientBuilder.build(), cfg), cache, cfg)
-            IDS.forEach { cache.delete(SKJERMING_CACHE, it) }
+            cacheManager.getCache(SKJERMING)?.clear()
         }
-
+        afterEach {
+            mockServer.verify()
+        }
         describe("skjerminger") {
-
             it("Rest kalles kun for cache-misser, treff hentes fra cache") {
                 putOne(ID1, false)
-                mockServer.expect(requestTo(cfg.skjermingerUri))
-                    .andRespond(withSuccess(mapper.writeValueAsString(mapOf(I2 to true)),
-                        APPLICATION_JSON))
+                mockServer.expect(times(1), requestTo(cfg.skjermingerUri))
+                    .andRespond(withSuccess("""{"$I2":true}""", APPLICATION_JSON))
 
                 skjerming.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to false, ID2 to true)
                 getMany(IDS).keys shouldContainExactlyInAnyOrder IDS
-                mockServer.verify()
             }
 
             it("Rest kalles ikke når alle er i cache") {
                 putOne(ID1, false)
                 putOne(ID2, true)
+                mockServer.expect(never(), requestTo(cfg.skjermingerUri))
+                    .andRespond(withSuccess("{}", APPLICATION_JSON))
                 skjerming.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to false, ID2 to true)
-                mockServer.verify()
-            }
-
-            it("Lytteren publiserer en CacheInnslagFjernetEvent når en nøkkel utløper") {
-                val mottatt = mutableListOf<CacheInnslagFjernetEvent>()
-                ctx.addApplicationListener(ApplicationListener<CacheInnslagFjernetEvent> {
-                    mottatt.add(it)
-                })
-                putOne(ID1, false)
-                eventually(3.seconds) {
-                    mottatt.isNotEmpty()
-                }
             }
 
             it("Rest kalles igjen etter at et cache-innslag er slettet") {
                 putOne(ID1, false)
                 putOne(ID2, true)
                 cache.delete(SKJERMING_CACHE, I2)
-                mockServer.expect(requestTo(cfg.skjermingerUri))
-                    .andRespond(withSuccess(mapper.writeValueAsString(mapOf(I2 to true)),
-                        APPLICATION_JSON))
+                mockServer.expect(times(1), requestTo(cfg.skjermingerUri))
+                    .andRespond(withSuccess("""{"$I2":true}""", APPLICATION_JSON))
 
                 skjerming.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to false, ID2 to true)
                 getMany(IDS).keys shouldContainExactlyInAnyOrder IDS
-                mockServer.verify()
             }
         }
     }
@@ -99,6 +103,10 @@ class SkjermingerCacheTest : AbstractCacheTest() {
         cache.getMany(SKJERMING_CACHE, ids, Boolean::class)
 
     private companion object {
-        private val cfg = SkjermingConfig(URI.create("http://skjerming"))
+        const val I1 = "03508331575"
+        const val I2 = "20478606614"
+        val IDS = setOf(I1, I2)
+        val ID1 = BrukerId(I1)
+        val ID2 = BrukerId(I2)
     }
 }

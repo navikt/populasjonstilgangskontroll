@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import io.kotest.assertions.nondeterministic.eventually
+import io.kotest.assertions.nondeterministic.eventuallyConfig
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -8,6 +9,7 @@ import io.kotest.matchers.shouldBe
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import java.time.Duration
 import java.time.Duration.ofSeconds
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class CacheOperationsTest : AbstractCacheTest() {
@@ -19,6 +21,7 @@ class CacheOperationsTest : AbstractCacheTest() {
     )
 
     init {
+
         beforeEach {
             setUpCache()
             IDS.forEach { cache.delete(TEST_CACHE, it) }
@@ -30,7 +33,7 @@ class CacheOperationsTest : AbstractCacheTest() {
                 putOne(T2)
                 getOne(T2.id) shouldBe T2
 
-                eventually(4.seconds) {
+                eventually(config) {
                     getOne(T2.id) shouldBe null
                 }
             }
@@ -38,7 +41,7 @@ class CacheOperationsTest : AbstractCacheTest() {
             it("Put og get flere verdier, og verifiser at de er borte etter utløp") {
                 putMany(T1, T2)
                 getMany(IDS).keys shouldBe IDS
-                eventually(4.seconds) {
+                eventually(config) {
                     getMany(IDS).shouldBeEmpty()
                 }
             }
@@ -76,5 +79,9 @@ class CacheOperationsTest : AbstractCacheTest() {
         val TEST_CACHE = CachableConfig("cache")
         val T1 = TestData.of(I1)
         val T2 = TestData.of(I2)
+        val config = eventuallyConfig {
+            duration = 4.seconds
+            interval = 500.milliseconds
+        }
     }
 }

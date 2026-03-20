@@ -26,7 +26,7 @@ plugins {
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
-    id("org.springframework.boot") version "4.0.3"
+    id("org.springframework.boot") version "4.0.4"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.cyclonedx.bom") version "3.0.0"
     id("com.google.cloud.tools.jib") version "3.5.3"
@@ -144,12 +144,25 @@ java {
         languageVersion.set(javaVersion)
     }
 }
-
+/*
 tasks.test {
     jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
   //  jvmArgs("-javaagent:${configurations.jacocoAgent.get().asPath}")
     jvmArgs("-Dkotlinx.coroutines.debug=off")
     useJUnitPlatform()
+} */
+tasks.named<Test>("test") {
+    useJUnitPlatform()
+
+    maxHeapSize = "4g"
+
+    jvmArgs =
+        listOf(
+            "--add-opens",
+            "java.base/java.util=ALL-UNNAMED",
+            //"-javaagent:${configurations.jacocoAgent.get().asPath}",
+            "-Dkotlinx.coroutines.debug=off",
+        )
 }
 
 tasks.jacocoTestReport {

@@ -21,6 +21,7 @@ import io.lettuce.core.RedisClient.create
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import no.nav.tilgangsmaskin.TestApp
+import no.nav.tilgangsmaskin.felles.cache.CacheOperationsTest.Companion.TestData.Kontakt.Adresse
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import no.nav.tilgangsmaskin.tilgang.Token
@@ -173,6 +174,18 @@ class CacheOperationsTest : BehaviorSpec() {
         val config = eventuallyConfig {
             duration = 4.seconds
             interval = 500.milliseconds
+        }
+
+        private data class TestData(val id: String, val navn: String, val alder: Int, val kontakt: Kontakt) {
+            data class Kontakt(val epost: String, val telefon: String, val adresse: Adresse) {
+                data class Adresse(val gate: String, val postnummer: String, val by: String)
+            }
+            companion object {
+                fun of(id: String) = TestData(
+                    id, "Navn $id", 42,
+                    Kontakt("$id@test.no", "99887766", Adresse("Testgata 1", "0001", "Oslo"))
+                )
+            }
         }
     }
 }

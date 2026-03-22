@@ -32,6 +32,7 @@ data class BrukerBuilder(
     var partnere: Set<FamilieMedlem> = emptySet(),
     var oppslagId: String = id.verdi,
     var dødsdato: LocalDate? = null) {
+    fun dødsdato(dødsdato: LocalDate?) = apply { this.dødsdato = dødsdato }
     fun oppslagId(oppslagId: String) = apply { this.oppslagId = oppslagId }
     fun aktørId(aktørId: AktørId) = apply { this.aktørId = aktørId }
     fun gt(gt: GeografiskTilknytning) = apply { this.gt = gt }

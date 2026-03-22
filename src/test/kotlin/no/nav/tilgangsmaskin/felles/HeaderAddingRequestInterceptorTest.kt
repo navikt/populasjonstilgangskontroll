@@ -44,7 +44,7 @@ class HeaderAddingRequestInterceptorTest : DescribeSpec({
             val request = request()
             val interceptor = headerAddingRequestInterceptor()
             interceptor.intercept(request, ByteArray(0), execution)
-            request.headers.isEmpty() shouldBe true
+            request.headers.isEmpty shouldBe true
         }
     }
 })

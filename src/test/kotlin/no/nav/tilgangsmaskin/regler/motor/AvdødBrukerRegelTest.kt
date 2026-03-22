@@ -1,115 +1,121 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.MockKAnnotations.init
+import io.mockk.clearAllMocks
 import io.mockk.every
-import io.mockk.mockk
+import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.bruker.BrukerId
-import java.time.LocalDate
+import java.time.LocalDate.now
 
-class AvdødBrukerRegelTest : DescribeSpec({
 
-    val teller = mockk<AvdødTeller>(relaxed = true)
-    val proxy = mockk<EntraProxyTjeneste>(relaxed = true)
-    val auditor = mockk<Auditor>(relaxed = true)
-    val regel = AvdødBrukerRegel(teller, proxy, auditor)
+class AvdødBrukerRegelTest : BehaviorSpec() {
 
-    val ansattId = AnsattId("Z999999")
-    val ansatt = AnsattBuilder(ansattId).build()
-    val brukerId = BrukerId("08526835670")
+    @MockK(relaxed = true)
+    private lateinit var teller: AvdødTeller
 
-    describe("evaluer") {
+    @MockK
+    private lateinit var proxy: EntraProxyTjeneste
 
-        it("returnerer alltid true for levende bruker") {
+    @MockK(relaxed = true)
+    private lateinit var auditor: Auditor
+
+    private lateinit var regel: AvdødBrukerRegel
+    private val NAV_TESTKONTOR = "NAV Testkontor"
+    private val ansattId = AnsattId("Z999999")
+    private val ansatt = AnsattBuilder(ansattId).build()
+    private val brukerId = BrukerId("08526835670")
+
+    init {
+        beforeSpec {
+            init(this@AvdødBrukerRegelTest)
+        }
+        beforeEach {
+            clearAllMocks()
+            regel = AvdødBrukerRegel(teller, proxy, auditor)
+        }
+
+        Given("Bruker er død") {
+
+            Then("regel avviser ikke") {
+                val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(1)).build()
+                regel.evaluer(ansatt, bruker) shouldBe true
+            }
+
+            Then("oppslag skal telles") {
+                val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(1)).build()
+                regel.skalTelle(ansatt, bruker) shouldBe true
+            }
+        }
+
+        Given("Bruker lever") {
+
             val bruker = BrukerBuilder(brukerId).build()
-            regel.evaluer(ansatt, bruker) shouldBe true
+
+            Then("regel avviser ikke") {
+                regel.evaluer(ansatt, bruker) shouldBe true
+            }
+
+            Then("oppslag skal ikke telles") {
+                regel.skalTelle(ansatt, bruker) shouldBe false
+            }
         }
 
-        it("returnerer alltid true for avdød bruker") {
-            val bruker = BrukerBuilder(brukerId).apply { dødsdato = LocalDate.now().minusMonths(1) }.build()
-            regel.evaluer(ansatt, bruker) shouldBe true
+        Given("Bruker er død for opptil ett år siden") {
+
+            Then("bruker UTILGJENGELIG som enhet (slår ikke opp) for 0-6 måneder") {
+                val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(1)).build()
+                regel.tell(ansatt, bruker)
+                verify { teller.tell(any(), UTILGJENGELIG) }
+                verify(exactly = 0) { proxy.enhet(any()) }
+            }
+
+            Then("bruker UTILGJENGELIG som enhet (slår ikke opp) for 7-12 måneder") {
+                val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(9)).build()
+                regel.tell(ansatt, bruker)
+                verify { teller.tell(any(), UTILGJENGELIG) }
+                verify(exactly = 0) { proxy.enhet(any()) }
+            }
         }
-    }
+        Given("Bruker er død for mer enn 1-2 år siden") {
 
-    describe("skalTelle") {
+            Then("henter enhet fra proxy") {
+                val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(15)).build()
+                every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), NAV_TESTKONTOR)
+                regel.tell(ansatt, bruker)
+                verify { teller.tell(any(), NAV_TESTKONTOR) }
+                verify { proxy.enhet(ansattId) }
+                verify { auditor.info(any(), null) }
+            }
 
-        it("er false når bruker ikke er avdød") {
-            val bruker = BrukerBuilder(brukerId).build()
-            regel.skalTelle(ansatt, bruker) shouldBe false
+            Then("henter enhet fra proxy for død mer enn 2 år siden") {
+                val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(30)).build()
+                every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), NAV_TESTKONTOR)
+
+                regel.tell(ansatt, bruker)
+                verify { teller.tell(any(), NAV_TESTKONTOR) }
+                verify { proxy.enhet(ansattId) }
+                verify { auditor.info(any(), null) }
+            }
         }
+        Given("Oppslaget mot proxy feiler") {
 
-        it("er true når bruker har dødsdato") {
-            val bruker = BrukerBuilder(brukerId).apply { dødsdato = LocalDate.now().minusMonths(1) }.build()
-            regel.skalTelle(ansatt, bruker) shouldBe true
-        }
-    }
-
-    describe("tell") {
-
-        it("bruker UTILGJENGELIG som enhet for død 0-6 måneder siden") {
-            val bruker = BrukerBuilder(brukerId).apply { dødsdato = LocalDate.now().minusMonths(1) }.build()
-
-            regel.tell(ansatt, bruker)
-
-            verify { teller.tell(any(), UTILGJENGELIG) }
-            verify(exactly = 0) { proxy.enhet(any()) }
-        }
-
-        it("bruker UTILGJENGELIG som enhet for død 7-12 måneder siden") {
-            val bruker = BrukerBuilder(brukerId).apply { dødsdato = LocalDate.now().minusMonths(9) }.build()
-
-            regel.tell(ansatt, bruker)
-
-            verify { teller.tell(any(), UTILGJENGELIG) }
-            verify(exactly = 0) { proxy.enhet(any()) }
-        }
-
-        it("henter enhet fra proxy for død 13-24 måneder siden") {
-            val bruker = BrukerBuilder(brukerId).apply { dødsdato = LocalDate.now().minusMonths(15) }.build()
-            every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "NAV Testkontor")
-
-            regel.tell(ansatt, bruker)
-
-            verify { teller.tell(any(), "NAV Testkontor") }
-            verify { proxy.enhet(ansattId) }
-        }
-
-        it("henter enhet fra proxy for død over 24 måneder siden") {
-            val bruker = BrukerBuilder(brukerId).apply { dødsdato = LocalDate.now().minusMonths(30) }.build()
-            every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "NAV Testkontor")
-
-            regel.tell(ansatt, bruker)
-
-            verify { teller.tell(any(), "NAV Testkontor") }
-            verify { proxy.enhet(ansattId) }
-        }
-
-        it("faller tilbake til UTILGJENGELIG når proxy feiler") {
-            val bruker = BrukerBuilder(brukerId).apply { dødsdato = LocalDate.now().minusMonths(15) }.build()
-            every { proxy.enhet(ansattId) } throws RuntimeException("proxy feil")
-
-            regel.tell(ansatt, bruker)
-
-            verify { teller.tell(any(), UTILGJENGELIG) }
-        }
-
-        it("logger via auditor når enhet er kjent") {
-            val bruker = BrukerBuilder(brukerId).apply { dødsdato = LocalDate.now().minusMonths(15) }.build()
-            every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "NAV Testkontor")
-
-            regel.tell(ansatt, bruker)
-
-            verify { auditor.info(any(), null) }
+            Then("bruker enhetsnavn UTILGJENGELIG") {
+                val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(15)).build()
+                every { proxy.enhet(ansattId) } throws RuntimeException("Shit happens")
+                regel.tell(ansatt, bruker)
+                verify { teller.tell(any(), UTILGJENGELIG) }
+            }
         }
     }
-})
-
+}

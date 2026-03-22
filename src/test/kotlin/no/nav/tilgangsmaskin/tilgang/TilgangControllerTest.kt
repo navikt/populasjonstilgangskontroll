@@ -1,7 +1,5 @@
 package no.nav.tilgangsmaskin.tilgang
 
-import com.ninjasquad.springmockk.MockkBean
-import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.core.spec.style.DescribeSpec
 import io.micrometer.core.instrument.Tags
 import io.mockk.MockKAnnotations
@@ -9,7 +7,6 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.justRun
-import io.mockk.slot
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
@@ -18,11 +15,9 @@ import no.nav.tilgangsmaskin.regler.motor.TokenTypeTeller
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.TEXT_PLAIN
-import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup
@@ -35,7 +30,7 @@ class TilgangControllerTest : DescribeSpec() {
     lateinit var regelTjeneste: RegelTjeneste
     @MockK
     lateinit var overstyringTjeneste: OverstyringTjeneste
-    @MockK
+    @MockK(relaxed = true)
     lateinit var token: Token
     @MockK
     lateinit var teller: TokenTypeTeller
@@ -56,14 +51,14 @@ class TilgangControllerTest : DescribeSpec() {
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
                 .build()
             justRun { teller.tell(any<Tags>()) }
+            every { token.ansattId } returns ansattId
+
         }
 
         describe("OBO enkeltoppslag") {
 
             beforeEach {
                 every { token.erObo } returns true
-                every { token.erCC } returns false
-                every { token.ansattId } returns ansattId
             }
 
             it("komplett - returnerer 204 ved tilgang") {
@@ -115,7 +110,6 @@ class TilgangControllerTest : DescribeSpec() {
 
             beforeEach {
                 every { token.erCC } returns true
-                every { token.erObo } returns false
             }
 
             it("komplett - returnerer 204 ved tilgang") {
@@ -170,8 +164,6 @@ class TilgangControllerTest : DescribeSpec() {
 
             beforeEach {
                 every { token.erObo } returns true
-                every { token.erCC } returns false
-                every { token.ansattId } returns ansattId
             }
 
             it("returnerer 207 med resultater") {
@@ -245,8 +237,6 @@ class TilgangControllerTest : DescribeSpec() {
 
             beforeEach {
                 every { token.erObo } returns true
-                every { token.erCC } returns false
-                every { token.ansattId } returns ansattId
             }
 
             it("returnerer 207 med resultater for gitt regeltype") {
@@ -282,7 +272,6 @@ class TilgangControllerTest : DescribeSpec() {
 
             beforeEach {
                 every { token.erCC } returns true
-                every { token.erObo } returns false
             }
 
             it("returnerer 207 med resultater") {
@@ -341,8 +330,6 @@ class TilgangControllerTest : DescribeSpec() {
 
             beforeEach {
                 every { token.erObo } returns true
-                every { token.erCC } returns false
-                every { token.ansattId } returns ansattId
             }
 
             it("returnerer 202 ved vellykket overstyring") {
@@ -398,10 +385,11 @@ class TilgangControllerTest : DescribeSpec() {
             }
 
             it("returnerer 400 ved gyldigtil mer enn 3 måneder frem i tid") {
-                val forLangtFremITid = LocalDate.now().plusMonths(4)
                 mockMvc.post("/api/v1/overstyr") {
                     contentType = APPLICATION_JSON
-                    content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$forLangtFremITid"}"""
+                    content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"${
+                        LocalDate.now().plusMonths(4)
+                    }"}"""
                 }.andExpect {
                     status { isBadRequest() }
                 }

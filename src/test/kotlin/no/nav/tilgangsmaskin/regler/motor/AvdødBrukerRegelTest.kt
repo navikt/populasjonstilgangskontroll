@@ -29,7 +29,6 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
     private lateinit var teller: AvdødTeller
     @MockK
     private lateinit var proxy: EntraProxyTjeneste
-
     @SpyK
     private var auditor = LocalAuditor()
 
@@ -66,16 +65,16 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
 
         Given("Bruker er død for opptil ett år siden") {
             val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(1)).build()
-            When("døsdato er mindre enn 6 måneder siden") {
-                Then("bruker enhetsnavn $UTILGJENGELIG og slår ikke opp for 0-6 måneder") {
+            When("dødsdato er mindre enn 6 måneder siden") {
+                Then("bruker enhetsnavn $UTILGJENGELIG og slår ikke opp enhetsnavn for 0-6 måneder") {
                     regel.evaluer(ansatt, bruker)
                     verify { teller.tell(MND_0_6, UTILGJENGELIG) }
                     verify(exactly = 0) { proxy.enhet(any()) }
                 }
             }
-            When("døsdato er mellom  6 og 12 måneder siden") {
+            When("dødsdato er mellom 6 og 12 måneder siden") {
                 val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(9)).build()
-                Then("bruker enhetsnavn $UTILGJENGELIG og slår ikke opp for 7-12 måneder") {
+                Then("bruker enhetsnavn $UTILGJENGELIG og slår ikke opp enhetsnavn for 7-12 måneder") {
                     regel.evaluer(ansatt, bruker)
                     verify { teller.tell(MND_7_12, UTILGJENGELIG) }
                     verify(exactly = 0) { proxy.enhet(any()) }
@@ -88,15 +87,15 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
             beforeEach { every { proxy.enhet(ansattId) } returns enhet }
             When("dødsdato er mellom ett og to år siden") {
                 val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(15)).build()
-                Then("henter enhetsnavn fra proxy og bruker dette i metrikkene for 13-24 måneder") {
+                Then("henter enhetsnavn fra proxy og bruker dette i metrikken for 13-24 måneder") {
                     regel.evaluer(ansatt, bruker) shouldBe true
                     verify { proxy.enhet(ansattId) }
                     verify { teller.tell(MND_13_24, enhet.navn) }
                     verify { auditor.info(any()) }
                 }
             }
-            When("dødsdato er mellom ett og to år siden") {
-                Then("henter enhetsnavn fra proxy og bruker dette i metrikkene for mer enn 24 måneder") {
+            When("dødsdato er mer enn to år siden") {
+                Then("henter enhetsnavn fra proxy og bruker dette i metrikken for mer enn 24 måneder") {
                     val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(30)).build()
                     regel.evaluer(ansatt, bruker) shouldBe true
                     verify { proxy.enhet(ansattId) }
@@ -105,7 +104,7 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
                 }
             }
             When("oppslaget mot proxy feiler") {
-                Then("bruker enhetsnavn $UTILGJENGELIG og bruker dette i metrikkene") {
+                Then("bruker enhetsnavn $UTILGJENGELIG i metrikken") {
                     val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(15)).build()
                     every { proxy.enhet(ansattId) } throws RuntimeException("Shit happens")
                     regel.evaluer(ansatt, bruker)

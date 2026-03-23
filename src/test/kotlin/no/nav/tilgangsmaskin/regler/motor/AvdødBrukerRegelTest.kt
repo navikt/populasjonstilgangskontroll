@@ -69,7 +69,7 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
                 Then("bruker enhetsnavn $UTILGJENGELIG og slår ikke opp enhetsnavn for 0-6 måneder") {
                     regel.evaluer(ansatt, bruker)
                     verify { teller.tell(MND_0_6, UTILGJENGELIG) }
-                    verify(exactly = 0) { proxy.enhet(any()) }
+                    verify(exactly = 0) { proxy.enhet(ansattId) }
                 }
             }
             When("dødsdato er mellom 6 og 12 måneder siden") {
@@ -77,7 +77,7 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
                 Then("bruker enhetsnavn $UTILGJENGELIG og slår ikke opp enhetsnavn for 7-12 måneder") {
                     regel.evaluer(ansatt, bruker)
                     verify { teller.tell(MND_7_12, UTILGJENGELIG) }
-                    verify(exactly = 0) { proxy.enhet(any()) }
+                    verify(exactly = 0) { proxy.enhet(ansattId) }
                 }
             }
         }

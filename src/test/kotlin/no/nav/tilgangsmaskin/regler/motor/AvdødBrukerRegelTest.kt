@@ -51,7 +51,7 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
             val bruker = BrukerBuilder(brukerId).build()
             When("regel evalueres") {
                 Then("tilgang godkjennes") { regel.evaluer(ansatt, bruker) shouldBe true }
-                Then("oppslag skal ikke telles") { regel.skalTelle(ansatt, bruker) shouldBe false }
+                And("oppslag skal ikke telles") { regel.skalTelle(ansatt, bruker) shouldBe false }
             }
         }
 
@@ -59,7 +59,7 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
             val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(1)).build()
             When("regel evalueres") {
                 Then("tilgang godkjennes") { regel.evaluer(ansatt, bruker) shouldBe true }
-                Then("oppslag skal telles") { regel.skalTelle(ansatt, bruker) shouldBe true }
+                And("oppslag skal telles") { regel.skalTelle(ansatt, bruker) shouldBe true }
             }
         }
 

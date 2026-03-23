@@ -6,29 +6,32 @@ import io.mockk.MockKAnnotations.init
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.impl.annotations.SpyK
 import io.mockk.verify
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
-import no.nav.tilgangsmaskin.felles.utils.Auditor
+import no.nav.tilgangsmaskin.felles.utils.LocalAuditor
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_0_6
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_13_24
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_7_12
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_OVER_24
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import java.time.LocalDate.now
-
 
 class AvdødBrukerRegelTest : BehaviorSpec() {
 
     @MockK(relaxed = true)
     private lateinit var teller: AvdødTeller
-
     @MockK
     private lateinit var proxy: EntraProxyTjeneste
 
-    @MockK(relaxed = true)
-    private lateinit var auditor: Auditor
+    @SpyK
+    private var auditor = LocalAuditor()
 
     private lateinit var regel: AvdødBrukerRegel
     private val NAV_TESTKONTOR = "NAV Testkontor"
@@ -45,76 +48,69 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
             regel = AvdødBrukerRegel(teller, proxy, auditor)
         }
 
-        Given("Bruker er død") {
-
-            Then("regel avviser ikke") {
-                val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(1)).build()
-                regel.evaluer(ansatt, bruker) shouldBe true
-            }
-
-            Then("oppslag skal telles") {
-                val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(1)).build()
-                regel.skalTelle(ansatt, bruker) shouldBe true
+        Given("Bruker lever") {
+            val bruker = BrukerBuilder(brukerId).build()
+            When("regel evalueres") {
+                Then("tilgang godkjennes") { regel.evaluer(ansatt, bruker) shouldBe true }
+                Then("oppslag skal ikke telles") { regel.skalTelle(ansatt, bruker) shouldBe false }
             }
         }
 
-        Given("Bruker lever") {
-
-            val bruker = BrukerBuilder(brukerId).build()
-
-            Then("regel avviser ikke") {
-                regel.evaluer(ansatt, bruker) shouldBe true
-            }
-
-            Then("oppslag skal ikke telles") {
-                regel.skalTelle(ansatt, bruker) shouldBe false
+        Given("Bruker er død") {
+            val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(1)).build()
+            When("regel evalueres") {
+                Then("tilgang godkjennes") { regel.evaluer(ansatt, bruker) shouldBe true }
+                Then("oppslag skal telles") { regel.skalTelle(ansatt, bruker) shouldBe true }
             }
         }
 
         Given("Bruker er død for opptil ett år siden") {
-
-            Then("bruker UTILGJENGELIG som enhet (slår ikke opp) for 0-6 måneder") {
-                val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(1)).build()
-                regel.tell(ansatt, bruker)
-                verify { teller.tell(any(), UTILGJENGELIG) }
-                verify(exactly = 0) { proxy.enhet(any()) }
+            val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(1)).build()
+            When("døsdato er mindre enn 6 måneder siden") {
+                Then("bruker enhetsnavn $UTILGJENGELIG og slår ikke opp for 0-6 måneder") {
+                    regel.evaluer(ansatt, bruker)
+                    verify { teller.tell(MND_0_6, UTILGJENGELIG) }
+                    verify(exactly = 0) { proxy.enhet(any()) }
+                }
             }
-
-            Then("bruker UTILGJENGELIG som enhet (slår ikke opp) for 7-12 måneder") {
+            When("døsdato er mellom  6 og 12 måneder siden") {
                 val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(9)).build()
-                regel.tell(ansatt, bruker)
-                verify { teller.tell(any(), UTILGJENGELIG) }
-                verify(exactly = 0) { proxy.enhet(any()) }
+                Then("bruker enhetsnavn $UTILGJENGELIG og slår ikke opp for 7-12 måneder") {
+                    regel.evaluer(ansatt, bruker)
+                    verify { teller.tell(MND_7_12, UTILGJENGELIG) }
+                    verify(exactly = 0) { proxy.enhet(any()) }
+                }
             }
         }
-        Given("Bruker er død for mer enn 1-2 år siden") {
 
-            Then("henter enhet fra proxy") {
+        Given("Bruker er død for mer enn ett år siden") {
+            val enhet = Enhet(Enhetsnummer("1234"), NAV_TESTKONTOR)
+            beforeEach { every { proxy.enhet(ansattId) } returns enhet }
+            When("dødsdato er mellom ett og to år siden") {
                 val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(15)).build()
-                every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), NAV_TESTKONTOR)
-                regel.tell(ansatt, bruker)
-                verify { teller.tell(any(), NAV_TESTKONTOR) }
-                verify { proxy.enhet(ansattId) }
-                verify { auditor.info(any(), null) }
+                Then("henter enhetsnavn fra proxy og bruker dette i metrikkene for 13-24 måneder") {
+                    regel.evaluer(ansatt, bruker) shouldBe true
+                    verify { proxy.enhet(ansattId) }
+                    verify { teller.tell(MND_13_24, enhet.navn) }
+                    verify { auditor.info(any()) }
+                }
             }
-
-            Then("henter enhet fra proxy for død mer enn 2 år siden") {
-                val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(30)).build()
-                every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), NAV_TESTKONTOR)
-
-                regel.tell(ansatt, bruker)
-                verify { teller.tell(any(), NAV_TESTKONTOR) }
-                verify { proxy.enhet(ansattId) }
-                verify { auditor.info(any(), null) }
+            When("dødsdato er mellom ett og to år siden") {
+                Then("henter enhetsnavn fra proxy og bruker dette i metrikkene for mer enn 24 måneder") {
+                    val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(30)).build()
+                    regel.evaluer(ansatt, bruker) shouldBe true
+                    verify { proxy.enhet(ansattId) }
+                    verify { teller.tell(MND_OVER_24, enhet.navn) }
+                    verify { auditor.info(any()) }
+                }
             }
-        }
-        Given("Oppslaget mot proxy feiler") {
-
-            Then("bruker enhetsnavn UTILGJENGELIG") {
-                val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(15)).build()
-                every { proxy.enhet(ansattId) } throws RuntimeException("Shit happens")
-                regel.tell(ansatt, bruker)
-                verify { teller.tell(any(), UTILGJENGELIG) }
+            When("oppslaget mot proxy feiler") {
+                Then("bruker enhetsnavn $UTILGJENGELIG og bruker dette i metrikkene") {
+                    val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(15)).build()
+                    every { proxy.enhet(ansattId) } throws RuntimeException("Shit happens")
+                    regel.evaluer(ansatt, bruker)
+                    verify { teller.tell(MND_13_24, UTILGJENGELIG) }
+                }
             }
         }
     }

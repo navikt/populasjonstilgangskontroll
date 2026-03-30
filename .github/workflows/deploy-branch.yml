@@ -25,7 +25,7 @@ jobs:
 
       # After
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Install Java 25
         uses: actions/setup-java@v5
@@ -96,10 +96,10 @@ jobs:
         uses: actions/deploy-pages@v4
 
       - name: Generate and submit dependency graph
-        uses: gradle/actions/dependency-submission@v5
+        uses: gradle/actions/dependency-submission@v6
 
       - name: Attest and sign
-        uses: nais/attest-sign@v2.0.4
+        uses: nais/attest-sign@v2.0.5
         with:
           image_ref: ${{env.IMAGE}}@${{env.DIGEST}}
           sbom: build/reports/cyclonedx/application.cdx.json

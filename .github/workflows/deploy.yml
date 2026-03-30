@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Install Java 25
         uses: actions/setup-java@v5
@@ -67,7 +67,7 @@ jobs:
           report_paths: '**/build/test-results/test/TEST-*.xml'
 
       - name: Attest and sign
-        uses: nais/attest-sign@v2.0.4
+        uses: nais/attest-sign@v2.0.5
         with:
           image_ref: ${{env.IMAGE}}@${{env.DIGEST}}
           sbom: build/reports/cyclonedx/application.cdx.json

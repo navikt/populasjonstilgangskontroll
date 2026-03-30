@@ -72,7 +72,6 @@ dependencies {
     implementation("no.nav.boot:boot-conditionals:$conditionalsVersion")
     implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
-    //implementation("org.apache.httpcomponents.client5:httpclient5")
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.apache.commons:commons-pool2:$poolsVersion")
     implementation("org.hibernate.orm:hibernate-micrometer")

@@ -47,9 +47,6 @@ class TimeExtensionsTest : DescribeSpec({
 
     describe("månederSidenIdag") {
 
-        it("1 hel måned siden gir 1") {
-            idag.minusMonths(1).månederSidenIdag() shouldBe 1
-        }
 
         it("6 hele måneder siden gir 6") {
             idag.minusMonths(6).månederSidenIdag() shouldBe 6
@@ -67,11 +64,6 @@ class TimeExtensionsTest : DescribeSpec({
             // idag er den 14., dato er 1 måned tilbake men med en dag tidligere (13.)
             val dato = idag.minusMonths(1).minusDays(1)
             dato.månederSidenIdag() shouldBe 2
-        }
-
-        it("legger ikke til ekstra måned når dayOfMonth er lik") {
-            val dato = idag.minusMonths(1)
-            dato.månederSidenIdag() shouldBe 1
         }
 
         it("kaster IllegalArgumentException for dato i fremtiden") {

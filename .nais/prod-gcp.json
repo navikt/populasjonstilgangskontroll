@@ -27,7 +27,7 @@
       "name": "mulighetsrommet-api",
       "namespace": "team-mulighetsrommet",
       "cluster": "prod-gcp"
-    },m
+    },
     {
       "name": "repr-api",
       "namespace": "repr",

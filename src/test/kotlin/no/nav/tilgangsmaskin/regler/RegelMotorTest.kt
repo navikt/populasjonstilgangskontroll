@@ -4,14 +4,16 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.Called
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.verify
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
@@ -25,6 +27,9 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Bydel
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
@@ -64,7 +69,7 @@ import java.util.*
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
 @ContextConfiguration(classes = [RegelTestConfig::class, LocalAuditor::class])
 @ApplyExtension(SpringExtension::class)
-class RegelMotorTest : DescribeSpec() {
+class RegelMotorTest : BehaviorSpec() {
 
     private val brukerId = BrukerId("08526835670")
     private val ansattId = AnsattId("Z999999")
@@ -91,125 +96,260 @@ class RegelMotorTest : DescribeSpec() {
             every { token.clusterAndSystem } returns "cluster:test"
         }
 
-        describe("SkjermingTester") {
 
-            it("Egen ansatt bruker med strengt fortrolig beskyttelse kan ikke behandles av ansatt med medlemsskap kun i egen ansatt gruppe") {
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(SKJERMING).build()
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG, SKJERMING).build()
+        Given("bruker krever ingen spesialtilganger") {
+            val bruker = BrukerBuilder(brukerId).build()
+            When("ansatt er medlem av strengt fortrolig")
+            Then("Tilgang gis") {
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
+                ansatt kanBehandle bruker
+            }
+
+            When("ansatt er medlem av fortrolig")
+            Then("Tilgang gis") {
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
+                ansatt kanBehandle bruker
+            }
+
+            When("ansatt har ingen spesialtilganger")
+            Then("Tilgang gis") {
+                val ansatt = AnsattBuilder(ansattId).build()
+                ansatt kanBehandle bruker
+            }
+        }
+
+        Given("bruker har strengt fortrolig beskyttelse") {
+            val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build()
+            When("Ansatt har ingen spesialtilganger")
+            Then("streng fortrolig-regel avviser tilgang") {
+                val ansatt = AnsattBuilder(ansattId).build()
                 forventAvvistAv<StrengtFortroligRegel>(ansatt, bruker)
             }
 
-            it("Egen ansatt bruker med fortrolig beskyttelse kan ikke behandles av ansatt med medlemsskap i egen gruppe ansatt") {
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(SKJERMING).build()
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(FORTROLIG, SKJERMING).build()
+            When("ansatt er medlem av fortrolig")
+            Then("streng fortrolig-regel avviser tilgang") {
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
+                forventAvvistAv<StrengtFortroligRegel>(ansatt, bruker)
+            }
+
+            When("ansatt er medlem av streng fortrolig")
+            Then("tilgang gis") {
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
+                ansatt kanBehandle bruker
+            }
+        }
+
+        Given("bruker har fortrolig beskyttelse") {
+            val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(FORTROLIG).build()
+            When("ansatt er medlem av strengt fortroligs")
+            Then("fortrolig-regel avviser tilgang") {
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
                 forventAvvistAv<FortroligRegel>(ansatt, bruker)
             }
 
-            it("Egen ansatt bruker med fortrolig beskyttelse kan behandles av ansatt med medlemsskap i egen ansatt gruppe som også har medlemsskap i fortrolig gruppe") {
+            When("ansatt har ingen spesialtilganger")
+            Then("fortrolig-regel avviser tilgang") {
+                val ansatt = AnsattBuilder(ansattId).build()
+                forventAvvistAv<FortroligRegel>(ansatt, bruker)
+            }
+
+            When("ansatt har ingen spesialtilganger")
+            And("ansatt er medlem av fortrolig")
+            Then("tilgang gis") {
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
+                ansatt kanBehandle bruker
+            }
+        }
+
+        Given("bruker er skjermet") {
+            When("ansatt er medlem av skjerming")
+            Then("tilgang gis") {
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(SKJERMING).build()
+                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(SKJERMING).build()
+                ansatt kanBehandle bruker
+            }
+
+            When("bruker i tillegg har fortrolig beskyttelse")
+            And("ansatt er medlem av skjerming")
+            And("ansatt i tillegg er medlem av fortrolig")
+            Then("tilgang gis") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG, SKJERMING).build()
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(FORTROLIG, SKJERMING).build()
                 ansatt kanBehandle bruker
             }
 
-            it("Egen ansatt bruker med strengt fortrolig beskyttelse kan behandles av ansatt i egen ansatt gruppe som også har strengt fortrolig gruppe") {
+            When("bruker i tillegg har strengt fortrolig beskyttelse")
+            And("ansatt er medlem av skjerming")
+            And("ansatt i tillegg er medlem av strengt fortrolig")
+            Then("tilgang gis") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG, SKJERMING).build()
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG, SKJERMING).build()
                 ansatt kanBehandle bruker
             }
 
-            it("Egen ansatt bruker med strengt fortrolig beskyttelse kan ikke behandles av ansatt med medlemsskap i egen ansatt gruppe") {
+            When("bruker i tillegg har streng fortrolig beskyttelse")
+            And("ansatt er kun medlem av skjerming")
+            Then("strengt fortrolig-regel avviser tilgang") {
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(SKJERMING).build()
+                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG, SKJERMING).build()
+                forventAvvistAv<StrengtFortroligRegel>(ansatt, bruker)
+            }
+
+            When("bruker i tillegg har fortrolig beskyttelse")
+            And("ansatt er kun medlem av skjerming")
+            Then("fortrolig regel avviser tilgang") {
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(SKJERMING).build()
+                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(FORTROLIG, SKJERMING).build()
+                forventAvvistAv<FortroligRegel>(ansatt, bruker)
+            }
+
+            When("bruker i tillegg har strengt fortrolig beskyttelse")
+            And("ansatt er medlem av fortrolig")
+            Then("strengt fortrolig-regel avviser tilgang") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG, SKJERMING).build()
                 forventAvvistAv<StrengtFortroligRegel>(ansatt, bruker)
             }
 
-            it("Egen ansatt bruker *kan* behandles av ansatt med medlemsskap i egen ansatt gruppe") {
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(SKJERMING).build()
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(SKJERMING).build()
-                ansatt kanBehandle bruker
-            }
 
-            it("Egen ansatt bruker kan ikke behandles av vanlig ansatt") {
-                val ansatt = AnsattBuilder(ansattId).build()
+            When("ansatt har ingen spesialtilganger")
+            Then("skjerming-regel avviser tilgang") {
+            val ansatt = AnsattBuilder(ansattId).build()
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(SKJERMING).build()
                 forventAvvistAv<SkjermingRegel>(ansatt, bruker)
             }
 
-            it("Ansatt kan ikke behandle seg selv") {
+            When("ansatt er medlem av skjerming")
+            And("ansatt er den samme som bruker")
+            Then("egne data-regel avviser tilgang") {
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(SKJERMING).build()
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(SKJERMING).bruker(bruker).build()
                 forventAvvistAv<EgneDataRegel>(ansatt, bruker)
             }
 
-            it("Egen ansatt bruker kan ikke behandles av ansatt med medlemsskap i fortrolig gruppe") {
+            When("ansatt er medlem av fortrolig")
+            Then("skjerming-regel avviser tilgang") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(SKJERMING).build()
                 forventAvvistAv<SkjermingRegel>(ansatt, bruker)
             }
 
-            it("Egen ansatt bruker kan ikke behandles av ansatt med medlemsskap i strengt fortrolig gruppe") {
+            And("ansatt er medlem av strengt fortrolig")
+            Then("skjerming-regel avviser tilgang") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(SKJERMING).build()
                 forventAvvistAv<SkjermingRegel>(ansatt, bruker)
             }
         }
 
-        describe("FortroligTester") {
-
-            it("Fortrolig bruker kan ikke behandles av ansatt med medlemsskap i strengt fortrolig gruppe") {
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(FORTROLIG).build()
-                forventAvvistAv<FortroligRegel>(ansatt, bruker)
-            }
-
-            it("Bruker med fortrolig beskyttelse kan ikke behandles av vanlig ansatt") {
-                val ansatt = AnsattBuilder(ansattId).build()
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(FORTROLIG).build()
-                forventAvvistAv<FortroligRegel>(ansatt, bruker)
-            }
-
-            it("Fortrolig bruker kan behandles av ansatt med medlemsskap i fortrolig gruppe") {
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(FORTROLIG).build()
-                ansatt kanBehandle bruker
-            }
-        }
-
-        describe("GeoTester") {
-            val enhet = Enhetsnummer("4242")
-            val enhetGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_${enhet.verdi}")
-            val oppfølgingGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-ENHET_${enhet.verdi}")
-
-            it("Ansatt med nasjonal tilgang kan behandle vanlig bruker") {
+        Given("bruker har ingen gepgrafisk tilknyting") {
+            When("ansatt er medlem av nasjonal")
+            Then("tilgang gis") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(NASJONAL).build()
                 val bruker = BrukerBuilder(brukerId).build()
                 ansatt kanBehandle bruker
                 verify { oppfølging wasNot Called }
             }
+        }
 
-            it("Ansatt med manglende geografisk tilknytning gruppe kan behandle bruker uten kjent geografisk tilknytning") {
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UKJENT_BOSTED).build()
-                val bruker = BrukerBuilder(brukerId, UkjentBosted()).kreverMedlemskapI(UKJENT_BOSTED).build()
+        Given("bruker er bosatt i utlandet") {
+            When("ansatt har ingen spesialtilganger")
+            Then("tilgang avvises av utland-regel") {
+                val ansatt = AnsattBuilder(ansattId).build()
+                val bruker = BrukerBuilder(brukerId).gt(UtenlandskTilknytning()).build()
+                forventAvvistAv<UtlandRegel>(ansatt, bruker)
+            }
+
+            When("ansatt er medlem av UTENLANDSK")
+            Then("tilgang gis") {
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UTENLANDSK).build()
+                val bruker = BrukerBuilder(brukerId).gt(UtenlandskTilknytning()).build()
                 ansatt kanBehandle bruker
             }
 
-            it("Ansatt med tilgang som samme GT som bruker kan behandle denne") {
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).medMedlemskapI(SKJERMING).build()
-                val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune(enhet.verdi))).build()
+            When("bruker har strengt fortrolig utland beskyttelse")
+            And("ansatt har ingen spesialtilganger")
+            Then("tilgang avvises av strengt fortrolog utland-regel") {
+                val ansatt = AnsattBuilder(ansattId).build()
+                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
+                forventAvvistAv<StrengtFortroligUtlandRegel>(ansatt, bruker)
+            }
+
+            When("bruker har strengt fortrolig utland beskyttelse")
+            And("ansatt er medlem av fortrolig")
+            Then("tilgang avvises av strengt fortrolig utland-regel") {
+                val ansatt = AnsattBuilder(ansattId)
+                    .medMedlemskapI(FORTROLIG)
+                    .build()
+                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
+                forventAvvistAv<StrengtFortroligUtlandRegel>(ansatt, bruker)
+            }
+        }
+
+        Given("bruker har ukjent bosted") {
+            val bruker = BrukerBuilder(brukerId, UkjentBosted()).kreverMedlemskapI(UKJENT_BOSTED).build()
+            When("ansatt er medlem av ukjent bosted")
+            Then("tilgang gis") {
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UKJENT_BOSTED).build()
                 ansatt kanBehandle bruker
                 verify { oppfølging wasNot Called }
             }
 
-            it("Ansatt uten tilgang som samme GT som bruker og uten tilgang til oppfølgingsenhet kan ikke behandle denne") {
+            When("ansatt er ikke medlem av ukjent bosted")
+            Then("tilgang avvises") {
+                val ansatt = AnsattBuilder(ansattId).build()
+                forventAvvistAv<UkjentBostedRegel>(ansatt, bruker)
+            }
+        }
+
+        Given("bruker har bydelstilknytning") {
+            val bydel = "111111"
+            val bruker = BrukerBuilder(brukerId, BydelTilknytning(Bydel(bydel))).build()
+            When("ansatt er ikke er medlem av gruppen for denne bydelen")
+            Then("tilgang avvises av geografisk-regel") {
                 every { oppfølging.enhetFor(any()) } returns null
+                val ansatt = AnsattBuilder(ansattId).build()
+                forventAvvistAv<GeografiskRegel>(ansatt, bruker)
+            }
+            When("ansatt er  er medlem av gruppen for denne bydelen")
+            Then("tilgang gis") {
+                val bydelGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_$bydel")
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(bydelGruppe).build()
+                ansatt kanBehandle bruker
+            }
+        }
+
+
+        Given("bruker har kommunetilknytning") {
+            When("ansatt er medlem av gruppe for denne kommunen")
+            Then("tilgang gis og intet kall til oppfølgingstjenesten er nødvendig") {
+                val enhet = Enhetsnummer("4242")
+                val enhetGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_${enhet.verdi}")
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).build()
+                val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune(enhet.verdi))).build()
+                ansatt kanBehandle bruker
+                verify { oppfølging wasNot Called }
+            }
+        }
+
+        Given("bruker har kommunal tilknytning og er ikke under oppfølging") {
+            When("ansatt har ingen spesialtilganger")
+            Then("tilgang avvises av geografisk-regel siden oppfølgingstjenesten ikke returnerer enhet") {
+                every { oppfølging.enhetFor(any()) } returns null
+                val ansatt = AnsattBuilder(ansattId).build()
                 val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
                 forventAvvistAv<GeografiskRegel>(ansatt, bruker)
                 verify(exactly = 1) { oppfølging.enhetFor(Identifikator(brukerId.verdi)) }
             }
+        }
 
-            it("Ansatt uten Nasjonal tilgang og uten GT kan likevel behandle om den har tilgang til brukerens oppfølgingsenhet") {
+        Given("bruker har kommunal tilknytning og er under oppfølging") {
+            When("ansatt har ikke geografisk tilknytning til samme kommune")
+            And("ansatt er medlem av gruppen for oppfølging")
+            Then("tilgang gis") {
+                val enhet = Enhetsnummer("4242")
                 every { oppfølging.enhetFor(Identifikator(brukerId.verdi)) } returns enhet
+                val oppfølgingGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-ENHET_${enhet.verdi}")
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(oppfølgingGruppe).build()
                 val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
                 ansatt kanBehandle bruker
@@ -217,130 +357,73 @@ class RegelMotorTest : DescribeSpec() {
             }
         }
 
-        describe("NærståendeTester") {
-            val annenAnsattBrukerId = BrukerId("08526835644")
-
-            it("Ansatt kan ikke behandle noen de har felles barn med") {
+        Given("ansatt er nærstående til bruker") {
+            When("Ansatt har felles barn med bruker")
+            Then("Tilgang avvises av felle barn-regel") {
+                val ansattBrukerId = BrukerId("08526835644")
                 val barn = BrukerId("08526835649")
-                val far = BrukerBuilder(annenAnsattBrukerId).barn(setOf(barn)).build()
-                val ansatt = AnsattBuilder(ansattId).bruker(far).build()
+                val ansattBruker = BrukerBuilder(ansattBrukerId).barn(setOf(barn)).build()
+                val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
                 val mor = BrukerBuilder(brukerId).barn(setOf(barn)).build()
                 forventAvvistAv<FellesBarnRegel>(ansatt, mor)
             }
 
-            it("Ansatt kan ikke behandle egen partner") {
-                val ansattBruker = BrukerBuilder(annenAnsattBrukerId).partnere(setOf(brukerId)).build()
+            When("ansatt er partner med bruker")
+            Then("Tilgang avvises av felles barn-regel") {
+                val ansattBrukerId = BrukerId("08526835644")
+                val ansattBruker = BrukerBuilder(ansattBrukerId).partnere(setOf(brukerId)).build()
                 val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
                 val partner = BrukerBuilder(brukerId).build()
                 forventAvvistAv<PartnerRegel>(ansatt, partner)
             }
 
-            it("Ansatt kan ikke behandle egne barn") {
-                val ansattBruker = BrukerBuilder(annenAnsattBrukerId).barn(setOf(brukerId)).build()
+            When("ansatt er forelder til bruker")
+            Then("tilgang avvises av foreldre og barn-regel") {
+                val ansattBrukerId = BrukerId("08526835644")
+                val ansattBruker = BrukerBuilder(ansattBrukerId).barn(setOf(brukerId)).build()
                 val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
                 val barn = BrukerBuilder(brukerId).build()
                 forventAvvistAv<ForeldreOgBarnRegel>(ansatt, barn)
             }
 
-            it("Ansatt kan ikke behandle egne foreldre") {
-                val ansattBruker = BrukerBuilder(annenAnsattBrukerId).far(brukerId).build()
+            When("ansatt er barn av til bruker")
+            Then("tilgang avvises av foreldre og barn-regel") {
+                val ansattBrukerId = BrukerId("08526835644")
+                val ansattBruker = BrukerBuilder(ansattBrukerId).far(brukerId).build()
                 val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
                 val far = BrukerBuilder(brukerId).build()
                 forventAvvistAv<ForeldreOgBarnRegel>(ansatt, far)
             }
 
-            it("Ansatt kan ikke behandle egne søsken") {
-                val ansattBruker = BrukerBuilder(annenAnsattBrukerId).søsken(setOf(brukerId)).build()
-                val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
-                val søsken = BrukerBuilder(brukerId).build()
-                forventAvvistAv<SøskenRegel>(ansatt, søsken)
+            When("ansatt er søsken til bruker") {
+                Then("tilgang avvises av søsken-regel") {
+                    val ansattBrukerId = BrukerId("08526835644")
+                    val ansattBruker = BrukerBuilder(ansattBrukerId).søsken(setOf(brukerId)).build()
+                    val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
+                    val søsken = BrukerBuilder(brukerId).build()
+                    forventAvvistAv<SøskenRegel>(ansatt, søsken)
+                }
             }
         }
 
-        describe("StrengtFortroligTester") {
+        Given("bruker har utenlandsk eller ukjent tilknytning") {
 
-            it("Bruker med strengt fortrolig beskyttelse kan ikke behandles av vanlig ansatt") {
-                val ansatt = AnsattBuilder(ansattId).build()
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build()
-                forventAvvistAv<StrengtFortroligRegel>(ansatt, bruker)
-            }
-
-            it("Bruker med strengt fortrolig beskyttelse kan ikke behandles av ansatt med medlemsskap i fortrolig gruppe") {
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build()
-                forventAvvistAv<StrengtFortroligRegel>(ansatt, bruker)
-            }
-
-            it("Bruker med strengt fortrolig beskyttelse kan behandles av ansatt med medlemsskap i strengt fortrolig gruppe") {
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build()
-                ansatt kanBehandle bruker
-            }
-        }
-
-        describe("UtlandTester") {
-
-            it("Bruker med strengt fortrolig utland beskyttelse kan behandles av ansatt med medlemsskap i strengt fortrolig gruppe") {
+            Then("Bruker med strengt fortrolig utland beskyttelse kan behandles av ansatt med medlemsskap i strengt fortrolig gruppe") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
                 ansatt kanBehandle bruker
             }
 
-            it("Bruker med strengt fortrolig utland beskyttelse kan ikke behandles av ansatt med medlemsskap i fortrolig gruppe") {
+            Then("Bruker med strengt fortrolig utland beskyttelse kan ikke behandles av ansatt med medlemsskap i fortrolig gruppe") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
                 forventAvvistAv<StrengtFortroligUtlandRegel>(ansatt, bruker)
             }
 
-            it("Bruker med strengt fortrolig utland beskyttelse kan ikke behandles av vanlig ansatt") {
+            Then("Bruker med strengt fortrolig utland beskyttelse kan ikke behandles av vanlig ansatt") {
                 val ansatt = AnsattBuilder(ansattId).build()
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
                 forventAvvistAv<StrengtFortroligUtlandRegel>(ansatt, bruker)
-            }
-
-            it("Bruker bosatt i utlandet kan ikke behandles av ansatt uten UTENLANDSK-gruppe") {
-                val ansatt = AnsattBuilder(ansattId).build()
-                val bruker = BrukerBuilder(brukerId).gt(UtenlandskTilknytning()).build()
-                forventAvvistAv<UtlandRegel>(ansatt, bruker)
-            }
-
-            it("Bruker bosatt i utlandet kan behandles av ansatt med UTENLANDSK-gruppe") {
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UTENLANDSK).build()
-                val bruker = BrukerBuilder(brukerId).gt(UtenlandskTilknytning()).build()
-                ansatt kanBehandle bruker
-            }
-
-            it("Bruker med ukjent bosted kan ikke behandles av ansatt uten UKJENT_BOSTED-gruppe") {
-                val ansatt = AnsattBuilder(ansattId).build()
-                val bruker = BrukerBuilder(brukerId).gt(UkjentBosted()).build()
-                forventAvvistAv<UkjentBostedRegel>(ansatt, bruker)
-            }
-
-            it("Bruker med ukjent bosted kan behandles av ansatt med UKJENT_BOSTED-gruppe") {
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UKJENT_BOSTED).build()
-                val bruker = BrukerBuilder(brukerId).gt(UkjentBosted()).build()
-                ansatt kanBehandle bruker
-            }
-        }
-
-        describe("VanligBrukerTest") {
-
-            it("Vanlig bruker kan behandles av ansatt med medlemsskap i strengt fortrolig gruppe") {
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
-                val bruker = BrukerBuilder(brukerId).build()
-                ansatt kanBehandle bruker
-            }
-
-            it("Vanlig bruker kan behandles av ansatt med medlemsskap i fortrolig gruppe") {
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
-                val bruker = BrukerBuilder(brukerId).build()
-                ansatt kanBehandle bruker
-            }
-
-            it("Vanlig bruker kan behandles av vanlig ansatt") {
-                val ansatt = AnsattBuilder(ansattId).build()
-                val bruker = BrukerBuilder(brukerId).build()
-                ansatt kanBehandle bruker
             }
         }
     }

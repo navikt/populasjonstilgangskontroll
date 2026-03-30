@@ -27,6 +27,11 @@
   },
   "inbound": [
     {
+      "name": "mulighetsrommet-api",
+      "namespace": "team-mulighetsrommet",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "repr-api",
       "namespace": "repr",
       "cluster": "dev-gcp"

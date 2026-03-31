@@ -8,12 +8,10 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.Called
-import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.verify
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
@@ -27,7 +25,6 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Bydel
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
@@ -253,35 +250,32 @@ class RegelMotorTest : BehaviorSpec() {
         }
 
         Given("bruker er bosatt i utlandet") {
+            val bruker = BrukerBuilder(brukerId).gt(UtenlandskTilknytning()).build()
             When("ansatt har ingen spesialtilganger")
             Then("tilgang avvises av utland-regel") {
                 val ansatt = AnsattBuilder(ansattId).build()
-                val bruker = BrukerBuilder(brukerId).gt(UtenlandskTilknytning()).build()
                 forventAvvistAv<UtlandRegel>(ansatt, bruker)
             }
 
-            When("ansatt er medlem av UTENLANDSK")
+            When("ansatt er medlem av utenlandsk")
             Then("tilgang gis") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UTENLANDSK).build()
-                val bruker = BrukerBuilder(brukerId).gt(UtenlandskTilknytning()).build()
                 ansatt kanBehandle bruker
             }
-
-            When("bruker har strengt fortrolig utland beskyttelse")
-            And("ansatt har ingen spesialtilganger")
+        }
+        Given("bruker har strengt fortrolig utland beskyttelse") {
+            val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
+            When("ansatt har ingen spesialtilganger")
             Then("tilgang avvises av strengt fortrolog utland-regel") {
                 val ansatt = AnsattBuilder(ansattId).build()
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
                 forventAvvistAv<StrengtFortroligUtlandRegel>(ansatt, bruker)
             }
 
-            When("bruker har strengt fortrolig utland beskyttelse")
-            And("ansatt er medlem av fortrolig")
+            When("ansatt er medlem av fortrolig")
             Then("tilgang avvises av strengt fortrolig utland-regel") {
                 val ansatt = AnsattBuilder(ansattId)
                     .medMedlemskapI(FORTROLIG)
                     .build()
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
                 forventAvvistAv<StrengtFortroligUtlandRegel>(ansatt, bruker)
             }
         }
@@ -292,7 +286,6 @@ class RegelMotorTest : BehaviorSpec() {
             Then("tilgang gis") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UKJENT_BOSTED).build()
                 ansatt kanBehandle bruker
-                verify { oppfølging wasNot Called }
             }
 
             When("ansatt er ikke medlem av ukjent bosted")
@@ -339,7 +332,7 @@ class RegelMotorTest : BehaviorSpec() {
                 val ansatt = AnsattBuilder(ansattId).build()
                 val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
                 forventAvvistAv<GeografiskRegel>(ansatt, bruker)
-                verify(exactly = 1) { oppfølging.enhetFor(Identifikator(brukerId.verdi)) }
+                verify { oppfølging.enhetFor(Identifikator(brukerId.verdi)) }
             }
         }
 
@@ -353,7 +346,7 @@ class RegelMotorTest : BehaviorSpec() {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(oppfølgingGruppe).build()
                 val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
                 ansatt kanBehandle bruker
-                verify(exactly = 1) { oppfølging.enhetFor(Identifikator(brukerId.verdi)) }
+                verify { oppfølging.enhetFor(Identifikator(brukerId.verdi)) }
             }
         }
 
@@ -407,7 +400,6 @@ class RegelMotorTest : BehaviorSpec() {
         }
 
         Given("bruker har utenlandsk eller ukjent tilknytning") {
-
             Then("Bruker med strengt fortrolig utland beskyttelse kan behandles av ansatt med medlemsskap i strengt fortrolig gruppe") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()

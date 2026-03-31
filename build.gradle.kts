@@ -19,7 +19,7 @@ group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
 version = "1.0.1"
 
 plugins {
-    val kotlinVersion = "2.3.20"
+    val kotlinVersion = "2.3.10"
     id("jacoco")
     id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
     kotlin("jvm") version kotlinVersion
@@ -37,7 +37,7 @@ springBoot {
     buildInfo {
         properties {
             additional = mapOf(
-                "kotlin.version" to "2.3.20",
+                "kotlin.version" to "2.3.10",
                 "jdk.version" to javaVersion.asInt().toString(),
                 "jdk.vendor" to getProperty("java.vendor")
             )

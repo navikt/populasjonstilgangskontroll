@@ -57,7 +57,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
         }
 
         Given("oppslag av enheter for ansatt") {
-            When("ansatt har enheter") {
+            When("ansatt er tilknyttet enheter") {
                 Then("returnerer liste av enheter for ansatt") {
                     server.expect(requestTo(cfg.enheterURI(ansattId.verdi)))
                         .andExpect(method(GET))
@@ -75,7 +75,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
             }
 
             When("ansatt ikke er tilknyttet enheter") {
-                Then("returnerer tom liste") {
+                Then("returneres tom liste") {
                     server.expect(requestTo(cfg.enheterURI(ansattId.verdi)))
                         .andExpect(method(GET))
                         .andRespond(withSuccess("[]", APPLICATION_JSON))

@@ -3,37 +3,33 @@ package no.nav.tilgangsmaskin.ansatt.nom
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.TestApp
-import no.nav.tilgangsmaskin.felles.utils.LederUtvelger.LeaderChangedEvent
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.ApplicationEventPublisher
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.util.ReflectionTestUtils.setField
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
-import java.net.InetAddress
-import java.time.Instant
+import java.time.Instant.now
 import java.time.LocalDate
 import java.time.ZoneOffset.UTC
 import java.util.concurrent.atomic.AtomicInteger
 
 @DataJpaTest
-@EnableJpaAuditing
 @Testcontainers
 @AutoConfigureMetrics
 @ContextConfiguration(classes = [TestApp::class, NomTjeneste::class, NomJPAAdapter::class, NomDBOpprydder::class, NomRaderFjernetTeller::class, NomKallTeller::class])
 @ApplyExtension(SpringExtension::class)
-class NomDBOpprydderTest : DescribeSpec() {
+class NomDBOpprydderTest : BehaviorSpec() {
 
     @MockkBean(relaxed = true)
     @Suppress("unused")
@@ -57,15 +53,8 @@ class NomDBOpprydderTest : DescribeSpec() {
     @Autowired
     private lateinit var raderFjernet: NomRaderFjernetTeller
 
-    companion object {
-        @ServiceConnection
-        private val postgres = PostgreSQLContainer("postgres:18")
 
-        private val hostname = InetAddress.getLocalHost().hostName
-        private val counter = AtomicInteger(0)
-    }
 
-    private fun nyttNavId() = "Z%06d".format(counter.incrementAndGet())
 
     init {
         beforeEach {
@@ -73,13 +62,11 @@ class NomDBOpprydderTest : DescribeSpec() {
             setField(opprydder, "erLeder", false)
         }
 
-        describe("ryddOpp") {
-
-            describe("som leder") {
+        Given("ryddOpp") {
+            When("pod er leder") {
                 beforeEach { blirLeder() }
-
-                it("sletter rader med utgått gyldigtil") {
-                    lagre(gyldigTil = LocalDate.now().minusDays(1))
+                Then("sletter rader med utgått gyldighet") {
+                    lagre(FNR,LocalDate.now().minusDays(1))
                     lagre("20478606614", LocalDate.now().minusDays(1))
                     repo.count() shouldBe 2
                     assertSoftly {
@@ -88,8 +75,8 @@ class NomDBOpprydderTest : DescribeSpec() {
                     }
                 }
 
-                it("beholder rader der gyldigtil er i fremtiden") {
-                    lagre(gyldigTil = LocalDate.now().plusMonths(6))
+                Then("beholder rader som fremdeles er gyldige") {
+                    lagre(FNR,LocalDate.now().plusMonths(6))
                     repo.count() shouldBe 1
                     assertSoftly {
                         opprydder.ryddOpp() shouldBe 0
@@ -97,9 +84,9 @@ class NomDBOpprydderTest : DescribeSpec() {
                     }
                 }
 
-                it("sletter kun utgåtte og beholder gyldige") {
-                    lagre(gyldigTil = LocalDate.now().minusDays(1))
-                    val gyldig = lagre(fnr = "20478606614", gyldigTil = LocalDate.now().plusMonths(6))
+                Then("sletter kun utgåtte og beholder gyldige") {
+                    lagre(FNR,LocalDate.now().minusDays(1))
+                    val gyldig = lagre( "20478606614", LocalDate.now().plusMonths(6))
 
                     assertSoftly {
                         opprydder.ryddOpp() shouldBe 1
@@ -108,15 +95,14 @@ class NomDBOpprydderTest : DescribeSpec() {
                     }
                 }
 
-                it("returnerer 0 når ingen rader finnes") {
+                Then("returnerer 0 nar ingen rader finnes") {
                     opprydder.ryddOpp() shouldBe 0
                 }
             }
 
-            describe("ikke som leder") {
-
-                it("returnerer 0 uten å slette noe") {
-                    lagre(gyldigTil = LocalDate.now().minusDays(1))
+            When("pod er ikke leder") {
+                Then("returnerer 0 uten å slette noe") {
+                    lagre(FNR,LocalDate.now().minusDays(1))
 
                     assertSoftly {
                         opprydder.ryddOpp() shouldBe 0
@@ -127,8 +113,8 @@ class NomDBOpprydderTest : DescribeSpec() {
         }
     }
 
-    private fun lagre(fnr: String = "08526835670", gyldigTil: LocalDate): NomEntity {
-        val now = Instant.now()
+    private fun lagre(fnr: String, gyldigTil: LocalDate): NomEntity {
+        val now = now()
         val gyldigtilInstant = gyldigTil.atStartOfDay().toInstant(UTC)
         return TransactionTemplate(txManager).execute {
             repo.save(NomEntity(nyttNavId(), fnr, now, gyldigtilInstant).also {
@@ -139,4 +125,11 @@ class NomDBOpprydderTest : DescribeSpec() {
     }
 
     private fun blirLeder() = setField(opprydder, "erLeder", true)
+    companion object {
+        @ServiceConnection
+        private val postgres = PostgreSQLContainer("postgres:18")
+        private fun nyttNavId() = "Z%06d".format(counter.incrementAndGet())
+        private const val FNR = "08526835670"
+        private val counter = AtomicInteger(0)
+    }
 }

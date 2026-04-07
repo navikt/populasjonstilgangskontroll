@@ -19,7 +19,9 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
+import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
@@ -75,6 +77,12 @@ class OverstyringRegelTjenesteTest : DescribeSpec() {
     private val dnr = BrukerId("12345678910")
 
     @MockkBean
+    private lateinit var vergemål: VergemålTjeneste
+
+    @MockkBean
+    private lateinit var nom: NomTjeneste
+
+    @MockkBean
     lateinit var token: Token
     @MockkBean
     lateinit var oppfølging: OppfølgingTjeneste
@@ -100,6 +108,8 @@ class OverstyringRegelTjenesteTest : DescribeSpec() {
     init {
 
         beforeEach {
+            every { nom.fnrForAnsatt(any()) } returns vanligBrukerId
+            every { vergemål.vergemål(any()) } returns emptyList()
             every { validator.validerKonsument() } returns Unit
             every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
             every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()

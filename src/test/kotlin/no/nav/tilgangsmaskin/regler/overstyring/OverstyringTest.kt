@@ -17,7 +17,9 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
+import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
@@ -62,6 +64,13 @@ internal class OverstyringTest : DescribeSpec() {
     private val ansattId = AnsattId("Z999999")
     private val historiskBrukerId = BrukerId("11111111111")
 
+
+    @MockkBean
+    private lateinit var vergemål: VergemålTjeneste
+
+    @MockkBean
+    private lateinit var nom: NomTjeneste
+
     @MockkBean
     lateinit var validator: OverstyringClientValidator
     @MockkBean
@@ -89,6 +98,8 @@ internal class OverstyringTest : DescribeSpec() {
         }
 
         beforeEach {
+            every { nom.fnrForAnsatt(any()) } returns vanligBrukerId
+            every { vergemål.vergemål(any()) } returns emptyList()  
             every { validator.validerKonsument() } returns Unit
             every { token.erObo } returns false
             every { token.erCC } returns true

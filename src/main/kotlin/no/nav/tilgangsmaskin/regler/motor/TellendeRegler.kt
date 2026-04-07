@@ -65,7 +65,9 @@ class VergemålRegel(private val vergemål: VergemålTjeneste, nom: NomTjeneste)
 
     override val metadata = RegelMetadata(VERGEMÅL)
 
-    override val skalTelle = { ansatt: Ansatt, bruker: Bruker -> vergemål.vergemål(nom.fnrForAnsatt(ansatt.ansattId))?.contains(bruker.brukerId) ?: false}
+    override val skalTelle = { ansatt: Ansatt, bruker: Bruker ->
+        vergemål.vergemål(nom.fnrForAnsatt(ansatt.ansattId))?.contains(bruker.brukerId) == true
+    }
 
     override fun tell(ansatt: Ansatt, bruker: Bruker) {
 

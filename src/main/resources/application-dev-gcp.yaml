@@ -17,3 +17,7 @@ management:
   httpexchanges:
     recording:
       enabled: true
+
+verge:
+  base-uri: https://repr-api.intern.dev.nav.no
+  scope: api://repr-api.intern.dev.nav.no/.default

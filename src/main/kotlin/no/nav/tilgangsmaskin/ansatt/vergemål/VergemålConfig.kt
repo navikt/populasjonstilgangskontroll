@@ -8,20 +8,20 @@ import java.net.URI
 
 @ConfigurationProperties(VERGEMÅL)
 class VergemålConfig(
-    baseUri: URI = DEFAULT_URI,
+    baseUri: URI,
+    val path: String = DEFAULT_PATH,
     pingPath: String = DEFAULT_PING_PATH,
     enabled: Boolean = true) :  AbstractRestConfig(baseUri, pingPath, VERGEMÅL, enabled) {
 
     val vergemålURI =
         builder().apply {
-            path(DEFAULT_PATH)
+            path(path)
         }.build()
 
     @Generated
-    override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
+    override fun toString() = "$javaClass.simpleName [uri=$vergemålURI, pingEndpoint=$pingEndpoint]"
 
     companion object {
-        private val DEFAULT_URI = URI.create("http://repr-api.repr")
         const val VERGEMÅL = "verge"
         private const val DEFAULT_PATH = "/api/v2/internbruker/vergemaal/kan-representere"
         private const val DEFAULT_PING_PATH = "/actuator/health/liveness"

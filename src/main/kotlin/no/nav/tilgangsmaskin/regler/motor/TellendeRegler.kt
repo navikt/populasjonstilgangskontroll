@@ -59,7 +59,7 @@ class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: Ent
 
 }
 
-@Component
+//@Component
 @Order(LOWEST_PRECEDENCE - 4)
 class VergemålRegel(private val vergemål: VergemålTjeneste, nom: NomTjeneste) : TellendeRegel {
 

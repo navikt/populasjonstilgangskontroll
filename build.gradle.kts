@@ -5,8 +5,8 @@ val javaVersion = JavaLanguageVersion.of(25)
 val springdocVersion = "3.0.2"
 val tokenSupportVersion = "6.0.4"
 val mockkVersion = "1.14.9"
-val kotestVersion = "6.1.7"
-val otelVersion = "2.26.0"
+val kotestVersion = "6.1.9"
+val otelVersion = "2.26.1"
 val conditionalsVersion = "6.0.3"
 val logstashVersion = "9.0"
 val coroutinesVersion = "1.9.0"
@@ -25,7 +25,7 @@ plugins {
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
-    id("org.springframework.boot") version "4.0.4"
+    id("org.springframework.boot") version "4.0.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.cyclonedx.bom") version "3.0.0"
     id("com.google.cloud.tools.jib") version "3.5.3"

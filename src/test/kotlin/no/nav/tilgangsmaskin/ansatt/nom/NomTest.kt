@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -26,10 +26,11 @@ import java.time.LocalDate.EPOCH
 @ContextConfiguration(classes = [NomJPAAdapter::class, TestApp::class])
 @Testcontainers
 @ApplyExtension(SpringExtension::class)
-internal class NomTest : DescribeSpec() {
+internal class NomTest : BehaviorSpec() {
 
     @Autowired
     private lateinit var nom: NomJPAAdapter
+
     @MockkBean
     private lateinit var token: Token
 
@@ -43,23 +44,28 @@ internal class NomTest : DescribeSpec() {
         val utgått = NomAnsattData(ansattId, brukerId, NomAnsattPeriode(EPOCH, IGÅR))
         val gyldig = NomAnsattData(ansattId, brukerId, ALWAYS)
 
-        describe("fnrForAnsatt") {
-
-            it("utgått ansatt returneres ikke") {
-                nom.upsert(utgått)
-                nom.fnrForAnsatt(ansattId.verdi) shouldBe null
+        Given("fnrForAnsatt kalles") {
+            When("ansatt er utgått") {
+                Then("returneres ikke") {
+                    nom.upsert(utgått)
+                    nom.fnrForAnsatt(ansattId.verdi) shouldBe null
+                }
             }
 
-            it("ansatt uten sluttdato er gyldig") {
-                nom.upsert(gyldig)
-                nom.fnrForAnsatt(ansattId.verdi) shouldNotBe null
+            When("ansatt har ingen sluttdato") {
+                Then("er gyldig og returneres") {
+                    nom.upsert(gyldig)
+                    nom.fnrForAnsatt(ansattId.verdi) shouldNotBe null
+                }
             }
 
-            it("siste hendelse gjelder") {
-                nom.upsert(utgått)
-                nom.fnrForAnsatt(ansattId.verdi) shouldBe null
-                nom.upsert(gyldig)
-                nom.fnrForAnsatt(ansattId.verdi) shouldBe gyldig.brukerId
+            When("siste hendelse overstyrer forrige") {
+                Then("siste hendelse gjelder") {
+                    nom.upsert(utgått)
+                    nom.fnrForAnsatt(ansattId.verdi) shouldBe null
+                    nom.upsert(gyldig)
+                    nom.fnrForAnsatt(ansattId.verdi) shouldBe gyldig.brukerId
+                }
             }
         }
     }

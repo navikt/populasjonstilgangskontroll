@@ -64,7 +64,7 @@ class NomDBOpprydderTest : BehaviorSpec() {
 
         Given("ryddOpp") {
             When("pod er leder") {
-                beforeEach { blirLeder() }
+                beforeEach { bliLeder() }
                 Then("sletter rader med utgått gyldighet") {
                     lagre(FNR,LocalDate.now().minusDays(1))
                     lagre("20478606614", LocalDate.now().minusDays(1))
@@ -124,7 +124,7 @@ class NomDBOpprydderTest : BehaviorSpec() {
         }
     }
 
-    private fun blirLeder() = setField(opprydder, "erLeder", true)
+    private fun bliLeder() = setField(opprydder, "erLeder", true)
     companion object {
         @ServiceConnection
         private val postgres = PostgreSQLContainer("postgres:18")

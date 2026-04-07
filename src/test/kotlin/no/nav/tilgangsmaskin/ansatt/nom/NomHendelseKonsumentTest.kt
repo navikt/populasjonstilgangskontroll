@@ -17,8 +17,6 @@ class NomHendelseKonsumentTest : BehaviorSpec({
     val logger = mockk<NomHendelseLogger>(relaxed = true)
     val konsument = NomHendelseKonsument(nom, logger)
 
-
-
     Given("listen") {
         When("listen kalles med flere hendelser") {
             Then("lagrer ansatt for hver hendelse i listen") {

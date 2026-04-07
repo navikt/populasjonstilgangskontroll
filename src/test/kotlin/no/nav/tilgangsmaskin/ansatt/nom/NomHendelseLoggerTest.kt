@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import io.kotest.assertions.throwables.shouldNotThrowAny
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.doubles.shouldBeExactly
 import io.kotest.matchers.shouldNotBe
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
@@ -9,11 +9,13 @@ import io.mockk.every
 import io.mockk.mockk
 import java.time.LocalDate
 
-class NomHendelseLoggerTest : DescribeSpec({
+class NomHendelseLoggerTest : BehaviorSpec({
 
     val repo = mockk<NomRepository>()
     lateinit var registry: SimpleMeterRegistry
     lateinit var logger: NomHendelseLogger
+
+    fun hendelse() = NomHendelse("08526835671", "Z999999", LocalDate.now(), null)
 
     beforeEach {
         registry = SimpleMeterRegistry()
@@ -21,29 +23,28 @@ class NomHendelseLoggerTest : DescribeSpec({
         logger = NomHendelseLogger(registry, repo)
     }
 
-    fun hendelse() = NomHendelse("08526835671", "Z999999", LocalDate.now(), null)
-
-    describe("init") {
-        it("registrerer nom.size gauge") {
+    Given("NomHendelseLogger er initialisert") {
+        Then("nom.size gauge er registrert") {
             registry.find("nom.size").gauge() shouldNotBe null
         }
 
-        it("gauge-verdi reflekterer repo.count()") {
+        Then("gauge-verdi reflekterer repo.count()") {
             registry.find("nom.size").gauge()!!.value() shouldBeExactly 3.0
         }
 
-        it("gauge-verdi oppdateres når repo.count() endres") {
+        Then("gauge-verdi oppdateres når repo.count() endres") {
             every { repo.count() } returns 7L
             registry.find("nom.size").gauge()!!.value() shouldBeExactly 7.0
         }
     }
 
-    describe("ferdig") {
-        it("kaller size() og re-registrerer gauge etter ferdigbehandling") {
-            every { repo.count() } returns 5L
-            shouldNotThrowAny { logger.ferdig(listOf(hendelse())) }
-            registry.find("nom.size").gauge()!!.value() shouldBeExactly 5.0
+    Given("ferdig kalles med en liste hendelser") {
+        When("repo.count() returnerer 5") {
+            Then("gauge-verdien oppdateres til 5") {
+                every { repo.count() } returns 5L
+                shouldNotThrowAny { logger.ferdig(listOf(hendelse())) }
+                registry.find("nom.size").gauge()!!.value() shouldBeExactly 5.0
+            }
         }
     }
 })
-

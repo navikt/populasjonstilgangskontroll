@@ -10,6 +10,7 @@ import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_SKJERMING
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_STRENGT_FORTROLIG_ADRESSE
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_UKJENT_BOSTED
+import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_VERGEMÅL
 
 const val HABILITET = "Du har ikke tilgang til data om deg selv eller dine nærstående"
 
@@ -25,7 +26,8 @@ enum class GruppeMetadata(val meta: AvvisningsKode, val begrunnelse: String, val
     PARTNER(AVVIST_HABILITET, HABILITET, "Partner"),
     SØSKEN(AVVIST_HABILITET, HABILITET, "Søsken"),
     FELLES_BARN(AVVIST_HABILITET, HABILITET, "Felles barn"),
-    AVDØD(AVVIST_AVDØD, "Du har ikke tilgang til ubformasjon om avdøde brukere", "Avdød bruker"),
+    AVDØD(AVVIST_AVDØD, "Du har ikke tilgang til informasjon om avdøde brukere", "Avdød bruker"),
+    VERGEMÅL(AVVIST_VERGEMÅL, "Du har ikke tilgang til informasjon om personer du er verge for", "Vergemål"),
     UTENLANDSK(AVVIST_PERSON_UTLAND, "Du har ikke tilgang til person bosatt i utlandet", "Person bosatt utland"),
     UKJENT_BOSTED(AVVIST_UKJENT_BOSTED, "Du har ikke tilgang til person uten kjent adresse", "Person bosatt ukjent bosted")
 }
@@ -35,6 +37,7 @@ enum class AvvisningsKode {
     AVVIST_STRENGT_FORTROLIG_ADRESSE,
     AVVIST_STRENGT_FORTROLIG_UTLAND,
     AVVIST_AVDØD,
+    AVVIST_VERGEMÅL,
     AVVIST_PERSON_UTLAND,
     AVVIST_SKJERMING,
     AVVIST_FORTROLIG_ADRESSE,

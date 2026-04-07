@@ -120,6 +120,15 @@ no.nav.security.jwt:
   client:
     registration:
 
+      repr-api:
+        token-endpoint-url: ${azure.openid.config.token.endpoint}
+        grant-type: client_credentials
+        scope: ${verge.scope}
+        authentication:
+          client-id: ${azure.app.client.id}
+          client-jwk: ${azure.app.jwk}
+          client-auth-method: private_key_jwt
+
       pdl-api:
         token-endpoint-url: ${azure.openid.config.token.endpoint}
         grant-type: client_credentials
@@ -193,6 +202,10 @@ valkey:
   password: ${valkey.password.${nais.cluster.cache}}
   port: ${valkey.port.${nais.cluster.cache}}
   host: ${valkey.host.${nais.cluster.cache}}
+
+
+verge:
+  scope: "api://${nais.cluster.type}-gcp.repr.repr-api/.default"
 
 entra-proxy:
   scope: "api://${nais.cluster.type}-gcp.sikkerhetstjenesten.entra-proxy/.default"

@@ -21,7 +21,7 @@ class VergemålConfig(
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
-        private val DEFAULT_URI = URI.create("https://repr-api.repr")
+        private val DEFAULT_URI = URI.create("http://repr-api.repr")
         const val VERGEMÅL = "verge"
         private const val DEFAULT_PATH = "/api/v2/internbruker/vergemaal/kan-representere"
         private const val DEFAULT_PING_PATH = "/actuator/health/liveness"

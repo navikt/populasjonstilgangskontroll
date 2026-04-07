@@ -11,10 +11,8 @@ import jakarta.validation.Valid
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.security.token.support.spring.ProtectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.rest.ValidOverstyring
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -84,7 +82,10 @@ class TilgangController(
         description =  """Setter overstyring for en bruker, slik at den kan saksbehandles selv om tilgang opprinnelig avslås.
     BrukerId må være gyldig og finnes i PDL. Kjerneregelsettet vil bli kjørt før overstyring, og hvis de feiler vil overstyring ikke bli gjort.
     Overstyring vil gjelde frem til og med utløpsdatoen.""")
-    fun overstyr(@RequestBody @Valid @ValidOverstyring data: OverstyringData) = overstyringTjeneste.overstyr(token.ansattId!!, data)
+    fun overstyr(@RequestBody @Valid @ValidOverstyring data: OverstyringData, request: HttpServletRequest) {
+        sjekk(token.erObo, FORBIDDEN, "Mismatch mellom token type ${TokenType.from(token)} og ${request.requestURI}")
+        overstyringTjeneste.overstyr(token.ansattId!!, data)
+    }
 
     @PostMapping("bulk/obo")
     @ResponseStatus(MULTI_STATUS)
@@ -141,24 +142,13 @@ class TilgangController(
         with(brukerId.trim('"')) {
             MDC.put(USER_ID, ansattId().verdi)
             log.trace(CONFIDENTIAL,"Kjører {} regler for {} og {}", regelType, ansattId(), this.maskFnr())
-            if (!isProd) {
-                if (brukerId.length == BRUKERID_LENGTH) {
-                    MDC.put("brukerId", brukerId.take(10) + "X" + brukerId.takeLast(1))
-                }
-                else {
-                    MDC.put("brukerId", brukerId)
-                }
-            }
-
             sjekk(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og $uri")
             sjekk(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")
             tell("single")
-            if (regelType == KJERNE_REGELTYPE) {
-                return regelTjeneste.kjerneregler(ansattId(), this)
-            }
-            if (regelType == KOMPLETT_REGELTYPE) {
-                return regelTjeneste.kompletteRegler(ansattId(), this)
+            return when (regelType) {
+                KJERNE_REGELTYPE -> regelTjeneste.kjerneregler(ansattId(), this)
+                else -> regelTjeneste.kompletteRegler(ansattId(), this)
             }
         }
 

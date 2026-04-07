@@ -18,18 +18,22 @@ internal enum class ClusterUtils(val clusterName: String) {
     PROD_GCP_CLUSTER(PROD_GCP);
 
     companion object {
-        val current = (getenv(NAIS_CLUSTER_NAME) ?: LOCAL).let { e -> entries.first { it.clusterName == e } }
+        val current = fraClusterNavn(getenv(NAIS_CLUSTER_NAME))
         val isProd = current == PROD_GCP_CLUSTER
         val isDev = current == DEV_GCP_CLUSTER
         val isLocalOrTest = !isDev && !isProd
-        val profiler =
-            when (current) {
-                TEST_CLUSTER, LOCAL_CLUSTER ->
-                    arrayOf(current.clusterName).also {
-                        setProperty(NAIS_CLUSTER_NAME, current.clusterName)
-                    }
+        val profiler = profilerFor(current)
 
-                DEV_GCP_CLUSTER -> arrayOf(DEV, DEV_GCP, GCP)
+        internal fun fraClusterNavn(navn: String?) =
+            (navn ?: LOCAL).let { e -> entries.first { it.clusterName == e } }
+
+        internal fun profilerFor(cluster: ClusterUtils) =
+            when (cluster) {
+                TEST_CLUSTER, LOCAL_CLUSTER ->
+                    arrayOf(cluster.clusterName).also {
+                        setProperty(NAIS_CLUSTER_NAME, cluster.clusterName)
+                    }
+                DEV_GCP_CLUSTER  -> arrayOf(DEV, DEV_GCP, GCP)
                 PROD_GCP_CLUSTER -> arrayOf(PROD, PROD_GCP, GCP)
             }
     }

@@ -5,6 +5,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
+import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.graphql.AbstractSyncGraphQLAdapter
 import no.nav.tilgangsmaskin.felles.graphql.GraphQLErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
@@ -35,6 +36,7 @@ class PdlSyncGraphQLClientAdapter(
             .accept(APPLICATION_JSON, TEXT_PLAIN)
             .retrieve()
             .onStatus(HttpStatusCode::isError, errorHandler::handle)
+            .toBodilessEntity()
     }
 
     fun partnere(ident: String) : Set<FamilieMedlem> =
@@ -53,6 +55,7 @@ class PdlSyncGraphQLClientAdapter(
         }
 
 
+    @Generated
     override fun toString() =
         "${javaClass.simpleName} [restClient=$restClient,graphQlClient=$graphQlClient, cfg=$cfg]"
 

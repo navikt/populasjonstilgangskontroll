@@ -20,7 +20,7 @@ class OverstyringEntityListener(private val token: Token) {
     private val log = getLogger(javaClass)
 
     @PrePersist
-    private fun lagrer(entity: OverstyringEntity) = setCrested(entity).also {
+    private fun lagrer(entity: OverstyringEntity) = setCreated(entity).also {
         log.trace("Lagrer overstyring for ${entity.fnr.maskFnr()} i DB")
     }
 
@@ -70,7 +70,7 @@ class OverstyringEntityListener(private val token: Token) {
             }
         }
     }
-    fun setCrested(target: OverstyringEntity) {
+    fun setCreated(target: OverstyringEntity) {
         setCreatedBySystem(target)
         val now = now()
         target::class.java.declaredFields.forEach {

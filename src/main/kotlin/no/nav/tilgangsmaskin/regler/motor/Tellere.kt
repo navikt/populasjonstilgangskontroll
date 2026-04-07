@@ -95,7 +95,7 @@ abstract class AbstractTeller(
             .increment(n.toDouble())
 }
 
-abstract class AbstractEnkelTeller(
+abstract class AbstractAsyncTeller(
     private val registry: MeterRegistry,
     private val navn: String,
     private val beskrivelse: String) {

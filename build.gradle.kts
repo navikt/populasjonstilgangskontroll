@@ -1,4 +1,5 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+import java.lang.System.getProperty
 
 val javaVersion = JavaLanguageVersion.of(25)
 val springdocVersion = "3.0.2"
@@ -10,7 +11,6 @@ val conditionalsVersion = "6.0.3"
 val logstashVersion = "9.0"
 val coroutinesVersion = "1.9.0"
 val poolsVersion = "2.13.1"
-val awaitilityVersion = "4.3.0"
 val springMockkVersion = "5.0.1"
 val confluentVersion = "8.1.1"
 
@@ -19,7 +19,8 @@ group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
 version = "1.0.1"
 
 plugins {
-    val kotlinVersion = "2.3.20"
+    val kotlinVersion = "2.3.10"
+    id("jacoco")
     id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
@@ -36,9 +37,9 @@ springBoot {
     buildInfo {
         properties {
             additional = mapOf(
-                "kotlin.version" to "2.3.0",
+                "kotlin.version" to "2.3.10",
                 "jdk.version" to javaVersion.asInt().toString(),
-                "jdk.vendor" to System.getProperty("java.vendor")
+                "jdk.vendor" to getProperty("java.vendor")
             )
         }
     }
@@ -63,8 +64,6 @@ dependencies {
     implementation("io.confluent:kafka-avro-serializer:$confluentVersion") {
         exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
     }
-   // implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("at.yawk.lz4:lz4-java:1.10.2") // fjernes ved neste release av org.apache.kafka:kafka-clients
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$otelVersion-alpha")
     implementation("io.micrometer:micrometer-core")
@@ -73,7 +72,6 @@ dependencies {
     implementation("no.nav.boot:boot-conditionals:$conditionalsVersion")
     implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
-    implementation("org.apache.httpcomponents.client5:httpclient5")
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.apache.commons:commons-pool2:$poolsVersion")
     implementation("org.hibernate.orm:hibernate-micrometer")
@@ -95,10 +93,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-kafka")
     implementation("org.springframework:spring-aspects")
     testImplementation("org.springframework.boot:spring-boot-micrometer-metrics-test")
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+    }
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
-    testImplementation("io.github.ss-bhatt:testcontainers-valkey:1.0.0")
     testImplementation("com.redis:testcontainers-redis")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     testImplementation("org.testcontainers:testcontainers-postgresql")
@@ -108,22 +106,12 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
-    testImplementation("org.awaitility:awaitility-kotlin:$awaitilityVersion")
     testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
-    testImplementation(kotlin("test"))
+    testImplementation("io.kotest:kotest-extensions-spring:$kotestVersion")
 }
 
 
-configurations.configureEach {
-    resolutionStrategy {
-        capabilitiesResolution {
-            withCapability("org.lz4:lz4-java") {
-                select(candidates.first { (it.id as ModuleComponentIdentifier).group == "at.yawk.lz4" })
-            }
-        }
-    }
-}
 dependencyManagement {
     imports {
         mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:$otelVersion")
@@ -143,11 +131,33 @@ java {
     }
 }
 
-tasks.test {
-    jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
+tasks.named<Test>("test") {
     useJUnitPlatform()
+
+    maxHeapSize = "4g"
+    jvmArgs =
+        listOf(
+            "--add-opens",
+            "java.base/java.util=ALL-UNNAMED",
+            "-Dkotlinx.coroutines.debug=off",
+        )
 }
 
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude("**/tilgang/*Swagger*.class", "**/tilgang/dev/*.class")
+            }
+        })
+    )
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
 kotlin {
     jvmToolchain(javaVersion.asInt())
 

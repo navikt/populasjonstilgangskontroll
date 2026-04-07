@@ -5,8 +5,8 @@ import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Identifikator
-import no.nav.tilgangsmaskin.bruker.pdl.PdlTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
+import no.nav.tilgangsmaskin.bruker.pdl.PdlTjeneste
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -25,7 +25,7 @@ class DevBrukerController(private val brukere: BrukerTjeneste,
 
 
     @GetMapping("person/{id}")
-    fun person(@PathVariable id: String) = pdl.medUtvidetFamile(id)
+    fun person(@PathVariable id: String) = pdl.medUtvidetFamilie(id)
 
     @PostMapping("brukere")
     fun brukere(@RequestBody ids: Set<String>) = brukere.brukere(ids)

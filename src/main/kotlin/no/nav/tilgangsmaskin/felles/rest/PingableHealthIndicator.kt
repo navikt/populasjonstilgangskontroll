@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import no.nav.tilgangsmaskin.felles.Generated
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.health.contributor.Health
 import org.springframework.boot.health.contributor.HealthIndicator
@@ -40,6 +41,7 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
                 .build()
         }
 
+    @Generated
     override fun toString() = "${javaClass.simpleName} [pingable=$pingable]"
 
     companion object {

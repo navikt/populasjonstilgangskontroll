@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.micrometer.core.instrument.Tag
-import no.nav.boot.conditionals.Cluster.LOCAL
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
@@ -28,19 +27,19 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
         if (parts.size == 3) "${parts[2]}:${parts[0]}" else system
     }
 
-    val systemNavn get() = system.split(":").lastOrNull() ?: UTILGJENGELIG
-    val systemAndNs get() = runCatching { system.split(":").drop(1).joinToString(separator = ":") }.getOrElse { systemNavn }
-    val cluster get() = runCatching { system.split(":").first() }.getOrElse { LOCAL.name.lowercase() }
+    val systemNavn get() = system.split(":").last()
+    val systemAndNs get() = system.split(":").drop(1).joinToString(separator = ":")
+    val cluster get() = system.split(":").first()
     val erCC get() = stringClaim(IDTYP) == APP
     val erObo get()  = !erCC && oid != null
     companion object {
         private const val FLOW = "flow"
         const val AAD_ISSUER: String = "azuread"
-        private const val APP = "app"
-        private const val OID = "oid"
-        private const val IDTYP = "idtyp"
-        private const val AZP_NAME = "azp_name"
-        private const val NAVIDENT = "NAVident"
+        const val APP = "app"
+        const val OID = "oid"
+        const val IDTYP = "idtyp"
+        const val AZP_NAME = "azp_name"
+        const val NAVIDENT = "NAVident"
         fun tokenTag(token: Token) = Tag.of(FLOW, TokenType.from(token).name.lowercase())
 
     }

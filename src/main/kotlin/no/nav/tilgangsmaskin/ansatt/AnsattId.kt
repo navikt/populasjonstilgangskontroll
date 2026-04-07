@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import com.fasterxml.jackson.annotation.JsonValue
+import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
 
 data class AnsattId(@JsonValue val verdi: String) {
@@ -15,5 +16,6 @@ data class AnsattId(@JsonValue val verdi: String) {
         const val ANSATTID_LENGTH = 7
     }
 
+    @Generated
     override fun toString() = verdi
 }

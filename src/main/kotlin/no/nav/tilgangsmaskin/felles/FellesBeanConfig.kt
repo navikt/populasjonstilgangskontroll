@@ -40,6 +40,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 import tools.jackson.databind.json.JsonMapper
 import java.util.function.Function
+import kotlin.annotation.AnnotationRetention.BINARY
+import kotlin.annotation.AnnotationTarget.CLASS
+import kotlin.annotation.AnnotationTarget.CONSTRUCTOR
+import kotlin.annotation.AnnotationTarget.FUNCTION
 
 
 @Configuration
@@ -98,11 +102,13 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 
     @Bean
     @ConditionalOnNotProd
+    @Generated
     fun traceRepository() = InMemoryHttpExchangeRepository()
 
 
     @Bean
     @ConditionalOnNotProd
+    @Generated
     fun httpExchangesFilter(repository: HttpExchangeRepository) =
         object : HttpExchangesFilter(repository, defaultIncludes()) {
             override fun shouldNotFilter(request: HttpServletRequest) = request.servletPath.contains("monitoring")
@@ -136,3 +142,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             }
     }
 }
+
+@Retention(BINARY)  // = CLASS in bytecode — enough for JaCoCo
+@Target(FUNCTION, CONSTRUCTOR, CLASS)
+annotation class Generated

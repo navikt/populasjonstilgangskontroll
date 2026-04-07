@@ -6,7 +6,9 @@ import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM_CACHE
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING_CACHE
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
+import no.nav.tilgangsmaskin.felles.Generated
 
+@Generated
 enum class Caches(vararg val  caches: CachableConfig) {
     PDL(*PDL_CACHES.toTypedArray()),
     SKJERMING(SKJERMING_CACHE),

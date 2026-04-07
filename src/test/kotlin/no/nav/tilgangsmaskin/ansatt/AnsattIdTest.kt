@@ -4,7 +4,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 
-class NavIdTest : DescribeSpec({
+class AnsattIdTest : DescribeSpec({
     describe("AnsattId") {
         it("Gyldig ansattId OK") {
             AnsattId("A123456").verdi shouldBe "A123456"

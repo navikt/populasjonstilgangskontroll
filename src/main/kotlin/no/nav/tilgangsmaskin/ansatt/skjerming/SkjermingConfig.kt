@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
+import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
@@ -15,6 +16,7 @@ class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH,
     val skjermingUri = uri(DEFAULT_SKJERMING_PATH)
     val skjermingerUri = uri(DEFAULT_SKJERMING_BULK_PATH)
 
+    @Generated
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
     override val navn = name
     override val caches = setOf(SKJERMING_CACHE)

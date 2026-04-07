@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.bruker
 
 import com.fasterxml.jackson.annotation.JsonValue
+import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
 
 data class AktørId(@JsonValue val verdi: String) {
@@ -8,6 +9,7 @@ data class AktørId(@JsonValue val verdi: String) {
         requireDigits(verdi, AKTØRID_LENGTH)
     }
 
+    @Generated
     override fun toString() = verdi
 
     companion object {

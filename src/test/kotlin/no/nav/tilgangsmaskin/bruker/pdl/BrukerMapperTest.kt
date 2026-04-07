@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -32,29 +33,31 @@ class BrukerMapperTest : DescribeSpec({
     val aktorId = "1234567890123"
 
     fun geoUtland() = PdlGeografiskTilknytning(UTLAND, gtLand = GTLand("SWE"))
-    fun geoKommune() = PdlGeografiskTilknytning(KOMMUNE, gtKommune = GTKommune("1234"))
+    fun geoKommune() = PdlGeografiskTilknytning(KOMMUNE, GTKommune("1234"))
 
     fun pipRespons(
         gradering: PdlAdressebeskyttelseGradering? = null,
-        geo: PdlGeografiskTilknytning = geoUtland(),
-    ) = PdlRespons(
-        PdlPerson(gradering?.let { listOf(PdlAdressebeskyttelse(it)) } ?: emptyList()),
-        PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT), PdlIdent(aktorId, false, AKTORID))),
-        geo
-    )
+        geo: PdlGeografiskTilknytning = geoUtland()) =
+        PdlRespons(PdlPerson(gradering?.let { listOf(PdlAdressebeskyttelse(it)) } ?: emptyList()),
+            PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT), PdlIdent(aktorId, false, AKTORID))),
+            geo)
 
     describe("tilBruker") {
 
         it("STRENGT_FORTROLIG_UTLAND krever STRENGT_FORTROLIG_UTLAND-gruppe og gir UtenlandskTilknytning") {
             val bruker = tilBruker(tilPerson(brukerId, pipRespons(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND)), false)
-            bruker.påkrevdeGrupper shouldContainExactly setOf(STRENGT_FORTROLIG_UTLAND)
-            bruker.geografiskTilknytning.shouldBeInstanceOf<UtenlandskTilknytning>()
+            assertSoftly(bruker) {
+                påkrevdeGrupper shouldContainExactly setOf(STRENGT_FORTROLIG_UTLAND)
+                geografiskTilknytning.shouldBeInstanceOf<UtenlandskTilknytning>()
+            }
         }
 
         it("STRENGT_FORTROLIG med kommunal geo krever STRENGT_FORTROLIG-gruppe og gir KommuneTilknytning") {
             val bruker = tilBruker(tilPerson(brukerId, pipRespons(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG, geoKommune())), false)
-            bruker.påkrevdeGrupper shouldContainExactly setOf(STRENGT_FORTROLIG)
-            bruker.geografiskTilknytning.shouldBeInstanceOf<KommuneTilknytning>()
+            assertSoftly(bruker) {
+                påkrevdeGrupper shouldContainExactly setOf(STRENGT_FORTROLIG)
+                geografiskTilknytning.shouldBeInstanceOf<KommuneTilknytning>()
+            }
         }
 
         it("skjermet bruker krever SKJERMING-gruppe") {

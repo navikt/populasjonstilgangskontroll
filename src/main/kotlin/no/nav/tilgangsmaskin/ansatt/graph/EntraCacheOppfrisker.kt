@@ -55,7 +55,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
         }
 
     companion object {
-        private const val GEO = "geoGrupper"
-        private const val GEO_OG_GLOBALE = "geoOgGlobaleGrupper"
+         const val GEO = "geoGrupper"
+         const val GEO_OG_GLOBALE = "geoOgGlobaleGrupper"
     }
 }

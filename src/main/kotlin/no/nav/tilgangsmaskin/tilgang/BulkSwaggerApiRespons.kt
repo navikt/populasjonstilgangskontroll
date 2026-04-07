@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import kotlin.annotation.AnnotationRetention.RUNTIME

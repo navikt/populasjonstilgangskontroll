@@ -10,10 +10,10 @@ class OverstyringClientValidator(private val cfg: OverstyringConfig, private val
 
     fun validerKonsument() {
         if (!cfg.systemer.contains(token.systemNavn) && isProd(env)) {
-           throw OverstyringKlientException("System ${token.systemNavn} har ikke tilgang til overstyring, kun ${cfg.systemer.joinToString(", ")}",token.systemNavn)
+           throw OverstyringException("System ${token.systemNavn} har ikke tilgang til overstyring, kun ${cfg.systemer.joinToString(", ")}",token.systemNavn)
         }
     }
-    class OverstyringKlientException(message: String, val system: String) : RuntimeException(message)
+    class OverstyringException(message: String, val system: String) : RuntimeException(message)
 
 }
 

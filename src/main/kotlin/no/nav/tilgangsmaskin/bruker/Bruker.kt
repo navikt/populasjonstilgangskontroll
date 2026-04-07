@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.bruker
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.bruker.Familie.Companion.INGEN
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
@@ -42,6 +43,7 @@ data class Bruker(
     val harUtenlandskBosted = geografiskTilknytning is UtenlandskTilknytning
     infix fun kreverMedlemskapI(gruppe: GlobalGruppe) = gruppe in påkrevdeGrupper
 
+    @Generated
     override fun toString()  = "${javaClass.simpleName}(brukerIds=$brukerIds, geografiskTilknytning=$geografiskTilknytning, påkrevdeGrupper=$påkrevdeGrupper, dødsdato=$dødsdato, foreldreOgBarn=$foreldreOgBarn, barn=$barn, søsken=$søsken, partnere=$partnere, harUkjentBosted=$harUkjentBosted, harUtenlandskBosted=$harUtenlandskBosted)"
 
 
@@ -49,6 +51,7 @@ data class Bruker(
                          val oppslagId: String = aktivBrukerId.verdi,
                          val historiskeIds: Set<BrukerId> = emptySet(),
                          val aktørId: AktørId) {
+        @Generated
         override fun toString() = "${javaClass.simpleName}(aktivBrukerId=$aktivBrukerId, oppslagId='${oppslagId.maskFnr()}', historiskeIds=$historiskeIds, aktørId=$aktørId)"
     }
 }

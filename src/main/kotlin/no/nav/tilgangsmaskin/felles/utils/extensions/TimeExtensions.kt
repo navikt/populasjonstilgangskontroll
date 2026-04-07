@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.felles.utils.extensions
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_0_6
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_13_24
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_7_12
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_OVER_24
 import java.time.Instant
 import java.time.Instant.now
 import java.time.LocalDate
@@ -26,11 +27,9 @@ object TimeExtensions {
 
      fun LocalDate.månederSidenIdag() =
         LocalDate.now().let {
-            assert(isBefore(it)) { "Datoen $this er ikke før dagens dato $it" }
+            require(isBefore(it)) { "Datoen $this er ikke før dagens dato $it" }
             Period.between(this, it).let { it.years * 12 + it.months } + if (it.dayOfMonth > dayOfMonth) 1 else 0
         }
-
-    fun java.time.Duration.format() = this.toKotlinDuration().format()
 
      fun Duration.format(): String {
         val dager = inWholeDays
@@ -55,13 +54,15 @@ object TimeExtensions {
                                                                                  )
         .format(DateTimeFormatter.ofPattern(fmt))
 
-    fun LocalDate.intervallSiden() =
-        when (månederSidenIdag()) {
-            in 0..6 -> MND_0_6
-            in 7..12 -> MND_7_12
-            in 13..24 -> MND_13_24
-            else -> MND_7_12
+    fun LocalDate.intervallSiden(): Dødsperiode {
+        val måneder = månederSidenIdag()
+        return when {
+            måneder <= 6 -> MND_0_6
+            måneder <= 12 -> MND_7_12
+            måneder <= 24 -> MND_13_24
+            else -> MND_OVER_24
         }
+    }
 
     enum class Dødsperiode(val tekst: String) {
         MND_0_6("0-6"),

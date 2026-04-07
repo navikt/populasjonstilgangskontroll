@@ -18,7 +18,7 @@ import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.regelTag
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringClientValidator.OverstyringKlientException
+import no.nav.tilgangsmaskin.regler.overstyring.OverstyringClientValidator.OverstyringException
 import org.jboss.logging.MDC
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
@@ -77,7 +77,7 @@ class OverstyringTjeneste(
                 log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}", it)
                 teller.tell(regelTag(t.regel),IKKE_OVERSTYRT,tokenSystemTag(UTILGJENGELIG))
             }
-            is OverstyringKlientException -> throw t.also {
+            is OverstyringException -> throw t.also {
                 log.warn("Overstyring feilet pga klientvalidering ${t.message} for $ansattId og ${data.brukerId}", it)
                 teller.tell(INGEN_REGEL_TAG,IKKE_OVERSTYRT,tokenSystemTag(t.system))
             }

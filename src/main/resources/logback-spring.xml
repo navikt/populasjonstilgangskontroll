@@ -25,7 +25,7 @@
         <logger name="org.springframework.cache" level="info" />
         <logger name="org.apache.kafka" level="info" />
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
-        <logger name="no.nav.security" level="trace"/>
+        <logger name="no.nav.security" level="info"/>
     </springProfile>
 
     <springProfile name="local | test">

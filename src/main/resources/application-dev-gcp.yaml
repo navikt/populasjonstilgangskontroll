@@ -19,5 +19,4 @@ management:
       enabled: true
 
 verge:
-  base-uri: https://repr-api.intern.dev.nav.no
   scope: api://dev-gcp.repr.repr-api/.default

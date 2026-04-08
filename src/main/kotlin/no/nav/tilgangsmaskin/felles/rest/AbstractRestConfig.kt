@@ -10,7 +10,7 @@ abstract class AbstractRestConfig(
         val name: String,
         val isEnabled: Boolean = true) {
 
-    protected fun builder() = DefaultUriBuilderFactory("$baseUri").builder()
+    fun builder() = DefaultUriBuilderFactory("$baseUri").builder()
 
     protected fun uri(path: String) = builder().path(path).build()
 

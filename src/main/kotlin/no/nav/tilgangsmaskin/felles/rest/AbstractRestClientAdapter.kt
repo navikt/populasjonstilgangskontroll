@@ -15,13 +15,14 @@ import java.net.URI
 abstract class AbstractRestClientAdapter(
         protected val restClient: RestClient,
         open val cfg: AbstractRestConfig,
+        protected val pingRestClient : RestClient = restClient,
         protected val errorHandler: ErrorHandler = DefaultRestErrorHandler()) : Pingable {
 
     protected val log = getLogger(javaClass)
-    override fun ping() = if (cfg.isEnabled) get<Any>(cfg.pingEndpoint) else "disabled"
+    override fun ping() = if (cfg.isEnabled) get<Any>(cfg.pingEndpoint, client = pingRestClient) else "disabled"
 
-    protected inline fun <reified T : Any> get(uri: URI, headers: Map<String, String> = emptyMap(), handler: ErrorHandler = errorHandler) =
-        restClient.get()
+    protected inline fun <reified T : Any> get(uri: URI, headers: Map<String, String> = emptyMap(), handler: ErrorHandler = errorHandler, client: RestClient = restClient) =
+        client.get()
             .uri(uri)
             .accept(APPLICATION_JSON)
             .headers { it.setAll(headers)}

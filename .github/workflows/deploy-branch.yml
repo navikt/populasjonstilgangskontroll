@@ -100,7 +100,7 @@ jobs:
         uses: gradle/actions/dependency-submission@39e147cb9de83bb9910b8ef8bd7fff0ee20fcd6f # v6.0.1
 
       - name: Attest and sign
-        uses: nais/attest-sign@518e541b5bd2eaff9ed7cb7fd305ec940b66fdaa # v2.0.5
+        uses: nais/attest-sign@d8ec1989b5d1eb59809b050149713002f3de8e2d # v2.0.6
         with:
           image_ref: ${{env.IMAGE}}@${{env.DIGEST}}
           sbom: build/reports/cyclonedx/application.cdx.json

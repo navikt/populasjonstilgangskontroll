@@ -17,6 +17,3 @@ management:
   httpexchanges:
     recording:
       enabled: true
-
-verge:
-  scope: api://dev-gcp.repr.repr-api/.default

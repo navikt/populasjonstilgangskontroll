@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 
 @Component
-class VergemålRestClientAdapter(@Qualifier(VERGEMÅL) restClient: RestClient, @Qualifier(VERGEMÅL + "ping") pingClient: RestClient, val cf: VergemålConfig) :
-    AbstractRestClientAdapter(restClient, cf, pingClient) {
+class VergemålRestClientAdapter(@Qualifier(VERGEMÅL) restClient: RestClient,/* @Qualifier(VERGEMÅL + "ping") pingClient: RestClient*/ val cf: VergemålConfig) :
+    AbstractRestClientAdapter(restClient, cf, /*pingClient*/) {
 
     fun vergemål(ident: String) =
         post<List<Vergemål>>(cf.vergemålURI, VergemålIdent(ident)).map { it.vergehaver }

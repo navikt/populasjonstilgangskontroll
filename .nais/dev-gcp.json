@@ -5,7 +5,6 @@
   ],
   "pdlgraph": "pdl-api.dev-fss-pub.nais.io",
   "pdl": "pdl-pip-api.dev-fss-pub.nais.io",
-  "repr-api": "pdl-pip-api.dev-fss-pub.nais.io",
   "grupper": {
     "fortrolig": "2e1dc582-f762-4510-a660-88bf68fb7128",
     "strengt": "a1b518e2-3947-478d-8929-e5d685c47cac",
@@ -16,7 +15,7 @@
   },
   "db": {
     "poolsize": "2",
-    "type": "POSTGRES_18  ",
+    "type": "POSTGRES_18",
     "tier": "db-f1-micro",
     "name": "tilgangsmaskin"
   },

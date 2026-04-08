@@ -203,7 +203,8 @@ valkey:
   port: ${valkey.port.${nais.cluster.cache}}
   host: ${valkey.host.${nais.cluster.cache}}
 
-
+verge:
+  scope: "api://${nais.cluster.type}-gcp.repr.repr-api/.default"
 
 entra-proxy:
   scope: "api://${nais.cluster.type}-gcp.sikkerhetstjenesten.entra-proxy/.default"

@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.tilgang.dev
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.transaction.Transactional
 import jakarta.validation.Valid
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
@@ -53,6 +54,7 @@ class DevTilgangController(
         summary= "Sette kobling mellom ansatt og fnr",
         description = """Funksjon for å opprette relasjon mellom nav-ident og fnrslik  at oppslag på egne data og familierelasjoner kan testes """)
     @PostMapping("ansatt/{ansattId}/{brukerId}")
+    @Transactional
     fun nom(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
         nom.upsert(NomAnsattData(ansattId, brukerId))
 

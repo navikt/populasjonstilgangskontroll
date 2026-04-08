@@ -300,6 +300,11 @@
       "name": "poao-tilgang",
       "namespace": "poao",
       "cluster": "dev-fss"
+    },
+    {
+      "name": "watson-admin-api",
+      "namespace": "holmes",
+      "cluster": "dev-gcp"
     }
   ],
   "nais": {

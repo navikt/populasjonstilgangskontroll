@@ -26,9 +26,11 @@ object TimeExtensions {
     fun LocalDate.toInstant(): Instant = atStartOfDay(systemDefault()).toInstant()
 
      fun LocalDate.månederSidenIdag() =
-        LocalDate.now().let {
-            require(isBefore(it)) { "Datoen $this er ikke før dagens dato $it" }
-            Period.between(this, it).let { it.years * 12 + it.months } + if (it.dayOfMonth > dayOfMonth) 1 else 0
+        LocalDate.now().let { today ->
+            require(!isAfter(today)) { "Datoen $this er etter dagens dato $today" }
+            val period = Period.between(this, today)
+            val måneder = period.years * 12 + period.months
+            maxOf(1, if (today.dayOfMonth > dayOfMonth) måneder + 1 else måneder)
         }
 
      fun Duration.format(): String {

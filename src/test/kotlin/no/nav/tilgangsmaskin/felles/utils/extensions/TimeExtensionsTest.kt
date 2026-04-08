@@ -72,10 +72,8 @@ class TimeExtensionsTest : DescribeSpec({
             }
         }
 
-        it("kaster IllegalArgumentException for dagens dato") {
-            shouldThrow<IllegalArgumentException> {
-                idag.månederSidenIdag()
-            }
+        it("dagens dato gir 1") {
+                idag.månederSidenIdag() shouldBe 1
         }
 
         it("IllegalArgumentException-meldingen inneholder datoen og dagens dato") {
@@ -83,7 +81,7 @@ class TimeExtensionsTest : DescribeSpec({
             val feil = shouldThrow<IllegalArgumentException> {
                 fremtidigDato.månederSidenIdag()
             }
-            feil.message shouldBe "Datoen $fremtidigDato er ikke før dagens dato $idag"
+            feil.message shouldBe "Datoen $fremtidigDato er etter dagens dato $idag"
         }
     }
 

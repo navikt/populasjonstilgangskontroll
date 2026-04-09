@@ -26,6 +26,9 @@ class AvdødTeller(registry: MeterRegistry, accessor: Token) :
     }
 }
 @Component
+class VergemålTeller(registry: MeterRegistry, token: Token) :
+    AbstractTeller(registry, token, "verge.total", "Oppslag på vergehaver")
+@Component
 class OverstyringTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "overstyring.forsøk", "Overstyringsforsøk pr resultat")
 

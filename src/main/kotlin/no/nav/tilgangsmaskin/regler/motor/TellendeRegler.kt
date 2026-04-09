@@ -2,6 +2,8 @@ package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
+import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
@@ -10,6 +12,8 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_OVER_24
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.VERGEMÅL
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
@@ -31,6 +35,8 @@ interface TellendeRegel : Regel {
 @Order(LOWEST_PRECEDENCE - 3)
 class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: EntraProxyTjeneste, private val auditor: Auditor) : TellendeRegel {
 
+    override val metadata = RegelMetadata(AVDØD)
+
     override val skalTelle = { _: Ansatt, bruker: Bruker -> bruker.dødsdato != null }
 
     override fun tell(ansatt: Ansatt, bruker: Bruker) {
@@ -51,6 +57,26 @@ class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: Ent
         }.getOrDefault(UTILGJENGELIG)
 
 
-    override val metadata = RegelMetadata(AVDØD)
 
+}
+
+@Component
+@Order(LOWEST_PRECEDENCE - 4)
+class VergemålRegel(private val vergemål: VergemålTjeneste, private val teller: VergemålTeller) : TellendeRegel {
+
+    private val log = getLogger(javaClass)
+
+    override val metadata = RegelMetadata(VERGEMÅL)
+
+    override val skalTelle = { ansatt: Ansatt, bruker: Bruker ->
+        runCatching {
+            vergemål.vergemål(ansatt.ansattId).contains(bruker.brukerId)
+        }.getOrElse {
+            log.error("Feil ved sjekk av vergemål for ansatt ${ansatt.ansattId.verdi}", it)
+            false
+        }
+    }
+
+    override fun tell(ansatt: Ansatt, bruker: Bruker) =
+        teller.tell()
 }

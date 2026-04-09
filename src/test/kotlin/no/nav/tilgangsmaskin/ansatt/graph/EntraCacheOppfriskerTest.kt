@@ -138,8 +138,8 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
     private companion object {
         private val ansattId = AnsattId("Z999999")
 
-        private val OID = UUID.fromString("11111111-1111-1111-1111-111111111111")
-        private val NY_OID = UUID.fromString("22222222-2222-2222-2222-222222222222")
+        private val OID = UUID.randomUUID()
+        private val NY_OID = UUID.randomUUID()
         private fun nøkkel(metode: String) = CacheNøkkelElementer("graph::$metode:${ansattId.verdi}")
     }
 }

@@ -160,9 +160,9 @@ class EntraTjenesteTest : BehaviorSpec() {
     }
 
     private companion object {
-        private val oid = UUID.fromString("11111111-1111-1111-1111-111111111111")
+        private val oid = UUID.randomUUID()
         private val ansattId = AnsattId("Z999999")
-        private val GRUPPE1 = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
-        private val GRUPPE2 = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+        private val GRUPPE1 = UUID.randomUUID()
+        private val GRUPPE2 = UUID.randomUUID()
     }
 }

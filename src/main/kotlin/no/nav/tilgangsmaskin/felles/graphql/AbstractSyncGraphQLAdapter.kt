@@ -11,7 +11,7 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 abstract class AbstractSyncGraphQLAdapter(
         protected val graphQlClient: GraphQlClient, client: RestClient, cf: AbstractRestConfig,
         errorHandler: ErrorHandler, protected val graphQlErrorHandler: GraphQLErrorHandler) :
-    AbstractRestClientAdapter(client, cf, errorHandler) {
+    AbstractRestClientAdapter(client, cf, errorHandler = errorHandler) {
 
     protected inline fun <reified T : Any> query(query: Pair<String, String>, vars: Map<String, String>) =
         runCatching {

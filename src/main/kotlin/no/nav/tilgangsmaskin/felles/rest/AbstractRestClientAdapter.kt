@@ -15,13 +15,18 @@ import java.net.URI
 abstract class AbstractRestClientAdapter(
         protected val restClient: RestClient,
         open val cfg: AbstractRestConfig,
+        protected val pingRestClient : RestClient = restClient,
         protected val errorHandler: ErrorHandler = DefaultRestErrorHandler()) : Pingable {
 
     protected val log = getLogger(javaClass)
-    override fun ping() = if (cfg.isEnabled) get<Any>(cfg.pingEndpoint) else "disabled"
 
-    protected inline fun <reified T : Any> get(uri: URI, headers: Map<String, String> = emptyMap(), handler: ErrorHandler = errorHandler) =
-        restClient.get()
+    override val name = cfg.name
+    override val pingEndpoint = "${cfg.pingEndpoint}"
+    override val isEnabled = cfg.isEnabled
+    override fun ping() = if (cfg.isEnabled) get<Any>(cfg.pingEndpoint, client = pingRestClient) else "disabled"
+
+    protected inline fun <reified T : Any> get(uri: URI, headers: Map<String, String> = emptyMap(), handler: ErrorHandler = errorHandler, client: RestClient = restClient) =
+        client.get()
             .uri(uri)
             .accept(APPLICATION_JSON)
             .headers { it.setAll(headers)}
@@ -40,10 +45,7 @@ abstract class AbstractRestClientAdapter(
             .onStatus(HttpStatusCode::isError, handler::handle)
             .requiredBody<T>()
 
-    override val name = cfg.name
 
-    override val pingEndpoint = "${cfg.pingEndpoint}"
-    override val isEnabled = cfg.isEnabled
     @Generated
     override fun toString() = "restClient=$restClient, cfg=$cfg, baseUri=${cfg.baseUri}"
 

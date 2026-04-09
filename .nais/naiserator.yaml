@@ -71,6 +71,8 @@ spec:
   accessPolicy:
     outbound:
       rules:
+        - application: repr-api
+          namespace: repr
         - application: entra-proxy
           namespace: sikkerhetstjenesten
         - application: opentelemetry-collector

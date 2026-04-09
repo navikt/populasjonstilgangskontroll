@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.TestApp
@@ -39,7 +39,7 @@ import java.time.LocalDate.now
 @ContextConfiguration(classes = [TestApp::class, NomTjeneste::class, NomJPAAdapter::class])
 @Import(CacheTestNomConfig::class)
 @ApplyExtension(SpringExtension::class)
-class NomTjenesteCacheTest : DescribeSpec() {
+class NomTjenesteCacheTest : BehaviorSpec() {
 
     @Configuration
     class CacheTestNomConfig {
@@ -49,12 +49,20 @@ class NomTjenesteCacheTest : DescribeSpec() {
         fun cacheOperations(cacheManager: CacheManager): CacheOperations = ConcurrentMapCacheOperations(cacheManager)
     }
 
-    @MockkBean private lateinit var token: Token
+    @MockkBean
+    private lateinit var token: Token
 
-    @Autowired private lateinit var tjeneste: NomTjeneste
-    @Autowired private lateinit var repo: NomRepository
-    @Autowired @Qualifier("cacheOperations") private lateinit var cache: CacheOperations
-    @Autowired private lateinit var cacheManager: CacheManager
+    @Autowired
+    private lateinit var tjeneste: NomTjeneste
+
+    @Autowired
+    private lateinit var repo: NomRepository
+
+    @Autowired @Qualifier("cacheOperations")
+    private lateinit var cache: CacheOperations
+
+    @Autowired
+    private lateinit var cacheManager: CacheManager
 
     companion object {
         @ServiceConnection
@@ -70,68 +78,79 @@ class NomTjenesteCacheTest : DescribeSpec() {
         val ansattId = AnsattId("Z999999")
         val brukerId = BrukerId("08526835670")
 
-        describe("fnrForAnsatt — cache") {
+        Given("fnrForAnsatt kalles") {
+            When("ansatt finnes i databasen") {
+                Then("cache populeres ved første oppslag") {
+                    tjeneste.lagre(NomAnsattData(ansattId, brukerId, NomAnsattPeriode(now(), now().plusYears(1))))
 
-            it("populerer cache fra databasen ved første oppslag") {
-                tjeneste.lagre(NomAnsattData(ansattId, brukerId, NomAnsattPeriode(now(), now().plusYears(1))))
+                    tjeneste.fnrForAnsatt(ansattId)
 
-                tjeneste.fnrForAnsatt(ansattId)
-
-                cache.getOne(NOM_CACHE, ansattId.verdi, BrukerId::class) shouldBe brukerId
+                    cache.getOne(NOM_CACHE, ansattId.verdi, BrukerId::class) shouldBe brukerId
+                }
             }
 
-            it("returnerer cachet verdi ved andre oppslag") {
-                val id = AnsattId("Z100010")
-                tjeneste.lagre(NomAnsattData(id, brukerId, NomAnsattPeriode(now(), now().plusYears(1))))
+            When("fnrForAnsatt kalles to ganger for samme ansatt") {
+                Then("returnerer cachet verdi ved andre oppslag") {
+                    val id = AnsattId("Z100010")
+                    tjeneste.lagre(NomAnsattData(id, brukerId, NomAnsattPeriode(now(), now().plusYears(1))))
 
-                val first = tjeneste.fnrForAnsatt(id)
-                val second = tjeneste.fnrForAnsatt(id)
+                    val first = tjeneste.fnrForAnsatt(id)
+                    val second = tjeneste.fnrForAnsatt(id)
 
-                first shouldBe brukerId
-                second shouldBe brukerId
-                cache.getOne(NOM_CACHE, id.verdi, BrukerId::class) shouldBe brukerId
+                    first shouldBe brukerId
+                    second shouldBe brukerId
+                    cache.getOne(NOM_CACHE, id.verdi, BrukerId::class) shouldBe brukerId
+                }
             }
 
-            it("returnerer null og cacher null når ansatt ikke finnes i databasen") {
-                val id = AnsattId("Z100011")
+            When("ansatt ikke finnes i databasen") {
+                Then("returnerer null og cacher null") {
+                    val id = AnsattId("Z100011")
 
-                val first = tjeneste.fnrForAnsatt(id)
-                val second = tjeneste.fnrForAnsatt(id)
+                    val first = tjeneste.fnrForAnsatt(id)
+                    val second = tjeneste.fnrForAnsatt(id)
 
-                first shouldBe null
-                second shouldBe null
+                    first shouldBe null
+                    second shouldBe null
+                }
             }
 
-            it("ulike ansattId-er cachet separat") {
-                val annenAnsattId = AnsattId("Z888888")
-                val annenBrukerId = BrukerId("20478606614")
-                tjeneste.lagre(NomAnsattData(ansattId, brukerId, NomAnsattPeriode(now(), now().plusYears(1))))
-                tjeneste.lagre(NomAnsattData(annenAnsattId, annenBrukerId, NomAnsattPeriode(now(), now().plusYears(1))))
+            When("to ulike ansattId-er slås opp") {
+                Then("caches separat") {
+                    val annenAnsattId = AnsattId("Z888888")
+                    val annenBrukerId = BrukerId("20478606614")
+                    tjeneste.lagre(NomAnsattData(ansattId, brukerId, NomAnsattPeriode(now(), now().plusYears(1))))
+                    tjeneste.lagre(NomAnsattData(annenAnsattId, annenBrukerId, NomAnsattPeriode(now(), now().plusYears(1))))
 
-                tjeneste.fnrForAnsatt(ansattId)
-                tjeneste.fnrForAnsatt(annenAnsattId)
+                    tjeneste.fnrForAnsatt(ansattId)
+                    tjeneste.fnrForAnsatt(annenAnsattId)
 
-                cache.getOne(NOM_CACHE, ansattId.verdi, BrukerId::class) shouldBe brukerId
-                cache.getOne(NOM_CACHE, annenAnsattId.verdi, BrukerId::class) shouldBe annenBrukerId
+                    cache.getOne(NOM_CACHE, ansattId.verdi, BrukerId::class) shouldBe brukerId
+                    cache.getOne(NOM_CACHE, annenAnsattId.verdi, BrukerId::class) shouldBe annenBrukerId
+                }
             }
 
-            it("evicts cache ved upsert") {
-                tjeneste.lagre(NomAnsattData(ansattId, brukerId, NomAnsattPeriode(now(), now().plusYears(1))))
-                tjeneste.fnrForAnsatt(ansattId) // populate cache
+            When("lagre kalles etter cache er populert") {
+                Then("cache evictes") {
+                    tjeneste.lagre(NomAnsattData(ansattId, brukerId, NomAnsattPeriode(now(), now().plusYears(1))))
+                    tjeneste.fnrForAnsatt(ansattId)
 
-                val nyBrukerId = BrukerId("20478606614")
-                tjeneste.lagre(NomAnsattData(ansattId, nyBrukerId, NomAnsattPeriode(now(), now().plusYears(1))))
+                    val nyBrukerId = BrukerId("20478606614")
+                    tjeneste.lagre(NomAnsattData(ansattId, nyBrukerId, NomAnsattPeriode(now(), now().plusYears(1))))
 
-                cache.getOne(NOM_CACHE, ansattId.verdi, BrukerId::class) shouldBe null
+                    cache.getOne(NOM_CACHE, ansattId.verdi, BrukerId::class) shouldBe null
+                }
             }
 
-            it("andre kall til lagre oppdaterer eksisterende rad") {
-                tjeneste.lagre(NomAnsattData(ansattId, brukerId, NomAnsattPeriode(now(), now().plusYears(1))))
-                tjeneste.fnrForAnsatt(ansattId) shouldBe brukerId
+            When("lagre kalles med utgått periode") {
+                Then("fnrForAnsatt returnerer null") {
+                    tjeneste.lagre(NomAnsattData(ansattId, brukerId, NomAnsattPeriode(now(), now().plusYears(1))))
+                    tjeneste.fnrForAnsatt(ansattId) shouldBe brukerId
 
-                tjeneste.lagre(NomAnsattData(ansattId, brukerId, NomAnsattPeriode(now(), now().minusYears(1))))
+                    tjeneste.lagre(NomAnsattData(ansattId, brukerId, NomAnsattPeriode(now(), now().minusYears(1))))
 
-                tjeneste.fnrForAnsatt(ansattId) shouldBe null
+                    tjeneste.fnrForAnsatt(ansattId) shouldBe null
+                }
             }
         }
     }

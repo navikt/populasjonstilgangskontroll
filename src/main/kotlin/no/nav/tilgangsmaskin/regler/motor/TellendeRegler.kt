@@ -13,6 +13,7 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.VERGEMÅL
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
@@ -59,14 +60,21 @@ class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: Ent
 
 }
 
-//@Component
+@Component
 @Order(LOWEST_PRECEDENCE - 4)
 class VergemålRegel(private val vergemål: VergemålTjeneste, nom: NomTjeneste) : TellendeRegel {
+
+    private val log = getLogger(javaClass)
 
     override val metadata = RegelMetadata(VERGEMÅL)
 
     override val skalTelle = { ansatt: Ansatt, bruker: Bruker ->
-        vergemål.vergemål(nom.fnrForAnsatt(ansatt.ansattId))?.contains(bruker.brukerId) == true
+        runCatching {
+            vergemål.vergemål(nom.fnrForAnsatt(ansatt.ansattId))?.contains(bruker.brukerId) == true
+        }.getOrElse {
+            log.error("Feil ved sjekk av vergemål for ansatt ${ansatt.ansattId.verdi}", it)
+            false
+        }
     }
 
     override fun tell(ansatt: Ansatt, bruker: Bruker) {

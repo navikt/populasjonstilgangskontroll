@@ -95,7 +95,7 @@ class RegelMotorTest : BehaviorSpec() {
 
         beforeEach {
             every { nom.fnrForAnsatt(any()) } returns brukerId
-            every { vergemål.vergemål(any()) } returns emptyList()
+            every { vergemål.vergemål(any()) } returns emptySet()
             every { token.system } returns "test"
             every { token.system } returns "test"
             every { token.erObo } returns false

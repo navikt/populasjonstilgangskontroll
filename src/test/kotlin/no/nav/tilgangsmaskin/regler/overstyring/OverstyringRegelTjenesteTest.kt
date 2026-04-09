@@ -109,7 +109,7 @@ class OverstyringRegelTjenesteTest : DescribeSpec() {
 
         beforeEach {
             every { nom.fnrForAnsatt(any()) } returns vanligBrukerId
-            every { vergemål.vergemål(any()) } returns emptyList()
+            every { vergemål.vergemål(any()) } returns emptySet()
             every { validator.validerKonsument() } returns Unit
             every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
             every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()

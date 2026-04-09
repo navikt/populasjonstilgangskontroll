@@ -99,7 +99,7 @@ internal class OverstyringTest : DescribeSpec() {
 
         beforeEach {
             every { nom.fnrForAnsatt(any()) } returns vanligBrukerId
-            every { vergemål.vergemål(any()) } returns emptyList()  
+            every { vergemål.vergemål(any()) } returns emptySet()
             every { validator.validerKonsument() } returns Unit
             every { token.erObo } returns false
             every { token.erCC } returns true

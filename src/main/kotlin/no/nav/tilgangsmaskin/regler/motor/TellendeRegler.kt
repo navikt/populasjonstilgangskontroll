@@ -62,7 +62,7 @@ class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: Ent
 
 @Component
 @Order(LOWEST_PRECEDENCE - 4)
-class VergemålRegel(private val vergemål: VergemålTjeneste, nom: NomTjeneste) : TellendeRegel {
+class VergemålRegel(private val vergemål: VergemålTjeneste, private val teller: VergemålTeller) : TellendeRegel {
 
     private val log = getLogger(javaClass)
 
@@ -70,13 +70,13 @@ class VergemålRegel(private val vergemål: VergemålTjeneste, nom: NomTjeneste)
 
     override val skalTelle = { ansatt: Ansatt, bruker: Bruker ->
         runCatching {
-            vergemål.vergemål(nom.fnrForAnsatt(ansatt.ansattId))?.contains(bruker.brukerId) == true
+            vergemål.vergemål(ansatt.ansattId).contains(bruker.brukerId)
         }.getOrElse {
             log.error("Feil ved sjekk av vergemål for ansatt ${ansatt.ansattId.verdi}", it)
             false
         }
     }
 
-    override fun tell(ansatt: Ansatt, bruker: Bruker) {
-    }
+    override fun tell(ansatt: Ansatt, bruker: Bruker) =
+        teller.tell()
 }

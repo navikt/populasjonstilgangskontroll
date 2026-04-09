@@ -24,9 +24,10 @@ class VergemålConfig(
     @Generated
     override fun toString() = "$javaClass.simpleName [uri=$vergemålURI, pingEndpoint=$pingEndpoint]"
     override val navn = VERGEMÅL
-    override val caches = setOf(CachableConfig(VERGEMÅL))
+    override val caches = setOf(VERGE_CACHE)
 
     companion object {
+        val VERGE_CACHE = CachableConfig(VERGEMÅL)
         val DEFAULT_URI = URI.create("http://repr-api.repr")
         const val VERGEMÅL = "verge"
         private const val DEFAULT_PATH = "/api/v2/internbruker/vergemaal/kan-representere"

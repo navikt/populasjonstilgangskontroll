@@ -16,13 +16,6 @@ class VergemålBeanConfig {
     fun vergemålRestClient(b: Builder, cfg: VergemålConfig) =
         b.baseUrl(cfg.baseUri).build()
 
-    /*
-    @Bean
-    @Qualifier(VERGEMÅL + "ping")
-    fun vergemålPingRestClient(cfg: VergemålConfig) =
-        RestClient.builder().baseUrl(cfg.baseUri).build()
-*/
-
     @Bean
     fun vergemålHealthIndicator(a: VergemålRestClientAdapter) =
         PingableHealthIndicator(a)

@@ -78,6 +78,5 @@ class VergemålRegel(private val vergemål: VergemålTjeneste, nom: NomTjeneste)
     }
 
     override fun tell(ansatt: Ansatt, bruker: Bruker) {
-
     }
 }

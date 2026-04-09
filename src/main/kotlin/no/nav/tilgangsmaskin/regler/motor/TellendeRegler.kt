@@ -55,14 +55,11 @@ class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: Ent
                 ?.let { proxy.enhet(ansatt.ansattId).navn }
                 ?: UTILGJENGELIG
         }.getOrDefault(UTILGJENGELIG)
-
-
-
 }
 
 @Component
 @Order(LOWEST_PRECEDENCE - 4)
-class VergemålRegel(private val vergemål: VergemålTjeneste, private val teller: VergemålTeller) : TellendeRegel {
+class VergemålRegel(private val vergemål: VergemålTjeneste, private val auditor: Auditor,private val teller: VergemålTeller) : TellendeRegel {
 
     private val log = getLogger(javaClass)
 
@@ -70,7 +67,11 @@ class VergemålRegel(private val vergemål: VergemålTjeneste, private val telle
 
     override val skalTelle = { ansatt: Ansatt, bruker: Bruker ->
         runCatching {
-            vergemål.vergemål(ansatt.ansattId).contains(bruker.brukerId)
+            vergemål.vergemål(ansatt.ansattId).contains(bruker.brukerId).also {
+                if (it) {
+                  auditor.info("Ansatt ${ansatt.ansattId.verdi} har vergemål for bruker ${bruker.brukerId.verdi}")
+                }
+            }
         }.getOrElse {
             log.error("Feil ved sjekk av vergemål for ansatt ${ansatt.ansattId.verdi}", it)
             false

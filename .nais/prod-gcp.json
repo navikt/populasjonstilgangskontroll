@@ -24,6 +24,11 @@
   },
   "inbound": [
     {
+      "name": "ung-deltakelse-opplyser",
+      "namespace": "k9saksbehandling",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "mulighetsrommet-api",
       "namespace": "team-mulighetsrommet",
       "cluster": "prod-gcp"

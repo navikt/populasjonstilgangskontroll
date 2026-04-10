@@ -16,6 +16,7 @@ import org.springframework.boot.actuate.info.Info
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.core.env.ConfigurableEnvironment
 
+@Suppress("UNCHECKED_CAST")
 class StartupInfoContributorTest : DescribeSpec({
 
     val env = mockk<ConfigurableEnvironment>()
@@ -42,19 +43,16 @@ class StartupInfoContributorTest : DescribeSpec({
     describe("info") {
 
         it("inneholder Cluster") {
-            @Suppress("UNCHECKED_CAST")
             val info = build()["info"] as Map<String, Any?>
             info.containsKey("Cluster") shouldBe true
         }
 
         it("inneholder Startup") {
-            @Suppress("UNCHECKED_CAST")
             val info = build()["info"] as Map<String, Any?>
             info.containsKey("Startup") shouldBe true
         }
 
         it("inneholder Name med riktig verdi") {
-            @Suppress("UNCHECKED_CAST")
             val info = build()["info"] as Map<String, Any?>
             info["Name"] shouldBe "test-app"
         }
@@ -74,13 +72,11 @@ class StartupInfoContributorTest : DescribeSpec({
         }
 
         it("dev-info inneholder Client ID") {
-            @Suppress("UNCHECKED_CAST")
             val devInfo = build()["dev-info"] as Map<String, Any?>
             devInfo["Client ID"] shouldBe "client-id"
         }
 
         it("dev-info inneholder Java version") {
-            @Suppress("UNCHECKED_CAST")
             val devInfo = build()["dev-info"] as Map<String, Any?>
             devInfo["Java version"] shouldBe "25"
         }

@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt.vergemål
 
-import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.VERGEMÅL
 import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
@@ -27,7 +26,7 @@ class VergemålConfig(
         }.build()
 
     @Generated
-    override fun toString() = "$javaClass.simpleName [uri=$vergemålURI, pingEndpoint=$pingEndpoint]"
+    override fun toString() = "${javaClass.simpleName} [uri=$vergemålURI, pingEndpoint=$pingEndpoint]"
 
 
     companion object {

@@ -83,6 +83,8 @@ spec:
           namespace: nais-system
       external:
         - host: {{pdl}}
+        - host: {{pdlgraph}}
+
     inbound:
       rules:
         {{#each inbound as |app|}}

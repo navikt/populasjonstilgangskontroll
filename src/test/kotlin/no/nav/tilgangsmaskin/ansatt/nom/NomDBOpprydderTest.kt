@@ -125,7 +125,7 @@ class NomDBOpprydderTest : BehaviorSpec() {
     }
 
     private fun bliLeder() = setField(opprydder, "erLeder", true)
-    companion object {
+    private companion object {
         @ServiceConnection
         private val postgres = PostgreSQLContainer("postgres:18")
         private fun nyttNavId() = "Z%06d".format(counter.incrementAndGet())

@@ -12,7 +12,7 @@ val logstashVersion = "9.0"
 val coroutinesVersion = "1.9.0"
 val poolsVersion = "2.13.1"
 val springMockkVersion = "5.0.1"
-val confluentVersion = "8.1.1"
+val confluentVersion = "8.2.0"
 
 
 group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"

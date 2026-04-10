@@ -42,7 +42,7 @@ class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: Ent
     override fun tell(ansatt: Ansatt, bruker: Bruker) {
         val intervall = bruker.dødsdato!!.intervallSiden()
         with(enhet(intervall, ansatt)) {
-            teller.tell(intervall,this)
+            teller.tell(intervall, this)
             if (this != UTILGJENGELIG)  {
                 auditor.info("Ansatt ${ansatt.ansattId.verdi} i enhet $this fikk tilgang til forlengst avdød bruker ${bruker.brukerId.verdi}")
             }
@@ -59,7 +59,7 @@ class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: Ent
 
 @Component
 @Order(LOWEST_PRECEDENCE - 4)
-class VergemålRegel(private val vergemål: VergemålTjeneste, private val auditor: Auditor,private val teller: VergemålTeller) : TellendeRegel {
+class VergemålRegel(private val vergemål: VergemålTjeneste, private val auditor: Auditor, private val teller: VergemålTeller) : TellendeRegel {
 
     private val log = getLogger(javaClass)
 

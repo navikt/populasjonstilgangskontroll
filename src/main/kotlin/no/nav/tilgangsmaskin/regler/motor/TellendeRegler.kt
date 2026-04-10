@@ -69,7 +69,7 @@ class VergemålRegel(private val vergemål: VergemålTjeneste, private val audit
         runCatching {
             vergemål.vergemål(ansatt.ansattId).contains(bruker.brukerId).also {
                 if (it) {
-                  auditor.info("Ansatt ${ansatt.ansattId.verdi} har vergemål for bruker ${bruker.brukerId.verdi}")
+                    auditor.info("Ansatt ${ansatt.ansattId.verdi} har vergemål for bruker ${bruker.brukerId.verdi}")
                 }
             }
         }.getOrElse {

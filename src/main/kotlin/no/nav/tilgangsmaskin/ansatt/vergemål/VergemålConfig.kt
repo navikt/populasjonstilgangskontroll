@@ -13,7 +13,7 @@ import java.time.Duration
 @ConfigurationProperties(VERGEMÅL)
 class VergemålConfig(
     baseUri: URI = DEFAULT_URI,
-    val path: String = DEFAULT_PATH,
+    path: String = DEFAULT_PATH,
     pingPath: String = DEFAULT_PING_PATH,
     enabled: Boolean = true) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, VERGEMÅL, enabled) {
 

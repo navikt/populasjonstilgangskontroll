@@ -95,7 +95,7 @@ class NomDBOpprydderTest : BehaviorSpec() {
                     }
                 }
 
-                Then("returnerer 0 nar ingen rader finnes") {
+                Then("returnerer 0 når ingen rader finnes") {
                     opprydder.ryddOpp() shouldBe 0
                 }
             }
@@ -115,9 +115,9 @@ class NomDBOpprydderTest : BehaviorSpec() {
 
     private fun lagre(fnr: String, gyldigTil: LocalDate): NomEntity {
         val now = now()
-        val gyldigtilInstant = gyldigTil.atStartOfDay().toInstant(UTC)
+        val gyldigTilInstant = gyldigTil.atStartOfDay().toInstant(UTC)
         return TransactionTemplate(txManager).execute {
-            repo.save(NomEntity(nyttNavId(), fnr, now, gyldigtilInstant).also {
+            repo.save(NomEntity(nyttNavId(), fnr, now, gyldigTilInstant).also {
                 it.created = now
                 it.updated = now
             })

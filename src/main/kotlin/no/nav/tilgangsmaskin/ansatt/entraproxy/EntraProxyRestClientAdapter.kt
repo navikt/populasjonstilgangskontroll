@@ -1,21 +1,17 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
 
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRAPROXY
-import no.nav.tilgangsmaskin.felles.rest.AbstractRestClientAdapter
-import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler.Companion.IDENTIFIKATOR
-import org.springframework.beans.factory.annotation.Qualifier
+import no.nav.tilgangsmaskin.felles.rest.Pingable
 import org.springframework.stereotype.Component
-import org.springframework.web.client.RestClient
 
 @Component
-class EntraProxyRestClientAdapter(@Qualifier(ENTRAPROXY) restClient: RestClient, val cf: EntraProxyConfig) :
-    AbstractRestClientAdapter(restClient, cf) {
+class EntraProxyRestClientAdapter(private val client: EntraProxyClient, private val cfg: EntraProxyConfig) : Pingable {
 
-    fun enhetForAnsatt(ansattId: String) =
-        get<EntraProxyAnsatt>(cf.brukerURI(ansattId)).enhet
+    override val name = cfg.name
+    override val pingEndpoint = "${cfg.pingEndpoint}"
+    override val isEnabled = cfg.isEnabled
+    override fun ping() = if (cfg.isEnabled) client.ping() else "disabled"
 
-    fun enheterForAnsatt(ansattId: String) =
-        get<Set<Enhet>>(cf.enheterURI(ansattId),mapOf(IDENTIFIKATOR to ansattId))
+    fun enhetForAnsatt(ansattId: String) = client.ansatt(ansattId).enhet
 
+    fun enheterForAnsatt(ansattId: String) = client.enheter(ansattId)
 }

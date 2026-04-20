@@ -24,6 +24,6 @@ class NomBeanConfig {
 
     @Bean(NOM_ERROR_HANDLER)
     fun nomErrorHandler() = KafkaListenerErrorHandler { msg, e ->
-        log.error("Feil ved behandling av hendelse: ${msg.payload as NomHendelse}", e)
+        log.error("Feil ved behandling av NOM-hendelse: ${msg.payload}", e)
     }
 }

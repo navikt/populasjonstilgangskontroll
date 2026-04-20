@@ -29,8 +29,9 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
         log.info("Mottok ${hendelser.size} hendelse(r) fra NOM")
         hendelser.forEach { h ->
             log.trace("Behandler hendelse fra NOM: {}", h)
-            nom.lagre(h.ansattData())
-            log.trace("Lagret brukerId ${h.personident.maskFnr()} for ${h.navident} OK")
+            runCatching { nom.lagre(h.ansattData()) }
+                .onSuccess { log.trace("Lagret brukerId ${h.personident.maskFnr()} for ${h.navident} OK") }
+                .onFailure { log.error("Kunne ikke lagre brukerId ${h.personident.maskFnr()} for ${h.navident}", it) }
         }
         log.info("${hendelser.size} hendelse(r) fra NOM ferdig behandlet og lagret")
     }

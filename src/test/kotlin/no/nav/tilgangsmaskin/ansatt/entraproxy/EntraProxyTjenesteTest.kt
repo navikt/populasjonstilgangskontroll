@@ -39,7 +39,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
         Given("oppslag av enhet for ansatt") {
             When("ansatt eksisterer") {
                 Then("returnerer enhet for ansatt") {
-                    server.expect(requestTo(cfg.brukerURI(ansattId.verdi)))
+                    server.expect(requestTo("${cfg.baseUri}/api/v1/ansatt/${ansattId.verdi}"))
                         .andExpect(method(GET))
                         .andRespond(withSuccess("""
                             {
@@ -59,7 +59,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
         Given("oppslag av enheter for ansatt") {
             When("ansatt er tilknyttet enheter") {
                 Then("returnerer liste av enheter for ansatt") {
-                    server.expect(requestTo(cfg.enheterURI(ansattId.verdi)))
+                    server.expect(requestTo("${cfg.baseUri}/api/v1/enhet/ansatt/${ansattId.verdi}"))
                         .andExpect(method(GET))
                         .andRespond(withSuccess("""
                             [
@@ -76,7 +76,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
 
             When("ansatt ikke er tilknyttet enheter") {
                 Then("returneres tom liste") {
-                    server.expect(requestTo(cfg.enheterURI(ansattId.verdi)))
+                    server.expect(requestTo("${cfg.baseUri}/api/v1/enhet/ansatt/${ansattId.verdi}"))
                         .andExpect(method(GET))
                         .andRespond(withSuccess("[]", APPLICATION_JSON))
 

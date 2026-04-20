@@ -7,7 +7,6 @@ import io.mockk.verify
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
 import java.time.LocalDate
 import java.time.LocalDate.EPOCH
@@ -63,10 +62,9 @@ class NomHendelseKonsumentTest : BehaviorSpec({
 
         When("lagre kaster exception") {
             Then("logger feilet og fortsetter med neste hendelse") {
-                val annenHendelse = hendelse("Z888888", "20478606614")
                 every { nom.lagre(match { it.ansattId == AnsattId(NAVIDENT) }) } throws RuntimeException("DB-feil")
 
-                konsument.listen(listOf(hendelse(), annenHendelse))
+                konsument.listen(listOf(hendelse(), hendelse("Z888888", "20478606614")))
                 verify { nom.lagre(match { it.ansattId == AnsattId("Z888888") }) }
             }
         }

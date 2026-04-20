@@ -9,7 +9,6 @@ import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.Companion.ALWAYS
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
@@ -42,7 +41,7 @@ internal class NomTest : BehaviorSpec() {
         val ansattId = AnsattId("Z999999")
         val brukerId = BrukerId("08526835670")
         val utgått = NomAnsattData(ansattId, brukerId, NomAnsattPeriode(EPOCH, IGÅR))
-        val gyldig = NomAnsattData(ansattId, brukerId, ALWAYS)
+        val gyldig = NomAnsattData(ansattId, brukerId)
 
         Given("fnrForAnsatt kalles") {
             When("ansatt er utgått") {

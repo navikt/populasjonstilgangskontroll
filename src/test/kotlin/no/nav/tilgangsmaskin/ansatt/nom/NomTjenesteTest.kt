@@ -64,7 +64,7 @@ class NomTjenesteTest : BehaviorSpec({
 
     Given("lagre kalles") {
         Then("delegerer til adapter.upsert") {
-            val data = NomAnsattData(ansattId, brukerId, NomAnsattData.ALWAYS)
+            val data = NomAnsattData(ansattId, brukerId)
             tjeneste.lagre(data)
             verify(exactly = 1) { adapter.upsert(data) }
         }

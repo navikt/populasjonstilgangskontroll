@@ -10,6 +10,7 @@ import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelElementer
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.regler.motor.OppfriskingTeller
+import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
 import java.util.*
@@ -17,6 +18,7 @@ import java.util.*
 @Component
 class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste: AnsattOidTjeneste, private val cache: CacheClient, private val teller: OppfriskingTeller) : AbstractCacheOppfrisker() {
 
+    private val log = getLogger(javaClass)
     override val cacheName = GRAPH
 
     override fun doOppfrisk(elementer: CacheNøkkelElementer)  =
@@ -33,7 +35,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
                 tømOgOppfrisk(ansattId, oid, metode)
             }
             else {
-                feil(elementer, it)
+                log.warn("Oppfrisking av ${elementer.masked} feilet", it)
             }
         }
     }

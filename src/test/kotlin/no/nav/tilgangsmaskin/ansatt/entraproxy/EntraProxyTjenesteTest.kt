@@ -14,7 +14,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
@@ -22,7 +21,6 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 
 @RestClientTest(components = [EntraProxyRestClientAdapter::class, EntraProxyBeanConfig::class, EntraProxyTjeneste::class, DefaultRestErrorHandler::class])
 @EnableConfigurationProperties(EntraProxyConfig::class)
-@TestPropertySource(properties = ["entra-proxy.base-uri=http://localhost"])
 @ApplyExtension(SpringExtension::class)
 class EntraProxyTjenesteTest : BehaviorSpec() {
 

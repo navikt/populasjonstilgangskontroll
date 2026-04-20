@@ -10,6 +10,7 @@ jobs:
       BASE: europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/jre:openjdk-25
     name: build
     permissions:
+      pages: write
       checks: write
       contents: write
       id-token: write

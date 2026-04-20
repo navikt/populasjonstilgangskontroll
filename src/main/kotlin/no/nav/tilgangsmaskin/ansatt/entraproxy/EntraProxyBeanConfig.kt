@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
 
-import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -16,7 +15,7 @@ import java.net.URI
 class EntraProxyBeanConfig {
 
     @Bean
-    fun entraProxyClient(b: Builder, cfg: EntraProxyConfig, errorHandler: ErrorHandler = DefaultRestErrorHandler())  =
+    fun entraProxyClient(b: Builder, cfg: EntraProxyConfig, errorHandler: ErrorHandler)  =
         HttpServiceProxyFactory
             .builderFor(create(client(b, cfg.baseUri, errorHandler)))
             .build()

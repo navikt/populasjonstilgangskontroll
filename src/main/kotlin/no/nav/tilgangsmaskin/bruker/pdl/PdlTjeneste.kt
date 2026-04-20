@@ -4,13 +4,11 @@ import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverable
+import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableService
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
-import org.springframework.stereotype.Service
 
-@RetryingWhenRecoverable
-@Service
+@RetryingWhenRecoverableService
 class PdlTjeneste(
     private val adapter: PdlRestClientAdapter,
     private val graphQL: PdlSyncGraphQLClientAdapter,

@@ -18,5 +18,4 @@ class EntraProxyBeanConfig {
     @Bean
     fun entraProxyHealthIndicator(a: EntraProxyRestClientAdapter) =
         PingableHealthIndicator(a)
-
 }

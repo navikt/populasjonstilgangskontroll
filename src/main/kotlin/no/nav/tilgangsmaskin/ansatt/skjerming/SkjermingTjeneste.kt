@@ -5,14 +5,12 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMIN
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverable
+import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableService
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
-import org.springframework.stereotype.Service
 
 
-@RetryingWhenRecoverable
-@Service
+@RetryingWhenRecoverableService
 class SkjermingTjeneste(
     private val adapter: SkjermingRestClientAdapter,
     private val cache: CacheOperations,

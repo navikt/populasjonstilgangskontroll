@@ -3,17 +3,15 @@ package no.nav.tilgangsmaskin.felles.cache
 import io.lettuce.core.RedisClient
 import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
-import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverable
+import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableService
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.stereotype.Component
 import java.time.Duration
 import kotlin.reflect.KClass
 
-@Component
-@RetryingWhenRecoverable
+@RetryingWhenRecoverableService
  class CacheClient(client: RedisClient, private val handler: CacheNøkkelHandler,
     private val alleTreffTeller: BulkCacheSuksessTeller,
     private val teller: BulkCacheTeller,

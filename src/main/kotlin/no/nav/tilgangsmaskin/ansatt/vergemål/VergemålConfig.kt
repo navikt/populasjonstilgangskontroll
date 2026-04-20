@@ -11,7 +11,7 @@ import java.time.Duration
 
 @ConfigurationProperties(VERGEMÅL)
 class VergemålConfig(
-    baseUri: URI = DEFAULT_URI,
+    baseUri: URI = PROXY_BASE,
     path: String = DEFAULT_PATH,
     pingPath: String = DEFAULT_PING_PATH,
     enabled: Boolean = true) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, VERGEMÅL, enabled) {
@@ -31,7 +31,7 @@ class VergemålConfig(
 
     companion object {
         val VERGE_CACHE = CachableConfig(VERGEMÅL)
-        val DEFAULT_URI = URI.create("http://repr-api.repr")
+        val PROXY_BASE = URI.create("http://repr-api.repr")
         const val VERGEMÅL = "verge"
         private const val DEFAULT_PATH = "/api/v2/internbruker/vergemaal/kan-representere"
         private const val DEFAULT_PING_PATH = "/actuator/health/liveness"

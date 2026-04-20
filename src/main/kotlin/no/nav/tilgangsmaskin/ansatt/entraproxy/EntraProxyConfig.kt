@@ -14,13 +14,14 @@ class EntraProxyConfig(
     enabled: Boolean = true) :  AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
 
     fun brukerURI(navIdent: String) =
-        builder().apply {
-            path(ANSATT_PATH)
-        }.build(navIdent)
+        pathFor(ANSATT_PATH, navIdent)
 
     fun enheterURI(navIdent: String) =
+       pathFor(ENHETER_PATH, navIdent)
+
+    private fun pathFor(path: String, navIdent: String) =
         builder().apply {
-            path(ENHETER_PATH)
+            path(path)
         }.build(navIdent)
 
     @Generated

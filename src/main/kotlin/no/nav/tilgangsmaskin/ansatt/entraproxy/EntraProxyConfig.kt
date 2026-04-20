@@ -17,6 +17,8 @@ class EntraProxyConfig(enabled: Boolean = true) : AbstractRestConfig(PROXY_BASE,
     companion object {
         val PROXY_BASE = URI.create("http://entra-proxy.sikkerhetstjenesten")
         const val ENTRAPROXY = "entra-proxy"
+        const val ANSATT_PATH = "/api/v1/ansatt/{navIdent}"
+        const val ENHETER_PATH = "/api/v1/enhet/ansatt/{navIdent}"
         const val PING_PATH = "/monitoring/health/liveness"
     }
 }

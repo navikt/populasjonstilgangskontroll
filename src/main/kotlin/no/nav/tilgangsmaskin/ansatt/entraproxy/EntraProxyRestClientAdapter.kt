@@ -13,5 +13,5 @@ class EntraProxyRestClientAdapter(private val client: EntraProxyClient, private 
 
     fun enhetForAnsatt(ansattId: String) = client.ansatt(ansattId).enhet
 
-    fun enheterForAnsatt(ansattId: String) = client.enheter(ansattId)
+    fun enheterForAnsatt(ansattId: String) = client.enheter(ansattId, ansattId)
 }

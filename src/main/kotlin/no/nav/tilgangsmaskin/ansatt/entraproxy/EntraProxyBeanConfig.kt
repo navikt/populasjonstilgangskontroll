@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
 
+import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.DEFAULT_URI
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -15,9 +16,9 @@ import java.net.URI
 class EntraProxyBeanConfig {
 
     @Bean
-    fun entraProxyClient(b: Builder, cfg: EntraProxyConfig, errorHandler: ErrorHandler)  =
+    fun entraProxyClient(b: Builder, errorHandler: ErrorHandler)  =
         HttpServiceProxyFactory
-            .builderFor(create(client(b, cfg.baseUri, errorHandler)))
+            .builderFor(create(client(b, DEFAULT_URI, errorHandler)))
             .build()
             .createClient<EntraProxyClient>()
 

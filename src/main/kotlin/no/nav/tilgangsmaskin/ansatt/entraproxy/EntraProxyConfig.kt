@@ -9,9 +9,7 @@ import java.net.URI
 
 @ConfigurationProperties(ENTRAPROXY)
 class EntraProxyConfig(
-    baseUri: URI = DEFAULT_URI,
-    pingPath: String = DEFAULT_PING_PATH,
-    enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
+    enabled: Boolean = true) : AbstractRestConfig(DEFAULT_URI, PING_PATH, GRAPH, enabled) {
 
     @Generated
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
@@ -19,6 +17,6 @@ class EntraProxyConfig(
     companion object {
         private val DEFAULT_URI = URI.create("http://entra-proxy.sikkerhetstjenesten")
         const val ENTRAPROXY = "entra-proxy"
-        private const val DEFAULT_PING_PATH = "/monitoring/health/liveness"
+        const val PING_PATH = "/monitoring/health/liveness"
     }
 }

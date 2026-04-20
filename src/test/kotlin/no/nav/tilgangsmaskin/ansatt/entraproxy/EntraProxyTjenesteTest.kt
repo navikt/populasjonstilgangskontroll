@@ -6,7 +6,7 @@ import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
-import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.PROXY_BASE
+import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.DEFAULT_URI
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
 import org.springframework.beans.factory.annotation.Autowired
@@ -41,7 +41,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
         Given("oppslag av enhet for ansatt") {
             When("ansatt eksisterer") {
                 Then("returnerer enhet for ansatt") {
-                    server.expect(requestTo("${PROXY_BASE}/api/v1/ansatt/${ansattId.verdi}"))
+                    server.expect(requestTo("${DEFAULT_URI}/api/v1/ansatt/${ansattId.verdi}"))
                         .andExpect(method(GET))
                         .andRespond(withSuccess("""
                             {
@@ -61,7 +61,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
         Given("oppslag av enheter for ansatt") {
             When("ansatt er tilknyttet enheter") {
                 Then("returnerer liste av enheter for ansatt") {
-                    server.expect(requestTo("${PROXY_BASE}/api/v1/enhet/ansatt/${ansattId.verdi}"))
+                    server.expect(requestTo("${DEFAULT_URI}/api/v1/enhet/ansatt/${ansattId.verdi}"))
                         .andExpect(method(GET))
                         .andRespond(withSuccess("""
                             [
@@ -78,7 +78,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
 
             When("ansatt ikke er tilknyttet enheter") {
                 Then("returneres tom liste") {
-                    server.expect(requestTo("${PROXY_BASE}/api/v1/enhet/ansatt/${ansattId.verdi}"))
+                    server.expect(requestTo("${DEFAULT_URI}/api/v1/enhet/ansatt/${ansattId.verdi}"))
                         .andExpect(method(GET))
                         .andRespond(withSuccess("[]", APPLICATION_JSON))
 

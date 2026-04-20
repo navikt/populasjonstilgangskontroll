@@ -9,7 +9,8 @@ import java.net.URI
 
 @ConfigurationProperties(ENTRAPROXY)
 class EntraProxyConfig(
-    enabled: Boolean = true) : AbstractRestConfig(DEFAULT_URI, PING_PATH, GRAPH, enabled) {
+    enabled: Boolean = true) : AbstractRestConfig(DEFAULT_URI, PING_PATH, GRAPH, enabled)
+{
 
     @Generated
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"

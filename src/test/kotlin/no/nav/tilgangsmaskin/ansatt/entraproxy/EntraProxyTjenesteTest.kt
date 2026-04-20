@@ -40,9 +40,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
     lateinit var tjeneste: EntraProxyTjeneste
     @Autowired
     lateinit var server: MockRestServiceServer
-
-
-
+    
     init {
         afterEach { server.verify() }
 
@@ -61,7 +59,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
                             }
                         """.trimIndent(), APPLICATION_JSON))
 
-                    tjeneste.enhet(ansattId) shouldBe Enhet(Enhetsnummer("1234"), "NAV Testkontor")
+                    tjeneste.enhet(ANSATTID) shouldBe Enhet(Enhetsnummer("1234"), "NAV Testkontor")
                 }
             }
         }
@@ -78,7 +76,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
                             ]
                         """.trimIndent(), APPLICATION_JSON))
 
-                    tjeneste.enheter(ansattId) shouldBe setOf(
+                    tjeneste.enheter(ANSATTID) shouldBe setOf(
                         Enhet(Enhetsnummer("1234"), "NAV Testkontor"),
                         Enhet(Enhetsnummer("5678"), "NAV Annenkontor"))
                 }
@@ -90,7 +88,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
                         .andExpect(method(GET))
                         .andRespond(withSuccess("[]", APPLICATION_JSON))
 
-                    tjeneste.enheter(ansattId) shouldBe emptySet()
+                    tjeneste.enheter(ANSATTID) shouldBe emptySet()
                 }
             }
         }
@@ -103,7 +101,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
                         .andRespond(withStatus(NOT_FOUND))
 
                     shouldThrow<NotFoundRestException> {
-                        tjeneste.enhet(ansattId)
+                        tjeneste.enhet(ANSATTID)
                     }
                 }
             }
@@ -115,7 +113,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
                         .andRespond(withStatus(UNAUTHORIZED))
 
                     shouldThrow<IrrecoverableRestException> {
-                        tjeneste.enhet(ansattId)
+                        tjeneste.enhet(ANSATTID)
                     }
                 }
             }
@@ -127,7 +125,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
                         .andRespond(withStatus(INTERNAL_SERVER_ERROR))
 
                     shouldThrow<RecoverableRestException> {
-                        tjeneste.enhet(ansattId)
+                        tjeneste.enhet(ANSATTID)
                     }
                 }
             }
@@ -139,14 +137,14 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
                         .andRespond(withStatus(SERVICE_UNAVAILABLE))
 
                     shouldThrow<RecoverableRestException> {
-                        tjeneste.enheter(ansattId)
+                        tjeneste.enheter(ANSATTID)
                     }
                 }
             }
         }
     }
 
-    private val ansattId = AnsattId("Z999999")
-    private fun ansattUrl() = "$PROXY_BASE${ANSATT_PATH.replace("{navIdent}", ansattId.verdi)}"
-    private fun enheterUrl() = "$PROXY_BASE${ENHETER_PATH.replace("{navIdent}", ansattId.verdi)}"
+    private val ANSATTID = AnsattId("Z999999")
+    private fun ansattUrl() = "$PROXY_BASE${ANSATT_PATH.replace("{navIdent}", ANSATTID.verdi)}"
+    private fun enheterUrl() = "$PROXY_BASE${ENHETER_PATH.replace("{navIdent}", ANSATTID.verdi)}"
 }

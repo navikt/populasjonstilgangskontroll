@@ -14,7 +14,6 @@ class NomBeanConfig {
 
     private val log = getLogger(javaClass)
 
-
     @Bean(NOM_FNR_FILTER_STRATEGY)
     fun nomFnrFilterStrategy() =
         RecordFilterStrategy<String, NomHendelse> {

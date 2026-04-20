@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
@@ -9,14 +10,23 @@ import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.PROXY_BASE
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
+import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
+import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
+import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.http.HttpMethod.GET
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE
+import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.test.web.client.ExpectedCount.times
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
+import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 
 @RestClientTest(components = [EntraProxyRestClientAdapter::class, EntraProxyBeanConfig::class, EntraProxyTjeneste::class, DefaultRestErrorHandler::class])
@@ -81,6 +91,56 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
                         .andRespond(withSuccess("[]", APPLICATION_JSON))
 
                     tjeneste.enheter(ansattId) shouldBe emptySet()
+                }
+            }
+        }
+
+        Given("feilhaandtering") {
+            When("tjenesten returnerer 404") {
+                Then("kaster NotFoundRestException") {
+                    server.expect(requestTo("${PROXY_BASE}/api/v1/ansatt/${ansattId.verdi}"))
+                        .andExpect(method(GET))
+                        .andRespond(withStatus(NOT_FOUND))
+
+                    shouldThrow<NotFoundRestException> {
+                        tjeneste.enhet(ansattId)
+                    }
+                }
+            }
+
+            When("tjenesten returnerer 401") {
+                Then("kaster IrrecoverableRestException") {
+                    server.expect(requestTo("${PROXY_BASE}/api/v1/ansatt/${ansattId.verdi}"))
+                        .andExpect(method(GET))
+                        .andRespond(withStatus(UNAUTHORIZED))
+
+                    shouldThrow<IrrecoverableRestException> {
+                        tjeneste.enhet(ansattId)
+                    }
+                }
+            }
+
+            When("tjenesten returnerer 500") {
+                Then("kaster RecoverableRestException") {
+                    server.expect(times(4), requestTo("${PROXY_BASE}/api/v1/ansatt/${ansattId.verdi}"))
+                        .andExpect(method(GET))
+                        .andRespond(withStatus(INTERNAL_SERVER_ERROR))
+
+                    shouldThrow<RecoverableRestException> {
+                        tjeneste.enhet(ansattId)
+                    }
+                }
+            }
+
+            When("tjenesten returnerer 503") {
+                Then("kaster RecoverableRestException") {
+                    server.expect(times(4), requestTo("${PROXY_BASE}/api/v1/enhet/ansatt/${ansattId.verdi}"))
+                        .andExpect(method(GET))
+                        .andRespond(withStatus(SERVICE_UNAVAILABLE))
+
+                    shouldThrow<RecoverableRestException> {
+                        tjeneste.enheter(ansattId)
+                    }
                 }
             }
         }

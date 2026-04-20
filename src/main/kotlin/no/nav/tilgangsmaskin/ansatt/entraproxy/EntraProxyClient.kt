@@ -1,7 +1,8 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
-
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
+import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler.Companion.IDENTIFIKATOR
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 
@@ -12,7 +13,7 @@ interface EntraProxyClient {
     fun ansatt(@PathVariable navIdent: String): EntraProxyAnsatt
 
     @GetExchange("/api/v1/enhet/ansatt/{navIdent}")
-    fun enheter(@PathVariable navIdent: String): Set<Enhet>
+    fun enheter(@PathVariable navIdent: String, @RequestHeader(IDENTIFIKATOR) identifikator: String = navIdent): Set<Enhet>
 
     @GetExchange("/monitoring/health/liveness")
     fun ping(): Any

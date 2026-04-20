@@ -31,7 +31,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
         with(hendelse) {
             oppfølging.registrer(oppfolgingsperiodeUuid,
                 Identer(ident, aktorId), kontor!!, startTidspunkt)
-            log.info("$melding til ${kontor.kontorId.verdi} for $oppfolgingsperiodeUuid")
+            log.info("$melding for kontor ${kontor.kontorId.verdi} og id  $oppfolgingsperiodeUuid")
         }
 
     private fun avslutt(hendelse: OppfølgingHendelse, melding: String) =

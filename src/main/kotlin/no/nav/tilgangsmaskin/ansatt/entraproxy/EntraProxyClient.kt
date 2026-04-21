@@ -1,8 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ANSATT_PATH
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENHETER_PATH
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.PING_PATH
 import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler.Companion.IDENTIFIKATOR
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestHeader

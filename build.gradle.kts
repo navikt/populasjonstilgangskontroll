@@ -2,7 +2,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 import java.lang.System.getProperty
 
 val javaVersion = JavaLanguageVersion.of(25)
-val springdocVersion = "3.0.2"
+val springdocVersion = "3.0.3"
 val tokenSupportVersion = "6.0.5"
 val mockkVersion = "1.14.9"
 val kotestVersion = "6.1.11"

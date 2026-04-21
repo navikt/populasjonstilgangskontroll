@@ -4,9 +4,9 @@ spring:
 management:
   endpoint:
     env:
-      show-values: always
+      show-values: when-authorized
     configprops:
-      show-values: always
+      show-values: when-authorized
     health:
       show-details: always
       show-components: always

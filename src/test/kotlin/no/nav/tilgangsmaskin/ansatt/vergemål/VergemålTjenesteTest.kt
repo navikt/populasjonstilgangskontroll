@@ -144,7 +144,6 @@ class VergemålTjenesteTest : BehaviorSpec() {
         private val IDENT = BrukerId("08526835670")
         private val BRUKER1 = BrukerId("20478606614")
         private val BRUKER2 = BrukerId("03508331575")
-
         private val VERGEMÅL_URI = fromUriString("$VERGEMÅL_BASE$VERGEMÅL_PATH").build().toUri()
     }
 }

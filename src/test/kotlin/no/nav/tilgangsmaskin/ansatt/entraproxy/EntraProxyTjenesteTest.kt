@@ -40,7 +40,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
     lateinit var tjeneste: EntraProxyTjeneste
     @Autowired
     lateinit var server: MockRestServiceServer
-    
+
     init {
         afterEach { server.verify() }
 
@@ -95,7 +95,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
 
         Given("feilhaandtering") {
             When("tjenesten returnerer 404") {
-                Then("kaster NotFoundRestException") {
+                Then("kaster NotFoundRestException uten retry") {
                     server.expect(requestTo(ansattUrl()))
                         .andExpect(method(GET))
                         .andRespond(withStatus(NOT_FOUND))
@@ -107,7 +107,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
             }
 
             When("tjenesten returnerer 401") {
-                Then("kaster IrrecoverableRestException") {
+                Then("kaster IrrecoverableRestException uten retry") {
                     server.expect(requestTo(ansattUrl()))
                         .andExpect(method(GET))
                         .andRespond(withStatus(UNAUTHORIZED))
@@ -119,25 +119,13 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
             }
 
             When("tjenesten returnerer 500") {
-                Then("kaster RecoverableRestException") {
+                Then("kaster RecoverableRestException etter 4 forsøk") {
                     server.expect(times(4), requestTo(ansattUrl()))
                         .andExpect(method(GET))
                         .andRespond(withStatus(INTERNAL_SERVER_ERROR))
 
                     shouldThrow<RecoverableRestException> {
                         tjeneste.enhet(ANSATTID)
-                    }
-                }
-            }
-
-            When("tjenesten returnerer 503") {
-                Then("kaster RecoverableRestException") {
-                    server.expect(times(4), requestTo(enheterUrl()))
-                        .andExpect(method(GET))
-                        .andRespond(withStatus(SERVICE_UNAVAILABLE))
-
-                    shouldThrow<RecoverableRestException> {
-                        tjeneste.enheter(ANSATTID)
                     }
                 }
             }

@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatusCode
 import org.springframework.web.client.RestClient.Builder
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.client.support.RestClientAdapter.create
-import org.springframework.web.service.invoker.HttpServiceProxyFactory
+import org.springframework.web.service.invoker.HttpServiceProxyFactory.builderFor
 import org.springframework.web.service.invoker.createClient
 import java.net.URI
 
@@ -16,8 +16,7 @@ class EntraProxyBeanConfig {
 
     @Bean
     fun entraProxyClient(b: Builder, cfg: EntraProxyConfig, errorHandler: ErrorHandler)  =
-        HttpServiceProxyFactory
-            .builderFor(create(client(b, cfg.baseUri, errorHandler)))
+        builderFor(create(client(b, cfg.baseUri, errorHandler)))
             .build()
             .createClient<EntraProxyClient>()
 

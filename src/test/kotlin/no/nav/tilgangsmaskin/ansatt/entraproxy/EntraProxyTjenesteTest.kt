@@ -21,7 +21,6 @@ import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
-import org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.client.ExpectedCount.times
@@ -30,6 +29,7 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
+import org.springframework.web.util.UriComponentsBuilder.fromUriString
 
 @RestClientTest(components = [EntraProxyRestClientAdapter::class, EntraProxyBeanConfig::class, EntraProxyTjeneste::class, DefaultRestErrorHandler::class])
 @EnableConfigurationProperties(EntraProxyConfig::class)
@@ -47,7 +47,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
         Given("oppslag av enhet for ansatt") {
             When("ansatt eksisterer") {
                 Then("returnerer enhet for ansatt") {
-                    server.expect(requestTo(ansattUrl()))
+                    server.expect(requestTo(ansattUri()))
                         .andExpect(method(GET))
                         .andRespond(withSuccess("""
                             {
@@ -67,7 +67,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
         Given("oppslag av enheter for ansatt") {
             When("ansatt er tilknyttet enheter") {
                 Then("returnerer liste av enheter for ansatt") {
-                    server.expect(requestTo(enheterUrl()))
+                    server.expect(requestTo(enheterUri()))
                         .andExpect(method(GET))
                         .andRespond(withSuccess("""
                             [
@@ -84,7 +84,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
 
             When("ansatt ikke er tilknyttet enheter") {
                 Then("returneres tom liste") {
-                    server.expect(requestTo(enheterUrl()))
+                    server.expect(requestTo(enheterUri()))
                         .andExpect(method(GET))
                         .andRespond(withSuccess("[]", APPLICATION_JSON))
 
@@ -96,7 +96,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
         Given("feilhaandtering") {
             When("tjenesten returnerer 404") {
                 Then("kaster NotFoundRestException uten retry") {
-                    server.expect(requestTo(ansattUrl()))
+                    server.expect(requestTo(ansattUri()))
                         .andExpect(method(GET))
                         .andRespond(withStatus(NOT_FOUND))
 
@@ -108,7 +108,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
 
             When("tjenesten returnerer 401") {
                 Then("kaster IrrecoverableRestException uten retry") {
-                    server.expect(requestTo(ansattUrl()))
+                    server.expect(requestTo(ansattUri()))
                         .andExpect(method(GET))
                         .andRespond(withStatus(UNAUTHORIZED))
 
@@ -120,7 +120,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
 
             When("tjenesten returnerer 500") {
                 Then("kaster RecoverableRestException etter 4 forsøk") {
-                    server.expect(times(4), requestTo(ansattUrl()))
+                    server.expect(times(4), requestTo(ansattUri()))
                         .andExpect(method(GET))
                         .andRespond(withStatus(INTERNAL_SERVER_ERROR))
 
@@ -133,6 +133,9 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
     }
 
     private val ANSATTID = AnsattId("Z999999")
-    private fun ansattUrl() = "$PROXY_BASE${ANSATT_PATH.replace("{navIdent}", ANSATTID.verdi)}"
-    private fun enheterUrl() = "$PROXY_BASE${ENHETER_PATH.replace("{navIdent}", ANSATTID.verdi)}"
+    private fun ansattUri() = fromUriString("$PROXY_BASE$ANSATT_PATH")
+        .buildAndExpand(ANSATTID.verdi).toUri()
+
+    private fun enheterUri() = fromUriString("$PROXY_BASE$ENHETER_PATH")
+        .buildAndExpand(ANSATTID.verdi).toUri()
 }

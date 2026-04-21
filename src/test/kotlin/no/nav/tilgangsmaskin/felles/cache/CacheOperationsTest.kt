@@ -65,7 +65,7 @@ class CacheOperationsTest : BehaviorSpec() {
         @Bean
         @Primary
         fun cacheConfig() =
-            CacheConfig("user", "pw", redis.host, redis.firstMappedPort.toString(), ofSeconds(1), ofSeconds(1))
+            CacheConfig("user", "pw", redis.host, redis.firstMappedPort, ofSeconds(1), ofSeconds(1))
 
         @Bean
         fun cacheManager()  =

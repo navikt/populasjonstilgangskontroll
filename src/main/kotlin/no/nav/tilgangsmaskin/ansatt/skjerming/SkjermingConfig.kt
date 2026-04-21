@@ -21,8 +21,6 @@ class SkjermingConfig : CachableRestConfig,
     companion object {
         val SKJERMING_BASE = URI.create("http://skjermede-personer-pip.nom")
         const val SKJERMING = "skjerming"
-        const val IDENT = "personident"
-        const val IDENTER = IDENT + "er"
         val SKJERMING_CACHE = CachableConfig(SKJERMING)
     }
 }

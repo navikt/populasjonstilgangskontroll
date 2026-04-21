@@ -11,11 +11,15 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.SKJERMING_BULK_PATH
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.SKJERMING_PATH
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_BASE
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
+import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RetryLogger
@@ -33,18 +37,17 @@ import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
-import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.client.ExpectedCount.never
 import org.springframework.test.web.client.ExpectedCount.times
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
+import org.springframework.web.util.UriComponentsBuilder.fromUriString
 
-@RestClientTest(components = [SkjermingRestClientAdapter::class, SkjermingClientBeanConfig::class, SkjermingTjeneste::class, RetryLogger::class])
+@RestClientTest(components = [SkjermingRestClientAdapter::class, SkjermingClientBeanConfig::class, SkjermingTjeneste::class, DefaultRestErrorHandler::class, RetryLogger::class])
 @EnableConfigurationProperties(SkjermingConfig::class)
 @EnableResilientMethods
-@TestPropertySource(properties = ["skjerming.base-uri=http://skjerming"])
 @Import(SkjermingTjenesteTest.CacheConfig::class)
 @ApplyExtension(SpringExtension::class)
 class SkjermingTjenesteTest : DescribeSpec() {
@@ -83,7 +86,7 @@ class SkjermingTjenesteTest : DescribeSpec() {
             describe("skjerming (@Cacheable)") {
 
                 it("andre kall returneres fra cache — REST kalles ikke på nytt") {
-                    server.expect(times(1), requestTo(cfg.skjermingUri))
+                    server.expect(times(1), requestTo(SKJERMING_URI))
                         .andRespond(withSuccess("true", APPLICATION_JSON))
 
                     tjeneste.skjerming(brukerId) shouldBe true
@@ -93,9 +96,9 @@ class SkjermingTjenesteTest : DescribeSpec() {
                 }
 
                 it("ulike brukerId-er cachet separat") {
-                    server.expect(requestTo(cfg.skjermingUri))
+                    server.expect(requestTo(SKJERMING_URI))
                         .andRespond(withSuccess("true", APPLICATION_JSON))
-                    server.expect(requestTo(cfg.skjermingUri))
+                    server.expect(requestTo(SKJERMING_URI))
                         .andRespond(withSuccess("false", APPLICATION_JSON))
 
                     tjeneste.skjerming(brukerId) shouldBe true
@@ -110,7 +113,7 @@ class SkjermingTjenesteTest : DescribeSpec() {
 
                 it("henter treff fra cache og kun misser fra REST") {
                     cache.putOne(SKJERMING_CACHE, brukerId.verdi, true, cfg.varighet)
-                    server.expect(times(1), requestTo(cfg.skjermingerUri))
+                    server.expect(times(1), requestTo(SKJERMINGER_URI))
                         .andRespond(withSuccess("""{"${brukerId2.verdi}":false}""", APPLICATION_JSON))
 
                     val result = tjeneste.skjerminger(listOf(brukerId, brukerId2))
@@ -129,7 +132,7 @@ class SkjermingTjenesteTest : DescribeSpec() {
                 }
 
                 it("kaller ikke REST når ingen identer") {
-                    server.expect(never(), requestTo(cfg.skjermingerUri))
+                    server.expect(never(), requestTo(SKJERMINGER_URI))
                         .andRespond(withSuccess("{}", APPLICATION_JSON))
 
                     val result = tjeneste.skjerminger(emptyList())
@@ -138,7 +141,7 @@ class SkjermingTjenesteTest : DescribeSpec() {
                 }
 
                 it("lagrer REST-resultater i cache") {
-                    server.expect(times(1), requestTo(cfg.skjermingerUri))
+                    server.expect(times(1), requestTo(SKJERMINGER_URI))
                         .andRespond(withSuccess("""{"${brukerId.verdi}":true}""", APPLICATION_JSON))
 
                     tjeneste.skjerminger(listOf(brukerId))
@@ -151,7 +154,7 @@ class SkjermingTjenesteTest : DescribeSpec() {
         describe("retry") {
 
             it("prøver 4 ganger og kaster RecoverableRestException når alle forsøk feiler") {
-                server.expect(times(4), requestTo(cfg.skjermingUri))
+                server.expect(times(4), requestTo(SKJERMING_URI))
                     .andRespond(withStatus(INTERNAL_SERVER_ERROR))
 
                 shouldThrow<RecoverableRestException> { tjeneste.skjerming(brukerId) }
@@ -159,9 +162,9 @@ class SkjermingTjenesteTest : DescribeSpec() {
             }
 
             it("returnerer resultat etter retry når andre forsøk lykkes") {
-                server.expect(times(1), requestTo(cfg.skjermingUri))
+                server.expect(times(1), requestTo(SKJERMING_URI))
                     .andRespond(withStatus(INTERNAL_SERVER_ERROR))
-                server.expect(times(1), requestTo(cfg.skjermingUri))
+                server.expect(times(1), requestTo(SKJERMING_URI))
                     .andRespond(withSuccess("false", APPLICATION_JSON))
 
                 tjeneste.skjerming(brukerId) shouldBe false
@@ -169,7 +172,7 @@ class SkjermingTjenesteTest : DescribeSpec() {
             }
 
             it("kaster IrrecoverableRestException uten retry") {
-                server.expect(times(1), requestTo(cfg.skjermingUri))
+                server.expect(times(1), requestTo(SKJERMING_URI))
                     .andRespond(withStatus(NOT_FOUND))
 
                 shouldThrow<IrrecoverableRestException> { tjeneste.skjerming(brukerId) }
@@ -198,7 +201,7 @@ class SkjermingTjenesteTest : DescribeSpec() {
                 }
 
                 it("logger WARN for hvert retry-forsøk ved RecoverableRestException") {
-                    server.expect(times(4), requestTo(cfg.skjermingUri))
+                    server.expect(times(4), requestTo(SKJERMING_URI))
                         .andRespond(withStatus(INTERNAL_SERVER_ERROR))
 
                     val logs = withLogCapture { shouldThrow<RecoverableRestException> { tjeneste.skjerming(brukerId) } }
@@ -207,7 +210,7 @@ class SkjermingTjenesteTest : DescribeSpec() {
                 }
 
                 it("logger WARN abort når alle retry-forsøk er brukt opp") {
-                    server.expect(times(4), requestTo(cfg.skjermingUri))
+                    server.expect(times(4), requestTo(SKJERMING_URI))
                         .andRespond(withStatus(INTERNAL_SERVER_ERROR))
 
                     val logs = withLogCapture { shouldThrow<RecoverableRestException> { tjeneste.skjerming(brukerId) } }
@@ -217,7 +220,7 @@ class SkjermingTjenesteTest : DescribeSpec() {
                 }
 
                 it("logger INFO for NotFoundRestException uten retry") {
-                    server.expect(times(1), requestTo(cfg.skjermingUri))
+                    server.expect(times(1), requestTo(SKJERMING_URI))
                         .andRespond(withStatus(NOT_FOUND))
 
                     val logs = withLogCapture {
@@ -229,5 +232,10 @@ class SkjermingTjenesteTest : DescribeSpec() {
                 }
             }
         }
+    }
+    companion object {
+        val SKJERMING_URI = uri(SKJERMING_PATH)
+        val SKJERMINGER_URI = uri(SKJERMING_BULK_PATH)
+        private fun uri(path: String) =  fromUriString("$SKJERMING_BASE$path").build().toUri()
     }
 }

@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.PING_PATH
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
@@ -9,12 +10,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
 
 @ConfigurationProperties(SKJERMING)
-class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH,
-                      enabled: Boolean = true) : CachableRestConfig,
-    AbstractRestConfig(baseUri, pingPath, SKJERMING, enabled) {
-
-    val skjermingUri = uri(DEFAULT_SKJERMING_PATH)
-    val skjermingerUri = uri(DEFAULT_SKJERMING_BULK_PATH)
+class SkjermingConfig : CachableRestConfig,
+    AbstractRestConfig(SKJERMING_BASE, PING_PATH, SKJERMING, true) {
 
     @Generated
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
@@ -22,12 +19,10 @@ class SkjermingConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH,
     override val caches = setOf(SKJERMING_CACHE)
 
     companion object {
+        val SKJERMING_BASE = URI.create("http://skjermede-personer-pip.nom")
         const val SKJERMING = "skjerming"
         const val IDENT = "personident"
         const val IDENTER = IDENT + "er"
-        private const val DEFAULT_PING_PATH = "internal/health/liveness"
-        private const val DEFAULT_SKJERMING_PATH = "skjermet"
-        private const val DEFAULT_SKJERMING_BULK_PATH = "skjermetBulk"
         val SKJERMING_CACHE = CachableConfig(SKJERMING)
     }
 }

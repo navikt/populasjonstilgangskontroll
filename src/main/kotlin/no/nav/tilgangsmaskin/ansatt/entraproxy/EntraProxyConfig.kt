@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
 
 @ConfigurationProperties(ENTRAPROXY)
-class EntraProxyConfig(enabled: Boolean = true) : AbstractRestConfig(PROXY_BASE, PING_PATH, GRAPH, enabled)
+class EntraProxyConfig : AbstractRestConfig(PROXY_BASE, PING_PATH, GRAPH, true)
 {
 
     @Generated

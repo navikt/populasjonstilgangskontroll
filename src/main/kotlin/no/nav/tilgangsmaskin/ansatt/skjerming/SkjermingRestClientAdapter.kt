@@ -4,7 +4,7 @@ import no.nav.tilgangsmaskin.felles.rest.Pingable
 import org.springframework.stereotype.Component
 
 @Component
-class SkjermingRestClientAdapter(private val client: SkjermingClient, private val cfg: SkjermingConfig) : Pingable{
+class SkjermingRestClientAdapter(private val client: SkjermingClient, private val cfg: SkjermingConfig) : Pingable {
 
     override val name = cfg.name
     override val pingEndpoint = "${cfg.pingEndpoint}"

@@ -13,14 +13,18 @@ import java.net.URI
 class SkjermingConfig : CachableRestConfig,
     AbstractRestConfig(SKJERMING_BASE, PING_PATH, SKJERMING, true) {
 
-    @Generated
-    override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
+
     override val navn = name
     override val caches = setOf(SKJERMING_CACHE)
+
+    @Generated
+    override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
         val SKJERMING_BASE = URI.create("http://skjermede-personer-pip.nom")
         const val SKJERMING = "skjerming"
         val SKJERMING_CACHE = CachableConfig(SKJERMING)
     }
+
+
 }

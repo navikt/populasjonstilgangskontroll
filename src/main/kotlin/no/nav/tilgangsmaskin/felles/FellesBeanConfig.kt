@@ -141,7 +141,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 
     companion object {
-        private val SENSITIVE_KEYS = setOf("password", "secret", "token", "key","credentials")
+        private val SENSITIVE_KEYS = setOf("password", "secret", "token", "key","credentials", "jwk","private_key")
 
         fun headerAddingRequestInterceptor(vararg verdier: Pair<String, String>) =
             ClientHttpRequestInterceptor { request, body, next ->

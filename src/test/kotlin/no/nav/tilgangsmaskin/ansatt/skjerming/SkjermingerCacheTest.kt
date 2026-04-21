@@ -7,9 +7,11 @@ import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.maps.shouldContainExactly
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjenesteTest.Companion.SKJERMINGER_URI
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
+import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.RetryLogger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -31,10 +33,9 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import java.time.Duration
 import java.time.Duration.ofSeconds
 
-@RestClientTest(components = [SkjermingRestClientAdapter::class, SkjermingClientBeanConfig::class, SkjermingTjeneste::class, RetryLogger::class])
+@RestClientTest(components = [SkjermingRestClientAdapter::class, SkjermingClientBeanConfig::class, SkjermingTjeneste::class, RetryLogger::class, DefaultRestErrorHandler::class])
 @EnableConfigurationProperties(SkjermingConfig::class)
 @EnableResilientMethods
-@TestPropertySource(properties = ["skjerming.base-uri=http://skjerming"])
 @Import(SkjermingerCacheTest.CacheTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class SkjermingerCacheTest : BehaviorSpec() {
@@ -70,7 +71,7 @@ class SkjermingerCacheTest : BehaviorSpec() {
         given("skjerminger") {
             `when`("noen identer er i cache") {
                 then("Rest kalles kun for cache-misser, treff hentes fra cache") {
-                    mockServer.expect(times(1), requestTo(cfg.skjermingerUri))
+                    mockServer.expect(times(1), requestTo(SKJERMINGER_URI))
                         .andRespond(withSuccess("""{"$I2":true}""", APPLICATION_JSON))
                     putOne(ID1, false)
                     skjerming.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to false, ID2 to true)
@@ -82,7 +83,7 @@ class SkjermingerCacheTest : BehaviorSpec() {
                 then("Rest kalles ikke") {
                     putOne(ID1, false)
                     putOne(ID2, true)
-                    mockServer.expect(never(), requestTo(cfg.skjermingerUri))
+                    mockServer.expect(never(), requestTo(SKJERMINGER_URI))
                     skjerming.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to false, ID2 to true)
                 }
             }
@@ -92,7 +93,7 @@ class SkjermingerCacheTest : BehaviorSpec() {
                     putOne(ID1, false)
                     putOne(ID2, true)
                     cache.delete(SKJERMING_CACHE, I2)
-                    mockServer.expect(times(1), requestTo(cfg.skjermingerUri))
+                    mockServer.expect(times(1), requestTo(SKJERMINGER_URI))
                         .andRespond(withSuccess("""{"$I2":true}""", APPLICATION_JSON))
 
                     skjerming.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to false, ID2 to true)

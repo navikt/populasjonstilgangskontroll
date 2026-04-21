@@ -18,9 +18,9 @@ interface SkjermingClient {
     fun ping(): Any
 
     companion object    {
-        const val SKJERMING_PATH = "skjermet"
-        const val SKJERMING_BULK_PATH = "skjermetBulk"
-        const val PING_PATH = "internal/health/liveness"
+        const val SKJERMING_PATH = "/skjermet"
+        const val SKJERMING_BULK_PATH = "/skjermetBulk"
+        const val PING_PATH = "/internal/health/liveness"
     }
 }
 

@@ -76,7 +76,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 
     @Bean
     fun sanitizingFunction() = SanitizingFunction { data ->
-        if (SENSITIVE_KEYS.any { data.key.contains(it, ignoreCase = true) }) data.withValue("******") else data
+        if (SENSITIVE_KEYS.any { data.key.equals(it, ignoreCase = true) }) data.withValue("******") else data
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -141,7 +141,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 
     companion object {
-        private val SENSITIVE_KEYS = setOf("password", "secret", "token", "credentials")
+        private val SENSITIVE_KEYS = setOf("password", "secret", "token", "key","credentials")
 
         fun headerAddingRequestInterceptor(vararg verdier: Pair<String, String>) =
             ClientHttpRequestInterceptor { request, body, next ->

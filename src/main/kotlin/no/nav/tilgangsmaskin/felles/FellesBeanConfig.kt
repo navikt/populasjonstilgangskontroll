@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.tilgang.Token
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
+import org.springframework.boot.actuate.endpoint.SanitizingFunction
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.Include.defaultIncludes
@@ -71,6 +72,11 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             DOWN in it -> DOWN
             else -> UP
         }
+    }
+
+    @Bean
+    fun sanitizingFunction() = SanitizingFunction { data ->
+        if (SENSITIVE_KEYS.any { data.key.contains(it, ignoreCase = true) }) data.withValue("******") else data
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -135,6 +141,8 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 
     companion object {
+        private val SENSITIVE_KEYS = setOf("password", "secret", "key", "token", "credentials")
+
         fun headerAddingRequestInterceptor(vararg verdier: Pair<String, String>) =
             ClientHttpRequestInterceptor { request, body, next ->
                 verdier.forEach { (key, value) -> request.headers.add(key, value) }

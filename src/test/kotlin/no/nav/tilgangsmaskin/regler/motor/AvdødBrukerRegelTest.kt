@@ -21,12 +21,15 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_OVER_24
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import no.nav.tilgangsmaskin.tilgang.Token
 import java.time.LocalDate.now
 
 class AvdødBrukerRegelTest : BehaviorSpec() {
 
     @MockK(relaxed = true)
     private lateinit var teller: AvdødTeller
+    @MockK
+    private lateinit var token: Token
     @MockK
     private lateinit var proxy: EntraProxyTjeneste
     @SpyK
@@ -44,7 +47,8 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
         }
         beforeEach {
             clearAllMocks()
-            regel = AvdødBrukerRegel(teller, proxy, auditor)
+            beforeEach { every { token.system } returns "system" }
+            regel = AvdødBrukerRegel(teller, proxy, auditor, token)
         }
 
         Given("Bruker lever") {

@@ -7,8 +7,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
 
 @ConfigurationProperties(PDLGRAPH)
-class PdlGraphQLConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) :
-    AbstractRestConfig(baseUri, pingPath, PdlConfig.PDL, enabled) {
+class PdlGraphQLConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH) :
+    AbstractRestConfig(baseUri, pingPath, PdlConfig.PDL) {
 
     @Generated
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"

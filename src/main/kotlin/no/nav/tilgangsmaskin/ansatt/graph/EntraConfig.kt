@@ -16,8 +16,7 @@ import java.time.Duration
 class EntraConfig(
     baseUri: URI,
     pingPath: String = DEFAULT_PING_PATH,
-    private val size: Int = DEFAULT_BATCH_SIZE,
-    enabled: Boolean = true) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, GRAPH, enabled) {
+    private val size: Int = DEFAULT_BATCH_SIZE) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, GRAPH) {
 
     override val caches = ENTRA_CACHES
     override val navn = name

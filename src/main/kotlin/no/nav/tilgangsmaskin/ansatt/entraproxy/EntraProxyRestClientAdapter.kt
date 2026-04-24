@@ -8,8 +8,7 @@ class EntraProxyRestClientAdapter(private val client: EntraProxyClient, private 
 
     override val name = cfg.name
     override val pingEndpoint = "${cfg.pingEndpoint}"
-    override val isEnabled = cfg.isEnabled
-    override fun ping() = if (cfg.isEnabled) client.ping() else "disabled"
+    override fun ping() =  client.ping()
 
     fun enhetForAnsatt(ansattId: String) = client.ansatt(ansattId).enhet
 

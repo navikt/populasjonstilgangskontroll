@@ -12,7 +12,6 @@ class PingableHealthIndicatorTest : DescribeSpec({
     class StubPingable(
         override val pingEndpoint: String = "http://example.com/ping",
         override val name: String = "test",
-        override val isEnabled: Boolean = true,
         val onPing: () -> Any? = { }
     ) : Pingable {
         var pinged = false
@@ -31,15 +30,6 @@ class PingableHealthIndicatorTest : DescribeSpec({
             health.status shouldBe UP
             health.details[ENDPOINT] shouldBe "http://example.com/ping"
             pingable.pinged shouldBe true
-        }
-
-        it("returnerer OUT_OF_SERVICE når isEnabled er false") {
-            val pingable = StubPingable(isEnabled = false)
-            val health = PingableHealthIndicator(pingable).health()
-
-            health.status shouldBe OUT_OF_SERVICE
-            health.details[ENDPOINT] shouldBe "http://example.com/ping"
-            pingable.pinged shouldBe false
         }
 
         it("returnerer DOWN når ping kaster exception") {

@@ -8,8 +8,7 @@ class VergemålRestClientAdapter(private val client: VergemålClient, private va
 
     override val name = cfg.name
     override val pingEndpoint = "${cfg.pingEndpoint}"
-    override val isEnabled = cfg.isEnabled
-    override fun ping() = if (cfg.isEnabled) client.ping() else "disabled"
+    override fun ping() = client.ping()
 
     fun vergemål(ident: String) =
         client.vergemål(VergemålIdent(ident))

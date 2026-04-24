@@ -71,15 +71,6 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             }
         }
 
-
-    @Bean
-    fun outOfServiceIgnoringStatusAggregator() = StatusAggregator {
-        when {
-            DOWN in it -> DOWN
-            else -> UP
-        }
-    }
-
     @Bean
     fun sanitizingFunction() = SanitizingFunction { data ->
         if (SENSITIVE_KEYS.any { data.key.contains(it, ignoreCase = true) }) data.withValue("******") else data

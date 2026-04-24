@@ -11,7 +11,7 @@ import java.net.URI
 import java.time.Duration
 
 @ConfigurationProperties(VERGEMÅL)
-class VergemålConfig : CachableRestConfig, AbstractRestConfig(VERGEMÅL_BASE, PING_PATH, VERGEMÅL, true) {
+class VergemålConfig : CachableRestConfig, AbstractRestConfig(VERGEMÅL_BASE, PING_PATH, VERGEMÅL) {
 
     override val navn = VERGEMÅL
     override val caches = setOf(VERGE_CACHE)

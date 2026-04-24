@@ -8,10 +8,9 @@ class SkjermingRestClientAdapter(private val client: SkjermingClient, private va
 
     override val name = cfg.name
     override val pingEndpoint = "${cfg.pingEndpoint}"
-    override val isEnabled = cfg.isEnabled
 
     override fun ping() =
-        if (cfg.isEnabled) client.ping() else "disabled"
+        client.ping()
 
     fun skjerming(id: String) =
         client.skjerming(mapOf(IDENT to id))

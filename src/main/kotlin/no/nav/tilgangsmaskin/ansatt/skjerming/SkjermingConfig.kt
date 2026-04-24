@@ -11,7 +11,7 @@ import java.net.URI
 
 @ConfigurationProperties(SKJERMING)
 class SkjermingConfig : CachableRestConfig,
-    AbstractRestConfig(SKJERMING_BASE, PING_PATH, SKJERMING, true) {
+    AbstractRestConfig(SKJERMING_BASE, PING_PATH, SKJERMING) {
 
 
     override val navn = name

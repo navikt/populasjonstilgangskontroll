@@ -14,8 +14,7 @@ class PdlConfig(
     baseUri: URI,
     pingPath: String = DEFAULT_PING_PATH,
     personPath: String = DEFAULT_PERSON_PATH,
-    personBolkPath: String = DEFAULT_PERSON__BOLK_PATH,
-    enabled: Boolean = true) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, PDL, enabled) {
+    personBolkPath: String = DEFAULT_PERSON__BOLK_PATH) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, PDL) {
 
     override val caches = PDL_CACHES
     override val navn = name

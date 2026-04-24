@@ -6,16 +6,15 @@ import java.net.URI
 
 abstract class AbstractRestConfig(
         val baseUri: URI,
-        private val pingPath: String = "",
-        val name: String,
-        val isEnabled: Boolean = true) {
+        private val pingPath: String,
+        val name: String) {
 
-    fun builder() = DefaultUriBuilderFactory("$baseUri").builder()
+    protected fun builder() = DefaultUriBuilderFactory("$baseUri").builder()
 
     protected fun uri(path: String) = builder().path(path).build()
 
     val pingEndpoint = builder().path(pingPath).build()
     @Generated
-    override fun toString() = "name=$name, pingPath=$pingPath,enabled=$isEnabled,baseUri=$baseUri"
+    override fun toString() = "name=$name, pingPath=$pingPath,baseUri=$baseUri"
 }
 

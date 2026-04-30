@@ -15,6 +15,6 @@ class EntraProxyBeanConfig {
         createClient<EntraProxyClient>(cfg, b, errorHandler)
 
     @Bean
-    fun entraProxyHealthIndicator(a: EntraProxyRestClientAdapter) =
-        PingableHealthIndicator(a)
+    fun entraProxyHealthIndicator(pingable: EntraProxyPingable) =
+        PingableHealthIndicator(pingable)
 }

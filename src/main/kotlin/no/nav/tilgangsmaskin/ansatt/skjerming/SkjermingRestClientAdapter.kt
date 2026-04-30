@@ -1,16 +1,10 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
-import no.nav.tilgangsmaskin.felles.rest.Pingable
+import no.nav.tilgangsmaskin.felles.rest.AbstractPingable
 import org.springframework.stereotype.Component
 
 @Component
-class SkjermingRestClientAdapter(private val client: SkjermingClient, private val cfg: SkjermingConfig) : Pingable {
-
-    override val name = cfg.name
-    override val pingEndpoint = "${cfg.pingEndpoint}"
-
-    override fun ping() =
-        client.ping()
+class SkjermingRestClientAdapter(private val client: SkjermingClient, cfg: SkjermingConfig) : AbstractPingable(cfg, client::ping) {
 
     fun skjerming(id: String) =
         client.skjerming(mapOf(IDENT to id))
@@ -19,7 +13,7 @@ class SkjermingRestClientAdapter(private val client: SkjermingClient, private va
         if (ids.isEmpty()) emptyMap()
         else client.skjerminger(mapOf(IDENTER to ids))
 
-    private companion object  {
+    private companion object {
         private const val IDENT = "personident"
         private const val IDENTER = IDENT + "er"
     }

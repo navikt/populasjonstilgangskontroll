@@ -31,7 +31,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
 
-@RestClientTest(components = [EntraProxyRestClientAdapter::class, EntraProxyBeanConfig::class, EntraProxyTjeneste::class, DefaultRestErrorHandler::class])
+@RestClientTest(components = [EntraProxyPingable::class,EntraProxyClient::class, EntraProxyBeanConfig::class, EntraProxyTjeneste::class, DefaultRestErrorHandler::class])
 @EnableConfigurationProperties(EntraProxyConfig::class)
 @ApplyExtension(SpringExtension::class)
 class EntraProxyTjenesteTest : BehaviorSpec() {

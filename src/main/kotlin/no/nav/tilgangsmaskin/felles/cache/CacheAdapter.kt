@@ -3,11 +3,12 @@ package no.nav.tilgangsmaskin.felles.cache
 import no.nav.tilgangsmaskin.felles.rest.Pingable
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.stereotype.Component
+import java.net.URI
 
 @Component
 class CacheAdapter(private val cf: RedisConnectionFactory, cfg: CacheConfig) : Pingable {
 
-    override val pingEndpoint  =  "${cfg.host}:${cfg.port}"
+    override val pingEndpoint  =  URI.create("${cfg.host}:${cfg.port}")
     override val name = "Cache"
 
     override fun ping() =

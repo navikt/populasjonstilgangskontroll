@@ -1,8 +1,10 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import java.net.URI
+
 interface Pingable {
 
     fun ping(): Any?
-    val pingEndpoint: String
+    val pingEndpoint: URI
     val name: String
 }

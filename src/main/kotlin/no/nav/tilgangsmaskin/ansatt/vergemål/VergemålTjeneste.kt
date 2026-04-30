@@ -9,15 +9,19 @@ import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableService
 import org.springframework.cache.annotation.Cacheable
 
 @RetryingWhenRecoverableService
-class VergemålTjeneste( private val nom: NomTjeneste,private val adapter: VergemålRestClientAdapter)  {
+class VergemålTjeneste(private val nom: NomTjeneste, private val client: VergemålClient) {
 
     @WithSpan
-    @Cacheable(cacheNames = [VERGEMÅL],  key = "#ansattId.verdi")
+    @Cacheable(cacheNames = [VERGEMÅL], key = "#ansattId.verdi")
     fun vergemål(ansattId: AnsattId) =
-        nom.fnrForAnsatt(ansattId)?.let { adapter.vergemål(it.verdi) } ?: emptySet()
+        nom.fnrForAnsatt(ansattId)?.let { fnr ->
+            client.vergemål(VergemålIdent(fnr.verdi))
+                .mapTo(mutableSetOf()) { it.vergehaver }
+                .toSet()
+        } ?: emptySet()
 
     @Generated
-    override fun toString() = "${javaClass.simpleName} [adapter=$adapter]"
+    override fun toString() = "${javaClass.simpleName} [client=$client]"
 }
 
 

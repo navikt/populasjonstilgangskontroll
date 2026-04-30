@@ -21,14 +21,14 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
     private fun up() =
         with(pingable) {
             Health.up()
-                .withDetail(ENDPOINT, pingEndpoint)
+                .withDetail(ENDPOINT, pingEndpoint.toString())
                 .build()
         }
 
     private fun down(e: Throwable) =
         with(pingable) {
             Health.down()
-                .withDetail(ENDPOINT, pingEndpoint)
+                .withDetail(ENDPOINT, pingEndpoint.toString())
                 .withException(e)
                 .build()
         }

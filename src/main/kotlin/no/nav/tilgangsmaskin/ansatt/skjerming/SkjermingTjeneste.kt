@@ -12,14 +12,14 @@ import org.springframework.cache.annotation.Cacheable
 
 @RetryingWhenRecoverableService
 class SkjermingTjeneste(
-    private val adapter: SkjermingRestClientAdapter,
+    private val client: SkjermingClient,
     private val cache: CacheOperations,
     private val cf: SkjermingConfig,
 ) {
 
     @Cacheable(cacheNames = [SKJERMING], key = "#brukerId.verdi")
     @WithSpan
-    fun skjerming(brukerId: BrukerId) = adapter.skjerming(brukerId.verdi)
+    fun skjerming(brukerId: BrukerId) = client.skjerming(mapOf(IDENT to brukerId.verdi))
 
     @WithSpan
     fun skjerminger(brukerIds: List<BrukerId>): Map<BrukerId, Boolean> {
@@ -28,7 +28,7 @@ class SkjermingTjeneste(
         log.trace("Hentet ${fraCache.size} skjerming(er) av ${ids.size} mulige fra $SKJERMING")
         if (fraCache.size == ids.size) return fraCache.mapKeys { BrukerId(it.key) }.mapValues { it.value }
 
-        val fraRest = adapter.skjerminger(ids - fraCache.keys)
+        val fraRest = client.skjerminger(mapOf(IDENTER to (ids - fraCache.keys)))
         log.trace("Hentet ${fraRest.size} skjerming(er) av ${ids.size - fraCache.size} mulige fra REST")
         cache.putMany(SKJERMING_CACHE, fraRest, cf.varighet)
         return (fraRest + fraCache).mapKeys { BrukerId(it.key) }.mapValues { it.value }
@@ -41,6 +41,7 @@ class SkjermingTjeneste(
 
     companion object {
         private val log = getLogger(SkjermingTjeneste::class.java)
+        private const val IDENT = "personident"
+        private const val IDENTER = IDENT + "er"
     }
 }
-

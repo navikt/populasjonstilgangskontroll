@@ -7,12 +7,12 @@ import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.stereotype.Component
 import java.net.URI
 
-@ConfigurationProperties(SKJERMING)
+@Component
 class SkjermingConfig : CachableRestConfig,
     AbstractRestConfig(SKJERMING_BASE, PING_PATH, SKJERMING) {
-
 
     override val navn = name
     override val caches = setOf(SKJERMING_CACHE)
@@ -25,6 +25,4 @@ class SkjermingConfig : CachableRestConfig,
         const val SKJERMING = "skjerming"
         val SKJERMING_CACHE = CachableConfig(SKJERMING)
     }
-
-
 }

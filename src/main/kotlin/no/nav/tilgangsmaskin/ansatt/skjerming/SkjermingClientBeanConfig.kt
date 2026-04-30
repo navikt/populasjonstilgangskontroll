@@ -15,5 +15,5 @@ class SkjermingClientBeanConfig {
         createClient<SkjermingClient>(cfg, b, errorHandler)
 
     @Bean
-    fun skjermingHealthIndicator(a: SkjermingRestClientAdapter) = PingableHealthIndicator(a)
+    fun skjermingHealthIndicator(pingable: SkjermingPingable) = PingableHealthIndicator(pingable)
 }

@@ -24,7 +24,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
-import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.client.ExpectedCount.never
 import org.springframework.test.web.client.ExpectedCount.times
 import org.springframework.test.web.client.MockRestServiceServer
@@ -33,8 +32,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import java.time.Duration
 import java.time.Duration.ofSeconds
 
-@RestClientTest(components = [SkjermingRestClientAdapter::class, SkjermingClientBeanConfig::class, SkjermingTjeneste::class, RetryLogger::class, DefaultRestErrorHandler::class])
-@EnableConfigurationProperties(SkjermingConfig::class)
+@RestClientTest(components = [SkjermingPingable::class, SkjermingClientBeanConfig::class,SkjermingConfig::class, SkjermingClient::class,SkjermingTjeneste::class, RetryLogger::class, DefaultRestErrorHandler::class])
 @EnableResilientMethods
 @Import(SkjermingerCacheTest.CacheTestConfig::class)
 @ApplyExtension(SpringExtension::class)

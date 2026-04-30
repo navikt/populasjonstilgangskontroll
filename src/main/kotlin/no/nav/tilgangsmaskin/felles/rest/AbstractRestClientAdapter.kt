@@ -21,7 +21,7 @@ abstract class AbstractRestClientAdapter(
     protected val log = getLogger(javaClass)
 
     override val name = cfg.name
-    override val pingEndpoint = "${cfg.pingEndpoint}"
+    override val pingEndpoint = cfg.pingEndpoint
     override fun ping() = get<Any>(cfg.pingEndpoint, client = pingRestClient)
 
     protected inline fun <reified T : Any> get(uri: URI, headers: Map<String, String> = emptyMap(), handler: ErrorHandler = errorHandler, client: RestClient = restClient) =

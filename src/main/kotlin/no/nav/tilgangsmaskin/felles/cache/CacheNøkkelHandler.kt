@@ -25,9 +25,7 @@ class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration?>, va
     fun idFraNøkkel(nøkkel: String) = CacheNøkkelElementer(nøkkel).id
 
     private fun prefixFor(cache: CachableConfig): String =
-        configs[cache.name]?.getKeyPrefixFor(cache.name).also {
-            log.debug("Prefix for cache ${cache.name} er: $it")
-        }
+        configs[cache.name]?.getKeyPrefixFor(cache.name)
             ?: error("Ingen cache med navn ${cache.name}")
 
 }

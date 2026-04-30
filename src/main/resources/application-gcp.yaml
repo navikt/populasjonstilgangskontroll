@@ -188,9 +188,10 @@ pdlgraph:
 pdl:
   scope: "api://${nais.cluster.type}-fss.pdl.pdl-pip-api/.default"
   base-uri: "https://${pdl}"
+
 skjerming:
-  base-uri: "http://skjermede-personer-pip.nom"
   scope: "api://${nais.cluster.type}-gcp.nom.skjermede-personer-pip/.default"
+
 graph:
   scope: https://graph.microsoft.com/.default
   base-uri: https://graph.microsoft.com/v1.0/

@@ -9,10 +9,8 @@ import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
 
-@ConfigurationProperties(SKJERMING)
 class SkjermingConfig : CachableRestConfig,
     AbstractRestConfig(SKJERMING_BASE, PING_PATH, SKJERMING) {
-
 
     override val navn = name
     override val caches = setOf(SKJERMING_CACHE)

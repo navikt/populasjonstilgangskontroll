@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
-import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.cache.CacheManager
@@ -15,7 +14,9 @@ import org.springframework.resilience.annotation.EnableResilientMethods
 @EnableResilientMethods
 class SkjermingTestConfig {
     @Bean
-    fun cacheManager(): CacheManager = ConcurrentMapCacheManager(SKJERMING)
+    fun cacheManager()
+    = ConcurrentMapCacheManager(SKJERMING)
     @Bean
-    fun cache(cacheManager: CacheManager): CacheOperations = ConcurrentMapCacheOperations(cacheManager)
+    fun cache(mgr: CacheManager)
+    = ConcurrentMapCacheOperations(mgr)
 }

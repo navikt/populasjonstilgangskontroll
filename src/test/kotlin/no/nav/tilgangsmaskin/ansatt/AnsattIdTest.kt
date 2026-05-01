@@ -1,22 +1,30 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 
-class AnsattIdTest : DescribeSpec({
-    describe("AnsattId") {
-        it("Gyldig ansattId OK") {
-            AnsattId("A123456").verdi shouldBe "A123456"
+class AnsattIdTest : BehaviorSpec({
+    Given("en AnsattId") {
+        When("format er gyldig") {
+            Then("opprettes uten feil") {
+                AnsattId("A123456").verdi shouldBe "A123456"
+            }
         }
-        it("ansattId med ugyldig lengde skal kaste IllegalArgumentException") {
-            shouldThrow<IllegalArgumentException> { AnsattId("A12345") }
+        When("lengden er ugyldig") {
+            Then("kaster IllegalArgumentException") {
+                shouldThrow<IllegalArgumentException> { AnsattId("A12345") }
+            }
         }
-        it("ansattId uten bokstav først skal kaste IllegalArgumentException") {
-            shouldThrow<IllegalArgumentException> { AnsattId("&123456") }
+        When("første tegn ikke er en bokstav") {
+            Then("kaster IllegalArgumentException") {
+                shouldThrow<IllegalArgumentException> { AnsattId("&123456") }
+            }
         }
-        it("ansattId uten 6 tall etter første bokstav skal kaste IllegalArgumentException") {
-            shouldThrow<IllegalArgumentException> { AnsattId("A12345a") }
+        When("tegnene etter bokstaven ikke er 6 siffer") {
+            Then("kaster IllegalArgumentException") {
+                shouldThrow<IllegalArgumentException> { AnsattId("A12345a") }
+            }
         }
     }
 })

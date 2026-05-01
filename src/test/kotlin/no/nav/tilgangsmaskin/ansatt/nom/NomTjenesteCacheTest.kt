@@ -112,6 +112,7 @@ class NomTjenesteCacheTest : BehaviorSpec() {
 
                     first shouldBe null
                     second shouldBe null
+                    cache.getOne(NOM_CACHE, id.verdi, BrukerId::class) shouldBe null
                 }
             }
 

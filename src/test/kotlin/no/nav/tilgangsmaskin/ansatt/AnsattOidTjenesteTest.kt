@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.ansatt
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste.Companion.ENTRA_OID
@@ -33,7 +33,7 @@ import java.util.UUID
 @Import(AnsattOidTjenesteTest.CacheConfig::class)
 @TestPropertySource(properties = ["graph.base-uri=http://graph"])
 @ApplyExtension(SpringExtension::class)
-class AnsattOidTjenesteTest : DescribeSpec() {
+class AnsattOidTjenesteTest : BehaviorSpec() {
 
     @TestConfiguration
     @EnableCaching(proxyTargetClass = true)
@@ -46,66 +46,73 @@ class AnsattOidTjenesteTest : DescribeSpec() {
     @Autowired lateinit var cfg: EntraConfig
     @Autowired lateinit var cacheManager: CacheManager
 
-    private val ansattId = AnsattId("Z999999")
-    private val oid = UUID.fromString("11111111-1111-1111-1111-111111111111")
-
-    private fun oidRespons(vararg ids: UUID) = """{ "value": [${ids.joinToString(",") { """{ "id": "$it" }""" }}] }"""
-
     init {
         beforeEach {
             server.reset()
             cacheManager.getCache(ENTRA_OID)?.clear()
         }
+        afterEach { server.verify() }
 
-        describe("oidFraEntra") {
+        Given("oidFraEntra") {
+            When("ansatt har én oid i Entra") {
+                Then("returnerer oid") {
+                    server.expect(requestTo(cfg.userURI(ansattId.verdi)))
+                        .andExpect(method(GET))
+                        .andRespond(withSuccess(oidRespons(OID), APPLICATION_JSON))
 
-            it("returnerer oid for gyldig ansatt") {
-                server.expect(requestTo(cfg.userURI(ansattId.verdi)))
-                    .andExpect(method(GET))
-                    .andRespond(withSuccess(oidRespons(oid), APPLICATION_JSON))
-
-                tjeneste.oidFraEntra(ansattId) shouldBe oid
-                server.verify()
+                    tjeneste.oidFraEntra(ansattId) shouldBe OID
+                }
             }
 
-            it("cacher resultatet slik at REST ikke kalles på nytt for samme ansatt") {
-                server.expect(requestTo(cfg.userURI(ansattId.verdi)))
-                    .andExpect(method(GET))
-                    .andRespond(withSuccess(oidRespons(oid), APPLICATION_JSON))
+            When("samme ansatt slås opp to ganger") {
+                Then("REST kalles kun én gang — andre svar returneres fra cache") {
+                    server.expect(requestTo(cfg.userURI(ansattId.verdi)))
+                        .andExpect(method(GET))
+                        .andRespond(withSuccess(oidRespons(OID), APPLICATION_JSON))
 
-                tjeneste.oidFraEntra(ansattId) shouldBe oid
-                tjeneste.oidFraEntra(ansattId) shouldBe oid
-                server.verify()
+                    tjeneste.oidFraEntra(ansattId) shouldBe OID
+                    tjeneste.oidFraEntra(ansattId) shouldBe OID
+                }
             }
 
-            it("kaster EntraOidException når ingen oid finnes i Entra") {
-                server.expect(requestTo(cfg.userURI(ansattId.verdi)))
-                    .andExpect(method(GET))
-                    .andRespond(withSuccess("""{ "value": [] }""", APPLICATION_JSON))
+            When("ingen oid finnes i Entra") {
+                Then("kaster EntraOidException") {
+                    server.expect(requestTo(cfg.userURI(ansattId.verdi)))
+                        .andExpect(method(GET))
+                        .andRespond(withSuccess("""{ "value": [] }""", APPLICATION_JSON))
 
-                shouldThrow<Exception> { tjeneste.oidFraEntra(ansattId) }
-                server.verify()
+                    shouldThrow<Exception> { tjeneste.oidFraEntra(ansattId) }
+                }
             }
 
-            it("kaster EntraOidException når flere oids finnes for samme ansatt") {
-                val oid2 = UUID.fromString("22222222-2222-2222-2222-222222222222")
-                server.expect(requestTo(cfg.userURI(ansattId.verdi)))
-                    .andExpect(method(GET))
-                    .andRespond(withSuccess(oidRespons(oid, oid2), APPLICATION_JSON))
+            When("flere oids finnes for samme ansatt") {
+                Then("kaster EntraOidException") {
+                    val oid2 = UUID.fromString("22222222-2222-2222-2222-222222222222")
+                    server.expect(requestTo(cfg.userURI(ansattId.verdi)))
+                        .andExpect(method(GET))
+                        .andRespond(withSuccess(oidRespons(OID, oid2), APPLICATION_JSON))
 
-                shouldThrow<Exception> { tjeneste.oidFraEntra(ansattId) }
-                server.verify()
+                    shouldThrow<Exception> { tjeneste.oidFraEntra(ansattId) }
+                }
             }
 
-            it("propagerer feil fra Entra") {
-                server.expect(requestTo(cfg.userURI(ansattId.verdi)))
-                    .andExpect(method(GET))
-                    .andRespond(withServerError())
+            When("Entra returnerer 500") {
+                Then("propagerer feilen") {
+                    server.expect(requestTo(cfg.userURI(ansattId.verdi)))
+                        .andExpect(method(GET))
+                        .andRespond(withServerError())
 
-                shouldThrow<Exception> { tjeneste.oidFraEntra(ansattId) }
-                server.verify()
+                    shouldThrow<Exception> { tjeneste.oidFraEntra(ansattId) }
+                }
             }
         }
     }
-}
 
+    private fun oidRespons(vararg ids: UUID) =
+        """{ "value": [${ids.joinToString(",") { """{ "id": "$it" }""" }}] }"""
+
+    companion object {
+        private val ansattId = AnsattId("Z999999")
+        private val OID = UUID.fromString("11111111-1111-1111-1111-111111111111")
+    }
+}

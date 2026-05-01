@@ -25,8 +25,8 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
 
     @Caching(
         put = [
-            CachePut(cacheNames = [OPPFØLGING], key = "#identer.aktorId.verdi"),
-            CachePut(cacheNames = [OPPFØLGING], key = "#identer.brukerId.verdi")
+            CachePut(value =[OPPFØLGING], key = "#identer.aktorId.verdi"),
+            CachePut(value = [OPPFØLGING], key = "#identer.brukerId.verdi")
         ]
     )
     fun registrer(id: UUID, identer: Identer, kontor: Kontor, tidspunkt: Instant = now()) =
@@ -36,8 +36,8 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
 
     @Caching(
         evict = [
-            CacheEvict(cacheNames = [OPPFØLGING], key = "#identer.aktorId.verdi"),
-            CacheEvict(cacheNames = [OPPFØLGING], key = "#identer.brukerId.verdi")
+            CacheEvict(value = [OPPFØLGING], key = "#identer.aktorId.verdi"),
+            CacheEvict(value = [OPPFØLGING], key = "#identer.brukerId.verdi")
         ]
     )
     fun avslutt(id: UUID, identer: Identer) =

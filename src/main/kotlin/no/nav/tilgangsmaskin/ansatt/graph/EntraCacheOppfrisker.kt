@@ -25,13 +25,13 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
         val ansattId = AnsattId(nøkkel.id)
         put(USER_ID, ansattId.verdi)
         val oid = oidTjeneste.oidFraEntra(ansattId)
-        this.runCatching {
+        runCatching {
             oppfrisk(ansattId, oid, nøkkel.metode)
-        }.getOrElse {
-            if (it is NotFoundRestException) {
+        }.onFailure { t ->
+            if (t is NotFoundRestException) {
                 tømOgOppfrisk(ansattId, oid, nøkkel.metode)
             } else {
-                log.warn("Oppfrisking av ${nøkkel.masked} feilet", it)
+                failure(nøkkel, t)
             }
         }
     }

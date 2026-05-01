@@ -13,7 +13,7 @@ data class OppfølgingHendelse(
     val aktorId: AktørId,
     val ident: BrukerId,
     val startTidspunkt: Instant,
-    val sluttTidspunkt: Instant?, // Nullable, always null on start messages
+    val sluttTidspunkt: Instant?, 
     val producerTimestamp: Instant) {
 
     enum class EndringType {

@@ -21,11 +21,11 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
         groupId = OPPFØLGING,
         errorHandler = OPPFØLGING_ERROR_HANDLER)
 
-    fun listen(hendelse: OppfølgingHendelse) =
-        when (hendelse.sisteEndringsType) {
-            OPPFOLGING_STARTET -> registrer(hendelse, "Oppfølging startet")
-            ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> registrer(hendelse, "Oppfølging endret")
-            OPPFOLGING_AVSLUTTET -> avslutt(hendelse,"Oppfølging avsluttet")
+    fun listen(h: OppfølgingHendelse) =
+        when (h.sisteEndringsType) {
+            OPPFOLGING_STARTET -> registrer(h, "Oppfølging startet")
+            ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> registrer(h, "Oppfølging endret")
+            OPPFOLGING_AVSLUTTET -> avslutt(h,"Oppfølging avsluttet")
         }
 
     private fun registrer(hendelse: OppfølgingHendelse, melding: String) =

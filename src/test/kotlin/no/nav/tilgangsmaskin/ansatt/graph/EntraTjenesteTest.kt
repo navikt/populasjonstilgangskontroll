@@ -12,14 +12,12 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.entries
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjenesteTest.CacheConfig
+import no.nav.tilgangsmaskin.felles.cache.AbstractCacheTestConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.cache.CacheManager
-import org.springframework.cache.annotation.EnableCaching
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -31,20 +29,15 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.request
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import java.util.*
 
-@RestClientTest(components = [EntraRestClientAdapter::class, EntraClientBeanConfig::class, EntraProxyConfig::class,EntraTjeneste::class])
-@EnableConfigurationProperties(EntraConfig::class)
+@RestClientTest(components = [EntraRestClientAdapter::class, EntraClientBeanConfig::class, EntraProxyConfig::class, EntraConfig::class,EntraTjeneste::class])
 @Import(CacheConfig::class)
-@TestPropertySource(properties = ["graph.base-uri=http://graph"])
 @ApplyExtension(SpringExtension::class)
 class EntraTjenesteTest : BehaviorSpec() {
 
-    @TestConfiguration
-    @EnableCaching
+
     @EnableResilientMethods
-    class CacheConfig {
-        @Bean
-        fun cacheManager(): CacheManager = ConcurrentMapCacheManager(GRAPH)
-    }
+    @TestConfiguration
+    class CacheConfig : AbstractCacheTestConfig(GRAPH)
 
     @MockkBean
     @Suppress("unused")

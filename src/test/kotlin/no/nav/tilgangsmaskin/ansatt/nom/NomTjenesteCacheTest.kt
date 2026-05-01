@@ -12,6 +12,7 @@ import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
 import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM_CACHE
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjenesteCacheTest.CacheTestNomConfig
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.cache.AbstractCacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants
@@ -19,6 +20,7 @@ import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
@@ -26,6 +28,7 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
+import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -41,13 +44,10 @@ import java.time.LocalDate.now
 @ApplyExtension(SpringExtension::class)
 class NomTjenesteCacheTest : BehaviorSpec() {
 
-    @Configuration
-    class CacheTestNomConfig {
-        @Bean
-        fun cacheManager(): CacheManager = ConcurrentMapCacheManager(NOM)
-        @Bean
-        fun cacheOperations(cacheManager: CacheManager): CacheOperations = ConcurrentMapCacheOperations(cacheManager)
-    }
+    @EnableCaching
+    @EnableResilientMethods
+    @TestConfiguration
+    class CacheTestNomConfig : AbstractCacheTestConfig(NOM)
 
     @MockkBean
     private lateinit var token: Token
@@ -58,7 +58,7 @@ class NomTjenesteCacheTest : BehaviorSpec() {
     @Autowired
     private lateinit var repo: NomRepository
 
-    @Autowired @Qualifier("cacheOperations")
+    @Autowired
     private lateinit var cache: CacheOperations
 
     @Autowired

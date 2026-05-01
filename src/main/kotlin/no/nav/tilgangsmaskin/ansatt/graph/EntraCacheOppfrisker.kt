@@ -11,7 +11,7 @@ import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Compani
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.regler.motor.OppfriskingTeller
 import org.slf4j.LoggerFactory.getLogger
-import org.slf4j.MDC
+import org.slf4j.MDC.put
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -21,20 +21,16 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
     private val log = getLogger(javaClass)
     override val cacheName = GRAPH
 
-    override fun doOppfrisk(nøkkel: CacheNøkkel)  =
-        oppfriskMedMetode(nøkkel, nøkkel.metode)
-
-    private fun oppfriskMedMetode(nøkkel: CacheNøkkel, metode: String?) {
+    override fun doOppfrisk(nøkkel: CacheNøkkel) {
         val ansattId = AnsattId(nøkkel.id)
-        MDC.put(USER_ID, ansattId.verdi)
-        val oid  = oidTjeneste.oidFraEntra(ansattId)
-        runCatching {
-            oppfrisk(ansattId, oid, metode)
+        put(USER_ID, ansattId.verdi)
+        val oid = oidTjeneste.oidFraEntra(ansattId)
+        this.runCatching {
+            oppfrisk(ansattId, oid, nøkkel.metode)
         }.getOrElse {
             if (it is NotFoundRestException) {
-                tømOgOppfrisk(ansattId, oid, metode)
-            }
-            else {
+                tømOgOppfrisk(ansattId, oid, nøkkel.metode)
+            } else {
                 log.warn("Oppfrisking av ${nøkkel.masked} feilet", it)
             }
         }
@@ -43,9 +39,10 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
     private fun tømOgOppfrisk(ansattId: AnsattId, oid: UUID, metode: String?) {
         log.warn("${ansattId.verdi} med oid $oid ikke funnet i Entra, sletter og oppfrisker cache innslag")
         cache.delete(OID_CACHE, ansattId.verdi)
-        val nyoid = oidTjeneste.oidFraEntra(ansattId)
-        log.info("Oppfrisking oid OK for ${ansattId.verdi}, ny verdi er $nyoid")
-        oppfrisk(ansattId, nyoid, metode)
+        with(oidTjeneste.oidFraEntra(ansattId)) {
+            log.info("Oppfrisking oid OK for ${ansattId.verdi}, ny verdi er $this")
+            oppfrisk(ansattId, this, metode)
+        }
         teller.tell()
     }
 

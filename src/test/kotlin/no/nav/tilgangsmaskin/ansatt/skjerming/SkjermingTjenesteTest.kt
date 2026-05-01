@@ -15,9 +15,12 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.SKJERMING_BULK_PATH
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.SKJERMING_PATH
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_BASE
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjenesteTest.SkjermingTestConfig
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.cache.AbstractCacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
@@ -25,10 +28,13 @@ import no.nav.tilgangsmaskin.felles.rest.RetryLogger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.web.client.ExpectedCount.never
 import org.springframework.test.web.client.ExpectedCount.times
 import org.springframework.test.web.client.MockRestServiceServer
@@ -51,6 +57,11 @@ class SkjermingTjenesteTest : BehaviorSpec() {
     lateinit var cfg: SkjermingConfig
     @Autowired
     lateinit var cache: CacheOperations
+
+    @EnableCaching
+    @EnableResilientMethods
+    @TestConfiguration
+    class SkjermingTestConfig  : AbstractCacheTestConfig(SKJERMING)
 
     init {
         beforeEach {

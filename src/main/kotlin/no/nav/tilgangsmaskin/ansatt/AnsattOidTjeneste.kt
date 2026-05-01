@@ -10,7 +10,6 @@ import java.time.Duration
 @Component
 class AnsattOidTjeneste(private val adapter: EntraRestClientAdapter) : CachableRestConfig {
 
-
     @Cacheable(cacheNames = [ENTRA_OID],key = "#ansattId.verdi")
      fun oidFraEntra(ansattId: AnsattId) = adapter.oidFraEntra(ansattId.verdi)
 

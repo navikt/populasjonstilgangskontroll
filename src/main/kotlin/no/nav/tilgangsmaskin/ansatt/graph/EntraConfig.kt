@@ -2,20 +2,16 @@ package no.nav.tilgangsmaskin.ansatt.graph
 
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste.Companion.ENTRA_OID
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.uuids
-import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
-import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.stereotype.Component
 import java.net.URI
 import java.time.Duration
 
-@ConfigurationProperties(GRAPH)
-class EntraConfig(
-    baseUri: URI,
-    pingPath: String = DEFAULT_PING_PATH,
-    private val size: Int = DEFAULT_BATCH_SIZE) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, GRAPH) {
+@Component
+class EntraConfig: CachableRestConfig, AbstractRestConfig(GRAPH_BASE_URI, DEFAULT_PING_PATH, GRAPH) {
 
     override val caches = ENTRA_CACHES
     override val navn = name
@@ -43,7 +39,7 @@ class EntraConfig(
             path(GRUPPER_PATH)
             queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
             queryParam(PARAM_NAME_COUNT, "true")
-            queryParam(PARAM_NAME_TOP, size)
+            queryParam(PARAM_NAME_TOP, BATCH_SIZE)
             queryParam(PARAM_NAME_FILTER, filter)
         }.build(ansattId)
 
@@ -54,9 +50,10 @@ class EntraConfig(
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
+        val GRAPH_BASE_URI = URI.create("https://graph.microsoft.com/v1.0/")
         const val GEO_PREFIX = "startswith(displayName,'0000-GA-GEO') or startswith(displayName,'0000-GA-ENHET') "
         const val GRAPH = "graph"
-        private const val DEFAULT_BATCH_SIZE = 250
+        private const val BATCH_SIZE = 250
         private const val USERS_PATH = "/users"
         private const val GRUPPER_PATH = "/users/{ansattId}/memberOf"
         private const val PARAM_NAME_SELECT = "\$select"

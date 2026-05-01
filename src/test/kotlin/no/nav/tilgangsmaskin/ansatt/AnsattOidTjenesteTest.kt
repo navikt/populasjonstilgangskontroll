@@ -6,21 +6,20 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste.Companion.ENTRA_OID
+import no.nav.tilgangsmaskin.ansatt.AnsattOidTjenesteTest.EntraCacheConfig
 import no.nav.tilgangsmaskin.ansatt.graph.EntraClientBeanConfig
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig
 import no.nav.tilgangsmaskin.ansatt.graph.EntraRestClientAdapter
+import no.nav.tilgangsmaskin.felles.cache.AbstractCacheTestConfig
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.context.TestPropertySource
+import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
@@ -28,23 +27,24 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import java.util.UUID
 
-@RestClientTest(components = [EntraRestClientAdapter::class, EntraClientBeanConfig::class, AnsattOidTjeneste::class])
-@EnableConfigurationProperties(EntraConfig::class)
-@Import(AnsattOidTjenesteTest.CacheConfig::class)
-@TestPropertySource(properties = ["graph.base-uri=http://graph"])
+@RestClientTest(components = [EntraRestClientAdapter::class, EntraClientBeanConfig::class, AnsattOidTjeneste::class,EntraConfig::class])
+@Import(EntraCacheConfig::class)
 @ApplyExtension(SpringExtension::class)
 class AnsattOidTjenesteTest : BehaviorSpec() {
 
     @TestConfiguration
     @EnableCaching(proxyTargetClass = true)
-    class CacheConfig {
-        @Bean fun cacheManager(): CacheManager = ConcurrentMapCacheManager(ENTRA_OID)
-    }
+    @EnableResilientMethods
+    class EntraCacheConfig : AbstractCacheTestConfig(ENTRA_OID)
 
-    @Autowired lateinit var tjeneste: AnsattOidTjeneste
-    @Autowired lateinit var server: MockRestServiceServer
-    @Autowired lateinit var cfg: EntraConfig
-    @Autowired lateinit var cacheManager: CacheManager
+    @Autowired
+    lateinit var tjeneste: AnsattOidTjeneste
+    @Autowired
+    lateinit var server: MockRestServiceServer
+    @Autowired
+    lateinit var cfg: EntraConfig
+    @Autowired
+    lateinit var cacheManager: CacheManager
 
     init {
         beforeEach {

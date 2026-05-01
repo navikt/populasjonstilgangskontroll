@@ -6,6 +6,7 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import org.springframework.context.annotation.Bean
 
+@EnableCaching
 open class AbstractCacheTestConfig(private val cache: String) {
     @Bean
     open fun cacheManager() = ConcurrentMapCacheManager(cache)

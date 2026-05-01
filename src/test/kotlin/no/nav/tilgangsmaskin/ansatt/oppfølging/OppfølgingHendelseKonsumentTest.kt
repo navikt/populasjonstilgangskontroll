@@ -22,11 +22,13 @@ class OppfølgingHendelseKonsumentTest : BehaviorSpec() {
     private val konsument = OppfølgingHendelseKonsument(oppfølging)
 
     init {
-        beforeEach { clearMocks(oppfølging) }
+        beforeEach {
+            clearMocks(oppfølging)
+        }
 
         Given("hendelse av type $OPPFOLGING_STARTET") {
             When("listen kalles") {
-                Then("kaller registrer med riktige argumenter") {
+                Then("registrer med riktige argumenter") {
                     konsument.listen(hendelse(OPPFOLGING_STARTET))
 
                     verify { oppfølging.registrer(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, START_TIDSPUNKT) }
@@ -42,7 +44,7 @@ class OppfølgingHendelseKonsumentTest : BehaviorSpec() {
 
         Given("hendelse av type $ARBEIDSOPPFOLGINGSKONTOR_ENDRET") {
             When("listen kalles") {
-                Then("kaller registrer med riktige argumenter") {
+                Then("registrer med riktige argumenter") {
                     konsument.listen(hendelse(ARBEIDSOPPFOLGINGSKONTOR_ENDRET))
 
                     verify { oppfølging.registrer(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, START_TIDSPUNKT) }
@@ -58,7 +60,7 @@ class OppfølgingHendelseKonsumentTest : BehaviorSpec() {
 
         Given("hendelse av type $OPPFOLGING_AVSLUTTET") {
             When("listen kalles") {
-                Then("kaller avslutt med riktige argumenter") {
+                Then("avslutter med riktige argumenter") {
                     konsument.listen(hendelse(OPPFOLGING_AVSLUTTET, kontor = null, sluttTidspunkt = Instant.now()))
 
                     verify { oppfølging.avslutt(ID, Identer(BRUKER_ID, AKTOR_ID)) }

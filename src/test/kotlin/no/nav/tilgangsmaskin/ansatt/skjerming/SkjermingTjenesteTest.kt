@@ -15,7 +15,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.SKJERMING_BULK_PATH
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.SKJERMING_PATH
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_BASE
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -26,7 +25,6 @@ import no.nav.tilgangsmaskin.felles.rest.RetryLogger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
-import org.springframework.cache.CacheManager
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
@@ -52,14 +50,12 @@ class SkjermingTjenesteTest : BehaviorSpec() {
     @Autowired
     lateinit var cfg: SkjermingConfig
     @Autowired
-    lateinit var cacheManager: CacheManager
-    @Autowired
     lateinit var cache: CacheOperations
 
     init {
         beforeEach {
             server.reset()
-            cacheManager.getCache(SKJERMING)?.clear()
+            delete(ID1,ID2)
         }
         afterEach { server.verify() }
 
@@ -204,6 +200,9 @@ class SkjermingTjenesteTest : BehaviorSpec() {
             }
         }
     }
+
+    private fun delete(vararg ids: BrukerId) =
+        ids.forEach { cache.delete(SKJERMING_CACHE, it.verdi) }
 
     private fun putOne(brukerId: BrukerId, skjermet: Boolean) =
         cache.putOne(SKJERMING_CACHE, brukerId.verdi, skjermet, ofSeconds(5))

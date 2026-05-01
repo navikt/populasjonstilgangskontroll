@@ -24,7 +24,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlTjenesteTest.PdlTestConfig
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.createClient
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
-import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -47,7 +46,7 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import tools.jackson.databind.json.JsonMapper
 import java.time.Duration.ofSeconds
 
-@RestClientTest(components = [PdlTjeneste::class, PdlClient::class,PdlConfig::class,DefaultRestErrorHandler::class])
+@RestClientTest(components = [PdlTjeneste::class, PdlClient::class,PdlConfig::class])
 @EnableConfigurationProperties(PdlConfig::class)
 @Import(PdlTestConfig::class)
 @TestPropertySource(properties = [
@@ -64,8 +63,8 @@ class PdlTjenesteTest : DescribeSpec() {
         @Bean fun cache(cacheManager: CacheManager): CacheOperations = ConcurrentMapCacheOperations(cacheManager)
 
         @Bean
-        fun pdlClient(b: RestClient.Builder, cfg: PdlConfig, errorHandler: ErrorHandler) =
-            createClient<PdlClient>(cfg, b, errorHandler)
+        fun pdlClient(b: RestClient.Builder, cfg: PdlConfig) =
+            createClient<PdlClient>(cfg, b)
     }
 
     @MockkBean lateinit var graphQL: PdlSyncGraphQLClientAdapter

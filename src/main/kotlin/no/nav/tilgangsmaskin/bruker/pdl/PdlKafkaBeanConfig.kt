@@ -8,7 +8,6 @@ import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
-import no.nav.tilgangsmaskin.bruker.pdl.PdlKafkaBeanConfig.Companion.PDL_CONTAINER_FACTORY
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUrl
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.userInfo
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG

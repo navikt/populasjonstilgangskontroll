@@ -16,16 +16,15 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.SKJERMIN
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_BASE
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjenesteTest.CacheConfig
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
-import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RetryLogger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.cache.CacheManager
@@ -45,9 +44,9 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
 
-@RestClientTest(components = [SkjermingClient::class,SkjermingClientBeanConfig::class, SkjermingTjeneste::class, SkjermingPingable::class,DefaultRestErrorHandler::class, SkjermingConfig::class,RetryLogger::class])
+@RestClientTest(components = [SkjermingClient::class, SkjermingConfig::class,SkjermingClientBeanConfig::class, SkjermingTjeneste::class, SkjermingPingable::class,RetryLogger::class])
 @EnableResilientMethods
-@Import(SkjermingTjenesteTest.CacheConfig::class)
+@Import(CacheConfig::class)
 @ApplyExtension(SpringExtension::class)
 class SkjermingTjenesteTest : DescribeSpec() {
 

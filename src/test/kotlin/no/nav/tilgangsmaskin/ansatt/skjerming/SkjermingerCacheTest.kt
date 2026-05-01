@@ -8,13 +8,12 @@ import io.kotest.matchers.maps.shouldContainExactly
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjenesteTest.Companion.SKJERMINGER_URI
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingerCacheTest.CacheTestConfig
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
-import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.RetryLogger
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.cache.CacheManager
@@ -32,9 +31,9 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import java.time.Duration
 import java.time.Duration.ofSeconds
 
-@RestClientTest(components = [SkjermingPingable::class, SkjermingClientBeanConfig::class,SkjermingConfig::class, SkjermingClient::class,SkjermingTjeneste::class, RetryLogger::class, DefaultRestErrorHandler::class])
+@RestClientTest(components = [SkjermingPingable::class, SkjermingClientBeanConfig::class,SkjermingConfig::class, SkjermingClient::class,SkjermingTjeneste::class, RetryLogger::class])
 @EnableResilientMethods
-@Import(SkjermingerCacheTest.CacheTestConfig::class)
+@Import(CacheTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class SkjermingerCacheTest : BehaviorSpec() {
 

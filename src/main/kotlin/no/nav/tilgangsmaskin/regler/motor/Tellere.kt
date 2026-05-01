@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.stereotype.Component
-import java.util.Locale.getDefault
+import java.util.Locale.*
 
 @Component
 class NasjonalGruppeTeller(registry: MeterRegistry, token: Token) :

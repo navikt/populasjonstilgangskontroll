@@ -5,14 +5,13 @@ import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.RestClient.Builder
-import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 @Configuration
 class EntraProxyBeanConfig {
 
     @Bean
-    fun entraProxyClient( cfg: EntraProxyConfig,b: Builder, errorHandler: ErrorHandler) =
-        createClient<EntraProxyClient>(cfg, b, errorHandler)
+    fun entraProxyClient( cfg: EntraProxyConfig,b: Builder) =
+        createClient<EntraProxyClient>(cfg, b)
 
     @Bean
     fun entraProxyHealthIndicator(pingable: EntraProxyPingable) =

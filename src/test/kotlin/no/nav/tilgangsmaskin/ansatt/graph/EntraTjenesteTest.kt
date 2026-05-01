@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.setIDs
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.entries
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjenesteTest.CacheConfig
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,7 +31,7 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.request
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import java.util.*
 
-@RestClientTest(components = [EntraRestClientAdapter::class, EntraClientBeanConfig::class, EntraTjeneste::class])
+@RestClientTest(components = [EntraRestClientAdapter::class, EntraClientBeanConfig::class, EntraProxyConfig::class,EntraTjeneste::class])
 @EnableConfigurationProperties(EntraConfig::class)
 @Import(CacheConfig::class)
 @TestPropertySource(properties = ["graph.base-uri=http://graph"])

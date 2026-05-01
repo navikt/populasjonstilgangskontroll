@@ -11,6 +11,7 @@ import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenRespons
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
+import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.LoggingRequestInterceptor
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.aspectj.lang.ProceedingJoinPoint
@@ -20,9 +21,6 @@ import org.springframework.boot.actuate.endpoint.SanitizingFunction
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.boot.actuate.web.exchanges.Include.defaultIncludes
-import org.springframework.boot.health.actuate.endpoint.StatusAggregator
-import org.springframework.boot.health.contributor.Status.DOWN
-import org.springframework.boot.health.contributor.Status.UP
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
 import org.springframework.boot.kafka.autoconfigure.DefaultKafkaConsumerFactoryCustomizer
 import org.springframework.boot.restclient.RestClientCustomizer
@@ -144,7 +142,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             .build()))
             .build()
 
-        inline fun <reified T : Any> createClient(cfg: AbstractRestConfig, b: Builder, errorHandler: ErrorHandler) =
+        inline fun <reified T : Any> createClient(cfg: AbstractRestConfig, b: Builder, errorHandler: ErrorHandler = DefaultRestErrorHandler()) =
             createProxyFactory(cfg, b, errorHandler).createClient(T::class.java)
 
         private val SENSITIVE_KEYS = setOf("password", "secret", "token", "key","credentials", "jwk","private_key")

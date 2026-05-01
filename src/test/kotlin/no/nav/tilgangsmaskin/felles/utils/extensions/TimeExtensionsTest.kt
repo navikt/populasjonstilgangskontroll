@@ -59,7 +59,7 @@ class TimeExtensionsTest : DescribeSpec({
         it("24 hele måneder siden gir 24") {
             idag.minusMonths(24).månederSidenIdag() shouldBe 24
         }
-        
+
 
         it("kaster IllegalArgumentException for dato i fremtiden") {
             shouldThrow<IllegalArgumentException> {

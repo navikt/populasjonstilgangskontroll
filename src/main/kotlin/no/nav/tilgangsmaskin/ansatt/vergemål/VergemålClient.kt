@@ -9,7 +9,7 @@ import org.springframework.web.service.annotation.PostExchange
 interface VergemålClient {
 
     @PostExchange(VERGEMÅL_PATH)
-    fun vergemål(@RequestBody body: VergemålIdent): List<Vergemål>
+    fun vergemål(@RequestBody body: VergemålIdent): Set<Vergemål>
 
     @GetExchange(PING_PATH)
     fun ping(): Any

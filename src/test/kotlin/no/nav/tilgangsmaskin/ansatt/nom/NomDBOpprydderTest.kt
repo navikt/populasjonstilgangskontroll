@@ -15,8 +15,8 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.util.ReflectionTestUtils.setField
-import org.springframework.transaction.PlatformTransactionManager
-import org.springframework.transaction.support.TransactionTemplate
+
+
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
 import java.time.Instant.now
@@ -45,9 +45,6 @@ class NomDBOpprydderTest : BehaviorSpec() {
     private lateinit var publisher: ApplicationEventPublisher
 
     @Autowired
-    private lateinit var txManager: PlatformTransactionManager
-
-    @Autowired
     private lateinit var antallKall: NomKallTeller
 
     @Autowired
@@ -58,7 +55,7 @@ class NomDBOpprydderTest : BehaviorSpec() {
 
     init {
         beforeEach {
-            TransactionTemplate(txManager).execute { repo.deleteAll() }
+            repo.deleteAll()
             setField(opprydder, "erLeder", false)
         }
 
@@ -116,12 +113,10 @@ class NomDBOpprydderTest : BehaviorSpec() {
     private fun lagre(fnr: String, gyldigTil: LocalDate): NomEntity {
         val now = now()
         val gyldigTilInstant = gyldigTil.atStartOfDay().toInstant(UTC)
-        return TransactionTemplate(txManager).execute {
-            repo.save(NomEntity(nyttNavId(), fnr, now, gyldigTilInstant).also {
-                it.created = now
-                it.updated = now
-            })
-        }
+        return repo.save(NomEntity(nyttNavId(), fnr, now, gyldigTilInstant).also {
+            it.created = now
+            it.updated = now
+        })
     }
 
     private fun bliLeder() = setField(opprydder, "erLeder", true)

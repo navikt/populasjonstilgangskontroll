@@ -32,7 +32,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
 
-@RestClientTest(components = [VergemålPingable::class, VergemålConfig::class,VergemålBeanConfig::class, VergemålTjeneste::class])
+@RestClientTest(components = [VergemålConfig::class,VergemålBeanConfig::class, VergemålTjeneste::class])
 @ApplyExtension(SpringExtension::class)
 class VergemålTjenesteTest : BehaviorSpec() {
 

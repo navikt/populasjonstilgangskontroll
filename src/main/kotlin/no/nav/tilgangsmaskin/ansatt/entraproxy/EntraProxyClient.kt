@@ -13,7 +13,7 @@ interface EntraProxyClient {
     fun ansatt(@PathVariable navIdent: String): EntraProxyAnsatt
 
     @GetExchange(ENHETER_PATH)
-    fun enheter(@PathVariable navIdent: String, @RequestHeader(IDENTIFIKATOR) identifikator: String): Set<Enhet>
+    fun enheter(@PathVariable navIdent: String, @RequestHeader(IDENTIFIKATOR) identifikator: String = navIdent): Set<Enhet>
 
     @GetExchange(PING_PATH)
     fun ping(): Any

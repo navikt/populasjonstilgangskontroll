@@ -10,6 +10,5 @@ import java.net.URI
 class EntraProxyConfig : AbstractRestConfig(PROXY_BASE, PING_PATH, GRAPH) {
     companion object {
         val PROXY_BASE = URI.create("http://entra-proxy.sikkerhetstjenesten")
-        const val ENTRAPROXY = "entra-proxy"
     }
 }

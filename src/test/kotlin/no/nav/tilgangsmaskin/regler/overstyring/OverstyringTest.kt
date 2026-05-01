@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.regler.overstyring
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
@@ -58,7 +58,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
 @ContextConfiguration(classes = [TestApp::class, LocalAuditor::class,OverstyringJPAAdapter::class])
 @ApplyExtension(SpringExtension::class)
-internal class OverstyringTest : DescribeSpec() {
+internal class OverstyringTest : BehaviorSpec() {
 
     private val vanligBrukerId = BrukerId("08526835670")
     private val ansattId = AnsattId("Z999999")
@@ -112,156 +112,174 @@ internal class OverstyringTest : DescribeSpec() {
             overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, proxy, validator, OverstyringTeller(registry, token))
         }
 
-        describe("overstyr") {
+        Given("overstyr") {
+            When("exception som ikke er RegelException kastes") {
+                Then("kastes exception videre") {
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } throws RuntimeException("teknisk feil")
 
-            it("exception som ikke er RegelException kastes videre") {
-                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } throws RuntimeException("teknisk feil")
-
-                shouldThrow<RuntimeException> {
-                    overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
+                    shouldThrow<RuntimeException> {
+                        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
+                    }
                 }
             }
 
-            it("OverstyringKlientException kastes videre") {
-                every { validator.validerKonsument() } throws OverstyringException("ukjent system", "ukjent-system")
+            When("OverstyringKlientException kastes") {
+                Then("kastes exception videre") {
+                    every { validator.validerKonsument() } throws OverstyringException("ukjent system", "ukjent-system")
 
-                shouldThrow<OverstyringException> {
-                    overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
-                }
-            }
-        }
-
-        describe("OverstyringEntity felter") {
-
-            it("alle felter settes når overstyring registreres") {
-                val bruker = BrukerBuilder(vanligBrukerId).build()
-                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-
-                overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
-
-                val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
-                assertSoftly(entity) {
-                    navid shouldBe ansattId.verdi
-                    fnr shouldBe vanligBrukerId.verdi
-                    begrunnelse shouldBe "Dette er en begrunnelse"
-                    enhet shouldBe "1234"
-                    expires shouldNotBe null
-                    id shouldNotBe 0
-                    created shouldNotBe null
-                    updated shouldNotBe null
-                    oppretter shouldBe ansattId.verdi
-                    system shouldBe "test"
+                    shouldThrow<OverstyringException> {
+                        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
+                    }
                 }
             }
         }
 
-        describe("erOverstyrt") {
+        Given("OverstyringEntity felter") {
+            When("overstyring registreres") {
+                Then("settes alle felter korrekt") {
+                    val bruker = BrukerBuilder(vanligBrukerId).build()
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
 
-            it("gyldig overstyring via historisk ident") {
-                val brukerMedHistorikk = BrukerBuilder(vanligBrukerId).historiske(setOf(historiskBrukerId)).build()
-                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns brukerMedHistorikk
-                every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns BrukerBuilder(historiskBrukerId).build()
+                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
 
-                overstyring.overstyr(ansattId, OverstyringData(historiskBrukerId, "Dette er en test", IMORGEN))
-
-                overstyring.erOverstyrt(ansattId, BrukerBuilder(vanligBrukerId).build().brukerId) shouldBe true
-            }
-
-            it("nyeste overstyring gjelder når det finnes flere") {
-                val bruker = BrukerBuilder(vanligBrukerId).build()
-                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-
-                overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er gammel", IGÅR))
-                overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er ny", IMORGEN))
-
-                overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe true
-            }
-
-            it("utgått overstyring gir ikke tilgang") {
-                val bruker = BrukerBuilder(vanligBrukerId).build()
-                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-
-                overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er utgått", IGÅR))
-
-                overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe false
-            }
-
-            it("returnerer false når ingen overstyring er registrert") {
-                val bruker = BrukerBuilder(vanligBrukerId).build()
-                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-
-                overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe false
+                    val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    assertSoftly(entity) {
+                        navid shouldBe ansattId.verdi
+                        fnr shouldBe vanligBrukerId.verdi
+                        begrunnelse shouldBe "Dette er en begrunnelse"
+                        enhet shouldBe "1234"
+                        expires shouldNotBe null
+                        id shouldNotBe 0
+                        created shouldNotBe null
+                        updated shouldNotBe null
+                        oppretter shouldBe ansattId.verdi
+                        system shouldBe "test"
+                    }
+                }
             }
         }
 
-        describe("OverstyringEntityListener") {
+        Given("erOverstyrt") {
+            When("en gyldig overstyring er registrert via historisk ident") {
+                Then("returneres true") {
+                    val brukerMedHistorikk = BrukerBuilder(vanligBrukerId).historiske(setOf(historiskBrukerId)).build()
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns brukerMedHistorikk
+                    every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns BrukerBuilder(historiskBrukerId).build()
 
-            it("setter created, updated, oppretter og system ved @PrePersist") {
-                val bruker = BrukerBuilder(vanligBrukerId).build()
-                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+                    overstyring.overstyr(ansattId, OverstyringData(historiskBrukerId, "Dette er en test", IMORGEN))
 
-                overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
-
-                val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
-                assertSoftly(entity) {
-                    created shouldNotBe null
-                    updated shouldNotBe null
-                    created shouldBe updated
-                    oppretter shouldBe ansattId.verdi
-                    system shouldBe "test"
+                    overstyring.erOverstyrt(ansattId, BrukerBuilder(vanligBrukerId).build().brukerId) shouldBe true
                 }
             }
 
-            it("laster entity med korrekte felter fra database ved @PostLoad") {
-                val bruker = BrukerBuilder(vanligBrukerId).build()
-                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+            When("det finnes flere overstyringer") {
+                Then("gjelder den nyeste") {
+                    val bruker = BrukerBuilder(vanligBrukerId).build()
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
 
-                overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er gammel", IGÅR))
+                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er ny", IMORGEN))
 
-                val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
-                val lastet = repository.findById(entity.id)
-
-                lastet.isPresent shouldBe true
-                with(lastet.get()) {
-                    navid shouldBe ansattId.verdi
-                    fnr shouldBe vanligBrukerId.verdi
-                    created shouldNotBe null
-                    updated shouldNotBe null
-                    oppretter shouldBe ansattId.verdi
-                    system shouldBe "test"
+                    overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe true
                 }
             }
 
-            it("nullstiller system og oppretter til tokenverdi ved @PreUpdate") {
-                val bruker = BrukerBuilder(vanligBrukerId).build()
-                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+            When("overstyringen er utgått") {
+                Then("gis ikke tilgang") {
+                    val bruker = BrukerBuilder(vanligBrukerId).build()
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
 
-                overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er utgått", IGÅR))
 
-                val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
-                val createdFør = entity.created
-                entity.system = "ukjent-system"
-                entity.oppretter = "X000000"
-                repository.saveAndFlush(entity)
-
-                val oppdatert = repository.findById(entity.id).get()
-                assertSoftly(oppdatert) {
-                    system shouldBe "test"
-                    oppretter shouldBe ansattId.verdi
-                    created shouldBe createdFør
+                    overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe false
                 }
             }
 
-            it("fjerner entity fra database ved @PreRemove og @PostRemove") {
-                val bruker = BrukerBuilder(vanligBrukerId).build()
-                every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+            When("ingen overstyring er registrert") {
+                Then("returneres false") {
+                    val bruker = BrukerBuilder(vanligBrukerId).build()
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
 
-                overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+                    overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe false
+                }
+            }
+        }
 
-                val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
-                repository.delete(entity)
+        Given("OverstyringEntityListener") {
+            When("overstyring persisteres (@PrePersist)") {
+                Then("settes created, updated, oppretter og system") {
+                    val bruker = BrukerBuilder(vanligBrukerId).build()
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
 
-                repository.findById(entity.id).isPresent shouldBe false
+                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+
+                    val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    assertSoftly(entity) {
+                        created shouldNotBe null
+                        updated shouldNotBe null
+                        created shouldBe updated
+                        oppretter shouldBe ansattId.verdi
+                        system shouldBe "test"
+                    }
+                }
+            }
+
+            When("entity lastes fra database (@PostLoad)") {
+                Then("er alle felter korrekte") {
+                    val bruker = BrukerBuilder(vanligBrukerId).build()
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+
+                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+
+                    val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    val lastet = repository.findById(entity.id)
+
+                    lastet.isPresent shouldBe true
+                    with(lastet.get()) {
+                        navid shouldBe ansattId.verdi
+                        fnr shouldBe vanligBrukerId.verdi
+                        created shouldNotBe null
+                        updated shouldNotBe null
+                        oppretter shouldBe ansattId.verdi
+                        system shouldBe "test"
+                    }
+                }
+            }
+
+            When("entity oppdateres (@PreUpdate)") {
+                Then("nullstilles system og oppretter til tokenverdi") {
+                    val bruker = BrukerBuilder(vanligBrukerId).build()
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+
+                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+
+                    val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    val createdFør = entity.created
+                    entity.system = "ukjent-system"
+                    entity.oppretter = "X000000"
+                    repository.saveAndFlush(entity)
+
+                    val oppdatert = repository.findById(entity.id).get()
+                    assertSoftly(oppdatert) {
+                        system shouldBe "test"
+                        oppretter shouldBe ansattId.verdi
+                        created shouldBe createdFør
+                    }
+                }
+            }
+
+            When("entity slettes (@PreRemove og @PostRemove)") {
+                Then("fjernes den fra databasen") {
+                    val bruker = BrukerBuilder(vanligBrukerId).build()
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+
+                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+
+                    val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    repository.delete(entity)
+
+                    repository.findById(entity.id).isPresent shouldBe false
+                }
             }
         }
     }

@@ -1,11 +1,11 @@
 package no.nav.tilgangsmaskin.felles.graphql
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilgangsmaskin.bruker.pdl.PdlClientBeanConfig.DefaultGraphQlErrorHandler
+import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLBeanConfig.DefaultGraphQlErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import org.springframework.graphql.ResponseError
@@ -17,7 +17,7 @@ import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import java.net.URI
 
-class GraphQLErrorHandlerTest : DescribeSpec({
+class GraphQLErrorHandlerTest : BehaviorSpec({
 
     val handler = DefaultGraphQlErrorHandler()
     val uri = URI.create("http://test/graphql")
@@ -33,51 +33,47 @@ class GraphQLErrorHandlerTest : DescribeSpec({
         every { extensions } returns mapOf("code" to code)
     }
 
-    describe("handle") {
-
-        describe("FieldAccessException") {
-
-            it("UNAUTHENTICATED kode gir IrrecoverableRestException med UNAUTHORIZED status") {
-                val ex = shouldThrow<IrrecoverableRestException> {
+    Given("handle - FieldAccessException") {
+        When("feilkode er UNAUTHENTICATED") {
+            Then("kastes IrrecoverableRestException med UNAUTHORIZED status") {
+                shouldThrow<IrrecoverableRestException> {
                     handler.handle(uri, fieldAccessException(responseError("UNAUTHENTICATED")))
-                }
-                ex.statusCode shouldBe UNAUTHORIZED
+                }.statusCode shouldBe UNAUTHORIZED
             }
-
-            it("annen kode gir IrrecoverableRestException med tilsvarende status") {
-                val ex = shouldThrow<IrrecoverableRestException> {
+        }
+        When("feilkode er annen (f.eks. FORBIDDEN)") {
+            Then("kastes IrrecoverableRestException med tilsvarende status") {
+                shouldThrow<IrrecoverableRestException> {
                     handler.handle(uri, fieldAccessException(responseError("FORBIDDEN")))
-                }
-                ex.statusCode shouldBe FORBIDDEN
+                }.statusCode shouldBe FORBIDDEN
             }
-
-            it("ingen errors gir IrrecoverableRestException med INTERNAL_SERVER_ERROR status") {
-                val ex = shouldThrow<IrrecoverableRestException> {
+        }
+        When("ingen errors finnes") {
+            Then("kastes IrrecoverableRestException med INTERNAL_SERVER_ERROR status") {
+                shouldThrow<IrrecoverableRestException> {
                     handler.handle(uri, fieldAccessException())
-                }
-                ex.statusCode shouldBe INTERNAL_SERVER_ERROR
+                }.statusCode shouldBe INTERNAL_SERVER_ERROR
             }
         }
+    }
 
-        describe("GraphQlTransportException") {
-
-            it("kaster RecoverableRestException med INTERNAL_SERVER_ERROR status") {
-                val ex = shouldThrow<RecoverableRestException> {
+    Given("handle - GraphQlTransportException") {
+        When("exception kastes") {
+            Then("kastes RecoverableRestException med INTERNAL_SERVER_ERROR status") {
+                shouldThrow<RecoverableRestException> {
                     handler.handle(uri, GraphQlTransportException("timeout", RuntimeException(), mockk()))
-                }
-                ex.statusCode shouldBe INTERNAL_SERVER_ERROR
+                }.statusCode shouldBe INTERNAL_SERVER_ERROR
             }
         }
+    }
 
-        describe("annen exception") {
-
-            it("kaster IrrecoverableRestException med INTERNAL_SERVER_ERROR status") {
-                val ex = shouldThrow<IrrecoverableRestException> {
+    Given("handle - annen exception") {
+        When("exception kastes") {
+            Then("kastes IrrecoverableRestException med INTERNAL_SERVER_ERROR status") {
+                shouldThrow<IrrecoverableRestException> {
                     handler.handle(uri, RuntimeException("noe gikk galt"))
-                }
-                ex.statusCode shouldBe INTERNAL_SERVER_ERROR
+                }.statusCode shouldBe INTERNAL_SERVER_ERROR
             }
         }
     }
 })
-

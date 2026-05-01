@@ -15,10 +15,10 @@ class CacheExpiredEventListener(val teller: CacheOppfriskerTeller, erLeder: Bool
     fun cacheInnslagFjernet(hendelse: CacheInnslagFjernetEvent) {
         somLeder("håndtering av cache innslag ${hendelse.nøkkel} fjernet", {
             if (isRunning()) {
-                val elementer = CacheNøkkelElementer(hendelse.nøkkel)
-                oppfriskere.firstOrNull { it.cacheName == elementer.cacheName }?.run {
-                    oppfrisk(elementer)
-                    teller.tell(of("cache", elementer.cacheName, "result", "expired", "method", elementer.metode ?: "ingen"))
+                val nøkkel = CacheNøkkel(hendelse.nøkkel)
+                oppfriskere.firstOrNull { it.cacheName == nøkkel.cacheName }?.run {
+                    oppfrisk(nøkkel)
+                    teller.tell(of("cache", nøkkel.cacheName, "result", "expired", "method", nøkkel.metode ?: "ingen"))
                 }
             }
         }) {}

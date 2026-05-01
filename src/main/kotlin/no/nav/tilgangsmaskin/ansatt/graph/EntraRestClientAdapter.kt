@@ -25,13 +25,11 @@ class EntraRestClientAdapter(@Qualifier(GRAPH) restClient: RestClient, val cf: E
     }
 
     fun grupper(ansattId: String, trengerGlobaleGrupper: Boolean) =
-        generateSequence(get<EntraGrupper>(cf.grupperURI(ansattId,trengerGlobaleGrupper))) { bolk ->
-            bolk.next?.let {
-                get<EntraGrupper>(it)
-            }
+        buildSet {
+            generateSequence(get<EntraGrupper>(cf.grupperURI(ansattId, trengerGlobaleGrupper))) { bolk ->
+                bolk.next?.let { get<EntraGrupper>(it) }
+            }.forEach { addAll(it.value) }
         }
-            .flatMap { it.value }
-            .toSet()
 
 
     @JsonIgnoreProperties(ignoreUnknown = true)

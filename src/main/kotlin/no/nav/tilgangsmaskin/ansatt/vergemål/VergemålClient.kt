@@ -1,15 +1,15 @@
 package no.nav.tilgangsmaskin.ansatt.vergemål
 
-import java.net.URI
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
+
 @HttpExchange
 interface VergemålClient {
 
     @PostExchange(VERGEMÅL_PATH)
-    fun vergemål(@RequestBody body: VergemålIdent): List<Vergemål>
+    fun vergemål(@RequestBody body: VergemålIdent): Set<Vergemål>
 
     @GetExchange(PING_PATH)
     fun ping(): Any

@@ -61,6 +61,7 @@ class TimeExtensionsTest : DescribeSpec({
         }
         
 
+
         it("kaster IllegalArgumentException for dato i fremtiden") {
             shouldThrow<IllegalArgumentException> {
                 idag.plusDays(1).månederSidenIdag()

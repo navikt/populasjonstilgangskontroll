@@ -1,19 +1,20 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.createClient
+import no.nav.tilgangsmaskin.felles.rest.AbstractPingable
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.RestClient.Builder
-import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 @Configuration
 class SkjermingClientBeanConfig {
 
     @Bean
-    fun skjermingClient(b: Builder, cfg: SkjermingConfig, errorHandler: ErrorHandler) =
-        createClient<SkjermingClient>(cfg, b, errorHandler)
+    fun skjermingClient(builder: Builder, cfg: SkjermingConfig) =
+        createClient<SkjermingClient>(cfg, builder)
 
     @Bean
-    fun skjermingHealthIndicator(a: SkjermingRestClientAdapter) = PingableHealthIndicator(a)
+    fun skjermingHealthIndicator(client: SkjermingClient, cfg: SkjermingConfig) =
+        PingableHealthIndicator(object : AbstractPingable(cfg, client::ping) {})
 }

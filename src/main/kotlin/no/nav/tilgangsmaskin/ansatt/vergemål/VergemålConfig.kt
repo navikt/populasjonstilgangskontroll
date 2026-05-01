@@ -1,16 +1,15 @@
 package no.nav.tilgangsmaskin.ansatt.vergemål
 
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålClient.Companion.PING_PATH
-import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.VERGEMÅL
 import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
-import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.stereotype.Component
 import java.net.URI
 import java.time.Duration
 
-@ConfigurationProperties(VERGEMÅL)
+@Component
 class VergemålConfig : CachableRestConfig, AbstractRestConfig(VERGEMÅL_BASE, PING_PATH, VERGEMÅL) {
 
     override val navn = VERGEMÅL

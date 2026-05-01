@@ -6,18 +6,18 @@ import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableService
 
 @RetryingWhenRecoverableService
-class EntraProxyTjeneste(private val adapter: EntraProxyRestClientAdapter)  {
+class EntraProxyTjeneste(private val client: EntraProxyClient)  {
 
     @WithSpan
     fun enhet(ansattId: AnsattId) =
-        adapter.enhetForAnsatt(ansattId.verdi)
-
+        client.ansatt(ansattId.verdi).enhet
     @WithSpan
     fun enheter(ansattId: AnsattId) =
-        adapter.enheterForAnsatt(ansattId.verdi)
+        client.enheter(ansattId.verdi )
 
     @Generated
-    override fun toString() = "${javaClass.simpleName} [adapter=$adapter]"
+    override fun toString() =
+        "${javaClass.simpleName} [client=$client]"
 }
 
 

@@ -1,11 +1,10 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
-import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
-import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.stereotype.Component
 
-@ConfigurationProperties(NOM)
+@Component
 class NomConfig: CachableRestConfig {
     override val navn = NOM
     override val cacheNulls = true

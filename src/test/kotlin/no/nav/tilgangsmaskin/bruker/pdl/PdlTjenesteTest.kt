@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.bruker.pdl
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
@@ -21,11 +21,11 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_UTVIDET_FAMI
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.pdlRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.restRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjenesteTest.PdlTestConfig
+import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.createClient
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -45,13 +45,15 @@ import org.springframework.web.client.RestClient
 import tools.jackson.databind.json.JsonMapper
 import java.time.Duration.ofSeconds
 
-@RestClientTest(components = [PdlRestClientAdapter::class, PdlTjeneste::class])
+@RestClientTest(components = [PdlTjeneste::class, PdlClient::class,PdlConfig::class])
 @EnableConfigurationProperties(PdlConfig::class)
 @Import(PdlTestConfig::class)
-@TestPropertySource(properties = ["pdl.base-uri=http://pdl"])
+@TestPropertySource(properties = [
+    "pdl.base-uri=http://pdl",
+])
 @EnableResilientMethods
 @ApplyExtension(SpringExtension::class)
-class PdlTjenesteTest : DescribeSpec() {
+class PdlTjenesteTest : BehaviorSpec() {
 
     @TestConfiguration
     @EnableCaching
@@ -60,8 +62,8 @@ class PdlTjenesteTest : DescribeSpec() {
         @Bean fun cache(cacheManager: CacheManager): CacheOperations = ConcurrentMapCacheOperations(cacheManager)
 
         @Bean
-        @Qualifier(PDL)
-        fun pdlRestClient(b: RestClient.Builder) = b.build()
+        fun pdlClient(b: RestClient.Builder, cfg: PdlConfig) =
+            createClient<PdlClient>(cfg, b)
     }
 
     @MockkBean lateinit var graphQL: PdlSyncGraphQLClientAdapter
@@ -80,99 +82,99 @@ class PdlTjenesteTest : DescribeSpec() {
             cacheManager.getCache(PDL)?.clear()
             every { graphQL.partnere(any()) } returns emptySet()
         }
+        afterEach { server.verify() }
 
-        describe("config") {
-            it("navn er korrekt") {
-                cfg.navn shouldBe PDL
-                cfg.caches.size shouldBe 2
+        Given("config") {
+            When("navn og caches sjekkes") {
+                Then("navn er korrekt og antall caches er 2") {
+                    cfg.navn shouldBe PDL
+                    cfg.caches.size shouldBe 2
+                }
             }
         }
 
-        describe("person") {
-            it("hentPerson kaller REST og oppdaterer cache") {
-                server.expect(requestTo(cfg.personURI))
-                    .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons( P1)), APPLICATION_JSON))
-                pdl.medFamilie(I1) shouldBe P1
-                server.verify()
-                cache.getOne(PDL_MED_FAMILIE_CACHE, I1, Person::class) shouldBe P1
+        Given("medFamilie") {
+            When("person ikke er i cache") {
+                Then("kalles REST og cache oppdateres") {
+                    server.expect(requestTo(cfg.personURI))
+                        .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
+                    pdl.medFamilie(I1) shouldBe P1
+                    cache.getOne(PDL_MED_FAMILIE_CACHE, I1, Person::class) shouldBe P1
+                }
             }
         }
 
-        describe("medUtvidetFamilie") {
-
-            it("kaller REST og oppdaterer cache") {
-                server.expect(requestTo(cfg.personURI))
-                    .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
-
-                pdl.medUtvidetFamilie(I1) shouldBe P1
-                server.verify()
-                cache.getOne(PDL_MED_UTVIDET_FAMILIE_CACHE, I1, Person::class) shouldBe P1
+        Given("medUtvidetFamilie") {
+            When("person ikke er i cache") {
+                Then("kalles REST og cache oppdateres") {
+                    server.expect(requestTo(cfg.personURI))
+                        .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
+                    pdl.medUtvidetFamilie(I1) shouldBe P1
+                    cache.getOne(PDL_MED_UTVIDET_FAMILIE_CACHE, I1, Person::class) shouldBe P1
+                }
             }
 
-            it("REST kalles ikke ved andre kall") {
-                server.expect(requestTo(cfg.personURI))
-                    .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
-                pdl.medUtvidetFamilie(I1)
-                server.verify()
-                server.reset()
+            When("person allerede er i cache") {
+                Then("kalles ikke REST på nytt") {
+                    server.expect(requestTo(cfg.personURI))
+                        .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
+                    pdl.medUtvidetFamilie(I1)
+                    server.verify()
+                    server.reset()
 
-                server.expect(never(), requestTo(cfg.personURI))
-                    .andRespond(withSuccess("", APPLICATION_JSON))
-                pdl.medUtvidetFamilie(I1) shouldBe P1
-                server.verify()
+                    server.expect(never(), requestTo(cfg.personURI))
+                    pdl.medUtvidetFamilie(I1) shouldBe P1
+                }
             }
 
-            it("inkluderer partnere fra GraphQL") {
-                val partner = FamilieMedlem(BrukerId("12345678901"), PARTNER)
-                every { graphQL.partnere(I1) } returns setOf(partner)
-
-                server.expect(requestTo(cfg.personURI))
-                    .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
-
-                pdl.medUtvidetFamilie(I1).familie.partnere shouldBe setOf(partner)
-                server.verify()
+            When("GraphQL returnerer en partner") {
+                Then("inkluderes partneren i familie") {
+                    val partner = FamilieMedlem(BrukerId("12345678901"), PARTNER)
+                    every { graphQL.partnere(I1) } returns setOf(partner)
+                    server.expect(requestTo(cfg.personURI))
+                        .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
+                    pdl.medUtvidetFamilie(I1).familie.partnere shouldBe setOf(partner)
+                }
             }
         }
 
-        describe("personer") {
-
-            it("REST kalles kun for cache-misser, treff hentes fra cache") {
-                cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(2))
-                server.expect(requestTo(cfg.personerURI))
-                    .andRespond(withSuccess(restRespons(mapper, P2), APPLICATION_JSON))
-                pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
-                server.verify()
+        Given("personer") {
+            When("én person er i cache og én er ikke") {
+                Then("kalles REST kun for cache-misser") {
+                    cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(2))
+                    server.expect(requestTo(cfg.personerURI))
+                        .andRespond(withSuccess(restRespons(mapper, P2), APPLICATION_JSON))
+                    pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
+                }
             }
 
-            it("REST kalles ikke når alle er i cache") {
-                cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(2))
-                cache.putOne(PDL_MED_FAMILIE_CACHE, I2, P2, ofSeconds(2))
-                server.expect(never(), requestTo(cfg.personerURI))
-                    .andRespond(withSuccess("[]", APPLICATION_JSON))
-
-                pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
-                server.verify()
+            When("alle er i cache") {
+                Then("kalles ikke REST") {
+                    val entries = mapOf(I1 to P1, I2 to P2)
+                    cache.putMany(PDL_MED_FAMILIE_CACHE, entries, ofSeconds(2))
+                    server.expect(never(), requestTo(cfg.personerURI))
+                    pdl.personer(IDS) shouldContainExactlyInAnyOrder entries.values
+                }
             }
 
-            it("slett ett element og verifiser at REST kalles for det elementet") {
-                cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(2))
-                cache.putOne(PDL_MED_FAMILIE_CACHE, I2, P2, ofSeconds(2))
-                pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
-                cache.delete(PDL_MED_FAMILIE_CACHE, I2)
-                server.expect(requestTo(cfg.personerURI))
-                    .andRespond(withSuccess(restRespons(mapper, P2), APPLICATION_JSON))
-
-                pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
-                cache.getOne(PDL_MED_FAMILIE_CACHE, I2, Person::class) shouldBe P2
-                server.verify()
+            When("ett element slettes fra cache") {
+                Then("kalles REST for det slettede elementet og cache oppdateres") {
+                    val innslag = mapOf(I1 to P1, I2 to P2)
+                    cache.putMany(PDL_MED_FAMILIE_CACHE, innslag, ofSeconds(200))
+                    pdl.personer(IDS) shouldContainExactlyInAnyOrder innslag.values
+                    cache.delete(PDL_MED_FAMILIE_CACHE, I2)
+                    server.expect(requestTo(cfg.personerURI))
+                        .andRespond(withSuccess(restRespons(mapper, P2), APPLICATION_JSON))
+                    pdl.personer(IDS) shouldContainExactlyInAnyOrder innslag.values
+                    cache.getOne(PDL_MED_FAMILIE_CACHE, I2, Person::class) shouldBe P2
+                }
             }
 
-            it("REST kalles ikke når settet er tomt") {
-                server.expect(never(), requestTo(cfg.personerURI))
-                    .andRespond(withSuccess("[]", APPLICATION_JSON))
-
-                pdl.personer(emptySet()) shouldContainExactlyInAnyOrder emptyList()
-                server.verify()
+            When("settet er tomt") {
+                Then("kalles ikke REST") {
+                    server.expect(never(), requestTo(cfg.personerURI))
+                    pdl.personer(emptySet()) shouldContainExactlyInAnyOrder emptyList()
+                }
             }
         }
     }

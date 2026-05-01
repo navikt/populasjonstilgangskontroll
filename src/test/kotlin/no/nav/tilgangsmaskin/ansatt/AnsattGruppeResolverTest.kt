@@ -1,13 +1,12 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
-import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
@@ -22,24 +21,15 @@ import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.web.client.HttpClientErrorException
 import java.util.*
 
-class AnsattGruppeResolverTest : DescribeSpec() {
+class AnsattGruppeResolverTest : BehaviorSpec() {
 
-    @MockK
-    lateinit var entra: EntraTjeneste
-
-    @MockK
-    lateinit var token: Token
-
-    @MockK
-    lateinit var oidTjeneste: AnsattOidTjeneste
+    private val entra = mockk<EntraTjeneste>()
+    private val token = mockk<Token>()
+    private val oidTjeneste = mockk<AnsattOidTjeneste>()
+    private val resolver by lazy { AnsattGruppeResolver(entra, token, oidTjeneste) }
 
     init {
-        val nasjonalId  = UUID.randomUUID()
-        val fortroligId = UUID.randomUUID()
-        val strengtId = UUID.randomUUID()
-
         beforeSpec {
-            MockKAnnotations.init(this@AnsattGruppeResolverTest)
             GlobalGruppe.setIDs(mapOf(
                 "gruppe.nasjonal"   to nasjonalId,
                 "gruppe.fortrolig"  to fortroligId,
@@ -50,114 +40,130 @@ class AnsattGruppeResolverTest : DescribeSpec() {
             ))
         }
 
-        val ansattId  = AnsattId("Z999999")
-        val oid       = UUID.randomUUID()
-        val geoGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_1234")
-
-        val resolver by lazy { AnsattGruppeResolver(entra, token, oidTjeneste) }
-
         beforeEach {
             clearAllMocks()
             every { oidTjeneste.oidFraEntra(ansattId) } returns oid
         }
 
-        describe("CC-flow") {
+        Given("CC-flow") {
+            beforeEach { every { token.erCC } returns true }
 
-            beforeEach {
-                every { token.erCC } returns true
+            When("token har kjente og ukjente gruppe-IDer") {
+                Then("globaleGrupper returnerer kun kjente EntraGruppe-instanser") {
+                    every { token.globaleGruppeIds } returns listOf(nasjonalId, fortroligId, strengtId, oid)
+
+                    token.globaleGrupper() shouldContainExactlyInAnyOrder setOf(
+                        EntraGruppe(nasjonalId, NASJONAL.name),
+                        EntraGruppe(fortroligId, FORTROLIG.name),
+                        EntraGruppe(strengtId, STRENGT_FORTROLIG.name)
+                    )
+                }
             }
 
-            it("Token.globaleGrupper returnerer EntraGruppe for kjente gruppe-IDer og ignorerer ukjente") {
-                every { token.globaleGruppeIds } returns listOf(nasjonalId, fortroligId, strengtId, oid)
+            When("token kun har ukjente gruppe-IDer") {
+                Then("globaleGrupper returnerer tomt sett") {
+                    every { token.globaleGruppeIds } returns listOf(UUID.randomUUID(), UUID.randomUUID())
 
-                token.globaleGrupper() shouldContainExactlyInAnyOrder setOf(
-                    EntraGruppe(nasjonalId, NASJONAL.name),
-                    EntraGruppe(fortroligId, FORTROLIG.name),
-                    EntraGruppe(strengtId, STRENGT_FORTROLIG.name)
-                )
+                    token.globaleGrupper() shouldBe emptySet()
+                }
             }
 
-            it("Token.globaleGrupper returnerer tomt sett når ingen av gruppe-IDene er kjente") {
-                every { token.globaleGruppeIds } returns listOf(UUID.randomUUID(), UUID.randomUUID())
+            When("token ikke har noen gruppe-IDer") {
+                Then("globaleGrupper returnerer tomt sett") {
+                    every { token.globaleGruppeIds } returns emptyList()
 
-                token.globaleGrupper() shouldBe emptySet()
+                    token.globaleGrupper() shouldBe emptySet()
+                }
             }
 
-            it("Token.globaleGrupper returnerer tomt sett når token ikke har noen gruppe-IDer") {
-                every { token.globaleGruppeIds } returns emptyList()
+            When("grupperForAnsatt kalles") {
+                Then("slår opp globale og GEO-grupper i Entra") {
+                    val forventet = setOf(geoGruppe, EntraGruppe(nasjonalId))
+                    every { entra.geoOgGlobaleGrupper(ansattId, oid) } returns forventet
 
-                token.globaleGrupper() shouldBe emptySet()
-            }
-
-            it("slår opp globale og GEO-grupper i Entra") {
-                val forventet = setOf(geoGruppe, EntraGruppe(nasjonalId))
-                every { entra.geoOgGlobaleGrupper(ansattId, oid) } returns forventet
-
-                resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder forventet
-                verify { entra.geoOgGlobaleGrupper(ansattId, oid) }
-                verify(exactly = 0) { entra.geoGrupper(any(), any()) }
+                    resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder forventet
+                    verify { entra.geoOgGlobaleGrupper(ansattId, oid) }
+                    verify(exactly = 0) { entra.geoGrupper(any(), any()) }
+                }
             }
         }
 
-        describe("OBO-flow") {
-
+        Given("OBO-flow") {
             beforeEach {
                 every { token.erCC }  returns false
                 every { token.erObo } returns true
                 every { token.oid }   returns oid
             }
 
-            it("returnerer kun globale grupper når ansatt har nasjonal tilgang") {
-                every { token.globaleGruppeIds } returns listOf(nasjonalId)
+            When("ansatt har nasjonal tilgang") {
+                Then("returnerer kun globale grupper fra token — ingen Entra-oppslag") {
+                    every { token.globaleGruppeIds } returns listOf(nasjonalId)
 
-                resolver.grupperForAnsatt(ansattId) shouldBe setOf(EntraGruppe(nasjonalId, NASJONAL.name))
-                verify(exactly = 0) { entra.geoGrupper(any(), any()) }
-                verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
+                    resolver.grupperForAnsatt(ansattId) shouldBe setOf(EntraGruppe(nasjonalId, NASJONAL.name))
+                    verify(exactly = 0) { entra.geoGrupper(any(), any()) }
+                    verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
+                }
             }
 
-            it("slår opp GEO-grupper i Entra når ansatt ikke har nasjonal tilgang") {
-                every { token.globaleGruppeIds } returns emptyList()
-                every { entra.geoGrupper(ansattId, oid) } returns setOf(geoGruppe)
+            When("ansatt ikke har nasjonal tilgang") {
+                Then("slår opp GEO-grupper i Entra") {
+                    every { token.globaleGruppeIds } returns emptyList()
+                    every { entra.geoGrupper(ansattId, oid) } returns setOf(geoGruppe)
 
-                resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder setOf(geoGruppe)
-                verify { entra.geoGrupper(ansattId, oid) }
-                verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
+                    resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder setOf(geoGruppe)
+                    verify { entra.geoGrupper(ansattId, oid) }
+                    verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
+                }
             }
 
-            it("kombinerer globale grupper fra token med GEO-grupper fra Entra") {
-                every { token.globaleGruppeIds } returns listOf(fortroligId)
-                every { entra.geoGrupper(ansattId, oid) } returns setOf(geoGruppe)
+            When("ansatt har noen globale grupper men ikke nasjonal") {
+                Then("kombinerer globale grupper fra token med GEO-grupper fra Entra") {
+                    every { token.globaleGruppeIds } returns listOf(fortroligId)
+                    every { entra.geoGrupper(ansattId, oid) } returns setOf(geoGruppe)
 
-                resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder
-                    setOf(EntraGruppe(fortroligId, FORTROLIG.name), geoGruppe)
+                    resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder
+                        setOf(EntraGruppe(fortroligId, FORTROLIG.name), geoGruppe)
+                }
             }
         }
 
-        describe("uautentisert") {
-
+        Given("uautentisert") {
             beforeEach {
                 every { token.erCC }  returns false
                 every { token.erObo } returns false
             }
 
-            it("slår opp globale og GEO-grupper i Entra i dev/test") {
-                every { entra.geoOgGlobaleGrupper(ansattId, oid) } returns setOf(geoGruppe)
+            When("miljøet er dev/test") {
+                Then("slår opp globale og GEO-grupper i Entra") {
+                    every { entra.geoOgGlobaleGrupper(ansattId, oid) } returns setOf(geoGruppe)
 
-                resolver.grupperForAnsatt(ansattId) shouldBe setOf(geoGruppe)
-                verify { entra.geoOgGlobaleGrupper(ansattId, oid) }
+                    resolver.grupperForAnsatt(ansattId) shouldBe setOf(geoGruppe)
+                    verify { entra.geoOgGlobaleGrupper(ansattId, oid) }
+                }
             }
 
-            it("kaster HttpClientErrorException med 401 i prod") {
-                mockkObject(ClusterUtils)
-                every { ClusterUtils.isProd } returns true
-                try {
-                    shouldThrow<HttpClientErrorException> {
-                        resolver.grupperForAnsatt(ansattId)
-                    }.statusCode.value() shouldBe 401
-                } finally {
-                    unmockkObject(ClusterUtils)
+            When("miljøet er prod") {
+                Then("kaster HttpClientErrorException med status 401") {
+                    mockkObject(ClusterUtils)
+                    try {
+                        every { ClusterUtils.isProd } returns true
+                        shouldThrow<HttpClientErrorException> {
+                            resolver.grupperForAnsatt(ansattId)
+                        }.statusCode.value() shouldBe 401
+                    } finally {
+                        unmockkObject(ClusterUtils)
+                    }
                 }
             }
         }
+    }
+
+    companion object {
+        private val ansattId    = AnsattId("Z999999")
+        private val oid         = UUID.randomUUID()
+        private val nasjonalId  = UUID.randomUUID()
+        private val fortroligId = UUID.randomUUID()
+        private val strengtId   = UUID.randomUUID()
+        private val geoGruppe   = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_1234")
     }
 }

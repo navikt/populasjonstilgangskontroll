@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.regler.overstyring
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -9,54 +9,58 @@ import no.nav.tilgangsmaskin.regler.overstyring.OverstyringClientValidator.Overs
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.mock.env.MockEnvironment
 
-class OverstyringClientValidatorTest : DescribeSpec({
+class OverstyringClientValidatorTest : BehaviorSpec({
 
     val token = mockk<Token>()
-    val cfg = OverstyringConfig(systemer = setOf("histark", "gosys"))
+    val cfg = OverstyringConfig(setOf("histark", "gosys"))
 
     fun validator(activeProfiles: List<String> = listOf("dev-gcp")) =
         OverstyringClientValidator(cfg, token, MockEnvironment().apply {
             setActiveProfiles(*activeProfiles.toTypedArray())
         })
 
-    describe("validerKonsument") {
-
-        describe("i prod") {
-
-            it("kaster ikke for godkjent system") {
+    Given("validerKonsument i prod") {
+        When("systemet er godkjent") {
+            Then("kastes ingen exception") {
                 every { token.systemNavn } returns "histark"
                 validator(listOf("prod-gcp")).validerKonsument()
             }
+        }
 
-            it("kaster for ukjent system") {
+        When("systemet er gosys") {
+            Then("kastes ingen exception") {
+                every { token.systemNavn } returns "gosys"
+                validator(listOf("prod-gcp")).validerKonsument()
+            }
+        }
+
+        When("systemet er ukjent") {
+            Then("kastes OverstyringException") {
                 every { token.systemNavn } returns "ukjent-system"
                 shouldThrow<OverstyringException> {
                     validator(listOf("prod-gcp")).validerKonsument()
                 }
             }
-
-            it("exception inneholder systemnavnet") {
+            Then("exception inneholder systemnavnet") {
                 every { token.systemNavn } returns "ukjent-system"
                 val ex = shouldThrow<OverstyringException> {
                     validator(listOf("prod-gcp")).validerKonsument()
                 }
                 ex.system shouldBe "ukjent-system"
             }
-
-            it("kaster ikke for gosys") {
-                every { token.systemNavn } returns "gosys"
-                validator(listOf("prod-gcp")).validerKonsument()
-            }
         }
+    }
 
-        describe("utenfor prod") {
-
-            it("kaster ikke for ukjent system i dev") {
+    Given("validerKonsument utenfor prod") {
+        When("systemet er ukjent i dev") {
+            Then("kastes ingen exception") {
                 every { token.systemNavn } returns "ukjent-system"
                 validator(listOf("dev-gcp")).validerKonsument()
             }
+        }
 
-            it("kaster ikke for ukjent system lokalt") {
+        When("systemet er ukjent lokalt") {
+            Then("kastes ingen exception") {
                 every { token.systemNavn } returns "ukjent-system"
                 validator(listOf("local")).validerKonsument()
             }

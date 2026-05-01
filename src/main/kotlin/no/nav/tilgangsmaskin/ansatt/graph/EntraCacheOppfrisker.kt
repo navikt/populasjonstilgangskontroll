@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOppfrisker
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
-import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelElementer
+import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.regler.motor.OppfriskingTeller
@@ -21,11 +21,11 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
     private val log = getLogger(javaClass)
     override val cacheName = GRAPH
 
-    override fun doOppfrisk(elementer: CacheNøkkelElementer)  =
-        oppfriskMedMetode(elementer, elementer.metode)
+    override fun doOppfrisk(nøkkel: CacheNøkkel)  =
+        oppfriskMedMetode(nøkkel, nøkkel.metode)
 
-    private fun oppfriskMedMetode(elementer: CacheNøkkelElementer, metode: String?) {
-        val ansattId = AnsattId(elementer.id)
+    private fun oppfriskMedMetode(nøkkel: CacheNøkkel, metode: String?) {
+        val ansattId = AnsattId(nøkkel.id)
         MDC.put(USER_ID, ansattId.verdi)
         val oid  = oidTjeneste.oidFraEntra(ansattId)
         runCatching {
@@ -35,7 +35,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
                 tømOgOppfrisk(ansattId, oid, metode)
             }
             else {
-                log.warn("Oppfrisking av ${elementer.masked} feilet", it)
+                log.warn("Oppfrisking av ${nøkkel.masked} feilet", it)
             }
         }
     }

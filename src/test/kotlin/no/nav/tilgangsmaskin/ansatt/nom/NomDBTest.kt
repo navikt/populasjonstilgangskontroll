@@ -25,7 +25,7 @@ import java.time.LocalDate.EPOCH
 @ContextConfiguration(classes = [NomJPAAdapter::class, TestApp::class])
 @Testcontainers
 @ApplyExtension(SpringExtension::class)
-internal class NomTest : BehaviorSpec() {
+internal class NomDBTest : BehaviorSpec() {
 
     @Autowired
     private lateinit var nom: NomJPAAdapter

@@ -14,23 +14,25 @@ class ConcurrentMapCacheOperations(private val mgr: CacheManager) : CacheOperati
         return if (existed) 1L else 0L
     }
 
-    @Suppress("UNCHECKED_CAST")
     override fun <T : Any> getOne(cache: CachableConfig, id: String, clazz: KClass<T>): T? =
-        mgr.getCache(cache.name)?.get(tilNøkkel(cache, id))?.get() as T?
+        mgr.getCache(cache.name)?.get(tilNøkkel(cache, id), clazz.javaObjectType)
 
     override fun putOne(cache: CachableConfig, id: String, value: Any, ttl: Duration) {
         mgr.getCache(cache.name)?.put(tilNøkkel(cache, id), value)
     }
 
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : Any> getMany(cache: CachableConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T?> =
-        ids.associateWith { id ->
-            mgr.getCache(cache.name)?.get(tilNøkkel(cache, id))?.get() as T?
+    override fun <T : Any> getMany(cache: CachableConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T?> {
+        val c = mgr.getCache(cache.name) ?: return emptyMap()
+        return ids.associateWith {
+            c.get(tilNøkkel(cache, it), clazz.javaObjectType)
         }.filterValues { it != null }
+    }
 
     override fun putMany(cache: CachableConfig, innslag: Map<String, Any>, ttl: Duration) {
         val c = mgr.getCache(cache.name) ?: return
-        innslag.forEach { (id, value) -> c.put(tilNøkkel(cache, id), value) }
+        innslag.forEach {
+            (id, value) -> c.put(tilNøkkel(cache, id), value)
+        }
     }
 
     override fun tilNøkkel(cache: CachableConfig, id: String) =

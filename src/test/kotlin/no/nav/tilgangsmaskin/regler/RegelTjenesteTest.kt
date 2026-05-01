@@ -3,14 +3,12 @@ package no.nav.tilgangsmaskin.regler
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
-import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
@@ -27,36 +25,27 @@ import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
 import java.net.URI
 
-class RegelTjenesteTest : DescribeSpec() {
+class RegelTjenesteTest : BehaviorSpec({
 
-    @MockK
-    lateinit var motor: RegelMotor
-    @MockK
-    lateinit var brukere: BrukerTjeneste
-    @MockK
-    lateinit var ansatte: AnsattTjeneste
-    @MockK
-    lateinit var overstyring: OverstyringTjeneste
+    val motor = mockk<RegelMotor>()
+    val brukere = mockk<BrukerTjeneste>()
+    val ansatte = mockk<AnsattTjeneste>()
+    val overstyring = mockk<OverstyringTjeneste>()
 
-    init {
-        val vanligBrukerId = BrukerId("08526835670")
-        val ansattId = AnsattId("Z999999")
+    val vanligBrukerId = BrukerId("08526835670")
+    val ansattId = AnsattId("Z999999")
 
-        lateinit var regler: RegelTjeneste
+    lateinit var regler: RegelTjeneste
 
-        beforeSpec {
-            MockKAnnotations.init(this@RegelTjenesteTest)
-        }
+    beforeEach {
+        clearAllMocks()
+        every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
+        regler = RegelTjeneste(motor, brukere, ansatte, overstyring, LocalAuditor())
+    }
 
-        beforeEach {
-            clearAllMocks()
-            every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-            regler = RegelTjeneste(motor, brukere, ansatte, overstyring, LocalAuditor())
-        }
-
-        describe("bulk") {
-
-            it("avvist bruker havner i godkjente når overstyring er registrert") {
+    Given("bulk") {
+        When("overstyring er registrert for avvist bruker") {
+            Then("havner bruker i godkjente") {
                 val funnetBruker = BrukerBuilder(vanligBrukerId).build()
                 val regelException = RegelException(AnsattBuilder(ansattId).build(), funnetBruker, mockk<Regel>(relaxed = true))
                 every { brukere.brukere(setOf(vanligBrukerId.verdi)) } returns setOf(funnetBruker)
@@ -71,10 +60,11 @@ class RegelTjenesteTest : DescribeSpec() {
                     resultater.avviste.shouldBeEmpty()
                     resultater.ukjente.shouldBeEmpty()
                 }
-
             }
+        }
 
-            it("avvist bruker havner i avviste når ingen overstyring er registrert") {
+        When("ingen overstyring er registrert for avvist bruker") {
+            Then("havner bruker i avviste") {
                 val funnetBruker = BrukerBuilder(vanligBrukerId).build()
                 val regelException = RegelException(AnsattBuilder(ansattId).build(), funnetBruker, mockk<Regel>(relaxed = true))
                 every { brukere.brukere(setOf(vanligBrukerId.verdi)) } returns setOf(funnetBruker)
@@ -89,8 +79,10 @@ class RegelTjenesteTest : DescribeSpec() {
                     ukjente.shouldBeEmpty()
                 }
             }
+        }
 
-            it("id som ikke finnes i PDL får tilgang") {
+        When("en id ikke finnes i PDL") {
+            Then("får den ukjente id-en tilgang") {
                 val ikkeFunnetId = BrukerId("11111111111")
                 val funnetBruker = BrukerBuilder(vanligBrukerId).build()
                 every { brukere.brukere(setOf(vanligBrukerId.verdi, ikkeFunnetId.verdi)) } returns setOf(funnetBruker)
@@ -101,14 +93,15 @@ class RegelTjenesteTest : DescribeSpec() {
                     setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi), BrukerIdOgRegelsett(ikkeFunnetId.verdi)))
 
                 assertSoftly(resultater) {
-                    godkjente.map { it.brukerId } shouldContainExactlyInAnyOrder
-                        listOf(vanligBrukerId.verdi, ikkeFunnetId.verdi)
+                    godkjente.map { it.brukerId } shouldContainExactlyInAnyOrder listOf(vanligBrukerId.verdi, ikkeFunnetId.verdi)
                     avviste.shouldBeEmpty()
                     ukjente.shouldBeEmpty()
                 }
             }
+        }
 
-            it("exception som ikke er RegelException kastes videre") {
+        When("motor kaster en ikke-RegelException") {
+            Then("kastes exception videre") {
                 val funnetBruker = BrukerBuilder(vanligBrukerId).build()
                 every { brukere.brukere(setOf(vanligBrukerId.verdi)) } returns setOf(funnetBruker)
                 every { motor.bulkRegler(any(), any()) } throws RuntimeException("noe gikk galt")
@@ -118,51 +111,58 @@ class RegelTjenesteTest : DescribeSpec() {
                 }
             }
         }
+    }
 
-        describe("kjerneregler") {
-
-            it("tilgang gis når bruker ikke finnes i PDL") {
+    Given("kjerneregler") {
+        When("bruker ikke finnes i PDL") {
+            Then("gis tilgang uten feil") {
                 every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } throws
                     NotFoundRestException(URI.create("http://pdl"))
 
                 shouldNotThrowAny { regler.kjerneregler(ansattId, vanligBrukerId.verdi) }
             }
+        }
 
-            it("exception fra PDL-oppslag som ikke er NotFoundRestException kastes videre") {
+        When("PDL-oppslag kaster en ikke-NotFoundRestException") {
+            Then("kastes exception videre") {
                 every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } throws RuntimeException("PDL er nede")
 
                 shouldThrow<RuntimeException> { regler.kjerneregler(ansattId, vanligBrukerId.verdi) }
             }
         }
+    }
 
-        describe("kompletteRegler") {
-
-            it("tilgang gis når bruker ikke finnes i PDL") {
+    Given("kompletteRegler") {
+        When("bruker ikke finnes i PDL") {
+            Then("gis tilgang uten feil") {
                 every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } throws
                     NotFoundRestException(URI.create("http://pdl"))
 
                 shouldNotThrowAny { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
             }
+        }
 
-            it("exception fra PDL-oppslag som ikke er NotFoundRestException kastes videre") {
+        When("PDL-oppslag kaster en ikke-NotFoundRestException") {
+            Then("kastes exception videre") {
                 every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } throws RuntimeException("PDL er nede")
 
                 shouldThrow<RuntimeException> { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
             }
+        }
 
-            it("exception som ikke er RegelException kastes videre, også ved overstyring") {
+        When("motor kaster en ikke-RegelException selv ved overstyring") {
+            Then("kastes exception videre") {
                 val funnetBruker = BrukerBuilder(vanligBrukerId).build()
                 every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns funnetBruker
                 every { overstyring.erOverstyrt(ansattId, funnetBruker.brukerId) } returns true
-
                 every { motor.kompletteRegler(any(), any()) } throws RuntimeException("noe gikk galt")
 
-                shouldThrow<RuntimeException> {
-                    regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
-                }
+                shouldThrow<RuntimeException> { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
             }
+        }
 
-            it("tilgang gis når en overstyrbar regel avslår og overstyring er registrert for brukeren") {
+        When("en overstyrbar regel avslår og overstyring er registrert") {
+            Then("gis tilgang uten feil") {
                 val funnetBruker = BrukerBuilder(vanligBrukerId).build()
                 val regelException = RegelException(AnsattBuilder(ansattId).build(), funnetBruker, mockk<Regel>(relaxed = true))
                 every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns funnetBruker
@@ -173,4 +173,5 @@ class RegelTjenesteTest : DescribeSpec() {
             }
         }
     }
-}
+})
+

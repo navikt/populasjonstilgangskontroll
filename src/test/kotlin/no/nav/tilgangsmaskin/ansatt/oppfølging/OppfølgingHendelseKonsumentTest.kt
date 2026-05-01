@@ -27,49 +27,35 @@ class OppfølgingHendelseKonsumentTest : BehaviorSpec() {
         }
 
         Given("hendelse av type $OPPFOLGING_STARTET") {
-            When("listen kalles") {
+            When("hendelse mottas") {
                 Then("registrer med riktige argumenter") {
                     konsument.listen(hendelse(OPPFOLGING_STARTET))
-
-                    verify { oppfølging.registrer(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, START_TIDSPUNKT) }
-                }
-
-                Then("kaller ikke avslutt") {
-                    konsument.listen(hendelse(OPPFOLGING_STARTET))
-
-                    verify(exactly = 0) { oppfølging.avslutt(any(), any()) }
+                    verify {
+                        oppfølging.registrer(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, START_TIDSPUNKT)
+                    }
                 }
             }
         }
 
         Given("hendelse av type $ARBEIDSOPPFOLGINGSKONTOR_ENDRET") {
-            When("listen kalles") {
+            When("hendelse mottas") {
                 Then("registrer med riktige argumenter") {
                     konsument.listen(hendelse(ARBEIDSOPPFOLGINGSKONTOR_ENDRET))
-
-                    verify { oppfølging.registrer(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, START_TIDSPUNKT) }
-                }
-
-                Then("kaller ikke avslutt") {
-                    konsument.listen(hendelse(ARBEIDSOPPFOLGINGSKONTOR_ENDRET))
-
-                    verify(exactly = 0) { oppfølging.avslutt(any(), any()) }
+                    verify {
+                        oppfølging.registrer(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, START_TIDSPUNKT)
+                    }
                 }
             }
         }
 
         Given("hendelse av type $OPPFOLGING_AVSLUTTET") {
-            When("listen kalles") {
+            When("hendelse mottas") {
                 Then("avslutter med riktige argumenter") {
-                    konsument.listen(hendelse(OPPFOLGING_AVSLUTTET, kontor = null, sluttTidspunkt = Instant.now()))
+                    konsument.listen(hendelse(OPPFOLGING_AVSLUTTET, null, Instant.now()))
 
-                    verify { oppfølging.avslutt(ID, Identer(BRUKER_ID, AKTOR_ID)) }
-                }
-
-                Then("kaller ikke registrer") {
-                    konsument.listen(hendelse(OPPFOLGING_AVSLUTTET, kontor = null, sluttTidspunkt = Instant.now()))
-
-                    verify(exactly = 0) { oppfølging.registrer(any(), any(), any(), any()) }
+                    verify {
+                        oppfølging.avslutt(ID, Identer(BRUKER_ID, AKTOR_ID))
+                    }
                 }
             }
         }

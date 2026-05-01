@@ -25,7 +25,7 @@ object PersonTilBrukerMapper {
                 dødsdato)
         }
 
-    private fun tilGruppeKrav(gt: GeografiskTilknytning, graderinger: List<Gradering>, erSkjermet: Boolean) =
+    private fun tilGruppeKrav(gt: GeografiskTilknytning, graderinger: Set<Gradering>, erSkjermet: Boolean) =
         setOfNotNull(
                 when {
                     graderinger.erStrengtFortrolig() -> STRENGT_FORTROLIG

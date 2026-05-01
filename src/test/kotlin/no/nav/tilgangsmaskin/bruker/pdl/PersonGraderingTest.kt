@@ -12,17 +12,17 @@ class PersonGraderingTest : BehaviorSpec({
     Given("erStrengtFortroligUtland") {
         When("listen inneholder STRENGT_FORTROLIG_UTLAND") {
             Then("returneres true") {
-                listOf(STRENGT_FORTROLIG_UTLAND).erStrengtFortroligUtland() shouldBe true
+                setOf(STRENGT_FORTROLIG_UTLAND).erStrengtFortroligUtland() shouldBe true
             }
         }
         When("listen ikke inneholder STRENGT_FORTROLIG_UTLAND") {
             Then("returneres false") {
-                listOf(STRENGT_FORTROLIG, FORTROLIG, UGRADERT).erStrengtFortroligUtland() shouldBe false
+                setOf(STRENGT_FORTROLIG, FORTROLIG, UGRADERT).erStrengtFortroligUtland() shouldBe false
             }
         }
         When("listen er tom") {
             Then("returneres false") {
-                emptyList<Person.Gradering>().erStrengtFortroligUtland() shouldBe false
+                setOf<Person.Gradering>().erStrengtFortroligUtland() shouldBe false
             }
         }
     }
@@ -30,17 +30,17 @@ class PersonGraderingTest : BehaviorSpec({
     Given("erStrengtFortrolig") {
         When("listen inneholder STRENGT_FORTROLIG") {
             Then("returneres true") {
-                listOf(STRENGT_FORTROLIG).erStrengtFortrolig() shouldBe true
+                setOf(STRENGT_FORTROLIG).erStrengtFortrolig() shouldBe true
             }
         }
         When("listen ikke inneholder STRENGT_FORTROLIG") {
             Then("returneres false") {
-                listOf(STRENGT_FORTROLIG_UTLAND, FORTROLIG, UGRADERT).erStrengtFortrolig() shouldBe false
+                setOf(STRENGT_FORTROLIG_UTLAND, FORTROLIG, UGRADERT).erStrengtFortrolig() shouldBe false
             }
         }
         When("listen er tom") {
             Then("returneres false") {
-                emptyList<Person.Gradering>().erStrengtFortrolig() shouldBe false
+                emptySet<Person.Gradering>().erStrengtFortrolig() shouldBe false
             }
         }
     }
@@ -48,17 +48,17 @@ class PersonGraderingTest : BehaviorSpec({
     Given("erFortrolig") {
         When("listen inneholder FORTROLIG") {
             Then("returneres true") {
-                listOf(FORTROLIG).erFortrolig() shouldBe true
+                setOf(FORTROLIG).erFortrolig() shouldBe true
             }
         }
         When("listen ikke inneholder FORTROLIG") {
             Then("returneres false") {
-                listOf(STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, UGRADERT).erFortrolig() shouldBe false
+                setOf(STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, UGRADERT).erFortrolig() shouldBe false
             }
         }
         When("listen er tom") {
             Then("returneres false") {
-                emptyList<Person.Gradering>().erFortrolig() shouldBe false
+                emptySet<Person.Gradering>().erFortrolig() shouldBe false
             }
         }
     }

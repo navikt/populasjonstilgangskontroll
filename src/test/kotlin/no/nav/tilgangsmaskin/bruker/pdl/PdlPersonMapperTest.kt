@@ -68,7 +68,7 @@ class PdlPersonMapperTest : BehaviorSpec({
     val far = BrukerId("01010154321")
 
     fun identer(fnr: String = brukerId, aktor: String = aktorId, historiske: List<Pair<String, PdlIdentGruppe>> = emptyList()) =
-        PdlIdenter(buildList {
+        PdlIdenter(buildSet {
             add(PdlIdent(fnr, false, FOLKEREGISTERIDENT))
             add(PdlIdent(aktor, false, AKTORID))
             historiske.forEach { (ident, gruppe) -> add(PdlIdent(ident, true, gruppe)) }
@@ -143,7 +143,7 @@ class PdlPersonMapperTest : BehaviorSpec({
 
         When("relasjon er MOR") {
             Then("mapper til foreldre med relasjon MOR") {
-                val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(mor, PdlFamilieRelasjonRolle.MOR)))))
+                val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = setOf(familierelasjon(mor, PdlFamilieRelasjonRolle.MOR)))))
                 result.foreldre.single().let {
                     it.brukerId shouldBe mor
                     it.relasjon shouldBe MOR
@@ -152,7 +152,7 @@ class PdlPersonMapperTest : BehaviorSpec({
         }
         When("relasjon er FAR") {
             Then("mapper til foreldre med relasjon FAR") {
-                val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(far, PdlFamilieRelasjonRolle.FAR)))))
+                val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = setOf(familierelasjon(far, PdlFamilieRelasjonRolle.FAR)))))
                 result.foreldre.single().let {
                     it.brukerId shouldBe far
                     it.relasjon shouldBe FAR
@@ -161,17 +161,17 @@ class PdlPersonMapperTest : BehaviorSpec({
         }
         When("relasjon er MEDMOR") {
             Then("mapper til foreldre med relasjon MOR") {
-                tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(mor, PdlFamilieRelasjonRolle.MEDMOR))))).foreldre.single().relasjon shouldBe MOR
+                tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = setOf(familierelasjon(mor, PdlFamilieRelasjonRolle.MEDMOR))))).foreldre.single().relasjon shouldBe MOR
             }
         }
         When("relasjon er MEDFAR") {
             Then("mapper til foreldre med relasjon FAR") {
-                tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(far, PdlFamilieRelasjonRolle.MEDFAR))))).foreldre.single().relasjon shouldBe FAR
+                tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = setOf(familierelasjon(far, PdlFamilieRelasjonRolle.MEDFAR))))).foreldre.single().relasjon shouldBe FAR
             }
         }
         When("relasjon er BARN") {
             Then("mapper til barn") {
-                val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(barn, PdlFamilieRelasjonRolle.BARN)))))
+                val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = setOf(familierelasjon(barn, PdlFamilieRelasjonRolle.BARN)))))
                 result.barn.single().let {
                     it.brukerId shouldBe barn
                     it.relasjon shouldBe BARN
@@ -180,7 +180,7 @@ class PdlPersonMapperTest : BehaviorSpec({
         }
         When("relasjon mangler ident") {
             Then("mapper til ingen barn eller foreldre") {
-                val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(PdlFamilierelasjon(null, PdlFamilieRelasjonRolle.BARN)))))
+                val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = setOf(PdlFamilierelasjon(null, PdlFamilieRelasjonRolle.BARN)))))
                 assertSoftly {
                     result.barn.shouldBeEmpty()
                     result.foreldre.shouldBeEmpty()
@@ -190,7 +190,7 @@ class PdlPersonMapperTest : BehaviorSpec({
         When("relasjon har ident men null rolle") {
             Then("kaster exception") {
                 shouldThrow<IllegalStateException> {
-                    tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(PdlFamilierelasjon(barn, null)))))
+                    tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = setOf(PdlFamilierelasjon(barn, null)))))
                 }
             }
         }
@@ -204,22 +204,22 @@ class PdlPersonMapperTest : BehaviorSpec({
         }
         When("gradering er STRENGT_FORTROLIG_UTLAND") {
             Then("mapper korrekt") {
-                tilPerson(brukerId, pdlRespons(PdlPerson(listOf(PdlAdressebeskyttelse(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND))))).graderinger shouldContainExactly listOf(Gradering.STRENGT_FORTROLIG_UTLAND)
+                tilPerson(brukerId, pdlRespons(PdlPerson(setOf(PdlAdressebeskyttelse(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND))))).graderinger shouldContainExactly listOf(Gradering.STRENGT_FORTROLIG_UTLAND)
             }
         }
         When("gradering er STRENGT_FORTROLIG") {
             Then("mapper korrekt") {
-                tilPerson(brukerId, pdlRespons(PdlPerson(listOf(PdlAdressebeskyttelse(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG))))).graderinger shouldContainExactly listOf(Gradering.STRENGT_FORTROLIG)
+                tilPerson(brukerId, pdlRespons(PdlPerson(setOf(PdlAdressebeskyttelse(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG))))).graderinger shouldContainExactly listOf(Gradering.STRENGT_FORTROLIG)
             }
         }
         When("gradering er FORTROLIG") {
             Then("mapper korrekt") {
-                tilPerson(brukerId, pdlRespons(PdlPerson(listOf(PdlAdressebeskyttelse(PdlAdressebeskyttelseGradering.FORTROLIG))))).graderinger shouldContainExactly listOf(Gradering.FORTROLIG)
+                tilPerson(brukerId, pdlRespons(PdlPerson(setOf(PdlAdressebeskyttelse(PdlAdressebeskyttelseGradering.FORTROLIG))))).graderinger shouldContainExactly listOf(Gradering.FORTROLIG)
             }
         }
         When("gradering er UGRADERT") {
             Then("mapper korrekt") {
-                tilPerson(brukerId, pdlRespons(PdlPerson(listOf(PdlAdressebeskyttelse(PdlAdressebeskyttelseGradering.UGRADERT))))).graderinger shouldContainExactly listOf(Gradering.UGRADERT)
+                tilPerson(brukerId, pdlRespons(PdlPerson(setOf(PdlAdressebeskyttelse(PdlAdressebeskyttelseGradering.UGRADERT))))).graderinger shouldContainExactly listOf(Gradering.UGRADERT)
             }
         }
     }
@@ -233,14 +233,14 @@ class PdlPersonMapperTest : BehaviorSpec({
         When("det finnes ett dødsfall") {
             Then("returneres dødsdatoen") {
                 val dato = LocalDate.of(2024, 1, 15)
-                tilPerson(brukerId, pdlRespons(PdlPerson(doedsfall = listOf(PdlDødsfall(dato))))).dødsdato shouldBe dato
+                tilPerson(brukerId, pdlRespons(PdlPerson(doedsfall = setOf(PdlDødsfall(dato))))).dødsdato shouldBe dato
             }
         }
         When("det finnes flere dødsfall") {
             Then("returneres den seneste dødsdatoen") {
                 val tidlig = LocalDate.of(2023, 1, 1)
                 val sen = LocalDate.of(2024, 6, 1)
-                tilPerson(brukerId, pdlRespons(PdlPerson(doedsfall = listOf(PdlDødsfall(tidlig), PdlDødsfall(sen))))).dødsdato shouldBe sen
+                tilPerson(brukerId, pdlRespons(PdlPerson(doedsfall = setOf(PdlDødsfall(tidlig), PdlDødsfall(sen))))).dødsdato shouldBe sen
             }
         }
     }
@@ -311,7 +311,7 @@ class PdlPersonMapperTest : BehaviorSpec({
         When("FOLKEREGISTERIDENT mangler og NPID finnes") {
             Then("brukes NPID som brukerId") {
                 val npid = "01234567890"
-                val identerMedNpid = PdlIdenter(listOf(
+                val identerMedNpid = PdlIdenter(setOf(
                     PdlIdent(npid, false, NPID),
                     PdlIdent(aktorId, false, AKTORID),
                 ))
@@ -321,14 +321,14 @@ class PdlPersonMapperTest : BehaviorSpec({
         When("aktørId mangler") {
             Then("kaster exception") {
                 shouldThrow<IllegalStateException> {
-                    PdlRespons(PdlPerson(), PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT))))
+                    PdlRespons(PdlPerson(), PdlIdenter(setOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT))))
                 }
             }
         }
         When("brukerId mangler") {
             Then("kaster exception") {
                 shouldThrow<IllegalStateException> {
-                    PdlRespons(PdlPerson(), PdlIdenter(listOf(PdlIdent(aktorId, false, AKTORID))))
+                    PdlRespons(PdlPerson(), PdlIdenter(setOf(PdlIdent(aktorId, false, AKTORID))))
                 }
             }
         }

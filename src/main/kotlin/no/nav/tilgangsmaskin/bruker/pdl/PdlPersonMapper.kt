@@ -74,19 +74,18 @@ object PdlPersonMapper {
 
     fun tilPartner(type: Sivilstandstype) =
         when (type) {
-            GIFT,
-            REGISTRERT_PARTNER -> PARTNER
-            SKILT,
-            ENKE_ELLER_ENKEMANN,
-            SEPARERT,
-            SKILT_PARTNER,
-            GJENLEVENDE_PARTNER,
-            SEPARERT_PARTNER -> TIDLIGERE_PARTNER
+            GIFT, REGISTRERT_PARTNER -> PARTNER
+            SKILT, ENKE_ELLER_ENKEMANN,
+            SEPARERT, SKILT_PARTNER,
+            GJENLEVENDE_PARTNER, SEPARERT_PARTNER -> TIDLIGERE_PARTNER
             else -> INGEN
         }
 
-    private fun tilGraderinger(beskyttelse: List<PdlAdressebeskyttelse>) =
-        beskyttelse.map { tilGradering(it.gradering) }
+    private fun tilGraderinger(beskyttelse: Set<PdlAdressebeskyttelse>) =
+        buildSet {
+            beskyttelse.forEach { add(tilGradering(it.gradering))
+            }
+        }
 
     private fun tilGradering(gradering: PdlAdressebeskyttelseGradering) =
         when (gradering) {
@@ -117,21 +116,32 @@ object PdlPersonMapper {
             else -> UdefinertTilknytning()
         }
 
-    private fun tilDødsdato(dødsfall: List<PdlDødsfall>) = dødsfall.maxByOrNull { it.doedsdato }?.doedsdato
+    private fun tilDødsdato(dødsfall: Set<PdlDødsfall>) = dødsfall.maxByOrNull { it.doedsdato }?.doedsdato
 
-    private fun tilFamilie(relasjoner: List<PdlFamilierelasjon>): Familie {
+    private fun tilFamilie(relasjoner: Set<PdlFamilierelasjon>): Familie {
         val (foreldre, barn) = relasjoner
             .mapNotNull { it.relatertPersonsIdent?.let { ident -> it.relatertPersonsRolle to ident } }
             .partition { it.first != BARN }
         return Familie(
-                foreldre.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet(),
-                barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet())
+            buildSet {
+                foreldre.forEach { add(FamilieMedlem(it.second, tilRelasjon(it.first)))
+                }
+            }, buildSet {
+                barn.forEach {
+                    add(FamilieMedlem(it.second, tilRelasjon(it.first)))
+                }
+            }
+        )
     }
 
-    private fun tilHistoriskeBrukerIds(identer: PdlIdenter) = identer.identer
-        .filter { it.historisk }
-        .filter { it.gruppe in listOf(FOLKEREGISTERIDENT, NPID) }
-        .map { (BrukerId(it.ident)) }.toSet()
+    private fun tilHistoriskeBrukerIds(identer: PdlIdenter) = buildSet {
+        identer.identer
+            .filter {
+                it.historisk && it.gruppe in setOf(FOLKEREGISTERIDENT, NPID) }
+            .forEach {
+                add(BrukerId(it.ident))
+            }
+    }
 
     private fun tilRelasjon(relasjon: PdlFamilieRelasjonRolle?) =
         when (relasjon) {

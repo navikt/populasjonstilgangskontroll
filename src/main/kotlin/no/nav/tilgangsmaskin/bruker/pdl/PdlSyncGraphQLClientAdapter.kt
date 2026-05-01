@@ -8,6 +8,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
 import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.graphql.AbstractSyncGraphQLAdapter
 import no.nav.tilgangsmaskin.felles.graphql.GraphQLErrorHandler
+import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.graphql.client.GraphQlClient
@@ -26,7 +27,7 @@ class PdlSyncGraphQLClientAdapter(
         @Qualifier(PDLGRAPH) restClient: RestClient,
         graphQlErrorHandler: GraphQLErrorHandler,
         cfg: PdlGraphQLConfig,
-        errorHandler: ErrorHandler) :
+        errorHandler: ErrorHandler = DefaultRestErrorHandler()) :
     AbstractSyncGraphQLAdapter(graphQlClient, restClient, cfg, errorHandler, graphQlErrorHandler) {
 
     override fun ping() {

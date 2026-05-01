@@ -21,6 +21,10 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentG
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering.FORTROLIG
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
+import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering.UGRADERT
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlDødsfall
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle
@@ -33,21 +37,32 @@ object PdlTestMapper {
 
     fun pdlRespons(p: Person) = PdlRespons(
         PdlPerson(
-            adressebeskyttelse = p.graderinger.map { tilPdlGradering(it) }.map { PdlAdressebeskyttelse(it) },
-            doedsfall          = listOfNotNull(p.dødsdato?.let { PdlDødsfall(it) }),
-            familierelasjoner  = tilFamilierelasjoner(p.familie).values.flatten()
+            buildSet {
+                p.graderinger.forEach {
+                    add(PdlAdressebeskyttelse(tilPdlGradering(it)))
+                }
+            },
+            setOfNotNull(p.dødsdato?.let {
+                PdlDødsfall(it)
+            }),
+            buildSet {
+                tilFamilierelasjoner(p.familie).values.forEach {
+                    addAll(it)
+                }
+            }
         ),
         PdlIdenter(
-            buildList {
+            buildSet {
                 add(PdlIdent(p.brukerId.verdi, false, FOLKEREGISTERIDENT))
                 add(PdlIdent(p.aktørId.verdi, false, AKTORID))
-                p.historiskeIds.forEach { add(PdlIdent(it.verdi, true, FOLKEREGISTERIDENT)) }
+                p.historiskeIds.forEach {
+                    add(PdlIdent(it.verdi, true, FOLKEREGISTERIDENT))
+                }
             }
         ),
         tilPdlGeografiskTilknytning(p.geoTilknytning)
     )
 
-    // ...existing code...
 
     private fun tilPdlGeografiskTilknytning(geo: GeografiskTilknytning) =
         when (geo) {
@@ -80,15 +95,15 @@ object PdlTestMapper {
             FamilieRelasjon.MOR  -> MOR
             FamilieRelasjon.FAR  -> FAR
             FamilieRelasjon.BARN -> BARN
-            else                 -> null
+            else -> null
         }
 
     private fun tilPdlGradering(gradering: Gradering): PdlAdressebeskyttelseGradering =
         when (gradering) {
-            Gradering.STRENGT_FORTROLIG_UTLAND -> PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
-            Gradering.STRENGT_FORTROLIG        -> PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG
-            Gradering.FORTROLIG                -> PdlAdressebeskyttelseGradering.FORTROLIG
-            Gradering.UGRADERT                 -> PdlAdressebeskyttelseGradering.UGRADERT
+            Gradering.STRENGT_FORTROLIG_UTLAND -> STRENGT_FORTROLIG_UTLAND
+            Gradering.STRENGT_FORTROLIG  -> STRENGT_FORTROLIG
+            Gradering.FORTROLIG-> FORTROLIG
+            Gradering.UGRADERT  -> UGRADERT
         }
 }
 

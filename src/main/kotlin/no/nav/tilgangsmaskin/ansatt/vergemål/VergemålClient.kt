@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.vergemål
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
@@ -22,3 +24,5 @@ interface VergemålClient {
 
 data class VergemålIdent(val ident: String)
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Vergemål(val vergehaver: BrukerId)

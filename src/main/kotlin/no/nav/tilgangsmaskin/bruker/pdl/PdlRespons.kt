@@ -15,14 +15,14 @@ data class PdlRespons(
 
     val aktørId = identer.identer.firstOrNull { it.gruppe == AKTORID }?.ident
         ?: error("Ingen gyldig aktørid funnet")
-    val brukerId = identer.identer.firstOrNull { it.gruppe in listOf(FOLKEREGISTERIDENT, NPID) && !it.historisk  }?.ident
+    val brukerId = identer.identer.firstOrNull { it.gruppe in setOf(FOLKEREGISTERIDENT, NPID) && !it.historisk  }?.ident
         ?: error("Ingen gyldig identer funnet")
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class PdlPerson(
-            val adressebeskyttelse: List<PdlAdressebeskyttelse> = emptyList(),
-            val doedsfall: List<PdlDødsfall> = emptyList(),
-            val familierelasjoner: List<PdlFamilierelasjon> = emptyList()) {
+            val adressebeskyttelse: Set<PdlAdressebeskyttelse> = emptySet(),
+            val doedsfall: Set<PdlDødsfall> = emptySet(),
+            val familierelasjoner: Set<PdlFamilierelasjon> = emptySet()) {
 
         data class PdlAdressebeskyttelse(val gradering: PdlAdressebeskyttelseGradering) {
             enum class PdlAdressebeskyttelseGradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG, UGRADERT }
@@ -37,7 +37,7 @@ data class PdlRespons(
         }
     }
 
-    data class PdlIdenter(val identer: List<PdlIdent> = emptyList()) {
+    data class PdlIdenter(val identer: Set<PdlIdent> = emptySet()) {
         data class PdlIdent(val ident: String, val historisk: Boolean, val gruppe: PdlIdentGruppe) {
             enum class PdlIdentGruppe { AKTORID, FOLKEREGISTERIDENT, NPID }
         }

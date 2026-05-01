@@ -32,7 +32,7 @@ class PersonTilBrukerMapperTest : BehaviorSpec({
 
     fun person(
         gt: GeografiskTilknytning = kommuneGT,
-        graderinger: List<Person.Gradering> = emptyList(),
+        graderinger: Set<Person.Gradering> = emptySet(),
         historiskeIds: Set<BrukerId> = emptySet(),
         dødsdato: LocalDate? = null,
     ) = Person(
@@ -68,7 +68,7 @@ class PersonTilBrukerMapperTest : BehaviorSpec({
     Given("tilBruker - påkrevdeGrupper — gradering") {
         When("person er ugradert uten skjerming") {
             Then("er påkrevdeGrupper tom") {
-                tilBruker(person(graderinger = listOf(UGRADERT)), false).påkrevdeGrupper shouldBe emptySet()
+                tilBruker(person(graderinger = setOf(UGRADERT)), false).påkrevdeGrupper shouldBe emptySet()
             }
         }
         When("person har ingen graderinger og ingen skjerming") {
@@ -78,27 +78,27 @@ class PersonTilBrukerMapperTest : BehaviorSpec({
         }
         When("person har STRENGT_FORTROLIG gradering") {
             Then("kreves STRENGT_FORTROLIG-gruppe") {
-                tilBruker(person(graderinger = listOf(GRAD_STRENGT_FORTROLIG)), false).påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG)
+                tilBruker(person(graderinger = setOf(GRAD_STRENGT_FORTROLIG)), false).påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG)
             }
         }
         When("person har STRENGT_FORTROLIG_UTLAND gradering") {
             Then("kreves STRENGT_FORTROLIG_UTLAND-gruppe") {
-                tilBruker(person(graderinger = listOf(GRAD_STRENGT_FORTROLIG_UTLAND)), false).påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG_UTLAND)
+                tilBruker(person(graderinger = setOf(GRAD_STRENGT_FORTROLIG_UTLAND)), false).påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG_UTLAND)
             }
         }
         When("person har FORTROLIG gradering") {
             Then("kreves FORTROLIG-gruppe") {
-                tilBruker(person(graderinger = listOf(GRAD_FORTROLIG)), false).påkrevdeGrupper shouldBe setOf(FORTROLIG)
+                tilBruker(person(graderinger = setOf(GRAD_FORTROLIG)), false).påkrevdeGrupper shouldBe setOf(FORTROLIG)
             }
         }
         When("person har både STRENGT_FORTROLIG og FORTROLIG") {
             Then("har STRENGT_FORTROLIG prioritet") {
-                tilBruker(person(graderinger = listOf(GRAD_STRENGT_FORTROLIG, GRAD_FORTROLIG)), false).påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG)
+                tilBruker(person(graderinger = setOf(GRAD_STRENGT_FORTROLIG, GRAD_FORTROLIG)), false).påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG)
             }
         }
         When("person har både STRENGT_FORTROLIG_UTLAND og STRENGT_FORTROLIG") {
             Then("har STRENGT_FORTROLIG prioritet") {
-                tilBruker(person(graderinger = listOf(GRAD_STRENGT_FORTROLIG_UTLAND, GRAD_STRENGT_FORTROLIG)), false).påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG)
+                tilBruker(person(graderinger = setOf(GRAD_STRENGT_FORTROLIG_UTLAND, GRAD_STRENGT_FORTROLIG)), false).påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG)
             }
         }
     }
@@ -111,12 +111,12 @@ class PersonTilBrukerMapperTest : BehaviorSpec({
         }
         When("person er skjermet og har FORTROLIG gradering") {
             Then("kombineres SKJERMING med FORTROLIG") {
-                tilBruker(person(graderinger = listOf(GRAD_FORTROLIG)), true).påkrevdeGrupper shouldBe setOf(FORTROLIG, SKJERMING)
+                tilBruker(person(graderinger = setOf(GRAD_FORTROLIG)), true).påkrevdeGrupper shouldBe setOf(FORTROLIG, SKJERMING)
             }
         }
         When("person er skjermet og har STRENGT_FORTROLIG gradering") {
             Then("kombineres SKJERMING med STRENGT_FORTROLIG") {
-                tilBruker(person(graderinger = listOf(GRAD_STRENGT_FORTROLIG)), true).påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG, SKJERMING)
+                tilBruker(person(graderinger = setOf(GRAD_STRENGT_FORTROLIG)), true).påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG, SKJERMING)
             }
         }
     }
@@ -124,17 +124,17 @@ class PersonTilBrukerMapperTest : BehaviorSpec({
     Given("tilBruker - påkrevdeGrupper — geografisk tilknytning") {
         When("person har UdefinertTilknytning") {
             Then("kreves UKJENT_BOSTED-gruppe") {
-                tilBruker(person(gt = UdefinertTilknytning()), false).påkrevdeGrupper shouldBe setOf(UKJENT_BOSTED)
+                tilBruker(person(UdefinertTilknytning()), false).påkrevdeGrupper shouldBe setOf(UKJENT_BOSTED)
             }
         }
         When("person har KommuneTilknytning") {
             Then("kreves ikke UKJENT_BOSTED") {
-                tilBruker(person(gt = kommuneGT), false).påkrevdeGrupper shouldNotContain UKJENT_BOSTED
+                tilBruker(person(kommuneGT), false).påkrevdeGrupper shouldNotContain UKJENT_BOSTED
             }
         }
         When("person har BydelTilknytning") {
             Then("kreves ikke UKJENT_BOSTED") {
-                tilBruker(person(gt = BydelTilknytning(Bydel("030101"))), false).påkrevdeGrupper shouldNotContain UKJENT_BOSTED
+                tilBruker(person(BydelTilknytning(Bydel("030101"))), false).påkrevdeGrupper shouldNotContain UKJENT_BOSTED
             }
         }
         When("person har UtenlandskTilknytning") {
@@ -144,17 +144,17 @@ class PersonTilBrukerMapperTest : BehaviorSpec({
         }
         When("person har UkjentBosted") {
             Then("kreves ikke UKJENT_BOSTED") {
-                tilBruker(person(gt = UkjentBosted()), false).påkrevdeGrupper shouldNotContain UKJENT_BOSTED
+                tilBruker(person(UkjentBosted()), false).påkrevdeGrupper shouldNotContain UKJENT_BOSTED
             }
         }
         When("person har UdefinertTilknytning og FORTROLIG gradering") {
             Then("kombineres UKJENT_BOSTED med FORTROLIG") {
-                tilBruker(person(gt = UdefinertTilknytning(), graderinger = listOf(GRAD_FORTROLIG)), false).påkrevdeGrupper shouldBe setOf(FORTROLIG, UKJENT_BOSTED)
+                tilBruker(person(UdefinertTilknytning(), graderinger = setOf(GRAD_FORTROLIG)), false).påkrevdeGrupper shouldBe setOf(FORTROLIG, UKJENT_BOSTED)
             }
         }
         When("person har UdefinertTilknytning og er skjermet") {
             Then("kombineres UKJENT_BOSTED med SKJERMING") {
-                tilBruker(person(gt = UdefinertTilknytning()), true).påkrevdeGrupper shouldBe setOf(UKJENT_BOSTED, SKJERMING)
+                tilBruker(person(UdefinertTilknytning()), true).påkrevdeGrupper shouldBe setOf(UKJENT_BOSTED, SKJERMING)
             }
         }
     }
@@ -162,13 +162,13 @@ class PersonTilBrukerMapperTest : BehaviorSpec({
     Given("tilBruker - kombinasjoner") {
         When("person har STRENGT_FORTROLIG, UdefinertTilknytning og er skjermet") {
             Then("kombineres STRENGT_FORTROLIG, UKJENT_BOSTED og SKJERMING") {
-                tilBruker(person(gt = UdefinertTilknytning(), graderinger = listOf(GRAD_STRENGT_FORTROLIG)), true)
+                tilBruker(person(gt = UdefinertTilknytning(), graderinger = setOf(GRAD_STRENGT_FORTROLIG)), true)
                     .påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG, UKJENT_BOSTED, SKJERMING)
             }
         }
         When("person er ugradert, ikke skjermet og har kjent GT") {
             Then("er påkrevdeGrupper tom") {
-                tilBruker(person(gt = kommuneGT, graderinger = listOf(UGRADERT)), false).påkrevdeGrupper shouldBe emptySet()
+                tilBruker(person(kommuneGT, graderinger = setOf(UGRADERT)), false).påkrevdeGrupper shouldBe emptySet()
             }
         }
     }

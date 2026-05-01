@@ -17,7 +17,7 @@ data class Person(
     val oppslagId: String = brukerId.verdi,
     val aktørId: AktørId,
     val geoTilknytning: GeografiskTilknytning,
-    val graderinger: List<Gradering> = emptyList(),
+    val graderinger: Set<Gradering> = emptySet(),
     val familie: Familie = INGEN,
     val dødsdato: LocalDate? = null,
     val historiskeIds: Set<BrukerId> = emptySet())  {
@@ -32,9 +32,9 @@ data class Person(
 
 }
 
-fun List<Gradering>.erStrengtFortroligUtland() = contains(STRENGT_FORTROLIG_UTLAND)
+fun Set<Gradering>.erStrengtFortroligUtland() = contains(STRENGT_FORTROLIG_UTLAND)
 
-fun List<Gradering>.erStrengtFortrolig() = contains(STRENGT_FORTROLIG)
+fun Set<Gradering>.erStrengtFortrolig() = contains(STRENGT_FORTROLIG)
 
-fun List<Gradering>.erFortrolig() = contains(FORTROLIG)
+fun Set<Gradering>.erFortrolig() = contains(FORTROLIG)
 

@@ -38,8 +38,8 @@ class BrukerMapperTest : BehaviorSpec({
     fun pipRespons(
         gradering: PdlAdressebeskyttelseGradering? = null,
         geo: PdlGeografiskTilknytning = geoUtland()) =
-        PdlRespons(PdlPerson(gradering?.let { listOf(PdlAdressebeskyttelse(it)) } ?: emptyList()),
-            PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT), PdlIdent(aktorId, false, AKTORID))),
+        PdlRespons(PdlPerson(gradering?.let { setOf(PdlAdressebeskyttelse(it)) } ?: emptySet()),
+            PdlIdenter(setOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT), PdlIdent(aktorId, false, AKTORID))),
             geo)
 
     Given("tilBruker") {

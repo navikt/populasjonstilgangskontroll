@@ -10,7 +10,7 @@ import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.INGEN
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.TIDLIGERE_PARTNER
 import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype
-import no.nav.tilgangsmaskin.bruker.pdl.PdlClientBeanConfig.DefaultGraphQlErrorHandler
+import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLBeanConfig.DefaultGraphQlErrorHandler
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import org.springframework.beans.factory.annotation.Autowired

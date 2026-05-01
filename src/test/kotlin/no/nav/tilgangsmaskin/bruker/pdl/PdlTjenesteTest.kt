@@ -21,11 +21,12 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_UTVIDET_FAMI
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.pdlRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.restRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjenesteTest.PdlTestConfig
+import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.createClient
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
+import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -42,13 +43,16 @@ import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import tools.jackson.databind.json.JsonMapper
 import java.time.Duration.ofSeconds
 
-@RestClientTest(components = [PdlRestClientAdapter::class, PdlTjeneste::class])
+@RestClientTest(components = [PdlTjeneste::class, PdlClient::class,PdlConfig::class,DefaultRestErrorHandler::class])
 @EnableConfigurationProperties(PdlConfig::class)
 @Import(PdlTestConfig::class)
-@TestPropertySource(properties = ["pdl.base-uri=http://pdl"])
+@TestPropertySource(properties = [
+    "pdl.base-uri=http://pdl",
+])
 @EnableResilientMethods
 @ApplyExtension(SpringExtension::class)
 class PdlTjenesteTest : DescribeSpec() {
@@ -60,8 +64,8 @@ class PdlTjenesteTest : DescribeSpec() {
         @Bean fun cache(cacheManager: CacheManager): CacheOperations = ConcurrentMapCacheOperations(cacheManager)
 
         @Bean
-        @Qualifier(PDL)
-        fun pdlRestClient(b: RestClient.Builder) = b.build()
+        fun pdlClient(b: RestClient.Builder, cfg: PdlConfig, errorHandler: ErrorHandler) =
+            createClient<PdlClient>(cfg, b, errorHandler)
     }
 
     @MockkBean lateinit var graphQL: PdlSyncGraphQLClientAdapter
@@ -145,24 +149,22 @@ class PdlTjenesteTest : DescribeSpec() {
             }
 
             it("REST kalles ikke når alle er i cache") {
-                cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(2))
-                cache.putOne(PDL_MED_FAMILIE_CACHE, I2, P2, ofSeconds(2))
+                val entries = mapOf(I1 to P1, I2 to P2)
+                cache.putMany(PDL_MED_FAMILIE_CACHE, entries, ofSeconds(2))
                 server.expect(never(), requestTo(cfg.personerURI))
-                    .andRespond(withSuccess("[]", APPLICATION_JSON))
-
-                pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
+                pdl.personer(IDS) shouldContainExactlyInAnyOrder entries.values
                 server.verify()
             }
 
             it("slett ett element og verifiser at REST kalles for det elementet") {
-                cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(2))
-                cache.putOne(PDL_MED_FAMILIE_CACHE, I2, P2, ofSeconds(2))
-                pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
+                val innslag = mapOf(I1 to P1, I2 to P2)
+                cache.putMany(PDL_MED_FAMILIE_CACHE, innslag, ofSeconds(200))
+                pdl.personer(IDS) shouldContainExactlyInAnyOrder innslag.values
                 cache.delete(PDL_MED_FAMILIE_CACHE, I2)
                 server.expect(requestTo(cfg.personerURI))
                     .andRespond(withSuccess(restRespons(mapper, P2), APPLICATION_JSON))
 
-                pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
+                pdl.personer(IDS) shouldContainExactlyInAnyOrder innslag.values
                 cache.getOne(PDL_MED_FAMILIE_CACHE, I2, Person::class) shouldBe P2
                 server.verify()
             }

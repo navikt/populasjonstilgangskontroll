@@ -10,16 +10,12 @@ import java.net.URI
 
 
 @ConfigurationProperties(PDL)
-class PdlConfig(
-    baseUri: URI,
-    pingPath: String = DEFAULT_PING_PATH,
+class PdlConfig(baseUri: URI,
     personPath: String = DEFAULT_PERSON_PATH,
-    personBolkPath: String = DEFAULT_PERSON__BOLK_PATH) : CachableRestConfig, AbstractRestConfig(baseUri, pingPath, PDL) {
+    personBolkPath: String = DEFAULT_PERSON__BOLK_PATH) : CachableRestConfig, AbstractRestConfig(baseUri, DEFAULT_PING_PATH, PDL) {
 
     override val caches = PDL_CACHES
     override val navn = name
-    @Generated
-    override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     val personURI = uri(personPath)
     val personerURI = uri(personBolkPath)

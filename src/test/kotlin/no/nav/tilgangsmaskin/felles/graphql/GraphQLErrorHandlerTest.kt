@@ -5,7 +5,7 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilgangsmaskin.bruker.pdl.PdlClientBeanConfig.DefaultGraphQlErrorHandler
+import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLBeanConfig.DefaultGraphQlErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import org.springframework.graphql.ResponseError

@@ -16,27 +16,22 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.SKJERMIN
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_BASE
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjenesteTest.CacheConfig
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RetryLogger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.cache.CacheManager
-import org.springframework.cache.annotation.EnableCaching
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.web.client.ExpectedCount.never
+import org.springframework.test.web.client.ExpectedCount.once
 import org.springframework.test.web.client.ExpectedCount.times
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
@@ -49,15 +44,6 @@ import org.springframework.web.util.UriComponentsBuilder.fromUriString
 @Import(CacheConfig::class)
 @ApplyExtension(SpringExtension::class)
 class SkjermingTjenesteTest : DescribeSpec() {
-
-    @TestConfiguration
-    @EnableCaching
-    class CacheConfig {
-        @Bean
-        fun cacheManager(): CacheManager = ConcurrentMapCacheManager(SKJERMING)
-        @Bean
-        fun cache(cacheManager: CacheManager): CacheOperations = ConcurrentMapCacheOperations(cacheManager)
-    }
 
     @Autowired
     lateinit var tjeneste: SkjermingTjeneste
@@ -84,7 +70,7 @@ class SkjermingTjenesteTest : DescribeSpec() {
             describe("skjerming (@Cacheable)") {
 
                 it("andre kall returneres fra cache — REST kalles ikke på nytt") {
-                    server.expect(times(1), requestTo(SKJERMING_URI))
+                    server.expect(once(), requestTo(SKJERMING_URI))
                         .andRespond(withSuccess("true", APPLICATION_JSON))
 
                     tjeneste.skjerming(brukerId) shouldBe true

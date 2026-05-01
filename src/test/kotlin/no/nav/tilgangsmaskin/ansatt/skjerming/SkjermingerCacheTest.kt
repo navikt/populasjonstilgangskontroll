@@ -8,18 +8,12 @@ import io.kotest.matchers.maps.shouldContainExactly
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjenesteTest.Companion.SKJERMINGER_URI
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingerCacheTest.CacheTestConfig
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
 import no.nav.tilgangsmaskin.felles.rest.RetryLogger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.cache.CacheManager
-import org.springframework.cache.annotation.EnableCaching
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
@@ -33,18 +27,10 @@ import java.time.Duration.ofSeconds
 
 @RestClientTest(components = [SkjermingPingable::class, SkjermingClientBeanConfig::class,SkjermingConfig::class, SkjermingClient::class,SkjermingTjeneste::class, RetryLogger::class])
 @EnableResilientMethods
-@Import(CacheTestConfig::class)
+@Import(CacheConfig::class)
 @ApplyExtension(SpringExtension::class)
 class SkjermingerCacheTest : BehaviorSpec() {
 
-    @TestConfiguration
-    @EnableCaching
-    class CacheTestConfig {
-        @Bean
-        fun cacheManager(): CacheManager = ConcurrentMapCacheManager(SKJERMING)
-        @Bean
-        fun cache(cacheManager: CacheManager): CacheOperations = ConcurrentMapCacheOperations(cacheManager)
-    }
 
     @Autowired
     private lateinit var skjerming: SkjermingTjeneste
@@ -65,9 +51,9 @@ class SkjermingerCacheTest : BehaviorSpec() {
             mockServer.verify()
         }
 
-        given("skjerminger") {
-            `when`("noen identer er i cache") {
-                then("Rest kalles kun for cache-misser, treff hentes fra cache") {
+        Given("skjerminger") {
+            When("noen identer er i cache") {
+                Then("Rest kalles kun for cache-misser, treff hentes fra cache") {
                     mockServer.expect(times(1), requestTo(SKJERMINGER_URI))
                         .andRespond(withSuccess("""{"$I2":true}""", APPLICATION_JSON))
                     putOne(ID1, false)
@@ -76,8 +62,8 @@ class SkjermingerCacheTest : BehaviorSpec() {
                 }
             }
 
-            `when`("alle identer er i cache") {
-                then("Rest kalles ikke") {
+            When("alle identer er i cache") {
+                Then("Rest kalles ikke") {
                     putOne(ID1, false)
                     putOne(ID2, true)
                     mockServer.expect(never(), requestTo(SKJERMINGER_URI))
@@ -85,8 +71,8 @@ class SkjermingerCacheTest : BehaviorSpec() {
                 }
             }
 
-            `when`("et cache-innslag er slettet") {
-                then("Rest kalles igjen for det slettede innslaget") {
+            When("et cache-innslag er slettet") {
+                Then("Rest kalles igjen for det slettede innslaget") {
                     putOne(ID1, false)
                     putOne(ID2, true)
                     cache.delete(SKJERMING_CACHE, I2)

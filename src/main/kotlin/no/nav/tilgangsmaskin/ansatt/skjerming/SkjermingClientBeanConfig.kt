@@ -10,8 +10,8 @@ import org.springframework.web.client.RestClient.Builder
 class SkjermingClientBeanConfig {
 
     @Bean
-    fun skjermingClient(b: Builder, cfg: SkjermingConfig) =
-        createClient<SkjermingClient>(cfg, b)
+    fun skjermingClient(builder: Builder, cfg: SkjermingConfig) =
+        createClient<SkjermingClient>(cfg, builder)
 
     @Bean
     fun skjermingHealthIndicator(pingable: SkjermingPingable) = PingableHealthIndicator(pingable)

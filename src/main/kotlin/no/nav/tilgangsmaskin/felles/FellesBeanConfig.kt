@@ -142,8 +142,8 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             .build()))
             .build()
 
-        inline fun <reified T : Any> createClient(cfg: AbstractRestConfig, b: Builder, errorHandler: ErrorHandler = DefaultRestErrorHandler()) =
-            createProxyFactory(cfg, b, errorHandler).createClient(T::class.java)
+        inline fun <reified T : Any> createClient(cfg: AbstractRestConfig, builder: Builder, errorHandler: ErrorHandler = DefaultRestErrorHandler()) =
+            createProxyFactory(cfg, builder, errorHandler).createClient(T::class.java)
 
         private val SENSITIVE_KEYS = setOf("password", "secret", "token", "key","credentials", "jwk","private_key")
 

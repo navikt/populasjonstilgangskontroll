@@ -1,88 +1,87 @@
 package no.nav.tilgangsmaskin.bruker
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 
-class BrukerIdTest : DescribeSpec({
+class BrukerIdTest : BehaviorSpec({
 
-    describe("Identifikator") {
-
-        it("gyldig AktørId (13 siffer) aksepteres") {
-            Identifikator("1234567890123")
+    Given("Identifikator") {
+        When("verdien er en gyldig AktørId (13 siffer)") {
+            Then("aksepteres den") { Identifikator("1234567890123") }
         }
-
-        it("gyldig BrukerId (11 siffer) aksepteres når AktørId feiler") {
-            Identifikator("08526835671")
+        When("verdien er en gyldig BrukerId (11 siffer)") {
+            Then("aksepteres den") { Identifikator("08526835671") }
         }
-
-        it("verdi som verken er gyldig AktørId eller BrukerId kaster IllegalArgumentException") {
-            shouldThrow<IllegalArgumentException> { Identifikator("abc") }
-        }
-    }
-
-    describe("AktørId") {
-
-        it("gyldig aktørId med 13 siffer aksepteres") {
-            AktørId("1234567890123")
-        }
-
-        it("aktørId med ikke-numeriske tegn kaster IllegalArgumentException") {
-            shouldThrow<IllegalArgumentException> { AktørId("123456789012a") }
-        }
-
-        it("aktørId med feil lengde kaster IllegalArgumentException") {
-            shouldThrow<IllegalArgumentException> { AktørId("123456789") }
+        When("verdien verken er gyldig AktørId eller BrukerId") {
+            Then("kastes IllegalArgumentException") {
+                shouldThrow<IllegalArgumentException> { Identifikator("abc") }
+            }
         }
     }
 
-    describe("BrukerId") {
-
-        it("Gyldig Fødselsnummer skal opprettes uten problemer") {
-            BrukerId("08526835671")
+    Given("AktørId") {
+        When("aktørId har 13 siffer") {
+            Then("aksepteres den") { AktørId("1234567890123") }
         }
-
-        it("Fødselsnummer med ugyldig lengde skal kaste IllegalArgumentException") {
-            shouldThrow<IllegalArgumentException> { BrukerId("111") }
+        When("aktørId inneholder ikke-numeriske tegn") {
+            Then("kastes IllegalArgumentException") {
+                shouldThrow<IllegalArgumentException> { AktørId("123456789012a") }
+            }
         }
-
-        it("Fødselsnummer uten bare tall skal kaste IllegalArgumentException") {
-            shouldThrow<IllegalArgumentException> { BrukerId("1111111111a") }
+        When("aktørId har feil lengde") {
+            Then("kastes IllegalArgumentException") {
+                shouldThrow<IllegalArgumentException> { AktørId("123456789") }
+            }
         }
     }
 
-    describe("BrukerId i prod - mod11 grener") {
+    Given("BrukerId") {
+        When("gyldig fødselsnummer") {
+            Then("opprettes uten problemer") { BrukerId("08526835671") }
+        }
+        When("fødselsnummer har ugyldig lengde") {
+            Then("kastes IllegalArgumentException") {
+                shouldThrow<IllegalArgumentException> { BrukerId("111") }
+            }
+        }
+        When("fødselsnummer inneholder ikke bare tall") {
+            Then("kastes IllegalArgumentException") {
+                shouldThrow<IllegalArgumentException> { BrukerId("1111111111a") }
+            }
+        }
+    }
 
+    Given("BrukerId i prod - mod11 grener") {
         beforeEach {
             mockkObject(ClusterUtils)
             every { ClusterUtils.isProd } returns true
         }
+        afterEach { unmockkObject(ClusterUtils) }
 
-        afterEach {
-            unmockkObject(ClusterUtils)
+        When("W1=0 og W2=0") {
+            Then("begge kontrollsiffer er 0 og aksepteres") { BrukerId("00000000000") }
         }
-
-        it("W1=0 og W2=0: begge kontrollsiffer er 0 (00000000000)") {
-            BrukerId("00000000000")
+        When("W1=else og W2=else") {
+            Then("vanlig gyldig fødselsnummer aksepteres") { BrukerId("08526835671") }
         }
-
-        it("W1=else og W2=else: vanlig gyldig fødselsnummer (08526835671)") {
-            BrukerId("08526835671")
+        When("W1=1") {
+            Then("kastes IllegalArgumentException") {
+                shouldThrow<IllegalArgumentException> { BrukerId("08526835682") }
+            }
         }
-
-        it("W1=1: kaster IllegalArgumentException (08526835682)") {
-            shouldThrow<IllegalArgumentException> { BrukerId("08526835682") }
+        When("W2=1") {
+            Then("kastes IllegalArgumentException") {
+                shouldThrow<IllegalArgumentException> { BrukerId("10000000910") }
+            }
         }
-
-        it("W2=1: kaster IllegalArgumentException (10000000910)") {
-            shouldThrow<IllegalArgumentException> { BrukerId("10000000910") }
-        }
-
-        it("W2 kontrollsiffer matcher ikke: kaster IllegalArgumentException (08526835672)") {
-            shouldThrow<IllegalArgumentException> { BrukerId("08526835672") }
+        When("W2 kontrollsiffer matcher ikke") {
+            Then("kastes IllegalArgumentException") {
+                shouldThrow<IllegalArgumentException> { BrukerId("08526835672") }
+            }
         }
     }
 })

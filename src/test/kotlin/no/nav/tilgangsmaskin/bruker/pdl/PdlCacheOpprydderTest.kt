@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.every
 import io.mockk.mockk
@@ -17,7 +17,7 @@ import no.nav.tilgangsmaskin.regler.motor.PdlCacheTømmerTeller
 import no.nav.tilgangsmaskin.tilgang.Token
 import java.time.Instant
 
-class PdlCacheOpprydderTest : DescribeSpec({
+class PdlCacheOpprydderTest : BehaviorSpec({
 
     val token = mockk<Token>().also {
         every { it.system } returns "test"
@@ -28,17 +28,18 @@ class PdlCacheOpprydderTest : DescribeSpec({
     val opprydder = PdlCacheOpprydder(pdl, client, PdlCacheTømmerTeller(SimpleMeterRegistry(), token))
 
     fun hendelse(identer: List<String>, endringstype: Endringstype = OPPRETTET,
-        gradering: Adressebeskyttelse? = null, ) = Personhendelse("hendelse-id", identer, "PDL", Instant.now(), "PDL_HENDELSE", endringstype, null, gradering, null)
+        gradering: Adressebeskyttelse? = null) =
+        Personhendelse("hendelse-id", identer, "PDL", Instant.now(), "PDL_HENDELSE", endringstype, null, gradering, null)
 
     beforeEach {
         every { client.tilNøkkel(any(), any()) } answers { "${firstArg<Any>()}::${secondArg<String>()}" }
         every { client.delete(any(), any()) } returns 0L
     }
 
-    describe("listen") {
+    Given("en personhendelse") {
 
-        describe("sletting") {
-            it("sletter fra alle PDL-cacher for alle identer i hendelsen") {
+        When("hendelsen inneholder flere identer") {
+            Then("slettes det fra alle PDL-cacher for alle identer") {
                 opprydder.listen(hendelse(listOf(I1, I2)))
                 PDL_CACHES.forEach { cache ->
                     listOf(I1, I2).forEach { id ->
@@ -46,11 +47,19 @@ class PdlCacheOpprydderTest : DescribeSpec({
                     }
                 }
             }
+            Then("refreshes medFamilie og medUtvidetFamilie for alle identer") {
+                opprydder.listen(hendelse(listOf(I1, I2)))
+                verify { pdl.medFamilie(I1) }
+                verify { pdl.medFamilie(I2) }
+                verify { pdl.medUtvidetFamilie(I1) }
+                verify { pdl.medUtvidetFamilie(I2) }
+            }
+        }
 
-            entries.forEach { endringstype ->
-                it("behandler endringstype $endringstype") {
+        entries.forEach { endringstype ->
+            When("endringstype er $endringstype") {
+                Then("slettes og refreshes cachen") {
                     opprydder.listen(hendelse(listOf(I1), endringstype))
-
                     PDL_CACHES.forEach { cache ->
                         verify { client.delete(cache, I1) }
                     }
@@ -58,32 +67,24 @@ class PdlCacheOpprydderTest : DescribeSpec({
                     verify { pdl.medUtvidetFamilie(I1) }
                 }
             }
+        }
 
-            it("bruker UGRADERT når adressebeskyttelse er null") {
+        When("adressebeskyttelse er null") {
+            Then("brukes UGRADERT og cache slettes") {
                 opprydder.listen(hendelse(listOf(I1), gradering = null))
-
-                PDL_CACHES.forEach { cache -> verify { client.delete(cache, I1) } }
-            }
-
-            it("bruker gradering fra hendelsen") {
-                opprydder.listen(hendelse(listOf(I1), gradering = Adressebeskyttelse(FORTROLIG)))
-
                 PDL_CACHES.forEach { cache -> verify { client.delete(cache, I1) } }
             }
         }
 
-        describe("refresh") {
-
-            it("kaller medFamilie og medUtvidetFamile for alle identer") {
-                opprydder.listen(hendelse(listOf(I1, I2)))
-
-                verify { pdl.medFamilie(I1) }
-                verify { pdl.medFamilie(I2) }
-                verify { pdl.medUtvidetFamilie(I1) }
-                verify { pdl.medUtvidetFamilie(I2) }
+        When("hendelsen har gradering FORTROLIG") {
+            Then("slettes cache for identen") {
+                opprydder.listen(hendelse(listOf(I1), gradering = Adressebeskyttelse(FORTROLIG)))
+                PDL_CACHES.forEach { cache -> verify { client.delete(cache, I1) } }
             }
+        }
 
-            it("utfører refresh selv om ingen innslag ble slettet") {
+        When("ingen innslag ble slettet") {
+            Then("utføres refresh likevel") {
                 opprydder.listen(hendelse(listOf(I1)))
                 verify { pdl.medFamilie(I1) }
                 verify { pdl.medUtvidetFamilie(I1) }

@@ -10,11 +10,7 @@ import org.springframework.boot.health.contributor.Status.UP
 class PingableHealthIndicatorTest : BehaviorSpec({
 
     class StubPingable(
-<<<<<<< HEAD
-        override val pingEndpoint: URI = URI.create("http://example.com/ping"),
-=======
         override val pingEndpoint : URI = URI.create("http://example.com/ping"),
->>>>>>> main
         override val name: String = "test",
         val onPing: () -> Any? = { }
     ) : Pingable {
@@ -46,7 +42,6 @@ class PingableHealthIndicatorTest : BehaviorSpec({
             }
         }
 
-<<<<<<< HEAD
         When("ping kaster exception og pingEndpoint er tilpasset") {
             Then("inkluderes riktig pingEndpoint i DOWN-detaljer") {
                 val pingable = StubPingable(
@@ -55,16 +50,6 @@ class PingableHealthIndicatorTest : BehaviorSpec({
                 )
                 PingableHealthIndicator(pingable).health().details[ENDPOINT] shouldBe "http://other.com/health"
             }
-=======
-        it("inkluderer riktig pingEndpoint i DOWN-detaljer") {
-            val pingable = StubPingable(
-                pingEndpoint = URI.create("http://other.com/health"),
-                onPing = { throw RuntimeException("timeout") }
-            )
-            val health = PingableHealthIndicator(pingable).health()
-
-            health.details[ENDPOINT] shouldBe "http://other.com/health"
->>>>>>> main
         }
     }
 })

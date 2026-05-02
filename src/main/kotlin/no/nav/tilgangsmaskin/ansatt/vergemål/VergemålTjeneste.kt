@@ -14,16 +14,15 @@ class VergemålTjeneste(private val nom: NomTjeneste, private val client: Vergem
     @WithSpan
     @Cacheable(cacheNames = [VERGEMÅL], key = "#ansattId.verdi")
     fun vergemål(ansattId: AnsattId) =
-        nom.fnrForAnsatt(ansattId)?.let {
-                fnr -> client.vergemål(VergemålIdent(fnr.verdi))
-            .map {
-                it.vergehaver
-            }.toSet()
-        }
-            ?: emptySet()
+
+        nom.fnrForAnsatt(ansattId)?.let { fnr ->
+            client.vergemål(VergemålIdent(fnr.verdi))
+                .mapTo(mutableSetOf()) { it.vergehaver }
+                .toSet()
+        } ?: emptySet()
 
     @Generated
-    override fun toString() = "${javaClass.simpleName} [client=$client,nom=$nom]"
+    override fun toString() = "${javaClass.simpleName} [client=$client]"
 }
 
 

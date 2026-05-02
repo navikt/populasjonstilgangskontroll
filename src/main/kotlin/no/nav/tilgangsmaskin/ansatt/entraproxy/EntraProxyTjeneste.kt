@@ -18,6 +18,7 @@ class EntraProxyTjeneste(private val client: EntraProxyClient)  {
     @Generated
     override fun toString() =
         "${javaClass.simpleName} [client=$client]"
+
 }
 
 

@@ -44,8 +44,14 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
 import java.time.Duration.ofSeconds
 
+<<<<<<< HEAD
 @RestClientTest(components = [SkjermingClient::class, SkjermingConfig::class, SkjermingClientBeanConfig::class, SkjermingTjeneste::class, RetryLogger::class])
 @Import(SkjermingTestConfig::class)
+=======
+@RestClientTest(components = [SkjermingClient::class,SkjermingClientBeanConfig::class, SkjermingTjeneste::class, SkjermingPingable::class,DefaultRestErrorHandler::class, SkjermingConfig::class,RetryLogger::class])
+@EnableResilientMethods
+@Import(SkjermingTjenesteTest.CacheConfig::class)
+>>>>>>> main
 @ApplyExtension(SpringExtension::class)
 class SkjermingTjenesteTest : BehaviorSpec() {
 

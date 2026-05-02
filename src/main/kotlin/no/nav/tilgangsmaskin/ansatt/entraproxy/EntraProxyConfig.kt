@@ -9,9 +9,7 @@ import java.net.URI
 
 @Component
 class EntraProxyConfig : AbstractRestConfig(PROXY_BASE, PING_PATH, GRAPH) {
-class EntraProxyConfig : AbstractRestConfig(PROXY_BASE, PING_PATH, GRAPH)
-{
-    companion object {
-        val PROXY_BASE = URI.create("http://entra-proxy.sikkerhetstjenesten")
+        companion object {
+            val PROXY_BASE = URI.create("http://entra-proxy.sikkerhetstjenesten")
+        }
     }
-}

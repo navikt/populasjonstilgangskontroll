@@ -137,10 +137,8 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 
     companion object {
 
-        fun createProxyFactory(cfg: AbstractRestConfig, b: Builder, errorHandler: ErrorHandler) = builderFor(create(b.baseUrl(cfg.baseUri)
-            .defaultStatusHandler(HttpStatusCode::isError, errorHandler::handle)
-            .build()))
-            .build()
+        fun createProxyFactory(cfg: AbstractRestConfig, builder: Builder, errorHandler: ErrorHandler) =
+            builderFor(create(builder.baseUrl(cfg.baseUri).defaultStatusHandler(HttpStatusCode::isError, errorHandler::handle).build())).build()
 
         inline fun <reified T : Any> createClient(cfg: AbstractRestConfig, builder: Builder, errorHandler: ErrorHandler = DefaultRestErrorHandler()) =
             createProxyFactory(cfg, builder, errorHandler).createClient(T::class.java)

@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.ansatt.vergemål
+    package no.nav.tilgangsmaskin.ansatt.vergemål
 
 import java.net.URI
 import org.springframework.web.bind.annotation.RequestBody

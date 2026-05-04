@@ -19,13 +19,13 @@ class RetryLogger {
             else -> if (event.isRetryAborted) {
                 logAbort(metode, args, t)
             } else {
-                logRetrying(metode, args, t)
+                logRetrying(metode, t)
             }
         }
     }
 
-    private fun logRetrying(metode: String, args: Set<Any?>, t: Throwable?) =
-        log.warn("Feil i '$metode' ($args)  prøver igjen", t)
+    private fun logRetrying(metode: String, t: Throwable?) =
+        log.warn("Feil i '$metode',  prøver igjen", t)
 
 
     private fun logNotFound(metode: String, t: NotFoundRestException) =

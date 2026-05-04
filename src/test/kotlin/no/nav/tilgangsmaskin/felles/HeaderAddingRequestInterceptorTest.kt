@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.felles
 
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -13,7 +13,7 @@ import org.springframework.mock.http.client.MockClientHttpRequest
 import org.springframework.mock.http.client.MockClientHttpResponse
 import java.net.URI
 
-class HeaderAddingRequestInterceptorTest : DescribeSpec({
+class HeaderAddingRequestInterceptorTest : BehaviorSpec({
 
     val execution = mockk<ClientHttpRequestExecution>()
 
@@ -23,28 +23,30 @@ class HeaderAddingRequestInterceptorTest : DescribeSpec({
 
     fun request() = MockClientHttpRequest(GET, URI.create("/test"))
 
-    describe("headerAddingRequestInterceptor") {
-        it("legger til angitte headere i requesten") {
-            val request = request()
-            val interceptor = headerAddingRequestInterceptor("X-Test" to "verdi1", "X-Annet" to "verdi2")
-            interceptor.intercept(request, ByteArray(0), execution)
-            request.headers["X-Test"] shouldBe listOf("verdi1")
-            request.headers["X-Annet"] shouldBe listOf("verdi2")
+    Given("headerAddingRequestInterceptor") {
+        When("headere er angitt") {
+            Then("legges de til i requesten") {
+                val request = request()
+                headerAddingRequestInterceptor("X-Test" to "verdi1", "X-Annet" to "verdi2")
+                    .intercept(request, ByteArray(0), execution)
+                request.headers["X-Test"] shouldBe listOf("verdi1")
+                request.headers["X-Annet"] shouldBe listOf("verdi2")
+            }
         }
-
-        it("kaller videre til neste i kjeden") {
-            val request = request()
-            val body = ByteArray(0)
-            val interceptor = headerAddingRequestInterceptor("X-Test" to "verdi")
-            interceptor.intercept(request, body, execution)
-            verify { execution.execute(request, body) }
+        When("interceptor kjøres") {
+            Then("videresendes kallet til neste i kjeden") {
+                val request = request()
+                val body = ByteArray(0)
+                headerAddingRequestInterceptor("X-Test" to "verdi").intercept(request, body, execution)
+                verify { execution.execute(request, body) }
+            }
         }
-
-        it("legger til ingen headere når ingen verdier er angitt") {
-            val request = request()
-            val interceptor = headerAddingRequestInterceptor()
-            interceptor.intercept(request, ByteArray(0), execution)
-            request.headers.isEmpty shouldBe true
+        When("ingen verdier er angitt") {
+            Then("legges ingen headere til") {
+                val request = request()
+                headerAddingRequestInterceptor().intercept(request, ByteArray(0), execution)
+                request.headers.isEmpty shouldBe true
+            }
         }
     }
 })

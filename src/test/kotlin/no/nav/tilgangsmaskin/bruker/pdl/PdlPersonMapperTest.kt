@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.bruker.pdl
 
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.maps.shouldBeEmpty
@@ -59,252 +59,157 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
 import java.time.LocalDate
 
-class PdlPersonMapperTest : DescribeSpec({
+class PdlPersonMapperTest : BehaviorSpec({
 
     val brukerId = "08526835670"
-    val aktorId = "1234567890123"
+    val aktorId  = "1234567890123"
     val barn = BrukerId("01010112345")
-    val mor = BrukerId("01010198765")
-    val far = BrukerId("01010154321")
+    val mor  = BrukerId("01010198765")
+    val far  = BrukerId("01010154321")
 
     fun identer(fnr: String = brukerId, aktor: String = aktorId, historiske: List<Pair<String, PdlIdentGruppe>> = emptyList()) =
         PdlIdenter(buildList {
             add(PdlIdent(fnr, false, FOLKEREGISTERIDENT))
             add(PdlIdent(aktor, false, AKTORID))
-            historiske.forEach {
-                    (ident, gruppe) -> add(PdlIdent(ident, true, gruppe))
-            }
+            historiske.forEach { (ident, gruppe) -> add(PdlIdent(ident, true, gruppe)) }
         })
 
     fun pdlRespons(person: PdlPerson = PdlPerson(), geo: PdlGeografiskTilknytning? = PdlGeografiskTilknytning(UDEFINERT), identer: PdlIdenter = identer()) =
         PdlRespons(person, identer, geo)
 
-    describe("tilGeoTilknytning") {
-
-        it("mapper null til UdefinertTilknytning") {
-            tilGeoTilknytning(null).shouldBeInstanceOf<UdefinertTilknytning>()
+    Given("tilGeoTilknytning") {
+        When("input er null") { Then("mappes til UdefinertTilknytning") { tilGeoTilknytning(null).shouldBeInstanceOf<UdefinertTilknytning>() } }
+        When("UDEFINERT") { Then("mappes til UdefinertTilknytning") { tilGeoTilknytning(PdlGeografiskTilknytning(UDEFINERT)).shouldBeInstanceOf<UdefinertTilknytning>() } }
+        When("UTLAND med land") { Then("mappes til UtenlandskTilknytning") { tilGeoTilknytning(PdlGeografiskTilknytning(UTLAND, gtLand = GTLand("SWE"))).shouldBeInstanceOf<UtenlandskTilknytning>() } }
+        When("UTLAND uten land") { Then("mappes til UkjentBosted") { tilGeoTilknytning(PdlGeografiskTilknytning(UTLAND)).shouldBeInstanceOf<UkjentBosted>() } }
+        When("KOMMUNE med kode") {
+            Then("mappes til KommuneTilknytning med riktig verdi") {
+                tilGeoTilknytning(PdlGeografiskTilknytning(KOMMUNE, gtKommune = GTKommune("0301")))
+                    .shouldBeInstanceOf<KommuneTilknytning>().kommune.verdi shouldBe "0301"
+            }
         }
-
-        it("mapper UDEFINERT til UdefinertTilknytning") {
-            tilGeoTilknytning(PdlGeografiskTilknytning(UDEFINERT)).shouldBeInstanceOf<UdefinertTilknytning>()
+        When("KOMMUNE uten kode") { Then("mappes til UkjentBosted") { tilGeoTilknytning(PdlGeografiskTilknytning(KOMMUNE)).shouldBeInstanceOf<UkjentBosted>() } }
+        When("BYDEL med kode") {
+            Then("mappes til BydelTilknytning med riktig verdi") {
+                tilGeoTilknytning(PdlGeografiskTilknytning(BYDEL, gtBydel = GTBydel("030101")))
+                    .shouldBeInstanceOf<BydelTilknytning>().bydel.verdi shouldBe "030101"
+            }
         }
-
-        it("mapper UTLAND med land til UtenlandskTilknytning") {
-            tilGeoTilknytning(PdlGeografiskTilknytning(UTLAND, gtLand = GTLand("SWE"))).shouldBeInstanceOf<UtenlandskTilknytning>()
-        }
-
-        it("mapper UTLAND uten land til UkjentBosted") {
-            tilGeoTilknytning(PdlGeografiskTilknytning(UTLAND)).shouldBeInstanceOf<UkjentBosted>()
-        }
-
-        it("mapper KOMMUNE med kode til KommuneTilknytning med riktig verdi") {
-            tilGeoTilknytning(PdlGeografiskTilknytning(KOMMUNE, gtKommune = GTKommune("0301")))
-                .shouldBeInstanceOf<KommuneTilknytning>()
-                .kommune.verdi shouldBe "0301"
-        }
-
-        it("mapper KOMMUNE uten kode til UkjentBosted") {
-            tilGeoTilknytning(PdlGeografiskTilknytning(KOMMUNE)).shouldBeInstanceOf<UkjentBosted>()
-        }
-
-        it("mapper BYDEL med kode til BydelTilknytning med riktig verdi") {
-            tilGeoTilknytning(PdlGeografiskTilknytning(BYDEL, gtBydel = GTBydel("030101")))
-                .shouldBeInstanceOf<BydelTilknytning>()
-                .bydel.verdi shouldBe "030101"
-        }
-
-        it("mapper BYDEL uten kode til UkjentBosted") {
-            tilGeoTilknytning(PdlGeografiskTilknytning(BYDEL)).shouldBeInstanceOf<UkjentBosted>()
-        }
+        When("BYDEL uten kode") { Then("mappes til UkjentBosted") { tilGeoTilknytning(PdlGeografiskTilknytning(BYDEL)).shouldBeInstanceOf<UkjentBosted>() } }
     }
 
-    describe("tilPartner") {
-
-        it("mapper GIFT til PARTNER") { tilPartner(GIFT) shouldBe PARTNER }
-        it("mapper REGISTRERT_PARTNER til PARTNER") { tilPartner(REGISTRERT_PARTNER) shouldBe PARTNER }
-        it("mapper SKILT til TIDLIGERE_PARTNER") { tilPartner(SKILT) shouldBe TIDLIGERE_PARTNER }
-        it("mapper ENKE_ELLER_ENKEMANN til TIDLIGERE_PARTNER") { tilPartner(ENKE_ELLER_ENKEMANN) shouldBe TIDLIGERE_PARTNER }
-        it("mapper SEPARERT til TIDLIGERE_PARTNER") { tilPartner(SEPARERT) shouldBe TIDLIGERE_PARTNER }
-        it("mapper SKILT_PARTNER til TIDLIGERE_PARTNER") { tilPartner(SKILT_PARTNER) shouldBe TIDLIGERE_PARTNER }
-        it("mapper GJENLEVENDE_PARTNER til TIDLIGERE_PARTNER") { tilPartner(GJENLEVENDE_PARTNER) shouldBe TIDLIGERE_PARTNER }
-        it("mapper SEPARERT_PARTNER til TIDLIGERE_PARTNER") { tilPartner(SEPARERT_PARTNER) shouldBe TIDLIGERE_PARTNER }
-        it("mapper UGIFT til INGEN") { tilPartner(UGIFT) shouldBe INGEN }
-        it("mapper UOPPGITT til INGEN") { tilPartner(UOPPGITT) shouldBe INGEN }
+    Given("tilPartner") {
+        When("GIFT") { Then("mappes til PARTNER") { tilPartner(GIFT) shouldBe PARTNER } }
+        When("REGISTRERT_PARTNER") { Then("mappes til PARTNER") { tilPartner(REGISTRERT_PARTNER) shouldBe PARTNER } }
+        When("SKILT") { Then("mappes til TIDLIGERE_PARTNER") { tilPartner(SKILT) shouldBe TIDLIGERE_PARTNER } }
+        When("ENKE_ELLER_ENKEMANN") { Then("mappes til TIDLIGERE_PARTNER") { tilPartner(ENKE_ELLER_ENKEMANN) shouldBe TIDLIGERE_PARTNER } }
+        When("SEPARERT") { Then("mappes til TIDLIGERE_PARTNER") { tilPartner(SEPARERT) shouldBe TIDLIGERE_PARTNER } }
+        When("SKILT_PARTNER") { Then("mappes til TIDLIGERE_PARTNER") { tilPartner(SKILT_PARTNER) shouldBe TIDLIGERE_PARTNER } }
+        When("GJENLEVENDE_PARTNER") { Then("mappes til TIDLIGERE_PARTNER") { tilPartner(GJENLEVENDE_PARTNER) shouldBe TIDLIGERE_PARTNER } }
+        When("SEPARERT_PARTNER") { Then("mappes til TIDLIGERE_PARTNER") { tilPartner(SEPARERT_PARTNER) shouldBe TIDLIGERE_PARTNER } }
+        When("UGIFT") { Then("mappes til INGEN") { tilPartner(UGIFT) shouldBe INGEN } }
+        When("UOPPGITT") { Then("mappes til INGEN") { tilPartner(UOPPGITT) shouldBe INGEN } }
     }
 
-    describe("tilPerson - familierelasjoner") {
+    Given("tilPerson - familierelasjoner") {
+        fun familierelasjon(ident: BrukerId, rolle: PdlFamilieRelasjonRolle) = PdlFamilierelasjon(ident, rolle)
 
-        fun familierelasjon(ident: BrukerId, rolle: PdlFamilieRelasjonRolle) =
-            PdlFamilierelasjon(ident, rolle)
-
-        it("mapper MOR-relasjon til foreldre med relasjon MOR") {
-            val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(mor, PdlFamilieRelasjonRolle.MOR)))))
-            result.foreldre.single().let {
-                it.brukerId shouldBe mor
-                it.relasjon shouldBe MOR
+        When("MOR-relasjon") {
+            Then("mappes til foreldre med relasjon MOR") {
+                tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(mor, PdlFamilieRelasjonRolle.MOR))))).foreldre.single().let {
+                    it.brukerId shouldBe mor; it.relasjon shouldBe MOR
+                }
             }
         }
-
-        it("mapper FAR-relasjon til foreldre med relasjon FAR") {
-            val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(far, PdlFamilieRelasjonRolle.FAR)))))
-            result.foreldre.single().let {
-                it.brukerId shouldBe far
-                it.relasjon shouldBe FAR
+        When("FAR-relasjon") {
+            Then("mappes til foreldre med relasjon FAR") {
+                tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(far, PdlFamilieRelasjonRolle.FAR))))).foreldre.single().let {
+                    it.brukerId shouldBe far; it.relasjon shouldBe FAR
+                }
             }
         }
-
-        it("mapper MEDMOR-relasjon til foreldre med relasjon MOR") {
-            tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(mor, PdlFamilieRelasjonRolle.MEDMOR))))).foreldre.single().relasjon shouldBe MOR
-        }
-
-        it("mapper MEDFAR-relasjon til foreldre med relasjon FAR") {
-            tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(far, PdlFamilieRelasjonRolle.MEDFAR))))).foreldre.single().relasjon shouldBe FAR
-        }
-
-        it("mapper BARN-relasjon til barn") {
-            val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(barn, PdlFamilieRelasjonRolle.BARN)))))
-            result.barn.single().let {
-                it.brukerId shouldBe barn
-                it.relasjon shouldBe BARN
+        When("MEDMOR-relasjon") { Then("mappes til foreldre med relasjon MOR") { tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(mor, PdlFamilieRelasjonRolle.MEDMOR))))).foreldre.single().relasjon shouldBe MOR } }
+        When("MEDFAR-relasjon") { Then("mappes til foreldre med relasjon FAR") { tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(far, PdlFamilieRelasjonRolle.MEDFAR))))).foreldre.single().relasjon shouldBe FAR } }
+        When("BARN-relasjon") {
+            Then("mappes til barn") {
+                tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(barn, PdlFamilieRelasjonRolle.BARN))))).barn.single().let {
+                    it.brukerId shouldBe barn; it.relasjon shouldBe BARN
+                }
             }
         }
-
-        it("mapper relasjon uten ident til ingenting") {
-            val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(PdlFamilierelasjon(null, PdlFamilieRelasjonRolle.BARN)))))
-            assertSoftly {
-                result.barn.shouldBeEmpty()
-                result.foreldre.shouldBeEmpty()
+        When("relasjon uten ident") {
+            Then("mappes til ingenting") {
+                val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(PdlFamilierelasjon(null, PdlFamilieRelasjonRolle.BARN)))))
+                assertSoftly { result.barn.shouldBeEmpty(); result.foreldre.shouldBeEmpty() }
             }
         }
-
-        it("kaster exception for ukjent relasjon (null rolle med ident)") {
-            shouldThrow<IllegalStateException> {
-                tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(PdlFamilierelasjon(barn, null)))))
+        When("null rolle med ident") {
+            Then("kastes IllegalStateException") {
+                shouldThrow<IllegalStateException> { tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(PdlFamilierelasjon(barn, null))))) }
             }
         }
     }
 
-    describe("tilPerson - graderinger") {
+    Given("tilPerson - graderinger") {
+        When("ingen adressebeskyttelse") { Then("graderingsliste er tom") { tilPerson(brukerId, pdlRespons()).graderinger.shouldBeEmpty() } }
+        When("STRENGT_FORTROLIG_UTLAND") { Then("mappes korrekt") { tilPerson(brukerId, pdlRespons(PdlPerson(listOf(PdlAdressebeskyttelse(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND))))).graderinger shouldContainExactly listOf(Gradering.STRENGT_FORTROLIG_UTLAND) } }
+        When("STRENGT_FORTROLIG") { Then("mappes korrekt") { tilPerson(brukerId, pdlRespons(PdlPerson(listOf(PdlAdressebeskyttelse(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG))))).graderinger shouldContainExactly listOf(Gradering.STRENGT_FORTROLIG) } }
+        When("FORTROLIG") { Then("mappes korrekt") { tilPerson(brukerId, pdlRespons(PdlPerson(listOf(PdlAdressebeskyttelse(PdlAdressebeskyttelseGradering.FORTROLIG))))).graderinger shouldContainExactly listOf(Gradering.FORTROLIG) } }
+        When("UGRADERT") { Then("mappes korrekt") { tilPerson(brukerId, pdlRespons(PdlPerson(listOf(PdlAdressebeskyttelse(PdlAdressebeskyttelseGradering.UGRADERT))))).graderinger shouldContainExactly listOf(Gradering.UGRADERT) } }
+    }
 
-        it("mapper ingen adressebeskyttelse til tom graderingsliste") {
-            tilPerson(brukerId, pdlRespons()).graderinger.shouldBeEmpty()
+    Given("tilPerson - dødsdato") {
+        When("ingen dødsfall") { Then("returneres null") { tilPerson(brukerId, pdlRespons()).dødsdato.shouldBeNull() } }
+        When("ett dødsfall") {
+            Then("returneres dødsdato") {
+                val dato = LocalDate.of(2024, 1, 15)
+                tilPerson(brukerId, pdlRespons(PdlPerson(doedsfall = listOf(PdlDødsfall(dato))))).dødsdato shouldBe dato
+            }
         }
-
-        it("mapper STRENGT_FORTROLIG_UTLAND") {
-            val result = tilPerson(brukerId, pdlRespons(PdlPerson(listOf(PdlAdressebeskyttelse(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND)))))
-            result.graderinger shouldContainExactly listOf(Gradering.STRENGT_FORTROLIG_UTLAND)
-        }
-
-        it("mapper STRENGT_FORTROLIG") {
-            val result = tilPerson(brukerId, pdlRespons(PdlPerson(listOf(PdlAdressebeskyttelse(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG)))))
-            result.graderinger shouldContainExactly listOf(Gradering.STRENGT_FORTROLIG)
-        }
-
-        it("mapper FORTROLIG") {
-            val result = tilPerson(brukerId, pdlRespons(PdlPerson(listOf(PdlAdressebeskyttelse(PdlAdressebeskyttelseGradering.FORTROLIG)))))
-            result.graderinger shouldContainExactly listOf(Gradering.FORTROLIG)
-        }
-
-        it("mapper UGRADERT") {
-            val result = tilPerson(brukerId, pdlRespons(PdlPerson(listOf(PdlAdressebeskyttelse(PdlAdressebeskyttelseGradering.UGRADERT)))))
-            result.graderinger shouldContainExactly listOf(Gradering.UGRADERT)
+        When("flere dødsfall") {
+            Then("returneres seneste dødsdato") {
+                val tidlig = LocalDate.of(2023, 1, 1)
+                val sen = LocalDate.of(2024, 6, 1)
+                tilPerson(brukerId, pdlRespons(PdlPerson(doedsfall = listOf(PdlDødsfall(tidlig), PdlDødsfall(sen))))).dødsdato shouldBe sen
+            }
         }
     }
 
-    describe("tilPerson - dødsdato") {
-
-        it("returnerer null når det ikke finnes dødsfall") {
-            tilPerson(brukerId, pdlRespons()).dødsdato.shouldBeNull()
-        }
-
-        it("returnerer dødsdato fra dødsfall") {
-            val dato = LocalDate.of(2024, 1, 15)
-            tilPerson(brukerId, pdlRespons(PdlPerson(doedsfall = listOf(PdlDødsfall(dato))))).dødsdato shouldBe dato
-        }
-
-        it("returnerer seneste dødsdato ved flere dødsfall") {
-            val tidlig = LocalDate.of(2023, 1, 1)
-            val sen = LocalDate.of(2024, 6, 1)
-            tilPerson(brukerId, pdlRespons(PdlPerson(doedsfall = listOf(PdlDødsfall(tidlig), PdlDødsfall(sen))))).dødsdato shouldBe sen
-        }
+    Given("tilPerson - historiske ids") {
+        When("historisk FOLKEREGISTERIDENT") { Then("inkluderes") { tilPerson(brukerId, pdlRespons(identer = identer(historiske = listOf("12345678901" to FOLKEREGISTERIDENT)))).historiskeIds shouldContainExactly setOf(BrukerId("12345678901")) } }
+        When("historisk NPID") { Then("inkluderes") { tilPerson(brukerId, pdlRespons(identer = identer(historiske = listOf("01234567890" to NPID)))).historiskeIds shouldContainExactly setOf(BrukerId("01234567890")) } }
+        When("historisk AKTORID") { Then("ekskluderes") { tilPerson(brukerId, pdlRespons(identer = identer(historiske = listOf("9876543210123" to AKTORID)))).historiskeIds.shouldBeEmpty() } }
+        When("ingen historiske identer") { Then("er tom") { tilPerson(brukerId, pdlRespons()).historiskeIds.shouldBeEmpty() } }
     }
 
-    describe("tilPerson - historiske ids") {
-
-        it("inkluderer historiske FOLKEREGISTERIDENT") {
-            val historiskId = "12345678901"
-            tilPerson(brukerId, pdlRespons(identer = identer(historiske = listOf(historiskId to FOLKEREGISTERIDENT)))).historiskeIds shouldContainExactly setOf(BrukerId(historiskId))
+    Given("tilPersoner") {
+        When("flere responser") {
+            Then("mappes til map keyed på oppslagId") {
+                val brukerId2 = "20478606614"
+                val aktorId2  = "9876543210987"
+                val result = tilPersoner(mapOf(
+                    brukerId  to pdlRespons(),
+                    brukerId2 to pdlRespons(identer = identer(fnr = brukerId2, aktor = aktorId2), geo = PdlGeografiskTilknytning(KOMMUNE, gtKommune = GTKommune("0301")))
+                ))
+                assertSoftly(result) {
+                    shouldHaveSize(2)
+                    get(brukerId).shouldNotBeNull().brukerId shouldBe BrukerId(brukerId)
+                    get(brukerId2).shouldNotBeNull().geoTilknytning.shouldBeInstanceOf<KommuneTilknytning>()
+                }
+            }
         }
-
-        it("inkluderer historiske NPID") {
-            val historiskNpid = "01234567890"
-            tilPerson(brukerId, pdlRespons(identer = identer(historiske = listOf(historiskNpid to NPID)))).historiskeIds shouldContainExactly setOf(BrukerId(historiskNpid))
-        }
-
-        it("ekskluderer historiske AKTORID") {
-            val historiskAktorId = "9876543210123"
-            tilPerson(brukerId, pdlRespons(identer = identer(historiske = listOf(historiskAktorId to AKTORID)))).historiskeIds.shouldBeEmpty()
-        }
-
-        it("er tom når det ikke finnes historiske identer") {
-            tilPerson(brukerId, pdlRespons()).historiskeIds.shouldBeEmpty()
-        }
+        When("responser med null") { Then("filtreres null ut") { val r = tilPersoner(mapOf(brukerId to pdlRespons(), "ukjent" to null)); assertSoftly(r) { shouldHaveSize(1); get(brukerId).shouldNotBeNull() } } }
+        When("ingen responser") { Then("returneres tom map") { tilPersoner(emptyMap()).shouldBeEmpty() } }
     }
 
-    describe("tilPersoner") {
-
-        it("mapper flere responser til persons map keyed på oppslagId") {
-            val brukerId2 = "20478606614"
-            val aktorId2 = "9876543210987"
-            val responser = mapOf(
-                brukerId to pdlRespons(),
-                brukerId2 to pdlRespons(
-                    identer = identer(fnr = brukerId2, aktor = aktorId2),
-                    geo = PdlGeografiskTilknytning(KOMMUNE, gtKommune = GTKommune("0301")),
-                )
-            )
-            val result = tilPersoner(responser)
-            assertSoftly(result) {
-                shouldHaveSize(2)
-                get(brukerId).shouldNotBeNull().brukerId shouldBe BrukerId(brukerId)
-                get(brukerId2).shouldNotBeNull().geoTilknytning.shouldBeInstanceOf<KommuneTilknytning>()
+    Given("tilPerson - identifikasjon") {
+        When("FOLKEREGISTERIDENT mangler, men NPID finnes") {
+            Then("brukes NPID som brukerId") {
+                val npid = "01234567890"
+                tilPerson(brukerId, pdlRespons(identer = PdlIdenter(listOf(PdlIdent(npid, false, NPID), PdlIdent(aktorId, false, AKTORID))))).brukerId shouldBe BrukerId(npid)
             }
         }
-
-        it("filtrerer ut null-responser") {
-            val result = tilPersoner(mapOf(brukerId to pdlRespons(), "ukjent" to null))
-            assertSoftly(result) {
-                shouldHaveSize(1)
-                get(brukerId).shouldNotBeNull()
-            }
-        }
-
-        it("returnerer tom map ved ingen responser") {
-            tilPersoner(emptyMap()).shouldBeEmpty()
-        }
-    }
-
-    describe("tilPerson - identifikasjon") {
-
-        it("bruker NPID som brukerId når FOLKEREGISTERIDENT mangler") {
-            val npid = "01234567890"
-            val identerMedNpid = PdlIdenter(listOf(
-                PdlIdent(npid, false, NPID),
-                PdlIdent(aktorId, false, AKTORID),
-            ))
-            tilPerson(brukerId, pdlRespons(identer = identerMedNpid)).brukerId shouldBe BrukerId(npid)
-        }
-
-        it("kaster exception når aktørId mangler") {
-            shouldThrow<IllegalStateException> {
-                PdlRespons(PdlPerson(), PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT))))
-            }
-        }
-
-        it("kaster exception når brukerId mangler") {
-            shouldThrow<IllegalStateException> {
-                PdlRespons(PdlPerson(), PdlIdenter(listOf(PdlIdent(aktorId, false, AKTORID))))
-            }
-        }
+        When("aktørId mangler") { Then("kastes IllegalStateException") { shouldThrow<IllegalStateException> { PdlRespons(PdlPerson(), PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT)))) } } }
+        When("brukerId mangler") { Then("kastes IllegalStateException") { shouldThrow<IllegalStateException> { PdlRespons(PdlPerson(), PdlIdenter(listOf(PdlIdent(aktorId, false, AKTORID)))) } } }
     }
 })

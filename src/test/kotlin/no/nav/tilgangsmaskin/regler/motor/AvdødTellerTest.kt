@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.doubles.shouldBeExactly
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry

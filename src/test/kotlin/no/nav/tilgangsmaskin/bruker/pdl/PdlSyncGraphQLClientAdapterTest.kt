@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
@@ -39,7 +39,7 @@ import java.net.URI
 @TestPropertySource(properties = ["pdlgraph.base-uri=http://pdlgraph"])
 @Import(PdlSyncGraphQLClientAdapterTest.GraphQLTestConfig::class)
 @ApplyExtension(SpringExtension::class)
-class PdlSyncGraphQLClientAdapterTest : DescribeSpec() {
+class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
 
     @TestConfiguration
     class GraphQLTestConfig {
@@ -71,85 +71,53 @@ class PdlSyncGraphQLClientAdapterTest : DescribeSpec() {
 
     init {
         beforeEach { server.reset() }
+        afterEach { server.verify() }
 
-        describe("partnere") {
-
-            it("returnerer PARTNER for GIFT sivilstand") {
-                server.expect(requestTo(cfg.baseUri))
-                    .andRespond(withSuccess(sivilstandRespons(Sivilstandstype.GIFT), APPLICATION_JSON))
-
-                val result = adapter.partnere("Z999999")
-                result.single().relasjon shouldBe PARTNER
-                server.verify()
+        Given("partnere") {
+            When("sivilstand er GIFT") {
+                Then("returneres PARTNER") {
+                    server.expect(requestTo(cfg.baseUri)).andRespond(withSuccess(sivilstandRespons(Sivilstandstype.GIFT), APPLICATION_JSON))
+                    adapter.partnere("Z999999").single().relasjon shouldBe PARTNER
+                }
             }
-
-            it("returnerer PARTNER for REGISTRERT_PARTNER") {
-                server.expect(requestTo(cfg.baseUri))
-                    .andRespond(withSuccess(sivilstandRespons(Sivilstandstype.REGISTRERT_PARTNER), APPLICATION_JSON))
-
-                val result = adapter.partnere("Z999999")
-                result.single().relasjon shouldBe PARTNER
-                server.verify()
+            When("sivilstand er REGISTRERT_PARTNER") {
+                Then("returneres PARTNER") {
+                    server.expect(requestTo(cfg.baseUri)).andRespond(withSuccess(sivilstandRespons(Sivilstandstype.REGISTRERT_PARTNER), APPLICATION_JSON))
+                    adapter.partnere("Z999999").single().relasjon shouldBe PARTNER
+                }
             }
-
-            it("returnerer TIDLIGERE_PARTNER for SKILT sivilstand") {
-                server.expect(requestTo(cfg.baseUri))
-                    .andRespond(withSuccess(sivilstandRespons(Sivilstandstype.SKILT), APPLICATION_JSON))
-
-                val result = adapter.partnere("Z999999")
-
-                result.single().relasjon shouldBe TIDLIGERE_PARTNER
-                server.verify()
+            When("sivilstand er SKILT") {
+                Then("returneres TIDLIGERE_PARTNER") {
+                    server.expect(requestTo(cfg.baseUri)).andRespond(withSuccess(sivilstandRespons(Sivilstandstype.SKILT), APPLICATION_JSON))
+                    adapter.partnere("Z999999").single().relasjon shouldBe TIDLIGERE_PARTNER
+                }
             }
-
-            it("returnerer INGEN for UGIFT sivilstand med partner-ident") {
-                server.expect(requestTo(cfg.baseUri))
-                    .andRespond(withSuccess(sivilstandRespons(Sivilstandstype.UGIFT), APPLICATION_JSON))
-
-                val result = adapter.partnere("Z999999")
-
-                result.single().relasjon shouldBe INGEN
-                server.verify()
+            When("sivilstand er UGIFT med partner-ident") {
+                Then("returneres INGEN") {
+                    server.expect(requestTo(cfg.baseUri)).andRespond(withSuccess(sivilstandRespons(Sivilstandstype.UGIFT), APPLICATION_JSON))
+                    adapter.partnere("Z999999").single().relasjon shouldBe INGEN
+                }
             }
-
-            it("returnerer tom mengde når ingen sivilstand har relatertVedSivilstand") {
-                server.expect(requestTo(cfg.baseUri))
-                    .andRespond(withSuccess(ingenPartnerRespons(), APPLICATION_JSON))
-
-                adapter.partnere("Z999999").shouldBeEmpty()
-                server.verify()
+            When("ingen sivilstand har relatertVedSivilstand") {
+                Then("returneres tom mengde") {
+                    server.expect(requestTo(cfg.baseUri)).andRespond(withSuccess(ingenPartnerRespons(), APPLICATION_JSON))
+                    adapter.partnere("Z999999").shouldBeEmpty()
+                }
             }
-
-            /*
-            it("returnerer tom mengde ved 404") {
-                server.expect(requestTo(cfg.baseUri))
-                    .andRespond(withStatus(NOT_FOUND))
-
-                adapter.partnere("Z999999").shouldBeEmpty()
-                server.verify()
-            }
-
-             */
-
-            it("filtrerer ut sivilstand uten relatertVedSivilstand") {
-                server.expect(requestTo(cfg.baseUri))
-                    .andRespond(withSuccess(blandaRespons(), APPLICATION_JSON))
-
-                val result = adapter.partnere("Z999999")
-
-                result shouldHaveSize 1
-                server.verify()
+            When("blandet respons med og uten relatertVedSivilstand") {
+                Then("filtreres sivilstand uten relatertVedSivilstand ut") {
+                    server.expect(requestTo(cfg.baseUri)).andRespond(withSuccess(blandaRespons(), APPLICATION_JSON))
+                    adapter.partnere("Z999999") shouldHaveSize 1
+                }
             }
         }
 
-        describe("ping") {
-
-            it("ping") {
-                server.expect(requestTo(cfg.baseUri))
-                    .andExpect(method(OPTIONS))
-                    .andRespond(withSuccess())
-                adapter.ping()
-                server.verify()
+        Given("ping") {
+            When("ping kalles") {
+                Then("sendes OPTIONS-request") {
+                    server.expect(requestTo(cfg.baseUri)).andExpect(method(OPTIONS)).andRespond(withSuccess())
+                    adapter.ping()
+                }
             }
         }
     }

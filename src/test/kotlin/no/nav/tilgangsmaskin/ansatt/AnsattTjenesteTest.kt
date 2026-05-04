@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt
 
-import com.ninjasquad.springmockk.MockkBean
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -16,76 +15,81 @@ import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.NasjonalGruppeTeller
 import java.util.UUID
 
-class AnsattTjenesteTest : DescribeSpec() {
+class AnsattTjenesteTest : BehaviorSpec({
 
-    val nom = mockk<NomTjeneste>(relaxed = true)
-    @MockkBean(relaxed = true)
-    val brukere = mockk<BrukerTjeneste>(relaxed = true)
+    val nom      = mockk<NomTjeneste>(relaxed = true)
+    val brukere  = mockk<BrukerTjeneste>(relaxed = true)
     val resolver = mockk<AnsattGruppeResolver>(relaxed = true)
-    val teller = mockk<NasjonalGruppeTeller>(relaxed = true)
+    val teller   = mockk<NasjonalGruppeTeller>(relaxed = true)
     val tjeneste = AnsattTjeneste(nom, brukere, resolver, teller)
 
     val ansattId = AnsattId("Z999999")
     val brukerId = BrukerId("08526835670")
-    val bruker = BrukerBuilder(brukerId).build()
+    val bruker   = BrukerBuilder(brukerId).build()
 
-    init {
-        beforeSpec {
-            GlobalGruppe.setIDs(mapOf(
-                "gruppe.nasjonal"   to UUID.randomUUID(),
-                "gruppe.fortrolig"  to UUID.randomUUID(),
-                "gruppe.strengt"    to UUID.randomUUID(),
-                "gruppe.utland"     to UUID.randomUUID(),
-                "gruppe.udefinert"  to UUID.randomUUID(),
-                "gruppe.egenansatt" to UUID.randomUUID(),
-            ))
-        }
-        describe("ansatt") {
+    beforeSpec {
+        GlobalGruppe.setIDs(mapOf(
+            "gruppe.nasjonal"   to UUID.randomUUID(),
+            "gruppe.fortrolig"  to UUID.randomUUID(),
+            "gruppe.strengt"    to UUID.randomUUID(),
+            "gruppe.utland"     to UUID.randomUUID(),
+            "gruppe.udefinert"  to UUID.randomUUID(),
+            "gruppe.egenansatt" to UUID.randomUUID(),
+        ))
+    }
 
-            it("returnerer ansatt med riktig id") {
+    Given("ansatt") {
+        When("kalles uten noen oppsett") {
+            Then("returneres ansatt med riktig id") {
                 tjeneste.ansatt(ansattId).ansattId shouldBe ansattId
             }
+        }
 
-            it("returnerer ansatt uten bruker når fnrForAnsatt returnerer null") {
+        When("fnrForAnsatt returnerer null") {
+            Then("returneres ansatt uten bruker") {
                 every { nom.fnrForAnsatt(ansattId) } returns null
                 tjeneste.ansatt(ansattId).bruker shouldBe null
             }
+        }
 
-            it("returnerer ansatt med bruker når fnrForAnsatt returnerer en brukerId") {
+        When("fnrForAnsatt returnerer en brukerId") {
+            Then("returneres ansatt med bruker") {
                 every { nom.fnrForAnsatt(ansattId) } returns brukerId
                 every { brukere.brukerMedUtvidetFamilie(brukerId.verdi) } returns bruker
                 tjeneste.ansatt(ansattId).bruker shouldBe bruker
             }
+        }
 
-            it("returnerer ansatt uten bruker når brukeroppslag feiler") {
+        When("brukeroppslag feiler") {
+            Then("returneres ansatt uten bruker") {
                 every { nom.fnrForAnsatt(ansattId) } returns brukerId
                 every { brukere.brukerMedUtvidetFamilie(brukerId.verdi) } throws RuntimeException("PDL nede")
                 tjeneste.ansatt(ansattId).bruker shouldBe null
             }
+        }
 
-            it("returnerer ansatt med grupper fra resolver") {
+        When("resolver returnerer nasjonal-gruppe") {
+            Then("er ansatt medlem av NASJONAL") {
                 val ansattMedNasjonal = AnsattBuilder(ansattId).medMedlemskapI(NASJONAL).build()
                 every { resolver.grupperForAnsatt(ansattId) } returns ansattMedNasjonal.grupper
                 tjeneste.ansatt(ansattId) erMedlemAv NASJONAL shouldBe true
             }
+        }
 
-            it("teller nasjonal gruppemedlemskap") {
-                every { resolver.grupperForAnsatt(ansattId) } returns AnsattBuilder(ansattId).medMedlemskapI(NASJONAL).build().grupper
-                tjeneste.ansatt(ansattId)
-                verify { teller.tell(any<Tags>()) }
-            }
-
-            it("teller false når ansatt ikke har nasjonal tilgang") {
+        When("ansatt ikke har nasjonal tilgang") {
+            Then("telles false for nasjonal gruppemedlemskap") {
                 every { resolver.grupperForAnsatt(ansattId) } returns emptySet()
                 tjeneste.ansatt(ansattId)
                 verify { teller.tell(match<Tags> { it.stream().anyMatch { tag -> tag.key == "medlem" && tag.value == "false" } }) }
             }
+        }
 
-            it("teller true når ansatt har nasjonal tilgang") {
+        When("ansatt har nasjonal tilgang") {
+            Then("telles true for nasjonal gruppemedlemskap") {
                 every { resolver.grupperForAnsatt(ansattId) } returns AnsattBuilder(ansattId).medMedlemskapI(NASJONAL).build().grupper
                 tjeneste.ansatt(ansattId)
                 verify { teller.tell(match<Tags> { it.stream().anyMatch { tag -> tag.key == "medlem" && tag.value == "true" } }) }
             }
         }
     }
-}
+})

@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.matchers.types.shouldNotBeInstanceOf
@@ -17,7 +17,7 @@ import org.springframework.mock.http.client.MockClientHttpRequest
 import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import java.net.URI
 
-class DefaultRestErrorHandlerTest : DescribeSpec({
+class DefaultRestErrorHandlerTest : BehaviorSpec({
 
     val handler = DefaultRestErrorHandler()
     val uri = URI.create("http://test-service/api/resource")
@@ -28,80 +28,47 @@ class DefaultRestErrorHandlerTest : DescribeSpec({
 
     fun res(status: HttpStatus) = withStatus(status).createResponse(null)
 
-    describe("handle") {
-
-        describe("404 Not Found") {
-
-            it("kaster NotFoundRestException") {
-                shouldThrow<NotFoundRestException> {
-                    handler.handle(req(), res(NOT_FOUND))
-                }
-            }
-
-            it("NotFoundRestException inneholder riktig URI") {
-                val ex = shouldThrow<NotFoundRestException> {
-                    handler.handle(req(), res(NOT_FOUND))
-                }
+    Given("handle - 404 Not Found") {
+        When("request uten identifikator") {
+            Then("kastes NotFoundRestException med riktig URI og null identifikator") {
+                val ex = shouldThrow<NotFoundRestException> { handler.handle(req(), res(NOT_FOUND)) }
                 ex.uri shouldBe uri
-            }
-
-            it("NotFoundRestException inneholder identifikator fra header") {
-                val ex = shouldThrow<NotFoundRestException> {
-                    handler.handle(req("12345678901"), res(NOT_FOUND))
-                }
-                ex.identifikator shouldBe "12345678901"
-            }
-
-            it("NotFoundRestException har null identifikator når header mangler") {
-                val ex = shouldThrow<NotFoundRestException> {
-                    handler.handle(req(), res(NOT_FOUND))
-                }
                 ex.identifikator shouldBe null
             }
         }
-
-        describe("4xx klientfeil (ikke 404)") {
-
-            it("400 Bad Request kaster IrrecoverableRestException") {
-                shouldThrow<IrrecoverableRestException> {
-                    handler.handle(req(), res(BAD_REQUEST))
-                }
+        When("request med identifikator-header") {
+            Then("kastes NotFoundRestException med identifikator fra header") {
+                val ex = shouldThrow<NotFoundRestException> { handler.handle(req("12345678901"), res(NOT_FOUND)) }
+                ex.identifikator shouldBe "12345678901"
             }
+        }
+    }
 
-            it("403 Forbidden kaster IrrecoverableRestException") {
-                shouldThrow<IrrecoverableRestException> {
-                    handler.handle(req(), res(FORBIDDEN))
-                }
-            }
-
-            it("IrrecoverableRestException er ikke NotFoundRestException for 400") {
-                val ex = shouldThrow<IrrecoverableRestException> {
-                    handler.handle(req(), res(BAD_REQUEST))
-                }
+    Given("handle - 4xx klientfeil (ikke 404)") {
+        When("400 Bad Request") {
+            Then("kastes IrrecoverableRestException, ikke NotFoundRestException") {
+                val ex = shouldThrow<IrrecoverableRestException> { handler.handle(req(), res(BAD_REQUEST)) }
                 ex.shouldBeInstanceOf<IrrecoverableRestException>()
                 (ex is NotFoundRestException) shouldBe false
             }
         }
-
-        describe("5xx serverfeil") {
-
-            it("500 Internal Server Error kaster RecoverableRestException") {
-                shouldThrow<RecoverableRestException> {
-                    handler.handle(req(), res(INTERNAL_SERVER_ERROR))
-                }
+        When("403 Forbidden") {
+            Then("kastes IrrecoverableRestException") {
+                shouldThrow<IrrecoverableRestException> { handler.handle(req(), res(FORBIDDEN)) }
             }
+        }
+    }
 
-            it("503 Service Unavailable kaster RecoverableRestException") {
-                shouldThrow<RecoverableRestException> {
-                    handler.handle(req(), res(SERVICE_UNAVAILABLE))
-                }
-            }
-
-            it("RecoverableRestException er ikke IrrecoverableRestException") {
-                val ex = shouldThrow<RecoverableRestException> {
-                    handler.handle(req(), res(INTERNAL_SERVER_ERROR))
-                }
+    Given("handle - 5xx serverfeil") {
+        When("500 Internal Server Error") {
+            Then("kastes RecoverableRestException, ikke IrrecoverableRestException") {
+                val ex = shouldThrow<RecoverableRestException> { handler.handle(req(), res(INTERNAL_SERVER_ERROR)) }
                 ex.shouldNotBeInstanceOf<IrrecoverableRestException>()
+            }
+        }
+        When("503 Service Unavailable") {
+            Then("kastes RecoverableRestException") {
+                shouldThrow<RecoverableRestException> { handler.handle(req(), res(SERVICE_UNAVAILABLE)) }
             }
         }
     }

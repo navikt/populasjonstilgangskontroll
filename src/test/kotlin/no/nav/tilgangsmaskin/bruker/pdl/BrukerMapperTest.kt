@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import io.kotest.assertions.assertSoftly
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -27,7 +27,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttel
 import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 
-class BrukerMapperTest : DescribeSpec({
+class BrukerMapperTest : BehaviorSpec({
 
     val brukerId = BrukerBuilder(BrukerId("08526835670")).build().brukerId.verdi
     val aktorId = "1234567890123"
@@ -42,37 +42,41 @@ class BrukerMapperTest : DescribeSpec({
             PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT), PdlIdent(aktorId, false, AKTORID))),
             geo)
 
-    describe("tilBruker") {
-
-        it("STRENGT_FORTROLIG_UTLAND krever STRENGT_FORTROLIG_UTLAND-gruppe og gir UtenlandskTilknytning") {
-            val bruker = tilBruker(tilPerson(brukerId, pipRespons(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND)), false)
-            assertSoftly(bruker) {
-                påkrevdeGrupper shouldContainExactly setOf(STRENGT_FORTROLIG_UTLAND)
-                geografiskTilknytning.shouldBeInstanceOf<UtenlandskTilknytning>()
+    Given("tilBruker") {
+        When("gradering er STRENGT_FORTROLIG_UTLAND") {
+            Then("kreves STRENGT_FORTROLIG_UTLAND-gruppe og UtenlandskTilknytning") {
+                val bruker = tilBruker(tilPerson(brukerId, pipRespons(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND)), false)
+                assertSoftly(bruker) {
+                    påkrevdeGrupper shouldContainExactly setOf(STRENGT_FORTROLIG_UTLAND)
+                    geografiskTilknytning.shouldBeInstanceOf<UtenlandskTilknytning>()
+                }
             }
         }
-
-        it("STRENGT_FORTROLIG med kommunal geo krever STRENGT_FORTROLIG-gruppe og gir KommuneTilknytning") {
-            val bruker = tilBruker(tilPerson(brukerId, pipRespons(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG, geoKommune())), false)
-            assertSoftly(bruker) {
-                påkrevdeGrupper shouldContainExactly setOf(STRENGT_FORTROLIG)
-                geografiskTilknytning.shouldBeInstanceOf<KommuneTilknytning>()
+        When("gradering er STRENGT_FORTROLIG med kommunal geo") {
+            Then("kreves STRENGT_FORTROLIG-gruppe og KommuneTilknytning") {
+                val bruker = tilBruker(tilPerson(brukerId, pipRespons(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG, geoKommune())), false)
+                assertSoftly(bruker) {
+                    påkrevdeGrupper shouldContainExactly setOf(STRENGT_FORTROLIG)
+                    geografiskTilknytning.shouldBeInstanceOf<KommuneTilknytning>()
+                }
             }
         }
-
-        it("skjermet bruker krever SKJERMING-gruppe") {
-            val bruker = tilBruker(tilPerson(brukerId, pipRespons()), true)
-            bruker.påkrevdeGrupper shouldContainExactly setOf(SKJERMING)
+        When("bruker er skjermet") {
+            Then("kreves SKJERMING-gruppe") {
+                tilBruker(tilPerson(brukerId, pipRespons()), true).påkrevdeGrupper shouldContainExactly setOf(SKJERMING)
+            }
         }
-
-        it("skjermet bruker med STRENGT_FORTROLIG krever SKJERMING og STRENGT_FORTROLIG-gruppe") {
-            val bruker = tilBruker(tilPerson(brukerId, pipRespons(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG)), true)
-            bruker.påkrevdeGrupper shouldContainExactlyInAnyOrder setOf(SKJERMING, STRENGT_FORTROLIG)
+        When("bruker er skjermet og har STRENGT_FORTROLIG") {
+            Then("kreves SKJERMING og STRENGT_FORTROLIG-gruppe") {
+                tilBruker(tilPerson(brukerId, pipRespons(PdlAdressebeskyttelseGradering.STRENGT_FORTROLIG)), true)
+                    .påkrevdeGrupper shouldContainExactlyInAnyOrder setOf(SKJERMING, STRENGT_FORTROLIG)
+            }
         }
-
-        it("skjermet bruker med FORTROLIG krever SKJERMING og FORTROLIG-gruppe") {
-            val bruker = tilBruker(tilPerson(brukerId, pipRespons(PdlAdressebeskyttelseGradering.FORTROLIG)), true)
-            bruker.påkrevdeGrupper shouldContainExactlyInAnyOrder setOf(SKJERMING, FORTROLIG)
+        When("bruker er skjermet og har FORTROLIG") {
+            Then("kreves SKJERMING og FORTROLIG-gruppe") {
+                tilBruker(tilPerson(brukerId, pipRespons(PdlAdressebeskyttelseGradering.FORTROLIG)), true)
+                    .påkrevdeGrupper shouldContainExactlyInAnyOrder setOf(SKJERMING, FORTROLIG)
+            }
         }
     }
 })

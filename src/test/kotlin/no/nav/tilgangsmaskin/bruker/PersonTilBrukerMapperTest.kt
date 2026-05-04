@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.bruker
 
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
@@ -23,7 +23,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG as GRAD_FORTR
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.STRENGT_FORTROLIG as GRAD_STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.STRENGT_FORTROLIG_UTLAND as GRAD_STRENGT_FORTROLIG_UTLAND
 
-class PersonTilBrukerMapperTest : DescribeSpec({
+class PersonTilBrukerMapperTest : BehaviorSpec({
 
     val brukerId = BrukerId("08526835670")
     val aktørId = AktørId("1234567890123")
@@ -35,156 +35,61 @@ class PersonTilBrukerMapperTest : DescribeSpec({
         graderinger: List<Person.Gradering> = emptyList(),
         historiskeIds: Set<BrukerId> = emptySet(),
         dødsdato: LocalDate? = null,
-    ) = Person(
-        brukerId = brukerId,
-        aktørId = aktørId,
-        geoTilknytning = gt,
-        graderinger = graderinger,
-        historiskeIds = historiskeIds,
-        dødsdato = dødsdato,
-    )
+    ) = Person(brukerId = brukerId, aktørId = aktørId, geoTilknytning = gt,
+        graderinger = graderinger, historiskeIds = historiskeIds, dødsdato = dødsdato)
 
-    describe("tilBruker") {
-
-        describe("identiteter") {
-
-            it("mapper brukerId fra person") {
-                val bruker = tilBruker(person(), false)
-                bruker.brukerId shouldBe brukerId
-            }
-
-            it("mapper aktørId fra person") {
-                val bruker = tilBruker(person(), false)
-                bruker.aktørId shouldBe aktørId
-            }
-
-            it("mapper historiskeIds fra person") {
+    Given("tilBruker - identiteter") {
+        When("person mappes") {
+            Then("brukerId mappes") { tilBruker(person(), false).brukerId shouldBe brukerId }
+            Then("aktørId mappes") { tilBruker(person(), false).aktørId shouldBe aktørId }
+            Then("geografisk tilknytning mappes") { tilBruker(person(gt = kommuneGT), false).geografiskTilknytning shouldBe kommuneGT }
+            Then("dødsdato mappes") { tilBruker(person(dødsdato = dødsdato), false).dødsdato shouldBe dødsdato }
+        }
+        When("person har historiske ids") {
+            Then("historiskeIds mappes") {
                 val historisk = BrukerId("20478606614")
-                val bruker = tilBruker(person(historiskeIds = setOf(historisk)), false)
-                bruker.historiskeIds shouldBe setOf(historisk)
-            }
-
-            it("mapper dødsdato fra person") {
-                val bruker = tilBruker(person(dødsdato = dødsdato), false)
-                bruker.dødsdato shouldBe dødsdato
-            }
-
-            it("mapper geografisk tilknytning fra person") {
-                val bruker = tilBruker(person(gt = kommuneGT), false)
-                bruker.geografiskTilknytning shouldBe kommuneGT
+                tilBruker(person(historiskeIds = setOf(historisk)), false).historiskeIds shouldBe setOf(historisk)
             }
         }
+    }
 
-        describe("påkrevdeGrupper — gradering") {
+    Given("tilBruker - påkrevdeGrupper — gradering") {
+        When("ugradert person uten skjerming") { Then("ingen grupper kreves") { tilBruker(person(graderinger = listOf(UGRADERT)), false).påkrevdeGrupper shouldBe emptySet() } }
+        When("ingen graderinger og ingen skjerming") { Then("ingen grupper kreves") { tilBruker(person(), false).påkrevdeGrupper shouldBe emptySet() } }
+        When("STRENGT_FORTROLIG gradering") { Then("STRENGT_FORTROLIG kreves") { tilBruker(person(graderinger = listOf(GRAD_STRENGT_FORTROLIG)), false).påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG) } }
+        When("STRENGT_FORTROLIG_UTLAND gradering") { Then("STRENGT_FORTROLIG_UTLAND kreves") { tilBruker(person(graderinger = listOf(GRAD_STRENGT_FORTROLIG_UTLAND)), false).påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG_UTLAND) } }
+        When("FORTROLIG gradering") { Then("FORTROLIG kreves") { tilBruker(person(graderinger = listOf(GRAD_FORTROLIG)), false).påkrevdeGrupper shouldBe setOf(FORTROLIG) } }
+        When("STRENGT_FORTROLIG og FORTROLIG") { Then("kun STRENGT_FORTROLIG kreves") { tilBruker(person(graderinger = listOf(GRAD_STRENGT_FORTROLIG, GRAD_FORTROLIG)), false).påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG) } }
+        When("STRENGT_FORTROLIG og STRENGT_FORTROLIG_UTLAND") { Then("kun STRENGT_FORTROLIG kreves") { tilBruker(person(graderinger = listOf(GRAD_STRENGT_FORTROLIG_UTLAND, GRAD_STRENGT_FORTROLIG)), false).påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG) } }
+    }
 
-            it("ingen grupper for ugradert person uten skjerming") {
-                val bruker = tilBruker(person(graderinger = listOf(UGRADERT)), false)
-                bruker.påkrevdeGrupper shouldBe emptySet()
-            }
+    Given("tilBruker - påkrevdeGrupper — skjerming") {
+        When("person er skjermet") { Then("SKJERMING kreves") { tilBruker(person(), true).påkrevdeGrupper shouldBe setOf(SKJERMING) } }
+        When("skjermet person med FORTROLIG") { Then("SKJERMING og FORTROLIG kreves") { tilBruker(person(graderinger = listOf(GRAD_FORTROLIG)), true).påkrevdeGrupper shouldBe setOf(FORTROLIG, SKJERMING) } }
+        When("skjermet person med STRENGT_FORTROLIG") { Then("SKJERMING og STRENGT_FORTROLIG kreves") { tilBruker(person(graderinger = listOf(GRAD_STRENGT_FORTROLIG)), true).påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG, SKJERMING) } }
+    }
 
-            it("ingen grupper for person uten graderinger og uten skjerming") {
-                val bruker = tilBruker(person(), false)
-                bruker.påkrevdeGrupper shouldBe emptySet()
-            }
+    Given("tilBruker - påkrevdeGrupper — geografisk tilknytning") {
+        When("UdefinertTilknytning") { Then("UKJENT_BOSTED kreves") { tilBruker(person(gt = UdefinertTilknytning()), false).påkrevdeGrupper shouldBe setOf(UKJENT_BOSTED) } }
+        When("KommuneTilknytning") { Then("UKJENT_BOSTED kreves ikke") { tilBruker(person(gt = kommuneGT), false).påkrevdeGrupper shouldNotContain UKJENT_BOSTED } }
+        When("BydelTilknytning") { Then("UKJENT_BOSTED kreves ikke") { tilBruker(person(gt = BydelTilknytning(Bydel("030101"))), false).påkrevdeGrupper shouldNotContain UKJENT_BOSTED } }
+        When("UtenlandskTilknytning") { Then("UKJENT_BOSTED kreves ikke") { tilBruker(person(gt = UtenlandskTilknytning()), false).påkrevdeGrupper shouldNotContain UKJENT_BOSTED } }
+        When("UkjentBosted") { Then("UKJENT_BOSTED kreves ikke") { tilBruker(person(gt = UkjentBosted()), false).påkrevdeGrupper shouldNotContain UKJENT_BOSTED } }
+        When("UdefinertTilknytning og FORTROLIG") { Then("UKJENT_BOSTED og FORTROLIG kreves") { tilBruker(person(gt = UdefinertTilknytning(), graderinger = listOf(GRAD_FORTROLIG)), false).påkrevdeGrupper shouldBe setOf(FORTROLIG, UKJENT_BOSTED) } }
+        When("UdefinertTilknytning og skjermet") { Then("UKJENT_BOSTED og SKJERMING kreves") { tilBruker(person(gt = UdefinertTilknytning()), true).påkrevdeGrupper shouldBe setOf(UKJENT_BOSTED, SKJERMING) } }
+    }
 
-            it("STRENGT_FORTROLIG for strengt fortrolig gradering") {
-                val bruker = tilBruker(person(graderinger = listOf(GRAD_STRENGT_FORTROLIG)), false)
-                bruker.påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG)
-            }
-
-            it("STRENGT_FORTROLIG_UTLAND for strengt fortrolig utland gradering") {
-                val bruker = tilBruker(person(graderinger = listOf(GRAD_STRENGT_FORTROLIG_UTLAND)), false)
-                bruker.påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG_UTLAND)
-            }
-
-            it("FORTROLIG for fortrolig gradering") {
-                val bruker = tilBruker(person(graderinger = listOf(GRAD_FORTROLIG)), false)
-                bruker.påkrevdeGrupper shouldBe setOf(FORTROLIG)
-            }
-
-            it("STRENGT_FORTROLIG har prioritet over FORTROLIG") {
-                val bruker = tilBruker(person(graderinger = listOf(GRAD_STRENGT_FORTROLIG, GRAD_FORTROLIG)), false)
-                bruker.påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG)
-            }
-
-            it("STRENGT_FORTROLIG har prioritet over STRENGT_FORTROLIG_UTLAND") {
-                val bruker = tilBruker(person(graderinger = listOf(GRAD_STRENGT_FORTROLIG_UTLAND, GRAD_STRENGT_FORTROLIG)), false)
-                bruker.påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG)
+    Given("tilBruker - kombinasjoner") {
+        When("STRENGT_FORTROLIG + UdefinertTilknytning + skjermet") {
+            Then("STRENGT_FORTROLIG, UKJENT_BOSTED og SKJERMING kreves") {
+                tilBruker(person(gt = UdefinertTilknytning(), graderinger = listOf(GRAD_STRENGT_FORTROLIG)), true)
+                    .påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG, UKJENT_BOSTED, SKJERMING)
             }
         }
-
-        describe("påkrevdeGrupper — skjerming") {
-
-            it("SKJERMING legges til for skjermet person") {
-                val bruker = tilBruker(person(), true)
-                bruker.påkrevdeGrupper shouldBe setOf(SKJERMING)
-            }
-
-            it("SKJERMING kombineres med gradering") {
-                val bruker = tilBruker(person(graderinger = listOf(GRAD_FORTROLIG)), true)
-                bruker.påkrevdeGrupper shouldBe setOf(FORTROLIG, SKJERMING)
-            }
-
-            it("SKJERMING kombineres med STRENGT_FORTROLIG") {
-                val bruker = tilBruker(person(graderinger = listOf(GRAD_STRENGT_FORTROLIG)), true)
-                bruker.påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG, SKJERMING)
-            }
-        }
-
-        describe("påkrevdeGrupper — geografisk tilknytning") {
-
-            it("UKJENT_BOSTED for UdefinertTilknytning") {
-                val bruker = tilBruker(person(gt = UdefinertTilknytning()), false)
-                bruker.påkrevdeGrupper shouldBe setOf(UKJENT_BOSTED)
-            }
-
-            it("ingen UKJENT_BOSTED for KommuneTilknytning") {
-                val bruker = tilBruker(person(gt = kommuneGT), false)
-                bruker.påkrevdeGrupper shouldNotContain UKJENT_BOSTED
-            }
-
-            it("ingen UKJENT_BOSTED for BydelTilknytning") {
-                val bruker = tilBruker(person(gt = BydelTilknytning(Bydel("030101"))), false)
-                bruker.påkrevdeGrupper shouldNotContain UKJENT_BOSTED
-            }
-
-            it("ingen UKJENT_BOSTED for UtenlandskTilknytning") {
-                val bruker = tilBruker(person(gt = UtenlandskTilknytning()), false)
-                bruker.påkrevdeGrupper shouldNotContain UKJENT_BOSTED
-            }
-
-            it("ingen UKJENT_BOSTED for UkjentBosted") {
-                val bruker = tilBruker(person(gt = UkjentBosted()), false)
-                bruker.påkrevdeGrupper shouldNotContain UKJENT_BOSTED
-            }
-
-            it("UKJENT_BOSTED kombineres med gradering") {
-                val bruker = tilBruker(person(gt = UdefinertTilknytning(), graderinger = listOf(GRAD_FORTROLIG)), false)
-                bruker.påkrevdeGrupper shouldBe setOf(FORTROLIG, UKJENT_BOSTED)
-            }
-
-            it("UKJENT_BOSTED kombineres med skjerming") {
-                val bruker = tilBruker(person(gt = UdefinertTilknytning()), true)
-                bruker.påkrevdeGrupper shouldBe setOf(UKJENT_BOSTED, SKJERMING)
-            }
-        }
-
-        describe("kombinasjoner") {
-
-            it("alle tre krav kombineres: STRENGT_FORTROLIG + UKJENT_BOSTED + SKJERMING") {
-                val bruker = tilBruker(
-                    person(gt = UdefinertTilknytning(), graderinger = listOf(GRAD_STRENGT_FORTROLIG)),
-                    true
-                )
-                bruker.påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG, UKJENT_BOSTED, SKJERMING)
-            }
-
-            it("ingen krav for helt vanlig ugradert ikke-skjermet person med kjent GT") {
-                val bruker = tilBruker(person(gt = kommuneGT, graderinger = listOf(UGRADERT)), false)
-                bruker.påkrevdeGrupper shouldBe emptySet()
+        When("ugradert, ikke skjermet, kjent GT") {
+            Then("ingen grupper kreves") {
+                tilBruker(person(gt = kommuneGT, graderinger = listOf(UGRADERT)), false).påkrevdeGrupper shouldBe emptySet()
             }
         }
     }
 })
-
-

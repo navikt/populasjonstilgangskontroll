@@ -5,7 +5,7 @@ import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
@@ -67,7 +67,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 @AutoConfigureMetrics
 @Testcontainers
 @ApplyExtension(SpringExtension::class)
-class OverstyringRegelTjenesteTest : DescribeSpec() {
+class OverstyringRegelTjenesteTest : BehaviorSpec() {
 
     private val strengtFortroligAktørId = AktørId("1234567890123")
     private val strengtFortroligBrukerId = BrukerId("08526835671")
@@ -122,108 +122,84 @@ class OverstyringRegelTjenesteTest : DescribeSpec() {
             every { token.erCC } returns true
         }
 
-        describe("bulk") {
+        Given("bulk") {
+            When("brukere krever spesialtilganger ansatt mangler") {
+                Then("havner de i avviste") {
+                    every {
+                        brukere.brukere(setOf(strengtFortroligAktørId.verdi, fortroligBrukerId.verdi))
+                    } returns setOf(
+                        BrukerBuilder(strengtFortroligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).oppslagId(strengtFortroligAktørId.verdi).aktørId(strengtFortroligAktørId).build(),
+                        BrukerBuilder(fortroligBrukerId).kreverMedlemskapI(FORTROLIG).build())
 
-            it("brukere uten tilgang havner i avviste") {
-                every {
-                    brukere.brukere(setOf(strengtFortroligAktørId.verdi, fortroligBrukerId.verdi))
-                } returns setOf(
-                    BrukerBuilder(strengtFortroligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).oppslagId(strengtFortroligAktørId.verdi).aktørId(strengtFortroligAktørId).build(),
-                    BrukerBuilder(fortroligBrukerId).kreverMedlemskapI(FORTROLIG).build())
+                    val resultater = regler.bulkRegler(ansattId,
+                        setOf(BrukerIdOgRegelsett(strengtFortroligAktørId.verdi), BrukerIdOgRegelsett(fortroligBrukerId.verdi)))
 
-                val resultater = regler.bulkRegler(ansattId,
-                    setOf(BrukerIdOgRegelsett(strengtFortroligAktørId.verdi),
-                        BrukerIdOgRegelsett(fortroligBrukerId.verdi)))
-
-                assertSoftly(resultater) {
-                    avviste shouldHaveSize 2
-                    godkjente.shouldBeEmpty()
-                    ukjente.shouldBeEmpty()
+                    assertSoftly(resultater) {
+                        avviste shouldHaveSize 2
+                        godkjente.shouldBeEmpty()
+                        ukjente.shouldBeEmpty()
+                    }
                 }
             }
+            When("avvist bruker og overstyring er registrert") {
+                Then("godkjennes bruker") {
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
+                    every { brukere.brukere(setOf(vanligBrukerId.verdi)) } returns setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build())
+                    overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er en test", IMORGEN))
 
-            it("avvist bruker godkjennes når overstyring er registrert") {
-                every {
-                    brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi)
-                } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(
-                    UTENLANDSK).build()
-                every {
-                    brukere.brukere(setOf(vanligBrukerId.verdi))
-                } returns setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(
-                    UTENLANDSK).build())
-                overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er en test",
-                    IMORGEN))
-
-                val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
-
-                assertSoftly(resultater) {
-                    avviste.shouldBeEmpty()
-                    godkjente shouldHaveSize 1
+                    val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
+                    assertSoftly(resultater) {
+                        avviste.shouldBeEmpty()
+                        godkjente shouldHaveSize 1
+                    }
                 }
             }
-
-            it("dnr som er erstattet med fnr avvises ikke") {
-                every {
-                    brukere.brukere(setOf(dnr.verdi))
-                } returns setOf(BrukerBuilder(vanligBrukerId).oppslagId(dnr.verdi).historiske(setOf(dnr)).build())
-
-                val resultat = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(dnr.verdi)))
-                resultat.godkjente shouldHaveSize 1
+            When("dnr er erstattet med fnr") {
+                Then("avvises ikke") {
+                    every { brukere.brukere(setOf(dnr.verdi)) } returns setOf(BrukerBuilder(vanligBrukerId).oppslagId(dnr.verdi).historiske(setOf(dnr)).build())
+                    regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(dnr.verdi))).godkjente shouldHaveSize 1
+                }
             }
         }
 
-        describe("kompletteRegler") {
-
-            it("dnr som er erstattet med fnr avvises ikke") {
-                every {
-                    brukere.brukerMedNærmesteFamilie(dnr.verdi)
-                } returns BrukerBuilder(vanligBrukerId).historiske(setOf(dnr)).build()
-
-                shouldNotThrowAny { regler.kompletteRegler(ansattId, dnr.verdi) }
-            }
-
-            it("tilgang gis når overstyring er registrert og en regel avslår") {
-                every {
-                    brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi)
-                } returns BrukerBuilder(vanligBrukerId).build()
-                overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
-
-                shouldNotThrowAny { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
-            }
-
-            it("tilgang gis ikke når regel avslår og ingen overstyring er registrert") {
-                every {
-                    brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi)
-                } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(
-                    UTENLANDSK).build()
-
-                shouldThrow<RegelException> { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
-            }
-        }
-
-        describe("kjerneregler") {
-
-            it("kjøres uten unntak når bruker finnes i PDL") {
-                every {
-                    brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi)
-                } returns BrukerBuilder(vanligBrukerId).build()
-
-                shouldNotThrowAny { regler.kjerneregler(ansattId, vanligBrukerId.verdi) }
-            }
-        }
-
-        describe("overstyring") {
-
-            it("registreres ikke når kjerneregler avslår") {
-                every {
-                    brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi)
-                } returns BrukerBuilder(vanligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build()
-
-                shouldThrow<RegelException> {
-                    overstyring.overstyr(ansattId,
-                        OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
+        Given("kompletteRegler") {
+            When("dnr er erstattet med fnr") {
+                Then("avvises ikke") {
+                    every { brukere.brukerMedNærmesteFamilie(dnr.verdi) } returns BrukerBuilder(vanligBrukerId).historiske(setOf(dnr)).build()
+                    shouldNotThrowAny { regler.kompletteRegler(ansattId, dnr.verdi) }
                 }
-                overstyring.erOverstyrt(ansattId, vanligBrukerId) shouldBe false
+            }
+            When("overstyring er registrert og en regel avslår") {
+                Then("gis tilgang") {
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
+                    overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
+                    shouldNotThrowAny { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
+                }
+            }
+            When("regel avslår og ingen overstyring er registrert") {
+                Then("gis ikke tilgang") {
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
+                    shouldThrow<RegelException> { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
+                }
+            }
+        }
+
+        Given("kjerneregler") {
+            When("bruker finnes i PDL") {
+                Then("kjøres uten unntak") {
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
+                    shouldNotThrowAny { regler.kjerneregler(ansattId, vanligBrukerId.verdi) }
+                }
+            }
+        }
+
+        Given("overstyring") {
+            When("kjerneregler avslår") {
+                Then("registreres ikke overstyring") {
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build()
+                    shouldThrow<RegelException> { overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN)) }
+                    overstyring.erOverstyrt(ansattId, vanligBrukerId) shouldBe false
+                }
             }
         }
     }

@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.felles
 
 import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.longs.shouldBeGreaterThan
 import io.mockk.every
@@ -21,7 +21,7 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(classes = [TestConfig::class])
 @AutoConfigureMetrics
 @ApplyExtension(SpringExtension::class)
-class ClusterAddingTimedAspectTest : DescribeSpec() {
+class ClusterAddingTimedAspectTest : BehaviorSpec() {
 
     @MockkBean
     lateinit var token: Token
@@ -38,29 +38,27 @@ class ClusterAddingTimedAspectTest : DescribeSpec() {
             every { token.systemNavn } returns "my-app"
         }
 
-        describe("clusterAddingTimedAspect") {
-            it("registrerer timer med cluster-, method- og client-tagg fra token") {
-                timedService.execute()
-
-                registry.get("test.execute")
-                    .tag("cluster", "dev-gcp")
-                    .tag("method", "execute")
-                    .tag("client", "my-app")
-                    .timer()
-                    .count() shouldBeGreaterThan 0L
+        Given("clusterAddingTimedAspect") {
+            When("tjeneste kalles") {
+                Then("registreres timer med cluster-, method- og client-tagg fra token") {
+                    timedService.execute()
+                    registry.get("test.execute")
+                        .tag("cluster", "dev-gcp")
+                        .tag("method", "execute")
+                        .tag("client", "my-app")
+                        .timer().count() shouldBeGreaterThan 0L
+                }
             }
-
-            it("bruker oppdaterte verdier fra token per kall") {
-                every { token.cluster } returns "prod-gcp"
-                every { token.systemNavn } returns "annen-app"
-
-                timedService.execute()
-
-                registry.get("test.execute")
-                    .tag("cluster", "prod-gcp")
-                    .tag("client", "annen-app")
-                    .timer()
-                    .count() shouldBeGreaterThan 0L
+            When("token-verdier endres mellom kall") {
+                Then("brukes oppdaterte verdier per kall") {
+                    every { token.cluster } returns "prod-gcp"
+                    every { token.systemNavn } returns "annen-app"
+                    timedService.execute()
+                    registry.get("test.execute")
+                        .tag("cluster", "prod-gcp")
+                        .tag("client", "annen-app")
+                        .timer().count() shouldBeGreaterThan 0L
+                }
             }
         }
     }

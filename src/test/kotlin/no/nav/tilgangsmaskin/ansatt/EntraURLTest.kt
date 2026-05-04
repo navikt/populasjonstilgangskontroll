@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.TestApp
@@ -21,21 +21,23 @@ import java.net.URI
 @EnableConfigurationProperties(GlobaleGrupperConfig::class)
 @ContextConfiguration(classes = [TestApp::class])
 @ApplyExtension(SpringExtension::class)
-class EntraURLTest : DescribeSpec() {
+class EntraURLTest : BehaviorSpec() {
 
     @Autowired
     private lateinit var env: Environment
 
     init {
-        describe("grupperURI") {
-            it("UUIDene til gruppene kommer i rett formatering") {
-                val globaleGrupper = GlobalGruppe.entries.map { env.getProperty(it.property) }.joinToString(",") { "'$it'" }
-                val expectedFilter = "id in($globaleGrupper) or $GEO_PREFIX"
-                val actualFilter = EntraConfig(baseUri = URI("https://example.com"))
-                    .grupperURI("Z999999", true).query
-                    .substringAfter("\$filter=").substringBefore("&")
+        Given("grupperURI") {
+            When("URI bygges med globale grupper") {
+                Then("UUIDene til gruppene kommer i rett formatering") {
+                    val globaleGrupper = GlobalGruppe.entries.map { env.getProperty(it.property) }.joinToString(",") { "'$it'" }
+                    val expectedFilter = "id in($globaleGrupper) or $GEO_PREFIX"
+                    val actualFilter = EntraConfig(baseUri = URI("https://example.com"))
+                        .grupperURI("Z999999", true).query
+                        .substringAfter("\$filter=").substringBefore("&")
 
-                actualFilter shouldBe expectedFilter
+                    actualFilter shouldBe expectedFilter
+                }
             }
         }
     }

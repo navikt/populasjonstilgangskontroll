@@ -1,57 +1,29 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.UGRADERT
 
-class PersonGraderingTest : DescribeSpec({
+class PersonGraderingTest : BehaviorSpec({
 
-    describe("erStrengtFortroligUtland") {
-
-        it("returnerer true når listen inneholder STRENGT_FORTROLIG_UTLAND") {
-            listOf(STRENGT_FORTROLIG_UTLAND).erStrengtFortroligUtland() shouldBe true
-        }
-
-        it("returnerer false når listen ikke inneholder STRENGT_FORTROLIG_UTLAND") {
-            listOf(STRENGT_FORTROLIG, FORTROLIG, UGRADERT).erStrengtFortroligUtland() shouldBe false
-        }
-
-        it("returnerer false for tom liste") {
-            emptyList<Person.Gradering>().erStrengtFortroligUtland() shouldBe false
-        }
+    Given("erStrengtFortroligUtland") {
+        When("listen inneholder STRENGT_FORTROLIG_UTLAND") { Then("returneres true")  { listOf(STRENGT_FORTROLIG_UTLAND).erStrengtFortroligUtland() shouldBe true  } }
+        When("listen mangler STRENGT_FORTROLIG_UTLAND")   { Then("returneres false") { listOf(STRENGT_FORTROLIG, FORTROLIG, UGRADERT).erStrengtFortroligUtland() shouldBe false } }
+        When("listen er tom")                              { Then("returneres false") { emptyList<Person.Gradering>().erStrengtFortroligUtland() shouldBe false } }
     }
 
-    describe("erStrengtFortrolig") {
-
-        it("returnerer true når listen inneholder STRENGT_FORTROLIG") {
-            listOf(STRENGT_FORTROLIG).erStrengtFortrolig() shouldBe true
-        }
-
-        it("returnerer false når listen ikke inneholder STRENGT_FORTROLIG") {
-            listOf(STRENGT_FORTROLIG_UTLAND, FORTROLIG, UGRADERT).erStrengtFortrolig() shouldBe false
-        }
-
-        it("returnerer false for tom liste") {
-            emptyList<Person.Gradering>().erStrengtFortrolig() shouldBe false
-        }
+    Given("erStrengtFortrolig") {
+        When("listen inneholder STRENGT_FORTROLIG") { Then("returneres true")  { listOf(STRENGT_FORTROLIG).erStrengtFortrolig() shouldBe true  } }
+        When("listen mangler STRENGT_FORTROLIG")    { Then("returneres false") { listOf(STRENGT_FORTROLIG_UTLAND, FORTROLIG, UGRADERT).erStrengtFortrolig() shouldBe false } }
+        When("listen er tom")                       { Then("returneres false") { emptyList<Person.Gradering>().erStrengtFortrolig() shouldBe false } }
     }
 
-    describe("erFortrolig") {
-
-        it("returnerer true når listen inneholder FORTROLIG") {
-            listOf(FORTROLIG).erFortrolig() shouldBe true
-        }
-
-        it("returnerer false når listen ikke inneholder FORTROLIG") {
-            listOf(STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, UGRADERT).erFortrolig() shouldBe false
-        }
-
-        it("returnerer false for tom liste") {
-            emptyList<Person.Gradering>().erFortrolig() shouldBe false
-        }
+    Given("erFortrolig") {
+        When("listen inneholder FORTROLIG") { Then("returneres true")  { listOf(FORTROLIG).erFortrolig() shouldBe true  } }
+        When("listen mangler FORTROLIG")    { Then("returneres false") { listOf(STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, UGRADERT).erFortrolig() shouldBe false } }
+        When("listen er tom")               { Then("returneres false") { emptyList<Person.Gradering>().erFortrolig() shouldBe false } }
     }
 })
-

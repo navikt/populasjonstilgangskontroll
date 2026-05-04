@@ -137,6 +137,16 @@ class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
                 }
             }
         }
+
+        Given("NOT_FOUND fra PDL") {
+            When("PDL returnerer NOT_FOUND-feil") {
+                Then("returneres tom mengde") {
+                    server.expect(requestTo(cfg.baseUri))
+                        .andRespond(withSuccess(notFoundErrorRespons(), APPLICATION_JSON))
+                    adapter.partnere("Z999999").shouldBeEmpty()
+                }
+            }
+        }
     }
 
     companion object {
@@ -193,6 +203,25 @@ class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
                             }
                         ]
                     }
+                }
+            }
+        """.trimIndent()
+
+        private fun notFoundErrorRespons() = """
+            {
+                "errors": [
+                    {
+                        "message": "Fant ikke person",
+                        "locations": [],
+                        "path": ["hentPerson"],
+                        "extensions": {
+                            "code": "not_found",
+                            "classification": "ExecutionAborted"
+                        }
+                    }
+                ],
+                "data": {
+                    "hentPerson": null
                 }
             }
         """.trimIndent()

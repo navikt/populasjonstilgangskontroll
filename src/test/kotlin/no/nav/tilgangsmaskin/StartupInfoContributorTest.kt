@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin
 
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -17,7 +17,7 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.core.env.ConfigurableEnvironment
 
 @Suppress("UNCHECKED_CAST")
-class StartupInfoContributorTest : DescribeSpec({
+class StartupInfoContributorTest : BehaviorSpec({
 
     val env = mockk<ConfigurableEnvironment>()
     val ctx = mockk<ConfigurableApplicationContext>()
@@ -40,81 +40,71 @@ class StartupInfoContributorTest : DescribeSpec({
     fun regelSett(vararg regler: Regel) =
         RegelSett(KJERNE_REGELTYPE to regler.toList())
 
-    describe("info") {
-
-        it("inneholder Cluster") {
-            val info = build()["info"] as Map<String, Any?>
-            info.containsKey("Cluster") shouldBe true
-        }
-
-        it("inneholder Startup") {
-            val info = build()["info"] as Map<String, Any?>
-            info.containsKey("Startup") shouldBe true
-        }
-
-        it("inneholder Name med riktig verdi") {
-            val info = build()["info"] as Map<String, Any?>
-            info["Name"] shouldBe "test-app"
+    Given("info") {
+        When("contributor bygger info") {
+            Then("inneholder Cluster") {
+                val info = build()["info"] as Map<String, Any?>
+                info.containsKey("Cluster") shouldBe true
+            }
+            Then("inneholder Startup") {
+                val info = build()["info"] as Map<String, Any?>
+                info.containsKey("Startup") shouldBe true
+            }
+            Then("inneholder Name med riktig verdi") {
+                val info = build()["info"] as Map<String, Any?>
+                info["Name"] shouldBe "test-app"
+            }
         }
     }
 
-    describe("dev-info utenfor prod") {
-
+    Given("dev-info utenfor prod") {
         beforeEach {
             mockkObject(ClusterUtils)
             every { isProd } returns false
         }
-
         afterEach { unmockkObject(ClusterUtils) }
 
-        it("inneholder dev-info") {
-            build().containsKey("dev-info") shouldBe true
-        }
-
-        it("dev-info inneholder Client ID") {
-            val devInfo = build()["dev-info"] as Map<String, Any?>
-            devInfo["Client ID"] shouldBe "client-id"
-        }
-
-        it("dev-info inneholder Java version") {
-            val devInfo = build()["dev-info"] as Map<String, Any?>
-            devInfo["Java version"] shouldBe "25"
+        When("contributor bygger info") {
+            Then("inneholder dev-info") {
+                build().containsKey("dev-info") shouldBe true
+            }
+            Then("dev-info inneholder Client ID") {
+                val devInfo = build()["dev-info"] as Map<String, Any?>
+                devInfo["Client ID"] shouldBe "client-id"
+            }
+            Then("dev-info inneholder Java version") {
+                val devInfo = build()["dev-info"] as Map<String, Any?>
+                devInfo["Java version"] shouldBe "25"
+            }
         }
     }
 
-    describe("dev-info i prod") {
-
-
+    Given("dev-info i prod") {
         beforeEach {
             mockkObject(ClusterUtils)
             every { isProd } returns true
         }
-
         afterEach { unmockkObject(ClusterUtils) }
 
-        it("inneholder ikke dev-info") {
-            build().containsKey("dev-info") shouldBe false
+        When("contributor bygger info") {
+            Then("inneholder ikke dev-info") {
+                build().containsKey("dev-info") shouldBe false
+            }
         }
     }
 
-    describe("regelsett") {
-
-        it("legger til detalj per regelsett med beskrivelse som nøkkel") {
-            val rs = regelSett(EgneDataRegel())
-            build(rs).containsKey(rs.beskrivelse) shouldBe true
-        }
-
-        it("regelsett-detalj inneholder regel-navn") {
-            val regel = EgneDataRegel()
-            val rs = regelSett(regel)
-            @Suppress("UNCHECKED_CAST")
-            val detalj = build(rs)[rs.beskrivelse] as List<*>
-            detalj.any { it.toString().contains(regel.kortNavn) } shouldBe true
-        }
-
-        it("ingen regelsett-detaljer når ingen regelsett er gitt") {
-            build().containsKey("kjerneregelsett") shouldBe false
+    Given("regelsett") {
+        When("ett regelsett er gitt") {
+            Then("legges det til en detalj med beskrivelse som nøkkel") {
+                val rs = regelSett(EgneDataRegel())
+                build(rs).containsKey(rs.beskrivelse) shouldBe true
+            }
+            Then("regelsett-detalj inneholder regel-navn") {
+                val regel = EgneDataRegel()
+                val rs = regelSett(regel)
+                val detalj = build(rs)[rs.beskrivelse] as List<*>
+                detalj.any { it.toString().contains(regel.kortNavn) } shouldBe true
+            }
         }
     }
 })
-

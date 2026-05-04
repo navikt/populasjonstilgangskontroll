@@ -11,7 +11,9 @@ import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNE
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.TIDLIGERE_PARTNER
 import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype
 import no.nav.tilgangsmaskin.bruker.pdl.PdlClientBeanConfig.DefaultGraphQlErrorHandler
+import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
+import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -25,6 +27,7 @@ import org.springframework.graphql.client.SyncGraphQlClientInterceptor
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.HttpMethod.OPTIONS
+import org.springframework.test.web.client.match.MockRestRequestMatchers.header
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.client.MockRestServiceServer
@@ -44,7 +47,10 @@ class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
     @TestConfiguration
     class GraphQLTestConfig {
         @Bean @Qualifier(PDLGRAPH)
-        fun pdlGraphRestClient(b: RestClient.Builder) = b.build()
+        fun pdlGraphRestClient(b: RestClient.Builder) =
+            b.requestInterceptors {
+                it.add(headerAddingRequestInterceptor(BEHANDLINGSNUMMER))
+            }.build()
 
         @Bean @Qualifier(PDLGRAPH)
         fun syncPdlGraphQLClient(
@@ -117,6 +123,17 @@ class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
                 Then("sendes OPTIONS-request") {
                     server.expect(requestTo(cfg.baseUri)).andExpect(method(OPTIONS)).andRespond(withSuccess())
                     adapter.ping()
+                }
+            }
+        }
+
+        Given("behandlingsnummer-header") {
+            When("request sendes til PDL") {
+                Then("inneholder header behandlingsnummer med verdi B897") {
+                    server.expect(requestTo(cfg.baseUri))
+                        .andExpect(header("behandlingsnummer", "B897"))
+                        .andRespond(withSuccess(sivilstandRespons(Sivilstandstype.GIFT), APPLICATION_JSON))
+                    adapter.partnere("Z999999")
                 }
             }
         }

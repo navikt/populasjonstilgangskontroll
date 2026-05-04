@@ -29,6 +29,7 @@ import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.utils.LocalAuditor
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
@@ -199,6 +200,32 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build()
                     shouldThrow<RegelException> { overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN)) }
                     overstyring.erOverstyrt(ansattId, vanligBrukerId) shouldBe false
+                }
+            }
+            When("overstyring har utløpt") {
+                Then("erOverstyrt returnerer false") {
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
+                    overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Utløpt test", IGÅR))
+                    overstyring.erOverstyrt(ansattId, vanligBrukerId) shouldBe false
+                }
+            }
+            When("overstyring er gyldig") {
+                Then("erOverstyrt returnerer true") {
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
+                    overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Gyldig test", IMORGEN))
+                    overstyring.erOverstyrt(ansattId, vanligBrukerId) shouldBe true
+                }
+            }
+            When("bulk overstyringer med utløpt og gyldig") {
+                Then("kun gyldige returneres") {
+                    val annenBrukerId = BrukerId("08526835673")
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
+                    every { brukere.brukerMedNærmesteFamilie(annenBrukerId.verdi) } returns BrukerBuilder(annenBrukerId).build()
+                    overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Gyldig", IMORGEN))
+                    overstyring.overstyr(ansattId, OverstyringData(annenBrukerId, "Utløpt", IGÅR))
+                    val resultat = overstyring.overstyringer(ansattId, listOf(vanligBrukerId, annenBrukerId))
+                    resultat shouldHaveSize 1
+                    resultat.single() shouldBe vanligBrukerId
                 }
             }
         }

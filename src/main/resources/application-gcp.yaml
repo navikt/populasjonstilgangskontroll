@@ -196,7 +196,7 @@ graph:
 
 valkey:
   timeout: 5s
-  connect-timeout: 5s
+  connect-timeout: 10s
   username: ${valkey.username.${nais.cluster.cache}}
   password: ${valkey.password.${nais.cluster.cache}}
   port: ${valkey.port.${nais.cluster.cache}}

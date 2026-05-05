@@ -96,7 +96,7 @@ spec:
               namespace: nais-system
   env:
     - name: PDL
-    - value = https://{{pdl}}
+      value: https://{{pdl}}
     - name: NAIS_CLUSTER_TYPE
       value: {{nais.cluster.type}}
     - name: NAIS_CLUSTER_CACHE

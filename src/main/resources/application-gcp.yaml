@@ -187,7 +187,7 @@ pdlgraph:
 
 pdl:
   scope: "api://${nais.cluster.type}-fss.pdl.pdl-pip-api/.default"
-  base-uri: "https://${pdl}"
+
 skjerming:
   scope: "api://${nais.cluster.type}-gcp.nom.skjermede-personer-pip/.default"
 graph:

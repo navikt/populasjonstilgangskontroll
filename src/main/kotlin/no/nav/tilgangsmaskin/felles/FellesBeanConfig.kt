@@ -79,7 +79,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor, loggingInterceptor: LoggingRequestInterceptor) =
         RestClientCustomizer { c ->
             c.requestFactory(HttpComponentsClientHttpRequestFactory().apply {
-                setConnectionRequestTimeout(2000)
+                setConnectionRequestTimeout(5000)
                 setReadTimeout(5000)
             })
             c.requestInterceptors {

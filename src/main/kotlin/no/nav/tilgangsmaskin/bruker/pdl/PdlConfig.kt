@@ -16,11 +16,12 @@ class PdlConfig(@Value("\${PDL}") hostname: String
 
     override val caches = PDL_CACHES
     override val navn = name
-    @Generated
-    override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     val personURI = uri(DEFAULT_PERSON_PATH)
     val personerURI = uri(DEFAULT_PERSON__BOLK_PATH)
+
+    @Generated
+    override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
         const val PDL = "pdl"

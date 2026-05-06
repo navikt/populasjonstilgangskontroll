@@ -1,14 +1,15 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
-import org.springframework.boot.context.properties.ConfigurationProperties
-import java.net.URI
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
+import java.net.URI.create
+import kotlin.jvm.javaClass
 
-@ConfigurationProperties(PDLGRAPH)
-class PdlGraphQLConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH) :
-    AbstractRestConfig(baseUri, pingPath, PdlConfig.PDL) {
+@Component
+class PdlGraphQLConfig(@Value("\${PDLGRAPH}") hostname: String) :
+    AbstractRestConfig(create("https://" + hostname), DEFAULT_PING_PATH, PDLGRAPH) {
 
     @Generated
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"

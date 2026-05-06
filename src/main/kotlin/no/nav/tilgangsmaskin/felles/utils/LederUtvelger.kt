@@ -41,8 +41,8 @@ class LederUtvelger(private val builder: Builder,
                     .retrieve()
                     .bodyToFlux<LederUtvelgerRespons>()
             .doOnError { log.error("SSE connection feilet for godt: ${it.message}", it) }
-            .doOnSubscribe { log.info("SSE subscribe") }
-            .doOnNext { log.info("SSE next: {} ", it) }
+            .doOnSubscribe { log.trace("SSE subscribe") }
+            .doOnNext { log.trace("SSE next: {} ", it) }
             .retryWhen(
                 backoff(MAX_VALUE, ofSeconds(1))
                     .maxBackoff(ofSeconds(30))
@@ -55,8 +55,8 @@ class LederUtvelger(private val builder: Builder,
                                 it is PrematureCloseException ||
                                 it.cause is PrematureCloseException
                     }
-                .doBeforeRetry { log.info("SSE retry ${it.failure().message}",it) }
-                .doAfterRetry { log.info("SSE connection retry etter ${it.totalRetriesInARow()} forsøk", it.failure()) }
+                .doBeforeRetry { log.warn("SSE retry ${it.failure().message}",it) }
+                .doAfterRetry { log.trace("SSE connection retry etter ${it.totalRetriesInARow()} forsøk", it.failure()) }
             )
             .subscribe(
                 { publisher.publishEvent(LeaderChangedEvent(this, it.name)) },

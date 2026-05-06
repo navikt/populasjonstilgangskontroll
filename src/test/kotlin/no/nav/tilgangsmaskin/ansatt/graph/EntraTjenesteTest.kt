@@ -30,8 +30,7 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.request
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import java.util.*
 
-@RestClientTest(components = [EntraRestClientAdapter::class, EntraClientBeanConfig::class, EntraTjeneste::class])
-@EnableConfigurationProperties(EntraConfig::class)
+@RestClientTest(components = [EntraRestClientAdapter::class, EntraClientBeanConfig::class, EntraTjeneste::class, EntraConfig::class])
 @Import(CacheConfig::class)
 @TestPropertySource(properties = ["graph.base-uri=http://graph"])
 @ApplyExtension(SpringExtension::class)

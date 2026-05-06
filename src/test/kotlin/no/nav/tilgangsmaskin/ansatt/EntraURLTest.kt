@@ -14,7 +14,6 @@ import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.core.env.Environment
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
-import java.net.URI
 
 @RestClientTest
 @TestPropertySource(locations = ["classpath:test.properties"])
@@ -32,7 +31,7 @@ class EntraURLTest : BehaviorSpec() {
                 Then("UUIDene til gruppene kommer i rett formatering") {
                     val globaleGrupper = GlobalGruppe.entries.map { env.getProperty(it.property) }.joinToString(",") { "'$it'" }
                     val expectedFilter = "id in($globaleGrupper) or $GEO_PREFIX"
-                    val actualFilter = EntraConfig(baseUri = URI("https://example.com"))
+                    val actualFilter = EntraConfig()
                         .grupperURI("Z999999", true).query
                         .substringAfter("\$filter=").substringBefore("&")
 

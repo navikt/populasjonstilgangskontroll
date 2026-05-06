@@ -3,12 +3,12 @@ package no.nav.tilgangsmaskin.ansatt.vergemål
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.VERGEMÅL
 import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOppfrisker
-import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelElementer
+import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
 import org.springframework.stereotype.Component
 
 @Component
 class VergemålCacheOppfrisker(private val vergemål: VergemålTjeneste) : AbstractCacheOppfrisker() {
-    override fun doOppfrisk(elementer: CacheNøkkelElementer) {
+    override fun doOppfrisk(elementer: CacheNøkkel) {
         vergemål.vergemål(AnsattId(elementer.id))
     }
 

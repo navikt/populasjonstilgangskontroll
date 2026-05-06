@@ -20,7 +20,7 @@ class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration?>, va
         return "$prefix$extra$nøkkel"
     }
 
-    fun idFraNøkkel(nøkkel: String) = CacheNøkkelElementer(nøkkel).id
+    fun idFraNøkkel(nøkkel: String) = CacheNøkkel(nøkkel).id
 
     private fun prefixFor(cache: CachableConfig): String =
         configs[cache.name]?.getKeyPrefixFor(cache.name)

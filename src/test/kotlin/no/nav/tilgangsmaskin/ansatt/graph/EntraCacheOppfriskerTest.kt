@@ -13,7 +13,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO
 import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO_OG_GLOBALE
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
-import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelElementer
+import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.regler.motor.OppfriskingTeller
 import org.springframework.beans.factory.annotation.Autowired
@@ -126,7 +126,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
         Given("ukjent metode") {
             When("oppfrisk kalles") {
                 Then("kaller verken geoGrupper eller geoOgGlobaleGrupper") {
-                    oppfrisker.oppfrisk(CacheNøkkelElementer("graph::ukjentMetode:${ansattId.verdi}"))
+                    oppfrisker.oppfrisk(CacheNøkkel("graph::ukjentMetode:${ansattId.verdi}"))
 
                     verify(exactly = 0) { entra.geoGrupper(any(), any()) }
                     verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
@@ -140,6 +140,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
 
         private val OID = UUID.randomUUID()
         private val NY_OID = UUID.randomUUID()
-        private fun nøkkel(metode: String) = CacheNøkkelElementer("graph::$metode:${ansattId.verdi}")
+        private fun nøkkel(metode: String) = CacheNøkkel("graph::$metode:${ansattId.verdi}")
     }
 }

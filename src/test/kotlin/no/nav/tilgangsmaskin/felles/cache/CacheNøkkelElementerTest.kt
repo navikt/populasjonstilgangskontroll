@@ -7,7 +7,7 @@ class CacheNøkkelElementerTest : DescribeSpec({
 
     describe("format med metode: cacheName::metode:id") {
 
-        val elementer = CacheNøkkelElementer("graph::geoGrupper:Z999999")
+        val elementer = CacheNøkkel("graph::geoGrupper:Z999999")
 
         it("parser cacheName") {
             elementer.cacheName shouldBe "graph"
@@ -28,7 +28,7 @@ class CacheNøkkelElementerTest : DescribeSpec({
 
     describe("format uten metode: cacheName::id") {
 
-        val elementer = CacheNøkkelElementer("oppfolging::08526835670")
+        val elementer = CacheNøkkel("oppfolging::08526835670")
 
         it("parser cacheName") {
             elementer.cacheName shouldBe "oppfolging"
@@ -50,22 +50,22 @@ class CacheNøkkelElementerTest : DescribeSpec({
     describe("maskering") {
 
         it("maskerer 11-sifret fnr i id") {
-            val elementer = CacheNøkkelElementer("skjerming::08526835670")
+            val elementer = CacheNøkkel("skjerming::08526835670")
             elementer.masked shouldBe "skjerming::0852*******"
         }
 
         it("maskerer 13-sifret aktørId i id") {
-            val elementer = CacheNøkkelElementer("pdl::1234567890123")
+            val elementer = CacheNøkkel("pdl::1234567890123")
             elementer.masked shouldBe "pdl::123456*******"
         }
 
         it("maskerer ikke kort id") {
-            val elementer = CacheNøkkelElementer("nom::Z999999")
+            val elementer = CacheNøkkel("nom::Z999999")
             elementer.masked shouldBe "nom::Z999999"
         }
 
         it("maskerer fnr i id også når metode er satt") {
-            val elementer = CacheNøkkelElementer("pdl::medFamilie:08526835670")
+            val elementer = CacheNøkkel("pdl::medFamilie:08526835670")
             elementer.masked shouldBe "pdl::medFamilie:0852*******"
         }
     }
@@ -74,7 +74,7 @@ class CacheNøkkelElementerTest : DescribeSpec({
 
         it("nøkkel er uendret") {
             val nøkkel = "graph::geoGrupper:Z999999"
-            CacheNøkkelElementer(nøkkel).nøkkel shouldBe nøkkel
+            CacheNøkkel(nøkkel).nøkkel shouldBe nøkkel
         }
     }
 })

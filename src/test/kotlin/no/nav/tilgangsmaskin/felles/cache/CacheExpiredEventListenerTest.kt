@@ -35,7 +35,7 @@ class CacheExpiredEventListenerTest : DescribeSpec({
             val listener = CacheExpiredEventListener(teller(), true, oppfrisker)
             listener.start()
             listener.cacheInnslagFjernet(hendelse)
-            verify { oppfrisker.oppfrisk(CacheNøkkelElementer(nøkkel)) }
+            verify { oppfrisker.oppfrisk(CacheNøkkel(nøkkel)) }
         }
 
         it("kaller ikke oppfrisk når lytteren ikke er startet") {

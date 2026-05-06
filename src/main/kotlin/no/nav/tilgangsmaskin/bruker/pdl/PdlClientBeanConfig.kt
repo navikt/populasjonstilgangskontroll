@@ -75,7 +75,7 @@ class PdlClientBeanConfig {
             }
     }
 
-   // @Bean
+   @Bean
     fun pdlGraphHealthIndicator(a: PdlSyncGraphQLClientAdapter) = PingableHealthIndicator(a)
 
     @Bean

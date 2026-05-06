@@ -9,7 +9,7 @@ import kotlin.jvm.javaClass
 
 @Component
 class PdlGraphQLConfig(@Value("\${PDLGRAPH}") hostname: String) :
-    AbstractRestConfig(create("https://" + hostname), DEFAULT_PING_PATH, PDLGRAPH) {
+    AbstractRestConfig(create("https://$hostname$DEFAULT_PING_PATH"), DEFAULT_PING_PATH, PDLGRAPH) {
 
     @Generated
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
@@ -18,6 +18,6 @@ class PdlGraphQLConfig(@Value("\${PDLGRAPH}") hostname: String) :
         const val PDLGRAPH = "pdlgraph"
         private const val BID = "B897"
         val BEHANDLINGSNUMMER = "behandlingsnummer" to BID
-        private const val DEFAULT_PING_PATH = ""
+        private const val DEFAULT_PING_PATH = "/graphql"
     }
 }

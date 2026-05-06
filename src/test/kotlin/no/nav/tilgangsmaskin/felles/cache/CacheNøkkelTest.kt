@@ -60,7 +60,7 @@ class CacheNøkkelTest : BehaviorSpec({
         When("nøkkel opprettes") {
             Then("originalnøkkel er uendret") {
                 val nøkkel = "graph::geoGrupper:Z999999"
-                CacheNøkkel(nøkkel).nøkkel shouldBe nøkkel
+                CacheNøkkel(nøkkel).verdi shouldBe nøkkel
             }
         }
     }

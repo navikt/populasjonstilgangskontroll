@@ -178,10 +178,6 @@ springdoc:
       client-id: ${azure.app.client.id}
     csrf:
       enabled: true
-
-graph:
-  base-uri: https://graph.microsoft.com/v1.0/
-
 valkey:
   timeout: 5s
   connect-timeout: 10s

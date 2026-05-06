@@ -28,10 +28,8 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import java.util.UUID
 
-@RestClientTest(components = [EntraRestClientAdapter::class, EntraClientBeanConfig::class, AnsattOidTjeneste::class])
-@EnableConfigurationProperties(EntraConfig::class)
+@RestClientTest(components = [EntraRestClientAdapter::class, EntraClientBeanConfig::class, AnsattOidTjeneste::class, EntraConfig::class])
 @Import(AnsattOidTjenesteTest.CacheConfig::class)
-@TestPropertySource(properties = ["graph.base-uri=http://graph"])
 @ApplyExtension(SpringExtension::class)
 class AnsattOidTjenesteTest : BehaviorSpec() {
 

@@ -1,14 +1,12 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import no.nav.tilgangsmaskin.felles.cache.CacheBeanConfig.Companion.VALKEY_MAPPER
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import tools.jackson.databind.json.JsonMapper
 import kotlin.reflect.KClass
 
 class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration?>, val mapper: JsonMapper = VALKEY_MAPPER) {
 
-    private val log = getLogger(javaClass)
 
     fun <T : Any> fraJson(json: String, clazz: KClass<T>): T =
         mapper.readValue(json, clazz.java)
@@ -25,9 +23,7 @@ class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration?>, va
     fun idFraNøkkel(nøkkel: String) = CacheNøkkelElementer(nøkkel).id
 
     private fun prefixFor(cache: CachableConfig): String =
-        configs[cache.name]?.getKeyPrefixFor(cache.name).also {
-            log.debug("Prefix for cache ${cache.name} er: $it")
-        }
+        configs[cache.name]?.getKeyPrefixFor(cache.name)
             ?: error("Ingen cache med navn ${cache.name}")
 
 }

@@ -45,10 +45,9 @@ import org.springframework.web.client.RestClient
 import tools.jackson.databind.json.JsonMapper
 import java.time.Duration.ofSeconds
 
-@RestClientTest(components = [PdlRestClientAdapter::class, PdlTjeneste::class])
-@EnableConfigurationProperties(PdlConfig::class)
+@RestClientTest(components = [PdlRestClientAdapter::class, PdlConfig::class,PdlTjeneste::class])
 @Import(PdlTestConfig::class)
-@TestPropertySource(properties = ["pdl.base-uri=http://pdl"])
+@TestPropertySource(properties = ["PDL=pdl"])
 @EnableResilientMethods
 @ApplyExtension(SpringExtension::class)
 class PdlTjenesteTest : BehaviorSpec() {

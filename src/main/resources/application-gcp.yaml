@@ -119,11 +119,10 @@ no.nav.security.jwt:
       accepted_audience: ${azure.app.client.id}
   client:
     registration:
-
       repr-api:
         token-endpoint-url: ${azure.openid.config.token.endpoint}
         grant-type: client_credentials
-        scope: ${verge.scope}
+        scope: "api://${nais.cluster.type}-gcp.repr.repr-api/.default"
         authentication:
           client-id: ${azure.app.client.id}
           client-jwk: ${azure.app.jwk}
@@ -132,7 +131,7 @@ no.nav.security.jwt:
       pdl-api:
         token-endpoint-url: ${azure.openid.config.token.endpoint}
         grant-type: client_credentials
-        scope: ${pdlgraph.scope}
+        scope: "api://${nais.cluster.type}-fss.pdl.pdl-api/.default"
         authentication:
           client-id: ${azure.app.client.id}
           client-jwk: ${azure.app.jwk}
@@ -141,7 +140,7 @@ no.nav.security.jwt:
       pdl-pip-api:
         token-endpoint-url: ${azure.openid.config.token.endpoint}
         grant-type: client_credentials
-        scope: ${pdl.scope}
+        scope: "api://${nais.cluster.type}-fss.pdl.pdl-pip-api/.default"
         authentication:
           client-id: ${azure.app.client.id}
           client-jwk: ${azure.app.jwk}
@@ -150,7 +149,7 @@ no.nav.security.jwt:
       skjermede-personer-pip:
         token-endpoint-url: ${azure.openid.config.token.endpoint}
         grant-type: client_credentials
-        scope: ${skjerming.scope}
+        scope: "api://${nais.cluster.type}-gcp.nom.skjermede-personer-pip/.default"
         authentication:
           client-id: ${azure.app.client.id}
           client-jwk: ${azure.app.jwk}
@@ -159,7 +158,7 @@ no.nav.security.jwt:
       graph:
         token-endpoint-url: ${azure.openid.config.token.endpoint}
         grant-type: client_credentials
-        scope: ${graph.scope}
+        scope:  https://graph.microsoft.com/.default
         authentication:
           client-id: ${azure.app.client.id}
           client-jwk: ${azure.app.jwk}
@@ -168,7 +167,7 @@ no.nav.security.jwt:
       entra-proxy:
         token-endpoint-url: ${azure.openid.config.token.endpoint}
         grant-type: client_credentials
-        scope: ${entra-proxy.scope}
+        scope: "api://${nais.cluster.type}-gcp.sikkerhetstjenesten.entra-proxy/.default"
         authentication:
           client-id: ${azure.app.client.id}
           client-jwk: ${azure.app.jwk}
@@ -180,18 +179,7 @@ springdoc:
     csrf:
       enabled: true
 
-
-pdlgraph:
-  scope: "api://${nais.cluster.type}-fss.pdl.pdl-api/.default"
-  base-uri: "https://${pdlgraph}/graphql"
-
-pdl:
-  scope: "api://${nais.cluster.type}-fss.pdl.pdl-pip-api/.default"
-  base-uri: "https://${pdl}"
-skjerming:
-  scope: "api://${nais.cluster.type}-gcp.nom.skjermede-personer-pip/.default"
 graph:
-  scope: https://graph.microsoft.com/.default
   base-uri: https://graph.microsoft.com/v1.0/
 
 valkey:
@@ -202,9 +190,4 @@ valkey:
   port: ${valkey.port.${nais.cluster.cache}}
   host: ${valkey.host.${nais.cluster.cache}}
 
-verge:
-  scope: "api://${nais.cluster.type}-gcp.repr.repr-api/.default"
-
-entra-proxy:
-  scope: "api://${nais.cluster.type}-gcp.sikkerhetstjenesten.entra-proxy/.default"
 

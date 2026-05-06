@@ -37,9 +37,8 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import java.net.URI
 
-@RestClientTest(components = [PdlSyncGraphQLClientAdapter::class, DefaultGraphQlErrorHandler::class])
-@EnableConfigurationProperties(PdlGraphQLConfig::class)
-@TestPropertySource(properties = ["pdlgraph.base-uri=http://pdlgraph"])
+@RestClientTest(components = [PdlSyncGraphQLClientAdapter::class, DefaultGraphQlErrorHandler::class, PdlGraphQLConfig::class])
+@TestPropertySource(properties = ["PDLGRAPH=pdlgraph"])
 @Import(PdlSyncGraphQLClientAdapterTest.GraphQLTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {

@@ -6,6 +6,7 @@ Dokumentasjon på Confluence: https://confluence.adeo.no/spaces/TM/pages/7604668
 
 Slack-kanal: [team-tilgangsmaskinen-værsågod](https://nav-it.slack.com/archives/C07GGDP38S2)
 
+
 ## Swagger
 Prod: https://tilgangsmaskin.intern.nav.no/swagger-ui/index.html#/
 

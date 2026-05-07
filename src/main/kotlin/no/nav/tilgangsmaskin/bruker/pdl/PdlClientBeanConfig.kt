@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
 import org.springframework.graphql.client.ClientGraphQlRequest
-import org.springframework.graphql.client.HttpSyncGraphQlClient
+import org.springframework.graphql.client.HttpSyncGraphQlClient.builder
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor.Chain
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
@@ -53,7 +53,7 @@ class PdlClientBeanConfig {
     @Bean
     @Qualifier(PDLGRAPH)
     fun syncPdlGraphQLClient(@Qualifier(PDLGRAPH) client: RestClient, cfg: PdlGraphQLConfig,  interceptors: List<SyncGraphQlClientInterceptor>) =
-        HttpSyncGraphQlClient.builder(client)
+        builder(client)
             .url(cfg.baseUri)
             .interceptors {
                 it.addAll(interceptors)

@@ -111,7 +111,6 @@ class PdlTjenesteTest : BehaviorSpec() {
                     server.verify()
                     server.reset()
                     server.expect(never(), requestTo(cfg.personURI))
-                        .andRespond(withSuccess("", APPLICATION_JSON))
                     pdl.medUtvidetFamilie(I1) shouldBe P1
                     server.verify()
                 }

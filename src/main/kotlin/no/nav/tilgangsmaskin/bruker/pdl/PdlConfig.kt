@@ -1,5 +1,8 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
+import no.nav.tilgangsmaskin.bruker.pdl.PdlClient.Companion.PERSONER_PATH
+import no.nav.tilgangsmaskin.bruker.pdl.PdlClient.Companion.PERSON_PATH
+import no.nav.tilgangsmaskin.bruker.pdl.PdlClient.Companion.PING_PATH
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
@@ -12,13 +15,13 @@ import java.net.URI.create
 @Component
 class PdlConfig(@Value("\${PDL}") hostname: String
 ) : CachableRestConfig, AbstractRestConfig(create(
-    "https://$hostname"), DEFAULT_PING_PATH, PDL) {
+    "https://$hostname"), PING_PATH, PDL) {
 
     override val caches = PDL_CACHES
     override val navn = name
 
-    val personURI = uri(DEFAULT_PERSON_PATH)
-    val personerURI = uri(DEFAULT_PERSON__BOLK_PATH)
+    val personURI = uri(PERSON_PATH)
+    val personerURI = uri(PERSONER_PATH)
 
     @Generated
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
@@ -28,8 +31,6 @@ class PdlConfig(@Value("\${PDL}") hostname: String
         val MED_FAMILIE = "medFamilie"
         val MED_UTVIDET_FAMILIE = "medUtvidetFamilie"
         private const val DEFAULT_PING_PATH = "/internal/health/liveness"
-        private const val DEFAULT_PERSON_PATH = "/api/v1/person"
-        private const val DEFAULT_PERSON__BOLK_PATH = "/api/v1/personBolk"
         val  PDL_MED_FAMILIE_CACHE = CachableConfig(PDL,MED_FAMILIE)
         val  PDL_MED_UTVIDET_FAMILIE_CACHE = CachableConfig(PDL,MED_UTVIDET_FAMILIE)
         val PDL_CACHES  = setOf(PDL_MED_FAMILIE_CACHE,PDL_MED_UTVIDET_FAMILIE_CACHE)

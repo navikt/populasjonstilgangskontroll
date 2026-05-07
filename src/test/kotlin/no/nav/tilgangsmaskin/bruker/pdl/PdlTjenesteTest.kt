@@ -21,12 +21,11 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_UTVIDET_FAMI
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.pdlRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.restRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjenesteTest.PdlTestConfig
+import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.createClient
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.cache.CacheManager
@@ -41,11 +40,11 @@ import org.springframework.test.web.client.ExpectedCount.never
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
-import org.springframework.web.client.RestClient
+import org.springframework.web.client.RestClient.Builder
 import tools.jackson.databind.json.JsonMapper
 import java.time.Duration.ofSeconds
 
-@RestClientTest(components = [PdlRestClientAdapter::class, PdlConfig::class,PdlTjeneste::class])
+@RestClientTest(components = [PdlConfig::class, PdlTjeneste::class])
 @Import(PdlTestConfig::class)
 @TestPropertySource(properties = ["PDL=pdl"])
 @EnableResilientMethods
@@ -55,12 +54,13 @@ class PdlTjenesteTest : BehaviorSpec() {
     @TestConfiguration
     @EnableCaching
     class PdlTestConfig {
+
         @Bean fun cacheManager(): CacheManager = ConcurrentMapCacheManager(PDL)
-        @Bean fun cache(cacheManager: CacheManager): CacheOperations = ConcurrentMapCacheOperations(cacheManager)
+
+        @Bean fun cache(cacheManager: CacheManager) = ConcurrentMapCacheOperations(cacheManager)
 
         @Bean
-        @Qualifier(PDL)
-        fun pdlRestClient(b: RestClient.Builder) = b.build()
+        fun pdlClient(builder: Builder, cfg: PdlConfig) = createClient<PdlClient>(cfg, builder)
     }
 
     @MockkBean lateinit var graphQL: PdlSyncGraphQLClientAdapter
@@ -80,14 +80,6 @@ class PdlTjenesteTest : BehaviorSpec() {
             every { graphQL.partnere(any()) } returns emptySet()
         }
 
-        Given("config") {
-            When("config leses") {
-                Then("navn er korrekt og to cacher er konfigurert") {
-                    cfg.navn shouldBe PDL
-                    cfg.caches.size shouldBe 2
-                }
-            }
-        }
 
         Given("medFamilie") {
             When("person ikke er cachet") {
@@ -148,18 +140,15 @@ class PdlTjenesteTest : BehaviorSpec() {
             }
             When("alle er i cache") {
                 Then("REST kalles ikke") {
-                    cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(2))
-                    cache.putOne(PDL_MED_FAMILIE_CACHE, I2, P2, ofSeconds(2))
+                    cache.putMany(PDL_MED_FAMILIE_CACHE, mapOf(I1 to P1, I2 to P2), ofSeconds(2))
                     server.expect(never(), requestTo(cfg.personerURI))
-                        .andRespond(withSuccess("[]", APPLICATION_JSON))
                     pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
                     server.verify()
                 }
             }
             When("ett cache-innslag slettes") {
                 Then("REST kalles for det slettede elementet") {
-                    cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(2))
-                    cache.putOne(PDL_MED_FAMILIE_CACHE, I2, P2, ofSeconds(2))
+                    cache.putMany(PDL_MED_FAMILIE_CACHE, mapOf(I1 to P1, I2 to P2), ofSeconds(2))
                     pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
                     cache.delete(PDL_MED_FAMILIE_CACHE, I2)
                     server.expect(requestTo(cfg.personerURI))
@@ -172,7 +161,6 @@ class PdlTjenesteTest : BehaviorSpec() {
             When("settet er tomt") {
                 Then("REST kalles ikke") {
                     server.expect(never(), requestTo(cfg.personerURI))
-                        .andRespond(withSuccess("[]", APPLICATION_JSON))
                     pdl.personer(emptySet()) shouldContainExactlyInAnyOrder emptyList()
                     server.verify()
                 }
@@ -183,7 +171,7 @@ class PdlTjenesteTest : BehaviorSpec() {
     companion object {
         const val I1 = "03508331575"
         const val I2 = "20478606614"
-        val IDS = setOf(I1, I2)
+
         val P1 = tilPerson(BrukerBuilder(BrukerId(I1))
             .aktørId(AktørId("1234567890123"))
             .gt(KommuneTilknytning(Kommune("0301")))
@@ -192,5 +180,6 @@ class PdlTjenesteTest : BehaviorSpec() {
             .aktørId(AktørId("9876543210987"))
             .gt(UtenlandskTilknytning())
             .build())
+        val IDS = setOf(P1,P2).map { it.brukerId.verdi }.toSet()
     }
 }

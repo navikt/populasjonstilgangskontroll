@@ -5,7 +5,7 @@ import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Identifikator
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRestClientAdapter
+import no.nav.tilgangsmaskin.bruker.pdl.PdlClient
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjeneste
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants
 import org.springframework.web.bind.annotation.GetMapping
@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RequestBody
 @Tag(name = "DevBrukerController", description = "Denne kontrolleren skal kun brukes til testing")
 class DevBrukerController(private val brukere: BrukerTjeneste,
                           private val pdl: PdlTjeneste,
-                          private val pip: PdlRestClientAdapter) {
+                          private val pip: PdlClient) {
 
     @GetMapping("person/pip/{id}")
-    fun pip(@PathVariable id: String) = pip.person(id)
+    fun pip(@PathVariable id: String) = pip.person(id, id)
 
 
     @GetMapping("person/{id}")

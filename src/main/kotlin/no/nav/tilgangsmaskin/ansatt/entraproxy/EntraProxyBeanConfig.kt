@@ -11,8 +11,8 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 class EntraProxyBeanConfig {
 
     @Bean
-    fun entraProxyClient( cfg: EntraProxyConfig,b: Builder, errorHandler: ErrorHandler) =
-        createClient<EntraProxyClient>(cfg, b, errorHandler)
+    fun entraProxyClient( cfg: EntraProxyConfig,builder: Builder) =
+        createClient<EntraProxyClient>(cfg, builder)
 
     @Bean
     fun entraProxyHealthIndicator(pingable: EntraProxyPingable) =

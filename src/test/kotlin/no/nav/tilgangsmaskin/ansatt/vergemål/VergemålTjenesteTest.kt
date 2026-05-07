@@ -12,7 +12,6 @@ import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålClient.Companion.VERGEMÅL_PATH
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.VERGEMÅL_BASE
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
@@ -34,7 +33,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
 
-@RestClientTest(components = [VergemålPingable::class, VergemålBeanConfig::class, VergemålTjeneste::class, DefaultRestErrorHandler::class])
+@RestClientTest(components = [VergemålPingable::class, VergemålBeanConfig::class, VergemålTjeneste::class])
 @EnableConfigurationProperties(VergemålConfig::class)
 @ApplyExtension(SpringExtension::class)
 class VergemålTjenesteTest : BehaviorSpec() {

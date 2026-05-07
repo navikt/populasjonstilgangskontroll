@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class VergemålCacheOppfrisker(private val vergemål: VergemålTjeneste) : AbstractCacheOppfrisker() {
-    override fun doOppfrisk(elementer: CacheNøkkel) {
-        vergemål.vergemål(AnsattId(elementer.id))
+    override fun doOppfrisk(nøkkel: CacheNøkkel) {
+        vergemål.vergemål(AnsattId(nøkkel.id))
     }
 
     override val cacheName = VERGEMÅL

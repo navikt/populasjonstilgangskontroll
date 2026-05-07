@@ -21,8 +21,8 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
     private val log = getLogger(javaClass)
     override val cacheName = GRAPH
 
-    override fun doOppfrisk(elementer: CacheNøkkel)  =
-        oppfriskMedMetode(elementer, elementer.metode)
+    override fun doOppfrisk(nøkkel: CacheNøkkel)  =
+        oppfriskMedMetode(nøkkel, nøkkel.metode)
 
     private fun oppfriskMedMetode(elementer: CacheNøkkel, metode: String?) {
         val ansattId = AnsattId(elementer.id)

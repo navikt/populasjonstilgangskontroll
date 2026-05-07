@@ -6,7 +6,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetEvent
+import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetHendelse
 import no.nav.tilgangsmaskin.regler.motor.CacheOppfriskerTeller
 import no.nav.tilgangsmaskin.tilgang.Token
 
@@ -26,7 +26,7 @@ class CacheExpiredEventListenerTest : DescribeSpec({
 
     // nøkkel format: "cacheName::metode:id" or "cacheName::id"
     val nøkkel = "pdl::medFamilie:03508331575"
-    val hendelse = CacheInnslagFjernetEvent(nøkkel)
+    val hendelse = CacheInnslagFjernetHendelse(nøkkel)
 
     describe("cacheInnslagFjernet") {
 

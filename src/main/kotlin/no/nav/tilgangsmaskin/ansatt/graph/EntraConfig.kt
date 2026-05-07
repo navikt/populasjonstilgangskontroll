@@ -2,12 +2,11 @@ package no.nav.tilgangsmaskin.ansatt.graph
 
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste.Companion.ENTRA_OID
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.uuids
-import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
-import no.nav.tilgangsmaskin.felles.Generated
+import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO
+import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO_OG_GLOBALE
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
-import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 import java.net.URI
 import java.time.Duration
@@ -47,10 +46,7 @@ class EntraConfig(
         }.build(ansattId)
 
     private fun uuidsFormatted() =
-        uuids().joinToString(separator ="','" , prefix = "'", postfix = "'")
-
-    @Generated
-    override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
+        uuids().joinToString("','" , "'",  "'")
 
     companion object {
         val BASE_URI = URI.create("https://graph.microsoft.com/v1.0/")
@@ -66,7 +62,7 @@ class EntraConfig(
         private const val PARAM_VALUE_SELECT_GROUPS = "id,displayName"
         private const val DEFAULT_PING_PATH = "/organization"
         private const val PARAM_NAME_TOP = "\$top"
-        val ENTRA_CACHES = setOf(CachableConfig(GRAPH,"geoGrupper"), CachableConfig(GRAPH,"geoOgGlobaleGrupper"))
+        val ENTRA_CACHES = setOf(CachableConfig(GRAPH,GEO), CachableConfig(GRAPH,GEO_OG_GLOBALE))
         val OID_CACHE = CachableConfig(ENTRA_OID)
 
     }

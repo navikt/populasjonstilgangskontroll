@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.rest
 
-import no.nav.tilgangsmaskin.bruker.Identifikator
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpRequest

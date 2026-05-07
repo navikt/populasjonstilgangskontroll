@@ -13,40 +13,35 @@ import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype
 import no.nav.tilgangsmaskin.bruker.pdl.PdlClientBeanConfig.DefaultGraphQlErrorHandler
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
+import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapterTest.GraphQLTestConfig
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
-import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.graphql.client.HttpSyncGraphQlClient
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor
-import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.http.HttpMethod.OPTIONS
 import org.springframework.test.web.client.match.MockRestRequestMatchers.header
-import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.client.RestClient
-import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
-import java.net.URI
+import org.springframework.web.client.RestClient.Builder
 
 @RestClientTest(components = [PdlSyncGraphQLClientAdapter::class, DefaultGraphQlErrorHandler::class, PdlGraphQLConfig::class])
 @TestPropertySource(properties = ["PDLGRAPH=pdlgraph"])
-@Import(PdlSyncGraphQLClientAdapterTest.GraphQLTestConfig::class)
+@Import(GraphQLTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
 
     @TestConfiguration
     class GraphQLTestConfig {
         @Bean @Qualifier(PDLGRAPH)
-        fun pdlGraphRestClient(b: RestClient.Builder) =
+        fun pdlGraphRestClient(b: Builder) =
             b.requestInterceptors {
                 it.add(headerAddingRequestInterceptor(BEHANDLINGSNUMMER))
             }.build()
@@ -60,11 +55,6 @@ class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
             .url(cfg.baseUri)
             .interceptors { it.addAll(interceptors) }
             .build()
-
-        @Bean
-        fun errorHandler() = ErrorHandler { _, response -> throw IrrecoverableRestException(
-            response.statusCode as HttpStatus, URI.create("http://pdlgraph"), response.statusText
-        )}
     }
 
     @Autowired
@@ -117,14 +107,7 @@ class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
             }
         }
 
-        Given("ping") {
-            When("ping kalles") {
-                Then("sendes OPTIONS-request") {
-                    server.expect(requestTo(cfg.baseUri)).andExpect(method(OPTIONS)).andRespond(withSuccess())
-                    adapter.ping()
-                }
-            }
-        }
+
 
         Given("behandlingsnummer-header") {
             When("request sendes til PDL") {

@@ -14,7 +14,7 @@ import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetEvent
+import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetHendelse
 import java.util.concurrent.CopyOnWriteArrayList
 import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisClient.create
@@ -104,7 +104,7 @@ class CacheOperationsTest : BehaviorSpec() {
     @Autowired
     private lateinit var cache: CacheOperations
 
-    private val events = CopyOnWriteArrayList<CacheInnslagFjernetEvent>()
+    private val events = CopyOnWriteArrayList<CacheInnslagFjernetHendelse>()
 
     private fun setUpCache() {
         every { token.system } returns "test"
@@ -115,7 +115,7 @@ class CacheOperationsTest : BehaviorSpec() {
 
         beforeSpec {
             ctx.addApplicationListener { event ->
-                if (event is CacheInnslagFjernetEvent) events.add(event)
+                if (event is CacheInnslagFjernetHendelse) events.add(event)
             }
             setUpCache()
         }

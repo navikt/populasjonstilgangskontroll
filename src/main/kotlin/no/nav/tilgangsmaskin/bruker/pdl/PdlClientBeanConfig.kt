@@ -14,7 +14,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNU
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.createClient
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
-import no.nav.tilgangsmaskin.felles.graphql.GraphQLErrorHandler
+import no.nav.tilgangsmaskin.felles.graphql.PdlGraphQLErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUrl
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.userInfo
@@ -41,7 +41,7 @@ import org.springframework.web.client.RestClient.Builder
 class PdlClientBeanConfig {
 
     @Component
-    class DefaultGraphQlErrorHandler : GraphQLErrorHandler
+    class DefaultGraphQlErrorHandler : PdlGraphQLErrorHandler
 
     @Bean
     @Qualifier(PDLGRAPH)
@@ -51,7 +51,6 @@ class PdlClientBeanConfig {
         }.build()
 
     @Bean
-    @Qualifier(PDLGRAPH)
     fun syncPdlGraphQLClient(@Qualifier(PDLGRAPH) client: RestClient, cfg: PdlGraphQLConfig,  interceptors: List<SyncGraphQlClientInterceptor>) =
         builder(client)
             .url(cfg.baseUri)
@@ -65,7 +64,8 @@ class PdlClientBeanConfig {
 
     @Bean
     @ConditionalOnNotProd
-    fun loggingGraphQLInterceptor() = object: SyncGraphQlClientInterceptor {
+    fun loggingGraphQLInterceptor() =
+        object: SyncGraphQlClientInterceptor {
 
         private val log = getLogger(javaClass)
 
@@ -75,8 +75,13 @@ class PdlClientBeanConfig {
             }
     }
 
-   @Bean
-    fun pdlGraphHealthIndicator(adapter: PdlSyncGraphQLClientAdapter) = PingableHealthIndicator(adapter)
+    @Bean
+    fun pdlGraphQLClient(builder: Builder, cfg: PdlGraphQLConfig) =
+        createClient<PdlGraphQLPingClient>(cfg, builder)
+
+    @Bean
+    fun pdlGraphHealthIndicator(pingable: PdlGraphQLPingable) =
+        PingableHealthIndicator(pingable)
 
     @Bean
     fun pdlHealthIndicator(pingable: PdlPingable) =

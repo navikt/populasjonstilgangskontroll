@@ -11,7 +11,7 @@ class EntraOidException(ansattId: String, msg: String) : ErrorResponseException(
         body.properties = mapOf("navIdent" to ansattId,"traceId" to Span.current().spanContext.traceId)
     }
 
-    companion object   {
-        const val TITLE = "Uventet respons fra Entra"
+    private companion object   {
+        private const val TITLE = "Uventet respons fra Entra"
     }
 }

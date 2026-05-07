@@ -14,7 +14,7 @@ interface PdlPipClient {
     fun person(@RequestHeader("ident") ident: String, @RequestHeader(IDENTIFIKATOR) identifikator: String): PdlRespons
 
     @PostExchange(PERSONER_PATH)
-    fun personer(@RequestBody identer: Set<String>): String
+    fun personer(@RequestBody identer: Set<String>): Map<String, PdlRespons?>
 
     @GetExchange(PING_PATH)
     fun ping(): Any

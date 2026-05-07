@@ -11,8 +11,6 @@ import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableService
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
-import tools.jackson.databind.json.JsonMapper
-import tools.jackson.module.kotlin.readValue
 
 @RetryingWhenRecoverableService
 class PdlTjeneste(
@@ -20,7 +18,6 @@ class PdlTjeneste(
     private val graphQL: PdlSyncGraphQLClientAdapter,
     private val cache: CacheOperations,
     private val cf: PdlConfig,
-    private val mapper: JsonMapper,
 ) {
 
     private val log = getLogger(PdlTjeneste::class.java)
@@ -60,7 +57,7 @@ class PdlTjeneste(
     private fun person(id: String) = tilPerson(id, pip.person(id, id))
 
     private fun hentPersoner(identer: Set<String>) =
-        tilPersoner(mapper.readValue<Map<String, PdlRespons?>>(pip.personer(identer)))
+        tilPersoner(pip.personer(identer))
 
     private fun søsken(person: Person): Set<FamilieMedlem> {
         if (person.foreldre.isEmpty()) return emptySet()

@@ -8,7 +8,7 @@ import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
 @HttpExchange
-interface PdlClient {
+interface PdlPipClient {
 
     @GetExchange(PERSON_PATH)
     fun person(@RequestHeader("ident") ident: String, @RequestHeader(IDENTIFIKATOR) identifikator: String): PdlRespons

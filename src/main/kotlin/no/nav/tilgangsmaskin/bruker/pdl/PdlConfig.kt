@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import no.nav.tilgangsmaskin.bruker.pdl.PdlClient.Companion.PERSONER_PATH
-import no.nav.tilgangsmaskin.bruker.pdl.PdlClient.Companion.PERSON_PATH
-import no.nav.tilgangsmaskin.bruker.pdl.PdlClient.Companion.PING_PATH
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PERSONER_PATH
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PERSON_PATH
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PING_PATH
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig

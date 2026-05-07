@@ -62,7 +62,7 @@ class PdlClientBeanConfig {
 
     @Bean
     fun pdlClient(b: Builder, cfg: PdlConfig) =
-        createClient<PdlClient>(cfg, b)
+        createClient<PdlPipClient>(cfg, b)
 
     @Bean
     @ConditionalOnNotProd

@@ -60,7 +60,7 @@ class PdlTjenesteTest : BehaviorSpec() {
         @Bean fun cache(cacheManager: CacheManager) = ConcurrentMapCacheOperations(cacheManager)
 
         @Bean
-        fun pdlClient(builder: Builder, cfg: PdlConfig) = createClient<PdlClient>(cfg, builder)
+        fun pdlClient(builder: Builder, cfg: PdlConfig) = createClient<PdlPipClient>(cfg, builder)
     }
 
     @MockkBean lateinit var graphQL: PdlSyncGraphQLClientAdapter

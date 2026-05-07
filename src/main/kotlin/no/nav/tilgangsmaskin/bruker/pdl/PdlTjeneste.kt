@@ -16,7 +16,7 @@ import tools.jackson.module.kotlin.readValue
 
 @RetryingWhenRecoverableService
 class PdlTjeneste(
-    private val client: PdlClient,
+    private val pip: PdlPipClient,
     private val graphQL: PdlSyncGraphQLClientAdapter,
     private val cache: CacheOperations,
     private val cf: PdlConfig,
@@ -57,10 +57,10 @@ class PdlTjeneste(
         return (fraCache.values + fraRest.values).toSet()
     }
 
-    private fun person(id: String) = tilPerson(id, client.person(id, id))
+    private fun person(id: String) = tilPerson(id, pip.person(id, id))
 
     private fun hentPersoner(identer: Set<String>) =
-        tilPersoner(mapper.readValue<Map<String, PdlRespons?>>(client.personer(identer)))
+        tilPersoner(mapper.readValue<Map<String, PdlRespons?>>(pip.personer(identer)))
 
     private fun søsken(person: Person): Set<FamilieMedlem> {
         if (person.foreldre.isEmpty()) return emptySet()

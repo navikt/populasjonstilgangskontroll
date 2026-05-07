@@ -7,6 +7,7 @@ import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.SCHEMA_REGI
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG
 import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
@@ -66,13 +67,13 @@ class PdlClientBeanConfig {
 
     @Bean
     @ConditionalOnNotProd
-    fun loggingGraphQLInterceptor() = object:  SyncGraphQlClientInterceptor {
+    fun loggingGraphQLInterceptor() = object: SyncGraphQlClientInterceptor {
 
         private val log = getLogger(javaClass)
 
-        override fun intercept(req: ClientGraphQlRequest, chain:    Chain) =
+        override fun intercept(req: ClientGraphQlRequest, chain: Chain) =
             chain.next(req).also {
-                log.trace("Eksekverer {} med variabler {}", req.document, req.variables)
+                log.trace(CONFIDENTIAL, "Eksekverer {} med variabler {}", req.document, req.variables)
             }
     }
 
@@ -80,7 +81,8 @@ class PdlClientBeanConfig {
     fun pdlGraphHealthIndicator(a: PdlSyncGraphQLClientAdapter) = PingableHealthIndicator(a)
 
     @Bean
-    fun pdlHealthIndicator(pingable: PdlPingable) = PingableHealthIndicator(pingable)
+    fun pdlHealthIndicator(pingable: PdlPingable) =
+        PingableHealthIndicator(pingable)
 
     @Bean
     fun pdlHendelseKafkaListenerConsumerFactory(props: KafkaProperties, env: Environment): ConsumerFactory<String, Personhendelse> =

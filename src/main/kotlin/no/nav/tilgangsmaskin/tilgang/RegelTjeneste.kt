@@ -120,7 +120,9 @@ class RegelTjeneste(
             }
         }
     }.also {
-            log.debug("Bulk avviste {}", it)
+            if (it.isNotEmpty()) {
+                log.debug("Bulk avviste {}", it)
+            }
         }
 
     private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) =
@@ -130,9 +132,9 @@ class RegelTjeneste(
             overstyringTjeneste
                 .overstyringer(ansatt.ansattId, avviste.map { it.bruker.brukerId })
                 .forEach { add(ok(it.verdi)) }
-        }.also {
-            if (it.isNotEmpty()) {
-                log.debug("Bulk godkjente oppslagId(s) {}", it.map { it.brukerId })
+        }.also { respons ->
+            if (respons.isNotEmpty()) {
+                log.debug("Bulk godkjente oppslagId(s) {}", respons.map { it.brukerId })
             }
         }
 

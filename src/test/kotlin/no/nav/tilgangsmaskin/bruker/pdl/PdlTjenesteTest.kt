@@ -160,7 +160,7 @@ class PdlTjenesteTest : BehaviorSpec() {
             When("settet er tomt") {
                 Then("REST kalles ikke") {
                     server.expect(never(), requestTo(cfg.personerURI))
-                    pdl.personer(emptySet()) shouldContainExactlyInAnyOrder emptyList()
+                    pdl.personer(emptySet()) shouldBe emptyList()
                     server.verify()
                 }
             }
@@ -179,6 +179,6 @@ class PdlTjenesteTest : BehaviorSpec() {
             .aktørId(AktørId("9876543210987"))
             .gt(UtenlandskTilknytning())
             .build())
-        val IDS = setOf(P1,P2).map { it.brukerId.verdi }.toSet()
+        val IDS = setOf(P1, P2).mapTo(mutableSetOf()) { it.brukerId.verdi }
     }
 }

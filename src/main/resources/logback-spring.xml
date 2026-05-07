@@ -58,9 +58,9 @@
     <logger name="secureLog" level="info" additivity="false">
         <appender-ref ref="secure-appender"/>
     </logger>
+    <logger name="org.springdoc.core.events.SpringDocAppInitializer" level="error"/>
+    <logger name="org.springframework.boot.webmvc.autoconfigure.ProblemDetailsExceptionHandler" level="error"/>
     <root level="info">
-        <logger name="org.springdoc.core.events.SpringDocAppInitializer" level="error"/>
-        <logger name="org.springframework.boot.webmvc.autoconfigure.ProblemDetailsExceptionHandler" level="error"/>
         <appender-ref ref="otel"/>
     </root>
 </configuration>

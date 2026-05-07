@@ -17,12 +17,12 @@ class EntraTjeneste(private val adapter: EntraRestClientAdapter, private val res
     @Cacheable(cacheNames = [GRAPH],  key = "#root.methodName + ':' + #ansattId.verdi")
     @WithSpan
     fun geoOgGlobaleGrupper(ansattId: AnsattId, oid: UUID) =
-        adapter.grupper(oid.toString(), true)
+        adapter.grupper("$oid", true)
 
     @Cacheable(cacheNames = [GRAPH],  key = "#root.methodName + ':' + #ansattId.verdi")
     @WithSpan
     fun geoGrupper(ansattId: AnsattId, oid: UUID) =
-        adapter.grupper(oid.toString(), false)
+        adapter.grupper("$oid", false)
 
     @Generated
     override fun toString() = "${javaClass.simpleName} [adapter=$adapter resolver=$resolver]"

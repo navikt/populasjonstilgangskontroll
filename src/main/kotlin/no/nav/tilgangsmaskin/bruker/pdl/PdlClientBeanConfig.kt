@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Primary
 import org.springframework.core.env.Environment
 import org.springframework.graphql.client.ClientGraphQlRequest
 import org.springframework.graphql.client.HttpSyncGraphQlClient
@@ -42,13 +41,12 @@ import org.springframework.web.client.RestClient.Builder
 class PdlClientBeanConfig {
 
     @Component
-    @Primary
     class DefaultGraphQlErrorHandler : GraphQLErrorHandler
 
     @Bean
     @Qualifier(PDLGRAPH)
-    fun pdlGraphRestClient(b: Builder) =
-        b.requestInterceptors {
+    fun pdlGraphRestClient(builder: Builder) =
+        builder.requestInterceptors {
             it.add(headerAddingRequestInterceptor(BEHANDLINGSNUMMER))
         }.build()
 
@@ -62,8 +60,8 @@ class PdlClientBeanConfig {
             }.build()
 
     @Bean
-    fun pdlClient(b: Builder, cfg: PdlConfig) =
-        createClient<PdlPipClient>(cfg, b)
+    fun pdlClient(builder: Builder, cfg: PdlConfig) =
+        createClient<PdlPipClient>(cfg, builder)
 
     @Bean
     @ConditionalOnNotProd
@@ -78,7 +76,7 @@ class PdlClientBeanConfig {
     }
 
    @Bean
-    fun pdlGraphHealthIndicator(a: PdlSyncGraphQLClientAdapter) = PingableHealthIndicator(a)
+    fun pdlGraphHealthIndicator(adapter: PdlSyncGraphQLClientAdapter) = PingableHealthIndicator(adapter)
 
     @Bean
     fun pdlHealthIndicator(pingable: PdlPingable) =

@@ -11,8 +11,8 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 class VergemålBeanConfig {
 
     @Bean
-    fun vergemålClient(b: Builder, cfg: VergemålConfig) =
-        createClient<VergemålClient>(cfg, b)
+    fun vergemålClient(builder: Builder, cfg: VergemålConfig) =
+        createClient<VergemålClient>(cfg, builder)
 
     @Bean
     fun vergemålHealthIndicator(pingable: VergemålPingable) =

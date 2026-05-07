@@ -1,14 +1,11 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import no.nav.tilgangsmaskin.felles.Generated
-import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler.Companion.IDENTIFIKATOR
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
-import org.springframework.web.client.body
 import org.springframework.web.client.requiredBody
 import java.net.URI
 
@@ -29,17 +26,6 @@ abstract class AbstractRestClientAdapter(
             .uri(uri)
             .accept(APPLICATION_JSON)
             .headers { it.setAll(headers)}
-            .retrieve()
-            .onStatus(HttpStatusCode::isError, handler::handle)
-            .requiredBody<T>()
-
-    protected inline fun <reified T : Any> post(uri: URI, body: Any, headers: Map<String, String> = emptyMap(), handler: ErrorHandler = errorHandler) =
-        restClient
-            .post()
-            .uri(uri)
-            .headers { it.setAll(headers) }
-            .accept(APPLICATION_JSON)
-            .body(body)
             .retrieve()
             .onStatus(HttpStatusCode::isError, handler::handle)
             .requiredBody<T>()

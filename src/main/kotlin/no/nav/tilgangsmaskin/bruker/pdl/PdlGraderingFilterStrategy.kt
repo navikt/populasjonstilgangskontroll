@@ -26,7 +26,7 @@ class PdlGraderingFilterStrategy : RecordFilterStrategy<String, Personhendelse> 
         if (resultat) {
             log.trace(CONFIDENTIAL, "Filtrerte bort PDL hendelse {}", hendelse.endringstype)
         } else {
-            log.info(CONFIDENTIAL, "Konsumerte PDL hendelse ${hendelse.endringstype}")
+            log.info(CONFIDENTIAL, "Konsumerte PDL hendelse {}", hendelse.endringstype)
         }
 
     companion object {

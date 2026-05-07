@@ -30,7 +30,6 @@ class PdlConfig(@Value("\${PDL}") hostname: String
         const val PDL = "pdl"
         val MED_FAMILIE = "medFamilie"
         val MED_UTVIDET_FAMILIE = "medUtvidetFamilie"
-        private const val DEFAULT_PING_PATH = "/internal/health/liveness"
         val  PDL_MED_FAMILIE_CACHE = CachableConfig(PDL,MED_FAMILIE)
         val  PDL_MED_UTVIDET_FAMILIE_CACHE = CachableConfig(PDL,MED_UTVIDET_FAMILIE)
         val PDL_CACHES  = setOf(PDL_MED_FAMILIE_CACHE,PDL_MED_UTVIDET_FAMILIE_CACHE)

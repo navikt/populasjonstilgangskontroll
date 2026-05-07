@@ -5,14 +5,13 @@ import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.RestClient.Builder
-import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 @Configuration
 class SkjermingClientBeanConfig {
 
     @Bean
-    fun skjermingClient(b: Builder, cfg: SkjermingConfig, errorHandler: ErrorHandler) =
-        createClient<SkjermingClient>(cfg, b, errorHandler)
+    fun skjermingClient(b: Builder, cfg: SkjermingConfig) =
+        createClient<SkjermingClient>(cfg, b)
 
     @Bean
     fun skjermingHealthIndicator(pingable: SkjermingPingable) = PingableHealthIndicator(pingable)

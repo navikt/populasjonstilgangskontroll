@@ -19,7 +19,6 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMIN
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
-import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RetryLogger
@@ -44,7 +43,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
 
-@RestClientTest(components = [SkjermingClient::class,SkjermingClientBeanConfig::class, SkjermingTjeneste::class, SkjermingPingable::class,DefaultRestErrorHandler::class, SkjermingConfig::class,RetryLogger::class])
+@RestClientTest(components = [SkjermingClient::class,SkjermingClientBeanConfig::class, SkjermingTjeneste::class, SkjermingPingable::class, SkjermingConfig::class,RetryLogger::class])
 @EnableResilientMethods
 @Import(SkjermingTjenesteTest.CacheConfig::class)
 @ApplyExtension(SpringExtension::class)
@@ -54,9 +53,10 @@ class SkjermingTjenesteTest : BehaviorSpec() {
     @EnableCaching
     class CacheConfig {
         @Bean
-        fun cacheManager(): CacheManager = ConcurrentMapCacheManager(SKJERMING)
+        fun cacheManager(): CacheManager =
+            ConcurrentMapCacheManager(SKJERMING)
         @Bean
-        fun cache(cacheManager: CacheManager): CacheOperations = ConcurrentMapCacheOperations(cacheManager)
+        fun cache(cacheManager: CacheManager) = ConcurrentMapCacheOperations(cacheManager)
     }
 
     @Autowired

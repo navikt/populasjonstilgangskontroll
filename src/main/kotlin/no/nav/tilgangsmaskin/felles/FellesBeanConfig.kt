@@ -9,6 +9,7 @@ import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenRespons
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
+import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.LoggingRequestInterceptor
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.aspectj.lang.ProceedingJoinPoint
@@ -121,7 +122,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             .build()))
             .build()
 
-        inline fun <reified T : Any> createClient(cfg: AbstractRestConfig, b: Builder, errorHandler: ErrorHandler) =
+        inline fun <reified T : Any> createClient(cfg: AbstractRestConfig, b: Builder, errorHandler: ErrorHandler = DefaultRestErrorHandler()) =
             createProxyFactory(cfg, b, errorHandler).createClient(T::class.java)
 
         private val SENSITIVE_KEYS = setOf("password", "secret", "token", "key","credentials", "jwk","private_key")

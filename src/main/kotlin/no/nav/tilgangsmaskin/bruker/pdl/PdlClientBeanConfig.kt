@@ -61,7 +61,8 @@ class PdlClientBeanConfig {
 
     @Bean
     @Qualifier(PDL)
-    fun pdlRestClient(b: Builder) = b.build()
+    fun pdlRestClient(builder: Builder) =
+        builder.build()
 
     @Bean
     @ConditionalOnNotProd

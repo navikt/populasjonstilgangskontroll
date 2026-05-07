@@ -24,9 +24,9 @@ class PdlGraderingFilterStrategy : RecordFilterStrategy<String, Personhendelse> 
     }
     private fun log(resultat: Boolean, hendelse: Personhendelse) =
         if (resultat) {
-            log.trace(CONFIDENTIAL, "Filtrerte bort PDL hendelse {}", hendelse)
+            log.trace(CONFIDENTIAL, "Filtrerte bort PDL hendelse {}", hendelse.adressebeskyttelse?.gradering)
         } else {
-            log.info(CONFIDENTIAL, "Konsumerte PDL hendelse $hendelse")
+            log.info(CONFIDENTIAL, "Konsumerte PDL hendelse ${hendelse.adressebeskyttelse?.gradering}")
         }
 
     companion object {

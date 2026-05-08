@@ -17,7 +17,7 @@ import java.net.URI
 class EntraRestClientAdapter(
     @param:Qualifier(GRAPH) private val restClient: RestClient,
     private val entraClient: EntraGraphClient,
-    val cfg: EntraConfig,
+    private val cfg: EntraConfig,
     private val errorHandler: ErrorHandler = DefaultRestErrorHandler()) {
 
     private val log = getLogger(javaClass)

@@ -1,43 +1,53 @@
 package no.nav.tilgangsmaskin.ansatt
 
-import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
-import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.TestApp
+import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.setIDs
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GEO_PREFIX
-import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
-import org.springframework.core.env.Environment
-import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.TestPropertySource
+import java.util.*
 
-@RestClientTest
-@TestPropertySource(locations = ["classpath:test.properties"])
-@EnableConfigurationProperties(GlobaleGrupperConfig::class)
-@ContextConfiguration(classes = [TestApp::class])
-@ApplyExtension(SpringExtension::class)
-class EntraURLTest : BehaviorSpec() {
+class EntraURLTest : BehaviorSpec({
 
-    @Autowired
-    private lateinit var env: Environment
+    val knownIds = GlobalGruppe.entries.associate { it.property to UUID.randomUUID() }
 
-    init {
-        Given("grupperURI") {
-            When("URI bygges med globale grupper") {
-                Then("UUIDene til gruppene kommer i rett formatering") {
-                    val globaleGrupper = GlobalGruppe.entries.map { env.getProperty(it.property) }.joinToString(",") { "'$it'" }
-                    val expectedFilter = "id in($globaleGrupper) or $GEO_PREFIX"
-                    val actualFilter = EntraConfig()
-                        .grupperURI("Z999999", true).query
-                        .substringAfter("\$filter=").substringBefore("&")
+    beforeContainer {
+        setIDs(knownIds)
+    }
 
-                    actualFilter shouldBe expectedFilter
+    Given("grupperURI") {
+        When("isCCF er true") {
+            Then("inneholder globale gruppe-IDer i OData-filter") {
+                val uri = EntraConfig().grupperURI("Z999999", true)
+                val filter = uri.query.substringAfter("\$filter=").substringBefore("&")
+
+                knownIds.values.forEach { uuid ->
+                    filter shouldContain uuid.toString()
+                }
+                filter shouldContain "id in("
+                filter shouldContain ") or $GEO_PREFIX"
+            }
+        }
+
+        When("isCCF er false") {
+            Then("inneholder kun GEO-prefix uten globale grupper") {
+                val uri = EntraConfig().grupperURI("Z999999", false)
+                val filter = uri.query.substringAfter("\$filter=").substringBefore("&")
+
+                filter shouldContain "startswith(displayName,'0000-GA-GEO')"
+                knownIds.values.forEach { uuid ->
+                    filter shouldNotContain uuid.toString()
                 }
             }
         }
+
+        When("ansattId settes i path") {
+            Then("erstatter {ansattId} i URI-path") {
+                val uri = EntraConfig().grupperURI("Z999999", false)
+                uri.path shouldContain "Z999999"
+            }
+        }
     }
-}
+})
+

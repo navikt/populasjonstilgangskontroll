@@ -23,7 +23,12 @@ class EntraClientBeanConfig {
 
     @Bean
     fun entraGraphClient(builder: Builder, cfg: EntraConfig) =
-        createClient<EntraGraphClient>(cfg, builder)
+        createClient<EntraGraphClient>(
+            cfg,
+            builder.clone().requestInterceptors {
+                it.add(headerAddingRequestInterceptor(HEADER_CONSISTENCY_LEVEL))
+            },
+        )
 
     @Bean
     fun graphHealthIndicator(pingable: EntraGraphPingable) =

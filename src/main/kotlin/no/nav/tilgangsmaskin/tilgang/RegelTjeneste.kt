@@ -134,7 +134,7 @@ class RegelTjeneste(
                 .forEach { add(ok(it.verdi)) }
         }.also { respons ->
             if (respons.isNotEmpty()) {
-                log.debug("Bulk godkjente oppslagId(s) {}", respons.map { it.brukerId })
+                log.debug("Bulk godkjente oppslagId(s) {}", respons.map { it.brukerId.maskFnr() })
             }
         }
 

@@ -19,15 +19,7 @@ class EntraConfig(
     override val navn = name
     override val varighet = Duration.ofHours(3)
 
-    fun userURI(navIdent: String) =
-        builder().apply {
-            path(USERS_PATH)
-            queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_USER)
-            queryParam(PARAM_NAME_FILTER, "onPremisesSamAccountName eq '$navIdent'")
-            queryParam(PARAM_NAME_COUNT, "true")
-        }.build()
-
-     fun grupperURI(ansattId: String, isCCF: Boolean) =
+    fun grupperURI(ansattId: String, isCCF: Boolean) =
          if (isCCF) ccUri(ansattId) else oboUri(ansattId)
 
     private fun oboUri(ansattId: String) =
@@ -53,7 +45,7 @@ class EntraConfig(
         const val GEO_PREFIX = "startswith(displayName,'0000-GA-GEO') or startswith(displayName,'0000-GA-ENHET') "
         const val GRAPH = "graph"
         private const val DEFAULT_BATCH_SIZE = 250
-        private const val USERS_PATH = "/users"
+        const val USERS_PATH = "/users"
         private const val GRUPPER_PATH = "/users/{ansattId}/memberOf"
         const val PARAM_NAME_SELECT = "\$select"
         const val PARAM_NAME_FILTER = "\$filter"

@@ -16,12 +16,12 @@ class LoggingRequestInterceptor : ClientHttpRequestInterceptor {
             return execution.execute(request, body)
         }
         if (!body.isEmpty()) {
-            log.debug(CONFIDENTIAL, "Body for {} {} : {} ",request.method, request.uri,String(body))
+            log.trace(CONFIDENTIAL, "Body for {} {} : {} ",request.method, request.uri,String(body))
         }
         val response = execution.execute(request, body)
-        if (!response.statusCode.is2xxSuccessful) {
-            log.debug(CONFIDENTIAL,"Response status for {} {}: {}", request.method, request.uri, response.statusCode)
-        }
+       // if (!response.statusCode.is2xxSuccessful) {
+            log.trace(CONFIDENTIAL,"Response status for {} {}: {}", request.method, request.uri, response.statusCode)
+        //}
         return response
     }
 }

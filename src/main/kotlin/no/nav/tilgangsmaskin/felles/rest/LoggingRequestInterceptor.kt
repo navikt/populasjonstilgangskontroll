@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution
@@ -15,11 +16,11 @@ class LoggingRequestInterceptor : ClientHttpRequestInterceptor {
             return execution.execute(request, body)
         }
         if (!body.isEmpty()) {
-            log.debug("Body for {} {} : {} ",request.method, request.uri,String(body))
+            log.debug(CONFIDENTIAL, "Body for {} {} : {} ",request.method, request.uri,String(body))
         }
         val response = execution.execute(request, body)
         if (!response.statusCode.is2xxSuccessful) {
-            log.debug("Response status for {} {}: {}", request.method, request.uri, response.statusCode)
+            log.debug(CONFIDENTIAL,"Response status for {} {}: {}", request.method, request.uri, response.statusCode)
         }
         return response
     }

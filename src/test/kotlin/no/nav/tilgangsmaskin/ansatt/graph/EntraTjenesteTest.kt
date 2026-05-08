@@ -10,7 +10,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.setIDs
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.entries
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
-import no.nav.tilgangsmaskin.ansatt.graph.EntraTjenesteTest.TestConfig
+import no.nav.tilgangsmaskin.ansatt.graph.EntraTjenesteTest.EntraTestConfig
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -28,24 +28,24 @@ import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
-import org.springframework.web.client.RestClient
+import org.springframework.web.client.RestClient.Builder
 import java.util.*
 
 @RestClientTest(components = [EntraRestClientAdapter::class, EntraTjeneste::class, EntraConfig::class])
-@Import(TestConfig::class)
+@Import(EntraTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class EntraTjenesteTest : BehaviorSpec() {
 
     @TestConfiguration
     @EnableCaching
     @EnableResilientMethods
-    class TestConfig {
+    class EntraTestConfig {
         @Bean
         fun cacheManager() =
             ConcurrentMapCacheManager(GRAPH)
 
         @Bean @Qualifier(GRAPH)
-        fun graphRestClient(b: RestClient.Builder, cfg: EntraConfig) =
+        fun graphRestClient(b: Builder, cfg: EntraConfig) =
             b.baseUrl(cfg.baseUri)
                 .requestInterceptors {
                     it.add(headerAddingRequestInterceptor("ConsistencyLevel" to "eventual"))

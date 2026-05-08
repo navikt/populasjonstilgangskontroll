@@ -12,8 +12,7 @@ import java.net.URI
 import java.time.Duration
 
 @Component
-class EntraConfig(
-    private val size: Int = DEFAULT_BATCH_SIZE) : CachableRestConfig, AbstractRestConfig(BASE_URI, PING_PATH, GRAPH) {
+class EntraConfig : CachableRestConfig, AbstractRestConfig(BASE_URI, PING_PATH, GRAPH) {
 
     override val caches = ENTRA_CACHES
     override val navn = name
@@ -33,7 +32,7 @@ class EntraConfig(
             path(GRUPPER_PATH)
             queryParam(PARAM_NAME_SELECT, PARAM_VALUE_SELECT_GROUPS)
             queryParam(PARAM_NAME_COUNT, "true")
-            queryParam(PARAM_NAME_TOP, size)
+            queryParam(PARAM_NAME_TOP, "$DEFAULT_BATCH_SIZE")
             queryParam(PARAM_NAME_FILTER, filter)
         }.build(ansattId)
 
@@ -41,21 +40,23 @@ class EntraConfig(
         uuids().joinToString("','" , "'",  "'")
 
     companion object {
-        val BASE_URI = URI.create("https://graph.microsoft.com/v1.0/")
-        const val GEO_PREFIX = "startswith(displayName,'0000-GA-GEO') or startswith(displayName,'0000-GA-ENHET') "
-        const val GRAPH = "graph"
         private const val DEFAULT_BATCH_SIZE = 250
-        const val USERS_PATH = "/users"
         private const val GRUPPER_PATH = "/users/{ansattId}/memberOf"
+        private const val PARAM_VALUE_SELECT_GROUPS = "id,displayName"
+        private const val PARAM_NAME_TOP = "\$top"
+        private const val GRAPH_URL = "https://graph.microsoft.com/v1.0/"
+        const val GRAPH = "graph"
+        const val PING_PATH = "/organization"
+        const val USERS_PATH = "/users"
         const val PARAM_NAME_SELECT = "\$select"
         const val PARAM_NAME_FILTER = "\$filter"
         const val PARAM_NAME_COUNT = "\$count"
         const val PARAM_VALUE_SELECT_USER = "id"
-        private const val PARAM_VALUE_SELECT_GROUPS = "id,displayName"
-        const val PING_PATH = "/organization"
-        private const val PARAM_NAME_TOP = "\$top"
-        val ENTRA_CACHES = setOf(CachableConfig(GRAPH,GEO), CachableConfig(GRAPH,GEO_OG_GLOBALE))
+        const val GEO_PREFIX = "startswith(displayName,'0000-GA-GEO') or startswith(displayName,'0000-GA-ENHET') "
+        val BASE_URI = URI.create(GRAPH_URL)
         val OID_CACHE = CachableConfig(ENTRA_OID)
+        val ENTRA_CACHES = setOf(CachableConfig(GRAPH,GEO), CachableConfig(GRAPH,GEO_OG_GLOBALE))
+
 
     }
 }

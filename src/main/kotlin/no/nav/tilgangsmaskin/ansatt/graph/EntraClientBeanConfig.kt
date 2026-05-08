@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
+import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.createClient
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.springframework.beans.factory.annotation.Qualifier
@@ -21,8 +22,12 @@ class EntraClientBeanConfig {
 
 
     @Bean
-    fun graphHealthIndicator(a: EntraRestClientAdapter) =
-        PingableHealthIndicator(a)
+    fun entraGraphClient(builder: Builder, cfg: EntraConfig) =
+        createClient<EntraGraphClient>(cfg, builder)
+
+    @Bean
+    fun graphHealthIndicator(pingable: EntraGraphPingable) =
+        PingableHealthIndicator(pingable)
 
     private companion object {
         private val HEADER_CONSISTENCY_LEVEL = "ConsistencyLevel" to "eventual"

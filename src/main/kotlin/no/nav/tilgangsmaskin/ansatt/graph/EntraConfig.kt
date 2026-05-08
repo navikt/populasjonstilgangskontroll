@@ -13,7 +13,7 @@ import java.time.Duration
 
 @Component
 class EntraConfig(
-    private val size: Int = DEFAULT_BATCH_SIZE) : CachableRestConfig, AbstractRestConfig(BASE_URI, DEFAULT_PING_PATH, GRAPH) {
+    private val size: Int = DEFAULT_BATCH_SIZE) : CachableRestConfig, AbstractRestConfig(BASE_URI, PING_PATH, GRAPH) {
 
     override val caches = ENTRA_CACHES
     override val navn = name
@@ -55,12 +55,12 @@ class EntraConfig(
         private const val DEFAULT_BATCH_SIZE = 250
         private const val USERS_PATH = "/users"
         private const val GRUPPER_PATH = "/users/{ansattId}/memberOf"
-        private const val PARAM_NAME_SELECT = "\$select"
-        private const val PARAM_NAME_FILTER = "\$filter"
-        private const val PARAM_NAME_COUNT = "\$count"
-        private const val PARAM_VALUE_SELECT_USER = "id"
+        const val PARAM_NAME_SELECT = "\$select"
+        const val PARAM_NAME_FILTER = "\$filter"
+        const val PARAM_NAME_COUNT = "\$count"
+        const val PARAM_VALUE_SELECT_USER = "id"
         private const val PARAM_VALUE_SELECT_GROUPS = "id,displayName"
-        private const val DEFAULT_PING_PATH = "/organization"
+        const val PING_PATH = "/organization"
         private const val PARAM_NAME_TOP = "\$top"
         val ENTRA_CACHES = setOf(CachableConfig(GRAPH,GEO), CachableConfig(GRAPH,GEO_OG_GLOBALE))
         val OID_CACHE = CachableConfig(ENTRA_OID)

@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GEO_PREFIX
 import java.util.*
 
-class EntraURLTest : BehaviorSpec({
+class EntraUrlTest : BehaviorSpec({
 
     val knownIds = GlobalGruppe.entries.associate { it.property to UUID.randomUUID() }
 

@@ -14,8 +14,8 @@ class EntraClientBeanConfig {
 
     @Bean
     @Qualifier(GRAPH)
-    fun graphRestClient(b: Builder, cfg: EntraConfig) =
-        b.baseUrl(cfg.baseUri)
+    fun graphRestClient(builder: Builder, cfg: EntraConfig) =
+        builder.baseUrl(cfg.baseUri)
             .requestInterceptors {
                 it.add(headerAddingRequestInterceptor(HEADER_CONSISTENCY_LEVEL))
             }.build()

@@ -18,7 +18,7 @@ class CacheExpiredEventListener(val teller: CacheOppfriskerTeller, erLeder: Bool
             if (isRunning()) {
                 with(nøkkel) {
                     oppfriskere.firstOrNull { it.cacheName == cacheName }?.run {
-                        oppfrisk(CacheNøkkel(hendelse.nøkkel))
+                        oppfrisk(nøkkel)
                         teller.tell(of("cache", cacheName, "result", "expired", "method", metode ?: "ingen"))
                     }
                 }

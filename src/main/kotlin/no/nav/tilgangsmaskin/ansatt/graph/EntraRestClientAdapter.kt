@@ -23,7 +23,7 @@ class EntraRestClientAdapter(
     private val log = getLogger(javaClass)
 
     fun oidFraEntra(ansattId: String) =
-         with(entraClient.findUser(filter = "onPremisesSamAccountName eq '$ansattId'").oids) {
+         with(entraClient.findUser("onPremisesSamAccountName eq '$ansattId'").oids) {
              log.info("Fant $size oids i Entra for $ansattId")
             when (size) {
                 0 -> throw EntraOidException(ansattId, "Fant ingen oid for navident $ansattId, er den fremdeles gyldig?")

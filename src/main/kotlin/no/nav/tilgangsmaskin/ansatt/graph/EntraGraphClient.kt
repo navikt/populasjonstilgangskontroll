@@ -21,8 +21,8 @@ interface EntraGraphClient {
 
     @GetExchange(USERS_PATH)
     fun findUser(
-        @RequestParam(PARAM_NAME_SELECT) select: String = PARAM_VALUE_SELECT_USER,
         @RequestParam(PARAM_NAME_FILTER) filter: String,
+        @RequestParam(PARAM_NAME_SELECT) select: String = PARAM_VALUE_SELECT_USER,
         @RequestParam(PARAM_NAME_COUNT) count: Boolean = true
     ): UserResponse
 

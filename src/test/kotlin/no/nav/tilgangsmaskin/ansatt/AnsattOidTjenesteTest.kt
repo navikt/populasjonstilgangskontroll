@@ -63,7 +63,7 @@ class AnsattOidTjenesteTest : BehaviorSpec() {
         Given("oidFraEntra") {
             When("ansatt har én oid i Entra") {
                 Then("returneres oid") {
-                    every { entraClient.findUser( "id", filter, true) } returns
+                    every { entraClient.findUser(filter, "id") } returns
                         UserResponse(setOf(OidEntry(oid)))
 
                     tjeneste.oidFraEntra(ansattId) shouldBe oid
@@ -72,19 +72,19 @@ class AnsattOidTjenesteTest : BehaviorSpec() {
 
             When("samme ansatt slås opp to ganger") {
                 Then("REST kalles kun én gang — andre svar returneres fra cache") {
-                    every { entraClient.findUser( "id", filter,  true) } returns
+                    every { entraClient.findUser(filter, "id") } returns
                         UserResponse(setOf(OidEntry(oid)))
 
                     tjeneste.oidFraEntra(ansattId) shouldBe oid
                     tjeneste.oidFraEntra(ansattId) shouldBe oid
 
-                    verify { entraClient.findUser("id", filter, true) }
+                    verify { entraClient.findUser(filter, "id") }
                 }
             }
 
             When("ingen oid finnes i Entra") {
                 Then("kastes EntraOidException") {
-                    every { entraClient.findUser("id", filter,  true) } returns
+                    every { entraClient.findUser(filter, "id") } returns
                         UserResponse(emptySet())
 
                     shouldThrow<EntraOidException> { tjeneste.oidFraEntra(ansattId) }
@@ -94,7 +94,7 @@ class AnsattOidTjenesteTest : BehaviorSpec() {
             When("flere oids finnes for samme ansatt") {
                 Then("kastes EntraOidException") {
                     val oid2 = UUID.fromString("22222222-2222-2222-2222-222222222222")
-                    every { entraClient.findUser("id", filter, true) } returns
+                    every { entraClient.findUser(filter, "id") } returns
                         UserResponse(setOf(OidEntry(oid), OidEntry(oid2)))
 
                     shouldThrow<EntraOidException> { tjeneste.oidFraEntra(ansattId) }

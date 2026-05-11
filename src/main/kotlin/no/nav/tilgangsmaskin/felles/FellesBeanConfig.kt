@@ -5,16 +5,17 @@ import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.Timer
+import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
-import no.nav.tilgangsmaskin.felles.rest.LoggingRequestInterceptor
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.actuate.endpoint.SanitizingFunction
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
 import org.springframework.boot.kafka.autoconfigure.DefaultKafkaConsumerFactoryCustomizer
@@ -22,9 +23,12 @@ import org.springframework.boot.restclient.RestClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
+import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
+import org.springframework.http.client.ClientHttpResponse
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer
@@ -77,7 +81,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 
     @Bean
-    fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor, loggingInterceptor: LoggingRequestInterceptor) =
+    fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor) =
         RestClientCustomizer { c ->
             c.requestFactory(HttpComponentsClientHttpRequestFactory().apply {
                 setConnectionRequestTimeout(5000)
@@ -85,7 +89,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             })
             c.requestInterceptors {
                 it.addFirst(interceptor)
-                it.add(loggingInterceptor)
+                it.add(LoggingRequestInterceptor())
             }
         }
 
@@ -138,3 +142,18 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 @Retention(BINARY)  // = CLASS in bytecode — enough for JaCoCo
 @Target(FUNCTION, CONSTRUCTOR, CLASS)
 annotation class Generated
+
+private class LoggingRequestInterceptor : ClientHttpRequestInterceptor {
+    private val log = getLogger(javaClass)
+    override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
+        if (req.uri.path.contains("monitoring")) {
+            return execution.execute(req, body)
+        }
+        if (!body.isEmpty()) {
+            log.trace(CONFIDENTIAL, "Body for {} {} : {} ",req.method, req.uri,String(body))
+        }
+        val res = execution.execute(req, body)
+        log.trace(CONFIDENTIAL,"Response status for {} {}: {}", req.method, req.uri, res.statusCode)
+        return res
+    }
+}

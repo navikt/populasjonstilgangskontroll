@@ -23,7 +23,7 @@ class EntraUrlTest : BehaviorSpec({
                 val filter = uri.query.substringAfter("\$filter=").substringBefore("&")
 
                 knownIds.values.forEach { uuid ->
-                    filter shouldContain uuid.toString()
+                    filter shouldContain "$uuid"
                 }
                 filter shouldContain "id in("
                 filter shouldContain ") or $GEO_PREFIX"
@@ -37,7 +37,7 @@ class EntraUrlTest : BehaviorSpec({
 
                 filter shouldContain "startswith(displayName,'0000-GA-GEO')"
                 knownIds.values.forEach { uuid ->
-                    filter shouldNotContain uuid.toString()
+                    filter shouldNotContain "$uuid"
                 }
             }
         }

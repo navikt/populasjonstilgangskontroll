@@ -9,18 +9,18 @@ import org.springframework.web.service.annotation.HttpExchange
 @HttpExchange
 interface EntraProxyClient {
 
-    @GetExchange(ANSATT_PATH)
+    @GetExchange(ENTRA_PROXY_ANSATT_PATH)
     fun ansatt(@PathVariable navIdent: String): EntraProxyAnsatt
 
-    @GetExchange(ENHETER_PATH)
+    @GetExchange(ENTRA_PROXY_ENHETER_PATH)
     fun enheter(@PathVariable navIdent: String, @RequestHeader(IDENTIFIKATOR) identifikator: String): Set<Enhet>
 
-    @GetExchange(PING_PATH)
+    @GetExchange(ENTRA_PROXY_PING_PATH)
     fun ping(): Any
 
     companion object {
-        const val ANSATT_PATH = "/api/v1/ansatt/{navIdent}"
-        const val ENHETER_PATH = "/api/v1/enhet/ansatt/{navIdent}"
-        const val PING_PATH = "/monitoring/health/liveness"
+        const val ENTRA_PROXY_ANSATT_PATH = "/api/v1/ansatt/{navIdent}"
+        const val ENTRA_PROXY_ENHETER_PATH = "/api/v1/enhet/ansatt/{navIdent}"
+        const val ENTRA_PROXY_PING_PATH = "/monitoring/health/liveness"
     }
 }

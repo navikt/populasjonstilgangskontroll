@@ -113,14 +113,16 @@ class RegelTjeneste(
         buildSet {
         val godkjenteIds = buildSet { godkjente.forEach { add(it.brukerId) } }
         for (resultat in resultater) {
-            log.trace("Bulk Sjekker overstyring for avvist {}", resultat)
+            log.trace("Bulk Sjekker overstyring for avvist {}", resultat.bruker.oppslagId.maskFnr())
             if (resultat.status == FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
-                log.trace("Bulk resultat {} har ingen overstyring", resultat)
+                log.trace("Bulk resultat for {} har ingen overstyring", resultat.bruker.oppslagId.maskFnr())
                 add(EnkeltBulkRespons(RegelException(ansatt, brukere.finnBruker(resultat.bruker.oppslagId), resultat.regel!!, status = resultat.status)))
             }
         }
     }.also {
-            log.debug("Bulk avviste {}", it)
+            if (it.isNotEmpty()) {
+                log.debug("Bulk avviste {}", it)
+            }
         }
 
     private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) =
@@ -130,9 +132,9 @@ class RegelTjeneste(
             overstyringTjeneste
                 .overstyringer(ansatt.ansattId, avviste.map { it.bruker.brukerId })
                 .forEach { add(ok(it.verdi)) }
-        }.also {
-            if (it.isNotEmpty()) {
-                log.debug("Bulk godkjente oppslagId(s) {}", it.map { it.brukerId })
+        }.also { respons ->
+            if (respons.isNotEmpty()) {
+                log.debug("Bulk godkjente oppslagId(s) {}", respons.map { it.brukerId.maskFnr() })
             }
         }
 

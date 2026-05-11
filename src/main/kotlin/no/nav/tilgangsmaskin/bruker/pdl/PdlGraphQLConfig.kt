@@ -5,7 +5,6 @@ import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.net.URI.create
-import kotlin.jvm.javaClass
 
 @Component
 class PdlGraphQLConfig(@Value("\${PDLGRAPH}") hostname: String) :

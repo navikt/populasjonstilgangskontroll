@@ -15,12 +15,12 @@ abstract class LeaderAware(private var erLeder: Boolean = false) {
     fun onApplicationEvent(event: LeaderChangedEvent) {
         erLeder = event.leder == hostname
         somLeder("håndtering av lederbytte", {
-            log.info("Denne instansen ($hostname) ER nå leder")
+            log.info("Denne instansen ($hostname) er nå leder")
             doHandleLeaderChange()
-        }) { log.info("Denne instansen ($hostname) er IKKE leder, lederen er ${event.leder}") }
+        }) { log.info("Denne instansen ($hostname) er ikke leder, lederen er ${event.leder}") }
     }
     protected fun <T> somLeder(beskrivelse: String, block: () -> T, default: () -> T): T = if (erLeder) {
-        log.trace("Kjører $beskrivelse som leder")
+        log.trace("Leder kjører $beskrivelse")
         block()
     } else {
         default()

@@ -9,6 +9,7 @@ import java.time.LocalDate.EPOCH
 data class NomAnsattData(val ansattId: AnsattId, val brukerId: BrukerId, val gyldighet: NomAnsattPeriode = ALWAYS) {
 
     data class NomAnsattPeriode(override val start: LocalDate = EPOCH, override val endInclusive: LocalDate = ALLTID) : ClosedRange<LocalDate>
+
      private companion object {
         private val ALWAYS = NomAnsattPeriode()
     }

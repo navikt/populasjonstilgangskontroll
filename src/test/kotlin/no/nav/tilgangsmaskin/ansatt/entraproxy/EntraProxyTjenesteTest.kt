@@ -7,11 +7,10 @@ import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyClient.Companion.ANSATT_PATH
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyClient.Companion.ENHETER_PATH
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyClient.Companion.ENTRA_PROXY_ANSATT_PATH
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyClient.Companion.ENTRA_PROXY_ENHETER_PATH
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.PROXY_BASE
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
-import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
@@ -132,8 +131,8 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
 
     companion object  {
         private val ANSATTID = AnsattId("Z999999")
-        private val ANSATT_URI = uri(ANSATT_PATH)
-        private val ENHETER_URI = uri(ENHETER_PATH)
+        private val ANSATT_URI = uri(ENTRA_PROXY_ANSATT_PATH)
+        private val ENHETER_URI = uri(ENTRA_PROXY_ENHETER_PATH)
         private fun uri(path: String) =fromUriString("$PROXY_BASE$path")
             .buildAndExpand(ANSATTID.verdi).toUri()
     }

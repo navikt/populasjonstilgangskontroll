@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus.UNAUTHORIZED
 import java.net.URI
 import java.util.*
 
-interface GraphQLErrorHandler {
+interface PdlGraphQLErrorHandler {
     fun handle(uri: URI, e: Throwable): Nothing =
         when (e) {
             is FieldAccessException -> throw e.oversett(uri)
@@ -28,7 +28,7 @@ interface GraphQLErrorHandler {
         }
 
     companion object {
-        private val log = getLogger(GraphQLErrorHandler::class.java)
+        private val log = getLogger(PdlGraphQLErrorHandler::class.java)
         private fun FieldAccessException.oversett(uri: URI) = response.errors.oversett(message, uri)
 
         private fun List<ResponseError>.oversett(message: String?, uri: URI) = oversett(

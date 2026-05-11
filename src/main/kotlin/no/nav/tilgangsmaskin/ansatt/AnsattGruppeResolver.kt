@@ -45,7 +45,7 @@ class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: 
         } else {
             log.info("Intet token i dev/local for $ansattId, slår opp globale og GEO-grupper i Entra")
             entra.geoOgGlobaleGrupper(ansattId, oid.oidFraEntra(ansattId)).also {
-                log.trace("Uautentisert: $ansattId slo opp $it i Entra for $ansattId")
+                log.trace("Uautentisert i dev: {} slo opp {} i Entra for {}", ansattId, it, ansattId)
             }
         }
 }

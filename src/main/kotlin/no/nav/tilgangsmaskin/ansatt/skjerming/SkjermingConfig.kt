@@ -1,12 +1,10 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.PING_PATH
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
-import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 import java.net.URI
 

@@ -5,14 +5,13 @@ import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.RestClient.Builder
-import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 @Configuration
 class VergemålBeanConfig {
 
     @Bean
-    fun vergemålClient(b: Builder, cfg: VergemålConfig) =
-        createClient<VergemålClient>(cfg, b)
+    fun vergemålClient(builder: Builder, cfg: VergemålConfig) =
+        createClient<VergemålClient>(cfg, builder)
 
     @Bean
     fun vergemålHealthIndicator(pingable: VergemålPingable) =

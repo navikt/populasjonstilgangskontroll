@@ -7,12 +7,14 @@ import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.SCHEMA_REGI
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG
 import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
+import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.createClient
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
-import no.nav.tilgangsmaskin.felles.graphql.GraphQLErrorHandler
+import no.nav.tilgangsmaskin.felles.graphql.PdlGraphQLErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUrl
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.userInfo
@@ -22,10 +24,9 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Primary
 import org.springframework.core.env.Environment
 import org.springframework.graphql.client.ClientGraphQlRequest
-import org.springframework.graphql.client.HttpSyncGraphQlClient
+import org.springframework.graphql.client.HttpSyncGraphQlClient.builder
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor.Chain
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
@@ -40,47 +41,51 @@ import org.springframework.web.client.RestClient.Builder
 class PdlClientBeanConfig {
 
     @Component
-    @Primary
-    class DefaultGraphQlErrorHandler : GraphQLErrorHandler
+    class DefaultGraphQlErrorHandler : PdlGraphQLErrorHandler
 
     @Bean
     @Qualifier(PDLGRAPH)
-    fun pdlGraphRestClient(b: Builder) =
-        b.requestInterceptors {
+    fun pdlGraphRestClient(builder: Builder) =
+        builder.requestInterceptors {
             it.add(headerAddingRequestInterceptor(BEHANDLINGSNUMMER))
         }.build()
 
     @Bean
-    @Qualifier(PDLGRAPH)
     fun syncPdlGraphQLClient(@Qualifier(PDLGRAPH) client: RestClient, cfg: PdlGraphQLConfig,  interceptors: List<SyncGraphQlClientInterceptor>) =
-        HttpSyncGraphQlClient.builder(client)
+        builder(client)
             .url(cfg.baseUri)
             .interceptors {
                 it.addAll(interceptors)
             }.build()
 
     @Bean
-    @Qualifier(PDL)
-    fun pdlRestClient(builder: Builder) =
-        builder.build()
+    fun pdlClient(builder: Builder, cfg: PdlConfig) =
+        createClient<PdlPipClient>(cfg, builder)
 
     @Bean
     @ConditionalOnNotProd
-    fun loggingGraphQLInterceptor() = object:  SyncGraphQlClientInterceptor {
+    fun loggingGraphQLInterceptor() =
+        object: SyncGraphQlClientInterceptor {
 
         private val log = getLogger(javaClass)
 
-        override fun intercept(req: ClientGraphQlRequest, chain:    Chain) =
+        override fun intercept(req: ClientGraphQlRequest, chain: Chain) =
             chain.next(req).also {
-                log.trace("Eksekverer {} med variabler {}", req.document, req.variables)
+                log.trace(CONFIDENTIAL, "Eksekverer {} med variabler {}", req.document, req.variables)
             }
     }
 
-   @Bean
-    fun pdlGraphHealthIndicator(a: PdlSyncGraphQLClientAdapter) = PingableHealthIndicator(a)
+    @Bean
+    fun pdlGraphQLClient(builder: Builder, cfg: PdlGraphQLConfig) =
+        createClient<PdlGraphQLPingClient>(cfg, builder)
 
     @Bean
-    fun pdlHealthIndicator(a: PdlRestClientAdapter) = PingableHealthIndicator(a)
+    fun pdlGraphHealthIndicator(pingable: PdlGraphQLPingable) =
+        PingableHealthIndicator(pingable)
+
+    @Bean
+    fun pdlHealthIndicator(pingable: PdlPingable) =
+        PingableHealthIndicator(pingable)
 
     @Bean
     fun pdlHendelseKafkaListenerConsumerFactory(props: KafkaProperties, env: Environment): ConsumerFactory<String, Personhendelse> =

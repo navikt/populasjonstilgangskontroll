@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import io.micrometer.core.instrument.Tags.of
-import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetEvent
+import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetHendelse
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import no.nav.tilgangsmaskin.regler.motor.CacheOppfriskerTeller
 import org.springframework.context.SmartLifecycle
@@ -12,13 +12,15 @@ import org.springframework.stereotype.Component
 class CacheExpiredEventListener(val teller: CacheOppfriskerTeller, erLeder: Boolean = true, private vararg val oppfriskere: CacheOppfrisker) :LeaderAware(erLeder), SmartLifecycle {
     private var running = false
     @EventListener
-    fun cacheInnslagFjernet(hendelse: CacheInnslagFjernetEvent) {
-        somLeder("håndtering av cache innslag ${hendelse.nøkkel} fjernet", {
+    fun cacheInnslagFjernet(hendelse: CacheInnslagFjernetHendelse) {
+        val nøkkel = CacheNøkkel(hendelse.nøkkel)
+        somLeder("håndterer fjernet cache innslag ${nøkkel.masked}", {
             if (isRunning()) {
-                val elementer = CacheNøkkel(hendelse.nøkkel)
-                oppfriskere.firstOrNull { it.cacheName == elementer.cacheName }?.run {
-                    oppfrisk(elementer)
-                    teller.tell(of("cache", elementer.cacheName, "result", "expired", "method", elementer.metode ?: "ingen"))
+                with(nøkkel) {
+                    oppfriskere.firstOrNull { it.cacheName == cacheName }?.run {
+                        oppfrisk(nøkkel)
+                        teller.tell(of("cache", cacheName, "result", "expired", "method", metode ?: "ingen"))
+                    }
                 }
             }
         }) {}

@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PERSONER_PATH
-import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PERSON_PATH
-import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PING_PATH
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PDL_PIP_PERSONER_PATH
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PDL_PIP_PERSON_PATH
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PDL_PIP_PING_PATH
 import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
@@ -15,13 +15,13 @@ import java.net.URI.create
 @Component
 class PdlConfig(@Value("\${PDL}") hostname: String
 ) : CachableRestConfig, AbstractRestConfig(create(
-    "https://$hostname"), PING_PATH, PDL) {
+    "https://$hostname"), PDL_PIP_PING_PATH, PDL) {
 
     override val caches = PDL_CACHES
     override val navn = name
 
-    val personURI = uri(PERSON_PATH)
-    val personerURI = uri(PERSONER_PATH)
+    val personURI = uri(PDL_PIP_PERSON_PATH)
+    val personerURI = uri(PDL_PIP_PERSONER_PATH)
 
     @Generated
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"

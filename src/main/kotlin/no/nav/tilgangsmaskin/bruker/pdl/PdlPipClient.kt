@@ -10,19 +10,19 @@ import org.springframework.web.service.annotation.PostExchange
 @HttpExchange
 interface PdlPipClient {
 
-    @GetExchange(PERSON_PATH)
+    @GetExchange(PDL_PIP_PERSON_PATH)
     fun person(@RequestHeader("ident") ident: String, @RequestHeader(IDENTIFIKATOR) identifikator: String): PdlRespons
 
-    @PostExchange(PERSONER_PATH)
+    @PostExchange(PDL_PIP_PERSONER_PATH)
     fun personer(@RequestBody identer: Set<String>): Map<String, PdlRespons?>
 
-    @GetExchange(PING_PATH)
+    @GetExchange(PDL_PIP_PING_PATH)
     fun ping(): Any
 
     companion object {
-        const val PERSON_PATH = "/api/v1/person"
-        const val PERSONER_PATH = "/api/v1/personBolk"
-        const val PING_PATH = "/internal/health/liveness"
+        const val PDL_PIP_PERSON_PATH = "/api/v1/person"
+        const val PDL_PIP_PERSONER_PATH = "/api/v1/personBolk"
+        const val PDL_PIP_PING_PATH = "/internal/health/liveness"
     }
 }
 

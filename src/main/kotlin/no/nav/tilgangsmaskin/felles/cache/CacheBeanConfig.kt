@@ -5,7 +5,7 @@ import io.lettuce.core.RedisClient
 import io.lettuce.core.SocketOptions
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
-import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

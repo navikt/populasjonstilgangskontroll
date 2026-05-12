@@ -11,7 +11,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjenesteTest.Companion.SK
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
-import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
+import no.nav.tilgangsmaskin.felles.rest.RestDefaultErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.RestRetryLogger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
@@ -31,7 +31,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import java.time.Duration
 import java.time.Duration.ofSeconds
 
-@RestClientTest(components = [SkjermingClientBeanConfig::class,SkjermingConfig::class, SkjermingClient::class,SkjermingTjeneste::class, RestRetryLogger::class, DefaultRestErrorHandler::class])
+@RestClientTest(components = [SkjermingClientBeanConfig::class,SkjermingConfig::class, SkjermingClient::class,SkjermingTjeneste::class, RestRetryLogger::class, RestDefaultErrorHandler::class])
 @EnableResilientMethods
 @Import(SkjermingerCacheTest.CacheTestConfig::class)
 @ApplyExtension(SpringExtension::class)

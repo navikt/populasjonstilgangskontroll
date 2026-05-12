@@ -12,7 +12,7 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.entries
 import no.nav.tilgangsmaskin.ansatt.entra.EntraClientBeanConfig.Companion.HEADER_CONSISTENCY_LEVEL
 import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.entra.EntraTjenesteTest.EntraTestConfig
-import no.nav.tilgangsmaskin.felles.rest.HeaderAddingRequestInterceptor
+import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
@@ -49,7 +49,7 @@ class EntraTjenesteTest : BehaviorSpec() {
         fun graphRestClient(b: Builder, cfg: EntraConfig) =
             b.baseUrl(cfg.baseUri)
                 .requestInterceptors {
-                    it.add(HeaderAddingRequestInterceptor(HEADER_CONSISTENCY_LEVEL))
+                    it.add(RestHeaderAddingRequestInterceptor(HEADER_CONSISTENCY_LEVEL))
                 }.build()
     }
 

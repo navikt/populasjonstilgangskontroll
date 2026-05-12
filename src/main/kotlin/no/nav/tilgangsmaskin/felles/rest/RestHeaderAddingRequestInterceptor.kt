@@ -5,7 +5,7 @@ import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.ClientHttpResponse
 
-class HeaderAddingRequestInterceptor(vararg headers: Pair<String, String>) : ClientHttpRequestInterceptor {
+class RestHeaderAddingRequestInterceptor(vararg headers: Pair<String, String>) : ClientHttpRequestInterceptor {
     private val headers = headers.toList()
 
     override fun intercept(request: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {

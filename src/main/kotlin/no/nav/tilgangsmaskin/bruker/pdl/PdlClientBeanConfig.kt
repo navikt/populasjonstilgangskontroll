@@ -10,8 +10,8 @@ import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
-import no.nav.tilgangsmaskin.felles.rest.HeaderAddingRequestInterceptor
-import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
+import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUrl
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.userInfo
@@ -36,7 +36,7 @@ class PdlClientBeanConfig {
     @Qualifier(PDLGRAPH)
     fun pdlGraphRestClient(builder: Builder) =
         builder.requestInterceptors {
-            it.add(HeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
+            it.add(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
         }.build()
 
     @Bean

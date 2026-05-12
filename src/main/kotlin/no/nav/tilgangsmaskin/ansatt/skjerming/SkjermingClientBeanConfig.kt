@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
-import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

@@ -7,7 +7,7 @@ import io.micrometer.core.instrument.Tags
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
-import no.nav.tilgangsmaskin.felles.rest.LoggingRequestInterceptor
+import no.nav.tilgangsmaskin.felles.rest.RestLoggingRequestInterceptor
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.boot.actuate.endpoint.SanitizingFunction
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
@@ -60,7 +60,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             })
             c.requestInterceptors {
                 it.addFirst(interceptor)
-                it.add(LoggingRequestInterceptor())
+                it.add(RestLoggingRequestInterceptor())
             }
         }
 

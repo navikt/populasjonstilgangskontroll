@@ -16,6 +16,6 @@ object RestClientFactory {
             )
         ).build()
 
-    inline fun <reified T : Any> createClient(cfg: AbstractRestConfig, builder: Builder, errorHandler: ErrorHandler =DefaultRestErrorHandler()) = createProxyFactory(cfg, builder, errorHandler).createClient(T::class.java)
+    inline fun <reified T : Any> createClient(cfg: AbstractRestConfig, builder: Builder, errorHandler: ErrorHandler =RestDefaultErrorHandler()) = createProxyFactory(cfg, builder, errorHandler).createClient(T::class.java)
 }
 

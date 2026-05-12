@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.Generated
-import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
+import no.nav.tilgangsmaskin.felles.rest.RestDefaultErrorHandler
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatusCode
@@ -20,7 +20,7 @@ class EntraRestClientAdapter(
     @param:Qualifier(GRAPH) private val restClient: RestClient,
     private val entraClient: EntraClient,
     private val cfg: EntraConfig,
-    private val errorHandler: ErrorHandler = DefaultRestErrorHandler()) {
+    private val errorHandler: ErrorHandler = RestDefaultErrorHandler()) {
 
     private val log = getLogger(javaClass)
 

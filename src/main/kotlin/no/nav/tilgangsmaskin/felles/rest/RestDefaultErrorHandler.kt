@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
-class DefaultRestErrorHandler : ErrorHandler {
+class RestDefaultErrorHandler : ErrorHandler {
     private val log = getLogger(javaClass)
 
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {

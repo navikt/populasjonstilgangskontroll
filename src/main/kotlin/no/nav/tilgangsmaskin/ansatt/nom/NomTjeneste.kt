@@ -4,13 +4,13 @@ import io.micrometer.core.annotation.Timed
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
-import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableService
+import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.transaction.annotation.Transactional
 
 @Timed
-@RetryingWhenRecoverableService
+@RetryingWhenRecoverableRestService
 @Transactional
 class NomTjeneste(private val adapter: NomJPAAdapter) {
 

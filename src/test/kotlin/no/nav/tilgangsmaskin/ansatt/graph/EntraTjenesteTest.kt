@@ -59,7 +59,7 @@ class EntraTjenesteTest : BehaviorSpec() {
 
     @MockkBean
     @Suppress("unused")
-    private lateinit var entraClient: EntraGraphClient
+    private lateinit var entraClient: EntraClient
 
     @Autowired
     private lateinit var tjeneste: EntraTjeneste

@@ -18,7 +18,7 @@ import java.net.URI
 @Component
 class EntraRestClientAdapter(
     @param:Qualifier(GRAPH) private val restClient: RestClient,
-    private val entraClient: EntraGraphClient,
+    private val entraClient: EntraClient,
     private val cfg: EntraConfig,
     private val errorHandler: ErrorHandler = DefaultRestErrorHandler()) {
 

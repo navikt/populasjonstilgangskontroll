@@ -12,7 +12,7 @@ import org.springframework.web.service.annotation.HttpExchange
 import java.util.*
 
 @HttpExchange
-interface EntraGraphClient {
+interface EntraClient {
 
     @GetExchange(ENTRA_PING_PATH)
     fun ping(): Any

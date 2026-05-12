@@ -9,7 +9,7 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
 
     private val log = getLogger(javaClass)
 
-    override fun health() : Health  =
+    override fun health()  =
         runCatching {
             pingable.ping()
             up()
@@ -21,14 +21,14 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
     private fun up() =
         with(pingable) {
             Health.up()
-                .withDetail(ENDPOINT, pingEndpoint.toString())
+                .withDetail(ENDPOINT, "$pingEndpoint")
                 .build()
         }
 
     private fun down(e: Throwable) =
         with(pingable) {
             Health.down()
-                .withDetail(ENDPOINT, pingEndpoint.toString())
+                .withDetail(ENDPOINT, "$pingEndpoint")
                 .withException(e)
                 .build()
         }
@@ -37,7 +37,7 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
     override fun toString() = "${javaClass.simpleName} [pingable=$pingable]"
 
     companion object {
-        const val ENDPOINT = "endpoint"
+        private const val ENDPOINT = "endpoint"
     }
 }
 

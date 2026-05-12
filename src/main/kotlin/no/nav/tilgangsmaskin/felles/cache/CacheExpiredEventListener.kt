@@ -14,7 +14,7 @@ class CacheExpiredEventListener(val teller: CacheOppfriskerTeller, erLeder: Bool
     @EventListener
     fun cacheInnslagFjernet(hendelse: CacheInnslagFjernetHendelse) {
         val nøkkel = CacheNøkkel(hendelse.nøkkel)
-        somLeder("håndterer fjernet cache innslag ${nøkkel.masked}", {
+        somLeder("håndterer fjernet cache innslag ${nøkkel.maskert}", {
             if (isRunning()) {
                 with(nøkkel) {
                     oppfriskere.firstOrNull { it.cacheName == cacheName }?.run {

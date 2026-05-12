@@ -37,7 +37,7 @@ class SkjermingTjeneste(private val client: SkjermingClient, private val cache: 
             .mapNotNull { (id, value) -> value?.let { id to it } }
             .toMap()
 
-    companion object {
+    private companion object {
         private const val IDENT = "personident"
         private const val IDENTER = IDENT + "er"
     }

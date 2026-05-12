@@ -38,6 +38,13 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
 
     companion object {
         const val ENDPOINT = "endpoint"
+
+        operator fun invoke(cfg: AbstractRestConfig, ping: () -> Any?) =
+            PingableHealthIndicator(object : Pingable {
+                override val name = cfg.name
+                override val pingEndpoint = cfg.pingEndpoint
+                override fun ping() = ping()
+            })
     }
 }
 

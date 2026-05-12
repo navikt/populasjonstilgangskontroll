@@ -11,7 +11,7 @@ class PdlGraphQLLoggingInterceptor : SyncGraphQlClientInterceptor {
 
     override fun intercept(req: ClientGraphQlRequest, chain: Chain) =
         chain.next(req).also {
-            log.trace(CONFIDENTIAL, "Eksekverer {} med variabler {}", req.document, req.variables)
+            log.trace(CONFIDENTIAL, "Eksekverte {} med variabler {}", req.document, req.variables)
         }
 }
 

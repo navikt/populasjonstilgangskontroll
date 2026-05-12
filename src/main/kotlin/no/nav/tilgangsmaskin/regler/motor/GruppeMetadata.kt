@@ -19,7 +19,7 @@ enum class GruppeMetadata(val meta: AvvisningsKode, val begrunnelse: String, val
     STRENGT_FORTROLIG(AVVIST_STRENGT_FORTROLIG_ADRESSE, "Du har ikke tilgang til brukere med strengt fortrolig adresse (kode 6)", "Kode 6"),
     STRENGT_FORTROLIG_UTLAND(AVVIST_STRENGT_FORTROLIG_UTLAND, "Du har ikke tilgang til brukere med strengt fortrolig adresse i utlandet (§ 19)", "Paragraf 19"),
     FORTROLIG(AVVIST_FORTROLIG_ADRESSE, "Du har ikke tilgang til brukere med fortrolig adresse (kode 7)", "Kode 7"),
-    SKJERMING(AVVIST_SKJERMING, "Du har ikke tilgang til Nav-ansatte og andre skjermede brukere", "Skjerming"),
+    SKJERMING(AVVIST_SKJERMING, "Du har ikke tilgang til Nav-ansatte og deres nærmeste familie", "Skjerming"),
     NASJONAL(AVVIST_GEOGRAFISK,"Du har ikke tilgang til brukerens geografiske område eller oppfølgingsenhet","Geografisk tilknytning"),
     EGNEDATA(AVVIST_HABILITET, HABILITET, "Egne data"),
     FORELDREBARN(AVVIST_HABILITET, HABILITET, "Foreldre/barn"),

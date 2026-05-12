@@ -23,8 +23,7 @@ class EntraClientBeanConfig {
 
     @Bean
     fun entraGraphClient(builder: Builder, cfg: EntraConfig) =
-        createClient<EntraGraphClient>(
-            cfg,
+        createClient<EntraGraphClient>(cfg,
             builder.clone().requestInterceptors {
                 it.add(HeaderAddingRequestInterceptor(HEADER_CONSISTENCY_LEVEL))
             },

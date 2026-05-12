@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import jakarta.validation.ConstraintValidatorContext
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.regler.overstyring.OverstyringValidator
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import java.time.LocalDate
 

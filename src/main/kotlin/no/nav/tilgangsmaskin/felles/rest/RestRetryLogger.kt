@@ -7,7 +7,7 @@ import org.springframework.resilience.retry.MethodRetryEvent
 import org.springframework.stereotype.Component
 
 @Component
-class RetryLogger {
+class RestRetryLogger {
     private val log = getLogger(javaClass)
 
     @EventListener(MethodRetryEvent::class)

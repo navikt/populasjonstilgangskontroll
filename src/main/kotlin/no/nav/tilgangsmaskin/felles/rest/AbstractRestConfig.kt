@@ -13,6 +13,6 @@ abstract class AbstractRestConfig(val baseUri: URI,private val pingPath: String,
     val pingEndpoint = builder().path(pingPath).build()
 
     @Generated
-    override fun toString() = "name=$name, pingPath=$pingPath,baseUri=$baseUri"
+    override fun toString()  = "${javaClass.simpleName} [name=$name, pingPath=$pingPath,baseUri=$baseUri]"
 }
 

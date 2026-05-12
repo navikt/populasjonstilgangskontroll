@@ -13,7 +13,7 @@ class EntraProxyTjeneste(private val client: EntraProxyClient)  {
         client.ansatt(ansattId.verdi).enhet
     @WithSpan
     fun enheter(ansattId: AnsattId) =
-        client.enheter(ansattId.verdi, ansattId.verdi)
+        client.enheter(ansattId.verdi)
 
     @Generated
     override fun toString() = "${javaClass.simpleName} [client=$client]"

@@ -6,7 +6,6 @@ import io.confluent.kafka.schemaregistry.client.security.basicauth.UserInfoCrede
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG
-import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
@@ -17,16 +16,12 @@ import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUrl
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.userInfo
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
-import org.springframework.graphql.client.ClientGraphQlRequest
 import org.springframework.graphql.client.HttpSyncGraphQlClient.builder
-import org.springframework.graphql.client.SyncGraphQlClientInterceptor
-import org.springframework.graphql.client.SyncGraphQlClientInterceptor.Chain
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
@@ -49,7 +44,7 @@ class PdlClientBeanConfig {
         builder(client)
             .url(cfg.baseUri)
             .interceptors {
-                it.addFirst(loggingGraphQLInterceptor())
+                it.addFirst(PdlGraphQLLoggingInterceptor())
             }.build()
 
     @Bean
@@ -91,14 +86,5 @@ class PdlClientBeanConfig {
         const val PDL_GRADERING_FILTER = "pdlGraderingFilter"
         const val PDL_CONTAINER_FACTORY = "pdlContainerFactory"
         private val CREDENTIALS_SOURCE = UserInfoCredentialProvider().alias()
-        private fun loggingGraphQLInterceptor() =
-            object: SyncGraphQlClientInterceptor {
-
-                private val log = getLogger(javaClass)
-                override fun intercept(req: ClientGraphQlRequest, chain: Chain) =
-                    chain.next(req).also {
-                        log.trace(CONFIDENTIAL, "Eksekverer {} med variabler {}", req.document, req.variables)
-                    }
-            }
     }
 }

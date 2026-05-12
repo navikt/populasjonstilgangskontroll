@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.ansatt.entra
+package no.nav.tilgangsmaskin.ansatt.graph
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.tilgangsmaskin.felles.Generated

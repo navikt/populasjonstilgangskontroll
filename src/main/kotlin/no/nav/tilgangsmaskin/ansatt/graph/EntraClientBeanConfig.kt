@@ -1,6 +1,6 @@
-package no.nav.tilgangsmaskin.ansatt.entra
+package no.nav.tilgangsmaskin.ansatt.graph
 
-import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
+import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient

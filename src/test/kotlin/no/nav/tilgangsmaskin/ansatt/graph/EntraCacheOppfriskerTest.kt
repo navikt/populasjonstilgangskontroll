@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.ansatt.entra
+package no.nav.tilgangsmaskin.ansatt.graph
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.extensions.ApplyExtension
@@ -9,9 +9,9 @@ import io.mockk.every
 import io.mockk.verify
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
-import no.nav.tilgangsmaskin.ansatt.entra.EntraCacheOppfrisker.Companion.GEO
-import no.nav.tilgangsmaskin.ansatt.entra.EntraCacheOppfrisker.Companion.GEO_OG_GLOBALE
-import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.OID_CACHE
+import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO
+import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO_OG_GLOBALE
+import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException

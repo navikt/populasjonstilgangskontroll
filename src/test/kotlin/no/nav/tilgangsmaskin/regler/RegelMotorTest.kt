@@ -20,7 +20,7 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
-import no.nav.tilgangsmaskin.ansatt.entra.EntraGruppe
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker

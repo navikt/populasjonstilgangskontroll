@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.ansatt.entra
+package no.nav.tilgangsmaskin.ansatt.graph
 
 import io.opentelemetry.api.trace.Span
 import org.springframework.http.HttpStatus.NOT_FOUND

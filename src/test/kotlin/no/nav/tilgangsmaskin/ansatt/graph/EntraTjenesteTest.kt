@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.ansatt.entra
+package no.nav.tilgangsmaskin.ansatt.graph
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.extensions.ApplyExtension
@@ -9,9 +9,9 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.setIDs
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.entries
-import no.nav.tilgangsmaskin.ansatt.entra.EntraClientBeanConfig.Companion.HEADER_CONSISTENCY_LEVEL
-import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GRAPH
-import no.nav.tilgangsmaskin.ansatt.entra.EntraTjenesteTest.EntraTestConfig
+import no.nav.tilgangsmaskin.ansatt.graph.EntraClientBeanConfig.Companion.HEADER_CONSISTENCY_LEVEL
+import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
+import no.nav.tilgangsmaskin.ansatt.graph.EntraTjenesteTest.EntraTestConfig
 import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier

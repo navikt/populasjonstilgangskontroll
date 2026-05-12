@@ -1,10 +1,10 @@
-package no.nav.tilgangsmaskin.ansatt.entra
+package no.nav.tilgangsmaskin.ansatt.graph
 
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste.Companion.ENTRA_OID
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.uuids
-import no.nav.tilgangsmaskin.ansatt.entra.EntraCacheOppfrisker.Companion.GEO
-import no.nav.tilgangsmaskin.ansatt.entra.EntraCacheOppfrisker.Companion.GEO_OG_GLOBALE
-import no.nav.tilgangsmaskin.ansatt.entra.EntraClient.Companion.ENTRA_PING_PATH
+import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO
+import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO_OG_GLOBALE
+import no.nav.tilgangsmaskin.ansatt.graph.EntraClient.Companion.ENTRA_PING_PATH
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig

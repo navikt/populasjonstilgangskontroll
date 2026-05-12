@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.vergemål
 
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.createClient
+import no.nav.tilgangsmaskin.felles.rest.AbstractPingable
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -14,6 +15,6 @@ class VergemålBeanConfig {
         createClient<VergemålClient>(cfg, builder)
 
     @Bean
-    fun vergemålHealthIndicator(pingable: VergemålPingable) =
-        PingableHealthIndicator(pingable)
+    fun vergemålHealthIndicator(client: VergemålClient, cfg: VergemålConfig) =
+        PingableHealthIndicator(object : AbstractPingable(cfg, client::ping) {})
 }

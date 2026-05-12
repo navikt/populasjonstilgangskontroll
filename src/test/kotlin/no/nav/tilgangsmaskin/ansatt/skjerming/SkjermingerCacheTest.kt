@@ -32,7 +32,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import java.time.Duration
 import java.time.Duration.ofSeconds
 
-@RestClientTest(components = [SkjermingPingable::class, SkjermingClientBeanConfig::class,SkjermingConfig::class, SkjermingClient::class,SkjermingTjeneste::class, RetryLogger::class, DefaultRestErrorHandler::class])
+@RestClientTest(components = [SkjermingClientBeanConfig::class,SkjermingConfig::class, SkjermingClient::class,SkjermingTjeneste::class, RetryLogger::class, DefaultRestErrorHandler::class])
 @EnableResilientMethods
 @Import(SkjermingerCacheTest.CacheTestConfig::class)
 @ApplyExtension(SpringExtension::class)

@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.ansatt.graph
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.createClient
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
+import no.nav.tilgangsmaskin.felles.rest.AbstractPingable
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
@@ -31,8 +32,8 @@ class EntraClientBeanConfig {
         )
 
     @Bean
-    fun graphHealthIndicator(pingable: EntraGraphPingable) =
-        PingableHealthIndicator(pingable)
+    fun graphHealthIndicator(client: EntraGraphClient, cfg: EntraConfig) =
+        PingableHealthIndicator(object : AbstractPingable(cfg, client::ping) {})
 
     private companion object {
         private val HEADER_CONSISTENCY_LEVEL = "ConsistencyLevel" to "eventual"

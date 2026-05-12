@@ -51,7 +51,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
         CacheNøkkelHandler(mgr.cacheConfigurations)
 
     @Bean
-    fun cacheHealthIndicator(adapter: CacheAdapter)  =
+    fun cacheHealthIndicator(adapter: CachePingable)  =
         PingableHealthIndicator(adapter)
 
     private fun cacheConfig(cfg: CachableRestConfig) =

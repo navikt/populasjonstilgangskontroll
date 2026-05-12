@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import io.lettuce.core.RedisURI.Builder
-import no.nav.tilgangsmaskin.felles.cache.CacheAdapter.Companion.VALKEY
+import no.nav.tilgangsmaskin.felles.cache.CachePingable.Companion.VALKEY
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.time.Duration
 

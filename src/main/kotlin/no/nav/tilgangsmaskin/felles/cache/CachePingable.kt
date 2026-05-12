@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 import java.net.URI
 
 @Component
-class CacheAdapter(private val cf: RedisConnectionFactory, cfg: CacheConfig) : Pingable {
+class CachePingable(private val cf: RedisConnectionFactory, cfg: CacheConfig) : Pingable {
 
     override val pingEndpoint  =  URI.create("${cfg.host}:${cfg.port}")
     override val name = "Cache"

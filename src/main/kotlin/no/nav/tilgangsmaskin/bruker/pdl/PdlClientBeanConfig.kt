@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.createClient
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.graphql.PdlGraphQLErrorHandler
+import no.nav.tilgangsmaskin.felles.rest.AbstractPingable
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUrl
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.userInfo
@@ -80,12 +81,12 @@ class PdlClientBeanConfig {
         createClient<PdlGraphQLPingClient>(cfg, builder)
 
     @Bean
-    fun pdlGraphHealthIndicator(pingable: PdlGraphQLPingable) =
-        PingableHealthIndicator(pingable)
+    fun pdlGraphHealthIndicator(client: PdlGraphQLPingClient, cfg: PdlGraphQLConfig) =
+        PingableHealthIndicator(object : AbstractPingable(cfg, client::ping) {})
 
     @Bean
-    fun pdlHealthIndicator(pingable: PdlPingable) =
-        PingableHealthIndicator(pingable)
+    fun pdlHealthIndicator(client: PdlPipClient, cfg: PdlConfig) =
+        PingableHealthIndicator(object : AbstractPingable(cfg, client::ping) {})
 
     @Bean
     fun pdlHendelseKafkaListenerConsumerFactory(props: KafkaProperties, env: Environment): ConsumerFactory<String, Personhendelse> =

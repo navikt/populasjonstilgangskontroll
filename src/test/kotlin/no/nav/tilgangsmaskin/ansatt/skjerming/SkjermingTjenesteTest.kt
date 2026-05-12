@@ -43,7 +43,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
 
-@RestClientTest(components = [SkjermingClient::class,SkjermingClientBeanConfig::class, SkjermingTjeneste::class, SkjermingPingable::class, SkjermingConfig::class,RetryLogger::class])
+@RestClientTest(components = [SkjermingClient::class,SkjermingClientBeanConfig::class, SkjermingTjeneste::class, SkjermingConfig::class,RetryLogger::class])
 @EnableResilientMethods
 @Import(SkjermingTjenesteTest.CacheConfig::class)
 @ApplyExtension(SpringExtension::class)

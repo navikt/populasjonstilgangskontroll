@@ -16,9 +16,10 @@ import org.springframework.stereotype.Component
 @Component
 @Timed(value = "pdl_tjeneste", histogram = true, extraTags = ["backend", "graphql"])
 class PdlSyncGraphQLClientAdapter(
+    private val cfg: PdlGraphQLConfig,
     private val client: GraphQlClient,
-    private val errorHandler: PdlGraphQLErrorHandler,
-    private val cfg: PdlGraphQLConfig) {
+    private val errorHandler: PdlGraphQLErrorHandler = object : PdlGraphQLErrorHandler {},
+    ) {
     private val log = getLogger(javaClass)
 
     fun partnere(ident: String): Set<FamilieMedlem> =

@@ -10,7 +10,6 @@ import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.INGEN
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.TIDLIGERE_PARTNER
 import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype
-import no.nav.tilgangsmaskin.bruker.pdl.PdlClientBeanConfig.DefaultGraphQlErrorHandler
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapterTest.GraphQLTestConfig
@@ -32,7 +31,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
 
-@RestClientTest(components = [PdlSyncGraphQLClientAdapter::class, DefaultGraphQlErrorHandler::class, PdlGraphQLConfig::class])
+@RestClientTest(components = [PdlSyncGraphQLClientAdapter::class, PdlGraphQLConfig::class])
 @TestPropertySource(properties = ["PDLGRAPH=pdlgraph"])
 @Import(GraphQLTestConfig::class)
 @ApplyExtension(SpringExtension::class)

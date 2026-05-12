@@ -6,7 +6,6 @@ import io.confluent.kafka.schemaregistry.client.security.basicauth.UserInfoCrede
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG
-import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
@@ -14,7 +13,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNU
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.createClient
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
-import no.nav.tilgangsmaskin.felles.graphql.PdlGraphQLErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUrl
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.userInfo
@@ -33,15 +31,11 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS
-import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
 
 @Configuration
 class PdlClientBeanConfig {
-
-    @Component
-    class DefaultGraphQlErrorHandler : PdlGraphQLErrorHandler
 
     @Bean
     @Qualifier(PDLGRAPH)
@@ -51,32 +45,19 @@ class PdlClientBeanConfig {
         }.build()
 
     @Bean
-    fun syncPdlGraphQLClient(@Qualifier(PDLGRAPH) client: RestClient, cfg: PdlGraphQLConfig,  interceptors: List<SyncGraphQlClientInterceptor>) =
+    fun syncPdlGraphQLClient(@Qualifier(PDLGRAPH) client: RestClient, cfg: PdlGraphQLConfig) =
         builder(client)
             .url(cfg.baseUri)
             .interceptors {
-                it.addAll(interceptors)
+                it.addFirst(loggingGraphQLInterceptor())
             }.build()
 
     @Bean
-    fun pdlClient(builder: Builder, cfg: PdlConfig) =
+    fun pdlPipClient(builder: Builder, cfg: PdlConfig) =
         createClient<PdlPipClient>(cfg, builder)
 
     @Bean
-    @ConditionalOnNotProd
-    fun loggingGraphQLInterceptor() =
-        object: SyncGraphQlClientInterceptor {
-
-        private val log = getLogger(javaClass)
-
-        override fun intercept(req: ClientGraphQlRequest, chain: Chain) =
-            chain.next(req).also {
-                log.trace(CONFIDENTIAL, "Eksekverer {} med variabler {}", req.document, req.variables)
-            }
-    }
-
-    @Bean
-    fun pdlGraphQLClient(builder: Builder, cfg: PdlGraphQLConfig) =
+    fun pdlGraphQLPingClient(builder: Builder, cfg: PdlGraphQLConfig) =
         createClient<PdlGraphQLPingClient>(cfg, builder)
 
     @Bean
@@ -84,7 +65,7 @@ class PdlClientBeanConfig {
         PingableHealthIndicator(cfg, client::ping)
 
     @Bean
-    fun pdlHealthIndicator(cfg: PdlConfig, client: PdlPipClient) =
+    fun pdlPipHealthIndicator(cfg: PdlConfig, client: PdlPipClient) =
         PingableHealthIndicator(cfg, client::ping)
 
     @Bean
@@ -110,5 +91,14 @@ class PdlClientBeanConfig {
         const val PDL_GRADERING_FILTER = "pdlGraderingFilter"
         const val PDL_CONTAINER_FACTORY = "pdlContainerFactory"
         private val CREDENTIALS_SOURCE = UserInfoCredentialProvider().alias()
+        private fun loggingGraphQLInterceptor() =
+            object: SyncGraphQlClientInterceptor {
+
+                private val log = getLogger(javaClass)
+                override fun intercept(req: ClientGraphQlRequest, chain: Chain) =
+                    chain.next(req).also {
+                        log.trace(CONFIDENTIAL, "Eksekverer {} med variabler {}", req.document, req.variables)
+                    }
+            }
     }
 }

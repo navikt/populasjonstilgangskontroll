@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.PING_PATH
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.SKJERMING_PING_PATH
 import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
@@ -10,7 +10,7 @@ import java.net.URI
 
 @Component
 class SkjermingConfig : CachableRestConfig,
-    AbstractRestConfig(SKJERMING_BASE, PING_PATH, SKJERMING) {
+    AbstractRestConfig(SKJERMING_BASE, SKJERMING_PING_PATH, SKJERMING) {
 
     override val navn = name
     override val caches = setOf(SKJERMING_CACHE)

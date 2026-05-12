@@ -11,11 +11,9 @@ import org.springframework.cache.annotation.Cacheable
 
 
 @RetryingWhenRecoverableService
-class SkjermingTjeneste(
-    private val client: SkjermingClient,
-    private val cache: CacheOperations,
-    private val cf: SkjermingConfig,
-) {
+class SkjermingTjeneste(private val client: SkjermingClient, private val cache: CacheOperations, private val cf: SkjermingConfig) {
+
+    private val log = getLogger(SkjermingTjeneste::class.java)
 
     @Cacheable(cacheNames = [SKJERMING], key = "#brukerId.verdi")
     @WithSpan
@@ -36,11 +34,10 @@ class SkjermingTjeneste(
 
     private fun fraCache(ids: Set<String>) =
         cache.getMany(SKJERMING_CACHE, ids, Boolean::class)
-            .filterValues { it != null }
-            .mapValues { it.value!! }
+            .mapNotNull { (id, value) -> value?.let { id to it } }
+            .toMap()
 
     companion object {
-        private val log = getLogger(SkjermingTjeneste::class.java)
         private const val IDENT = "personident"
         private const val IDENTER = IDENT + "er"
     }

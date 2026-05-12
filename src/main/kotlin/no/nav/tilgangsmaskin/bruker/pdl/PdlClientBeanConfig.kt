@@ -80,11 +80,11 @@ class PdlClientBeanConfig {
         createClient<PdlGraphQLPingClient>(cfg, builder)
 
     @Bean
-    fun pdlGraphHealthIndicator(client: PdlGraphQLPingClient, cfg: PdlGraphQLConfig) =
+    fun pdlGraphHealthIndicator(cfg: PdlGraphQLConfig, client: PdlGraphQLPingClient) =
         PingableHealthIndicator(cfg, client::ping)
 
     @Bean
-    fun pdlHealthIndicator(client: PdlPipClient, cfg: PdlConfig) =
+    fun pdlHealthIndicator(cfg: PdlConfig, client: PdlPipClient) =
         PingableHealthIndicator(cfg, client::ping)
 
     @Bean

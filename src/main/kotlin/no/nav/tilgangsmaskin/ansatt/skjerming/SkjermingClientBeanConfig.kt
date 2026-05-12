@@ -14,6 +14,6 @@ class SkjermingClientBeanConfig {
         createClient<SkjermingClient>(cfg, builder)
 
     @Bean
-    fun skjermingHealthIndicator(client: SkjermingClient, cfg: SkjermingConfig) =
+    fun skjermingHealthIndicator(cfg: SkjermingConfig, client: SkjermingClient) =
         PingableHealthIndicator(cfg, client::ping)
 }

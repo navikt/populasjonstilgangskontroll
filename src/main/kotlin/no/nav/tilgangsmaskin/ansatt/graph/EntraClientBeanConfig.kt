@@ -31,7 +31,7 @@ class EntraClientBeanConfig {
         )
 
     @Bean
-    fun graphHealthIndicator(client: EntraGraphClient, cfg: EntraConfig) =
+    fun graphHealthIndicator(cfg: EntraConfig, client: EntraGraphClient) =
         PingableHealthIndicator(cfg, client::ping)
 
     private companion object {

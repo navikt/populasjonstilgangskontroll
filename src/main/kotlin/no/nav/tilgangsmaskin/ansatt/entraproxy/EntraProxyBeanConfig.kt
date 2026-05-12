@@ -14,6 +14,6 @@ class EntraProxyBeanConfig {
         createClient<EntraProxyClient>(cfg, builder)
 
     @Bean
-    fun entraProxyHealthIndicator(client: EntraProxyClient, cfg: EntraProxyConfig) =
+    fun entraProxyHealthIndicator(cfg: EntraProxyConfig, client: EntraProxyClient) =
         PingableHealthIndicator(cfg, client::ping)
 }

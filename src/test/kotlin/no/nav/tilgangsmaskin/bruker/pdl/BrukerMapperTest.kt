@@ -18,13 +18,13 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTLand
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTType.KOMMUNE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTType.UTLAND
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.AKTORID
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlIdenter
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlIdenter.PdlIdent
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.AKTORID
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlPerson
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlPerson.PdlAdressebeskyttelse
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 
 class BrukerMapperTest : BehaviorSpec({
@@ -38,7 +38,7 @@ class BrukerMapperTest : BehaviorSpec({
     fun pipRespons(
         gradering: PdlAdressebeskyttelseGradering? = null,
         geo: PdlGeografiskTilknytning = geoUtland()) =
-        PdlRespons(PdlPerson(gradering?.let { listOf(PdlAdressebeskyttelse(it)) } ?: emptyList()),
+        PdlPipRespons(PdlPerson(gradering?.let { listOf(PdlAdressebeskyttelse(it)) } ?: emptyList()),
             PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT), PdlIdent(aktorId, false, AKTORID))),
             geo)
 

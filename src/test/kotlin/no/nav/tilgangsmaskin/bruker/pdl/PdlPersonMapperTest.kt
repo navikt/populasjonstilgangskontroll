@@ -44,18 +44,18 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilGeoTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPersoner
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.AKTORID
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.NPID
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlDødsfall
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon
-import no.nav.tilgangsmaskin.bruker.pdl.PdlRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlIdenter
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlIdenter.PdlIdent
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlIdenter.PdlIdent.PdlIdentGruppe
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.AKTORID
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.NPID
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlPerson
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlPerson.PdlAdressebeskyttelse
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlPerson.PdlDødsfall
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlPerson.PdlFamilierelasjon
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
 import java.time.LocalDate
 
@@ -75,7 +75,7 @@ class PdlPersonMapperTest : BehaviorSpec({
         })
 
     fun pdlRespons(person: PdlPerson = PdlPerson(), geo: PdlGeografiskTilknytning? = PdlGeografiskTilknytning(UDEFINERT), identer: PdlIdenter = identer()) =
-        PdlRespons(person, identer, geo)
+        PdlPipRespons(person, identer, geo)
 
     Given("tilGeoTilknytning") {
         When("input er null") { Then("mappes til UdefinertTilknytning") { tilGeoTilknytning(null).shouldBeInstanceOf<UdefinertTilknytning>() } }
@@ -209,7 +209,7 @@ class PdlPersonMapperTest : BehaviorSpec({
                 tilPerson(brukerId, pdlRespons(identer = PdlIdenter(listOf(PdlIdent(npid, false, NPID), PdlIdent(aktorId, false, AKTORID))))).brukerId shouldBe BrukerId(npid)
             }
         }
-        When("aktørId mangler") { Then("kastes IllegalStateException") { shouldThrow<IllegalStateException> { PdlRespons(PdlPerson(), PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT)))) } } }
-        When("brukerId mangler") { Then("kastes IllegalStateException") { shouldThrow<IllegalStateException> { PdlRespons(PdlPerson(), PdlIdenter(listOf(PdlIdent(aktorId, false, AKTORID)))) } } }
+        When("aktørId mangler") { Then("kastes IllegalStateException") { shouldThrow<IllegalStateException> { PdlPipRespons(PdlPerson(), PdlIdenter(listOf(PdlIdent(brukerId, false, FOLKEREGISTERIDENT)))) } } }
+        When("brukerId mangler") { Then("kastes IllegalStateException") { shouldThrow<IllegalStateException> { PdlPipRespons(PdlPerson(), PdlIdenter(listOf(PdlIdent(aktorId, false, AKTORID)))) } } }
     }
 })

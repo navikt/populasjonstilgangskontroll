@@ -24,12 +24,11 @@ class NomTjeneste(private val adapter: NomJPAAdapter) {
 
     fun ryddOpp() =
         adapter.ryddOpp().also {
-        if (it > 0) log.info("Vaktmester ryddet opp $it rad(er) med utgått informasjon om ansatte som ikke lenger jobber i Nav")
+        if (it > 0) log.info("Vaktmester gjernet informasjon om $it  ansatte som ikke lenger er ansatt i Nav")
     }
 
     @WithSpan
-    fun lagre(nomAnsattData: NomAnsattData) {
+    fun lagre(nomAnsattData: NomAnsattData) =
         adapter.upsert(nomAnsattData)
-    }
 }
 

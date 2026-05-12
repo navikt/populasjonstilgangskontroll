@@ -5,7 +5,6 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
 import no.nav.tilgangsmaskin.felles.Generated
-import no.nav.tilgangsmaskin.felles.graphql.PdlGraphQLErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.graphql.client.GraphQlClient

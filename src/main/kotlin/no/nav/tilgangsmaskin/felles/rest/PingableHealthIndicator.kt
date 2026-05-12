@@ -37,7 +37,7 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
     override fun toString() = "${javaClass.simpleName} [pingable=$pingable]"
 
     companion object {
-        private const val ENDPOINT = "endpoint"
+        const val ENDPOINT = "endpoint"
     }
 }
 

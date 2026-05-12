@@ -11,9 +11,9 @@ import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
-import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.createClient
-import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
+import no.nav.tilgangsmaskin.felles.rest.HeaderAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUrl
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.userInfo
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
@@ -41,7 +41,7 @@ class PdlClientBeanConfig {
     @Qualifier(PDLGRAPH)
     fun pdlGraphRestClient(builder: Builder) =
         builder.requestInterceptors {
-            it.add(headerAddingRequestInterceptor(BEHANDLINGSNUMMER))
+            it.add(HeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
         }.build()
 
     @Bean

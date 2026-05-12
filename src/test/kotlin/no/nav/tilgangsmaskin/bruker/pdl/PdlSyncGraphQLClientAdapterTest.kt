@@ -13,7 +13,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapterTest.GraphQLTestConfig
-import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
+import no.nav.tilgangsmaskin.felles.rest.HeaderAddingRequestInterceptor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
@@ -42,7 +42,7 @@ class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
         @Bean @Qualifier(PDLGRAPH)
         fun pdlGraphRestClient(b: Builder) =
             b.requestInterceptors {
-                it.add(headerAddingRequestInterceptor(BEHANDLINGSNUMMER))
+                it.add(HeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
             }.build()
 
         @Bean @Qualifier(PDLGRAPH)

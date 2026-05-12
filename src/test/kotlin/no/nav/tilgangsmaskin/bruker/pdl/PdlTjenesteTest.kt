@@ -21,9 +21,9 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_UTVIDET_FAMI
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.pdlRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.restRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjenesteTest.PdlTestConfig
-import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.createClient
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
+import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest

@@ -4,8 +4,8 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.setIDs
-import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig
-import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GEO_PREFIX
+import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig
+import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.GEO_PREFIX
 import java.util.*
 
 class EntraUrlTest : BehaviorSpec({

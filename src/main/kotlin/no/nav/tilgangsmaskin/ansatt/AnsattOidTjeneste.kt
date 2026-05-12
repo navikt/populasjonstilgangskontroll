@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt
 
-import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.OID_CACHE
-import no.nav.tilgangsmaskin.ansatt.graph.EntraRestClientAdapter
+import no.nav.tilgangsmaskin.ansatt.entra.EntraConfig.Companion.OID_CACHE
+import no.nav.tilgangsmaskin.ansatt.entra.EntraRestClientAdapter
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component

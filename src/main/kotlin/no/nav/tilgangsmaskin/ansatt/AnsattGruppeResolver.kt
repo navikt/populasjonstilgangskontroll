@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.ansatt
 
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.girNasjonalTilgang
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.globaleGrupper
-import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
+import no.nav.tilgangsmaskin.ansatt.entra.EntraTjeneste
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger

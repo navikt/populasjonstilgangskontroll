@@ -28,10 +28,12 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import java.util.*
 
+private const val DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.tilgang.tag.description"
+
 
 @UnprotectedRestController(value = ["/${DEV}"])
 @ConditionalOnNotProd
-@Tag(name = "DevTilgangController", description = "Denne kontrolleren skal kun brukes til testing")
+@Tag(name = "DevTilgangController", description = DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION)
 class DevTilgangController(
     private val graphql: PdlSyncGraphQLClientAdapter,
     private val overstyring: OverstyringTjeneste,
@@ -39,20 +41,18 @@ class DevTilgangController(
     private val nom: NomJPAAdapter) {
 
     @PostMapping("oppfolging/{uuid}/avslutt")
-    fun oppfølgingAvslutt(@RequestBody identer : Identer, @PathVariable uuid: UUID) = oppfølging.avslutt(uuid, identer)
+    fun oppfølgingAvslutt(@RequestBody identer : Identer, @PathVariable uuid: UUID) =
+        oppfølging.avslutt(uuid, identer)
 
     @GetMapping("oppfolging/enhet")
-    fun enhetFor(@RequestParam id: Identifikator) = oppfølging.enhetFor(id)
-
-
+    fun enhetFor(@RequestParam id: Identifikator) =
+        oppfølging.enhetFor(id)
 
     @GetMapping("sivilstand/{id}")
-    fun sivilstand(@PathVariable  id: String) = graphql.partnere(id)
+    fun sivilstand(@PathVariable  id: String) =
+        graphql.partnere(id)
 
-
-    @Operation(
-        summary= "Sette kobling mellom ansatt og fnr",
-        description = """Funksjon for å opprette relasjon mellom nav-ident og fnrslik  at oppslag på egne data og familierelasjoner kan testes """)
+    @Operation(summary = SUMMARY_KOBLING, description = DESCRIPTION_KOBLING)
     @PostMapping("ansatt/{ansattId}/{brukerId}")
     @Transactional
     fun nom(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
@@ -66,24 +66,24 @@ class DevTilgangController(
     @PostMapping("overstyr/{ansattId}")
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse
-    @Operation(
-        summary = "Overstyr regler for en bruker",
-        description = """Setter overstyring for en bruker, slik at den kan saksbehandles selv om saksbehandler opprinnelig ikke har tilgang.
-                BrukerId må være gyldig og finnes i PDL. Kjerneregelsettet vil bli kjørt før overstyring, og hvis de feiler vil overstyring ikke bli gjort.
-                Overstyring vil gjelde frem til og med utløpsdatoen."""
-    )
+    @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
     @Valid
-    fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody  @Valid @ValidOverstyring  data: OverstyringData) = overstyring.overstyr(ansattId, data)
+    fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody  @Valid @ValidOverstyring data: OverstyringData) =
+        overstyring.overstyr(ansattId, data)
 
     @PostMapping("overstyringer/{ansattId}")
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse
-    @Operation(
-        summary = "Hent overstyringer for en ansatt og en eller flere brukere",
-        description = "Henter overstyringer for en eller flere  brukere."
-    )
-    fun overstyringer(@PathVariable ansattId: AnsattId, @RequestBody brukerIds: List<BrukerId>) = overstyring.overstyringer(ansattId, brukerIds)
+    @Operation(summary = SUMMARY_HENT_OVERSTYRINGER, description = DESCRIPTION_HENT_OVERSTYRINGER)
+    fun overstyringer(@PathVariable ansattId: AnsattId, @RequestBody brukerIds: List<BrukerId>) =
+        overstyring.overstyringer(ansattId, brukerIds)
 
-
-
+    companion object {
+        const val SUMMARY_KOBLING = "msg:openapi.dev.tilgang.kobling.summary"
+        const val DESCRIPTION_KOBLING = "msg:openapi.dev.tilgang.kobling.description"
+        const val SUMMARY_OVERSTYR = "msg:openapi.dev.tilgang.overstyr.summary"
+        const val DESCRIPTION_OVERSTYR = "msg:openapi.dev.tilgang.overstyr.description"
+        const val SUMMARY_HENT_OVERSTYRINGER = "msg:openapi.dev.tilgang.overstyringer.summary"
+        const val DESCRIPTION_HENT_OVERSTYRINGER = "msg:openapi.dev.tilgang.overstyringer.description"
+    }
 }

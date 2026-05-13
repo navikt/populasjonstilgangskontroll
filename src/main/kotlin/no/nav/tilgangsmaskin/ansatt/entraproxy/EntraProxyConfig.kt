@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component
 import java.net.URI
 
 @Component
-class EntraProxyConfig : RestConfig(PROXY_BASE, ENTRA_PROXY_PING_PATH, GRAPH)
+class EntraProxyConfig : RestConfig(PROXY_BASE_URI, ENTRA_PROXY_PING_PATH, GRAPH)
 {
 
     companion object {
-        val PROXY_BASE = URI.create("http://entra-proxy.sikkerhetstjenesten")
+        val PROXY_BASE_URI = URI.create("http://entra-proxy.sikkerhetstjenesten")
     }
 }

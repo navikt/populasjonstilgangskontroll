@@ -37,10 +37,10 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
     }
 
     private fun tømOgOppfrisk(ansattId: AnsattId, oid: UUID, metode: String?) {
-        log.warn("${ansattId.verdi} med oid $oid ikke funnet i Entra, sletter og oppfrisker cache innslag")
+        log.warn("${ansattId.verdi} med oid $oid ikke funnet i Entra, sletter og oppfrisker cache-innslag")
         cache.delete(OID_CACHE, ansattId.verdi)
         with(oidTjeneste.oidFraEntra(ansattId)) {
-            log.info("Oppfrisking oid OK for ${ansattId.verdi}, ny verdi er $this")
+            log.info("Oppfrisking av oid OK for ${ansattId.verdi}, ny verdi er $this")
             oppfriskFor(ansattId, this, metode)
         }
         teller.tell()

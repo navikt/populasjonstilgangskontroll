@@ -26,11 +26,11 @@ class EntraRestClientAdapter(
 
     fun oidFraEntra(ansattId: String) =
          with(entraClient.findUser("onPremisesSamAccountName eq '$ansattId'").oids) {
-             log.info("Fant $size oids i Entra for $ansattId")
+             log.trace("Fant $size oids i Entra for $ansattId")
             when (size) {
-                0 -> throw EntraOidException(ansattId, "Fant ingen oid for navident $ansattId, er den fremdeles gyldig?")
+                0 -> throw EntraOidException(ansattId, "Fant ingen oid for $ansattId, er den fremdeles gyldig?")
                 1 -> single().id
-                else -> throw EntraOidException(ansattId, "Forventet nøyaktig én oid for navident $ansattId, fant $size (${joinToString(", ") { it.id.toString() }})")
+                else -> throw EntraOidException(ansattId, "Forventet nøyaktig én oid for $ansattId, fant $size (${joinToString(", ") { it.id.toString() }})")
             }
     }
 

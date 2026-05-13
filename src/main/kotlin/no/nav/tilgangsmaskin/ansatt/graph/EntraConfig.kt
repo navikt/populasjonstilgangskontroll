@@ -13,7 +13,7 @@ import java.net.URI
 import java.time.Duration
 
 @Component
-class EntraConfig : CachableRestConfig, RestConfig(BASE_URI, ENTRA_PING_PATH, GRAPH) {
+class EntraConfig : CachableRestConfig, RestConfig(ENTRA_BASE_URI, ENTRA_PING_PATH, GRAPH) {
 
     override val caches = ENTRA_CACHES
     override val navn = name
@@ -46,6 +46,7 @@ class EntraConfig : CachableRestConfig, RestConfig(BASE_URI, ENTRA_PING_PATH, GR
         private const val PARAM_VALUE_SELECT_GROUPS = "id,displayName"
         private const val PARAM_NAME_TOP = "\$top"
         private const val GRAPH_URL = "https://graph.microsoft.com/v1.0/"
+        private val ENTRA_BASE_URI = URI.create(GRAPH_URL)
         const val GRAPH = "graph"
 
         const val PARAM_NAME_SELECT = "\$select"
@@ -53,9 +54,7 @@ class EntraConfig : CachableRestConfig, RestConfig(BASE_URI, ENTRA_PING_PATH, GR
         const val PARAM_NAME_COUNT = "\$count"
         const val PARAM_VALUE_SELECT_USER = "id"
         const val GEO_PREFIX = "startswith(displayName,'0000-GA-GEO') or startswith(displayName,'0000-GA-ENHET') "
-        val BASE_URI = URI.create(GRAPH_URL)
         val OID_CACHE = CachableConfig(ENTRA_OID)
         val ENTRA_CACHES = setOf(CachableConfig(GRAPH,GEO), CachableConfig(GRAPH,GEO_OG_GLOBALE))
-
     }
 }

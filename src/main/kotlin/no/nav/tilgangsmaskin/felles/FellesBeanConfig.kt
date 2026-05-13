@@ -52,7 +52,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
         ReloadableResourceBundleMessageSource().apply {
         setBasenames(
             "classpath:messages",
-            "classpath:openapi-messages",
+            "classpath:openapi-prod-tilgang",
             "classpath:openapi-dev-ansatt",
             "classpath:openapi-dev-bruker",
             "classpath:openapi-dev-cache",

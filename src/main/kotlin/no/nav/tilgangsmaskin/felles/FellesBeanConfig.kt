@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
+import no.nav.boot.conditionals.ConditionalOnDev
+import no.nav.boot.conditionals.ConditionalOnDevOrLocal
+import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
@@ -48,21 +51,29 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     private interface IgnoreUnknownMixin
 
     @Bean
+    @ConditionalOnProd
     fun messageSource() =
         ReloadableResourceBundleMessageSource().apply {
-        setBasenames(
-            "classpath:messages",
-            "classpath:openapi-prod-tilgang",
-            "classpath:openapi-dev-ansatt",
-            "classpath:openapi-dev-bruker",
-            "classpath:openapi-dev-cache",
-            "classpath:openapi-dev-regel",
-            "classpath:openapi-dev-skjerming",
-            "classpath:openapi-dev-tilgang",
-            "classpath:openapi-dev-vergemal",
-        )
+        setBasenames("classpath:messages", "classpath:openapi-prod-tilgang")
         setDefaultEncoding("UTF-8")
     }
+    @Bean
+    @ConditionalOnDevOrLocal
+    fun messageSourceDevOrLocal() =
+        ReloadableResourceBundleMessageSource().apply {
+            setBasenames(
+                "classpath:messages",
+                "classpath:openapi-prod-tilgang",
+                "classpath:openapi-dev-ansatt",
+                "classpath:openapi-dev-bruker",
+                "classpath:openapi-dev-cache",
+                "classpath:openapi-dev-regel",
+                "classpath:openapi-dev-skjerming",
+                "classpath:openapi-dev-tilgang",
+                "classpath:openapi-dev-vergemal",
+            )
+            setDefaultEncoding("UTF-8")
+        }
 
     @Bean
     fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor) =

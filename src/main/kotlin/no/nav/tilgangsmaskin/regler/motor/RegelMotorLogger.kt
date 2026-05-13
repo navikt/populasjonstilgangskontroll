@@ -22,15 +22,16 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
 
     private val log = getLogger(javaClass)
 
-    private fun  bulkHistogram() =  DistributionSummary
-        .builder("bulk.histogram")
-        .description("Histogram av bulk-størrelse")
-        .baseUnit("størrelse")
-        .publishPercentileHistogram(true)
-        .tags("system", token.system)
-        .serviceLevelObjectives(1.0,2.0,5.0,10.0, 20.0, 50.0, 100.0)
-        .register(registry)
-
+    private val bulkHistogram by lazy {
+        DistributionSummary
+            .builder("bulk.histogram")
+            .description("Histogram av bulk-størrelse")
+            .baseUnit("størrelse")
+            .publishPercentileHistogram(true)
+            .tags("system", token.system)
+            .serviceLevelObjectives(1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 100.0)
+            .register(registry)
+    }
 
     fun avvist(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, regel: Regel,type: EvalueringType) =
         withMDC(Pair(BESLUTNING, regel.kode),Pair(REGELSETT, regelSett.type.beskrivelse),Pair(OPPSLAGTYPE, type.name)) {
@@ -49,7 +50,7 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
 
     fun trace(message: String) = log.trace(message)
 
-    fun tellBulkSize(size: Int) =   bulkHistogram().record(size.toDouble())
+    fun tellBulkSize(size: Int) = bulkHistogram.record(size.toDouble())
     fun godkjent(ansatt: Ansatt, bruker: Bruker, regel: Regel, type: EvalueringType) {
         log.trace("Evaluert regel '{}' OK for {} for {} og {} {}", regel.kortNavn, ansatt.ansattId, bruker.oppslagId.maskFnr(), type.name,konsument())
     }

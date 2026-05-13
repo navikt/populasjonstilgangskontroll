@@ -7,7 +7,7 @@ import org.springframework.web.client.support.RestClientAdapter.create
 import org.springframework.web.service.invoker.HttpServiceProxyFactory.builderFor
 
 object RestClientFactory {
-    fun createProxyFactory(cfg: AbstractRestConfig, builder: Builder, errorHandler: ErrorHandler) =
+    fun createProxyFactory(cfg: RestConfig, builder: Builder, errorHandler: ErrorHandler) =
         builderFor(
             create(
                 builder.baseUrl(cfg.baseUri)
@@ -16,6 +16,6 @@ object RestClientFactory {
             )
         ).build()
 
-    inline fun <reified T : Any> createClient(cfg: AbstractRestConfig, builder: Builder, errorHandler: ErrorHandler =RestDefaultErrorHandler()) = createProxyFactory(cfg, builder, errorHandler).createClient(T::class.java)
+    inline fun <reified T : Any> createClient(cfg: RestConfig, builder: Builder, errorHandler: ErrorHandler =RestDefaultErrorHandler()) = createProxyFactory(cfg, builder, errorHandler).createClient(T::class.java)
 }
 

@@ -2,12 +2,12 @@ package no.nav.tilgangsmaskin.ansatt.entraproxy
 
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyClient.Companion.ENTRA_PROXY_PING_PATH
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
-import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
+import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import org.springframework.stereotype.Component
 import java.net.URI
 
 @Component
-class EntraProxyConfig : AbstractRestConfig(PROXY_BASE, ENTRA_PROXY_PING_PATH, GRAPH)
+class EntraProxyConfig : RestConfig(PROXY_BASE, ENTRA_PROXY_PING_PATH, GRAPH)
 {
 
     companion object {

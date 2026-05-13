@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PDL_PIP_PERSON_PA
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PDL_PIP_PING_PATH
 import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
-import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
+import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -14,7 +14,7 @@ import java.net.URI.create
 
 @Component
 class PdlConfig(@Value("\${PDL}") hostname: String
-) : CachableRestConfig, AbstractRestConfig(create(
+) : CachableRestConfig, RestConfig(create(
     "https://$hostname"), PDL_PIP_PING_PATH, PDL) {
 
     override val caches = PDL_CACHES

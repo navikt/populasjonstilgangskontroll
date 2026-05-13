@@ -4,14 +4,14 @@ import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålClient.Companion.VERGEMÅ
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.VERGEMÅL
 import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
-import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
+import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
 import java.time.Duration
 
 @ConfigurationProperties(VERGEMÅL)
-class VergemålConfig : CachableRestConfig, AbstractRestConfig(VERGEMÅL_BASE, VERGEMÅL_PING_PATH, VERGEMÅL) {
+class VergemålConfig : CachableRestConfig, RestConfig(VERGEMÅL_BASE, VERGEMÅL_PING_PATH, VERGEMÅL) {
 
     override val navn = VERGEMÅL
     override val caches = setOf(VERGE_CACHE)

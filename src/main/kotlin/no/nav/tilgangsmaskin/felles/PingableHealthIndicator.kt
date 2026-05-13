@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.felles
 
-import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
+import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import org.slf4j.LoggerFactory
 import org.springframework.boot.health.contributor.Health
 import org.springframework.boot.health.contributor.HealthIndicator
@@ -39,7 +39,7 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
     companion object {
         const val ENDPOINT = "endpoint"
 
-        operator fun invoke(cfg: AbstractRestConfig, ping: () -> Any?) =
+        operator fun invoke(cfg: RestConfig, ping: () -> Any?) =
             PingableHealthIndicator(object : Pingable {
                 override val name = cfg.name
                 override val pingEndpoint = cfg.pingEndpoint

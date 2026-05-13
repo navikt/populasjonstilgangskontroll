@@ -30,7 +30,7 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
 
 @Configuration
-class PdlClientBeanConfig {
+class PdlBeanConfig {
 
     @Bean
     @Qualifier(PDLGRAPH)

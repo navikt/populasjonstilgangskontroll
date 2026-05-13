@@ -13,7 +13,8 @@ import java.time.Instant
 @Component
 class NomJPAAdapter(val repo: NomRepository, val entityManager: EntityManager) {
 
-    fun ryddOpp() = repo.deleteByGyldigtilBefore()
+    fun ryddOpp() =
+        repo.deleteByGyldigtilBefore()
 
     @CacheEvict(cacheNames = [NOM],key = "#data.ansattId.verdi")
     fun upsert(data: NomAnsattData) =
@@ -30,7 +31,8 @@ class NomJPAAdapter(val repo: NomRepository, val entityManager: EntityManager) {
             .executeUpdate()
 
 
-    fun fnrForAnsatt(ansattId: String) = repo.findFnrByNavidAndGyldigtilGreaterThanEqual(ansattId)?.let { BrukerId(it.fnr) }
+    fun fnrForAnsatt(ansattId: String) =
+        repo.findFnrByNavidAndGyldigtilGreaterThanEqual(ansattId)?.let { BrukerId(it.fnr) }
 
     companion object {
         private const val UPSERT_QUERY = """

@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.RestClient.Builder
 
 @Configuration
-class EntraClientBeanConfig {
+class EntraBeanConfig {
 
     @Bean
     @Qualifier(GRAPH)

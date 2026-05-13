@@ -4,8 +4,8 @@ package no.nav.tilgangsmaskin.bruker.pdl
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.UGRADERT
-import no.nav.tilgangsmaskin.bruker.pdl.PdlClientBeanConfig.Companion.PDL_CONTAINER_FACTORY
-import no.nav.tilgangsmaskin.bruker.pdl.PdlClientBeanConfig.Companion.PDL_GRADERING_FILTER
+import no.nav.tilgangsmaskin.bruker.pdl.PdlBeanConfig.Companion.PDL_CONTAINER_FACTORY
+import no.nav.tilgangsmaskin.bruker.pdl.PdlBeanConfig.Companion.PDL_GRADERING_FILTER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheClient

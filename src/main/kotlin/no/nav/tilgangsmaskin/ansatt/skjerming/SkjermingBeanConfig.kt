@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.RestClient.Builder
 
 @Configuration
-class SkjermingClientBeanConfig {
+class SkjermingBeanConfig {
 
     @Bean
     fun skjermingClient(builder: Builder, cfg: SkjermingConfig) =

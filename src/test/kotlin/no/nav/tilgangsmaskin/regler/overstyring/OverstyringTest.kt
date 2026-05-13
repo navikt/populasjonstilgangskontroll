@@ -165,6 +165,15 @@ internal class OverstyringTest : BehaviorSpec() {
                     overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe true
                 }
             }
+            When("nyeste overstyring er utgått, eldre er aktiv") {
+                Then("returneres false — nyeste vinner") {
+                    val bruker = BrukerBuilder(vanligBrukerId).build()
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er aktiv men gammel", IMORGEN))
+                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er ny men utgått", IGÅR))
+                    overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe false
+                }
+            }
             When("overstyring er utgått") {
                 Then("returneres false") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
@@ -205,6 +214,16 @@ internal class OverstyringTest : BehaviorSpec() {
                     overstyring.overstyr(ansattId, OverstyringData(bruker2.brukerId, "Utgått overstyring", IGÅR))
                     val resultat = overstyring.overstyringer(ansattId, listOf(bruker1.brukerId, bruker2.brukerId))
                     resultat shouldBe listOf(bruker1.brukerId)
+                }
+            }
+            When("nyeste overstyring for en bruker er utgått, eldre er aktiv") {
+                Then("returneres tom liste for den brukeren — nyeste vinner") {
+                    val bruker = BrukerBuilder(vanligBrukerId).build()
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Aktiv men gammel", IMORGEN))
+                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Ny men utgått", IGÅR))
+                    val resultat = overstyring.overstyringer(ansattId, listOf(bruker.brukerId))
+                    resultat shouldBe emptyList()
                 }
             }
             When("alle overstyringer er utgått") {

@@ -13,8 +13,10 @@ interface OverstyringRepository : JpaRepository<OverstyringEntity, Long> {
         WHERE o.navid = :ansattId
           AND o.fnr IN :brukerIds
           AND o.expires > CURRENT_TIMESTAMP
-        ORDER BY o.created DESC
-        LIMIT 1
+          AND o.created = (
+              SELECT MAX(o2.created) FROM overstyring o2
+              WHERE o2.navid = :ansattId AND o2.fnr IN :brukerIds
+          )
     """)
     fun gjeldendeOverstyring(
             @Param("ansattId") ansattId: String,

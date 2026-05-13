@@ -19,6 +19,7 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
+import no.nav.tilgangsmaskin.tilgang.dev.DevTilgangController.Companion.DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -28,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import java.util.*
 
-private const val DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.tilgang.tag.description"
 
 
 @UnprotectedRestController(value = ["/${DEV}"])
@@ -83,6 +83,8 @@ class DevTilgangController(
         overstyring.overstyringer(ansattId, brukerIds)
 
     companion object {
+        private const val DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.tilgang.tag.description"
+
         private const val SUMMARY_OPPFOLGING_AVSLUTT = "msg:openapi.dev.tilgang.oppfolging.avslutt.summary"
         private const val DESCRIPTION_OPPFOLGING_AVSLUTT = "msg:openapi.dev.tilgang.oppfolging.avslutt.description"
         private const val SUMMARY_OPPFOLGING_ENHET = "msg:openapi.dev.tilgang.oppfolging.enhet.summary"

@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import no.nav.tilgangsmaskin.felles.rest.Pingable
+import no.nav.tilgangsmaskin.felles.Pingable
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.stereotype.Component
 import java.net.URI

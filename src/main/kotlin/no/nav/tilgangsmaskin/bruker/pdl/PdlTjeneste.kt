@@ -8,11 +8,11 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPersoner
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableService
+import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
 
-@RetryingWhenRecoverableService
+@RetryingWhenRecoverableRestService
 class PdlTjeneste(
     private val pip: PdlPipClient,
     private val graphQL: PdlSyncGraphQLClientAdapter,

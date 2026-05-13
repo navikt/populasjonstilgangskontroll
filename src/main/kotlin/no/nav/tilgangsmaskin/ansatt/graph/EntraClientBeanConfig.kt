@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
-import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.createClient
-import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
-import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
+import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -17,24 +17,23 @@ class EntraClientBeanConfig {
     fun graphRestClient(builder: Builder, cfg: EntraConfig) =
         builder.baseUrl(cfg.baseUri)
             .requestInterceptors {
-                it.add(headerAddingRequestInterceptor(HEADER_CONSISTENCY_LEVEL))
+                it.add(RestHeaderAddingRequestInterceptor(HEADER_CONSISTENCY_LEVEL))
             }.build()
 
 
     @Bean
     fun entraGraphClient(builder: Builder, cfg: EntraConfig) =
-        createClient<EntraGraphClient>(
-            cfg,
+        createClient<EntraClient>(cfg,
             builder.clone().requestInterceptors {
-                it.add(headerAddingRequestInterceptor(HEADER_CONSISTENCY_LEVEL))
+                it.add(RestHeaderAddingRequestInterceptor(HEADER_CONSISTENCY_LEVEL))
             },
         )
 
     @Bean
-    fun graphHealthIndicator(cfg: EntraConfig, client: EntraGraphClient) =
+    fun graphHealthIndicator(cfg: EntraConfig, client: EntraClient) =
         PingableHealthIndicator(cfg, client::ping)
 
-    private companion object {
-        private val HEADER_CONSISTENCY_LEVEL = "ConsistencyLevel" to "eventual"
+     companion object {
+         val HEADER_CONSISTENCY_LEVEL = "ConsistencyLevel" to "eventual"
     }
 }

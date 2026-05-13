@@ -1,13 +1,13 @@
-package no.nav.tilgangsmaskin.felles.rest
+package no.nav.tilgangsmaskin.felles
 
-import no.nav.tilgangsmaskin.felles.Generated
-import org.slf4j.LoggerFactory.getLogger
+import no.nav.tilgangsmaskin.felles.rest.RestConfig
+import org.slf4j.LoggerFactory
 import org.springframework.boot.health.contributor.Health
 import org.springframework.boot.health.contributor.HealthIndicator
 
 class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator {
 
-    private val log = getLogger(javaClass)
+    private val log = LoggerFactory.getLogger(javaClass)
 
     override fun health()  =
         runCatching {
@@ -39,7 +39,7 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
     companion object {
         const val ENDPOINT = "endpoint"
 
-        operator fun invoke(cfg: AbstractRestConfig, ping: () -> Any?) =
+        operator fun invoke(cfg: RestConfig, ping: () -> Any?) =
             PingableHealthIndicator(object : Pingable {
                 override val name = cfg.name
                 override val pingEndpoint = cfg.pingEndpoint
@@ -47,4 +47,3 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
             })
     }
 }
-

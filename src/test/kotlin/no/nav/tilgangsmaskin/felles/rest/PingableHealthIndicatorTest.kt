@@ -2,8 +2,10 @@ package no.nav.tilgangsmaskin.felles.rest
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import no.nav.tilgangsmaskin.felles.Pingable
+import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import java.net.URI
-import no.nav.tilgangsmaskin.felles.rest.PingableHealthIndicator.Companion.ENDPOINT
+import no.nav.tilgangsmaskin.felles.PingableHealthIndicator.Companion.ENDPOINT
 import org.springframework.boot.health.contributor.Status.DOWN
 import org.springframework.boot.health.contributor.Status.UP
 

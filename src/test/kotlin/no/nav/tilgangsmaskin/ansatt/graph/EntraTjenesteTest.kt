@@ -9,9 +9,10 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.setIDs
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.entries
+import no.nav.tilgangsmaskin.ansatt.graph.EntraClientBeanConfig.Companion.HEADER_CONSISTENCY_LEVEL
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjenesteTest.EntraTestConfig
-import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.headerAddingRequestInterceptor
+import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
@@ -48,7 +49,7 @@ class EntraTjenesteTest : BehaviorSpec() {
         fun graphRestClient(b: Builder, cfg: EntraConfig) =
             b.baseUrl(cfg.baseUri)
                 .requestInterceptors {
-                    it.add(headerAddingRequestInterceptor("ConsistencyLevel" to "eventual"))
+                    it.add(RestHeaderAddingRequestInterceptor(HEADER_CONSISTENCY_LEVEL))
                 }.build()
     }
 
@@ -58,7 +59,7 @@ class EntraTjenesteTest : BehaviorSpec() {
 
     @MockkBean
     @Suppress("unused")
-    private lateinit var entraClient: EntraGraphClient
+    private lateinit var entraClient: EntraClient
 
     @Autowired
     private lateinit var tjeneste: EntraTjeneste

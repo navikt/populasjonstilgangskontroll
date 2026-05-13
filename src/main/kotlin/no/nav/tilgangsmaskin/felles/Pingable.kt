@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.rest
+package no.nav.tilgangsmaskin.felles
 
 import java.net.URI
 

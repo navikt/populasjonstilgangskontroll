@@ -7,7 +7,7 @@ import org.springframework.resilience.retry.MethodRetryEvent
 import org.springframework.stereotype.Component
 
 @Component
-class RetryLogger {
+class RestRetryLogger {
     private val log = getLogger(javaClass)
 
     @EventListener(MethodRetryEvent::class)
@@ -15,34 +15,23 @@ class RetryLogger {
         val args = event.source.arguments.toSet()
         val metode = event.method.name
         when (val t = cause(event)) {
-            is NotFoundRestException -> logNotFound(metode, t)
+            is NotFoundRestException -> log.info("NotFoundRestException fra '$metode' for [${t.identifikator}] mot ${t.uri}", t)
             else -> if (event.isRetryAborted) {
-                logAbort(metode, args, t)
+                if (t !is RetryException) {
+                    log.warn("Aborterer metode '$metode}' grunnet ${t.javaClass.simpleName} $args")
+                } else {
+                    log.warn("Aborterer metode '$metode' grunnet ${t.cause.javaClass.simpleName} $args", t.cause)
+                }
             } else {
-                logRetrying(metode, t)
+                log.warn("Feil i '$metode',  prøver igjen", t)
             }
         }
     }
-
-    private fun logRetrying(metode: String, t: Throwable?) =
-        log.warn("Feil i '$metode',  prøver igjen", t)
-
-
-    private fun logNotFound(metode: String, t: NotFoundRestException) =
-        log.info("NotFoundRestException fra '$metode' for [${t.identifikator}] på ${t.uri}", t)
-
 
     private fun cause(event: MethodRetryEvent)  =
         listOf(event.failure, event.failure.cause)
             .filterIsInstance<NotFoundRestException>()
             .firstOrNull()
             ?: event.failure
-
-    private fun logAbort(method: String, args: Set<Any?>, t: Throwable) =
-        if (t !is RetryException) {
-            log.warn("Aborterer metode '$method}' grunnet ${t.javaClass.simpleName} $args", t) // Skjer dette noen gang?
-        } else {
-            log.warn("Aborterer metode '$method' grunnet ${t.cause.javaClass.simpleName} $args", t.cause)
-        }
 
 }

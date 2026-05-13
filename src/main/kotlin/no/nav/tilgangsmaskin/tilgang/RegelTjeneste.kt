@@ -82,7 +82,7 @@ class RegelTjeneste(
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val brukere = idOgType.brukerOgRegelsett()
             val resultater = motor.bulkRegler(ansatt, brukere).also {
-                log.debug("Bulk resultater {}", it)
+                log.debug("${it.size} bulk resultater {}", it.map { resultat -> "${resultat.bruker.oppslagId.maskFnr()}: ${resultat.status}" })
             }
             val godkjente = godkjente(ansatt, resultater)
             val avviste = avviste(ansatt, godkjente, resultater, brukere)
@@ -104,7 +104,7 @@ class RegelTjeneste(
             }
         }.also {
             if (it.isNotEmpty()) {
-                auditor.info("404: Brukere med identer ${it.map { ident -> ident.brukerId }} ikke funnet i PDL ved oppslag")
+                auditor.info("404: Brukere med identer ${it.map { ident -> ident.brukerId.maskFnr() }} ikke funnet i PDL ved oppslag")
                 log.debug("${it.size} bulk elementer ikke funnet")
             }
         }

@@ -6,10 +6,10 @@ import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålClient.VergemålIdent
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.VERGEMÅL
 import no.nav.tilgangsmaskin.felles.Generated
-import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableService
+import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.springframework.cache.annotation.Cacheable
 
-@RetryingWhenRecoverableService
+@RetryingWhenRecoverableRestService
 class VergemålTjeneste(private val nom: NomTjeneste, private val client: VergemålClient) {
 
     @WithSpan

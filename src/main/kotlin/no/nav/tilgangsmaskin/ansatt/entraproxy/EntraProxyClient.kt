@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
-import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler.Companion.IDENTIFIKATOR
+import no.nav.tilgangsmaskin.felles.rest.RestDefaultErrorHandler.Companion.IDENTIFIKATOR
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.service.annotation.GetExchange

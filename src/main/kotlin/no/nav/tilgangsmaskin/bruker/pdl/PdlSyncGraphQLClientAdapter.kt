@@ -5,7 +5,6 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
 import no.nav.tilgangsmaskin.felles.Generated
-import no.nav.tilgangsmaskin.felles.graphql.PdlGraphQLErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.graphql.client.GraphQlClient
@@ -16,9 +15,10 @@ import org.springframework.stereotype.Component
 @Component
 @Timed(value = "pdl_tjeneste", histogram = true, extraTags = ["backend", "graphql"])
 class PdlSyncGraphQLClientAdapter(
+    private val cfg: PdlGraphQLConfig,
     private val client: GraphQlClient,
-    private val errorHandler: PdlGraphQLErrorHandler,
-    private val cfg: PdlGraphQLConfig) {
+    private val errorHandler: PdlGraphQLErrorHandler = object : PdlGraphQLErrorHandler {}) {
+
     private val log = getLogger(javaClass)
 
     fun partnere(ident: String): Set<FamilieMedlem> =

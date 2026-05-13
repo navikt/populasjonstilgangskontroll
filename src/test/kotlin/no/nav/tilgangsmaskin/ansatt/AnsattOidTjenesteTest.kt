@@ -12,9 +12,9 @@ import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste.Companion.ENTRA_OID
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjenesteTest.TestConfig
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGraphClient
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGraphClient.UserResponse
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGraphClient.UserResponse.OidEntry
+import no.nav.tilgangsmaskin.ansatt.graph.EntraClient
+import no.nav.tilgangsmaskin.ansatt.graph.EntraClient.UserResponse
+import no.nav.tilgangsmaskin.ansatt.graph.EntraClient.UserResponse.OidEntry
 import no.nav.tilgangsmaskin.ansatt.graph.EntraOidException
 import no.nav.tilgangsmaskin.ansatt.graph.EntraRestClientAdapter
 import org.springframework.beans.factory.annotation.Autowired
@@ -45,7 +45,7 @@ class AnsattOidTjenesteTest : BehaviorSpec() {
     }
 
     @MockkBean
-    lateinit var entraClient: EntraGraphClient
+    lateinit var entraClient: EntraClient
     @Autowired
     lateinit var tjeneste: AnsattOidTjeneste
     @Autowired

@@ -1,24 +1,10 @@
-package no.nav.tilgangsmaskin.felles.rest
+package no.nav.tilgangsmaskin.regler.overstyring
 
-import jakarta.validation.Constraint
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
-import jakarta.validation.Payload
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import org.slf4j.LoggerFactory.getLogger
 import java.time.LocalDate
 import java.time.LocalDate.now
-import kotlin.reflect.KClass
-
-@MustBeDocumented
-@Constraint(validatedBy = [OverstyringValidator::class])
-@Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class ValidOverstyring(
-    val message: String = "Overstyring må være fra nå og maks 3 måneder frem i tid",
-    val groups: Array<KClass<*>> = [],
-    val months: Long = 3,
-    val payload: Array<KClass<out Payload>> = [])
 
 class OverstyringValidator : ConstraintValidator<ValidOverstyring, OverstyringData> {
     private val log = getLogger(javaClass)

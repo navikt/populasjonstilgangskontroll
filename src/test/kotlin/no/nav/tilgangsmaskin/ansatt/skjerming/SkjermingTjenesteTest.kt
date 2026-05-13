@@ -21,7 +21,7 @@ import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
-import no.nav.tilgangsmaskin.felles.rest.RetryLogger
+import no.nav.tilgangsmaskin.felles.rest.RestRetryLogger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
@@ -43,7 +43,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
 
-@RestClientTest(components = [SkjermingClient::class,SkjermingClientBeanConfig::class, SkjermingTjeneste::class, SkjermingConfig::class,RetryLogger::class])
+@RestClientTest(components = [SkjermingClient::class,SkjermingClientBeanConfig::class, SkjermingTjeneste::class, SkjermingConfig::class,RestRetryLogger::class])
 @EnableResilientMethods
 @Import(SkjermingTjenesteTest.CacheConfig::class)
 @ApplyExtension(SpringExtension::class)
@@ -75,7 +75,7 @@ class SkjermingTjenesteTest : BehaviorSpec() {
         val brukerId2 = BrukerId("20478606614")
 
         fun withLogCapture(block: (ListAppender<ILoggingEvent>) -> Unit): List<ILoggingEvent> {
-            val logger = LoggerFactory.getLogger(RetryLogger::class.java) as Logger
+            val logger = LoggerFactory.getLogger(RestRetryLogger::class.java) as Logger
             val appender = ListAppender<ILoggingEvent>().apply { start(); (logger).addAppender(this) }
             return try { block(appender); appender.list } finally { logger.detachAppender(appender) }
         }

@@ -26,7 +26,7 @@
         <logger name="org.apache.kafka" level="info" />
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
         <logger name="no.nav.security" level="info"/>
-        <logger name="no.nav.tilgangsmaskin.felles.rest.LoggingRequestInterceptor" level="trace"/>
+        <logger name="no.nav.tilgangsmaskin.felles.rest.RestLoggingRequestInterceptor" level="trace"/>
     </springProfile>
 
     <springProfile name="local | test">
@@ -41,7 +41,7 @@
             </layout>
         </appender>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
-        <logger name="no.nav.tilgangsmaskin.felles.rest.LoggingRequestInterceptor" level="trace"/>
+        <logger name="no.nav.tilgangsmaskin.felles.rest.RestLoggingRequestInterceptor" level="trace"/>
     </springProfile>
 
     <springProfile name="prod">

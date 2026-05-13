@@ -6,12 +6,9 @@ import org.springframework.web.ErrorResponseException
 
 class EntraOidException(ansattId: String, msg: String) : ErrorResponseException(NOT_FOUND) {
     init {
-        body.title = TITLE
+        body.title = "Uventet respons fra Entra"
         body.detail = msg
         body.properties = mapOf("navIdent" to ansattId,"traceId" to Span.current().spanContext.traceId)
     }
 
-    private companion object   {
-        private const val TITLE = "Uventet respons fra Entra"
-    }
 }

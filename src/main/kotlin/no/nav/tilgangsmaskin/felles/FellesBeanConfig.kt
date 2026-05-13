@@ -4,44 +4,27 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
-import io.micrometer.core.instrument.Timer
-import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
+import no.nav.boot.conditionals.ConditionalOnDev
+import no.nav.boot.conditionals.ConditionalOnDevOrLocal
+import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
-import no.nav.tilgangsmaskin.felles.rest.AbstractRestConfig
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
-import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
+import no.nav.tilgangsmaskin.felles.rest.RestLoggingRequestInterceptor
 import no.nav.tilgangsmaskin.tilgang.Token
-import org.aspectj.lang.ProceedingJoinPoint
-import org.aspectj.lang.annotation.Around
-import org.aspectj.lang.annotation.Aspect
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.actuate.endpoint.SanitizingFunction
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
-import org.springframework.boot.kafka.autoconfigure.DefaultKafkaConsumerFactoryCustomizer
 import org.springframework.boot.restclient.RestClientCustomizer
+import org.springframework.context.MessageSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
-import org.springframework.http.HttpRequest
-import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.http.client.ClientHttpRequestExecution
-import org.springframework.http.client.ClientHttpRequestInterceptor
-import org.springframework.http.client.ClientHttpResponse
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
-import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
-import org.springframework.kafka.support.serializer.JacksonJsonDeserializer
-import org.springframework.stereotype.Component
-import org.springframework.web.client.RestClient.Builder
-import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
-import org.springframework.web.client.support.RestClientAdapter.create
-import org.springframework.web.service.invoker.HttpServiceProxyFactory.builderFor
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
-import tools.jackson.databind.json.JsonMapper
 import java.util.function.Function
 import kotlin.annotation.AnnotationRetention.BINARY
 import kotlin.annotation.AnnotationTarget.CLASS
@@ -58,14 +41,6 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
        it.enable(INCLUDE_SOURCE_IN_LOCATION)
     }
 
-    
-    @Bean
-    fun kafkaConsumerFactoryCustomizer(mapper: JsonMapper) =
-        DefaultKafkaConsumerFactoryCustomizer {
-            it.setValueDeserializerSupplier {
-                ErrorHandlingDeserializer(JacksonJsonDeserializer(mapper))
-            }
-        }
 
     @Bean
     fun sanitizingFunction() = SanitizingFunction { data ->
@@ -76,9 +51,29 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     private interface IgnoreUnknownMixin
 
     @Bean
-    fun errorMessageSource() = ReloadableResourceBundleMessageSource().apply {
-        setBasename("classpath:messages")
+    @ConditionalOnProd
+    fun messageSource() =
+        ReloadableResourceBundleMessageSource().apply {
+        setBasenames("classpath:messages", "classpath:openapi-prod-tilgang")
+        setDefaultEncoding("UTF-8")
     }
+    @Bean
+    @ConditionalOnDevOrLocal
+    fun messageSourceDevOrLocal() =
+        ReloadableResourceBundleMessageSource().apply {
+            setBasenames(
+                "classpath:messages",
+                "classpath:openapi-prod-tilgang",
+                "classpath:openapi-dev-ansatt",
+                "classpath:openapi-dev-bruker",
+                "classpath:openapi-dev-cache",
+                "classpath:openapi-dev-regel",
+                "classpath:openapi-dev-skjerming",
+                "classpath:openapi-dev-tilgang",
+                "classpath:openapi-dev-vergemal",
+            )
+            setDefaultEncoding("UTF-8")
+        }
 
     @Bean
     fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor) =
@@ -89,7 +84,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             })
             c.requestInterceptors {
                 it.addFirst(interceptor)
-                it.add(LoggingRequestInterceptor())
+                it.add(RestLoggingRequestInterceptor())
             }
         }
 
@@ -107,35 +102,9 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 
 
-    @Aspect
-    @Component
-    class TimingAspect(private val meterRegistry: MeterRegistry) {
-
-        @Around("execution(* no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor.intercept(..))")
-        fun timeMethod(joinPoint: ProceedingJoinPoint) = Timer.builder("mslogin")
-            .description("Timer med histogram for mslogin")
-            .tags("method", joinPoint.signature.name)
-            .publishPercentileHistogram()
-            .register(meterRegistry).recordCallable { joinPoint.proceed() }
-    }
-
     companion object {
 
-        fun createProxyFactory(cfg: AbstractRestConfig, builder: Builder, errorHandler: ErrorHandler) = builderFor(create(builder.baseUrl(cfg.baseUri)
-            .defaultStatusHandler(HttpStatusCode::isError, errorHandler::handle)
-            .build()))
-            .build()
-
-        inline fun <reified T : Any> createClient(cfg: AbstractRestConfig, builder: Builder, errorHandler: ErrorHandler = DefaultRestErrorHandler()) =
-            createProxyFactory(cfg, builder, errorHandler).createClient(T::class.java)
-
         private val SENSITIVE_KEYS = setOf("password", "secret", "token", "key","credentials", "jwk","private_key")
-
-        fun headerAddingRequestInterceptor(vararg verdier: Pair<String, String>) =
-            ClientHttpRequestInterceptor { request, body, next ->
-                verdier.forEach { (key, value) -> request.headers.add(key, value) }
-                next.execute(request, body)
-            }
     }
 }
 
@@ -143,17 +112,3 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 @Target(FUNCTION, CONSTRUCTOR, CLASS)
 annotation class Generated
 
-private class LoggingRequestInterceptor : ClientHttpRequestInterceptor {
-    private val log = getLogger(javaClass)
-    override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
-        if (req.uri.path.contains("monitoring")) {
-            return execution.execute(req, body)
-        }
-        if (!body.isEmpty()) {
-            log.trace(CONFIDENTIAL, "Body for {} {} : {} ",req.method, req.uri,String(body))
-        }
-        val res = execution.execute(req, body)
-        log.trace(CONFIDENTIAL,"Response status for {} {}: {}", req.method, req.uri, res.statusCode)
-        return res
-    }
-}

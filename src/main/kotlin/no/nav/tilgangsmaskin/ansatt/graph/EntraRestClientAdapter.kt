@@ -1,8 +1,10 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.Generated
-import no.nav.tilgangsmaskin.felles.rest.DefaultRestErrorHandler
+import no.nav.tilgangsmaskin.felles.rest.RestDefaultErrorHandler
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatusCode
@@ -16,19 +18,19 @@ import java.net.URI
 @Component
 class EntraRestClientAdapter(
     @param:Qualifier(GRAPH) private val restClient: RestClient,
-    private val entraClient: EntraGraphClient,
+    private val entraClient: EntraClient,
     private val cfg: EntraConfig,
-    private val errorHandler: ErrorHandler = DefaultRestErrorHandler()) {
+    private val errorHandler: ErrorHandler = RestDefaultErrorHandler()) {
 
     private val log = getLogger(javaClass)
 
     fun oidFraEntra(ansattId: String) =
          with(entraClient.findUser("onPremisesSamAccountName eq '$ansattId'").oids) {
-             log.info("Fant $size oids i Entra for $ansattId")
+             log.trace("Fant $size oids i Entra for $ansattId")
             when (size) {
-                0 -> throw EntraOidException(ansattId, "Fant ingen oid for navident $ansattId, er den fremdeles gyldig?")
+                0 -> throw EntraOidException(ansattId, "Fant ingen oid for $ansattId, er den fremdeles gyldig?")
                 1 -> single().id
-                else -> throw EntraOidException(ansattId, "Forventet nøyaktig én oid for navident $ansattId, fant $size (${joinToString(", ") { it.id.toString() }})")
+                else -> throw EntraOidException(ansattId, "Forventet nøyaktig én oid for $ansattId, fant $size (${joinToString(", ") { it.id.toString() }})")
             }
     }
 
@@ -53,3 +55,6 @@ class EntraRestClientAdapter(
     override fun toString() = "${javaClass.simpleName} [client=$restClient, config=$cfg, errorHandler=$errorHandler]"
 
 }
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+private data class EntraGrupper(@param:JsonProperty("@odata.nextLink") val next: URI? = null, val value: Set<EntraGruppe> = emptySet())

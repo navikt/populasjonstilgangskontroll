@@ -21,7 +21,7 @@ class OverstyringValidator : ConstraintValidator<ValidOverstyring, OverstyringDa
     }
 
     private fun gyldigDato(verdi: LocalDate) =
-        verdi.isAfter(now()) && verdi.isBefore(now().plusMonths(3))
+        (verdi.isAfter(now()) && verdi.isBefore(now().plusMonths(3)))
             .also {
                 if (!it) log.warn("Overstyring med gyldig til $verdi er ugyldig, må være fra nå og maks 3 måneder frem i tid")
             }

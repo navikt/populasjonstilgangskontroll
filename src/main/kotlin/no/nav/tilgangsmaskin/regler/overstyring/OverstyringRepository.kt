@@ -8,10 +8,16 @@ import org.springframework.data.repository.query.Param
 @Timed
 interface OverstyringRepository : JpaRepository<OverstyringEntity, Long> {
 
-    @Query("SELECT o FROM overstyring o WHERE o.navid = :ansattId AND (o.fnr = :brukerId OR o.fnr IN :brukerIds) ORDER BY o.created DESC LIMIT 1")
+    @Query("""
+        SELECT o FROM overstyring o
+        WHERE o.navid = :ansattId
+          AND o.fnr IN :brukerIds
+          AND o.expires > CURRENT_TIMESTAMP
+        ORDER BY o.created DESC
+        LIMIT 1
+    """)
     fun gjeldendeOverstyring(
             @Param("ansattId") ansattId: String,
-            @Param("brukerId") brukerId: String,
             @Param("brukerIds") brukerIds: List<String>): OverstyringEntity?
 
     @Query("""

@@ -14,7 +14,7 @@ class OverstyringJPAAdapter(private val repository: OverstyringRepository) {
         }
 
     fun gjeldendeOverstyring(ansattId: String, brukerId: String, brukerIds: List<String>) =
-        repository.gjeldendeOverstyring(ansattId, brukerId, brukerIds)
+        repository.gjeldendeOverstyring(ansattId, listOf(brukerId) + brukerIds)
 
     fun gjeldendeOverstyringer(ansattId: String, brukerIds: List<String>): List<BrukerId> =
         repository.gjeldendeOverstyringer(ansattId, brukerIds)

@@ -29,6 +29,7 @@ data class BrukerId(@JsonValue val verdi: String) {
             }
         }
     }
+    fun maskert() = verdi.maskFnr()
 
     companion object {
 

@@ -9,9 +9,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.isBeforeNow
 import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
 import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.INGEN_REGEL_TAG
 import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.regelTag
@@ -43,11 +41,11 @@ class OverstyringTjeneste(
     fun overstyringer(ansattId: AnsattId, brukerIds: List<BrukerId>) =
         adapter.gjeldendeOverstyringer(ansattId.verdi, brukerIds.map { it.verdi })
 
-    fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId): Boolean {
-        log.info("Sjekker eventuell overstyring for $ansattId og ${brukerId.verdi.maskFnr()}")
-        val overstyring = gjeldendeOverstyring(ansattId, brukerId)
-        return erOverstyrt(ansattId,brukerId,overstyring)
-    }
+    fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId) =
+        gjeldendeOverstyring(ansattId, brukerId)
+            ?.also {
+                log.trace("Overstyring er gyldig i {} til for {} og {}", it.diffFromNow(), ansattId, brukerId.maskert())
+            } != null
 
 
     @Transactional
@@ -55,11 +53,13 @@ class OverstyringTjeneste(
         runCatching {
             MDC.put(USER_ID, ansattId.verdi)
             validator.validerKonsument()
-            log.info("Sjekker kjerneregler før eventuell overstyring for $ansattId og ${data.brukerId}")
-            motor.kjerneregler(ansattTjeneste.ansatt(ansattId), brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi))
-            adapter.overstyr(ansattId.verdi, enhetFor(ansattId), data).also {
+            val ansatt = ansattTjeneste.ansatt(ansattId)
+            val bruker = brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi)
+            motor.kjerneregler(ansatt,bruker)
+            val enhet = enhetFor(ansattId)
+            adapter.overstyr(ansattId.verdi, enhet, data).also {
                 teller.tell(INGEN_REGEL_TAG,OVERSTYRT)
-                log.info("Overstyring til og med ${data.gyldigtil} ble registrert for $ansattId og ${data.brukerId}")
+                log.info("Overstyring til og med ${data.gyldigtil} ble registrert for $ansattId og ${data.brukerId.maskert()}")
             }
             true
         }.getOrElse {
@@ -71,11 +71,11 @@ class OverstyringTjeneste(
             is RegelException -> throw RegelException(OVERSTYRING_MESSAGE_CODE,
                 arrayOf(t.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
                 e = t).also {
-                log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}", it)
+                log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId.maskert()}", it)
                 teller.tell(regelTag(t.regel),IKKE_OVERSTYRT,tokenSystemTag(UTILGJENGELIG))
             }
             is OverstyringException -> throw t.also {
-                log.warn("Overstyring feilet pga klientvalidering ${t.message} for $ansattId og ${data.brukerId}", it)
+                log.warn("Overstyring feilet pga klientvalidering ${t.message} for $ansattId og ${data.brukerId.maskert()}", it)
                 teller.tell(INGEN_REGEL_TAG,IKKE_OVERSTYRT,tokenSystemTag(t.system))
             }
             else -> throw t
@@ -92,21 +92,6 @@ class OverstyringTjeneste(
             proxy.enhet(ansattId).enhetnummer.verdi
         }.getOrDefault(UTILGJENGELIG)
 
-    private fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId, expires: Instant?) =
-        when {
-            expires == null -> {
-                log.trace("Ingen overstyring for {} og {} ble funnet", ansattId, brukerId)
-                false
-            }
-            expires.isBeforeNow() -> {
-                log.trace("Overstyring har gått ut på tid for {} siden for {} og {}", expires.diffFromNow(), ansattId, brukerId)
-                false
-            }
-            else -> {
-                log.trace("Overstyring er gyldig i {} til for {} og {}", expires.diffFromNow(), ansattId, brukerId)
-                true
-            }
-        }
 
     companion object {
         private fun tokenSystemTag(system: String) = Tag.of("system",system)

@@ -41,14 +41,17 @@ class DevTilgangController(
     private val nom: NomJPAAdapter) {
 
     @PostMapping("oppfolging/{uuid}/avslutt")
+    @Operation(summary = SUMMARY_OPPFOLGING_AVSLUTT, description = DESCRIPTION_OPPFOLGING_AVSLUTT)
     fun oppfølgingAvslutt(@RequestBody identer : Identer, @PathVariable uuid: UUID) =
         oppfølging.avslutt(uuid, identer)
 
     @GetMapping("oppfolging/enhet")
+    @Operation(summary = SUMMARY_OPPFOLGING_ENHET, description = DESCRIPTION_OPPFOLGING_ENHET)
     fun enhetFor(@RequestParam id: Identifikator) =
         oppfølging.enhetFor(id)
 
     @GetMapping("sivilstand/{id}")
+    @Operation(summary = SUMMARY_SIVILSTAND, description = DESCRIPTION_SIVILSTAND)
     fun sivilstand(@PathVariable  id: String) =
         graphql.partnere(id)
 
@@ -59,6 +62,7 @@ class DevTilgangController(
         nom.upsert(NomAnsattData(ansattId, brukerId))
 
     @GetMapping("nom/{ansattId}")
+    @Operation(summary = SUMMARY_NOM_FNR, description = DESCRIPTION_NOM_FNR)
     fun nomFnr(@PathVariable ansattId: AnsattId) =
         nom.fnrForAnsatt(ansattId.verdi)
 
@@ -79,11 +83,19 @@ class DevTilgangController(
         overstyring.overstyringer(ansattId, brukerIds)
 
     companion object {
-        const val SUMMARY_KOBLING = "msg:openapi.dev.tilgang.kobling.summary"
-        const val DESCRIPTION_KOBLING = "msg:openapi.dev.tilgang.kobling.description"
-        const val SUMMARY_OVERSTYR = "msg:openapi.dev.tilgang.overstyr.summary"
-        const val DESCRIPTION_OVERSTYR = "msg:openapi.dev.tilgang.overstyr.description"
-        const val SUMMARY_HENT_OVERSTYRINGER = "msg:openapi.dev.tilgang.overstyringer.summary"
-        const val DESCRIPTION_HENT_OVERSTYRINGER = "msg:openapi.dev.tilgang.overstyringer.description"
+        private const val SUMMARY_OPPFOLGING_AVSLUTT = "msg:openapi.dev.tilgang.oppfolging.avslutt.summary"
+        private const val DESCRIPTION_OPPFOLGING_AVSLUTT = "msg:openapi.dev.tilgang.oppfolging.avslutt.description"
+        private const val SUMMARY_OPPFOLGING_ENHET = "msg:openapi.dev.tilgang.oppfolging.enhet.summary"
+        private const val DESCRIPTION_OPPFOLGING_ENHET = "msg:openapi.dev.tilgang.oppfolging.enhet.description"
+        private const val SUMMARY_SIVILSTAND = "msg:openapi.dev.tilgang.sivilstand.summary"
+        private const val DESCRIPTION_SIVILSTAND = "msg:openapi.dev.tilgang.sivilstand.description"
+        private const val SUMMARY_KOBLING = "msg:openapi.dev.tilgang.kobling.summary"
+        private const val DESCRIPTION_KOBLING = "msg:openapi.dev.tilgang.kobling.description"
+        private const val SUMMARY_NOM_FNR = "msg:openapi.dev.tilgang.nom.fnr.summary"
+        private const val DESCRIPTION_NOM_FNR = "msg:openapi.dev.tilgang.nom.fnr.description"
+        private const val SUMMARY_OVERSTYR = "msg:openapi.dev.tilgang.overstyr.summary"
+        private const val DESCRIPTION_OVERSTYR = "msg:openapi.dev.tilgang.overstyr.description"
+        private const val SUMMARY_HENT_OVERSTYRINGER = "msg:openapi.dev.tilgang.overstyringer.summary"
+        private const val DESCRIPTION_HENT_OVERSTYRINGER = "msg:openapi.dev.tilgang.overstyringer.description"
     }
 }

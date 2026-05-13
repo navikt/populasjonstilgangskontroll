@@ -11,7 +11,7 @@ import java.time.Instant
 
 
 @Component
-class NomJPAAdapter(val repo: NomRepository, val entityManager: EntityManager) {
+class NomJPAAdapter(private val repo: NomRepository, private val entityManager: EntityManager) {
 
     fun ryddOpp() =
         repo.deleteByGyldigtilBefore()

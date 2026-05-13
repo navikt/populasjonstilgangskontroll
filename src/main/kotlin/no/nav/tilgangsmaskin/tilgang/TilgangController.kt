@@ -54,26 +54,26 @@ class TilgangController(
     @PostMapping("komplett")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
-    @Operation(summary = SUMMARY_KOMPLETT_OBO)
+    @Operation(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
     fun kompletteRegler(@RequestBody brukerId: String,request: HttpServletRequest) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KOMPLETT_REGELTYPE,request.requestURI)
 
     @PostMapping("/ccf/komplett/{ansattId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
-    @Operation(summary = SUMMARY_KOMPLETT_CCF)
+    @Operation(summary = SUMMARY_KOMPLETT_CCF, description = DESCRIPTION_KOMPLETT_CCF)
     fun kompletteReglerCCF(@PathVariable ansattId: AnsattId,@RequestBody brukerId: String,request: HttpServletRequest) = enkeltOppslag({ansattId}, {token.erCC}, brukerId, KOMPLETT_REGELTYPE, request.requestURI)
 
     @PostMapping("kjerne")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
-    @Operation(summary = SUMMARY_KJERNE_OBO)
+    @Operation(summary = SUMMARY_KJERNE_OBO, description = DESCRIPTION_KJERNE_OBO)
     fun kjerneregler(@RequestBody brukerId: String, request: HttpServletRequest) = enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KJERNE_REGELTYPE, request.requestURI)
 
 
     @PostMapping("/ccf/kjerne/{ansattId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
-    @Operation(summary = SUMMARY_KOMPLETT_CCF)
+    @Operation(summary = SUMMARY_KJERNE_CCF, description = DESCRIPTION_KJERNE_CCF)
     fun kjerneReglerCCF(@PathVariable ansattId: AnsattId,@RequestBody brukerId: String,request: HttpServletRequest) = enkeltOppslag({ansattId}, {token.erCC}, brukerId, KJERNE_REGELTYPE,request.requestURI)
 
 
@@ -152,21 +152,31 @@ class TilgangController(
     }
 
     companion object {
-        const val SUMMARY_KOMPLETT_OBO =
+        private const val SUMMARY_KOMPLETT_OBO =
             "msg:openapi.tilgang.komplett.obo.summary"
-        const val SUMMARY_KOMPLETT_CCF =
+        private const val DESCRIPTION_KOMPLETT_OBO =
+            "msg:openapi.tilgang.komplett.obo.description"
+        private const val SUMMARY_KOMPLETT_CCF =
             "msg:openapi.tilgang.komplett.ccf.summary"
-        const val SUMMARY_KJERNE_OBO =
+        private const val DESCRIPTION_KOMPLETT_CCF =
+            "msg:openapi.tilgang.komplett.ccf.description"
+        private const val SUMMARY_KJERNE_OBO =
             "msg:openapi.tilgang.kjerne.obo.summary"
-        const val SUMMARY_OVERSTYR =
+        private const val SUMMARY_KJERNE_CCF =
+            "msg:openapi.tilgang.kjerne.ccf.summary"
+        private const val DESCRIPTION_KJERNE_OBO =
+            "msg:openapi.tilgang.kjerne.obo.description"
+        private const val DESCRIPTION_KJERNE_CCF =
+            "msg:openapi.tilgang.kjerne.ccf.description"
+        private const val SUMMARY_OVERSTYR =
             "msg:openapi.tilgang.overstyr.summary"
-        const val DESCRIPTION_OVERSTYR =
+        private const val DESCRIPTION_OVERSTYR =
             "msg:openapi.tilgang.overstyr.description"
-        const val SUMMARY_BULK = "msg:openapi.tilgang.bulk.summary"
-        const val DESCRIPTION_BULK_OBO =
+        private const val SUMMARY_BULK = "msg:openapi.tilgang.bulk.summary"
+        private const val DESCRIPTION_BULK_OBO =
             "msg:openapi.tilgang.bulk.obo.description"
-        const val DESCRIPTION_BULK_OBO_REGELTYPE = "msg:openapi.tilgang.bulk.obo.regeltype.description"
-        const val DESCRIPTION_BULK_CCF = "msg:openapi.tilgang.bulk.ccf.description"
-        const val DESCRIPTION_BULK_CCF_REGELTYPE = "msg:openapi.tilgang.bulk.ccf.regeltype.description"
+        private const val DESCRIPTION_BULK_OBO_REGELTYPE = "msg:openapi.tilgang.bulk.obo.regeltype.description"
+        private const val DESCRIPTION_BULK_CCF = "msg:openapi.tilgang.bulk.ccf.description"
+        private const val DESCRIPTION_BULK_CCF_REGELTYPE = "msg:openapi.tilgang.bulk.ccf.regeltype.description"
     }
 }

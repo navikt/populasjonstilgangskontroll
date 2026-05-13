@@ -44,7 +44,7 @@ class OverstyringTjeneste(
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId) =
         gjeldendeOverstyring(ansattId, brukerId)
             ?.also {
-                log.trace("Overstyring er gyldig i {} til for {} og {}", it.diffFromNow(), ansattId, brukerId.maskert())
+                log.trace("Overstyring er gyldig i {} til for {} og {}", it.diffFromNow(), ansattId, brukerId)
             } != null
 
 
@@ -59,7 +59,7 @@ class OverstyringTjeneste(
             val enhet = enhetFor(ansattId)
             adapter.overstyr(ansattId.verdi, enhet, data).also {
                 teller.tell(INGEN_REGEL_TAG,OVERSTYRT)
-                log.info("Overstyring til og med ${data.gyldigtil} ble registrert for $ansattId og ${data.brukerId.maskert()}")
+                log.info("Overstyring til og med ${data.gyldigtil} ble registrert for $ansattId og ${data.brukerId}")
             }
             true
         }.getOrElse {
@@ -71,11 +71,11 @@ class OverstyringTjeneste(
             is RegelException -> throw RegelException(OVERSTYRING_MESSAGE_CODE,
                 arrayOf(t.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
                 e = t).also {
-                log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId.maskert()}", it)
+                log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}", it)
                 teller.tell(regelTag(t.regel),IKKE_OVERSTYRT,tokenSystemTag(UTILGJENGELIG))
             }
             is OverstyringException -> throw t.also {
-                log.warn("Overstyring feilet pga klientvalidering ${t.message} for $ansattId og ${data.brukerId.maskert()}", it)
+                log.warn("Overstyring feilet pga klientvalidering ${t.message} for $ansattId og ${data.brukerId}", it)
                 teller.tell(INGEN_REGEL_TAG,IKKE_OVERSTYRT,tokenSystemTag(t.system))
             }
             else -> throw t

@@ -1,103 +1,128 @@
 package no.nav.tilgangsmaskin.felles.utils.extensions
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.upcase
 
-class DomainExtensionsTest : DescribeSpec({
+class DomainExtensionsTest : BehaviorSpec({
 
-    describe("requireDigits") {
+    Given("requireDigits") {
 
-        it("godtar streng med kun siffer og riktig lengde") {
-            requireDigits("08526835670", 11)
-        }
-
-        it("kaster ved bokstav i strengen") {
-            shouldThrow<IllegalArgumentException> {
-                requireDigits("0852683567a", 11)
+        When("strengen har kun siffer og riktig lengde") {
+            Then("kaster ikke") {
+                requireDigits("08526835670", 11)
             }
         }
 
-        it("kaster ved spesialtegn i strengen") {
-            shouldThrow<IllegalArgumentException> {
-                requireDigits("0852683567-", 11)
+        When("strengen inneholder en bokstav") {
+            Then("kaster IllegalArgumentException") {
+                shouldThrow<IllegalArgumentException> { requireDigits("0852683567a", 11) }
             }
         }
 
-        it("kaster ved for kort streng") {
-            shouldThrow<IllegalArgumentException> {
-                requireDigits("0852683567", 11)
+        When("strengen inneholder spesialtegn") {
+            Then("kaster IllegalArgumentException") {
+                shouldThrow<IllegalArgumentException> { requireDigits("0852683567-", 11) }
             }
         }
 
-        it("kaster ved for lang streng") {
-            shouldThrow<IllegalArgumentException> {
-                requireDigits("085268356701", 11)
+        When("strengen er for kort") {
+            Then("kaster IllegalArgumentException") {
+                shouldThrow<IllegalArgumentException> { requireDigits("0852683567", 11) }
             }
         }
 
-        it("kaster ved tom streng") {
-            shouldThrow<IllegalArgumentException> {
-                requireDigits("", 11)
+        When("strengen er for lang") {
+            Then("kaster IllegalArgumentException") {
+                shouldThrow<IllegalArgumentException> { requireDigits("085268356701", 11) }
             }
         }
 
-        it("godtar 13-sifret aktørId") {
-            requireDigits("1234567890123", 13)
+        When("strengen er tom") {
+            Then("kaster IllegalArgumentException") {
+                shouldThrow<IllegalArgumentException> { requireDigits("", 11) }
+            }
+        }
+
+        When("strengen er gyldig 13-sifret aktørId") {
+            Then("kaster ikke") {
+                requireDigits("1234567890123", 13)
+            }
         }
     }
 
-    describe("maskFnr") {
+    Given("maskFnr") {
 
-        it("maskerer 11-sifret fnr fra posisjon 4") {
-            "08526835670".maskFnr() shouldBe "0852*******"
+        When("strengen er et 11-sifret fnr") {
+            Then("maskeres fra posisjon 4") {
+                "08526835670".maskFnr() shouldBe "0852*******"
+            }
         }
 
-        it("maskerer 13-sifret aktørId fra posisjon 6") {
-            "1234567890123".maskFnr() shouldBe "123456*******"
+        When("strengen er et 13-sifret aktørId") {
+            Then("maskeres fra posisjon 6") {
+                "1234567890123".maskFnr() shouldBe "123456*******"
+            }
         }
 
-        it("returnerer kort streng uendret") {
-            "Z999999".maskFnr() shouldBe "Z999999"
+        When("strengen er kortere enn forventet") {
+            Then("returneres uendret") {
+                "Z999999".maskFnr() shouldBe "Z999999"
+            }
         }
 
-        it("returnerer tom streng uendret") {
-            "".maskFnr() shouldBe ""
+        When("strengen er tom") {
+            Then("returneres uendret") {
+                "".maskFnr() shouldBe ""
+            }
         }
 
-        it("returnerer streng med annen lengde uendret") {
-            "12345".maskFnr() shouldBe "12345"
+        When("strengen har annen lengde") {
+            Then("returneres uendret") {
+                "12345".maskFnr() shouldBe "12345"
+            }
         }
 
-        it("maskert fnr har alltid 11 tegn totalt") {
-            "08526835670".maskFnr().length shouldBe 11
+        When("fnr maskeres") {
+            Then("har alltid 11 tegn totalt") {
+                "08526835670".maskFnr().length shouldBe 11
+            }
         }
 
-        it("maskert aktørId har alltid 13 tegn totalt") {
-            "1234567890123".maskFnr().length shouldBe 13
+        When("aktørId maskeres") {
+            Then("har alltid 13 tegn totalt") {
+                "1234567890123".maskFnr().length shouldBe 13
+            }
         }
     }
 
-    describe("upcase") {
+    Given("upcase") {
 
-        it("gjør første bokstav stor") {
-            "hello".upcase() shouldBe "Hello"
+        When("strengen starter med liten bokstav") {
+            Then("gjør første bokstav stor") {
+                "hello".upcase() shouldBe "Hello"
+            }
         }
 
-        it("endrer ikke resten av strengen") {
-            "hELLO".upcase() shouldBe "HELLO"
+        When("resten av strengen er store bokstaver") {
+            Then("endres ikke") {
+                "hELLO".upcase() shouldBe "HELLO"
+            }
         }
 
-        it("håndterer allerede stor forbokstav") {
-            "Hello".upcase() shouldBe "Hello"
+        When("første bokstav allerede er stor") {
+            Then("returneres uendret") {
+                "Hello".upcase() shouldBe "Hello"
+            }
         }
 
-        it("håndterer tom streng") {
-            "".upcase() shouldBe ""
+        When("strengen er tom") {
+            Then("returneres uendret") {
+                "".upcase() shouldBe ""
+            }
         }
     }
 })
-

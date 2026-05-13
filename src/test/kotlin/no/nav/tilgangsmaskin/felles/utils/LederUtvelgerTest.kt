@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.felles.utils
 
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearMocks
 import io.mockk.mockk
@@ -21,7 +21,7 @@ import java.net.URI
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicInteger
 
-class LederUtvelgerTest : DescribeSpec({
+class LederUtvelgerTest : BehaviorSpec({
 
     val publisher = mockk<ApplicationEventPublisher>(relaxed = true)
 
@@ -46,97 +46,95 @@ class LederUtvelgerTest : DescribeSpec({
         )
     }
 
-    beforeEach {
-        clearMocks(publisher)
-    }
+    beforeEach { clearMocks(publisher) }
 
-    describe("onApplicationReady") {
+    Given("onApplicationReady") {
 
-        it("publiserer LeaderChangedEvent med riktig leder-navn") {
-            val utvelger = lederUtvelger(sseBody("pod-abc-123"))
-
-            utvelger.onApplicationReady()
-            Thread.sleep(500)
-
-            val event = slot<LeaderChangedEvent>()
-            verify { publisher.publishEvent(capture(event)) }
-            event.captured.leder shouldBe "pod-abc-123"
-        }
-
-        it("publiserer LeaderChangedEvent for hvert SSE-event") {
-            val utvelger = lederUtvelger(sseBody("pod-1", "pod-2", "pod-3"))
-
-            utvelger.onApplicationReady()
-            Thread.sleep(500)
-
-            verify(exactly = 3) { publisher.publishEvent(any<LeaderChangedEvent>()) }
-        }
-
-        it("publiserer ikke event ved tom SSE-strøm") {
-            val utvelger = lederUtvelger("")
-
-            utvelger.onApplicationReady()
-            Thread.sleep(500)
-
-            verify(exactly = 0) { publisher.publishEvent(any<LeaderChangedEvent>()) }
-        }
-    }
-
-    describe("onPreDestroy") {
-
-        it("setter shuttingDown og disposer subscription") {
-            val utvelger = lederUtvelger("")
-            utvelger.onApplicationReady()
-            Thread.sleep(100)
-
-            utvelger.onPreDestroy()
-            Thread.sleep(200)
-
-            verify(exactly = 0) { publisher.publishEvent(any<LeaderChangedEvent>()) }
-        }
-    }
-
-    describe("onShutdown") {
-
-        it("setter shuttingDown og disposer subscription") {
-            val utvelger = lederUtvelger("")
-            utvelger.onApplicationReady()
-            Thread.sleep(100)
-
-            utvelger.onShutdown()
-            Thread.sleep(200)
-
-            verify(exactly = 0) { publisher.publishEvent(any<LeaderChangedEvent>()) }
-        }
-    }
-
-    describe("shuttingDown filter i retryWhen") {
-
-        it("hindrer retry av WebClientRequestException når shuttingDown er true") {
-            val callCount = AtomicInteger(0)
-            val failingExchange = ExchangeFunction { _ ->
-                callCount.incrementAndGet()
-                Mono.error(
-                    WebClientRequestException(
-                        RuntimeException("connection refused"),
-                        GET,
-                        URI.create("http://elector/sse"),
-                        HttpHeaders()
-                    )
-                )
+        When("SSE-stream inneholder ett event") {
+            Then("publiserer LeaderChangedEvent med riktig leder-navn") {
+                val utvelger = lederUtvelger(sseBody("pod-abc-123"))
+                utvelger.onApplicationReady()
+                Thread.sleep(500)
+                val event = slot<LeaderChangedEvent>()
+                verify { publisher.publishEvent(capture(event)) }
+                event.captured.leder shouldBe "pod-abc-123"
             }
-            val utvelger = LederUtvelger(
-                WebClient.builder().exchangeFunction(failingExchange),
-                URI.create("http://elector/sse"),
-                publisher
-            )
+        }
 
-            utvelger.onPreDestroy()       // shuttingDown = true before any retry
-            utvelger.onApplicationReady() // exchange is called once, filter returns false → no retry
-            Thread.sleep(200)
+        When("SSE-stream inneholder flere events") {
+            Then("publiserer LeaderChangedEvent for hvert event") {
+                val utvelger = lederUtvelger(sseBody("pod-1", "pod-2", "pod-3"))
+                utvelger.onApplicationReady()
+                Thread.sleep(500)
+                verify(exactly = 3) { publisher.publishEvent(any<LeaderChangedEvent>()) }
+            }
+        }
 
-            callCount.get() shouldBe 1
-            verify(exactly = 0) { publisher.publishEvent(any<LeaderChangedEvent>()) }
+        When("SSE-stream er tom") {
+            Then("publiserer ikke noe event") {
+                val utvelger = lederUtvelger("")
+                utvelger.onApplicationReady()
+                Thread.sleep(500)
+                verify(exactly = 0) { publisher.publishEvent(any<LeaderChangedEvent>()) }
+            }
+        }
+    }
+
+    Given("onPreDestroy") {
+
+        When("kalt etter onApplicationReady") {
+            Then("setter shuttingDown og disposer subscription") {
+                val utvelger = lederUtvelger("")
+                utvelger.onApplicationReady()
+                Thread.sleep(100)
+                utvelger.onPreDestroy()
+                Thread.sleep(200)
+                verify(exactly = 0) { publisher.publishEvent(any<LeaderChangedEvent>()) }
+            }
+        }
+    }
+
+    Given("onShutdown") {
+
+        When("kalt etter onApplicationReady") {
+            Then("setter shuttingDown og disposer subscription") {
+                val utvelger = lederUtvelger("")
+                utvelger.onApplicationReady()
+                Thread.sleep(100)
+                utvelger.onShutdown()
+                Thread.sleep(200)
+                verify(exactly = 0) { publisher.publishEvent(any<LeaderChangedEvent>()) }
+            }
+        }
+    }
+
+    Given("shuttingDown filter i retryWhen") {
+
+        When("shuttingDown er true og WebClientRequestException kastes") {
+            Then("hindrer retry og kaller exchange kun én gang") {
+                val callCount = AtomicInteger(0)
+                val failingExchange = ExchangeFunction { _ ->
+                    callCount.incrementAndGet()
+                    Mono.error(
+                        WebClientRequestException(
+                            RuntimeException("connection refused"),
+                            GET,
+                            URI.create("http://elector/sse"),
+                            HttpHeaders()
+                        )
+                    )
+                }
+                val utvelger = LederUtvelger(
+                    WebClient.builder().exchangeFunction(failingExchange),
+                    URI.create("http://elector/sse"),
+                    publisher
+                )
+                utvelger.onPreDestroy()
+                utvelger.onApplicationReady()
+                Thread.sleep(200)
+                callCount.get() shouldBe 1
+                verify(exactly = 0) { publisher.publishEvent(any<LeaderChangedEvent>()) }
+            }
         }
     }
 })

@@ -48,8 +48,19 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     private interface IgnoreUnknownMixin
 
     @Bean
-    fun messageSource(): MessageSource = ReloadableResourceBundleMessageSource().apply {
-        setBasenames("classpath:messages", "classpath:openapi-messages")
+    fun messageSource() =
+        ReloadableResourceBundleMessageSource().apply {
+        setBasenames(
+            "classpath:messages",
+            "classpath:openapi-messages",
+            "classpath:openapi-dev-ansatt",
+            "classpath:openapi-dev-bruker",
+            "classpath:openapi-dev-cache",
+            "classpath:openapi-dev-regel",
+            "classpath:openapi-dev-skjerming",
+            "classpath:openapi-dev-tilgang",
+            "classpath:openapi-dev-vergemal",
+        )
         setDefaultEncoding("UTF-8")
     }
 

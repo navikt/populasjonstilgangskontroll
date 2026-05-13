@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.felles.rest
 
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpRequest
-import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
@@ -13,7 +13,7 @@ class RestDefaultErrorHandler : ErrorHandler {
         val ident = req.headers.getFirst(IDENTIFIKATOR)
 
         when {
-            res.statusCode == HttpStatus.NOT_FOUND -> {
+            res.statusCode == NOT_FOUND -> {
                 log.info("Not found exception etter ${res.statusCode.value()} fra ${req.uri}")
                 throw NotFoundRestException(req.uri, ident)
             }

@@ -5,7 +5,7 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration
 import tools.jackson.databind.json.JsonMapper
 import kotlin.reflect.KClass
 
-class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration?>, val mapper: JsonMapper = VALKEY_MAPPER) {
+class CacheNøkkelMapper(val configs: Map<String, RedisCacheConfiguration?>, val mapper: JsonMapper = VALKEY_MAPPER) {
 
 
     fun <T : Any> fraJson(json: String, clazz: KClass<T>): T =
@@ -20,7 +20,8 @@ class CacheNøkkelHandler(val configs: Map<String, RedisCacheConfiguration?>, va
         return "$prefix$extra$nøkkel"
     }
 
-    fun idFraNøkkel(nøkkel: String) = CacheNøkkel(nøkkel).id
+    fun idFraNøkkel(nøkkel: String) =
+        CacheNøkkel(nøkkel).id
 
     private fun prefixFor(cache: CachableConfig): String =
         configs[cache.name]?.getKeyPrefixFor(cache.name)

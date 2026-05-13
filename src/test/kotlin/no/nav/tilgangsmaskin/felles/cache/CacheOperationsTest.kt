@@ -84,10 +84,10 @@ class CacheOperationsTest : BehaviorSpec() {
 
         @Bean
         fun cacheNøkkelHandler(mgr: RedisCacheManager) =
-            CacheNøkkelHandler(mgr.cacheConfigurations)
+            CacheNøkkelMapper(mgr.cacheConfigurations)
 
         @Bean
-        fun cacheClient(client: RedisClient, handler: CacheNøkkelHandler, cfg: CacheConfig)  =
+        fun cacheClient(client: RedisClient, handler: CacheNøkkelMapper, cfg: CacheConfig)  =
             CacheClient(client, handler, BulkCacheSuksessTeller(meterRegistry, token), BulkCacheTeller(meterRegistry, token), cfg)
 
         @Bean

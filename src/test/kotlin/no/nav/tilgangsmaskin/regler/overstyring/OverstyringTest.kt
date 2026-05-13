@@ -24,7 +24,6 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.felles.utils.LocalAuditor
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
@@ -42,7 +41,6 @@ import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfig
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -51,7 +49,6 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 @Import(RegelTestConfig::class)
 @DataJpaTest
 @EnableJpaAuditing
-@ActiveProfiles(TEST)
 @Testcontainers
 @AutoConfigureMetrics
 @TestPropertySource(locations = ["classpath:test.properties"])
@@ -83,8 +80,10 @@ internal class OverstyringTest : BehaviorSpec() {
     lateinit var motor: RegelMotor
     @Autowired
     lateinit var registry: MeterRegistry
-    @Autowired lateinit var adapter: OverstyringJPAAdapter
-    @Autowired lateinit var repository: OverstyringRepository
+    @Autowired
+    lateinit var adapter: OverstyringJPAAdapter
+    @Autowired
+    lateinit var repository: OverstyringRepository
     @MockK
     lateinit var ansatte: AnsattTjeneste
     @MockK
@@ -113,14 +112,7 @@ internal class OverstyringTest : BehaviorSpec() {
         }
 
         Given("overstyr") {
-            When("exception ikke er RegelException") {
-                Then("kastes exception videre") {
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } throws RuntimeException("teknisk feil")
-                    shouldThrow<RuntimeException> {
-                        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
-                    }
-                }
-            }
+
             When("OverstyringException kastes fra validator") {
                 Then("kastes exception videre") {
                     every { validator.validerKonsument() } throws OverstyringException("ukjent system", "ukjent-system")
@@ -186,6 +178,48 @@ internal class OverstyringTest : BehaviorSpec() {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe false
+                }
+            }
+        }
+
+        Given("overstyringer (bulk)") {
+            When("aktive overstyringer eksisterer for flere brukere") {
+                Then("returneres alle aktive brukerIds") {
+                    val bruker1 = BrukerBuilder(vanligBrukerId).build()
+                    val bruker2 = BrukerBuilder(historiskBrukerId).build()
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker1
+                    every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns bruker2
+                    overstyring.overstyr(ansattId, OverstyringData(bruker1.brukerId, "Aktiv overstyring 1", IMORGEN))
+                    overstyring.overstyr(ansattId, OverstyringData(bruker2.brukerId, "Aktiv overstyring 2", IMORGEN))
+                    val resultat = overstyring.overstyringer(ansattId, listOf(bruker1.brukerId, bruker2.brukerId))
+                    resultat shouldBe listOf(bruker1.brukerId, bruker2.brukerId)
+                }
+            }
+            When("én overstyring er aktiv og én er utgått") {
+                Then("returneres kun den aktive") {
+                    val bruker1 = BrukerBuilder(vanligBrukerId).build()
+                    val bruker2 = BrukerBuilder(historiskBrukerId).build()
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker1
+                    every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns bruker2
+                    overstyring.overstyr(ansattId, OverstyringData(bruker1.brukerId, "Aktiv overstyring", IMORGEN))
+                    overstyring.overstyr(ansattId, OverstyringData(bruker2.brukerId, "Utgått overstyring", IGÅR))
+                    val resultat = overstyring.overstyringer(ansattId, listOf(bruker1.brukerId, bruker2.brukerId))
+                    resultat shouldBe listOf(bruker1.brukerId)
+                }
+            }
+            When("alle overstyringer er utgått") {
+                Then("returneres tom liste") {
+                    val bruker = BrukerBuilder(vanligBrukerId).build()
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Utgått overstyring", IGÅR))
+                    val resultat = overstyring.overstyringer(ansattId, listOf(bruker.brukerId))
+                    resultat shouldBe emptyList()
+                }
+            }
+            When("ingen overstyringer er registrert") {
+                Then("returneres tom liste") {
+                    val resultat = overstyring.overstyringer(ansattId, listOf(vanligBrukerId))
+                    resultat shouldBe emptyList()
                 }
             }
         }

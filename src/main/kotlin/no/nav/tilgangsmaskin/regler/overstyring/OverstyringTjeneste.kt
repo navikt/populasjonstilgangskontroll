@@ -41,10 +41,7 @@ class OverstyringTjeneste(
     private val log = getLogger(javaClass)
 
     fun overstyringer(ansattId: AnsattId, brukerIds: List<BrukerId>) =
-        adapter.gjeldendeOverstyringer(ansattId.verdi,brukerIds.map { it.verdi }).associate { it.first to it.second }.filter {
-            erOverstyrt(ansattId,it.key,it.value)
-        }
-            .map { it.key }
+        adapter.gjeldendeOverstyringer(ansattId.verdi, brukerIds.map { it.verdi })
 
     fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId): Boolean {
         log.info("Sjekker eventuell overstyring for $ansattId og ${brukerId.verdi.maskFnr()}")

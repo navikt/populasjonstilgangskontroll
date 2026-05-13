@@ -12,6 +12,7 @@ import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.boot.actuate.endpoint.SanitizingFunction
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
 import org.springframework.boot.restclient.RestClientCustomizer
+import org.springframework.context.MessageSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
@@ -47,8 +48,9 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     private interface IgnoreUnknownMixin
 
     @Bean
-    fun errorMessageSource() = ReloadableResourceBundleMessageSource().apply {
-        setBasename("classpath:messages")
+    fun messageSource(): MessageSource = ReloadableResourceBundleMessageSource().apply {
+        setBasenames("classpath:messages", "classpath:openapi-messages")
+        setDefaultEncoding("UTF-8")
     }
 
     @Bean

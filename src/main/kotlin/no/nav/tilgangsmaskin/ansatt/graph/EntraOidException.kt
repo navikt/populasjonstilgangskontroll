@@ -10,5 +10,4 @@ class EntraOidException(ansattId: String, msg: String) : ErrorResponseException(
         body.detail = msg
         body.properties = mapOf("navIdent" to ansattId,"traceId" to Span.current().spanContext.traceId)
     }
-
 }

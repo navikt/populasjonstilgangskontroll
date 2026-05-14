@@ -49,7 +49,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
     beforeEach {
         clearAllMocks()
-        every { oidTjeneste.oidFraEntra(ansattId) } returns oid
+        every { oidTjeneste.oid(ansattId) } returns oid
     }
 
     Given("CC-flow") {

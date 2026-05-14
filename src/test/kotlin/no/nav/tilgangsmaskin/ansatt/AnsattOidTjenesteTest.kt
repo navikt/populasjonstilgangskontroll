@@ -9,12 +9,12 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.verify
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste.Companion.ENTRA_OID
-import no.nav.tilgangsmaskin.ansatt.AnsattOidTjenesteTest.TestConfig
+import no.nav.tilgangsmaskin.ansatt.AnsattOidTjenesteTest.EntraTestConfig
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.graph.EntraClient
-import no.nav.tilgangsmaskin.ansatt.graph.EntraClient.UserResponse
-import no.nav.tilgangsmaskin.ansatt.graph.EntraClient.UserResponse.OidEntry
+import no.nav.tilgangsmaskin.ansatt.graph.EntraOidRespons
+import no.nav.tilgangsmaskin.ansatt.graph.EntraOidRespons.EntraOid
 import no.nav.tilgangsmaskin.ansatt.graph.EntraOidException
 import no.nav.tilgangsmaskin.ansatt.graph.EntraRestClientAdapter
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,22 +25,25 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.web.client.RestClient
 import java.util.UUID
 
-@SpringJUnitConfig(classes = [EntraRestClientAdapter::class, AnsattOidTjeneste::class, EntraConfig::class])
-@Import(TestConfig::class)
+@ContextConfiguration(classes = [EntraRestClientAdapter::class, AnsattOidTjeneste::class, EntraConfig::class])
+@Import(EntraTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class AnsattOidTjenesteTest : BehaviorSpec() {
 
     @TestConfiguration
     @EnableCaching(proxyTargetClass = true)
-    class TestConfig {
-        @Bean fun cacheManager() =
+    class EntraTestConfig {
+        @Bean
+        fun cacheManager() =
             ConcurrentMapCacheManager(ENTRA_OID)
 
-        @Bean @Qualifier(GRAPH)
+
+        @Bean
+        @Qualifier(GRAPH)
         fun graphRestClient() = RestClient.builder().build()
     }
 
@@ -63,41 +66,41 @@ class AnsattOidTjenesteTest : BehaviorSpec() {
         Given("oidFraEntra") {
             When("ansatt har én oid i Entra") {
                 Then("returneres oid") {
-                    every { entraClient.findUser(filter, "id") } returns
-                        UserResponse(setOf(OidEntry(oid)))
+                    every { entraClient.oid(filter) } returns
+                        EntraOidRespons(setOf(EntraOid(oid)))
 
-                    tjeneste.oidFraEntra(ansattId) shouldBe oid
+                    tjeneste.oid(ansattId) shouldBe oid
                 }
             }
 
             When("samme ansatt slås opp to ganger") {
                 Then("REST kalles kun én gang — andre svar returneres fra cache") {
-                    every { entraClient.findUser(filter, "id") } returns
-                        UserResponse(setOf(OidEntry(oid)))
+                    every { entraClient.oid(filter) } returns
+                        EntraOidRespons(setOf(EntraOid(oid)))
 
-                    tjeneste.oidFraEntra(ansattId) shouldBe oid
-                    tjeneste.oidFraEntra(ansattId) shouldBe oid
+                    tjeneste.oid(ansattId) shouldBe oid
+                    tjeneste.oid(ansattId) shouldBe oid
 
-                    verify { entraClient.findUser(filter, "id") }
+                    verify { entraClient.oid(filter, "id") }
                 }
             }
 
             When("ingen oid finnes i Entra") {
                 Then("kastes EntraOidException") {
-                    every { entraClient.findUser(filter, "id") } returns
-                        UserResponse(emptySet())
+                    every { entraClient.oid(filter) } returns
+                        EntraOidRespons(emptySet())
 
-                    shouldThrow<EntraOidException> { tjeneste.oidFraEntra(ansattId) }
+                    shouldThrow<EntraOidException> { tjeneste.oid(ansattId) }
                 }
             }
 
             When("flere oids finnes for samme ansatt") {
                 Then("kastes EntraOidException") {
                     val oid2 = UUID.fromString("22222222-2222-2222-2222-222222222222")
-                    every { entraClient.findUser(filter, "id") } returns
-                        UserResponse(setOf(OidEntry(oid), OidEntry(oid2)))
+                    every { entraClient.oid(filter) } returns
+                        EntraOidRespons(setOf(EntraOid(oid), EntraOid(oid2)))
 
-                    shouldThrow<EntraOidException> { tjeneste.oidFraEntra(ansattId) }
+                    shouldThrow<EntraOidException> { tjeneste.oid(ansattId) }
                 }
             }
         }

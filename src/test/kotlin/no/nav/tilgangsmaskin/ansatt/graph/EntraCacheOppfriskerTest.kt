@@ -43,7 +43,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
     init {
         beforeEach {
             clearMocks(entra, oid, cache, teller)
-            every { oid.oidFraEntra(ansattId) } returns OID
+            every { oid.oid(ansattId) } returns OID
         }
 
         Given("cache-innslag går ut på tid") {
@@ -66,14 +66,14 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
 
             When("ansatt ikke finnes i Entra") {
                 beforeEach {
-                    every { oid.oidFraEntra(ansattId) } returnsMany listOf(OID, NY_OID)
+                    every { oid.oid(ansattId) } returnsMany listOf(OID, NY_OID)
                     every { entra.geoGrupper(ansattId, OID) } throws NotFoundRestException(URI.create("http://entra"))
                 }
 
                 Then("sletter OID-cache og henter ny OID") {
                     oppfrisker.oppfrisk(nøkkel("geoGrupper"))
                     verify { cache.delete(OID_CACHE, ansattId.verdi) }
-                    verify(exactly = 2) { oid.oidFraEntra(ansattId) }
+                    verify(exactly = 2) { oid.oid(ansattId) }
                 }
 
                 Then("kaller oppfrisk pa nytt med ny OID") {
@@ -111,7 +111,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
 
             When("NotFoundRestException kastes") {
                 Then("sletter OID-cache, henter ny OID og kaller oppfrisk pa nytt") {
-                    every { oid.oidFraEntra(ansattId) } returnsMany listOf(OID, NY_OID)
+                    every { oid.oid(ansattId) } returnsMany listOf(OID, NY_OID)
                     every { entra.geoOgGlobaleGrupper(ansattId, OID) } throws NotFoundRestException(URI.create("http://entra"))
 
                     oppfrisker.oppfrisk(nøkkel("geoOgGlobaleGrupper"))

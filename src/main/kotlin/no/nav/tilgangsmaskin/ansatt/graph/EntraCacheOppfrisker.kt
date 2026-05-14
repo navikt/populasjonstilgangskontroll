@@ -24,7 +24,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
     override fun doOppfrisk(nøkkel: CacheNøkkel) {
         val ansattId = AnsattId(nøkkel.id)
         put(USER_ID, ansattId.verdi)
-        val oid = oidTjeneste.oidFraEntra(ansattId)
+        val oid = oidTjeneste.oid(ansattId)
         this.runCatching {
             oppfriskFor(ansattId, oid, nøkkel.metode)
         }.getOrElse {
@@ -39,7 +39,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
     private fun tømOgOppfrisk(ansattId: AnsattId, oid: UUID, metode: String?) {
         log.warn("${ansattId.verdi} med oid $oid ikke funnet i Entra, sletter og oppfrisker cache-innslag")
         cache.delete(OID_CACHE, ansattId.verdi)
-        with(oidTjeneste.oidFraEntra(ansattId)) {
+        with(oidTjeneste.oid(ansattId)) {
             log.info("Oppfrisking av oid OK for ${ansattId.verdi}, ny verdi er $this")
             oppfriskFor(ansattId, this, metode)
         }

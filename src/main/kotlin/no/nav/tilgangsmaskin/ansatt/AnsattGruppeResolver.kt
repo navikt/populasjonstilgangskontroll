@@ -24,7 +24,7 @@ class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: 
         }
 
     private fun grupperForCC(ansattId: AnsattId) =
-        entra.geoOgGlobaleGrupper(ansattId, oid.oidFraEntra(ansattId)).also {
+        entra.geoOgGlobaleGrupper(ansattId, oid.oid(ansattId)).also {
             log.trace("CC-flow: {} slo opp globale og GEO-grupper i Entra", ansattId)
         }
 
@@ -44,7 +44,7 @@ class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: 
             throw HttpClientErrorException(UNAUTHORIZED, "Autentisering påkrevet i produksjonsmiljøet", HttpHeaders(), null, null)
         } else {
             log.info("Intet token i dev/local for $ansattId, slår opp globale og GEO-grupper i Entra")
-            entra.geoOgGlobaleGrupper(ansattId, oid.oidFraEntra(ansattId)).also {
+            entra.geoOgGlobaleGrupper(ansattId, oid.oid(ansattId)).also {
                 log.trace("Uautentisert i dev: {} slo opp {} i Entra for {}", ansattId, it, ansattId)
             }
         }

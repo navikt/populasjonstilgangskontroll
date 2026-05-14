@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.transaction.annotation.Transactional
 
@@ -27,6 +28,7 @@ class NomTjeneste(private val adapter: NomJPAAdapter) {
         if (it > 0) log.info("Vaktmester gjernet informasjon om $it  ansatte som ikke lenger er ansatt i Nav")
     }
 
+    @CacheEvict(cacheNames = [NOM], key = "#nomAnsattData.ansattId.verdi")
     @WithSpan
     fun lagre(nomAnsattData: NomAnsattData) =
         adapter.upsert(nomAnsattData)

@@ -49,19 +49,27 @@ class NomTjenesteTest : BehaviorSpec() {
     @Configuration
     class NomTestConfig {
         @Bean
-        fun cacheManager(): CacheManager = ConcurrentMapCacheManager(NOM)
+        fun cacheManager() =
+            ConcurrentMapCacheManager(NOM)
 
         @Bean
-        fun cacheOperations(cacheManager: CacheManager): CacheOperations = ConcurrentMapCacheOperations(cacheManager)
+        fun cacheOperations(cacheManager: CacheManager) = ConcurrentMapCacheOperations(cacheManager)
     }
 
-    @MockkBean private lateinit var token: Token
+    @MockkBean
+    private lateinit var token: Token
 
-    @Autowired private lateinit var tjeneste: NomTjeneste
-    @Autowired private lateinit var repo: NomRepository
-    @Autowired private lateinit var cacheManager: CacheManager
-    @Autowired @Qualifier("cacheOperations") private lateinit var cache: CacheOperations
-    @MockkSpyBean private lateinit var adapter: NomJPAAdapter
+    @Autowired
+    private lateinit var tjeneste: NomTjeneste
+    @Autowired
+    private lateinit var repo: NomRepository
+    @Autowired
+    private lateinit var cacheManager: CacheManager
+    @Autowired
+    @Qualifier("cacheOperations")
+    private lateinit var cache: CacheOperations
+    @MockkSpyBean
+    private lateinit var adapter: NomJPAAdapter
 
     private val ansattId = AnsattId("Z999999")
     private val brukerId = BrukerId("08526835670")

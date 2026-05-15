@@ -13,6 +13,7 @@ val coroutinesVersion = "1.9.0"
 val poolsVersion = "2.13.1"
 val springMockkVersion = "5.0.1"
 val confluentVersion = "8.2.0"
+val nettyVersion = "4.2.13.Final"
 
 
 group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
@@ -115,6 +116,9 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:$otelVersion")
+    }
+    dependencies {
+        dependency("io.netty:netty-transport-native-epoll:$nettyVersion")
     }
 }
 

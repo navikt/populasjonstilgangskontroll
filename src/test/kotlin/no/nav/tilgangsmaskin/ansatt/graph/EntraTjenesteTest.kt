@@ -9,12 +9,10 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.setIDs
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.entries
-import no.nav.tilgangsmaskin.ansatt.graph.EntraBeanConfig.Companion.HEADER_CONSISTENCY_LEVEL
 import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjenesteTest.EntraTestConfig
-import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
+import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.cache.CacheManager
@@ -29,10 +27,9 @@ import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
-import org.springframework.web.client.RestClient.Builder
 import java.util.*
 
-@RestClientTest(components = [EntraRestClientAdapter::class, EntraTjeneste::class, EntraConfig::class])
+@RestClientTest(components = [EntraRestClientAdapter::class, EntraTjeneste::class, EntraConfig::class, EntraBeanConfig::class])
 @Import(EntraTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class EntraTjenesteTest : BehaviorSpec() {
@@ -45,12 +42,8 @@ class EntraTjenesteTest : BehaviorSpec() {
         fun cacheManager() =
             ConcurrentMapCacheManager(GRAPH)
 
-        @Bean @Qualifier(GRAPH)
-        fun graphRestClient(b: Builder, cfg: EntraConfig) =
-            b.baseUrl(cfg.baseUri)
-                .requestInterceptors {
-                    it.add(RestHeaderAddingRequestInterceptor(HEADER_CONSISTENCY_LEVEL))
-                }.build()
+        @Bean
+        fun cacheOperations(cacheManager: CacheManager) = ConcurrentMapCacheOperations(cacheManager)
     }
 
     @MockkBean
@@ -73,18 +66,6 @@ class EntraTjenesteTest : BehaviorSpec() {
     @Autowired
     private lateinit var cacheManager: CacheManager
 
-
-
-    private fun grupperRespons(vararg ids: UUID) = """
-        {
-          "value": [
-            ${ids.joinToString(",") { 
-                """
-                { "id": "$it", "displayName": "0000-GA-GEO-$it" }
-                """.trimIndent() }}
-          ]
-        }
-    """.trimIndent()
 
     init {
 
@@ -170,6 +151,17 @@ class EntraTjenesteTest : BehaviorSpec() {
             }
         }
     }
+
+    private fun grupperRespons(vararg ids: UUID) = """
+        {
+          "value": [
+            ${ids.joinToString(",") {
+        """
+                { "id": "$it", "displayName": "0000-GA-GEO-$it" }
+                """.trimIndent() }}
+          ]
+        }
+    """.trimIndent()
 
     private companion object {
         private val oid = UUID.randomUUID()

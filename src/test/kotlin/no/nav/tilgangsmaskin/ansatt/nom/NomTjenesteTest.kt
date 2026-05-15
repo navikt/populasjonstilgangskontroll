@@ -58,7 +58,6 @@ class NomTjenesteTest : BehaviorSpec() {
 
     @MockkBean
     private lateinit var token: Token
-
     @Autowired
     private lateinit var tjeneste: NomTjeneste
     @Autowired

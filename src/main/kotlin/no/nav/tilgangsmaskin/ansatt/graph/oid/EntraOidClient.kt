@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.graph.oid
 
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.service.annotation.GetExchange
@@ -20,6 +21,6 @@ interface EntraOidClient {
     companion object {
         const val ENTRA_PING_PATH = "/organization"
         const val ENTRA_USERS_PATH = "/users"
-        fun accountFilter(ansattId: String) = "onPremisesSamAccountName eq '$ansattId'"
+        fun accountFilter(ansattId: AnsattId) = "onPremisesSamAccountName eq '${ansattId.verdi}'"
     }
 }

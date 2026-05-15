@@ -16,6 +16,7 @@ class EntraOidConfig : CachableRestConfig, RestConfig(ENTRA_BASE_URI, ENTRA_PING
     override val caches   = setOf(OID_CACHE)
 
     companion object {
+        const val PARAM_VALUE_SELECT_USER = "id"
         const val ENTRA_OID = "entraoid"
         val OID_CACHE = CacheNøkkelConfig(ENTRA_OID)
     }

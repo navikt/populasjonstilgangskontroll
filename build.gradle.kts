@@ -57,6 +57,15 @@ repositories {
 configurations.all {
     resolutionStrategy {
         failOnNonReproducibleResolution()
+        eachDependency {
+            if (requested.group == "org.postgresql" && requested.name == "postgresql") {
+                val minimum = "42.7.11"
+                if ((requested.version ?: "0") < minimum) {
+                    useVersion(minimum)
+                    because("CVE-2025-49146, CVE-2026-42198 — minimum $minimum required")
+                }
+            }
+        }
     }
 }
 

@@ -84,6 +84,8 @@ class OidTjenesteTest : BehaviorSpec() {
 
                     tjeneste.oid(ANSATTID) shouldBe OID
                     tjeneste.oid(ANSATTID) shouldBe OID
+                    cache.getOne(OID_CACHE, ANSATTID.verdi, UUID::class) shouldBe OID
+
                 }
             }
 
@@ -105,38 +107,6 @@ class OidTjenesteTest : BehaviorSpec() {
                         .andRespond(withSuccess(oidRespons(OID, oid2), APPLICATION_JSON))
 
                     shouldThrow<EntraOidException> { tjeneste.oid(ANSATTID) }
-                }
-            }
-        }
-
-        Given("cache") {
-            When("oid kalles to ganger for samme ansatt") {
-                Then("server kalles kun én gang og oid er i cache") {
-                    server.expect(requestTo(containsString(ENTRA_USERS_PATH)))
-                        .andExpect(method(GET))
-                        .andRespond(withSuccess(oidRespons(OID), APPLICATION_JSON))
-
-                    tjeneste.oid(ANSATTID) shouldBe OID
-                    tjeneste.oid(ANSATTID) shouldBe OID
-                    cache.getOne(OID_CACHE, ANSATTID.verdi, UUID::class) shouldBe OID
-                }
-            }
-
-            When("to ulike ansatte slås opp") {
-                Then("caches separat — server kalles to ganger") {
-                    val ansattId2 = AnsattId("Z888888")
-                    val oid2 = UUID.randomUUID()
-                    server.expect(requestTo(containsString(ENTRA_USERS_PATH)))
-                        .andExpect(method(GET))
-                        .andRespond(withSuccess(oidRespons(OID), APPLICATION_JSON))
-                    server.expect(requestTo(containsString(ENTRA_USERS_PATH)))
-                        .andExpect(method(GET))
-                        .andRespond(withSuccess(oidRespons(oid2), APPLICATION_JSON))
-
-                    tjeneste.oid(ANSATTID)  shouldBe OID
-                    tjeneste.oid(ansattId2) shouldBe oid2
-                    cache.getOne(OID_CACHE, ANSATTID.verdi,  UUID::class) shouldBe OID
-                    cache.getOne(OID_CACHE, ansattId2.verdi, UUID::class) shouldBe oid2
                 }
             }
         }

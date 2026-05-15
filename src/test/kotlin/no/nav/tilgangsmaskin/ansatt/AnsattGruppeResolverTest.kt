@@ -16,6 +16,7 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
+import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.web.client.HttpClientErrorException
@@ -25,7 +26,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
     val entra      = mockk<EntraTjeneste>()
     val token      = mockk<Token>()
-    val oidTjeneste = mockk<AnsattOidTjeneste>()
+    val oidTjeneste = mockk<EntraOidTjeneste>()
 
     val nasjonalId  = UUID.randomUUID()
     val fortroligId = UUID.randomUUID()

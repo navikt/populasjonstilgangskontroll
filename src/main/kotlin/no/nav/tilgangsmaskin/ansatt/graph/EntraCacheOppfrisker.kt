@@ -1,29 +1,28 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
-import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.GRAPH
-import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.OID_CACHE
+import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig
+import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOppfrisker
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
-import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
+import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.regler.motor.OppfriskingTeller
-import org.slf4j.LoggerFactory.getLogger
-import org.slf4j.MDC.put
+import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import org.springframework.stereotype.Component
-import java.util.*
+import java.util.UUID
 
 @Component
-class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste: AnsattOidTjeneste, private val cache: CacheClient, private val teller: OppfriskingTeller) : AbstractCacheOppfrisker() {
+class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste: EntraOidTjeneste, private val cache: CacheClient, private val teller: OppfriskingTeller) : AbstractCacheOppfrisker() {
 
-    private val log = getLogger(javaClass)
-    override val cacheName = GRAPH
+    private val log = LoggerFactory.getLogger(javaClass)
+    override val cacheName = EntraGrupperConfig.GRAPH
 
     override fun doOppfrisk(nøkkel: CacheNøkkel) {
         val ansattId = AnsattId(nøkkel.id)
-        put(USER_ID, ansattId.verdi)
+        MDC.put(ConsumerAwareHandlerInterceptor.USER_ID, ansattId.verdi)
         val oid = oidTjeneste.oid(ansattId)
         this.runCatching {
             oppfriskFor(ansattId, oid, nøkkel.metode)
@@ -38,7 +37,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
 
     private fun tømOgOppfrisk(ansattId: AnsattId, oid: UUID, metode: String?) {
         log.warn("${ansattId.verdi} med oid $oid ikke funnet i Entra, sletter og oppfrisker cache-innslag")
-        cache.delete(OID_CACHE, ansattId.verdi)
+        cache.delete(EntraOidConfig.OID_CACHE, ansattId.verdi)
         with(oidTjeneste.oid(ansattId)) {
             log.info("Oppfrisking av oid OK for ${ansattId.verdi}, ny verdi er $this")
             oppfriskFor(ansattId, this, metode)

@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.ansatt.graph
+package no.nav.tilgangsmaskin.ansatt.graph.oid
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty

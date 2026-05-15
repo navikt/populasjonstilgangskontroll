@@ -1,23 +1,22 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
-import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste.Companion.ENTRA_OID
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.uuids
 import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO
 import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO_OG_GLOBALE
-import no.nav.tilgangsmaskin.ansatt.graph.EntraClient.Companion.ENTRA_PING_PATH
+import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient.Companion.ENTRA_PING_PATH
 import no.nav.tilgangsmaskin.felles.cache.CachableConfig
 import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.stereotype.Component
 import java.net.URI
-import java.time.Duration
+import java.time.Duration.ofHours
 
 @Component
-class EntraConfig : CachableRestConfig, RestConfig(ENTRA_BASE_URI, ENTRA_PING_PATH, GRAPH) {
+class EntraGrupperConfig : CachableRestConfig, RestConfig(ENTRA_BASE_URI, ENTRA_PING_PATH, GRAPH) {
 
     override val caches = ENTRA_CACHES
     override val navn = name
-    override val varighet = Duration.ofHours(3)
+    override val varighet = ofHours(3)
 
     fun grupperURI(ansattId: String, isCCF: Boolean) =
          if (isCCF) ccUri(ansattId) else oboUri(ansattId)
@@ -46,7 +45,7 @@ class EntraConfig : CachableRestConfig, RestConfig(ENTRA_BASE_URI, ENTRA_PING_PA
         private const val PARAM_VALUE_SELECT_GROUPS = "id,displayName"
         private const val PARAM_NAME_TOP = "\$top"
         private const val GRAPH_URL = "https://graph.microsoft.com/v1.0/"
-        private val ENTRA_BASE_URI = URI.create(GRAPH_URL)
+        val ENTRA_BASE_URI = URI.create(GRAPH_URL)
         const val GRAPH = "graph"
 
         const val PARAM_NAME_SELECT = "\$select"
@@ -54,7 +53,10 @@ class EntraConfig : CachableRestConfig, RestConfig(ENTRA_BASE_URI, ENTRA_PING_PA
         const val PARAM_NAME_COUNT = "\$count"
         const val PARAM_VALUE_SELECT_USER = "id"
         const val GEO_PREFIX = "startswith(displayName,'0000-GA-GEO') or startswith(displayName,'0000-GA-ENHET') "
-        val OID_CACHE = CachableConfig(ENTRA_OID)
-        val ENTRA_CACHES = setOf(CachableConfig(GRAPH,GEO), CachableConfig(GRAPH,GEO_OG_GLOBALE))
+
+        val GEO_CACHE            = CachableConfig(GRAPH, GEO)
+        val GEO_OG_GLOBALE_CACHE = CachableConfig(GRAPH, GEO_OG_GLOBALE)
+        val ENTRA_CACHES         = setOf(GEO_CACHE, GEO_OG_GLOBALE_CACHE)
+        val CONSISTENCY_LEVEL    = "ConsistencyLevel" to "eventual"
     }
 }

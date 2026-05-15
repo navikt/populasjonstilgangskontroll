@@ -4,7 +4,7 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Tags
-import no.nav.tilgangsmaskin.felles.cache.CachableConfig
+import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.stereotype.Component
@@ -66,7 +66,7 @@ class OppfriskingTeller(registry: MeterRegistry, token: Token) :
 @Component
 class PdlCacheTømmerTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, NAVN, "Cache tømming pr beskyttelsesgrad") {
-    fun tell(cache: CachableConfig,gradering: String, endringsType: String) =
+    fun tell(cache: CacheNøkkelConfig, gradering: String, endringsType: String) =
         tell(Tags.of(CACHE, cache.name,GRADERING ,
             gradering.lowercase(getDefault()),TYPE,endringsType))
 

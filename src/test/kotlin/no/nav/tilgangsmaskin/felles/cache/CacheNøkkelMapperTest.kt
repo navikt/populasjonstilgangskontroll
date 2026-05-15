@@ -56,7 +56,7 @@ class CacheNøkkelMapperTest : BehaviorSpec({
         When("tilNøkkel kalles") {
             Then("kaster IllegalStateException") {
                 shouldThrow<IllegalStateException> {
-                    CacheNøkkelMapper(emptyMap()).tilNøkkel(CachableConfig("unknown"), "key")
+                    CacheNøkkelMapper(emptyMap()).tilNøkkel(CacheNøkkelConfig("unknown"), "key")
                 }
             }
         }

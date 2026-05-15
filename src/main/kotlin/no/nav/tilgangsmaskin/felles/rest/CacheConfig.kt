@@ -1,12 +1,12 @@
 package no.nav.tilgangsmaskin.felles.rest
 
-import no.nav.tilgangsmaskin.felles.cache.CachableConfig
+import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import java.time.Duration
 import java.time.Duration.ofHours
 
-interface CachableRestConfig {
+interface CacheConfig {
     val varighet: Duration get() = ofHours(12)
     val navn: String
     val cacheNulls: Boolean get() = false
-     val caches: Set<CachableConfig>
+     val caches: Set<CacheNøkkelConfig>
 }

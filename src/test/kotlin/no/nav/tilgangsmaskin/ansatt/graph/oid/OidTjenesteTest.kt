@@ -1,18 +1,16 @@
-package no.nav.tilgangsmaskin.ansatt
+package no.nav.tilgangsmaskin.ansatt.graph.oid
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.ansatt.OidTjenesteTest.EntraTestConfig
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig
-import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidBeanConfig
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient.Companion.ENTRA_USERS_PATH
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.ENTRA_OID
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
-import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidException
-import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
+import no.nav.tilgangsmaskin.ansatt.graph.oid.OidTjenesteTest.EntraTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
 import org.hamcrest.Matchers.containsString

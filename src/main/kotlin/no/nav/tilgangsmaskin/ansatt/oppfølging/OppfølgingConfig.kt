@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.`oppfølging`
 
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
-import no.nav.tilgangsmaskin.felles.rest.CacheConfig
+import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -11,7 +11,7 @@ import org.springframework.kafka.listener.KafkaListenerErrorHandler
 
 @Configuration
 @ConfigurationProperties(OPPFØLGING)
-class OppfølgingConfig: CacheConfig {
+class OppfølgingConfig: CachableRestConfig {
     override val navn = OPPFØLGING
     override val caches = setOf(OPPFØLGING_CACHE)
 

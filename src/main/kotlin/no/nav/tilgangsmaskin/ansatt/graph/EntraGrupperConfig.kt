@@ -6,13 +6,13 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO_OG_
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient.Companion.ENTRA_PING_PATH
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.felles.rest.RestConfig
-import no.nav.tilgangsmaskin.felles.rest.CacheConfig
+import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.stereotype.Component
 import java.net.URI
 import java.time.Duration.ofHours
 
 @Component
-class EntraGrupperConfig : CacheConfig, RestConfig(ENTRA_BASE_URI, ENTRA_PING_PATH, GRAPH) {
+class EntraGrupperConfig : CachableRestConfig, RestConfig(ENTRA_BASE_URI, ENTRA_PING_PATH, GRAPH) {
 
     override val caches = ENTRA_CACHES
     override val navn = name

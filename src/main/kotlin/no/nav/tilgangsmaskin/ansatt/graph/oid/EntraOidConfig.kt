@@ -4,13 +4,13 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.ENTRA_BAS
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient.Companion.ENTRA_PING_PATH
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
-import no.nav.tilgangsmaskin.felles.rest.CacheConfig
+import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import org.springframework.stereotype.Component
 import java.time.Duration
 
 @Component
-class EntraOidConfig : CacheConfig, RestConfig(ENTRA_BASE_URI, ENTRA_PING_PATH, GRAPH) {
+class EntraOidConfig : CachableRestConfig, RestConfig(ENTRA_BASE_URI, ENTRA_PING_PATH, GRAPH) {
     override val navn     = ENTRA_OID
     override val varighet = Duration.ofDays(365)
     override val caches   = setOf(OID_CACHE)

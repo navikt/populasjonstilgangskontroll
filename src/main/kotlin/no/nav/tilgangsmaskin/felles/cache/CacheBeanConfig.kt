@@ -4,7 +4,7 @@ import io.lettuce.core.ClientOptions
 import io.lettuce.core.RedisClient
 import io.lettuce.core.SocketOptions
 import no.nav.boot.conditionals.ConditionalOnGCP
-import no.nav.tilgangsmaskin.felles.rest.CacheConfig
+import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.context.annotation.Bean
@@ -22,7 +22,7 @@ import tools.jackson.module.kotlin.KotlinModule.Builder
 @Configuration(proxyBeanMethods = true)
 @ConditionalOnGCP
 class CacheBeanConfig(private val cf: RedisConnectionFactory,
-                      private vararg val cfgs: CacheConfig) : CachingConfigurer {
+                      private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
 
 
@@ -54,7 +54,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
     fun cacheHealthIndicator(adapter: CachePingable)  =
         PingableHealthIndicator(adapter)
 
-    private fun cacheConfig(cfg: CacheConfig) =
+    private fun cacheConfig(cfg: CachableRestConfig) =
         defaultCacheConfig()
             .entryTtl(cfg.varighet)
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))

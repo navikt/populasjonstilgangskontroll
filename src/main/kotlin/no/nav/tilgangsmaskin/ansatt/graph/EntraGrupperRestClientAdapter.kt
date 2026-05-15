@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.Generated
 import no.nav.tilgangsmaskin.felles.rest.RestDefaultErrorHandler
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -21,7 +20,6 @@ class EntraGrupperRestClientAdapter(
     private val cfg: EntraGrupperConfig,
     private val errorHandler: ErrorHandler = RestDefaultErrorHandler()) {
 
-    private val log = getLogger(javaClass)
 
     fun grupper(ansattId: String, trengerGlobaleGrupper: Boolean) =
         generateSequence(get<EntraGrupper>(cfg.grupperURI(ansattId, trengerGlobaleGrupper))) { bolk ->

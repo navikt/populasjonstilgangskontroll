@@ -47,7 +47,6 @@ class EntraGrupperConfig : CachableRestConfig, RestConfig(ENTRA_BASE_URI, ENTRA_
         private const val GRAPH_URL = "https://graph.microsoft.com/v1.0/"
         val ENTRA_BASE_URI = URI.create(GRAPH_URL)
         const val GRAPH = "graph"
-
         const val PARAM_NAME_SELECT = "\$select"
         const val PARAM_NAME_FILTER = "\$filter"
         const val PARAM_NAME_COUNT = "\$count"

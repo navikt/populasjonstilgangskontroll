@@ -114,6 +114,7 @@ dependencies {
 
 dependencyManagement {
     imports {
+        mavenBom("io.netty:netty-bom:4.2.13.Final")  // ← before other BOMs, highest priority
         mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:$otelVersion")
     }
 }

@@ -10,7 +10,7 @@ abstract class AbstractCacheOppfrisker : CacheOppfrisker {
     @WithSpan
     final override fun oppfrisk(nøkkel: CacheNøkkel) {
         runCatching { doOppfrisk(nøkkel) }
-            .onSuccess { log.info("Oppfrisking av cache innslag ${nøkkel.maskert} OK") }
+            .onSuccess { log.trace("Oppfrisking av cache innslag ${nøkkel.maskert} OK") }
             .onFailure { log.warn("Oppfrisking av cache innslag ${nøkkel.maskert} feilet", it) }
     }
 }

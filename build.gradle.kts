@@ -57,7 +57,7 @@ repositories {
 configurations.all {
     resolutionStrategy {
         failOnNonReproducibleResolution()
-        eachDependency {
+        eachDependency {  // TODO rethink on next boot version
             if (requested.group == "org.postgresql" && requested.name == "postgresql") {
                 val minimum = "42.7.11"
                 if ((requested.version ?: "0") < minimum) {
@@ -123,7 +123,7 @@ dependencies {
 
 dependencyManagement {
     imports {
-        mavenBom("io.netty:netty-bom:4.2.13.Final")  // ← before other BOMs, highest priority
+        mavenBom("io.netty:netty-bom:4.2.13.Final")  // TODO rethink on next boot version
         mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:$otelVersion")
     }
 }

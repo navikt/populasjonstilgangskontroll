@@ -27,24 +27,24 @@ import kotlin.reflect.KClass
     }
 
     @WithSpan
-    override fun delete(cache: CachableConfig, id: String) =
+    override fun delete(cache: CacheNøkkelConfig, id: String) =
         conn.sync().del(handler.tilNøkkel(cache, id))
 
 
     @WithSpan
-    override fun <T : Any> getOne(cache: CachableConfig,id: String, clazz: KClass<T>): T? =
+    override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? =
         conn.sync().get(handler.tilNøkkel(cache, id))?.let { json ->
             handler.fraJson(json, clazz)
         }
 
     @WithSpan
-    override fun putOne(cache: CachableConfig, id: String, value: Any, ttl: Duration) {
+    override fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration) {
         conn.async().setex(handler.tilNøkkel(cache, id), ttl.seconds, handler.tilJson(value))
     }
 
 
     @WithSpan
-    override fun <T : Any> getMany(cache: CachableConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T> =
+    override fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T> =
         if (ids.isEmpty()) {
             emptyMap()
         } else {
@@ -56,7 +56,7 @@ import kotlin.reflect.KClass
         }
 
     @WithSpan
-    override fun putMany(cache: CachableConfig, innslag: Map<String, Any>, ttl: Duration) {
+    override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
         if (innslag.isNotEmpty()) {
             log.trace("Bulk lagrer {} verdier for cache {} med prefix {}", innslag.size, cache.name, cache.extraPrefix)
             conn.apply {
@@ -73,7 +73,7 @@ import kotlin.reflect.KClass
         }
     }
 
-    private fun payloadFor(innslag: Map<String, Any>, cache: CachableConfig) =
+    private fun payloadFor(innslag: Map<String, Any>, cache: CacheNøkkelConfig) =
         buildMap {
             innslag.forEach { (key, value) ->
                 put(handler.tilNøkkel(cache, key), handler.tilJson(value))
@@ -87,5 +87,5 @@ import kotlin.reflect.KClass
         log.trace("Fant $funnet verdier i cache $navn for $etterspurt identer")
     }
 
-    override fun tilNøkkel(cache: CachableConfig, id: String) = handler.tilNøkkel(cache, id)
+    override fun tilNøkkel(cache: CacheNøkkelConfig, id: String) = handler.tilNøkkel(cache, id)
 }

@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMIN
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.Person
-import no.nav.tilgangsmaskin.felles.cache.CachableConfig
+import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import org.springframework.web.bind.annotation.PostMapping
@@ -23,12 +23,12 @@ class DevCacheController(private val cacheClient: CacheClient) {
 
     @PostMapping("cache/skjerminger")
     @Operation(summary = SUMMARY_CACHE_SKJERMINGER, description = DESCRIPTION_CACHE_SKJERMINGER)
-    fun cacheSkjerminger(@RequestBody navIds: Set<String>) = cacheClient.getMany(CachableConfig(SKJERMING),
+    fun cacheSkjerminger(@RequestBody navIds: Set<String>) = cacheClient.getMany(CacheNøkkelConfig(SKJERMING),
         navIds, Boolean::class)
 
     @PostMapping("cache/personer")
     @Operation(summary = SUMMARY_CACHE_PERSONER, description = DESCRIPTION_CACHE_PERSONER)
-    fun cachePersoner(@RequestBody navIds: Set<Identifikator>) = cacheClient.getMany(CachableConfig(PDL),
+    fun cachePersoner(@RequestBody navIds: Set<Identifikator>) = cacheClient.getMany(CacheNøkkelConfig(PDL),
         navIds.map { it.verdi }.toSet(), Person::class)
 
     companion object {

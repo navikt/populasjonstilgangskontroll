@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.ansatt.vergemål
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålClient.Companion.VERGEMÅL_PING_PATH
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.VERGEMÅL
 import no.nav.tilgangsmaskin.felles.Generated
-import no.nav.tilgangsmaskin.felles.cache.CachableConfig
+import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -22,7 +22,7 @@ class VergemålConfig : CachableRestConfig, RestConfig(VERGEMÅL_BASE, VERGEMÅL
 
     companion object {
         val VERGEMÅL_BASE = URI.create("http://repr-api.repr")
-        val VERGE_CACHE = CachableConfig(VERGEMÅL)
+        val VERGE_CACHE = CacheNøkkelConfig(VERGEMÅL)
         const val VERGEMÅL = "verge"
     }
 }

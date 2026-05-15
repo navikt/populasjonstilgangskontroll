@@ -5,7 +5,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.OID_CACHE
+import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 
@@ -56,7 +56,7 @@ class CacheNøkkelMapperTest : BehaviorSpec({
         When("tilNøkkel kalles") {
             Then("kaster IllegalStateException") {
                 shouldThrow<IllegalStateException> {
-                    CacheNøkkelMapper(emptyMap()).tilNøkkel(CachableConfig("unknown"), "key")
+                    CacheNøkkelMapper(emptyMap()).tilNøkkel(CacheNøkkelConfig("unknown"), "key")
                 }
             }
         }

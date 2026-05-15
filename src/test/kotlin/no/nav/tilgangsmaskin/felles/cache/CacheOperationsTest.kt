@@ -194,7 +194,7 @@ class CacheOperationsTest : BehaviorSpec() {
         const val I1 = "03508331575"
         const val I2 = "20478606614"
         val IDS = setOf(I1, I2)
-        val TEST_CACHE = CachableConfig("cache")
+        val TEST_CACHE = CacheNøkkelConfig("cache")
         val T1 = TestData.of(I1)
         val T2 = TestData.of(I2)
         val TIMEOUTS = eventuallyConfig {

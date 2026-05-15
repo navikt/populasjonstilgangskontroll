@@ -8,10 +8,10 @@ import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.verify
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.AnsattOidTjeneste
+import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO
 import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO_OG_GLOBALE
-import no.nav.tilgangsmaskin.ansatt.graph.EntraConfig.Companion.OID_CACHE
+import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
@@ -29,7 +29,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
     private lateinit var entra: EntraTjeneste
 
     @MockkBean
-    private lateinit var oid: AnsattOidTjeneste
+    private lateinit var oid: EntraOidTjeneste
 
     @MockkBean(relaxed = true)
     private lateinit var cache: CacheClient

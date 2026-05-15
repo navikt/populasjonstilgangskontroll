@@ -21,7 +21,7 @@ enum class GlobalGruppe(val property: String, val metadata: GruppeMetadata) {
 
     companion object {
         private fun navnFor(id: UUID) = entries.find { it.id == id }?.name ?: "Fant ikke gruppenavn for id $id"
-        fun uuids() = entries.map { it.id }
+        fun uuids() = entries.mapTo(mutableSetOf()) { it.id }
         fun setIDs(grupper: Map<String, UUID>) =
             entries.forEach { it.id = grupper[it.property] ?: error("Mangler id for ${it.property}") }
 

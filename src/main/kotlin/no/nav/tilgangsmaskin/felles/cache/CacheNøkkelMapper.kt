@@ -14,7 +14,7 @@ class CacheNøkkelMapper(val configs: Map<String, RedisCacheConfiguration?>, val
     fun tilJson(value: Any): String =
         mapper.writeValueAsString(value)
 
-    fun tilNøkkel(cache: CachableConfig, nøkkel: String): String {
+    fun tilNøkkel(cache: CacheNøkkelConfig, nøkkel: String): String {
         val prefix = prefixFor(cache)
         val extra = cache.extraPrefix?.let { "$it:" } ?: ""
         return "$prefix$extra$nøkkel"
@@ -23,10 +23,10 @@ class CacheNøkkelMapper(val configs: Map<String, RedisCacheConfiguration?>, val
     fun idFraNøkkel(nøkkel: String) =
         CacheNøkkel(nøkkel).id
 
-    private fun prefixFor(cache: CachableConfig): String =
+    private fun prefixFor(cache: CacheNøkkelConfig): String =
         configs[cache.name]?.getKeyPrefixFor(cache.name)
             ?: error("Ingen cache med navn ${cache.name}")
 
 }
 
-data class CachableConfig(val name: String, val extraPrefix: String? = null)
+data class CacheNøkkelConfig(val name: String, val extraPrefix: String? = null)

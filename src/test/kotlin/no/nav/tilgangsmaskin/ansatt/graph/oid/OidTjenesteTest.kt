@@ -43,7 +43,8 @@ class OidTjenesteTest : BehaviorSpec() {
             ConcurrentMapCacheManager(ENTRA_OID)
 
         @Bean
-        fun cacheOperations(cacheManager: CacheManager) = ConcurrentMapCacheOperations(cacheManager)
+        fun cacheOperations(cacheManager: CacheManager) =
+            ConcurrentMapCacheOperations(cacheManager)
     }
 
     @Autowired

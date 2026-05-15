@@ -7,12 +7,12 @@ import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import org.springframework.stereotype.Component
-import java.time.Duration
+import java.time.Duration.ofDays
 
 @Component
 class EntraOidConfig : CachableRestConfig, RestConfig(ENTRA_BASE_URI, ENTRA_PING_PATH, GRAPH) {
     override val navn     = ENTRA_OID
-    override val varighet = Duration.ofDays(365)
+    override val varighet = ofDays(365)
     override val caches   = setOf(OID_CACHE)
 
     companion object {

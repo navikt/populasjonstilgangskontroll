@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.web.ErrorResponseException
 
-class EntraOidException(ansattId: AnsattId, msg: String) : ErrorResponseException(NOT_FOUND) {
+class EntraUnexpectedResponseException(ansattId: AnsattId, msg: String) : ErrorResponseException(NOT_FOUND) {
     init {
         body.title = "Uventet respons fra Entra"
         body.detail = msg

@@ -96,7 +96,7 @@ class OidTjenesteTest : BehaviorSpec() {
                         .andExpect(method(GET))
                         .andRespond(withSuccess("""{"value": []}""", APPLICATION_JSON))
 
-                    shouldThrow<EntraOidException> { tjeneste.oid(ANSATTID) }
+                    shouldThrow<EntraUnexpectedResponseException> { tjeneste.oid(ANSATTID) }
                 }
             }
 
@@ -107,7 +107,7 @@ class OidTjenesteTest : BehaviorSpec() {
                         .andExpect(method(GET))
                         .andRespond(withSuccess(oidRespons(OID, oid2), APPLICATION_JSON))
 
-                    shouldThrow<EntraOidException> { tjeneste.oid(ANSATTID) }
+                    shouldThrow<EntraUnexpectedResponseException> { tjeneste.oid(ANSATTID) }
                 }
             }
         }

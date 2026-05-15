@@ -13,13 +13,14 @@ class EntraOidTjeneste(private val oidClient: EntraOidClient) {
 
 
     @Cacheable(cacheNames = [ENTRA_OID], key = "#ansattId.verdi")
-    fun oid(ansattId: AnsattId) = validerRespons(ansattId,oidClient.oid(accountFilter(ansattId)).oids)
+    fun oid(ansattId: AnsattId) =
+        validerRespons(ansattId,oidClient.oid(accountFilter(ansattId)).oids)
 
     private fun validerRespons(ansattId: AnsattId, oids: Set<EntraOid>) : UUID {
         return when (oids.size) {
-            0 -> throw EntraOidException(ansattId, "Fant ingen oid for $ansattId, er den fremdeles gyldig?")
+            0 -> throw EntraUnexpectedResponseException(ansattId, "Fant ingen oid for $ansattId, er den fremdeles gyldig?")
             1 -> oids.single().id
-            else -> throw EntraOidException(ansattId, "Forventet nøyaktig én oid for $ansattId, fant ${oids.size} (${oids.formatted()})")
+            else -> throw EntraUnexpectedResponseException(ansattId, "Forventet nøyaktig én oid for $ansattId, fant ${oids.size} (${oids.formatted()})")
         }
     }
 }

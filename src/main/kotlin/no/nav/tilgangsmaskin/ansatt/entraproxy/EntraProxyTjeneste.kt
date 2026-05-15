@@ -11,6 +11,7 @@ class EntraProxyTjeneste(private val client: EntraProxyClient)  {
     @WithSpan
     fun enhet(ansattId: AnsattId) =
         client.ansatt(ansattId.verdi).enhet
+
     @WithSpan
     fun enheter(ansattId: AnsattId) =
         client.enheter(ansattId.verdi)

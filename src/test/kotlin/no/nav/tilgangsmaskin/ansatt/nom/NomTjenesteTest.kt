@@ -16,6 +16,7 @@ import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM_CACHE
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjenesteTest.NomTestConfig
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
 import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
 import no.nav.tilgangsmaskin.tilgang.Token
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
@@ -38,23 +40,13 @@ import java.time.LocalDate.now
 
 @DataJpaTest
 @Testcontainers
-@TestPropertySource(locations = ["classpath:test.properties"])
-@EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
 @ContextConfiguration(classes = [TestApp::class,NomTjeneste::class, NomJPAAdapter::class])
 @Import(NomTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class NomTjenesteTest : BehaviorSpec() {
 
-    @EnableCaching
-    @Configuration
-    class NomTestConfig {
-        @Bean
-        fun cacheManager() =
-            ConcurrentMapCacheManager(NOM)
-
-        @Bean
-        fun cacheOperations(cacheManager: CacheManager) = ConcurrentMapCacheOperations(cacheManager)
-    }
+    @TestConfiguration
+    class NomTestConfig : CacheTestConfig(NOM)
 
     @MockkBean
     private lateinit var token: Token

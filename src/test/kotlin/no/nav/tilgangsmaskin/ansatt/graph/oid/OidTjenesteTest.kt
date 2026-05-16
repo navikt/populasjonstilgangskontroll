@@ -12,15 +12,12 @@ import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.ENTRA_OID
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.OidTjenesteTest.EntraTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
+import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import org.hamcrest.Matchers.containsString
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.cache.CacheManager
-import org.springframework.cache.annotation.EnableCaching
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -36,16 +33,7 @@ import java.util.UUID
 class OidTjenesteTest : BehaviorSpec() {
 
     @TestConfiguration
-    @EnableCaching(proxyTargetClass = true)
-    class EntraTestConfig {
-        @Bean
-        fun cacheManager() =
-            ConcurrentMapCacheManager(ENTRA_OID)
-
-        @Bean
-        fun cacheOperations(cacheManager: CacheManager) =
-            ConcurrentMapCacheOperations(cacheManager)
-    }
+    class EntraTestConfig : CacheTestConfig(ENTRA_OID)
 
     @Autowired
     private lateinit var tjeneste: EntraOidTjeneste

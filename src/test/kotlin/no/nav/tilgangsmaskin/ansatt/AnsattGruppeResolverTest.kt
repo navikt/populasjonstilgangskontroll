@@ -24,29 +24,15 @@ import java.util.*
 
 class AnsattGruppeResolverTest : BehaviorSpec({
 
-    val entra      = mockk<EntraTjeneste>()
-    val token      = mockk<Token>()
+    val entra       = mockk<EntraTjeneste>()
+    val token       = mockk<Token>()
     val oidTjeneste = mockk<EntraOidTjeneste>()
 
-    val nasjonalId  = UUID.randomUUID()
-    val fortroligId = UUID.randomUUID()
-    val strengtId   = UUID.randomUUID()
-    val ansattId    = AnsattId("Z999999")
-    val oid         = UUID.randomUUID()
-    val geoGruppe   = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_1234")
+    val ansattId  = AnsattId("Z999999")
+    val oid       = UUID.randomUUID()
+    val geoGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_1234")
 
     val resolver = AnsattGruppeResolver(entra, token, oidTjeneste)
-
-    beforeSpec {
-        GlobalGruppe.setIDs(mapOf(
-            "gruppe.nasjonal"   to nasjonalId,
-            "gruppe.fortrolig"  to fortroligId,
-            "gruppe.strengt"    to strengtId,
-            "gruppe.utland"     to UUID.randomUUID(),
-            "gruppe.udefinert"  to UUID.randomUUID(),
-            "gruppe.egenansatt" to UUID.randomUUID(),
-        ))
-    }
 
     beforeEach {
         clearAllMocks()
@@ -58,11 +44,11 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
         When("token inneholder kjente og ukjente gruppe-IDer") {
             Then("Token.globaleGrupper returnerer kun kjente EntraGrupper") {
-                every { token.globaleGruppeIds } returns listOf(nasjonalId, fortroligId, strengtId, oid)
+                every { token.globaleGruppeIds } returns listOf(NASJONAL.id, FORTROLIG.id, STRENGT_FORTROLIG.id, oid)
                 token.globaleGrupper() shouldContainExactlyInAnyOrder setOf(
-                    EntraGruppe(nasjonalId, NASJONAL.name),
-                    EntraGruppe(fortroligId, FORTROLIG.name),
-                    EntraGruppe(strengtId, STRENGT_FORTROLIG.name)
+                    EntraGruppe(NASJONAL.id, NASJONAL.name),
+                    EntraGruppe(FORTROLIG.id, FORTROLIG.name),
+                    EntraGruppe(STRENGT_FORTROLIG.id, STRENGT_FORTROLIG.name)
                 )
             }
         }
@@ -83,7 +69,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
         When("grupperForAnsatt kalles") {
             Then("slår opp globale og GEO-grupper i Entra") {
-                val forventet = setOf(geoGruppe, EntraGruppe(nasjonalId))
+                val forventet = setOf(geoGruppe, EntraGruppe(NASJONAL.id))
                 every { entra.geoOgGlobaleGrupper(ansattId, oid) } returns forventet
                 resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder forventet
                 verify { entra.geoOgGlobaleGrupper(ansattId, oid) }
@@ -101,8 +87,8 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
         When("ansatt har nasjonal tilgang") {
             Then("returneres kun globale grupper uten Entra-oppslag") {
-                every { token.globaleGruppeIds } returns listOf(nasjonalId)
-                resolver.grupperForAnsatt(ansattId) shouldBe setOf(EntraGruppe(nasjonalId, NASJONAL.name))
+                every { token.globaleGruppeIds } returns listOf(NASJONAL.id)
+                resolver.grupperForAnsatt(ansattId) shouldBe setOf(EntraGruppe(NASJONAL.id, NASJONAL.name))
                 verify(exactly = 0) { entra.geoGrupper(any(), any()) }
                 verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
             }
@@ -120,10 +106,10 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
         When("ansatt har fortrolig-gruppe i token") {
             Then("kombineres globale grupper fra token med GEO-grupper fra Entra") {
-                every { token.globaleGruppeIds } returns listOf(fortroligId)
+                every { token.globaleGruppeIds } returns listOf(FORTROLIG.id)
                 every { entra.geoGrupper(ansattId, oid) } returns setOf(geoGruppe)
                 resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder
-                    setOf(EntraGruppe(fortroligId, FORTROLIG.name), geoGruppe)
+                    setOf(EntraGruppe(FORTROLIG.id, FORTROLIG.name), geoGruppe)
             }
         }
     }

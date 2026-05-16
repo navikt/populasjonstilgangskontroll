@@ -7,8 +7,6 @@ import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.setIDs
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.entries
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_OG_GLOBALE_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRAPH
@@ -16,14 +14,11 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraTjenesteTest.EntraTestConfig
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidBeanConfig
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
+import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.cache.CacheManager
-import org.springframework.cache.annotation.EnableCaching
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -40,16 +35,8 @@ import java.util.*
 class EntraTjenesteTest : BehaviorSpec() {
 
     @TestConfiguration
-    @EnableCaching
     @EnableResilientMethods
-    class EntraTestConfig {
-        @Bean
-        fun cacheManager() =
-            ConcurrentMapCacheManager(GRAPH)
-
-        @Bean
-        fun cacheOperations(cacheManager: CacheManager) = ConcurrentMapCacheOperations(cacheManager)
-    }
+    class EntraTestConfig : CacheTestConfig(GRAPH)
 
     @MockkBean
     @Suppress("unused")
@@ -78,7 +65,6 @@ class EntraTjenesteTest : BehaviorSpec() {
     init {
 
         beforeEach {
-            setIDs(entries.associate { it.property to UUID.randomUUID() })
             server.reset()
             cacheManager.getCache(GRAPH)?.clear()
         }

@@ -13,7 +13,6 @@ import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.NasjonalGruppeTeller
-import java.util.UUID
 
 class AnsattTjenesteTest : BehaviorSpec({
 
@@ -27,16 +26,6 @@ class AnsattTjenesteTest : BehaviorSpec({
     val brukerId = BrukerId("08526835670")
     val bruker   = BrukerBuilder(brukerId).build()
 
-    beforeSpec {
-        GlobalGruppe.setIDs(mapOf(
-            "gruppe.nasjonal"   to UUID.randomUUID(),
-            "gruppe.fortrolig"  to UUID.randomUUID(),
-            "gruppe.strengt"    to UUID.randomUUID(),
-            "gruppe.utland"     to UUID.randomUUID(),
-            "gruppe.udefinert"  to UUID.randomUUID(),
-            "gruppe.egenansatt" to UUID.randomUUID(),
-        ))
-    }
 
     Given("ansatt") {
         When("kalles uten noen oppsett") {

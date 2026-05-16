@@ -22,15 +22,15 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.pdlRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.restRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjenesteTest.PdlTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
+import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -52,12 +52,7 @@ import java.time.Duration.ofSeconds
 class PdlTjenesteTest : BehaviorSpec() {
 
     @TestConfiguration
-    @EnableCaching
-    class PdlTestConfig {
-
-        @Bean fun cacheManager(): CacheManager = ConcurrentMapCacheManager(PDL)
-
-        @Bean fun cache(cacheManager: CacheManager) = ConcurrentMapCacheOperations(cacheManager)
+    class PdlTestConfig : CacheTestConfig(PDL) {
 
         @Bean
         fun pdlClient(builder: Builder, cfg: PdlConfig) = createClient<PdlPipClient>(cfg, builder)
@@ -70,7 +65,7 @@ class PdlTjenesteTest : BehaviorSpec() {
     lateinit var server: MockRestServiceServer
     @Autowired lateinit var cfg: PdlConfig
     @Autowired lateinit var cacheManager: CacheManager
-    @Autowired lateinit var cache: CacheOperations
+    @Qualifier("cacheOperations") @Autowired lateinit var cache: CacheOperations
     @Autowired lateinit var mapper: JsonMapper
 
     init {

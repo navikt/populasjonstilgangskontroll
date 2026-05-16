@@ -11,30 +11,26 @@ import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING_CACHE
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjenesteTest.CacheTestConfig
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjenesteTest.OppfølgingTestConfig
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
+import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.tilgang.Token
 
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
@@ -42,19 +38,15 @@ import java.util.UUID.*
 
 @DataJpaTest
 @EnableJpaAuditing
-@ActiveProfiles(TEST)
 @Testcontainers
 @EnableCaching
 @ContextConfiguration(classes = [TestApp::class, OppfølgingTjeneste::class, OppfølgingJPAAdapter::class])
-@Import(CacheTestConfig::class)
+@Import(OppfølgingTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class OppfølgingTjenesteTest : BehaviorSpec() {
 
-    @Configuration
-    class CacheTestConfig {
-        @Bean fun cacheManager(): CacheManager = ConcurrentMapCacheManager(OPPFØLGING)
-        @Bean fun cacheOperations(cacheManager: CacheManager): CacheOperations = ConcurrentMapCacheOperations(cacheManager)
-    }
+    @TestConfiguration
+    class OppfølgingTestConfig : CacheTestConfig(OPPFØLGING)
 
     @MockkBean private lateinit var token: Token
 

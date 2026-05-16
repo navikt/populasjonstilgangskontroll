@@ -3,18 +3,11 @@ package no.nav.tilgangsmaskin.ansatt
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.setIDs
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_PREFIX
-import java.util.*
 
 class EntraUrlTest : BehaviorSpec({
 
-    val knownIds = GlobalGruppe.entries.associate { it.property to UUID.randomUUID() }
-
-    beforeContainer {
-        setIDs(knownIds)
-    }
 
     Given("grupperURI") {
         When("isCCF er true") {
@@ -22,8 +15,8 @@ class EntraUrlTest : BehaviorSpec({
                 val uri = EntraGrupperConfig().grupperURI("Z999999", true)
                 val filter = uri.query.substringAfter("\$filter=").substringBefore("&")
 
-                knownIds.values.forEach { uuid ->
-                    filter shouldContain "$uuid"
+                GlobalGruppe.entries.forEach { gruppe ->
+                    filter shouldContain "${gruppe.id}"
                 }
                 filter shouldContain "id in("
                 filter shouldContain ") or $GEO_PREFIX"
@@ -36,8 +29,8 @@ class EntraUrlTest : BehaviorSpec({
                 val filter = uri.query.substringAfter("\$filter=").substringBefore("&")
 
                 filter shouldContain "startswith(displayName,'0000-GA-GEO')"
-                knownIds.values.forEach { uuid ->
-                    filter shouldNotContain "$uuid"
+                GlobalGruppe.entries.forEach { gruppe ->
+                    filter shouldNotContain "${gruppe.id}"
                 }
             }
         }

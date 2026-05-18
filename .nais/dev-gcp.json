@@ -310,6 +310,11 @@
       "name": "watson-admin-api",
       "namespace": "holmes",
       "cluster": "dev-gcp"
+    },
+    {
+      "name": "sokos-skattekort-q1",
+      "namespace": "okonomi",
+      "cluster": "dev-gcp"
     }
   ],
   "nais": {

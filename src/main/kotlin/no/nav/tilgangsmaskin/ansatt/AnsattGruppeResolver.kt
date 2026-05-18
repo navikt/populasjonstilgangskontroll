@@ -35,10 +35,12 @@ class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: 
         }.getOrElse {
             if (it is NotFoundRestException) {
                 cache.delete(GEO_OG_GLOBALE_CACHE, ansattId.verdi)
-                val nyoid = oid.oid(ansattId)
-                entra.geoOgGlobaleGrupper(ansattId, nyoid).also {
-                    log.info("CC-flow: {} slo opp globale og GEO-grupper i Entra med ny oid {}", ansattId,nyoid)
-                }
+                runCatching {
+                    val nyoid = oid.oid(ansattId)
+                    entra.geoOgGlobaleGrupper(ansattId, nyoid).also {
+                        log.info("CC-flow: {} slo opp globale og GEO-grupper i Entra med ny oid {}", ansattId,nyoid)
+                    }
+                }.getOrThrow()
             } else {
                 throw it
             }

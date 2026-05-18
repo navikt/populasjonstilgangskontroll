@@ -16,14 +16,13 @@ interface EntraOidClient {
     fun ping(): Any
 
     @GetExchange(ENTRA_USERS_PATH)
-    fun oid(
-        @RequestParam(PARAM_NAME_FILTER) filter: String,
-        @RequestParam(PARAM_NAME_SELECT) select: String = PARAM_VALUE_SELECT_USER,
-        @RequestParam(PARAM_NAME_COUNT) count: Boolean = true): EntraOidRespons
+    fun oid(@RequestParam(PARAM_NAME_FILTER) filter: String,
+            @RequestParam(PARAM_NAME_SELECT) select: String = PARAM_VALUE_SELECT_USER,
+            @RequestParam(PARAM_NAME_COUNT) count: Boolean = true): EntraOidRespons
 
     companion object {
         const val ENTRA_PING_PATH = "/organization"
         const val ENTRA_USERS_PATH = "/users"
-        fun accountFilter(ansattId: AnsattId) = "onPremisesSamAccountName eq '${ansattId.verdi}'"
+        fun filter(ansattId: AnsattId) = "onPremisesSamAccountName eq '${ansattId.verdi}'"
     }
 }

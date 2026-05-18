@@ -10,4 +10,4 @@ data class EntraOidRespons(@param:JsonProperty("value") val oids: Set<EntraOid>)
     data class EntraOid(val id: UUID)
 }
 
-fun Set<EntraOid>.formatted() =  joinToString { "${it.id}" }
+fun Set<EntraOid>.formattert() =  joinToString { "${it.id}" }

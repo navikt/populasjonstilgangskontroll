@@ -9,7 +9,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyClient.Companion.ENTRA_PROXY_ANSATT_PATH
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyClient.Companion.ENTRA_PROXY_ENHETER_PATH
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.PROXY_BASE_URI
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRA_PROXY_BASE_URI
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
@@ -133,7 +133,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
         private val ANSATTID = AnsattId("Z999999")
         private val ANSATT_URI = uri(ENTRA_PROXY_ANSATT_PATH)
         private val ENHETER_URI = uri(ENTRA_PROXY_ENHETER_PATH)
-        private fun uri(path: String) =fromUriString("$PROXY_BASE_URI$path")
+        private fun uri(path: String) =fromUriString("$ENTRA_PROXY_BASE_URI$path")
             .buildAndExpand(ANSATTID.verdi).toUri()
     }
 }

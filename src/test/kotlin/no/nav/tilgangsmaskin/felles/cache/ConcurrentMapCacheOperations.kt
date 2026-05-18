@@ -6,6 +6,7 @@ import kotlin.reflect.KClass
 
 class ConcurrentMapCacheOperations(private val mgr: CacheManager) : CacheOperations {
 
+
     override fun delete(cache: CacheNøkkelConfig, id: String): Long {
         val c = mgr.getCache(cache.name) ?: return 0L
         val key = tilNøkkel(cache, id)

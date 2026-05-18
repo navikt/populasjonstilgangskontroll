@@ -33,6 +33,7 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
 
 
 @Configuration
+@NoCoverageAnalysis
 class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : WebMvcConfigurer {
 
      @Bean

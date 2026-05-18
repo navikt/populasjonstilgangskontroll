@@ -6,6 +6,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.mockk.every
 import io.mockk.verify
+import org.junit.jupiter.api.assertDoesNotThrow
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO
@@ -100,7 +101,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
         Given("geoOgGlobaleGrupper") {
             When("oppfrisk kalles") {
                 Then("kaller entra.geoOgGlobaleGrupper med riktig ansattId og oid") {
-                    oppfrisker.oppfrisk(nøkkel("geoOgGlobaleGrupper"))
+                    oppfrisker.oppfrisk(nøkkel(GEO_OG_GLOBALE))
 
                     verify { entra.geoOgGlobaleGrupper(ansattId, OID) }
                     verify(exactly = 0) { entra.geoGrupper(any(), any()) }
@@ -112,11 +113,77 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                     every { oid.oid(ansattId) } returnsMany listOf(OID, NY_OID)
                     every { entra.geoOgGlobaleGrupper(ansattId, OID) } throws NotFoundRestException(URI.create("http://entra"))
 
-                    oppfrisker.oppfrisk(nøkkel("geoOgGlobaleGrupper"))
+                    oppfrisker.oppfrisk(nøkkel(GEO_OG_GLOBALE))
 
                     verify { cache.delete(OID_CACHE, ansattId.verdi) }
                     verify { entra.geoOgGlobaleGrupper(ansattId, NY_OID) }
                     verify { teller.tell() }
+                }
+            }
+        }
+
+        Given("doOppfrisk kaster uventet exception") {
+            When("oidTjeneste.oid feiler") {
+                Then("oppfrisk fanger exception og propagerer ikke") {
+                    every { oid.oid(ansattId) } throws RuntimeException("oid-oppslag feilet")
+
+                    assertDoesNotThrow {
+                        oppfrisker.oppfrisk(nøkkel(GEO))
+                    }
+
+                    verify(exactly = 0) { entra.geoGrupper(any(), any()) }
+                    verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
+                    verify(exactly = 0) { cache.delete(any(), any()) }
+                    verify(exactly = 0) { teller.tell() }
+                }
+            }
+        }
+
+        Given("retry ved NotFoundRestException fra Entra") {
+            When("geoGrupper kaster NotFoundRestException") {
+                Then("sletter OID-cache, henter ny OID og kaller geoGrupper på nytt") {
+                    every { oid.oid(ansattId) } returnsMany listOf(OID, NY_OID)
+                    every { entra.geoGrupper(ansattId, OID) } throws NotFoundRestException(URI.create("http://entra"))
+
+                    assertDoesNotThrow {
+                        oppfrisker.oppfrisk(nøkkel(GEO))
+                    }
+
+                    verify { cache.delete(OID_CACHE, ansattId.verdi) }
+                    verify(exactly = 2) { oid.oid(ansattId) }
+                    verify { entra.geoGrupper(ansattId, NY_OID) }
+                    verify { teller.tell() }
+                }
+            }
+
+            When("geoOgGlobaleGrupper kaster NotFoundRestException") {
+                Then("sletter OID-cache, henter ny OID og kaller geoOgGlobaleGrupper på nytt") {
+                    every { oid.oid(ansattId) } returnsMany listOf(OID, NY_OID)
+                    every { entra.geoOgGlobaleGrupper(ansattId, OID) } throws NotFoundRestException(URI.create("http://entra"))
+
+                    assertDoesNotThrow {
+                        oppfrisker.oppfrisk(nøkkel(GEO_OG_GLOBALE))
+                    }
+
+                    verify { cache.delete(OID_CACHE, ansattId.verdi) }
+                    verify(exactly = 2) { oid.oid(ansattId) }
+                    verify { entra.geoOgGlobaleGrupper(ansattId, NY_OID) }
+                    verify { teller.tell() }
+                }
+            }
+
+            When("retry også feiler med NotFoundRestException") {
+                Then("oppfrisk fanger exception og propagerer ikke") {
+                    every { oid.oid(ansattId) } returnsMany listOf(OID, NY_OID)
+                    every { entra.geoGrupper(ansattId, OID) } throws NotFoundRestException(URI.create("http://entra"))
+                    every { entra.geoGrupper(ansattId, NY_OID) } throws NotFoundRestException(URI.create("http://entra"))
+
+                    assertDoesNotThrow {
+                        oppfrisker.oppfrisk(nøkkel(GEO))
+                    }
+
+                    verify { cache.delete(OID_CACHE, ansattId.verdi) }
+                    verify(exactly = 0) { teller.tell() }
                 }
             }
         }

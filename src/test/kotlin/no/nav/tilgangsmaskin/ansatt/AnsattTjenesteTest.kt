@@ -7,6 +7,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
+import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
@@ -18,7 +19,7 @@ class AnsattTjenesteTest : BehaviorSpec({
 
     val nom      = mockk<NomTjeneste>(relaxed = true)
     val brukere  = mockk<BrukerTjeneste>(relaxed = true)
-    val resolver = mockk<AnsattGruppeResolver>(relaxed = true)
+    val resolver = mockk<EntraAnsattGruppeResolver>(relaxed = true)
     val teller   = mockk<NasjonalGruppeTeller>(relaxed = true)
     val tjeneste = AnsattTjeneste(nom, brukere, resolver, teller)
 

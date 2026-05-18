@@ -14,6 +14,7 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.globaleGrupper
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
@@ -32,7 +33,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
     val oid       = UUID.randomUUID()
     val geoGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_1234")
 
-    val resolver = AnsattGruppeResolver(entra, token, oidTjeneste, mockk())
+    val resolver = EntraAnsattGruppeResolver(entra, token, oidTjeneste, mockk())
 
     beforeEach {
         clearAllMocks()

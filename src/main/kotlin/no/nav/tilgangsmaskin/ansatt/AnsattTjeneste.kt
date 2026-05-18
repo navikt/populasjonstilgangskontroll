@@ -4,6 +4,7 @@ import io.micrometer.core.annotation.Timed
 import io.micrometer.core.instrument.Tags
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
+import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.regler.motor.NasjonalGruppeTeller
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Service
 @ConditionalOnGCP
 class AnsattTjeneste(private val ansatte: NomTjeneste,
                      private val brukere: BrukerTjeneste,
-                     private val resolver: AnsattGruppeResolver,
+                     private val resolver: EntraAnsattGruppeResolver,
                      private val teller: NasjonalGruppeTeller) {
 
     private val log = getLogger(javaClass)

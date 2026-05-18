@@ -1,24 +1,23 @@
-package no.nav.tilgangsmaskin.ansatt
+package no.nav.tilgangsmaskin.ansatt.graph
 
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.girNasjonalTilgang
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.globaleGrupper
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_OG_GLOBALE_CACHE
-import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.tilgang.Token
-import org.slf4j.LoggerFactory.getLogger
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus.UNAUTHORIZED
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 
 @Component
-class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: Token, private val oid: EntraOidTjeneste, private val cache: CacheOperations)  {
+class EntraAnsattGruppeResolver(private val entra: EntraTjeneste, private val token: Token, private val oid: EntraOidTjeneste, private val cache: CacheOperations)  {
 
-    private val log = getLogger(javaClass)
+    private val log = LoggerFactory.getLogger(javaClass)
 
      fun grupperForAnsatt(ansattId: AnsattId) =
         when {
@@ -34,7 +33,7 @@ class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: 
             }
         }.getOrElse {
             if (it is NotFoundRestException) {
-                cache.delete(GEO_OG_GLOBALE_CACHE, ansattId.verdi)
+                cache.delete(EntraGrupperConfig.GEO_OG_GLOBALE_CACHE, ansattId.verdi)
                 runCatching {
                     val nyoid = oid.oid(ansattId)
                     entra.geoOgGlobaleGrupper(ansattId, nyoid).also {
@@ -58,8 +57,12 @@ class AnsattGruppeResolver(private val entra: EntraTjeneste, private val token: 
         }
     }
     private fun grupperForUautentisert(ansattId: AnsattId) =
-        if (isProd) {
-            throw HttpClientErrorException(UNAUTHORIZED, "Autentisering påkrevet i produksjonsmiljøet", HttpHeaders(), null, null)
+        if (ClusterUtils.isProd) {
+            throw HttpClientErrorException(HttpStatus.UNAUTHORIZED,
+                "Autentisering påkrevet i produksjonsmiljøet",
+                HttpHeaders(),
+                null,
+                null)
         } else {
             log.info("Intet token i dev/local for $ansattId, slår opp globale og GEO-grupper i Entra")
             entra.geoOgGlobaleGrupper(ansattId, oid.oid(ansattId)).also {

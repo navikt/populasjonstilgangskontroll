@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.ansatt.graph
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRAPH
-import no.nav.tilgangsmaskin.felles.Generated
+import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.RestDefaultErrorHandler
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatusCode
@@ -38,7 +38,7 @@ class EntraGrupperRestClientAdapter(
             .requiredBody<T>()
 
 
-    @Generated
+    @NoCoverageAnalysis
     override fun toString() = "${javaClass.simpleName} [client=$restClient, config=$cfg, errorHandler=$errorHandler]"
 
 }

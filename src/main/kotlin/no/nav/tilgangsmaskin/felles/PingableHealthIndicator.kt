@@ -33,7 +33,7 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
                 .build()
         }
 
-    @Generated
+    @NoCoverageAnalysis
     override fun toString() = "${javaClass.simpleName} [pingable=$pingable]"
 
     companion object {

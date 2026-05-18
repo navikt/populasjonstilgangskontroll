@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.KOMMUNE
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.UDEFINERT
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.UTLAND
-import no.nav.tilgangsmaskin.felles.Generated
+import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
 
 
@@ -25,24 +25,24 @@ sealed class GeografiskTilknytning(type: Type) {
     }
 
     data class KommuneTilknytning(val kommune: Kommune) : GeografiskTilknytning(KOMMUNE){
-        @Generated
+        @NoCoverageAnalysis
         override fun toString() = "${javaClass.simpleName} (kommune=${kommune.verdi})"
     }
     data class BydelTilknytning(val bydel: Bydel) : GeografiskTilknytning(BYDEL) {
-        @Generated
+        @NoCoverageAnalysis
         override fun toString() = "${javaClass.simpleName} (bydel=${bydel.verdi})"
     }
     class UkjentBosted : GeografiskTilknytning(UKJENT_BOSTED) {
-        @Generated override fun equals(other: Any?) = other is UkjentBosted
-        @Generated override fun hashCode() = javaClass.hashCode()
+        @NoCoverageAnalysis override fun equals(other: Any?) = other is UkjentBosted
+        @NoCoverageAnalysis override fun hashCode() = javaClass.hashCode()
     }
 
     class UtenlandskTilknytning : GeografiskTilknytning(UTLAND){
-        @Generated override fun equals(other: Any?) = other is UtenlandskTilknytning
-        @Generated override fun hashCode() = javaClass.hashCode()
+        @NoCoverageAnalysis override fun equals(other: Any?) = other is UtenlandskTilknytning
+        @NoCoverageAnalysis override fun hashCode() = javaClass.hashCode()
     }
     class UdefinertTilknytning : GeografiskTilknytning(UDEFINERT) {
-        @Generated override fun equals(other: Any?) = other is UdefinertTilknytning
-        @Generated override fun hashCode() = javaClass.hashCode()
+        @NoCoverageAnalysis override fun equals(other: Any?) = other is UdefinertTilknytning
+        @NoCoverageAnalysis override fun hashCode() = javaClass.hashCode()
     }
 }

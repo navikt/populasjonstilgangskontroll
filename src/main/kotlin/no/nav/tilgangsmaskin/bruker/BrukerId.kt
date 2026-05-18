@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.bruker
 
 import com.fasterxml.jackson.annotation.JsonValue
-import no.nav.tilgangsmaskin.felles.Generated
+import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
@@ -15,7 +15,7 @@ data class Identifikator(@JsonValue val verdi: String) {
         }.isSuccess)
     }
 
-    @Generated
+    @NoCoverageAnalysis
     override fun toString() = verdi.maskFnr()
 }
 
@@ -46,7 +46,7 @@ data class BrukerId(@JsonValue val verdi: String) {
             }
     }
 
-    @Generated
+    @NoCoverageAnalysis
     override fun toString() = verdi.maskFnr()
 }
 

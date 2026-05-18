@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.tilgang
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.felles.Generated
+import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import org.springframework.http.HttpStatus
@@ -20,7 +20,7 @@ data class AggregertBulkRespons(val ansattId: AnsattId, val resultater: Set<Enke
            // fun ok(brukerId: BrukerId) = ok(brukerId.verdi)
         }
 
-        @Generated
+        @NoCoverageAnalysis
         override fun toString(): String =
             "${javaClass.simpleName}(oppslagId='${brukerId.maskFnr()}', httpStatus=$httpStatus, detaljer=$detaljer, status=$status)"
     }
@@ -33,7 +33,7 @@ data class AggregertBulkRespons(val ansattId: AnsattId, val resultater: Set<Enke
 
     private fun filter(status: HttpStatus) = resultater.filter { it.httpStatus == status }.toSet()
 
-    @Generated
+    @NoCoverageAnalysis
     override fun toString(): String =
         "${javaClass.simpleName}(ansattId=$ansattId, resultater=$resultater)"
 }

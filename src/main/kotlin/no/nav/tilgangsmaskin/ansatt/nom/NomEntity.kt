@@ -23,7 +23,7 @@ class NomEntity(
         @Column(nullable = false) var gyldigtil: Instant) {
 
     @Id
-    @GeneratedValue(strategy = IDENTITY)
+    @NoCoverageAnalysisValue(strategy = IDENTITY)
     val id: Long? = null
 
     @Column(nullable = false, updatable = false)

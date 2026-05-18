@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.Generated
+import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
 import org.slf4j.LoggerFactory.getLogger
@@ -54,7 +54,7 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class NomHendelse(val personident: String, val navident: String, val startdato: LocalDate?, val sluttdato: LocalDate?) {
 
-    @Generated
+    @NoCoverageAnalysis
     override fun toString() =
         "${javaClass.simpleName} (personident=${personident.maskFnr()}, navident=$navident, startdato=$startdato, sluttdato=$sluttdato)"
 }

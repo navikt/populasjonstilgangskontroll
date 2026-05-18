@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
-import no.nav.tilgangsmaskin.felles.Generated
+import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import org.springframework.web.util.DefaultUriBuilderFactory
 import java.net.URI
 
@@ -12,7 +12,7 @@ abstract class RestConfig(val baseUri: URI, pingPath: String, val name: String) 
 
     val pingEndpoint = builder().path(pingPath).build()
 
-    @Generated
+    @NoCoverageAnalysis
     override fun toString()  = "${javaClass.simpleName} [name=$name, pingEndpoint=$pingEndpoint,baseUri=$baseUri]"
 }
 

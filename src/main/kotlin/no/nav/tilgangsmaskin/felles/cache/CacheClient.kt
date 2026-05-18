@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
 import java.time.Duration
+import java.time.Duration.ofSeconds
 import kotlin.reflect.KClass
 
 @RetryingWhenRecoverableRestService
@@ -20,7 +21,7 @@ import kotlin.reflect.KClass
     private val log = getLogger(javaClass)
 
     private val conn = client.connect().apply {
-        timeout = Duration.ofSeconds(cfg.timeout.seconds)
+        timeout = ofSeconds(cfg.timeout.seconds)
         if (isLocalOrTest) {
             sync().configSet("notify-keyspace-events", "Exd")
         }

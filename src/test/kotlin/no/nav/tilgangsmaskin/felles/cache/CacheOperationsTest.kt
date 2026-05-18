@@ -22,7 +22,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.felles.cache.CacheOperationsTest.CacheTestConfig
-import no.nav.tilgangsmaskin.felles.cache.CacheOperationsTest.Companion.TestData.Kontakt.Adresse
+
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import no.nav.tilgangsmaskin.tilgang.Token
@@ -65,7 +65,7 @@ class CacheOperationsTest : BehaviorSpec() {
         @Bean
         @Primary
         fun cacheConfig() =
-            CacheConfig("user", "pw", redis.host, redis.firstMappedPort, ofSeconds(1), ofSeconds(1))
+            CacheConfig("user", "pw", redis.host, redis.firstMappedPort, ofSeconds(1))
 
         @Bean
         fun cacheManager()  =
@@ -180,13 +180,13 @@ class CacheOperationsTest : BehaviorSpec() {
         cache.putMany(TEST_CACHE, innslag.associateBy { it.id }, duration)
 
     private fun getMany(ids: Set<String>) =
-        cache.getMany(TEST_CACHE, ids, TestData::class)
+        cache.getMany<TestData>(TEST_CACHE, ids)
 
     private fun putOne(innslag: TestData, duration: Duration = ofSeconds(2)) =
         cache.putOne(TEST_CACHE, innslag.id, innslag, duration)
 
     private fun getOne(id: String) =
-        cache.getOne(TEST_CACHE, id, TestData::class)
+        cache.getOne<TestData>(TEST_CACHE, id)
 
     private companion object {
         @ServiceConnection
@@ -209,7 +209,7 @@ class CacheOperationsTest : BehaviorSpec() {
             companion object {
                 fun of(id: String) = TestData(
                     id, "Navn $id", 42,
-                    Kontakt("$id@test.no", "99887766", Adresse("Testgata 1", "0001", "Oslo"))
+                    Kontakt("$id@test.no", "99887766", Kontakt.Adresse("Testgata 1", "0001", "Oslo"))
                 )
             }
         }

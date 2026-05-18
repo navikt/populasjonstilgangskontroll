@@ -8,6 +8,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPersoner
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.tilgangsmaskin.felles.cache.*
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
@@ -70,7 +71,7 @@ class PdlTjeneste(
     }
 
     private fun fraCache(identer: Set<String>) =
-        cache.getMany(PDL_MED_FAMILIE_CACHE, identer, Person::class)
+        cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, identer)
             .filterValues { it != null }
             .mapValues { it.value!! }.also {
                 log.info("Hentet ${it.size} person(er) av ${identer.size} mulige fra CACHE")

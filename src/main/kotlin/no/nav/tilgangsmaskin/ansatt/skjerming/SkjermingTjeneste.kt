@@ -5,6 +5,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMIN
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.tilgangsmaskin.felles.cache.*
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
@@ -33,7 +34,7 @@ class SkjermingTjeneste(private val client: SkjermingClient, private val cache: 
     }
 
     private fun fraCache(ids: Set<String>) =
-        cache.getMany(SKJERMING_CACHE, ids, Boolean::class)
+        cache.getMany<Boolean>(SKJERMING_CACHE, ids)
             .mapNotNull { (id, value) -> value?.let { id to it } }
             .toMap()
 

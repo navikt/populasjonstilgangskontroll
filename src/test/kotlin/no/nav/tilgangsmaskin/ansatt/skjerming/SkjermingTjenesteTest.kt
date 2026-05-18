@@ -22,6 +22,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjenesteTest.SkjermingTes
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
+import no.nav.tilgangsmaskin.felles.cache.*
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RestRetryLogger
@@ -83,7 +84,7 @@ class SkjermingTjenesteTest : BehaviorSpec() {
                         .andRespond(withSuccess("true", APPLICATION_JSON))
                     tjeneste.skjerming(ID1) shouldBe true
                     tjeneste.skjerming(ID1) shouldBe true
-                    cache.getOne(SKJERMING_CACHE, I1, Boolean::class) shouldBe true
+                    cache.getOne<Boolean>(SKJERMING_CACHE, I1) shouldBe true
                 }
             }
         }
@@ -95,7 +96,7 @@ class SkjermingTjenesteTest : BehaviorSpec() {
                     server.expect(once(), requestTo(SKJERMINGER_URI))
                         .andRespond(withSuccess("""{"$I2":false}""", APPLICATION_JSON))
                     tjeneste.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to true, ID2 to false)
-                    cache.getMany(SKJERMING_CACHE, IDS, Boolean::class).keys shouldContainExactlyInAnyOrder IDS
+                    cache.getMany<Boolean>(SKJERMING_CACHE, IDS).keys shouldContainExactlyInAnyOrder IDS
                 }
             }
             When("alle er i cache") {
@@ -112,7 +113,7 @@ class SkjermingTjenesteTest : BehaviorSpec() {
                     server.expect(once(), requestTo(SKJERMINGER_URI))
                         .andRespond(withSuccess("""{"$I2":false}""", APPLICATION_JSON))
                     tjeneste.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to true, ID2 to false)
-                    cache.getMany(SKJERMING_CACHE, IDS, Boolean::class).keys shouldContainExactlyInAnyOrder IDS
+                    cache.getMany<Boolean>(SKJERMING_CACHE, IDS).keys shouldContainExactlyInAnyOrder IDS
                 }
             }
             When("ingen identer") {
@@ -126,7 +127,7 @@ class SkjermingTjenesteTest : BehaviorSpec() {
                     server.expect(once(), requestTo(SKJERMINGER_URI))
                         .andRespond(withSuccess("""{"$I1":true}""", APPLICATION_JSON))
                     tjeneste.skjerminger(listOf(ID1))
-                    cache.getOne(SKJERMING_CACHE, I1, Boolean::class) shouldBe true
+                    cache.getOne<Boolean>(SKJERMING_CACHE, I1) shouldBe true
                 }
             }
         }

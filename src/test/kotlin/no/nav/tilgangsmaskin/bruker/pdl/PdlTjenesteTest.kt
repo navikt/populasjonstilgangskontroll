@@ -23,6 +23,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.restRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjenesteTest.PdlTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
+import no.nav.tilgangsmaskin.felles.cache.*
 import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,7 +31,6 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.cache.CacheManager
-import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -83,7 +83,7 @@ class PdlTjenesteTest : BehaviorSpec() {
                         .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
                     pdl.medFamilie(I1) shouldBe P1
                     server.verify()
-                    cache.getOne(PDL_MED_FAMILIE_CACHE, I1, Person::class) shouldBe P1
+                    cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, I1) shouldBe P1
                 }
             }
         }
@@ -95,7 +95,7 @@ class PdlTjenesteTest : BehaviorSpec() {
                         .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
                     pdl.medUtvidetFamilie(I1) shouldBe P1
                     server.verify()
-                    cache.getOne(PDL_MED_UTVIDET_FAMILIE_CACHE, I1, Person::class) shouldBe P1
+                    cache.getOne<Person>(PDL_MED_UTVIDET_FAMILIE_CACHE, I1) shouldBe P1
                 }
             }
             When("samme person slås opp to ganger") {
@@ -148,7 +148,7 @@ class PdlTjenesteTest : BehaviorSpec() {
                     server.expect(requestTo(cfg.personerURI))
                         .andRespond(withSuccess(restRespons(mapper, P2), APPLICATION_JSON))
                     pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
-                    cache.getOne(PDL_MED_FAMILIE_CACHE, I2, Person::class) shouldBe P2
+                    cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, I2) shouldBe P2
                     server.verify()
                 }
             }

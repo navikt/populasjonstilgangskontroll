@@ -43,9 +43,6 @@ class PdlCacheOpprydder(private val pdl: PdlTjeneste,
             log.trace(CONFIDENTIAL,"Slettet nøkkel ${client.tilNøkkel(cache, id)} fra cache ${cache.name} etter hendelse av type: {}", id.maskFnr(), gradering)
             log.info("Slettet innslag fra cache ${cache.name} etter hendelse med gradering: {}",gradering)
         }
-        else {
-            log.trace( CONFIDENTIAL,"Fant ikke ident {} i ${cache.name} for sletting ved hendelse med gradering: {}", id.maskFnr(), gradering)
-        }
     }
     private fun refresh(identer: List<String>, gradering: String) =
         identer.forEach { id ->

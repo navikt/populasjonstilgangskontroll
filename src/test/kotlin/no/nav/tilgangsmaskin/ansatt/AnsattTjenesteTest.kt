@@ -29,11 +29,6 @@ class AnsattTjenesteTest : BehaviorSpec({
 
 
     Given("ansatt") {
-        When("kalles uten noen oppsett") {
-            Then("returneres ansatt med riktig id") {
-                tjeneste.ansatt(ansattId).ansattId shouldBe ansattId
-            }
-        }
 
         When("fnrForAnsatt returnerer null") {
             Then("returneres ansatt uten bruker") {

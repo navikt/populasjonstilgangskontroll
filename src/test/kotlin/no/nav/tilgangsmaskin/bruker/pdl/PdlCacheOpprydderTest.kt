@@ -33,7 +33,7 @@ class PdlCacheOpprydderTest : BehaviorSpec({
 
     beforeEach {
         every { client.tilNøkkel(any(), any()) } answers { "${firstArg<Any>()}::${secondArg<String>()}" }
-        every { client.delete(any(), any()) } returns 0L
+        every { client.delete(any(), any()) } returns 1L
     }
 
     Given("sletting") {

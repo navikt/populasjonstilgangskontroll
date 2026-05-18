@@ -32,7 +32,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
     val oid       = UUID.randomUUID()
     val geoGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_1234")
 
-    val resolver = AnsattGruppeResolver(entra, token, oidTjeneste)
+    val resolver = AnsattGruppeResolver(entra, token, oidTjeneste, mockk())
 
     beforeEach {
         clearAllMocks()

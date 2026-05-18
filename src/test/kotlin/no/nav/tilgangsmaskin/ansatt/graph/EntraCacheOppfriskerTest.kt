@@ -4,7 +4,6 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
-import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.verify
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -42,7 +41,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
 
     init {
         beforeEach {
-            clearMocks(entra, oid, cache, teller)
             every { oid.oid(ansattId) } returns OID
         }
 

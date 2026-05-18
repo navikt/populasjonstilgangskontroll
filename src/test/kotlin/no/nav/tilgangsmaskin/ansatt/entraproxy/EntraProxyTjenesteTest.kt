@@ -39,7 +39,9 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
     lateinit var server: MockRestServiceServer
 
     init {
-        afterEach { server.verify() }
+        afterEach {
+            server.verify()
+        }
 
         Given("oppslag av enhet for ansatt") {
             When("ansatt eksisterer") {

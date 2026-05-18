@@ -68,6 +68,9 @@ class CacheOperationsTest : BehaviorSpec() {
             CacheConfig("user", "pw", redis.host, redis.firstMappedPort, ofSeconds(1))
 
         @Bean
+        fun cachePingable(cfg: CacheConfig) = CachePingable(cf, cfg)
+
+        @Bean
         fun cacheManager()  =
             builder(cf)
                 .withInitialCacheConfigurations(
@@ -104,6 +107,9 @@ class CacheOperationsTest : BehaviorSpec() {
     @Autowired
     private lateinit var cache: CacheOperations
 
+    @Autowired
+    private lateinit var pingable: CachePingable
+
     private val events = CopyOnWriteArrayList<CacheInnslagFjernetHendelse>()
 
     private fun setUpCache() {
@@ -117,12 +123,27 @@ class CacheOperationsTest : BehaviorSpec() {
             ctx.addApplicationListener { event ->
                 if (event is CacheInnslagFjernetHendelse) events.add(event)
             }
-            setUpCache()
         }
 
         beforeEach {
+            setUpCache()
             events.clear()
             ctx.getBean<RedisCacheManager>().getCache(TEST_CACHE.name)?.clear()
+        }
+
+        Given("CachePingable mot ekte Redis") {
+            When("ping kalles") {
+                Then("returnerer tomt map (PONG)") {
+                    val result = pingable.ping()
+                    result shouldBe emptyMap()
+                }
+            }
+            When("name og pingEndpoint sjekkes") {
+                Then("har korrekte verdier") {
+                    pingable.name shouldBe "Cache"
+                    pingable.pingEndpoint.toString() shouldBe "${redis.host}:${redis.firstMappedPort}"
+                }
+            }
         }
 
         Given("verdier som legges i cache med kort TTL fjernes etterhvert") {

@@ -157,6 +157,13 @@ class CacheOperationsTest : BehaviorSpec() {
                 }
             }
         }
+        Given("getMany med tomt set") {
+            When("ingen entries") {
+                Then("slås ikke opp") {
+                    getMany(emptySet()).shouldBeEmpty()
+                }
+            }
+        }
 
         Given("en eksisterende nøkkel i cachen") {
             When("delete kalles") {

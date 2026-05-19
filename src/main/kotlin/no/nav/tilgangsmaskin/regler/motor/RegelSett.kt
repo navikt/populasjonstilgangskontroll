@@ -7,9 +7,7 @@ data class RegelSett(val spec: Pair<RegelType, List<Regel>>) {
     val type = spec.first
     val beskrivelse = type.beskrivelse.upcase()
     val size = regler.size
-
-    operator fun plus(other: RegelSett) = regler + other.regler
-
+    
     enum class RegelType(val beskrivelse: String) {
         KJERNE_REGELTYPE(KJERNE),
         TELLENDE_REGELTYPE(TELLENDE),

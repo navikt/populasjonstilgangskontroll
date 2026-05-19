@@ -100,7 +100,7 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
             When("avslutt kalles etter registrering") {
                 Then("fjernes cache-innslag for brukerId og aktørId") {
                     val id = randomUUID()
-                    tjeneste.registrer(id, IDENTER, KONTOR)
+                    tjeneste.registrer(id, IDENTER, kontorHendelse)
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, brukerId.verdi) shouldBe kontor
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, aktørId.verdi) shouldBe kontor
 
@@ -118,7 +118,7 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
         private val aktørId  = AktørId("1234567890123")
         private val kontor   = Enhetsnummer("1234")
         private val IDENTER  = Identer(brukerId, aktørId)
-        private val KONTOR = Kontor(kontor, "Testenhet")
+        private val kontorHendelse = Kontor(kontor, "Testenhet")
         @ServiceConnection
         private val postgres = PostgreSQLContainer("postgres:17")
     }

@@ -11,8 +11,8 @@ open class IrrecoverableRestException(
     val status: HttpStatusCode, uri: URI, msg: String = (status as HttpStatus).reasonPhrase,
     cause: Throwable? = null) : ErrorResponseException(status, problemDetail(status, msg, uri), cause)
 
-class NotFoundRestException(val uri: URI, val identifikator: String? = null, msg: String = "Ikke funnet",cause: Throwable? = null) :
-    IrrecoverableRestException(NOT_FOUND, uri, msg,cause)
+class NotFoundRestException(val uri: URI, val identifikator: String? = null, msg: String = "Ikke funnet", cause: Throwable? = null) :
+    IrrecoverableRestException(NOT_FOUND, uri, msg, cause)
 
 open class RecoverableRestException(status: HttpStatusCode,
                                     uri: URI,
@@ -25,4 +25,3 @@ private fun problemDetail(status: HttpStatusCode, msg: String, uri: URI) =
         title = "${status.value()}"
         properties = mapOf("uri" to "$uri")
     }
-

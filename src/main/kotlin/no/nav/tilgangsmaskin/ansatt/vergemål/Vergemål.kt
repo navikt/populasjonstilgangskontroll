@@ -1,11 +1,8 @@
 package no.nav.tilgangsmaskin.ansatt.vergemål
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.tilgangsmaskin.bruker.BrukerId
 
-data class Vergemål(
-    val vergehaver: BrukerId,
-    val verge: BrukerId,
-    val leserettigheter: List<String>,
-    val skriverettigheter: List<String>
-)
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Vergemål(val vergehaver: BrukerId)
 

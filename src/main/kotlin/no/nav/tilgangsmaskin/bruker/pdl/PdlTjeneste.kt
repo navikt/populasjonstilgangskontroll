@@ -55,7 +55,8 @@ class PdlTjeneste(
         return (fraCache.values + fraRest.values).toSet()
     }
 
-    private fun person(id: String) = tilPerson(id, pip.person(id, id))
+    private fun person(id: String) =
+        tilPerson(id, pip.person(id, id))
 
     private fun hentPersoner(identer: Set<String>) =
         tilPersoner(pip.personer(identer))

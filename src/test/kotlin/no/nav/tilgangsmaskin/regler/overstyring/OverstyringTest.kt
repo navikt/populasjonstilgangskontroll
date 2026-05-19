@@ -28,7 +28,7 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.RegelTestConfig
+import no.nav.tilgangsmaskin.regler.motor.RegelMotorTestConfig
 import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
 import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringClientValidator.OverstyringException
@@ -39,21 +39,19 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
-import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
 
-@Import(RegelTestConfig::class)
 @DataJpaTest
 @EnableJpaAuditing
 @Testcontainers
 @AutoConfigureMetrics
 @TestPropertySource(locations = ["classpath:test.properties"])
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [TestApp::class, LocalAuditor::class,OverstyringJPAAdapter::class])
+@ContextConfiguration(classes = [TestApp::class, RegelMotorTestConfig::class, LocalAuditor::class,OverstyringJPAAdapter::class])
 @ApplyExtension(SpringExtension::class)
 internal class OverstyringTest : BehaviorSpec() {
 

@@ -22,7 +22,6 @@ import no.nav.tilgangsmaskin.regler.motor.Regel
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
-import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
 import java.net.URI
 
 class RegelTjenesteTest : BehaviorSpec() {

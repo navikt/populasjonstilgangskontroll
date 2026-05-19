@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.tilgang
+package no.nav.tilgangsmaskin.regler
 
 import io.micrometer.core.annotation.Timed
 import io.opentelemetry.instrumentation.annotations.WithSpan
@@ -14,13 +14,12 @@ import no.nav.tilgangsmaskin.regler.motor.BrukerOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
+import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
+import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
-import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
-import org.slf4j.LoggerFactory.getLogger
-import org.springframework.http.HttpStatus.FORBIDDEN
-import org.springframework.http.HttpStatus.NOT_FOUND
+import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import kotlin.time.measureTime
 import kotlin.time.measureTimedValue
@@ -32,13 +31,13 @@ class RegelTjeneste(
     private val ansattTjeneste: AnsattTjeneste,
     private val overstyringTjeneste: OverstyringTjeneste,
     private val auditor: Auditor) {
-    private val log = getLogger(javaClass)
+    private val log = LoggerFactory.getLogger(javaClass)
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "komplett"])
     @WithSpan
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
-            log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
+            log.info("Sjekker ${RegelType.KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
             bruker(brukerId)?.let { bruker ->
                 runCatching {
                     motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
@@ -46,11 +45,15 @@ class RegelTjeneste(
                     if (overstyringTjeneste.erOverstyrt(ansattId, bruker.brukerId) && it is RegelException) {
                         log.trace("Overstyring registrert for {} og {}", ansattId, brukerId.maskFnr(), it)
                     } else {
-                        log.trace("Tilgang avvist ved kjøring av komplette regler for {} og {}", ansattId, brukerId.maskFnr(), it)
+                        log.trace("Tilgang avvist ved kjøring av komplette regler for {} og {}",
+                            ansattId,
+                            brukerId.maskFnr(),
+                            it)
                         throw it
                     }
                 }
-            } ?: log.info("Komplette regler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
+            }
+                ?: log.info("Komplette regler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
         }
         log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
     }
@@ -59,7 +62,7 @@ class RegelTjeneste(
         brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
     }.getOrElse {
         if (it is NotFoundRestException) {
-            auditor.info("${NOT_FOUND.name}: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
+            auditor.info("${HttpStatus.NOT_FOUND.name}: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
             null
         } else {
             log.warn("Feil ved oppslag av bruker for ${brukerId.maskFnr()}", it)
@@ -82,7 +85,8 @@ class RegelTjeneste(
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val brukere = idOgType.brukerOgRegelsett()
             val resultater = motor.bulkRegler(ansatt, brukere).also {
-                log.debug("${it.size} bulk resultater {}", it.map { resultat -> "${resultat.bruker.oppslagId.maskFnr()}: ${resultat.status}" })
+                log.debug("${it.size} bulk resultater {}",
+                    it.map { resultat -> "${resultat.bruker.oppslagId.maskFnr()}: ${resultat.status}" })
             }
             val godkjente = godkjente(ansatt, resultater)
             val avviste = avviste(ansatt, godkjente, resultater, brukere)
@@ -100,7 +104,7 @@ class RegelTjeneste(
     private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) =
         buildSet {
             for (item in (oppgitt - funnet)) {
-                add(ok(item.brukerId))
+                add(EnkeltBulkRespons.ok(item.brukerId))
             }
         }.also {
             if (it.isNotEmpty()) {
@@ -114,9 +118,12 @@ class RegelTjeneste(
         val godkjenteIds = buildSet { godkjente.forEach { add(it.brukerId) } }
         for (resultat in resultater) {
             log.trace("Bulk Sjekker overstyring for avvist {}", resultat.bruker.oppslagId.maskFnr())
-            if (resultat.status == FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
+            if (resultat.status == HttpStatus.FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
                 log.trace("Bulk resultat for {} har ingen overstyring", resultat.bruker.oppslagId.maskFnr())
-                add(EnkeltBulkRespons(RegelException(ansatt, brukere.finnBruker(resultat.bruker.oppslagId), resultat.regel!!, status = resultat.status)))
+                add(EnkeltBulkRespons(RegelException(ansatt,
+                    brukere.finnBruker(resultat.bruker.oppslagId),
+                    resultat.regel!!,
+                    status = resultat.status)))
             }
         }
     }.also {
@@ -128,10 +135,10 @@ class RegelTjeneste(
     private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) =
         buildSet {
             val (godkjente, avviste) = resultater.partition { it.status.is2xxSuccessful }
-            godkjente.forEach { add(ok(it.bruker.oppslagId)) }
+            godkjente.forEach { add(EnkeltBulkRespons.ok(it.bruker.oppslagId)) }
             overstyringTjeneste
                 .overstyringer(ansatt.ansattId, avviste.map { it.bruker.brukerId })
-                .forEach { add(ok(it.verdi)) }
+                .forEach { add(EnkeltBulkRespons.ok(it.verdi)) }
         }.also { respons ->
             if (respons.isNotEmpty()) {
                 log.debug("Bulk godkjente oppslagId(s) {}", respons.map { it.brukerId.maskFnr() })

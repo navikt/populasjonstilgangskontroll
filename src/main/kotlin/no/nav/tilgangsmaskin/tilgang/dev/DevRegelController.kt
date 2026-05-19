@@ -11,7 +11,7 @@ import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.tilgang.BulkSwaggerApiRespons
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
-import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
+import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import org.springframework.http.HttpStatus.MULTI_STATUS
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.web.bind.annotation.GetMapping

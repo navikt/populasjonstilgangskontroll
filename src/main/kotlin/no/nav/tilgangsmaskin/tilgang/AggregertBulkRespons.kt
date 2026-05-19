@@ -16,8 +16,8 @@ data class AggregertBulkRespons(val ansattId: AnsattId, val resultater: Set<Enke
         val status = httpStatus.value()
 
         companion object {
-            fun ok(brukerId: String) = EnkeltBulkRespons(brukerId, NO_CONTENT)
-           // fun ok(brukerId: BrukerId) = ok(brukerId.verdi)
+            fun ok(brukerId: String) =
+                EnkeltBulkRespons(brukerId, NO_CONTENT)
         }
 
         @NoCoverageAnalysis

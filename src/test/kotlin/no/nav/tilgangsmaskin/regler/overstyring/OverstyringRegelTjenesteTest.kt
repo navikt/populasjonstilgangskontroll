@@ -33,26 +33,24 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.RegelTestConfig
+import no.nav.tilgangsmaskin.regler.motor.RegelMotorTestConfig
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.tilgang.RegelTjeneste
+import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
-import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
 
-@Import(RegelTestConfig::class)
 @DataJpaTest
 @EnableJpaAuditing
 @TestPropertySource(properties = [
@@ -64,7 +62,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer
     "gruppe.egenansatt=dbe4ad45-320b-4e9a-aaa1-73cca4ee124d",
 ])
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [TestApp::class, OverstyringTjeneste::class,OverstyringJPAAdapter::class,RegelTjeneste::class,LocalAuditor::class])
+@ContextConfiguration(classes = [TestApp::class, RegelMotorTestConfig::class, OverstyringTjeneste::class,OverstyringJPAAdapter::class,RegelTjeneste::class,LocalAuditor::class])
 @AutoConfigureMetrics
 @Testcontainers
 @ApplyExtension(SpringExtension::class)

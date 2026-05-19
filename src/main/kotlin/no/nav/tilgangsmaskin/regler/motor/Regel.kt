@@ -12,7 +12,6 @@ interface Regel {
     val kode get() = metadata.kode
     val kortNavn get() = metadata.kortNavn
     val begrunnelse get() = metadata.begrunnelse
-    val navn get() = metadata.navn
     val erOverstyrbar get() = this is OverstyrbarRegel
     fun godtaHvis(predikat: () -> Boolean) = predikat.invoke()
     fun avvisHvis(predikat: () -> Boolean) = !godtaHvis(predikat)

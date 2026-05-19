@@ -14,6 +14,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraTjenesteTest.EntraTestConfig
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidBeanConfig
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
@@ -147,7 +148,7 @@ class EntraTjenesteTest : BehaviorSpec() {
                     val second = tjeneste.geoGrupper(ANSATTID, OID)
 
                     first shouldBe second
-                    cache.getOne(GEO_CACHE, ANSATTID.verdi, Set::class) shouldBe first
+                    cache.getOne<Set<EntraGruppe>>(GEO_CACHE, ANSATTID.verdi) shouldBe first
                 }
             }
 
@@ -161,7 +162,7 @@ class EntraTjenesteTest : BehaviorSpec() {
                     val second = tjeneste.geoOgGlobaleGrupper(ANSATTID, OID)
 
                     first shouldBe second
-                    cache.getOne(GEO_OG_GLOBALE_CACHE, ANSATTID.verdi, Set::class) shouldBe first
+                    cache.getOne<Set<EntraGruppe>>(GEO_OG_GLOBALE_CACHE, ANSATTID.verdi) shouldBe first
                 }
             }
 

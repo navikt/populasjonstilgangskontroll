@@ -18,6 +18,7 @@ import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.tilgang.Token
 
@@ -73,7 +74,7 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
                     tjeneste.registrer(randomUUID(), IDENTER, KONTOR)
                     tjeneste.enhetFor(Identifikator(brukerId.verdi))
                     verify(exactly = 0) { adapter.enhetFor(brukerId.verdi) }
-                    cache.getOne(OPPFØLGING_CACHE, brukerId.verdi, Enhetsnummer::class) shouldBe kontor
+                    cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, brukerId.verdi) shouldBe kontor
                 }
                 Then("returneres enhet ved cache-treff uten adapter-kall") {
                     tjeneste.registrer(randomUUID(), IDENTER, KONTOR)
@@ -86,11 +87,11 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
             When("registrering utføres") {
                 Then("populeres cache for brukerId") {
                     tjeneste.registrer(randomUUID(), IDENTER, KONTOR)
-                    cache.getOne(OPPFØLGING_CACHE, brukerId.verdi, Enhetsnummer::class) shouldBe kontor
+                    cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, brukerId.verdi) shouldBe kontor
                 }
                 Then("populeres cache for aktørId") {
                     tjeneste.registrer(randomUUID(), IDENTER, KONTOR)
-                    cache.getOne(OPPFØLGING_CACHE, aktørId.verdi, Enhetsnummer::class) shouldBe kontor
+                    cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, aktørId.verdi) shouldBe kontor
                 }
             }
         }
@@ -100,13 +101,13 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
                 Then("fjernes cache-innslag for brukerId og aktørId") {
                     val id = randomUUID()
                     tjeneste.registrer(id, IDENTER, KONTOR)
-                    cache.getOne(OPPFØLGING_CACHE, brukerId.verdi, Enhetsnummer::class) shouldBe kontor
-                    cache.getOne(OPPFØLGING_CACHE, aktørId.verdi,  Enhetsnummer::class) shouldBe kontor
+                    cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, brukerId.verdi) shouldBe kontor
+                    cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, aktørId.verdi) shouldBe kontor
 
                     tjeneste.avslutt(id, IDENTER)
 
-                    cache.getOne(OPPFØLGING_CACHE, brukerId.verdi, Enhetsnummer::class) shouldBe null
-                    cache.getOne(OPPFØLGING_CACHE, aktørId.verdi,  Enhetsnummer::class) shouldBe null
+                    cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, brukerId.verdi) shouldBe null
+                    cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, aktørId.verdi) shouldBe null
                 }
             }
         }

@@ -12,6 +12,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.ENTRA_OID
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.OidTjenesteTest.EntraTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import org.hamcrest.Matchers.containsString
 import org.springframework.beans.factory.annotation.Autowired
@@ -73,7 +74,7 @@ class OidTjenesteTest : BehaviorSpec() {
 
                     tjeneste.oid(ANSATTID) shouldBe OID
                     tjeneste.oid(ANSATTID) shouldBe OID
-                    cache.getOne(OID_CACHE, ANSATTID.verdi, UUID::class) shouldBe OID
+                    cache.getOne<UUID>(OID_CACHE, ANSATTID.verdi) shouldBe OID
 
                 }
             }

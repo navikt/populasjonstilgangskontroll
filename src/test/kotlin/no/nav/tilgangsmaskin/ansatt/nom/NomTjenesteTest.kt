@@ -16,6 +16,7 @@ import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM_CACHE
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjenesteTest.NomTestConfig
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.ConcurrentMapCacheOperations
 import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
@@ -134,7 +135,7 @@ class NomTjenesteTest : BehaviorSpec() {
                     tjeneste.lagre(NomAnsattData(id, brukerId, NomAnsattPeriode(now(), now().plusYears(1))))
                     tjeneste.fnrForAnsatt(id) shouldBe brukerId
                     tjeneste.fnrForAnsatt(id) shouldBe brukerId
-                    cache.getOne(NOM_CACHE, id.verdi, BrukerId::class) shouldBe brukerId
+                    cache.getOne<BrukerId>(NOM_CACHE, id.verdi) shouldBe brukerId
                     verify(exactly = 1) { adapter.fnrForAnsatt(id.verdi) }
                 }
             }
@@ -145,7 +146,7 @@ class NomTjenesteTest : BehaviorSpec() {
                     tjeneste.fnrForAnsatt(ansattId)
                     val nyBrukerId = BrukerId("20478606614")
                     tjeneste.lagre(NomAnsattData(ansattId, nyBrukerId, NomAnsattPeriode(now(), now().plusYears(1))))
-                    cache.getOne(NOM_CACHE, ansattId.verdi, BrukerId::class) shouldBe null
+                    cache.getOne<BrukerId>(NOM_CACHE, ansattId.verdi) shouldBe null
                 }
             }
 

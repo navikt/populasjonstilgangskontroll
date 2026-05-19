@@ -4,6 +4,7 @@ import io.lettuce.core.ClientOptions
 import io.lettuce.core.RedisClient
 import io.lettuce.core.SocketOptions
 import no.nav.boot.conditionals.ConditionalOnGCP
+import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import org.springframework.cache.annotation.CachingConfigurer
@@ -21,6 +22,7 @@ import tools.jackson.module.kotlin.KotlinModule.Builder
 
 @Configuration(proxyBeanMethods = true)
 @ConditionalOnGCP
+@NoCoverageAnalysis
 class CacheBeanConfig(private val cf: RedisConnectionFactory,
                       private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 

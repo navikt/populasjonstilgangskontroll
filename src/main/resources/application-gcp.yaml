@@ -1,7 +1,7 @@
 server:
-  tomcat:
-    mbeanregistry:
-      enabled: true
+  jetty:
+    threads:
+      max: 200
 management:
   auditevents:
     enabled: false

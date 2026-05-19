@@ -20,7 +20,7 @@ class EntraOidTjeneste(private val oidClient: EntraOidClient, private val cfg: E
 
     private fun validerRespons(ansattId: AnsattId, oids: Set<EntraOid>): UUID {
         return when (oids.size) {
-            0 -> throw NotFoundRestException(cfg.baseUri,ansattId.verdi, "Fant ingen identifikator oid")
+            0 -> throw NotFoundRestException(cfg.baseUri, ansattId.verdi, "Fant ingen identifikator oid")
             1 -> oids.single().id
             else -> throw IrrecoverableRestException(CONFLICT, cfg.baseUri,
                 "Forventet kun én oid for $ansattId, fant ${oids.size} (${oids.formattert()})")

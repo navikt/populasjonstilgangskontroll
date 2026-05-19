@@ -37,11 +37,9 @@ class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
         }.getOrElse {
             if (it is NotFoundRestException) {
                 cache.delete(EntraGrupperConfig.GEO_OG_GLOBALE_CACHE, ansattId.verdi)
-                run {
-                    val nyoid = oid.oid(ansattId)
-                    entra.geoOgGlobaleGrupper(ansattId, nyoid).also {
-                        log.info("CC-flow: {} slo opp globale og GEO-grupper i Entra med ny oid {}", ansattId, nyoid)
-                    }
+                val nyoid = oid.oid(ansattId)
+                entra.geoOgGlobaleGrupper(ansattId, nyoid).also {
+                    log.info("CC-flow: {} slo opp globale og GEO-grupper i Entra med ny oid {}", ansattId, nyoid)
                 }
             } else {
                 throw it

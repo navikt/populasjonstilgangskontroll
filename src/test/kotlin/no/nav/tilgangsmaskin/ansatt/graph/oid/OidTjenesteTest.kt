@@ -68,7 +68,7 @@ class OidTjenesteTest : BehaviorSpec() {
             }
 
             When("samme ansatt slås opp to ganger") {
-                Then("REST kalles kun én gang — andre svar returneres fra cache") {
+                Then("REST kalles kun én gang -- andre svar returneres fra cache") {
                     server.expect(requestTo(containsString(ENTRA_USERS_PATH)))
                         .andExpect(method(GET))
                         .andRespond(withSuccess(oidRespons(OID), APPLICATION_JSON))

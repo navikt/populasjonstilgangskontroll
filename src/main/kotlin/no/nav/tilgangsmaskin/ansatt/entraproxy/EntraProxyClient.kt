@@ -1,5 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
 import no.nav.tilgangsmaskin.felles.rest.RestDefaultErrorHandler.Companion.IDENTIFIKATOR
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestHeader
@@ -10,7 +10,7 @@ import org.springframework.web.service.annotation.HttpExchange
 interface EntraProxyClient {
 
     @GetExchange(ENTRA_PROXY_ANSATT_PATH)
-    fun ansatt(@PathVariable navIdent: String): EntraProxyAnsatt
+    fun enhet(@PathVariable navIdent: String,@RequestHeader(IDENTIFIKATOR) identifikator: String = navIdent): EntraProxyEnhet
 
     @GetExchange(ENTRA_PROXY_ENHETER_PATH)
     fun enheter(@PathVariable navIdent: String, @RequestHeader(IDENTIFIKATOR) identifikator: String = navIdent): Set<Enhet>

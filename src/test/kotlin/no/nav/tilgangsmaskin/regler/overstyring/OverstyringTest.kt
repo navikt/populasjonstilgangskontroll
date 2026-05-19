@@ -15,7 +15,7 @@ import io.mockk.impl.annotations.MockK
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste

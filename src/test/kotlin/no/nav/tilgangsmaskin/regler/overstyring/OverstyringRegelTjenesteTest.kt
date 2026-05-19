@@ -17,7 +17,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyAnsatt.Enhet
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste

@@ -11,9 +11,9 @@ import java.time.Duration.ofDays
 
 @Component
 class EntraOidConfig : CachableRestConfig, RestConfig(ENTRA_BASE_URI, ENTRA_PING_PATH, GRAPH) {
-    override val navn     = ENTRA_OID
+    override val navn = ENTRA_OID
     override val varighet = ofDays(365)
-    override val caches   = setOf(OID_CACHE)
+    override val caches = setOf(OID_CACHE)
 
     companion object {
         const val PARAM_VALUE_SELECT_USER = "id"

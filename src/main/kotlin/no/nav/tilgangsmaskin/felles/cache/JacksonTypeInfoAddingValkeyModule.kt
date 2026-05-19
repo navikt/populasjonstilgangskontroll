@@ -19,6 +19,7 @@ class JacksonTypeInfoAddingValkeyModule : SimpleModule() {
             override fun findTypeResolverBuilder(config: MapperConfig<*>, ann: Annotated) =
                 StdTypeResolverBuilder().init(
                     construct(CLASS, PROPERTY, "@class", null, true, true), null)
+
             override fun version() = unknownVersion()
         })
     }

@@ -14,6 +14,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.oid.OidTjenesteTest.EntraTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
+import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import org.hamcrest.Matchers.containsString
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
@@ -28,7 +29,7 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.request
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import java.util.UUID
 
-@RestClientTest(components = [EntraOidTjeneste::class, EntraGrupperConfig::class, EntraOidBeanConfig::class])
+@RestClientTest(components = [EntraOidTjeneste::class, EntraOidConfig::class, EntraGrupperConfig::class, EntraOidBeanConfig::class])
 @Import(EntraTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class OidTjenesteTest : BehaviorSpec() {
@@ -85,7 +86,7 @@ class OidTjenesteTest : BehaviorSpec() {
                         .andExpect(method(GET))
                         .andRespond(withSuccess("""{"value": []}""", APPLICATION_JSON))
 
-                    shouldThrow<EntraUnexpectedResponseException> { tjeneste.oid(ANSATTID) }
+                    shouldThrow<IrrecoverableRestException> { tjeneste.oid(ANSATTID) }
                 }
             }
 
@@ -96,7 +97,7 @@ class OidTjenesteTest : BehaviorSpec() {
                         .andExpect(method(GET))
                         .andRespond(withSuccess(oidRespons(OID, oid2), APPLICATION_JSON))
 
-                    shouldThrow<EntraUnexpectedResponseException> { tjeneste.oid(ANSATTID) }
+                    shouldThrow<IrrecoverableRestException> { tjeneste.oid(ANSATTID) }
                 }
             }
         }

@@ -13,6 +13,6 @@ abstract class RestConfig(val baseUri: URI, pingPath: String, val name: String) 
     val pingEndpoint = builder().path(pingPath).build()
 
     @NoCoverageAnalysis
-    override fun toString()  = "${javaClass.simpleName} [name=$name, pingEndpoint=$pingEndpoint,baseUri=$baseUri]"
+    override fun toString() = "${javaClass.simpleName} [name=$name, pingEndpoint=$pingEndpoint,baseUri=$baseUri]"
 }
 

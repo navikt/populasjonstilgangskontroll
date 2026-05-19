@@ -6,11 +6,11 @@ import org.springframework.core.env.getRequiredProperty
 
 @NoCoverageAnalysis
 object EnvExtensions {
-     fun Environment.schemaRegistryUrl() =
+    fun Environment.schemaRegistryUrl() =
         getRequiredProperty<String>("kafka.schema.registry")
 
     @NoCoverageAnalysis
-     fun Environment.userInfo() =
+    fun Environment.userInfo() =
         "${getRequiredProperty<String>("kafka.schema.registry.user")}:${getRequiredProperty<String>("kafka.schema.registry.password")}"
 
 }

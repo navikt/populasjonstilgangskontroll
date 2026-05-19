@@ -44,4 +44,5 @@ class EntraGrupperRestClientAdapter(
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-private data class EntraGrupper(@param:JsonProperty("@odata.nextLink") val next: URI? = null, val value: Set<EntraGruppe> = emptySet())
+private data class EntraGrupper(@param:JsonProperty("@odata.nextLink") val next: URI? = null,
+                                val value: Set<EntraGruppe> = emptySet())

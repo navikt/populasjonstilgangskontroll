@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
-import no.nav.boot.conditionals.ConditionalOnDev
 import no.nav.boot.conditionals.ConditionalOnDevOrLocal
 import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
@@ -15,7 +14,6 @@ import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.boot.actuate.endpoint.SanitizingFunction
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
 import org.springframework.boot.restclient.RestClientCustomizer
-import org.springframework.context.MessageSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
@@ -36,10 +34,10 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
 @NoCoverageAnalysis
 class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : WebMvcConfigurer {
 
-     @Bean
+    @Bean
     fun jackson3Customizer() = JsonMapperBuilderCustomizer {
         it.addMixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
-       it.enable(INCLUDE_SOURCE_IN_LOCATION)
+        it.enable(INCLUDE_SOURCE_IN_LOCATION)
     }
 
 
@@ -55,9 +53,10 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     @ConditionalOnProd
     fun messageSource() =
         ReloadableResourceBundleMessageSource().apply {
-        setBasenames("classpath:messages", "classpath:openapi-prod-tilgang")
-        setDefaultEncoding("UTF-8")
-    }
+            setBasenames("classpath:messages", "classpath:openapi-prod-tilgang")
+            setDefaultEncoding("UTF-8")
+        }
+
     @Bean
     @ConditionalOnDevOrLocal
     fun messageSourceDevOrLocal() =
@@ -90,14 +89,22 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
         }
 
 
-
     @Bean
     fun clusterAddingTimedAspect(meterRegistry: MeterRegistry, token: Token) =
-        TimedAspect(meterRegistry,Function   { pjp -> Tags.of("cluster", token.cluster, "method", pjp.signature.name, "client", token.systemNavn) })
+        TimedAspect(meterRegistry,
+            Function { pjp ->
+                Tags.of("cluster",
+                    token.cluster,
+                    "method",
+                    pjp.signature.name,
+                    "client",
+                    token.systemNavn)
+            })
 
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(ansattIdAddingInterceptor)
     }
+
     override fun configureContentNegotiation(configurer: ContentNegotiationConfigurer) {
         configurer.defaultContentType(APPLICATION_JSON)
     }
@@ -105,7 +112,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 
     companion object {
 
-        private val SENSITIVE_KEYS = setOf("password", "secret", "token", "key","credentials", "jwk","private_key")
+        private val SENSITIVE_KEYS = setOf("password", "secret", "token", "key", "credentials", "jwk", "private_key")
     }
 }
 

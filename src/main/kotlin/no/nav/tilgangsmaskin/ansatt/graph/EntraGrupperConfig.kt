@@ -5,8 +5,8 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO
 import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO_OG_GLOBALE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient.Companion.ENTRA_PING_PATH
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
-import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
+import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import org.springframework.stereotype.Component
 import java.net.URI
 import java.time.Duration.ofHours
@@ -19,13 +19,13 @@ class EntraGrupperConfig : CachableRestConfig, RestConfig(ENTRA_BASE_URI, ENTRA_
     override val varighet = ofHours(3)
 
     fun grupperURI(ansattId: String, isCCF: Boolean) =
-         if (isCCF) ccUri(ansattId) else oboUri(ansattId)
+        if (isCCF) ccUri(ansattId) else oboUri(ansattId)
 
     private fun oboUri(ansattId: String) =
-        query(ansattId,GEO_PREFIX)
+        query(ansattId, GEO_PREFIX)
 
     private fun ccUri(ansattId: String) =
-        query(ansattId,"id in(${uuidsFormatted()}) or $GEO_PREFIX")
+        query(ansattId, "id in(${uuidsFormatted()}) or $GEO_PREFIX")
 
     private fun query(ansattId: String, filter: String) =
         builder().apply {
@@ -37,7 +37,7 @@ class EntraGrupperConfig : CachableRestConfig, RestConfig(ENTRA_BASE_URI, ENTRA_
         }.build(ansattId)
 
     private fun uuidsFormatted() =
-        uuids().joinToString("','" , "'",  "'")
+        uuids().joinToString("','", "'", "'")
 
     companion object {
         private const val DEFAULT_BATCH_SIZE = 250
@@ -52,9 +52,9 @@ class EntraGrupperConfig : CachableRestConfig, RestConfig(ENTRA_BASE_URI, ENTRA_
         const val PARAM_NAME_COUNT = "\$count"
         const val GEO_PREFIX = "startswith(displayName,'0000-GA-GEO') or startswith(displayName,'0000-GA-ENHET') "
 
-        val GEO_CACHE            = CacheNøkkelConfig(GRAPH, GEO)
+        val GEO_CACHE = CacheNøkkelConfig(GRAPH, GEO)
         val GEO_OG_GLOBALE_CACHE = CacheNøkkelConfig(GRAPH, GEO_OG_GLOBALE)
-        val ENTRA_CACHES         = setOf(GEO_CACHE, GEO_OG_GLOBALE_CACHE)
-        val CONSISTENCY_LEVEL    = "ConsistencyLevel" to "eventual"
+        val ENTRA_CACHES = setOf(GEO_CACHE, GEO_OG_GLOBALE_CACHE)
+        val CONSISTENCY_LEVEL = "ConsistencyLevel" to "eventual"
     }
 }

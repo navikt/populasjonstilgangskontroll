@@ -16,7 +16,7 @@ import java.time.Instant
 import java.util.*
 
 @Entity
-@Table(name = "oppfolging",  uniqueConstraints = [
+@Table(name = "oppfolging", uniqueConstraints = [
     UniqueConstraint(name = "uc_oppfølgingentity_aktoerid", columnNames = ["aktoerid"]),
     UniqueConstraint(name = "uc_oppfølgingentity_brukerid", columnNames = ["brukerid"])
 ])

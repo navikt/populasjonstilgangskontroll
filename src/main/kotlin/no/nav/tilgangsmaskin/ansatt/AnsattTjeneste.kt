@@ -22,7 +22,7 @@ class AnsattTjeneste(private val ansatte: NomTjeneste,
     private val log = getLogger(javaClass)
 
     fun ansatt(ansattId: AnsattId) =
-        Ansatt(ansattId,ansattBruker(ansattId), ansattGrupper(ansattId)).also {
+        Ansatt(ansattId, ansattBruker(ansattId), ansattGrupper(ansattId)).also {
             tell(it erMedlemAv NASJONAL)
             log.trace("Ansatt er {}", it)
         }
@@ -34,7 +34,7 @@ class AnsattTjeneste(private val ansatte: NomTjeneste,
             runCatching { brukere.brukerMedUtvidetFamilie(it.verdi) }.getOrNull()
         }
 
-    private fun tell(status: Boolean) = teller.tell(Tags.of(MEDLEM,"$status"))
+    private fun tell(status: Boolean) = teller.tell(Tags.of(MEDLEM, "$status"))
 
     companion object {
         private const val MEDLEM = "medlem"

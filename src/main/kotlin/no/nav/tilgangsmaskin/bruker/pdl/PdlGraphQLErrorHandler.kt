@@ -8,8 +8,7 @@ import org.springframework.graphql.client.FieldAccessException
 import org.springframework.graphql.client.GraphQlTransportException
 import org.springframework.http.HttpStatus
 import java.net.URI
-import java.util.Locale
-import kotlin.jvm.javaClass
+import java.util.*
 
 interface PdlGraphQLErrorHandler {
     fun handle(uri: URI, e: Throwable): Nothing =
@@ -31,9 +30,9 @@ interface PdlGraphQLErrorHandler {
         private fun FieldAccessException.oversett(uri: URI) = response.errors.oversett(message, uri)
 
         private fun List<ResponseError>.oversett(message: String?, uri: URI) = oversett(
-                firstOrNull()?.extensions?.get("code")?.toString() ?: HttpStatus.INTERNAL_SERVER_ERROR.name,
-                message ?: "Ukjent feil", uri
-                                                                                       )
+            firstOrNull()?.extensions?.get("code")?.toString() ?: HttpStatus.INTERNAL_SERVER_ERROR.name,
+            message ?: "Ukjent feil", uri
+        )
             .also {
                 log.warn("GraphQL returnerte $size feil, oversatte $message til ${it.javaClass.simpleName}", it)
             }
@@ -43,6 +42,6 @@ interface PdlGraphQLErrorHandler {
 
         private fun String.tilStatus() =
             if (this.uppercase() == "UNAUTHENTICATED") HttpStatus.UNAUTHORIZED else HttpStatus.valueOf(
-                    this.uppercase(Locale.getDefault()))
+                this.uppercase(Locale.getDefault()))
     }
 }

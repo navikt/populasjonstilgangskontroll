@@ -25,7 +25,7 @@ object TimeExtensions {
     fun Instant.diffFromNow() = java.time.Duration.between(now(), this).toKotlinDuration().format()
     fun LocalDate.toInstant(): Instant = atStartOfDay(systemDefault()).toInstant()
 
-     fun LocalDate.månederSidenIdag() =
+    fun LocalDate.månederSidenIdag() =
         LocalDate.now().let { today ->
             require(!isAfter(today)) { "Datoen $this er etter dagens dato $today" }
             val period = Period.between(this, today)
@@ -33,7 +33,7 @@ object TimeExtensions {
             maxOf(1, if (today.dayOfMonth > dayOfMonth) måneder + 1 else måneder)
         }
 
-     fun Duration.format(): String {
+    fun Duration.format(): String {
         val dager = inWholeDays
         val timer = inWholeHours % 24
         val minutter = inWholeMinutes % 60
@@ -41,19 +41,19 @@ object TimeExtensions {
 
         return buildString {
             if (dager > 0) append("$dager ${pluralize(dager, "dag")} ")
-            if (timer > 0) append("$timer ${pluralize(timer, "time","timer")}")
+            if (timer > 0) append("$timer ${pluralize(timer, "time", "timer")}")
             if (minutter > 0) append("$minutter ${pluralize(minutter, "minutt")}  ")
             if (sekunder > 0) append("$sekunder${pluralize(sekunder, "sekund")} ")
         }.trim()
     }
 
-    private fun pluralize(value: Long, singular: String,plural : String = singular + "er"): String =
+    private fun pluralize(value: Long, singular: String, plural: String = singular + "er"): String =
         if (value == 1L) singular else plural
 
     fun Long.local(fmt: String = "yyyy-MM-dd HH:mm:ss") = LocalDateTime.ofInstant(
-            Instant.ofEpochMilli(this),
-            ZoneId.of("Europe/Oslo")
-                                                                                 )
+        Instant.ofEpochMilli(this),
+        ZoneId.of("Europe/Oslo")
+    )
         .format(DateTimeFormatter.ofPattern(fmt))
 
     fun LocalDate.intervallSiden(): Dødsperiode {

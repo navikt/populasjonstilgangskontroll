@@ -17,10 +17,10 @@ import java.time.Instant
     indexes = [Index(name = "idx_gyldig", columnList = "gyldigtil")],
     uniqueConstraints = [UniqueConstraint(name = "uc_ansattentity_navid", columnNames = ["navid"])])
 class NomEntity(
-        @Column(length = ANSATTID_LENGTH, nullable = false) val navid: String,
-        @Column(length = BRUKERID_LENGTH, nullable = false) var fnr: String,
-        @Column(nullable = false) var startdato: Instant,
-        @Column(nullable = false) var gyldigtil: Instant) {
+    @Column(length = ANSATTID_LENGTH, nullable = false) val navid: String,
+    @Column(length = BRUKERID_LENGTH, nullable = false) var fnr: String,
+    @Column(nullable = false) var startdato: Instant,
+    @Column(nullable = false) var gyldigtil: Instant) {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)

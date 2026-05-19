@@ -1,10 +1,10 @@
 package no.nav.tilgangsmaskin.bruker
 
 data class Familie(
-        val foreldre: Set<FamilieMedlem> = emptySet(),
-        val barn: Set<FamilieMedlem> = emptySet(),
-        val søsken: Set<FamilieMedlem> = emptySet(),
-        val partnere: Set<FamilieMedlem> = emptySet()) {
+    val foreldre: Set<FamilieMedlem> = emptySet(),
+    val barn: Set<FamilieMedlem> = emptySet(),
+    val søsken: Set<FamilieMedlem> = emptySet(),
+    val partnere: Set<FamilieMedlem> = emptySet()) {
 
     companion object {
         val INGEN = Familie()

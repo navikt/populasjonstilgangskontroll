@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import org.slf4j.LoggerFactory.getLogger
+
 abstract class AbstractCacheOppfrisker : CacheOppfrisker {
     private val log = getLogger(javaClass)
 

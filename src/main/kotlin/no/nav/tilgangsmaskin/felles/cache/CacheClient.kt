@@ -13,10 +13,10 @@ import java.time.Duration.ofSeconds
 import kotlin.reflect.KClass
 
 @RetryingWhenRecoverableRestService
- class CacheClient(client: RedisClient, private val handler: CacheNøkkelMapper,
-                   private val alleTreffTeller: BulkCacheSuksessTeller,
-                   private val teller: BulkCacheTeller,
-                   private val cfg: CacheConfig) : CacheOperations {
+class CacheClient(client: RedisClient, private val handler: CacheNøkkelMapper,
+                  private val alleTreffTeller: BulkCacheSuksessTeller,
+                  private val teller: BulkCacheTeller,
+                  private val cfg: CacheConfig) : CacheOperations {
 
     private val log = getLogger(javaClass)
 

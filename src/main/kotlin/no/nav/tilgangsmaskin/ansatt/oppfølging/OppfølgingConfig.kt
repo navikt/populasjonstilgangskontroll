@@ -11,7 +11,7 @@ import org.springframework.kafka.listener.KafkaListenerErrorHandler
 
 @Configuration
 @ConfigurationProperties(OPPFØLGING)
-class OppfølgingConfig: CachableRestConfig {
+class OppfølgingConfig : CachableRestConfig {
     override val navn = OPPFØLGING
     override val caches = setOf(OPPFØLGING_CACHE)
 

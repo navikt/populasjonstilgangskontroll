@@ -10,11 +10,11 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import java.time.LocalDate
 
 data class Bruker(
-        val brukerIds: BrukerIds,
-        val geografiskTilknytning: GeografiskTilknytning,
-        val påkrevdeGrupper: Set<GlobalGruppe> = emptySet(),
-        val familie: Familie = INGEN,
-        val dødsdato: LocalDate? = null) {
+    val brukerIds: BrukerIds,
+    val geografiskTilknytning: GeografiskTilknytning,
+    val påkrevdeGrupper: Set<GlobalGruppe> = emptySet(),
+    val familie: Familie = INGEN,
+    val dødsdato: LocalDate? = null) {
 
     @JsonIgnore
     val brukerId = brukerIds.aktivBrukerId
@@ -44,7 +44,8 @@ data class Bruker(
     infix fun kreverMedlemskapI(gruppe: GlobalGruppe) = gruppe in påkrevdeGrupper
 
     @NoCoverageAnalysis
-    override fun toString()  = "${javaClass.simpleName}(brukerIds=$brukerIds, geografiskTilknytning=$geografiskTilknytning, påkrevdeGrupper=$påkrevdeGrupper, dødsdato=$dødsdato, foreldreOgBarn=$foreldreOgBarn, barn=$barn, søsken=$søsken, partnere=$partnere, harUkjentBosted=$harUkjentBosted, harUtenlandskBosted=$harUtenlandskBosted)"
+    override fun toString() =
+        "${javaClass.simpleName}(brukerIds=$brukerIds, geografiskTilknytning=$geografiskTilknytning, påkrevdeGrupper=$påkrevdeGrupper, dødsdato=$dødsdato, foreldreOgBarn=$foreldreOgBarn, barn=$barn, søsken=$søsken, partnere=$partnere, harUkjentBosted=$harUkjentBosted, harUtenlandskBosted=$harUtenlandskBosted)"
 
 
     data class BrukerIds(val aktivBrukerId: BrukerId,
@@ -52,6 +53,7 @@ data class Bruker(
                          val historiskeIds: Set<BrukerId> = emptySet(),
                          val aktørId: AktørId) {
         @NoCoverageAnalysis
-        override fun toString() = "${javaClass.simpleName}(aktivBrukerId=$aktivBrukerId, oppslagId='${oppslagId.maskFnr()}', historiskeIds=$historiskeIds, aktørId=$aktørId)"
+        override fun toString() =
+            "${javaClass.simpleName}(aktivBrukerId=$aktivBrukerId, oppslagId='${oppslagId.maskFnr()}', historiskeIds=$historiskeIds, aktørId=$aktørId)"
     }
 }

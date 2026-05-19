@@ -5,8 +5,8 @@ import io.lettuce.core.RedisClient
 import io.lettuce.core.SocketOptions
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -27,10 +27,8 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
                       private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
 
-
-
     @Bean
-    override fun cacheManager()  =
+    override fun cacheManager() =
         RedisCacheManager.builder(nonLockingRedisCacheWriter(cf))
             .withInitialCacheConfigurations(cfgs.associate { it.navn to cacheConfig(it) })
             .enableStatistics()
@@ -53,7 +51,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
         CacheNøkkelMapper(mgr.cacheConfigurations)
 
     @Bean
-    fun cacheHealthIndicator(adapter: CachePingable)  =
+    fun cacheHealthIndicator(adapter: CachePingable) =
         PingableHealthIndicator(adapter)
 
     private fun cacheConfig(cfg: CachableRestConfig) =

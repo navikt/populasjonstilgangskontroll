@@ -24,25 +24,34 @@ sealed class GeografiskTilknytning(type: Type) {
         }
     }
 
-    data class KommuneTilknytning(val kommune: Kommune) : GeografiskTilknytning(KOMMUNE){
+    data class KommuneTilknytning(val kommune: Kommune) : GeografiskTilknytning(KOMMUNE) {
         @NoCoverageAnalysis
         override fun toString() = "${javaClass.simpleName} (kommune=${kommune.verdi})"
     }
+
     data class BydelTilknytning(val bydel: Bydel) : GeografiskTilknytning(BYDEL) {
         @NoCoverageAnalysis
         override fun toString() = "${javaClass.simpleName} (bydel=${bydel.verdi})"
     }
+
     class UkjentBosted : GeografiskTilknytning(UKJENT_BOSTED) {
-        @NoCoverageAnalysis override fun equals(other: Any?) = other is UkjentBosted
-        @NoCoverageAnalysis override fun hashCode() = javaClass.hashCode()
+        @NoCoverageAnalysis
+        override fun equals(other: Any?) = other is UkjentBosted
+        @NoCoverageAnalysis
+        override fun hashCode() = javaClass.hashCode()
     }
 
-    class UtenlandskTilknytning : GeografiskTilknytning(UTLAND){
-        @NoCoverageAnalysis override fun equals(other: Any?) = other is UtenlandskTilknytning
-        @NoCoverageAnalysis override fun hashCode() = javaClass.hashCode()
+    class UtenlandskTilknytning : GeografiskTilknytning(UTLAND) {
+        @NoCoverageAnalysis
+        override fun equals(other: Any?) = other is UtenlandskTilknytning
+        @NoCoverageAnalysis
+        override fun hashCode() = javaClass.hashCode()
     }
+
     class UdefinertTilknytning : GeografiskTilknytning(UDEFINERT) {
-        @NoCoverageAnalysis override fun equals(other: Any?) = other is UdefinertTilknytning
-        @NoCoverageAnalysis override fun hashCode() = javaClass.hashCode()
+        @NoCoverageAnalysis
+        override fun equals(other: Any?) = other is UdefinertTilknytning
+        @NoCoverageAnalysis
+        override fun hashCode() = javaClass.hashCode()
     }
 }

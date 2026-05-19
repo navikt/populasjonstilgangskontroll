@@ -19,9 +19,11 @@ class PdlGraderingFilterStrategy : RecordFilterStrategy<String, Personhendelse> 
     override fun filter(hendelse: ConsumerRecord<String, Personhendelse>) =
         hendelse.skalFiltreres()
 
-    private fun ConsumerRecord<String, Personhendelse>.skalFiltreres() = (value().adressebeskyttelse?.gradering !in UFILTRERTE_GRADERINGER).also {
-        log(it, value())
-    }
+    private fun ConsumerRecord<String, Personhendelse>.skalFiltreres() =
+        (value().adressebeskyttelse?.gradering !in UFILTRERTE_GRADERINGER).also {
+            log(it, value())
+        }
+
     private fun log(resultat: Boolean, hendelse: Personhendelse) =
         if (resultat) {
             log.trace(CONFIDENTIAL, "Filtrerte bort PDL hendelse {}", hendelse.endringstype)

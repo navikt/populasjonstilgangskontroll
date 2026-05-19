@@ -15,13 +15,16 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 
 @Component
-class EntraAnsattGruppeResolver(private val entra: EntraTjeneste, private val token: Token, private val oid: EntraOidTjeneste, private val cache: CacheOperations)  {
+class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
+                                private val token: Token,
+                                private val oid: EntraOidTjeneste,
+                                private val cache: CacheOperations) {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-     fun grupperForAnsatt(ansattId: AnsattId) =
+    fun grupperForAnsatt(ansattId: AnsattId) =
         when {
-            token.erCC ->  grupperForCC(ansattId)
+            token.erCC -> grupperForCC(ansattId)
             token.erObo -> grupperForObo(ansattId)
             else -> grupperForUautentisert(ansattId)
         }
@@ -37,7 +40,7 @@ class EntraAnsattGruppeResolver(private val entra: EntraTjeneste, private val to
                 runCatching {
                     val nyoid = oid.oid(ansattId)
                     entra.geoOgGlobaleGrupper(ansattId, nyoid).also {
-                        log.info("CC-flow: {} slo opp globale og GEO-grupper i Entra med ny oid {}", ansattId,nyoid)
+                        log.info("CC-flow: {} slo opp globale og GEO-grupper i Entra med ny oid {}", ansattId, nyoid)
                     }
                 }.getOrThrow()
             } else {
@@ -56,6 +59,7 @@ class EntraAnsattGruppeResolver(private val entra: EntraTjeneste, private val to
             }
         }
     }
+
     private fun grupperForUautentisert(ansattId: AnsattId) =
         if (ClusterUtils.isProd) {
             throw HttpClientErrorException(HttpStatus.UNAUTHORIZED,

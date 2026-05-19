@@ -9,8 +9,12 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
 @Component
-class CacheExpiredEventListener(val teller: CacheOppfriskerTeller, erLeder: Boolean = true, private vararg val oppfriskere: CacheOppfrisker) :LeaderAware(erLeder), SmartLifecycle {
+class CacheExpiredEventListener(val teller: CacheOppfriskerTeller,
+                                erLeder: Boolean = true,
+                                private vararg val oppfriskere: CacheOppfrisker) : LeaderAware(erLeder),
+    SmartLifecycle {
     private var running = false
+
     @EventListener
     fun cacheInnslagFjernet(hendelse: CacheInnslagFjernetHendelse) {
         val nøkkel = CacheNøkkel(hendelse.nøkkel)
@@ -26,7 +30,12 @@ class CacheExpiredEventListener(val teller: CacheOppfriskerTeller, erLeder: Bool
         }) {}
     }
 
-    override fun start() { running = true }
+    override fun start() {
+        running = true
+    }
+
     override fun isRunning() = running
-    override fun stop() { running = false }
+    override fun stop() {
+        running = false
+    }
 }

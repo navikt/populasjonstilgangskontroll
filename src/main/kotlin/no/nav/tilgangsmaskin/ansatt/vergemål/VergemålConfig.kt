@@ -4,8 +4,8 @@ import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålClient.Companion.VERGEMÅ
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.VERGEMÅL
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
-import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
+import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
 import java.time.Duration

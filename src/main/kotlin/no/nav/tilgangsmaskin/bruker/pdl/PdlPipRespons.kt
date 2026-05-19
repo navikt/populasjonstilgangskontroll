@@ -9,20 +9,20 @@ import java.time.LocalDate
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PdlPipRespons(
-        val person: PdlPerson,
-        val identer: PdlIdenter = PdlIdenter(),
-        val geografiskTilknytning: PdlGeografiskTilknytning? = null) {
+    val person: PdlPerson,
+    val identer: PdlIdenter = PdlIdenter(),
+    val geografiskTilknytning: PdlGeografiskTilknytning? = null) {
 
     val aktørId = identer.identer.firstOrNull { it.gruppe == AKTORID }?.ident
         ?: error("Ingen gyldig aktørid funnet")
-    val brukerId = identer.identer.firstOrNull { it.gruppe in listOf(FOLKEREGISTERIDENT, NPID) && !it.historisk  }?.ident
+    val brukerId = identer.identer.firstOrNull { it.gruppe in listOf(FOLKEREGISTERIDENT, NPID) && !it.historisk }?.ident
         ?: error("Ingen gyldig identer funnet")
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class PdlPerson(
-            val adressebeskyttelse: List<PdlAdressebeskyttelse> = emptyList(),
-            val doedsfall: List<PdlDødsfall> = emptyList(),
-            val familierelasjoner: List<PdlFamilierelasjon> = emptyList()) {
+        val adressebeskyttelse: List<PdlAdressebeskyttelse> = emptyList(),
+        val doedsfall: List<PdlDødsfall> = emptyList(),
+        val familierelasjoner: List<PdlFamilierelasjon> = emptyList()) {
 
         data class PdlAdressebeskyttelse(val gradering: PdlAdressebeskyttelseGradering) {
             enum class PdlAdressebeskyttelseGradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG, UGRADERT }
@@ -30,9 +30,9 @@ data class PdlPipRespons(
 
         data class PdlDødsfall(val doedsdato: LocalDate)
         data class PdlFamilierelasjon(
-                val relatertPersonsIdent: BrukerId? = null,
-                val relatertPersonsRolle: PdlFamilieRelasjonRolle? = null,
-                val minRolleForPerson: PdlFamilieRelasjonRolle? = null) {
+            val relatertPersonsIdent: BrukerId? = null,
+            val relatertPersonsRolle: PdlFamilieRelasjonRolle? = null,
+            val minRolleForPerson: PdlFamilieRelasjonRolle? = null) {
             enum class PdlFamilieRelasjonRolle { MOR, FAR, MEDMOR, MEDFAR, BARN }
         }
     }
@@ -47,10 +47,10 @@ data class PdlPipRespons(
 
 data class Partnere(val sivilstand: Set<Sivilstand> = emptySet()) {
     data class Sivilstand(
-            val type: Sivilstandstype,
-            val relatertVedSivilstand: String?,
-            val bekreftelsesdato: String?,
-            val gyldigFraOgMed: String?) {
+        val type: Sivilstandstype,
+        val relatertVedSivilstand: String?,
+        val bekreftelsesdato: String?,
+        val gyldigFraOgMed: String?) {
         enum class Sivilstandstype {
             UOPPGITT,
             UGIFT,

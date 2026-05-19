@@ -29,7 +29,7 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
     fun listen(hendelser: List<NomHendelse>) {
         log.trace("Mottok ${hendelser.size} hendelse(r) fra NOM")
         hendelser.forEach { h ->
-            log.trace(CONFIDENTIAL,"Behandler hendelse fra NOM: {}", h)
+            log.trace(CONFIDENTIAL, "Behandler hendelse fra NOM: {}", h)
             runCatching { nom.lagre(h.ansattData()) }
                 .onSuccess { log.trace("Lagret brukerId ${h.personident.maskFnr()} for ${h.navident} OK") }
                 .onFailure { log.error("Kunne ikke lagre brukerId ${h.personident.maskFnr()} for ${h.navident}", it) }
@@ -43,6 +43,7 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
             BrukerId(personident),
             NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: ALLTID)
         )
+
     companion object {
         const val NOM_ERROR_HANDLER = "nomErrorHandler"
         const val NOM_FNR_FILTER_STRATEGY = "nomFnrFilterStrategy"
@@ -52,7 +53,10 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class NomHendelse(val personident: String, val navident: String, val startdato: LocalDate?, val sluttdato: LocalDate?) {
+data class NomHendelse(val personident: String,
+                       val navident: String,
+                       val startdato: LocalDate?,
+                       val sluttdato: LocalDate?) {
 
     @NoCoverageAnalysis
     override fun toString() =

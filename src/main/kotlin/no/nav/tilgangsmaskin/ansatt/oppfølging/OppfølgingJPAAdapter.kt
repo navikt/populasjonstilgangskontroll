@@ -12,16 +12,15 @@ class OppfølgingJPAAdapter(private val repo: OppfølgingRepository, val entityM
 
     private val log = getLogger(javaClass)
 
-    fun avslutt(id: UUID)  =
-         repo.deleteById(id).also {
+    fun avslutt(id: UUID) =
+        repo.deleteById(id).also {
             log.info("Oppfølging avsluttet for $id")
         }
 
     fun enhetFor(id: String) =
-        repo.findByBrukerid(id)?.kontor?.let(::Enhetsnummer) ?:
-        repo.findByAktoerid(id)?.kontor?.let(::Enhetsnummer)
+        repo.findByBrukerid(id)?.kontor?.let(::Enhetsnummer) ?: repo.findByAktoerid(id)?.kontor?.let(::Enhetsnummer)
 
-      fun registrer(id: UUID, brukerId: String, aktørId: String, start: Instant, kontor: String) =
+    fun registrer(id: UUID, brukerId: String, aktørId: String, start: Instant, kontor: String) =
         entityManager.createNativeQuery(UPSERT_QUERY)
             .setParameter("id", id)
             .setParameter("brukerid", brukerId)

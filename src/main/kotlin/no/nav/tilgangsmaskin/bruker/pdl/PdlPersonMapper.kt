@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory.getLogger
 object PdlPersonMapper {
     private val log = getLogger(javaClass)
 
-    fun tilPerson(oppslagId: String,data: PdlPipRespons) =
+    fun tilPerson(oppslagId: String, data: PdlPipRespons) =
         with(data) {
 
             Person(
@@ -96,7 +96,7 @@ object PdlPersonMapper {
             UGRADERT -> Gradering.UGRADERT
         }
 
-     fun tilGeoTilknytning(geo: PdlGeografiskTilknytning?): GeografiskTilknytning =
+    fun tilGeoTilknytning(geo: PdlGeografiskTilknytning?): GeografiskTilknytning =
         when (geo?.gtType) {
             UTLAND -> geo.gtLand?.let {
                 UtenlandskTilknytning()
@@ -110,7 +110,7 @@ object PdlPersonMapper {
 
             BYDEL -> geo.gtBydel?.let {
                 BydelTilknytning(Bydel(it.verdi))
-            } ?:   UkjentBosted().also {
+            } ?: UkjentBosted().also {
                 log.warn("Bydelstilknytning uten bydelskode, antar ukjent bosted")
             }
 
@@ -124,8 +124,8 @@ object PdlPersonMapper {
             .mapNotNull { it.relatertPersonsIdent?.let { ident -> it.relatertPersonsRolle to ident } }
             .partition { it.first != BARN }
         return Familie(
-                foreldre.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet(),
-                barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet())
+            foreldre.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet(),
+            barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet())
     }
 
     private fun tilHistoriskeBrukerIds(identer: PdlIdenter) = identer.identer

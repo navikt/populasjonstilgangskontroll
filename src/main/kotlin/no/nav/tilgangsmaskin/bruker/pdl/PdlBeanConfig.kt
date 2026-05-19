@@ -11,9 +11,9 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
+import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUrl
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.userInfo
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
@@ -66,7 +66,8 @@ class PdlBeanConfig {
         PingableHealthIndicator(cfg, client::ping)
 
     @Bean
-    fun pdlHendelseKafkaListenerConsumerFactory(props: KafkaProperties, env: Environment): ConsumerFactory<String, Personhendelse> =
+    fun pdlHendelseKafkaListenerConsumerFactory(props: KafkaProperties,
+                                                env: Environment): ConsumerFactory<String, Personhendelse> =
         DefaultKafkaConsumerFactory(
             props.buildConsumerProperties().apply {
                 put(GROUP_ID_CONFIG, PDL)
@@ -80,9 +81,9 @@ class PdlBeanConfig {
 
     @Bean(PDL_CONTAINER_FACTORY)
     fun pdlAvroListenerContainerFactory(consumerFactory: ConsumerFactory<String, Personhendelse>) =
-         ConcurrentKafkaListenerContainerFactory<String, Personhendelse>().apply {
+        ConcurrentKafkaListenerContainerFactory<String, Personhendelse>().apply {
             setConsumerFactory(consumerFactory)
-    }
+        }
 
     companion object {
         const val PDL_GRADERING_FILTER = "pdlGraderingFilter"

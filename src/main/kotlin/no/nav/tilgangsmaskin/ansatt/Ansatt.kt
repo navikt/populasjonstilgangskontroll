@@ -35,7 +35,8 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
             grupper.any { it.displayName.endsWith("ENHET_${e.verdi}") }
         } ?: false
 
-    infix fun erMedlemAv(gruppe: GlobalGruppe) = grupper.any { it.id == gruppe.id
+    infix fun erMedlemAv(gruppe: GlobalGruppe) = grupper.any {
+        it.id == gruppe.id
     }
 
     infix fun ikkeErMedlemAv(gruppe: GlobalGruppe) = !erMedlemAv(gruppe)
@@ -50,7 +51,9 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
 
     infix fun harFellesBarnMed(bruker: Bruker) = bruker.barn harMinstEnFelles barn
 
-    private infix fun Set<FamilieMedlem>.harMinstEnFelles(medlemmer: Set<FamilieMedlem>) = intersect(medlemmer).isNotEmpty()
+    private infix fun Set<FamilieMedlem>.harMinstEnFelles(medlemmer: Set<FamilieMedlem>) =
+        intersect(medlemmer).isNotEmpty()
+
     private infix fun Bruker.erNærståendeMed(medlemmer: Set<FamilieMedlem>) = medlemmer.any { it.brukerId == brukerId }
 
 }

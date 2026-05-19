@@ -20,7 +20,7 @@ data class Person(
     val graderinger: List<Gradering> = emptyList(),
     val familie: Familie = INGEN,
     val dødsdato: LocalDate? = null,
-    val historiskeIds: Set<BrukerId> = emptySet())  {
+    val historiskeIds: Set<BrukerId> = emptySet()) {
 
     @JsonIgnore
     val foreldre = familie.foreldre

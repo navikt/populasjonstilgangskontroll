@@ -12,10 +12,13 @@ import no.nav.tilgangsmaskin.regler.motor.OppfriskingTeller
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
-import java.util.UUID
+import java.util.*
 
 @Component
-class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjeneste: EntraOidTjeneste, private val cache: CacheClient, private val teller: OppfriskingTeller) : AbstractCacheOppfrisker() {
+class EntraCacheOppfrisker(private val entra: EntraTjeneste,
+                           private val oidTjeneste: EntraOidTjeneste,
+                           private val cache: CacheClient,
+                           private val teller: OppfriskingTeller) : AbstractCacheOppfrisker() {
 
     private val log = LoggerFactory.getLogger(javaClass)
     override val cacheName = EntraGrupperConfig.GRAPH
@@ -53,7 +56,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste, private val oidTjen
         }
 
     companion object {
-         const val GEO = "geoGrupper"
-         const val GEO_OG_GLOBALE = "geoOgGlobaleGrupper"
+        const val GEO = "geoGrupper"
+        const val GEO_OG_GLOBALE = "geoOgGlobaleGrupper"
     }
 }

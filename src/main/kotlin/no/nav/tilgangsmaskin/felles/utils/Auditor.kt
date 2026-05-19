@@ -14,7 +14,7 @@ class LocalAuditor : AbstractAuditor(LocalAuditor::class.java.simpleName)
 
 abstract class AbstractAuditor(loggerName: String) : Auditor {
     private val logger = getLogger(loggerName)
-    override fun info(message: String,t: Throwable?) = logger.info(message,t)
+    override fun info(message: String, t: Throwable?) = logger.info(message, t)
 }
 
 @FunctionalInterface

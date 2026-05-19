@@ -14,7 +14,9 @@ class EntraOidBeanConfig {
 
     @Bean
     fun entraOidClient(builder: Builder, cfg: EntraGrupperConfig) =
-        createClient<EntraOidClient>(cfg, builder, interceptors = arrayOf(RestHeaderAddingRequestInterceptor(CONSISTENCY_LEVEL)))
+        createClient<EntraOidClient>(cfg,
+            builder,
+            interceptors = arrayOf(RestHeaderAddingRequestInterceptor(CONSISTENCY_LEVEL)))
 
     @Bean
     fun graphHealthIndicator(cfg: EntraGrupperConfig, client: EntraOidClient) =

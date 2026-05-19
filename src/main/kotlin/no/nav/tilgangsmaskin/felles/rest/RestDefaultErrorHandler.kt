@@ -27,8 +27,9 @@ class RestDefaultErrorHandler : ErrorHandler {
             }
         }
     }
+
     companion object {
-       const val IDENTIFIKATOR =  "X-Identifikator"
+        const val IDENTIFIKATOR = "X-Identifikator"
     }
 
 }

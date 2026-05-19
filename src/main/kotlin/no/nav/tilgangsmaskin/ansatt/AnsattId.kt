@@ -12,6 +12,7 @@ data class AnsattId(@JsonValue val verdi: String) {
             requireDigits(substring(1), 6)
         }
     }
+
     companion object {
         const val ANSATTID_LENGTH = 7
     }

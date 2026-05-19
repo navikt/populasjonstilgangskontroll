@@ -18,21 +18,21 @@ object PersonTilBrukerMapper {
     fun tilBruker(person: Person, erSkjermet: Boolean) =
         with(person) {
             Bruker(
-                    BrukerIds(brukerId, oppslagId,historiskeIds, aktørId),
-                    geoTilknytning,
-                    tilGruppeKrav(geoTilknytning, graderinger, erSkjermet),
-                    familie,
+                BrukerIds(brukerId, oppslagId, historiskeIds, aktørId),
+                geoTilknytning,
+                tilGruppeKrav(geoTilknytning, graderinger, erSkjermet),
+                familie,
                 dødsdato)
         }
 
     private fun tilGruppeKrav(gt: GeografiskTilknytning, graderinger: List<Gradering>, erSkjermet: Boolean) =
         setOfNotNull(
-                when {
-                    graderinger.erStrengtFortrolig() -> STRENGT_FORTROLIG
-                    graderinger.erStrengtFortroligUtland() -> STRENGT_FORTROLIG_UTLAND
-                    graderinger.erFortrolig() -> FORTROLIG
-                    else -> null
-                },
-                UKJENT_BOSTED.takeIf { gt is UdefinertTilknytning },
-                SKJERMING.takeIf { erSkjermet })
+            when {
+                graderinger.erStrengtFortrolig() -> STRENGT_FORTROLIG
+                graderinger.erStrengtFortroligUtland() -> STRENGT_FORTROLIG_UTLAND
+                graderinger.erFortrolig() -> FORTROLIG
+                else -> null
+            },
+            UKJENT_BOSTED.takeIf { gt is UdefinertTilknytning },
+            SKJERMING.takeIf { erSkjermet })
 }

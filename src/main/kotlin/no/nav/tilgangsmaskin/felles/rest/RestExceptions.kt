@@ -8,12 +8,17 @@ import org.springframework.web.ErrorResponseException
 import java.net.URI
 
 open class IrrecoverableRestException(
-        val status: HttpStatusCode, uri: URI, msg: String = (status as HttpStatus).reasonPhrase,
-        cause: Throwable? = null) : ErrorResponseException(status, problemDetail(status, msg, uri), cause)
+    val status: HttpStatusCode, uri: URI, msg: String = (status as HttpStatus).reasonPhrase,
+    cause: Throwable? = null) : ErrorResponseException(status, problemDetail(status, msg, uri), cause)
 
-class NotFoundRestException(val uri: URI,val identifikator: String? = null, cause: Throwable? = null) : IrrecoverableRestException(NOT_FOUND, uri, cause = cause)
+class NotFoundRestException(val uri: URI, val identifikator: String? = null, cause: Throwable? = null) :
+    IrrecoverableRestException(NOT_FOUND, uri, cause = cause)
 
-open class RecoverableRestException(status: HttpStatusCode, uri: URI, msg: String = (status as HttpStatus).reasonPhrase, cause: Throwable? = null) : ErrorResponseException(status, problemDetail(status, msg, uri), cause)
+open class RecoverableRestException(status: HttpStatusCode,
+                                    uri: URI,
+                                    msg: String = (status as HttpStatus).reasonPhrase,
+                                    cause: Throwable? = null) :
+    ErrorResponseException(status, problemDetail(status, msg, uri), cause)
 
 private fun problemDetail(status: HttpStatusCode, msg: String, uri: URI) =
     forStatusAndDetail(status, msg).apply {

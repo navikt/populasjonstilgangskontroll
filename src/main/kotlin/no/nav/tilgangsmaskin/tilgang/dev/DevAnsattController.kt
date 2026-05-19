@@ -19,7 +19,7 @@ private const val DEV_ANSATT_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.ansat
 class DevAnsattController(
     private val ansatte: AnsattTjeneste,
     private val proxy: EntraProxyTjeneste) {
-    
+
     @GetMapping("{ansattId}")
     @Operation(summary = SUMMARY_ANSATT, description = DESCRIPTION_ANSATT)
     fun ansatt(@PathVariable ansattId: AnsattId) = ansatte.ansatt(ansattId)

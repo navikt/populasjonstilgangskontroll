@@ -9,7 +9,7 @@ class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator 
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    override fun health()  =
+    override fun health() =
         runCatching {
             pingable.ping()
             up()

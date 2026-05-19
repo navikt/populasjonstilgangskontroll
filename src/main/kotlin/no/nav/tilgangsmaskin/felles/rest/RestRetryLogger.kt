@@ -15,7 +15,8 @@ class RestRetryLogger {
         val args = event.source.arguments.toSet()
         val metode = event.method.name
         when (val t = cause(event)) {
-            is NotFoundRestException -> log.info("NotFoundRestException fra '$metode' for [${t.identifikator}] mot ${t.uri}", t)
+            is NotFoundRestException -> log.info("NotFoundRestException fra '$metode' for [${t.identifikator}] mot ${t.uri}",
+                t)
             else -> if (event.isRetryAborted) {
                 if (t !is RetryException) {
                     log.warn("Aborterer metode '$metode}' grunnet ${t.javaClass.simpleName} $args")
@@ -28,7 +29,7 @@ class RestRetryLogger {
         }
     }
 
-    private fun cause(event: MethodRetryEvent)  =
+    private fun cause(event: MethodRetryEvent) =
         listOf(event.failure, event.failure.cause)
             .filterIsInstance<NotFoundRestException>()
             .firstOrNull()

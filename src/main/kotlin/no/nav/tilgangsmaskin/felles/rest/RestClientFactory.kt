@@ -9,7 +9,10 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory.builderFo
 import java.net.URI
 
 object RestClientFactory {
-    fun createProxyFactory(baseUri: URI, builder: Builder, errorHandler: ErrorHandler, vararg interceptors: ClientHttpRequestInterceptor) =
+    fun createProxyFactory(baseUri: URI,
+                           builder: Builder,
+                           errorHandler: ErrorHandler,
+                           vararg interceptors: ClientHttpRequestInterceptor) =
         builderFor(
             create(
                 builder.baseUrl(baseUri)
@@ -21,7 +24,10 @@ object RestClientFactory {
             )
         ).build()
 
-    inline fun <reified T : Any> createClient(cfg: RestConfig, builder: Builder, errorHandler: ErrorHandler = RestDefaultErrorHandler(),vararg interceptors: ClientHttpRequestInterceptor) =
+    inline fun <reified T : Any> createClient(cfg: RestConfig,
+                                              builder: Builder,
+                                              errorHandler: ErrorHandler = RestDefaultErrorHandler(),
+                                              vararg interceptors: ClientHttpRequestInterceptor) =
         createProxyFactory(cfg.baseUri, builder, errorHandler, *interceptors).createClient(T::class.java)
 }
 

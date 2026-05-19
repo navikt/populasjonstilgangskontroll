@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 
 @RetryingWhenRecoverableRestService
-class EntraProxyTjeneste(private val client: EntraProxyClient)  {
+class EntraProxyTjeneste(private val client: EntraProxyClient) {
 
     @WithSpan
     fun enhet(ansattId: AnsattId) =

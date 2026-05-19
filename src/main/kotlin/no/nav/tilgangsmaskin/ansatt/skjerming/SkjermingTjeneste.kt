@@ -5,14 +5,16 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMIN
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.cache.*
+import no.nav.tilgangsmaskin.felles.cache.getMany
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
 
 
 @RetryingWhenRecoverableRestService
-class SkjermingTjeneste(private val client: SkjermingClient, private val cache: CacheOperations, private val cf: SkjermingConfig) {
+class SkjermingTjeneste(private val client: SkjermingClient,
+                        private val cache: CacheOperations,
+                        private val cf: SkjermingConfig) {
 
     private val log = getLogger(SkjermingTjeneste::class.java)
 

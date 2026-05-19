@@ -42,7 +42,9 @@ class PdlSyncGraphQLClientAdapter(
                 .variables(vars)
                 .executeSync()
                 .field(query.second)
-                .toEntity(T::class.java) ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, cfg.baseUri, "Fant ikke feltet ${query.second} i responsen")
+                .toEntity(T::class.java) ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR,
+                cfg.baseUri,
+                "Fant ikke feltet ${query.second} i responsen")
         }.getOrElse {
             log.warn("Feil ved oppslag av {}", T::class.java.simpleName, it)
             errorHandler.handle(cfg.baseUri, it)

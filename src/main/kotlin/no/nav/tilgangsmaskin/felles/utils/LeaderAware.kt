@@ -7,7 +7,7 @@ import java.net.InetAddress
 
 abstract class LeaderAware(private var erLeder: Boolean = false) {
     private val hostname = InetAddress.getLocalHost().hostName
-    protected open fun doHandleLeaderChange()  = Unit
+    protected open fun doHandleLeaderChange() = Unit
 
     private val log = getLogger(javaClass)
 
@@ -19,6 +19,7 @@ abstract class LeaderAware(private var erLeder: Boolean = false) {
             doHandleLeaderChange()
         }) { log.info("Denne instansen ($hostname) er ikke leder, lederen er ${event.leder}") }
     }
+
     protected fun <T> somLeder(beskrivelse: String, block: () -> T, default: () -> T): T = if (erLeder) {
         log.trace("Leder kjører $beskrivelse")
         block()

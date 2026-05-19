@@ -33,7 +33,7 @@ internal enum class ClusterUtils(val clusterName: String) {
                     arrayOf(cluster.clusterName).also {
                         setProperty(NAIS_CLUSTER_NAME, cluster.clusterName)
                     }
-                DEV_GCP_CLUSTER  -> arrayOf(DEV, DEV_GCP, GCP)
+                DEV_GCP_CLUSTER -> arrayOf(DEV, DEV_GCP, GCP)
                 PROD_GCP_CLUSTER -> arrayOf(PROD, PROD_GCP, GCP)
             }
     }

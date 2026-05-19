@@ -34,33 +34,36 @@ class LederUtvelger(private val builder: Builder,
     @EventListener(ApplicationReadyEvent::class)
     fun onApplicationReady() {
         subscription =
-                builder.build()
-                    .get()
-                    .uri(uri)
-                    .retrieve()
-                    .bodyToFlux<LederUtvelgerRespons>()
-            .doOnError { log.error("SSE connection feilet for godt: ${it.message}", it) }
-            .doOnSubscribe { log.trace("SSE subscribe") }
-            .doOnNext { log.trace("SSE next: {} ", it) }
-            .retryWhen(
-                backoff(MAX_VALUE, ofSeconds(1))
-                    .maxBackoff(ofSeconds(30))
-                    .filter {
-                        if (shuttingDown) {
-                            log.info("SSE shutdown, slutt med retries")
-                            return@filter false
+            builder.build()
+                .get()
+                .uri(uri)
+                .retrieve()
+                .bodyToFlux<LederUtvelgerRespons>()
+                .doOnError { log.error("SSE connection feilet for godt: ${it.message}", it) }
+                .doOnSubscribe { log.trace("SSE subscribe") }
+                .doOnNext { log.trace("SSE next: {} ", it) }
+                .retryWhen(
+                    backoff(MAX_VALUE, ofSeconds(1))
+                        .maxBackoff(ofSeconds(30))
+                        .filter {
+                            if (shuttingDown) {
+                                log.info("SSE shutdown, slutt med retries")
+                                return@filter false
+                            }
+                            it is WebClientRequestException ||
+                                    it is PrematureCloseException ||
+                                    it.cause is PrematureCloseException
                         }
-                        it is WebClientRequestException ||
-                                it is PrematureCloseException ||
-                                it.cause is PrematureCloseException
-                    }
-                .doBeforeRetry { log.warn("SSE retry ${it.failure().message}",it) }
-                .doAfterRetry { log.trace("SSE connection retry etter ${it.totalRetriesInARow()} forsøk", it.failure()) }
-            )
-            .subscribe(
-                { publisher.publishEvent(LeaderChangedEvent(this, it.name)) },
-                { log.warn("SSE error: ${it.message}", it) }
-            )
+                        .doBeforeRetry { log.warn("SSE retry ${it.failure().message}", it) }
+                        .doAfterRetry {
+                            log.trace("SSE connection retry etter ${it.totalRetriesInARow()} forsøk",
+                                it.failure())
+                        }
+                )
+                .subscribe(
+                    { publisher.publishEvent(LeaderChangedEvent(this, it.name)) },
+                    { log.warn("SSE error: ${it.message}", it) }
+                )
     }
 
     @PreDestroy

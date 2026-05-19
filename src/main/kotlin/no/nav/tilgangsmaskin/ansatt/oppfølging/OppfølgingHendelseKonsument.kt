@@ -25,7 +25,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
         when (hendelse.sisteEndringsType) {
             OPPFOLGING_STARTET -> registrer(hendelse, "Oppfølging startet")
             ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> registrer(hendelse, "Oppfølging endret")
-            OPPFOLGING_AVSLUTTET -> avslutt(hendelse,"Oppfølging avsluttet")
+            OPPFOLGING_AVSLUTTET -> avslutt(hendelse, "Oppfølging avsluttet")
         }
 
     private fun registrer(hendelse: OppfølgingHendelse, melding: String) =
@@ -42,7 +42,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
         }
 
     companion object {
-        private const val OPPFØLGING_TOPIC  = "poao.siste-oppfolgingsperiode-v3"
+        private const val OPPFØLGING_TOPIC = "poao.siste-oppfolgingsperiode-v3"
     }
 }
 

@@ -50,7 +50,7 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, va
                     "Cluster" to current.clusterName,
                     "Startup" to startupDate.local(),
                     "Name" to environment.getProperty("spring.application.name"),
-                    ))
+                ))
             if (!isProd) {
                 builder.withDetail("dev-info", mapOf(
                     "Client ID" to environment.getProperty("azure.app.client.id"),
@@ -59,7 +59,7 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, va
                     "Java version" to environment.getProperty("java.version"),
                     "Java runtime version" to environment.getProperty("java.runtime.version"),
                     "Java vendor" to environment.getProperty("java.vm.vendor")
-                    ))
+                ))
             }
             regelsett.forEach {
                 builder.withDetail(it.beskrivelse, it.regler.map { "(${it.javaClass.simpleName}) ${it.kortNavn}" })

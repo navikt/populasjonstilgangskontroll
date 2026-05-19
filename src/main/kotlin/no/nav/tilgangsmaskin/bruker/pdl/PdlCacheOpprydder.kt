@@ -7,8 +7,8 @@ import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.UGRADERT
 import no.nav.tilgangsmaskin.bruker.pdl.PdlBeanConfig.Companion.PDL_CONTAINER_FACTORY
 import no.nav.tilgangsmaskin.bruker.pdl.PdlBeanConfig.Companion.PDL_GRADERING_FILTER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
-import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheClient
+import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.PdlCacheTømmerTeller
@@ -39,11 +39,15 @@ class PdlCacheOpprydder(private val pdl: PdlTjeneste,
 
     private fun slett(cache: CacheNøkkelConfig, id: String, gradering: String, endringsType: String) {
         if (client.delete(cache, id) > 0) {
-            teller.tell(cache, gradering,endringsType)
-            log.trace(CONFIDENTIAL,"Slettet nøkkel ${client.tilNøkkel(cache, id)} fra cache ${cache.name} etter hendelse av type: {}", id.maskFnr(), gradering)
-            log.info("Slettet innslag fra cache ${cache.name} etter hendelse med gradering: {}",gradering)
+            teller.tell(cache, gradering, endringsType)
+            log.trace(CONFIDENTIAL,
+                "Slettet nøkkel ${client.tilNøkkel(cache, id)} fra cache ${cache.name} etter hendelse av type: {}",
+                id.maskFnr(),
+                gradering)
+            log.info("Slettet innslag fra cache ${cache.name} etter hendelse med gradering: {}", gradering)
         }
     }
+
     private fun refresh(identer: List<String>, gradering: String) =
         identer.forEach { id ->
             pdl.medFamilie(id)

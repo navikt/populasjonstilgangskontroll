@@ -18,15 +18,15 @@ class NomTjeneste(private val adapter: NomJPAAdapter) {
     private val log = getLogger(javaClass)
 
     @Transactional(readOnly = true)
-    @Cacheable(cacheNames = [NOM],  key = "#ansattId.verdi")
+    @Cacheable(cacheNames = [NOM], key = "#ansattId.verdi")
     @WithSpan
     fun fnrForAnsatt(ansattId: AnsattId) =
         adapter.fnrForAnsatt(ansattId.verdi)
 
     fun ryddOpp() =
         adapter.ryddOpp().also {
-        if (it > 0) log.info("Fjernet informasjon fra DB om $it ansatte som ikke lenger er ansatt i Nav")
-    }
+            if (it > 0) log.info("Fjernet informasjon fra DB om $it ansatte som ikke lenger er ansatt i Nav")
+        }
 
     @CacheEvict(cacheNames = [NOM], key = "#nomAnsattData.ansattId.verdi")
     @WithSpan

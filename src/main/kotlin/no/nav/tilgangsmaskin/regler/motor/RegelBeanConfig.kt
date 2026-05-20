@@ -18,7 +18,7 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator.INSTAN
 class RegelBeanConfig(messageSource: MessageSource) {
 
     init {
-        RegelMetadata.messageSource = messageSource
+        RegelMetadata.configureMessageSource(messageSource)
     }
 
     @Bean

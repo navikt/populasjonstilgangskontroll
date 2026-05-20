@@ -5,7 +5,10 @@ import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder.getLocale
 import java.net.URI
 
-data class RegelMetadata(val gruppeMetadata: GruppeMetadata) {
+data class RegelMetadata(
+    val gruppeMetadata: GruppeMetadata,
+    private val overstyrtMessageSource: MessageSource? = null,
+) {
 
     val kode = gruppeMetadata.meta.name
     val begrunnelse get() = resolve("begrunnelse")
@@ -14,13 +17,27 @@ data class RegelMetadata(val gruppeMetadata: GruppeMetadata) {
 
     private fun resolve(suffix: String): String {
         val key = "${gruppeMetadata.meldingsnøkkel}.$suffix"
-        return messageSource.getMessage(key, null, key, getLocale())!!
+        return (overstyrtMessageSource ?: messageSource())
+            .getMessage(key, null, key, getLocale())!!
     }
 
-    constructor(gruppe: GlobalGruppe) : this(gruppe.metadata)
+    constructor(gruppe: GlobalGruppe, overstyrtMessageSource: MessageSource? = null) : this(gruppe.metadata, overstyrtMessageSource)
 
     companion object {
-        lateinit var messageSource: MessageSource
+        private lateinit var messageSource: MessageSource
+
+        fun configureMessageSource(source: MessageSource) {
+            if (!::messageSource.isInitialized) {
+                messageSource = source
+            }
+        }
+
+        private fun messageSource(): MessageSource {
+            check(::messageSource.isInitialized) {
+                "MessageSource er ikke konfigurert for RegelMetadata"
+            }
+            return messageSource
+        }
 
         val TYPE_URI = URI.create("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett")
         const val DETAIL_MESSAGE_CODE: String =

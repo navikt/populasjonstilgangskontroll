@@ -26,6 +26,7 @@ data class RegelMetadata(
     companion object {
         private lateinit var messageSource: MessageSource
 
+        @Synchronized
         fun configureMessageSource(source: MessageSource) {
             if (!::messageSource.isInitialized) {
                 messageSource = source

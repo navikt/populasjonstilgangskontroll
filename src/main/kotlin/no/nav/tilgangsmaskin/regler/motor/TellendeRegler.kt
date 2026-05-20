@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.regler.motor
 
+import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker
@@ -25,7 +27,8 @@ interface TellendeRegel : Regel {
 
 @Component
 @Order(LOWEST_PRECEDENCE - 4)
-class VergemålRegel(private val vergemål: VergemålTjeneste, private val auditor: Auditor, private val teller: VergemålTeller) : TellendeRegel {
+@ConditionalOnProd
+class VergemålTellendeRegel(private val vergemål: VergemålTjeneste, private val auditor: Auditor, private val teller: VergemålTeller) : TellendeRegel {
 
     private val log = getLogger(javaClass)
 
@@ -46,4 +49,24 @@ class VergemålRegel(private val vergemål: VergemålTjeneste, private val audit
 
     override fun tell(ansatt: Ansatt, bruker: Bruker) =
         teller.tell()
+}
+
+@Component
+@Order(LOWEST_PRECEDENCE - 4)
+@ConditionalOnNotProd
+class VergemålRegel(private val vergemål: VergemålTjeneste) : OverstyrbarRegel {
+
+    private val log = getLogger(javaClass)
+
+    override val metadata = RegelMetadata(VERGEMÅL)
+
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
+        avvisHvis {
+            runCatching {
+                vergemål.vergemål(ansatt.ansattId).contains(bruker.brukerId)
+            }.getOrElse {
+                log.error("Feil ved sjekk av vergemål for ansatt ${ansatt.ansattId.verdi}", it)
+                false
+            }
+        }
 }

@@ -11,6 +11,7 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.Identifikator
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.år
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.VERGEMÅL
 import org.slf4j.LoggerFactory.getLogger
@@ -55,9 +56,10 @@ class AvdødBrukerRegel : OverstyrbarRegel {
 
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis {
-            bruker.erForlengstAvdød && ansatt ikkeErMedlemAv GlobalGruppe.AVDØD
+            bruker harVærtDødMerEnn 1.år && ansatt ikkeErMedlemAv GlobalGruppe.AVDØD
         }
 }
+
 
 @SortertRegel(LOWEST_PRECEDENCE - 4)
 @ConditionalOnNotProd

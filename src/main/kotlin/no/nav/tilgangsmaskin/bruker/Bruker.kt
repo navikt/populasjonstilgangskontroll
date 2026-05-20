@@ -9,7 +9,9 @@ import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_7_12
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
+import java.time.Duration
 import java.time.LocalDate
+import java.time.Period
 
 data class Bruker(
     val brukerIds: BrukerIds,
@@ -45,8 +47,7 @@ data class Bruker(
     val harUtenlandskBosted = geografiskTilknytning is UtenlandskTilknytning
     infix fun kreverMedlemskapI(gruppe: GlobalGruppe) = gruppe in påkrevdeGrupper
 
-    @JsonIgnore
-    val erForlengstAvdød = dødsdato != null && dødsdato.intervallSiden() > MND_7_12
+    infix fun harVærtDødMerEnn(dur: Period) = dødsdato != null && dødsdato.plus(dur) < LocalDate.now()
 
     @NoCoverageAnalysis
     override fun toString() =

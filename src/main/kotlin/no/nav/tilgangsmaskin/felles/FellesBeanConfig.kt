@@ -5,6 +5,7 @@ import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import no.nav.boot.conditionals.ConditionalOnDevOrLocal
+import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
@@ -58,8 +59,8 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
         }
 
     @Bean("messageSource")
-    @ConditionalOnDevOrLocal
-    fun devMessageSource() =
+    @ConditionalOnNotProd
+    fun notProdMessageSource() =
         ReloadableResourceBundleMessageSource().apply {
             setBasenames(
                 "classpath:messages",

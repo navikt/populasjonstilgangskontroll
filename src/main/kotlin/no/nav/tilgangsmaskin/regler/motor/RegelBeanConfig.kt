@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import jakarta.annotation.PostConstruct
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.KJERNE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.KOMPLETT
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.Companion.OVERSTYRBAR
@@ -16,10 +15,9 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.AnnotationAwareOrderComparator.INSTANCE
 
 @Configuration
-class RegelBeanConfig(private val messageSource: MessageSource) {
+class RegelBeanConfig(messageSource: MessageSource) {
 
-    @PostConstruct
-    fun initMessageSource() {
+    init {
         RegelMetadata.messageSource = messageSource
     }
 

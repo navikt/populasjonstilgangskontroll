@@ -34,9 +34,9 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ContextConfiguration
+import no.nav.tilgangsmaskin.SharedPostgresContainer
 import org.springframework.test.context.TestPropertySource
 import org.testcontainers.junit.jupiter.Testcontainers
-import org.testcontainers.postgresql.PostgreSQLContainer
 import java.time.LocalDate.now
 
 @DataJpaTest
@@ -163,6 +163,6 @@ class NomTjenesteTest : BehaviorSpec() {
 
     companion object {
         @ServiceConnection
-        private val postgres = PostgreSQLContainer("postgres:18")
+        private val postgres = SharedPostgresContainer.instance
     }
 }

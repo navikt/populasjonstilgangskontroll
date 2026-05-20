@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.regler.motor
 
 import io.micrometer.core.instrument.Tag
 import no.nav.tilgangsmaskin.ansatt.Ansatt
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 
@@ -24,11 +23,17 @@ interface Regel {
     }
 }
 
-abstract class GlobalGruppeRegel(private val gruppe: GlobalGruppe) : Regel {
+interface OverstyrbarRegel : Regel
+interface KjerneRegel : Regel
+interface TellendeRegel : Regel {
+    val skalTelle: (Ansatt, Bruker) -> Boolean
+        get() = { _, _ -> false }
+    fun tell(ansatt: Ansatt, bruker: Bruker) = Unit
 
-    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avvisHvis { bruker kreverMedlemskapI gruppe && ansatt ikkeErMedlemAv gruppe }
-
-    override val metadata = RegelMetadata(gruppe)
-
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker): Boolean {
+        if (skalTelle(ansatt, bruker)) {
+            tell(ansatt, bruker)
+        }
+        return true
+    }
 }

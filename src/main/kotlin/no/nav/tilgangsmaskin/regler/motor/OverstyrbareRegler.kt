@@ -18,10 +18,8 @@ import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 import org.springframework.stereotype.Component
 
 
-interface OverstyrbarRegel : Regel
-
 @SortertRegel(LOWEST_PRECEDENCE)
-class GeografiskRegel(private val oppfølging: OppfølgingTjeneste,private val teller: OppfølgingkontorTeller) : GlobalGruppeRegel(NASJONAL), OverstyrbarRegel {
+class GeografiskRegel(private val oppfølging: OppfølgingTjeneste,private val teller: OppfølgingkontorTeller) : GlobalGruppeMedlemskapRegel(NASJONAL), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         godtaHvis {
             ansatt erMedlemAv NASJONAL
@@ -33,7 +31,7 @@ class GeografiskRegel(private val oppfølging: OppfølgingTjeneste,private val t
 }
 
 @SortertRegel(LOWEST_PRECEDENCE - 1)
-class UkjentBostedRegel : GlobalGruppeRegel(UKJENT_BOSTED), OverstyrbarRegel {
+class UkjentBostedRegel : GlobalGruppeMedlemskapRegel(UKJENT_BOSTED), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis {
             bruker.harUkjentBosted && ansatt ikkeErMedlemAv UKJENT_BOSTED
@@ -41,7 +39,7 @@ class UkjentBostedRegel : GlobalGruppeRegel(UKJENT_BOSTED), OverstyrbarRegel {
 }
 
 @SortertRegel(LOWEST_PRECEDENCE - 2)
-class UtlandRegel : GlobalGruppeRegel(UTENLANDSK), OverstyrbarRegel {
+class UtlandRegel : GlobalGruppeMedlemskapRegel(UTENLANDSK), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis {
             bruker.harUtenlandskBosted && ansatt ikkeErMedlemAv UTENLANDSK

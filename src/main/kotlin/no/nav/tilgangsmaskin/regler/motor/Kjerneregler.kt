@@ -13,19 +13,17 @@ import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.PARTNER
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.SØSKEN
 import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
 
-interface KjerneRegel : Regel
-
 @SortertRegel(HIGHEST_PRECEDENCE)
-class StrengtFortroligRegel : GlobalGruppeRegel(STRENGT_FORTROLIG), KjerneRegel
+class StrengtFortroligRegel : GlobalGruppeMedlemskapRegel(STRENGT_FORTROLIG), KjerneRegel
 
 @SortertRegel(HIGHEST_PRECEDENCE + 1)
-class StrengtFortroligUtlandRegel : GlobalGruppeRegel(STRENGT_FORTROLIG_UTLAND), KjerneRegel
+class StrengtFortroligUtlandRegel : GlobalGruppeMedlemskapRegel(STRENGT_FORTROLIG_UTLAND), KjerneRegel
 
 @SortertRegel(HIGHEST_PRECEDENCE + 2)
-class FortroligRegel : GlobalGruppeRegel(FORTROLIG), KjerneRegel
+class FortroligRegel : GlobalGruppeMedlemskapRegel(FORTROLIG), KjerneRegel
 
 @SortertRegel(HIGHEST_PRECEDENCE + 3)
-class SkjermingRegel : GlobalGruppeRegel(SKJERMING), KjerneRegel
+class SkjermingRegel : GlobalGruppeMedlemskapRegel(SKJERMING), KjerneRegel
 
 @SortertRegel(HIGHEST_PRECEDENCE + 4)
 class EgneDataRegel : KjerneRegel {

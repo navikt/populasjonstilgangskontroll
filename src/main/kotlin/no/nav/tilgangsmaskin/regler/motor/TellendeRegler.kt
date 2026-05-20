@@ -15,19 +15,6 @@ import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 
-interface TellendeRegel : Regel {
-    val skalTelle: (Ansatt, Bruker) -> Boolean
-        get() = { _, _ -> false }
-    fun tell(ansatt: Ansatt, bruker: Bruker) = Unit
-
-    override fun evaluer(ansatt: Ansatt, bruker: Bruker): Boolean {
-        if (skalTelle(ansatt, bruker)) {
-            tell(ansatt, bruker)
-        }
-        return true
-    }
-}
-
 @SortertRegel(LOWEST_PRECEDENCE - 3)
 @ConditionalOnProd
 class VergemålTellendeRegel(private val vergemål: VergemålTjeneste, private val auditor: Auditor, private val teller: VergemålTeller) : TellendeRegel {

@@ -27,7 +27,7 @@ enum class GlobalGruppe(val property: String, val metadata: GruppeMetadata) {
             entries.mapTo(mutableSetOf()) { it.id }
 
         fun setIDs(grupper: Map<String, UUID>) =
-            entries.forEach { it.id = grupper[it.property] ?: error("Mangler id for ${it.property}") }
+            entries.forEach { it.id = checkNotNull(grupper[it.property]) { "Mangler id for ${it.property}" } }
 
         fun Token.globaleGrupper() =
             globaleGruppeIds.intersect(uuids()).map { uuid ->

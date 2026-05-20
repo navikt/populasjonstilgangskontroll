@@ -13,10 +13,8 @@ data class PdlPipRespons(
     val identer: PdlIdenter = PdlIdenter(),
     val geografiskTilknytning: PdlGeografiskTilknytning? = null) {
 
-    val aktørId = identer.identer.firstOrNull { it.gruppe == AKTORID }?.ident
-        ?: error("Ingen gyldig aktørid funnet")
-    val brukerId = identer.identer.firstOrNull { it.gruppe in listOf(FOLKEREGISTERIDENT, NPID) && !it.historisk }?.ident
-        ?: error("Ingen gyldig identer funnet")
+    val aktørId = checkNotNull(identer.identer.firstOrNull { it.gruppe == AKTORID }?.ident) { "Ingen gyldig aktørid funnet" }
+    val brukerId = checkNotNull(identer.identer.firstOrNull { it.gruppe in listOf(FOLKEREGISTERIDENT, NPID) && !it.historisk }?.ident) { "Ingen gyldig identer funnet" }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class PdlPerson(

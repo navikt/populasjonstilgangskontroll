@@ -45,7 +45,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
         When("token inneholder kjente og ukjente gruppe-IDer") {
             Then("Token.globaleGrupper returnerer kun kjente EntraGrupper") {
-                every { token.globaleGruppeIds } returns listOf(NASJONAL.id, FORTROLIG.id, STRENGT_FORTROLIG.id, oid)
+                every { token.globaleGruppeIds } returns setOf(NASJONAL.id, FORTROLIG.id, STRENGT_FORTROLIG.id, oid)
                 token.globaleGrupper() shouldContainExactlyInAnyOrder setOf(
                     EntraGruppe(NASJONAL.id, NASJONAL.name),
                     EntraGruppe(FORTROLIG.id, FORTROLIG.name),
@@ -56,14 +56,14 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
         When("ingen av token-gruppeIDene er kjente") {
             Then("Token.globaleGrupper returnerer tomt sett") {
-                every { token.globaleGruppeIds } returns listOf(UUID.randomUUID(), UUID.randomUUID())
+                every { token.globaleGruppeIds } returns setOf(UUID.randomUUID(), UUID.randomUUID())
                 token.globaleGrupper() shouldBe emptySet()
             }
         }
 
         When("token ikke har noen gruppe-IDer") {
             Then("Token.globaleGrupper returnerer tomt sett") {
-                every { token.globaleGruppeIds } returns emptyList()
+                every { token.globaleGruppeIds } returns emptySet()
                 token.globaleGrupper() shouldBe emptySet()
             }
         }
@@ -88,7 +88,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
         When("ansatt har nasjonal tilgang") {
             Then("returneres kun globale grupper uten Entra-oppslag") {
-                every { token.globaleGruppeIds } returns listOf(NASJONAL.id)
+                every { token.globaleGruppeIds } returns setOf(NASJONAL.id)
                 resolver.grupperForAnsatt(ansattId) shouldBe setOf(EntraGruppe(NASJONAL.id, NASJONAL.name))
                 verify(exactly = 0) { entra.geoGrupper(any(), any()) }
                 verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
@@ -97,7 +97,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
         When("ansatt ikke har nasjonal tilgang") {
             Then("slås opp GEO-grupper i Entra") {
-                every { token.globaleGruppeIds } returns emptyList()
+                every { token.globaleGruppeIds } returns emptySet()
                 every { entra.geoGrupper(ansattId, oid) } returns setOf(geoGruppe)
                 resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder setOf(geoGruppe)
                 verify { entra.geoGrupper(ansattId, oid) }
@@ -107,7 +107,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
         When("ansatt har fortrolig-gruppe i token") {
             Then("kombineres globale grupper fra token med GEO-grupper fra Entra") {
-                every { token.globaleGruppeIds } returns listOf(FORTROLIG.id)
+                every { token.globaleGruppeIds } returns setOf(FORTROLIG.id)
                 every { entra.geoGrupper(ansattId, oid) } returns setOf(geoGruppe)
                 resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder
                     setOf(EntraGruppe(FORTROLIG.id, FORTROLIG.name), geoGruppe)

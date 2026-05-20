@@ -200,33 +200,33 @@ class TokenTest : BehaviorSpec({
 
     Given("globaleGruppeIds") {
         When("groups-claim inneholder gyldige UUIDs") {
-            Then("returnerer liste av UUIDs") {
+            Then("returnerer set av UUIDs") {
                 val gruppeId = UUID.randomUUID()
                 every { claims.getAsList("groups") } returns listOf(gruppeId.toString())
-                token.globaleGruppeIds shouldBe listOf(gruppeId)
+                token.globaleGruppeIds shouldBe setOf(gruppeId)
             }
         }
         When("groups mangler") {
-            Then("returnerer tom liste") {
-                token.globaleGruppeIds shouldBe emptyList()
+            Then("returnerer tomt set") {
+                token.globaleGruppeIds shouldBe emptySet()
             }
         }
         When("groups er tom liste") {
-            Then("returnerer tom liste") {
+            Then("returnerer tomt set") {
                 every { claims.getAsList("groups") } returns emptyList()
-                token.globaleGruppeIds shouldBe emptyList()
+                token.globaleGruppeIds shouldBe emptySet()
             }
         }
         When("getClaims kaster exception") {
-            Then("returnerer tom liste") {
+            Then("returnerer tomt set") {
                 every { validationContext.getClaims(AAD_ISSUER) } throws RuntimeException("ingen token")
-                token.globaleGruppeIds shouldBe emptyList()
+                token.globaleGruppeIds shouldBe emptySet()
             }
         }
         When("getAsList returnerer null") {
-            Then("returnerer tom liste") {
+            Then("returnerer tomt set") {
                 every { claims.getAsList("groups") } returns null
-                token.globaleGruppeIds shouldBe emptyList()
+                token.globaleGruppeIds shouldBe emptySet()
             }
         }
         When("groups inneholder ugyldig UUID-verdi") {

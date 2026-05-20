@@ -15,7 +15,8 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
         get() =
             claimSet()?.getAsList("groups")
                 ?.mapNotNull { UUID.fromString(it) }
-                ?: emptyList()
+                ?.toSet()
+                ?: emptySet()
 
 
     val system get() = stringClaim(AZP_NAME)  ?: UTILGJENGELIG

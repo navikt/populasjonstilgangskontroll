@@ -21,7 +21,7 @@ enum class GlobalGruppe(val property: String, val metadata: GruppeMetadata) {
 
     companion object {
         private fun navnFor(id: UUID) =
-            entries.find { it.id == id }?.name ?: "Fant ikke gruppenavn for id $id"
+            entries.first { it.id == id }.name
 
         fun uuids() =
             entries.mapTo(mutableSetOf()) { it.id }
@@ -30,9 +30,9 @@ enum class GlobalGruppe(val property: String, val metadata: GruppeMetadata) {
             entries.forEach { it.id = checkNotNull(grupper[it.property]) { "Mangler id for ${it.property}" } }
 
         fun Token.globaleGrupper() =
-            globaleGruppeIds.intersect(uuids()).map { uuid ->
+            globaleGruppeIds.intersect(uuids()).mapTo(mutableSetOf()) { uuid ->
                 EntraGruppe(uuid, navnFor(uuid))
-            }.toSet()
+            }
 
         fun Set<EntraGruppe>.girNasjonalTilgang() =
             any { it.id == NASJONAL.id }

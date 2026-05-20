@@ -27,7 +27,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste,
         val ansattId = AnsattId(nøkkel.id)
         MDC.put(ConsumerAwareHandlerInterceptor.USER_ID, ansattId.verdi)
         val oid = oidTjeneste.oid(ansattId)
-        this.runCatching {
+        runCatching {
             oppfriskFor(ansattId, oid, nøkkel.metode)
         }.getOrElse {
             if (it is NotFoundRestException) {

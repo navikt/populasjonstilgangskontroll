@@ -25,13 +25,13 @@ object TimeExtensions {
     fun Instant.diffFromNow() = java.time.Duration.between(now(), this).toKotlinDuration().format()
     fun LocalDate.toInstant(): Instant = atStartOfDay(systemDefault()).toInstant()
 
-    fun LocalDate.månederSidenIdag() =
-        LocalDate.now().let { today ->
-            require(!isAfter(today)) { "Datoen $this er etter dagens dato $today" }
-            val period = Period.between(this, today)
-            val måneder = period.years * 12 + period.months
-            maxOf(1, if (today.dayOfMonth > dayOfMonth) måneder + 1 else måneder)
-        }
+    fun LocalDate.månederSidenIdag(): Int {
+        val today = LocalDate.now()
+        require(!isAfter(today)) { "Datoen $this er etter dagens dato $today" }
+        val period = Period.between(this, today)
+        val måneder = period.years * 12 + period.months
+        return maxOf(1, if (today.dayOfMonth > dayOfMonth) måneder + 1 else måneder)
+    }
 
     fun Duration.format(): String {
         val dager = inWholeDays

@@ -30,8 +30,8 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter) {
         ]
     )
     fun registrer(id: UUID, identer: Identer, kontor: Kontor, tidspunkt: Instant = now()) =
-        kontor.kontorId.apply {
-            db.registrer(id, identer.brukerId.verdi, identer.aktorId.verdi, tidspunkt, verdi)
+        kontor.kontorId.also {
+            db.registrer(id, identer.brukerId.verdi, identer.aktorId.verdi, tidspunkt, it.verdi)
         }
 
     @Caching(

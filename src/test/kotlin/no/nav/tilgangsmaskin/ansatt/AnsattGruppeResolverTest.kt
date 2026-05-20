@@ -19,8 +19,8 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.tilgang.Token
-import org.springframework.web.client.HttpClientErrorException
 import java.util.*
 
 class AnsattGruppeResolverTest : BehaviorSpec({
@@ -130,13 +130,13 @@ class AnsattGruppeResolverTest : BehaviorSpec({
         }
 
         When("miljø er prod") {
-            Then("kastes HttpClientErrorException med 401") {
+            Then("kastes IllegalStateException") {
                 mockkObject(ClusterUtils)
-                every { ClusterUtils.isProd } returns true
+                every { isProd } returns true
                 try {
-                    shouldThrow<HttpClientErrorException> {
+                    shouldThrow<IllegalStateException> {
                         resolver.grupperForAnsatt(ansattId)
-                    }.statusCode.value() shouldBe 401
+                    }.message shouldBe "Autentisering påkrevet i produksjonsmiljøet"
                 } finally {
                     unmockkObject(ClusterUtils)
                 }

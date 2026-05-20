@@ -6,13 +6,10 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.globaleGrupper
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
-import org.springframework.web.client.HttpClientErrorException
 
 @Component
 class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
@@ -58,17 +55,9 @@ class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
         }
     }
 
-    private fun grupperForUautentisert(ansattId: AnsattId) =
-        if (ClusterUtils.isProd) {
-            throw HttpClientErrorException(HttpStatus.UNAUTHORIZED,
-                "Autentisering påkrevet i produksjonsmiljøet",
-                HttpHeaders(),
-                null,
-                null)
-        } else {
-            log.info("Intet token i dev/local for $ansattId, slår opp globale og GEO-grupper i Entra")
-            entra.geoOgGlobaleGrupper(ansattId, oid.oid(ansattId)).also {
-                log.trace("Uautentisert i dev: {} slo opp {} i Entra for {}", ansattId, it, ansattId)
-            }
-        }
+    private fun grupperForUautentisert(ansattId: AnsattId): Set<EntraGruppe> {
+        check(!isProd) { "Autentisering påkrevet i produksjonsmiljøet" }
+        log.info("Intet token i dev/local for {}, slår opp globale og GEO-grupper i Entra", ansattId)
+        return entra.geoOgGlobaleGrupper(ansattId, oid.oid(ansattId))
+    }
 }

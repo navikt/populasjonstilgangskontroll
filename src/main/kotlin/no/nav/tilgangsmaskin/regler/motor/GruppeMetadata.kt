@@ -26,7 +26,7 @@ enum class GruppeMetadata(val meta: AvvisningsKode, val begrunnelse: String, val
     PARTNER(AVVIST_HABILITET, HABILITET, "Partner"),
     SØSKEN(AVVIST_HABILITET, HABILITET, "Søsken"),
     FELLES_BARN(AVVIST_HABILITET, HABILITET, "Felles barn"),
-    AVDØD(AVVIST_AVDØD, "Du har ikke tilgang til informasjon om avdøde brukere", "Avdød bruker"),
+    AVDØD(AVVIST_AVDØD, "Du har ikke tilgang til brukere som har vært død mer enn 12 måneder. Du kan be om tilgangen \"Populasjon avdød bruker\" gjennom Mine Tilganger", "Avdød bruker"),
     VERGEMÅL(AVVIST_VERGEMÅL, "Du har ikke tilgang til informasjon om personer du er verge for", "Vergemål"),
     UTENLANDSK(AVVIST_PERSON_UTLAND, "Du har ikke tilgang til person bosatt i utlandet", "Person bosatt utland"),
     UKJENT_BOSTED(AVVIST_UKJENT_BOSTED, "Du har ikke tilgang til person uten kjent adresse", "Person bosatt ukjent bosted")

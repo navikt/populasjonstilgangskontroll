@@ -15,7 +15,6 @@ import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.VERGEMÅL
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
-import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 
 

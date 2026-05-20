@@ -7,6 +7,9 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_7_12
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
 import java.time.LocalDate
 
 data class Bruker(
@@ -42,6 +45,9 @@ data class Bruker(
     val harUkjentBosted = geografiskTilknytning is UkjentBosted
     val harUtenlandskBosted = geografiskTilknytning is UtenlandskTilknytning
     infix fun kreverMedlemskapI(gruppe: GlobalGruppe) = gruppe in påkrevdeGrupper
+
+    @JsonIgnore
+    val erForlengstAvdød = dødsdato != null && dødsdato.intervallSiden() > MND_7_12
 
     @NoCoverageAnalysis
     override fun toString() =

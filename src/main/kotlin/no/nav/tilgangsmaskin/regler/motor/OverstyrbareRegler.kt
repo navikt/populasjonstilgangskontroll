@@ -10,14 +10,19 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
+import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_7_12
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.VERGEMÅL
 import no.nav.tilgangsmaskin.tilgang.Token
+import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
@@ -90,7 +95,26 @@ class AvdødBrukerRegel : OverstyrbarRegel {
 
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis {
-            val dødsdato = bruker.dødsdato
-            dødsdato != null && dødsdato.intervallSiden() > Dødsperiode.MND_7_12 && ansatt ikkeErMedlemAv GlobalGruppe.AVDØD
+            bruker.erForlengstAvdød && ansatt ikkeErMedlemAv GlobalGruppe.AVDØD
+        }
+}
+
+@Component
+@Order(LOWEST_PRECEDENCE - 4)
+@ConditionalOnNotProd
+class VergemålRegel(private val vergemål: VergemålTjeneste) : OverstyrbarRegel {
+
+    private val log = getLogger(javaClass)
+
+    override val metadata = RegelMetadata(VERGEMÅL)
+
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
+        avvisHvis {
+            runCatching {
+                vergemål.vergemål(ansatt.ansattId).contains(bruker.brukerId)
+            }.getOrElse {
+                log.error("Feil ved sjekk av vergemål for ansatt ${ansatt.ansattId.verdi}", it)
+                false
+            }
         }
 }

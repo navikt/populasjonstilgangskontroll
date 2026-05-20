@@ -63,8 +63,8 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, va
             }
             regelsett.filter {
                 it.regler.isNotEmpty()
-            }.forEach { regelSett ->
-                builder.withDetail(regelSett.beskrivelse, regelSett.regler.map { "(${it.javaClass.simpleName}) ${it.kortNavn}" })
+            }.forEach {
+                builder.withDetail(it.beskrivelse, it.regler.map { regel -> "(${regel.javaClass.simpleName}) ${regel.kortNavn}" })
             }
         }
     }

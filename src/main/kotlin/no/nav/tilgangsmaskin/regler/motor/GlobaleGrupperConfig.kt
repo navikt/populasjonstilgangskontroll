@@ -6,11 +6,11 @@ import java.util.*
 
 @ConfigurationProperties("gruppe")
 data class GlobaleGrupperConfig(val strengt: UUID, val nasjonal: UUID, val utland: UUID,
-                                val udefinert: UUID, val fortrolig: UUID, val egenansatt: UUID,val avdød: UUID) {
+                                val udefinert: UUID, val fortrolig: UUID, val egenansatt: UUID,val dead: UUID) {
     init {
         GlobalGruppe.setIDs(
             mapOf(
-                "gruppe.dead" to avdød,
+                "gruppe.dead" to dead,
                 "gruppe.strengt" to strengt,
                 "gruppe.nasjonal" to nasjonal,
                 "gruppe.utland" to utland,

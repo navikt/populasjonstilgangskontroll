@@ -134,7 +134,7 @@ class TilgangController(
             }
         }
 
-    private fun enkeltOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, brukerId: String, regelType: RegelType, uri: String) : Unit =
+    private fun enkeltOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, brukerId: String, regelType: RegelType, uri: String) =
         with(brukerId.trim('"')) {
             MDC.put(USER_ID, ansattId().verdi)
             log.trace(CONFIDENTIAL,"Kjører {} regler for {} og {}", regelType, ansattId(), this.maskFnr())
@@ -142,7 +142,7 @@ class TilgangController(
             sjekk(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")
             tell("single")
-            return when (regelType) {
+            when (regelType) {
                 KJERNE_REGELTYPE -> regelTjeneste.kjerneregler(ansattId(), this)
                 else -> regelTjeneste.kompletteRegler(ansattId(), this)
             }

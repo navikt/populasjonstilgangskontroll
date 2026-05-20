@@ -103,6 +103,8 @@ spec:
       value: {{pdlgraph}}
     - name: PDL
       value: {{pdl}}
+    - name: GRUPPE_DEAD
+      value: '{{grupper.dead}}'
     - name: GRUPPE_STRENGT
       value: '{{grupper.strengt}}'
     - name: GRUPPE_FORTROLIG

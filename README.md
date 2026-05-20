@@ -5,7 +5,6 @@ Fagsystemer kan spørre tilgangsmaskinen om den ansatte har tilgang til brukeren
 Dokumentasjon på Confluence: https://confluence.adeo.no/spaces/TM/pages/760466828/Tilgangsmaskinen
 
 Slack-kanal: [team-tilgangsmaskinen-værsågod](https://nav-it.slack.com/archives/C07GGDP38S2)
-
 ## Swagger
 Prod: https://tilgangsmaskin.intern.nav.no/swagger-ui/index.html#/
 

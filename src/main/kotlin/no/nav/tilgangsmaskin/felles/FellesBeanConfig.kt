@@ -49,17 +49,17 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     @JsonIgnoreProperties(ignoreUnknown = true)
     private interface IgnoreUnknownMixin
 
-    @Bean
+    @Bean("messageSource")
     @ConditionalOnProd
-    fun messageSource() =
+    fun prodMessageSource() =
         ReloadableResourceBundleMessageSource().apply {
             setBasenames("classpath:messages", "classpath:regel-messages", "classpath:openapi-prod-tilgang")
             setDefaultEncoding("UTF-8")
         }
 
-    @Bean
+    @Bean("messageSource")
     @ConditionalOnDevOrLocal
-    fun messageSourceDevOrLocal() =
+    fun devMessageSource() =
         ReloadableResourceBundleMessageSource().apply {
             setBasenames(
                 "classpath:messages",

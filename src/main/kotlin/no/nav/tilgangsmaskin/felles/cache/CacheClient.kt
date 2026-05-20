@@ -13,7 +13,7 @@ import java.time.Duration.ofSeconds
 import kotlin.reflect.KClass
 
 @RetryingWhenRecoverableRestService
-class CacheClient(client: RedisClient, private val handler: CacheNøkkelMapper,
+class CacheClient(client: RedisClient, private val mapper: CacheNøkkelMapper,
                   private val alleTreffTeller: BulkCacheSuksessTeller,
                   private val teller: BulkCacheTeller,
                   private val cfg: CacheConfig) : CacheOperations {
@@ -29,18 +29,18 @@ class CacheClient(client: RedisClient, private val handler: CacheNøkkelMapper,
 
     @WithSpan
     override fun delete(cache: CacheNøkkelConfig, id: String) =
-        conn.sync().del(handler.tilNøkkel(cache, id))
+        conn.sync().del(mapper.tilNøkkel(cache, id))
 
 
     @WithSpan
     override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? =
-        conn.sync().get(handler.tilNøkkel(cache, id))?.let { json ->
-            handler.fraJson(json, clazz)
+        conn.sync().get(mapper.tilNøkkel(cache, id))?.let { json ->
+            mapper.fraJson(json, clazz)
         }
 
     @WithSpan
     override fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration) {
-        conn.async().setex(handler.tilNøkkel(cache, id), ttl.seconds, handler.tilJson(value))
+        conn.async().setex(mapper.tilNøkkel(cache, id), ttl.seconds, mapper.tilJson(value))
     }
 
 
@@ -50,9 +50,9 @@ class CacheClient(client: RedisClient, private val handler: CacheNøkkelMapper,
             emptyMap()
         } else {
             conn.sync()
-                .mget(*ids.map { id -> handler.tilNøkkel(cache, id) }.toTypedArray<String>())
+                .mget(*ids.map { id -> mapper.tilNøkkel(cache, id) }.toTypedArray<String>())
                 .filter { it.hasValue() }
-                .associate { handler.idFraNøkkel(it.key) to handler.fraJson(it.value, clazz) }
+                .associate { mapper.idFraNøkkel(it.key) to mapper.fraJson(it.value, clazz) }
                 .also { tellOgLog(cache.name, it.size, ids.size) }
         }
 
@@ -75,10 +75,8 @@ class CacheClient(client: RedisClient, private val handler: CacheNøkkelMapper,
     }
 
     private fun payloadFor(innslag: Map<String, Any>, cache: CacheNøkkelConfig) =
-        buildMap {
-            innslag.forEach { (key, value) ->
-                put(handler.tilNøkkel(cache, key), handler.tilJson(value))
-            }
+        innslag.entries.associate { (key, value) ->
+            mapper.tilNøkkel(cache, key) to this@CacheClient.mapper.tilJson(value)
         }
 
     fun tellOgLog(navn: String, funnet: Int, etterspurt: Int) {
@@ -88,5 +86,5 @@ class CacheClient(client: RedisClient, private val handler: CacheNøkkelMapper,
         log.trace("Fant $funnet verdier i cache $navn for $etterspurt identer")
     }
 
-    override fun tilNøkkel(cache: CacheNøkkelConfig, id: String) = handler.tilNøkkel(cache, id)
+    override fun tilNøkkel(cache: CacheNøkkelConfig, id: String) = mapper.tilNøkkel(cache, id)
 }

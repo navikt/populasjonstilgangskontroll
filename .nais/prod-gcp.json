@@ -8,7 +8,8 @@
     "egenansatt": "e750ceb5-b70b-4d94-b4fa-9d22467b786b",
     "udefinert": "8804ac77-50c7-4339-822f-d509e551e82e",
     "nasjonal": "ebdddf06-dc5b-45ef-9dad-850894b935f9",
-    "utland": "bb308252-d600-4e5c-bc53-bbd2bb8a29ba"
+    "utland": "bb308252-d600-4e5c-bc53-bbd2bb8a29ba",
+    "dead" : "995d6ab0-c557-4ae5-af7a-064b8c9585ce"
   },
   "db": {
     "poolsize": "6",

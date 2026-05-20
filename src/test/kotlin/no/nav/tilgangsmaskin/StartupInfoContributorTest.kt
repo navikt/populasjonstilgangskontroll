@@ -12,12 +12,18 @@ import no.nav.tilgangsmaskin.regler.motor.EgneDataRegel
 import no.nav.tilgangsmaskin.regler.motor.Regel
 import no.nav.tilgangsmaskin.regler.motor.RegelSett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
+import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
 import org.springframework.boot.actuate.info.Info
 import org.springframework.context.ConfigurableApplicationContext
+import org.springframework.context.support.StaticMessageSource
 import org.springframework.core.env.ConfigurableEnvironment
 
 @Suppress("UNCHECKED_CAST")
 class StartupInfoContributorTest : BehaviorSpec({
+
+    beforeSpec {
+        RegelMetadata.messageSource = StaticMessageSource()
+    }
 
     val env = mockk<ConfigurableEnvironment>()
     val ctx = mockk<ConfigurableApplicationContext>()

@@ -53,7 +53,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     @ConditionalOnProd
     fun messageSource() =
         ReloadableResourceBundleMessageSource().apply {
-            setBasenames("classpath:messages", "classpath:openapi-prod-tilgang")
+            setBasenames("classpath:messages", "classpath:regel-messages", "classpath:openapi-prod-tilgang")
             setDefaultEncoding("UTF-8")
         }
 
@@ -63,6 +63,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
         ReloadableResourceBundleMessageSource().apply {
             setBasenames(
                 "classpath:messages",
+                "classpath:regel-messages",
                 "classpath:openapi-prod-tilgang",
                 "classpath:openapi-dev-ansatt",
                 "classpath:openapi-dev-bruker",

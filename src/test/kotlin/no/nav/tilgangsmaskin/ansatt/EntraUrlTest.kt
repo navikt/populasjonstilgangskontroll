@@ -4,7 +4,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_PREFIX
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRUPPER_FILTER
 
 class EntraUrlTest : BehaviorSpec({
 
@@ -19,7 +19,7 @@ class EntraUrlTest : BehaviorSpec({
                     filter shouldContain "${gruppe.id}"
                 }
                 filter shouldContain "id in("
-                filter shouldContain ") or $GEO_PREFIX"
+                filter shouldContain ") or $GRUPPER_FILTER"
             }
         }
 

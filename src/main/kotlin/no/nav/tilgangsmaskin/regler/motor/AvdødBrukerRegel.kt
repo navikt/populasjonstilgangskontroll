@@ -46,7 +46,7 @@ class AvdødBrukerRegel(private val teller: AvdødTeller, private val proxy: Ent
 @ConditionalOnNotProd
 @Order(LOWEST_PRECEDENCE - 3)
 @Component
-class AvdødBrukerDevRegel(private val proxy: EntraProxyTjeneste, private val auditor: Auditor, private val token: Token) : GlobalGruppeRegel(
+class AvdødBrukerDevRegel(private val proxy: EntraProxyTjeneste, private val auditor: Auditor, private val token: Token) : KjerneRegel, GlobalGruppeRegel(
     GlobalGruppe.AVDØD)  {
 
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) : Boolean {

@@ -145,11 +145,6 @@
       "cluster": "prod-fss"
     },
     {
-      "name": "oh-tilgangskontroll",
-      "namespace": "oppgavehandtering",
-      "cluster": "prod-gcp"
-    },
-    {
       "name": "saf",
       "namespace": "teamdokumenthandtering",
       "cluster": "prod-fss"
@@ -180,18 +175,8 @@
       "cluster": "prod-fss"
     },
     {
-      "name": "kabal-api",
-      "namespace": "klage",
-      "cluster": "prod-gcp"
-    },
-    {
       "name": "klage-lookup",
       "namespace": "klage",
-      "cluster": "prod-gcp"
-    },
-    {
-      "name": "infotrygd-hentsaksliste-backend",
-      "namespace": "infotrygd",
       "cluster": "prod-gcp"
     },
     {

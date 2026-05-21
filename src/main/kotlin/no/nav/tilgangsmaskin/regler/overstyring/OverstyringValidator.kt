@@ -2,12 +2,10 @@ package no.nav.tilgangsmaskin.regler.overstyring
 
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
-import org.slf4j.LoggerFactory.getLogger
 import java.time.LocalDate
 import java.time.LocalDate.now
 
 class OverstyringValidator : ConstraintValidator<ValidOverstyring, OverstyringData> {
-    private val log = getLogger(javaClass)
 
     private var months: Long = 3
     override fun initialize(constraintAnnotation: ValidOverstyring) {
@@ -16,13 +14,9 @@ class OverstyringValidator : ConstraintValidator<ValidOverstyring, OverstyringDa
     override fun isValid(verdi: OverstyringData, context: ConstraintValidatorContext) =
         gyldigDato(verdi.gyldigtil) && gyldigLengde(verdi.begrunnelse)
 
-    private fun gyldigLengde(verdi: String) = (verdi.length in 10..400).also {
-        if (!it) log.warn("Overstyring med begrunnelse '$verdi' er ugyldig, må være mellom 10 og 400 tegn")
-    }
+    private fun gyldigLengde(verdi: String) =
+        verdi.length in 10..400
 
     private fun gyldigDato(verdi: LocalDate) =
-        (verdi.isAfter(now()) && verdi.isBefore(now().plusMonths(3)))
-            .also {
-                if (!it) log.warn("Overstyring med gyldig til $verdi er ugyldig, må være fra nå og maks 3 måneder frem i tid")
-            }
+        verdi.isAfter(now()) && verdi.isBefore(now().plusMonths(months))
 }

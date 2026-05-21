@@ -282,11 +282,6 @@
       "cluster": "dev-fss"
     },
     {
-      "name": "kabal-api",
-      "namespace": "klage",
-      "cluster": "dev-gcp"
-    },
-    {
       "name": "klage-lookup",
       "namespace": "klage",
       "cluster": "dev-gcp"

@@ -6,14 +6,17 @@ import io.kotest.matchers.string.shouldNotContain
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
 
 class RegelMetadataKeyResolverTest : BehaviorSpec({
-    val messageSource = ReloadableResourceBundleMessageSource().apply {
-        setBasename("classpath:regel-messages")
-        setDefaultEncoding("UTF-8")
+
+    beforeSpec {
+        RegelMetadata.messageSource = ReloadableResourceBundleMessageSource().apply {
+            setBasename("classpath:regel-messages")
+            setDefaultEncoding("UTF-8")
+        }
     }
 
     Given("alle GruppeMetadata-entries") {
         GruppeMetadata.entries.forEach { gruppe ->
-            val metadata = RegelMetadata(gruppe, messageSource)
+            val metadata = RegelMetadata(gruppe)
 
             Then("${gruppe.name} har begrunnelse som ikke er en nøkkel") {
                 metadata.begrunnelse shouldNotContain "regel."

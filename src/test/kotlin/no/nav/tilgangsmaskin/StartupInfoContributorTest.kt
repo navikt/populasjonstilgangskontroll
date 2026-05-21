@@ -22,7 +22,7 @@ import org.springframework.core.env.ConfigurableEnvironment
 class StartupInfoContributorTest : BehaviorSpec({
 
     beforeSpec {
-        RegelMetadata.configureMessageSource(StaticMessageSource())
+        RegelMetadata.messageSource = StaticMessageSource()
     }
 
     val env = mockk<ConfigurableEnvironment>()

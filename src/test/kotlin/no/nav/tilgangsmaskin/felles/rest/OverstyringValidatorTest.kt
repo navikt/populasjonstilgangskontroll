@@ -19,7 +19,7 @@ class OverstyringValidatorTest : BehaviorSpec({
     val gyldigDato = now().plusMonths(1)
     val brukerId = BrukerId("08526835670")
 
-    fun data(begrunnelse: String = gyldigBegrunnelse, gyldigtil: LocalDate = gyldigDato) =
+    fun data(begrunnelse: String, gyldigtil: LocalDate = gyldigDato) =
         OverstyringData(brukerId, begrunnelse, gyldigtil)
 
     Given("en overstyring") {

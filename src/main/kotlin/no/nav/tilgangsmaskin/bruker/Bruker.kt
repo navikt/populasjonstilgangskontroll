@@ -11,6 +11,7 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
 import java.time.Duration
 import java.time.LocalDate
+import java.time.LocalDate.now
 import java.time.Period
 
 data class Bruker(
@@ -47,7 +48,7 @@ data class Bruker(
     val harUtenlandskBosted = geografiskTilknytning is UtenlandskTilknytning
     infix fun kreverMedlemskapI(gruppe: GlobalGruppe) = gruppe in påkrevdeGrupper
 
-    infix fun harVærtDødMerEnn(dur: Period) = dødsdato != null && dødsdato.plus(dur) < LocalDate.now()
+    infix fun harVærtDødMerEnn(dur: Period) = dødsdato != null && dødsdato.plus(dur) < now()
 
     @NoCoverageAnalysis
     override fun toString() =

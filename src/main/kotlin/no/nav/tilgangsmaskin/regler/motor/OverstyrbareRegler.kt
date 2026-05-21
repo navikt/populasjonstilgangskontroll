@@ -66,10 +66,6 @@ class VergemålRegel(private val vergemål: VergemålTjeneste) : OverstyrbarRege
 
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis {
-            runCatching {
-                vergemål.vergemål(ansatt.ansattId).contains(bruker.brukerId)
-            }.getOrElse {
-                false
-            }
+            vergemål.vergemål(ansatt.ansattId).contains(bruker.brukerId)
         }
 }

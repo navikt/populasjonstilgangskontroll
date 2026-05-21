@@ -15,11 +15,14 @@ class VergemålTjeneste(private val nom: NomTjeneste, private val client: Vergem
     @WithSpan
     @Cacheable(cacheNames = [VERGEMÅL], key = "#ansattId.verdi")
     fun vergemål(ansattId: AnsattId) =
-        nom.fnrForAnsatt(ansattId)?.let { fnr ->
-            client.vergemål(VergemålIdent(fnr.verdi))
-                .map { it.vergehaver }
-                .toSet()
-        } ?: emptySet()
+        runCatching {
+            nom.fnrForAnsatt(ansattId)?.let { fnr ->
+                client.vergemål(VergemålIdent(fnr.verdi))
+                    .map { it.vergehaver }
+                    .toSet()
+            } ?: emptySet()
+        }.getOrElse { emptySet() }
+
 
     @NoCoverageAnalysis
     override fun toString() = "${javaClass.simpleName} [client=$client]"

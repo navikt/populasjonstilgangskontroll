@@ -9,7 +9,7 @@ import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
-import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD_MER_ENN_ETT_ÅR
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.VERGEMÅL
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger
@@ -44,7 +44,7 @@ class VergemålTellendeRegel(private val vergemål: VergemålTjeneste, private v
 @ConditionalOnProd
 class AvdødBrukerTellendeRegel(private val teller: AvdødTeller, private val proxy: EntraProxyTjeneste, private val auditor: Auditor, private val token: Token) : TellendeRegel {
 
-    override val metadata = RegelMetadata(AVDØD)
+    override val metadata = RegelMetadata(AVDØD_MER_ENN_ETT_ÅR)
 
     override val skalTelle = { _: Ansatt, bruker: Bruker -> bruker.dødsdato != null }
 

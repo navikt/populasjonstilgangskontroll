@@ -24,7 +24,7 @@ enum class GruppeMetadata(val meta: AvvisningsKode, val meldingsnøkkel: String)
     PARTNER(AVVIST_HABILITET, "regel.partner"),
     SØSKEN(AVVIST_HABILITET, "regel.søsken"),
     FELLES_BARN(AVVIST_HABILITET, "regel.felles-barn"),
-    AVDØD(AVVIST_AVDØD, "regel.avdød"),
+    AVDØD_MER_ENN_ETT_ÅR(AVVIST_AVDØD, "regel.avdød"),
     VERGEMÅL(AVVIST_VERGEMÅL, "regel.vergemål"),
     UTENLANDSK(AVVIST_PERSON_UTLAND, "regel.utenlandsk"),
     UKJENT_BOSTED(AVVIST_UKJENT_BOSTED, "regel.ukjent-bosted")

@@ -10,10 +10,10 @@ class OverstyringValidator : ConstraintValidator<ValidOverstyring, OverstyringDa
     private var minLengde: Int = 10
     private var maxLengde: Int = 255
 
-    override fun initialize(constraintAnnotation: ValidOverstyring) {
-        months = constraintAnnotation.months
-        minLengde = constraintAnnotation.minLengde
-        maxLengde = constraintAnnotation.maxLengde
+    override fun initialize(ann: ValidOverstyring) {
+        months = ann.months
+        minLengde = ann.minLengde
+        maxLengde = ann.maxLengde
     }
 
     override fun isValid(verdi: OverstyringData, context: ConstraintValidatorContext): Boolean {

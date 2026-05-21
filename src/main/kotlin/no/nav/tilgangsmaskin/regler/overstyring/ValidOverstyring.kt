@@ -16,5 +16,5 @@ annotation class ValidOverstyring(
     val groups: Array<KClass<*>> = [],
     val months: Long = 3,
     val minLengde: Int = 10,
-    val maxLengde: Int = 400,
+    val maxLengde: Int = 255,
     val payload: Array<KClass<out Payload>> = [])

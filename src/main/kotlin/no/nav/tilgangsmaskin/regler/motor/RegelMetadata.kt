@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder.getLocale
 import java.net.URI
@@ -12,12 +11,10 @@ data class RegelMetadata(val gruppeMetadata: GruppeMetadata) {
     val kortNavn get() = resolve("kortnavn")
     val navn = gruppeMetadata.name
 
-    private fun resolve(suffix: String): String {
-        val key = "${gruppeMetadata.meldingsnøkkel}.$suffix"
-        return messageSource.getMessage(key, null, key, getLocale())!!
-    }
-
-    constructor(gruppe: GlobalGruppe) : this(gruppe.metadata)
+    private fun resolve(suffix: String) =
+         with("${gruppeMetadata.meldingsnøkkel}.$suffix") {
+             messageSource.getMessage(this, null, this, getLocale())!!
+        }
 
     companion object {
         lateinit var messageSource: MessageSource

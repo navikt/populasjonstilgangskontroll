@@ -7,6 +7,8 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGE
 import org.springframework.core.annotation.AliasFor
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
+import kotlin.annotation.AnnotationRetention.RUNTIME
+import kotlin.annotation.AnnotationTarget.CLASS
 
 interface Regel {
     fun evaluer(ansatt: Ansatt, bruker: Bruker): Boolean
@@ -41,8 +43,8 @@ interface TellendeRegel : Regel {
     }
 }
 
-@Target(AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.RUNTIME)
+@Target(CLASS)
+@Retention(RUNTIME)
 @Order
 @Component
 annotation class SortertRegel(@get:AliasFor(annotation = Order::class, attribute = "value") val value: Int)

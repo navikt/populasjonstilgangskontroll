@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.regler.overstyring
 
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.isBetweenExclusive
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.isBetween
 import java.time.LocalDate.now
 
 class OverstyringValidator : ConstraintValidator<ValidOverstyring, OverstyringData> {
@@ -19,7 +19,7 @@ class OverstyringValidator : ConstraintValidator<ValidOverstyring, OverstyringDa
 
     override fun isValid(verdi: OverstyringData, context: ConstraintValidatorContext) =
         with(now()) {
-            isBetweenExclusive(this, plusMonths(months)) &&
+            verdi.gyldigtil.isBetween(this, plusMonths(months)) &&
                     verdi.begrunnelse.length in min..max
         }
 }

@@ -70,8 +70,8 @@ object TimeExtensions {
     val Int.år: Period get() = ofYears(this)
 
 
-    fun LocalDate.isBetweenExclusive(start: LocalDate, end: LocalDate) =
-        isAfter(start) && isBefore(end)
+    fun LocalDate.isBetween(start: LocalDate, end: LocalDate) =
+        !isBefore(start) && !isAfter(end)
 
     enum class Dødsperiode(val tekst: String) {
         MND_0_6("0-6"),

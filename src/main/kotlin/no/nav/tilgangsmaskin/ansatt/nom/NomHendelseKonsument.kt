@@ -23,9 +23,7 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
     @KafkaListener(
         topics = [NOM_TOPIC],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.nom.NomHendelse"],
-        groupId = NOM,
-        errorHandler = NOM_ERROR_HANDLER,
-        filter = NOM_FNR_FILTER_STRATEGY)
+        groupId = NOM, errorHandler = NOM_ERROR_HANDLER, filter = NOM_FNR_FILTER_STRATEGY)
     fun listen(hendelser: List<NomHendelse>) {
         log.trace("Mottok ${hendelser.size} hendelse(r) fra NOM")
         hendelser.forEach { h ->

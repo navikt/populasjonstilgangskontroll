@@ -6,13 +6,16 @@ import org.slf4j.LoggerFactory.getLogger
 abstract class AbstractCacheOppfrisker : CacheOppfrisker {
     private val log = getLogger(javaClass)
 
-    protected abstract fun doOppfrisk(nøkkel: CacheNøkkel)
+    protected abstract fun doOppfrisk(nøkkel: CacheNøkkel) : Any?
 
     @WithSpan
-    final override fun oppfrisk(nøkkel: CacheNøkkel) {
-        runCatching { doOppfrisk(nøkkel) }
-            .onSuccess { log.trace("Oppfrisking av cache innslag ${nøkkel.maskert} OK") }
-            .onFailure { log.warn("Oppfrisking av cache innslag ${nøkkel.maskert} feilet", it) }
-    }
+    final override fun oppfrisk(nøkkel: CacheNøkkel) =
+        runCatching {
+            doOppfrisk(nøkkel)
+        }.onSuccess {
+            log.trace("Oppfrisking av cache innslag ${nøkkel.maskert} OK")
+        }.onFailure {
+            log.warn("Oppfrisking av cache innslag ${nøkkel.maskert} feilet", it)
+        }
 }
 

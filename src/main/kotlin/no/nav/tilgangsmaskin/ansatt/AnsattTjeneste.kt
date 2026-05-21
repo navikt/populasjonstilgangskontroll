@@ -27,14 +27,16 @@ class AnsattTjeneste(private val ansatte: NomTjeneste,
             log.trace("Ansatt er {}", it)
         }
 
-    private fun ansattGrupper(ansattId: AnsattId) = resolver.grupperForAnsatt(ansattId)
+    private fun ansattGrupper(ansattId: AnsattId) =
+        resolver.grupperForAnsatt(ansattId)
 
     private fun ansattBruker(ansattId: AnsattId) =
         ansatte.fnrForAnsatt(ansattId)?.let {
             runCatching { brukere.brukerMedUtvidetFamilie(it.verdi) }.getOrNull()
         }
 
-    private fun tell(status: Boolean) = teller.tell(Tags.of(MEDLEM, "$status"))
+    private fun tell(status: Boolean) =
+        teller.tell(Tags.of(MEDLEM, "$status"))
 
     companion object {
         private const val MEDLEM = "medlem"

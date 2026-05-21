@@ -15,13 +15,11 @@ class VergemålTjeneste(private val nom: NomTjeneste, private val client: Vergem
     @WithSpan
     @Cacheable(cacheNames = [VERGEMÅL], key = "#ansattId.verdi")
     fun vergemål(ansattId: AnsattId) =
-        runCatching {
-            nom.fnrForAnsatt(ansattId)?.let { fnr ->
-                client.vergemål(VergemålIdent(fnr.verdi))
-                    .map { it.vergehaver }
-                    .toSet()
-            } ?: emptySet()
-        }.getOrElse { emptySet() }
+        nom.fnrForAnsatt(ansattId)?.let { fnr ->
+            client.vergemål(VergemålIdent(fnr.verdi))
+                .map { it.vergehaver }
+                .toSet()
+        } ?: emptySet()
 
 
     @NoCoverageAnalysis

@@ -20,6 +20,7 @@ import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
+import no.nav.tilgangsmaskin.regler.motor.OppfølgingkontorTeller
 import no.nav.tilgangsmaskin.tilgang.Token
 
 
@@ -50,6 +51,7 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
     class OppfølgingTestConfig : CacheTestConfig(OPPFØLGING)
 
     @MockkBean private lateinit var token: Token
+    @MockkBean(relaxed = true) private lateinit var teller: OppfølgingkontorTeller
 
     @MockkSpyBean private lateinit var adapter: OppfølgingJPAAdapter
     @Autowired private lateinit var tjeneste: OppfølgingTjeneste

@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import io.micrometer.core.instrument.Tags
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.AVDØD
@@ -18,14 +17,12 @@ import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 
 
 @SortertRegel(LOWEST_PRECEDENCE)
-class GeografiskRegel(private val oppfølging: OppfølgingTjeneste,private val teller: OppfølgingkontorTeller) : GlobalGruppeMedlemskapRegel(NASJONAL), OverstyrbarRegel {
+class GeografiskRegel(private val oppfølging: OppfølgingTjeneste) : GlobalGruppeMedlemskapRegel(NASJONAL), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         godtaHvis {
             ansatt erMedlemAv NASJONAL
                     || ansatt kanBehandle bruker.geografiskTilknytning
-                    || (ansatt tilhører oppfølging.enhetFor(Identifikator(bruker.oppslagId))).also {
-                teller.tell(Tags.of("resultat", "$it"))
-            }
+                    || ansatt tilhører oppfølging.enhetFor(Identifikator(bruker.oppslagId))
         }
 }
 
@@ -66,6 +63,8 @@ class VergemålRegel(private val vergemål: VergemålTjeneste) : OverstyrbarRege
 
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis {
-            vergemål.vergemål(ansatt.ansattId).contains(bruker.brukerId)
+            runCatching {
+                vergemål.vergemål(ansatt.ansattId).contains(bruker.brukerId)
+            }.getOrDefault(false)
         }
 }

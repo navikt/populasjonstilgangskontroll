@@ -7,7 +7,7 @@ metadata:
   namespace: tilgangsmaskin
 spec:
   envFrom:
-    - configmap: globalegrupper
+    - configmap: grupper
   valkey:
     - instance: {{nais.cluster.cache}}
       access: readwrite
@@ -68,7 +68,6 @@ spec:
           - id: {{grupper.utland}}
           - id: {{grupper.egenansatt}}
           - id: {{grupper.udefinert}}
-          - id: {{grupper.fortrolig}}
           - id: {{grupper.strengt}}
   accessPolicy:
     outbound:
@@ -109,8 +108,6 @@ spec:
       value: '{{grupper.dead}}'
     - name: GRUPPE_STRENGT
       value: '{{grupper.strengt}}'
-    - name: GRUPPE_FORTROLIG
-      value: '{{grupper.fortrolig}}'
     - name: GRUPPE_EGENANSATT
       value: '{{grupper.egenansatt}}'
     - name: GRUPPE_UDEFINERT

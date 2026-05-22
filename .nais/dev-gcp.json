@@ -32,6 +32,11 @@
       "cluster": "dev-gcp"
     },
     {
+      "name": "sporhund",
+      "namespace": "tbd",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "mulighetsrommet-api",
       "namespace": "team-mulighetsrommet",
       "cluster": "dev-gcp"

@@ -23,7 +23,8 @@ class VergemålTjeneste(private val nom: NomTjeneste, private val client: Vergem
 
 
     @NoCoverageAnalysis
-    override fun toString() = "${javaClass.simpleName} [client=$client]"
+    override fun toString() =
+        "${javaClass.simpleName} [client=$client]"
 }
 
 

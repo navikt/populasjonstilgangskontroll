@@ -13,13 +13,13 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
 
     private val brukerId = bruker?.brukerId
 
-    private val barn = bruker?.barn ?: emptySet()
+    private val barn = bruker?.barn.orEmpty()
 
-    private val foreldreEllerBarn = bruker?.foreldreOgBarn ?: emptySet()
+    private val foreldreEllerBarn = bruker?.foreldreOgBarn.orEmpty()
 
-    private val søsken = bruker?.søsken ?: emptySet()
+    private val søsken = bruker?.søsken.orEmpty()
 
-    private val partnere = bruker?.partnere ?: emptySet()
+    private val partnere = bruker?.partnere.orEmpty()
 
     infix fun kanBehandle(gt: GeografiskTilknytning): Boolean {
         val kode = when (gt) {

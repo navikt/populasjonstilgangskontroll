@@ -1,7 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
-import ch.qos.logback.classic.Level.INFO
-import ch.qos.logback.classic.Level.WARN
 import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
@@ -12,7 +10,6 @@ import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.maps.shouldContainExactly
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.SKJERMING_BULK_PATH
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.SKJERMING_PATH
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING

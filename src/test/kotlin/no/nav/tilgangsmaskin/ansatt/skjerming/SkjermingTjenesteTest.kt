@@ -41,7 +41,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
 
-@RestClientTest(components = [SkjermingClient::class,SkjermingBeanConfig::class, SkjermingTjeneste::class, SkjermingConfig::class,RestRetryLogger::class])
+@RestClientTest(components = [SkjermingClient::class,SkjermingBeanConfig::class, SkjermingTjeneste::class, SkjermingConfig::class])
 @Import(SkjermingTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class SkjermingTjenesteTest : BehaviorSpec() {

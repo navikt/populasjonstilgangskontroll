@@ -8,8 +8,6 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer

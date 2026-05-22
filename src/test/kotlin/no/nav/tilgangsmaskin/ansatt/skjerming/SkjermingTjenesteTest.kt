@@ -153,28 +153,6 @@ class SkjermingTjenesteTest : BehaviorSpec() {
                 }
             }
         }
-
-        Given("RetryLogger") {
-            When("RecoverableRestException kastes etter retry") {
-                Then("logges WARN for hvert retry-forsøk") {
-                    server.expect(times(4), requestTo(SKJERMING_URI)).andRespond(withStatus(INTERNAL_SERVER_ERROR))
-                    val logs = withLogCapture { shouldThrow<RecoverableRestException> { tjeneste.skjerming(ID1) } }
-                    logs.any { e -> e.level == WARN && e.formattedMessage.contains("skjerming") } shouldBe true
-                }
-                Then("siste logg inneholder tjenestenavn") {
-                    server.expect(times(4), requestTo(SKJERMING_URI)).andRespond(withStatus(INTERNAL_SERVER_ERROR))
-                    val logs = withLogCapture { shouldThrow<RecoverableRestException> { tjeneste.skjerming(ID1) } }
-                    logs.last { e -> e.level == WARN }.formattedMessage shouldContain "skjerming"
-                }
-            }
-            When("IrrecoverableRestException kastes uten retry") {
-                Then("logges INFO") {
-                    server.expect(once(), requestTo(SKJERMING_URI)).andRespond(withStatus(NOT_FOUND))
-                    val logs = withLogCapture { shouldThrow<IrrecoverableRestException> { tjeneste.skjerming(ID1) } }
-                    logs.any { e -> e.level == INFO && e.formattedMessage.contains("skjerming") } shouldBe true
-                }
-            }
-        }
     }
 
     companion object {

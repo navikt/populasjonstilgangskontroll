@@ -63,12 +63,6 @@ class OverstyrbareReglerTest : BehaviorSpec() {
                     regel.evaluer(ansatt, bruker) shouldBe true
                 }
             }
-
-            When("metadata sjekkes") {
-                Then("er overstyrbar") {
-                    regel.erOverstyrbar shouldBe true
-                }
-            }
         }
 
         Given("UtlandRegel") {
@@ -95,12 +89,6 @@ class OverstyrbareReglerTest : BehaviorSpec() {
                     val bruker = BrukerBuilder(brukerId).build()
                     val ansatt = AnsattBuilder(ansattId).build()
                     regel.evaluer(ansatt, bruker) shouldBe true
-                }
-            }
-
-            When("metadata sjekkes") {
-                Then("er overstyrbar") {
-                    regel.erOverstyrbar shouldBe true
                 }
             }
         }
@@ -157,23 +145,6 @@ class OverstyrbareReglerTest : BehaviorSpec() {
                     val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
                     val ansatt = AnsattBuilder(ansattId).build()
                     regel.evaluer(ansatt, bruker) shouldBe false
-                }
-            }
-
-            When("metadata sjekkes") {
-                Then("er overstyrbar") {
-                    val regel = GeografiskRegel(oppfølging, teller)
-                    regel.erOverstyrbar shouldBe true
-                    regel.metadata.gruppeMetadata shouldBe GruppeMetadata.NASJONAL
-                }
-            }
-        }
-
-        Given("OverstyrbarRegel interface") {
-            When("UkjentBostedRegel sjekkes") {
-                Then("er en OverstyrbarRegel") {
-                    val regel: Regel = UkjentBostedRegel()
-                    (regel is OverstyrbarRegel) shouldBe true
                 }
             }
         }

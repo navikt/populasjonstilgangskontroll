@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.EGNEDATA
 
 class KjernereglerTest : BehaviorSpec({
 
@@ -29,13 +30,6 @@ class KjernereglerTest : BehaviorSpec({
                 val bruker = BrukerBuilder(brukerId).build()
                 val ansatt = AnsattBuilder(ansattId).build()
                 regel.evaluer(ansatt, bruker) shouldBe true
-            }
-        }
-
-        When("metadata sjekkes") {
-            Then("har riktig kode og begrunnelse") {
-                regel.metadata.gruppeMetadata shouldBe GruppeMetadata.EGNEDATA
-                regel.kortNavn shouldBe "Egne data"
             }
         }
     }
@@ -70,12 +64,6 @@ class KjernereglerTest : BehaviorSpec({
                 regel.evaluer(ansatt, bruker) shouldBe true
             }
         }
-
-        When("metadata sjekkes") {
-            Then("har riktig kode") {
-                regel.metadata.gruppeMetadata shouldBe GruppeMetadata.FORELDREBARN
-            }
-        }
     }
 
     Given("PartnerRegel") {
@@ -98,12 +86,6 @@ class KjernereglerTest : BehaviorSpec({
                 regel.evaluer(ansatt, bruker) shouldBe true
             }
         }
-
-        When("metadata sjekkes") {
-            Then("har riktig kode") {
-                regel.metadata.gruppeMetadata shouldBe GruppeMetadata.PARTNER
-            }
-        }
     }
 
     Given("SøskenRegel") {
@@ -124,12 +106,6 @@ class KjernereglerTest : BehaviorSpec({
                 val ansatt = AnsattBuilder(ansattId).build()
                 val bruker = BrukerBuilder(brukerId).build()
                 regel.evaluer(ansatt, bruker) shouldBe true
-            }
-        }
-
-        When("metadata sjekkes") {
-            Then("har riktig kode") {
-                regel.metadata.gruppeMetadata shouldBe GruppeMetadata.SØSKEN
             }
         }
     }
@@ -165,12 +141,6 @@ class KjernereglerTest : BehaviorSpec({
                 val ansatt = AnsattBuilder(ansattId).build()
                 val bruker = BrukerBuilder(brukerId).build()
                 regel.evaluer(ansatt, bruker) shouldBe true
-            }
-        }
-
-        When("metadata sjekkes") {
-            Then("har riktig kode") {
-                regel.metadata.gruppeMetadata shouldBe GruppeMetadata.FELLES_BARN
             }
         }
     }

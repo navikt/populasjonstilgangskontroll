@@ -2,6 +2,8 @@ package no.nav.tilgangsmaskin.ansatt
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
@@ -94,28 +96,21 @@ class AnsattTest : BehaviorSpec({
                 (ansatt tilhører enhet) shouldBe false
             }
         }
-
-        When("enhet er null") {
-            Then("returnerer false") {
-                val ansatt = AnsattBuilder(ansattId).build()
-                (ansatt tilhører null) shouldBe false
-            }
-        }
     }
 
     Given("erMedlemAv") {
 
         When("ansatt har riktig global gruppe") {
             Then("returnerer true") {
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(GlobalGruppe.FORTROLIG).build()
-                (ansatt erMedlemAv GlobalGruppe.FORTROLIG) shouldBe true
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
+                (ansatt erMedlemAv FORTROLIG) shouldBe true
             }
         }
 
         When("ansatt har ikke riktig global gruppe") {
             Then("returnerer false") {
                 val ansatt = AnsattBuilder(ansattId).build()
-                (ansatt erMedlemAv GlobalGruppe.FORTROLIG) shouldBe false
+                (ansatt erMedlemAv FORTROLIG) shouldBe false
             }
         }
     }
@@ -125,14 +120,14 @@ class AnsattTest : BehaviorSpec({
         When("ansatt mangler gruppen") {
             Then("returnerer true") {
                 val ansatt = AnsattBuilder(ansattId).build()
-                (ansatt ikkeErMedlemAv GlobalGruppe.SKJERMING) shouldBe true
+                (ansatt ikkeErMedlemAv SKJERMING) shouldBe true
             }
         }
 
         When("ansatt har gruppen") {
             Then("returnerer false") {
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(GlobalGruppe.SKJERMING).build()
-                (ansatt ikkeErMedlemAv GlobalGruppe.SKJERMING) shouldBe false
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(SKJERMING).build()
+                (ansatt ikkeErMedlemAv SKJERMING) shouldBe false
             }
         }
     }

@@ -30,6 +30,11 @@
       "cluster": "prod-gcp"
     },
     {
+      "name": "sporhund",
+      "namespace": "tbd",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "mulighetsrommet-api",
       "namespace": "team-mulighetsrommet",
       "cluster": "prod-gcp"

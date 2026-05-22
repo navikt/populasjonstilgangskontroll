@@ -6,8 +6,6 @@ metadata:
   name: populasjonstilgangskontroll
   namespace: tilgangsmaskin
 spec:
-  envFrom:
-    - configmap: grupper
   valkey:
     - instance: {{nais.cluster.cache}}
       access: readwrite
@@ -108,6 +106,8 @@ spec:
       value: '{{grupper.dead}}'
     - name: GRUPPE_STRENGT
       value: '{{grupper.strengt}}'
+    - name: GRUPPE_FORTROLIG
+      value: '{{grupper.fortrolig}}'
     - name: GRUPPE_EGENANSATT
       value: '{{grupper.egenansatt}}'
     - name: GRUPPE_UDEFINERT

@@ -24,9 +24,7 @@ class NomTjeneste(private val adapter: NomJPAAdapter) {
         adapter.fnrForAnsatt(ansattId.verdi)
 
     fun ryddOpp() =
-        adapter.ryddOpp().also {
-            if (it > 0) log.info("Fjernet informasjon fra DB om $it ansatte som ikke lenger er ansatt i Nav")
-        }
+        adapter.ryddOpp()
 
     @CacheEvict(cacheNames = [NOM], key = "#nomAnsattData.ansattId.verdi")
     @WithSpan

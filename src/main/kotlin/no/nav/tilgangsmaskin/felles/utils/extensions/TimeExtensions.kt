@@ -9,6 +9,7 @@ import java.time.Instant.now
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Period
+import java.time.Period.ofYears
 import java.time.ZoneId
 import java.time.ZoneId.systemDefault
 import java.time.format.DateTimeFormatter
@@ -65,6 +66,12 @@ object TimeExtensions {
             else -> MND_OVER_24
         }
     }
+
+    val Int.år: Period get() = ofYears(this)
+
+
+    fun LocalDate.isBetween(start: LocalDate, end: LocalDate) =
+        !isBefore(start) && !isAfter(end)
 
     enum class Dødsperiode(val tekst: String) {
         MND_0_6("0-6"),

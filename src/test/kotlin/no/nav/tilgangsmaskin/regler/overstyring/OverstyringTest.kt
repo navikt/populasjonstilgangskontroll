@@ -41,9 +41,9 @@ import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfig
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
+import no.nav.tilgangsmaskin.SharedPostgresContainer
 import org.springframework.test.context.TestPropertySource
 import org.testcontainers.junit.jupiter.Testcontainers
-import org.testcontainers.postgresql.PostgreSQLContainer
 
 @DataJpaTest
 @EnableJpaAuditing
@@ -308,6 +308,6 @@ internal class OverstyringTest : BehaviorSpec() {
 
     companion object {
         @ServiceConnection
-        private val postgres = PostgreSQLContainer("postgres:18")
+        private val postgres = SharedPostgresContainer.instance
     }
 }

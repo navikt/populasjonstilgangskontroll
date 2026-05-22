@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
-import no.nav.boot.conditionals.ConditionalOnDevOrLocal
+import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
@@ -49,20 +49,21 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     @JsonIgnoreProperties(ignoreUnknown = true)
     private interface IgnoreUnknownMixin
 
-    @Bean
+    @Bean("messageSource")
     @ConditionalOnProd
-    fun messageSource() =
+    fun prodMessageSource() =
         ReloadableResourceBundleMessageSource().apply {
-            setBasenames("classpath:messages", "classpath:openapi-prod-tilgang")
+            setBasenames("classpath:messages", "classpath:regel-messages", "classpath:openapi-prod-tilgang")
             setDefaultEncoding("UTF-8")
         }
 
-    @Bean
-    @ConditionalOnDevOrLocal
-    fun messageSourceDevOrLocal() =
+    @Bean("messageSource")
+    @ConditionalOnNotProd
+    fun notProdMessageSource() =
         ReloadableResourceBundleMessageSource().apply {
             setBasenames(
                 "classpath:messages",
+                "classpath:regel-messages",
                 "classpath:openapi-prod-tilgang",
                 "classpath:openapi-dev-ansatt",
                 "classpath:openapi-dev-bruker",

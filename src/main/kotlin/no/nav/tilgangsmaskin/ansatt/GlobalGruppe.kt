@@ -7,6 +7,7 @@ import java.util.*
 
 
 enum class GlobalGruppe(val property: String, val metadata: GruppeMetadata) {
+    AVDØD("gruppe.dead", GruppeMetadata.AVDØD_MER_ENN_ETT_ÅR),
     STRENGT_FORTROLIG("gruppe.strengt", GruppeMetadata.STRENGT_FORTROLIG),
     STRENGT_FORTROLIG_UTLAND("gruppe.strengt", GruppeMetadata.STRENGT_FORTROLIG_UTLAND),
     FORTROLIG("gruppe.fortrolig", GruppeMetadata.FORTROLIG),

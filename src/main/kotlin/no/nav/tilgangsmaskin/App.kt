@@ -61,8 +61,10 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, va
                     "Java vendor" to environment.getProperty("java.vm.vendor")
                 ))
             }
-            regelsett.forEach {
-                builder.withDetail(it.beskrivelse, it.regler.map { "(${it.javaClass.simpleName}) ${it.kortNavn}" })
+            regelsett.filter {
+                it.regler.isNotEmpty()
+            }.forEach {
+                builder.withDetail(it.beskrivelse, it.regler.map { regel -> "(${regel.javaClass.simpleName}) ${regel.kortNavn}" })
             }
         }
     }

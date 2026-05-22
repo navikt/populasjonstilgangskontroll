@@ -15,7 +15,7 @@ import no.nav.tilgangsmaskin.felles.utils.LocalAuditor
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 
-class VergemålRegelTest : BehaviorSpec() {
+class VergemålTellendeRegelTest : BehaviorSpec() {
 
     @MockK(relaxed = true)
     private lateinit var teller: VergemålTeller
@@ -24,34 +24,18 @@ class VergemålRegelTest : BehaviorSpec() {
     @SpyK
     private var auditor = LocalAuditor()
 
-    private lateinit var regel: VergemålRegel
+    private lateinit var regel: VergemålTellendeRegel
 
     init {
-        beforeSpec { init(this@VergemålRegelTest) }
+        beforeSpec { init(this@VergemålTellendeRegelTest) }
         beforeEach {
             clearAllMocks()
-            regel = VergemålRegel(vergemål, auditor, teller)
-        }
-
-        Given("ansatt har ikke vergemål for bruker") {
-            When("regel evalueres") {
-                Then("tilgang godkjennes uten telling og uten audit") {
-                    every { vergemål.vergemål(ansattId) } returns emptySet()
-                    regel.evaluer(ansatt, bruker) shouldBe true
-                    regel.skalTelle(ansatt, bruker) shouldBe false
-                    verify(exactly = 0) { auditor.info(any()) }
-                    verify(exactly = 0) { teller.tell() }
-                }
-            }
+            regel = VergemålTellendeRegel(vergemål, auditor, teller)
         }
 
         Given("ansatt har vergemål for bruker") {
-            When("regel evalueres") {
-                Then("tilgang godkjennes") {
-                    every { vergemål.vergemål(ansattId) } returns setOf(brukerId)
-                    regel.evaluer(ansatt, bruker) shouldBe true
-                }
-                Then("oppslag skal telles") {
+            When("sideeffekter verifiseres") {
+                Then("skalTelle returnerer true") {
                     every { vergemål.vergemål(ansattId) } returns setOf(brukerId)
                     regel.skalTelle(ansatt, bruker) shouldBe true
                 }
@@ -68,21 +52,30 @@ class VergemålRegelTest : BehaviorSpec() {
             }
         }
 
+        Given("ansatt har ikke vergemål for bruker") {
+            When("sideeffekter verifiseres") {
+                Then("skalTelle returnerer false og ingen audit eller telling") {
+                    every { vergemål.vergemål(ansattId) } returns emptySet()
+                    regel.skalTelle(ansatt, bruker) shouldBe false
+                    verify(exactly = 0) { auditor.info(any()) }
+                    verify(exactly = 0) { teller.tell() }
+                }
+            }
+        }
+
         Given("ansatt har vergemål for andre brukere") {
             When("regel evalueres for denne brukeren") {
-                Then("tilgang godkjennes uten telling") {
+                Then("skalTelle returnerer false") {
                     every { vergemål.vergemål(ansattId) } returns setOf(BrukerId("20478606614"))
-                    regel.evaluer(ansatt, bruker) shouldBe true
                     regel.skalTelle(ansatt, bruker) shouldBe false
                 }
             }
         }
 
         Given("oppslag mot vergemålstjenesten feiler") {
-            When("regel evalueres") {
-                Then("tilgang godkjennes (skalTelle svelger feilen og returnerer false)") {
+            When("sideeffekter verifiseres") {
+                Then("skalTelle returnerer false og teller kalles ikke") {
                     every { vergemål.vergemål(ansattId) } throws RuntimeException("tjenesten er nede")
-                    regel.evaluer(ansatt, bruker) shouldBe true
                     regel.skalTelle(ansatt, bruker) shouldBe false
                     verify(exactly = 0) { teller.tell() }
                 }
@@ -97,4 +90,3 @@ class VergemålRegelTest : BehaviorSpec() {
         private val bruker = BrukerBuilder(brukerId).build()
     }
 }
-

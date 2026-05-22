@@ -22,23 +22,27 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
         errorHandler = OPPFØLGING_ERROR_HANDLER)
 
     fun listen(hendelse: OppfølgingHendelse) =
-        when (hendelse.sisteEndringsType) {
-            OPPFOLGING_STARTET -> registrer(hendelse, "Oppfølging startet")
-            ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> registrer(hendelse, "Oppfølging endret")
-            OPPFOLGING_AVSLUTTET -> avslutt(hendelse, "Oppfølging avsluttet")
+        with(hendelse) {
+            when (sisteEndringsType) {
+                OPPFOLGING_STARTET -> registrer(this, "Oppfølging startet")
+                ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> registrer(this, "Oppfølging endret")
+                OPPFOLGING_AVSLUTTET -> avslutt(this)
+            }
         }
 
     private fun registrer(hendelse: OppfølgingHendelse, melding: String) =
         with(hendelse) {
             oppfølging.registrer(oppfolgingsperiodeUuid,
-                Identer(ident, aktorId), kontor!!, startTidspunkt)
-            log.info("$melding for kontor ${kontor.kontorId.verdi} og id  $oppfolgingsperiodeUuid")
+                Identer(ident, aktorId), kontor!!, startTidspunkt).also {
+                log.info("$melding for kontor ${kontor.kontorId.verdi} og id  $oppfolgingsperiodeUuid")
+            }
         }
 
-    private fun avslutt(hendelse: OppfølgingHendelse, melding: String) =
+    private fun avslutt(hendelse: OppfølgingHendelse) =
         with(hendelse) {
-            oppfølging.avslutt(oppfolgingsperiodeUuid, Identer(ident, aktorId))
-            log.info("$melding for $oppfolgingsperiodeUuid")
+            oppfølging.avslutt(oppfolgingsperiodeUuid, Identer(ident, aktorId)).also {
+                log.info("Oppfølging avsluttet for $oppfolgingsperiodeUuid")
+            }
         }
 
     companion object {

@@ -18,7 +18,8 @@ class VergemålConfig : CachableRestConfig, RestConfig(VERGEMÅL_BASE, VERGEMÅL
     override val varighet = Duration.ofHours(24)
 
     @NoCoverageAnalysis
-    override fun toString() = "${javaClass.simpleName} [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
+    override fun toString() =
+        "${javaClass.simpleName} [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
         val VERGEMÅL_BASE = URI.create("http://repr-api.repr")

@@ -12,24 +12,22 @@ import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_STRENGT_FORTROLI
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_UKJENT_BOSTED
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_VERGEMÅL
 
-const val HABILITET = "Du har ikke tilgang til data om deg selv eller dine nærstående"
+enum class GruppeMetadata(val meta: AvvisningsKode, val meldingsnøkkel: String) {
 
-enum class GruppeMetadata(val meta: AvvisningsKode, val begrunnelse: String, val kortNavn: String) {
-
-    STRENGT_FORTROLIG(AVVIST_STRENGT_FORTROLIG_ADRESSE, "Du har ikke tilgang til brukere med strengt fortrolig adresse (kode 6)", "Kode 6"),
-    STRENGT_FORTROLIG_UTLAND(AVVIST_STRENGT_FORTROLIG_UTLAND, "Du har ikke tilgang til brukere med strengt fortrolig adresse i utlandet (§ 19)", "Paragraf 19"),
-    FORTROLIG(AVVIST_FORTROLIG_ADRESSE, "Du har ikke tilgang til brukere med fortrolig adresse (kode 7)", "Kode 7"),
-    SKJERMING(AVVIST_SKJERMING, "Du har ikke tilgang til Nav-ansatte og deres nærmeste familie", "Skjerming"),
-    NASJONAL(AVVIST_GEOGRAFISK,"Du har ikke tilgang til brukerens geografiske område eller oppfølgingsenhet","Geografisk tilknytning"),
-    EGNEDATA(AVVIST_HABILITET, HABILITET, "Egne data"),
-    FORELDREBARN(AVVIST_HABILITET, HABILITET, "Foreldre/barn"),
-    PARTNER(AVVIST_HABILITET, HABILITET, "Partner"),
-    SØSKEN(AVVIST_HABILITET, HABILITET, "Søsken"),
-    FELLES_BARN(AVVIST_HABILITET, HABILITET, "Felles barn"),
-    AVDØD(AVVIST_AVDØD, "Du har ikke tilgang til informasjon om avdøde brukere", "Avdød bruker"),
-    VERGEMÅL(AVVIST_VERGEMÅL, "Du har ikke tilgang til informasjon om personer du er verge for", "Vergemål"),
-    UTENLANDSK(AVVIST_PERSON_UTLAND, "Du har ikke tilgang til person bosatt i utlandet", "Person bosatt utland"),
-    UKJENT_BOSTED(AVVIST_UKJENT_BOSTED, "Du har ikke tilgang til person uten kjent adresse", "Person bosatt ukjent bosted")
+    STRENGT_FORTROLIG(AVVIST_STRENGT_FORTROLIG_ADRESSE, "regel.strengt-fortrolig"),
+    STRENGT_FORTROLIG_UTLAND(AVVIST_STRENGT_FORTROLIG_UTLAND, "regel.strengt-fortrolig-utland"),
+    FORTROLIG(AVVIST_FORTROLIG_ADRESSE, "regel.fortrolig"),
+    SKJERMING(AVVIST_SKJERMING, "regel.skjerming"),
+    NASJONAL(AVVIST_GEOGRAFISK, "regel.geografisk"),
+    EGNEDATA(AVVIST_HABILITET, "regel.egnedata"),
+    FORELDREBARN(AVVIST_HABILITET, "regel.foreldrebarn"),
+    PARTNER(AVVIST_HABILITET, "regel.partner"),
+    SØSKEN(AVVIST_HABILITET, "regel.søsken"),
+    FELLES_BARN(AVVIST_HABILITET, "regel.felles-barn"),
+    AVDØD_MER_ENN_ETT_ÅR(AVVIST_AVDØD, "regel.avdød"),
+    VERGEMÅL(AVVIST_VERGEMÅL, "regel.vergemål"),
+    UTENLANDSK(AVVIST_PERSON_UTLAND, "regel.utenlandsk"),
+    UKJENT_BOSTED(AVVIST_UKJENT_BOSTED, "regel.ukjent-bosted")
 }
 
 @Schema(description = "Avvisningskoder")

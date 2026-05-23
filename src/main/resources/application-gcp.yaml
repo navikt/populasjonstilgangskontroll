@@ -1,3 +1,4 @@
+
 server:
   shutdown: graceful
   jetty:
@@ -197,5 +198,7 @@ valkey:
   password: ${valkey.password.${nais.cluster.cache}}
   port: ${valkey.port.${nais.cluster.cache}}
   host: ${valkey.host.${nais.cluster.cache}}
-
+info:
+  cluster: ${nais.cluster.name:local}
+  name: ${spring.application.name}
 

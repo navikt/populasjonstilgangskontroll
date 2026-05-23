@@ -6,10 +6,15 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import org.springframework.context.support.StaticMessageSource
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.NO_CONTENT
 
 class BulkResultatTest : BehaviorSpec({
+
+    beforeSpec {
+        RegelMetadata.messageSource = StaticMessageSource()
+    }
 
     val ansattId = AnsattId("Z999999")
     val brukerId = BrukerId("08526835670")

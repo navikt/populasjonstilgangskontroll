@@ -7,7 +7,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
@@ -98,7 +98,7 @@ class OverstyrbareReglerTest : BehaviorSpec() {
                 Then("tilgang godkjennes uansett geografisk tilknytning") {
                     val regel = GeografiskRegel(oppfølging,)
                     val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("1234"))).build()
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(GlobalGruppe.NASJONAL).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(NASJONAL).build()
                     regel.evaluer(ansatt, bruker) shouldBe true
                 }
             }

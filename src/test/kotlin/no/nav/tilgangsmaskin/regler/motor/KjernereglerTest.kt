@@ -4,10 +4,12 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.EGNEDATA
 
 class KjernereglerTest : BehaviorSpec({
 
@@ -150,7 +152,7 @@ class KjernereglerTest : BehaviorSpec({
 
         When("bruker krever strengt fortrolig og ansatt mangler") {
             Then("tilgang avvises") {
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(GlobalGruppe.STRENGT_FORTROLIG).build()
+                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build()
                 val ansatt = AnsattBuilder(ansattId).build()
                 regel.evaluer(ansatt, bruker) shouldBe false
             }
@@ -158,8 +160,8 @@ class KjernereglerTest : BehaviorSpec({
 
         When("bruker krever strengt fortrolig og ansatt har tilgang") {
             Then("tilgang godkjennes") {
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(GlobalGruppe.STRENGT_FORTROLIG).build()
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(GlobalGruppe.STRENGT_FORTROLIG).build()
+                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build()
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
                 regel.evaluer(ansatt, bruker) shouldBe true
             }
         }
@@ -178,7 +180,7 @@ class KjernereglerTest : BehaviorSpec({
 
         When("bruker krever fortrolig og ansatt mangler") {
             Then("tilgang avvises") {
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(GlobalGruppe.FORTROLIG).build()
+                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(FORTROLIG).build()
                 val ansatt = AnsattBuilder(ansattId).build()
                 regel.evaluer(ansatt, bruker) shouldBe false
             }
@@ -186,8 +188,8 @@ class KjernereglerTest : BehaviorSpec({
 
         When("bruker krever fortrolig og ansatt har tilgang") {
             Then("tilgang godkjennes") {
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(GlobalGruppe.FORTROLIG).build()
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(GlobalGruppe.FORTROLIG).build()
+                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(FORTROLIG).build()
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
                 regel.evaluer(ansatt, bruker) shouldBe true
             }
         }
@@ -218,7 +220,7 @@ class KjernereglerTest : BehaviorSpec({
 
         When("bruker krever strengt fortrolig utland og ansatt mangler") {
             Then("tilgang avvises") {
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(GlobalGruppe.STRENGT_FORTROLIG_UTLAND).build()
+                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
                 val ansatt = AnsattBuilder(ansattId).build()
                 regel.evaluer(ansatt, bruker) shouldBe false
             }
@@ -226,8 +228,8 @@ class KjernereglerTest : BehaviorSpec({
 
         When("bruker krever strengt fortrolig utland og ansatt har strengt fortrolig") {
             Then("tilgang godkjennes fordi strengt fortrolig dekker også utland") {
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(GlobalGruppe.STRENGT_FORTROLIG_UTLAND).build()
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(GlobalGruppe.STRENGT_FORTROLIG).build()
+                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
                 regel.evaluer(ansatt, bruker) shouldBe true
             }
         }

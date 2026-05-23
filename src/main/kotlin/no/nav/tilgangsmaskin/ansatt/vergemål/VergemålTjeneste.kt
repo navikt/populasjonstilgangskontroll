@@ -17,12 +17,14 @@ class VergemålTjeneste(private val nom: NomTjeneste, private val client: Vergem
     fun vergemål(ansattId: AnsattId) =
         nom.fnrForAnsatt(ansattId)?.let { fnr ->
             client.vergemål(VergemålIdent(fnr.verdi))
-                .mapTo(mutableSetOf()) { it.vergehaver }
+                .map { it.vergehaver }
                 .toSet()
         } ?: emptySet()
 
+
     @NoCoverageAnalysis
-    override fun toString() = "${javaClass.simpleName} [client=$client]"
+    override fun toString() =
+        "${javaClass.simpleName} [client=$client]"
 }
 
 

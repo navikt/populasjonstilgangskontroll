@@ -6,8 +6,8 @@ import org.springdoc.core.customizers.OpenApiCustomizer
 import org.springframework.context.MessageSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import java.util.Locale
-import java.util.Locale.getDefault
+import java.util.Locale.*
+
 @Configuration
 @NoCoverageAnalysis
 class OpenApiMessageResolverConfig(private val messageSource: MessageSource) {

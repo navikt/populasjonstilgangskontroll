@@ -15,4 +15,6 @@ annotation class ValidOverstyring(
     val message: String = "Overstyring må være fra nå og maks 3 måneder frem i tid",
     val groups: Array<KClass<*>> = [],
     val months: Long = 3,
+    val min: Int = 10,
+    val max: Int = 255,
     val payload: Array<KClass<out Payload>> = [])

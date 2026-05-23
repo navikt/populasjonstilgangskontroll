@@ -35,7 +35,7 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
     @SpyK
     private var auditor = LocalAuditor()
 
-    private lateinit var regel: AvdødBrukerRegel
+    private lateinit var regel: AvdødBrukerTellendeRegel
     private val NAV_TESTKONTOR = "NAV Testkontor"
     private val ansattId = AnsattId("Z999999")
     private val ansatt = AnsattBuilder(ansattId).build()
@@ -48,7 +48,7 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
         beforeEach {
             clearAllMocks()
             beforeEach { every { token.system } returns "system" }
-            regel = AvdødBrukerRegel(teller, proxy, auditor, token)
+            regel = AvdødBrukerTellendeRegel(teller, proxy, auditor, token)
         }
 
         Given("Bruker lever") {

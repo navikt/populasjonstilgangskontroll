@@ -26,7 +26,7 @@ data class PdlPipRespons(
             enum class PdlAdressebeskyttelseGradering { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG, UGRADERT }
         }
 
-        data class PdlDødsfall(val doedsdato: LocalDate)
+        data class PdlDødsfall(val doedsdato: LocalDate? = null)
         data class PdlFamilierelasjon(
             val relatertPersonsIdent: BrukerId? = null,
             val relatertPersonsRolle: PdlFamilieRelasjonRolle? = null,

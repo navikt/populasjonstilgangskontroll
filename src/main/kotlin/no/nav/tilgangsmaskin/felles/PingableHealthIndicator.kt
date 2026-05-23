@@ -1,13 +1,13 @@
 package no.nav.tilgangsmaskin.felles
 
 import no.nav.tilgangsmaskin.felles.rest.RestConfig
-import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.health.contributor.Health
 import org.springframework.boot.health.contributor.HealthIndicator
 
 class PingableHealthIndicator(private val pingable: Pingable) : HealthIndicator {
 
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val log = getLogger(javaClass)
 
     override fun health() =
         runCatching {

@@ -33,7 +33,6 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.motor.RegelMotorTestConfig
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
 import no.nav.tilgangsmaskin.regler.motor.RegelException
@@ -47,24 +46,22 @@ import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfig
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
+import no.nav.tilgangsmaskin.SharedPostgresContainer
+import no.nav.tilgangsmaskin.regler.overstyring.OverstyringRegelTjenesteTest.RegelMotorTestConfig
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestPropertySource
 import org.testcontainers.junit.jupiter.Testcontainers
-import org.testcontainers.postgresql.PostgreSQLContainer
 
 @DataJpaTest
 @EnableJpaAuditing
-@TestPropertySource(properties = [
-    "gruppe.strengt=5ef775f2-61f8-4283-bf3d-8d03f428aa14",
-    "gruppe.nasjonal=c7107487-310d-4c06-83e0-cf5395dc3be3",
-    "gruppe.utland=de62a4bf-957b-4cde-acdb-6d8bcbf821a0",
-    "gruppe.udefinert=35d9d1ac-7fcb-4a22-9155-e0d1e57898a8",
-    "gruppe.fortrolig=ea930b6b-9397-44d9-b9e6-f4cf527a632a",
-    "gruppe.egenansatt=dbe4ad45-320b-4e9a-aaa1-73cca4ee124d",
-])
+@TestPropertySource(locations = ["classpath:test.properties"])
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [TestApp::class, RegelMotorTestConfig::class, OverstyringTjeneste::class,OverstyringJPAAdapter::class,RegelTjeneste::class,LocalAuditor::class])
+@ContextConfiguration(classes = [TestApp::class, OverstyringTjeneste::class,OverstyringJPAAdapter::class,RegelTjeneste::class,LocalAuditor::class])
 @AutoConfigureMetrics
 @Testcontainers
+@Import(RegelMotorTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class OverstyringRegelTjenesteTest : BehaviorSpec() {
 
@@ -103,6 +100,9 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
     lateinit var regler: RegelTjeneste
 
 
+    @TestConfiguration
+    @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
+    class RegelMotorTestConfig
 
     init {
 
@@ -231,6 +231,6 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
 
     companion object {
         @ServiceConnection
-        private val postgres = PostgreSQLContainer("postgres:18")
+        private val postgres = SharedPostgresContainer.instance
     }
 }

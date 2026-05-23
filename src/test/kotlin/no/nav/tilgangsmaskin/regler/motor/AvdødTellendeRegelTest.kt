@@ -9,7 +9,7 @@ import io.mockk.mockk
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode
 import no.nav.tilgangsmaskin.tilgang.Token
 
-class AvdødTellerTest : BehaviorSpec({
+class AvdødTellendeRegelTest : BehaviorSpec({
 
     val token = mockk<Token>().also {
         every { it.system } returns "test-system"

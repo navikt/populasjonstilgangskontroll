@@ -7,7 +7,9 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
@@ -27,9 +29,6 @@ class OverstyrbareReglerTest : BehaviorSpec() {
 
     @MockK(relaxed = true)
     private lateinit var oppfølging: OppfølgingTjeneste
-    @MockK(relaxed = true)
-    private lateinit var teller: OppfølgingkontorTeller
-
     private val ansattId = AnsattId("Z999999")
     private val brukerId = BrukerId("08526835670")
 
@@ -42,7 +41,7 @@ class OverstyrbareReglerTest : BehaviorSpec() {
 
             When("bruker har ukjent bosted og ansatt mangler ukjent-bosted-gruppe") {
                 Then("tilgang avvises") {
-                    val bruker = BrukerBuilder(brukerId).gt(UkjentBosted()).kreverMedlemskapI(GlobalGruppe.UKJENT_BOSTED).build()
+                    val bruker = BrukerBuilder(brukerId).gt(UkjentBosted()).kreverMedlemskapI(UKJENT_BOSTED).build()
                     val ansatt = AnsattBuilder(ansattId).build()
                     regel.evaluer(ansatt, bruker) shouldBe false
                 }
@@ -50,8 +49,8 @@ class OverstyrbareReglerTest : BehaviorSpec() {
 
             When("bruker har ukjent bosted og ansatt har ukjent-bosted-gruppe") {
                 Then("tilgang godkjennes") {
-                    val bruker = BrukerBuilder(brukerId).gt(UkjentBosted()).kreverMedlemskapI(GlobalGruppe.UKJENT_BOSTED).build()
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(GlobalGruppe.UKJENT_BOSTED).build()
+                    val bruker = BrukerBuilder(brukerId).gt(UkjentBosted()).kreverMedlemskapI(UKJENT_BOSTED).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UKJENT_BOSTED).build()
                     regel.evaluer(ansatt, bruker) shouldBe true
                 }
             }
@@ -70,7 +69,7 @@ class OverstyrbareReglerTest : BehaviorSpec() {
 
             When("bruker har utenlandsk bosted og ansatt mangler utlandsgruppe") {
                 Then("tilgang avvises") {
-                    val bruker = BrukerBuilder(brukerId).gt(UtenlandskTilknytning()).kreverMedlemskapI(GlobalGruppe.UTENLANDSK).build()
+                    val bruker = BrukerBuilder(brukerId).gt(UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
                     val ansatt = AnsattBuilder(ansattId).build()
                     regel.evaluer(ansatt, bruker) shouldBe false
                 }
@@ -78,8 +77,8 @@ class OverstyrbareReglerTest : BehaviorSpec() {
 
             When("bruker har utenlandsk bosted og ansatt har utlandsgruppe") {
                 Then("tilgang godkjennes") {
-                    val bruker = BrukerBuilder(brukerId).gt(UtenlandskTilknytning()).kreverMedlemskapI(GlobalGruppe.UTENLANDSK).build()
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(GlobalGruppe.UTENLANDSK).build()
+                    val bruker = BrukerBuilder(brukerId).gt(UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UTENLANDSK).build()
                     regel.evaluer(ansatt, bruker) shouldBe true
                 }
             }
@@ -97,16 +96,16 @@ class OverstyrbareReglerTest : BehaviorSpec() {
 
             When("ansatt er medlem av nasjonal") {
                 Then("tilgang godkjennes uansett geografisk tilknytning") {
-                    val regel = GeografiskRegel(oppfølging, teller)
+                    val regel = GeografiskRegel(oppfølging,)
                     val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("1234"))).build()
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(GlobalGruppe.NASJONAL).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(NASJONAL).build()
                     regel.evaluer(ansatt, bruker) shouldBe true
                 }
             }
 
             When("ansatt kan behandle brukers geografiske tilknytning via bydelsgruppe") {
                 Then("tilgang godkjennes") {
-                    val regel = GeografiskRegel(oppfølging, teller)
+                    val regel = GeografiskRegel(oppfølging)
                     val bydel = "111111"
                     val bruker = BrukerBuilder(brukerId).gt(BydelTilknytning(Bydel(bydel))).build()
                     val geoGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_$bydel")
@@ -117,7 +116,7 @@ class OverstyrbareReglerTest : BehaviorSpec() {
 
             When("ansatt kan behandle brukers geografiske tilknytning via kommunegruppe") {
                 Then("tilgang godkjennes") {
-                    val regel = GeografiskRegel(oppfølging, teller)
+                    val regel = GeografiskRegel(oppfølging)
                     val kommune = "1234"
                     val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune(kommune))).build()
                     val geoGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_$kommune")
@@ -128,7 +127,7 @@ class OverstyrbareReglerTest : BehaviorSpec() {
 
             When("ansatt tilhører oppfølgingsenhet for bruker") {
                 Then("tilgang godkjennes") {
-                    val regel = GeografiskRegel(oppfølging, teller)
+                    val regel = GeografiskRegel(oppfølging)
                     val enhet = Enhetsnummer("4242")
                     every { oppfølging.enhetFor(Identifikator(brukerId.verdi)) } returns enhet
                     val enhetGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-ENHET_${enhet.verdi}")
@@ -140,7 +139,7 @@ class OverstyrbareReglerTest : BehaviorSpec() {
 
             When("ansatt har hverken geo-gruppe, nasjonal eller oppfølgingsenhet") {
                 Then("tilgang avvises") {
-                    val regel = GeografiskRegel(oppfølging, teller)
+                    val regel = GeografiskRegel(oppfølging)
                     every { oppfølging.enhetFor(any()) } returns null
                     val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
                     val ansatt = AnsattBuilder(ansattId).build()

@@ -44,26 +44,9 @@ class StartupInfoContributor(private val ctx: ConfigurableApplicationContext, va
     InfoContributor {
 
     override fun contribute(builder: Builder) {
-        with(ctx) {
-            builder.withDetail(
-                "info", mapOf(
-                    "Cluster" to current.clusterName,
-                    "Startup" to startupDate.local(),
-                    "Name" to environment.getProperty("spring.application.name"),
-                ))
-            if (!isProd) {
-                builder.withDetail("dev-info", mapOf(
-                    "Client ID" to environment.getProperty("azure.app.client.id"),
-                    "Spring Boot version" to SpringBootVersion.getVersion(),
-                    "Spring Framework version" to SpringVersion.getVersion(),
-                    "Java version" to environment.getProperty("java.version"),
-                    "Java runtime version" to environment.getProperty("java.runtime.version"),
-                    "Java vendor" to environment.getProperty("java.vm.vendor")
-                ))
-            }
-            regelsett.forEach {
-                builder.withDetail(it.beskrivelse, it.regler.map { "(${it.javaClass.simpleName}) ${it.kortNavn}" })
-            }
+        builder.withDetail("startup", ctx.startupDate.local())
+        regelsett.filter { it.regler.isNotEmpty() }.forEach {
+            builder.withDetail(it.beskrivelse, it.regler.map { regel -> "(${regel.javaClass.simpleName}) ${regel.kortNavn}" })
         }
     }
 }

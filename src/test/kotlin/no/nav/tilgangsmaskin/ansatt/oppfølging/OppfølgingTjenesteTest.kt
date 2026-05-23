@@ -20,6 +20,7 @@ import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
+import no.nav.tilgangsmaskin.regler.motor.OppfølgingkontorTeller
 import no.nav.tilgangsmaskin.tilgang.Token
 
 
@@ -32,9 +33,9 @@ import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
+import no.nav.tilgangsmaskin.SharedPostgresContainer
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
-import org.testcontainers.postgresql.PostgreSQLContainer
 import java.util.UUID.*
 
 @DataJpaTest
@@ -50,6 +51,7 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
     class OppfølgingTestConfig : CacheTestConfig(OPPFØLGING)
 
     @MockkBean private lateinit var token: Token
+    @MockkBean(relaxed = true) private lateinit var teller: OppfølgingkontorTeller
 
     @MockkSpyBean private lateinit var adapter: OppfølgingJPAAdapter
     @Autowired private lateinit var tjeneste: OppfølgingTjeneste
@@ -120,6 +122,6 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
         private val IDENTER  = Identer(brukerId, aktørId)
         private val KONTOR = Kontor(kontor, "Testenhet")
         @ServiceConnection
-        private val postgres = PostgreSQLContainer("postgres:17")
+        private val postgres = SharedPostgresContainer.instance
     }
 }

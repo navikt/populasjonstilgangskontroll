@@ -1,8 +1,19 @@
+
 server:
+  shutdown: graceful
   jetty:
     threads:
       max: 200
 management:
+  info:
+    os:
+      enabled: true
+    git:
+      enabled: true
+    java:
+      enabled: true
+    env:
+      enabled: true
   auditevents:
     enabled: false
   metrics:
@@ -92,6 +103,8 @@ spring:
         enabled: true
   cache:
     type: redis
+    redis:
+      enable-statistics: true
   mvc:
     problemdetails:
       enabled: true
@@ -185,5 +198,7 @@ valkey:
   password: ${valkey.password.${nais.cluster.cache}}
   port: ${valkey.port.${nais.cluster.cache}}
   host: ${valkey.host.${nais.cluster.cache}}
-
+info:
+  cluster: ${nais.cluster.name:local}
+  name: ${spring.application.name}
 

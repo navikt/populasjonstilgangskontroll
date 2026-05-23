@@ -117,7 +117,7 @@ object PdlPersonMapper {
             else -> UdefinertTilknytning()
         }
 
-    private fun tilDødsdato(dødsfall: List<PdlDødsfall>) = dødsfall.maxByOrNull { it.doedsdato }?.doedsdato
+    private fun tilDødsdato(dødsfall: List<PdlDødsfall>) = dødsfall.mapNotNull { it.doedsdato }.maxOrNull()
 
     private fun tilFamilie(relasjoner: List<PdlFamilierelasjon>): Familie {
         val (foreldre, barn) = relasjoner

@@ -13,6 +13,7 @@ import io.mockk.verify
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
@@ -31,18 +32,24 @@ import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.utils.LocalAuditor
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import no.nav.tilgangsmaskin.regler.motor.RegelMotorTest.RegelMotorTestConfig
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
+import java.time.LocalDate.now
 import java.util.UUID
 
 @TestPropertySource(locations = ["classpath:test.properties"])
 @AutoConfigureMetrics
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [RegelMotorTestConfig::class, LocalAuditor::class])
+@ContextConfiguration(classes = [LocalAuditor::class])
+@Import(RegelMotorTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class RegelMotorTest : BehaviorSpec() {
 
@@ -66,6 +73,10 @@ class RegelMotorTest : BehaviorSpec() {
 
     @Autowired
     private lateinit var regelMotor: RegelMotor
+
+    @TestConfiguration
+    @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
+    class RegelMotorTestConfig
 
     init {
 
@@ -275,7 +286,7 @@ class RegelMotorTest : BehaviorSpec() {
         }
 
         Given("bruker har strengt fortrolig utland beskyttelse") {
-            val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(GlobalGruppe.STRENGT_FORTROLIG_UTLAND).build()
+            val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
             When("ansatt har ingen spesialtilganger") {
                 Then("tilgang avvises av strengt fortrolig utland-regel") {
                     val ansatt = AnsattBuilder(ansattId).build()
@@ -423,7 +434,7 @@ class RegelMotorTest : BehaviorSpec() {
             When("ansatt er medlem av strengt fortrolig") {
                 Then("bruker med strengt fortrolig utland beskyttelse kan behandles") {
                     val ansatt = AnsattBuilder(ansattId).medMedlemskapI(GlobalGruppe.STRENGT_FORTROLIG).build()
-                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(GlobalGruppe.STRENGT_FORTROLIG_UTLAND).build()
+                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
                     ansatt kanBehandle bruker
                 }
             }
@@ -431,7 +442,7 @@ class RegelMotorTest : BehaviorSpec() {
             When("ansatt er medlem av fortrolig") {
                 Then("bruker med strengt fortrolig utland beskyttelse kan ikke behandles") {
                     val ansatt = AnsattBuilder(ansattId).medMedlemskapI(GlobalGruppe.FORTROLIG).build()
-                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(GlobalGruppe.STRENGT_FORTROLIG_UTLAND).build()
+                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
                     forventAvvistAv<StrengtFortroligUtlandRegel>(ansatt, bruker)
                 }
             }
@@ -439,8 +450,79 @@ class RegelMotorTest : BehaviorSpec() {
             When("ansatt er vanlig ansatt uten spesialtilganger") {
                 Then("bruker med strengt fortrolig utland beskyttelse kan ikke behandles") {
                     val ansatt = AnsattBuilder(ansattId).build()
-                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(GlobalGruppe.STRENGT_FORTROLIG_UTLAND).build()
+                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
                     forventAvvistAv<StrengtFortroligUtlandRegel>(ansatt, bruker)
+                }
+            }
+        }
+
+        Given("bruker er avdød") {
+            When("bruker er død for mindre enn 12 måneder siden") {
+                val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(6)).build()
+
+                Then("tilgang gis uavhengig av gruppetilhørighet") {
+                    val ansatt = AnsattBuilder(ansattId).build()
+                    ansatt kanBehandle bruker
+                }
+            }
+
+            When("bruker er død for mer enn 12 måneder siden og ansatt mangler AVDØD-gruppe") {
+                val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(15)).build()
+
+                Then("tilgang avvises av AvdødBrukerDevRegel") {
+                    val ansatt = AnsattBuilder(ansattId).build()
+                    forventAvvistAv<AvdødBrukerRegel>(ansatt, bruker)
+                }
+            }
+
+            When("bruker er død for mer enn 12 måneder siden og ansatt har AVDØD-gruppe") {
+                val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(15)).build()
+
+                Then("tilgang gis") {
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(GlobalGruppe.AVDØD).build()
+                    ansatt kanBehandle bruker
+                }
+            }
+
+            When("bruker er død for mer enn 24 måneder siden og ansatt mangler AVDØD-gruppe") {
+                val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(30)).build()
+
+                Then("tilgang avvises av AvdødBrukerDevRegel") {
+                    val ansatt = AnsattBuilder(ansattId).build()
+                    forventAvvistAv<AvdødBrukerRegel>(ansatt, bruker)
+                }
+            }
+        }
+
+        Given("ansatt har vergemål for bruker") {
+            When("vergemålstjenesten returnerer bruker") {
+                Then("tilgang avvises av VergemålDevRegel") {
+                    every { vergemål.vergemål(ansattId) } returns setOf(brukerId)
+                    val ansatt = AnsattBuilder(ansattId).build()
+                    val bruker = BrukerBuilder(brukerId).build()
+                    forventAvvistAv<VergemålRegel>(ansatt, bruker)
+                }
+            }
+        }
+
+        Given("ansatt har ikke vergemål for bruker") {
+            When("vergemålstjenesten returnerer tom liste") {
+                Then("tilgang gis") {
+                    every { vergemål.vergemål(ansattId) } returns emptySet()
+                    val ansatt = AnsattBuilder(ansattId).build()
+                    val bruker = BrukerBuilder(brukerId).build()
+                    ansatt kanBehandle bruker
+                }
+            }
+        }
+
+        Given("vergemålstjenesten feiler") {
+            When("oppslaget kaster exception") {
+                Then("tilgang gis (feilen svelges)") {
+                    every { vergemål.vergemål(ansattId) } throws RuntimeException("tjenesten er nede")
+                    val ansatt = AnsattBuilder(ansattId).build()
+                    val bruker = BrukerBuilder(brukerId).build()
+                    ansatt kanBehandle bruker
                 }
             }
         }

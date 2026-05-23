@@ -148,6 +148,7 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 
     maxHeapSize = "4g"
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
     jvmArgs =
         listOf(
             "--add-opens",

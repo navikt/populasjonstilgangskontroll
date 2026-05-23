@@ -173,6 +173,17 @@ class PdlPersonMapperTest : BehaviorSpec({
                 tilPerson(brukerId, pdlRespons(PdlPerson(doedsfall = listOf(PdlDødsfall(tidlig), PdlDødsfall(sen))))).dødsdato shouldBe sen
             }
         }
+        When("dødsfall uten dato") {
+            Then("returneres null") {
+                tilPerson(brukerId, pdlRespons(PdlPerson(doedsfall = listOf(PdlDødsfall())))).dødsdato.shouldBeNull()
+            }
+        }
+        When("flere dødsfall der noen mangler dato") {
+            Then("returneres seneste kjente dødsdato") {
+                val dato = LocalDate.of(2024, 3, 1)
+                tilPerson(brukerId, pdlRespons(PdlPerson(doedsfall = listOf(PdlDødsfall(), PdlDødsfall(dato))))).dødsdato shouldBe dato
+            }
+        }
     }
 
     Given("tilPerson - historiske ids") {

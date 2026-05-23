@@ -19,4 +19,4 @@ spec:
       - http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/skjerming
       - http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/valKey
       - http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/db
-
+      - http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/verge

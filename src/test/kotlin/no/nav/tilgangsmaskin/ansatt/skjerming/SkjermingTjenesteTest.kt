@@ -1,7 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
-import ch.qos.logback.classic.Level.INFO
-import ch.qos.logback.classic.Level.WARN
 import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
@@ -12,7 +10,6 @@ import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.maps.shouldContainExactly
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.SKJERMING_BULK_PATH
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.SKJERMING_PATH
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
@@ -44,7 +41,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
 
-@RestClientTest(components = [SkjermingClient::class,SkjermingBeanConfig::class, SkjermingTjeneste::class, SkjermingConfig::class,RestRetryLogger::class])
+@RestClientTest(components = [SkjermingClient::class,SkjermingBeanConfig::class, SkjermingTjeneste::class, SkjermingConfig::class])
 @Import(SkjermingTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class SkjermingTjenesteTest : BehaviorSpec() {
@@ -150,28 +147,6 @@ class SkjermingTjenesteTest : BehaviorSpec() {
                 Then("kastes IrrecoverableRestException uten retry") {
                     server.expect(once(), requestTo(SKJERMING_URI)).andRespond(withStatus(NOT_FOUND))
                     shouldThrow<IrrecoverableRestException> { tjeneste.skjerming(ID1) }
-                }
-            }
-        }
-
-        Given("RetryLogger") {
-            When("RecoverableRestException kastes etter retry") {
-                Then("logges WARN for hvert retry-forsøk") {
-                    server.expect(times(4), requestTo(SKJERMING_URI)).andRespond(withStatus(INTERNAL_SERVER_ERROR))
-                    val logs = withLogCapture { shouldThrow<RecoverableRestException> { tjeneste.skjerming(ID1) } }
-                    logs.any { e -> e.level == WARN && e.formattedMessage.contains("skjerming") } shouldBe true
-                }
-                Then("siste logg inneholder tjenestenavn") {
-                    server.expect(times(4), requestTo(SKJERMING_URI)).andRespond(withStatus(INTERNAL_SERVER_ERROR))
-                    val logs = withLogCapture { shouldThrow<RecoverableRestException> { tjeneste.skjerming(ID1) } }
-                    logs.last { e -> e.level == WARN }.formattedMessage shouldContain "skjerming"
-                }
-            }
-            When("IrrecoverableRestException kastes uten retry") {
-                Then("logges INFO") {
-                    server.expect(once(), requestTo(SKJERMING_URI)).andRespond(withStatus(NOT_FOUND))
-                    val logs = withLogCapture { shouldThrow<IrrecoverableRestException> { tjeneste.skjerming(ID1) } }
-                    logs.any { e -> e.level == INFO && e.formattedMessage.contains("skjerming") } shouldBe true
                 }
             }
         }

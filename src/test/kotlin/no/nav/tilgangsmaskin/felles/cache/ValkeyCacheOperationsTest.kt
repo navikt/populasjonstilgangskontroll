@@ -20,14 +20,12 @@ import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisClient.create
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
-import no.nav.tilgangsmaskin.TestApp
-import no.nav.tilgangsmaskin.felles.cache.CacheOperationsTest.CacheTestConfig
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheOperationsTest.ValkeyCacheTestConfig
 
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.getBean
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
@@ -41,26 +39,21 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
-import org.springframework.test.context.ContextConfiguration
-import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Duration
 import java.time.Duration.ofSeconds
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @DataRedisTest
-@ContextConfiguration(classes = [TestApp::class])
-@Testcontainers
 @AutoConfigureMetrics
-@Import(CacheTestConfig::class)
+@Import(ValkeyCacheTestConfig::class)
 @ApplyExtension(SpringExtension::class)
-class CacheOperationsTest : BehaviorSpec() {
+class ValkeyCacheOperationsTest : BehaviorSpec() {
 
     @TestConfiguration
-    class CacheTestConfig(
+    class ValkeyCacheTestConfig(
         private val cf: RedisConnectionFactory,
-        private val meterRegistry: MeterRegistry,
-        private val token: Token) {
+        private val meterRegistry: MeterRegistry) {
 
         @Bean
         @Primary
@@ -90,7 +83,7 @@ class CacheOperationsTest : BehaviorSpec() {
             CacheNøkkelMapper(mgr.cacheConfigurations)
 
         @Bean
-        fun cacheClient(client: RedisClient, handler: CacheNøkkelMapper, cfg: CacheConfig)  =
+        fun cacheClient(client: RedisClient, handler: CacheNøkkelMapper, cfg: CacheConfig, token: Token)  =
             CacheClient(client, handler, BulkCacheSuksessTeller(meterRegistry, token), BulkCacheTeller(meterRegistry, token), cfg)
 
         @Bean
@@ -110,12 +103,10 @@ class CacheOperationsTest : BehaviorSpec() {
     @Autowired
     private lateinit var pingable: CachePingable
 
-    private val events = CopyOnWriteArrayList<CacheInnslagFjernetHendelse>()
+    @Autowired
+    private lateinit var cacheManager: RedisCacheManager
 
-    private fun setUpCache() {
-        every { token.system } returns "test"
-        every { token.clusterAndSystem } returns "test:dev-gcp"
-    }
+    private val events = CopyOnWriteArrayList<CacheInnslagFjernetHendelse>()
 
     init {
 
@@ -126,16 +117,16 @@ class CacheOperationsTest : BehaviorSpec() {
         }
 
         beforeEach {
-            setUpCache()
+            every { token.system } returns "test"
+            every { token.clusterAndSystem } returns "test:dev-gcp"
             events.clear()
-            ctx.getBean<RedisCacheManager>().getCache(TEST_CACHE.name)?.clear()
+            cacheManager.getCache(TEST_CACHE.name)?.clear()
         }
 
-        Given("CachePingable mot ekte Redis") {
+        Given("CachePingable") {
             When("ping kalles") {
-                Then("returnerer tomt map (PONG)") {
-                    val result = pingable.ping()
-                    result shouldBe emptyMap()
+                Then("returnerer tomt map") {
+                    pingable.ping() shouldBe emptyMap()
                 }
             }
             When("name og pingEndpoint sjekkes") {
@@ -146,9 +137,9 @@ class CacheOperationsTest : BehaviorSpec() {
             }
         }
 
-        Given("verdier som legges i cache med kort TTL fjernes etterhvert") {
-            When("TTL løper ut") {
-                Then("verdiene er borte fra cachen") {
+        Given("putMany og getMany") {
+            When("verdier legges i cache med kort TTL") {
+                Then("returneres ved oppslag og fjernes etter TTL") {
                     putMany(T1, T2)
                     getMany(IDS).keys shouldBe IDS
                     eventually(TIMEOUTS) {
@@ -156,18 +147,16 @@ class CacheOperationsTest : BehaviorSpec() {
                     }
                 }
             }
-        }
-        Given("getMany med tomt set") {
-            When("ingen entries") {
-                Then("slås ikke opp") {
+            When("kalles med tomt set") {
+                Then("returnerer tomt map") {
                     getMany(emptySet()).shouldBeEmpty()
                 }
             }
         }
 
-        Given("en eksisterende nøkkel i cachen") {
-            When("delete kalles") {
-                Then("returnerer 1 og verdien er fjernet fra cachen") {
+        Given("delete") {
+            When("nøkkelen eksisterer") {
+                Then("returnerer 1 og verdien er fjernet") {
                     putOne(T1)
                     assertSoftly {
                         getOne(T1.id).shouldNotBeNull()
@@ -176,10 +165,7 @@ class CacheOperationsTest : BehaviorSpec() {
                     }
                 }
             }
-        }
-
-        Given("en ikke-eksisterende nøkkel forsøkes slettet") {
-            When("delete kalles") {
+            When("nøkkelen ikke eksisterer") {
                 Then("returnerer 0") {
                     assertSoftly {
                         getOne(T1.id).shouldBeNull()
@@ -189,9 +175,9 @@ class CacheOperationsTest : BehaviorSpec() {
             }
         }
 
-        Given("en nøkkel utløper i Redis") {
+        Given("cache-utløp") {
             When("TTL løper ut") {
-                Then("CacheInnslagFjernetEvent publiseres") {
+                Then("CacheInnslagFjernetHendelse publiseres") {
                     putOne(T1, ofSeconds(1))
                     eventually(TIMEOUTS) {
                         events.any { T1.id in it.nøkkel }.shouldBeTrue()

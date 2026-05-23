@@ -9,12 +9,17 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.OVERSTYRBAR_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.TELLENDE_REGELTYPE
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.context.MessageSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.AnnotationAwareOrderComparator.INSTANCE
 
 @Configuration
-class RegelBeanConfig {
+class RegelBeanConfig(messageSource: MessageSource) {
+
+    init {
+        RegelMetadata.messageSource = messageSource
+    }
 
     @Bean
     @Qualifier(KJERNE)

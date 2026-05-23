@@ -8,6 +8,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringValidator
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import java.time.LocalDate
+import java.time.LocalDate.now
 
 class OverstyringValidatorTest : BehaviorSpec({
 
@@ -15,83 +16,83 @@ class OverstyringValidatorTest : BehaviorSpec({
     val validator = OverstyringValidator()
 
     val gyldigBegrunnelse = "En gyldig begrunnelse på minst 10 tegn"
-    val gyldigDato = LocalDate.now().plusMonths(1)
+    val gyldigDato = now().plusMonths(1)
     val brukerId = BrukerId("08526835670")
 
-    fun data(begrunnelse: String = gyldigBegrunnelse, gyldigtil: LocalDate = gyldigDato) =
+    fun data(begrunnelse: String, gyldigtil: LocalDate = gyldigDato) =
         OverstyringData(brukerId, begrunnelse, gyldigtil)
 
     Given("en overstyring") {
 
         When("dato er én dag frem i tid") {
             Then("er gyldig") {
-                validator.isValid(data(gyldigtil = LocalDate.now().plusDays(1)), ctx) shouldBe true
+                validator.isValid(data(gyldigBegrunnelse, now().plusDays(1)), ctx) shouldBe true
             }
         }
 
         When("dato er én måned frem i tid") {
             Then("er gyldig") {
-                validator.isValid(data(gyldigtil = LocalDate.now().plusMonths(1)), ctx) shouldBe true
+                validator.isValid(data(gyldigBegrunnelse, now().plusMonths(1)), ctx) shouldBe true
             }
         }
 
         When("dato er akkurat 3 måneder frem i tid") {
             Then("er ugyldig") {
-                validator.isValid(data(gyldigtil = LocalDate.now().plusMonths(3)), ctx) shouldBe false
+                validator.isValid(data(gyldigBegrunnelse, now().plusMonths(3)), ctx) shouldBe true
             }
         }
 
         When("dato er mer enn 3 måneder frem i tid") {
             Then("er ugyldig") {
-                validator.isValid(data(gyldigtil = LocalDate.now().plusMonths(4)), ctx) shouldBe false
+                validator.isValid(data(gyldigBegrunnelse, now().plusMonths(4)), ctx) shouldBe false
             }
         }
 
         When("dato er dagens dato") {
-            Then("er ugyldig") {
-                validator.isValid(data(gyldigtil = LocalDate.now()), ctx) shouldBe false
+            Then("gyldig") {
+                validator.isValid(data(gyldigBegrunnelse, now()), ctx) shouldBe true
             }
         }
 
         When("dato er i fortiden") {
             Then("er ugyldig") {
-                validator.isValid(data(gyldigtil = LocalDate.now().minusDays(1)), ctx) shouldBe false
+                validator.isValid(data(gyldigBegrunnelse, now().minusDays(1)), ctx) shouldBe false
             }
         }
 
         When("begrunnelse er på nøyaktig 10 tegn") {
             Then("er gyldig") {
-                validator.isValid(data(begrunnelse = "1234567890"), ctx) shouldBe true
+                validator.isValid(data("1234567890"), ctx) shouldBe true
             }
         }
 
-        When("begrunnelse er på nøyaktig 400 tegn") {
+        When("begrunnelse er på nøyaktig 255 tegn") {
             Then("er gyldig") {
-                validator.isValid(data(begrunnelse = "a".repeat(400)), ctx) shouldBe true
+                validator.isValid(data("a".repeat(255)), ctx) shouldBe true
             }
         }
 
         When("begrunnelse er på 9 tegn") {
             Then("er ugyldig") {
-                validator.isValid(data(begrunnelse = "123456789"), ctx) shouldBe false
+                validator.isValid(data("123456789"), ctx) shouldBe false
             }
         }
 
         When("begrunnelse er på 401 tegn") {
             Then("er ugyldig") {
-                validator.isValid(data(begrunnelse = "a".repeat(401)), ctx) shouldBe false
+                validator.isValid(data("a".repeat(401)), ctx) shouldBe false
             }
         }
 
         When("begrunnelse er tom") {
             Then("er ugyldig") {
-                validator.isValid(data(begrunnelse = ""), ctx) shouldBe false
+                validator.isValid(data( ""), ctx) shouldBe false
             }
         }
 
         When("dato er ugyldig og begrunnelse er ugyldig") {
             Then("er ugyldig") {
-                validator.isValid(data(begrunnelse = "kort", gyldigtil = LocalDate.now().minusDays(1)), ctx) shouldBe false
+                validator.isValid(data(begrunnelse = "kort", gyldigtil = now().minusDays(1)), ctx) shouldBe false
             }
         }
 

@@ -79,3 +79,45 @@ spec:
           labels:
             namespace: tilgangsmaskin
             severity: critical
+        - alert: HelsesjekkEntraProxyFeilet
+          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/entraProxy", namespace="tilgangsmaskin"} == 0
+          for: 2m
+          annotations:
+            consequence: Entra Proxy er nede
+            action: "Sjekk Grafana og Kibana"
+            summary: |-
+              Grafana: https://grafana.nav.cloud.nais.io/d/42e329f6-6f6c-4365-84a1-7c65def92463/tilgangmaskin-prod?orgId=1
+              Loki securelogs: 
+              Kibana securelogs: 
+              Kibana åpne logger:
+          labels:
+            namespace: tilgangsmaskin
+            severity: critical
+        - alert: HelsesjekkDatabaseFeilet
+          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/db", namespace="tilgangsmaskin"} == 0
+          for: 2m
+          annotations:
+            consequence: Databasen er nede
+            action: "Sjekk Grafana og Kibana"
+            summary: |-
+              Grafana: https://grafana.nav.cloud.nais.io/d/42e329f6-6f6c-4365-84a1-7c65def92463/tilgangmaskin-prod?orgId=1
+              Loki securelogs: 
+              Kibana securelogs: 
+              Kibana åpne logger:
+          labels:
+            namespace: tilgangsmaskin
+            severity: critical
+        - alert: HelsesjekkVergemålFeilet
+          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/verge", namespace="tilgangsmaskin"} == 0
+          for: 2m
+          annotations:
+            consequence: Vergemålstjenesten er nede
+            action: "Sjekk Grafana og Kibana"
+            summary: |-
+              Grafana: https://grafana.nav.cloud.nais.io/d/42e329f6-6f6c-4365-84a1-7c65def92463/tilgangmaskin-prod?orgId=1
+              Loki securelogs: 
+              Kibana securelogs: 
+              Kibana åpne logger:
+          labels:
+            namespace: tilgangsmaskin
+            severity: critical

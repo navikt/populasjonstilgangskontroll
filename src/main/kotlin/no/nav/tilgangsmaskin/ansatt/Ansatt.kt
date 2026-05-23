@@ -13,13 +13,13 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
 
     private val brukerId = bruker?.brukerId
 
-    private val barn = bruker?.barn ?: emptySet()
+    private val barn = bruker?.barn.orEmpty()
 
-    private val foreldreEllerBarn = bruker?.foreldreOgBarn ?: emptySet()
+    private val foreldreEllerBarn = bruker?.foreldreOgBarn.orEmpty()
 
-    private val søsken = bruker?.søsken ?: emptySet()
+    private val søsken = bruker?.søsken.orEmpty()
 
-    private val partnere = bruker?.partnere ?: emptySet()
+    private val partnere = bruker?.partnere.orEmpty()
 
     infix fun kanBehandle(gt: GeografiskTilknytning): Boolean {
         val kode = when (gt) {
@@ -27,13 +27,11 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
             is BydelTilknytning -> gt.bydel.verdi
             else -> return true
         }
-        return grupper.any { it.displayName.endsWith("GEO_$kode") }
+        return harGruppeMedSuffix("GEO_$kode")
     }
 
     infix fun tilhører(enhet: Enhetsnummer?) =
-        enhet?.let { e ->
-            grupper.any { it.displayName.endsWith("ENHET_${e.verdi}") }
-        } ?: false
+        enhet?.let { harGruppeMedSuffix("ENHET_${it.verdi}") } ?: false
 
     infix fun erMedlemAv(gruppe: GlobalGruppe) = grupper.any {
         it.id == gruppe.id
@@ -49,12 +47,10 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
 
     infix fun erSøskenTil(bruker: Bruker) = bruker erNærståendeMed søsken
 
-    infix fun harFellesBarnMed(bruker: Bruker) = bruker.barn harMinstEnFelles barn
+    infix fun harFellesBarnMed(bruker: Bruker) = bruker.barn.any { it in barn }
 
-    private infix fun Set<FamilieMedlem>.harMinstEnFelles(medlemmer: Set<FamilieMedlem>) =
-        intersect(medlemmer).isNotEmpty()
+    private fun harGruppeMedSuffix(suffix: String) = grupper.any { it.displayName.endsWith(suffix) }
 
     private infix fun Bruker.erNærståendeMed(medlemmer: Set<FamilieMedlem>) = medlemmer.any { it.brukerId == brukerId }
 
 }
-

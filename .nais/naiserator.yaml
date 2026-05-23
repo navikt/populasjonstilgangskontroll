@@ -66,7 +66,6 @@ spec:
           - id: {{grupper.utland}}
           - id: {{grupper.egenansatt}}
           - id: {{grupper.udefinert}}
-          - id: {{grupper.fortrolig}}
           - id: {{grupper.strengt}}
   accessPolicy:
     outbound:
@@ -103,6 +102,8 @@ spec:
       value: {{pdlgraph}}
     - name: PDL
       value: {{pdl}}
+    - name: GRUPPE_DEAD
+      value: '{{grupper.dead}}'
     - name: GRUPPE_STRENGT
       value: '{{grupper.strengt}}'
     - name: GRUPPE_FORTROLIG

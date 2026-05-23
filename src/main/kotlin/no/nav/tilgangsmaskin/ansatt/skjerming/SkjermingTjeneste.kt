@@ -20,7 +20,8 @@ class SkjermingTjeneste(private val client: SkjermingClient,
 
     @Cacheable(cacheNames = [SKJERMING], key = "#brukerId.verdi")
     @WithSpan
-    fun skjerming(brukerId: BrukerId) = client.skjerming(mapOf(IDENT to brukerId.verdi))
+    fun skjerming(brukerId: BrukerId) =
+        client.skjerming(mapOf(IDENT to brukerId.verdi))
 
     @WithSpan
     fun skjerminger(brukerIds: List<BrukerId>): Map<BrukerId, Boolean> {

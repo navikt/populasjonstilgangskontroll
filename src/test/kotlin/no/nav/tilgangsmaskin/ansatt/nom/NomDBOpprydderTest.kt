@@ -6,6 +6,7 @@ import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
+import no.nav.tilgangsmaskin.SharedPostgresContainer
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,7 +19,6 @@ import org.springframework.test.util.ReflectionTestUtils.setField
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 import org.testcontainers.junit.jupiter.Testcontainers
-import org.testcontainers.postgresql.PostgreSQLContainer
 import java.time.Instant.now
 import java.time.LocalDate
 import java.time.ZoneOffset.UTC
@@ -127,7 +127,7 @@ class NomDBOpprydderTest : BehaviorSpec() {
     private fun bliLeder() = setField(opprydder, "erLeder", true)
     private companion object {
         @ServiceConnection
-        private val postgres = PostgreSQLContainer("postgres:18")
+        private val postgres = SharedPostgresContainer.instance
         private fun nyttNavId() = "Z%06d".format(counter.incrementAndGet())
         private const val FNR = "08526835670"
         private val counter = AtomicInteger(0)

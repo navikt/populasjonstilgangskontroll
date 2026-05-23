@@ -1,8 +1,8 @@
 {
   "collection": "kotlin-backend",
-  "version": "2026.05.15-141852-d0c0363",
+  "version": "2026.05.22-103454-7acbe01",
   "scope": "repo",
-  "source_sha": "5ef9edb",
+  "source_sha": "7acbe01",
   "installed_at": "2026-05-06T05:49:37Z",
   "files": [
     {
@@ -11,7 +11,7 @@
     },
     {
       "path": ".github/agents/kafka.agent.md",
-      "hash": "fdf4869940190473"
+      "hash": "9660e586ca26c47a"
     },
     {
       "path": ".github/agents/nais.agent.md",
@@ -70,7 +70,7 @@
     },
     {
       "path": ".github/skills/nav-plan/",
-      "hash": "0849265460ea23e2"
+      "hash": "0a160744cf2b4e82"
     },
     {
       "path": ".github/skills/nav-deep-interview/",
@@ -82,11 +82,12 @@
     },
     {
       "path": ".github/skills/nav-troubleshoot/",
-      "hash": "ce043cf29ce427b1"
+      "hash": "e9900d58d91ee0ee"
     },
     {
       "path": ".github/instructions/kotlin-ktor.instructions.md",
-      "hash": "5d85d53d8f375ec2"
+      "hash": "5d85d53d8f375ec2",
+      "status": "ignored"
     },
     {
       "path": ".github/instructions/kotlin-spring.instructions.md",
@@ -94,7 +95,8 @@
     },
     {
       "path": ".github/instructions/security-owasp.instructions.md",
-      "hash": "6d2de01195174566"
+      "hash": "6d2de01195174566",
+      "status": "ignored"
     },
     {
       "path": ".github/instructions/testing.instructions.md",
@@ -127,7 +129,8 @@
     },
     {
       "path": ".github/prompts/kafka-topic.prompt.md",
-      "hash": "4e3cb2fe36ecb2f4"
+      "hash": "4e3cb2fe36ecb2f4",
+      "status": "ignored"
     },
     {
       "path": ".github/prompts/nais-manifest.prompt.md",

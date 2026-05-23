@@ -5,7 +5,7 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration
 import tools.jackson.databind.json.JsonMapper
 import kotlin.reflect.KClass
 
-class CacheNøkkelMapper(val configs: Map<String, RedisCacheConfiguration?>, val mapper: JsonMapper = VALKEY_MAPPER) {
+class CacheNøkkelMapper(private val configs: Map<String, RedisCacheConfiguration?>, private val mapper: JsonMapper = VALKEY_MAPPER) {
 
 
     fun <T : Any> fraJson(json: String, clazz: KClass<T>): T =

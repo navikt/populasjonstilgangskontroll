@@ -3,10 +3,12 @@ package no.nav.tilgangsmaskin.bruker.pdl
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.graphql.ResponseError
 import org.springframework.graphql.client.FieldAccessException
 import org.springframework.graphql.client.GraphQlTransportException
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import java.net.URI
 import java.util.*
 
@@ -14,23 +16,16 @@ interface PdlGraphQLErrorHandler {
     fun handle(uri: URI, e: Throwable): Nothing =
         when (e) {
             is FieldAccessException -> throw e.oversett(uri)
-            is GraphQlTransportException -> throw RecoverableRestException(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                uri,
-                e.message ?: "Uventet respons",
-                e)
-            else -> throw IrrecoverableRestException(
-                HttpStatus.INTERNAL_SERVER_ERROR, uri,
-                e.message ?: "Uventet respons",
-                e)
+            is GraphQlTransportException -> throw RecoverableRestException(INTERNAL_SERVER_ERROR, uri,e.message ?: "Uventet respons", e)
+            else -> throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri, e.message ?: "Uventet respons", e)
         }
 
     companion object {
-        private val log = LoggerFactory.getLogger(PdlGraphQLErrorHandler::class.java)
+        private val log = getLogger(PdlGraphQLErrorHandler::class.java)
         private fun FieldAccessException.oversett(uri: URI) = response.errors.oversett(message, uri)
 
         private fun List<ResponseError>.oversett(message: String?, uri: URI) = oversett(
-            firstOrNull()?.extensions?.get("code")?.toString() ?: HttpStatus.INTERNAL_SERVER_ERROR.name,
+            firstOrNull()?.extensions?.get("code")?.toString() ?: INTERNAL_SERVER_ERROR.name,
             message ?: "Ukjent feil", uri
         )
             .also {

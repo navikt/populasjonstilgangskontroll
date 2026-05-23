@@ -21,7 +21,7 @@
     <springProfile name="dev">
         <logger name="io.lettuce.core.protocol.ReconnectionHandler" level="warn"/>
         <logger name="io.lettuce.core.protocol.ConnectionWatchdog" level="warn"/>
-        <logger name="org.apache.hc.client5.http.impl.classic" level="warn"/>
+        <logger name="org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec" level="warn"/>
         <logger name="org.hibernate.orm.connections.pooling" level="warn"/>
         <logger name="org.springframework.cache" level="info" />
         <logger name="org.apache.kafka" level="info" />

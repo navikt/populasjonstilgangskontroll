@@ -108,7 +108,7 @@ spec:
             namespace: tilgangsmaskin
             severity: critical
         - alert: HelsesjekkVergemålFeilet
-          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/vergemål", namespace="tilgangsmaskin"} == 0
+          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/verge", namespace="tilgangsmaskin"} == 0
           for: 2m
           annotations:
             consequence: Vergemålstjenesten er nede

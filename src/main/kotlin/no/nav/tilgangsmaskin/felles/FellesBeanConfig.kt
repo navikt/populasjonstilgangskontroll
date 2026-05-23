@@ -19,6 +19,10 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import org.apache.hc.client5.http.impl.classic.HttpClients
+import org.apache.hc.client5.http.config.ConnectionConfig
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder
+import org.apache.hc.core5.util.Timeout
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -79,7 +83,17 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     @Bean
     fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor) =
         RestClientCustomizer { c ->
-            c.requestFactory(HttpComponentsClientHttpRequestFactory().apply {
+            val connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
+                .setDefaultConnectionConfig(
+                    ConnectionConfig.custom()
+                        .setValidateAfterInactivity(Timeout.ofSeconds(2))
+                        .build()
+                )
+                .build()
+            val httpClient = HttpClients.custom()
+                .setConnectionManager(connectionManager)
+                .build()
+            c.requestFactory(HttpComponentsClientHttpRequestFactory(httpClient).apply {
                 setConnectionRequestTimeout(3000)
                 setReadTimeout(5000)
             })

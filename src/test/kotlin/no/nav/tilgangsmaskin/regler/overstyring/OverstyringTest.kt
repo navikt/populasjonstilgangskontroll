@@ -28,7 +28,6 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.motor.RegelMotorTestConfig
 import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
 import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringClientValidator.OverstyringException
@@ -42,6 +41,10 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
 import no.nav.tilgangsmaskin.SharedPostgresContainer
+import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTest.RegelMotorTestConfig
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestPropertySource
 import org.testcontainers.junit.jupiter.Testcontainers
 
@@ -49,9 +52,10 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @EnableJpaAuditing
 @Testcontainers
 @AutoConfigureMetrics
+@Import(RegelMotorTestConfig::class)
 @TestPropertySource(locations = ["classpath:test.properties"])
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [TestApp::class, RegelMotorTestConfig::class, LocalAuditor::class,OverstyringJPAAdapter::class])
+@ContextConfiguration(classes = [TestApp::class, LocalAuditor::class,OverstyringJPAAdapter::class])
 @ApplyExtension(SpringExtension::class)
 internal class OverstyringTest : BehaviorSpec() {
 
@@ -86,6 +90,10 @@ internal class OverstyringTest : BehaviorSpec() {
     lateinit var ansatte: AnsattTjeneste
     @MockK
     lateinit var brukere: BrukerTjeneste
+
+    @TestConfiguration
+    @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
+    class RegelMotorTestConfig
 
     init {
         lateinit var overstyring: OverstyringTjeneste

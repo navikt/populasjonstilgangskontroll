@@ -92,6 +92,8 @@ spring:
         enabled: true
   cache:
     type: redis
+    redis:
+      enable-statistics: true
   mvc:
     problemdetails:
       enabled: true

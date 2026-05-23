@@ -9,6 +9,7 @@ import org.springframework.boot.health.contributor.Status.UP
 import org.springframework.context.annotation.Configuration
 
 
+@NoCoverageAnalysis
 @Configuration(proxyBeanMethods = false)
 class HealthMetricsExportConfiguration(registry: MeterRegistry, healthEndpoint: HealthEndpoint) {
 

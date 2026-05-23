@@ -1,4 +1,5 @@
 server:
+  shutdown: graceful
   jetty:
     threads:
       max: 200

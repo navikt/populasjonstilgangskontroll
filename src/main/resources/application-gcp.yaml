@@ -4,6 +4,9 @@ server:
     threads:
       max: 200
 management:
+  info:
+    os:
+      enabled: true
   auditevents:
     enabled: false
   metrics:

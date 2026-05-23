@@ -17,7 +17,7 @@ spec:
           labels:
             namespace: "tilgangsmaskin"
             severity: warning
-        - alert: "[tilgangsmaskin] Forhøyede feilrater (errors"
+        - alert: "[tilgangsmaskin] Forhøyede feilrater (errors)"
           expr: sum(round(increase(logback_events_total{app="populasjonstilgangskontroll", level="error"}[2m]))) > 10
           for: 3m
           annotations:
@@ -25,4 +25,15 @@ spec:
           labels:
             namespace: "tilgangsmaskin"
             severity: danger
+        - alert: "[tilgangsmaskin] Helsesjekk ikke UP"
+          expr: health{app="populasjonstilgangskontroll", namespace="tilgangsmaskin"} != 3
+          for: 2m
+          annotations:
+            action: "Sjekk /monitoring/health for detaljer om hvilken komponent som er nede"
+            consequence: "Applikasjonen rapporterer ikke UP — en eller flere avhengigheter kan være nede"
+            summary: |-
+              Grafana: https://grafana.nav.cloud.nais.io/d/42e329f6-6f6c-4365-84a1-7c65def92463/tilgangmaskin-prod?orgId=1
+          labels:
+            namespace: "tilgangsmaskin"
+            severity: critical
 

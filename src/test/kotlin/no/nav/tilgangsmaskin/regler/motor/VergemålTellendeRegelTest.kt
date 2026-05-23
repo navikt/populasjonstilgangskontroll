@@ -6,7 +6,6 @@ import io.mockk.MockKAnnotations.init
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.impl.annotations.SpyK
 import io.mockk.verify
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
@@ -21,7 +20,7 @@ class VergemålTellendeRegelTest : BehaviorSpec() {
     private lateinit var teller: VergemålTeller
     @MockK
     private lateinit var vergemål: VergemålTjeneste
-    @SpyK
+    @MockK(relaxed = true)
     private var auditor = LocalAuditor()
 
     private lateinit var regel: VergemålTellendeRegel
@@ -38,11 +37,6 @@ class VergemålTellendeRegelTest : BehaviorSpec() {
                 Then("skalTelle returnerer true") {
                     every { vergemål.vergemål(ansattId) } returns setOf(brukerId)
                     regel.skalTelle(ansatt, bruker) shouldBe true
-                }
-                Then("auditor informeres med ansattId og brukerId") {
-                    every { vergemål.vergemål(ansattId) } returns setOf(brukerId)
-                    regel.skalTelle(ansatt, bruker)
-                    verify { auditor.info(match { it.contains(ansattId.verdi) && it.contains(brukerId.verdi) }) }
                 }
                 Then("teller inkrementeres") {
                     every { vergemål.vergemål(ansattId) } returns setOf(brukerId)

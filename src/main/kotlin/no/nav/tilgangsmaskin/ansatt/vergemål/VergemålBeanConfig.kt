@@ -16,6 +16,6 @@ class VergemålBeanConfig {
         createClient<VergemålClient>(cfg, builder)
 
     @Bean
-    fun vergemålHealthIndicator(client: VergemålClient, cfg: VergemålConfig) =
+    fun vergeHealthIndicator(client: VergemålClient, cfg: VergemålConfig) =
         PingableHealthIndicator(cfg, client::ping)
 }

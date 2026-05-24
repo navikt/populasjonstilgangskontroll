@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.utils.extensions
 
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -13,7 +14,7 @@ class DomainExtensionsTest : BehaviorSpec({
 
         When("strengen har kun siffer og riktig lengde") {
             Then("kaster ikke") {
-                requireDigits("08526835670", 11)
+                shouldNotThrowAny { requireDigits("08526835670", 11) }
             }
         }
 
@@ -49,7 +50,7 @@ class DomainExtensionsTest : BehaviorSpec({
 
         When("strengen er gyldig 13-sifret aktørId") {
             Then("kaster ikke") {
-                requireDigits("1234567890123", 13)
+                shouldNotThrowAny { requireDigits("1234567890123", 13) }
             }
         }
     }

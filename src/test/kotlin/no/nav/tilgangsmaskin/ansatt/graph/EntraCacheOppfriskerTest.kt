@@ -6,7 +6,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.mockk.every
 import io.mockk.verify
-import org.junit.jupiter.api.assertDoesNotThrow
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO
@@ -127,7 +127,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                 Then("oppfrisk fanger exception og propagerer ikke") {
                     every { oid.oid(ansattId) } throws RuntimeException("oid-oppslag feilet")
 
-                    assertDoesNotThrow {
+                    shouldNotThrowAny {
                         oppfrisker.oppfrisk(nøkkel(GEO))
                     }
 
@@ -145,7 +145,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                     every { oid.oid(ansattId) } returnsMany listOf(OID, NY_OID)
                     every { entra.geoGrupper(ansattId, OID) } throws NotFoundRestException(URI.create("http://entra"))
 
-                    assertDoesNotThrow {
+                    shouldNotThrowAny {
                         oppfrisker.oppfrisk(nøkkel(GEO))
                     }
 
@@ -161,7 +161,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                     every { oid.oid(ansattId) } returnsMany listOf(OID, NY_OID)
                     every { entra.geoOgGlobaleGrupper(ansattId, OID) } throws NotFoundRestException(URI.create("http://entra"))
 
-                    assertDoesNotThrow {
+                    shouldNotThrowAny {
                         oppfrisker.oppfrisk(nøkkel(GEO_OG_GLOBALE))
                     }
 
@@ -178,7 +178,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                     every { entra.geoGrupper(ansattId, OID) } throws NotFoundRestException(URI.create("http://entra"))
                     every { entra.geoGrupper(ansattId, NY_OID) } throws NotFoundRestException(URI.create("http://entra"))
 
-                    assertDoesNotThrow {
+                    shouldNotThrowAny {
                         oppfrisker.oppfrisk(nøkkel(GEO))
                     }
 

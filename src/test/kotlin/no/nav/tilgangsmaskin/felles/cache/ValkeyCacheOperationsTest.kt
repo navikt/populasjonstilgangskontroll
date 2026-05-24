@@ -123,7 +123,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
         Given("CachePingable") {
             When("ping kalles") {
                 Then("returnerer tomt map") {
-                    pingable.ping().shouldBeEmpty()
+                    pingable.ping().shouldBe(Unit)
                 }
             }
             When("name og pingEndpoint sjekkes") {

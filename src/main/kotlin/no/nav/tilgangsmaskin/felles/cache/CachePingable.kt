@@ -14,7 +14,7 @@ class CachePingable(private val cf: RedisConnectionFactory, cfg: CacheConfig) : 
     override fun ping() =
         cf.connection.use {
             if (it.ping().equals(PONG, ignoreCase = true)) {
-                emptyMap<String, String>()
+               Unit
             } else {
                 error("$name ping failed")
             }

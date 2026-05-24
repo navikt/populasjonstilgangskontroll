@@ -4,6 +4,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
@@ -87,7 +88,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
                         .andExpect(method(GET))
                         .andRespond(withSuccess("[]", APPLICATION_JSON))
 
-                    tjeneste.enheter(ANSATTID) shouldBe emptySet()
+                    tjeneste.enheter(ANSATTID).shouldBeEmpty()
                 }
             }
         }

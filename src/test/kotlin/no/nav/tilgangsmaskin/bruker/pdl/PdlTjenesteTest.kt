@@ -5,6 +5,7 @@ import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import no.nav.tilgangsmaskin.bruker.AktørId
@@ -176,7 +177,7 @@ class PdlTjenesteTest : BehaviorSpec() {
             When("settet er tomt") {
                 Then("REST kalles ikke") {
                     server.expect(never(), requestTo(cfg.personerURI))
-                    pdl.personer(emptySet()) shouldBe emptyList()
+                    pdl.personer(emptySet()).shouldBeEmpty()
                 }
             }
         }

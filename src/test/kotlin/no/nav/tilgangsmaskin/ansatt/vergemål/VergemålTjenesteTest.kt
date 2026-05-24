@@ -1,3 +1,4 @@
+
 package no.nav.tilgangsmaskin.ansatt.vergemål
 
 import com.ninjasquad.springmockk.MockkBean
@@ -5,6 +6,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -88,7 +90,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
                         .andExpect(method(POST))
                         .andRespond(withSuccess("[]", APPLICATION_JSON))
 
-                    tjeneste.vergemål(ANSATT_ID) shouldBe emptySet()
+                    tjeneste.vergemål(ANSATT_ID).shouldBeEmpty()
                 }
             }
         }
@@ -98,7 +100,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
                 Then("returnerer tom liste uten HTTP-kall") {
                     every { nom.fnrForAnsatt(ANSATT_ID) } returns null
 
-                    tjeneste.vergemål(ANSATT_ID) shouldBe emptySet()
+                    tjeneste.vergemål(ANSATT_ID).shouldBeEmpty()
                 }
             }
         }

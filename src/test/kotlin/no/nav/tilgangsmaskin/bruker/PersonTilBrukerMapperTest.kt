@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.bruker
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldNotContain
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.SKJERMING
@@ -54,8 +55,8 @@ class PersonTilBrukerMapperTest : BehaviorSpec({
     }
 
     Given("tilBruker - påkrevdeGrupper — gradering") {
-        When("ugradert person uten skjerming") { Then("ingen grupper kreves") { tilBruker(person(graderinger = listOf(UGRADERT)), false).påkrevdeGrupper shouldBe emptySet() } }
-        When("ingen graderinger og ingen skjerming") { Then("ingen grupper kreves") { tilBruker(person(), false).påkrevdeGrupper shouldBe emptySet() } }
+        When("ugradert person uten skjerming") { Then("ingen grupper kreves") { tilBruker(person(graderinger = listOf(UGRADERT)), false).påkrevdeGrupper.shouldBeEmpty() } }
+        When("ingen graderinger og ingen skjerming") { Then("ingen grupper kreves") { tilBruker(person(), false).påkrevdeGrupper.shouldBeEmpty() } }
         When("STRENGT_FORTROLIG gradering") { Then("STRENGT_FORTROLIG kreves") { tilBruker(person(graderinger = listOf(GRAD_STRENGT_FORTROLIG)), false).påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG) } }
         When("STRENGT_FORTROLIG_UTLAND gradering") { Then("STRENGT_FORTROLIG_UTLAND kreves") { tilBruker(person(graderinger = listOf(GRAD_STRENGT_FORTROLIG_UTLAND)), false).påkrevdeGrupper shouldBe setOf(STRENGT_FORTROLIG_UTLAND) } }
         When("FORTROLIG gradering") { Then("FORTROLIG kreves") { tilBruker(person(graderinger = listOf(GRAD_FORTROLIG)), false).påkrevdeGrupper shouldBe setOf(FORTROLIG) } }
@@ -88,7 +89,7 @@ class PersonTilBrukerMapperTest : BehaviorSpec({
         }
         When("ugradert, ikke skjermet, kjent GT") {
             Then("ingen grupper kreves") {
-                tilBruker(person(gt = kommuneGT, graderinger = listOf(UGRADERT)), false).påkrevdeGrupper shouldBe emptySet()
+                tilBruker(person(gt = kommuneGT, graderinger = listOf(UGRADERT)), false).påkrevdeGrupper.shouldBeEmpty()
             }
         }
     }

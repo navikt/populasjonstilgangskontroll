@@ -126,7 +126,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
         Given("CachePingable") {
             When("ping kalles") {
                 Then("returnerer tomt map") {
-                    pingable.ping() shouldBe emptyMap()
+                    pingable.ping().shouldBeEmpty()
                 }
             }
             When("name og pingEndpoint sjekkes") {

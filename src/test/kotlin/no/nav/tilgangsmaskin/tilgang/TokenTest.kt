@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.tilgang
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -208,25 +209,25 @@ class TokenTest : BehaviorSpec({
         }
         When("groups mangler") {
             Then("returnerer tomt set") {
-                token.globaleGruppeIds shouldBe emptySet()
+                token.globaleGruppeIds.shouldBeEmpty()
             }
         }
         When("groups er tom liste") {
             Then("returnerer tomt set") {
                 every { claims.getAsList("groups") } returns emptyList()
-                token.globaleGruppeIds shouldBe emptySet()
+                token.globaleGruppeIds.shouldBeEmpty()
             }
         }
         When("getClaims kaster exception") {
             Then("returnerer tomt set") {
                 every { validationContext.getClaims(AAD_ISSUER) } throws RuntimeException("ingen token")
-                token.globaleGruppeIds shouldBe emptySet()
+                token.globaleGruppeIds.shouldBeEmpty()
             }
         }
         When("getAsList returnerer null") {
             Then("returnerer tomt set") {
                 every { claims.getAsList("groups") } returns null
-                token.globaleGruppeIds shouldBe emptySet()
+                token.globaleGruppeIds.shouldBeEmpty()
             }
         }
         When("groups inneholder ugyldig UUID-verdi") {

@@ -8,6 +8,7 @@ import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.maps.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.SKJERMING_BULK_PATH
@@ -61,11 +62,6 @@ class SkjermingTjenesteTest : BehaviorSpec() {
     lateinit var cache: CacheOperations
 
     init {
-        fun withLogCapture(block: (ListAppender<ILoggingEvent>) -> Unit): List<ILoggingEvent> {
-            val logger = getLogger(RestRetryLogger::class.java) as Logger
-            val appender = ListAppender<ILoggingEvent>().apply { start(); logger.addAppender(this) }
-            return try { block(appender); appender.list } finally { logger.detachAppender(appender) }
-        }
 
         beforeEach {
             server.reset()
@@ -116,7 +112,7 @@ class SkjermingTjenesteTest : BehaviorSpec() {
             When("ingen identer") {
                 Then("kalles ikke REST") {
                     server.expect(never(), requestTo(SKJERMINGER_URI))
-                    tjeneste.skjerminger(emptyList()) shouldBe emptyMap()
+                    tjeneste.skjerminger(emptyList()).shouldBeEmpty()
                 }
             }
             When("REST returnerer resultat") {

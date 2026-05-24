@@ -1,6 +1,8 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.collections.shouldExist
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.felles.Pingable
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
@@ -27,7 +29,7 @@ class PingableHealthIndicatorTest : BehaviorSpec({
                 val health = PingableHealthIndicator(pingable).health()
                 health.status shouldBe UP
                 health.details[ENDPOINT] shouldBe "http://example.com/ping"
-                pingable.pinged shouldBe true
+                pingable.pinged.shouldBeTrue()
             }
         }
         When("ping kaster exception") {
@@ -36,7 +38,7 @@ class PingableHealthIndicatorTest : BehaviorSpec({
                 val health = PingableHealthIndicator(pingable).health()
                 health.status shouldBe DOWN
                 health.details[ENDPOINT] shouldBe "http://example.com/ping"
-                health.details.values.map { it.toString() }.any { it.contains("Connection refused") } shouldBe true
+                health.details.values.map { it.toString() }.shouldExist { it.contains("Connection refused") }
             }
         }
         When("annen pingEndpoint er konfigurert og ping feiler") {

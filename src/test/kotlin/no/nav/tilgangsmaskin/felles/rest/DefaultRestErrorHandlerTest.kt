@@ -49,7 +49,7 @@ class DefaultRestErrorHandlerTest : BehaviorSpec({
             Then("kastes IrrecoverableRestException, ikke NotFoundRestException") {
                 val ex = shouldThrow<IrrecoverableRestException> { handler.handle(req(), res(BAD_REQUEST)) }
                 ex.shouldBeInstanceOf<IrrecoverableRestException>()
-                (ex is NotFoundRestException) shouldBe false
+                ex.shouldNotBeInstanceOf<NotFoundRestException>()
             }
         }
         When("403 Forbidden") {

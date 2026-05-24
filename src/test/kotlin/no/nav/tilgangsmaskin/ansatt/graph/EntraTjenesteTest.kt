@@ -4,6 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
@@ -91,7 +92,7 @@ class EntraTjenesteTest : BehaviorSpec() {
                         .andExpect(method(GET))
                         .andRespond(withSuccess("""{ "value": [] }""", APPLICATION_JSON))
 
-                    tjeneste.geoGrupper(ANSATTID, OID) shouldBe emptySet()
+                    tjeneste.geoGrupper(ANSATTID, OID).shouldBeEmpty()
                 }
             }
 
@@ -132,7 +133,7 @@ class EntraTjenesteTest : BehaviorSpec() {
                         .andExpect(method(GET))
                         .andRespond(withSuccess("""{ "value": [] }""", APPLICATION_JSON))
 
-                    tjeneste.geoOgGlobaleGrupper(ANSATTID, OID) shouldBe emptySet()
+                    tjeneste.geoOgGlobaleGrupper(ANSATTID, OID).shouldBeEmpty()
                 }
             }
         }

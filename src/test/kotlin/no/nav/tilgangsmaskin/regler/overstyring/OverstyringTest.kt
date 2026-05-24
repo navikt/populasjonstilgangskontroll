@@ -6,6 +6,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.micrometer.core.instrument.MeterRegistry
@@ -229,7 +230,7 @@ internal class OverstyringTest : BehaviorSpec() {
                     overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Aktiv men gammel", IMORGEN))
                     overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Ny men utgått", IGÅR))
                     val resultat = overstyring.overstyringer(ansattId, listOf(bruker.brukerId))
-                    resultat shouldBe emptyList()
+                    resultat.shouldBeEmpty()
                 }
             }
             When("alle overstyringer er utgått") {
@@ -238,13 +239,13 @@ internal class OverstyringTest : BehaviorSpec() {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Utgått overstyring", IGÅR))
                     val resultat = overstyring.overstyringer(ansattId, listOf(bruker.brukerId))
-                    resultat shouldBe emptyList()
+                    resultat.shouldBeEmpty()
                 }
             }
             When("ingen overstyringer er registrert") {
                 Then("returneres tom liste") {
                     val resultat = overstyring.overstyringer(ansattId, listOf(vanligBrukerId))
-                    resultat shouldBe emptyList()
+                    resultat.shouldBeEmpty()
                 }
             }
         }

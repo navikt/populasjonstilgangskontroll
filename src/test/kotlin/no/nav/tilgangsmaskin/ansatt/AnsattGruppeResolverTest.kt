@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.ansatt
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -57,14 +58,14 @@ class AnsattGruppeResolverTest : BehaviorSpec({
         When("ingen av token-gruppeIDene er kjente") {
             Then("Token.globaleGrupper returnerer tomt sett") {
                 every { token.globaleGruppeIds } returns setOf(UUID.randomUUID(), UUID.randomUUID())
-                token.globaleGrupper() shouldBe emptySet()
+                token.globaleGrupper().shouldBeEmpty()
             }
         }
 
         When("token ikke har noen gruppe-IDer") {
             Then("Token.globaleGrupper returnerer tomt sett") {
                 every { token.globaleGruppeIds } returns emptySet()
-                token.globaleGrupper() shouldBe emptySet()
+                token.globaleGrupper().shouldBeEmpty()
             }
         }
 

@@ -60,24 +60,17 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
     override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
         if (innslag.isNotEmpty()) {
             log.trace("Bulk lagrer {} verdier for cache {} med prefix {}", innslag.size, cache.name, cache.extraPrefix)
+            val payload = innslag.entries.associate { (key, value) -> mapper.tilEntry(cache, key, value) }
             conn.apply {
-                with(payloadFor(innslag, cache)) {
-                    setAutoFlushCommands(false)
-                    async().mset(this)
-                    keys.forEach { key ->
-                        async().expire(key, ttl.seconds)
-                    }
-                }
+                setAutoFlushCommands(false)
+                async().mset(payload)
+                payload.keys.forEach { key -> async().expire(key, ttl.seconds) }
                 flushCommands()
                 setAutoFlushCommands(true)
             }
         }
     }
 
-    private fun payloadFor(innslag: Map<String, Any>, cache: CacheNøkkelConfig) =
-        innslag.entries.associate { (key, value) ->
-            mapper.tilNøkkel(cache, key) to this@ValkeyCacheClient.mapper.tilJson(value)
-        }
 
     fun tellOgLog(navn: String, funnet: Int, etterspurt: Int) {
         alleTreffTeller.tell(of("name", navn, "suksess", (funnet == etterspurt).toString()))

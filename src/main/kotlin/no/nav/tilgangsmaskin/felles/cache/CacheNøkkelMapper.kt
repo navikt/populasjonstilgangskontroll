@@ -27,6 +27,8 @@ class CacheNøkkelMapper(private val configs: Map<String, RedisCacheConfiguratio
         configs[cache.name]?.getKeyPrefixFor(cache.name)
             ?: error("Ingen cache med navn ${cache.name}")
 
+    fun tilEntry(cache: CacheNøkkelConfig, key: String, value: Any) =             tilNøkkel(cache, key) to tilJson(value)
+
 }
 
 data class CacheNøkkelConfig(val name: String, val extraPrefix: String? = null)

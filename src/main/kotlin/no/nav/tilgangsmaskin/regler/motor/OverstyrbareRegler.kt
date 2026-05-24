@@ -44,7 +44,7 @@ class UtlandRegel : GlobalGruppeMedlemskapRegel(UTENLANDSK), OverstyrbarRegel {
 
 @SortertRegel(LOWEST_PRECEDENCE - 3)
 @ConditionalOnNotProd
-class AvdødBrukerRegel : OverstyrbarRegel {
+class AvdødBrukerRegel : OverstyrbarRegel, TellendeRegel {
 
     override val metadata = RegelMetadata(AVDØD_MER_ENN_ETT_ÅR)
 
@@ -57,14 +57,15 @@ class AvdødBrukerRegel : OverstyrbarRegel {
 
 @SortertRegel(LOWEST_PRECEDENCE - 4)
 @ConditionalOnNotProd
-class VergemålRegel(private val vergemål: VergemålTjeneste) : OverstyrbarRegel {
+class VergemålRegel(private val vergemål: VergemålTjeneste,private val teller: VergemålTeller) : OverstyrbarRegel {
 
     override val metadata = RegelMetadata(VERGEMÅL)
 
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis {
             runCatching {
-                vergemål.vergemål(ansatt.ansattId).contains(bruker.brukerId)
+                vergemål.vergemål(ansatt.ansattId).contains(bruker.brukerId).also { if (it) teller.tell()
+                }
             }.getOrDefault(false)
         }
 }

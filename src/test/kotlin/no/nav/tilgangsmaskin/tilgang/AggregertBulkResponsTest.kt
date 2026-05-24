@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.tilgang
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
@@ -27,7 +28,7 @@ class AggregertBulkResponsTest : BehaviorSpec({
         When("godkjente hentes") {
             Then("returnerer kun NO_CONTENT resultater") {
                 respons.godkjente shouldHaveSize 2
-                respons.godkjente.all { it.httpStatus == NO_CONTENT } shouldBe true
+                respons.godkjente.all { it.httpStatus == NO_CONTENT }.shouldBeTrue()
             }
         }
 

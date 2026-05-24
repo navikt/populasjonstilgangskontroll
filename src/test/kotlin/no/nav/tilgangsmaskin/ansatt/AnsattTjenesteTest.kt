@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -57,7 +58,7 @@ class AnsattTjenesteTest : BehaviorSpec({
             Then("er ansatt medlem av NASJONAL") {
                 val ansattMedNasjonal = AnsattBuilder(ansattId).medMedlemskapI(NASJONAL).build()
                 every { resolver.grupperForAnsatt(ansattId) } returns ansattMedNasjonal.grupper
-                tjeneste.ansatt(ansattId) erMedlemAv NASJONAL shouldBe true
+                (tjeneste.ansatt(ansattId) erMedlemAv NASJONAL).shouldBeTrue()
             }
         }
 

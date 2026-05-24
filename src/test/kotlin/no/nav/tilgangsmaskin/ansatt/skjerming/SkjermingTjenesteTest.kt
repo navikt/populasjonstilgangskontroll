@@ -10,6 +10,7 @@ import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.maps.shouldContainExactly
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.SKJERMING_BULK_PATH
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.SKJERMING_PATH
@@ -75,9 +76,9 @@ class SkjermingTjenesteTest : BehaviorSpec() {
                 Then("andre kall returneres fra cache uten REST-kall") {
                     server.expect(once(), requestTo(SKJERMING_URI))
                         .andRespond(withSuccess("true", APPLICATION_JSON))
-                    tjeneste.skjerming(ID1) shouldBe true
-                    tjeneste.skjerming(ID1) shouldBe true
-                    cache.getOne<Boolean>(SKJERMING_CACHE, I1) shouldBe true
+                    tjeneste.skjerming(ID1).shouldBeTrue()
+                    tjeneste.skjerming(ID1).shouldBeTrue()
+                    cache.getOne<Boolean>(SKJERMING_CACHE, I1).shouldBeTrue()
                 }
             }
         }
@@ -120,7 +121,7 @@ class SkjermingTjenesteTest : BehaviorSpec() {
                     server.expect(once(), requestTo(SKJERMINGER_URI))
                         .andRespond(withSuccess("""{"$I1":true}""", APPLICATION_JSON))
                     tjeneste.skjerminger(listOf(ID1))
-                    cache.getOne<Boolean>(SKJERMING_CACHE, I1) shouldBe true
+                    cache.getOne<Boolean>(SKJERMING_CACHE, I1).shouldBeTrue()
                 }
             }
         }

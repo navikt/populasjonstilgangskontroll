@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.tilgang
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -39,7 +40,7 @@ class TokenTest : BehaviorSpec({
         When("idtyp er 'app'") {
             Then("CC er true") {
                 every { claims.getStringClaim(IDTYP) } returns APP
-                token.erCC shouldBe true
+                token.erCC.shouldBeTrue()
             }
         }
         When("idtyp ikke er 'app'") {
@@ -59,7 +60,7 @@ class TokenTest : BehaviorSpec({
         When("oid finnes og idtyp ikke er 'app'") {
             Then("OBO er true") {
                 every { claims.getStringClaim(OID) } returns oid.toString()
-                token.erObo shouldBe true
+                token.erObo.shouldBeTrue()
             }
         }
         When("token er CC (idtyp=app)") {

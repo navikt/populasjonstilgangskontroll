@@ -9,6 +9,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import no.nav.tilgangsmaskin.TestApp
@@ -211,7 +212,7 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
                 Then("erOverstyrt returnerer true") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
                     overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Gyldig test", IMORGEN))
-                    overstyring.erOverstyrt(ansattId, vanligBrukerId) shouldBe true
+                    overstyring.erOverstyrt(ansattId, vanligBrukerId).shouldBeTrue()
                 }
             }
             When("bulk overstyringer med utløpt og gyldig") {

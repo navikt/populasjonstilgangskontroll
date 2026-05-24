@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -45,7 +46,7 @@ class HeaderAddingRequestInterceptorTest : BehaviorSpec({
             Then("legges ingen headere til") {
                 val request = request()
                 RestHeaderAddingRequestInterceptor().intercept(request, ByteArray(0), execution)
-                request.headers.isEmpty shouldBe true
+                request.headers.isEmpty.shouldBeTrue()
             }
         }
     }

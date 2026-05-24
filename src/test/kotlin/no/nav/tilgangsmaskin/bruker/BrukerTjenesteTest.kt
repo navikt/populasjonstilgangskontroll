@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.collections.shouldNotContain
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.mockk.clearMocks
 import io.mockk.every
@@ -54,7 +55,7 @@ class BrukerTjenesteTest : BehaviorSpec({
             Then("returneres bruker med SKJERMING-gruppe") {
                 every { pdl.personer(setOf(id1.verdi)) } returns setOf(person(id1, aktørId1))
                 every { skjerming.skjerminger(listOf(id1)) } returns mapOf(id1 to true)
-                brukerTjeneste.brukere(setOf(id1.verdi)).single() kreverMedlemskapI SKJERMING shouldBe true
+                (brukerTjeneste.brukere(setOf(id1.verdi)).single() kreverMedlemskapI SKJERMING).shouldBeTrue()
             }
         }
         When("to brukere returneres fra PDL") {
@@ -64,7 +65,7 @@ class BrukerTjenesteTest : BehaviorSpec({
                 val result = brukerTjeneste.brukere(setOf(id1.verdi, id2.verdi))
                 result shouldHaveSize 2
                 result.first { it.brukerId == id1 } kreverMedlemskapI SKJERMING shouldBe false
-                result.first { it.brukerId == id2 } kreverMedlemskapI SKJERMING shouldBe true
+                (result.first { it.brukerId == id2 } kreverMedlemskapI SKJERMING).shouldBeTrue()
             }
         }
         When("PDL finner ingen personer") {
@@ -110,7 +111,7 @@ class BrukerTjenesteTest : BehaviorSpec({
             Then("settes SKJERMING-gruppe") {
                 every { pdl.medFamilie(id1.verdi) } returns person(id1, aktørId1)
                 every { skjerming.skjerming(id1) } returns true
-                brukerTjeneste.brukerMedNærmesteFamilie(id1.verdi) kreverMedlemskapI SKJERMING shouldBe true
+                (brukerTjeneste.brukerMedNærmesteFamilie(id1.verdi) kreverMedlemskapI SKJERMING).shouldBeTrue()
             }
         }
         When("kalt") {
@@ -136,7 +137,7 @@ class BrukerTjenesteTest : BehaviorSpec({
             Then("settes SKJERMING-gruppe") {
                 every { pdl.medUtvidetFamilie(id1.verdi) } returns person(id1, aktørId1)
                 every { skjerming.skjerming(id1) } returns true
-                brukerTjeneste.brukerMedUtvidetFamilie(id1.verdi) kreverMedlemskapI SKJERMING shouldBe true
+                (brukerTjeneste.brukerMedUtvidetFamilie(id1.verdi) kreverMedlemskapI SKJERMING).shouldBeTrue()
             }
         }
         When("kalt") {

@@ -7,6 +7,7 @@ import io.kotest.extensions.spring.SpringExtension
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.micrometer.core.instrument.MeterRegistry
@@ -160,7 +161,7 @@ internal class OverstyringTest : BehaviorSpec() {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns brukerMedHistorikk
                     every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns BrukerBuilder(historiskBrukerId).build()
                     overstyring.overstyr(ansattId, OverstyringData(historiskBrukerId, "Dette er en test", IMORGEN))
-                    overstyring.erOverstyrt(ansattId, BrukerBuilder(vanligBrukerId).build().brukerId) shouldBe true
+                    overstyring.erOverstyrt(ansattId, BrukerBuilder(vanligBrukerId).build().brukerId).shouldBeTrue()
                 }
             }
             When("det finnes flere overstyringer") {
@@ -169,7 +170,7 @@ internal class OverstyringTest : BehaviorSpec() {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er gammel", IGÅR))
                     overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er ny", IMORGEN))
-                    overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe true
+                    overstyring.erOverstyrt(ansattId, bruker.brukerId).shouldBeTrue()
                 }
             }
             When("nyeste overstyring er utgått, eldre er aktiv") {
@@ -273,7 +274,7 @@ internal class OverstyringTest : BehaviorSpec() {
                     overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     val lastet = repository.findById(entity.id)
-                    lastet.isPresent shouldBe true
+                    lastet.isPresent.shouldBeTrue()
                     with(lastet.get()) {
                         navid shouldBe ansattId.verdi
                         fnr shouldBe vanligBrukerId.verdi

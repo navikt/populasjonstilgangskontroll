@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import jakarta.validation.ConstraintValidatorContext
@@ -26,19 +27,19 @@ class OverstyringValidatorTest : BehaviorSpec({
 
         When("dato er én dag frem i tid") {
             Then("er gyldig") {
-                validator.isValid(data(gyldigBegrunnelse, now().plusDays(1)), ctx) shouldBe true
+                validator.isValid(data(gyldigBegrunnelse, now().plusDays(1)), ctx).shouldBeTrue()
             }
         }
 
         When("dato er én måned frem i tid") {
             Then("er gyldig") {
-                validator.isValid(data(gyldigBegrunnelse, now().plusMonths(1)), ctx) shouldBe true
+                validator.isValid(data(gyldigBegrunnelse, now().plusMonths(1)), ctx).shouldBeTrue()
             }
         }
 
         When("dato er akkurat 3 måneder frem i tid") {
             Then("er ugyldig") {
-                validator.isValid(data(gyldigBegrunnelse, now().plusMonths(3)), ctx) shouldBe true
+                validator.isValid(data(gyldigBegrunnelse, now().plusMonths(3)), ctx).shouldBeTrue()
             }
         }
 
@@ -50,7 +51,7 @@ class OverstyringValidatorTest : BehaviorSpec({
 
         When("dato er dagens dato") {
             Then("gyldig") {
-                validator.isValid(data(gyldigBegrunnelse, now()), ctx) shouldBe true
+                validator.isValid(data(gyldigBegrunnelse, now()), ctx).shouldBeTrue()
             }
         }
 
@@ -62,13 +63,13 @@ class OverstyringValidatorTest : BehaviorSpec({
 
         When("begrunnelse er på nøyaktig 10 tegn") {
             Then("er gyldig") {
-                validator.isValid(data("1234567890"), ctx) shouldBe true
+                validator.isValid(data("1234567890"), ctx).shouldBeTrue()
             }
         }
 
         When("begrunnelse er på nøyaktig 255 tegn") {
             Then("er gyldig") {
-                validator.isValid(data("a".repeat(255)), ctx) shouldBe true
+                validator.isValid(data("a".repeat(255)), ctx).shouldBeTrue()
             }
         }
 
@@ -98,7 +99,7 @@ class OverstyringValidatorTest : BehaviorSpec({
 
         When("dato er gyldig og begrunnelse er gyldig") {
             Then("er gyldig") {
-                validator.isValid(data(begrunnelse = gyldigBegrunnelse, gyldigtil = gyldigDato), ctx) shouldBe true
+                validator.isValid(data(begrunnelse = gyldigBegrunnelse, gyldigtil = gyldigDato), ctx).shouldBeTrue()
             }
         }
     }

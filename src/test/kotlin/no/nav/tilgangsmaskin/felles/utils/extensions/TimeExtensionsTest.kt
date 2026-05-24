@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.utils.extensions
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_0_6
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_13_24
@@ -20,19 +21,19 @@ class TimeExtensionsTest : BehaviorSpec({
     val idag = LocalDate.now()
 
     Given("isBeforeNow") {
-        When("Instant er i fortiden") { Then("returneres true")  { Instant.now().minusSeconds(1).isBeforeNow() shouldBe true  } }
+        When("Instant er i fortiden") { Then("returneres true")  { Instant.now().minusSeconds(1).isBeforeNow().shouldBeTrue()  } }
         When("Instant er i fremtiden") { Then("returneres false") { Instant.now().plusSeconds(60).isBeforeNow() shouldBe false } }
     }
 
     Given("toInstant") {
         When("LocalDate konverteres") {
             Then("gir Instant ved start av dagen") {
-                LocalDate.of(2024, 6, 1).toInstant().isBefore(Instant.now()) shouldBe true
+                LocalDate.of(2024, 6, 1).toInstant().isBefore(Instant.now()).shouldBeTrue()
             }
         }
         When("to ulike datoer konverteres") {
             Then("gir ulike Instant-verdier") {
-                LocalDate.of(2024, 1, 1).toInstant().isBefore(LocalDate.of(2024, 1, 2).toInstant()) shouldBe true
+                LocalDate.of(2024, 1, 1).toInstant().isBefore(LocalDate.of(2024, 1, 2).toInstant()).shouldBeTrue()
             }
         }
     }
@@ -69,7 +70,7 @@ class TimeExtensionsTest : BehaviorSpec({
 
     Given("diffFromNow") {
         When("Instant er i fremtiden") { Then("gir ikke-tom streng") {
-            Instant.now().plusSeconds(90).diffFromNow().isNotBlank() shouldBe true
+            Instant.now().plusSeconds(90).diffFromNow().isNotBlank().shouldBeTrue()
         } }
         When("Instant er i fortiden") { Then("gir tom streng") {
             Instant.now().minusSeconds(1).diffFromNow() shouldBe ""

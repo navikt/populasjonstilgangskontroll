@@ -5,6 +5,7 @@ import io.kotest.assertions.assertSoftly
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.SharedPostgresContainer
 import no.nav.tilgangsmaskin.TestApp
@@ -91,7 +92,7 @@ class NomDBOpprydderTest : BehaviorSpec() {
                     assertSoftly {
                         opprydder.ryddOpp() shouldBe 1
                         repo.count() shouldBe 1
-                        repo.findById(gyldig.id!!).isPresent shouldBe true
+                        repo.findById(gyldig.id!!).isPresent.shouldBeTrue()
                     }
                 }
 

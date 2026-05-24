@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.mockk.MockKAnnotations.init
 import io.mockk.clearAllMocks
@@ -54,7 +55,7 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
         Given("Bruker lever") {
             val bruker = BrukerBuilder(brukerId).build()
             When("regel evalueres") {
-                Then("tilgang godkjennes") { regel.evaluer(ansatt, bruker) shouldBe true }
+                Then("tilgang godkjennes") { regel.evaluer(ansatt, bruker).shouldBeTrue() }
                 And("oppslag skal ikke telles") { regel.skalTelle(ansatt, bruker) shouldBe false }
             }
         }
@@ -62,8 +63,8 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
         Given("Bruker er død") {
             val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(1)).build()
             When("regel evalueres") {
-                Then("tilgang godkjennes") { regel.evaluer(ansatt, bruker) shouldBe true }
-                And("oppslag skal telles") { regel.skalTelle(ansatt, bruker) shouldBe true }
+                Then("tilgang godkjennes") { regel.evaluer(ansatt, bruker).shouldBeTrue() }
+                And("oppslag skal telles") { regel.skalTelle(ansatt, bruker).shouldBeTrue() }
             }
         }
 
@@ -92,7 +93,7 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
             When("dødsdato er mellom ett og to år siden") {
                 val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(15)).build()
                 Then("henter enhetsnavn fra proxy og bruker dette i metrikken for 13-24 måneder") {
-                    regel.evaluer(ansatt, bruker) shouldBe true
+                    regel.evaluer(ansatt, bruker).shouldBeTrue()
                     verify { proxy.enhet(ansattId) }
                     verify { teller.tell(MND_13_24, enhet.navn) }
                     verify { auditor.info(any()) }
@@ -101,7 +102,7 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
             When("dødsdato er mer enn to år siden") {
                 Then("henter enhetsnavn fra proxy og bruker dette i metrikken for mer enn 24 måneder") {
                     val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(30)).build()
-                    regel.evaluer(ansatt, bruker) shouldBe true
+                    regel.evaluer(ansatt, bruker).shouldBeTrue()
                     verify { proxy.enhet(ansattId) }
                     verify { teller.tell(MND_OVER_24, enhet.navn) }
                     verify { auditor.info(any()) }

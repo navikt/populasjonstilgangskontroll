@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
@@ -31,7 +32,7 @@ class KjernereglerTest : BehaviorSpec({
             Then("tilgang godkjennes") {
                 val bruker = BrukerBuilder(brukerId).build()
                 val ansatt = AnsattBuilder(ansattId).build()
-                regel.evaluer(ansatt, bruker) shouldBe true
+                regel.evaluer(ansatt, bruker).shouldBeTrue()
             }
         }
     }
@@ -63,7 +64,7 @@ class KjernereglerTest : BehaviorSpec({
             Then("tilgang godkjennes") {
                 val ansatt = AnsattBuilder(ansattId).build()
                 val bruker = BrukerBuilder(brukerId).build()
-                regel.evaluer(ansatt, bruker) shouldBe true
+                regel.evaluer(ansatt, bruker).shouldBeTrue()
             }
         }
     }
@@ -85,7 +86,7 @@ class KjernereglerTest : BehaviorSpec({
             Then("tilgang godkjennes") {
                 val ansatt = AnsattBuilder(ansattId).build()
                 val bruker = BrukerBuilder(brukerId).build()
-                regel.evaluer(ansatt, bruker) shouldBe true
+                regel.evaluer(ansatt, bruker).shouldBeTrue()
             }
         }
     }
@@ -107,7 +108,7 @@ class KjernereglerTest : BehaviorSpec({
             Then("tilgang godkjennes") {
                 val ansatt = AnsattBuilder(ansattId).build()
                 val bruker = BrukerBuilder(brukerId).build()
-                regel.evaluer(ansatt, bruker) shouldBe true
+                regel.evaluer(ansatt, bruker).shouldBeTrue()
             }
         }
     }
@@ -134,7 +135,7 @@ class KjernereglerTest : BehaviorSpec({
                 val ansattBruker = BrukerBuilder(ansattBrukerId).barn(setOf(ansattBarn)).build()
                 val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
                 val bruker = BrukerBuilder(brukerId).barn(setOf(brukerBarn)).build()
-                regel.evaluer(ansatt, bruker) shouldBe true
+                regel.evaluer(ansatt, bruker).shouldBeTrue()
             }
         }
 
@@ -142,7 +143,7 @@ class KjernereglerTest : BehaviorSpec({
             Then("tilgang godkjennes") {
                 val ansatt = AnsattBuilder(ansattId).build()
                 val bruker = BrukerBuilder(brukerId).build()
-                regel.evaluer(ansatt, bruker) shouldBe true
+                regel.evaluer(ansatt, bruker).shouldBeTrue()
             }
         }
     }
@@ -162,7 +163,7 @@ class KjernereglerTest : BehaviorSpec({
             Then("tilgang godkjennes") {
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build()
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
-                regel.evaluer(ansatt, bruker) shouldBe true
+                regel.evaluer(ansatt, bruker).shouldBeTrue()
             }
         }
 
@@ -170,7 +171,7 @@ class KjernereglerTest : BehaviorSpec({
             Then("tilgang godkjennes uavhengig av ansattes grupper") {
                 val bruker = BrukerBuilder(brukerId).build()
                 val ansatt = AnsattBuilder(ansattId).build()
-                regel.evaluer(ansatt, bruker) shouldBe true
+                regel.evaluer(ansatt, bruker).shouldBeTrue()
             }
         }
     }
@@ -190,7 +191,7 @@ class KjernereglerTest : BehaviorSpec({
             Then("tilgang godkjennes") {
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(FORTROLIG).build()
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
-                regel.evaluer(ansatt, bruker) shouldBe true
+                regel.evaluer(ansatt, bruker).shouldBeTrue()
             }
         }
     }
@@ -210,7 +211,7 @@ class KjernereglerTest : BehaviorSpec({
             Then("tilgang godkjennes") {
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(EntraGlobalGruppe.SKJERMING).build()
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.SKJERMING).build()
-                regel.evaluer(ansatt, bruker) shouldBe true
+                regel.evaluer(ansatt, bruker).shouldBeTrue()
             }
         }
     }
@@ -230,7 +231,7 @@ class KjernereglerTest : BehaviorSpec({
             Then("tilgang godkjennes fordi strengt fortrolig dekker også utland") {
                 val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
-                regel.evaluer(ansatt, bruker) shouldBe true
+                regel.evaluer(ansatt, bruker).shouldBeTrue()
             }
         }
     }
@@ -239,13 +240,13 @@ class KjernereglerTest : BehaviorSpec({
         When("StrengtFortroligRegel sjekkes") {
             Then("er en KjerneRegel") {
                 val regel: Regel = StrengtFortroligRegel()
-                (regel is KjerneRegel) shouldBe true
+                (regel is KjerneRegel).shouldBeTrue()
             }
         }
         When("EgneDataRegel sjekkes") {
             Then("er en KjerneRegel") {
                 val regel: Regel = EgneDataRegel()
-                (regel is KjerneRegel) shouldBe true
+                (regel is KjerneRegel).shouldBeTrue()
             }
         }
         When("erOverstyrbar sjekkes") {

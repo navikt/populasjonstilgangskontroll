@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.every
@@ -36,7 +37,7 @@ class ConsumerAwareHandlerInterceptorTest : BehaviorSpec({
                 registry.get("http_requests_by_remote_system").tag("remote_system", "my-app").counter().count() shouldBe 1.0
             }
             Then("returneres true") {
-                interceptor.preHandle(MockHttpServletRequest(), MockHttpServletResponse(), Any()) shouldBe true
+                interceptor.preHandle(MockHttpServletRequest(), MockHttpServletResponse(), Any()).shouldBeTrue()
             }
         }
     }

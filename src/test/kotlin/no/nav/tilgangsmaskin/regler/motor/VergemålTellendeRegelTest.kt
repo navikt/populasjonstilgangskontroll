@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.mockk.MockKAnnotations.init
 import io.mockk.clearAllMocks
@@ -36,7 +37,7 @@ class VergemålTellendeRegelTest : BehaviorSpec() {
             When("sideeffekter verifiseres") {
                 Then("skalTelle returnerer true") {
                     every { vergemål.vergemål(ansattId) } returns setOf(brukerId)
-                    regel.skalTelle(ansatt, bruker) shouldBe true
+                    regel.skalTelle(ansatt, bruker).shouldBeTrue()
                 }
                 Then("teller inkrementeres") {
                     every { vergemål.vergemål(ansattId) } returns setOf(brukerId)

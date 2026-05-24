@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -27,8 +28,8 @@ class PdlGraderingFilterStrategyTest : BehaviorSpec({
         When("gradering er STRENGT_FORTROLIG") { Then("filtreres ikke bort") { strategy.filter(record(STRENGT_FORTROLIG)) shouldBe false } }
         When("gradering er STRENGT_FORTROLIG_UTLAND") { Then("filtreres ikke bort") { strategy.filter(record(STRENGT_FORTROLIG_UTLAND)) shouldBe false } }
         When("gradering er FORTROLIG") { Then("filtreres ikke bort") { strategy.filter(record(FORTROLIG)) shouldBe false } }
-        When("gradering er UGRADERT") { Then("filtreres bort") { strategy.filter(record(UGRADERT)) shouldBe true } }
-        When("hendelse mangler adressebeskyttelse") { Then("filtreres bort") { strategy.filter(record(null)) shouldBe true } }
+        When("gradering er UGRADERT") { Then("filtreres bort") { strategy.filter(record(UGRADERT)).shouldBeTrue() } }
+        When("hendelse mangler adressebeskyttelse") { Then("filtreres bort") { strategy.filter(record(null)).shouldBeTrue() } }
     }
 })
 

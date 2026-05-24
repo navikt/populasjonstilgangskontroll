@@ -84,7 +84,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
 
         @Bean
         fun cacheClient(client: RedisClient, handler: CacheNøkkelMapper, cfg: CacheConfig, token: Token)  =
-            CacheClient(client, handler, BulkCacheSuksessTeller(meterRegistry, token), BulkCacheTeller(meterRegistry, token), cfg)
+            ValkeyCacheClient(client, handler, BulkCacheSuksessTeller(meterRegistry, token), BulkCacheTeller(meterRegistry, token), cfg)
 
         @Bean
         fun cacheElementUtløptLytter(client: RedisClient, publisher: ApplicationEventPublisher) =

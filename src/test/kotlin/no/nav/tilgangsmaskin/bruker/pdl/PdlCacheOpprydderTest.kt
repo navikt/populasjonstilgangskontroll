@@ -12,7 +12,7 @@ import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Adressebeskyttelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
-import no.nav.tilgangsmaskin.felles.cache.CacheClient
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheClient
 import no.nav.tilgangsmaskin.regler.motor.PdlCacheTømmerTeller
 import no.nav.tilgangsmaskin.tilgang.Token
 import java.time.Instant
@@ -24,7 +24,7 @@ class PdlCacheOpprydderTest : BehaviorSpec({
         every { it.clusterAndSystem } returns "test:dev-gcp"
     }
     val pdl = mockk<PdlTjeneste>(relaxed = true)
-    val client = mockk<CacheClient>()
+    val client = mockk<ValkeyCacheClient>()
     val opprydder = PdlCacheOpprydder(pdl, client, PdlCacheTømmerTeller(SimpleMeterRegistry(), token))
 
     fun hendelse(identer: List<String>, endringstype: Endringstype = OPPRETTET,

@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMIN
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.Person
-import no.nav.tilgangsmaskin.felles.cache.CacheClient
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheClient
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.felles.cache.getMany
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
@@ -20,7 +20,7 @@ private const val DEV_CACHE_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.cache.
 @UnprotectedRestController(value = ["/${DEV}/cache"])
 @ConditionalOnNotProd
 @Tag(name = "DevCacheController", description = DEV_CACHE_CONTROLLER_TAG_DESCRIPTION)
-class DevCacheController(private val cacheClient: CacheClient) {
+class DevCacheController(private val cacheClient: ValkeyCacheClient) {
 
     @PostMapping("cache/skjerminger")
     @Operation(summary = SUMMARY_CACHE_SKJERMINGER, description = DESCRIPTION_CACHE_SKJERMINGER)

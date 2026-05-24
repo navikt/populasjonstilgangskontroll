@@ -13,10 +13,10 @@ import java.time.Duration.ofSeconds
 import kotlin.reflect.KClass
 
 @RetryingWhenRecoverableRestService
-class CacheClient(client: RedisClient, private val mapper: CacheNøkkelMapper,
-                  private val alleTreffTeller: BulkCacheSuksessTeller,
-                  private val teller: BulkCacheTeller,
-                  private val cfg: CacheConfig) : CacheOperations {
+class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMapper,
+                        private val alleTreffTeller: BulkCacheSuksessTeller,
+                        private val teller: BulkCacheTeller,
+                        private val cfg: CacheConfig) : CacheOperations {
 
     private val log = getLogger(javaClass)
 
@@ -76,7 +76,7 @@ class CacheClient(client: RedisClient, private val mapper: CacheNøkkelMapper,
 
     private fun payloadFor(innslag: Map<String, Any>, cache: CacheNøkkelConfig) =
         innslag.entries.associate { (key, value) ->
-            mapper.tilNøkkel(cache, key) to this@CacheClient.mapper.tilJson(value)
+            mapper.tilNøkkel(cache, key) to this@ValkeyCacheClient.mapper.tilJson(value)
         }
 
     fun tellOgLog(navn: String, funnet: Int, etterspurt: Int) {

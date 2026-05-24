@@ -4,7 +4,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOppfrisker
-import no.nav.tilgangsmaskin.felles.cache.CacheClient
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheClient
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
@@ -17,7 +17,7 @@ import java.util.*
 @Component
 class EntraCacheOppfrisker(private val entra: EntraTjeneste,
                            private val oidTjeneste: EntraOidTjeneste,
-                           private val cache: CacheClient,
+                           private val cache: ValkeyCacheClient,
                            private val teller: OppfriskingTeller) : AbstractCacheOppfrisker() {
 
     private val log = LoggerFactory.getLogger(javaClass)

@@ -7,6 +7,7 @@ import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.ENTRA_CACHES
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_OG_GLOBALE_CACHE
@@ -15,12 +16,12 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraTjenesteTest.EntraTestConfig
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidBeanConfig
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.cache.CacheManager
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -58,9 +59,6 @@ class EntraTjenesteTest : BehaviorSpec() {
     private lateinit var cfg: EntraGrupperConfig
 
     @Autowired
-    private lateinit var cacheManager: CacheManager
-
-    @Autowired
     private lateinit var cache: CacheOperations
 
 
@@ -68,7 +66,7 @@ class EntraTjenesteTest : BehaviorSpec() {
 
         beforeEach {
             server.reset()
-            cacheManager.getCache(GRAPH)?.clear()
+            cache.clear(ENTRA_CACHES)
         }
 
         afterEach {

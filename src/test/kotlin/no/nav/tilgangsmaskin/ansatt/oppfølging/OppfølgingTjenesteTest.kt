@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
-import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
@@ -55,13 +54,12 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
 
     @MockkSpyBean private lateinit var adapter: OppfølgingJPAAdapter
     @Autowired private lateinit var tjeneste: OppfølgingTjeneste
-    @Autowired private lateinit var cacheManager: CacheManager
 
     @Qualifier("cacheOperations")
     @Autowired private lateinit var cache: CacheOperations
 
     init {
-        beforeEach { cacheManager.getCache(OPPFØLGING)?.clear() }
+        beforeEach { cache.clear(OPPFØLGING_CACHE) }
 
         Given("enhetFor") {
             When("det ikke finnes oppfølging") {

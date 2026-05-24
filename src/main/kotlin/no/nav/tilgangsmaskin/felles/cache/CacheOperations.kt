@@ -10,6 +10,8 @@ interface CacheOperations {
     fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T?>
     fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration)
     fun tilNøkkel(cache: CacheNøkkelConfig, id: String): String
+    fun clear(cache: CacheNøkkelConfig)
+    fun clear(caches: Set<CacheNøkkelConfig>) = caches.forEach { clear(it) }
 }
 
 inline fun <reified T : Any> CacheOperations.getOne(cache: CacheNøkkelConfig, id: String): T? =

@@ -87,4 +87,10 @@ class CacheClient(client: RedisClient, private val mapper: CacheNøkkelMapper,
     }
 
     override fun tilNøkkel(cache: CacheNøkkelConfig, id: String) = mapper.tilNøkkel(cache, id)
+
+    override fun clear(cache: CacheNøkkelConfig) {
+        log.info("Tømmer cache {}", cache.name)
+        val prefix = mapper.tilNøkkel(cache, "")
+        conn.sync().keys("$prefix*").forEach { conn.sync().del(it) }
+    }
 }

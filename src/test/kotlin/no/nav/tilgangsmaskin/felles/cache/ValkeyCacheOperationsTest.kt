@@ -103,9 +103,6 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
     @Autowired
     private lateinit var pingable: CachePingable
 
-    @Autowired
-    private lateinit var cacheManager: RedisCacheManager
-
     private val events = CopyOnWriteArrayList<CacheInnslagFjernetHendelse>()
 
     init {
@@ -120,7 +117,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
             every { token.system } returns "test"
             every { token.clusterAndSystem } returns "test:dev-gcp"
             events.clear()
-            cacheManager.getCache(TEST_CACHE.name)?.clear()
+            cache.clear(TEST_CACHE)
         }
 
         Given("CachePingable") {
@@ -182,6 +179,23 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     eventually(TIMEOUTS) {
                         events.any { T1.id in it.nøkkel }.shouldBeTrue()
                     }
+                }
+            }
+        }
+
+        Given("clear") {
+            When("cache inneholder verdier") {
+                Then("alle verdier i cachen fjernes") {
+                    putMany(T1, T2)
+                    getMany(IDS).keys shouldBe IDS
+                    cache.clear(TEST_CACHE)
+                    getMany(IDS).shouldBeEmpty()
+                }
+            }
+            When("cache er tom") {
+                Then("clear kaster ikke exception") {
+                    cache.clear(TEST_CACHE)
+                    getMany(IDS).shouldBeEmpty()
                 }
             }
         }

@@ -18,6 +18,7 @@ import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_UTVIDET_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.pdlRespons
@@ -32,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.cache.CacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -66,14 +66,13 @@ class PdlTjenesteTest : BehaviorSpec() {
     @Autowired
     lateinit var server: MockRestServiceServer
     @Autowired lateinit var cfg: PdlConfig
-    @Autowired lateinit var cacheManager: CacheManager
     @Qualifier("cacheOperations") @Autowired lateinit var cache: CacheOperations
     @Autowired lateinit var mapper: JsonMapper
 
     init {
         beforeEach {
             server.reset()
-            cacheManager.getCache(PDL)?.clear()
+            cache.clear(PDL_CACHES)
             every { graphQL.partnere(any()) } returns emptySet()
         }
 

@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.regler
 
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.Bruker
@@ -24,7 +24,7 @@ data class BrukerBuilder(
     var gt: GeografiskTilknytning = UdefinertTilknytning(),
     var historiskeIds: Set<BrukerId> = emptySet(),
     var aktørId: AktørId = AktørId("0000000000000"),
-    var grupper: Set<GlobalGruppe> = emptySet(),
+    var grupper: Set<EntraGlobalGruppe> = emptySet(),
     var søsken: Set<FamilieMedlem> = emptySet(),
     var mor: FamilieMedlem? = null,
     var far: FamilieMedlem? = null,
@@ -36,7 +36,7 @@ data class BrukerBuilder(
     fun oppslagId(oppslagId: String) = apply { this.oppslagId = oppslagId }
     fun aktørId(aktørId: AktørId) = apply { this.aktørId = aktørId }
     fun gt(gt: GeografiskTilknytning) = apply { this.gt = gt }
-    fun kreverMedlemskapI(vararg grupper: GlobalGruppe) = apply { this.grupper = setOf(*grupper) }
+    fun kreverMedlemskapI(vararg grupper: EntraGlobalGruppe) = apply { this.grupper = setOf(*grupper) }
     fun barn(barn: Set<BrukerId>) = apply { this.barn = buildSet { barn.forEach { add(FamilieMedlem(it, BARN)) } } }
     fun far(far: BrukerId?) = apply { this.far = far?.let { FamilieMedlem(it, FAR) } }
     fun søsken(søsken: Set<BrukerId>) = apply { this.søsken = buildSet { søsken.forEach { add(FamilieMedlem(it, SØSKEN)) } } }
@@ -52,13 +52,13 @@ data class BrukerBuilder(
 
 
 data class AnsattBuilder(
-        val id: AnsattId,
-        var grupper: Set<EntraGruppe> = emptySet(),
-        var globaleGrupper: Set<GlobalGruppe> = emptySet(),
-        var oid: UUID = UUID.randomUUID(),
-        var bruker: Bruker? = null) {
+    val id: AnsattId,
+    var grupper: Set<EntraGruppe> = emptySet(),
+    var globaleGrupper: Set<EntraGlobalGruppe> = emptySet(),
+    var oid: UUID = UUID.randomUUID(),
+    var bruker: Bruker? = null) {
 
-    fun medMedlemskapI(vararg grupper: GlobalGruppe) = apply { this.grupper += setOf(*grupper).map { it.entraGruppe } }
+    fun medMedlemskapI(vararg grupper: EntraGlobalGruppe) = apply { this.grupper += setOf(*grupper).map { it.entraGruppe } }
     fun medMedlemskapI(vararg grupper: EntraGruppe) = apply { this.grupper += setOf(*grupper) }
     fun bruker(bruker: Bruker?) = apply { bruker?.let { this.bruker = it } }
     fun build() = Ansatt(id, bruker, grupper)

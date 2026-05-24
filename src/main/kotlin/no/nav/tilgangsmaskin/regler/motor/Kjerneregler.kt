@@ -1,10 +1,10 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.tilgangsmaskin.ansatt.Ansatt
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.SKJERMING
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.EGNEDATA
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.FELLES_BARN

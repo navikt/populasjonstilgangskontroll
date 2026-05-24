@@ -6,7 +6,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.micrometer.core.instrument.Tags
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId

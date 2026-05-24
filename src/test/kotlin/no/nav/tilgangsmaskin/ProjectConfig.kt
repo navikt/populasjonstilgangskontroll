@@ -4,7 +4,7 @@ import io.kotest.core.config.AbstractProjectConfig
 import io.kotest.core.extensions.Extension
 import io.kotest.core.listeners.BeforeSpecListener
 import io.kotest.core.spec.Spec
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -22,8 +22,8 @@ private object GruppeInitializer : BeforeSpecListener {
                     .getResourceAsStream("test.properties")
                     ?.use { load(it) }
             }
-            GlobalGruppe.setIDs(
-                GlobalGruppe.entries.associate { it.property to UUID.fromString(props.getProperty(it.property)) }
+            EntraGlobalGruppe.setIDs(
+                EntraGlobalGruppe.entries.associate { it.property to UUID.fromString(props.getProperty(it.property)) }
             )
         }
     }

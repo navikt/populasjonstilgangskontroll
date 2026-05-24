@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.girNasjonalTilgang
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.globaleGrupper
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.girNasjonalTilgang
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.globaleGrupper
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException

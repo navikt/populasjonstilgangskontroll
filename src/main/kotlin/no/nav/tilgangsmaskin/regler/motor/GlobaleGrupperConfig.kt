@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.util.*
 
@@ -8,7 +8,7 @@ import java.util.*
 data class GlobaleGrupperConfig(val strengt: UUID, val nasjonal: UUID, val utland: UUID,
                                 val udefinert: UUID, val fortrolig: UUID, val egenansatt: UUID,val dead: UUID) {
     init {
-        GlobalGruppe.setIDs(
+        EntraGlobalGruppe.setIDs(
             mapOf(
                 "gruppe.dead" to dead,
                 "gruppe.strengt" to strengt,

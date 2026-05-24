@@ -3,11 +3,11 @@ package no.nav.tilgangsmaskin.bruker
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.SKJERMING
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG_UTLAND
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Bydel
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune

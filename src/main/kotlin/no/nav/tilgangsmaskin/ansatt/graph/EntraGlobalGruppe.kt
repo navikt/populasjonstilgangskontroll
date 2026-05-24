@@ -1,12 +1,10 @@
-package no.nav.tilgangsmaskin.ansatt
+package no.nav.tilgangsmaskin.ansatt.graph
 
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata
 import no.nav.tilgangsmaskin.tilgang.Token
-import java.util.*
+import java.util.UUID
 
-
-enum class GlobalGruppe(val property: String, val metadata: GruppeMetadata) {
+enum class EntraGlobalGruppe(val property: String, val metadata: GruppeMetadata) {
     AVDØD("gruppe.dead", GruppeMetadata.AVDØD_MER_ENN_ETT_ÅR),
     STRENGT_FORTROLIG("gruppe.strengt", GruppeMetadata.STRENGT_FORTROLIG),
     STRENGT_FORTROLIG_UTLAND("gruppe.strengt", GruppeMetadata.STRENGT_FORTROLIG_UTLAND),

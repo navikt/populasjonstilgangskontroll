@@ -9,7 +9,7 @@ import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning

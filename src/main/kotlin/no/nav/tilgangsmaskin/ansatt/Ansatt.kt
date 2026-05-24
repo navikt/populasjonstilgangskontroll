@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
@@ -33,11 +34,11 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
     infix fun tilhører(enhet: Enhetsnummer?) =
         enhet?.let { harGruppeMedSuffix("ENHET_${it.verdi}") } ?: false
 
-    infix fun erMedlemAv(gruppe: GlobalGruppe) = grupper.any {
+    infix fun erMedlemAv(gruppe: EntraGlobalGruppe) = grupper.any {
         it.id == gruppe.id
     }
 
-    infix fun ikkeErMedlemAv(gruppe: GlobalGruppe) = !erMedlemAv(gruppe)
+    infix fun ikkeErMedlemAv(gruppe: EntraGlobalGruppe) = !erMedlemAv(gruppe)
 
     infix fun erNåværendeEllerTidligerePartnerMed(bruker: Bruker) = bruker erNærståendeMed partnere
 

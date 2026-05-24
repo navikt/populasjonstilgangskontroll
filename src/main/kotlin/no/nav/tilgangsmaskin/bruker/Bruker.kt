@@ -1,15 +1,12 @@
 package no.nav.tilgangsmaskin.bruker
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 import no.nav.tilgangsmaskin.bruker.Familie.Companion.INGEN
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_7_12
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.intervallSiden
-import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDate.now
 import java.time.Period
@@ -17,7 +14,7 @@ import java.time.Period
 data class Bruker(
     val brukerIds: BrukerIds,
     val geografiskTilknytning: GeografiskTilknytning,
-    val påkrevdeGrupper: Set<GlobalGruppe> = emptySet(),
+    val påkrevdeGrupper: Set<EntraGlobalGruppe> = emptySet(),
     val familie: Familie = INGEN,
     val dødsdato: LocalDate? = null) {
 
@@ -46,7 +43,7 @@ data class Bruker(
 
     val harUkjentBosted = geografiskTilknytning is UkjentBosted
     val harUtenlandskBosted = geografiskTilknytning is UtenlandskTilknytning
-    infix fun kreverMedlemskapI(gruppe: GlobalGruppe) = gruppe in påkrevdeGrupper
+    infix fun kreverMedlemskapI(gruppe: EntraGlobalGruppe) = gruppe in påkrevdeGrupper
 
     infix fun harVærtDødMerEnn(dur: Period) = dødsdato != null && dødsdato.plus(dur) < now()
 

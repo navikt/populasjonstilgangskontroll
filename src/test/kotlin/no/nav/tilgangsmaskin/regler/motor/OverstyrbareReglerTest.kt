@@ -7,9 +7,9 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.UKJENT_BOSTED
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer

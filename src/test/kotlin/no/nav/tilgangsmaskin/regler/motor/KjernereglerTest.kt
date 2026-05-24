@@ -3,10 +3,10 @@ package no.nav.tilgangsmaskin.regler.motor
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG_UTLAND
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
@@ -200,7 +200,7 @@ class KjernereglerTest : BehaviorSpec({
 
         When("bruker er skjermet og ansatt mangler skjermingsgruppe") {
             Then("tilgang avvises") {
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(GlobalGruppe.SKJERMING).build()
+                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(EntraGlobalGruppe.SKJERMING).build()
                 val ansatt = AnsattBuilder(ansattId).build()
                 regel.evaluer(ansatt, bruker) shouldBe false
             }
@@ -208,8 +208,8 @@ class KjernereglerTest : BehaviorSpec({
 
         When("bruker er skjermet og ansatt har skjermingsgruppe") {
             Then("tilgang godkjennes") {
-                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(GlobalGruppe.SKJERMING).build()
-                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(GlobalGruppe.SKJERMING).build()
+                val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(EntraGlobalGruppe.SKJERMING).build()
+                val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.SKJERMING).build()
                 regel.evaluer(ansatt, bruker) shouldBe true
             }
         }

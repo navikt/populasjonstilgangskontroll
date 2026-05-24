@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.event.EventListener
 import org.springframework.core.retry.RetryException
@@ -7,6 +8,7 @@ import org.springframework.resilience.retry.MethodRetryEvent
 import org.springframework.stereotype.Component
 
 @Component
+@NoCoverageAnalysis
 class RestRetryLogger {
     private val log = getLogger(javaClass)
 

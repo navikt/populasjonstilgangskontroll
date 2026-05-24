@@ -5,6 +5,7 @@ import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRUPPER_FILTER
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 
 class EntraUrlTest : BehaviorSpec({
 
@@ -15,7 +16,7 @@ class EntraUrlTest : BehaviorSpec({
                 val uri = EntraGrupperConfig().grupperURI("Z999999", true)
                 val filter = uri.query.substringAfter("\$filter=").substringBefore("&")
 
-                GlobalGruppe.entries.forEach { gruppe ->
+                EntraGlobalGruppe.entries.forEach { gruppe ->
                     filter shouldContain "${gruppe.id}"
                 }
                 filter shouldContain "id in("
@@ -29,7 +30,7 @@ class EntraUrlTest : BehaviorSpec({
                 val filter = uri.query.substringAfter("\$filter=").substringBefore("&")
 
                 filter shouldContain "startswith(displayName,'0000-GA-GEO')"
-                GlobalGruppe.entries.forEach { gruppe ->
+                EntraGlobalGruppe.entries.forEach { gruppe ->
                     filter shouldNotContain "${gruppe.id}"
                 }
             }

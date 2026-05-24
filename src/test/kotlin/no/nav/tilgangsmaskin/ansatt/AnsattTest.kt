@@ -2,8 +2,8 @@ package no.nav.tilgangsmaskin.ansatt
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.SKJERMING
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer

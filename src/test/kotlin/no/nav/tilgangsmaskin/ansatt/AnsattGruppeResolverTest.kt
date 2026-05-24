@@ -10,10 +10,10 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.globaleGrupper
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.globaleGrupper
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste

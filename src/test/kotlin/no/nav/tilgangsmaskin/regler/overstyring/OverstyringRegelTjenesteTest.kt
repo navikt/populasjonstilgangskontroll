@@ -14,9 +14,9 @@ import io.mockk.every
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.STRENGT_FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste

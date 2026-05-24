@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.BrukerTilPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_UTVIDET_FAMILIE_CACHE
@@ -75,6 +76,10 @@ class PdlTjenesteTest : BehaviorSpec() {
             every { graphQL.partnere(any()) } returns emptySet()
         }
 
+        afterEach {
+            server.verify()
+        }
+
 
         Given("medFamilie") {
             When("person ikke er cachet") {
@@ -82,7 +87,6 @@ class PdlTjenesteTest : BehaviorSpec() {
                     server.expect(requestTo(cfg.personURI))
                         .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
                     pdl.medFamilie(I1) shouldBe P1
-                    server.verify()
                     cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, I1) shouldBe P1
                 }
             }
@@ -94,7 +98,6 @@ class PdlTjenesteTest : BehaviorSpec() {
                     server.expect(requestTo(cfg.personURI))
                         .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
                     pdl.medUtvidetFamilie(I1) shouldBe P1
-                    server.verify()
                     cache.getOne<Person>(PDL_MED_UTVIDET_FAMILIE_CACHE, I1) shouldBe P1
                 }
             }
@@ -102,12 +105,8 @@ class PdlTjenesteTest : BehaviorSpec() {
                 Then("REST kalles kun én gang") {
                     server.expect(requestTo(cfg.personURI))
                         .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
-                    pdl.medUtvidetFamilie(I1)
-                    server.verify()
-                    server.reset()
-                    server.expect(never(), requestTo(cfg.personURI))
                     pdl.medUtvidetFamilie(I1) shouldBe P1
-                    server.verify()
+                    pdl.medUtvidetFamilie(I1) shouldBe P1
                 }
             }
             When("GraphQL returnerer partnere") {
@@ -117,7 +116,32 @@ class PdlTjenesteTest : BehaviorSpec() {
                     server.expect(requestTo(cfg.personURI))
                         .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
                     pdl.medUtvidetFamilie(I1).familie.partnere shouldBe setOf(partner)
-                    server.verify()
+                }
+            }
+            When("person har foreldre") {
+                Then("søsken hentes via foreldrenes barn") {
+                    val morId = BrukerId("11111111111")
+                    val søskenId = BrukerId("99999999999")
+
+                    val personMedMor = tilPerson(BrukerBuilder(BrukerId(I1))
+                        .aktørId(AktørId("1234567890123"))
+                        .gt(KommuneTilknytning(Kommune("0301")))
+                        .far(morId)
+                        .build())
+
+                    val mor = tilPerson(BrukerBuilder(morId)
+                        .aktørId(AktørId("1111111111111"))
+                        .gt(KommuneTilknytning(Kommune("0301")))
+                        .barn(setOf(BrukerId(I1), søskenId))
+                        .build())
+
+                    server.expect(requestTo(cfg.personURI))
+                        .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(personMedMor)), APPLICATION_JSON))
+                    server.expect(requestTo(cfg.personerURI))
+                        .andRespond(withSuccess(restRespons(mapper, mor), APPLICATION_JSON))
+
+                    val resultat = pdl.medUtvidetFamilie(I1)
+                    resultat.familie.søsken shouldBe setOf(FamilieMedlem(søskenId, SØSKEN))
                 }
             }
         }
@@ -129,7 +153,6 @@ class PdlTjenesteTest : BehaviorSpec() {
                     server.expect(requestTo(cfg.personerURI))
                         .andRespond(withSuccess(restRespons(mapper, P2), APPLICATION_JSON))
                     pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
-                    server.verify()
                 }
             }
             When("alle er i cache") {
@@ -137,7 +160,6 @@ class PdlTjenesteTest : BehaviorSpec() {
                     cache.putMany(PDL_MED_FAMILIE_CACHE, mapOf(I1 to P1, I2 to P2), ofSeconds(2))
                     server.expect(never(), requestTo(cfg.personerURI))
                     pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
-                    server.verify()
                 }
             }
             When("ett cache-innslag slettes") {
@@ -149,14 +171,12 @@ class PdlTjenesteTest : BehaviorSpec() {
                         .andRespond(withSuccess(restRespons(mapper, P2), APPLICATION_JSON))
                     pdl.personer(IDS) shouldContainExactlyInAnyOrder listOf(P1, P2)
                     cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, I2) shouldBe P2
-                    server.verify()
                 }
             }
             When("settet er tomt") {
                 Then("REST kalles ikke") {
                     server.expect(never(), requestTo(cfg.personerURI))
                     pdl.personer(emptySet()) shouldBe emptyList()
-                    server.verify()
                 }
             }
         }

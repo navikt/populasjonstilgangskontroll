@@ -4,7 +4,7 @@ import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
@@ -39,22 +39,22 @@ class GlobaleGrupperConfigTest : BehaviorSpec() {
 
             When("@PostConstruct er kjørt") {
                 Then("settes STRENGT_FORTROLIG-IDen på GlobalGruppe") {
-                    GlobalGruppe.STRENGT_FORTROLIG.id shouldBe cfg.strengt
+                    EntraGlobalGruppe.STRENGT_FORTROLIG.id shouldBe cfg.strengt
                 }
                 Then("settes NASJONAL-IDen på GlobalGruppe") {
-                    GlobalGruppe.NASJONAL.id shouldBe cfg.nasjonal
+                    EntraGlobalGruppe.NASJONAL.id shouldBe cfg.nasjonal
                 }
                 Then("settes UTENLANDSK-IDen på GlobalGruppe") {
-                    GlobalGruppe.UTENLANDSK.id shouldBe cfg.utland
+                    EntraGlobalGruppe.UTENLANDSK.id shouldBe cfg.utland
                 }
                 Then("settes UKJENT_BOSTED-IDen på GlobalGruppe") {
-                    GlobalGruppe.UKJENT_BOSTED.id shouldBe cfg.udefinert
+                    EntraGlobalGruppe.UKJENT_BOSTED.id shouldBe cfg.udefinert
                 }
                 Then("settes FORTROLIG-IDen på GlobalGruppe") {
-                    GlobalGruppe.FORTROLIG.id shouldBe cfg.fortrolig
+                    EntraGlobalGruppe.FORTROLIG.id shouldBe cfg.fortrolig
                 }
                 Then("settes SKJERMING-IDen på GlobalGruppe") {
-                    GlobalGruppe.SKJERMING.id shouldBe cfg.egenansatt
+                    EntraGlobalGruppe.SKJERMING.id shouldBe cfg.egenansatt
                 }
             }
         }

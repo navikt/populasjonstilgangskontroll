@@ -2,10 +2,10 @@ package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.ansatt.Ansatt
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.AVDØD
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.NASJONAL
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UKJENT_BOSTED
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.UTENLANDSK
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.AVDØD
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.UKJENT_BOSTED
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker

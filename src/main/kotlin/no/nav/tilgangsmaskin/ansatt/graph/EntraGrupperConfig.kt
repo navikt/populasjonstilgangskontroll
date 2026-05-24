@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
-import no.nav.tilgangsmaskin.ansatt.GlobalGruppe.Companion.uuids
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.uuids
 import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO
 import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO_OG_GLOBALE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient.Companion.ENTRA_PING_PATH

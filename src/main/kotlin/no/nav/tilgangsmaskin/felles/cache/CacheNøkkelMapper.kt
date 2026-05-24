@@ -1,12 +1,12 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import io.lettuce.core.KeyValue
 import no.nav.tilgangsmaskin.felles.cache.CacheBeanConfig.Companion.VALKEY_MAPPER
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import tools.jackson.databind.json.JsonMapper
 import kotlin.reflect.KClass
 
 class CacheNøkkelMapper(private val configs: Map<String, RedisCacheConfiguration?>, private val mapper: JsonMapper = VALKEY_MAPPER) {
-
 
     fun <T : Any> fraJson(json: String, clazz: KClass<T>): T =
         mapper.readValue(json, clazz.java)
@@ -27,8 +27,12 @@ class CacheNøkkelMapper(private val configs: Map<String, RedisCacheConfiguratio
         configs[cache.name]?.getKeyPrefixFor(cache.name)
             ?: error("Ingen cache med navn ${cache.name}")
 
-    fun tilEntry(cache: CacheNøkkelConfig, key: String, value: Any) =             tilNøkkel(cache, key) to tilJson(value)
+    fun tilJsonEntry(cache: CacheNøkkelConfig, key: String, value: Any) =
+        tilNøkkel(cache, key) to tilJson(value)
 
+     fun <T : Any> tilEntry(it: KeyValue<String, String>, clazz: KClass<T>) =
+        idFraNøkkel(it.key) to fraJson(it.value, clazz)
 }
 
-data class CacheNøkkelConfig(val name: String, val extraPrefix: String? = null)
+
+

@@ -16,7 +16,6 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraTjenesteTest.EntraTestConfig
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidBeanConfig
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import org.springframework.beans.factory.annotation.Autowired

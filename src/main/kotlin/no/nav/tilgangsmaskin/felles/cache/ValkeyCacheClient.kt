@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import io.lettuce.core.KeyValue
 import io.lettuce.core.RedisClient
 import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
@@ -34,8 +35,8 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
 
     @WithSpan
     override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? =
-        conn.sync().get(mapper.tilNøkkel(cache, id))?.let { json ->
-            mapper.fraJson(json, clazz)
+        conn.sync().get(mapper.tilNøkkel(cache, id))?.let {
+            json -> mapper.fraJson(json, clazz)
         }
 
     @WithSpan
@@ -43,16 +44,18 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
         conn.async().setex(mapper.tilNøkkel(cache, id), ttl.seconds, mapper.tilJson(value))
     }
 
-
     @WithSpan
     override fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T> =
         if (ids.isEmpty()) {
             emptyMap()
         } else {
+            val keys = ids.map { mapper.tilNøkkel(cache, it) }.toTypedArray()
             conn.sync()
-                .mget(*ids.map { id -> mapper.tilNøkkel(cache, id) }.toTypedArray<String>())
+                .mget(*keys)
                 .filter { it.hasValue() }
-                .associate { mapper.idFraNøkkel(it.key) to mapper.fraJson(it.value, clazz) }
+                .associate {
+                    it.fraJsonEntry(mapper, clazz)
+                }
                 .also { tellOgLog(cache.name, it.size, ids.size) }
         }
 
@@ -60,17 +63,22 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
     override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
         if (innslag.isNotEmpty()) {
             log.trace("Bulk lagrer {} verdier for cache {} med prefix {}", innslag.size, cache.name, cache.extraPrefix)
-            val payload = innslag.entries.associate { (key, value) -> mapper.tilEntry(cache, key, value) }
+            val payload = innslag.entries.associate {
+                (key, value) -> mapper.tilJsonEntry(cache, key, value)
+            }
             conn.apply {
                 setAutoFlushCommands(false)
-                async().mset(payload)
-                payload.keys.forEach { key -> async().expire(key, ttl.seconds) }
-                flushCommands()
-                setAutoFlushCommands(true)
+                try {
+                    payload.forEach {
+                        (key, value) -> async().setex(key, ttl.seconds, value)
+                    }
+                } finally {
+                    flushCommands()
+                    setAutoFlushCommands(true)
+                }
             }
         }
     }
-
 
     fun tellOgLog(navn: String, funnet: Int, etterspurt: Int) {
         alleTreffTeller.tell(of("name", navn, "suksess", (funnet == etterspurt).toString()))
@@ -86,4 +94,7 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
         val prefix = mapper.tilNøkkel(cache, "")
         conn.sync().keys("$prefix*").forEach { conn.sync().del(it) }
     }
+
+    private fun <T : Any> KeyValue<String, String>.fraJsonEntry(mapper: CacheNøkkelMapper, clazz: KClass<T>) =
+        mapper.tilEntry(this, clazz)
 }

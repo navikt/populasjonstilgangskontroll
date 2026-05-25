@@ -32,8 +32,11 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
 
     private fun registrer(hendelse: OppfølgingHendelse, melding: String) =
         with(hendelse) {
+            val kontor = requireNotNull(kontor) {
+                "kontor mangler for $sisteEndringsType (uuid=$oppfolgingsperiodeUuid)"
+            }
             oppfølging.registrer(oppfolgingsperiodeUuid,
-                Identer(ident, aktorId), kontor!!, startTidspunkt).also {
+                Identer(ident, aktorId), kontor, startTidspunkt).also {
                 log.info("$melding for kontor ${kontor.kontorId.verdi} og id  $oppfolgingsperiodeUuid")
             }
         }

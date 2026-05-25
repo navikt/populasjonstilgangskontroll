@@ -3,6 +3,13 @@ on:
   push:
     branches:
       - main
+
+# Hindre parallelle deploys av samme branch — køes opp i stedet.
+# cancel-in-progress: false fordi en pågående deploy ikke skal avbrytes midt i.
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     env:
@@ -15,6 +22,7 @@ jobs:
       contents: write
       id-token: write
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Sjekker ut kode
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -107,7 +115,7 @@ jobs:
 
   deploy:
     permissions:
-      contents: write
+      contents: read
       id-token: write
     strategy:
       matrix:
@@ -115,6 +123,7 @@ jobs:
     name: Deploy til ${{matrix.cluster}}
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     environment: ${{matrix.cluster}}:tilgangsmaskin
     env:
       PRINT_PAYLOAD: true

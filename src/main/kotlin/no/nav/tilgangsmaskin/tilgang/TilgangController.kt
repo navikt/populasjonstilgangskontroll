@@ -57,7 +57,7 @@ class TilgangController(
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
     fun kompletteRegler(@RequestBody brukerId: String,request: HttpServletRequest) =
-        enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KOMPLETT_REGELTYPE,request.requestURI)
+        enkeltOppslag({ ansattIdFraToken(request.requestURI) }, {token.erObo}, brukerId, KOMPLETT_REGELTYPE,request.requestURI)
 
     @PostMapping("/ccf/komplett/{ansattId}")
     @ResponseStatus(NO_CONTENT)
@@ -71,7 +71,7 @@ class TilgangController(
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KJERNE_OBO, description = DESCRIPTION_KJERNE_OBO)
     fun kjerneregler(@RequestBody brukerId: String, request: HttpServletRequest) =
-        enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KJERNE_REGELTYPE, request.requestURI)
+        enkeltOppslag({ ansattIdFraToken(request.requestURI) }, {token.erObo}, brukerId, KJERNE_REGELTYPE, request.requestURI)
 
 
     @PostMapping("/ccf/kjerne/{ansattId}")
@@ -88,7 +88,7 @@ class TilgangController(
     @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
     fun overstyr(@RequestBody @Valid @ValidOverstyring data: OverstyringData, request: HttpServletRequest) {
         sjekk(token.erObo, FORBIDDEN, "Mismatch mellom token type ${TokenType.from(token)} og ${request.requestURI}")
-        overstyringTjeneste.overstyr(token.ansattId!!, data)
+        overstyringTjeneste.overstyr(ansattIdFraToken(request.requestURI), data)
     }
 
     @PostMapping("bulk/obo")
@@ -96,14 +96,14 @@ class TilgangController(
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO)
     fun bulkOBO(@RequestBody  specs: Set<BrukerIdOgRegelsett>,request: HttpServletRequest) =
-        bulkOppslag({token.ansattId!!},{token.erObo}, specs,request.requestURI)
+        bulkOppslag({ ansattIdFraToken(request.requestURI) },{token.erObo}, specs,request.requestURI)
 
     @PostMapping("bulk/obo/{regelType}")
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO_REGELTYPE)
     fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>,request: HttpServletRequest) =
-        bulkOppslag({token.ansattId!!},{token.erObo},brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet(),request.requestURI)
+        bulkOppslag({ ansattIdFraToken(request.requestURI) },{token.erObo},brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet(),request.requestURI)
 
     @PostMapping("bulk/ccf/{ansattId}")
     @ResponseStatus(MULTI_STATUS)
@@ -155,6 +155,9 @@ class TilgangController(
     private fun sjekk(predikat: Boolean, status: HttpStatus, message: String) {
         if (!predikat) throw ResponseStatusException(status,message)
     }
+
+    private fun ansattIdFraToken(uri: String): AnsattId =
+        requireNotNull(token.ansattId) { "Mangler ansattId i OBO-token for $uri" }
 
     companion object {
         private const val SUMMARY_KOMPLETT_OBO =

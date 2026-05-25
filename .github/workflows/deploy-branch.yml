@@ -3,6 +3,12 @@ on:
   pull_request:
     branches:
       - main
+
+# Én PR-build om gangen per PR — kanseller pågående når ny push kommer.
+concurrency:
+  group: deploy-branch-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 env:
   IMAGE: europe-north1-docker.pkg.dev/nais-management-233d/tilgangsmaskin/${{ github.event.repository.name }}
 jobs:
@@ -14,6 +20,7 @@ jobs:
       contents: write
       id-token: write
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     environment: github-pages
     steps:
       - name: Sjekker ut kode
@@ -79,7 +86,7 @@ jobs:
 
   deploy:
     permissions:
-      contents: write
+      contents: read
       id-token: write
     strategy:
       matrix:
@@ -87,6 +94,7 @@ jobs:
     name: Deploy til ${{matrix.cluster}}
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     environment:
       ${{matrix.cluster}}:tilgangsmaskin
     env:

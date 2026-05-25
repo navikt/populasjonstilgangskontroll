@@ -12,8 +12,8 @@ import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO
 import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO_OG_GLOBALE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheClient
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
+import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.regler.motor.OppfriskingTeller
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,7 +32,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
     private lateinit var oid: EntraOidTjeneste
 
     @MockkBean(relaxed = true)
-    private lateinit var cache: ValkeyCacheClient
+    private lateinit var cache: CacheOperations
 
     @MockkBean
     private lateinit var teller: OppfriskingTeller

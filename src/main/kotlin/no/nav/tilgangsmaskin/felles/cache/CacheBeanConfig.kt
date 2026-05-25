@@ -10,6 +10,7 @@ import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.cache.interceptor.LoggingCacheErrorHandler

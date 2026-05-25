@@ -14,7 +14,7 @@ interface CacheOperations {
     fun clear(caches: Set<CacheNøkkelConfig>) = caches.forEach { clear(it) }
     fun size(cache: CacheNøkkelConfig): Long
     fun sizes(caches: Set<CacheNøkkelConfig>): Map<String, Long> =
-        caches.associate { it.name to size(it) }
+        caches.associate { it.fullName to size(it) }
 }
 
 inline fun <reified T : Any> CacheOperations.getOne(cache: CacheNøkkelConfig, id: String): T? =

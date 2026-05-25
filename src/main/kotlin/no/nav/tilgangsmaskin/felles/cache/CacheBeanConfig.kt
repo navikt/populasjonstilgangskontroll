@@ -34,7 +34,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
 
     @Bean
     fun cacheSizeBean(cache: CacheOperations) =
-        CacheSizeAwareBean(cfgs.toSet(), cache)
+        CacheSizeAware(cfgs.toSet(), cache)
 
     @Bean
     override fun cacheManager() =
@@ -81,7 +81,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
 }
 
 
-class CacheSizeAwareBean(private val cfgs: Set<CachableRestConfig>, private val cache: CacheOperations) {
-    fun sizes() = cache.sizes(cfgs.flatMap { it.caches }.toSet())
+class CacheSizeAware(private val cfgs: Set<CachableRestConfig>, private val cache: CacheOperations) {
+    fun sizes() = cache.sizes(cfgs.flatMap { it.caches}.toSet())
 
 }

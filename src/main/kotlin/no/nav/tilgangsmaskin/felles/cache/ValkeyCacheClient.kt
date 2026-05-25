@@ -95,7 +95,7 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
         log.info("Tømmer cache {}", cache.name)
         val prefix = mapper.tilNøkkel(cache, "")
         var cursor = INITIAL
-        val args = ScanArgs().match("$prefix*").limit(1000)
+        val args = ScanArgs().match("$prefix*").limit(10000)
         do {
             val result = conn.sync().scan(cursor, args)
             if (result.keys.isNotEmpty()) {
@@ -109,7 +109,7 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
         val prefix = mapper.tilNøkkel(cache, "")
         var count = 0L
         var cursor = INITIAL
-        val args = ScanArgs().match("$prefix*").limit(1000)
+        val args = ScanArgs().match("$prefix*").limit(10000)
         do {
             val result = conn.sync().scan(cursor, args)
             count += result.keys.size

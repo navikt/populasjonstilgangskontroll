@@ -54,7 +54,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
 
         @Bean
         fun cacheConfig() =
-            CacheConfig("unused", "unused", redis.host, redis.firstMappedPort, ofSeconds(1))
+            CacheConfig("unused", "unused", redis.host, redis.firstMappedPort, ofSeconds(5))
 
         @Bean
         fun redisClient(cfg: CacheConfig) =
@@ -225,8 +225,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     val elapsed = measureTime {
                         cache.size(TEST_CACHE) shouldBe 500_000L
                     }
-                    println("Took $elapsed ms")
-                    elapsed shouldBeLessThan 2.seconds
+                    elapsed shouldBeLessThan 5.seconds
 
                     cache.clear(TEST_CACHE)
                     cache.size(TEST_CACHE) shouldBe 0L

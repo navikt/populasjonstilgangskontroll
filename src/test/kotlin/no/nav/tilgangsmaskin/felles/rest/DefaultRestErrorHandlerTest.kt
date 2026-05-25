@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -32,8 +33,10 @@ class DefaultRestErrorHandlerTest : BehaviorSpec({
         When("request uten identifikator") {
             Then("kastes NotFoundRestException med riktig URI og null identifikator") {
                 val ex = shouldThrow<NotFoundRestException> { handler.handle(req(), res(NOT_FOUND)) }
-                ex.uri shouldBe uri
-                ex.identifikator shouldBe null
+                assertSoftly {
+                    ex.uri shouldBe uri
+                    ex.identifikator shouldBe null
+                }
             }
         }
         When("request med identifikator-header") {
@@ -48,8 +51,10 @@ class DefaultRestErrorHandlerTest : BehaviorSpec({
         When("400 Bad Request") {
             Then("kastes IrrecoverableRestException, ikke NotFoundRestException") {
                 val ex = shouldThrow<IrrecoverableRestException> { handler.handle(req(), res(BAD_REQUEST)) }
-                ex.shouldBeInstanceOf<IrrecoverableRestException>()
-                ex.shouldNotBeInstanceOf<NotFoundRestException>()
+                assertSoftly {
+                    ex.shouldBeInstanceOf<IrrecoverableRestException>()
+                    ex.shouldNotBeInstanceOf<NotFoundRestException>()
+                }
             }
         }
         When("403 Forbidden") {

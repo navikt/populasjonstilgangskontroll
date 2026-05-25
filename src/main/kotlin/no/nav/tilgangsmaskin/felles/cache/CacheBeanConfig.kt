@@ -33,6 +33,10 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
 
 
     @Bean
+    fun cacheSizeBean(cache: CacheOperations) =
+        CacheSizeAwareBean(cfgs.toSet(), cache)
+
+    @Bean
     override fun cacheManager() =
         RedisCacheManager.builder(nonLockingRedisCacheWriter(cf))
             .withInitialCacheConfigurations(cfgs.associate { it.navn to cacheConfig(it) })
@@ -76,3 +80,11 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
     }
 }
 
+
+class CacheSizeAwareBean(private val cfgs: Set<CachableRestConfig>, private val cache: CacheOperations) {
+    fun size(cfg: CacheNøkkelConfig) =
+        cfgs.firstOrNull { it.caches.contains(cfg) }?.let {
+            cache.size(cfg)
+        } ?: 0L
+
+}

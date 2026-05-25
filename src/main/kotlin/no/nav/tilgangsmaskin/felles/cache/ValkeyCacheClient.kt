@@ -2,6 +2,8 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import io.lettuce.core.KeyValue
 import io.lettuce.core.RedisClient
+import io.lettuce.core.ScanArgs
+import io.lettuce.core.ScanCursor.INITIAL
 import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
@@ -92,7 +94,28 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
     override fun clear(cache: CacheNøkkelConfig) {
         log.info("Tømmer cache {}", cache.name)
         val prefix = mapper.tilNøkkel(cache, "")
-        conn.sync().keys("$prefix*").forEach { conn.sync().del(it) }
+        var cursor = INITIAL
+        val args = ScanArgs().match("$prefix*").limit(1000)
+        do {
+            val result = conn.sync().scan(cursor, args)
+            if (result.keys.isNotEmpty()) {
+                conn.sync().del(*result.keys.toTypedArray())
+            }
+            cursor = result
+        } while (!result.isFinished)
+    }
+
+    override fun size(cache: CacheNøkkelConfig): Long {
+        val prefix = mapper.tilNøkkel(cache, "")
+        var count = 0L
+        var cursor = INITIAL
+        val args = ScanArgs().match("$prefix*").limit(1000)
+        do {
+            val result = conn.sync().scan(cursor, args)
+            count += result.keys.size
+            cursor = result
+        } while (!result.isFinished)
+        return count
     }
 
     private fun <T : Any> KeyValue<String, String>.fraJsonEntry(mapper: CacheNøkkelMapper, clazz: KClass<T>) =

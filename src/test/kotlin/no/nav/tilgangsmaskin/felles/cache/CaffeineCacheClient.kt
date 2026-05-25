@@ -61,4 +61,17 @@ class CaffeineCacheClient(private val cacheManager: CacheManager) : CacheOperati
             }
         }
     }
+
+    override fun size(cache: CacheNøkkelConfig): Long {
+        val springCache = cacheManager.getCache(cache.name) ?: return 0L
+        val nativeCache = springCache.nativeCache
+        if (nativeCache is com.github.benmanes.caffeine.cache.Cache<*, *>) {
+            if (cache.extraPrefix == null) {
+                return nativeCache.estimatedSize()
+            }
+            val prefix = tilNøkkel(cache, "")
+            return nativeCache.asMap().keys.count { it is String && it.startsWith(prefix) }.toLong()
+        }
+        return 0L
+    }
 }

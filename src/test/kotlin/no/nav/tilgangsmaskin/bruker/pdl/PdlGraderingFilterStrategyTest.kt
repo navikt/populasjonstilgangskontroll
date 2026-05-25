@@ -25,11 +25,30 @@ class PdlGraderingFilterStrategyTest : BehaviorSpec({
     }
 
     Given("filter") {
-        When("gradering er STRENGT_FORTROLIG") { Then("filtreres ikke bort") { strategy.filter(record(STRENGT_FORTROLIG)) shouldBe false } }
-        When("gradering er STRENGT_FORTROLIG_UTLAND") { Then("filtreres ikke bort") { strategy.filter(record(STRENGT_FORTROLIG_UTLAND)) shouldBe false } }
-        When("gradering er FORTROLIG") { Then("filtreres ikke bort") { strategy.filter(record(FORTROLIG)) shouldBe false } }
-        When("gradering er UGRADERT") { Then("filtreres bort") { strategy.filter(record(UGRADERT)).shouldBeTrue() } }
-        When("hendelse mangler adressebeskyttelse") { Then("filtreres bort") { strategy.filter(record(null)).shouldBeTrue() } }
+        When("gradering er STRENGT_FORTROLIG") {
+            Then("filtreres ikke bort") {
+                strategy.filter(record(STRENGT_FORTROLIG)) shouldBe false
+            }
+        }
+        When("gradering er STRENGT_FORTROLIG_UTLAND") {
+            Then("filtreres ikke bort") {
+                strategy.filter(record(STRENGT_FORTROLIG_UTLAND)) shouldBe false
+            }
+        }
+        When("gradering er FORTROLIG") {
+            Then("filtreres ikke bort") {
+                strategy.filter(record(FORTROLIG)) shouldBe false
+            }
+        }
+        When("gradering er UGRADERT") {
+            Then("filtreres bort") {
+                strategy.filter(record(UGRADERT)).shouldBeTrue()
+            }
+        }
+        When("hendelse mangler adressebeskyttelse") {
+            Then("filtreres bort") {
+                strategy.filter(record(null)).shouldBeTrue()
+            }
+        }
     }
 })
-

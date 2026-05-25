@@ -114,7 +114,7 @@ class BrukerTjenesteTest : BehaviorSpec({
                 (brukerTjeneste.brukerMedNærmesteFamilie(id1.verdi) kreverMedlemskapI SKJERMING).shouldBeTrue()
             }
         }
-        When("kalt") {
+        When("brukerMedNærmesteFamilie kalles") {
             Then("kalles medFamilie, ikke medUtvidetFamilie") {
                 every { pdl.medFamilie(id1.verdi) } returns person(id1, aktørId1)
                 every { skjerming.skjerming(id1) } returns false
@@ -140,7 +140,7 @@ class BrukerTjenesteTest : BehaviorSpec({
                 (brukerTjeneste.brukerMedUtvidetFamilie(id1.verdi) kreverMedlemskapI SKJERMING).shouldBeTrue()
             }
         }
-        When("kalt") {
+        When("brukerMedUtvidetFamilie kalles") {
             Then("kalles medUtvidetFamilie, ikke medFamilie") {
                 every { pdl.medUtvidetFamilie(id1.verdi) } returns person(id1, aktørId1)
                 every { skjerming.skjerming(id1) } returns false

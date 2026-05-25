@@ -7,7 +7,6 @@ import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
-import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
 import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
@@ -17,7 +16,6 @@ import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringClientValidator.OverstyringException
-import org.jboss.logging.MDC
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -51,7 +49,7 @@ class OverstyringTjeneste(
     @Transactional
     fun overstyr(ansattId: AnsattId, data: OverstyringData) =
         runCatching {
-            MDC.put(USER_ID, ansattId.verdi)
+
             validator.validerKonsument()
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val bruker = brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi)

@@ -23,8 +23,8 @@ import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.regler.overstyring.ValidOverstyring
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
-import org.jboss.logging.MDC
 import org.slf4j.LoggerFactory.getLogger
+import org.slf4j.MDC
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -121,8 +121,8 @@ class TilgangController(
 
     private fun bulkOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, specs: Set<BrukerIdOgRegelsett>,uri: String) =
         with(ansattId()) {
+            MDC.put(USER_ID, verdi)
             if (specs.isNotEmpty()) {
-                MDC.put(USER_ID, ansattId().verdi)
                 sjekk(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og $uri")
                 sjekk(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
                 tell("bulk")
@@ -136,15 +136,16 @@ class TilgangController(
 
     private fun enkeltOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, brukerId: String, regelType: RegelType, uri: String) =
         with(brukerId.trim('"')) {
-            MDC.put(USER_ID, ansattId().verdi)
-            log.trace(CONFIDENTIAL,"Kjører {} regler for {} og {}", regelType, ansattId(), this.maskFnr())
+            val ansatt = ansattId()
+            MDC.put(USER_ID, ansatt.verdi)
+            log.trace(CONFIDENTIAL,"Kjører {} regler for {} og {}", regelType, ansatt, this.maskFnr())
             sjekk(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og $uri")
             sjekk(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")
             tell("single")
             when (regelType) {
-                KJERNE_REGELTYPE -> regelTjeneste.kjerneregler(ansattId(), this)
-                else -> regelTjeneste.kompletteRegler(ansattId(), this)
+                KJERNE_REGELTYPE -> regelTjeneste.kjerneregler(ansatt, this)
+                else -> regelTjeneste.kompletteRegler(ansatt, this)
             }
         }
 

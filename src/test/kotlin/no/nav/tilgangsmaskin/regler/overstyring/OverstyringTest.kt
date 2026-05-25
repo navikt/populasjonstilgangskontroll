@@ -119,7 +119,7 @@ internal class OverstyringTest : BehaviorSpec() {
             overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, proxy, validator, OverstyringTeller(registry, token))
         }
 
-        Given("overstyr") {
+        Given("overstyring av tilgangsresultat") {
 
             When("OverstyringException kastes fra validator") {
                 Then("kastes exception videre") {

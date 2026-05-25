@@ -135,7 +135,7 @@ class EntraTjenesteTest : BehaviorSpec() {
             }
         }
 
-        Given("cache") {
+        Given("caching av Entra-grupper") {
             When("geoGrupper kalles to ganger for samme ansatt") {
                 Then("server kalles kun én gang") {
                     server.expect(requestTo(cfg.grupperURI(OID.toString(), false)))

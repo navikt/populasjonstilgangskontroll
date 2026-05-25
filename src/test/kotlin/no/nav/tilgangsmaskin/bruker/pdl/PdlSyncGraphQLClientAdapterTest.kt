@@ -67,7 +67,7 @@ class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
         beforeEach { server.reset() }
         afterEach { server.verify() }
 
-        Given("partnere") {
+        Given("oppslag av partnere fra PDL") {
             When("sivilstand er GIFT") {
                 Then("returneres PARTNER") {
                     server.expect(requestTo(cfg.baseUri)).andRespond(withSuccess(sivilstandRespons(Sivilstandstype.GIFT), APPLICATION_JSON))

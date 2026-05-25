@@ -35,7 +35,7 @@ class BrukerTjenesteTest : BehaviorSpec({
 
     beforeEach { clearMocks(pdl, skjerming) }
 
-    Given("brukere") {
+    Given("oppslag av flere brukere") {
         When("tom input") {
             Then("returneres tom mengde uten PDL-kall") {
                 brukerTjeneste.brukere(emptySet()).shouldBeEmpty()

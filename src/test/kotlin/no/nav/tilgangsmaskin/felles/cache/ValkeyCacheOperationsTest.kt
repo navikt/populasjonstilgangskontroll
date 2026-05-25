@@ -137,7 +137,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
             }
         }
 
-        Given("delete") {
+        Given("sletting av enkeltinnslag") {
             When("nøkkelen eksisterer") {
                 Then("returnerer 1 og verdien er fjernet") {
                     cache.putOne(TEST_CACHE, T1.id, T1, ofSeconds(2))
@@ -169,7 +169,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
             }
         }
 
-        Given("clear") {
+        Given("tømming av cache") {
             When("cache inneholder verdier") {
                 Then("alle verdier i cachen fjernes") {
                     cache.putMany(TEST_CACHE, arrayOf(T1, T2).associateBy { it.id }, ofSeconds(1))
@@ -186,7 +186,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
             }
         }
 
-        Given("size") {
+        Given("antall innslag i cache") {
             When("cache er tom") {
                 Then("returnerer 0") {
                     cache.size(TEST_CACHE) shouldBe 0L

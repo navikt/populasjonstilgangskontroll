@@ -122,7 +122,7 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
             every { token.erCC } returns true
         }
 
-        Given("bulk") {
+        Given("bulk-oppslag med overstyring") {
             When("brukere krever spesialtilganger ansatt mangler") {
                 Then("havner de i avviste") {
                     every {

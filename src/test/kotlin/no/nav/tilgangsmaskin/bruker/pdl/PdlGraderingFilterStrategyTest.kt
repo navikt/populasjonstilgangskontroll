@@ -24,7 +24,7 @@ class PdlGraderingFilterStrategyTest : BehaviorSpec({
         return ConsumerRecord("topic", 0, 0L, "key", hendelse)
     }
 
-    Given("filter") {
+    Given("filtrering av personhendelser etter gradering") {
         When("gradering er STRENGT_FORTROLIG") {
             Then("filtreres ikke bort") {
                 strategy.filter(record(STRENGT_FORTROLIG)) shouldBe false

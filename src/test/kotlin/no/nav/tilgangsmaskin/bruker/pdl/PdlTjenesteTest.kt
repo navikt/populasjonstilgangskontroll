@@ -146,7 +146,7 @@ class PdlTjenesteTest : BehaviorSpec() {
             }
         }
 
-        Given("personer") {
+        Given("oppslag av flere personer fra PDL") {
             When("én er i cache og én er cache-miss") {
                 Then("REST kalles kun for cache-misser") {
                     cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(2))

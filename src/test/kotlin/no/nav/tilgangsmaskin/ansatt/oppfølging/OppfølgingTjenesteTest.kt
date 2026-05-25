@@ -96,7 +96,7 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
             }
         }
 
-        Given("avslutt") {
+        Given("avslutning av oppfølging") {
             When("avslutt kalles etter registrering") {
                 Then("fjernes cache-innslag for brukerId og aktørId") {
                     val id = randomUUID()

@@ -116,7 +116,7 @@ class NomTjenesteTest : BehaviorSpec() {
             }
         }
 
-        Given("cache") {
+        Given("caching av NOM-oppslag") {
 
             When("fnrForAnsatt kalles to ganger for samme ansatt") {
                 Then("returnerer cachet verdi ved andre oppslag") {

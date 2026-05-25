@@ -36,7 +36,7 @@ class PdlCacheOpprydderTest : BehaviorSpec({
         every { client.delete(any(), any()) } returns 1L
     }
 
-    Given("sletting") {
+    Given("sletting av cache ved personhendelse") {
         When("hendelsen inneholder to identer") {
             Then("slettes fra alle PDL-cacher for begge identer") {
                 opprydder.listen(hendelse(listOf(I1, I2)))
@@ -72,7 +72,7 @@ class PdlCacheOpprydderTest : BehaviorSpec({
         }
     }
 
-    Given("refresh") {
+    Given("oppfrisking av cache etter endring") {
         When("hendelsen inneholder to identer") {
             Then("kalles medFamilie og medUtvidetFamilie for begge") {
                 opprydder.listen(hendelse(listOf(I1, I2)))

@@ -118,7 +118,7 @@ class SkjermingTjenesteTest : BehaviorSpec() {
             }
         }
 
-        Given("retry") {
+        Given("retry ved feil mot skjermingstjenesten") {
             When("alle 4 forsøk feiler med 500") {
                 Then("kastes RecoverableRestException") {
                     server.expect(times(4), requestTo(SKJERMING_URI)).andRespond(withStatus(INTERNAL_SERVER_ERROR))

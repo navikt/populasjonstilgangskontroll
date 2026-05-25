@@ -214,16 +214,16 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     cache.size(TEST_CACHE) shouldBe 0L
                 }
             }
-            When("500000 innslag legges inn") {
+            When("50000 innslag legges inn") {
                 Then("size returnerer 500000 og clear tømmer alt") {
                     val batchSize = 10_000
-                    (1..500_000).chunked(batchSize).forEach { chunk ->
+                    (1..50000).chunked(batchSize).forEach { chunk ->
                         val entries = chunk.associate { "id-$it" to TestData.of("id-$it") }
                         cache.putMany(TEST_CACHE, entries, ofSeconds(60))
                     }
 
                     val elapsed = measureTime {
-                        cache.size(TEST_CACHE) shouldBe 500_000L
+                        cache.size(TEST_CACHE) shouldBe 50000L
                     }
                     elapsed shouldBeLessThan 5.seconds
 

@@ -26,9 +26,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
-      security-events: write
-      packages: read
-      actions: read
+      security-events: write  # codeql-action/analyze laster opp SARIF
+      packages: read          # hente private GitHub Packages under build
+      actions: read           # CodeQL leser workflow-metadata
       contents: read
 
     steps:

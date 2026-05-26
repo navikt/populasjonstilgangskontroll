@@ -32,8 +32,8 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
-      security-events: write   # For å laste opp SARIF til Code Scanning
-      actions: read
+      security-events: write  # codeql-action/upload-sarif publiserer funn til Code Scanning
+      actions: read           # zizmor leser workflow-metadata via GH API
     steps:
       - name: Sjekker ut kode
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2

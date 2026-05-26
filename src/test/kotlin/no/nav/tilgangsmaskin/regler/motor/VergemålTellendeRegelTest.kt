@@ -27,7 +27,9 @@ class VergemålTellendeRegelTest : BehaviorSpec() {
     private lateinit var regel: VergemålTellendeRegel
 
     init {
-        beforeSpec { init(this@VergemålTellendeRegelTest) }
+        beforeSpec {
+            init(this@VergemålTellendeRegelTest)
+        }
         beforeEach {
             clearAllMocks()
             regel = VergemålTellendeRegel(vergemål, auditor, teller)

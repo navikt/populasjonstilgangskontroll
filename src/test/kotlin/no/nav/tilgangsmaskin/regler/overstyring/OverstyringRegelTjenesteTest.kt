@@ -48,10 +48,7 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
 import no.nav.tilgangsmaskin.SharedPostgresContainer
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringRegelTjenesteTest.RegelMotorTestConfig
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestPropertySource
 import org.testcontainers.junit.jupiter.Testcontainers
 
@@ -62,7 +59,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @ContextConfiguration(classes = [TestApp::class, OverstyringTjeneste::class,OverstyringJPAAdapter::class,RegelTjeneste::class,LocalAuditor::class])
 @AutoConfigureMetrics
 @Testcontainers
-@Import(RegelMotorTestConfig::class)
+@ComponentScan("no.nav.tilgangsmaskin.regler.motor")
 @ApplyExtension(SpringExtension::class)
 class OverstyringRegelTjenesteTest : BehaviorSpec() {
 
@@ -100,10 +97,6 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
     @Autowired
     lateinit var regler: RegelTjeneste
 
-
-    @TestConfiguration
-    @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
-    class RegelMotorTestConfig
 
     init {
 

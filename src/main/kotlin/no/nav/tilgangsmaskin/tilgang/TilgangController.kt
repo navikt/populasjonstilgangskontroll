@@ -58,69 +58,69 @@ class TilgangController(
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
-    fun kompletteRegler(@RequestBody brukerId: String,request: HttpServletRequest) =
-        enkeltOppslag({ ansattIdFraToken(request.requestURI) }, OBO, brukerId, KOMPLETT_REGELTYPE,request.requestURI)
+    fun kompletteRegler(@RequestBody brukerId: String, req: HttpServletRequest) =
+        enkeltOppslag({ ansattIdFraToken(req.requestURI) }, OBO, brukerId, KOMPLETT_REGELTYPE,req.requestURI)
 
     @PostMapping("/ccf/komplett/{ansattId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KOMPLETT_CCF, description = DESCRIPTION_KOMPLETT_CCF)
-    fun kompletteReglerCCF(@PathVariable ansattId: AnsattId,@RequestBody brukerId: String,request: HttpServletRequest) =
-        enkeltOppslag({ansattId}, CCF, brukerId, KOMPLETT_REGELTYPE, request.requestURI)
+    fun kompletteReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String, req: HttpServletRequest) =
+        enkeltOppslag({ansattId}, CCF, brukerId, KOMPLETT_REGELTYPE, req.requestURI)
 
     @PostMapping("kjerne")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KJERNE_OBO, description = DESCRIPTION_KJERNE_OBO)
-    fun kjerneregler(@RequestBody brukerId: String, request: HttpServletRequest) =
-        enkeltOppslag({ ansattIdFraToken(request.requestURI) }, OBO, brukerId, KJERNE_REGELTYPE, request.requestURI)
+    fun kjerneregler(@RequestBody brukerId: String, req: HttpServletRequest) =
+        enkeltOppslag({ ansattIdFraToken(req.requestURI) }, OBO, brukerId, KJERNE_REGELTYPE, req.requestURI)
 
 
     @PostMapping("/ccf/kjerne/{ansattId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KJERNE_CCF, description = DESCRIPTION_KJERNE_CCF)
-    fun kjerneReglerCCF(@PathVariable ansattId: AnsattId,@RequestBody brukerId: String,request: HttpServletRequest) =
-        enkeltOppslag({ansattId}, CCF, brukerId, KJERNE_REGELTYPE,request.requestURI)
+    fun kjerneReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String, req: HttpServletRequest) =
+        enkeltOppslag({ansattId}, CCF, brukerId, KJERNE_REGELTYPE,req.requestURI)
 
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
-    fun overstyr(@RequestBody @Valid @ValidOverstyring data: OverstyringData, request: HttpServletRequest) {
-        guard.krev(OBO, request.requestURI)
-        overstyringTjeneste.overstyr(ansattIdFraToken(request.requestURI), data)
+    fun overstyr(@RequestBody @Valid @ValidOverstyring data: OverstyringData, req: HttpServletRequest) {
+        guard.krev(OBO, req.requestURI)
+        overstyringTjeneste.overstyr(ansattIdFraToken(req.requestURI), data)
     }
 
     @PostMapping("bulk/obo")
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO)
-    fun bulkOBO(@RequestBody  specs: Set<BrukerIdOgRegelsett>,request: HttpServletRequest) =
-        bulkOppslag({ ansattIdFraToken(request.requestURI) }, OBO, specs,request.requestURI)
+    fun bulkOBO(@RequestBody  specs: Set<BrukerIdOgRegelsett>, req: HttpServletRequest) =
+        bulkOppslag({ ansattIdFraToken(req.requestURI) }, OBO, specs,req.requestURI)
 
     @PostMapping("bulk/obo/{regelType}")
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO_REGELTYPE)
-    fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>,request: HttpServletRequest) =
-        bulkOppslag({ ansattIdFraToken(request.requestURI) },
-            OBO, brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet(),request.requestURI)
+    fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>, req: HttpServletRequest) =
+        bulkOppslag({ ansattIdFraToken(req.requestURI) },
+            OBO, brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet(),req.requestURI)
 
     @PostMapping("bulk/ccf/{ansattId}")
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_CCF)
-    fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody specs: Set<BrukerIdOgRegelsett>,request: HttpServletRequest) =
-        bulkOppslag({ansattId}, CCF, specs,request.requestURI)
+    fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody specs: Set<BrukerIdOgRegelsett>, req: HttpServletRequest) =
+        bulkOppslag({ansattId}, CCF, specs,req.requestURI)
 
     @PostMapping("bulk/ccf/{ansattId}/{regelType}")
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_CCF_REGELTYPE)
-    fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>, request: HttpServletRequest) =
-        bulkOppslag({ ansattId }, CCF, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(),request.requestURI)
+    fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>, req: HttpServletRequest) =
+        bulkOppslag({ ansattId }, CCF, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(),req.requestURI)
 
     private fun bulkOppslag(ansattId: () -> AnsattId, forventet: TokenType, specs: Set<BrukerIdOgRegelsett>,uri: String) =
         with(ansattId()) {

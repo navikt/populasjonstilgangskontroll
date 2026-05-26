@@ -62,7 +62,7 @@ class RegelTjeneste(
         brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
     }.getOrElse {
         if (it is NotFoundRestException) {
-            auditor.info("${HttpStatus.NOT_FOUND.name}: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
+            auditor.info("${it.status}: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
             null
         } else {
             log.warn("Feil ved oppslag av bruker for ${brukerId.maskFnr()}", it)

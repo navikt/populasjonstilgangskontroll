@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.regler.motor.BulkResultat
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
+import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
@@ -37,20 +38,16 @@ class RegelTjeneste(
     @WithSpan
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
-            log.info("Sjekker ${RegelType.KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
+            log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
             bruker(brukerId)?.let { bruker ->
-                runCatching {
+                try {
                     motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
-                }.getOrElse {
-                    if (overstyringTjeneste.erOverstyrt(ansattId, bruker.brukerId) && it is RegelException) {
-                        log.trace("Overstyring registrert for {} og {}", ansattId, brukerId.maskFnr(), it)
-                    } else {
-                        log.trace("Tilgang avvist ved kjøring av komplette regler for {} og {}",
-                            ansattId,
-                            brukerId.maskFnr(),
-                            it)
-                        throw it
+                } catch (e: RegelException) {
+                    if (!overstyringTjeneste.erOverstyrt(ansattId, bruker.brukerId)) {
+                        log.trace("Tilgang avvist ved kjøring av komplette regler for {} og {}", ansattId, brukerId.maskFnr(), e)
+                        throw e
                     }
+                    log.trace("Overstyring registrert for {} og {}", ansattId, brukerId.maskFnr(), e)
                 }
             }
                 ?: log.info("Komplette regler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
@@ -58,17 +55,16 @@ class RegelTjeneste(
         log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
     }
 
-    private fun bruker(brukerId: String) = runCatching {
-        brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
-    }.getOrElse {
-        if (it is NotFoundRestException) {
-            auditor.info("${it.status}: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
+    private fun bruker(brukerId: String) =
+        try {
+            brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
+        } catch (e: NotFoundRestException) {
+            auditor.info("${e.status}: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
             null
-        } else {
-            log.warn("Feil ved oppslag av bruker for ${brukerId.maskFnr()}", it)
-            throw it
+        } catch (e: Exception) {
+            log.warn("Feil ved oppslag av bruker for ${brukerId.maskFnr()}", e)
+            throw e
         }
-    }
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])
     @WithSpan

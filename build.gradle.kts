@@ -122,6 +122,7 @@ dependencies {
     testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.kotest:kotest-extensions-spring:$kotestVersion")
+    testImplementation("com.tngtech.archunit:archunit-junit5:1.4.2")
 }
 
 
@@ -156,6 +157,14 @@ tasks.named<Test>("test") {
             "java.base/java.util=ALL-UNNAMED",
             "-Dkotlinx.coroutines.debug=off",
         )
+
+    // Videresend archunit.*-system properties til test-JVM (for FreezingArchRule).
+    // Eksempel:
+    //   ./gradlew test -Darchunit.freeze.refreeze=true
+    //   ./gradlew test -Darchunit.freeze.store.default.allowStoreCreation=true
+    System.getProperties()
+        .filterKeys { (it as String).startsWith("archunit.") }
+        .forEach { (k, v) -> systemProperty(k as String, v as Any) }
 }
 
 tasks.jacocoTestReport {

@@ -35,6 +35,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import no.nav.tilgangsmaskin.SharedPostgresContainer
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.time.Instant
 import java.util.UUID.*
 
 @DataJpaTest
@@ -61,6 +62,9 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
     init {
         beforeEach { cache.clear(OPPFØLGING_CACHE) }
 
+        fun startet(periode: java.util.UUID = randomUUID()) =
+            Oppfølgingsendring.Startet(periode, IDENTER, KONTOR, Instant.parse("2024-01-01T09:00:00Z"))
+
         Given("enhetFor") {
             When("det ikke finnes oppfølging") {
                 Then("returneres null") {
@@ -71,13 +75,13 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
 
             When("oppfølging er registrert") {
                 Then("caches resultatet etter første oppslag") {
-                    tjeneste.registrer(randomUUID(), IDENTER, KONTOR)
+                    tjeneste.registrer(startet())
                     tjeneste.enhetFor(Identifikator(brukerId.verdi))
                     verify(exactly = 0) { adapter.enhetFor(brukerId.verdi) }
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, brukerId.verdi) shouldBe kontor
                 }
                 Then("returneres enhet ved cache-treff uten adapter-kall") {
-                    tjeneste.registrer(randomUUID(), IDENTER, KONTOR)
+                    tjeneste.registrer(startet())
                     tjeneste.enhetFor(Identifikator(brukerId.verdi)) shouldBe kontor
                 }
             }
@@ -86,11 +90,11 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
         Given("registrer") {
             When("registrering utføres") {
                 Then("populeres cache for brukerId") {
-                    tjeneste.registrer(randomUUID(), IDENTER, KONTOR)
+                    tjeneste.registrer(startet())
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, brukerId.verdi) shouldBe kontor
                 }
                 Then("populeres cache for aktørId") {
-                    tjeneste.registrer(randomUUID(), IDENTER, KONTOR)
+                    tjeneste.registrer(startet())
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, aktørId.verdi) shouldBe kontor
                 }
             }
@@ -100,11 +104,11 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
             When("avslutt kalles etter registrering") {
                 Then("fjernes cache-innslag for brukerId og aktørId") {
                     val id = randomUUID()
-                    tjeneste.registrer(id, IDENTER, KONTOR)
+                    tjeneste.registrer(startet(id))
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, brukerId.verdi) shouldBe kontor
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, aktørId.verdi) shouldBe kontor
 
-                    tjeneste.avslutt(id, IDENTER)
+                    tjeneste.avslutt(Oppfølgingsendring.Avsluttet(id, IDENTER))
 
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, brukerId.verdi) shouldBe null
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, aktørId.verdi) shouldBe null

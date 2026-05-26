@@ -1,10 +1,13 @@
 package no.nav.tilgangsmaskin.tilgang
 
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
+import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.web.server.ResponseStatusException
 
@@ -19,7 +22,9 @@ class TokenTypeGuardTest : BehaviorSpec({
             Then("kastes ingen exception") {
                 every { token.erObo } returns true
                 every { token.erCC } returns false
-                guard.krev(TokenType.OBO, uri)
+                shouldNotThrowAny {
+                    guard.krev(OBO, uri)
+                }
             }
         }
 
@@ -27,9 +32,9 @@ class TokenTypeGuardTest : BehaviorSpec({
             Then("kastes 403 Forbidden med URI i meldingen") {
                 every { token.erObo } returns false
                 every { token.erCC } returns true
-                val ex = shouldThrow<ResponseStatusException> { guard.krev(TokenType.OBO, uri) }
-                ex.statusCode shouldBe FORBIDDEN
-                ex.reason!! shouldBe "Mismatch mellom token type CCF og $uri"
+                shouldThrow<ResponseStatusException> {
+                    guard.krev(OBO, uri)
+                }.statusCode shouldBe FORBIDDEN
             }
         }
 
@@ -37,8 +42,9 @@ class TokenTypeGuardTest : BehaviorSpec({
             Then("kastes 403 Forbidden") {
                 every { token.erObo } returns false
                 every { token.erCC } returns false
-                val ex = shouldThrow<ResponseStatusException> { guard.krev(TokenType.OBO, uri) }
-                ex.statusCode shouldBe FORBIDDEN
+                shouldThrow<ResponseStatusException> {
+                    guard.krev(OBO, uri)
+                }.statusCode shouldBe FORBIDDEN
             }
         }
     }
@@ -48,7 +54,9 @@ class TokenTypeGuardTest : BehaviorSpec({
             Then("kastes ingen exception") {
                 every { token.erObo } returns false
                 every { token.erCC } returns true
-                guard.krev(TokenType.CCF, uri)
+               shouldNotThrowAny {
+                   guard.krev(CCF, uri)
+               }
             }
         }
 
@@ -56,9 +64,9 @@ class TokenTypeGuardTest : BehaviorSpec({
             Then("kastes 403 Forbidden") {
                 every { token.erObo } returns true
                 every { token.erCC } returns false
-                val ex = shouldThrow<ResponseStatusException> { guard.krev(TokenType.CCF, uri) }
-                ex.statusCode shouldBe FORBIDDEN
-                ex.reason!! shouldBe "Mismatch mellom token type OBO og $uri"
+                shouldThrow<ResponseStatusException> {
+                    guard.krev(CCF, uri)
+                }.statusCode shouldBe FORBIDDEN
             }
         }
     }

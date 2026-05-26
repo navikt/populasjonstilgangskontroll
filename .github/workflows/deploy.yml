@@ -10,6 +10,10 @@ concurrency:
   group: deploy-${{ github.ref }}
   cancel-in-progress: false
 
+# Deny-by-default på workflow-nivå; jobs åpner kun det de trenger.
+permissions:
+  contents: read
+
 jobs:
   build:
     name: build

@@ -11,6 +11,10 @@ on:
   schedule:
     - cron: '0 0 * * 0'
 
+# Deny-by-default på workflow-nivå; jobs åpner kun det de trenger.
+permissions:
+  contents: read
+
 jobs:
   analyze:
     name: Analyze (java-kotlin)

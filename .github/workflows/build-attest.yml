@@ -49,6 +49,10 @@ on:
         description: "Image digest (sha256:...)"
         value: ${{ jobs.build.outputs.digest }}
 
+# Deny-by-default på workflow-nivå; jobs åpner kun det de trenger.
+permissions:
+  contents: read
+
 jobs:
   build:
     name: build

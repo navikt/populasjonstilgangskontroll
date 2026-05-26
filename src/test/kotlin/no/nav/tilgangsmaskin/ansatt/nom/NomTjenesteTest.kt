@@ -26,7 +26,7 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ContextConfiguration
-import no.nav.tilgangsmaskin.SharedPostgresContainer
+import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDate.now
 
@@ -152,6 +152,6 @@ class NomTjenesteTest : BehaviorSpec() {
 
     companion object {
         @ServiceConnection
-        private val postgres = SharedPostgresContainer.instance
+        private val postgres = postgreSQLContainer
     }
 }

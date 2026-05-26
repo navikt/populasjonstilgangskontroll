@@ -8,8 +8,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer
  * Unngår å starte en ny container per testklasse (~5-8s per oppstart).
  */
 object SharedPostgresContainer {
-    @ServiceConnection
-    val instance = PostgreSQLContainer("postgres:18").apply {
+    val postgreSQLContainer = PostgreSQLContainer("postgres:18").apply {
         start()
     }
 }

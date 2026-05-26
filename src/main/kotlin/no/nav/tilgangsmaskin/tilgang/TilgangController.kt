@@ -139,10 +139,10 @@ class TilgangController(
 
     private fun enkeltOppslag(ansattId: () -> AnsattId, forventet: TokenType, brukerId: String, regelType: RegelType, uri: String) =
         with(brukerId.trim('"')) {
+            guard.krev(forventet, uri)
             val ansatt = ansattId()
             MDC.put(USER_ID, ansatt.verdi)
             log.trace(CONFIDENTIAL,"Kjører {} regler for {} og {}", regelType, ansatt, this.maskFnr())
-            guard.krev(forventet, uri)
             sjekk(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")
             tell("single")

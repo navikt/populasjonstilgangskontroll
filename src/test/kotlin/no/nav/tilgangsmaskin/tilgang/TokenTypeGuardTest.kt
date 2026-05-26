@@ -29,7 +29,7 @@ class TokenTypeGuardTest : BehaviorSpec({
         }
 
         When("tokenet er CCF") {
-            Then("kastes 403 Forbidden med URI i meldingen") {
+            Then("kastes 403 Forbidden") {
                 every { token.erObo } returns false
                 every { token.erCC } returns true
                 shouldThrow<ResponseStatusException> {

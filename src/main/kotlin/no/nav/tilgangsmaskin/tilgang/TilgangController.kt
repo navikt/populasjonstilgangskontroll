@@ -122,22 +122,19 @@ class TilgangController(
     fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>, req: HttpServletRequest) =
         bulkOppslag({ ansattId }, CCF, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(),req.requestURI)
 
-    private fun bulkOppslag(ansattId: () -> AnsattId, forventet: TokenType, specs: Set<BrukerIdOgRegelsett>,uri: String) =
-        run {
-            guard.krev(forventet, uri)
-            with(ansattId()) {
-                MDC.put(USER_ID, verdi)
-                if (specs.isNotEmpty()) {
-                    sjekk(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
-                    tell("bulk")
-                    regelTjeneste.bulkRegler( this, specs)
-                }
-                else {
-                    log.debug("Ingen brukerId-er oppgitt i bulk forespørsel for {}", this)
-                    AggregertBulkRespons(this)
-                }
-            }
+    private fun bulkOppslag(ansattId: () -> AnsattId, forventet: TokenType, specs: Set<BrukerIdOgRegelsett>, uri: String): AggregertBulkRespons {
+        guard.krev(forventet, uri)
+        val ansatt = ansattId()
+        MDC.put(USER_ID, ansatt.verdi)
+        return if (specs.isNotEmpty()) {
+            sjekk(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
+            tell("bulk")
+            regelTjeneste.bulkRegler(ansatt, specs)
+        } else {
+            log.debug("Ingen brukerId-er oppgitt i bulk forespørsel for {}", ansatt)
+            AggregertBulkRespons(ansatt)
         }
+    }
 
     private fun enkeltOppslag(ansattId: () -> AnsattId, forventet: TokenType, brukerId: String, regelType: RegelType, uri: String) =
         with(brukerId.trim('"')) {

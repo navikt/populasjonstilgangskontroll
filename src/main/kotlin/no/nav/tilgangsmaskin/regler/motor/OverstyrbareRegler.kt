@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.ansatt.Ansatt
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.AVDØD
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.UTENLANDSK
@@ -10,8 +9,6 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.Identifikator
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.år
-import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD_MER_ENN_ETT_ÅR
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.VERGEMÅL
 import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 
@@ -39,18 +36,6 @@ class UtlandRegel : GlobalGruppeMedlemskapRegel(UTENLANDSK), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis {
             bruker.harUtenlandskBosted && ansatt ikkeErMedlemAv UTENLANDSK
-        }
-}
-
-@SortertRegel(LOWEST_PRECEDENCE - 3)
-@ConditionalOnNotProd
-class AvdødBrukerRegel : OverstyrbarRegel, TellendeRegel {
-
-    override val metadata = RegelMetadata(AVDØD_MER_ENN_ETT_ÅR)
-
-    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
-        avvisHvis {
-            bruker harVærtDødMerEnn 1.år && ansatt ikkeErMedlemAv AVDØD
         }
 }
 

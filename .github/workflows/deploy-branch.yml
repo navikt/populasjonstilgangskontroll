@@ -26,7 +26,6 @@ jobs:
       checkout-repository: ${{ github.event.pull_request.head.repo.full_name }}
       checkout-fetch-depth: 0
       environment: github-pages
-    secrets: inherit
 
   deploy:
     permissions:
@@ -50,4 +49,6 @@ jobs:
       IMAGE: ${{needs.build.outputs.image}}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - uses: nais/deploy/actions/deploy@a7f8690f9b367fcbf5348a0a1e21d44f1aae50eb # v2

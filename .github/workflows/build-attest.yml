@@ -73,6 +73,7 @@ jobs:
           ref: ${{ inputs.checkout-ref || github.ref }}
           repository: ${{ inputs.checkout-repository || github.repository }}
           fetch-depth: ${{ inputs.checkout-fetch-depth }}
+          persist-credentials: false
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
@@ -99,22 +100,25 @@ jobs:
           team: tilgangsmaskin
 
       - name: Configure Gradle for GPR
+        env:
+          GH_ACTOR: ${{ github.actor }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p ~/.gradle
-          echo "gpr.user=${{ github.actor }}" >> ~/.gradle/gradle.properties
-          echo "gpr.key=${{ secrets.GITHUB_TOKEN }}" >> ~/.gradle/gradle.properties
+          echo "gpr.user=${GH_ACTOR}" >> ~/.gradle/gradle.properties
+          echo "gpr.key=${GH_TOKEN}" >> ~/.gradle/gradle.properties
 
       - name: Test og bygg
         id: kompiler
         run: |
-          echo "image=${{ env.IMAGE }}:${{ env.TAG }}" >> $GITHUB_OUTPUT
+          echo "image=${IMAGE}:${TAG}" >> "$GITHUB_OUTPUT"
           ./gradlew --warning-mode all test jacocoTestReport cyclonedxBom jib \
-            -Djib.to.tags=latest,${TAG} \
-            -Djib.from.image=${BASE} \
-            -Djib.to.image=${{ env.IMAGE }}:${{ env.TAG }}
+            -Djib.to.tags=latest,"${TAG}" \
+            -Djib.from.image="${BASE}" \
+            -Djib.to.image="${IMAGE}:${TAG}"
           DIGEST=$(cat build/jib-image.digest)
-          echo "DIGEST=${DIGEST}" >> $GITHUB_ENV
-          echo "digest=${DIGEST}" >> $GITHUB_OUTPUT
+          echo "DIGEST=${DIGEST}" >> "$GITHUB_ENV"
+          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
         env:
           ORG_GRADLE_PROJECT_githubUser: x-access-token
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}

@@ -123,19 +123,19 @@ class TilgangController(
         bulkOppslag({ ansattId }, CCF, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(),req.requestURI)
 
     private fun bulkOppslag(ansattId: () -> AnsattId, forventet: TokenType, specs: Set<BrukerIdOgRegelsett>,uri: String) =
-        with(run {
+        run {
             guard.krev(forventet, uri)
-            ansattId()
-        }) {
-            MDC.put(USER_ID, verdi)
-            if (specs.isNotEmpty()) {
-                sjekk(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
-                tell("bulk")
-                regelTjeneste.bulkRegler( this, specs)
-            }
-            else {
-                log.debug("Ingen brukerId-er oppgitt i bulk forespørsel for {}", this)
-                AggregertBulkRespons(this)
+            with(ansattId()) {
+                MDC.put(USER_ID, verdi)
+                if (specs.isNotEmpty()) {
+                    sjekk(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
+                    tell("bulk")
+                    regelTjeneste.bulkRegler( this, specs)
+                }
+                else {
+                    log.debug("Ingen brukerId-er oppgitt i bulk forespørsel for {}", this)
+                    AggregertBulkRespons(this)
+                }
             }
         }
 

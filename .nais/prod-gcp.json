@@ -25,6 +25,11 @@
   },
   "inbound": [
     {
+      "name": "syfosmmanuell-backend",
+      "namespace": "teamsykmelding",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "ung-deltakelse-opplyser",
       "namespace": "k9saksbehandling",
       "cluster": "prod-gcp"

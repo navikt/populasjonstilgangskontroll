@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import no.nav.boot.conditionals.Cluster
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.CacheManager
 import java.time.Duration
@@ -47,6 +49,9 @@ class CaffeineCacheClient(private val cacheManager: CacheManager) : CacheOperati
     }
 
     override fun clear(cache: CacheNøkkelConfig) {
+        if (isProd) {
+            throw UnsupportedOperationException("Clear er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold")
+        }
         val springCache = cacheManager.getCache(cache.name) ?: return
         if (cache.extraPrefix == null) {
             springCache.clear()

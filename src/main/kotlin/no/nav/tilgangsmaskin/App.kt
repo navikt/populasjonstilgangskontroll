@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
+import no.nav.tilgangsmaskin.felles.ClockConfig.Companion.AUDITING_TIME_PROVIDER
 import no.nav.tilgangsmaskin.felles.cache.CacheSizeAware
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.profiler
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.local
@@ -24,7 +25,7 @@ import org.springframework.stereotype.Component
 @EnableOAuth2Client(cacheEnabled = true)
 @EnableCaching
 @EnableResilientMethods
-@EnableJpaAuditing(dateTimeProviderRef = "auditingDateTimeProvider")
+@EnableJpaAuditing(dateTimeProviderRef = AUDITING_TIME_PROVIDER)
 @EnableScheduling
 @ConditionalOnGCP
 @EnableJwtTokenValidation(ignore = ["org.springdoc", "org.springframework"])

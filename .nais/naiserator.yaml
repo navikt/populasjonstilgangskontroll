@@ -67,6 +67,7 @@ spec:
           - id: {{grupper.egenansatt}}
           - id: {{grupper.udefinert}}
           - id: {{grupper.strengt}}
+          - id: {{grupper.fortrolig}}
   accessPolicy:
     outbound:
       rules:

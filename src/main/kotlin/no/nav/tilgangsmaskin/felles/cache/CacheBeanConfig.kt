@@ -8,12 +8,10 @@ import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.cache.annotation.CachingConfigurer
-import org.springframework.cache.interceptor.SimpleCacheErrorHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager
-import org.springframework.cache.Cache
 import org.springframework.cache.interceptor.LoggingCacheErrorHandler
 import org.springframework.data.redis.cache.RedisCacheWriter.nonLockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
@@ -33,6 +31,10 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
     override fun errorHandler() =
         LoggingCacheErrorHandler(true)
 
+
+    @Bean
+    fun cacheSizeBean(cache: CacheOperations) =
+        CacheSizeAware(cfgs.toSet(), cache)
 
     @Bean
     override fun cacheManager() =
@@ -58,8 +60,8 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
         CacheNøkkelMapper(mgr.cacheConfigurations)
 
     @Bean
-    fun cacheHealthIndicator(adapter: CachePingable) =
-        PingableHealthIndicator(adapter)
+    fun cacheHealthIndicator(pingable: CachePingable) =
+        PingableHealthIndicator(pingable)
 
     private fun cacheConfig(cfg: CachableRestConfig) =
         defaultCacheConfig()
@@ -77,4 +79,5 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
         }.build()
     }
 }
+
 

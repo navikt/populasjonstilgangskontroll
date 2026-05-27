@@ -7,7 +7,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.SharedPostgresContainer
+import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
@@ -128,7 +128,7 @@ class NomDBOpprydderTest : BehaviorSpec() {
     private fun bliLeder() = setField(opprydder, "erLeder", true)
     private companion object {
         @ServiceConnection
-        private val postgres = SharedPostgresContainer.instance
+        private val postgres = postgreSQLContainer
         private fun nyttNavId() = "Z%06d".format(counter.incrementAndGet())
         private const val FNR = "08526835670"
         private val counter = AtomicInteger(0)

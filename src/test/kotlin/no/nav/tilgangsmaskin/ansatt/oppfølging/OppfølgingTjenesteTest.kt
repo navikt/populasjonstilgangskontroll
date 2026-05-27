@@ -29,13 +29,14 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
-import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import no.nav.tilgangsmaskin.SharedPostgresContainer
+import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.time.Instant
 import java.util.UUID.*
 
 @DataJpaTest
@@ -55,13 +56,15 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
 
     @MockkSpyBean private lateinit var adapter: OppfølgingJPAAdapter
     @Autowired private lateinit var tjeneste: OppfølgingTjeneste
-    @Autowired private lateinit var cacheManager: CacheManager
 
     @Qualifier("cacheOperations")
     @Autowired private lateinit var cache: CacheOperations
 
     init {
-        beforeEach { cacheManager.getCache(OPPFØLGING)?.clear() }
+        beforeEach { cache.clear(OPPFØLGING_CACHE) }
+
+        fun startet(periode: java.util.UUID = randomUUID()) =
+            Oppfølgingsendring.Startet(periode, IDENTER, KONTOR, Instant.parse("2024-01-01T09:00:00Z"))
 
         Given("enhetFor") {
             When("det ikke finnes oppfølging") {
@@ -73,13 +76,13 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
 
             When("oppfølging er registrert") {
                 Then("caches resultatet etter første oppslag") {
-                    tjeneste.registrer(randomUUID(), IDENTER, KONTOR)
+                    tjeneste.registrer(startet())
                     tjeneste.enhetFor(Identifikator(brukerId.verdi))
                     verify(exactly = 0) { adapter.enhetFor(brukerId.verdi) }
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, brukerId.verdi) shouldBe kontor
                 }
                 Then("returneres enhet ved cache-treff uten adapter-kall") {
-                    tjeneste.registrer(randomUUID(), IDENTER, KONTOR)
+                    tjeneste.registrer(startet())
                     tjeneste.enhetFor(Identifikator(brukerId.verdi)) shouldBe kontor
                 }
             }
@@ -88,25 +91,25 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
         Given("registrer") {
             When("registrering utføres") {
                 Then("populeres cache for brukerId") {
-                    tjeneste.registrer(randomUUID(), IDENTER, KONTOR)
+                    tjeneste.registrer(startet())
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, brukerId.verdi) shouldBe kontor
                 }
                 Then("populeres cache for aktørId") {
-                    tjeneste.registrer(randomUUID(), IDENTER, KONTOR)
+                    tjeneste.registrer(startet())
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, aktørId.verdi) shouldBe kontor
                 }
             }
         }
 
-        Given("avslutt") {
+        Given("avslutning av oppfølging") {
             When("avslutt kalles etter registrering") {
                 Then("fjernes cache-innslag for brukerId og aktørId") {
                     val id = randomUUID()
-                    tjeneste.registrer(id, IDENTER, KONTOR)
+                    tjeneste.registrer(startet(id))
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, brukerId.verdi) shouldBe kontor
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, aktørId.verdi) shouldBe kontor
 
-                    tjeneste.avslutt(id, IDENTER)
+                    tjeneste.avslutt(Oppfølgingsendring.Avsluttet(id, IDENTER))
 
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, brukerId.verdi) shouldBe null
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, aktørId.verdi) shouldBe null
@@ -122,6 +125,6 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
         private val IDENTER  = Identer(brukerId, aktørId)
         private val KONTOR = Kontor(kontor, "Testenhet")
         @ServiceConnection
-        private val postgres = SharedPostgresContainer.instance
+        private val postgres = postgreSQLContainer
     }
 }

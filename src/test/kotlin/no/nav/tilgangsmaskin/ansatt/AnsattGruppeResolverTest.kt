@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -73,9 +74,11 @@ class AnsattGruppeResolverTest : BehaviorSpec({
             Then("slår opp globale og GEO-grupper i Entra") {
                 val forventet = setOf(geoGruppe, EntraGruppe(NASJONAL.id))
                 every { entra.geoOgGlobaleGrupper(ansattId, oid) } returns forventet
-                resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder forventet
-                verify { entra.geoOgGlobaleGrupper(ansattId, oid) }
-                verify(exactly = 0) { entra.geoGrupper(any(), any()) }
+                assertSoftly {
+                    resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder forventet
+                    verify { entra.geoOgGlobaleGrupper(ansattId, oid) }
+                    verify(exactly = 0) { entra.geoGrupper(any(), any()) }
+                }
             }
         }
     }
@@ -90,9 +93,11 @@ class AnsattGruppeResolverTest : BehaviorSpec({
         When("ansatt har nasjonal tilgang") {
             Then("returneres kun globale grupper uten Entra-oppslag") {
                 every { token.globaleGruppeIds } returns setOf(NASJONAL.id)
-                resolver.grupperForAnsatt(ansattId) shouldBe setOf(EntraGruppe(NASJONAL.id, NASJONAL.name))
-                verify(exactly = 0) { entra.geoGrupper(any(), any()) }
-                verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
+                assertSoftly {
+                    resolver.grupperForAnsatt(ansattId) shouldBe setOf(EntraGruppe(NASJONAL.id, NASJONAL.name))
+                    verify(exactly = 0) { entra.geoGrupper(any(), any()) }
+                    verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
+                }
             }
         }
 
@@ -100,9 +105,11 @@ class AnsattGruppeResolverTest : BehaviorSpec({
             Then("slås opp GEO-grupper i Entra") {
                 every { token.globaleGruppeIds } returns emptySet()
                 every { entra.geoGrupper(ansattId, oid) } returns setOf(geoGruppe)
-                resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder setOf(geoGruppe)
-                verify { entra.geoGrupper(ansattId, oid) }
-                verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
+                assertSoftly {
+                    resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder setOf(geoGruppe)
+                    verify { entra.geoGrupper(ansattId, oid) }
+                    verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
+                }
             }
         }
 
@@ -125,8 +132,10 @@ class AnsattGruppeResolverTest : BehaviorSpec({
         When("miljø er dev/test") {
             Then("slås opp globale og GEO-grupper i Entra") {
                 every { entra.geoOgGlobaleGrupper(ansattId, oid) } returns setOf(geoGruppe)
-                resolver.grupperForAnsatt(ansattId) shouldBe setOf(geoGruppe)
-                verify { entra.geoOgGlobaleGrupper(ansattId, oid) }
+                assertSoftly {
+                    resolver.grupperForAnsatt(ansattId) shouldBe setOf(geoGruppe)
+                    verify { entra.geoOgGlobaleGrupper(ansattId, oid) }
+                }
             }
         }
 

@@ -1,0 +1,76 @@
+package no.nav.tilgangsmaskin.ansatt.oppfølging
+
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.types.shouldBeInstanceOf
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.ARBEIDSOPPFOLGINGSKONTOR_ENDRET
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_AVSLUTTET
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_STARTET
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
+import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.Avsluttet
+import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.KontorEndret
+import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.Startet
+import no.nav.tilgangsmaskin.bruker.AktørId
+import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.Enhetsnummer
+import no.nav.tilgangsmaskin.bruker.Identer
+import java.time.Instant
+import java.util.UUID
+
+class OppfølgingsendringTest : BehaviorSpec({
+
+    Given("OPPFOLGING_STARTET med kontor") {
+        Then("mapper til Startet") {
+            val resultat = hendelse(OPPFOLGING_STARTET).tilDomene()
+            resultat shouldBe Startet(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, TIDSPUNKT)
+        }
+    }
+
+    Given("ARBEIDSOPPFOLGINGSKONTOR_ENDRET med kontor") {
+        Then("mapper til KontorEndret") {
+            val resultat = hendelse(ARBEIDSOPPFOLGINGSKONTOR_ENDRET).tilDomene()
+            resultat shouldBe KontorEndret(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, TIDSPUNKT)
+        }
+    }
+
+    Given("OPPFOLGING_AVSLUTTET") {
+        Then("mapper til Avsluttet uavhengig av kontor") {
+            val resultat = hendelse(OPPFOLGING_AVSLUTTET, kontor = null).tilDomene()
+            resultat.shouldBeInstanceOf<Avsluttet>()
+        }
+    }
+
+    Given("OPPFOLGING_STARTET uten kontor") {
+        Then("kaster IllegalArgumentException med kontekstuell melding") {
+             shouldThrow<IllegalArgumentException> {
+                hendelse(OPPFOLGING_STARTET, kontor = null).tilDomene()
+            }
+        }
+    }
+
+    Given("ARBEIDSOPPFOLGINGSKONTOR_ENDRET uten kontor") {
+        Then("kaster IllegalArgumentException med kontekstuell melding") {
+            shouldThrow<IllegalArgumentException> {
+                hendelse(ARBEIDSOPPFOLGINGSKONTOR_ENDRET, kontor = null).tilDomene()
+            }
+        }
+    }
+}) {
+    companion object {
+        private fun hendelse(type: EndringType, kontor: Kontor? = KONTOR) =
+            OppfølgingHendelse(
+                kontor, type, ID, AKTOR_ID, BRUKER_ID,TIDSPUNKT, if (type == OPPFOLGING_AVSLUTTET) Instant.now() else null,
+                PRODUCER_TIMESTAMP,
+            )
+        private val ID = UUID.randomUUID()
+        private val BRUKER_ID = BrukerId("08526835670")
+        private val AKTOR_ID = AktørId("1234567890123")
+        private val KONTOR = Kontor(Enhetsnummer("0301"), "NAV Oslo")
+        private val TIDSPUNKT = Instant.parse("2024-01-01T09:00:00Z")
+        private val PRODUCER_TIMESTAMP = Instant.parse("2024-01-01T09:00:01Z")
+    }
+}
+

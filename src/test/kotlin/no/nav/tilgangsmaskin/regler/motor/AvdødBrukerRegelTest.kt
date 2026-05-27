@@ -1,6 +1,8 @@
+
 package no.nav.tilgangsmaskin.regler.motor
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.mockk.MockKAnnotations.init
@@ -36,7 +38,7 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
     @SpyK
     private var auditor = LocalAuditor()
 
-    private lateinit var regel: AvdødBrukerTellendeRegel
+    private lateinit var regel: AvdødBrukerRegel
     private val NAV_TESTKONTOR = "NAV Testkontor"
     private val ansattId = AnsattId("Z999999")
     private val ansatt = AnsattBuilder(ansattId).build()
@@ -48,8 +50,8 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
         }
         beforeEach {
             clearAllMocks()
-            beforeEach { every { token.system } returns "system" }
-            regel = AvdødBrukerTellendeRegel(teller, proxy, auditor, token)
+            every { token.system } returns "system"
+            regel = AvdødBrukerRegel(auditor, teller, proxy, token)
         }
 
         Given("Bruker lever") {
@@ -64,55 +66,55 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
             val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(1)).build()
             When("regel evalueres") {
                 Then("tilgang godkjennes") { regel.evaluer(ansatt, bruker).shouldBeTrue() }
-                And("oppslag skal telles") { regel.skalTelle(ansatt, bruker).shouldBeTrue() }
+                And("oppslag skal ikke telles fordi < 1 år") { regel.skalTelle(ansatt, bruker) shouldBe false }
             }
         }
 
         Given("Bruker er død for opptil ett år siden") {
             val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(1)).build()
             When("dødsdato er mindre enn 6 måneder siden") {
-                Then("bruker enhetsnavn $UTILGJENGELIG og slår ikke opp enhetsnavn for 0-6 måneder") {
-                    regel.evaluer(ansatt, bruker)
-                    verify { teller.tell(MND_0_6, UTILGJENGELIG) }
+                Then("tilgang godkjennes og ingen telling skjer for 0-6 måneder") {
+                    regel.evaluer(ansatt, bruker).shouldBeTrue()
+                    verify(exactly = 0) { teller.tell(any<no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode>(), any<String>()) }
                     verify(exactly = 0) { proxy.enhet(ansattId) }
                 }
             }
             When("dødsdato er mellom 6 og 12 måneder siden") {
                 val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(9)).build()
-                Then("bruker enhetsnavn $UTILGJENGELIG og slår ikke opp enhetsnavn for 7-12 måneder") {
-                    regel.evaluer(ansatt, bruker)
-                    verify { teller.tell(MND_7_12, UTILGJENGELIG) }
+                Then("tilgang godkjennes og ingen telling skjer for 7-12 måneder") {
+                    regel.evaluer(ansatt, bruker).shouldBeTrue()
+                    verify(exactly = 0) { teller.tell(any<no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode>(), any<String>()) }
                     verify(exactly = 0) { proxy.enhet(ansattId) }
                 }
             }
         }
 
-        Given("Bruker er død for mer enn ett år siden") {
+        Given("Bruker er død for mer enn ett år siden og ansatt er ikke i AVDØD-gruppen") {
             val enhet = Enhet(Enhetsnummer("1234"), NAV_TESTKONTOR)
             beforeEach { every { proxy.enhet(ansattId) } returns enhet }
             When("dødsdato er mellom ett og to år siden") {
                 val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(15)).build()
-                Then("henter enhetsnavn fra proxy og bruker dette i metrikken for 13-24 måneder") {
-                    regel.evaluer(ansatt, bruker).shouldBeTrue()
+                Then("tilgang blokkeres, men telles med enhetsnavn for 13-24 måneder") {
+                    regel.evaluer(ansatt, bruker).shouldBeFalse()
                     verify { proxy.enhet(ansattId) }
                     verify { teller.tell(MND_13_24, enhet.navn) }
                     verify { auditor.info(any()) }
                 }
             }
             When("dødsdato er mer enn to år siden") {
-                Then("henter enhetsnavn fra proxy og bruker dette i metrikken for mer enn 24 måneder") {
+                Then("tilgang blokkeres, men telles med enhetsnavn for mer enn 24 måneder") {
                     val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(30)).build()
-                    regel.evaluer(ansatt, bruker).shouldBeTrue()
+                    regel.evaluer(ansatt, bruker).shouldBeFalse()
                     verify { proxy.enhet(ansattId) }
                     verify { teller.tell(MND_OVER_24, enhet.navn) }
                     verify { auditor.info(any()) }
                 }
             }
             When("oppslaget mot proxy feiler") {
-                Then("bruker enhetsnavn $UTILGJENGELIG i metrikken") {
+                Then("tilgang blokkeres og enhetsnavn $UTILGJENGELIG brukes i metrikken") {
                     val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(15)).build()
                     every { proxy.enhet(ansattId) } throws RuntimeException("Shit happens")
-                    regel.evaluer(ansatt, bruker)
+                    regel.evaluer(ansatt, bruker).shouldBeFalse()
                     verify { teller.tell(MND_13_24, UTILGJENGELIG) }
                 }
             }

@@ -47,11 +47,8 @@ import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfig
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
-import no.nav.tilgangsmaskin.SharedPostgresContainer
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringRegelTjenesteTest.RegelMotorTestConfig
-import org.springframework.boot.test.context.TestConfiguration
+import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestPropertySource
 import org.testcontainers.junit.jupiter.Testcontainers
 
@@ -62,7 +59,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @ContextConfiguration(classes = [TestApp::class, OverstyringTjeneste::class,OverstyringJPAAdapter::class,RegelTjeneste::class,LocalAuditor::class])
 @AutoConfigureMetrics
 @Testcontainers
-@Import(RegelMotorTestConfig::class)
+@ComponentScan("no.nav.tilgangsmaskin.regler.motor")
 @ApplyExtension(SpringExtension::class)
 class OverstyringRegelTjenesteTest : BehaviorSpec() {
 
@@ -101,10 +98,6 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
     lateinit var regler: RegelTjeneste
 
 
-    @TestConfiguration
-    @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
-    class RegelMotorTestConfig
-
     init {
 
         beforeEach {
@@ -122,7 +115,7 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
             every { token.erCC } returns true
         }
 
-        Given("bulk") {
+        Given("bulk-oppslag med overstyring") {
             When("brukere krever spesialtilganger ansatt mangler") {
                 Then("havner de i avviste") {
                     every {
@@ -166,20 +159,26 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
             When("dnr er erstattet med fnr") {
                 Then("avvises ikke") {
                     every { brukere.brukerMedNærmesteFamilie(dnr.verdi) } returns BrukerBuilder(vanligBrukerId).historiske(setOf(dnr)).build()
-                    shouldNotThrowAny { regler.kompletteRegler(ansattId, dnr.verdi) }
+                    shouldNotThrowAny {
+                        regler.kompletteRegler(ansattId, dnr.verdi)
+                    }
                 }
             }
             When("overstyring er registrert og en regel avslår") {
                 Then("gis tilgang") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
                     overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
-                    shouldNotThrowAny { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
+                    shouldNotThrowAny {
+                        regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
+                    }
                 }
             }
             When("regel avslår og ingen overstyring er registrert") {
                 Then("gis ikke tilgang") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
-                    shouldThrow<RegelException> { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
+                    shouldThrow<RegelException> {
+                        regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
+                    }
                 }
             }
         }
@@ -188,7 +187,9 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
             When("bruker finnes i PDL") {
                 Then("kjøres uten unntak") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
-                    shouldNotThrowAny { regler.kjerneregler(ansattId, vanligBrukerId.verdi) }
+                    shouldNotThrowAny {
+                        regler.kjerneregler(ansattId, vanligBrukerId.verdi)
+                    }
                 }
             }
         }
@@ -197,7 +198,9 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
             When("kjerneregler avslår") {
                 Then("registreres ikke overstyring") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build()
-                    shouldThrow<RegelException> { overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN)) }
+                    shouldThrow<RegelException> {
+                        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
+                    }
                     overstyring.erOverstyrt(ansattId, vanligBrukerId) shouldBe false
                 }
             }
@@ -232,6 +235,6 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
 
     companion object {
         @ServiceConnection
-        private val postgres = SharedPostgresContainer.instance
+        private val postgres = postgreSQLContainer
     }
 }

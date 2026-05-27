@@ -35,7 +35,9 @@ class CacheExpiredEventListenerTest : BehaviorSpec({
                 val listener = CacheExpiredEventListener(teller(), true, oppfrisker)
                 listener.start()
                 listener.cacheInnslagFjernet(hendelse)
-                verify { oppfrisker.oppfrisk(CacheNøkkel(nkkel)) }
+                verify {
+                    oppfrisker.oppfrisk(CacheNøkkel(nkkel))
+                }
             }
         }
 
@@ -44,7 +46,9 @@ class CacheExpiredEventListenerTest : BehaviorSpec({
                 val oppfrisker = oppfrisker("pdl")
                 val listener = CacheExpiredEventListener(teller(), true, oppfrisker)
                 listener.cacheInnslagFjernet(hendelse)
-                verify(exactly = 0) { oppfrisker.oppfrisk(any()) }
+                verify(exactly = 0) {
+                    oppfrisker.oppfrisk(any())
+                }
             }
         }
 
@@ -55,7 +59,9 @@ class CacheExpiredEventListenerTest : BehaviorSpec({
                 listener.start()
                 listener.stop()
                 listener.cacheInnslagFjernet(hendelse)
-                verify(exactly = 0) { oppfrisker.oppfrisk(any()) }
+                verify(exactly = 0) {
+                    oppfrisker.oppfrisk(any())
+                }
             }
         }
 
@@ -65,7 +71,9 @@ class CacheExpiredEventListenerTest : BehaviorSpec({
                 val listener = CacheExpiredEventListener(teller(), false, oppfrisker)
                 listener.start()
                 listener.cacheInnslagFjernet(hendelse)
-                verify(exactly = 0) { oppfrisker.oppfrisk(any()) }
+                verify(exactly = 0) {
+                    oppfrisker.oppfrisk(any())
+                }
             }
         }
 
@@ -75,7 +83,9 @@ class CacheExpiredEventListenerTest : BehaviorSpec({
                 val listener = CacheExpiredEventListener(teller(), erLeder = true, oppfrisker)
                 listener.start()
                 listener.cacheInnslagFjernet(hendelse)
-                verify(exactly = 0) { oppfrisker.oppfrisk(any()) }
+                verify(exactly = 0) {
+                    oppfrisker.oppfrisk(any())
+                }
             }
         }
 
@@ -87,7 +97,9 @@ class CacheExpiredEventListenerTest : BehaviorSpec({
                 listener.start()
                 listener.cacheInnslagFjernet(hendelse)
                 verify { første.oppfrisk(any()) }
-                verify(exactly = 0) { andre.oppfrisk(any()) }
+                verify(exactly = 0) {
+                    andre.oppfrisk(any())
+                }
             }
         }
 

@@ -103,14 +103,14 @@ class BrukerIdTest : BehaviorSpec({
                 }
             }
         }
-        When("W1=1") {
+        When("kontrollsiffer 1 er feil") {
             Then("kastes IllegalArgumentException (08526835682)") {
                 shouldThrow<IllegalArgumentException> {
                     BrukerId("08526835682")
                 }
             }
         }
-        When("W2=1") {
+        When("kontrollsiffer 2 er feil") {
             Then("kastes IllegalArgumentException (10000000910)") {
                 shouldThrow<IllegalArgumentException> {
                     BrukerId("10000000910")

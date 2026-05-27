@@ -7,7 +7,6 @@ import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
-import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
 import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
@@ -17,7 +16,6 @@ import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringClientValidator.OverstyringException
-import org.jboss.logging.MDC
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -49,38 +47,32 @@ class OverstyringTjeneste(
 
 
     @Transactional
-    fun overstyr(ansattId: AnsattId, data: OverstyringData) =
-        runCatching {
-            MDC.put(USER_ID, ansattId.verdi)
+    fun overstyr(ansattId: AnsattId, data: OverstyringData): Boolean {
+        try {
             validator.validerKonsument()
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val bruker = brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi)
-            motor.kjerneregler(ansatt,bruker)
+            motor.kjerneregler(ansatt, bruker)
             val enhet = enhetFor(ansattId)
-            adapter.overstyr(ansattId.verdi, enhet, data).also {
-                teller.tell(INGEN_REGEL_TAG,OVERSTYRT)
-                log.info("Overstyring til og med ${data.gyldigtil} ble registrert for $ansattId og ${data.brukerId}")
-            }
-            true
-        }.getOrElse {
-            overstyringFeilet(it, ansattId, data)
-        }
-
-    private fun overstyringFeilet(t: Throwable,ansattId: AnsattId, data: OverstyringData): Nothing {
-        when (t) {
-            is RegelException -> throw RegelException(OVERSTYRING_MESSAGE_CODE,
-                arrayOf(t.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
-                e = t).also {
-                log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}", it)
-                teller.tell(regelTag(t.regel),IKKE_OVERSTYRT,tokenSystemTag(UTILGJENGELIG))
-            }
-            is OverstyringException -> throw t.also {
-                log.warn("Overstyring feilet pga klientvalidering ${t.message} for $ansattId og ${data.brukerId}", it)
-                teller.tell(INGEN_REGEL_TAG,IKKE_OVERSTYRT,tokenSystemTag(t.system))
-            }
-            else -> throw t
+            adapter.overstyr(ansattId.verdi, enhet, data)
+            teller.tell(INGEN_REGEL_TAG, OVERSTYRT)
+            log.info("Overstyring til og med ${data.gyldigtil} ble registrert for $ansattId og ${data.brukerId}")
+            return true
+        } catch (e: RegelException) {
+            log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}", e)
+            teller.tell(regelTag(e.regel), IKKE_OVERSTYRT, tokenSystemTag(UTILGJENGELIG))
+            throw RegelException(
+                OVERSTYRING_MESSAGE_CODE,
+                arrayOf(e.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
+                e = e
+            )
+        } catch (e: OverstyringException) {
+            log.warn("Overstyring feilet pga klientvalidering ${e.message} for $ansattId og ${data.brukerId}", e)
+            teller.tell(INGEN_REGEL_TAG, IKKE_OVERSTYRT, tokenSystemTag(e.system))
+            throw e
         }
     }
+
     private fun gjeldendeOverstyring(ansattId: AnsattId, brukerId: BrukerId): Instant? =
         adapter.gjeldendeOverstyring(ansattId.verdi, brukerId.verdi,
         brukerTjeneste.brukerMedNærmesteFamilie(brukerId.verdi).historiskeIds.map {

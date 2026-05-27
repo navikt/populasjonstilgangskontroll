@@ -20,11 +20,7 @@ class OppfølgingHendelseKonsumentTest : BehaviorSpec({
     val oppfølging = mockk<OppfølgingTjeneste>(relaxed = true)
     val konsument = OppfølgingHendelseKonsument(oppfølging)
 
-    fun hendelse(
-        type: OppfølgingHendelse.EndringType,
-        kontor: Kontor? = KONTOR,
-        sluttTidspunkt: Instant? = null,
-    ) = OppfølgingHendelse(
+    fun hendelse(type: OppfølgingHendelse.EndringType, kontor: Kontor? = KONTOR, sluttTidspunkt: Instant? = null) = OppfølgingHendelse(
         kontor,
         type,
         ID,
@@ -39,51 +35,34 @@ class OppfølgingHendelseKonsumentTest : BehaviorSpec({
 
     Given("OPPFOLGING_STARTET") {
         When("listen kalles") {
-            Then("kalles registrer med riktige argumenter") {
+            Then("kalles registrer med Startet-domeneobjekt") {
                 konsument.listen(hendelse(OPPFOLGING_STARTET))
-
                 verify {
-                    oppfølging.registrer(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, START_TIDSPUNKT)
+                    oppfølging.registrer(Oppfølgingsendring.Startet(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, START_TIDSPUNKT))
                 }
-            }
-            Then("kalles ikke avslutt") {
-                konsument.listen(hendelse(OPPFOLGING_STARTET))
-
-                verify(exactly = 0) { oppfølging.avslutt(any(), any()) }
             }
         }
     }
 
     Given("ARBEIDSOPPFOLGINGSKONTOR_ENDRET") {
         When("listen kalles") {
-            Then("kalles registrer med riktige argumenter") {
+            Then("kalles registrer med KontorEndret-domeneobjekt") {
                 konsument.listen(hendelse(ARBEIDSOPPFOLGINGSKONTOR_ENDRET))
-
                 verify {
-                    oppfølging.registrer(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, START_TIDSPUNKT)
+                    oppfølging.registrer(Oppfølgingsendring.KontorEndret(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, START_TIDSPUNKT))
                 }
-            }
-            Then("kalles ikke avslutt") {
-                konsument.listen(hendelse(ARBEIDSOPPFOLGINGSKONTOR_ENDRET))
-
-                verify(exactly = 0) { oppfølging.avslutt(any(), any()) }
             }
         }
     }
 
     Given("OPPFOLGING_AVSLUTTET") {
         When("listen kalles") {
-            Then("kalles avslutt med riktige argumenter") {
-                konsument.listen(hendelse(OPPFOLGING_AVSLUTTET, kontor = null, sluttTidspunkt = Instant.now()))
+            Then("kalles avslutt med Avsluttet-domeneobjekt") {
+                konsument.listen(hendelse(OPPFOLGING_AVSLUTTET,  null,  Instant.now()))
 
                 verify {
-                    oppfølging.avslutt(ID, Identer(BRUKER_ID, AKTOR_ID))
+                    oppfølging.avslutt(Oppfølgingsendring.Avsluttet(ID, Identer(BRUKER_ID, AKTOR_ID)))
                 }
-            }
-            Then("kalles ikke registrer") {
-                konsument.listen(hendelse(OPPFOLGING_AVSLUTTET, kontor = null, sluttTidspunkt = Instant.now()))
-
-                verify(exactly = 0) { oppfølging.registrer(any(), any(), any(), any()) }
             }
         }
     }

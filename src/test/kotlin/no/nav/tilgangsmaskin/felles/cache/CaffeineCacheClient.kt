@@ -37,7 +37,6 @@ class CaffeineCacheClient(private val cacheManager: CacheManager) : CacheOperati
     }
 
     override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
-        if (innslag.isEmpty()) return
         val springCache = cacheManager.getCache(cache.name) ?: return
         log.trace("Caffeine bulk lagrer {} verdier for cache {}", innslag.size, cache.name)
         innslag.forEach { (id, value) -> springCache.put(tilNøkkel(cache, id), value) }

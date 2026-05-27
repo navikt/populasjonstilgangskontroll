@@ -10,13 +10,19 @@ class CacheNøkkelTest : BehaviorSpec({
         val nøkkel = CacheNøkkel("graph::geoGrupper:Z999999")
 
         When("cacheName parses") {
-            Then("cacheName er graph") { nøkkel.cacheName shouldBe "graph" }
+            Then("cacheName er graph") {
+                nøkkel.cacheName shouldBe "graph"
+            }
         }
         When("metode parses") {
-            Then("metode er geoGrupper") { nøkkel.metode shouldBe "geoGrupper" }
+            Then("metode er geoGrupper") {
+                nøkkel.metode shouldBe "geoGrupper"
+            }
         }
         When("id parses") {
-            Then("id er Z999999") { nøkkel.id shouldBe "Z999999" }
+            Then("id er Z999999") {
+                nøkkel.id shouldBe "Z999999"
+            }
         }
         When("masked genereres") {
             Then("id maskeres ikke for kort id") { nøkkel.maskert shouldBe "graph::geoGrupper:Z999999" }
@@ -43,16 +49,23 @@ class CacheNøkkelTest : BehaviorSpec({
 
     Given("maskering") {
         When("11-sifret fnr i id") {
-            Then("maskeres") { CacheNøkkel("skjerming::08526835670").maskert shouldBe "skjerming::0852*******" }
+            Then("maskeres") {
+                CacheNøkkel("skjerming::08526835670").maskert shouldBe "skjerming::0852*******"
+            }
         }
         When("13-sifret aktørId i id") {
-            Then("maskeres") { CacheNøkkel("pdl::1234567890123").maskert shouldBe "pdl::123456*******" }
+            Then("maskeres") {
+                CacheNøkkel("pdl::1234567890123").maskert shouldBe "pdl::123456*******"
+            }
         }
         When("kort id") {
-            Then("maskeres ikke") { CacheNøkkel("nom::Z999999").maskert shouldBe "nom::Z999999" }
+            Then("maskeres ikke") {
+                CacheNøkkel("nom::Z999999").maskert shouldBe "nom::Z999999"
+            }
         }
         When("fnr i id med metode satt") {
-            Then("maskeres") { CacheNøkkel("pdl::medFamilie:08526835670").maskert shouldBe "pdl::medFamilie:0852*******" }
+            Then("maskeres") {
+                CacheNøkkel("pdl::medFamilie:08526835670").maskert shouldBe "pdl::medFamilie:0852*******" }
         }
     }
 

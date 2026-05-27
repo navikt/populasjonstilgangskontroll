@@ -42,7 +42,7 @@ class TilgangControllerTest : BehaviorSpec() {
 
         beforeEach {
             clearAllMocks()
-            mockMvc = standaloneSetup(TilgangController(regelTjeneste, overstyringTjeneste, token, teller))
+            mockMvc = standaloneSetup(TilgangController(regelTjeneste, overstyringTjeneste, token, TokenTypeGuard(token), teller))
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
                 .build()
             justRun { teller.tell(any<Tags>()) }

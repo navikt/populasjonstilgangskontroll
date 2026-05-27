@@ -43,7 +43,7 @@ class RegelTjenesteTest : BehaviorSpec() {
             regler = RegelTjeneste(motor, brukere, ansatte, overstyring, LocalAuditor())
         }
 
-        Given("bulk") {
+        Given("bulk-tilgangskontroll") {
             When("avvist bruker og overstyring er registrert") {
                 Then("havner bruker i godkjente") {
                     val funnetBruker = BrukerBuilder(vanligBrukerId).build()

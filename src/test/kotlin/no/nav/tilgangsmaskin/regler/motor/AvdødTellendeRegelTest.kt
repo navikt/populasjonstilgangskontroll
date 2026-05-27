@@ -16,7 +16,7 @@ class AvdødTellendeRegelTest : BehaviorSpec({
         every { it.clusterAndSystem } returns "test-system:dev-gcp"
     }
 
-    Given("tell") {
+    Given("telling av dødsperioder") {
         Dødsperiode.entries.forEach { intervall ->
             When("intervall er ${intervall.tekst}") {
                 Then("brukes intervall.tekst som months-tag") {

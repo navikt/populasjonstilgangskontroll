@@ -91,7 +91,7 @@ class TokenTest : BehaviorSpec({
         }
     }
 
-    Given("oid") {
+    Given("oid-oppslag fra token") {
         When("oid finnes") {
             Then("returnerer oid") {
                 every { claims.getStringClaim(OID) } returns oid.toString()
@@ -139,7 +139,7 @@ class TokenTest : BehaviorSpec({
         }
     }
 
-    Given("cluster") {
+    Given("cluster-informasjon fra token") {
         When("azp_name har tre deler") {
             Then("returnerer første del") {
                 every { claims.getStringClaim(AZP_NAME) } returns "dev-gcp:team:app"

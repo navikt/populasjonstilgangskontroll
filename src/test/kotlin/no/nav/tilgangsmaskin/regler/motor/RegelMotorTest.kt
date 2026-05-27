@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.AVDØD
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
@@ -473,7 +474,7 @@ class RegelMotorTest : BehaviorSpec() {
                 val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(15)).build()
 
                 Then("tilgang gis") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.AVDØD).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(AVDØD).build()
                     ansatt kanBehandle bruker
                 }
             }

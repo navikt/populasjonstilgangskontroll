@@ -38,6 +38,7 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import io.kotest.matchers.comparables.shouldBeLessThan
+import org.springframework.context.annotation.Primary
 import java.time.Duration.ofSeconds
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -53,6 +54,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
     class ValkeyCacheTestConfig(private val cf: RedisConnectionFactory) {
 
         @Bean
+        @Primary
         fun cacheConfig() =
             CacheConfig("unused", "unused", redis.host, redis.firstMappedPort, ofSeconds(5))
 

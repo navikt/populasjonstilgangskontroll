@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.regler.motor
 
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.ansatt.Ansatt
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.AVDØD
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.UTENLANDSK
@@ -51,7 +51,7 @@ class AvdødBrukerRegel : OverstyrbarRegel {
 
     override fun evaluer(ansatt: Ansatt, bruker: Bruker)  =
          avvisHvis {
-            bruker harVærtDødMerEnn 1.år && ansatt ikkeErMedlemAv EntraGlobalGruppe.AVDØD
+            bruker harVærtDødMerEnn 1.år && ansatt ikkeErMedlemAv AVDØD
         }
 }
 

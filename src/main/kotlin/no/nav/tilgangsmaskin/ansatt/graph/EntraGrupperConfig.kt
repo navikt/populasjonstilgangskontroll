@@ -50,7 +50,7 @@ class EntraGrupperConfig : CachableRestConfig, RestConfig(ENTRA_BASE_URI, ENTRA_
         const val PARAM_NAME_SELECT = "\$select"
         const val PARAM_NAME_FILTER = "\$filter"
         const val PARAM_NAME_COUNT = "\$count"
-        const val GRUPPER_FILTER = "startswith(displayName,'0000-GA-GEO') or startswith(displayName,'0000-GA-ENHET') or startswith(displayName,'0000-GA-Avdod_Bruker')"
+        const val GRUPPER_FILTER = "startswith(displayName,'0000-GA-GEO') or startswith(displayName,'0000-GA-ENHET')"
         val GEO_CACHE = CacheNøkkelConfig(GRAPH, GEO)
         val GEO_OG_GLOBALE_CACHE = CacheNøkkelConfig(GRAPH, GEO_OG_GLOBALE)
         val ENTRA_CACHES = setOf(GEO_CACHE, GEO_OG_GLOBALE_CACHE)

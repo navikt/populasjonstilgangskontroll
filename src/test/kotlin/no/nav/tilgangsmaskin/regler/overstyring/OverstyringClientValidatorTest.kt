@@ -17,9 +17,9 @@ class OverstyringClientValidatorTest : BehaviorSpec({
     val token = mockk<Token>()
     val cfg = OverstyringConfig()
 
-    fun validator(activeProfiles: List<String> = listOf(DEV_GCP)) =
+    fun validator(vararg activeProfiles:  String) =
         OverstyringClientValidator(cfg, token, MockEnvironment().apply {
-            setActiveProfiles(*activeProfiles.toTypedArray())
+            setActiveProfiles(*activeProfiles)
         })
 
     Given("validerKonsument - i prod") {
@@ -27,7 +27,7 @@ class OverstyringClientValidatorTest : BehaviorSpec({
             Then("kastes ikke exception") {
                 every { token.systemNavn } returns "histark"
                 shouldNotThrowAny {
-                    validator(listOf(PROD_GCP)).valider()
+                    validator(PROD_GCP).valider()
                 }
             }
         }
@@ -35,7 +35,7 @@ class OverstyringClientValidatorTest : BehaviorSpec({
             Then("kastes ikke exception") {
                 every { token.systemNavn } returns "gosys"
                 shouldNotThrowAny {
-                    validator(listOf(PROD_GCP)).valider()
+                    validator(PROD_GCP).valider()
                 }
             }
         }
@@ -43,7 +43,7 @@ class OverstyringClientValidatorTest : BehaviorSpec({
             Then("kastes OverstyringException med systemnavnet") {
                 every { token.systemNavn } returns "ukjent-system"
                 shouldThrow<OverstyringException> {
-                    validator(listOf(PROD_GCP)).valider()
+                    validator(PROD_GCP).valider()
                 }
             }
         }
@@ -54,7 +54,7 @@ class OverstyringClientValidatorTest : BehaviorSpec({
             Then("kastes ikke exception") {
                 every { token.systemNavn } returns "ukjent-system"
                 shouldNotThrowAny {
-                    validator(listOf(DEV_GCP)).valider()
+                    validator(DEV_GCP).valider()
                 }
             }
         }
@@ -62,7 +62,7 @@ class OverstyringClientValidatorTest : BehaviorSpec({
             Then("kastes ikke exception") {
                 every { token.systemNavn } returns "ukjent-system"
                 shouldNotThrowAny {
-                    validator(listOf(LOCAL)).valider()
+                    validator(LOCAL).valider()
                 }
             }
         }

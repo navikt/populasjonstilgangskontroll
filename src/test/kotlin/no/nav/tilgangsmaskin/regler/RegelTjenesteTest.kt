@@ -29,7 +29,7 @@ class RegelTjenesteTest : BehaviorSpec() {
     private val motor      = mockk<RegelMotor>()
     private val brukere    = mockk<BrukerTjeneste>()
     private val ansatte    = mockk<AnsattTjeneste>()
-    private val overstyring = mockk<EnkeltTilgangTjeneste>()
+    private val enkeltTilgang = mockk<EnkeltTilgangTjeneste>()
 
     init {
         val vanligBrukerId = BrukerId("08526835670")
@@ -40,17 +40,17 @@ class RegelTjenesteTest : BehaviorSpec() {
         beforeEach {
             clearAllMocks()
             every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-            regler = RegelTjeneste(motor, brukere, ansatte, overstyring, LocalAuditor())
+            regler = RegelTjeneste(motor, brukere, ansatte, enkeltTilgang, LocalAuditor())
         }
 
         Given("bulk-tilgangskontroll") {
-            When("avvist bruker og overstyring er registrert") {
+            When("avvist bruker og enkelttilgang er registrert") {
                 Then("havner bruker i godkjente") {
                     val funnetBruker = BrukerBuilder(vanligBrukerId).build()
                     val regelException = RegelException(AnsattBuilder(ansattId).build(), funnetBruker, mockk<Regel>(relaxed = true))
                     every { brukere.brukere(setOf(vanligBrukerId.verdi)) } returns setOf(funnetBruker)
                     every { motor.bulkRegler(any(), any()) } returns setOf(BulkResultat.avvist(funnetBruker, regelException))
-                    every { overstyring.tilganger(any(), any()) } returns listOf(vanligBrukerId)
+                    every { enkeltTilgang.tilganger(any(), any()) } returns listOf(vanligBrukerId)
 
                     val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
                     assertSoftly {
@@ -61,13 +61,13 @@ class RegelTjenesteTest : BehaviorSpec() {
                     }
                 }
             }
-            When("avvist bruker og ingen overstyring er registrert") {
+            When("avvist bruker og ingen enkelttilgang er registrert") {
                 Then("havner bruker i avviste") {
                     val funnetBruker = BrukerBuilder(vanligBrukerId).build()
                     val regelException = RegelException(AnsattBuilder(ansattId).build(), funnetBruker, mockk<Regel>(relaxed = true))
                     every { brukere.brukere(setOf(vanligBrukerId.verdi)) } returns setOf(funnetBruker)
                     every { motor.bulkRegler(any(), any()) } returns setOf(BulkResultat.avvist(funnetBruker, regelException))
-                    every { overstyring.tilganger(any(), any()) } returns emptyList()
+                    every { enkeltTilgang.tilganger(any(), any()) } returns emptyList()
 
                     val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
                     assertSoftly(resultater) {
@@ -83,7 +83,7 @@ class RegelTjenesteTest : BehaviorSpec() {
                     val funnetBruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukere(setOf(vanligBrukerId.verdi, ikkeFunnetId.verdi)) } returns setOf(funnetBruker)
                     every { motor.bulkRegler(any(), any()) } returns setOf(BulkResultat.ok(funnetBruker))
-                    every { overstyring.tilganger(any(), any()) } returns emptyList()
+                    every { enkeltTilgang.tilganger(any(), any()) } returns emptyList()
 
                     val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi), BrukerIdOgRegelsett(ikkeFunnetId.verdi)))
                     assertSoftly(resultater) {
@@ -131,22 +131,22 @@ class RegelTjenesteTest : BehaviorSpec() {
                     shouldThrow<RuntimeException> { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
                 }
             }
-            When("overstyring er registrert men motor kaster annen exception") {
+            When("enkelttilgang er registrert men motor kaster annen exception") {
                 Then("kastes exception videre") {
                     val funnetBruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns funnetBruker
-                    every { overstyring.harEnkeltTilgang(ansattId, funnetBruker.brukerId) } returns true
+                    every { enkeltTilgang.harEnkeltTilgang(ansattId, funnetBruker.brukerId) } returns true
                     every { motor.kompletteRegler(any(), any()) } throws RuntimeException("noe gikk galt")
                     shouldThrow<RuntimeException> { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
                 }
             }
-            When("overstyrbar regel avslår og overstyring er registrert") {
+            When("overstyrbar regel avslår og enkelttilgang er registrert") {
                 Then("gis tilgang") {
                     val funnetBruker = BrukerBuilder(vanligBrukerId).build()
                     val regelException = RegelException(AnsattBuilder(ansattId).build(), funnetBruker, mockk<Regel>(relaxed = true))
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns funnetBruker
                     every { motor.kompletteRegler(any(), any()) } throws regelException
-                    every { overstyring.harEnkeltTilgang(ansattId, vanligBrukerId) } returns true
+                    every { enkeltTilgang.harEnkeltTilgang(ansattId, vanligBrukerId) } returns true
                     shouldNotThrowAny { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
                 }
             }

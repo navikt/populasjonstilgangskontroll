@@ -36,7 +36,7 @@ import java.util.*
 @Tag(name = "DevTilgangController", description = DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION)
 class DevTilgangController(
     private val graphql: PdlSyncGraphQLClientAdapter,
-    private val overstyring: EnkeltTilgangTjeneste,
+    private val enkeltTilgang: EnkeltTilgangTjeneste,
     private val oppfølging: OppfølgingTjeneste,
     private val nom: NomJPAAdapter) {
 
@@ -67,20 +67,20 @@ class DevTilgangController(
         nom.fnrForAnsatt(ansattId.verdi)
 
 
-    @PostMapping("overstyr/{ansattId}")
+    @PostMapping("enkelttilgang/{ansattId}")
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
     @Valid
     fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody  @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData) =
-        overstyring.overstyr(ansattId, data)
+        enkeltTilgang.registrerEnkeltTilgang(ansattId, data)
 
-    @PostMapping("overstyringer/{ansattId}")
+    @PostMapping("enkelttilganger/{ansattId}")
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_HENT_OVERSTYRINGER, description = DESCRIPTION_HENT_OVERSTYRINGER)
-    fun overstyringer(@PathVariable ansattId: AnsattId, @RequestBody brukerIds: List<BrukerId>) =
-        overstyring.tilganger(ansattId, brukerIds)
+    fun enkelttilganger(@PathVariable ansattId: AnsattId, @RequestBody brukerIds: List<BrukerId>) =
+        enkeltTilgang.tilganger(ansattId, brukerIds)
 
     companion object {
         private const val DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.tilgang.tag.description"

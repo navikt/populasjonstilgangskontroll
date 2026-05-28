@@ -22,33 +22,33 @@ class EnkeltTilgangEntityListener(private val token: Token, private val clock: C
 
     @PrePersist
     private fun lagrer(entity: EnkeltTilgangEntity) = setCreated(entity).also {
-        log.trace("Lagrer overstyring for ${entity.fnr.maskFnr()} i DB")
+        log.trace("Lagrer enkelttilgang for ${entity.fnr.maskFnr()} i DB")
     }
 
     @PreUpdate
     private fun oppdaterer(entity: EnkeltTilgangEntity) = setOppdatert(entity).also {
-        log.trace("Oppdaterer overstyring for ${entity.fnr.maskFnr()} i DB")
+        log.trace("Oppdaterer enkelttilgang for ${entity.fnr.maskFnr()} i DB")
     }
 
     @PreRemove
     private fun fjerner(entity: EnkeltTilgangEntity) =
-        log.trace("Fjerner overstyring for ${entity.fnr.maskFnr()} i DB")
+        log.trace("Fjerner enkelttilgang for ${entity.fnr.maskFnr()} i DB")
 
     @PostPersist
     private fun lagret(entity: EnkeltTilgangEntity) =
-        log.trace("Lagret overstyring for ${entity.fnr.maskFnr()} i DB")
+        log.trace("Lagret enkelttilgang for ${entity.fnr.maskFnr()} i DB")
 
     @PostUpdate
     private fun oppdatert(entity: EnkeltTilgangEntity) =
-        log.trace("Oppdaterte overstyring for ${entity.fnr.maskFnr()} i DB")
+        log.trace("Oppdaterte enkelttilgang for ${entity.fnr.maskFnr()} i DB")
 
     @PostRemove
     private fun fjernet(entity: EnkeltTilgangEntity) =
-        log.trace("Fjernet overstyring for ${entity.fnr.maskFnr()} i DB")
+        log.trace("Fjernet enkelttilgang for ${entity.fnr.maskFnr()} i DB")
 
     @PostLoad
     private fun lest(entity: EnkeltTilgangEntity) =
-        log.trace("Leste overstyring for ${entity.fnr.maskFnr()} i DB")
+        log.trace("Leste enkelttilgang for ${entity.fnr.maskFnr()} i DB")
 
     fun setCreatedBySystem(target: EnkeltTilgangEntity) {
         target::class.java.declaredFields.forEach {

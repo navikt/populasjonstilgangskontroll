@@ -115,7 +115,7 @@ class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
             every { token.erCC } returns true
         }
 
-        Given("bulk-oppslag med overstyring") {
+        Given("bulk-oppslag med enkelttilgang") {
             When("brukere krever spesialtilganger ansatt mangler") {
                 Then("havner de i avviste") {
                     every {
@@ -134,11 +134,11 @@ class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
                     }
                 }
             }
-            When("avvist bruker og overstyring er registrert") {
+            When("avvist bruker og enkelttilgang er registrert") {
                 Then("godkjennes bruker") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
                     every { brukere.brukere(setOf(vanligBrukerId.verdi)) } returns setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build())
-                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er en test", IMORGEN))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er en test", IMORGEN))
 
                     val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
                     assertSoftly(resultater) {
@@ -164,16 +164,16 @@ class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
                     }
                 }
             }
-            When("overstyring er registrert og en regel avslår") {
+            When("enkelttilgang er registrert og en regel avslår") {
                 Then("gis tilgang") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
-                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er test", IMORGEN))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er test", IMORGEN))
                     shouldNotThrowAny {
                         regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
                     }
                 }
             }
-            When("regel avslår og ingen overstyring er registrert") {
+            When("regel avslår og ingen enkelttilgang er registrert") {
                 Then("gis ikke tilgang") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
                     shouldThrow<RegelException> {
@@ -194,37 +194,37 @@ class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
             }
         }
 
-        Given("overstyring") {
+        Given("enkelttilgang") {
             When("kjerneregler avslår") {
-                Then("registreres ikke overstyring") {
+                Then("registreres ikke enkelttilgang") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build()
                     shouldThrow<RegelException> {
-                        enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er test", IMORGEN))
+                        enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er test", IMORGEN))
                     }
                     enkeltTilgang.harEnkeltTilgang(ansattId, vanligBrukerId) shouldBe false
                 }
             }
-            When("overstyring har utløpt") {
-                Then("erOverstyrt returnerer false") {
+            When("enkelttilgang har utløpt") {
+                Then("harEnkelttilgang returnerer false") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
-                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(vanligBrukerId, "Utløpt test", IGÅR))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(vanligBrukerId, "Utløpt test", IGÅR))
                     enkeltTilgang.harEnkeltTilgang(ansattId, vanligBrukerId) shouldBe false
                 }
             }
-            When("overstyring er gyldig") {
-                Then("erOverstyrt returnerer true") {
+            When("enkelttilgang er gyldig") {
+                Then("harEnkelttilgang returnerer true") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
-                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(vanligBrukerId, "Gyldig test", IMORGEN))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(vanligBrukerId, "Gyldig test", IMORGEN))
                     enkeltTilgang.harEnkeltTilgang(ansattId, vanligBrukerId).shouldBeTrue()
                 }
             }
-            When("bulk overstyringer med utløpt og gyldig") {
+            When("bulk enkelttilganger  med utløpt og gyldig") {
                 Then("kun gyldige returneres") {
                     val annenBrukerId = BrukerId("08526835673")
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(annenBrukerId.verdi) } returns BrukerBuilder(annenBrukerId).build()
-                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(vanligBrukerId, "Gyldig", IMORGEN))
-                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(annenBrukerId, "Utløpt", IGÅR))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(vanligBrukerId, "Gyldig", IMORGEN))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(annenBrukerId, "Utløpt", IGÅR))
                     val resultat = enkeltTilgang.tilganger(ansattId, listOf(vanligBrukerId, annenBrukerId))
                     resultat shouldHaveSize 1
                     resultat.single() shouldBe vanligBrukerId

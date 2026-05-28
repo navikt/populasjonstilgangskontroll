@@ -11,7 +11,7 @@ import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
 import java.time.LocalDate
 import java.time.LocalDate.now
 
-class OverstyringValidatorTest : BehaviorSpec({
+class EnkeltTilgangValidatorTest : BehaviorSpec({
 
     val ctx = mockk<ConstraintValidatorContext>(relaxed = true)
     val validator = EnkeltTilgangValidator()
@@ -23,7 +23,7 @@ class OverstyringValidatorTest : BehaviorSpec({
     fun data(begrunnelse: String, gyldigtil: LocalDate = gyldigDato) =
         EnkeltTilgangData(brukerId, begrunnelse, gyldigtil)
 
-    Given("en overstyring") {
+    Given("en enkelttilgang") {
 
         When("dato er én dag frem i tid") {
             Then("er gyldig") {

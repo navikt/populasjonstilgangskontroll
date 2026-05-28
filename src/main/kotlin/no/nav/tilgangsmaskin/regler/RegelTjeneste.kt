@@ -112,9 +112,9 @@ class RegelTjeneste(
         buildSet {
         val godkjenteIds = buildSet { godkjente.forEach { add(it.brukerId) } }
         for (resultat in resultater) {
-            log.trace("Bulk Sjekker overstyring for avvist {}", resultat.bruker.oppslagId.maskFnr())
+            log.trace("Bulk Sjekker enkelttilgang for avvist {}", resultat.bruker.oppslagId.maskFnr())
             if (resultat.status == HttpStatus.FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
-                log.trace("Bulk resultat for {} har ingen overstyring", resultat.bruker.oppslagId.maskFnr())
+                log.trace("Bulk resultat for {} har ingen enkelttilgangqq", resultat.bruker.oppslagId.maskFnr())
                 add(EnkeltBulkRespons(RegelException(ansatt,
                     brukere.finnBruker(resultat.bruker.oppslagId),
                     resultat.regel!!,

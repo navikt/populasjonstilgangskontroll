@@ -7,7 +7,7 @@ import java.time.ZoneId.systemDefault
 @Component
 class EnkeltTilgangJPAAdapter(private val repository: EnkeltTilgangRepository) {
 
-    fun overstyr(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData) =
+    fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData) =
         with(data) {
             repository.save(EnkeltTilgangEntity(ansattId, brukerId.verdi, begrunnelse, enhetsnummer,gyldigtil.atStartOfDay(systemDefault()).toInstant()))
             Unit

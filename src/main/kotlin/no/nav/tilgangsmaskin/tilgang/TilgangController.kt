@@ -90,7 +90,7 @@ class TilgangController(
     @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
     fun overstyr(@RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData, req: HttpServletRequest) {
         guard.krev(OBO, req.requestURI)
-        enkeltTilgangTjeneste.overstyr(ansattIdFraToken(req.requestURI), data)
+        enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattIdFraToken(req.requestURI), data)
     }
 
     @PostMapping("bulk/obo")

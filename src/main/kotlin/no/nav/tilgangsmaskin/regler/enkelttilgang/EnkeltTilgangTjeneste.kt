@@ -9,13 +9,13 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
-import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
+import no.nav.tilgangsmaskin.regler.motor.EnkeltTilgangTeller
 import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.INGEN_REGEL_TAG
 import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.regelTag
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangClientValidator.OverstyringException
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangClientValidator.EnkeltTilgangException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -32,7 +32,7 @@ class EnkeltTilgangTjeneste(
     private val motor: RegelMotor,
     private val proxy: EntraProxyTjeneste,
     private val validator: KonsumentValidator,
-    private val teller: OverstyringTeller) {
+    private val teller: EnkeltTilgangTeller) {
 
     private val log = getLogger(javaClass)
 
@@ -47,26 +47,26 @@ class EnkeltTilgangTjeneste(
 
 
     @Transactional
-    fun overstyr(ansattId: AnsattId, data: EnkeltTilgangData): Boolean {
+    fun registrerEnkeltTilgang(ansattId: AnsattId, data: EnkeltTilgangData): Boolean {
         try {
             validator.valider()
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val bruker = brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi)
             motor.kjerneregler(ansatt, bruker)
-            adapter.overstyr(ansattId.verdi, enhetFor(ansattId), data)
+            adapter.enkeltTilgang(ansattId.verdi, enhetFor(ansattId), data)
             teller.tell(INGEN_REGEL_TAG, OVERSTYRT)
-            log.info("Overstyring til og med ${data.gyldigtil} ble registrert for $ansattId og ${data.brukerId}")
+            log.info("Enkelttilgang til og med ${data.gyldigtil} ble registrert for $ansattId og ${data.brukerId}")
             return true
         } catch (e: RegelException) {
-            log.warn("Overstyring er avvist av kjerneregler for $ansattId og ${data.brukerId}", e)
+            log.warn("Enkelttilgang er avvist av kjerneregler for $ansattId og ${data.brukerId}", e)
             teller.tell(regelTag(e.regel), IKKE_OVERSTYRT, tokenSystemTag(UTILGJENGELIG))
             throw RegelException(
                 OVERSTYRING_MESSAGE_CODE,
                 arrayOf(e.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
                 e = e
             )
-        } catch (e: OverstyringException) {
-            log.warn("Overstyring feilet pga klientvalidering ${e.message} for $ansattId og ${data.brukerId}", e)
+        } catch (e: EnkeltTilgangException) {
+            log.warn("Enkelttilgang feilet pga klientvalidering ${e.message} for $ansattId og ${data.brukerId}", e)
             teller.tell(INGEN_REGEL_TAG, IKKE_OVERSTYRT, tokenSystemTag(e.system))
             throw e
         }

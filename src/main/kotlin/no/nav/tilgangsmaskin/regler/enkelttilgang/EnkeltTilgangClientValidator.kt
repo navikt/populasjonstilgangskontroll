@@ -10,10 +10,10 @@ class EnkeltTilgangClientValidator(private val cfg: EnkeltTilgangConfig, private
 
     override fun valider() {
         if (!cfg.systemer.contains(token.systemNavn) && isProd(env)) {
-           throw OverstyringException("System ${token.systemNavn} har ikke tilgang til overstyring, kun ${cfg.systemer.joinToString(", ")}",token.systemNavn)
+           throw EnkeltTilgangException("System ${token.systemNavn} har ikke tilgang til overstyring, kun ${cfg.systemer.joinToString(", ")}",token.systemNavn)
         }
     }
-    class OverstyringException(message: String, val system: String) : RuntimeException(message)
+    class EnkeltTilgangException(message: String, val system: String) : RuntimeException(message)
 
 }
 

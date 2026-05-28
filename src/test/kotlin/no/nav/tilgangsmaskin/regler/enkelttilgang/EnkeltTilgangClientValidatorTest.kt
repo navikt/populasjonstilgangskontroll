@@ -8,7 +8,7 @@ import io.mockk.mockk
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV_GCP
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.LOCAL
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangClientValidator.OverstyringException
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangClientValidator.EnkeltTilgangException
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.mock.env.MockEnvironment
 
@@ -42,7 +42,7 @@ class EnkeltTilgangClientValidatorTest : BehaviorSpec({
         When("system er ukjent") {
             Then("kastes OverstyringException med systemnavnet") {
                 every { token.systemNavn } returns "ukjent-system"
-                shouldThrow<OverstyringException> {
+                shouldThrow<EnkeltTilgangException> {
                     validator(PROD_GCP).valider()
                 }
             }

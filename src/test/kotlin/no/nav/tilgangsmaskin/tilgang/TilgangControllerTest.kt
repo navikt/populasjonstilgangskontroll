@@ -295,7 +295,7 @@ class TilgangControllerTest : BehaviorSpec() {
 
             When("overstyr kalles med gyldig request og OBO-token") {
                 Then("returnerer 202") {
-                    every { enkeltTilgangTjeneste.overstyr(ansattId, any()) } returns true
+                    every { enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattId, any()) } returns true
                     mockMvc.post("/api/v1/overstyr") {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""

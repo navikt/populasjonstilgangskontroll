@@ -217,7 +217,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                 }
             }
             When("50000 innslag legges inn") {
-                Then("size returnerer 500000 og clear tømmer alt") {
+                Then("size returnerer 50000 og clear tømmer alt") {
                     val batchSize = 10_000
                     (1..50000).chunked(batchSize).forEach { chunk ->
                         val entries = chunk.associate { "id-$it" to TestData.of("id-$it") }

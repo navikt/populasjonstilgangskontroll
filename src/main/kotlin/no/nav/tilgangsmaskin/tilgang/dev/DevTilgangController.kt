@@ -70,7 +70,7 @@ class DevTilgangController(
     @PostMapping("enkelttilgang/{ansattId}")
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse
-    @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
+    @Operation(summary = SUMMARY_ENKELTTILGANG, description = DESCRIPTION_ENKELTTILGANG)
     @Valid
     fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody  @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData) =
         enkeltTilgang.registrerEnkeltTilgang(ansattId, data)
@@ -78,7 +78,7 @@ class DevTilgangController(
     @PostMapping("enkelttilganger/{ansattId}")
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse
-    @Operation(summary = SUMMARY_HENT_OVERSTYRINGER, description = DESCRIPTION_HENT_OVERSTYRINGER)
+    @Operation(summary = SUMMARY_HENT_ENKELTTILGANGER, description = DESCRIPTION_HENT_ENKELTTILGANGER)
     fun enkelttilganger(@PathVariable ansattId: AnsattId, @RequestBody brukerIds: List<BrukerId>) =
         enkeltTilgang.tilganger(ansattId, brukerIds)
 
@@ -95,9 +95,9 @@ class DevTilgangController(
         private const val DESCRIPTION_KOBLING = "msg:openapi.dev.tilgang.kobling.description"
         private const val SUMMARY_NOM_FNR = "msg:openapi.dev.tilgang.nom.fnr.summary"
         private const val DESCRIPTION_NOM_FNR = "msg:openapi.dev.tilgang.nom.fnr.description"
-        private const val SUMMARY_OVERSTYR = "msg:openapi.dev.tilgang.overstyr.summary"
-        private const val DESCRIPTION_OVERSTYR = "msg:openapi.dev.tilgang.overstyr.description"
-        private const val SUMMARY_HENT_OVERSTYRINGER = "msg:openapi.dev.tilgang.overstyringer.summary"
-        private const val DESCRIPTION_HENT_OVERSTYRINGER = "msg:openapi.dev.tilgang.overstyringer.description"
+        private const val SUMMARY_ENKELTTILGANG = "msg:openapi.dev.tilgang.enkelttilgang.summary"
+        private const val DESCRIPTION_ENKELTTILGANG = "msg:openapi.dev.tilgang.enkelttilgang.description"
+        private const val SUMMARY_HENT_ENKELTTILGANGER = "msg:openapi.dev.tilgang.enkelttilganger.summary"
+        private const val DESCRIPTION_HENT_ENKELTTILGANGER = "msg:openapi.dev.tilgang.enkelttilganger.description"
     }
 }

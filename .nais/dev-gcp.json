@@ -321,6 +321,11 @@
       "name": "sokos-skattekort-q1",
       "namespace": "okonomi",
       "cluster": "dev-gcp"
+    },
+    {
+      "name": "infotrygd-brukeroppslag-backend",
+      "namespace": "infotrygd",
+      "cluster": "dev-fss"
     }
   ],
   "nais": {

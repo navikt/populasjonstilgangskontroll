@@ -198,6 +198,11 @@
       "name": "poao-tilgang",
       "namespace": "poao",
       "cluster": "prod-fss"
+    },
+    {
+      "name": "infotrygd-brukeroppslag-backend",
+      "namespace": "infotrygd",
+      "cluster": "prod-fss"
     }
 
   ],

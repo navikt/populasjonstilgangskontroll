@@ -103,7 +103,7 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
         beforeEach {
             every { nom.fnrForAnsatt(any()) } returns vanligBrukerId
             every { vergemål.vergemål(any()) } returns emptySet()
-            every { validator.validerKonsument() } returns Unit
+            every { validator.valider() } returns Unit
             every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
             every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
             every { oppfølging.enhetFor(Identifikator(vanligBrukerId.verdi)) } returns Enhetsnummer("1234")

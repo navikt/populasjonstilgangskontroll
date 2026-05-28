@@ -31,7 +31,7 @@ class OverstyringTjeneste(
     private val adapter: OverstyringJPAAdapter,
     private val motor: RegelMotor,
     private val proxy: EntraProxyTjeneste,
-    private val validator: OverstyringClientValidator,
+    private val validator: KonsumentValidator,
     private val teller: OverstyringTeller) {
 
     private val log = getLogger(javaClass)
@@ -49,12 +49,11 @@ class OverstyringTjeneste(
     @Transactional
     fun overstyr(ansattId: AnsattId, data: OverstyringData): Boolean {
         try {
-            validator.validerKonsument()
+            validator.valider()
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val bruker = brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi)
             motor.kjerneregler(ansatt, bruker)
-            val enhet = enhetFor(ansattId)
-            adapter.overstyr(ansattId.verdi, enhet, data)
+            adapter.overstyr(ansattId.verdi, enhetFor(ansattId), data)
             teller.tell(INGEN_REGEL_TAG, OVERSTYRT)
             log.info("Overstyring til og med ${data.gyldigtil} ble registrert for $ansattId og ${data.brukerId}")
             return true

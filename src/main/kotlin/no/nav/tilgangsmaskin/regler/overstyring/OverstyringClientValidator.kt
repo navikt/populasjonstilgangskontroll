@@ -6,15 +6,19 @@ import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 
 @Component
-class OverstyringClientValidator(private val cfg: OverstyringConfig, private val token: Token, private val env: Environment)  {
+class OverstyringClientValidator(private val cfg: OverstyringConfig, private val token: Token, private val env: Environment) : KonsumentValidator {
 
-    fun validerKonsument() {
+    override fun valider() {
         if (!cfg.systemer.contains(token.systemNavn) && isProd(env)) {
            throw OverstyringException("System ${token.systemNavn} har ikke tilgang til overstyring, kun ${cfg.systemer.joinToString(", ")}",token.systemNavn)
         }
     }
     class OverstyringException(message: String, val system: String) : RuntimeException(message)
 
+}
+
+interface KonsumentValidator {
+    fun valider()
 }
 
 

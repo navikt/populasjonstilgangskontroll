@@ -70,7 +70,7 @@ internal class OverstyringTest : BehaviorSpec() {
     private lateinit var nom: NomTjeneste
 
     @MockkBean
-    lateinit var validator: OverstyringClientValidator
+    lateinit var validator: KonsumentValidator
     @MockkBean
     lateinit var proxy: EntraProxyTjeneste
     @MockkBean
@@ -100,7 +100,7 @@ internal class OverstyringTest : BehaviorSpec() {
         beforeEach {
             every { nom.fnrForAnsatt(any()) } returns vanligBrukerId
             every { vergemål.vergemål(any()) } returns emptySet()
-            every { validator.validerKonsument() } returns Unit
+            every { validator.valider() } returns Unit
             every { token.erObo } returns false
             every { token.erCC } returns true
             every { token.system } returns "test"
@@ -116,7 +116,7 @@ internal class OverstyringTest : BehaviorSpec() {
 
             When("OverstyringException kastes fra validator") {
                 Then("kastes exception videre") {
-                    every { validator.validerKonsument() } throws OverstyringException("ukjent system", "ukjent-system")
+                    every { validator.valider() } throws OverstyringException("ukjent system", "ukjent-system")
                     shouldThrow<OverstyringException> {
                         overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
                     }

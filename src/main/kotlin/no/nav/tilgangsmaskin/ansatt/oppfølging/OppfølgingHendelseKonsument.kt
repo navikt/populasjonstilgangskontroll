@@ -39,7 +39,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
             }
         }
 
-    fun OppfølgingHendelse.tilDomene(): Oppfølgingsendring {
+    private fun OppfølgingHendelse.tilDomene(): Oppfølgingsendring {
         val identer = Identer(ident, aktorId)
         fun krevKontor() = requireNotNull(kontor) {
             "kontor mangler for $sisteEndringsType (uuid=$oppfolgingsperiodeUuid)"

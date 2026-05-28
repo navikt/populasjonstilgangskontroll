@@ -1,0 +1,56 @@
+name: GitHub Actions Security (zizmor)
+
+# Statisk analyse av workflows for sikkerhetsproblemer.
+# Resultatet lastes opp som SARIF til GitHub Code Scanning.
+# Se: https://woodruffw.github.io/zizmor/
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - '.github/actions/**'
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - '.github/actions/**'
+  schedule:
+    # Ukentlig kjøring for å fange nye audits i zizmor.
+    - cron: '0 6 * * 1'
+
+concurrency:
+  group: zizmor-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  zizmor:
+    name: Scan workflows
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write  # codeql-action/upload-sarif publiserer funn til Code Scanning
+      actions: read           # zizmor leser workflow-metadata via GH API
+    steps:
+      - name: Sjekker ut kode
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Installer zizmor
+        uses: astral-sh/setup-uv@7edac99f961f18b581bbd960d59d049f04c0002f # v6.1.0
+
+      - name: Kjør zizmor
+        run: uvx zizmor --format sarif . > zizmor.sarif
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Last opp SARIF til Code Scanning
+        uses: github/codeql-action/upload-sarif@4e828ff8d448a8a6e532957b1811f387a63867e8 # v3.29.4
+        with:
+          sarif_file: zizmor.sarif
+          category: zizmor
+

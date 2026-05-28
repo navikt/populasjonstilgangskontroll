@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.AVDØD
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
@@ -32,14 +33,11 @@ import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.utils.LocalAuditor
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.motor.RegelMotorTest.RegelMotorTestConfig
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.Import
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
 import java.time.LocalDate.now
@@ -49,7 +47,7 @@ import java.util.UUID
 @AutoConfigureMetrics
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
 @ContextConfiguration(classes = [LocalAuditor::class])
-@Import(RegelMotorTestConfig::class)
+@ComponentScan("no.nav.tilgangsmaskin.regler.motor")
 @ApplyExtension(SpringExtension::class)
 class RegelMotorTest : BehaviorSpec() {
 
@@ -74,9 +72,6 @@ class RegelMotorTest : BehaviorSpec() {
     @Autowired
     private lateinit var regelMotor: RegelMotor
 
-    @TestConfiguration
-    @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
-    class RegelMotorTestConfig
 
     init {
 
@@ -479,7 +474,7 @@ class RegelMotorTest : BehaviorSpec() {
                 val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(15)).build()
 
                 Then("tilgang gis") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.AVDØD).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(AVDØD).build()
                     ansatt kanBehandle bruker
                 }
             }

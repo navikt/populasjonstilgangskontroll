@@ -8,8 +8,8 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMIN
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.Person
-import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
+import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.getMany
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import org.springframework.web.bind.annotation.PostMapping
@@ -20,7 +20,7 @@ private const val DEV_CACHE_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.cache.
 @UnprotectedRestController(value = ["/${DEV}/cache"])
 @ConditionalOnNotProd
 @Tag(name = "DevCacheController", description = DEV_CACHE_CONTROLLER_TAG_DESCRIPTION)
-class DevCacheController(private val cacheClient: CacheClient) {
+class DevCacheController(private val cacheClient: CacheOperations) {
 
     @PostMapping("cache/skjerminger")
     @Operation(summary = SUMMARY_CACHE_SKJERMINGER, description = DESCRIPTION_CACHE_SKJERMINGER)

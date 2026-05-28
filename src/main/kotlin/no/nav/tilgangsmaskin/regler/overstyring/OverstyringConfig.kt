@@ -4,9 +4,10 @@ import no.nav.tilgangsmaskin.regler.overstyring.OverstyringConfig.Companion.OVER
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(OVERSTYRING)
-class OverstyringConfig(val systemer: Set<String> = setOf("histark","gosys")) {
+class OverstyringConfig(val systemer: Set<String> = SYSTEMER) {
 
     companion object {
         const val OVERSTYRING = "overstyring"
+        val SYSTEMER = setOf("histark","gosys")
     }
 }

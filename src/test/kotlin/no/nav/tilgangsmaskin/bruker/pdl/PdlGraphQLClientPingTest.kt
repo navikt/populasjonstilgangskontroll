@@ -40,7 +40,7 @@ class PdlGraphQLClientPingTest : BehaviorSpec() {
         beforeEach { server.reset() }
         afterEach { server.verify() }
 
-        Given("ping") {
+        Given("ping mot PDL GraphQL-endepunkt") {
             When("ping kalles") {
                 Then("sendes OPTIONS-request") {
                     server.expect(requestTo(cfg.baseUri))

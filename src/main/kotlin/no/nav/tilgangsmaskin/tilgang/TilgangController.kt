@@ -23,12 +23,13 @@ import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
 import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
 import no.nav.tilgangsmaskin.regler.overstyring.ValidOverstyring
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
-import org.jboss.logging.MDC
+import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
+import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
 import org.slf4j.LoggerFactory.getLogger
+import org.slf4j.MDC
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.BAD_REQUEST
-import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.MULTI_STATUS
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.HttpStatus.PAYLOAD_TOO_LARGE
@@ -48,6 +49,7 @@ class TilgangController(
     private val regelTjeneste: RegelTjeneste,
     private val overstyringTjeneste: OverstyringTjeneste,
     private val token: Token,
+    private val guard: TokenTypeGuard,
     private val teller: TokenTypeTeller) {
 
     private val log = getLogger(javaClass)
@@ -56,95 +58,96 @@ class TilgangController(
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
-    fun kompletteRegler(@RequestBody brukerId: String,request: HttpServletRequest) =
-        enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KOMPLETT_REGELTYPE,request.requestURI)
+    fun kompletteRegler(@RequestBody brukerId: String, req: HttpServletRequest) =
+        enkeltOppslag({ ansattIdFraToken(req.requestURI) }, OBO, brukerId, KOMPLETT_REGELTYPE,req.requestURI)
 
     @PostMapping("/ccf/komplett/{ansattId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KOMPLETT_CCF, description = DESCRIPTION_KOMPLETT_CCF)
-    fun kompletteReglerCCF(@PathVariable ansattId: AnsattId,@RequestBody brukerId: String,request: HttpServletRequest) =
-        enkeltOppslag({ansattId}, {token.erCC}, brukerId, KOMPLETT_REGELTYPE, request.requestURI)
+    fun kompletteReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String, req: HttpServletRequest) =
+        enkeltOppslag({ansattId}, CCF, brukerId, KOMPLETT_REGELTYPE, req.requestURI)
 
     @PostMapping("kjerne")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KJERNE_OBO, description = DESCRIPTION_KJERNE_OBO)
-    fun kjerneregler(@RequestBody brukerId: String, request: HttpServletRequest) =
-        enkeltOppslag({token.ansattId!!}, {token.erObo}, brukerId, KJERNE_REGELTYPE, request.requestURI)
+    fun kjerneregler(@RequestBody brukerId: String, req: HttpServletRequest) =
+        enkeltOppslag({ ansattIdFraToken(req.requestURI) }, OBO, brukerId, KJERNE_REGELTYPE, req.requestURI)
 
 
     @PostMapping("/ccf/kjerne/{ansattId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KJERNE_CCF, description = DESCRIPTION_KJERNE_CCF)
-    fun kjerneReglerCCF(@PathVariable ansattId: AnsattId,@RequestBody brukerId: String,request: HttpServletRequest) =
-        enkeltOppslag({ansattId}, {token.erCC}, brukerId, KJERNE_REGELTYPE,request.requestURI)
+    fun kjerneReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String, req: HttpServletRequest) =
+        enkeltOppslag({ansattId}, CCF, brukerId, KJERNE_REGELTYPE,req.requestURI)
 
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
-    fun overstyr(@RequestBody @Valid @ValidOverstyring data: OverstyringData, request: HttpServletRequest) {
-        sjekk(token.erObo, FORBIDDEN, "Mismatch mellom token type ${TokenType.from(token)} og ${request.requestURI}")
-        overstyringTjeneste.overstyr(token.ansattId!!, data)
+    fun overstyr(@RequestBody @Valid @ValidOverstyring data: OverstyringData, req: HttpServletRequest) {
+        guard.krev(OBO, req.requestURI)
+        overstyringTjeneste.overstyr(ansattIdFraToken(req.requestURI), data)
     }
 
     @PostMapping("bulk/obo")
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO)
-    fun bulkOBO(@RequestBody  specs: Set<BrukerIdOgRegelsett>,request: HttpServletRequest) =
-        bulkOppslag({token.ansattId!!},{token.erObo}, specs,request.requestURI)
+    fun bulkOBO(@RequestBody  specs: Set<BrukerIdOgRegelsett>, req: HttpServletRequest) =
+        bulkOppslag({ ansattIdFraToken(req.requestURI) }, OBO, specs,req.requestURI)
 
     @PostMapping("bulk/obo/{regelType}")
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO_REGELTYPE)
-    fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>,request: HttpServletRequest) =
-        bulkOppslag({token.ansattId!!},{token.erObo},brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet(),request.requestURI)
+    fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>, req: HttpServletRequest) =
+        bulkOppslag({ ansattIdFraToken(req.requestURI) },
+            OBO, brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet(),req.requestURI)
 
     @PostMapping("bulk/ccf/{ansattId}")
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_CCF)
-    fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody specs: Set<BrukerIdOgRegelsett>,request: HttpServletRequest) =
-        bulkOppslag({ansattId},{token.erCC}, specs,request.requestURI)
+    fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody specs: Set<BrukerIdOgRegelsett>, req: HttpServletRequest) =
+        bulkOppslag({ansattId}, CCF, specs,req.requestURI)
 
     @PostMapping("bulk/ccf/{ansattId}/{regelType}")
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_CCF_REGELTYPE)
-    fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>, request: HttpServletRequest) =
-        bulkOppslag({ ansattId }, { token.erCC }, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(),request.requestURI)
+    fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>, req: HttpServletRequest) =
+        bulkOppslag({ ansattId }, CCF, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(),req.requestURI)
 
-    private fun bulkOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, specs: Set<BrukerIdOgRegelsett>,uri: String) =
-        with(ansattId()) {
-            if (specs.isNotEmpty()) {
-                MDC.put(USER_ID, ansattId().verdi)
-                sjekk(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og $uri")
-                sjekk(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
-                tell("bulk")
-                regelTjeneste.bulkRegler( this, specs)
-            }
-            else {
-                log.debug("Ingen brukerId-er oppgitt i bulk forespørsel for {}", this)
-                AggregertBulkRespons(this)
-            }
+    private fun bulkOppslag(ansattId: () -> AnsattId, forventet: TokenType, specs: Set<BrukerIdOgRegelsett>, uri: String): AggregertBulkRespons {
+        guard.krev(forventet, uri)
+        val ansatt = ansattId()
+        MDC.put(USER_ID, ansatt.verdi)
+        return if (specs.isNotEmpty()) {
+            sjekk(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
+            tell("bulk")
+            regelTjeneste.bulkRegler(ansatt, specs)
+        } else {
+            log.debug("Ingen brukerId-er oppgitt i bulk forespørsel for {}", ansatt)
+            AggregertBulkRespons(ansatt)
         }
+    }
 
-    private fun enkeltOppslag(ansattId: () -> AnsattId, predikat: () -> Boolean, brukerId: String, regelType: RegelType, uri: String) =
+    private fun enkeltOppslag(ansattId: () -> AnsattId, forventet: TokenType, brukerId: String, regelType: RegelType, uri: String) =
         with(brukerId.trim('"')) {
-            MDC.put(USER_ID, ansattId().verdi)
-            log.trace(CONFIDENTIAL,"Kjører {} regler for {} og {}", regelType, ansattId(), this.maskFnr())
-            sjekk(predikat(), FORBIDDEN,"Mismatch mellom token type ${TokenType.from(token)} og $uri")
+            guard.krev(forventet, uri)
+            val ansatt = ansattId()
+            MDC.put(USER_ID, ansatt.verdi)
+            log.trace(CONFIDENTIAL,"Kjører {} regler for {} og {}", regelType, ansatt, this.maskFnr())
             sjekk(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")
             tell("single")
             when (regelType) {
-                KJERNE_REGELTYPE -> regelTjeneste.kjerneregler(ansattId(), this)
-                else -> regelTjeneste.kompletteRegler(ansattId(), this)
+                KJERNE_REGELTYPE -> regelTjeneste.kjerneregler(ansatt, this)
+                else -> regelTjeneste.kompletteRegler(ansatt, this)
             }
         }
 
@@ -155,6 +158,9 @@ class TilgangController(
     private fun sjekk(predikat: Boolean, status: HttpStatus, message: String) {
         if (!predikat) throw ResponseStatusException(status,message)
     }
+
+    private fun ansattIdFraToken(uri: String): AnsattId =
+        requireNotNull(token.ansattId) { "Mangler ansattId i OBO-token for $uri" }
 
     companion object {
         private const val SUMMARY_KOMPLETT_OBO =

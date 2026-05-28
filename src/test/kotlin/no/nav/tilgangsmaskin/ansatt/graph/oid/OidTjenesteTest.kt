@@ -19,7 +19,6 @@ import org.hamcrest.Matchers.containsString
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.cache.CacheManager
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -42,14 +41,12 @@ class OidTjenesteTest : BehaviorSpec() {
     @Autowired
     private lateinit var server: MockRestServiceServer
     @Autowired
-    private lateinit var cacheManager: CacheManager
-    @Autowired
     private lateinit var cache: CacheOperations
 
     init {
         beforeEach {
             server.reset()
-            cacheManager.getCache(ENTRA_OID)?.clear()
+            cache.clear(OID_CACHE)
         }
 
         afterEach {

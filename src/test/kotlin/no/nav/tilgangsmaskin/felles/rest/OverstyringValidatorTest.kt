@@ -50,7 +50,7 @@ class OverstyringValidatorTest : BehaviorSpec({
         }
 
         When("dato er dagens dato") {
-            Then("gyldig") {
+            Then("validering godkjennes") {
                 validator.isValid(data(gyldigBegrunnelse, now()), ctx).shouldBeTrue()
             }
         }

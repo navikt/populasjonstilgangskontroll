@@ -12,7 +12,7 @@ import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Adressebeskyttelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
-import no.nav.tilgangsmaskin.felles.cache.CacheClient
+import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.regler.motor.PdlCacheTømmerTeller
 import no.nav.tilgangsmaskin.tilgang.Token
 import java.time.Instant
@@ -24,7 +24,7 @@ class PdlCacheOpprydderTest : BehaviorSpec({
         every { it.clusterAndSystem } returns "test:dev-gcp"
     }
     val pdl = mockk<PdlTjeneste>(relaxed = true)
-    val client = mockk<CacheClient>()
+    val client = mockk<CacheOperations>()
     val opprydder = PdlCacheOpprydder(pdl, client, PdlCacheTømmerTeller(SimpleMeterRegistry(), token))
 
     fun hendelse(identer: List<String>, endringstype: Endringstype = OPPRETTET,
@@ -36,7 +36,7 @@ class PdlCacheOpprydderTest : BehaviorSpec({
         every { client.delete(any(), any()) } returns 1L
     }
 
-    Given("sletting") {
+    Given("sletting av cache ved personhendelse") {
         When("hendelsen inneholder to identer") {
             Then("slettes fra alle PDL-cacher for begge identer") {
                 opprydder.listen(hendelse(listOf(I1, I2)))
@@ -72,7 +72,7 @@ class PdlCacheOpprydderTest : BehaviorSpec({
         }
     }
 
-    Given("refresh") {
+    Given("oppfrisking av cache etter endring") {
         When("hendelsen inneholder to identer") {
             Then("kalles medFamilie og medUtvidetFamilie for begge") {
                 opprydder.listen(hendelse(listOf(I1, I2)))

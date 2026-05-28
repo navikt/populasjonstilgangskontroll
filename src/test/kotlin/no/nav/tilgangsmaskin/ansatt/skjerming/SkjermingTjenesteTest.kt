@@ -1,8 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
-import ch.qos.logback.classic.Logger
-import ch.qos.logback.classic.spi.ILoggingEvent
-import ch.qos.logback.core.read.ListAppender
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
@@ -24,12 +21,9 @@ import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.*
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
-import no.nav.tilgangsmaskin.felles.rest.RestRetryLogger
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.cache.CacheManager
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
@@ -58,15 +52,13 @@ class SkjermingTjenesteTest : BehaviorSpec() {
     @Autowired
     lateinit var cfg: SkjermingConfig
     @Autowired
-    lateinit var cacheManager: CacheManager
-    @Autowired
     lateinit var cache: CacheOperations
 
     init {
 
         beforeEach {
             server.reset()
-            cacheManager.getCache(SKJERMING)?.clear()
+            cache.clear(SKJERMING_CACHE)
         }
 
         afterEach { server.verify() }
@@ -126,7 +118,7 @@ class SkjermingTjenesteTest : BehaviorSpec() {
             }
         }
 
-        Given("retry") {
+        Given("retry ved feil mot skjermingstjenesten") {
             When("alle 4 forsøk feiler med 500") {
                 Then("kastes RecoverableRestException") {
                     server.expect(times(4), requestTo(SKJERMING_URI)).andRespond(withStatus(INTERNAL_SERVER_ERROR))

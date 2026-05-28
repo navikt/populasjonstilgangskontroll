@@ -29,7 +29,7 @@ class AnsattTjenesteTest : BehaviorSpec({
     val bruker   = BrukerBuilder(brukerId).build()
 
 
-    Given("ansatt") {
+    Given("tilgangskontroll for ansatt") {
 
         When("fnrForAnsatt returnerer null") {
             Then("returneres ansatt uten bruker") {

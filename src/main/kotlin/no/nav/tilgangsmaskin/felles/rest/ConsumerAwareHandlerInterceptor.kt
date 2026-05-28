@@ -15,8 +15,19 @@ class ConsumerAwareHandlerInterceptor(private val token: Token, private val regi
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         MDC.put(CONSUMER_ID, token.systemAndNs)
+        token.ansattId?.verdi?.let { MDC.put(USER_ID, it) }
         registry.counter(METRIC, Tags.of("remote_system", token.systemNavn)).increment()
         return true
+    }
+
+    override fun afterCompletion(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        handler: Any,
+        ex: Exception?
+    ) {
+        MDC.remove(CONSUMER_ID)
+        MDC.remove(USER_ID)
     }
 
     companion object {

@@ -3,9 +3,14 @@ on:
   schedule:
     - cron: '0 7 * * 1'  # Mandager kl. 07:00 UTC
   workflow_dispatch:
+
+# Deny-by-default på workflow-nivå; jobben åpner kun det den trenger.
+permissions:
+  contents: read
+
 jobs:
   sync:
-    uses: navikt/copilot/.github/workflows/copilot-customization-sync.yml@main
+    uses: navikt/copilot/.github/workflows/copilot-customization-sync.yml@7acbe01f5609d6079a1a05d6187079a772705a95 # main
     permissions:
-      contents: write
-      pull-requests: write
+      contents: write       # committe oppdaterte Copilot-customization-filer
+      pull-requests: write  # opprette PR med endringene

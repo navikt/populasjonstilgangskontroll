@@ -7,8 +7,8 @@ import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.UGRADERT
 import no.nav.tilgangsmaskin.bruker.pdl.PdlBeanConfig.Companion.PDL_CONTAINER_FACTORY
 import no.nav.tilgangsmaskin.bruker.pdl.PdlBeanConfig.Companion.PDL_GRADERING_FILTER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
-import no.nav.tilgangsmaskin.felles.cache.CacheClient
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
+import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.PdlCacheTømmerTeller
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class PdlCacheOpprydder(private val pdl: PdlTjeneste,
-                        private val client: CacheClient,
+                        private val client: CacheOperations,
                         private val teller: PdlCacheTømmerTeller) {
     private val log = getLogger(javaClass)
 

@@ -42,11 +42,8 @@ import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfig
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
-import no.nav.tilgangsmaskin.SharedPostgresContainer
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTest.RegelMotorTestConfig
-import org.springframework.boot.test.context.TestConfiguration
+import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestPropertySource
 import org.testcontainers.junit.jupiter.Testcontainers
 
@@ -54,11 +51,11 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @EnableJpaAuditing
 @Testcontainers
 @AutoConfigureMetrics
-@Import(RegelMotorTestConfig::class)
 @TestPropertySource(locations = ["classpath:test.properties"])
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
 @ContextConfiguration(classes = [TestApp::class, LocalAuditor::class,OverstyringJPAAdapter::class])
 @ApplyExtension(SpringExtension::class)
+@ComponentScan("no.nav.tilgangsmaskin.regler.motor")
 internal class OverstyringTest : BehaviorSpec() {
 
     private val vanligBrukerId = BrukerId("08526835670")
@@ -73,7 +70,7 @@ internal class OverstyringTest : BehaviorSpec() {
     private lateinit var nom: NomTjeneste
 
     @MockkBean
-    lateinit var validator: OverstyringClientValidator
+    lateinit var validator: KonsumentValidator
     @MockkBean
     lateinit var proxy: EntraProxyTjeneste
     @MockkBean
@@ -93,10 +90,6 @@ internal class OverstyringTest : BehaviorSpec() {
     @MockK
     lateinit var brukere: BrukerTjeneste
 
-    @TestConfiguration
-    @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
-    class RegelMotorTestConfig
-
     init {
         lateinit var overstyring: OverstyringTjeneste
 
@@ -107,7 +100,7 @@ internal class OverstyringTest : BehaviorSpec() {
         beforeEach {
             every { nom.fnrForAnsatt(any()) } returns vanligBrukerId
             every { vergemål.vergemål(any()) } returns emptySet()
-            every { validator.validerKonsument() } returns Unit
+            every { validator.valider() } returns Unit
             every { token.erObo } returns false
             every { token.erCC } returns true
             every { token.system } returns "test"
@@ -119,11 +112,11 @@ internal class OverstyringTest : BehaviorSpec() {
             overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, proxy, validator, OverstyringTeller(registry, token))
         }
 
-        Given("overstyr") {
+        Given("overstyring av tilgangsresultat") {
 
             When("OverstyringException kastes fra validator") {
                 Then("kastes exception videre") {
-                    every { validator.validerKonsument() } throws OverstyringException("ukjent system", "ukjent-system")
+                    every { validator.valider() } throws OverstyringException("ukjent system", "ukjent-system")
                     shouldThrow<OverstyringException> {
                         overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
                     }
@@ -318,6 +311,6 @@ internal class OverstyringTest : BehaviorSpec() {
 
     companion object {
         @ServiceConnection
-        private val postgres = SharedPostgresContainer.instance
+        private val postgres = postgreSQLContainer
     }
 }

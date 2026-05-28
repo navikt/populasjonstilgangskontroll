@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.CONFLICT
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ProblemDetail.forStatusAndDetail
@@ -13,6 +14,9 @@ open class IrrecoverableRestException(
 
 class NotFoundRestException(val uri: URI, val identifikator: String? = null, msg: String = "Ikke funnet", cause: Throwable? = null) :
     IrrecoverableRestException(NOT_FOUND, uri, msg, cause)
+
+class ConflictRestException(val uri: URI, msg: String = "Konflikt", cause: Throwable? = null) :
+    IrrecoverableRestException(CONFLICT, uri, msg, cause)
 
 open class RecoverableRestException(status: HttpStatusCode,
                                     uri: URI,

@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.regler.overstyring
+package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import io.swagger.v3.oas.annotations.media.Schema
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -11,4 +11,4 @@ import java.time.LocalDate
   "gyldigtil": "2025-05-24"
 }
 """)
-data class OverstyringData(val brukerId: BrukerId, val begrunnelse: String,  val gyldigtil: LocalDate = LocalDate.now().plusMonths(3))
+data class EnkeltTilgangData(val brukerId: BrukerId, val begrunnelse: String, val gyldigtil: LocalDate = LocalDate.now().plusMonths(3))

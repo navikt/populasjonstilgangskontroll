@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.regler.overstyring
+package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.assertions.assertSoftly
@@ -56,12 +56,12 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @EnableJpaAuditing
 @TestPropertySource(locations = ["classpath:test.properties"])
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [TestApp::class, OverstyringTjeneste::class,OverstyringJPAAdapter::class,RegelTjeneste::class,LocalAuditor::class])
+@ContextConfiguration(classes = [TestApp::class, EnkeltTilgangTjeneste::class,EnkeltTilgangJPAAdapter::class,RegelTjeneste::class,LocalAuditor::class])
 @AutoConfigureMetrics
 @Testcontainers
 @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
 @ApplyExtension(SpringExtension::class)
-class OverstyringRegelTjenesteTest : BehaviorSpec() {
+class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
 
     private val strengtFortroligAktørId = AktørId("1234567890123")
     private val strengtFortroligBrukerId = BrukerId("08526835671")
@@ -81,7 +81,7 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
     @MockkBean
     lateinit var oppfølging: OppfølgingTjeneste
     @MockkBean
-    lateinit var validator: OverstyringClientValidator
+    lateinit var validator: EnkeltTilgangClientValidator
     @MockkBean
     lateinit var proxy: EntraProxyTjeneste
 
@@ -93,7 +93,7 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
     @Autowired
     lateinit var motor: RegelMotor
     @Autowired
-    lateinit var overstyring: OverstyringTjeneste
+    lateinit var enkeltTilgang: EnkeltTilgangTjeneste
     @Autowired
     lateinit var regler: RegelTjeneste
 
@@ -138,7 +138,7 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
                 Then("godkjennes bruker") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
                     every { brukere.brukere(setOf(vanligBrukerId.verdi)) } returns setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build())
-                    overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er en test", IMORGEN))
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er en test", IMORGEN))
 
                     val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
                     assertSoftly(resultater) {
@@ -167,7 +167,7 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
             When("overstyring er registrert og en regel avslår") {
                 Then("gis tilgang") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
-                    overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er test", IMORGEN))
                     shouldNotThrowAny {
                         regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
                     }
@@ -199,23 +199,23 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
                 Then("registreres ikke overstyring") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build()
                     shouldThrow<RegelException> {
-                        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
+                        enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er test", IMORGEN))
                     }
-                    overstyring.erOverstyrt(ansattId, vanligBrukerId) shouldBe false
+                    enkeltTilgang.harEnkeltTilgang(ansattId, vanligBrukerId) shouldBe false
                 }
             }
             When("overstyring har utløpt") {
                 Then("erOverstyrt returnerer false") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
-                    overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Utløpt test", IGÅR))
-                    overstyring.erOverstyrt(ansattId, vanligBrukerId) shouldBe false
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(vanligBrukerId, "Utløpt test", IGÅR))
+                    enkeltTilgang.harEnkeltTilgang(ansattId, vanligBrukerId) shouldBe false
                 }
             }
             When("overstyring er gyldig") {
                 Then("erOverstyrt returnerer true") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
-                    overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Gyldig test", IMORGEN))
-                    overstyring.erOverstyrt(ansattId, vanligBrukerId).shouldBeTrue()
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(vanligBrukerId, "Gyldig test", IMORGEN))
+                    enkeltTilgang.harEnkeltTilgang(ansattId, vanligBrukerId).shouldBeTrue()
                 }
             }
             When("bulk overstyringer med utløpt og gyldig") {
@@ -223,9 +223,9 @@ class OverstyringRegelTjenesteTest : BehaviorSpec() {
                     val annenBrukerId = BrukerId("08526835673")
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(annenBrukerId.verdi) } returns BrukerBuilder(annenBrukerId).build()
-                    overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Gyldig", IMORGEN))
-                    overstyring.overstyr(ansattId, OverstyringData(annenBrukerId, "Utløpt", IGÅR))
-                    val resultat = overstyring.overstyringer(ansattId, listOf(vanligBrukerId, annenBrukerId))
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(vanligBrukerId, "Gyldig", IMORGEN))
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(annenBrukerId, "Utløpt", IGÅR))
+                    val resultat = enkeltTilgang.tilganger(ansattId, listOf(vanligBrukerId, annenBrukerId))
                     resultat shouldHaveSize 1
                     resultat.single() shouldBe vanligBrukerId
                 }

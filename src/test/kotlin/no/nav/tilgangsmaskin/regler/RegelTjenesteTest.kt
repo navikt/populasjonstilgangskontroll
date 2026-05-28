@@ -21,7 +21,7 @@ import no.nav.tilgangsmaskin.regler.motor.BulkResultat
 import no.nav.tilgangsmaskin.regler.motor.Regel
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import java.net.URI
 
 class RegelTjenesteTest : BehaviorSpec() {
@@ -29,7 +29,7 @@ class RegelTjenesteTest : BehaviorSpec() {
     private val motor      = mockk<RegelMotor>()
     private val brukere    = mockk<BrukerTjeneste>()
     private val ansatte    = mockk<AnsattTjeneste>()
-    private val overstyring = mockk<OverstyringTjeneste>()
+    private val overstyring = mockk<EnkeltTilgangTjeneste>()
 
     init {
         val vanligBrukerId = BrukerId("08526835670")
@@ -50,7 +50,7 @@ class RegelTjenesteTest : BehaviorSpec() {
                     val regelException = RegelException(AnsattBuilder(ansattId).build(), funnetBruker, mockk<Regel>(relaxed = true))
                     every { brukere.brukere(setOf(vanligBrukerId.verdi)) } returns setOf(funnetBruker)
                     every { motor.bulkRegler(any(), any()) } returns setOf(BulkResultat.avvist(funnetBruker, regelException))
-                    every { overstyring.overstyringer(any(), any()) } returns listOf(vanligBrukerId)
+                    every { overstyring.tilganger(any(), any()) } returns listOf(vanligBrukerId)
 
                     val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
                     assertSoftly {
@@ -67,7 +67,7 @@ class RegelTjenesteTest : BehaviorSpec() {
                     val regelException = RegelException(AnsattBuilder(ansattId).build(), funnetBruker, mockk<Regel>(relaxed = true))
                     every { brukere.brukere(setOf(vanligBrukerId.verdi)) } returns setOf(funnetBruker)
                     every { motor.bulkRegler(any(), any()) } returns setOf(BulkResultat.avvist(funnetBruker, regelException))
-                    every { overstyring.overstyringer(any(), any()) } returns emptyList()
+                    every { overstyring.tilganger(any(), any()) } returns emptyList()
 
                     val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
                     assertSoftly(resultater) {
@@ -83,7 +83,7 @@ class RegelTjenesteTest : BehaviorSpec() {
                     val funnetBruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukere(setOf(vanligBrukerId.verdi, ikkeFunnetId.verdi)) } returns setOf(funnetBruker)
                     every { motor.bulkRegler(any(), any()) } returns setOf(BulkResultat.ok(funnetBruker))
-                    every { overstyring.overstyringer(any(), any()) } returns emptyList()
+                    every { overstyring.tilganger(any(), any()) } returns emptyList()
 
                     val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi), BrukerIdOgRegelsett(ikkeFunnetId.verdi)))
                     assertSoftly(resultater) {
@@ -135,7 +135,7 @@ class RegelTjenesteTest : BehaviorSpec() {
                 Then("kastes exception videre") {
                     val funnetBruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns funnetBruker
-                    every { overstyring.erOverstyrt(ansattId, funnetBruker.brukerId) } returns true
+                    every { overstyring.harEnkeltTilgang(ansattId, funnetBruker.brukerId) } returns true
                     every { motor.kompletteRegler(any(), any()) } throws RuntimeException("noe gikk galt")
                     shouldThrow<RuntimeException> { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
                 }
@@ -146,7 +146,7 @@ class RegelTjenesteTest : BehaviorSpec() {
                     val regelException = RegelException(AnsattBuilder(ansattId).build(), funnetBruker, mockk<Regel>(relaxed = true))
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns funnetBruker
                     every { motor.kompletteRegler(any(), any()) } throws regelException
-                    every { overstyring.erOverstyrt(ansattId, vanligBrukerId) } returns true
+                    every { overstyring.harEnkeltTilgang(ansattId, vanligBrukerId) } returns true
                     shouldNotThrowAny { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
                 }
             }

@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.regler.overstyring
+package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import jakarta.validation.Constraint
 import jakarta.validation.Payload
@@ -8,11 +8,11 @@ import kotlin.annotation.AnnotationTarget.VALUE_PARAMETER
 import kotlin.reflect.KClass
 
 @MustBeDocumented
-@Constraint(validatedBy = [OverstyringValidator::class])
+@Constraint(validatedBy = [EnkeltTilgangValidator::class])
 @Target(FIELD, VALUE_PARAMETER)
 @Retention(RUNTIME)
-annotation class ValidOverstyring(
-    val message: String = "Overstyring må være fra nå og maks 3 måneder frem i tid",
+annotation class EnkeltTilgangGyldig(
+    val message: String = "Enkelttilgang må være fra nå og maks 3 måneder frem i tid",
     val groups: Array<KClass<*>> = [],
     val months: Long = 3,
     val min: Int = 10,

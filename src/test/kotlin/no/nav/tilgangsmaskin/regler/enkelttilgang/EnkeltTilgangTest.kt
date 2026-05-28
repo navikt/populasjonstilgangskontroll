@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.regler.overstyring
+package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.extensions.ApplyExtension
@@ -32,7 +32,7 @@ import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
 import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringClientValidator.OverstyringException
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangClientValidator.OverstyringException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
@@ -53,10 +53,10 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @AutoConfigureMetrics
 @TestPropertySource(locations = ["classpath:test.properties"])
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [TestApp::class, LocalAuditor::class,OverstyringJPAAdapter::class])
+@ContextConfiguration(classes = [TestApp::class, LocalAuditor::class,EnkeltTilgangJPAAdapter::class])
 @ApplyExtension(SpringExtension::class)
 @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
-internal class OverstyringTest : BehaviorSpec() {
+internal class EnkeltTilgangTest : BehaviorSpec() {
 
     private val vanligBrukerId = BrukerId("08526835670")
     private val ansattId = AnsattId("Z999999")
@@ -82,19 +82,19 @@ internal class OverstyringTest : BehaviorSpec() {
     @Autowired
     lateinit var registry: MeterRegistry
     @Autowired
-    lateinit var adapter: OverstyringJPAAdapter
+    lateinit var adapter: EnkeltTilgangJPAAdapter
     @Autowired
-    lateinit var repository: OverstyringRepository
+    lateinit var repository: EnkeltTilgangRepository
     @MockK
     lateinit var ansatte: AnsattTjeneste
     @MockK
     lateinit var brukere: BrukerTjeneste
 
     init {
-        lateinit var overstyring: OverstyringTjeneste
+        lateinit var enkeltTilgang: EnkeltTilgangTjeneste
 
         beforeSpec {
-            MockKAnnotations.init(this@OverstyringTest)
+            MockKAnnotations.init(this@EnkeltTilgangTest)
         }
 
         beforeEach {
@@ -109,7 +109,7 @@ internal class OverstyringTest : BehaviorSpec() {
             every { token.clusterAndSystem } returns "cluster:test"
             every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
             every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-            overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, proxy, validator, OverstyringTeller(registry, token))
+            enkeltTilgang = EnkeltTilgangTjeneste(ansatte, brukere, adapter, motor, proxy, validator, OverstyringTeller(registry, token))
         }
 
         Given("overstyring av tilgangsresultat") {
@@ -118,7 +118,7 @@ internal class OverstyringTest : BehaviorSpec() {
                 Then("kastes exception videre") {
                     every { validator.valider() } throws OverstyringException("ukjent system", "ukjent-system")
                     shouldThrow<OverstyringException> {
-                        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
+                        enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er test", IMORGEN))
                     }
                 }
             }
@@ -129,7 +129,7 @@ internal class OverstyringTest : BehaviorSpec() {
                 Then("settes alle felter korrekt") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     assertSoftly(entity) {
                         navid shouldBe ansattId.verdi
@@ -153,41 +153,41 @@ internal class OverstyringTest : BehaviorSpec() {
                     val brukerMedHistorikk = BrukerBuilder(vanligBrukerId).historiske(setOf(historiskBrukerId)).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns brukerMedHistorikk
                     every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns BrukerBuilder(historiskBrukerId).build()
-                    overstyring.overstyr(ansattId, OverstyringData(historiskBrukerId, "Dette er en test", IMORGEN))
-                    overstyring.erOverstyrt(ansattId, BrukerBuilder(vanligBrukerId).build().brukerId).shouldBeTrue()
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(historiskBrukerId, "Dette er en test", IMORGEN))
+                    enkeltTilgang.harEnkeltTilgang(ansattId, BrukerBuilder(vanligBrukerId).build().brukerId).shouldBeTrue()
                 }
             }
             When("det finnes flere overstyringer") {
                 Then("gjelder den nyeste") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er gammel", IGÅR))
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er ny", IMORGEN))
-                    overstyring.erOverstyrt(ansattId, bruker.brukerId).shouldBeTrue()
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er gammel", IGÅR))
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er ny", IMORGEN))
+                    enkeltTilgang.harEnkeltTilgang(ansattId, bruker.brukerId).shouldBeTrue()
                 }
             }
             When("nyeste overstyring er utgått, eldre er aktiv") {
                 Then("returneres false — nyeste vinner") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er aktiv men gammel", IMORGEN))
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er ny men utgått", IGÅR))
-                    overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe false
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er aktiv men gammel", IMORGEN))
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er ny men utgått", IGÅR))
+                    enkeltTilgang.harEnkeltTilgang(ansattId, bruker.brukerId) shouldBe false
                 }
             }
             When("overstyring er utgått") {
                 Then("returneres false") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er utgått", IGÅR))
-                    overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe false
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er utgått", IGÅR))
+                    enkeltTilgang.harEnkeltTilgang(ansattId, bruker.brukerId) shouldBe false
                 }
             }
             When("ingen overstyring er registrert") {
                 Then("returneres false") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe false
+                    enkeltTilgang.harEnkeltTilgang(ansattId, bruker.brukerId) shouldBe false
                 }
             }
         }
@@ -199,9 +199,9 @@ internal class OverstyringTest : BehaviorSpec() {
                     val bruker2 = BrukerBuilder(historiskBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker1
                     every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns bruker2
-                    overstyring.overstyr(ansattId, OverstyringData(bruker1.brukerId, "Aktiv overstyring 1", IMORGEN))
-                    overstyring.overstyr(ansattId, OverstyringData(bruker2.brukerId, "Aktiv overstyring 2", IMORGEN))
-                    val resultat = overstyring.overstyringer(ansattId, listOf(bruker1.brukerId, bruker2.brukerId))
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(bruker1.brukerId, "Aktiv overstyring 1", IMORGEN))
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(bruker2.brukerId, "Aktiv overstyring 2", IMORGEN))
+                    val resultat = enkeltTilgang.tilganger(ansattId, listOf(bruker1.brukerId, bruker2.brukerId))
                     resultat shouldBe listOf(bruker1.brukerId, bruker2.brukerId)
                 }
             }
@@ -211,9 +211,9 @@ internal class OverstyringTest : BehaviorSpec() {
                     val bruker2 = BrukerBuilder(historiskBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker1
                     every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns bruker2
-                    overstyring.overstyr(ansattId, OverstyringData(bruker1.brukerId, "Aktiv overstyring", IMORGEN))
-                    overstyring.overstyr(ansattId, OverstyringData(bruker2.brukerId, "Utgått overstyring", IGÅR))
-                    val resultat = overstyring.overstyringer(ansattId, listOf(bruker1.brukerId, bruker2.brukerId))
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(bruker1.brukerId, "Aktiv overstyring", IMORGEN))
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(bruker2.brukerId, "Utgått overstyring", IGÅR))
+                    val resultat = enkeltTilgang.tilganger(ansattId, listOf(bruker1.brukerId, bruker2.brukerId))
                     resultat shouldBe listOf(bruker1.brukerId)
                 }
             }
@@ -221,9 +221,9 @@ internal class OverstyringTest : BehaviorSpec() {
                 Then("returneres tom liste for den brukeren — nyeste vinner") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Aktiv men gammel", IMORGEN))
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Ny men utgått", IGÅR))
-                    val resultat = overstyring.overstyringer(ansattId, listOf(bruker.brukerId))
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(bruker.brukerId, "Aktiv men gammel", IMORGEN))
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(bruker.brukerId, "Ny men utgått", IGÅR))
+                    val resultat = enkeltTilgang.tilganger(ansattId, listOf(bruker.brukerId))
                     resultat.shouldBeEmpty()
                 }
             }
@@ -231,14 +231,14 @@ internal class OverstyringTest : BehaviorSpec() {
                 Then("returneres tom liste") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Utgått overstyring", IGÅR))
-                    val resultat = overstyring.overstyringer(ansattId, listOf(bruker.brukerId))
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(bruker.brukerId, "Utgått overstyring", IGÅR))
+                    val resultat = enkeltTilgang.tilganger(ansattId, listOf(bruker.brukerId))
                     resultat.shouldBeEmpty()
                 }
             }
             When("ingen overstyringer er registrert") {
                 Then("returneres tom liste") {
-                    val resultat = overstyring.overstyringer(ansattId, listOf(vanligBrukerId))
+                    val resultat = enkeltTilgang.tilganger(ansattId, listOf(vanligBrukerId))
                     resultat.shouldBeEmpty()
                 }
             }
@@ -249,7 +249,7 @@ internal class OverstyringTest : BehaviorSpec() {
                 Then("settes created, updated, oppretter og system") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     assertSoftly(entity) {
                         created shouldNotBe null
@@ -264,7 +264,7 @@ internal class OverstyringTest : BehaviorSpec() {
                 Then("lastes entity med korrekte felter fra database") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     val lastet = repository.findById(entity.id)
                     lastet.isPresent.shouldBeTrue()
@@ -282,7 +282,7 @@ internal class OverstyringTest : BehaviorSpec() {
                 Then("nullstilles system og oppretter til tokenverdi") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     val createdFør = entity.created
                     entity.system = "ukjent-system"
@@ -300,7 +300,7 @@ internal class OverstyringTest : BehaviorSpec() {
                 Then("fjernes entity fra database") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+                    enkeltTilgang.overstyr(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     repository.delete(entity)
                     repository.findById(entity.id).isPresent shouldBe false

@@ -19,9 +19,9 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.TokenTypeTeller
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
-import no.nav.tilgangsmaskin.regler.overstyring.ValidOverstyring
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangGyldig
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
 import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
 import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
@@ -47,7 +47,7 @@ private const val TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.tilgang.tag.
 @Tag(name = "TilgangController", description = TILGANG_CONTROLLER_TAG_DESCRIPTION)
 class TilgangController(
     private val regelTjeneste: RegelTjeneste,
-    private val overstyringTjeneste: OverstyringTjeneste,
+    private val enkeltTilgangTjeneste: EnkeltTilgangTjeneste,
     private val token: Token,
     private val guard: TokenTypeGuard,
     private val teller: TokenTypeTeller) {
@@ -88,9 +88,9 @@ class TilgangController(
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
-    fun overstyr(@RequestBody @Valid @ValidOverstyring data: OverstyringData, req: HttpServletRequest) {
+    fun overstyr(@RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData, req: HttpServletRequest) {
         guard.krev(OBO, req.requestURI)
-        overstyringTjeneste.overstyr(ansattIdFraToken(req.requestURI), data)
+        enkeltTilgangTjeneste.overstyr(ansattIdFraToken(req.requestURI), data)
     }
 
     @PostMapping("bulk/obo")

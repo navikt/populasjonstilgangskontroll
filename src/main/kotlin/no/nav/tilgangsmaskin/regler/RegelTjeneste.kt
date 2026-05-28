@@ -14,9 +14,8 @@ import no.nav.tilgangsmaskin.regler.motor.BrukerOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
 import org.slf4j.LoggerFactory
@@ -30,7 +29,7 @@ class RegelTjeneste(
     private val motor: RegelMotor,
     private val brukerTjeneste: BrukerTjeneste,
     private val ansattTjeneste: AnsattTjeneste,
-    private val overstyringTjeneste: OverstyringTjeneste,
+    private val enkeltTilgangTjeneste: EnkeltTilgangTjeneste,
     private val auditor: Auditor) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -43,11 +42,11 @@ class RegelTjeneste(
                 try {
                     motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
                 } catch (e: RegelException) {
-                    if (!overstyringTjeneste.erOverstyrt(ansattId, bruker.brukerId)) {
+                    if (!enkeltTilgangTjeneste.harEnkeltTilgang(ansattId, bruker.brukerId)) {
                         log.trace("Tilgang avvist ved kjøring av komplette regler for {} og {}", ansattId, brukerId.maskFnr(), e)
                         throw e
                     }
-                    log.trace("Overstyring registrert for {} og {}", ansattId, brukerId.maskFnr(), e)
+                    log.trace("Enkelttilgang registrert for {} og {}", ansattId, brukerId.maskFnr(), e)
                 }
             }
                 ?: log.info("Komplette regler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
@@ -132,8 +131,8 @@ class RegelTjeneste(
         buildSet {
             val (godkjente, avviste) = resultater.partition { it.status.is2xxSuccessful }
             godkjente.forEach { add(EnkeltBulkRespons.ok(it.bruker.oppslagId)) }
-            overstyringTjeneste
-                .overstyringer(ansatt.ansattId, avviste.map { it.bruker.brukerId })
+            enkeltTilgangTjeneste
+                .tilganger(ansatt.ansattId, avviste.map { it.bruker.brukerId })
                 .forEach { add(EnkeltBulkRespons.ok(it.verdi)) }
         }.also { respons ->
             if (respons.isNotEmpty()) {

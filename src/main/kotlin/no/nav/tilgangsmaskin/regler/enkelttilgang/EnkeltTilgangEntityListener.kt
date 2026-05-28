@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.regler.overstyring
+package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import jakarta.persistence.PostLoad
 import jakarta.persistence.PostPersist
@@ -16,41 +16,41 @@ import java.time.Clock
 import java.time.Instant
 
 @Component
-class OverstyringEntityListener(private val token: Token, private val clock: Clock) {
+class EnkeltTilgangEntityListener(private val token: Token, private val clock: Clock) {
 
     private val log = getLogger(javaClass)
 
     @PrePersist
-    private fun lagrer(entity: OverstyringEntity) = setCreated(entity).also {
+    private fun lagrer(entity: EnkeltTilgangEntity) = setCreated(entity).also {
         log.trace("Lagrer overstyring for ${entity.fnr.maskFnr()} i DB")
     }
 
     @PreUpdate
-    private fun oppdaterer(entity: OverstyringEntity) = setOppdatert(entity).also {
+    private fun oppdaterer(entity: EnkeltTilgangEntity) = setOppdatert(entity).also {
         log.trace("Oppdaterer overstyring for ${entity.fnr.maskFnr()} i DB")
     }
 
     @PreRemove
-    private fun fjerner(entity: OverstyringEntity) =
+    private fun fjerner(entity: EnkeltTilgangEntity) =
         log.trace("Fjerner overstyring for ${entity.fnr.maskFnr()} i DB")
 
     @PostPersist
-    private fun lagret(entity: OverstyringEntity) =
+    private fun lagret(entity: EnkeltTilgangEntity) =
         log.trace("Lagret overstyring for ${entity.fnr.maskFnr()} i DB")
 
     @PostUpdate
-    private fun oppdatert(entity: OverstyringEntity) =
+    private fun oppdatert(entity: EnkeltTilgangEntity) =
         log.trace("Oppdaterte overstyring for ${entity.fnr.maskFnr()} i DB")
 
     @PostRemove
-    private fun fjernet(entity: OverstyringEntity) =
+    private fun fjernet(entity: EnkeltTilgangEntity) =
         log.trace("Fjernet overstyring for ${entity.fnr.maskFnr()} i DB")
 
     @PostLoad
-    private fun lest(entity: OverstyringEntity) =
+    private fun lest(entity: EnkeltTilgangEntity) =
         log.trace("Leste overstyring for ${entity.fnr.maskFnr()} i DB")
 
-    fun setCreatedBySystem(target: OverstyringEntity) {
+    fun setCreatedBySystem(target: EnkeltTilgangEntity) {
         target::class.java.declaredFields.forEach {
             if (it.isAnnotationPresent(CreatedBySystem::class.java)) {
                 it.isAccessible = true
@@ -62,7 +62,7 @@ class OverstyringEntityListener(private val token: Token, private val clock: Clo
             }
         }
     }
-    fun setOppdatert(target: OverstyringEntity) {
+    fun setOppdatert(target: EnkeltTilgangEntity) {
         setCreatedBySystem(target)
         val now = Instant.now(clock)
         target::class.java.declaredFields.forEach {
@@ -72,7 +72,7 @@ class OverstyringEntityListener(private val token: Token, private val clock: Clo
             }
         }
     }
-    fun setCreated(target: OverstyringEntity) {
+    fun setCreated(target: EnkeltTilgangEntity) {
         setCreatedBySystem(target)
         val now = Instant.now(clock)
         target::class.java.declaredFields.forEach {

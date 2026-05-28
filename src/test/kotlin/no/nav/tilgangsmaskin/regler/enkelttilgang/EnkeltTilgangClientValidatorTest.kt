@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.regler.overstyring
+package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
@@ -8,17 +8,17 @@ import io.mockk.mockk
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV_GCP
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.LOCAL
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringClientValidator.OverstyringException
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangClientValidator.OverstyringException
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.mock.env.MockEnvironment
 
-class OverstyringClientValidatorTest : BehaviorSpec({
+class EnkeltTilgangClientValidatorTest : BehaviorSpec({
 
     val token = mockk<Token>()
-    val cfg = OverstyringConfig()
+    val cfg = EnkeltTilgangConfig()
 
     fun validator(vararg activeProfiles:  String) =
-        OverstyringClientValidator(cfg, token, MockEnvironment().apply {
+        EnkeltTilgangClientValidator(cfg, token, MockEnvironment().apply {
             setActiveProfiles(*activeProfiles)
         })
 

@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.regler.overstyring
+package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import io.micrometer.core.annotation.Timed
 import io.micrometer.core.instrument.Tag
@@ -15,7 +15,7 @@ import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.regelTag
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringClientValidator.OverstyringException
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangClientValidator.OverstyringException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -25,10 +25,10 @@ import java.time.Instant
 @Component
 @Transactional(readOnly = true)
 @Timed
-class OverstyringTjeneste(
+class EnkeltTilgangTjeneste(
     private val ansattTjeneste: AnsattTjeneste,
     private val brukerTjeneste: BrukerTjeneste,
-    private val adapter: OverstyringJPAAdapter,
+    private val adapter: EnkeltTilgangJPAAdapter,
     private val motor: RegelMotor,
     private val proxy: EntraProxyTjeneste,
     private val validator: KonsumentValidator,
@@ -36,18 +36,18 @@ class OverstyringTjeneste(
 
     private val log = getLogger(javaClass)
 
-    fun overstyringer(ansattId: AnsattId, brukerIds: List<BrukerId>) =
-        adapter.gjeldendeOverstyringer(ansattId.verdi, brukerIds.map { it.verdi })
+    fun tilganger(ansattId: AnsattId, brukerIds: List<BrukerId>) =
+        adapter.gjeldendeTilganger(ansattId.verdi, brukerIds.map { it.verdi })
 
-    fun erOverstyrt(ansattId: AnsattId, brukerId: BrukerId) =
-        gjeldendeOverstyring(ansattId, brukerId)
+    fun harEnkeltTilgang(ansattId: AnsattId, brukerId: BrukerId) =
+        gjeldendeEnkeltTilgang(ansattId, brukerId)
             ?.also {
                 log.trace("Overstyring er gyldig i {} til for {} og {}", it.diffFromNow(), ansattId, brukerId)
             } != null
 
 
     @Transactional
-    fun overstyr(ansattId: AnsattId, data: OverstyringData): Boolean {
+    fun overstyr(ansattId: AnsattId, data: EnkeltTilgangData): Boolean {
         try {
             validator.valider()
             val ansatt = ansattTjeneste.ansatt(ansattId)
@@ -72,7 +72,7 @@ class OverstyringTjeneste(
         }
     }
 
-    private fun gjeldendeOverstyring(ansattId: AnsattId, brukerId: BrukerId): Instant? =
+    private fun gjeldendeEnkeltTilgang(ansattId: AnsattId, brukerId: BrukerId): Instant? =
         adapter.gjeldendeOverstyring(ansattId.verdi, brukerId.verdi,
         brukerTjeneste.brukerMedNærmesteFamilie(brukerId.verdi).historiskeIds.map {
             it.verdi

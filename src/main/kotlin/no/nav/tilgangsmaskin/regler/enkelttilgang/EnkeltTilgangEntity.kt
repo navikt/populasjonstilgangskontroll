@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.regler.overstyring
+package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import jakarta.persistence.CheckConstraint
 import jakarta.persistence.Column
@@ -22,8 +22,8 @@ import kotlin.annotation.AnnotationTarget.FIELD
     check = [CheckConstraint(constraint = "char_length(begrunnelse) >= 10 AND char_length(begrunnelse) <= 255")
     ]
 )
-@EntityListeners(OverstyringEntityListener::class, AuditingEntityListener::class)
-class OverstyringEntity(
+@EntityListeners(EnkeltTilgangEntityListener::class, AuditingEntityListener::class)
+class EnkeltTilgangEntity(
         @Column(length = ANSATTID_LENGTH, nullable = false) val navid: String,
         @Column(length = BRUKERID_LENGTH, nullable = false) val fnr: String,
         @Column(length = 400, nullable = false) val begrunnelse: String,

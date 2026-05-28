@@ -1,22 +1,22 @@
-package no.nav.tilgangsmaskin.regler.overstyring
+package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import org.springframework.stereotype.Component
 import java.time.ZoneId.systemDefault
 
 @Component
-class OverstyringJPAAdapter(private val repository: OverstyringRepository) {
+class EnkeltTilgangJPAAdapter(private val repository: EnkeltTilgangRepository) {
 
-    fun overstyr(ansattId: String, enhetsnummer: String, data: OverstyringData) =
+    fun overstyr(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData) =
         with(data) {
-            repository.save(OverstyringEntity(ansattId, brukerId.verdi, begrunnelse, enhetsnummer,gyldigtil.atStartOfDay(systemDefault()).toInstant()))
+            repository.save(EnkeltTilgangEntity(ansattId, brukerId.verdi, begrunnelse, enhetsnummer,gyldigtil.atStartOfDay(systemDefault()).toInstant()))
             Unit
         }
 
     fun gjeldendeOverstyring(ansattId: String, brukerId: String, brukerIds: List<String>) =
         repository.gjeldendeOverstyring(ansattId, listOf(brukerId) + brukerIds)
 
-    fun gjeldendeOverstyringer(ansattId: String, brukerIds: List<String>): List<BrukerId> =
+    fun gjeldendeTilganger(ansattId: String, brukerIds: List<String>): List<BrukerId> =
         repository.gjeldendeOverstyringer(ansattId, brukerIds)
             .map { BrukerId(it.fnr) }
 }

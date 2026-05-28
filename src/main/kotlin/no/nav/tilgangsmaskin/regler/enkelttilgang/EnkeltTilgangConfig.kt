@@ -1,10 +1,10 @@
-package no.nav.tilgangsmaskin.regler.overstyring
+package no.nav.tilgangsmaskin.regler.enkelttilgang
 
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringConfig.Companion.OVERSTYRING
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangConfig.Companion.OVERSTYRING
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(OVERSTYRING)
-class OverstyringConfig(val systemer: Set<String> = SYSTEMER) {
+class EnkeltTilgangConfig(val systemer: Set<String> = SYSTEMER) {
 
     companion object {
         const val OVERSTYRING = "overstyring"

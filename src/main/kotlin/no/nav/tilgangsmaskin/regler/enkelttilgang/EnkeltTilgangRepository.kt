@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.regler.overstyring
+package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import io.micrometer.core.annotation.Timed
 import org.springframework.data.jpa.repository.JpaRepository
@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param
 import java.time.Instant
 
 @Timed
-interface OverstyringRepository : JpaRepository<OverstyringEntity, Long> {
+interface EnkeltTilgangRepository : JpaRepository<EnkeltTilgangEntity, Long> {
 
     @Query("""
         SELECT o FROM overstyring o
@@ -22,7 +22,7 @@ interface OverstyringRepository : JpaRepository<OverstyringEntity, Long> {
     fun gjeldendeOverstyring(
             @Param("ansattId") ansattId: String,
             @Param("brukerIds") brukerIds: List<String>,
-            @Param("now") now: Instant = Instant.now()): OverstyringEntity?
+            @Param("now") now: Instant = Instant.now()): EnkeltTilgangEntity?
 
     @Query("""
     SELECT o FROM overstyring o
@@ -37,6 +37,6 @@ interface OverstyringRepository : JpaRepository<OverstyringEntity, Long> {
     fun gjeldendeOverstyringer(
         @Param("ansattId") ansattId: String,
         @Param("brukerIds") brukerIds: List<String>,
-        @Param("now") now: Instant = Instant.now()): List<OverstyringEntity>
+        @Param("now") now: Instant = Instant.now()): List<EnkeltTilgangEntity>
 
 }

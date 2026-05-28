@@ -16,9 +16,9 @@ import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
-import no.nav.tilgangsmaskin.regler.overstyring.ValidOverstyring
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangGyldig
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
 import no.nav.tilgangsmaskin.tilgang.dev.DevTilgangController.Companion.DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.http.HttpStatus.ACCEPTED
@@ -36,7 +36,7 @@ import java.util.*
 @Tag(name = "DevTilgangController", description = DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION)
 class DevTilgangController(
     private val graphql: PdlSyncGraphQLClientAdapter,
-    private val overstyring: OverstyringTjeneste,
+    private val overstyring: EnkeltTilgangTjeneste,
     private val oppfølging: OppfølgingTjeneste,
     private val nom: NomJPAAdapter) {
 
@@ -72,7 +72,7 @@ class DevTilgangController(
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
     @Valid
-    fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody  @Valid @ValidOverstyring data: OverstyringData) =
+    fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody  @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData) =
         overstyring.overstyr(ansattId, data)
 
     @PostMapping("overstyringer/{ansattId}")
@@ -80,7 +80,7 @@ class DevTilgangController(
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_HENT_OVERSTYRINGER, description = DESCRIPTION_HENT_OVERSTYRINGER)
     fun overstyringer(@PathVariable ansattId: AnsattId, @RequestBody brukerIds: List<BrukerId>) =
-        overstyring.overstyringer(ansattId, brukerIds)
+        overstyring.tilganger(ansattId, brukerIds)
 
     companion object {
         private const val DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.tilgang.tag.description"

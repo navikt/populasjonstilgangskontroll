@@ -37,7 +37,7 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
 
 @Configuration
 @NoCoverageAnalysis
-class wFellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : WebMvcConfigurer {
+class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : WebMvcConfigurer {
 
     @Bean
     fun jackson3Customizer() = JsonMapperBuilderCustomizer {

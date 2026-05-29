@@ -11,7 +11,6 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
-import org.springframework.kafka.support.KafkaHeaders
 import org.springframework.kafka.support.KafkaHeaders.OFFSET
 import org.springframework.messaging.handler.annotation.Header
 import org.springframework.stereotype.Component
@@ -29,9 +28,11 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
         groupId = NOM, filter = NOM_FNR_FILTER_STRATEGY)
     fun listen(hendelse: NomHendelse, @Header(OFFSET) offset: Long) {
         log.trace(CONFIDENTIAL, "Behandler hendelse {} fra NOM på offset {}", hendelse.navident,offset)
-        nom.lagre(hendelse.ansattData())
-        log.trace("Lagret brukerId ${hendelse.personident.maskFnr()} for ${hendelse.navident} OK")
-        log.info("${hendelse.navident} hendelse fra NOM ferdig behandlet og lagret")
+        with(hendelse.ansattData()) {
+            nom.lagre(this)
+            log.trace("Lagret brukerId {} for {} og offset {} OK", brukerId, ansattId, offset)
+            log.info("$ansattId hendelse på offset $offset fra NOM ferdig behandlet og lagret")
+        }
     }
 
     private fun NomHendelse.ansattData() =

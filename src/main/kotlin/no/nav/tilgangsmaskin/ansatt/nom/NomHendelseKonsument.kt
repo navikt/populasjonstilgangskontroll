@@ -32,9 +32,9 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
                @Header(OFFSET) offset: Long,
                @Header(RECEIVED_PARTITION) partition: Int) =
         with(hendelse.ansattData()) {
-            log.info("Behandler hendelse {} for {} fra NOM, partition {} og, offset {}",hendelse, partition, ansattId,offset)
+            log.info("Behandler hendelse $hendelse for $ansattId fra NOM, partition $partition og offset $offset")
             nom.lagre(this)
-            log.info("Lagret brukerId {} for {}, partition {} og offset {} OK", brukerId, ansattId, partition, offset)
+            log.info("Lagret brukerId $brukerId for $ansattId, partition $partition og offset $offset OK")
             log.info("$ansattId hendelse på partition $partition, offset $offset fra NOM ferdig behandlet og lagret")
     }
 

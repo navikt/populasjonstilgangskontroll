@@ -16,10 +16,14 @@ class CacheMeteredErrorHandler(private val registry: MeterRegistry) : CacheError
         record("put", cache, ex)
 
     override fun handleCacheEvictError(ex: RuntimeException, cache: Cache, key: Any) =
-        record("evict", cache, ex)
+        record("evict", cache, ex).also {
+            throw ex
+        }
 
     override fun handleCacheClearError(ex: RuntimeException, cache: Cache) =
-        record("clear", cache, ex)
+        record("clear", cache, ex).also {
+            throw ex
+        }
 
     private fun record(op: String, cache: Cache, ex: RuntimeException) {
         registry.counter("cache.operation.failed", "op", op, "cache", cache.name,

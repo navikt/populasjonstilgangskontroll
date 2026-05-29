@@ -26,13 +26,12 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
         topics = [NOM_TOPIC],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.nom.NomHendelse"],
         groupId = NOM, filter = NOM_FNR_FILTER_STRATEGY)
-    fun listen(hendelse: NomHendelse, @Header(OFFSET) offset: Long) {
-        log.trace(CONFIDENTIAL, "Behandler hendelse {} fra NOM på offset {}", hendelse.navident,offset)
+    fun listen(hendelse: NomHendelse, @Header(OFFSET) offset: Long) =
         with(hendelse.ansattData()) {
+            log.info("Behandler hendelse for {} fra NOM på offset {}", ansattId,offset)
             nom.lagre(this)
-            log.trace("Lagret brukerId {} for {} og offset {} OK", brukerId, ansattId, offset)
+            log.info("Lagret brukerId {} for {} og offset {} OK", brukerId, ansattId, offset)
             log.info("$ansattId hendelse på offset $offset fra NOM ferdig behandlet og lagret")
-        }
     }
 
     private fun NomHendelse.ansattData() =

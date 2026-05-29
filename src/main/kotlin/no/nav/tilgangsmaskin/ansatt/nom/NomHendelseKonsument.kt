@@ -28,7 +28,7 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
         groupId = NOM, filter = NOM_FNR_FILTER_STRATEGY)
     fun listen(hendelse: NomHendelse, @Header(OFFSET) offset: Long) =
         with(hendelse.ansattData()) {
-            log.info("Behandler hendelse for {} fra NOM på offset {}", ansattId,offset)
+            log.info("Behandler hendelse {} for {} fra NOM på offset {}",hendelse, ansattId,offset)
             nom.lagre(this)
             log.info("Lagret brukerId {} for {} og offset {} OK", brukerId, ansattId, offset)
             log.info("$ansattId hendelse på offset $offset fra NOM ferdig behandlet og lagret")

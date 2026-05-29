@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.redis.serializer.RedisSerializer
 import org.springframework.data.redis.serializer.SerializationException
 
-class ResilientRedisSerializer(private val delegate: RedisSerializer<Any>, private val meterRegistry: MeterRegistry, ) : RedisSerializer<Any> {
+class ResilientRedisSerializer(private val delegate: RedisSerializer<Any>, private val meterRegistry: MeterRegistry) : RedisSerializer<Any> {
 
     private val log = getLogger(javaClass)
 

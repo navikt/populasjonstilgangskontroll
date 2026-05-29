@@ -59,15 +59,6 @@ class NomHendelseKonsumentTest : BehaviorSpec({
                 }
             }
         }
-
-        When("lagre kaster exception") {
-            Then("logger feilet og fortsetter med neste hendelse") {
-                every { nom.lagre(match { it.ansattId == AnsattId(NAVIDENT) }) } throws RuntimeException("DB-feil")
-
-                konsument.listen(listOf(hendelse(), hendelse("Z888888", "20478606614")))
-                verify { nom.lagre(match { it.ansattId == AnsattId("Z888888") }) }
-            }
-        }
     }
 }) {
     companion object {

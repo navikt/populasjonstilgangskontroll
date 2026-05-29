@@ -12,27 +12,11 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.BARN
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.FAR
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.INGEN
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.MOR
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.TIDLIGERE_PARTNER
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UdefinertTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
-import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.ENKE_ELLER_ENKEMANN
-import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.GIFT
-import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.GJENLEVENDE_PARTNER
-import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.REGISTRERT_PARTNER
-import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.SEPARERT
-import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.SEPARERT_PARTNER
-import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.SKILT
-import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.SKILT_PARTNER
-import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.UGIFT
-import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.UOPPGITT
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTBydel
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTKommune
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTLand
@@ -41,7 +25,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTType.KOMMUNE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTType.UDEFINERT
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGeografiskTilknytning.GTType.UTLAND
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilGeoTilknytning
-import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPersoner
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlIdenter
@@ -98,54 +81,30 @@ class PdlPersonMapperTest : BehaviorSpec({
         When("BYDEL uten kode") { Then("mappes til UkjentBosted") { tilGeoTilknytning(PdlGeografiskTilknytning(BYDEL)).shouldBeInstanceOf<UkjentBosted>() } }
     }
 
-    Given("tilPartner") {
-        When("GIFT") { Then("mappes til PARTNER") { tilPartner(GIFT) shouldBe PARTNER } }
-        When("REGISTRERT_PARTNER") { Then("mappes til PARTNER") { tilPartner(REGISTRERT_PARTNER) shouldBe PARTNER } }
-        When("SKILT") { Then("mappes til TIDLIGERE_PARTNER") { tilPartner(SKILT) shouldBe TIDLIGERE_PARTNER } }
-        When("ENKE_ELLER_ENKEMANN") { Then("mappes til TIDLIGERE_PARTNER") { tilPartner(ENKE_ELLER_ENKEMANN) shouldBe TIDLIGERE_PARTNER } }
-        When("SEPARERT") { Then("mappes til TIDLIGERE_PARTNER") { tilPartner(SEPARERT) shouldBe TIDLIGERE_PARTNER } }
-        When("SKILT_PARTNER") { Then("mappes til TIDLIGERE_PARTNER") { tilPartner(SKILT_PARTNER) shouldBe TIDLIGERE_PARTNER } }
-        When("GJENLEVENDE_PARTNER") { Then("mappes til TIDLIGERE_PARTNER") { tilPartner(GJENLEVENDE_PARTNER) shouldBe TIDLIGERE_PARTNER } }
-        When("SEPARERT_PARTNER") { Then("mappes til TIDLIGERE_PARTNER") { tilPartner(SEPARERT_PARTNER) shouldBe TIDLIGERE_PARTNER } }
-        When("UGIFT") { Then("mappes til INGEN") { tilPartner(UGIFT) shouldBe INGEN } }
-        When("UOPPGITT") { Then("mappes til INGEN") { tilPartner(UOPPGITT) shouldBe INGEN } }
-    }
-
     Given("tilPerson - familierelasjoner") {
         fun familierelasjon(ident: BrukerId, rolle: PdlFamilieRelasjonRolle) = PdlFamilierelasjon(ident, rolle)
 
         When("MOR-relasjon") {
-            Then("mappes til foreldre med relasjon MOR") {
-                tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(mor, PdlFamilieRelasjonRolle.MOR))))).foreldre.single().let {
-                    it.brukerId shouldBe mor; it.relasjon shouldBe MOR
-                }
+            Then("mappes til foreldre") {
+                tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(mor, PdlFamilieRelasjonRolle.MOR))))).foreldre.single() shouldBe mor
             }
         }
         When("FAR-relasjon") {
-            Then("mappes til foreldre med relasjon FAR") {
-                tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(far, PdlFamilieRelasjonRolle.FAR))))).foreldre.single().let {
-                    it.brukerId shouldBe far; it.relasjon shouldBe FAR
-                }
+            Then("mappes til foreldre") {
+                tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(far, PdlFamilieRelasjonRolle.FAR))))).foreldre.single() shouldBe far
             }
         }
-        When("MEDMOR-relasjon") { Then("mappes til foreldre med relasjon MOR") { tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(mor, PdlFamilieRelasjonRolle.MEDMOR))))).foreldre.single().relasjon shouldBe MOR } }
-        When("MEDFAR-relasjon") { Then("mappes til foreldre med relasjon FAR") { tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(far, PdlFamilieRelasjonRolle.MEDFAR))))).foreldre.single().relasjon shouldBe FAR } }
+        When("MEDMOR-relasjon") { Then("mappes til foreldre") { tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(mor, PdlFamilieRelasjonRolle.MEDMOR))))).foreldre.single() shouldBe mor } }
+        When("MEDFAR-relasjon") { Then("mappes til foreldre") { tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(far, PdlFamilieRelasjonRolle.MEDFAR))))).foreldre.single() shouldBe far } }
         When("BARN-relasjon") {
             Then("mappes til barn") {
-                tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(barn, PdlFamilieRelasjonRolle.BARN))))).barn.single().let {
-                    it.brukerId shouldBe barn; it.relasjon shouldBe BARN
-                }
+                tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(familierelasjon(barn, PdlFamilieRelasjonRolle.BARN))))).barn.single() shouldBe barn
             }
         }
         When("relasjon uten ident") {
             Then("mappes til ingenting") {
                 val result = tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(PdlFamilierelasjon(null, PdlFamilieRelasjonRolle.BARN)))))
                 assertSoftly { result.barn.shouldBeEmpty(); result.foreldre.shouldBeEmpty() }
-            }
-        }
-        When("null rolle med ident") {
-            Then("kastes IllegalStateException") {
-                shouldThrow<IllegalStateException> { tilPerson(brukerId, pdlRespons(PdlPerson(familierelasjoner = listOf(PdlFamilierelasjon(barn, null))))) }
             }
         }
     }

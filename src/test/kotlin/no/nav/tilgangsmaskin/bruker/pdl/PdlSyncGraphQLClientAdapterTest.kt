@@ -6,9 +6,7 @@ import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.INGEN
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.TIDLIGERE_PARTNER
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
@@ -69,27 +67,21 @@ class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
 
         Given("oppslag av partnere fra PDL") {
             When("sivilstand er GIFT") {
-                Then("returneres PARTNER") {
+                Then("returneres partnerens BrukerId") {
                     server.expect(requestTo(cfg.baseUri)).andRespond(withSuccess(sivilstandRespons(Sivilstandstype.GIFT), APPLICATION_JSON))
-                    adapter.partnere("Z999999").single().relasjon shouldBe PARTNER
+                    adapter.partnere("Z999999").single() shouldBe BrukerId("12345678901")
                 }
             }
             When("sivilstand er REGISTRERT_PARTNER") {
-                Then("returneres PARTNER") {
+                Then("returneres partnerens BrukerId") {
                     server.expect(requestTo(cfg.baseUri)).andRespond(withSuccess(sivilstandRespons(Sivilstandstype.REGISTRERT_PARTNER), APPLICATION_JSON))
-                    adapter.partnere("Z999999").single().relasjon shouldBe PARTNER
+                    adapter.partnere("Z999999").single() shouldBe BrukerId("12345678901")
                 }
             }
             When("sivilstand er SKILT") {
-                Then("returneres TIDLIGERE_PARTNER") {
+                Then("returneres tidligere partners BrukerId") {
                     server.expect(requestTo(cfg.baseUri)).andRespond(withSuccess(sivilstandRespons(Sivilstandstype.SKILT), APPLICATION_JSON))
-                    adapter.partnere("Z999999").single().relasjon shouldBe TIDLIGERE_PARTNER
-                }
-            }
-            When("sivilstand er UGIFT med partner-ident") {
-                Then("returneres INGEN") {
-                    server.expect(requestTo(cfg.baseUri)).andRespond(withSuccess(sivilstandRespons(Sivilstandstype.UGIFT), APPLICATION_JSON))
-                    adapter.partnere("Z999999").single().relasjon shouldBe INGEN
+                    adapter.partnere("Z999999").single() shouldBe BrukerId("12345678901")
                 }
             }
             When("ingen sivilstand har relatertVedSivilstand") {

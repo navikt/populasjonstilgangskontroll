@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.bruker.pdl
 
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.Familie
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
@@ -23,9 +22,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlPerson.PdlAdressebeskyt
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlPerson.PdlAdressebeskyttelse.PdlAdressebeskyttelseGradering
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlPerson.PdlDødsfall
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlPerson.PdlFamilierelasjon
-import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.BARN
-import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.FAR
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlPerson.PdlFamilierelasjon.PdlFamilieRelasjonRolle.MOR
 import tools.jackson.databind.json.JsonMapper
 
@@ -35,7 +32,7 @@ object PdlTestMapper {
         PdlPerson(
             adressebeskyttelse = p.graderinger.map { tilPdlGradering(it) }.map { PdlAdressebeskyttelse(it) },
             doedsfall          = listOfNotNull(p.dødsdato?.let { PdlDødsfall(it) }),
-            familierelasjoner  = tilFamilierelasjoner(p.familie).values.flatten()
+            familierelasjoner  = tilFamilierelasjoner(p.familie)
         ),
         PdlIdenter(
             buildList {
@@ -46,8 +43,6 @@ object PdlTestMapper {
         ),
         tilPdlGeografiskTilknytning(p.geoTilknytning)
     )
-
-    // ...existing code...
 
     private fun tilPdlGeografiskTilknytning(geo: GeografiskTilknytning) =
         when (geo) {
@@ -67,21 +62,14 @@ object PdlTestMapper {
     fun restRespons(mapper: JsonMapper, p: Person) =
         mapper.writeValueAsString(mapOf(p.brukerId.verdi to pdlRespons(p)))
 
-    fun tilFamilierelasjoner(familie: Familie): Map<FamilieRelasjon, List<PdlFamilierelasjon>> =
-        (familie.foreldre + familie.barn + familie.partnere + familie.søsken)
-            .groupBy { it.relasjon }
-            .mapValues { (relasjon, medlemmer) ->
-                val rolle = tilPdlRolle(relasjon)
-                medlemmer.map { PdlFamilierelasjon(it.brukerId, rolle) }
-            }
-
-    private fun tilPdlRolle(relasjon: FamilieRelasjon): PdlFamilieRelasjonRolle? =
-        when (relasjon) {
-            FamilieRelasjon.MOR  -> MOR
-            FamilieRelasjon.FAR  -> FAR
-            FamilieRelasjon.BARN -> BARN
-            else                 -> null
-        }
+    /**
+     * Bygger PdlFamilierelasjon-liste fra Familie. Siden den interne modellen ikke lenger
+     * skiller MOR vs FAR (bare "foreldre"-settet), markeres alle foreldre som MOR.
+     * Tester som verifiserte denne distinksjonen er fjernet.
+     */
+    fun tilFamilierelasjoner(familie: Familie): List<PdlFamilierelasjon> =
+        familie.foreldre.map { PdlFamilierelasjon(it, MOR) } +
+        familie.barn.map { PdlFamilierelasjon(it, BARN) }
 
     private fun tilPdlGradering(gradering: Gradering): PdlAdressebeskyttelseGradering =
         when (gradering) {

@@ -2,8 +2,6 @@ package no.nav.tilgangsmaskin.bruker.pdl
 
 import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
-import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import org.slf4j.LoggerFactory.getLogger
@@ -21,13 +19,10 @@ class PdlSyncGraphQLClientAdapter(
 
     private val log = getLogger(javaClass)
 
-    fun partnere(ident: String): Set<FamilieMedlem> =
+    fun partnere(ident: String): Set<BrukerId> =
         runCatching {
-            query<Partnere>(SIVILSTAND_QUERY, ident(ident)).sivilstand.mapNotNull {
-                it.relatertVedSivilstand?.let { brukerId ->
-                    FamilieMedlem(BrukerId(brukerId), tilPartner(it.type))
-                }
-            }.toSet()
+            query<Partnere>(SIVILSTAND_QUERY, ident(ident)).sivilstand
+                .mapNotNullTo(mutableSetOf()) { it.relatertVedSivilstand?.let(::BrukerId) }
         }.getOrElse {
             if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {
                 log.trace("Fant ingen partnere for $ident")

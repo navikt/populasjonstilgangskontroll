@@ -14,9 +14,6 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.BrukerTilPersonMapper.tilPerson
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
@@ -111,11 +108,11 @@ class PdlTjenesteTest : BehaviorSpec() {
             }
             When("GraphQL returnerer partnere") {
                 Then("inkluderes partnere i familien") {
-                    val partner = FamilieMedlem(BrukerId("12345678901"), PARTNER)
-                    every { graphQL.partnere(I1) } returns setOf(partner)
+                    val partnerId = BrukerId("12345678901")
+                    every { graphQL.partnere(I1) } returns setOf(partnerId)
                     server.expect(requestTo(cfg.personURI))
                         .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
-                    pdl.medUtvidetFamilie(I1).familie.partnere shouldBe setOf(partner)
+                    pdl.medUtvidetFamilie(I1).familie.partnere shouldBe setOf(partnerId)
                 }
             }
             When("person har foreldre") {
@@ -141,7 +138,7 @@ class PdlTjenesteTest : BehaviorSpec() {
                         .andRespond(withSuccess(restRespons(mapper, mor), APPLICATION_JSON))
 
                     val resultat = pdl.medUtvidetFamilie(I1)
-                    resultat.familie.søsken shouldBe setOf(FamilieMedlem(søskenId, SØSKEN))
+                    resultat.familie.søsken shouldBe setOf(søskenId)
                 }
             }
         }

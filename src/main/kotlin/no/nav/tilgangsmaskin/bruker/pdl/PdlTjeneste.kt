@@ -1,8 +1,7 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import io.opentelemetry.instrumentation.annotations.WithSpan
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
@@ -61,14 +60,12 @@ class PdlTjeneste(
     private fun hentPersoner(identer: Set<String>) =
         tilPersoner(pip.personer(identer))
 
-    private fun søsken(person: Person): Set<FamilieMedlem> {
+    private fun søsken(person: Person): Set<BrukerId> {
         if (person.foreldre.isEmpty()) return emptySet()
-        return buildSet {
-            hentPersoner(person.foreldre.map { it.brukerId.verdi }.toSet())
-                .flatMap { it.value.barn }
-                .filterNot { it.brukerId.verdi == person.brukerId.verdi }
-                .mapTo(this) { FamilieMedlem(it.brukerId, SØSKEN) }
-        }
+        return hentPersoner(person.foreldre.mapTo(mutableSetOf()) { it.verdi })
+            .flatMap { it.value.barn }
+            .filterNot { it.verdi == person.brukerId.verdi }
+            .toSet()
     }
 
     private fun fraCache(identer: Set<String>) =

@@ -3,8 +3,8 @@ package no.nav.tilgangsmaskin.ansatt
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
@@ -52,6 +52,6 @@ data class Ansatt(val ansattId: AnsattId, val bruker: Bruker? = null, val gruppe
 
     private fun harGruppeMedSuffix(suffix: String) = grupper.any { it.displayName.endsWith(suffix) }
 
-    private infix fun Bruker.erNærståendeMed(medlemmer: Set<FamilieMedlem>) = medlemmer.any { it.brukerId == brukerId }
+    private infix fun Bruker.erNærståendeMed(medlemmer: Set<BrukerId>) = brukerId in medlemmer
 
 }

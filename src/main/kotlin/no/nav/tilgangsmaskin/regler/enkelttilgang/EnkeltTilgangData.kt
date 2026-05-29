@@ -3,12 +3,15 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 import io.swagger.v3.oas.annotations.media.Schema
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import java.time.LocalDate
+import java.time.LocalDate.now
 
-@Schema(requiredProperties = ["brukerId","begrunnelse","gyldigTil"], example = """
-  {
-  "brukerId": "22420094160",
-  "begrunnelse": "En begrunnelse",
-  "gyldigtil": "2025-05-24"
-}
-""")
-data class EnkeltTilgangData(val brukerId: BrukerId, val begrunnelse: String, val gyldigtil: LocalDate = LocalDate.now().plusMonths(3))
+data class EnkeltTilgangData(
+    @field:Schema(description = "Fødselsnummer eller D-nummer", example = "22420094160")
+    val brukerId: BrukerId,
+
+    @field:Schema(description = "Begrunnelse for tilgang", example = "En begrunnelse")
+    val begrunnelse: String,
+
+    @field:Schema(description = "Tilgang gyldig til og med denne datoen", example = "2025-05-24")
+    val gyldigtil: LocalDate = now().plusMonths(3)
+)

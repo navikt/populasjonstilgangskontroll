@@ -32,7 +32,7 @@ import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
 import no.nav.tilgangsmaskin.regler.motor.EnkeltTilgangTeller
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangClientValidator.EnkeltTilgangException
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
@@ -100,7 +100,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
         beforeEach {
             every { nom.fnrForAnsatt(any()) } returns vanligBrukerId
             every { vergemål.vergemål(any()) } returns emptySet()
-            every { validator.valider() } returns Unit
+            every { validator.valider(any()) } returns Unit
             every { token.erObo } returns false
             every { token.erCC } returns true
             every { token.system } returns "test"
@@ -116,7 +116,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
 
             When("EnkeltTilgangException kastes fra validator") {
                 Then("kastes exception videre") {
-                    every { validator.valider() } throws EnkeltTilgangException("ukjent system", "ukjent-system")
+                    every { validator.valider(any()) } throws EnkeltTilgangException("ukjent system")
                     shouldThrow<EnkeltTilgangException> {
                         enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er test", IMORGEN))
                     }

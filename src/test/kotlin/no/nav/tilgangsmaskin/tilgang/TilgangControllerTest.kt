@@ -293,9 +293,9 @@ class TilgangControllerTest : BehaviorSpec() {
 
             beforeEach { every { token.erObo } returns true }
 
-            When("overstyr kalles med gyldig request og OBO-token") {
+            When("enkelttilgang kalles med gyldig request og OBO-token") {
                 Then("returnerer 202") {
-                    every { enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattId, any()) } returns true
+                    every { enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattId, any(), any()) } returns true
                     mockMvc.post("/api/v1/overstyr") {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
@@ -303,7 +303,7 @@ class TilgangControllerTest : BehaviorSpec() {
                 }
             }
 
-            When("overstyr kalles med CCF-token") {
+            When("enkelttilgang kalles med CCF-token") {
                 Then("returnerer 403") {
                     every { token.erCC } returns true
                     every { token.erObo } returns false

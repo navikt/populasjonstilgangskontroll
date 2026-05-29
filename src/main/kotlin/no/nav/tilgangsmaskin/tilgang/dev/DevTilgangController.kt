@@ -72,8 +72,8 @@ class DevTilgangController(
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_ENKELTTILGANG, description = DESCRIPTION_ENKELTTILGANG)
     @Valid
-    fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody  @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData) =
-        enkeltTilgang.registrerEnkeltTilgang(ansattId, data)
+    fun enkelttilgang(@PathVariable ansattId: AnsattId, @RequestBody  @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData) =
+        enkeltTilgang.registrerEnkeltTilgang(ansattId, data,"alle")
 
     @PostMapping("enkelttilganger/{ansattId}")
     @ResponseStatus(ACCEPTED)

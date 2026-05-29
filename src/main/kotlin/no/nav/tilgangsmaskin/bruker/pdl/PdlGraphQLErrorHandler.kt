@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.bruker.pdl
 
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
-import org.slf4j.LoggerFactory
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.graphql.ResponseError
 import org.springframework.graphql.client.FieldAccessException

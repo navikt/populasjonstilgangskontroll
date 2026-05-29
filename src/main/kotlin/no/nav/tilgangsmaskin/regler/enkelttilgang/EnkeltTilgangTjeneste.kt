@@ -15,7 +15,6 @@ import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.regelTag
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangClientValidator.EnkeltTilgangException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -47,9 +46,9 @@ class EnkeltTilgangTjeneste(
 
 
     @Transactional
-    fun registrerEnkeltTilgang(ansattId: AnsattId, data: EnkeltTilgangData): Boolean {
+    fun registrerEnkeltTilgang(ansattId: AnsattId, data: EnkeltTilgangData, konsument: String = "Ukjent"): Boolean {
         try {
-            validator.valider()
+            validator.valider(konsument)
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val bruker = brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi)
             motor.kjerneregler(ansatt, bruker)
@@ -67,7 +66,7 @@ class EnkeltTilgangTjeneste(
             )
         } catch (e: EnkeltTilgangException) {
             log.warn("Enkelttilgang feilet pga klientvalidering ${e.message} for $ansattId og ${data.brukerId}", e)
-            teller.tell(INGEN_REGEL_TAG, IKKE_OVERSTYRT, tokenSystemTag(e.system))
+            teller.tell(INGEN_REGEL_TAG, IKKE_OVERSTYRT, tokenSystemTag(konsument))
             throw e
         }
     }

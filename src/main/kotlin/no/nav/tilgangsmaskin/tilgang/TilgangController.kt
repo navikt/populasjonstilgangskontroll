@@ -59,7 +59,7 @@ class TilgangController(
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
     fun kompletteRegler(@RequestBody brukerId: String, req: HttpServletRequest) =
-        enkeltOppslag({ ansattIdFraToken(req.requestURI) }, OBO, brukerId, KOMPLETT_REGELTYPE,req.requestURI)
+        enkeltOppslag({ ansattIdFraToken() }, OBO, brukerId, KOMPLETT_REGELTYPE,req.requestURI)
 
     @PostMapping("/ccf/komplett/{ansattId}")
     @ResponseStatus(NO_CONTENT)
@@ -73,7 +73,7 @@ class TilgangController(
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KJERNE_OBO, description = DESCRIPTION_KJERNE_OBO)
     fun kjerneregler(@RequestBody brukerId: String, req: HttpServletRequest) =
-        enkeltOppslag({ ansattIdFraToken(req.requestURI) }, OBO, brukerId, KJERNE_REGELTYPE, req.requestURI)
+        enkeltOppslag({ ansattIdFraToken() }, OBO, brukerId, KJERNE_REGELTYPE, req.requestURI)
 
 
     @PostMapping("/ccf/kjerne/{ansattId}")
@@ -90,7 +90,7 @@ class TilgangController(
     @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
     fun overstyr(@RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData, req: HttpServletRequest) {
         guard.krev(OBO, req.requestURI)
-        enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattIdFraToken(req.requestURI), data)
+        enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattIdFraToken(), data, token.systemNavn)
     }
 
     @PostMapping("bulk/obo")
@@ -98,14 +98,14 @@ class TilgangController(
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO)
     fun bulkOBO(@RequestBody  specs: Set<BrukerIdOgRegelsett>, req: HttpServletRequest) =
-        bulkOppslag({ ansattIdFraToken(req.requestURI) }, OBO, specs,req.requestURI)
+        bulkOppslag({ ansattIdFraToken() }, OBO, specs,req.requestURI)
 
     @PostMapping("bulk/obo/{regelType}")
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO_REGELTYPE)
     fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>, req: HttpServletRequest) =
-        bulkOppslag({ ansattIdFraToken(req.requestURI) },
+        bulkOppslag({ ansattIdFraToken() },
             OBO, brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet(),req.requestURI)
 
     @PostMapping("bulk/ccf/{ansattId}")
@@ -159,8 +159,8 @@ class TilgangController(
         if (!predikat) throw ResponseStatusException(status,message)
     }
 
-    private fun ansattIdFraToken(uri: String): AnsattId =
-        requireNotNull(token.ansattId) { "Mangler ansattId i OBO-token for $uri" }
+    private fun ansattIdFraToken(): AnsattId =
+        requireNotNull(token.ansattId) { "Mangler ansattId i OBO-token" }
 
     companion object {
         private const val SUMMARY_KOMPLETT_OBO =

@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -8,8 +9,11 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
+import org.springframework.kafka.annotation.KafkaListener
 import java.time.LocalDate
 import java.time.LocalDate.EPOCH
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.functions
 
 class NomHendelseKonsumentTest : BehaviorSpec({
 
@@ -55,6 +59,20 @@ class NomHendelseKonsumentTest : BehaviorSpec({
                 verify {
                     nom.lagre(match { it.gyldighet.endInclusive == ALLTID })
                 }
+            }
+        }
+    }
+
+    Given("@KafkaListener-konfigurasjon") {
+        When("default-type-property leses fra annotasjonen") {
+            Then("matcher faktisk klassenavn for NomHendelse") {
+                val listen = NomHendelseKonsument::class.functions.first { it.name == "listen" }
+                val annotasjon = listen.findAnnotation<KafkaListener>()!!
+                val defaultType = annotasjon.properties
+                    .first { it.startsWith("spring.json.value.default.type=") }
+                    .substringAfter("=")
+
+                defaultType shouldBe NomHendelse::class.java.name
             }
         }
     }

@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.clearMocks
 import io.mockk.mockk
 import io.mockk.verify
@@ -12,8 +13,11 @@ import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Identer
+import org.springframework.kafka.annotation.KafkaListener
 import java.time.Instant
 import java.util.*
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.functions
 
 class OppfølgingHendelseKonsumentTest : BehaviorSpec({
 
@@ -63,6 +67,20 @@ class OppfølgingHendelseKonsumentTest : BehaviorSpec({
                 verify {
                     oppfølging.avslutt(Oppfølgingsendring.Avsluttet(ID, Identer(BRUKER_ID, AKTOR_ID)))
                 }
+            }
+        }
+    }
+
+    Given("@KafkaListener-konfigurasjon") {
+        When("default-type-property leses fra annotasjonen") {
+            Then("matcher faktisk klassenavn for OppfølgingHendelse") {
+                val listen = OppfølgingHendelseKonsument::class.functions.first { it.name == "listen" }
+                val annotasjon = listen.findAnnotation<KafkaListener>()!!
+                val defaultType = annotasjon.properties
+                    .first { it.startsWith("spring.json.value.default.type=") }
+                    .substringAfter("=")
+
+                defaultType shouldBe OppfølgingHendelse::class.java.name
             }
         }
     }

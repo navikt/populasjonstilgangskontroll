@@ -15,12 +15,12 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
-class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter, private val teller: OppfølgingkontorTeller) {
+class OppfølgingTjeneste(private val adapter: OppfølgingJPAAdapter, private val teller: OppfølgingkontorTeller) {
 
     @Cacheable(cacheNames = [OPPFØLGING], key = "#id.verdi")
     @Transactional(readOnly = true)
     fun enhetFor(id: Identifikator) =
-        db.enhetFor(id.verdi).also { enhet ->
+        adapter.enhetFor(id.verdi).also { enhet ->
             teller.tell(Tags.of("resultat", "${enhet != null}"))
         }
 
@@ -32,7 +32,7 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter, private val tel
     )
     fun registrer(endring: MedKontor) =
         endring.kontor.kontorId.also {
-            db.registrer(
+            adapter.registrer(
                 endring.uuid,
                 endring.identer.brukerId.verdi,
                 endring.identer.aktorId.verdi,
@@ -48,5 +48,5 @@ class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter, private val tel
         ]
     )
     fun avslutt(endring: Avsluttet) =
-        db.avslutt(endring.uuid)
+        adapter.avslutt(endring.uuid)
 }

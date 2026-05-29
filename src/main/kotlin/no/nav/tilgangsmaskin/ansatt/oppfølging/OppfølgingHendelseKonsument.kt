@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING_ERROR_HANDLER
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.ARBEIDSOPPFOLGINGSKONTOR_ENDRET
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_AVSLUTTET
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_STARTET
@@ -21,8 +20,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
     @KafkaListener(
         topics = [OPPFØLGING_TOPIC],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
-        groupId = OPPFØLGING,
-        errorHandler = OPPFØLGING_ERROR_HANDLER)
+        groupId = OPPFØLGING)
     fun listen(hendelse: OppfølgingHendelse) =
         when (val endring = hendelse.tilDomene()) {
             is Startet -> {

@@ -23,14 +23,13 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
     @KafkaListener(
         topics = [NOM_TOPIC],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.nom.NomHendelse"],
-        groupId = NOM, errorHandler = NOM_ERROR_HANDLER, filter = NOM_FNR_FILTER_STRATEGY)
+        groupId = NOM, filter = NOM_FNR_FILTER_STRATEGY)
     fun listen(hendelser: List<NomHendelse>) {
         log.trace("Mottok ${hendelser.size} hendelse(r) fra NOM")
         hendelser.forEach { h ->
             log.trace(CONFIDENTIAL, "Behandler hendelse fra NOM: {}", h)
-            runCatching { nom.lagre(h.ansattData()) }
-                .onSuccess { log.trace("Lagret brukerId ${h.personident.maskFnr()} for ${h.navident} OK") }
-                .onFailure { log.error("Kunne ikke lagre brukerId ${h.personident.maskFnr()} for ${h.navident}", it) }
+            nom.lagre(h.ansattData())
+            log.trace("Lagret brukerId ${h.personident.maskFnr()} for ${h.navident} OK")
         }
         log.info("${hendelser.size} hendelse(r) fra NOM ferdig behandlet og lagret")
     }
@@ -43,7 +42,6 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
         )
 
     companion object {
-        const val NOM_ERROR_HANDLER = "nomErrorHandler"
         const val NOM_FNR_FILTER_STRATEGY = "nomFnrFilterStrategy"
         private const val NOM_TOPIC = "org.nom.api-ressurs-state-v4"
     }

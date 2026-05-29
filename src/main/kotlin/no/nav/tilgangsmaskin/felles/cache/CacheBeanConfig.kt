@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.felles.cache
 import io.lettuce.core.ClientOptions
 import io.lettuce.core.RedisClient
 import io.lettuce.core.SocketOptions
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
@@ -24,8 +25,7 @@ import tools.jackson.module.kotlin.KotlinModule.Builder
 @Configuration(proxyBeanMethods = true)
 @ConditionalOnGCP
 @NoCoverageAnalysis
-class CacheBeanConfig(private val cf: RedisConnectionFactory,
-                      private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
+class CacheBeanConfig(private val cf: RedisConnectionFactory, private val meterRegistry: MeterRegistry, private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
 
     override fun errorHandler() =
@@ -67,8 +67,8 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
         defaultCacheConfig()
             .entryTtl(cfg.varighet)
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))
-            .serializeValuesWith(fromSerializer(GenericJacksonJsonRedisSerializer(VALKEY_MAPPER)))
-            .apply {
+            .serializeValuesWith(fromSerializer(
+                ResilientRedisSerializer(GenericJacksonJsonRedisSerializer(VALKEY_MAPPER), meterRegistry))).apply {
                 if (!cfg.cacheNulls) disableCachingNullValues()
             }
 

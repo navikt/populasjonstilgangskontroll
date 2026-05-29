@@ -9,11 +9,11 @@ import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.cache.annotation.CachingConfigurer
+import org.springframework.cache.interceptor.CacheErrorHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager
-import org.springframework.cache.interceptor.LoggingCacheErrorHandler
 import org.springframework.data.redis.cache.RedisCacheWriter.nonLockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer
@@ -25,11 +25,11 @@ import tools.jackson.module.kotlin.KotlinModule.Builder
 @Configuration(proxyBeanMethods = true)
 @ConditionalOnGCP
 @NoCoverageAnalysis
-class CacheBeanConfig(private val cf: RedisConnectionFactory, private val meterRegistry: MeterRegistry, private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
+class CacheBeanConfig(private val cf: RedisConnectionFactory, private val meterRegistry: MeterRegistry,  private val errorHandler: CacheErrorHandler, private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
 
     override fun errorHandler() =
-        LoggingCacheErrorHandler(true)
+        errorHandler
 
 
     @Bean

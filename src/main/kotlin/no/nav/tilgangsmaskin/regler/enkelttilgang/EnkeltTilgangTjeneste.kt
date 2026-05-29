@@ -35,8 +35,8 @@ class EnkeltTilgangTjeneste(
 
     private val log = getLogger(javaClass)
 
-    fun tilganger(ansattId: AnsattId, brukerIds: List<BrukerId>) =
-        adapter.gjeldendeTilganger(ansattId.verdi, brukerIds.map { it.verdi })
+    fun tilganger(ansattId: AnsattId, brukerIds: Set<BrukerId>) =
+        adapter.gjeldendeTilganger(ansattId.verdi, brukerIds.map { it.verdi }.toSet())
 
     fun harEnkeltTilgang(ansattId: AnsattId, brukerId: BrukerId) =
         gjeldendeEnkeltTilgang(ansattId, brukerId)

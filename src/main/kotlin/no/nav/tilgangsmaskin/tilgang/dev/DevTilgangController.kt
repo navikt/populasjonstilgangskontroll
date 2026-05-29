@@ -79,7 +79,7 @@ class DevTilgangController(
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_HENT_ENKELTTILGANGER, description = DESCRIPTION_HENT_ENKELTTILGANGER)
-    fun enkelttilganger(@PathVariable ansattId: AnsattId, @RequestBody brukerIds: List<BrukerId>) =
+    fun enkelttilganger(@PathVariable ansattId: AnsattId, @RequestBody brukerIds: Set<BrukerId>) =
         enkeltTilgang.tilganger(ansattId, brukerIds)
 
     companion object {

@@ -225,7 +225,7 @@ class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
                     every { brukere.brukerMedNærmesteFamilie(annenBrukerId.verdi) } returns BrukerBuilder(annenBrukerId).build()
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(vanligBrukerId, "Gyldig", IMORGEN))
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(annenBrukerId, "Utløpt", IGÅR))
-                    val resultat = enkeltTilgang.tilganger(ansattId, listOf(vanligBrukerId, annenBrukerId))
+                    val resultat = enkeltTilgang.tilganger(ansattId, setOf(vanligBrukerId, annenBrukerId))
                     resultat shouldHaveSize 1
                     resultat.single() shouldBe vanligBrukerId
                 }

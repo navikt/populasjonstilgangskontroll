@@ -200,7 +200,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns bruker2
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker1.brukerId, "Aktiv enkelttilgang 1", IMORGEN))
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker2.brukerId, "Aktiv enkelttilgang 2", IMORGEN))
-                    val resultat = enkeltTilgang.tilganger(ansattId, listOf(bruker1.brukerId, bruker2.brukerId))
+                    val resultat = enkeltTilgang.tilganger(ansattId, setOf(bruker1.brukerId, bruker2.brukerId))
                     resultat shouldBe listOf(bruker1.brukerId, bruker2.brukerId)
                 }
             }
@@ -212,7 +212,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns bruker2
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker1.brukerId, "Aktiv enkelttilgang", IMORGEN))
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker2.brukerId, "Utgått enkelttilgang", IGÅR))
-                    val resultat = enkeltTilgang.tilganger(ansattId, listOf(bruker1.brukerId, bruker2.brukerId))
+                    val resultat = enkeltTilgang.tilganger(ansattId, setOf(bruker1.brukerId, bruker2.brukerId))
                     resultat shouldBe listOf(bruker1.brukerId)
                 }
             }
@@ -222,7 +222,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Aktiv men gammel", IMORGEN))
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Ny men utgått", IGÅR))
-                    val resultat = enkeltTilgang.tilganger(ansattId, listOf(bruker.brukerId))
+                    val resultat = enkeltTilgang.tilganger(ansattId, setOf(bruker.brukerId))
                     resultat.shouldBeEmpty()
                 }
             }
@@ -231,13 +231,13 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Utgått enkelttilgang", IGÅR))
-                    val resultat = enkeltTilgang.tilganger(ansattId, listOf(bruker.brukerId))
+                    val resultat = enkeltTilgang.tilganger(ansattId, setOf(bruker.brukerId))
                     resultat.shouldBeEmpty()
                 }
             }
             When("ingen enkelttilganger er registrert") {
                 Then("returneres tom liste") {
-                    val resultat = enkeltTilgang.tilganger(ansattId, listOf(vanligBrukerId))
+                    val resultat = enkeltTilgang.tilganger(ansattId, setOf(vanligBrukerId))
                     resultat.shouldBeEmpty()
                 }
             }

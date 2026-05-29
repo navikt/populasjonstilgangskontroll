@@ -21,7 +21,7 @@ interface EnkeltTilgangRepository : JpaRepository<EnkeltTilgangEntity, Long> {
     """)
     fun gjeldendeOverstyring(
             @Param("ansattId") ansattId: String,
-            @Param("brukerIds") brukerIds: List<String>,
+            @Param("brukerIds") brukerIds: Set<String>,
             @Param("now") now: Instant = Instant.now()): EnkeltTilgangEntity?
 
     @Query("""
@@ -36,7 +36,7 @@ interface EnkeltTilgangRepository : JpaRepository<EnkeltTilgangEntity, Long> {
 """)
     fun gjeldendeOverstyringer(
         @Param("ansattId") ansattId: String,
-        @Param("brukerIds") brukerIds: List<String>,
-        @Param("now") now: Instant = Instant.now()): List<EnkeltTilgangEntity>
+        @Param("brukerIds") brukerIds: Set<String>,
+        @Param("now") now: Instant = Instant.now()): Set<EnkeltTilgangEntity>
 
 }

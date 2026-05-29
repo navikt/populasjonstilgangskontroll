@@ -132,7 +132,7 @@ class RegelTjeneste(
             val (godkjente, avviste) = resultater.partition { it.status.is2xxSuccessful }
             godkjente.forEach { add(EnkeltBulkRespons.ok(it.bruker.oppslagId)) }
             enkeltTilgangTjeneste
-                .tilganger(ansatt.ansattId, avviste.map { it.bruker.brukerId })
+                .tilganger(ansatt.ansattId, avviste.map { it.bruker.brukerId }.toSet())
                 .forEach { add(EnkeltBulkRespons.ok(it.verdi)) }
         }.also { respons ->
             if (respons.isNotEmpty()) {

@@ -50,7 +50,7 @@ class RegelTjenesteTest : BehaviorSpec() {
                     val regelException = RegelException(AnsattBuilder(ansattId).build(), funnetBruker, mockk<Regel>(relaxed = true))
                     every { brukere.brukere(setOf(vanligBrukerId.verdi)) } returns setOf(funnetBruker)
                     every { motor.bulkRegler(any(), any()) } returns setOf(BulkResultat.avvist(funnetBruker, regelException))
-                    every { enkeltTilgang.tilganger(any(), any()) } returns listOf(vanligBrukerId)
+                    every { enkeltTilgang.tilganger(any(), any()) } returns setOf(vanligBrukerId)
 
                     val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
                     assertSoftly {
@@ -67,7 +67,7 @@ class RegelTjenesteTest : BehaviorSpec() {
                     val regelException = RegelException(AnsattBuilder(ansattId).build(), funnetBruker, mockk<Regel>(relaxed = true))
                     every { brukere.brukere(setOf(vanligBrukerId.verdi)) } returns setOf(funnetBruker)
                     every { motor.bulkRegler(any(), any()) } returns setOf(BulkResultat.avvist(funnetBruker, regelException))
-                    every { enkeltTilgang.tilganger(any(), any()) } returns emptyList()
+                    every { enkeltTilgang.tilganger(any(), any()) } returns emptySet()
 
                     val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
                     assertSoftly(resultater) {
@@ -83,7 +83,7 @@ class RegelTjenesteTest : BehaviorSpec() {
                     val funnetBruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukere(setOf(vanligBrukerId.verdi, ikkeFunnetId.verdi)) } returns setOf(funnetBruker)
                     every { motor.bulkRegler(any(), any()) } returns setOf(BulkResultat.ok(funnetBruker))
-                    every { enkeltTilgang.tilganger(any(), any()) } returns emptyList()
+                    every { enkeltTilgang.tilganger(any(), any()) } returns emptySet()
 
                     val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi), BrukerIdOgRegelsett(ikkeFunnetId.verdi)))
                     assertSoftly(resultater) {

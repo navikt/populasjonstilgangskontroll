@@ -6,6 +6,7 @@ import io.confluent.kafka.schemaregistry.client.security.basicauth.UserInfoCrede
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
@@ -17,6 +18,8 @@ import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUrl
 import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.userInfo
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
+import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties
 import org.springframework.context.annotation.Bean
@@ -26,7 +29,10 @@ import org.springframework.graphql.client.HttpSyncGraphQlClient.builder
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
+import org.springframework.kafka.listener.DefaultErrorHandler
+import org.springframework.kafka.listener.RetryListener
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS
+import org.springframework.util.backoff.ExponentialBackOff
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
 
@@ -80,14 +86,41 @@ class PdlBeanConfig {
         )
 
     @Bean(PDL_CONTAINER_FACTORY)
-    fun pdlAvroListenerContainerFactory(consumerFactory: ConsumerFactory<String, Personhendelse>) =
-        ConcurrentKafkaListenerContainerFactory<String, Personhendelse>().apply {
-            setConsumerFactory(consumerFactory)
-        }
+    fun pdlAvroListenerContainerFactory(
+        consumerFactory: ConsumerFactory<String, Personhendelse>,
+        meterRegistry: MeterRegistry,
+    ) = ConcurrentKafkaListenerContainerFactory<String, Personhendelse>().apply {
+        setConsumerFactory(consumerFactory)
+        setCommonErrorHandler(
+            DefaultErrorHandler(
+                ExponentialBackOff(1_000L, 2.0).apply {
+                    maxInterval = 60_000L          // taket per retry: 60 sek
+                    maxElapsedTime = 600_000L      // gi opp etter 10 min totalt
+                }
+            ).apply {
+                setRetryListeners(DroppedMessageMeter(meterRegistry))
+            }
+        )
+    }
 
     companion object {
         const val PDL_GRADERING_FILTER = "pdlGraderingFilter"
         const val PDL_CONTAINER_FACTORY = "pdlContainerFactory"
         private val CREDENTIALS_SOURCE = UserInfoCredentialProvider().alias()
+    }
+}
+
+private class DroppedMessageMeter(private val registry: MeterRegistry) : RetryListener {
+    private val log = LoggerFactory.getLogger(javaClass)
+
+    override fun recovered(record: ConsumerRecord<*, *>, ex: Exception?) {
+        registry.counter("kafka.message.dropped",
+            "topic", record.topic(),
+            "exception", ex?.javaClass?.simpleName ?: "unknown").increment()
+        log.error("Ga opp Kafka-melding på topic=${record.topic()} partition=${record.partition()} offset=${record.offset()}: ${ex?.message}", ex)
+    }
+
+    override fun failedDelivery(record: ConsumerRecord<*, *>, ex: Exception?, deliveryAttempt: Int) {
+        log.warn("Forsøk $deliveryAttempt feilet for melding på topic=${record.topic()} offset=${record.offset()}: ${ex?.message}")
     }
 }

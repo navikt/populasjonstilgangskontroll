@@ -25,7 +25,7 @@ class PdlCacheOpprydderTest : BehaviorSpec({
     }
     val pdl = mockk<PdlTjeneste>(relaxed = true)
     val client = mockk<CacheOperations>()
-    val opprydder = PdlCacheOpprydder(pdl, client, PdlCacheTømmerTeller(SimpleMeterRegistry(), token))
+    val opprydder = PdlHendelseKonsument(pdl, client, PdlCacheTømmerTeller(SimpleMeterRegistry(), token))
 
     fun hendelse(identer: List<String>, endringstype: Endringstype = OPPRETTET,
         gradering: Adressebeskyttelse? = null) =

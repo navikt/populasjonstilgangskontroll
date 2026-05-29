@@ -17,9 +17,9 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 
 @Component
-class PdlCacheOpprydder(private val pdl: PdlTjeneste,
-                        private val client: CacheOperations,
-                        private val teller: PdlCacheTømmerTeller) {
+class PdlHendelseKonsument(private val pdl: PdlTjeneste,
+                           private val client: CacheOperations,
+                           private val teller: PdlCacheTømmerTeller) {
     private val log = getLogger(javaClass)
 
     @KafkaListener(

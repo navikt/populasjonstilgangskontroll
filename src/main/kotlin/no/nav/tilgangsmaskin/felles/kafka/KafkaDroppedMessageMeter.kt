@@ -2,11 +2,11 @@ package no.nav.tilgangsmaskin.felles.kafka
 
 import io.micrometer.core.instrument.MeterRegistry
 import org.apache.kafka.clients.consumer.ConsumerRecord
-import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.listener.RetryListener
 
 class KafkaDroppedMessageMeter(private val registry: MeterRegistry) : RetryListener {
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val log = getLogger(javaClass)
 
     override fun recovered(record: ConsumerRecord<*, *>, ex: Exception?) {
         registry.counter("kafka.message.dropped",

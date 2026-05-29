@@ -25,7 +25,7 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.nom.NomHendelse"],
         groupId = NOM, filter = NOM_FNR_FILTER_STRATEGY)
     fun listen(hendelse: NomHendelse) {
-        log.trace(CONFIDENTIAL, "Behandler hendelse fra NOM: {}", hendelse)
+        log.trace(CONFIDENTIAL, "Behandler hendelse fra NOM: {}", hendelse.navident)
         nom.lagre(hendelse.ansattData())
         log.trace("Lagret brukerId ${hendelse.personident.maskFnr()} for ${hendelse.navident} OK")
         log.info("${hendelse.navident} hendelse fra NOM ferdig behandlet og lagret")

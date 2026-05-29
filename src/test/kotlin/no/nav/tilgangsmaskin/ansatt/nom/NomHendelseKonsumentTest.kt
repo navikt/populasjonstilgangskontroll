@@ -17,18 +17,18 @@ class NomHendelseKonsumentTest : BehaviorSpec({
     val konsument = NomHendelseKonsument(nom)
 
     Given("konsumering av NOM-hendelser") {
-        When("listen kalles med flere hendelser") {
-            Then("lagrer ansatt for hver hendelse i listen") {
-                val hendelser = listOf(hendelse(), hendelse("Z888888", "20478606614"))
-                konsument.listen(hendelser)
+        When("listen kalles med hendelse") {
+            Then("lagrer ansatt for hendelse i listen") {
+                val hendelse = hendelse()
+                konsument.listen(hendelse,0L)
 
-                verify(exactly = 2) { nom.lagre(any()) }
+                verify(exactly = 1) { nom.lagre(any()) }
             }
         }
 
         When("hendelse har alle felter satt") {
             Then("mapper hendelse til NomAnsattData med korrekte felter") {
-                konsument.listen(listOf(hendelse(NAVIDENT,PERSONIDENT,STARTDATO,SLUTTDATO)))
+                konsument.listen(hendelse(NAVIDENT,PERSONIDENT,STARTDATO,SLUTTDATO),0L)
 
                 verify {
                     nom.lagre(NomAnsattData(
@@ -42,8 +42,7 @@ class NomHendelseKonsumentTest : BehaviorSpec({
 
         When("startdato er null") {
             Then("bruker EPOCH som startdato") {
-                konsument.listen(listOf(hendelse(startdato = null)))
-
+                konsument.listen(hendelse(startdato = null),0L)
                 verify {
                     nom.lagre(match { it.gyldighet.start == EPOCH })
                 }
@@ -52,8 +51,7 @@ class NomHendelseKonsumentTest : BehaviorSpec({
 
         When("sluttdato er null") {
             Then("bruker ALLTID som sluttdato") {
-                konsument.listen(listOf(hendelse(sluttdato = null)))
-
+                konsument.listen(hendelse(sluttdato = null),0L)
                 verify {
                     nom.lagre(match { it.gyldighet.endInclusive == ALLTID })
                 }

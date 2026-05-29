@@ -81,7 +81,7 @@ class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
     @MockkBean
     lateinit var oppfølging: OppfølgingTjeneste
     @MockkBean
-    lateinit var validator: EnkeltTilgangProdClientValidator
+    lateinit var validator: EnkeltTilgangProdKonsumentValidator
     @MockkBean
     lateinit var proxy: EntraProxyTjeneste
 

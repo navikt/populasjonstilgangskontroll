@@ -7,20 +7,22 @@ import io.kotest.core.spec.style.BehaviorSpec
 class EnkeltTilgangClientValidatorTest : BehaviorSpec({
 
     val cfg = EnkeltTilgangConfig()
-    val prodValidator = EnkeltTilgangProdClientValidator(cfg)
-    val devValidator = EnkeltTilgangDevClientValidator()
+    val prodValidator = EnkeltTilgangProdKonsumentValidator(cfg)
+    val devValidator = EnkeltTilgangDevKonsumentValidator()
 
     Given("EnkeltTilgangProdClientValidator") {
         cfg.systemer.forEach { konsument ->
             When("konsument er godkjent ($konsument)") {
                 Then("slipper gjennom uten exception") {
-                    shouldNotThrowAny { prodValidator.valider(konsument) }
+                    shouldNotThrowAny {
+                        prodValidator.valider(konsument)
+                    }
                 }
             }
         }
         When("konsument er ukjent") {
             Then("kaster EnkeltTilgangException") {
-                shouldThrow<EnkeltTilgangException> {
+                shouldThrow<EnkeltTilgangKonsumentException> {
                     prodValidator.valider("ukjent-system")
                 }
             }

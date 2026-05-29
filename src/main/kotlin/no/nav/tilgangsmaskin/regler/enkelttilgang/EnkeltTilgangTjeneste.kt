@@ -30,7 +30,7 @@ class EnkeltTilgangTjeneste(
     private val adapter: EnkeltTilgangJPAAdapter,
     private val motor: RegelMotor,
     private val proxy: EntraProxyTjeneste,
-    private val validator: KonsumentValidator,
+    private val validator: EnkeltTilgangKonsumentValidator,
     private val teller: EnkeltTilgangTeller) {
 
     private val log = getLogger(javaClass)
@@ -64,7 +64,7 @@ class EnkeltTilgangTjeneste(
                 arrayOf(e.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
                 e = e
             )
-        } catch (e: EnkeltTilgangException) {
+        } catch (e: EnkeltTilgangKonsumentException) {
             log.warn("Enkelttilgang feilet pga klientvalidering ${e.message} for $ansattId og ${data.brukerId}", e)
             teller.tell(INGEN_REGEL_TAG, IKKE_OVERSTYRT, tokenSystemTag(konsument))
             throw e

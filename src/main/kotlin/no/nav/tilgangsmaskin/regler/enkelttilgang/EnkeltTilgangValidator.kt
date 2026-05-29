@@ -19,7 +19,7 @@ class EnkeltTilgangValidator : ConstraintValidator<EnkeltTilgangGyldig, EnkeltTi
 
     override fun isValid(verdi: EnkeltTilgangData, context: ConstraintValidatorContext) =
         with(now()) {
-            verdi.gyldigtil.isBetween(this, plusMonths(months)) &&
+            verdi.gyldigtil.isBetween(now(), plusMonths(months)) &&
                     verdi.begrunnelse.length in min..max
         }
 }

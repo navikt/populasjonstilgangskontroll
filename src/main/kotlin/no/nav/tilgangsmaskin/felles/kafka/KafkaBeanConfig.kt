@@ -2,6 +2,8 @@ package no.nav.tilgangsmaskin.felles.kafka
 
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
+import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.slf4j.LoggerFactory
 import org.springframework.boot.kafka.autoconfigure.DefaultKafkaConsumerFactoryCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -9,6 +11,7 @@ import org.springframework.kafka.listener.DefaultErrorHandler
 import org.springframework.kafka.listener.RetryListener
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+import org.springframework.stereotype.Component
 import org.springframework.util.backoff.ExponentialBackOff
 import tools.jackson.databind.json.JsonMapper
 
@@ -37,11 +40,7 @@ class KafkaBeanConfig {
         }
 
     @Bean
-    fun droppedMessageMeter(meterRegistry: MeterRegistry) =
-        KafkaDroppedMessageMeter(meterRegistry)
-
-    @Bean
-    fun commonErrorHandler(listener: RetryListener) =
+    fun commonErrorHandler(listener: KafkaDroppedMessageMeter) =
         DefaultErrorHandler(
             ExponentialBackOff(1_000L, 2.0).apply {
                 maxInterval = 30_000L
@@ -50,4 +49,20 @@ class KafkaBeanConfig {
         ).apply {
             setRetryListeners(listener)
         }
+}
+
+@Component
+class KafkaDroppedMessageMeter(private val registry: MeterRegistry) : RetryListener {
+    private val log = LoggerFactory.getLogger(javaClass)
+
+    override fun recovered(record: ConsumerRecord<*, *>, ex: Exception?) {
+        registry.counter("kafka.message.dropped",
+            "topic", record.topic(),
+            "exception", ex?.javaClass?.simpleName ?: "unknown").increment()
+        log.error("Ga opp Kafka-melding på topic=${record.topic()} partition=${record.partition()} offset=${record.offset()}: ${ex?.message}", ex)
+    }
+
+    override fun failedDelivery(record: ConsumerRecord<*, *>, ex: Exception?, deliveryAttempt: Int) {
+        log.warn("Forsøk $deliveryAttempt feilet for melding på topic=${record.topic()} offset=${record.offset()}: ${ex?.message}")
+    }
 }

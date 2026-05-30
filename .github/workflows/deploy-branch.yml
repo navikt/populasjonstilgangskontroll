@@ -24,7 +24,7 @@ jobs:
     uses: ./.github/workflows/build-attest.yml
     with:
       base-image: europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/jre:openjdk-25-dev
-      publish-pages: false
+      publish-pages: true
       cache-read-only: false
       checkout-ref: ${{ github.event.pull_request.head.ref }}
       checkout-repository: ${{ github.event.pull_request.head.repo.full_name }}

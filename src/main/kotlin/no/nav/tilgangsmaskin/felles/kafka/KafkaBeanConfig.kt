@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.kafka.autoconfigure.DefaultKafkaConsumerFactoryCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -53,7 +54,7 @@ class KafkaBeanConfig {
 
 @Component
 class KafkaDroppedMessageMeter(private val registry: MeterRegistry) : RetryListener {
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val log = getLogger(javaClass)
 
     override fun recovered(record: ConsumerRecord<*, *>, ex: Exception?) {
         registry.counter("kafka.message.dropped",

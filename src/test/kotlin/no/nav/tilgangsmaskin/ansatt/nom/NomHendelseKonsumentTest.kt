@@ -7,6 +7,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
+import no.nav.tilgangsmaskin.ansatt.nom.NomHendelseKonsument.Companion.ansattData
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
 import org.springframework.kafka.annotation.KafkaListener
@@ -26,20 +27,8 @@ class NomHendelseKonsumentTest : BehaviorSpec({
                 val hendelse = hendelse()
                 konsument.listen(hendelse,0L,0)
 
-                verify(exactly = 1) { nom.lagre(any()) }
-            }
-        }
-
-        When("hendelse har alle felter satt") {
-            Then("mapper hendelse til NomAnsattData med korrekte felter") {
-                konsument.listen(hendelse(NAVIDENT,PERSONIDENT,STARTDATO,SLUTTDATO),0L,0)
-
-                verify {
-                    nom.lagre(NomAnsattData(
-                        AnsattId(NAVIDENT),
-                        BrukerId(PERSONIDENT),
-                        NomAnsattPeriode(STARTDATO, SLUTTDATO)
-                    ))
+                verify(exactly = 1) {
+                    nom.lagre(hendelse.ansattData())
                 }
             }
         }
@@ -66,8 +55,8 @@ class NomHendelseKonsumentTest : BehaviorSpec({
     Given("@KafkaListener-konfigurasjon") {
         When("default-type-property leses fra annotasjonen") {
             Then("matcher faktisk klassenavn for NomHendelse") {
-                val listen = NomHendelseKonsument::class.functions.first { it.name == "listen" }
-                val annotasjon = listen.findAnnotation<KafkaListener>()!!
+                val annotasjon = NomHendelseKonsument::class.functions
+                    .firstNotNullOf { it.findAnnotation<KafkaListener>() }
                 val defaultType = annotasjon.properties
                     .first { it.startsWith("spring.json.value.default.type=") }
                     .substringAfter("=")

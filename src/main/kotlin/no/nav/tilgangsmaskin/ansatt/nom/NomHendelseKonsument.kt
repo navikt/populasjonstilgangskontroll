@@ -38,10 +38,10 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
             log.info("$ansattId hendelse på partition $partition, offset $offset fra NOM ferdig behandlet og lagret")
     }
 
-    private fun NomHendelse.ansattData() =
-        NomAnsattData(AnsattId(navident), BrukerId(personident), NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: ALLTID))
 
     companion object {
+        fun NomHendelse.ansattData() =
+            NomAnsattData(AnsattId(navident), BrukerId(personident), NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: ALLTID))
         const val NOM_FNR_FILTER_STRATEGY = "nomFnrFilterStrategy"
         private const val NOM_TOPIC = "org.nom.api-ressurs-state-v4"
     }

@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.ansatt.oppfølging
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeInstanceOf
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.ARBEIDSOPPFOLGINGSKONTOR_ENDRET
@@ -20,33 +19,30 @@ import no.nav.tilgangsmaskin.bruker.Identer
 import java.time.Instant
 import java.util.UUID
 
-class OppfølgingsendringTest : BehaviorSpec({
+class OppfølgingEndringTest : BehaviorSpec({
 
     Given("OPPFOLGING_STARTET med kontor") {
         Then("mapper til Startet") {
-            val resultat = hendelse(OPPFOLGING_STARTET).tilDomene()
-            resultat shouldBe Startet(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, TIDSPUNKT)
+            hendelse(OPPFOLGING_STARTET, KONTOR).tilDomene() shouldBe Startet(ID,Identer(BRUKER_ID, AKTOR_ID), KONTOR, TIDSPUNKT)
         }
     }
 
     Given("ARBEIDSOPPFOLGINGSKONTOR_ENDRET med kontor") {
         Then("mapper til KontorEndret") {
-            val resultat = hendelse(ARBEIDSOPPFOLGINGSKONTOR_ENDRET).tilDomene()
-            resultat shouldBe KontorEndret(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, TIDSPUNKT)
+            hendelse(ARBEIDSOPPFOLGINGSKONTOR_ENDRET, KONTOR).tilDomene() shouldBe KontorEndret(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, TIDSPUNKT)
         }
     }
 
     Given("OPPFOLGING_AVSLUTTET") {
         Then("mapper til Avsluttet uavhengig av kontor") {
-            val resultat = hendelse(OPPFOLGING_AVSLUTTET, kontor = null).tilDomene()
-            resultat.shouldBeInstanceOf<Avsluttet>()
+            hendelse(OPPFOLGING_AVSLUTTET).tilDomene().shouldBeInstanceOf<Avsluttet>()
         }
     }
 
     Given("OPPFOLGING_STARTET uten kontor") {
         Then("kaster IllegalArgumentException med kontekstuell melding") {
              shouldThrow<IllegalArgumentException> {
-                hendelse(OPPFOLGING_STARTET, kontor = null).tilDomene()
+                hendelse(OPPFOLGING_STARTET).tilDomene()
             }
         }
     }
@@ -54,13 +50,13 @@ class OppfølgingsendringTest : BehaviorSpec({
     Given("ARBEIDSOPPFOLGINGSKONTOR_ENDRET uten kontor") {
         Then("kaster IllegalArgumentException med kontekstuell melding") {
             shouldThrow<IllegalArgumentException> {
-                hendelse(ARBEIDSOPPFOLGINGSKONTOR_ENDRET, kontor = null).tilDomene()
+                hendelse(ARBEIDSOPPFOLGINGSKONTOR_ENDRET).tilDomene()
             }
         }
     }
 }) {
     companion object {
-        private fun hendelse(type: EndringType, kontor: Kontor? = KONTOR) =
+        private fun hendelse(type: EndringType, kontor: Kontor? = null) =
             OppfølgingHendelse(
                 kontor, type, ID, AKTOR_ID, BRUKER_ID,TIDSPUNKT, if (type == OPPFOLGING_AVSLUTTET) Instant.now() else null,
                 PRODUCER_TIMESTAMP,

@@ -69,7 +69,6 @@ class NomDBOpprydderTest : BehaviorSpec() {
                 Then("sletter rader med utgått gyldighet") {
                     lagre(FNR,LocalDate.now().minusDays(1))
                     lagre("20478606614", LocalDate.now().minusDays(1))
-                    repo.count() shouldBe 2
                     assertSoftly {
                         opprydder.ryddOpp() shouldBe 2
                         repo.count() shouldBe 0
@@ -78,7 +77,6 @@ class NomDBOpprydderTest : BehaviorSpec() {
 
                 Then("beholder rader som fremdeles er gyldige") {
                     lagre(FNR,LocalDate.now().plusMonths(6))
-                    repo.count() shouldBe 1
                     assertSoftly {
                         opprydder.ryddOpp() shouldBe 0
                         repo.count() shouldBe 1

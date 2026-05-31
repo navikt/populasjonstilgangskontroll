@@ -74,8 +74,8 @@ class OppfølgingHendelseKonsumentTest : BehaviorSpec({
     Given("@KafkaListener-konfigurasjon") {
         When("default-type-property leses fra annotasjonen") {
             Then("matcher faktisk klassenavn for OppfølgingHendelse") {
-                val listen = OppfølgingHendelseKonsument::class.functions.first { it.name == "listen" }
-                val annotasjon = listen.findAnnotation<KafkaListener>()!!
+                val annotasjon = OppfølgingHendelseKonsument::class.functions
+                    .firstNotNullOf { it.findAnnotation<KafkaListener>() }
                 val defaultType = annotasjon.properties
                     .first { it.startsWith("spring.json.value.default.type=") }
                     .substringAfter("=")
@@ -86,7 +86,7 @@ class OppfølgingHendelseKonsumentTest : BehaviorSpec({
     }
 }) {
     companion object {
-        private val ID = UUID.fromString("11111111-1111-1111-1111-111111111111")
+        private val ID = UUID.randomUUID()
         private val BRUKER_ID = BrukerId("08526835670")
         private val AKTOR_ID = AktørId("1234567890123")
         private val KONTOR = Kontor(Enhetsnummer("0301"), "NAV Oslo")

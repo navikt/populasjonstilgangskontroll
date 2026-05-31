@@ -154,7 +154,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                 Then("returnerer 0") {
                     assertSoftly {
                         cache.getOne<TestData>(TEST_CACHE, T1.id).shouldBeNull()
-                        cache.delete(TEST_CACHE, T1.id) shouldBe 0L
+                        cache.delete(TEST_CACHE, T1.id) shouldBe 0
                     }
                 }
             }
@@ -188,32 +188,58 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
             }
         }
 
+        Given("graceful degradation ved Redis-feil") {
+            When("getOne kalles mot pauset Redis") {
+                Then("returnerer null i stedet for å kaste exception") {
+                    cache.putOne(TEST_CACHE, T1.id, T1, ofSeconds(30))
+                    cache.getOne<TestData>(TEST_CACHE, T1.id) shouldBe T1
+                    redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
+                    try {
+                        cache.getOne<TestData>(TEST_CACHE, T1.id).shouldBeNull()
+                    } finally {
+                        redis.dockerClient.unpauseContainerCmd(redis.containerId).exec()
+                    }
+                }
+            }
+            When("getMany kalles mot pauset Redis") {
+                Then("returnerer tomt map i stedet for å kaste exception") {
+                    cache.putMany(TEST_CACHE, arrayOf(T1, T2).associateBy { it.id }, ofSeconds(30))
+                    redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
+                    try {
+                        cache.getMany<TestData>(TEST_CACHE, IDS).shouldBeEmpty()
+                    } finally {
+                        redis.dockerClient.unpauseContainerCmd(redis.containerId).exec()
+                    }
+                }
+            }
+        }
+
         Given("antall innslag i cache") {
             When("cache er tom") {
                 Then("returnerer 0") {
-                    cache.size(TEST_CACHE) shouldBe 0L
+                    cache.size(TEST_CACHE) shouldBe 0
                 }
             }
             When("cache inneholder verdier") {
                 Then("returnerer antall innslag") {
                     cache.putMany(TEST_CACHE, arrayOf(T1, T2).associateBy { it.id }, ofSeconds(5))
-                    cache.size(TEST_CACHE) shouldBe 2L
+                    cache.size(TEST_CACHE) shouldBe 2
                 }
             }
             When("verdier fjernes") {
                 Then("size oppdateres") {
                     cache.putMany(TEST_CACHE, arrayOf(T1, T2).associateBy { it.id }, ofSeconds(5))
-                    cache.size(TEST_CACHE) shouldBe 2L
+                    cache.size(TEST_CACHE) shouldBe 2
                     cache.delete(TEST_CACHE, T1.id)
-                    cache.size(TEST_CACHE) shouldBe 1L
+                    cache.size(TEST_CACHE) shouldBe 1
                 }
             }
             When("clear kalles") {
                 Then("size blir 0") {
                     cache.putMany(TEST_CACHE, arrayOf(T1, T2).associateBy { it.id }, ofSeconds(5))
-                    cache.size(TEST_CACHE) shouldBe 2L
+                    cache.size(TEST_CACHE) shouldBe 2
                     cache.clear(TEST_CACHE)
-                    cache.size(TEST_CACHE) shouldBe 0L
+                    cache.size(TEST_CACHE) shouldBe 0
                 }
             }
             When("50000 innslag legges inn") {
@@ -225,12 +251,12 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     }
 
                     val elapsed = measureTime {
-                        cache.size(TEST_CACHE) shouldBe 50000L
+                        cache.size(TEST_CACHE) shouldBe 50000
                     }
                     elapsed shouldBeLessThan 5.seconds
 
                     cache.clear(TEST_CACHE)
-                    cache.size(TEST_CACHE) shouldBe 0L
+                    cache.size(TEST_CACHE) shouldBe 0
                 }
             }
         }

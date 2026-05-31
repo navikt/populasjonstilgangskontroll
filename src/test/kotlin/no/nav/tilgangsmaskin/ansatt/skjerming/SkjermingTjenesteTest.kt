@@ -118,6 +118,26 @@ class SkjermingTjenesteTest : BehaviorSpec() {
             }
         }
 
+        Given("cache-feil faller tilbake til REST for alle nøkler") {
+            When("cache er tom (simulerer timeout/feil)") {
+                Then("REST kalles med alle identer") {
+                    cache.clear(SKJERMING_CACHE)
+                    server.expect(once(), requestTo(SKJERMINGER_URI))
+                        .andRespond(withSuccess("""{"$I1":true,"$I2":false}""", APPLICATION_JSON))
+                    tjeneste.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to true, ID2 to false)
+                }
+            }
+            When("cache har partial data og resten mangler") {
+                Then("REST kalles kun for manglende nøkler og resultat kombineres") {
+                    cache.clear(SKJERMING_CACHE)
+                    cache.putOne(SKJERMING_CACHE, I1, true, cfg.varighet)
+                    server.expect(once(), requestTo(SKJERMINGER_URI))
+                        .andRespond(withSuccess("""{"$I2":false}""", APPLICATION_JSON))
+                    tjeneste.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to true, ID2 to false)
+                }
+            }
+        }
+
         Given("retry ved feil mot skjermingstjenesten") {
             When("alle 4 forsøk feiler med 500") {
                 Then("kastes RecoverableRestException") {

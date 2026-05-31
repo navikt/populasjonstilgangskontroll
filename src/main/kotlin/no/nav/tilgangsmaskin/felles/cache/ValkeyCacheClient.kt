@@ -31,52 +31,52 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
     }
 
     @WithSpan
-    override fun delete(cache: CacheNøkkelConfig, id: String) =
-        conn.sync().del(mapper.tilNøkkel(cache, id))
+    override fun delete(cfg: CacheNøkkelConfig, id: String) =
+        conn.sync().del(mapper.tilNøkkel(cfg, id))
 
 
     @WithSpan
-    override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? =
+    override fun <T : Any> getOne(cfg: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? =
         runCatching {
-            conn.sync().get(mapper.tilNøkkel(cache, id))?.let { json ->
+            conn.sync().get(mapper.tilNøkkel(cfg, id))?.let { json ->
                 mapper.fraJson(json, clazz)
             }
         }.getOrElse { ex ->
-            log.warn("Cache getOne feilet for ${cache.name} nøkkel $id: ${ex.message}")
+            log.warn("Cache getOne feilet for ${cfg.name} nøkkel $id: ${ex.message}")
             null
         }
 
     @WithSpan
-    override fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration) {
-        conn.async().setex(mapper.tilNøkkel(cache, id), ttl.seconds, mapper.tilJson(value))
+    override fun putOne(cfg: CacheNøkkelConfig, id: String, value: Any, ttl: Duration) {
+        conn.async().setex(mapper.tilNøkkel(cfg, id), ttl.seconds, mapper.tilJson(value))
     }
 
     @WithSpan
-    override fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T> =
+    override fun <T : Any> getMany(cfg: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T> =
         if (ids.isEmpty()) {
             emptyMap()
         } else {
             runCatching {
-                val keys = ids.map { mapper.tilNøkkel(cache, it) }.toTypedArray()
+                val keys = ids.map { mapper.tilNøkkel(cfg, it) }.toTypedArray()
                 conn.sync()
                     .mget(*keys)
                     .filter { it.hasValue() }
                     .associate {
                         it.fraJsonEntry(mapper, clazz)
                     }
-                    .also { tellOgLog(cache.name, it.size, ids.size) }
+                    .also { tellOgLog(cfg.name, it.size, ids.size) }
             }.getOrElse { ex ->
-                log.warn("Cache getMany feilet for ${cache.name} med ${ids.size} nøkler: ${ex.message}")
+                log.warn("Cache getMany feilet for ${cfg.name} med ${ids.size} nøkler: ${ex.message}")
                 emptyMap()
             }
         }
 
     @WithSpan
-    override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
+    override fun putMany(cfg: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
         if (innslag.isNotEmpty()) {
-            log.trace("Bulk lagrer {} verdier for cache {} med prefix {}", innslag.size, cache.name, cache.extraPrefix)
+            log.trace("Bulk lagrer {} verdier for cache {} med prefix {}", innslag.size, cfg.name, cfg.extraPrefix)
             val payload = innslag.entries.associate {
-                (key, value) -> mapper.tilJsonEntry(cache, key, value)
+                (key, value) -> mapper.tilJsonEntry(cfg, key, value)
             }
             conn.apply {
                 setAutoFlushCommands(false)
@@ -99,11 +99,11 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
         log.trace("Fant $funnet verdier i cache $navn for $etterspurt identer")
     }
 
-    override fun tilNøkkel(cache: CacheNøkkelConfig, id: String) = mapper.tilNøkkel(cache, id)
+    override fun tilNøkkel(cfg: CacheNøkkelConfig, id: String) = mapper.tilNøkkel(cfg, id)
 
-    override fun clear(cache: CacheNøkkelConfig) {
-        log.info("Tømmer cache {}", cache.name)
-        val prefix = mapper.tilNøkkel(cache, "")
+    override fun clear(cfg: CacheNøkkelConfig) {
+        log.info("Tømmer cache {}", cfg.name)
+        val prefix = mapper.tilNøkkel(cfg, "")
         var cursor = INITIAL
         val args = ScanArgs().match("$prefix*").limit(10000)
         do {
@@ -115,8 +115,8 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
         } while (!result.isFinished)
     }
 
-    override fun size(cache: CacheNøkkelConfig): Long {
-        val prefix = mapper.tilNøkkel(cache, "")
+    override fun size(cfg: CacheNøkkelConfig): Long {
+        val prefix = mapper.tilNøkkel(cfg, "")
         var count = 0L
         var cursor = INITIAL
         val args = ScanArgs().match("$prefix*").limit(10000)

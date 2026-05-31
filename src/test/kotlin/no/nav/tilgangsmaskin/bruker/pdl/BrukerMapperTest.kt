@@ -61,6 +61,17 @@ class BrukerMapperTest : BehaviorSpec({
                 }
             }
         }
+        When("ingen gradering og ikke skjermet") {
+            Then("påkrevdeGrupper er tom") {
+                tilBruker(tilPerson(brukerId, pipRespons()), false).påkrevdeGrupper shouldContainExactly emptySet()
+            }
+        }
+        When("gradering er FORTROLIG uten skjerming") {
+            Then("kreves FORTROLIG-gruppe") {
+                tilBruker(tilPerson(brukerId, pipRespons(PdlAdressebeskyttelseGradering.FORTROLIG)), false)
+                    .påkrevdeGrupper shouldContainExactly setOf(FORTROLIG)
+            }
+        }
         When("bruker er skjermet") {
             Then("kreves SKJERMING-gruppe") {
                 tilBruker(tilPerson(brukerId, pipRespons()), true).påkrevdeGrupper shouldContainExactly setOf(SKJERMING)

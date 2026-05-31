@@ -4,21 +4,21 @@ import java.time.Duration
 import kotlin.reflect.KClass
 
 interface CacheOperations {
-    fun delete(cache: CacheNøkkelConfig, id: String): Long
-    fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T?
-    fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration)
-    fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T?>
-    fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration)
-    fun tilNøkkel(cache: CacheNøkkelConfig, id: String): String
-    fun clear(cache: CacheNøkkelConfig)
-    fun clear(caches: Set<CacheNøkkelConfig>) = caches.forEach { clear(it) }
-    fun size(cache: CacheNøkkelConfig): Long
-    fun sizes(caches: Set<CacheNøkkelConfig>): Map<String, Long> =
-        caches.associate { it.fullName to size(it) }
+    fun delete(cfg: CacheNøkkelConfig, id: String): Long
+    fun <T : Any> getOne(cfg: CacheNøkkelConfig, id: String, clazz: KClass<T>): T?
+    fun putOne(cfg: CacheNøkkelConfig, id: String, value: Any, ttl: Duration)
+    fun <T : Any> getMany(cfg: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T?>
+    fun putMany(cfg: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration)
+    fun tilNøkkel(cfg: CacheNøkkelConfig, id: String): String
+    fun clear(cfg: CacheNøkkelConfig)
+    fun clear(cfgs: Set<CacheNøkkelConfig>) = cfgs.forEach { clear(it) }
+    fun size(cfg: CacheNøkkelConfig): Long
+    fun sizes(cfgs: Set<CacheNøkkelConfig>): Map<String, Long> =
+        cfgs.associate { it.fullName to size(it) }
 }
 
-inline fun <reified T : Any> CacheOperations.getOne(cache: CacheNøkkelConfig, id: String): T? =
-    getOne(cache, id, T::class)
+inline fun <reified T : Any> CacheOperations.getOne(cfg: CacheNøkkelConfig, id: String): T? =
+    getOne(cfg, id, T::class)
 
-inline fun <reified T : Any> CacheOperations.getMany(cache: CacheNøkkelConfig, ids: Set<String>): Map<String, T?> =
-    getMany(cache, ids, T::class)
+inline fun <reified T : Any> CacheOperations.getMany(cfg: CacheNøkkelConfig, ids: Set<String>): Map<String, T?> =
+    getMany(cfg, ids, T::class)

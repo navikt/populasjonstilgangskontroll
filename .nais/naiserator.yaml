@@ -66,7 +66,6 @@ spec:
           - id: {{grupper.utland}}
           - id: {{grupper.egenansatt}}
           - id: {{grupper.udefinert}}
-          - id: {{grupper.fortrolig}}
           - id: {{grupper.strengt}}
           - id: {{grupper.fortrolig}}
           - id: {{grupper.dead}}

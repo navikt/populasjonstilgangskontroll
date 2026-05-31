@@ -1,14 +1,12 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.ansatt.nom.NomHendelseKonsument.Companion.ansattData
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
 import org.springframework.kafka.annotation.KafkaListener
 import java.time.LocalDate
@@ -47,6 +45,15 @@ class NomHendelseKonsumentTest : BehaviorSpec({
                 konsument.listen(hendelse(sluttdato = null),0L,0)
                 verify {
                     nom.lagre(match { it.gyldighet.endInclusive == ALLTID })
+                }
+            }
+        }
+
+        When("nom.lagre kaster exception") {
+            Then("propageres exception for retry") {
+                every { nom.lagre(any()) } throws RuntimeException("DB timeout")
+                shouldThrow<RuntimeException> {
+                    konsument.listen(hendelse(), 0L, 0)
                 }
             }
         }

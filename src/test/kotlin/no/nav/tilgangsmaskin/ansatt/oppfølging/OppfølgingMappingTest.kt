@@ -19,7 +19,7 @@ import no.nav.tilgangsmaskin.bruker.Identer
 import java.time.Instant
 import java.util.UUID
 
-class OppfølgingEndringTest : BehaviorSpec({
+class OppfølgingMappingTest : BehaviorSpec({
 
     Given("OPPFOLGING_STARTET med kontor") {
         Then("mapper til Startet") {

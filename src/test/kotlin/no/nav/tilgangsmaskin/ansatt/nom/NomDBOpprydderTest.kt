@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.util.ReflectionTestUtils.setField
 import org.springframework.transaction.PlatformTransactionManager
@@ -42,8 +41,6 @@ class NomDBOpprydderTest : BehaviorSpec() {
     @Autowired
     private lateinit var repo: NomRepository
 
-    @Autowired
-    private lateinit var publisher: ApplicationEventPublisher
 
     @Autowired
     private lateinit var txManager: PlatformTransactionManager

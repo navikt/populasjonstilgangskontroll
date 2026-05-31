@@ -9,9 +9,8 @@ interface CacheOperations {
     fun putOne(cfg: CacheNøkkelConfig, id: String, value: Any, ttl: Duration)
     fun <T : Any> getMany(cfg: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T?>
     fun putMany(cfg: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration)
-    fun tilNøkkel(cfg: CacheNøkkelConfig, id: String): String
     fun clear(cfg: CacheNøkkelConfig)
-    fun clear(cfgs: Set<CacheNøkkelConfig>) = cfgs.forEach { clear(it) }
+    fun clearAll(cfgs: Set<CacheNøkkelConfig>) = cfgs.forEach { clear(it) }
     fun size(cfg: CacheNøkkelConfig): Long
     fun sizes(cfgs: Set<CacheNøkkelConfig>): Map<String, Long> =
         cfgs.associate { it.fullName to size(it) }

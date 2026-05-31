@@ -99,8 +99,6 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
         log.trace("Fant $funnet verdier i cache $navn for $etterspurt identer")
     }
 
-    override fun tilNøkkel(cfg: CacheNøkkelConfig, id: String) = mapper.tilNøkkel(cfg, id)
-
     override fun clear(cfg: CacheNøkkelConfig) {
         log.info("Tømmer cache {}", cfg.name)
         val prefix = mapper.tilNøkkel(cfg, "")

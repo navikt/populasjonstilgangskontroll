@@ -32,7 +32,6 @@ import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
@@ -80,7 +79,7 @@ class PdlTjenesteTest : BehaviorSpec() {
     init {
         beforeEach {
             server.reset()
-            cache.clear(PDL_CACHES)
+            cache.clearAll(PDL_CACHES)
             every { graphQL.partnere(any()) } returns emptySet()
         }
 

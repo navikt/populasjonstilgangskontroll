@@ -14,7 +14,7 @@ class CaffeineCacheClient(private val mgr: CacheManager) : CacheOperations {
 
     override fun delete(cfg: CacheNøkkelConfig, id: String): Long {
         val cache = cache(cfg)
-        return with(tilNøkkel(cfg, id)) {
+        return with(cfg.tilNøkkel( id)) {
             val existed = cache.get(this) != null
             cache.evict(this)
             if (existed) 1 else 0
@@ -22,19 +22,19 @@ class CaffeineCacheClient(private val mgr: CacheManager) : CacheOperations {
     }
 
     override fun <T : Any> getOne(cfg: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? =
-        cache(cfg).get(tilNøkkel(cfg, id))?.get()?.let {
+        cache(cfg).get(cfg.tilNøkkel(id))?.get()?.let {
             clazz.java.cast(it)
         }
 
     override fun putOne(cfg: CacheNøkkelConfig, id: String, value: Any, ttl: Duration) =
-        cache(cfg).put(tilNøkkel(cfg, id), value)
+        cache(cfg).put(cfg.tilNøkkel(id), value)
 
 
     override fun <T : Any> getMany(cfg: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T?> {
         if (ids.isEmpty()) return emptyMap()
         val cache = cache(cfg)
         return ids.associateWith { id ->
-            cache.get(tilNøkkel(cfg, id))?.get()?.let { clazz.java.cast(it) }
+            cache.get(cfg.tilNøkkel( id))?.get()?.let { clazz.java.cast(it) }
         }.filterValues { it != null }
     }
 
@@ -42,14 +42,10 @@ class CaffeineCacheClient(private val mgr: CacheManager) : CacheOperations {
         val cache = cache(cfg)
         log.trace("Caffeine bulk lagrer {} verdier for cache {}", innslag.size, cfg.name)
         innslag.forEach {
-            (id, value) -> cache.put(tilNøkkel(cfg, id), value)
+            (id, value) -> cache.put(cfg.tilNøkkel(id), value)
         }
     }
 
-    override fun tilNøkkel(cfg: CacheNøkkelConfig, id: String): String {
-        val extra = cfg.extraPrefix?.let { "$it:" } ?: ""
-        return "$extra$id"
-    }
 
     override fun clear(cfg: CacheNøkkelConfig) {
         val cache = cache(cfg)
@@ -58,17 +54,17 @@ class CaffeineCacheClient(private val mgr: CacheManager) : CacheOperations {
         } else {
             nativeCache(cfg).asMap().keys
                 .filterIsInstance<String>()
-                .filter { it.startsWith(tilNøkkel(cfg, "")) }
+                .filter { it.startsWith(cfg.tilNøkkel( "")) }
                 .forEach { cache.evict(it) }
         }
     }
 
-    override fun size(cfg: CacheNøkkelConfig): Long {
+        override fun size(cfg: CacheNøkkelConfig): Long {
         val cache = nativeCache(cfg)
         if (cfg.extraPrefix == null) {
             return cache.estimatedSize()
         }
-        val prefix = tilNøkkel(cfg, "")
+        val prefix = cfg.tilNøkkel( "")
         return cache.asMap().keys.count { it is String && it.startsWith(prefix) }.toLong()
     }
 

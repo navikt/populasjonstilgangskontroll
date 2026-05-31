@@ -70,22 +70,31 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
 
     @MockkBean
     lateinit var validator: EnkeltTilgangKonsumentValidator
+
     @MockkBean
     lateinit var proxy: EntraProxyTjeneste
+
     @MockkBean
     lateinit var token: Token
+
     @MockkBean
     lateinit var oppfølging: OppfølgingTjeneste
+
     @Autowired
     lateinit var motor: RegelMotor
+
     @Autowired
     lateinit var registry: MeterRegistry
+
     @Autowired
     lateinit var adapter: EnkeltTilgangJPAAdapter
+
     @Autowired
     lateinit var repository: EnkeltTilgangRepository
+
     @MockK
     lateinit var ansatte: AnsattTjeneste
+
     @MockK
     lateinit var brukere: BrukerTjeneste
 

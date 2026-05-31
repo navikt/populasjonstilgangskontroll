@@ -63,12 +63,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @ApplyExtension(SpringExtension::class)
 class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
 
-    private val strengtFortroligAktørId = AktørId("1234567890123")
-    private val strengtFortroligBrukerId = BrukerId("08526835671")
-    private val fortroligBrukerId = BrukerId("08526835672")
-    private val vanligBrukerId = BrukerId("08526835670")
-    private val ansattId = AnsattId("Z999999")
-    private val dnr = BrukerId("12345678910")
+
 
     @MockkBean
     private lateinit var vergemål: VergemålTjeneste
@@ -78,22 +73,28 @@ class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
 
     @MockkBean
     lateinit var token: Token
+
     @MockkBean
     lateinit var oppfølging: OppfølgingTjeneste
+
     @MockkBean
     lateinit var validator: EnkeltTilgangProdKonsumentValidator
+
     @MockkBean
     lateinit var proxy: EntraProxyTjeneste
 
     @MockkBean
     lateinit var brukere: BrukerTjeneste
+
     @MockkBean
     lateinit var ansatte: AnsattTjeneste
 
     @Autowired
     lateinit var motor: RegelMotor
+
     @Autowired
     lateinit var enkeltTilgang: EnkeltTilgangTjeneste
+
     @Autowired
     lateinit var regler: RegelTjeneste
 
@@ -236,5 +237,11 @@ class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
     companion object {
         @ServiceConnection
         private val postgres = postgreSQLContainer
+        private val strengtFortroligAktørId = AktørId("1234567890123")
+        private val strengtFortroligBrukerId = BrukerId("08526835671")
+        private val fortroligBrukerId = BrukerId("08526835672")
+        private val vanligBrukerId = BrukerId("08526835670")
+        private val ansattId = AnsattId("Z999999")
+        private val dnr = BrukerId("12345678910")
     }
 }

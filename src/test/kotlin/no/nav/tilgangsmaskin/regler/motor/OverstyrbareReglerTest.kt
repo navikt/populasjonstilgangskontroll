@@ -52,7 +52,7 @@ class OverstyrbareReglerTest : BehaviorSpec() {
                 Then("tilgang godkjennes") {
                     val bruker = BrukerBuilder(brukerId).gt(UkjentBosted()).kreverMedlemskapI(UKJENT_BOSTED).build()
                     val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UKJENT_BOSTED).build()
-                    regel.evaluer(ansatt, bruker).shouldBeTrue()
+                    regel.evaluer(ansatt, bruker) shouldBe true
                 }
             }
 
@@ -60,7 +60,7 @@ class OverstyrbareReglerTest : BehaviorSpec() {
                 Then("tilgang godkjennes") {
                     val bruker = BrukerBuilder(brukerId).build()
                     val ansatt = AnsattBuilder(ansattId).build()
-                    regel.evaluer(ansatt, bruker).shouldBeTrue()
+                    regel.evaluer(ansatt, bruker) shouldBe true
                 }
             }
         }
@@ -80,7 +80,7 @@ class OverstyrbareReglerTest : BehaviorSpec() {
                 Then("tilgang godkjennes") {
                     val bruker = BrukerBuilder(brukerId).gt(UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
                     val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UTENLANDSK).build()
-                    regel.evaluer(ansatt, bruker).shouldBeTrue()
+                    regel.evaluer(ansatt, bruker) shouldBe true
                 }
             }
 
@@ -88,7 +88,7 @@ class OverstyrbareReglerTest : BehaviorSpec() {
                 Then("tilgang godkjennes") {
                     val bruker = BrukerBuilder(brukerId).build()
                     val ansatt = AnsattBuilder(ansattId).build()
-                    regel.evaluer(ansatt, bruker).shouldBeTrue()
+                    regel.evaluer(ansatt, bruker) shouldBe true
                 }
             }
         }
@@ -100,7 +100,7 @@ class OverstyrbareReglerTest : BehaviorSpec() {
                     val regel = GeografiskRegel(oppfølging,)
                     val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("1234"))).build()
                     val ansatt = AnsattBuilder(ansattId).medMedlemskapI(NASJONAL).build()
-                    regel.evaluer(ansatt, bruker).shouldBeTrue()
+                    regel.evaluer(ansatt, bruker) shouldBe true
                 }
             }
 
@@ -111,7 +111,7 @@ class OverstyrbareReglerTest : BehaviorSpec() {
                     val bruker = BrukerBuilder(brukerId).gt(BydelTilknytning(Bydel(bydel))).build()
                     val geoGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_$bydel")
                     val ansatt = AnsattBuilder(ansattId).medMedlemskapI(geoGruppe).build()
-                    regel.evaluer(ansatt, bruker).shouldBeTrue()
+                    regel.evaluer(ansatt, bruker) shouldBe true
                 }
             }
 
@@ -122,7 +122,7 @@ class OverstyrbareReglerTest : BehaviorSpec() {
                     val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune(kommune))).build()
                     val geoGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_$kommune")
                     val ansatt = AnsattBuilder(ansattId).medMedlemskapI(geoGruppe).build()
-                    regel.evaluer(ansatt, bruker).shouldBeTrue()
+                    regel.evaluer(ansatt, bruker) shouldBe true
                 }
             }
 
@@ -134,7 +134,7 @@ class OverstyrbareReglerTest : BehaviorSpec() {
                     val enhetGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-ENHET_${enhet.verdi}")
                     val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).build()
                     val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
-                    regel.evaluer(ansatt, bruker).shouldBeTrue()
+                    regel.evaluer(ansatt, bruker) shouldBe true
                 }
             }
 

@@ -37,8 +37,13 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
 
     @WithSpan
     override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? =
-        conn.sync().get(mapper.tilNøkkel(cache, id))?.let {
-            json -> mapper.fraJson(json, clazz)
+        runCatching {
+            conn.sync().get(mapper.tilNøkkel(cache, id))?.let { json ->
+                mapper.fraJson(json, clazz)
+            }
+        }.getOrElse { ex ->
+            log.warn("Cache getOne feilet for ${cache.name} nøkkel $id: ${ex.message}")
+            null
         }
 
     @WithSpan
@@ -51,14 +56,19 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
         if (ids.isEmpty()) {
             emptyMap()
         } else {
-            val keys = ids.map { mapper.tilNøkkel(cache, it) }.toTypedArray()
-            conn.sync()
-                .mget(*keys)
-                .filter { it.hasValue() }
-                .associate {
-                    it.fraJsonEntry(mapper, clazz)
-                }
-                .also { tellOgLog(cache.name, it.size, ids.size) }
+            runCatching {
+                val keys = ids.map { mapper.tilNøkkel(cache, it) }.toTypedArray()
+                conn.sync()
+                    .mget(*keys)
+                    .filter { it.hasValue() }
+                    .associate {
+                        it.fraJsonEntry(mapper, clazz)
+                    }
+                    .also { tellOgLog(cache.name, it.size, ids.size) }
+            }.getOrElse { ex ->
+                log.warn("Cache getMany feilet for ${cache.name} med ${ids.size} nøkler: ${ex.message}")
+                emptyMap()
+            }
         }
 
     @WithSpan

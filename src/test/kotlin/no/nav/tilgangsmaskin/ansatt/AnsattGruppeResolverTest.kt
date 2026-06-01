@@ -19,6 +19,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_OG_GLOBALE_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
@@ -97,7 +98,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
                 assertSoftly {
                     resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder forventet
-                    verify { cache.delete(EntraGrupperConfig.GEO_OG_GLOBALE_CACHE, ansattId.verdi) }
+                    verify { cache.delete(GEO_OG_GLOBALE_CACHE, ansattId.verdi) }
                     verify { entra.geoOgGlobaleGrupper(ansattId, nyOid) }
                 }
             }

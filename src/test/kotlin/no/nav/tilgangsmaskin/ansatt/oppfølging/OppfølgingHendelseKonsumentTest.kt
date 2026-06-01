@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.clearMocks
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.ARBEIDSOPPFOLGINGSKONTOR_ENDRET
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_AVSLUTTET
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_STARTET
@@ -24,7 +25,7 @@ class OppfølgingHendelseKonsumentTest : BehaviorSpec({
     val oppfølging = mockk<OppfølgingTjeneste>(relaxed = true)
     val konsument = OppfølgingHendelseKonsument(oppfølging)
 
-    fun hendelse(type: OppfølgingHendelse.EndringType, kontor: Kontor? = KONTOR, sluttTidspunkt: Instant? = null) = OppfølgingHendelse(
+    fun hendelse(type: EndringType, kontor: Kontor? = KONTOR, sluttTidspunkt: Instant? = null) = OppfølgingHendelse(
         kontor,
         type,
         ID,

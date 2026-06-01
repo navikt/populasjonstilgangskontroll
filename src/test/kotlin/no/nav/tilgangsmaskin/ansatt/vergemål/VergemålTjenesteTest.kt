@@ -57,7 +57,11 @@ class VergemålTjenesteTest : BehaviorSpec() {
         afterEach { server.verify() }
 
         Given("oppslag av vergemål for ansatt") {
-            beforeEach { every { nom.fnrForAnsatt(ANSATT_ID) } returns IDENT }
+            beforeEach {
+                every {
+                    nom.fnrForAnsatt(ANSATT_ID)
+                } returns IDENT
+            }
 
             When("ansatt har vergemål") {
                 Then("returnerer brukerId-er for vergehavere") {
@@ -106,7 +110,11 @@ class VergemålTjenesteTest : BehaviorSpec() {
         }
 
         Given("feilhaandtering") {
-            beforeEach { every { nom.fnrForAnsatt(ANSATT_ID) } returns IDENT }
+            beforeEach {
+                every {
+                    nom.fnrForAnsatt(ANSATT_ID)
+                } returns IDENT
+            }
 
             When("tjenesten returnerer 404") {
                 Then("kaster NotFoundRestException uten retry") {

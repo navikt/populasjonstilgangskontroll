@@ -19,6 +19,7 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import java.util.UUID
+import java.util.UUID.randomUUID
 
 class AnsattTest : BehaviorSpec({
 
@@ -30,7 +31,7 @@ class AnsattTest : BehaviorSpec({
         When("bruker har kommunetilknytning og ansatt har matchende GEO-gruppe") {
             Then("returnerer true") {
                 val kommune = "1234"
-                val gruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_$kommune")
+                val gruppe = EntraGruppe(randomUUID(), "0000-GA-GEO_$kommune")
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(gruppe).build()
                 val gt = KommuneTilknytning(Kommune(kommune))
                 (ansatt kanBehandle gt).shouldBeTrue()
@@ -40,7 +41,7 @@ class AnsattTest : BehaviorSpec({
         When("bruker har bydelstilknytning og ansatt har matchende GEO-gruppe") {
             Then("returnerer true") {
                 val bydel = "123456"
-                val gruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_$bydel")
+                val gruppe = EntraGruppe(randomUUID(), "0000-GA-GEO_$bydel")
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(gruppe).build()
                 val gt = BydelTilknytning(Bydel(bydel))
                 (ansatt kanBehandle gt).shouldBeTrue()
@@ -85,7 +86,7 @@ class AnsattTest : BehaviorSpec({
         When("ansatt har ENHET-gruppe som matcher enheten") {
             Then("returnerer true") {
                 val enhet = Enhetsnummer("4242")
-                val gruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-ENHET_${enhet.verdi}")
+                val gruppe = EntraGruppe(randomUUID(), "0000-GA-ENHET_${enhet.verdi}")
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(gruppe).build()
                 (ansatt tilhører enhet).shouldBeTrue()
             }

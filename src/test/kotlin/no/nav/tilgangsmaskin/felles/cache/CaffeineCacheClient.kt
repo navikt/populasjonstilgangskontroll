@@ -34,7 +34,7 @@ class CaffeineCacheClient(private val mgr: CacheManager) : CacheOperations {
         if (ids.isEmpty()) return emptyMap()
         val cache = cache(cfg)
         return ids.associateWith { id ->
-            cache.get(cfg.tilNøkkel( id))?.get()?.let { clazz.java.cast(it) }
+            cache.get(cfg.tilNøkkel(id))?.get()?.let { clazz.java.cast(it) }
         }.filterValues { it != null }
     }
 

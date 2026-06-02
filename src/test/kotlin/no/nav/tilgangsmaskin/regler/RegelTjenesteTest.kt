@@ -93,6 +93,22 @@ class RegelTjenesteTest : BehaviorSpec() {
                     }
                 }
             }
+            When("oppslag med historisk id som matcher funnet bruker") {
+                Then("regnes ikke som ukjent") {
+                    val historiskId = BrukerId("22222222222")
+                    val funnetBruker = BrukerBuilder(vanligBrukerId).historiske(setOf(historiskId)).build()
+                    every { brukere.brukere(setOf(vanligBrukerId.verdi, historiskId.verdi)) } returns setOf(funnetBruker)
+                    every { motor.bulkRegler(any(), any()) } returns setOf(BulkResultat.ok(funnetBruker))
+                    every { enkeltTilgang.tilganger(any(), any()) } returns emptySet()
+
+                    val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi), BrukerIdOgRegelsett(historiskId.verdi)))
+                    assertSoftly(resultater) {
+                        godkjente.map { it.brukerId } shouldContainExactlyInAnyOrder listOf(vanligBrukerId.verdi)
+                        avviste.shouldBeEmpty()
+                        ukjente.shouldBeEmpty()
+                    }
+                }
+            }
             When("exception ikke er RegelException") {
                 Then("kastes exception videre") {
                     val funnetBruker = BrukerBuilder(vanligBrukerId).build()

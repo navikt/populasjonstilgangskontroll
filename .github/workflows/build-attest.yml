@@ -139,7 +139,7 @@ jobs:
           cp -r build/reports/jacoco/test/html/. build/reports/pages/jacoco/
           cp -r build/reports/tests/test/. build/reports/pages/tests/
           pip install mkdocs-material
-          cd docs && mkdocs build
+          mkdocs build -f docs/mkdocs.yml
           cat > build/reports/pages/index.html << 'EOF'
           <!DOCTYPE html>
           <html>
@@ -177,4 +177,3 @@ jobs:
         with:
           image_ref: ${{ env.IMAGE }}@${{ env.DIGEST }}
           sbom: build/reports/cyclonedx/application.cdx.json
-

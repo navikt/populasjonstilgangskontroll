@@ -4,7 +4,7 @@ site_dir: ../build/reports/pages/adr
 
 theme:
   name: material
-  language: "no"
+  language: "nb"
   palette:
     scheme: default
 
@@ -15,4 +15,3 @@ nav:
   - ADR-003 Kafka: ADR-003-kafka-feilhåndtering.md
   - ADR-004 Enkelttilgang: ADR-004-enkelttilgang-overstyring.md
   - ADR-005 Domenemodell: ADR-005-domenemodell-bruker-ansatt.md
-

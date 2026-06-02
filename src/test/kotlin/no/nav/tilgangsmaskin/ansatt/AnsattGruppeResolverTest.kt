@@ -18,7 +18,6 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_OG_GLOBALE_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste

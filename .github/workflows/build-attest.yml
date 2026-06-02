@@ -136,10 +136,10 @@ jobs:
           ls build/reports/tests/test/ || echo "Missing test report"
           mkdir -p build/reports/pages/jacoco
           mkdir -p build/reports/pages/tests
-          mkdir -p build/reports/pages/adr
           cp -r build/reports/jacoco/test/html/. build/reports/pages/jacoco/
           cp -r build/reports/tests/test/. build/reports/pages/tests/
-          cp -r docs/adr/. build/reports/pages/adr/
+          pip install mkdocs-material
+          cd docs && mkdocs build
           cat > build/reports/pages/index.html << 'EOF'
           <!DOCTYPE html>
           <html>
@@ -148,7 +148,7 @@ jobs:
             <ul>
               <li><a href="jacoco/index.html">JaCoCo Coverage</a></li>
               <li><a href="tests/index.html">Test Report</a></li>
-              <li><a href="adr/README.md">Architecture Decision Records</a></li>
+              <li><a href="adr/">Architecture Decision Records</a></li>
             </ul>
           </body>
           </html>

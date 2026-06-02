@@ -1,0 +1,18 @@
+site_name: Populasjonstilgangskontroll
+docs_dir: adr
+site_dir: ../build/reports/pages/adr
+
+theme:
+  name: material
+  language: "no"
+  palette:
+    scheme: default
+
+nav:
+  - Oversikt: README.md
+  - ADR-001 Regelmotor: ADR-001-regelmotor-arkitektur.md
+  - ADR-002 Caching: ADR-002-caching-strategi.md
+  - ADR-003 Kafka: ADR-003-kafka-feilhåndtering.md
+  - ADR-004 Enkelttilgang: ADR-004-enkelttilgang-overstyring.md
+  - ADR-005 Domenemodell: ADR-005-domenemodell-bruker-ansatt.md
+

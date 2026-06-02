@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.tilgang
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.booleans.shouldBeTrue
@@ -27,7 +26,7 @@ class TokenTest : BehaviorSpec({
     val claims = mockk<JwtTokenClaims>()
     val token = Token(contextHolder)
 
-    val oid = UUID.fromString("11111111-1111-1111-1111-111111111111")
+    val oid = UUID.randomUUID()
 
     beforeEach {
         every { contextHolder.getTokenValidationContext() } returns validationContext
@@ -232,9 +231,9 @@ class TokenTest : BehaviorSpec({
             }
         }
         When("groups inneholder ugyldig UUID-verdi") {
-            Then("kaster IllegalArgumentException") {
+            Then("ignoreres og returnerer tomt sett") {
                 every { claims.getAsList("groups") } returns listOf("ikke-en-uuid")
-                shouldThrow<IllegalArgumentException> { token.globaleGruppeIds }
+                token.globaleGruppeIds.shouldBeEmpty()
             }
         }
     }

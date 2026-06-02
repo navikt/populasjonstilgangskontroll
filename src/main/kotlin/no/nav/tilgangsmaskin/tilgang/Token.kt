@@ -14,13 +14,13 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
     val globaleGruppeIds
         get() =
             claimSet()?.getAsList("groups")
-                ?.mapNotNull { UUID.fromString(it) }
+                ?.mapNotNull { runCatching { UUID.fromString(it) }.getOrNull() }
                 ?.toSet()
                 ?: emptySet()
 
 
     val system get() = stringClaim(AZP_NAME)  ?: UTILGJENGELIG
-    val oid get() = stringClaim(OID)?.let { UUID.fromString(it) }
+    val oid get() = stringClaim(OID)?.let { runCatching { UUID.fromString(it) }.getOrNull() }
     val ansattId get() = stringClaim(NAVIDENT)?.let { AnsattId(it) }
     private fun stringClaim(name: String) = claimSet()?.getStringClaim(name)
     private fun claimSet() = runCatching { contextHolder.getTokenValidationContext().getClaims(AAD_ISSUER) }.getOrNull()

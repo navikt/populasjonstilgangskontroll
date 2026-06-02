@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -17,11 +18,15 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_OG_GLOBALE_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
+import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.tilgang.Token
+import java.net.URI
 import java.util.*
 
 class AnsattGruppeResolverTest : BehaviorSpec({
@@ -29,12 +34,13 @@ class AnsattGruppeResolverTest : BehaviorSpec({
     val entra       = mockk<EntraTjeneste>()
     val token       = mockk<Token>()
     val oidTjeneste = mockk<EntraOidTjeneste>()
+    val cache       = mockk<CacheOperations>(relaxed = true)
 
     val ansattId  = AnsattId("Z999999")
     val oid       = UUID.randomUUID()
     val geoGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_1234")
 
-    val resolver = EntraAnsattGruppeResolver(entra, token, oidTjeneste, mockk())
+    val resolver = EntraAnsattGruppeResolver(entra, token, oidTjeneste, cache)
 
     beforeEach {
         clearAllMocks()
@@ -73,9 +79,36 @@ class AnsattGruppeResolverTest : BehaviorSpec({
             Then("slår opp globale og GEO-grupper i Entra") {
                 val forventet = setOf(geoGruppe, EntraGruppe(NASJONAL.id))
                 every { entra.geoOgGlobaleGrupper(ansattId, oid) } returns forventet
-                resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder forventet
-                verify { entra.geoOgGlobaleGrupper(ansattId, oid) }
-                verify(exactly = 0) { entra.geoGrupper(any(), any()) }
+                assertSoftly {
+                    resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder forventet
+                    verify { entra.geoOgGlobaleGrupper(ansattId, oid) }
+                    verify(exactly = 0) { entra.geoGrupper(any(), any()) }
+                }
+            }
+        }
+
+        When("entra kaster NotFoundRestException") {
+            Then("sletter cache, henter ny oid og gjør retry") {
+                val nyOid = UUID.randomUUID()
+                val forventet = setOf(geoGruppe)
+                every { entra.geoOgGlobaleGrupper(ansattId, oid) } throws NotFoundRestException(URI("http://graph"), ansattId.verdi)
+                every { oidTjeneste.oid(ansattId) } returnsMany listOf(oid, nyOid)
+                every { entra.geoOgGlobaleGrupper(ansattId, nyOid) } returns forventet
+
+                assertSoftly {
+                    resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder forventet
+                    verify { cache.delete(GEO_OG_GLOBALE_CACHE, ansattId.verdi) }
+                    verify { entra.geoOgGlobaleGrupper(ansattId, nyOid) }
+                }
+            }
+        }
+
+        When("entra kaster annen exception") {
+            Then("kastes videre uten retry") {
+                every { entra.geoOgGlobaleGrupper(ansattId, oid) } throws RuntimeException("uventet feil")
+                shouldThrow<RuntimeException> {
+                    resolver.grupperForAnsatt(ansattId)
+                }.message shouldBe "uventet feil"
             }
         }
     }
@@ -90,9 +123,11 @@ class AnsattGruppeResolverTest : BehaviorSpec({
         When("ansatt har nasjonal tilgang") {
             Then("returneres kun globale grupper uten Entra-oppslag") {
                 every { token.globaleGruppeIds } returns setOf(NASJONAL.id)
-                resolver.grupperForAnsatt(ansattId) shouldBe setOf(EntraGruppe(NASJONAL.id, NASJONAL.name))
-                verify(exactly = 0) { entra.geoGrupper(any(), any()) }
-                verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
+                assertSoftly {
+                    resolver.grupperForAnsatt(ansattId) shouldBe setOf(EntraGruppe(NASJONAL.id, NASJONAL.name))
+                    verify(exactly = 0) { entra.geoGrupper(any(), any()) }
+                    verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
+                }
             }
         }
 
@@ -100,9 +135,11 @@ class AnsattGruppeResolverTest : BehaviorSpec({
             Then("slås opp GEO-grupper i Entra") {
                 every { token.globaleGruppeIds } returns emptySet()
                 every { entra.geoGrupper(ansattId, oid) } returns setOf(geoGruppe)
-                resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder setOf(geoGruppe)
-                verify { entra.geoGrupper(ansattId, oid) }
-                verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
+                assertSoftly {
+                    resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder setOf(geoGruppe)
+                    verify { entra.geoGrupper(ansattId, oid) }
+                    verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
+                }
             }
         }
 
@@ -125,8 +162,10 @@ class AnsattGruppeResolverTest : BehaviorSpec({
         When("miljø er dev/test") {
             Then("slås opp globale og GEO-grupper i Entra") {
                 every { entra.geoOgGlobaleGrupper(ansattId, oid) } returns setOf(geoGruppe)
-                resolver.grupperForAnsatt(ansattId) shouldBe setOf(geoGruppe)
-                verify { entra.geoOgGlobaleGrupper(ansattId, oid) }
+                assertSoftly {
+                    resolver.grupperForAnsatt(ansattId) shouldBe setOf(geoGruppe)
+                    verify { entra.geoOgGlobaleGrupper(ansattId, oid) }
+                }
             }
         }
 

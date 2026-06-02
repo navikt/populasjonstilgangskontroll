@@ -22,7 +22,7 @@ class PingableHealthIndicatorTest : BehaviorSpec({
         override fun ping(): Any? { pinged = true; return onPing() }
     }
 
-    Given("health") {
+    Given("helseindikator for pingable") {
         When("ping lykkes") {
             Then("returneres UP med riktig endpoint og pinged=true") {
                 val pingable = StubPingable()

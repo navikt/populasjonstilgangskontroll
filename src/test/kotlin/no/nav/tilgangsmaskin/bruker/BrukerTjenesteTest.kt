@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.bruker
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
@@ -35,11 +36,13 @@ class BrukerTjenesteTest : BehaviorSpec({
 
     beforeEach { clearMocks(pdl, skjerming) }
 
-    Given("brukere") {
+    Given("oppslag av flere brukere") {
         When("tom input") {
             Then("returneres tom mengde uten PDL-kall") {
-                brukerTjeneste.brukere(emptySet()).shouldBeEmpty()
-                verify(exactly = 0) { pdl.personer(any()) }
+                assertSoftly {
+                    brukerTjeneste.brukere(emptySet()).shouldBeEmpty()
+                    verify(exactly = 0) { pdl.personer(any()) }
+                }
             }
         }
         When("bruker ikke er skjermet") {
@@ -47,8 +50,10 @@ class BrukerTjenesteTest : BehaviorSpec({
                 every { pdl.personer(setOf(id1.verdi)) } returns setOf(person(id1, aktørId1))
                 every { skjerming.skjerminger(listOf(id1)) } returns mapOf(id1 to false)
                 val result = brukerTjeneste.brukere(setOf(id1.verdi)).single()
-                result.brukerId shouldBe id1
-                result.påkrevdeGrupper shouldNotContain SKJERMING
+                assertSoftly {
+                    result.brukerId shouldBe id1
+                    result.påkrevdeGrupper shouldNotContain SKJERMING
+                }
             }
         }
         When("bruker er skjermet") {
@@ -63,9 +68,11 @@ class BrukerTjenesteTest : BehaviorSpec({
                 every { pdl.personer(setOf(id1.verdi, id2.verdi)) } returns setOf(person(id1, aktørId1), person(id2, aktørId2))
                 every { skjerming.skjerminger(any()) } returns mapOf(id1 to false, id2 to true)
                 val result = brukerTjeneste.brukere(setOf(id1.verdi, id2.verdi))
-                result shouldHaveSize 2
-                result.first { it.brukerId == id1 } kreverMedlemskapI SKJERMING shouldBe false
-                (result.first { it.brukerId == id2 } kreverMedlemskapI SKJERMING).shouldBeTrue()
+                assertSoftly {
+                    result shouldHaveSize 2
+                    result.first { it.brukerId == id1 } kreverMedlemskapI SKJERMING shouldBe false
+                    (result.first { it.brukerId == id2 } kreverMedlemskapI SKJERMING).shouldBeTrue()
+                }
             }
         }
         When("PDL finner ingen personer") {
@@ -114,13 +121,15 @@ class BrukerTjenesteTest : BehaviorSpec({
                 (brukerTjeneste.brukerMedNærmesteFamilie(id1.verdi) kreverMedlemskapI SKJERMING).shouldBeTrue()
             }
         }
-        When("kalt") {
+        When("brukerMedNærmesteFamilie kalles") {
             Then("kalles medFamilie, ikke medUtvidetFamilie") {
                 every { pdl.medFamilie(id1.verdi) } returns person(id1, aktørId1)
                 every { skjerming.skjerming(id1) } returns false
                 brukerTjeneste.brukerMedNærmesteFamilie(id1.verdi)
-                verify { pdl.medFamilie(id1.verdi) }
-                verify(exactly = 0) { pdl.medUtvidetFamilie(any()) }
+                assertSoftly {
+                    verify { pdl.medFamilie(id1.verdi) }
+                    verify(exactly = 0) { pdl.medUtvidetFamilie(any()) }
+                }
             }
         }
     }
@@ -140,13 +149,15 @@ class BrukerTjenesteTest : BehaviorSpec({
                 (brukerTjeneste.brukerMedUtvidetFamilie(id1.verdi) kreverMedlemskapI SKJERMING).shouldBeTrue()
             }
         }
-        When("kalt") {
+        When("brukerMedUtvidetFamilie kalles") {
             Then("kalles medUtvidetFamilie, ikke medFamilie") {
                 every { pdl.medUtvidetFamilie(id1.verdi) } returns person(id1, aktørId1)
                 every { skjerming.skjerming(id1) } returns false
                 brukerTjeneste.brukerMedUtvidetFamilie(id1.verdi)
-                verify { pdl.medUtvidetFamilie(id1.verdi) }
-                verify(exactly = 0) { pdl.medFamilie(any()) }
+                assertSoftly {
+                    verify { pdl.medUtvidetFamilie(id1.verdi) }
+                    verify(exactly = 0) { pdl.medFamilie(any()) }
+                }
             }
         }
     }

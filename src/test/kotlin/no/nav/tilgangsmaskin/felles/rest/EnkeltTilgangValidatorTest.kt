@@ -6,24 +6,24 @@ import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import jakarta.validation.ConstraintValidatorContext
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringValidator
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangValidator
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
 import java.time.LocalDate
 import java.time.LocalDate.now
 
-class OverstyringValidatorTest : BehaviorSpec({
+class EnkeltTilgangValidatorTest : BehaviorSpec({
 
     val ctx = mockk<ConstraintValidatorContext>(relaxed = true)
-    val validator = OverstyringValidator()
+    val validator = EnkeltTilgangValidator()
 
     val gyldigBegrunnelse = "En gyldig begrunnelse på minst 10 tegn"
     val gyldigDato = now().plusMonths(1)
     val brukerId = BrukerId("08526835670")
 
     fun data(begrunnelse: String, gyldigtil: LocalDate = gyldigDato) =
-        OverstyringData(brukerId, begrunnelse, gyldigtil)
+        EnkeltTilgangData(brukerId, begrunnelse, gyldigtil)
 
-    Given("en overstyring") {
+    Given("en enkelttilgang") {
 
         When("dato er én dag frem i tid") {
             Then("er gyldig") {
@@ -50,7 +50,7 @@ class OverstyringValidatorTest : BehaviorSpec({
         }
 
         When("dato er dagens dato") {
-            Then("gyldig") {
+            Then("validering godkjennes") {
                 validator.isValid(data(gyldigBegrunnelse, now()), ctx).shouldBeTrue()
             }
         }

@@ -1,10 +1,12 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING_ERROR_HANDLER
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.ARBEIDSOPPFOLGINGSKONTOR_ENDRET
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_AVSLUTTET
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_STARTET
+import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.Avsluttet
+import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.KontorEndret
+import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.Startet
 import no.nav.tilgangsmaskin.bruker.Identer
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
@@ -18,32 +20,34 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
     @KafkaListener(
         topics = [OPPFØLGING_TOPIC],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
-        groupId = OPPFØLGING,
-        errorHandler = OPPFØLGING_ERROR_HANDLER)
-
+        groupId = OPPFØLGING)
     fun listen(hendelse: OppfølgingHendelse) =
-        with(hendelse) {
-            when (sisteEndringsType) {
-                OPPFOLGING_STARTET -> registrer(this, "Oppfølging startet")
-                ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> registrer(this, "Oppfølging endret")
-                OPPFOLGING_AVSLUTTET -> avslutt(this)
+        when (val endring = hendelse.tilDomene()) {
+            is Startet -> {
+                oppfølging.registrer(endring)
+                log.info("Oppfølging startet for kontor {} og id {}", endring.kontor.kontorId.verdi, endring.uuid)
+            }
+            is KontorEndret -> {
+                oppfølging.registrer(endring)
+                log.info("Oppfølging endret for kontor {} og id {}", endring.kontor.kontorId.verdi, endring.uuid)
+            }
+            is Avsluttet -> {
+                oppfølging.avslutt(endring)
+                log.info("Oppfølging avsluttet for {}", endring.uuid)
             }
         }
 
-    private fun registrer(hendelse: OppfølgingHendelse, melding: String) =
-        with(hendelse) {
-            oppfølging.registrer(oppfolgingsperiodeUuid,
-                Identer(ident, aktorId), kontor!!, startTidspunkt).also {
-                log.info("$melding for kontor ${kontor.kontorId.verdi} og id  $oppfolgingsperiodeUuid")
-            }
+    private fun OppfølgingHendelse.tilDomene(): Oppfølgingsendring {
+        val identer = Identer(ident, aktorId)
+        fun krevKontor() = requireNotNull(kontor) {
+            "kontor mangler for $sisteEndringsType (uuid=$oppfolgingsperiodeUuid)"
         }
-
-    private fun avslutt(hendelse: OppfølgingHendelse) =
-        with(hendelse) {
-            oppfølging.avslutt(oppfolgingsperiodeUuid, Identer(ident, aktorId)).also {
-                log.info("Oppfølging avsluttet for $oppfolgingsperiodeUuid")
-            }
+        return when (sisteEndringsType) {
+            OPPFOLGING_STARTET -> Startet(oppfolgingsperiodeUuid, identer, krevKontor(), startTidspunkt)
+            ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> KontorEndret(oppfolgingsperiodeUuid, identer, krevKontor(), startTidspunkt)
+            OPPFOLGING_AVSLUTTET -> Avsluttet(oppfolgingsperiodeUuid, identer)
         }
+    }
 
     companion object {
         private const val OPPFØLGING_TOPIC = "poao.siste-oppfolgingsperiode-v3"

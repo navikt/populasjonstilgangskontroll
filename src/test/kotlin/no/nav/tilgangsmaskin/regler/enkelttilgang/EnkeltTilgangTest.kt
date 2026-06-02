@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.regler.overstyring
+package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.extensions.ApplyExtension
@@ -31,8 +31,7 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
-import no.nav.tilgangsmaskin.regler.motor.OverstyringTeller
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringClientValidator.OverstyringException
+import no.nav.tilgangsmaskin.regler.motor.EnkeltTilgangTeller
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
@@ -42,11 +41,8 @@ import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfig
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
-import no.nav.tilgangsmaskin.SharedPostgresContainer
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTest.RegelMotorTestConfig
-import org.springframework.boot.test.context.TestConfiguration
+import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestPropertySource
 import org.testcontainers.junit.jupiter.Testcontainers
 
@@ -54,12 +50,12 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @EnableJpaAuditing
 @Testcontainers
 @AutoConfigureMetrics
-@Import(RegelMotorTestConfig::class)
 @TestPropertySource(locations = ["classpath:test.properties"])
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [TestApp::class, LocalAuditor::class,OverstyringJPAAdapter::class])
+@ContextConfiguration(classes = [TestApp::class, LocalAuditor::class,EnkeltTilgangJPAAdapter::class])
 @ApplyExtension(SpringExtension::class)
-internal class OverstyringTest : BehaviorSpec() {
+@ComponentScan("no.nav.tilgangsmaskin.regler.motor")
+internal class EnkeltTilgangTest : BehaviorSpec() {
 
     private val vanligBrukerId = BrukerId("08526835670")
     private val ansattId = AnsattId("Z999999")
@@ -73,7 +69,7 @@ internal class OverstyringTest : BehaviorSpec() {
     private lateinit var nom: NomTjeneste
 
     @MockkBean
-    lateinit var validator: OverstyringClientValidator
+    lateinit var validator: EnkeltTilgangKonsumentValidator
     @MockkBean
     lateinit var proxy: EntraProxyTjeneste
     @MockkBean
@@ -85,29 +81,25 @@ internal class OverstyringTest : BehaviorSpec() {
     @Autowired
     lateinit var registry: MeterRegistry
     @Autowired
-    lateinit var adapter: OverstyringJPAAdapter
+    lateinit var adapter: EnkeltTilgangJPAAdapter
     @Autowired
-    lateinit var repository: OverstyringRepository
+    lateinit var repository: EnkeltTilgangRepository
     @MockK
     lateinit var ansatte: AnsattTjeneste
     @MockK
     lateinit var brukere: BrukerTjeneste
 
-    @TestConfiguration
-    @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
-    class RegelMotorTestConfig
-
     init {
-        lateinit var overstyring: OverstyringTjeneste
+        lateinit var enkeltTilgang: EnkeltTilgangTjeneste
 
         beforeSpec {
-            MockKAnnotations.init(this@OverstyringTest)
+            MockKAnnotations.init(this@EnkeltTilgangTest)
         }
 
         beforeEach {
             every { nom.fnrForAnsatt(any()) } returns vanligBrukerId
             every { vergemål.vergemål(any()) } returns emptySet()
-            every { validator.validerKonsument() } returns Unit
+            every { validator.valider(any()) } returns Unit
             every { token.erObo } returns false
             every { token.erCC } returns true
             every { token.system } returns "test"
@@ -116,27 +108,27 @@ internal class OverstyringTest : BehaviorSpec() {
             every { token.clusterAndSystem } returns "cluster:test"
             every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
             every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-            overstyring = OverstyringTjeneste(ansatte, brukere, adapter, motor, proxy, validator, OverstyringTeller(registry, token))
+            enkeltTilgang = EnkeltTilgangTjeneste(ansatte, brukere, adapter, motor, proxy, validator, EnkeltTilgangTeller(registry, token))
         }
 
-        Given("overstyr") {
+        Given("enkelttilgang av tilgangsresultat") {
 
-            When("OverstyringException kastes fra validator") {
+            When("EnkeltTilgangException kastes fra validator") {
                 Then("kastes exception videre") {
-                    every { validator.validerKonsument() } throws OverstyringException("ukjent system", "ukjent-system")
-                    shouldThrow<OverstyringException> {
-                        overstyring.overstyr(ansattId, OverstyringData(vanligBrukerId, "Dette er test", IMORGEN))
+                    every { validator.valider(any()) } throws EnkeltTilgangKonsumentException("ukjent system")
+                    shouldThrow<EnkeltTilgangKonsumentException> {
+                        enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er test", IMORGEN))
                     }
                 }
             }
         }
 
         Given("OverstyringEntity felter") {
-            When("overstyring registreres") {
+            When("enkelttilgang registreres") {
                 Then("settes alle felter korrekt") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     assertSoftly(entity) {
                         navid shouldBe ansattId.verdi
@@ -154,109 +146,109 @@ internal class OverstyringTest : BehaviorSpec() {
             }
         }
 
-        Given("erOverstyrt") {
-            When("gyldig overstyring eksisterer via historisk ident") {
+        Given("har enkelttilgang") {
+            When("gyldig enkelttilgang eksisterer via historisk ident") {
                 Then("returneres true") {
                     val brukerMedHistorikk = BrukerBuilder(vanligBrukerId).historiske(setOf(historiskBrukerId)).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns brukerMedHistorikk
                     every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns BrukerBuilder(historiskBrukerId).build()
-                    overstyring.overstyr(ansattId, OverstyringData(historiskBrukerId, "Dette er en test", IMORGEN))
-                    overstyring.erOverstyrt(ansattId, BrukerBuilder(vanligBrukerId).build().brukerId).shouldBeTrue()
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(historiskBrukerId, "Dette er en test", IMORGEN))
+                    enkeltTilgang.harEnkeltTilgang(ansattId, BrukerBuilder(vanligBrukerId).build().brukerId).shouldBeTrue()
                 }
             }
-            When("det finnes flere overstyringer") {
+            When("det finnes flere enkelttilganger") {
                 Then("gjelder den nyeste") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er gammel", IGÅR))
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er ny", IMORGEN))
-                    overstyring.erOverstyrt(ansattId, bruker.brukerId).shouldBeTrue()
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er gammel", IGÅR))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er ny", IMORGEN))
+                    enkeltTilgang.harEnkeltTilgang(ansattId, bruker.brukerId).shouldBeTrue()
                 }
             }
-            When("nyeste overstyring er utgått, eldre er aktiv") {
+            When("nyeste enkelttilgang er utgått, eldre er aktiv") {
                 Then("returneres false — nyeste vinner") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er aktiv men gammel", IMORGEN))
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er ny men utgått", IGÅR))
-                    overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe false
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er aktiv men gammel", IMORGEN))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er ny men utgått", IGÅR))
+                    enkeltTilgang.harEnkeltTilgang(ansattId, bruker.brukerId) shouldBe false
                 }
             }
-            When("overstyring er utgått") {
+            When("enkelttilgang er utgått") {
                 Then("returneres false") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Denne er utgått", IGÅR))
-                    overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe false
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er utgått", IGÅR))
+                    enkeltTilgang.harEnkeltTilgang(ansattId, bruker.brukerId) shouldBe false
                 }
             }
-            When("ingen overstyring er registrert") {
+            When("ingen enkelttilgang er registrert") {
                 Then("returneres false") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.erOverstyrt(ansattId, bruker.brukerId) shouldBe false
+                    enkeltTilgang.harEnkeltTilgang(ansattId, bruker.brukerId) shouldBe false
                 }
             }
         }
 
-        Given("overstyringer (bulk)") {
-            When("aktive overstyringer eksisterer for flere brukere") {
+        Given("enkelttilganger (bulk)") {
+            When("aktive enkelttilganger eksisterer for flere brukere") {
                 Then("returneres alle aktive brukerIds") {
                     val bruker1 = BrukerBuilder(vanligBrukerId).build()
                     val bruker2 = BrukerBuilder(historiskBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker1
                     every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns bruker2
-                    overstyring.overstyr(ansattId, OverstyringData(bruker1.brukerId, "Aktiv overstyring 1", IMORGEN))
-                    overstyring.overstyr(ansattId, OverstyringData(bruker2.brukerId, "Aktiv overstyring 2", IMORGEN))
-                    val resultat = overstyring.overstyringer(ansattId, listOf(bruker1.brukerId, bruker2.brukerId))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker1.brukerId, "Aktiv enkelttilgang 1", IMORGEN))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker2.brukerId, "Aktiv enkelttilgang 2", IMORGEN))
+                    val resultat = enkeltTilgang.tilganger(ansattId, setOf(bruker1.brukerId, bruker2.brukerId))
                     resultat shouldBe listOf(bruker1.brukerId, bruker2.brukerId)
                 }
             }
-            When("én overstyring er aktiv og én er utgått") {
+            When("én enkelttilgang er aktiv og én er utgått") {
                 Then("returneres kun den aktive") {
                     val bruker1 = BrukerBuilder(vanligBrukerId).build()
                     val bruker2 = BrukerBuilder(historiskBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker1
                     every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns bruker2
-                    overstyring.overstyr(ansattId, OverstyringData(bruker1.brukerId, "Aktiv overstyring", IMORGEN))
-                    overstyring.overstyr(ansattId, OverstyringData(bruker2.brukerId, "Utgått overstyring", IGÅR))
-                    val resultat = overstyring.overstyringer(ansattId, listOf(bruker1.brukerId, bruker2.brukerId))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker1.brukerId, "Aktiv enkelttilgang", IMORGEN))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker2.brukerId, "Utgått enkelttilgang", IGÅR))
+                    val resultat = enkeltTilgang.tilganger(ansattId, setOf(bruker1.brukerId, bruker2.brukerId))
                     resultat shouldBe listOf(bruker1.brukerId)
                 }
             }
-            When("nyeste overstyring for en bruker er utgått, eldre er aktiv") {
+            When("nyeste enkelttilgang for en bruker er utgått, eldre er aktiv") {
                 Then("returneres tom liste for den brukeren — nyeste vinner") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Aktiv men gammel", IMORGEN))
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Ny men utgått", IGÅR))
-                    val resultat = overstyring.overstyringer(ansattId, listOf(bruker.brukerId))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Aktiv men gammel", IMORGEN))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Ny men utgått", IGÅR))
+                    val resultat = enkeltTilgang.tilganger(ansattId, setOf(bruker.brukerId))
                     resultat.shouldBeEmpty()
                 }
             }
-            When("alle overstyringer er utgått") {
+            When("alle enkelttilganger er utgått") {
                 Then("returneres tom liste") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Utgått overstyring", IGÅR))
-                    val resultat = overstyring.overstyringer(ansattId, listOf(bruker.brukerId))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Utgått enkelttilgang", IGÅR))
+                    val resultat = enkeltTilgang.tilganger(ansattId, setOf(bruker.brukerId))
                     resultat.shouldBeEmpty()
                 }
             }
-            When("ingen overstyringer er registrert") {
+            When("ingen enkelttilganger er registrert") {
                 Then("returneres tom liste") {
-                    val resultat = overstyring.overstyringer(ansattId, listOf(vanligBrukerId))
+                    val resultat = enkeltTilgang.tilganger(ansattId, setOf(vanligBrukerId))
                     resultat.shouldBeEmpty()
                 }
             }
         }
 
-        Given("OverstyringEntityListener") {
+        Given("enkeltTilgangEntityListener") {
             When("@PrePersist kalles") {
                 Then("settes created, updated, oppretter og system") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     assertSoftly(entity) {
                         created shouldNotBe null
@@ -271,7 +263,7 @@ internal class OverstyringTest : BehaviorSpec() {
                 Then("lastes entity med korrekte felter fra database") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     val lastet = repository.findById(entity.id)
                     lastet.isPresent.shouldBeTrue()
@@ -289,7 +281,7 @@ internal class OverstyringTest : BehaviorSpec() {
                 Then("nullstilles system og oppretter til tokenverdi") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     val createdFør = entity.created
                     entity.system = "ukjent-system"
@@ -307,7 +299,7 @@ internal class OverstyringTest : BehaviorSpec() {
                 Then("fjernes entity fra database") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    overstyring.overstyr(ansattId, OverstyringData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     repository.delete(entity)
                     repository.findById(entity.id).isPresent shouldBe false
@@ -318,6 +310,6 @@ internal class OverstyringTest : BehaviorSpec() {
 
     companion object {
         @ServiceConnection
-        private val postgres = SharedPostgresContainer.instance
+        private val postgres = postgreSQLContainer
     }
 }

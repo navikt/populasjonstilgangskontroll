@@ -2,8 +2,8 @@ package no.nav.tilgangsmaskin.ansatt.oppfølging
 
 import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
-import no.nav.tilgangsmaskin.bruker.Identer
+import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.Avsluttet
+import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.MedKontor
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.regler.motor.OppfølgingkontorTeller
 import org.springframework.cache.annotation.CacheEvict
@@ -12,38 +12,41 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.cache.annotation.Caching
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Instant
-import java.time.Instant.now
-import java.util.*
 
 @Service
 @Transactional
-class OppfølgingTjeneste(private val db: OppfølgingJPAAdapter, private val teller: OppfølgingkontorTeller) {
+class OppfølgingTjeneste(private val adapter: OppfølgingJPAAdapter, private val teller: OppfølgingkontorTeller) {
 
     @Cacheable(cacheNames = [OPPFØLGING], key = "#id.verdi")
     @Transactional(readOnly = true)
     fun enhetFor(id: Identifikator) =
-        db.enhetFor(id.verdi).also { enhet ->
+        adapter.enhetFor(id.verdi).also { enhet ->
             teller.tell(Tags.of("resultat", "${enhet != null}"))
         }
 
     @Caching(
         put = [
-            CachePut(cacheNames = [OPPFØLGING], key = "#identer.aktorId.verdi"),
-            CachePut(cacheNames = [OPPFØLGING], key = "#identer.brukerId.verdi")
+            CachePut(cacheNames = [OPPFØLGING], key = "#endring.identer.aktorId.verdi"),
+            CachePut(cacheNames = [OPPFØLGING], key = "#endring.identer.brukerId.verdi")
         ]
     )
-    fun registrer(id: UUID, identer: Identer, kontor: Kontor, tidspunkt: Instant = now()) =
-        kontor.kontorId.also {
-            db.registrer(id, identer.brukerId.verdi, identer.aktorId.verdi, tidspunkt, it.verdi)
+    fun registrer(endring: MedKontor) =
+        endring.kontor.kontorId.also {
+            adapter.registrer(
+                endring.uuid,
+                endring.identer.brukerId.verdi,
+                endring.identer.aktorId.verdi,
+                endring.tidspunkt,
+                it.verdi,
+            )
         }
 
     @Caching(
         evict = [
-            CacheEvict(cacheNames = [OPPFØLGING], key = "#identer.aktorId.verdi"),
-            CacheEvict(cacheNames = [OPPFØLGING], key = "#identer.brukerId.verdi")
+            CacheEvict(cacheNames = [OPPFØLGING], key = "#endring.identer.aktorId.verdi"),
+            CacheEvict(cacheNames = [OPPFØLGING], key = "#endring.identer.brukerId.verdi")
         ]
     )
-    fun avslutt(id: UUID, identer: Identer) =
-        db.avslutt(id)
+    fun avslutt(endring: Avsluttet) =
+        adapter.avslutt(endring.uuid)
 }

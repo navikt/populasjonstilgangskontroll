@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.regler.overstyring
+package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.tilgang.Token
@@ -8,6 +8,6 @@ import java.util.*
 
 
 @Component
-class OverstyringAzureAdTokenAuditorAware(private val token: Token) : AuditorAware<String> {
+class EnkeltTilgangAzureAdTokenAuditorAware(private val token: Token) : AuditorAware<String> {
     override fun getCurrentAuditor() = Optional.of(token.ansattId?.verdi ?: UTILGJENGELIG)
 }

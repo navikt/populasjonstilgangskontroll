@@ -17,6 +17,7 @@ import org.springframework.boot.restclient.RestClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
+import org.springframework.data.auditing.DateTimeProvider
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.apache.hc.client5.http.impl.classic.HttpClients
@@ -28,6 +29,10 @@ import org.springframework.web.servlet.config.annotation.ContentNegotiationConfi
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
+import java.time.Clock
+import java.time.Clock.systemDefaultZone
+import java.time.Instant
+import java.util.Optional
 import java.util.function.Function
 import kotlin.annotation.AnnotationRetention.BINARY
 import kotlin.annotation.AnnotationTarget.CLASS
@@ -117,6 +122,22 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                     token.systemNavn)
             })
 
+    /**
+     * Sentral klokke-bønne. Injiser `Clock` i komponenter som trenger nåtid
+     * (i stedet for `Instant.now()` / `LocalDate.now()` direkte) — så blir tid testbart
+     * med `Clock.fixed(...)` eller en mutbar test-klokke.
+     */
+    @Bean
+    fun clock(): Clock = systemDefaultZone()
+
+    /**
+     * Brukes av JPA-auditing (@CreatedDate / @LastModifiedDate) og er knyttet
+     * via `@EnableJpaAuditing(dateTimeProviderRef = AUDITING_TIME_PROVIDER)`.
+     */
+    @Bean(AUDITING_TIME_PROVIDER)
+    fun auditingDateTimeProvider(clock: Clock) =
+        DateTimeProvider { Optional.of(Instant.now(clock)) }
+
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(ansattIdAddingInterceptor)
     }
@@ -127,7 +148,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 
 
     companion object {
-
+        const val AUDITING_TIME_PROVIDER = "auditingDateTimeProvider"
         private val SENSITIVE_KEYS = setOf("password", "secret", "token", "key", "credentials", "jwk", "private_key")
     }
 }

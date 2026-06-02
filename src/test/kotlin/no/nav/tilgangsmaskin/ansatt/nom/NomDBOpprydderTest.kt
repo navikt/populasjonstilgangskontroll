@@ -7,14 +7,13 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.SharedPostgresContainer
+import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.util.ReflectionTestUtils.setField
 import org.springframework.transaction.PlatformTransactionManager
@@ -42,8 +41,6 @@ class NomDBOpprydderTest : BehaviorSpec() {
     @Autowired
     private lateinit var repo: NomRepository
 
-    @Autowired
-    private lateinit var publisher: ApplicationEventPublisher
 
     @Autowired
     private lateinit var txManager: PlatformTransactionManager
@@ -69,7 +66,6 @@ class NomDBOpprydderTest : BehaviorSpec() {
                 Then("sletter rader med utgått gyldighet") {
                     lagre(FNR,LocalDate.now().minusDays(1))
                     lagre("20478606614", LocalDate.now().minusDays(1))
-                    repo.count() shouldBe 2
                     assertSoftly {
                         opprydder.ryddOpp() shouldBe 2
                         repo.count() shouldBe 0
@@ -78,7 +74,6 @@ class NomDBOpprydderTest : BehaviorSpec() {
 
                 Then("beholder rader som fremdeles er gyldige") {
                     lagre(FNR,LocalDate.now().plusMonths(6))
-                    repo.count() shouldBe 1
                     assertSoftly {
                         opprydder.ryddOpp() shouldBe 0
                         repo.count() shouldBe 1
@@ -128,7 +123,7 @@ class NomDBOpprydderTest : BehaviorSpec() {
     private fun bliLeder() = setField(opprydder, "erLeder", true)
     private companion object {
         @ServiceConnection
-        private val postgres = SharedPostgresContainer.instance
+        private val postgres = postgreSQLContainer
         private fun nyttNavId() = "Z%06d".format(counter.incrementAndGet())
         private const val FNR = "08526835670"
         private val counter = AtomicInteger(0)

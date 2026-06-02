@@ -14,8 +14,8 @@ import no.nav.tilgangsmaskin.regler.motor.BrukerOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
+import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
 import org.slf4j.LoggerFactory
@@ -29,7 +29,7 @@ class RegelTjeneste(
     private val motor: RegelMotor,
     private val brukerTjeneste: BrukerTjeneste,
     private val ansattTjeneste: AnsattTjeneste,
-    private val overstyringTjeneste: OverstyringTjeneste,
+    private val enkeltTilgangTjeneste: EnkeltTilgangTjeneste,
     private val auditor: Auditor) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -37,20 +37,16 @@ class RegelTjeneste(
     @WithSpan
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
-            log.info("Sjekker ${RegelType.KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
+            log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
             bruker(brukerId)?.let { bruker ->
-                runCatching {
+                try {
                     motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
-                }.getOrElse {
-                    if (overstyringTjeneste.erOverstyrt(ansattId, bruker.brukerId) && it is RegelException) {
-                        log.trace("Overstyring registrert for {} og {}", ansattId, brukerId.maskFnr(), it)
-                    } else {
-                        log.trace("Tilgang avvist ved kjøring av komplette regler for {} og {}",
-                            ansattId,
-                            brukerId.maskFnr(),
-                            it)
-                        throw it
+                } catch (e: RegelException) {
+                    if (!enkeltTilgangTjeneste.harEnkeltTilgang(ansattId, bruker.brukerId)) {
+                        log.trace("Tilgang avvist ved kjøring av komplette regler for {} og {}", ansattId, brukerId.maskFnr(), e)
+                        throw e
                     }
+                    log.trace("Enkelttilgang registrert for {} og {}", ansattId, brukerId.maskFnr(), e)
                 }
             }
                 ?: log.info("Komplette regler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
@@ -58,17 +54,16 @@ class RegelTjeneste(
         log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
     }
 
-    private fun bruker(brukerId: String) = runCatching {
-        brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
-    }.getOrElse {
-        if (it is NotFoundRestException) {
-            auditor.info("${HttpStatus.NOT_FOUND.name}: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
+    private fun bruker(brukerId: String) =
+        try {
+            brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
+        } catch (e: NotFoundRestException) {
+            auditor.info("${e.status}: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
             null
-        } else {
-            log.warn("Feil ved oppslag av bruker for ${brukerId.maskFnr()}", it)
-            throw it
+        } catch (e: Exception) {
+            log.warn("Feil ved oppslag av bruker for ${brukerId.maskFnr()}", e)
+            throw e
         }
-    }
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])
     @WithSpan
@@ -117,9 +112,9 @@ class RegelTjeneste(
         buildSet {
         val godkjenteIds = buildSet { godkjente.forEach { add(it.brukerId) } }
         for (resultat in resultater) {
-            log.trace("Bulk Sjekker overstyring for avvist {}", resultat.bruker.oppslagId.maskFnr())
+            log.trace("Bulk Sjekker enkelttilgang for avvist {}", resultat.bruker.oppslagId.maskFnr())
             if (resultat.status == HttpStatus.FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
-                log.trace("Bulk resultat for {} har ingen overstyring", resultat.bruker.oppslagId.maskFnr())
+                log.trace("Bulk resultat for {} har ingen enkelttilgangqq", resultat.bruker.oppslagId.maskFnr())
                 add(EnkeltBulkRespons(RegelException(ansatt,
                     brukere.finnBruker(resultat.bruker.oppslagId),
                     resultat.regel!!,
@@ -136,8 +131,8 @@ class RegelTjeneste(
         buildSet {
             val (godkjente, avviste) = resultater.partition { it.status.is2xxSuccessful }
             godkjente.forEach { add(EnkeltBulkRespons.ok(it.bruker.oppslagId)) }
-            overstyringTjeneste
-                .overstyringer(ansatt.ansattId, avviste.map { it.bruker.brukerId })
+            enkeltTilgangTjeneste
+                .tilganger(ansatt.ansattId, avviste.map { it.bruker.brukerId }.toSet())
                 .forEach { add(EnkeltBulkRespons.ok(it.verdi)) }
         }.also { respons ->
             if (respons.isNotEmpty()) {

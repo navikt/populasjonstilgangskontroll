@@ -26,6 +26,7 @@ import org.springframework.graphql.client.HttpSyncGraphQlClient.builder
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
+import org.springframework.kafka.listener.CommonErrorHandler
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
@@ -80,10 +81,13 @@ class PdlBeanConfig {
         )
 
     @Bean(PDL_CONTAINER_FACTORY)
-    fun pdlAvroListenerContainerFactory(consumerFactory: ConsumerFactory<String, Personhendelse>) =
-        ConcurrentKafkaListenerContainerFactory<String, Personhendelse>().apply {
-            setConsumerFactory(consumerFactory)
-        }
+    fun pdlAvroListenerContainerFactory(
+        consumerFactory: ConsumerFactory<String, Personhendelse>,
+        commonErrorHandler: CommonErrorHandler,
+    ) = ConcurrentKafkaListenerContainerFactory<String, Personhendelse>().apply {
+        setConsumerFactory(consumerFactory)
+        setCommonErrorHandler(commonErrorHandler)
+    }
 
     companion object {
         const val PDL_GRADERING_FILTER = "pdlGraderingFilter"
@@ -91,3 +95,4 @@ class PdlBeanConfig {
         private val CREDENTIALS_SOURCE = UserInfoCredentialProvider().alias()
     }
 }
+

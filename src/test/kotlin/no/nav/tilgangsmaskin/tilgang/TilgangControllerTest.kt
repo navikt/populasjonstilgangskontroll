@@ -13,7 +13,7 @@ import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.TokenTypeTeller
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
 import org.springframework.http.HttpStatus.FORBIDDEN
@@ -28,7 +28,7 @@ import java.time.LocalDate
 class TilgangControllerTest : BehaviorSpec() {
 
     @MockK lateinit var regelTjeneste: RegelTjeneste
-    @MockK lateinit var overstyringTjeneste: OverstyringTjeneste
+    @MockK lateinit var enkeltTilgangTjeneste: EnkeltTilgangTjeneste
     @MockK(relaxed = true) lateinit var token: Token
     @MockK lateinit var teller: TokenTypeTeller
 
@@ -42,7 +42,7 @@ class TilgangControllerTest : BehaviorSpec() {
 
         beforeEach {
             clearAllMocks()
-            mockMvc = standaloneSetup(TilgangController(regelTjeneste, overstyringTjeneste, token, teller))
+            mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, TokenTypeGuard(token), teller))
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
                 .build()
             justRun { teller.tell(any<Tags>()) }
@@ -293,9 +293,9 @@ class TilgangControllerTest : BehaviorSpec() {
 
             beforeEach { every { token.erObo } returns true }
 
-            When("overstyr kalles med gyldig request og OBO-token") {
+            When("enkelttilgang kalles med gyldig request og OBO-token") {
                 Then("returnerer 202") {
-                    every { overstyringTjeneste.overstyr(ansattId, any()) } returns true
+                    every { enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattId, any(), any()) } returns true
                     mockMvc.post("/api/v1/overstyr") {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
@@ -303,7 +303,7 @@ class TilgangControllerTest : BehaviorSpec() {
                 }
             }
 
-            When("overstyr kalles med CCF-token") {
+            When("enkelttilgang kalles med CCF-token") {
                 Then("returnerer 403") {
                     every { token.erCC } returns true
                     every { token.erObo } returns false

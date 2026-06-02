@@ -10,14 +10,15 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomJPAAdapter
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
+import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringData
-import no.nav.tilgangsmaskin.regler.overstyring.OverstyringTjeneste
-import no.nav.tilgangsmaskin.regler.overstyring.ValidOverstyring
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangGyldig
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
 import no.nav.tilgangsmaskin.tilgang.dev.DevTilgangController.Companion.DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.http.HttpStatus.ACCEPTED
@@ -35,14 +36,14 @@ import java.util.*
 @Tag(name = "DevTilgangController", description = DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION)
 class DevTilgangController(
     private val graphql: PdlSyncGraphQLClientAdapter,
-    private val overstyring: OverstyringTjeneste,
+    private val enkeltTilgang: EnkeltTilgangTjeneste,
     private val oppfølging: OppfølgingTjeneste,
     private val nom: NomJPAAdapter) {
 
     @PostMapping("oppfolging/{uuid}/avslutt")
     @Operation(summary = SUMMARY_OPPFOLGING_AVSLUTT, description = DESCRIPTION_OPPFOLGING_AVSLUTT)
     fun oppfølgingAvslutt(@RequestBody identer : Identer, @PathVariable uuid: UUID) =
-        oppfølging.avslutt(uuid, identer)
+        oppfølging.avslutt(Oppfølgingsendring.Avsluttet(uuid, identer))
 
     @GetMapping("oppfolging/enhet")
     @Operation(summary = SUMMARY_OPPFOLGING_ENHET, description = DESCRIPTION_OPPFOLGING_ENHET)
@@ -66,20 +67,20 @@ class DevTilgangController(
         nom.fnrForAnsatt(ansattId.verdi)
 
 
-    @PostMapping("overstyr/{ansattId}")
+    @PostMapping("enkelttilgang/{ansattId}")
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse
-    @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
+    @Operation(summary = SUMMARY_ENKELTTILGANG, description = DESCRIPTION_ENKELTTILGANG)
     @Valid
-    fun overstyr(@PathVariable ansattId: AnsattId, @RequestBody  @Valid @ValidOverstyring data: OverstyringData) =
-        overstyring.overstyr(ansattId, data)
+    fun enkelttilgang(@PathVariable ansattId: AnsattId, @RequestBody  @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData) =
+        enkeltTilgang.registrerEnkeltTilgang(ansattId, data,"alle")
 
-    @PostMapping("overstyringer/{ansattId}")
+    @PostMapping("enkelttilganger/{ansattId}")
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse
-    @Operation(summary = SUMMARY_HENT_OVERSTYRINGER, description = DESCRIPTION_HENT_OVERSTYRINGER)
-    fun overstyringer(@PathVariable ansattId: AnsattId, @RequestBody brukerIds: List<BrukerId>) =
-        overstyring.overstyringer(ansattId, brukerIds)
+    @Operation(summary = SUMMARY_HENT_ENKELTTILGANGER, description = DESCRIPTION_HENT_ENKELTTILGANGER)
+    fun enkelttilganger(@PathVariable ansattId: AnsattId, @RequestBody brukerIds: Set<BrukerId>) =
+        enkeltTilgang.tilganger(ansattId, brukerIds)
 
     companion object {
         private const val DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.tilgang.tag.description"
@@ -94,9 +95,9 @@ class DevTilgangController(
         private const val DESCRIPTION_KOBLING = "msg:openapi.dev.tilgang.kobling.description"
         private const val SUMMARY_NOM_FNR = "msg:openapi.dev.tilgang.nom.fnr.summary"
         private const val DESCRIPTION_NOM_FNR = "msg:openapi.dev.tilgang.nom.fnr.description"
-        private const val SUMMARY_OVERSTYR = "msg:openapi.dev.tilgang.overstyr.summary"
-        private const val DESCRIPTION_OVERSTYR = "msg:openapi.dev.tilgang.overstyr.description"
-        private const val SUMMARY_HENT_OVERSTYRINGER = "msg:openapi.dev.tilgang.overstyringer.summary"
-        private const val DESCRIPTION_HENT_OVERSTYRINGER = "msg:openapi.dev.tilgang.overstyringer.description"
+        private const val SUMMARY_ENKELTTILGANG = "msg:openapi.dev.tilgang.enkelttilgang.summary"
+        private const val DESCRIPTION_ENKELTTILGANG = "msg:openapi.dev.tilgang.enkelttilgang.description"
+        private const val SUMMARY_HENT_ENKELTTILGANGER = "msg:openapi.dev.tilgang.enkelttilganger.summary"
+        private const val DESCRIPTION_HENT_ENKELTTILGANGER = "msg:openapi.dev.tilgang.enkelttilganger.description"
     }
 }

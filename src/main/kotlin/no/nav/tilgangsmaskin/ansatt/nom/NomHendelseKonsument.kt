@@ -11,6 +11,10 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.kafka.support.KafkaHeaders
+import org.springframework.kafka.support.KafkaHeaders.OFFSET
+import org.springframework.kafka.support.KafkaHeaders.RECEIVED_PARTITION
+import org.springframework.messaging.handler.annotation.Header
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.LocalDate.EPOCH
@@ -23,27 +27,21 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
     @KafkaListener(
         topics = [NOM_TOPIC],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.nom.NomHendelse"],
-        groupId = NOM, errorHandler = NOM_ERROR_HANDLER, filter = NOM_FNR_FILTER_STRATEGY)
-    fun listen(hendelser: List<NomHendelse>) {
-        log.trace("Mottok ${hendelser.size} hendelse(r) fra NOM")
-        hendelser.forEach { h ->
-            log.trace(CONFIDENTIAL, "Behandler hendelse fra NOM: {}", h)
-            runCatching { nom.lagre(h.ansattData()) }
-                .onSuccess { log.trace("Lagret brukerId ${h.personident.maskFnr()} for ${h.navident} OK") }
-                .onFailure { log.error("Kunne ikke lagre brukerId ${h.personident.maskFnr()} for ${h.navident}", it) }
-        }
-        log.info("${hendelser.size} hendelse(r) fra NOM ferdig behandlet og lagret")
+        groupId = NOM, filter = NOM_FNR_FILTER_STRATEGY)
+    fun listen(hendelse: NomHendelse,
+               @Header(OFFSET) offset: Long,
+               @Header(RECEIVED_PARTITION) partition: Int) =
+        with(hendelse.ansattData()) {
+            log.info("Behandler hendelse $hendelse for $ansattId fra NOM, partition $partition og offset $offset")
+            nom.lagre(this)
+            log.info("Lagret brukerId $brukerId for $ansattId, partition $partition og offset $offset OK")
+            log.info("$ansattId hendelse på partition $partition, offset $offset fra NOM ferdig behandlet og lagret")
     }
 
-    private fun NomHendelse.ansattData() =
-        NomAnsattData(
-            AnsattId(navident),
-            BrukerId(personident),
-            NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: ALLTID)
-        )
 
     companion object {
-        const val NOM_ERROR_HANDLER = "nomErrorHandler"
+        fun NomHendelse.ansattData() =
+            NomAnsattData(AnsattId(navident), BrukerId(personident), NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: ALLTID))
         const val NOM_FNR_FILTER_STRATEGY = "nomFnrFilterStrategy"
         private const val NOM_TOPIC = "org.nom.api-ressurs-state-v4"
     }
@@ -51,10 +49,8 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class NomHendelse(val personident: String,
-                       val navident: String,
-                       val startdato: LocalDate?,
-                       val sluttdato: LocalDate?) {
+data class NomHendelse(val personident: String, val navident: String,
+                       val startdato: LocalDate?, val sluttdato: LocalDate?) {
 
     @NoCoverageAnalysis
     override fun toString() =

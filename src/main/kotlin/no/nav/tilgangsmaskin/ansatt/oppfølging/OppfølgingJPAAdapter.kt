@@ -18,7 +18,7 @@ class OppfølgingJPAAdapter(private val repo: OppfølgingRepository, val entityM
         }
 
     fun enhetFor(id: String) =
-        repo.findByBrukerid(id)?.kontor?.let(::Enhetsnummer) ?: repo.findByAktoerid(id)?.kontor?.let(::Enhetsnummer)
+        (repo.findByBrukerid(id) ?: repo.findByAktoerid(id))?.kontor?.let(::Enhetsnummer)
 
     fun registrer(id: UUID, brukerId: String, aktørId: String, start: Instant, kontor: String) =
         entityManager.createNativeQuery(UPSERT_QUERY)

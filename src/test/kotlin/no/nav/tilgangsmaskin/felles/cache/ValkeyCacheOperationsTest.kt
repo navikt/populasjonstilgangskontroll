@@ -12,7 +12,6 @@ import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
-import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetHendelse
 import java.util.concurrent.CopyOnWriteArrayList
@@ -38,11 +37,12 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import io.kotest.matchers.comparables.shouldBeLessThan
 import org.springframework.context.annotation.Primary
-import java.time.Duration
 import java.time.Duration.ofSeconds
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.measureTime
 
 @DataRedisTest
 @AutoConfigureMetrics
@@ -51,20 +51,19 @@ import kotlin.time.Duration.Companion.seconds
 class ValkeyCacheOperationsTest : BehaviorSpec() {
 
     @TestConfiguration
-    class ValkeyCacheTestConfig(
-        private val cf: RedisConnectionFactory,
-        private val meterRegistry: MeterRegistry) {
+    class ValkeyCacheTestConfig(private val cf: RedisConnectionFactory) {
 
         @Bean
         @Primary
         fun cacheConfig() =
-            CacheConfig("user", "pw", redis.host, redis.firstMappedPort, ofSeconds(1))
+            CacheConfig("unused", "unused", redis.host, redis.firstMappedPort, ofSeconds(5))
 
         @Bean
-        fun cachePingable(cfg: CacheConfig) = CachePingable(cf, cfg)
+        fun redisClient(cfg: CacheConfig) =
+            create("redis://${cfg.host}:${cfg.port}")
 
         @Bean
-        fun cacheManager()  =
+        fun cacheManager() =
             builder(cf)
                 .withInitialCacheConfigurations(
                     mapOf(TEST_CACHE.name to defaultCacheConfig()
@@ -72,19 +71,22 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                         .disableCachingNullValues())
                 )
                 .build()
-                .also { it.getCache(TEST_CACHE.name) }
-
-        @Bean
-        fun redisClient(cfg: CacheConfig)  =
-            create("redis://${cfg.host}:${cfg.port}")
 
         @Bean
         fun cacheNøkkelHandler(mgr: RedisCacheManager) =
             CacheNøkkelMapper(mgr.cacheConfigurations)
 
         @Bean
-        fun cacheClient(client: RedisClient, handler: CacheNøkkelMapper, cfg: CacheConfig, token: Token)  =
-            CacheClient(client, handler, BulkCacheSuksessTeller(meterRegistry, token), BulkCacheTeller(meterRegistry, token), cfg)
+        fun bulkCacheSuksessTeller(meterRegistry: MeterRegistry, token: Token) =
+            BulkCacheSuksessTeller(meterRegistry, token)
+
+        @Bean
+        fun bulkCacheTeller(meterRegistry: MeterRegistry, token: Token) =
+            BulkCacheTeller(meterRegistry, token)
+
+        @Bean
+        fun valkeyCacheClient(client: RedisClient, handler: CacheNøkkelMapper, cfg: CacheConfig, alle: BulkCacheSuksessTeller, bulk: BulkCacheTeller) =
+            ValkeyCacheClient(client, handler, alle, bulk, cfg)
 
         @Bean
         fun cacheElementUtløptLytter(client: RedisClient, publisher: ApplicationEventPublisher) =
@@ -100,11 +102,6 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
     @Autowired
     private lateinit var cache: CacheOperations
 
-    @Autowired
-    private lateinit var pingable: CachePingable
-
-    @Autowired
-    private lateinit var cacheManager: RedisCacheManager
 
     private val events = CopyOnWriteArrayList<CacheInnslagFjernetHendelse>()
 
@@ -120,56 +117,44 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
             every { token.system } returns "test"
             every { token.clusterAndSystem } returns "test:dev-gcp"
             events.clear()
-            cacheManager.getCache(TEST_CACHE.name)?.clear()
-        }
-
-        Given("CachePingable") {
-            When("ping kalles") {
-                Then("returnerer tomt map") {
-                    pingable.ping().shouldBeEmpty()
-                }
-            }
-            When("name og pingEndpoint sjekkes") {
-                Then("har korrekte verdier") {
-                    pingable.name shouldBe "Cache"
-                    pingable.pingEndpoint.toString() shouldBe "${redis.host}:${redis.firstMappedPort}"
-                }
-            }
+            cache.clear(TEST_CACHE)
         }
 
         Given("putMany og getMany") {
             When("verdier legges i cache med kort TTL") {
                 Then("returneres ved oppslag og fjernes etter TTL") {
-                    putMany(T1, T2)
-                    getMany(IDS).keys shouldBe IDS
+                    cache.putMany(TEST_CACHE, arrayOf(T1, T2).associateBy { it.id }, ofSeconds(1))
+                    val many = cache.getMany<TestData>(TEST_CACHE, IDS)
+                    many.keys shouldBe IDS
+                    many.values shouldBe listOf(T1, T2)
                     eventually(TIMEOUTS) {
-                        getMany(IDS).shouldBeEmpty()
+                        cache.getMany<TestData>(TEST_CACHE, IDS).shouldBeEmpty()
                     }
                 }
             }
             When("kalles med tomt set") {
                 Then("returnerer tomt map") {
-                    getMany(emptySet()).shouldBeEmpty()
+                    cache.getMany<TestData>(TEST_CACHE, emptySet()).shouldBeEmpty()
                 }
             }
         }
 
-        Given("delete") {
+        Given("sletting av enkeltinnslag") {
             When("nøkkelen eksisterer") {
                 Then("returnerer 1 og verdien er fjernet") {
-                    putOne(T1)
+                    cache.putOne(TEST_CACHE, T1.id, T1, ofSeconds(2))
                     assertSoftly {
-                        getOne(T1.id).shouldNotBeNull()
-                        delete(T1) shouldBe 1L
-                        getOne(T1.id).shouldBeNull()
+                        cache.getOne<TestData>(TEST_CACHE, T1.id) shouldBe T1
+                        cache.delete(TEST_CACHE, T1.id) shouldBe 1L
+                        cache.getOne<TestData>(TEST_CACHE, T1.id).shouldBeNull()
                     }
                 }
             }
             When("nøkkelen ikke eksisterer") {
                 Then("returnerer 0") {
                     assertSoftly {
-                        getOne(T1.id).shouldBeNull()
-                        cache.delete(TEST_CACHE, T1.id) shouldBe 0L
+                        cache.getOne<TestData>(TEST_CACHE, T1.id).shouldBeNull()
+                        cache.delete(TEST_CACHE, T1.id) shouldBe 0
                     }
                 }
             }
@@ -178,29 +163,104 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
         Given("cache-utløp") {
             When("TTL løper ut") {
                 Then("CacheInnslagFjernetHendelse publiseres") {
-                    putOne(T1, ofSeconds(1))
+                    cache.putOne(TEST_CACHE, T1.id, T1, ofSeconds(1))
                     eventually(TIMEOUTS) {
                         events.any { T1.id in it.nøkkel }.shouldBeTrue()
                     }
                 }
             }
         }
+
+        Given("tømming av cache") {
+            When("cache inneholder verdier") {
+                Then("alle verdier i cachen fjernes") {
+                    cache.putMany(TEST_CACHE, arrayOf(T1, T2).associateBy { it.id }, ofSeconds(1))
+                    cache.getMany<TestData>(TEST_CACHE, IDS).keys shouldBe IDS
+                    cache.clear(TEST_CACHE)
+                    cache.getMany<TestData>(TEST_CACHE, IDS).shouldBeEmpty()
+                }
+            }
+            When("cache er tom") {
+                Then("clear kaster ikke exception") {
+                    cache.clear(TEST_CACHE)
+                    cache.getMany<TestData>(TEST_CACHE, IDS).shouldBeEmpty()
+                }
+            }
+        }
+
+        Given("graceful degradation ved Redis-feil") {
+            When("getOne kalles mot pauset Redis") {
+                Then("returnerer null i stedet for å kaste exception") {
+                    cache.putOne(TEST_CACHE, T1.id, T1, ofSeconds(30))
+                    cache.getOne<TestData>(TEST_CACHE, T1.id) shouldBe T1
+                    redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
+                    try {
+                        cache.getOne<TestData>(TEST_CACHE, T1.id).shouldBeNull()
+                    } finally {
+                        redis.dockerClient.unpauseContainerCmd(redis.containerId).exec()
+                    }
+                }
+            }
+            When("getMany kalles mot pauset Redis") {
+                Then("returnerer tomt map i stedet for å kaste exception") {
+                    cache.putMany(TEST_CACHE, arrayOf(T1, T2).associateBy { it.id }, ofSeconds(30))
+                    redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
+                    try {
+                        cache.getMany<TestData>(TEST_CACHE, IDS).shouldBeEmpty()
+                    } finally {
+                        redis.dockerClient.unpauseContainerCmd(redis.containerId).exec()
+                    }
+                }
+            }
+        }
+
+        Given("antall innslag i cache") {
+            When("cache er tom") {
+                Then("returnerer 0") {
+                    cache.size(TEST_CACHE) shouldBe 0
+                }
+            }
+            When("cache inneholder verdier") {
+                Then("returnerer antall innslag") {
+                    cache.putMany(TEST_CACHE, arrayOf(T1, T2).associateBy { it.id }, ofSeconds(5))
+                    cache.size(TEST_CACHE) shouldBe 2
+                }
+            }
+            When("verdier fjernes") {
+                Then("size oppdateres") {
+                    cache.putMany(TEST_CACHE, arrayOf(T1, T2).associateBy { it.id }, ofSeconds(5))
+                    cache.size(TEST_CACHE) shouldBe 2
+                    cache.delete(TEST_CACHE, T1.id)
+                    cache.size(TEST_CACHE) shouldBe 1
+                }
+            }
+            When("clear kalles") {
+                Then("size blir 0") {
+                    cache.putMany(TEST_CACHE, arrayOf(T1, T2).associateBy { it.id }, ofSeconds(5))
+                    cache.size(TEST_CACHE) shouldBe 2
+                    cache.clear(TEST_CACHE)
+                    cache.size(TEST_CACHE) shouldBe 0
+                }
+            }
+            When("50000 innslag legges inn") {
+                Then("size returnerer 50000 og clear tømmer alt") {
+                    val batchSize = 10_000
+                    (1..50000).chunked(batchSize).forEach { chunk ->
+                        val entries = chunk.associate { "id-$it" to TestData.of("id-$it") }
+                        cache.putMany(TEST_CACHE, entries, ofSeconds(60))
+                    }
+
+                    val elapsed = measureTime {
+                        cache.size(TEST_CACHE) shouldBe 50000
+                    }
+                    elapsed shouldBeLessThan 5.seconds
+
+                    cache.clear(TEST_CACHE)
+                    cache.size(TEST_CACHE) shouldBe 0
+                }
+            }
+        }
     }
-
-    private fun delete(innslag: TestData) =
-        cache.delete(TEST_CACHE, innslag.id)
-
-    private fun putMany(vararg innslag: TestData, duration: Duration = ofSeconds(1)) =
-        cache.putMany(TEST_CACHE, innslag.associateBy { it.id }, duration)
-
-    private fun getMany(ids: Set<String>) =
-        cache.getMany<TestData>(TEST_CACHE, ids)
-
-    private fun putOne(innslag: TestData, duration: Duration = ofSeconds(2)) =
-        cache.putOne(TEST_CACHE, innslag.id, innslag, duration)
-
-    private fun getOne(id: String) =
-        cache.getOne<TestData>(TEST_CACHE, id)
 
     private companion object {
         @ServiceConnection
@@ -208,7 +268,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
         const val I1 = "03508331575"
         const val I2 = "20478606614"
         val IDS = setOf(I1, I2)
-        val TEST_CACHE = CacheNøkkelConfig("cache")
+        val TEST_CACHE = CacheNøkkelConfig("cache", "jalla")
         val T1 = TestData.of(I1)
         val T2 = TestData.of(I2)
         val TIMEOUTS = eventuallyConfig {

@@ -19,7 +19,7 @@ class CachePingableTest : BehaviorSpec({
     )
     val pingable = CachePingable(connectionFactory, cfg)
 
-    Given("ping") {
+    Given("ping mot cache-tilkobling") {
         When("Redis returnerer PONG") {
             Then("kaster ingen feil og lukker connection") {
                 every { connection.ping() } returns "PONG"

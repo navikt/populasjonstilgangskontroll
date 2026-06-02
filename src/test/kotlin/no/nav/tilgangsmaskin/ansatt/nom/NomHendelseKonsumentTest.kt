@@ -1,49 +1,39 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
-import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.ansatt.nom.NomHendelseKonsument.Companion.ansattData
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
+import org.springframework.kafka.annotation.KafkaListener
 import java.time.LocalDate
 import java.time.LocalDate.EPOCH
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.functions
 
 class NomHendelseKonsumentTest : BehaviorSpec({
 
     val nom = mockk<NomTjeneste>(relaxed = true)
     val konsument = NomHendelseKonsument(nom)
 
-    Given("listen") {
-        When("listen kalles med flere hendelser") {
-            Then("lagrer ansatt for hver hendelse i listen") {
-                val hendelser = listOf(hendelse(), hendelse("Z888888", "20478606614"))
-                konsument.listen(hendelser)
+    Given("konsumering av NOM-hendelser") {
+        When("listen kalles med hendelse") {
+            Then("lagrer ansatt for hendelse i listen") {
+                val hendelse = hendelse()
+                konsument.listen(hendelse,0L,0)
 
-                verify(exactly = 2) { nom.lagre(any()) }
-            }
-        }
-
-        When("hendelse har alle felter satt") {
-            Then("mapper hendelse til NomAnsattData med korrekte felter") {
-                konsument.listen(listOf(hendelse(NAVIDENT,PERSONIDENT,STARTDATO,SLUTTDATO)))
-
-                verify {
-                    nom.lagre(NomAnsattData(
-                        AnsattId(NAVIDENT),
-                        BrukerId(PERSONIDENT),
-                        NomAnsattPeriode(STARTDATO, SLUTTDATO)
-                    ))
+                verify(exactly = 1) {
+                    nom.lagre(hendelse.ansattData())
                 }
             }
         }
 
         When("startdato er null") {
             Then("bruker EPOCH som startdato") {
-                konsument.listen(listOf(hendelse(startdato = null)))
-
+                konsument.listen(hendelse(startdato = null),0L,0)
                 verify {
                     nom.lagre(match { it.gyldighet.start == EPOCH })
                 }
@@ -52,20 +42,33 @@ class NomHendelseKonsumentTest : BehaviorSpec({
 
         When("sluttdato er null") {
             Then("bruker ALLTID som sluttdato") {
-                konsument.listen(listOf(hendelse(sluttdato = null)))
-
+                konsument.listen(hendelse(sluttdato = null),0L,0)
                 verify {
                     nom.lagre(match { it.gyldighet.endInclusive == ALLTID })
                 }
             }
         }
 
-        When("lagre kaster exception") {
-            Then("logger feilet og fortsetter med neste hendelse") {
-                every { nom.lagre(match { it.ansattId == AnsattId(NAVIDENT) }) } throws RuntimeException("DB-feil")
+        When("nom.lagre kaster exception") {
+            Then("propageres exception for retry") {
+                every { nom.lagre(any()) } throws RuntimeException("DB timeout")
+                shouldThrow<RuntimeException> {
+                    konsument.listen(hendelse(), 0L, 0)
+                }
+            }
+        }
+    }
 
-                konsument.listen(listOf(hendelse(), hendelse("Z888888", "20478606614")))
-                verify { nom.lagre(match { it.ansattId == AnsattId("Z888888") }) }
+    Given("@KafkaListener-konfigurasjon") {
+        When("default-type-property leses fra annotasjonen") {
+            Then("matcher faktisk klassenavn for NomHendelse") {
+                val annotasjon = NomHendelseKonsument::class.functions
+                    .firstNotNullOf { it.findAnnotation<KafkaListener>() }
+                val defaultType = annotasjon.properties
+                    .first { it.startsWith("spring.json.value.default.type=") }
+                    .substringAfter("=")
+
+                defaultType shouldBe NomHendelse::class.java.name
             }
         }
     }

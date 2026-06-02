@@ -3,18 +3,17 @@ package no.nav.tilgangsmaskin.felles.cache
 import io.lettuce.core.ClientOptions
 import io.lettuce.core.RedisClient
 import io.lettuce.core.SocketOptions
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.cache.annotation.CachingConfigurer
-import org.springframework.cache.interceptor.SimpleCacheErrorHandler
+import org.springframework.cache.interceptor.CacheErrorHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager
-import org.springframework.cache.Cache
-import org.springframework.cache.interceptor.LoggingCacheErrorHandler
 import org.springframework.data.redis.cache.RedisCacheWriter.nonLockingRedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer
@@ -26,13 +25,16 @@ import tools.jackson.module.kotlin.KotlinModule.Builder
 @Configuration(proxyBeanMethods = true)
 @ConditionalOnGCP
 @NoCoverageAnalysis
-class CacheBeanConfig(private val cf: RedisConnectionFactory,
-                      private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
+class CacheBeanConfig(private val cf: RedisConnectionFactory, private val meterRegistry: MeterRegistry,  private val errorHandler: CacheErrorHandler, private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
 
 
     override fun errorHandler() =
-        LoggingCacheErrorHandler(true)
+        errorHandler
 
+
+    @Bean
+    fun cacheSizeBean(cache: CacheOperations) =
+        CacheSizeAware(cfgs.toSet(), cache)
 
     @Bean
     override fun cacheManager() =
@@ -58,15 +60,15 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
         CacheNøkkelMapper(mgr.cacheConfigurations)
 
     @Bean
-    fun cacheHealthIndicator(adapter: CachePingable) =
-        PingableHealthIndicator(adapter)
+    fun cacheHealthIndicator(pingable: CachePingable) =
+        PingableHealthIndicator(pingable)
 
     private fun cacheConfig(cfg: CachableRestConfig) =
         defaultCacheConfig()
             .entryTtl(cfg.varighet)
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))
-            .serializeValuesWith(fromSerializer(GenericJacksonJsonRedisSerializer(VALKEY_MAPPER)))
-            .apply {
+            .serializeValuesWith(fromSerializer(
+                ResilientRedisSerializer(GenericJacksonJsonRedisSerializer(VALKEY_MAPPER), meterRegistry))).apply {
                 if (!cfg.cacheNulls) disableCachingNullValues()
             }
 
@@ -77,4 +79,5 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
         }.build()
     }
 }
+
 

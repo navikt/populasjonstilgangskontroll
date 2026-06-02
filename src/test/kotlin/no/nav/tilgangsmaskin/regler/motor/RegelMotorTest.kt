@@ -1,11 +1,15 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import com.ninjasquad.springmockk.MockkBean
+import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.Called
 import io.mockk.every
@@ -15,6 +19,12 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG_UTLAND
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.AVDØD
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.SKJERMING
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.UKJENT_BOSTED
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
@@ -32,14 +42,16 @@ import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.utils.LocalAuditor
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.motor.RegelMotorTest.RegelMotorTestConfig
 import no.nav.tilgangsmaskin.tilgang.Token
+import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
+import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.Import
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.FORBIDDEN
+import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
 import java.time.LocalDate.now
@@ -49,7 +61,7 @@ import java.util.UUID
 @AutoConfigureMetrics
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
 @ContextConfiguration(classes = [LocalAuditor::class])
-@Import(RegelMotorTestConfig::class)
+@ComponentScan("no.nav.tilgangsmaskin.regler.motor")
 @ApplyExtension(SpringExtension::class)
 class RegelMotorTest : BehaviorSpec() {
 
@@ -74,9 +86,6 @@ class RegelMotorTest : BehaviorSpec() {
     @Autowired
     private lateinit var regelMotor: RegelMotor
 
-    @TestConfiguration
-    @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
-    class RegelMotorTestConfig
 
     init {
 
@@ -96,14 +105,14 @@ class RegelMotorTest : BehaviorSpec() {
             val bruker = BrukerBuilder(brukerId).build()
             When("ansatt er medlem av strengt fortrolig") {
                 Then("Tilgang gis") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.STRENGT_FORTROLIG).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
                     ansatt kanBehandle bruker
                 }
             }
 
             When("ansatt er medlem av fortrolig") {
                 Then("Tilgang gis") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.FORTROLIG).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
                     ansatt kanBehandle bruker
                 }
             }
@@ -117,7 +126,7 @@ class RegelMotorTest : BehaviorSpec() {
         }
 
         Given("bruker har strengt fortrolig beskyttelse") {
-            val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(EntraGlobalGruppe.STRENGT_FORTROLIG).build()
+            val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build()
             When("Ansatt har ingen spesialtilganger") {
                 Then("streng fortrolig-regel avviser tilgang") {
                     val ansatt = AnsattBuilder(ansattId).build()
@@ -127,24 +136,24 @@ class RegelMotorTest : BehaviorSpec() {
 
             When("ansatt er medlem av fortrolig") {
                 Then("streng fortrolig-regel avviser tilgang") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.FORTROLIG).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
                     forventAvvistAv<StrengtFortroligRegel>(ansatt, bruker)
                 }
             }
 
             When("ansatt er medlem av streng fortrolig") {
                 Then("tilgang gis") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.STRENGT_FORTROLIG).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
                     ansatt kanBehandle bruker
                 }
             }
         }
 
         Given("bruker har fortrolig beskyttelse") {
-            val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(EntraGlobalGruppe.FORTROLIG).build()
+            val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(FORTROLIG).build()
             When("ansatt er medlem av strengt fortrolig") {
                 Then("fortrolig-regel avviser tilgang") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.STRENGT_FORTROLIG).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
                     forventAvvistAv<FortroligRegel>(ansatt, bruker)
                 }
             }
@@ -158,7 +167,7 @@ class RegelMotorTest : BehaviorSpec() {
 
             When("ansatt er medlem av fortrolig") {
                 Then("tilgang gis") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.FORTROLIG).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
                     ansatt kanBehandle bruker
                 }
             }
@@ -167,8 +176,8 @@ class RegelMotorTest : BehaviorSpec() {
         Given("bruker er skjermet") {
             When("ansatt er medlem av skjerming") {
                 Then("tilgang gis") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.SKJERMING).build()
-                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(EntraGlobalGruppe.SKJERMING).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(SKJERMING).build()
+                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(SKJERMING).build()
                     ansatt kanBehandle bruker
                 }
             }
@@ -176,10 +185,10 @@ class RegelMotorTest : BehaviorSpec() {
             When("bruker i tillegg har fortrolig beskyttelse") {
                 And("ansatt er medlem av skjerming og fortrolig") {
                     Then("tilgang gis") {
-                        val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.FORTROLIG,
-                            EntraGlobalGruppe.SKJERMING).build()
-                        val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(EntraGlobalGruppe.FORTROLIG,
-                            EntraGlobalGruppe.SKJERMING).build()
+                        val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG,
+                            SKJERMING).build()
+                        val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(FORTROLIG,
+                            SKJERMING).build()
                         ansatt kanBehandle bruker
                     }
                 }
@@ -188,19 +197,19 @@ class RegelMotorTest : BehaviorSpec() {
             When("bruker i tillegg har strengt fortrolig beskyttelse") {
                 And("ansatt er medlem av skjerming og strengt fortrolig") {
                     Then("tilgang gis") {
-                        val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.STRENGT_FORTROLIG,
-                            EntraGlobalGruppe.SKJERMING).build()
-                        val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(EntraGlobalGruppe.STRENGT_FORTROLIG,
-                            EntraGlobalGruppe.SKJERMING).build()
+                        val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG,
+                            SKJERMING).build()
+                        val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG,
+                            SKJERMING).build()
                         ansatt kanBehandle bruker
                     }
                 }
 
                 And("ansatt er kun medlem av skjerming") {
                     Then("strengt fortrolig-regel avviser tilgang") {
-                        val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.SKJERMING).build()
-                        val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(EntraGlobalGruppe.STRENGT_FORTROLIG,
-                            EntraGlobalGruppe.SKJERMING).build()
+                        val ansatt = AnsattBuilder(ansattId).medMedlemskapI(SKJERMING).build()
+                        val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG,
+                            SKJERMING).build()
                         forventAvvistAv<StrengtFortroligRegel>(ansatt, bruker)
                     }
                 }
@@ -208,18 +217,18 @@ class RegelMotorTest : BehaviorSpec() {
 
             When("bruker i tillegg har fortrolig beskyttelse og ansatt er kun medlem av skjerming") {
                 Then("fortrolig regel avviser tilgang") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.SKJERMING).build()
-                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(EntraGlobalGruppe.FORTROLIG,
-                        EntraGlobalGruppe.SKJERMING).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(SKJERMING).build()
+                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(FORTROLIG,
+                        SKJERMING).build()
                     forventAvvistAv<FortroligRegel>(ansatt, bruker)
                 }
             }
 
             When("bruker i tillegg har strengt fortrolig beskyttelse og ansatt er medlem av fortrolig") {
                 Then("strengt fortrolig-regel avviser tilgang") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.FORTROLIG).build()
-                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(EntraGlobalGruppe.STRENGT_FORTROLIG,
-                        EntraGlobalGruppe.SKJERMING).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
+                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG,
+                        SKJERMING).build()
                     forventAvvistAv<StrengtFortroligRegel>(ansatt, bruker)
                 }
             }
@@ -227,31 +236,31 @@ class RegelMotorTest : BehaviorSpec() {
             When("ansatt har ingen spesialtilganger") {
                 Then("skjerming-regel avviser tilgang") {
                     val ansatt = AnsattBuilder(ansattId).build()
-                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(EntraGlobalGruppe.SKJERMING).build()
+                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(SKJERMING).build()
                     forventAvvistAv<SkjermingRegel>(ansatt, bruker)
                 }
             }
 
             When("ansatt er medlem av skjerming og er den samme som bruker") {
                 Then("egne data-regel avviser tilgang") {
-                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(EntraGlobalGruppe.SKJERMING).build()
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.SKJERMING).bruker(bruker).build()
+                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(SKJERMING).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(SKJERMING).bruker(bruker).build()
                     forventAvvistAv<EgneDataRegel>(ansatt, bruker)
                 }
             }
 
             When("ansatt er medlem av fortrolig") {
                 Then("skjerming-regel avviser tilgang") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.FORTROLIG).build()
-                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(EntraGlobalGruppe.SKJERMING).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
+                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(SKJERMING).build()
                     forventAvvistAv<SkjermingRegel>(ansatt, bruker)
                 }
             }
 
             When("ansatt er medlem av strengt fortrolig") {
                 Then("skjerming-regel avviser tilgang") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.STRENGT_FORTROLIG).build()
-                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(EntraGlobalGruppe.SKJERMING).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
+                    val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(SKJERMING).build()
                     forventAvvistAv<SkjermingRegel>(ansatt, bruker)
                 }
             }
@@ -279,7 +288,7 @@ class RegelMotorTest : BehaviorSpec() {
 
             When("ansatt er medlem av utenlandsk") {
                 Then("tilgang gis") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.UTENLANDSK).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UTENLANDSK).build()
                     ansatt kanBehandle bruker
                 }
             }
@@ -296,17 +305,17 @@ class RegelMotorTest : BehaviorSpec() {
 
             When("ansatt er medlem av fortrolig") {
                 Then("tilgang avvises av strengt fortrolig utland-regel") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.FORTROLIG).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
                     forventAvvistAv<StrengtFortroligUtlandRegel>(ansatt, bruker)
                 }
             }
         }
 
         Given("bruker har ukjent bosted") {
-            val bruker = BrukerBuilder(brukerId, UkjentBosted()).kreverMedlemskapI(EntraGlobalGruppe.UKJENT_BOSTED).build()
+            val bruker = BrukerBuilder(brukerId, UkjentBosted()).kreverMedlemskapI(UKJENT_BOSTED).build()
             When("ansatt er medlem av ukjent bosted") {
                 Then("tilgang gis") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.UKJENT_BOSTED).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UKJENT_BOSTED).build()
                     ansatt kanBehandle bruker
                 }
             }
@@ -433,7 +442,7 @@ class RegelMotorTest : BehaviorSpec() {
         Given("bruker har utenlandsk eller ukjent tilknytning") {
             When("ansatt er medlem av strengt fortrolig") {
                 Then("bruker med strengt fortrolig utland beskyttelse kan behandles") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.STRENGT_FORTROLIG).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
                     val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
                     ansatt kanBehandle bruker
                 }
@@ -441,7 +450,7 @@ class RegelMotorTest : BehaviorSpec() {
 
             When("ansatt er medlem av fortrolig") {
                 Then("bruker med strengt fortrolig utland beskyttelse kan ikke behandles") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.FORTROLIG).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
                     val bruker = BrukerBuilder(brukerId).kreverMedlemskapI(STRENGT_FORTROLIG_UTLAND).build()
                     forventAvvistAv<StrengtFortroligUtlandRegel>(ansatt, bruker)
                 }
@@ -479,7 +488,7 @@ class RegelMotorTest : BehaviorSpec() {
                 val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(15)).build()
 
                 Then("tilgang gis") {
-                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.AVDØD).build()
+                    val ansatt = AnsattBuilder(ansattId).medMedlemskapI(AVDØD).build()
                     ansatt kanBehandle bruker
                 }
             }
@@ -523,6 +532,112 @@ class RegelMotorTest : BehaviorSpec() {
                     val ansatt = AnsattBuilder(ansattId).build()
                     val bruker = BrukerBuilder(brukerId).build()
                     ansatt kanBehandle bruker
+                }
+            }
+        }
+
+        Given("bulkRegler") {
+            When("alle brukere passerer reglene") {
+                Then("alle returneres som ok") {
+                    val ansatt = AnsattBuilder(ansattId).build()
+                    val bruker1 = BrukerBuilder(brukerId).build()
+                    val bruker2 = BrukerBuilder(BrukerId("08526835644")).build()
+                    val resultater = regelMotor.bulkRegler(ansatt, setOf(
+                        BrukerOgRegelsett(bruker1, KOMPLETT_REGELTYPE),
+                        BrukerOgRegelsett(bruker2, KOMPLETT_REGELTYPE)
+                    ))
+                    assertSoftly(resultater) {
+                        shouldHaveSize(2)
+                        all { it.status == NO_CONTENT } shouldBe true
+                    }
+                }
+            }
+
+            When("en bruker avvises av regel") {
+                Then("avvist bruker får FORBIDDEN, godkjent bruker får NO_CONTENT") {
+                    val ansatt = AnsattBuilder(ansattId).build()
+                    val godkjentBruker = BrukerBuilder(brukerId).build()
+                    val avvistBruker = BrukerBuilder(BrukerId("08526835644"))
+                        .kreverMedlemskapI(STRENGT_FORTROLIG).build()
+                    val resultater = regelMotor.bulkRegler(ansatt, setOf(
+                        BrukerOgRegelsett(godkjentBruker, KOMPLETT_REGELTYPE),
+                        BrukerOgRegelsett(avvistBruker, KOMPLETT_REGELTYPE)
+                    ))
+                    assertSoftly(resultater) {
+                        shouldHaveSize(2)
+                        single { it.bruker == godkjentBruker }.status shouldBe NO_CONTENT
+                        single { it.bruker == avvistBruker }.status shouldBe FORBIDDEN
+                        single { it.bruker == avvistBruker }.regel.shouldBeInstanceOf<StrengtFortroligRegel>()
+                    }
+                }
+            }
+
+            When("enkelt bruker evalueres") {
+                Then("evalueringstype er ENKELT") {
+                    val ansatt = AnsattBuilder(ansattId).build()
+                    val bruker = BrukerBuilder(brukerId).build()
+                    val resultater = regelMotor.bulkRegler(ansatt, setOf(BrukerOgRegelsett(bruker, KOMPLETT_REGELTYPE)))
+                    assertSoftly(resultater) {
+                        shouldHaveSize(1)
+                        single().status shouldBe NO_CONTENT
+                    }
+                }
+            }
+
+            When("tomt sett med brukere") {
+                Then("returneres tomt sett") {
+                    val ansatt = AnsattBuilder(ansattId).build()
+                    regelMotor.bulkRegler(ansatt, emptySet()).shouldBeEmpty()
+                }
+            }
+
+            When("bruker evalueres med KJERNE_REGELTYPE") {
+                Then("kun kjerneregler evalueres") {
+                    val ansatt = AnsattBuilder(ansattId).build()
+                    val bruker = BrukerBuilder(brukerId).build()
+                    val resultater = regelMotor.bulkRegler(ansatt, setOf(BrukerOgRegelsett(bruker, KJERNE_REGELTYPE)))
+                    assertSoftly(resultater) {
+                        shouldHaveSize(1)
+                        single().status shouldBe NO_CONTENT
+                    }
+                }
+            }
+
+            When("brukere evalueres med forskjellige regeltyper") {
+                Then("hver bruker evalueres mot sitt eget regelsett") {
+                    val ansatt = AnsattBuilder(ansattId).build()
+                    val vanligBruker = BrukerBuilder(brukerId).build()
+                    val utlandsBruker = BrukerBuilder(BrukerId("08526835644"))
+                        .gt(UtenlandskTilknytning()).build()
+
+                    val resultater = regelMotor.bulkRegler(ansatt, setOf(
+                        BrukerOgRegelsett(vanligBruker, KOMPLETT_REGELTYPE),
+                        BrukerOgRegelsett(utlandsBruker, KJERNE_REGELTYPE)
+                    ))
+
+                    assertSoftly(resultater) {
+                        shouldHaveSize(2)
+                        single { it.bruker == vanligBruker }.status shouldBe NO_CONTENT
+                        single { it.bruker == utlandsBruker }.status shouldBe NO_CONTENT
+                    }
+                }
+            }
+
+            When("samme bruker hadde blitt avvist med komplett regelsett") {
+                Then("utlandsBruker avvises av UtlandRegel med KOMPLETT_REGELTYPE") {
+                    val ansatt = AnsattBuilder(ansattId).build()
+                    val utlandsBruker = BrukerBuilder(BrukerId("08526835644"))
+                        .gt(UtenlandskTilknytning()).build()
+
+                    val resultater = regelMotor.bulkRegler(ansatt, setOf(
+                        BrukerOgRegelsett(utlandsBruker, KOMPLETT_REGELTYPE)
+                    ))
+
+                    assertSoftly(resultater) {
+                        shouldHaveSize(1)
+                        single().status shouldBe FORBIDDEN
+                        single().regel.shouldBeInstanceOf<UtlandRegel>()
+                    }
                 }
             }
         }

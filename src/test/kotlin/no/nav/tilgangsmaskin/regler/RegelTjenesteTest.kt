@@ -33,6 +33,7 @@ class RegelTjenesteTest : BehaviorSpec() {
 
     init {
         val vanligBrukerId = BrukerId("08526835670")
+        val vanligBruker = BrukerBuilder(vanligBrukerId).build()
         val ansattId = AnsattId("Z999999")
 
         lateinit var regler: RegelTjeneste
@@ -126,7 +127,9 @@ class RegelTjenesteTest : BehaviorSpec() {
             When("bruker ikke finnes i PDL") {
                 Then("gis tilgang") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } throws NotFoundRestException(URI.create("http://pdl"))
-                    shouldNotThrowAny { regler.kompletteRegler(ansattId, vanligBrukerId.verdi) }
+                    shouldNotThrowAny {
+                        regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
+                    }
                 }
             }
             When("PDL-oppslag kaster annen exception") {

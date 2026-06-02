@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import com.ninjasquad.springmockk.MockkBean
+import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.ApplyExtension
@@ -49,6 +50,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.FORBIDDEN
+import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
 import java.time.LocalDate.now
@@ -543,8 +546,10 @@ class RegelMotorTest : BehaviorSpec() {
                         BrukerOgRegelsett(bruker1, KOMPLETT_REGELTYPE),
                         BrukerOgRegelsett(bruker2, KOMPLETT_REGELTYPE)
                     ))
-                    resultater shouldHaveSize 2
-                    resultater.all { it.status == HttpStatus.NO_CONTENT } shouldBe true
+                    assertSoftly(resultater) {
+                        shouldHaveSize(2)
+                        all { it.status == NO_CONTENT } shouldBe true
+                    }
                 }
             }
 
@@ -558,10 +563,12 @@ class RegelMotorTest : BehaviorSpec() {
                         BrukerOgRegelsett(godkjentBruker, KOMPLETT_REGELTYPE),
                         BrukerOgRegelsett(avvistBruker, KOMPLETT_REGELTYPE)
                     ))
-                    resultater shouldHaveSize 2
-                    resultater.single { it.bruker == godkjentBruker }.status shouldBe HttpStatus.NO_CONTENT
-                    resultater.single { it.bruker == avvistBruker }.status shouldBe HttpStatus.FORBIDDEN
-                    resultater.single { it.bruker == avvistBruker }.regel.shouldBeInstanceOf<StrengtFortroligRegel>()
+                    assertSoftly(resultater) {
+                        shouldHaveSize(2)
+                        single { it.bruker == godkjentBruker }.status shouldBe NO_CONTENT
+                        single { it.bruker == avvistBruker }.status shouldBe FORBIDDEN
+                        single { it.bruker == avvistBruker }.regel.shouldBeInstanceOf<StrengtFortroligRegel>()
+                    }
                 }
             }
 
@@ -570,8 +577,10 @@ class RegelMotorTest : BehaviorSpec() {
                     val ansatt = AnsattBuilder(ansattId).build()
                     val bruker = BrukerBuilder(brukerId).build()
                     val resultater = regelMotor.bulkRegler(ansatt, setOf(BrukerOgRegelsett(bruker, KOMPLETT_REGELTYPE)))
-                    resultater shouldHaveSize 1
-                    resultater.single().status shouldBe HttpStatus.NO_CONTENT
+                    assertSoftly(resultater) {
+                        shouldHaveSize(1)
+                        single().status shouldBe NO_CONTENT
+                    }
                 }
             }
 
@@ -587,8 +596,48 @@ class RegelMotorTest : BehaviorSpec() {
                     val ansatt = AnsattBuilder(ansattId).build()
                     val bruker = BrukerBuilder(brukerId).build()
                     val resultater = regelMotor.bulkRegler(ansatt, setOf(BrukerOgRegelsett(bruker, KJERNE_REGELTYPE)))
-                    resultater shouldHaveSize 1
-                    resultater.single().status shouldBe HttpStatus.NO_CONTENT
+                    assertSoftly(resultater) {
+                        shouldHaveSize(1)
+                        single().status shouldBe NO_CONTENT
+                    }
+                }
+            }
+
+            When("brukere evalueres med forskjellige regeltyper") {
+                Then("hver bruker evalueres mot sitt eget regelsett") {
+                    val ansatt = AnsattBuilder(ansattId).build()
+                    val vanligBruker = BrukerBuilder(brukerId).build()
+                    val utlandsBruker = BrukerBuilder(BrukerId("08526835644"))
+                        .gt(UtenlandskTilknytning()).build()
+
+                    val resultater = regelMotor.bulkRegler(ansatt, setOf(
+                        BrukerOgRegelsett(vanligBruker, KOMPLETT_REGELTYPE),
+                        BrukerOgRegelsett(utlandsBruker, KJERNE_REGELTYPE)
+                    ))
+
+                    assertSoftly(resultater) {
+                        shouldHaveSize(2)
+                        single { it.bruker == vanligBruker }.status shouldBe NO_CONTENT
+                        single { it.bruker == utlandsBruker }.status shouldBe NO_CONTENT
+                    }
+                }
+            }
+
+            When("samme bruker hadde blitt avvist med komplett regelsett") {
+                Then("utlandsBruker avvises av UtlandRegel med KOMPLETT_REGELTYPE") {
+                    val ansatt = AnsattBuilder(ansattId).build()
+                    val utlandsBruker = BrukerBuilder(BrukerId("08526835644"))
+                        .gt(UtenlandskTilknytning()).build()
+
+                    val resultater = regelMotor.bulkRegler(ansatt, setOf(
+                        BrukerOgRegelsett(utlandsBruker, KOMPLETT_REGELTYPE)
+                    ))
+
+                    assertSoftly(resultater) {
+                        shouldHaveSize(1)
+                        single().status shouldBe FORBIDDEN
+                        single().regel.shouldBeInstanceOf<UtlandRegel>()
+                    }
                 }
             }
         }

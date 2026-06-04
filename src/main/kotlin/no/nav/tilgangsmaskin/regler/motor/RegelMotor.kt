@@ -15,7 +15,6 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.OVERSTYRBAR_REGELTYPE
-import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.TELLENDE_REGELTYPE
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.FORBIDDEN
@@ -74,7 +73,6 @@ class RegelMotor(
             KJERNE_REGELTYPE -> kjerne
             KOMPLETT_REGELTYPE -> komplett
             OVERSTYRBAR_REGELTYPE -> komplett.regler.filterIsInstance<OverstyrbarRegel>().let { RegelSett(OVERSTYRBAR_REGELTYPE to it) }
-            TELLENDE_REGELTYPE -> komplett.regler.filterIsInstance<TellendeRegel>().let { RegelSett(TELLENDE_REGELTYPE to it) }
         }
 
     @NoCoverageAnalysis

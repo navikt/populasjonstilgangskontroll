@@ -44,19 +44,17 @@ class UtlandRegel : GlobalGruppeMedlemskapRegel(UTENLANDSK), OverstyrbarRegel {
 
 
 @SortertRegel(LOWEST_PRECEDENCE - 3)
-@ConditionalOnNotProd
 class AvdødBrukerRegel : OverstyrbarRegel {
 
     override val metadata = RegelMetadata(AVDØD_MER_ENN_ETT_ÅR)
 
     override fun evaluer(ansatt: Ansatt, bruker: Bruker)  =
-         avvisHvis {
+        avvisHvis {
             bruker harVærtDødMerEnn 1.år && ansatt ikkeErMedlemAv AVDØD
         }
 }
 
 @SortertRegel(LOWEST_PRECEDENCE - 4)
-@ConditionalOnNotProd
 class VergemålRegel(private val vergemål: VergemålTjeneste) : OverstyrbarRegel {
 
     override val metadata = RegelMetadata(VERGEMÅL)

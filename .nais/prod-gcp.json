@@ -203,6 +203,11 @@
       "name": "infotrygd-brukeroppslag-backend",
       "namespace": "infotrygd",
       "cluster": "prod-fss"
+    },
+    {
+      "name": "sokos-oppgjorsrapporter",
+      "namespace": "oppgjorsrapporter",
+      "cluster": "prod-gcp"
     }
 
   ],

@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import com.ninjasquad.springmockk.MockkBean
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
@@ -27,20 +28,23 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlTjenesteTest.PdlTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.*
+import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.client.ExpectedCount.never
+import org.springframework.test.web.client.ExpectedCount.times
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
+import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.client.RestClient.Builder
 import tools.jackson.databind.json.JsonMapper
@@ -60,19 +64,22 @@ class PdlTjenesteTest : BehaviorSpec() {
         fun pdlClient(builder: Builder, cfg: PdlConfig) = createClient<PdlPipClient>(cfg, builder)
     }
 
-    @MockkBean lateinit var graphQL: PdlSyncGraphQLClientAdapter
+    @MockkBean
+    lateinit var graphQL: PdlSyncGraphQLClientAdapter
 
     @Autowired lateinit var pdl: PdlTjeneste
     @Autowired
     lateinit var server: MockRestServiceServer
-    @Autowired lateinit var cfg: PdlConfig
-    @Qualifier("cacheOperations") @Autowired lateinit var cache: CacheOperations
+    @Autowired
+    lateinit var cfg: PdlConfig
+    @Autowired
+    lateinit var cache: CacheOperations
     @Autowired lateinit var mapper: JsonMapper
 
     init {
         beforeEach {
             server.reset()
-            cache.clear(PDL_CACHES)
+            cache.clearAll(PDL_CACHES)
             every { graphQL.partnere(any()) } returns emptySet()
         }
 
@@ -88,6 +95,13 @@ class PdlTjenesteTest : BehaviorSpec() {
                         .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
                     pdl.medFamilie(I1) shouldBe P1
                     cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, I1) shouldBe P1
+                }
+            }
+            When("person er cachet") {
+                Then("REST kalles ikke") {
+                    cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(2))
+                    server.expect(never(), requestTo(cfg.personURI))
+                    pdl.medFamilie(I1) shouldBe P1
                 }
             }
         }
@@ -177,6 +191,37 @@ class PdlTjenesteTest : BehaviorSpec() {
                 Then("REST kalles ikke") {
                     server.expect(never(), requestTo(cfg.personerURI))
                     pdl.personer(emptySet()).shouldBeEmpty()
+                }
+            }
+        }
+
+        Given("separate cacher for medFamilie og medUtvidetFamilie") {
+            When("person er cachet i medFamilie-cache") {
+                Then("medUtvidetFamilie kaller REST likevel") {
+                    cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(2))
+                    server.expect(requestTo(cfg.personURI))
+                        .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
+                    pdl.medUtvidetFamilie(I1) shouldBe P1
+                }
+            }
+            When("person er cachet i medUtvidetFamilie-cache") {
+                Then("medFamilie kaller REST likevel") {
+                    cache.putOne(PDL_MED_UTVIDET_FAMILIE_CACHE, I1, P1, ofSeconds(2))
+                    server.expect(requestTo(cfg.personURI))
+                        .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
+                    pdl.medFamilie(I1) shouldBe P1
+                }
+            }
+        }
+
+        Given("feilhåndtering") {
+            When("PDL returnerer 500") {
+                Then("kastes RecoverableRestException etter retries") {
+                    server.expect(times(4), requestTo(cfg.personURI))
+                        .andRespond(withStatus(INTERNAL_SERVER_ERROR))
+                    shouldThrow<RecoverableRestException> {
+                        pdl.medFamilie(I1)
+                    }
                 }
             }
         }

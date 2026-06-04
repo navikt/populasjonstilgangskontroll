@@ -65,7 +65,7 @@ class EntraTjenesteTest : BehaviorSpec() {
 
         beforeEach {
             server.reset()
-            cache.clear(ENTRA_CACHES)
+            cache.clearAll(ENTRA_CACHES)
         }
 
         afterEach {

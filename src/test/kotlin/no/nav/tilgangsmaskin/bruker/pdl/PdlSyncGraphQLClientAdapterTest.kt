@@ -10,6 +10,8 @@ import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.INGEN
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.TIDLIGERE_PARTNER
 import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.GIFT
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype.UGIFT
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapterTest.GraphQLTestConfig
@@ -70,7 +72,7 @@ class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
         Given("oppslag av partnere fra PDL") {
             When("sivilstand er GIFT") {
                 Then("returneres PARTNER") {
-                    server.expect(requestTo(cfg.baseUri)).andRespond(withSuccess(sivilstandRespons(Sivilstandstype.GIFT), APPLICATION_JSON))
+                    server.expect(requestTo(cfg.baseUri)).andRespond(withSuccess(sivilstandRespons(GIFT), APPLICATION_JSON))
                     adapter.partnere("Z999999").single().relasjon shouldBe PARTNER
                 }
             }
@@ -88,7 +90,7 @@ class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
             }
             When("sivilstand er UGIFT med partner-ident") {
                 Then("returneres INGEN") {
-                    server.expect(requestTo(cfg.baseUri)).andRespond(withSuccess(sivilstandRespons(Sivilstandstype.UGIFT), APPLICATION_JSON))
+                    server.expect(requestTo(cfg.baseUri)).andRespond(withSuccess(sivilstandRespons(UGIFT), APPLICATION_JSON))
                     adapter.partnere("Z999999").single().relasjon shouldBe INGEN
                 }
             }
@@ -113,7 +115,7 @@ class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
                 Then("inneholder header behandlingsnummer med verdi B897") {
                     server.expect(requestTo(cfg.baseUri))
                         .andExpect(header("behandlingsnummer", "B897"))
-                        .andRespond(withSuccess(sivilstandRespons(Sivilstandstype.GIFT), APPLICATION_JSON))
+                        .andRespond(withSuccess(sivilstandRespons(GIFT), APPLICATION_JSON))
                     adapter.partnere("Z999999")
                 }
             }

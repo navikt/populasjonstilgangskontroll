@@ -32,9 +32,15 @@ class EnkeltTilgangClientValidatorTest : BehaviorSpec({
     Given("EnkeltTilgangDevClientValidator (fallback)") {
         When("hvilken som helst konsument") {
             Then("slipper alt gjennom") {
-                shouldNotThrowAny { devValidator.valider("ukjent-system") }
-                shouldNotThrowAny { devValidator.valider("") }
-                shouldNotThrowAny { devValidator.valider(cfg.systemer.first()) }
+                shouldNotThrowAny {
+                    devValidator.valider("ukjent-system")
+                }
+                shouldNotThrowAny {
+                    devValidator.valider("")
+                }
+                shouldNotThrowAny {
+                    devValidator.valider(cfg.systemer.first())
+                }
             }
         }
     }

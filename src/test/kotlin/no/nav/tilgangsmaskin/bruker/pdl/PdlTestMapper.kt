@@ -33,9 +33,9 @@ object PdlTestMapper {
 
     fun pdlRespons(p: Person) = PdlPipRespons(
         PdlPerson(
-            adressebeskyttelse = p.graderinger.map { tilPdlGradering(it) }.map { PdlAdressebeskyttelse(it) },
-            doedsfall          = listOfNotNull(p.dødsdato?.let { PdlDødsfall(it) }),
-            familierelasjoner  = tilFamilierelasjoner(p.familie).values.flatten()
+             p.graderinger.map { tilPdlGradering(it) }.map { PdlAdressebeskyttelse(it) },
+            listOfNotNull(p.dødsdato?.let { PdlDødsfall(it) }),
+            tilFamilierelasjoner(p.familie).values.flatten()
         ),
         PdlIdenter(
             buildList {

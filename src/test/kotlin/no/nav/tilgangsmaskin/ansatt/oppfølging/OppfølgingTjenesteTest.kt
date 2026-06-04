@@ -53,9 +53,11 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
     @TestConfiguration
     class OppfølgingTestConfig : CacheTestConfig(OPPFØLGING)
 
-    @MockkBean private lateinit var token: Token
+    @MockkBean
+    private lateinit var token: Token
 
-    @MockkBean(relaxed = true) private lateinit var teller: OppfølgingkontorTeller
+    @MockkBean(relaxed = true)
+    private lateinit var teller: OppfølgingkontorTeller
 
     @MockkSpyBean
     private lateinit var adapter: OppfølgingJPAAdapter

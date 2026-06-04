@@ -5,7 +5,6 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.collections.shouldNotContain
-import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.mockk.clearMocks
 import io.mockk.every
@@ -25,14 +24,8 @@ class BrukerTjenesteTest : BehaviorSpec({
     val skjerming = mockk<SkjermingTjeneste>()
     val brukerTjeneste = BrukerTjeneste(pdl, skjerming)
 
-    val id1      = BrukerId("08526835670")
-    val id2      = BrukerId("20478606614")
-    val aktørId1 = AktørId("1111111111111")
-    val aktørId2 = AktørId("2222222222222")
-    val kommuneGT = KommuneTilknytning(Kommune("0301"))
-
-    fun person(brukerId: BrukerId, aktørId: AktørId, gt: GeografiskTilknytning = kommuneGT) =
-        Person(brukerId = brukerId, aktørId = aktørId, geoTilknytning = gt)
+    fun person(brukerId: BrukerId, aktørId: AktørId, gt: GeografiskTilknytning = KOMMUNE_GT) =
+        Person(brukerId, aktørId = aktørId, geoTilknytning = gt)
 
     beforeEach { clearMocks(pdl, skjerming) }
 
@@ -49,10 +42,9 @@ class BrukerTjenesteTest : BehaviorSpec({
             Then("returneres bruker uten SKJERMING-gruppe") {
                 every { pdl.personer(setOf(id1.verdi)) } returns setOf(person(id1, aktørId1))
                 every { skjerming.skjerminger(listOf(id1)) } returns mapOf(id1 to false)
-                val result = brukerTjeneste.brukere(setOf(id1.verdi)).single()
-                assertSoftly {
-                    result.brukerId shouldBe id1
-                    result.påkrevdeGrupper shouldNotContain SKJERMING
+                assertSoftly(brukerTjeneste.brukere(setOf(id1.verdi)).single()) {
+                    it.brukerId shouldBe id1
+                    it.påkrevdeGrupper shouldNotContain SKJERMING
                 }
             }
         }
@@ -60,18 +52,17 @@ class BrukerTjenesteTest : BehaviorSpec({
             Then("returneres bruker med SKJERMING-gruppe") {
                 every { pdl.personer(setOf(id1.verdi)) } returns setOf(person(id1, aktørId1))
                 every { skjerming.skjerminger(listOf(id1)) } returns mapOf(id1 to true)
-                (brukerTjeneste.brukere(setOf(id1.verdi)).single() kreverMedlemskapI SKJERMING).shouldBeTrue()
+                (brukerTjeneste.brukere(setOf(id1.verdi)).single() kreverMedlemskapI SKJERMING) shouldBe true
             }
         }
         When("to brukere returneres fra PDL") {
             Then("slås opp skjerming for alle og returneres begge") {
                 every { pdl.personer(setOf(id1.verdi, id2.verdi)) } returns setOf(person(id1, aktørId1), person(id2, aktørId2))
-                every { skjerming.skjerminger(any()) } returns mapOf(id1 to false, id2 to true)
-                val result = brukerTjeneste.brukere(setOf(id1.verdi, id2.verdi))
-                assertSoftly {
-                    result shouldHaveSize 2
-                    result.first { it.brukerId == id1 } kreverMedlemskapI SKJERMING shouldBe false
-                    (result.first { it.brukerId == id2 } kreverMedlemskapI SKJERMING).shouldBeTrue()
+                every { skjerming.skjerminger(listOf(id1, id2)) } returns mapOf(id1 to false, id2 to true)
+                assertSoftly(brukerTjeneste.brukere(setOf(id1.verdi, id2.verdi))) {
+                    it shouldHaveSize 2
+                    it.first { it.brukerId == id1 } kreverMedlemskapI SKJERMING shouldBe false
+                    (it.first { it.brukerId == id2 } kreverMedlemskapI SKJERMING) shouldBe true
                 }
             }
         }
@@ -118,7 +109,7 @@ class BrukerTjenesteTest : BehaviorSpec({
             Then("settes SKJERMING-gruppe") {
                 every { pdl.medFamilie(id1.verdi) } returns person(id1, aktørId1)
                 every { skjerming.skjerming(id1) } returns true
-                (brukerTjeneste.brukerMedNærmesteFamilie(id1.verdi) kreverMedlemskapI SKJERMING).shouldBeTrue()
+                (brukerTjeneste.brukerMedNærmesteFamilie(id1.verdi) kreverMedlemskapI SKJERMING) shouldBe true
             }
         }
         When("brukerMedNærmesteFamilie kalles") {
@@ -146,7 +137,7 @@ class BrukerTjenesteTest : BehaviorSpec({
             Then("settes SKJERMING-gruppe") {
                 every { pdl.medUtvidetFamilie(id1.verdi) } returns person(id1, aktørId1)
                 every { skjerming.skjerming(id1) } returns true
-                (brukerTjeneste.brukerMedUtvidetFamilie(id1.verdi) kreverMedlemskapI SKJERMING).shouldBeTrue()
+                (brukerTjeneste.brukerMedUtvidetFamilie(id1.verdi) kreverMedlemskapI SKJERMING) shouldBe true
             }
         }
         When("brukerMedUtvidetFamilie kalles") {
@@ -161,4 +152,12 @@ class BrukerTjenesteTest : BehaviorSpec({
             }
         }
     }
-})
+}) {
+    companion object {
+        private val id1 = BrukerId("08526835670")
+        private val id2 = BrukerId("20478606614")
+        private val aktørId1 = AktørId("1111111111111")
+        private val aktørId2 = AktørId("2222222222222")
+        private val KOMMUNE_GT = KommuneTilknytning(Kommune("0301"))
+    }
+}

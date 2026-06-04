@@ -65,7 +65,8 @@ class CacheNøkkelTest : BehaviorSpec({
         }
         When("fnr i id med metode satt") {
             Then("maskeres") {
-                CacheNøkkel("pdl::medFamilie:08526835670").maskert shouldBe "pdl::medFamilie:0852*******" }
+                CacheNøkkel("pdl::medFamilie:08526835670").maskert shouldBe "pdl::medFamilie:0852*******"
+            }
         }
     }
 

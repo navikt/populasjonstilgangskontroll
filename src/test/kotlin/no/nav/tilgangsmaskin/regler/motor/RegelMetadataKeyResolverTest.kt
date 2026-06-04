@@ -21,12 +21,12 @@ class RegelMetadataKeyResolverTest : BehaviorSpec({
 
             Then("${gruppe.name} har begrunnelse som ikke er en nøkkel") {
                 metadata.begrunnelse shouldNotContain "regel."
-                metadata.begrunnelse.isNotBlank().shouldBeTrue()
+                metadata.begrunnelse.isNotBlank() shouldBe true
             }
 
             Then("${gruppe.name} har kortNavn som ikke er en nøkkel") {
                 metadata.kortNavn shouldNotContain "regel."
-                metadata.kortNavn.isNotBlank().shouldBeTrue()
+                metadata.kortNavn.isNotBlank() shouldBe true
             }
         }
     }

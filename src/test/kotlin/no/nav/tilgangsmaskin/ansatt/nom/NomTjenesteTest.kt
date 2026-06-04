@@ -52,9 +52,6 @@ class NomTjenesteTest : BehaviorSpec() {
     @MockkSpyBean
     private lateinit var adapter: NomJPAAdapter
 
-    private val ansattId = AnsattId("Z999999")
-    private val brukerId = BrukerId("08526835670")
-
     init {
         beforeEach {
             every { token.system } returns "test"
@@ -153,5 +150,7 @@ class NomTjenesteTest : BehaviorSpec() {
     companion object {
         @ServiceConnection
         private val postgres = postgreSQLContainer
+        private val ansattId = AnsattId("Z999999")
+        private val brukerId = BrukerId("08526835670")
     }
 }

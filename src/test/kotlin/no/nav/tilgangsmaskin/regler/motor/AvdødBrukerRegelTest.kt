@@ -35,14 +35,18 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
         Given("Bruker lever") {
             val bruker = BrukerBuilder(brukerId).build()
             When("regel evalueres") {
-                Then("tilgang godkjennes") { regel.evaluer(ansatt, bruker).shouldBeTrue() }
+                Then("tilgang godkjennes") {
+                    regel.evaluer(ansatt, bruker).shouldBeTrue()
+                }
             }
         }
 
         Given("Bruker er død") {
             val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(1)).build()
             When("regel evalueres") {
-                Then("tilgang godkjennes") { regel.evaluer(ansatt, bruker).shouldBeTrue() }
+                Then("tilgang godkjennes") {
+                    regel.evaluer(ansatt, bruker).shouldBeTrue()
+                }
             }
         }
 

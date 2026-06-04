@@ -1,81 +1,73 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import no.nav.boot.conditionals.Cluster
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
-import org.slf4j.LoggerFactory.getLogger
+import com.github.benmanes.caffeine.cache.Cache
+import no.nav.boot.conditionals.ConditionalOnLocalOrTest
 import org.springframework.cache.CacheManager
 import java.time.Duration
 import kotlin.reflect.KClass
 
-class CaffeineCacheClient(private val cacheManager: CacheManager) : CacheOperations {
+@ConditionalOnLocalOrTest
+class CaffeineCacheClient(private val mgr: CacheManager) : CacheOperations {
 
-    private val log = getLogger(javaClass)
 
-    override fun delete(cache: CacheNøkkelConfig, id: String): Long {
-        val key = tilNøkkel(cache, id)
-        val springCache = cacheManager.getCache(cache.name) ?: return 0L
-        val existed = springCache.get(key) != null
-        springCache.evict(key)
-        return if (existed) 1L else 0L
-    }
+    override fun delete(cfg: CacheNøkkelConfig, id: String) =
+        if (cache(cfg).evictIfPresent(cfg.tilNøkkel(id))) 1L else 0L
 
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? =
-        cacheManager.getCache(cache.name)?.get(tilNøkkel(cache, id))?.get() as T?
-
-    override fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration) {
-        cacheManager.getCache(cache.name)?.put(tilNøkkel(cache, id), value)
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T?> {
-        if (ids.isEmpty()) return emptyMap()
-        val springCache = cacheManager.getCache(cache.name) ?: return emptyMap()
-        return ids.associateWith { id ->
-            springCache.get(tilNøkkel(cache, id))?.get() as T?
-        }.filterValues { it != null }
-    }
-
-    override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
-        val springCache = cacheManager.getCache(cache.name) ?: return
-        log.trace("Caffeine bulk lagrer {} verdier for cache {}", innslag.size, cache.name)
-        innslag.forEach { (id, value) -> springCache.put(tilNøkkel(cache, id), value) }
-    }
-
-    override fun tilNøkkel(cache: CacheNøkkelConfig, id: String): String {
-        val extra = cache.extraPrefix?.let { "$it:" } ?: ""
-        return "$extra$id"
-    }
-
-    override fun clear(cache: CacheNøkkelConfig) {
-        if (isProd) {
-            throw UnsupportedOperationException("Clear er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold")
+    override fun <T : Any> getOne(cfg: CacheNøkkelConfig, id: String, clazz: KClass<T>) =
+        cache(cfg).get(cfg.tilNøkkel(id))?.get()?.let {
+            clazz.java.cast(it)
         }
-        val springCache = cacheManager.getCache(cache.name) ?: return
-        if (cache.extraPrefix == null) {
-            springCache.clear()
+
+    override fun putOne(cfg: CacheNøkkelConfig, id: String, value: Any, ttl: Duration) =
+        cache(cfg).put(cfg.tilNøkkel(id), value)
+
+    override fun <T : Any> getMany(cfg: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>) =
+        with(ids.associateBy { cfg.tilNøkkel(it) }) {
+            typedCache(cfg).getAllPresent(keys).entries.associate { (key, value) ->
+                getValue(key) to clazz.java.cast(value)
+            }
+        }
+
+    override fun putMany(cfg: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) =
+        typedCache(cfg).putAll(innslag.map {
+            (id, value) -> cfg.tilNøkkel(id) to value
+        }.toMap())
+
+    override fun clear(cfg: CacheNøkkelConfig) {
+        if (cfg.extraPrefix == null) {
+            cache(cfg).clear()
         } else {
-            val prefix = tilNøkkel(cache, "")
-            val nativeCache = springCache.nativeCache
-            if (nativeCache is com.github.benmanes.caffeine.cache.Cache<*, *>) {
-                nativeCache.asMap().keys
-                    .filterIsInstance<String>()
-                    .filter { it.startsWith(prefix) }
-                    .forEach { springCache.evict(it) }
+            with(typedCache(cfg))  {
+                val prefix = cfg.tilNøkkel("")
+                invalidateAll(asMap().keys.filter {
+                    it.startsWith(prefix)
+                })
             }
         }
     }
 
-    override fun size(cache: CacheNøkkelConfig): Long {
-        val springCache = cacheManager.getCache(cache.name) ?: return 0L
-        val nativeCache = springCache.nativeCache
-        if (nativeCache is com.github.benmanes.caffeine.cache.Cache<*, *>) {
-            if (cache.extraPrefix == null) {
-                return nativeCache.estimatedSize()
+    override fun size(cfg: CacheNøkkelConfig) =
+        with(typedCache(cfg)) {
+            if (cfg.extraPrefix == null) {
+                estimatedSize()
+            } else {
+                val prefix = cfg.tilNøkkel("")
+                asMap().keys.count {
+                    it.startsWith(prefix)
+                }.toLong()
             }
-            val prefix = tilNøkkel(cache, "")
-            return nativeCache.asMap().keys.count { it is String && it.startsWith(prefix) }.toLong()
         }
-        return 0L
-    }
+
+    private fun cache(cfg: CacheNøkkelConfig) =
+        requireNotNull(mgr.getCache(cfg.name)) {
+            "Cache '${cfg.name}' ikke konfigurert i CacheManager" // never
+        }
+
+    private fun nativeCache(cfg: CacheNøkkelConfig) =
+        cache(cfg).nativeCache as? Cache<*, *>
+            ?: error("Forventet Caffeine Cache for '${cfg.name}'") // never
+
+    @Suppress("UNCHECKED_CAST")
+    private fun typedCache(cfg: CacheNøkkelConfig): Cache<String, Any> =
+        nativeCache(cfg) as Cache<String, Any>
 }

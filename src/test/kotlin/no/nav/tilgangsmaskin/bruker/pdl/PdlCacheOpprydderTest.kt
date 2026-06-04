@@ -32,8 +32,8 @@ class PdlCacheOpprydderTest : BehaviorSpec({
         Personhendelse("hendelse-id", identer, "PDL", Instant.now(), "PDL_HENDELSE", endringstype, null, gradering, null)
 
     beforeEach {
-        every { client.tilNøkkel(any(), any()) } answers { "${firstArg<Any>()}::${secondArg<String>()}" }
-        every { client.delete(any(), any()) } returns 1L
+       // every { client.tilNøkkel(any(), any()) } answers { "${firstArg<Any>()}::${secondArg<String>()}" }
+        every { client.delete(any(), any()) } returns 1
     }
 
     Given("sletting av cache ved personhendelse") {

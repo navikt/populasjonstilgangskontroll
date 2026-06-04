@@ -93,7 +93,7 @@ class RegelTjeneste(
     }
 
     private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<BulkResultat>) = filterNot { brukerIdOgRegelsett ->
-        brukerIdOgRegelsett.brukerId in (funnet.flatMap { it.bruker.historiskeIds.map { id -> id.verdi } } + funnet.map { it.bruker.oppslagId })
+        brukerIdOgRegelsett.brukerId in (funnet.map { it.bruker.historiskeIds} + funnet.map { it.bruker.oppslagId })
     }
 
     private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) =
@@ -114,7 +114,7 @@ class RegelTjeneste(
         for (resultat in resultater) {
             log.trace("Bulk Sjekker enkelttilgang for avvist {}", resultat.bruker.oppslagId.maskFnr())
             if (resultat.status == HttpStatus.FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
-                log.trace("Bulk resultat for {} har ingen enkelttilgangqq", resultat.bruker.oppslagId.maskFnr())
+                log.trace("Bulk resultat for {} har ingen enkelttilgang", resultat.bruker.oppslagId.maskFnr())
                 add(EnkeltBulkRespons(RegelException(ansatt,
                     brukere.finnBruker(resultat.bruker.oppslagId),
                     resultat.regel!!,

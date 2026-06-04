@@ -12,14 +12,16 @@ class CaffeineCacheClient(private val mgr: CacheManager) : CacheOperations {
 
     private val log = getLogger(javaClass)
 
-    override fun delete(cfg: CacheNøkkelConfig, id: String): Long {
-        val cache = cache(cfg)
-        return with(cfg.tilNøkkel( id)) {
-            val existed = cache.get(this) != null
-            cache.evict(this)
-            if (existed) 1 else 0
+    override fun delete(cfg: CacheNøkkelConfig, id: String) =
+        with(cache(cfg)) {
+            val nøkkel = cfg.tilNøkkel(id)
+            if (get(nøkkel) != null) {
+                evict(nøkkel)
+                1L
+            } else {
+                0L
+            }
         }
-    }
 
     override fun <T : Any> getOne(cfg: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? =
         cache(cfg).get(cfg.tilNøkkel(id))?.get()?.let {
@@ -31,21 +33,16 @@ class CaffeineCacheClient(private val mgr: CacheManager) : CacheOperations {
 
 
     override fun <T : Any> getMany(cfg: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T?> {
-        if (ids.isEmpty()) return emptyMap()
-        val cache = cache(cfg)
-        return ids.associateWith { id ->
-            cache.get(cfg.tilNøkkel(id))?.get()?.let { clazz.java.cast(it) }
-        }.filterValues { it != null }
+        val keys = ids.associateBy { cfg.tilNøkkel(it) }
+        val found = typedCache(cfg).getAllPresent(keys.keys)
+        return found.entries.associate { (key, value) -> keys.getValue(key) to clazz.java.cast(value) }
     }
 
     override fun putMany(cfg: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
-        val cache = cache(cfg)
         log.trace("Caffeine bulk lagrer {} verdier for cache {}", innslag.size, cfg.name)
-        innslag.forEach {
-            (id, value) -> cache.put(cfg.tilNøkkel(id), value)
-        }
+        val keyed = innslag.map { (id, value) -> cfg.tilNøkkel(id) to value }.toMap()
+        typedCache(cfg).putAll(keyed)
     }
-
 
     override fun clear(cfg: CacheNøkkelConfig) {
         val cache = cache(cfg)
@@ -59,7 +56,7 @@ class CaffeineCacheClient(private val mgr: CacheManager) : CacheOperations {
         }
     }
 
-        override fun size(cfg: CacheNøkkelConfig): Long {
+    override fun size(cfg: CacheNøkkelConfig): Long {
         val cache = nativeCache(cfg)
         if (cfg.extraPrefix == null) {
             return cache.estimatedSize()
@@ -73,7 +70,11 @@ class CaffeineCacheClient(private val mgr: CacheManager) : CacheOperations {
             "Cache '${cfg.name}' ikke konfigurert i CacheManager"
         }
 
+    private fun nativeCache(cfg: CacheNøkkelConfig) =
+        cache(cfg).nativeCache as? Cache<*, *>
+            ?: error("Forventet Caffeine Cache for '${cfg.name}'")
 
-    private fun nativeCache(cfg: CacheNøkkelConfig) = cache(cfg).nativeCache as? Cache<*, *>
-        ?: error("Forventet Caffeine Cache for '${cfg.name}'")
+    @Suppress("UNCHECKED_CAST")
+    private fun typedCache(cfg: CacheNøkkelConfig): Cache<String, Any> =
+        nativeCache(cfg) as Cache<String, Any>
 }

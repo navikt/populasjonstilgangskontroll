@@ -37,9 +37,7 @@ class CaffeineCacheClient(private val mgr: CacheManager) : CacheOperations {
             cache(cfg).clear()
         } else {
             with(typedCache(cfg))  {
-                val prefix = cfg.tilNøkkel("")
-                val keysToRemove = asMap().keys.filter { it.startsWith(prefix) }
-                invalidateAll(keysToRemove)
+                invalidateAll(asMap().keys.filter { it.startsWith(cfg.tilNøkkel("")) })
             }
         }
     }

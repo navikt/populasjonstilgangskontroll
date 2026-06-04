@@ -15,20 +15,6 @@ class NasjonalGruppeTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "gruppe.medlemskap.nasjonal", "Ansatte med og uten nasjonalt gruppemedlemsskap")
 
 @Component
-class AvdødTeller(registry: MeterRegistry, accessor: Token) :
-    AbstractTeller(registry, accessor, "dead.oppslag.total", "Forsøk på å slå opp avdøde") {
-    fun tell(intervall: Dødsperiode, enhet: String) =
-        tell(Tags.of(MÅNEDER, intervall.tekst, ENHET, enhet))
-
-    private companion object {
-        private const val ENHET = "enhet"
-        private const val MÅNEDER = "months"
-    }
-}
-@Component
-class VergemålTeller(registry: MeterRegistry, token: Token) :
-    AbstractTeller(registry, token, "verge.total", "Oppslag på vergehaver")
-@Component
 class EnkeltTilgangTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "overstyring.forsøk", "Enkelttilgang forsøk pr resultat")
 

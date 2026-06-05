@@ -54,7 +54,6 @@ class AvdødBrukerRegel : OverstyrbarRegel {
 }
 
 @SortertRegel(RegelRekkefølge.VERGEMÅL)
-@ConditionalOnNotProd
 class VergemålRegel(private val vergemål: VergemålTjeneste) : OverstyrbarRegel {
 
     override val metadata = RegelMetadata(VERGEMÅL)

@@ -128,6 +128,7 @@ class TilgangController(
         MDC.put(USER_ID, ansatt.verdi)
         return if (specs.isNotEmpty()) {
             sjekk(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
+            sjekk(specs.none { it.brukerId.isBlank() }, BAD_REQUEST, "brukerId kan ikke være tom")
             tell("bulk")
             regelTjeneste.bulkRegler(ansatt, specs)
         } else {
@@ -138,6 +139,7 @@ class TilgangController(
 
     private fun enkeltOppslag(ansattId: () -> AnsattId, forventet: TokenType, brukerId: String, regelType: RegelType, uri: String) =
         with(brukerId.trim('"')) {
+            sjekk(isNotBlank(), BAD_REQUEST, "brukerId kan ikke være tom")
             guard.krev(forventet, uri)
             val ansatt = ansattId()
             MDC.put(USER_ID, ansatt.verdi)

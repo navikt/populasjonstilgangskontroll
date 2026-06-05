@@ -1,0 +1,101 @@
+package no.nav.tilgangsmaskin.tilgang
+
+import io.mockk.every
+import io.mockk.justRun
+import org.springframework.http.MediaType.TEXT_PLAIN
+import org.springframework.test.web.servlet.post
+
+class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
+
+    init {
+
+        Given("CCF enkeltoppslag") {
+
+            beforeEach { every { token.erCC } returns true }
+
+            When("komplett kalles med CCF-token") {
+                Then("returnerer 204 ved tilgang") {
+                    justRun { regelTjeneste.kompletteRegler(ansattId, brukerId) }
+                    mockMvc.post("/api/v1/ccf/komplett/${ansattId.verdi}") {
+                        contentType = TEXT_PLAIN; content = brukerId
+                    }.andExpect { status { isNoContent() } }
+                }
+            }
+
+            When("kjerne kalles med CCF-token") {
+                Then("returnerer 204 ved tilgang") {
+                    justRun { regelTjeneste.kjerneregler(ansattId, brukerId) }
+                    mockMvc.post("/api/v1/ccf/kjerne/${ansattId.verdi}") {
+                        contentType = TEXT_PLAIN; content = brukerId
+                    }.andExpect { status { isNoContent() } }
+                }
+            }
+
+            When("komplett kalles med OBO-token") {
+                Then("returnerer 403") {
+                    every { token.erCC } returns false
+                    mockMvc.post("/api/v1/ccf/komplett/${ansattId.verdi}") {
+                        contentType = TEXT_PLAIN; content = brukerId
+                    }.andExpect { status { isForbidden() } }
+                }
+            }
+
+            When("kjerne kalles med OBO-token") {
+                Then("returnerer 403") {
+                    every { token.erCC } returns false
+                    mockMvc.post("/api/v1/ccf/kjerne/${ansattId.verdi}") {
+                        contentType = TEXT_PLAIN; content = brukerId
+                    }.andExpect { status { isForbidden() } }
+                }
+            }
+
+            When("ccf/komplett kalles med tom brukerId") {
+                Then("returnerer 400") {
+                    mockMvc.post("/api/v1/ccf/komplett/${ansattId.verdi}") {
+                        contentType = TEXT_PLAIN; content = ""
+                    }.andExpect { status { isBadRequest() } }
+                }
+            }
+
+            When("ccf/komplett kalles med blank brukerId") {
+                Then("returnerer 400") {
+                    mockMvc.post("/api/v1/ccf/komplett/${ansattId.verdi}") {
+                        contentType = TEXT_PLAIN; content = "   "
+                    }.andExpect { status { isBadRequest() } }
+                }
+            }
+
+            When("ccf/kjerne kalles med tom brukerId") {
+                Then("returnerer 400") {
+                    mockMvc.post("/api/v1/ccf/kjerne/${ansattId.verdi}") {
+                        contentType = TEXT_PLAIN; content = ""
+                    }.andExpect { status { isBadRequest() } }
+                }
+            }
+
+            When("ccf/kjerne kalles med blank brukerId") {
+                Then("returnerer 400") {
+                    mockMvc.post("/api/v1/ccf/kjerne/${ansattId.verdi}") {
+                        contentType = TEXT_PLAIN; content = "   "
+                    }.andExpect { status { isBadRequest() } }
+                }
+            }
+
+            When("ccf/komplett kalles uten body") {
+                Then("returnerer 400") {
+                    mockMvc.post("/api/v1/ccf/komplett/${ansattId.verdi}") {
+                        contentType = TEXT_PLAIN
+                    }.andExpect { status { isBadRequest() } }
+                }
+            }
+
+            When("ccf/kjerne kalles uten body") {
+                Then("returnerer 400") {
+                    mockMvc.post("/api/v1/ccf/kjerne/${ansattId.verdi}") {
+                        contentType = TEXT_PLAIN
+                    }.andExpect { status { isBadRequest() } }
+                }
+            }
+        }
+    }
+}

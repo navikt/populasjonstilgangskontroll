@@ -4,26 +4,31 @@ import io.lettuce.core.KeyValue
 import io.lettuce.core.RedisClient
 import io.lettuce.core.ScanArgs
 import io.lettuce.core.ScanCursor.INITIAL
-import io.lettuce.core.ScriptOutputType.INTEGER
+import io.lettuce.core.ScriptOutputType.MULTI
 import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.core.io.ClassPathResource
 import java.time.Duration
 import java.time.Duration.ofSeconds
 import kotlin.reflect.KClass
-import kotlin.time.measureTime
+import kotlin.text.Charsets.UTF_8
+import kotlin.time.measureTimedValue
 
 @RetryingWhenRecoverableRestService
-class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMapper,
+class ValkeyCacheClient(client: RedisClient,
+                        private val mapper: CacheNøkkelMapper,
                         private val alleTreffTeller: BulkCacheSuksessTeller,
                         private val teller: BulkCacheTeller,
                         private val cfg: CacheConfig) : CacheOperations {
 
     private val log = getLogger(javaClass)
+    private val countScript  = ClassPathResource("scripts/count-all-keys.lua").getContentAsString(UTF_8)
 
     private val conn = client.connect().apply {
         timeout = ofSeconds(cfg.timeout.seconds)
@@ -104,6 +109,7 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
     override fun tilNøkkel(cache: CacheNøkkelConfig, id: String) = mapper.tilNøkkel(cache, id)
 
     override fun clear(cache: CacheNøkkelConfig) {
+        check(!isProd) { "Clear er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold" }
         log.info("Tømmer cache {}", cache.name)
         val prefix = mapper.tilNøkkel(cache, "")
         var cursor = INITIAL
@@ -117,55 +123,26 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
         } while (!result.isFinished)
     }
 
-    override fun size(cache: CacheNøkkelConfig): Long {
-        val prefix = mapper.tilNøkkel(cache, "")
-        var count: Long
-        val totalDuration = measureTime {
-            count = conn.sync().eval(COUNT_KEYS_SCRIPT, INTEGER, emptyArray(), "$prefix*")
+    override fun size(cache: CacheNøkkelConfig) =
+        sizes(cache).values.single()
+
+    override fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long> {
+        val prefixes = caches.map {
+            "${mapper.tilNøkkel(it, "")}*"
+        }.toTypedArray()
+        val (results, totalDuration) = eval(*prefixes)
+        return caches.zip(results).associate {
+            (cache, count) -> cache.fullName to count
+        }.also {
+            log.info("Cache sizes completed in single operation: {}, took {}ms", it, totalDuration.inWholeMilliseconds)
         }
-        log.info("Cache size for {} (prefix={}) completed: {} keys, took {}ms", cache.fullName, prefix, count, totalDuration.inWholeMilliseconds)
-        return count
     }
 
-    override fun sizes(caches: Set<CacheNøkkelConfig>): Map<String, Long> {
-        if (caches.isEmpty()) return emptyMap()
-        val prefixes = caches.map { "${mapper.tilNøkkel(it, "")}*" }.toTypedArray()
-        val results: List<Long>
-        val totalDuration = measureTime {
-            results = conn.sync().eval(COUNT_ALL_KEYS_SCRIPT, io.lettuce.core.ScriptOutputType.MULTI, emptyArray(), *prefixes)
+    private fun eval(vararg prefixes: String) =
+        measureTimedValue {
+            conn.sync().eval<List<Long>>(countScript, MULTI, emptyArray(), *prefixes)
         }
-        val sizeMap = caches.zip(results).associate { (cache, count) -> cache.fullName to count }
-        log.info("Cache sizes completed in single operation: {}, took {}ms", sizeMap, totalDuration.inWholeMilliseconds)
-        return sizeMap
-    }
 
-    companion object {
-        private const val COUNT_KEYS_SCRIPT = """
-            local cursor = "0"
-            local count = 0
-            repeat
-                local result = redis.call("SCAN", cursor, "MATCH", ARGV[1], "COUNT", 50000)
-                cursor = result[1]
-                count = count + #result[2]
-            until cursor == "0"
-            return count
-        """
-
-        private const val COUNT_ALL_KEYS_SCRIPT = """
-            local counts = {}
-            for i, pattern in ipairs(ARGV) do
-                local cursor = "0"
-                local count = 0
-                repeat
-                    local result = redis.call("SCAN", cursor, "MATCH", pattern, "COUNT", 10000)
-                    cursor = result[1]
-                    count = count + #result[2]
-                until cursor == "0"
-                counts[i] = count
-            end
-            return counts
-        """
-    }
 
     private fun <T : Any> KeyValue<String, String>.fraJsonEntry(mapper: CacheNøkkelMapper, clazz: KClass<T>) =
         mapper.tilEntry(this, clazz)

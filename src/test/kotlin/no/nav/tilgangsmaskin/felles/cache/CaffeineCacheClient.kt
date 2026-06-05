@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import no.nav.boot.conditionals.Cluster
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.CacheManager
@@ -66,16 +65,22 @@ class CaffeineCacheClient(private val cacheManager: CacheManager) : CacheOperati
         }
     }
 
-    override fun size(cache: CacheNøkkelConfig): Long {
-        val springCache = cacheManager.getCache(cache.name) ?: return 0L
-        val nativeCache = springCache.nativeCache
-        if (nativeCache is com.github.benmanes.caffeine.cache.Cache<*, *>) {
-            if (cache.extraPrefix == null) {
-                return nativeCache.estimatedSize()
+    override fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long> =
+        caches.associate { cache ->
+            val springCache = cacheManager.getCache(cache.name) ?: error("Cache $cache ikke funnet")
+            val count = run {
+                val nativeCache = springCache.nativeCache
+                if (nativeCache is com.github.benmanes.caffeine.cache.Cache<*, *>) {
+                    if (cache.extraPrefix == null) {
+                        nativeCache.estimatedSize()
+                    } else {
+                        val prefix = tilNøkkel(cache, "")
+                        nativeCache.asMap().keys.count { it is String && it.startsWith(prefix) }.toLong()
+                    }
+                } else {
+                    error("Cache $cache ikke Caffeine")
+                }
             }
-            val prefix = tilNøkkel(cache, "")
-            return nativeCache.asMap().keys.count { it is String && it.startsWith(prefix) }.toLong()
+            cache.fullName to count
         }
-        return 0L
-    }
 }

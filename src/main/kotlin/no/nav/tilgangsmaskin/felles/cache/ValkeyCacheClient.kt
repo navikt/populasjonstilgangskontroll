@@ -1,10 +1,10 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import io.lettuce.core.KeyScanCursor
 import io.lettuce.core.KeyValue
 import io.lettuce.core.RedisClient
 import io.lettuce.core.ScanArgs
 import io.lettuce.core.ScanCursor.INITIAL
+import io.lettuce.core.ScriptOutputType.INTEGER
 import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
@@ -119,24 +119,25 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
 
     override fun size(cache: CacheNøkkelConfig): Long {
         val prefix = mapper.tilNøkkel(cache, "")
-        var count = 0L
-        var cursor = INITIAL
-        val args = ScanArgs().match("$prefix*").limit(50000)
-        var iterations = 0
+        var count: Long
         val totalDuration = measureTime {
-            do {
-                lateinit var result: io.lettuce.core.KeyScanCursor<String>
-                val duration = measureTime {
-                    result = conn.sync().scan(cursor, args)
-                    count += result.keys.size
-                    cursor = result
-                }
-                iterations++
-                log.info("Cache size scan iteration {} for {}: found {} keys in this batch, total so far {}, took {}", iterations, cache.name, result.keys.size, count, duration)
-            } while (!result.isFinished)
+            count = conn.sync().eval(COUNT_KEYS_SCRIPT, INTEGER, emptyArray(), "$prefix*")
         }
-        log.info("Cache size scan for {} completed: {} keys total in {} iterations, took {}", cache.name, count, iterations, totalDuration)
+        log.info("Cache size for {} completed: {} keys, took {}ms", cache.fullName, count, totalDuration.inWholeMilliseconds)
         return count
+    }
+
+    companion object {
+        private const val COUNT_KEYS_SCRIPT = """
+            local cursor = "0"
+            local count = 0
+            repeat
+                local result = redis.call("SCAN", cursor, "MATCH", ARGV[1], "COUNT", 10000)
+                cursor = result[1]
+                count = count + #result[2]
+            until cursor == "0"
+            return count
+        """
     }
 
     private fun <T : Any> KeyValue<String, String>.fraJsonEntry(mapper: CacheNøkkelMapper, clazz: KClass<T>) =

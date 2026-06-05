@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.AVDØD
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
@@ -44,19 +43,17 @@ class UtlandRegel : GlobalGruppeMedlemskapRegel(UTENLANDSK), OverstyrbarRegel {
 
 
 @SortertRegel(LOWEST_PRECEDENCE - 3)
-@ConditionalOnNotProd
 class AvdødBrukerRegel : OverstyrbarRegel {
 
     override val metadata = RegelMetadata(AVDØD_MER_ENN_ETT_ÅR)
 
     override fun evaluer(ansatt: Ansatt, bruker: Bruker)  =
-         avvisHvis {
+        avvisHvis {
             bruker harVærtDødMerEnn 1.år && ansatt ikkeErMedlemAv AVDØD
         }
 }
 
 @SortertRegel(LOWEST_PRECEDENCE - 4)
-@ConditionalOnNotProd
 class VergemålRegel(private val vergemål: VergemålTjeneste) : OverstyrbarRegel {
 
     override val metadata = RegelMetadata(VERGEMÅL)

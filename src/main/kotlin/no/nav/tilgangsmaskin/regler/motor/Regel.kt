@@ -30,18 +30,6 @@ interface Regel {
 
 interface OverstyrbarRegel : Regel
 interface KjerneRegel : Regel
-interface TellendeRegel : Regel {
-    val skalTelle: (Ansatt, Bruker) -> Boolean
-        get() = { _, _ -> false }
-    fun tell(ansatt: Ansatt, bruker: Bruker) = Unit
-
-    override fun evaluer(ansatt: Ansatt, bruker: Bruker): Boolean {
-        if (skalTelle(ansatt, bruker)) {
-            tell(ansatt, bruker)
-        }
-        return true
-    }
-}
 
 @Target(CLASS)
 @Retention(RUNTIME)

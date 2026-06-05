@@ -13,10 +13,8 @@ import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.år
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD_MER_ENN_ETT_ÅR
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.VERGEMÅL
-import org.springframework.core.Ordered.LOWEST_PRECEDENCE
 
-
-@SortertRegel(LOWEST_PRECEDENCE)
+@SortertRegel(RegelRekkefølge.GEOGRAFISK)
 class GeografiskRegel(private val oppfølging: OppfølgingTjeneste) : GlobalGruppeMedlemskapRegel(NASJONAL), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         godtaHvis {
@@ -26,7 +24,7 @@ class GeografiskRegel(private val oppfølging: OppfølgingTjeneste) : GlobalGrup
         }
 }
 
-@SortertRegel(LOWEST_PRECEDENCE - 1)
+@SortertRegel(RegelRekkefølge.UKJENT_BOSTED)
 class UkjentBostedRegel : GlobalGruppeMedlemskapRegel(UKJENT_BOSTED), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis {
@@ -34,7 +32,7 @@ class UkjentBostedRegel : GlobalGruppeMedlemskapRegel(UKJENT_BOSTED), Overstyrba
         }
 }
 
-@SortertRegel(LOWEST_PRECEDENCE - 2)
+@SortertRegel(RegelRekkefølge.UTLAND)
 class UtlandRegel : GlobalGruppeMedlemskapRegel(UTENLANDSK), OverstyrbarRegel {
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis {
@@ -43,7 +41,7 @@ class UtlandRegel : GlobalGruppeMedlemskapRegel(UTENLANDSK), OverstyrbarRegel {
 }
 
 
-@SortertRegel(LOWEST_PRECEDENCE - 3)
+@SortertRegel(RegelRekkefølge.AVDØD)
 @ConditionalOnNotProd
 class AvdødBrukerRegel : OverstyrbarRegel {
 
@@ -55,7 +53,7 @@ class AvdødBrukerRegel : OverstyrbarRegel {
         }
 }
 
-@SortertRegel(LOWEST_PRECEDENCE - 4)
+@SortertRegel(RegelRekkefølge.VERGEMÅL)
 @ConditionalOnNotProd
 class VergemålRegel(private val vergemål: VergemålTjeneste) : OverstyrbarRegel {
 

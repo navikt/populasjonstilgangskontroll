@@ -25,6 +25,17 @@ spec:
           labels:
             namespace: "tilgangsmaskin"
             severity: danger
+        - alert: "[tilgangsmaskin] Kafka-melding droppet"
+          expr: sum(increase(kafka_message_dropped_total{app="populasjonstilgangskontroll"}[5m])) > 0
+          for: 1m
+          annotations:
+            action: "Sjekk loggene for hvilken topic og exception som forårsaket droppet melding"
+            consequence: "En eller flere Kafka-meldinger ble permanent droppet etter maks antall retries"
+            summary: |-
+              Grafana: https://grafana.nav.cloud.nais.io/d/42e329f6-6f6c-4365-84a1-7c65def92463/tilgangmaskin-prod?orgId=1
+          labels:
+            namespace: "tilgangsmaskin"
+            severity: danger
         - alert: "[tilgangsmaskin] Helsesjekk ikke UP"
           expr: health{app="populasjonstilgangskontroll", namespace="tilgangsmaskin"} != 3
           for: 2m

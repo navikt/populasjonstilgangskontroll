@@ -123,8 +123,6 @@ class ValkeyCacheClient(client: RedisClient,
         } while (!result.isFinished)
     }
 
-    override fun size(cache: CacheNøkkelConfig) =
-        sizes(cache).values.single()
 
     override fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long> {
         val prefixes = caches.map {

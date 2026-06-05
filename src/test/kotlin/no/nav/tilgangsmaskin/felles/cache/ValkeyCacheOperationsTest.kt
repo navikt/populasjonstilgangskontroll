@@ -212,6 +212,41 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     }
                 }
             }
+            When("putOne kalles mot pauset Redis") {
+                Then("kaster ikke exception") {
+                    redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
+                    try {
+                        cache.putOne(TEST_CACHE, T1.id, T1, ofSeconds(30))
+                    } finally {
+                        redis.dockerClient.unpauseContainerCmd(redis.containerId).exec()
+                    }
+                }
+            }
+            When("putMany kalles mot pauset Redis") {
+                Then("kaster ikke exception") {
+                    redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
+                    try {
+                        cache.putMany(TEST_CACHE, arrayOf(T1, T2).associateBy { it.id }, ofSeconds(30))
+                    } finally {
+                        redis.dockerClient.unpauseContainerCmd(redis.containerId).exec()
+                    }
+                }
+            }
+            When("putMany feiler mot pauset Redis og Redis gjenopprettes") {
+                Then("tilkoblingen er fortsatt brukbar og neste putMany lagrer riktig") {
+                    redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
+                    try {
+                        cache.putMany(TEST_CACHE, arrayOf(T1).associateBy { it.id }, ofSeconds(30))
+                    } finally {
+                        redis.dockerClient.unpauseContainerCmd(redis.containerId).exec()
+                    }
+                    Thread.sleep(200)
+                    cache.putMany(TEST_CACHE, arrayOf(T2).associateBy { it.id }, ofSeconds(30))
+                    eventually(TIMEOUTS) {
+                        cache.getOne<TestData>(TEST_CACHE, T2.id) shouldBe T2
+                    }
+                }
+            }
         }
 
         Given("antall innslag i cache") {

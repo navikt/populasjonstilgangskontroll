@@ -12,14 +12,19 @@ import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetHendelse
 import java.util.concurrent.CopyOnWriteArrayList
 import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisClient.create
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheOperationsTest.ValkeyCacheTestConfig
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
@@ -184,6 +189,21 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                 Then("clear kaster ikke exception") {
                     cache.clear(TEST_CACHE)
                     cache.getMany<TestData>(TEST_CACHE, IDS).shouldBeEmpty()
+                }
+            }
+        }
+
+        Given("clear i prod-miljø") {
+            beforeEach {
+                mockkObject(ClusterUtils.Companion)
+                every { ClusterUtils.isProd } returns true
+            }
+            afterEach { unmockkObject(ClusterUtils.Companion) }
+
+            When("clear kalles") {
+                Then("kaster IllegalStateException fordi clear er blokkert i prod") {
+                    shouldThrow<IllegalStateException> { cache.clear(TEST_CACHE) }
+                        .message shouldContain "prod"
                 }
             }
         }

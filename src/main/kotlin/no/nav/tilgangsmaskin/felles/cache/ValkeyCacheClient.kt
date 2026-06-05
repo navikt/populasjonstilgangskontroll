@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import io.lettuce.core.KeyScanCursor
 import io.lettuce.core.KeyValue
 import io.lettuce.core.RedisClient
 import io.lettuce.core.ScanArgs
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory.getLogger
 import java.time.Duration
 import java.time.Duration.ofSeconds
 import kotlin.reflect.KClass
+import kotlin.time.measureTime
 
 @RetryingWhenRecoverableRestService
 class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMapper,
@@ -120,11 +122,18 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
         var count = 0L
         var cursor = INITIAL
         val args = ScanArgs().match("$prefix*").limit(10000)
-        do {
-            val result = conn.sync().scan(cursor, args)
-            count += result.keys.size
-            cursor = result
-        } while (!result.isFinished)
+        val totalDuration = measureTime {
+            do {
+                lateinit var result: KeyScanCursor<String>
+                val duration = measureTime {
+                    result = conn.sync().scan(cursor, args)
+                    count += result.keys.size
+                    cursor = result
+                }
+                log.info("Cache size scan iteration for {}: found {} keys in this batch, total so far {}, took {}ms", cache.name, result.keys.size, count, duration.inWholeMilliseconds)
+            } while (!result.isFinished)
+        }
+        log.info("Cache size scan for {} completed: {} keys total, took {}ms", cache.name, count, totalDuration.inWholeMilliseconds)
         return count
     }
 

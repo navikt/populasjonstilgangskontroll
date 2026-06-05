@@ -123,8 +123,20 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
         val totalDuration = measureTime {
             count = conn.sync().eval(COUNT_KEYS_SCRIPT, INTEGER, emptyArray(), "$prefix*")
         }
-        log.info("Cache size for {} completed: {} keys, took {}ms", cache.fullName, count, totalDuration.inWholeMilliseconds)
+        log.info("Cache size for {} (prefix={}) completed: {} keys, took {}ms", cache.fullName, prefix, count, totalDuration.inWholeMilliseconds)
         return count
+    }
+
+    override fun sizes(caches: Set<CacheNøkkelConfig>): Map<String, Long> {
+        if (caches.isEmpty()) return emptyMap()
+        val prefixes = caches.map { "${mapper.tilNøkkel(it, "")}*" }.toTypedArray()
+        val results: List<Long>
+        val totalDuration = measureTime {
+            results = conn.sync().eval(COUNT_ALL_KEYS_SCRIPT, io.lettuce.core.ScriptOutputType.MULTI, emptyArray(), *prefixes)
+        }
+        val sizeMap = caches.zip(results).associate { (cache, count) -> cache.fullName to count }
+        log.info("Cache sizes completed in single operation: {}, took {}ms", sizeMap, totalDuration.inWholeMilliseconds)
+        return sizeMap
     }
 
     companion object {
@@ -137,6 +149,21 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
                 count = count + #result[2]
             until cursor == "0"
             return count
+        """
+
+        private const val COUNT_ALL_KEYS_SCRIPT = """
+            local counts = {}
+            for i, pattern in ipairs(ARGV) do
+                local cursor = "0"
+                local count = 0
+                repeat
+                    local result = redis.call("SCAN", cursor, "MATCH", pattern, "COUNT", 10000)
+                    cursor = result[1]
+                    count = count + #result[2]
+                until cursor == "0"
+                counts[i] = count
+            end
+            return counts
         """
     }
 

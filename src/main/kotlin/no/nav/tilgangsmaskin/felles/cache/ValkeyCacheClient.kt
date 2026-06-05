@@ -121,19 +121,21 @@ class ValkeyCacheClient(client: RedisClient, private val mapper: CacheNøkkelMap
         val prefix = mapper.tilNøkkel(cache, "")
         var count = 0L
         var cursor = INITIAL
-        val args = ScanArgs().match("$prefix*").limit(10000)
+        val args = ScanArgs().match("$prefix*").limit(50000)
+        var iterations = 0
         val totalDuration = measureTime {
             do {
-                lateinit var result: KeyScanCursor<String>
+                lateinit var result: io.lettuce.core.KeyScanCursor<String>
                 val duration = measureTime {
                     result = conn.sync().scan(cursor, args)
                     count += result.keys.size
                     cursor = result
                 }
-                log.info("Cache size scan iteration for {}: found {} keys in this batch, total so far {}, took {}ms", cache.name, result.keys.size, count, duration.inWholeMilliseconds)
+                iterations++
+                log.info("Cache size scan iteration {} for {}: found {} keys in this batch, total so far {}, took {}", iterations, cache.name, result.keys.size, count, duration)
             } while (!result.isFinished)
         }
-        log.info("Cache size scan for {} completed: {} keys total, took {}ms", cache.name, count, totalDuration.inWholeMilliseconds)
+        log.info("Cache size scan for {} completed: {} keys total in {} iterations, took {}", cache.name, count, iterations, totalDuration)
         return count
     }
 

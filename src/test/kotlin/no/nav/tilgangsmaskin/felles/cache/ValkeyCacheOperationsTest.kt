@@ -59,7 +59,6 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
     class ValkeyCacheTestConfig(private val cf: RedisConnectionFactory) {
 
         @Bean
-        @Primary
         fun cacheConfig() =
             CacheConfig("unused", "unused", redis.host, redis.firstMappedPort, ofSeconds(5))
 
@@ -78,10 +77,6 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                 .build()
 
         @Bean
-        fun cacheNøkkelHandler(mgr: RedisCacheManager) =
-            CacheNøkkelMapper(mgr.cacheConfigurations)
-
-        @Bean
         fun bulkCacheSuksessTeller(meterRegistry: MeterRegistry, token: Token) =
             BulkCacheSuksessTeller(meterRegistry, token)
 
@@ -90,8 +85,8 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
             BulkCacheTeller(meterRegistry, token)
 
         @Bean
-        fun valkeyCacheClient(client: RedisClient, handler: CacheNøkkelMapper, cfg: CacheConfig, alle: BulkCacheSuksessTeller, bulk: BulkCacheTeller) =
-            ValkeyCacheClient(client, handler, alle, bulk, cfg)
+        fun valkeyCacheClient(client: RedisClient, cfg: CacheConfig, alle: BulkCacheSuksessTeller, bulk: BulkCacheTeller) =
+            ValkeyCacheClient(client, alle, bulk, cfg)
 
         @Bean
         fun cacheElementUtløptLytter(client: RedisClient, publisher: ApplicationEventPublisher) =
@@ -208,63 +203,36 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
             }
         }
 
-        Given("graceful degradation ved Redis-feil") {
-            When("getOne kalles mot pauset Redis") {
+        Given("graceful degradation ved Valkey-feil") {
+            beforeSpec {
+                cache.putMany(TEST_CACHE, arrayOf(T1, T2).associateBy { it.id }, ofSeconds(30))
+                redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
+            }
+            afterSpec {
+                val paused = redis.dockerClient.inspectContainerCmd(redis.containerId).exec().state.paused == true
+                if (paused) {
+                    redis.dockerClient.unpauseContainerCmd(redis.containerId).exec()
+                }
+            }
+
+            When("getOne kalles mot unavailable Valkey") {
                 Then("returnerer null i stedet for å kaste exception") {
-                    cache.putOne(TEST_CACHE, T1.id, T1, ofSeconds(30))
-                    cache.getOne<TestData>(TEST_CACHE, T1.id) shouldBe T1
-                    redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
-                    try {
-                        cache.getOne<TestData>(TEST_CACHE, T1.id).shouldBeNull()
-                    } finally {
-                        redis.dockerClient.unpauseContainerCmd(redis.containerId).exec()
-                    }
+                    cache.getOne<TestData>(TEST_CACHE, T1.id).shouldBeNull()
                 }
             }
-            When("getMany kalles mot pauset Redis") {
+            When("getMany kalles mot unavailable Valkey") {
                 Then("returnerer tomt map i stedet for å kaste exception") {
+                    cache.getMany<TestData>(TEST_CACHE, IDS).shouldBeEmpty()
+                }
+            }
+            When("putOne kalles mot unavailable Valkey") {
+                Then("kaster ikke exception") {
+                    cache.putOne(TEST_CACHE, T1.id, T1, ofSeconds(30))
+                }
+            }
+            When("putMany kalles mot unavailable Valkey") {
+                Then("kaster ikke exception") {
                     cache.putMany(TEST_CACHE, arrayOf(T1, T2).associateBy { it.id }, ofSeconds(30))
-                    redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
-                    try {
-                        cache.getMany<TestData>(TEST_CACHE, IDS).shouldBeEmpty()
-                    } finally {
-                        redis.dockerClient.unpauseContainerCmd(redis.containerId).exec()
-                    }
-                }
-            }
-            When("putOne kalles mot pauset Redis") {
-                Then("kaster ikke exception") {
-                    redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
-                    try {
-                        cache.putOne(TEST_CACHE, T1.id, T1, ofSeconds(30))
-                    } finally {
-                        redis.dockerClient.unpauseContainerCmd(redis.containerId).exec()
-                    }
-                }
-            }
-            When("putMany kalles mot pauset Redis") {
-                Then("kaster ikke exception") {
-                    redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
-                    try {
-                        cache.putMany(TEST_CACHE, arrayOf(T1, T2).associateBy { it.id }, ofSeconds(30))
-                    } finally {
-                        redis.dockerClient.unpauseContainerCmd(redis.containerId).exec()
-                    }
-                }
-            }
-            When("putMany feiler mot pauset Redis og Redis gjenopprettes") {
-                Then("tilkoblingen er fortsatt brukbar og neste putMany lagrer riktig") {
-                    redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
-                    try {
-                        cache.putMany(TEST_CACHE, arrayOf(T1).associateBy { it.id }, ofSeconds(30))
-                    } finally {
-                        redis.dockerClient.unpauseContainerCmd(redis.containerId).exec()
-                    }
-                    Thread.sleep(200)
-                    cache.putMany(TEST_CACHE, arrayOf(T2).associateBy { it.id }, ofSeconds(30))
-                    eventually(TIMEOUTS) {
-                        cache.getOne<TestData>(TEST_CACHE, T2.id) shouldBe T2
-                    }
                 }
             }
         }

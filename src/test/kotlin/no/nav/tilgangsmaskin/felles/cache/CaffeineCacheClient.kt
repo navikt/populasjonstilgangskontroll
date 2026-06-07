@@ -41,7 +41,7 @@ class CaffeineCacheClient(private val cacheManager: CacheManager) : CacheOperati
         innslag.forEach { (id, value) -> springCache.put(tilNøkkel(cache, id), value) }
     }
 
-    override fun tilNøkkel(cache: CacheNøkkelConfig, id: String): String {
+    private fun tilNøkkel(cache: CacheNøkkelConfig, id: String): String {
         val extra = cache.extraPrefix?.let { "$it:" } ?: ""
         return "$extra$id"
     }

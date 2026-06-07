@@ -22,6 +22,7 @@ import no.nav.tilgangsmaskin.regler.motor.TokenTypeTeller
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangGyldig
+import no.nav.tilgangsmaskin.tilgang.BulkGyldigValidator.Companion.valider
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
 import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
 import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
@@ -32,7 +33,6 @@ import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.MULTI_STATUS
 import org.springframework.http.HttpStatus.NO_CONTENT
-import org.springframework.http.HttpStatus.PAYLOAD_TOO_LARGE
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -97,7 +97,7 @@ class TilgangController(
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO)
-    fun bulkOBO(@RequestBody  specs: Set<BrukerIdOgRegelsett>, req: HttpServletRequest) =
+    fun bulkOBO(@RequestBody specs: Set<BrukerIdOgRegelsett>, req: HttpServletRequest) =
         bulkOppslag({ ansattIdFraToken() }, OBO, specs,req.requestURI)
 
     @PostMapping("bulk/obo/{regelType}")
@@ -125,10 +125,8 @@ class TilgangController(
     private fun bulkOppslag(ansattId: () -> AnsattId, forventet: TokenType, specs: Set<BrukerIdOgRegelsett>, uri: String): AggregertBulkRespons {
         guard.krev(forventet, uri)
         val ansatt = ansattId()
-        MDC.put(USER_ID, ansatt.verdi)
         return if (specs.isNotEmpty()) {
-            sjekk(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
-            sjekk(specs.none { it.brukerId.isBlank() }, BAD_REQUEST, "brukerId kan ikke være tom")
+            valider(specs)
             tell("bulk")
             regelTjeneste.bulkRegler(ansatt, specs)
         } else {

@@ -139,7 +139,7 @@ class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
                 Then("godkjennes bruker") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
                     every { brukere.brukere(setOf(vanligBrukerId.verdi)) } returns setOf(BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build())
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er en test", IMORGEN))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er en test", IMORGEN))
 
                     val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
                     assertSoftly(resultater) {
@@ -168,7 +168,7 @@ class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
             When("enkelttilgang er registrert og en regel avslår") {
                 Then("gis tilgang") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er test", IMORGEN))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er test", IMORGEN))
                     shouldNotThrowAny {
                         regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
                     }
@@ -200,7 +200,7 @@ class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
                 Then("registreres ikke enkelttilgang") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).kreverMedlemskapI(STRENGT_FORTROLIG).build()
                     shouldThrow<RegelException> {
-                        enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er test", IMORGEN))
+                        enkeltTilgang.registrer(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er test", IMORGEN))
                     }
                     enkeltTilgang.harEnkeltTilgang(ansattId, vanligBrukerId) shouldBe false
                 }
@@ -208,14 +208,14 @@ class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
             When("enkelttilgang har utløpt") {
                 Then("harEnkelttilgang returnerer false") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(vanligBrukerId, "Utløpt test", IGÅR))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(vanligBrukerId, "Utløpt test", IGÅR))
                     enkeltTilgang.harEnkeltTilgang(ansattId, vanligBrukerId) shouldBe false
                 }
             }
             When("enkelttilgang er gyldig") {
                 Then("harEnkelttilgang returnerer true") {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(vanligBrukerId, "Gyldig test", IMORGEN))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(vanligBrukerId, "Gyldig test", IMORGEN))
                     enkeltTilgang.harEnkeltTilgang(ansattId, vanligBrukerId).shouldBeTrue()
                 }
             }
@@ -224,8 +224,8 @@ class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
                     val annenBrukerId = BrukerId("08526835673")
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(annenBrukerId.verdi) } returns BrukerBuilder(annenBrukerId).build()
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(vanligBrukerId, "Gyldig", IMORGEN))
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(annenBrukerId, "Utløpt", IGÅR))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(vanligBrukerId, "Gyldig", IMORGEN))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(annenBrukerId, "Utløpt", IGÅR))
                     val resultat = enkeltTilgang.tilganger(ansattId, setOf(vanligBrukerId, annenBrukerId))
                     resultat shouldHaveSize 1
                     resultat.single() shouldBe vanligBrukerId

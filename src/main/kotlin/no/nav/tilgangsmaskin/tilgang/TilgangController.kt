@@ -26,7 +26,6 @@ import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
 import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
 import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
 import org.slf4j.LoggerFactory.getLogger
-import org.slf4j.MDC
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -46,7 +45,7 @@ private const val TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.tilgang.tag.
 @Tag(name = "TilgangController", description = TILGANG_CONTROLLER_TAG_DESCRIPTION)
 class TilgangController(
     private val regelTjeneste: RegelTjeneste,
-    private val enkeltTilgangTjeneste: EnkeltTilgangTjeneste,
+    private val enkeltTilgang: EnkeltTilgangTjeneste,
     private val token: Token,
     private val guard: TokenTypeGuard,
     private val teller: TokenTypeTeller) {
@@ -89,7 +88,7 @@ class TilgangController(
     @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
     fun overstyr(@RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData, req: HttpServletRequest) {
         guard.krev(OBO, req.requestURI)
-        enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattIdFraToken(), data, token.systemNavn)
+        enkeltTilgang.registrer(ansattIdFraToken(), data, token.systemNavn)
     }
 
     @PostMapping("bulk/obo")

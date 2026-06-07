@@ -46,7 +46,7 @@ class EnkeltTilgangTjeneste(
 
 
     @Transactional
-    fun registrerEnkeltTilgang(ansattId: AnsattId, data: EnkeltTilgangData, konsument: String = "Ukjent"): Boolean {
+    fun registrer(ansattId: AnsattId, data: EnkeltTilgangData, konsument: String = "Ukjent"): Boolean {
         try {
             validator.valider(konsument)
             val ansatt = ansattTjeneste.ansatt(ansattId)

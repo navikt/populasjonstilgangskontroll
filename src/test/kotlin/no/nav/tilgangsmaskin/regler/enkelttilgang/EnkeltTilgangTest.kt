@@ -117,7 +117,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                 Then("kastes exception videre") {
                     every { validator.valider(any()) } throws EnkeltTilgangKonsumentException("ukjent system")
                     shouldThrow<EnkeltTilgangKonsumentException> {
-                        enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er test", IMORGEN))
+                        enkeltTilgang.registrer(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er test", IMORGEN))
                     }
                 }
             }
@@ -128,7 +128,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                 Then("settes alle felter korrekt") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     assertSoftly(entity) {
                         navid shouldBe ansattId.verdi
@@ -152,7 +152,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     val brukerMedHistorikk = BrukerBuilder(vanligBrukerId).historiske(setOf(historiskBrukerId)).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns brukerMedHistorikk
                     every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns BrukerBuilder(historiskBrukerId).build()
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(historiskBrukerId, "Dette er en test", IMORGEN))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(historiskBrukerId, "Dette er en test", IMORGEN))
                     enkeltTilgang.harEnkeltTilgang(ansattId, BrukerBuilder(vanligBrukerId).build().brukerId).shouldBeTrue()
                 }
             }
@@ -160,8 +160,8 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                 Then("gjelder den nyeste") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er gammel", IGÅR))
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er ny", IMORGEN))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er gammel", IGÅR))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er ny", IMORGEN))
                     enkeltTilgang.harEnkeltTilgang(ansattId, bruker.brukerId).shouldBeTrue()
                 }
             }
@@ -169,8 +169,8 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                 Then("returneres false — nyeste vinner") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er aktiv men gammel", IMORGEN))
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er ny men utgått", IGÅR))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er aktiv men gammel", IMORGEN))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er ny men utgått", IGÅR))
                     enkeltTilgang.harEnkeltTilgang(ansattId, bruker.brukerId) shouldBe false
                 }
             }
@@ -178,7 +178,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                 Then("returneres false") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er utgått", IGÅR))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er utgått", IGÅR))
                     enkeltTilgang.harEnkeltTilgang(ansattId, bruker.brukerId) shouldBe false
                 }
             }
@@ -198,8 +198,8 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     val bruker2 = BrukerBuilder(historiskBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker1
                     every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns bruker2
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker1.brukerId, "Aktiv enkelttilgang 1", IMORGEN))
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker2.brukerId, "Aktiv enkelttilgang 2", IMORGEN))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(bruker1.brukerId, "Aktiv enkelttilgang 1", IMORGEN))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(bruker2.brukerId, "Aktiv enkelttilgang 2", IMORGEN))
                     val resultat = enkeltTilgang.tilganger(ansattId, setOf(bruker1.brukerId, bruker2.brukerId))
                     resultat shouldBe listOf(bruker1.brukerId, bruker2.brukerId)
                 }
@@ -210,8 +210,8 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     val bruker2 = BrukerBuilder(historiskBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker1
                     every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns bruker2
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker1.brukerId, "Aktiv enkelttilgang", IMORGEN))
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker2.brukerId, "Utgått enkelttilgang", IGÅR))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(bruker1.brukerId, "Aktiv enkelttilgang", IMORGEN))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(bruker2.brukerId, "Utgått enkelttilgang", IGÅR))
                     val resultat = enkeltTilgang.tilganger(ansattId, setOf(bruker1.brukerId, bruker2.brukerId))
                     resultat shouldBe listOf(bruker1.brukerId)
                 }
@@ -220,8 +220,8 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                 Then("returneres tom liste for den brukeren — nyeste vinner") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Aktiv men gammel", IMORGEN))
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Ny men utgått", IGÅR))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(bruker.brukerId, "Aktiv men gammel", IMORGEN))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(bruker.brukerId, "Ny men utgått", IGÅR))
                     val resultat = enkeltTilgang.tilganger(ansattId, setOf(bruker.brukerId))
                     resultat.shouldBeEmpty()
                 }
@@ -230,7 +230,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                 Then("returneres tom liste") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Utgått enkelttilgang", IGÅR))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(bruker.brukerId, "Utgått enkelttilgang", IGÅR))
                     val resultat = enkeltTilgang.tilganger(ansattId, setOf(bruker.brukerId))
                     resultat.shouldBeEmpty()
                 }
@@ -248,7 +248,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                 Then("settes created, updated, oppretter og system") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     assertSoftly(entity) {
                         created shouldNotBe null
@@ -263,7 +263,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                 Then("lastes entity med korrekte felter fra database") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     val lastet = repository.findById(entity.id)
                     lastet.isPresent.shouldBeTrue()
@@ -281,7 +281,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                 Then("nullstilles system og oppretter til tokenverdi") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     val createdFør = entity.created
                     entity.system = "ukjent-system"
@@ -299,7 +299,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                 Then("fjernes entity fra database") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
+                    enkeltTilgang.registrer(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     repository.delete(entity)
                     repository.findById(entity.id).isPresent shouldBe false

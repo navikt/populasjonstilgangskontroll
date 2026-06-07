@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.Tags.of
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component
 import java.time.Duration
@@ -12,7 +13,7 @@ import kotlin.reflect.KClass
 @Component
 @Primary
 class MeteredCacheOperations(
-    private val delegate: ValkeyCacheOperations,
+    @Qualifier("valkeyCacheOperations") private val delegate: CacheOperations,
     private val alleTreffTeller: BulkCacheSuksessTeller,
     private val teller: BulkCacheTeller) : CacheOperations {
 

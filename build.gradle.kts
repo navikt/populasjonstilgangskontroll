@@ -180,3 +180,8 @@ kotlin {
         freeCompilerArgs.add("-Xjsr305=strict")
     }
 }
+
+tasks.named("compileKotlin") {
+    dependsOn("generateAvroJava")
+}
+

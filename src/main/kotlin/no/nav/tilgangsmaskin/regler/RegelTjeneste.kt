@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.regler
 
 import io.micrometer.core.annotation.Timed
 import io.opentelemetry.instrumentation.annotations.WithSpan
-import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
@@ -11,15 +10,12 @@ import no.nav.tilgangsmaskin.felles.utils.Auditor
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BrukerOgRegelsett
-import no.nav.tilgangsmaskin.regler.motor.BulkResultat
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons
-import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
 import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import kotlin.time.measureTime
 import kotlin.time.measureTimedValue
@@ -30,6 +26,7 @@ class RegelTjeneste(
     private val brukerTjeneste: BrukerTjeneste,
     private val ansattTjeneste: AnsattTjeneste,
     private val enkeltTilgangTjeneste: EnkeltTilgangTjeneste,
+    private val aggregator: BulkResponsAggregator,
     private val auditor: Auditor) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -83,63 +80,11 @@ class RegelTjeneste(
                 log.debug("${it.size} bulk resultater {}",
                     it.map { resultat -> "${resultat.bruker.oppslagId.maskFnr()}: ${resultat.status}" })
             }
-            val godkjente = godkjente(ansatt, resultater)
-            val avviste = avviste(ansatt, godkjente, resultater, brukere)
-            val ikkeFunnet = ikkeFunnet(idOgType, resultater)
-            AggregertBulkRespons(ansattId, godkjente + avviste + ikkeFunnet)
+            aggregator.aggreger(ansattId, ansatt, idOgType, resultater, brukere)
         }
         log.info("Tid brukt på bulk med størrelse ${idOgType.size} for $ansattId: ${elapsedTime.inWholeMilliseconds}ms")
         return respons
     }
-
-    private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<BulkResultat>) = filterNot { brukerIdOgRegelsett ->
-        brukerIdOgRegelsett.brukerId in (funnet.flatMap { it.bruker.historiskeIds.map { id -> id.verdi } } + funnet.map { it.bruker.oppslagId })
-    }
-
-    private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) =
-        buildSet {
-            for (item in (oppgitt - funnet)) {
-                add(EnkeltBulkRespons.ok(item.brukerId))
-            }
-        }.also {
-            if (it.isNotEmpty()) {
-                auditor.info("404: Brukere med identer ${it.map { ident -> ident.brukerId.maskFnr() }} ikke funnet i PDL ved oppslag")
-                log.debug("${it.size} bulk elementer ikke funnet")
-            }
-        }
-
-    private fun avviste(ansatt: Ansatt, godkjente: Set<EnkeltBulkRespons>, resultater: Set<BulkResultat>, brukere: Set<BrukerOgRegelsett>) =
-        buildSet {
-        val godkjenteIds = buildSet { godkjente.forEach { add(it.brukerId) } }
-        for (resultat in resultater) {
-            log.trace("Bulk Sjekker enkelttilgang for avvist {}", resultat.bruker.oppslagId.maskFnr())
-            if (resultat.status == HttpStatus.FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
-                log.trace("Bulk resultat for {} har ingen enkelttilgangqq", resultat.bruker.oppslagId.maskFnr())
-                add(EnkeltBulkRespons(RegelException(ansatt,
-                    brukere.finnBruker(resultat.bruker.oppslagId),
-                    resultat.regel!!,
-                    status = resultat.status)))
-            }
-        }
-    }.also {
-            if (it.isNotEmpty()) {
-                log.debug("Bulk avviste {}", it)
-            }
-        }
-
-    private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) =
-        buildSet {
-            val (godkjente, avviste) = resultater.partition { it.status.is2xxSuccessful }
-            godkjente.forEach { add(EnkeltBulkRespons.ok(it.bruker.oppslagId)) }
-            enkeltTilgangTjeneste
-                .tilganger(ansatt.ansattId, avviste.map { it.bruker.brukerId }.toSet())
-                .forEach { add(EnkeltBulkRespons.ok(it.verdi)) }
-        }.also { respons ->
-            if (respons.isNotEmpty()) {
-                log.debug("Bulk godkjente oppslagId(s) {}", respons.map { it.brukerId.maskFnr() })
-            }
-        }
-
 
     private fun Set<BrukerIdOgRegelsett>.brukerOgRegelsett() =
         with(associate { it.brukerId to it }) {
@@ -150,10 +95,5 @@ class RegelTjeneste(
                 BrukerOgRegelsett(bruker, idOgType!!.type)
             }.toSet()
         }
-
-    private fun Set<BrukerOgRegelsett>.finnBruker(oppslagId: String)  =
-        first {
-            it.bruker.oppslagId == oppslagId
-        }.bruker
 
 }

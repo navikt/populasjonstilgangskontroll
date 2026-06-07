@@ -41,7 +41,7 @@ class RegelTjenesteTest : BehaviorSpec() {
         beforeEach {
             clearAllMocks()
             every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-            regler = RegelTjeneste(motor, brukere, ansatte, enkeltTilgang, LocalAuditor())
+            regler = RegelTjeneste(motor, brukere, ansatte, enkeltTilgang, BulkResponsAggregator(enkeltTilgang, LocalAuditor()), LocalAuditor())
         }
 
         Given("bulk-tilgangskontroll") {

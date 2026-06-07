@@ -5,14 +5,11 @@ import io.lettuce.core.RedisClient
 import io.lettuce.core.ScanArgs
 import io.lettuce.core.ScanCursor.INITIAL
 import io.lettuce.core.ScriptOutputType.MULTI
-import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.felles.cache.CacheBeanConfig.Companion.VALKEY_MAPPER
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
-import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
-import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import tools.jackson.databind.json.JsonMapper
@@ -25,11 +22,9 @@ import kotlin.time.measureTimedValue
 private const val SCRIPTS_COUNT_ALL_KEYS_LUA = "scripts/count-all-keys.lua"
 
 @RetryingWhenRecoverableRestService
-class ValkeyCacheClient(client: RedisClient,
-                        private val alleTreffTeller: BulkCacheSuksessTeller,
-                        private val teller: BulkCacheTeller,
-                        private val cfg: CacheConfig,
-                        private val mapper: JsonMapper = VALKEY_MAPPER) : CacheOperations {
+class ValkeyCacheOperations(client: RedisClient,
+                            private val cfg: CacheConfig,
+                            private val mapper: JsonMapper = VALKEY_MAPPER) : CacheOperations {
 
     private val log = getLogger(javaClass)
     private val countScript  = ClassPathResource(SCRIPTS_COUNT_ALL_KEYS_LUA).getContentAsString(UTF_8)
@@ -44,7 +39,6 @@ class ValkeyCacheClient(client: RedisClient,
     @WithSpan
     override fun delete(cache: CacheNøkkelConfig, id: String) =
         conn.sync().del(cache.tilNøkkel(id))
-
 
     @WithSpan
     override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? =
@@ -73,7 +67,6 @@ class ValkeyCacheClient(client: RedisClient,
                     .mget(*keys)
                     .filter { it.hasValue() }
                     .associate { it.toEntry(clazz) }
-                    .also { tellOgLog(cache.name, it.size, ids.size) }
             }.getOrElse { ex ->
                 log.warn("Cache getMany feilet for ${cache.name} med ${ids.size} nøkler: ${ex.message}")
                 emptyMap()
@@ -99,13 +92,6 @@ class ValkeyCacheClient(client: RedisClient,
                 }
             }
         }
-    }
-
-    fun tellOgLog(navn: String, funnet: Int, etterspurt: Int) {
-        alleTreffTeller.tell(of("name", navn, "suksess", (funnet == etterspurt).toString()))
-        teller.tell(of("cache", navn, "result", "miss"), etterspurt - funnet)
-        teller.tell(of("cache", navn, "result", "hit"), funnet)
-        log.trace("Fant $funnet verdier i cache $navn for $etterspurt identer")
     }
 
     override fun clear(cache: CacheNøkkelConfig) {

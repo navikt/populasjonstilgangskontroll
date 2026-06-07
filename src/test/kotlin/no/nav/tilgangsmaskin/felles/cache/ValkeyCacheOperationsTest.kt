@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
 import com.redis.testcontainers.RedisContainer.DEFAULT_IMAGE_NAME
 import io.kotest.assertions.assertSoftly
@@ -19,16 +18,11 @@ import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslag
 import java.util.concurrent.CopyOnWriteArrayList
 import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisClient.create
-import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheOperationsTest.ValkeyCacheTestConfig
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
-
-import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
-import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
-import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
@@ -36,14 +30,12 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
-import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import io.kotest.matchers.comparables.shouldBeLessThan
-import org.springframework.context.annotation.Primary
 import java.time.Duration.ofSeconds
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -76,17 +68,10 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                 )
                 .build()
 
-        @Bean
-        fun bulkCacheSuksessTeller(meterRegistry: MeterRegistry, token: Token) =
-            BulkCacheSuksessTeller(meterRegistry, token)
 
         @Bean
-        fun bulkCacheTeller(meterRegistry: MeterRegistry, token: Token) =
-            BulkCacheTeller(meterRegistry, token)
-
-        @Bean
-        fun valkeyCacheClient(client: RedisClient, cfg: CacheConfig, alle: BulkCacheSuksessTeller, bulk: BulkCacheTeller) =
-            ValkeyCacheClient(client, alle, bulk, cfg)
+        fun cacheOperations(client: RedisClient, cfg: CacheConfig): CacheOperations =
+            ValkeyCacheOperations(client, cfg)
 
         @Bean
         fun cacheElementUtløptLytter(client: RedisClient, publisher: ApplicationEventPublisher) =
@@ -96,8 +81,6 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
     @Autowired
     private lateinit var ctx: ConfigurableApplicationContext
 
-    @MockkBean
-    private lateinit var token: Token
 
     @Autowired
     private lateinit var cache: CacheOperations
@@ -114,8 +97,6 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
         }
 
         beforeEach {
-            every { token.system } returns "test"
-            every { token.clusterAndSystem } returns "test:dev-gcp"
             events.clear()
             cache.clear(TEST_CACHE)
         }

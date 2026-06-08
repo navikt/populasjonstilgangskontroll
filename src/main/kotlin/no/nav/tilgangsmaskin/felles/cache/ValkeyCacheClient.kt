@@ -92,15 +92,17 @@ class ValkeyCacheClient(client: RedisClient,
                 (key, value) -> mapper.tilJsonEntry(cache, key, value)
             }
             runCatching {
-                batchConn.setAutoFlushCommands(false)
-                try {
-                    val futures = payload.map {
-                        (key, value) -> batchConn.async().setex(key, ttl.seconds, value)
+                synchronized(batchConn) {
+                    batchConn.setAutoFlushCommands(false)
+                    try {
+                        val futures = payload.map {
+                            (key, value) -> batchConn.async().setex(key, ttl.seconds, value)
+                        }
+                        batchConn.flushCommands()
+                        awaitAll(cfg.timeout, *futures.toTypedArray())
+                    } finally {
+                        batchConn.setAutoFlushCommands(true)
                     }
-                    batchConn.flushCommands()
-                    awaitAll(cfg.timeout, *futures.toTypedArray())
-                } finally {
-                    batchConn.setAutoFlushCommands(true)
                 }
             }.onFailure { ex ->
                 log.info("Cache putMany feilet for ${cache.name} med ${innslag.size} nøkler: ${ex.message}")

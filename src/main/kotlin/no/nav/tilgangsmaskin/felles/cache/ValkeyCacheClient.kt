@@ -8,6 +8,7 @@ import io.lettuce.core.ScanCursor.INITIAL
 import io.lettuce.core.ScriptOutputType.MULTI
 import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
+import jakarta.annotation.PreDestroy
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
@@ -42,7 +43,7 @@ class ValkeyCacheClient(client: RedisClient,
         timeout = ofSeconds(cfg.timeout.seconds)
     }
 
-    @jakarta.annotation.PreDestroy
+    @PreDestroy
     fun closeConnections() {
         conn.close()
         batchConn.close()

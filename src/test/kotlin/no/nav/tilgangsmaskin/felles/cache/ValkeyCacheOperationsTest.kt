@@ -350,15 +350,15 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     cache.putOne(PDL_MED_FAMILIE_CACHE, person.brukerId.verdi, person, ofSeconds(5))
                     val retrieved = cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, person.brukerId.verdi)
 
-                    assertSoftly(retrieved!!) {
-                        it shouldBe person
-                        it.brukerId.verdi shouldBe I1
-                        it.aktørId.verdi shouldBe AKTØR_ID
-                        it.geoTilknytning shouldBe KommuneTilknytning(Kommune("0301"))
-                        it.graderinger shouldBe listOf(UGRADERT)
-                        it.familie.foreldre.first().brukerId shouldBe BrukerId(I2)
-                        it.historiskeIds shouldBe setOf(BrukerId(I2))
-                    }
+assertSoftly(retrieved!!) {
+    this shouldBe person
+    brukerId.verdi shouldBe I1
+    aktørId.verdi shouldBe AKTØR_ID
+    geoTilknytning shouldBe KommuneTilknytning(Kommune("0301"))
+    graderinger shouldBe listOf(UGRADERT)
+    familie.foreldre.first().brukerId shouldBe BrukerId(I2)
+    historiskeIds shouldBe setOf(BrukerId(I2))
+}
                 }
             }
             When("Person lagres og hentes via putMany/getMany") {

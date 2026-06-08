@@ -1,16 +1,10 @@
 package no.nav.tilgangsmaskin.bruker
 
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.BYDEL
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.KOMMUNE
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.UDEFINERT
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.UKJENT_BOSTED
-import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Type.UTLAND
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
 
 
-sealed class GeografiskTilknytning(type: Type) {
-    enum class Type { BYDEL, KOMMUNE, UDEFINERT, UTLAND, UKJENT_BOSTED }
+sealed class GeografiskTilknytning {
 
     data class Kommune(val verdi: String) {
         init {
@@ -24,31 +18,31 @@ sealed class GeografiskTilknytning(type: Type) {
         }
     }
 
-    data class KommuneTilknytning(val kommune: Kommune) : GeografiskTilknytning(KOMMUNE) {
+    data class KommuneTilknytning(val kommune: Kommune) : GeografiskTilknytning() {
         @NoCoverageAnalysis
         override fun toString() = "${javaClass.simpleName} (kommune=${kommune.verdi})"
     }
 
-    data class BydelTilknytning(val bydel: Bydel) : GeografiskTilknytning(BYDEL) {
+    data class BydelTilknytning(val bydel: Bydel) : GeografiskTilknytning() {
         @NoCoverageAnalysis
         override fun toString() = "${javaClass.simpleName} (bydel=${bydel.verdi})"
     }
 
-    class UkjentBosted : GeografiskTilknytning(UKJENT_BOSTED) {
+    class UkjentBosted : GeografiskTilknytning() {
         @NoCoverageAnalysis
         override fun equals(other: Any?) = other is UkjentBosted
         @NoCoverageAnalysis
         override fun hashCode() = javaClass.hashCode()
     }
 
-    class UtenlandskTilknytning : GeografiskTilknytning(UTLAND) {
+    class UtenlandskTilknytning : GeografiskTilknytning() {
         @NoCoverageAnalysis
         override fun equals(other: Any?) = other is UtenlandskTilknytning
         @NoCoverageAnalysis
         override fun hashCode() = javaClass.hashCode()
     }
 
-    class UdefinertTilknytning : GeografiskTilknytning(UDEFINERT) {
+    class UdefinertTilknytning : GeografiskTilknytning() {
         @NoCoverageAnalysis
         override fun equals(other: Any?) = other is UdefinertTilknytning
         @NoCoverageAnalysis

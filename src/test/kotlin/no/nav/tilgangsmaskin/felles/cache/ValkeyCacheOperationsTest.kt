@@ -23,9 +23,16 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Bydel
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UdefinertTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheOperationsTest.ValkeyCacheTestConfig
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
-
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
 import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import no.nav.tilgangsmaskin.tilgang.Token
@@ -315,6 +322,49 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                 }
             }
         }
+        Given("serialisering av sealed class-hierarkier") {
+            When("GeografiskTilknytning-subtyper lagres og hentes") {
+                Then("korrekt subtype deserialiseres") {
+                    val kommune = KommuneTilknytning(Kommune("0301"))
+                    val bydel = BydelTilknytning(Bydel("030101"))
+                    val ukjent = UkjentBosted()
+                    val utland = UtenlandskTilknytning()
+                    val udefinert = UdefinertTilknytning()
+
+                    cache.putOne(TEST_CACHE, "kommune", kommune, ofSeconds(5))
+                    cache.putOne(TEST_CACHE, "bydel", bydel, ofSeconds(5))
+                    cache.putOne(TEST_CACHE, "ukjent", ukjent, ofSeconds(5))
+                    cache.putOne(TEST_CACHE, "utland", utland, ofSeconds(5))
+                    cache.putOne(TEST_CACHE, "udefinert", udefinert, ofSeconds(5))
+
+                    assertSoftly {
+                        cache.getOne<GeografiskTilknytning>(TEST_CACHE, "kommune") shouldBe kommune
+                        cache.getOne<GeografiskTilknytning>(TEST_CACHE, "bydel") shouldBe bydel
+                        cache.getOne<GeografiskTilknytning>(TEST_CACHE, "ukjent") shouldBe ukjent
+                        cache.getOne<GeografiskTilknytning>(TEST_CACHE, "utland") shouldBe utland
+                        cache.getOne<GeografiskTilknytning>(TEST_CACHE, "udefinert") shouldBe udefinert
+                    }
+                }
+            }
+            When("GeografiskTilknytning lagres via getMany/putMany") {
+                Then("korrekte subtyper returneres") {
+                    val entries = mapOf(
+                        "k1" to KommuneTilknytning(Kommune("0301")),
+                        "k2" to BydelTilknytning(Bydel("030101")),
+                        "k3" to UkjentBosted()
+                    )
+                    cache.putMany(TEST_CACHE, entries, ofSeconds(5))
+                    val result = cache.getMany<GeografiskTilknytning>(TEST_CACHE, entries.keys)
+
+                    assertSoftly {
+                        result["k1"] shouldBe entries["k1"]
+                        result["k2"] shouldBe entries["k2"]
+                        result["k3"] shouldBe entries["k3"]
+                    }
+                }
+            }
+        }
+
     }
 
     private companion object {

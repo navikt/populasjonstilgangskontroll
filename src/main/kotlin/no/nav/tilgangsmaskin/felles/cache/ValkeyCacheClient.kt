@@ -1,6 +1,8 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import io.lettuce.core.LettuceFutures
 import io.lettuce.core.KeyValue
+import io.lettuce.core.LettuceFutures.awaitAll
 import io.lettuce.core.RedisClient
 import io.lettuce.core.ScanArgs
 import io.lettuce.core.ScanCursor.INITIAL
@@ -37,6 +39,10 @@ class ValkeyCacheClient(client: RedisClient,
         }
     }
 
+    private val batchConn = client.connect().apply {
+        timeout = ofSeconds(cfg.timeout.seconds)
+    }
+
     @WithSpan
     override fun delete(cache: CacheNøkkelConfig, id: String) =
         conn.sync().del(mapper.tilNøkkel(cache, id))
@@ -59,7 +65,7 @@ class ValkeyCacheClient(client: RedisClient,
     }
 
     @WithSpan
-    override fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T> =
+    override fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>) =
         if (ids.isEmpty()) {
             emptyMap()
         } else {
@@ -85,16 +91,19 @@ class ValkeyCacheClient(client: RedisClient,
             val payload = innslag.entries.associate {
                 (key, value) -> mapper.tilJsonEntry(cache, key, value)
             }
-            conn.apply {
-                setAutoFlushCommands(false)
+            runCatching {
+                batchConn.setAutoFlushCommands(false)
                 try {
-                    payload.forEach {
-                        (key, value) -> async().setex(key, ttl.seconds, value)
+                    val futures = payload.map {
+                        (key, value) -> batchConn.async().setex(key, ttl.seconds, value)
                     }
+                    batchConn.flushCommands()
+                    awaitAll(cfg.timeout, *futures.toTypedArray())
                 } finally {
-                    flushCommands()
-                    setAutoFlushCommands(true)
+                    batchConn.setAutoFlushCommands(true)
                 }
+            }.onFailure { ex ->
+                log.info("Cache putMany feilet for ${cache.name} med ${innslag.size} nøkler: ${ex.message}")
             }
         }
     }

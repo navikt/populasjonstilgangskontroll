@@ -121,7 +121,7 @@ class ValkeyCacheClient(client: RedisClient,
                         log.info("Cache putMany feilet for ${cache.name} med ${innslag.size} nøkler: ${ex.message}")
                     }
                 }
-                log.info("putMany {} lagret {} nøkler på {}ms", cache.name, innslag.size, elapsed.inWholeMilliseconds)
+                log.info("putMany {} lagret {} nøkler på {}ms", cache.fullName, innslag.size, elapsed.inWholeMilliseconds)
             }
         }
     }

@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import java.time.Duration
 import java.time.Duration.ofSeconds
+import kotlin.collections.emptyMap
 import kotlin.reflect.KClass
 import kotlin.text.Charsets.UTF_8
 import kotlin.time.measureTimedValue
@@ -72,34 +73,34 @@ class ValkeyCacheClient(client: RedisClient,
 
     @WithSpan
     override fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>) =
-        if (ids.isEmpty()) {
-            emptyMap()
-        } else {
-            val (result, elapsed) = measureTimedValue {
-                runCatching {
-                    val keys = ids.map { mapper.tilNøkkel(cache, it) }.toTypedArray()
-                    conn.sync()
-                        .mget(*keys)
-                        .filter { it.hasValue() }
-                        .associate {
-                            it.fraJsonEntry(mapper, clazz)
-                        }
-                }.getOrElse { ex ->
-                    log.info("Cache getMany feilet for ${cache.name} med ${ids.size} nøkler, faller tilbake til tjenestekall: ${ex.message}")
-                    emptyMap()
+        when {
+            ids.isEmpty() -> emptyMap()
+            ids.size == 1 -> getOne(cache, ids.first(), clazz)?.let { mapOf(ids.first() to it) } ?: emptyMap()
+            else -> {
+                val (result, elapsed) = measureTimedValue {
+                    runCatching {
+                        val keys = ids.map { mapper.tilNøkkel(cache, it) }.toTypedArray()
+                        conn.sync()
+                            .mget(*keys)
+                            .filter { it.hasValue() }
+                            .associate {
+                                it.fraJsonEntry(mapper, clazz)
+                            }
+                    }.getOrElse { ex ->
+                        log.info("Cache getMany feilet for ${cache.name} med ${ids.size} nøkler, faller tilbake til tjenestekall: ${ex.message}")
+                        emptyMap()
+                    }
                 }
-            }
-            result.also {
-                tellOgLog(cache.name, it.size, ids.size, elapsed)
+                result.also { tellOgLog(cache.name, it.size, ids.size, elapsed) }
             }
         }
 
     @WithSpan
     override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
-        if (innslag.isNotEmpty()) {
-            if (innslag.size == 1) {
-                putOne(cache, innslag.keys.single(), innslag.values.single(), ttl)
-            } else {
+        when {
+            innslag.isEmpty() -> return
+            innslag.size == 1 -> putOne(cache, innslag.keys.single(), innslag.values.single(), ttl)
+            else -> {
                 val (_, elapsed) = measureTimedValue {
                     val payload = innslag.entries.associate {
                             (key, value) -> mapper.tilJsonEntry(cache, key, value)

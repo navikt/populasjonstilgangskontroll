@@ -90,28 +90,32 @@ class ValkeyCacheClient(client: RedisClient,
     @WithSpan
     override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
         if (innslag.isNotEmpty()) {
-            val (_, elapsed) = measureTimedValue {
-                val payload = innslag.entries.associate {
-                    (key, value) -> mapper.tilJsonEntry(cache, key, value)
-                }
-                runCatching {
-                    synchronized(batchConn) {
-                        batchConn.setAutoFlushCommands(false)
-                        try {
-                            val futures = payload.map {
-                                (key, value) -> batchConn.async().setex(key, ttl.seconds, value)
-                            }
-                            batchConn.flushCommands()
-                            awaitAll(cfg.timeout, *futures.toTypedArray())
-                        } finally {
-                            batchConn.setAutoFlushCommands(true)
-                        }
+            if (innslag.size == 1) {
+                putOne(cache, innslag.keys.single(), innslag.values.single(), ttl)
+            } else {
+                val (_, elapsed) = measureTimedValue {
+                    val payload = innslag.entries.associate {
+                            (key, value) -> mapper.tilJsonEntry(cache, key, value)
                     }
-                }.onFailure { ex ->
-                    log.info("Cache putMany feilet for ${cache.name} med ${innslag.size} nøkler: ${ex.message}")
+                    runCatching {
+                        synchronized(batchConn) {
+                            batchConn.setAutoFlushCommands(false)
+                            try {
+                                val futures = payload.map {
+                                        (key, value) -> batchConn.async().setex(key, ttl.seconds, value)
+                                }
+                                batchConn.flushCommands()
+                                awaitAll(cfg.timeout, *futures.toTypedArray())
+                            } finally {
+                                batchConn.setAutoFlushCommands(true)
+                            }
+                        }
+                    }.onFailure { ex ->
+                        log.info("Cache putMany feilet for ${cache.name} med ${innslag.size} nøkler: ${ex.message}")
+                    }
                 }
+                log.info("putMany {} lagret {} nøkler på {}ms", cache.name, innslag.size, elapsed.inWholeMilliseconds)
             }
-            log.info("putMany {} lagret {} nøkler på {}ms", cache.name, innslag.size, elapsed.inWholeMilliseconds)
         }
     }
 

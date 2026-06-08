@@ -42,6 +42,12 @@ class ValkeyCacheClient(client: RedisClient,
         timeout = ofSeconds(cfg.timeout.seconds)
     }
 
+    @jakarta.annotation.PreDestroy
+    fun closeConnections() {
+        conn.close()
+        batchConn.close()
+    }
+
     @WithSpan
     override fun delete(cache: CacheNøkkelConfig, id: String) =
         conn.sync().del(mapper.tilNøkkel(cache, id))

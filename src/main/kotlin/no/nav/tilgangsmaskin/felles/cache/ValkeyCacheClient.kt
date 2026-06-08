@@ -55,7 +55,7 @@ class ValkeyCacheClient(client: RedisClient,
                 mapper.fraJson(json, clazz)
             }
         }.getOrElse { ex ->
-            log.info("Cache getOne feilet for ${cache.name} nøkkel $id, faller tilbake til tjenestekall: ${ex.message}")
+            log.info("Cache getOne feilet for {}, faller tilbake til tjenestekall", cache.name, ex)
             null
         }
 

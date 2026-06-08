@@ -38,7 +38,7 @@ class ValkeyCacheClient(client: RedisClient,
     @WithSpan
     override fun delete(cache: CacheNøkkelConfig, id: String) =
         conn.sync().del(mapper.tilNøkkel(cache, id))
-    
+
     @WithSpan
     override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? =
         runCatching {
@@ -71,11 +71,11 @@ class ValkeyCacheClient(client: RedisClient,
                                 it.fraJsonEntry(mapper, clazz)
                             }
                     }.getOrElse { ex ->
-                        log.info("Cache getMany feilet for ${cache.name} med ${ids.size} nøkler, faller tilbake til tjenestekall: ${ex.message}")
+                        log.info("Cache getMany feilet for ${cache.fullName} med ${ids.size} nøkler, faller tilbake til tjenestekall: ${ex.message}")
                         emptyMap()
                     }
                 }
-                result.also { tellOgLog(cache.name, it.size, ids.size, elapsed) }
+                result.also { tellOgLog(cache.fullName, it.size, ids.size, elapsed) }
             }
         }
 
@@ -103,7 +103,7 @@ class ValkeyCacheClient(client: RedisClient,
                             }
                         }
                     }.onFailure { ex ->
-                        log.info("Cache putMany feilet for ${cache.name} med ${innslag.size} nøkler: ${ex.message}")
+                        log.info("Cache putMany feilet for ${cache.fullName} med ${innslag.size} nøkler: ${ex.message}")
                     }
                 }
                 log.info("putMany {} lagret {} nøkler på {}ms", cache.fullName, innslag.size, elapsed.inWholeMilliseconds)

@@ -20,6 +20,7 @@ import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.stereotype.Service
 import kotlin.time.measureTime
 import kotlin.time.measureTimedValue
@@ -113,8 +114,8 @@ class RegelTjeneste(
         val godkjenteIds = buildSet { godkjente.forEach { add(it.brukerId) } }
         for (resultat in resultater) {
             log.trace("Bulk Sjekker enkelttilgang for avvist {}", resultat.bruker.oppslagId.maskFnr())
-            if (resultat.status == HttpStatus.FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
-                log.trace("Bulk resultat for {} har ingen enkelttilgangqq", resultat.bruker.oppslagId.maskFnr())
+            if (resultat.status == FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
+                log.trace("Bulk resultat for {} har ingen enkelttilgang", resultat.bruker.oppslagId.maskFnr())
                 add(EnkeltBulkRespons(RegelException(ansatt,
                     brukere.finnBruker(resultat.bruker.oppslagId),
                     resultat.regel!!,

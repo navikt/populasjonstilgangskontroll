@@ -147,6 +147,26 @@ class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
                     }
                 }
             }
+            When("én bruker har enkelttilgang og én mangler det i bulk") {
+                Then("godkjennes kun bruker med enkelttilgang") {
+                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build()
+                    every { brukere.brukere(setOf(vanligBrukerId.verdi, fortroligBrukerId.verdi)) } returns setOf(
+                        BrukerBuilder(vanligBrukerId, UtenlandskTilknytning()).kreverMedlemskapI(UTENLANDSK).build(),
+                        BrukerBuilder(fortroligBrukerId).kreverMedlemskapI(FORTROLIG).build()
+                    )
+                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(vanligBrukerId, "Har enkelttilgang", IMORGEN))
+
+                    val resultater = regler.bulkRegler(ansattId,
+                        setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi), BrukerIdOgRegelsett(fortroligBrukerId.verdi)))
+
+                    assertSoftly(resultater) {
+                        godkjente shouldHaveSize 1
+                        godkjente.first().brukerId shouldBe vanligBrukerId.verdi
+                        avviste shouldHaveSize 1
+                        avviste.first().brukerId shouldBe fortroligBrukerId.verdi
+                    }
+                }
+            }
             When("dnr er erstattet med fnr") {
                 Then("avvises ikke") {
                     every { brukere.brukere(setOf(dnr.verdi)) } returns setOf(BrukerBuilder(vanligBrukerId).oppslagId(dnr.verdi).historiske(setOf(dnr)).build())

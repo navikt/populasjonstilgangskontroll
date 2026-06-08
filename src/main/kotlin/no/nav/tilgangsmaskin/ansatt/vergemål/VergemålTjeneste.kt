@@ -9,7 +9,6 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.springframework.cache.annotation.Cacheable
-import java.util.TreeSet
 
 @RetryingWhenRecoverableRestService
 class VergemålTjeneste(private val nom: NomTjeneste, private val client: VergemålClient) {

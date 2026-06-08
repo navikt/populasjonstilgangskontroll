@@ -121,7 +121,9 @@ class ValkeyCacheClient(client: RedisClient,
     override fun tilNøkkel(cache: CacheNøkkelConfig, id: String) = mapper.tilNøkkel(cache, id)
 
     override fun clear(cache: CacheNøkkelConfig) {
-        check(!isProd) { "Clear er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold" }
+        check(!isProd) {
+            "Clear er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold"
+        }
         log.info("Tømmer cache {}", cache.name)
         val prefix = mapper.tilNøkkel(cache, "")
         var cursor = INITIAL

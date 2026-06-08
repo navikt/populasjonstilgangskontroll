@@ -16,7 +16,7 @@ class ResilientRedisSerializer(private val delegate: RedisSerializer<Any>, priva
             delegate.deserialize(bytes)
         } catch (e: SerializationException) {
             meterRegistry.counter("cache.deserialize.failed").increment()
-            log.warn("Kunne ikke deserialisere cache-entry, behandler som miss: ${e.message}")
+            log.warn("Kunne ikke deserialisere cache-entry, behandler som miss",e)
             null
         }
 }

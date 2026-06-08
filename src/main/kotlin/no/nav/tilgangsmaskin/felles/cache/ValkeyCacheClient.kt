@@ -31,30 +31,14 @@ class ValkeyCacheClient(client: RedisClient,
                         private val cfg: CacheConfig) : CacheOperations {
 
     private val log = getLogger(javaClass)
-    private val countScript  = ClassPathResource("scripts/count-all-keys.lua").getContentAsString(UTF_8)
-
-    private val conn = client.connect().apply {
-        timeout = ofSeconds(cfg.timeout.seconds)
-        if (isLocalOrTest) {
-            sync().configSet("notify-keyspace-events", "Exd")
-        }
-    }
-
-    private val batchConn = client.connect().apply {
-        timeout = ofSeconds(cfg.timeout.seconds)
-    }
-
-    @PreDestroy
-    fun closeConnections() {
-        conn.close()
-        batchConn.close()
-    }
+    private val countScript  = script()
+    private val conn = connect(client)
+    private val batchConn = connect(client)
 
     @WithSpan
     override fun delete(cache: CacheNøkkelConfig, id: String) =
         conn.sync().del(mapper.tilNøkkel(cache, id))
-
-
+    
     @WithSpan
     override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? =
         runCatching {
@@ -172,4 +156,20 @@ class ValkeyCacheClient(client: RedisClient,
 
     private fun <T : Any> KeyValue<String, String>.fraJsonEntry(mapper: CacheNøkkelMapper, clazz: KClass<T>) =
         mapper.tilEntry(this, clazz)
+
+    private fun connect(client: RedisClient) =
+        client.connect().apply {
+            timeout = ofSeconds(cfg.timeout.seconds)
+            if (isLocalOrTest) {
+                sync().configSet("notify-keyspace-events", "Exd")
+            }
+        }
+    private fun script() =
+        ClassPathResource("scripts/count-all-keys.lua").getContentAsString(UTF_8)
+
+    @PreDestroy
+    fun closeConnections() {
+        conn.close()
+        batchConn.close()
+    }
 }

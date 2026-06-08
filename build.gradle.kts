@@ -1,3 +1,4 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import java.lang.System.getProperty
 
@@ -39,7 +40,8 @@ springBoot {
             additional = mapOf(
                 "kotlin.version" to "2.3.21",
                 "jdk.version" to javaVersion.asInt().toString(),
-                "jdk.vendor" to getProperty("java.vendor")
+                "jdk.vendor" to getProperty("java.vendor"),
+                "spring-boot.version" to plugins.getPlugin(SpringBootPlugin::class).javaClass.`package`.implementationVersion
             )
         }
     }

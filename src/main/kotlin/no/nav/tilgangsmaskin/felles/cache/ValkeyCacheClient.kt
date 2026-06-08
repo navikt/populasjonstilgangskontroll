@@ -1,8 +1,7 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import io.lettuce.core.LettuceFutures
-import io.lettuce.core.KeyValue
 import io.lettuce.core.LettuceFutures.awaitAll
+import io.lettuce.core.KeyValue
 import io.lettuce.core.RedisClient
 import io.lettuce.core.ScanArgs
 import io.lettuce.core.ScanCursor.INITIAL
@@ -69,52 +68,58 @@ class ValkeyCacheClient(client: RedisClient,
         if (ids.isEmpty()) {
             emptyMap()
         } else {
-            runCatching {
-                val keys = ids.map { mapper.tilNøkkel(cache, it) }.toTypedArray()
-                conn.sync()
-                    .mget(*keys)
-                    .filter { it.hasValue() }
-                    .associate {
-                        it.fraJsonEntry(mapper, clazz)
-                    }
-                    .also { tellOgLog(cache.name, it.size, ids.size) }
-            }.getOrElse { ex ->
-                log.info("Cache getMany feilet for ${cache.name} med ${ids.size} nøkler, faller tilbake til tjenestekall: ${ex.message}")
-                emptyMap()
+            val (result, elapsed) = measureTimedValue {
+                runCatching {
+                    val keys = ids.map { mapper.tilNøkkel(cache, it) }.toTypedArray()
+                    conn.sync()
+                        .mget(*keys)
+                        .filter { it.hasValue() }
+                        .associate {
+                            it.fraJsonEntry(mapper, clazz)
+                        }
+                }.getOrElse { ex ->
+                    log.info("Cache getMany feilet for ${cache.name} med ${ids.size} nøkler, faller tilbake til tjenestekall: ${ex.message}")
+                    emptyMap()
+                }
+            }
+            result.also {
+                tellOgLog(cache.name, it.size, ids.size, elapsed)
             }
         }
 
     @WithSpan
     override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
         if (innslag.isNotEmpty()) {
-            log.trace("Bulk lagrer {} verdier for cache {} med prefix {}", innslag.size, cache.name, cache.extraPrefix)
-            val payload = innslag.entries.associate {
-                (key, value) -> mapper.tilJsonEntry(cache, key, value)
-            }
-            runCatching {
-                synchronized(batchConn) {
-                    batchConn.setAutoFlushCommands(false)
-                    try {
-                        val futures = payload.map {
-                            (key, value) -> batchConn.async().setex(key, ttl.seconds, value)
-                        }
-                        batchConn.flushCommands()
-                        awaitAll(cfg.timeout, *futures.toTypedArray())
-                    } finally {
-                        batchConn.setAutoFlushCommands(true)
-                    }
+            val (_, elapsed) = measureTimedValue {
+                val payload = innslag.entries.associate {
+                    (key, value) -> mapper.tilJsonEntry(cache, key, value)
                 }
-            }.onFailure { ex ->
-                log.info("Cache putMany feilet for ${cache.name} med ${innslag.size} nøkler: ${ex.message}")
+                runCatching {
+                    synchronized(batchConn) {
+                        batchConn.setAutoFlushCommands(false)
+                        try {
+                            val futures = payload.map {
+                                (key, value) -> batchConn.async().setex(key, ttl.seconds, value)
+                            }
+                            batchConn.flushCommands()
+                            awaitAll(cfg.timeout, *futures.toTypedArray())
+                        } finally {
+                            batchConn.setAutoFlushCommands(true)
+                        }
+                    }
+                }.onFailure { ex ->
+                    log.info("Cache putMany feilet for ${cache.name} med ${innslag.size} nøkler: ${ex.message}")
+                }
             }
+            log.info("putMany {} lagret {} nøkler på {}ms", cache.name, innslag.size, elapsed.inWholeMilliseconds)
         }
     }
 
-    fun tellOgLog(navn: String, funnet: Int, etterspurt: Int) {
+    fun tellOgLog(navn: String, funnet: Int, etterspurt: Int, elapsed: kotlin.time.Duration) {
         alleTreffTeller.tell(of("name", navn, "suksess", (funnet == etterspurt).toString()))
         teller.tell(of("cache", navn, "result", "miss"), etterspurt - funnet)
         teller.tell(of("cache", navn, "result", "hit"), funnet)
-        log.trace("Fant $funnet verdier i cache $navn for $etterspurt identer")
+        log.info("getMany {} hentet {} av {} nøkler på {}ms", navn, funnet, etterspurt, elapsed.inWholeMilliseconds)
     }
 
     override fun tilNøkkel(cache: CacheNøkkelConfig, id: String) = mapper.tilNøkkel(cache, id)

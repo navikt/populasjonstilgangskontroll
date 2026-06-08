@@ -1,6 +1,6 @@
 ---
 name: api-design
-description: REST API-designmønstre, versjonering, feilhåndtering (RFC 9457) og OpenAPI-konvensjoner for Nav-tjenester
+description: REST API-designmønstre, versjonering, feilhåndtering (RFC 7807) og OpenAPI-konvensjoner for Nav-tjenester
 license: MIT
 compatibility: Go or Kotlin backend on Nais
 metadata:
@@ -37,11 +37,10 @@ POST   /api/createVedtak              # Verb in URL
 GET    /api/Vedtak                    # PascalCase
 ```
 
-## Error Handling (RFC 9457 / ProblemDetail)
+## Error Handling (RFC 7807 / ProblemDetail)
 
 ```kotlin
 // Spring Boot 3+ — built-in ProblemDetail support
-// Bruk Content-Type: application/problem+json (RFC 9457)
 
 @RestControllerAdvice
 class ErrorHandler {
@@ -49,7 +48,6 @@ class ErrorHandler {
     fun handleNotFound(ex: ResourceNotFoundException): ProblemDetail =
         ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.message ?: "Resource not found").apply {
             title = "Resource not found"
-            type = URI.create("about:blank")
             setProperty("resourceType", ex.resourceType)
             setProperty("resourceId", ex.resourceId)
         }
@@ -58,8 +56,6 @@ class ErrorHandler {
     fun handleValidation(ex: MethodArgumentNotValidException): ProblemDetail =
         ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation failed").apply {
             title = "Invalid request"
-            type = URI.create("about:blank")
-            // RFC 9457: «errors» er et standardisert extension-member for valideringsfeil
             setProperty("errors", ex.bindingResult.fieldErrors.map {
                 mapOf("field" to it.field, "message" to it.defaultMessage)
             })
@@ -90,7 +86,7 @@ install(StatusPages) {
 }
 ```
 
-Response format (RFC 9457):
+Response format (RFC 7807):
 
 ```json
 {
@@ -103,8 +99,6 @@ Response format (RFC 9457):
   "resourceId": "123"
 }
 ```
-
-> **RFC 9457 vs 7807:** `type` er nå påkrevd (ikke implisitt), `about:blank` brukes for generiske feil, og `errors` er standardisert som extension-member for valideringsfeil. Sett alltid `Content-Type: application/problem+json` på feilsvar.
 
 ## Pagination
 
@@ -214,7 +208,7 @@ Alternatively, avoid versioning by:
 - **Use nouns** in URLs, not verbs
 - **Use kebab-case** for multi-word URL segments: `/api/vedtak-perioder`
 - **Use camelCase** for JSON fields: `opprettetDato`, `brukerId`
-- **Always return ProblemDetail** on errors with `Content-Type: application/problem+json` (RFC 9457)
+- **Always return ProblemDetail** on errors (not plain text)
 - **Validate input** at controller level with `@Valid`
 - **Never log PII** in request/response — log correlation ID
 - **Set `Content-Type: application/json`** on all responses

@@ -49,7 +49,7 @@ class ValkeyCacheClient(client: RedisClient,
                 mapper.fraJson(json, clazz)
             }
         }.getOrElse { ex ->
-            log.warn("Cache getOne feilet for ${cache.name} nøkkel $id: ${ex.message}")
+            log.info("Cache getOne feilet for ${cache.name} nøkkel $id, faller tilbake til tjenestekall: ${ex.message}")
             null
         }
 
@@ -73,7 +73,7 @@ class ValkeyCacheClient(client: RedisClient,
                     }
                     .also { tellOgLog(cache.name, it.size, ids.size) }
             }.getOrElse { ex ->
-                log.warn("Cache getMany feilet for ${cache.name} med ${ids.size} nøkler: ${ex.message}")
+                log.info("Cache getMany feilet for ${cache.name} med ${ids.size} nøkler, faller tilbake til tjenestekall: ${ex.message}")
                 emptyMap()
             }
         }

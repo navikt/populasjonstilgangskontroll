@@ -16,6 +16,7 @@ permissions:
 jobs:
   build:
     name: build
+    if: github.event.pull_request.head.repo.full_name == github.repository
     permissions:
       pages: write     # actions/deploy-pages
       checks: write    # publisere test-resultater til Checks API

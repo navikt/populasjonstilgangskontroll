@@ -56,14 +56,19 @@ class RegelTjeneste(
     }
 
     private fun bruker(brukerId: String) =
-        try {
+        runCatching {
             brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
-        } catch (e: NotFoundRestException) {
-            auditor.info("${e.status}: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
-            null
-        } catch (e: Exception) {
-            log.warn("Feil ved oppslag av bruker for ${brukerId.maskFnr()}", e)
-            throw e
+        }.getOrElse { e ->
+            when (e) {
+                is NotFoundRestException -> {
+                    auditor.info("${e.status}: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
+                    null
+                }
+                else -> {
+                    log.warn("Feil ved oppslag av bruker for ${brukerId.maskFnr()}", e)
+                    throw e
+                }
+            }
         }
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])

@@ -84,40 +84,34 @@ class ValkeyCacheOperations(client: RedisClient,
     @WithSpan
     override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
         when {
-            innslag.isEmpty() -> Unit
-            innslag.size == 1 ->
-                with(innslag.entries.single()) {
-                    putOne(cache, key, value, ttl)
-                }
+            innslag.isEmpty() -> return
+            innslag.size == 1 -> with(innslag.entries.single()) { putOne(cache, key, value, ttl) }
             else -> {
                 val payload = payload(innslag, cache)
                 val (resultat, varighet) = measureTimedValue {
-                    runCatching {
-                        val futures = synchronized(batchConn) {
-                            batchConn.setAutoFlushCommands(false)
-                            try {
-                                val f = payload.map {
-                                        (key, value) -> batchConn.async().setex(key, ttl.seconds, value)
-                                }
-                                batchConn.flushCommands()
-                                f
-                            } finally {
-                                batchConn.setAutoFlushCommands(true)
-                            }
-                        }
-                        awaitAll(cfg.timeout, *futures.toTypedArray())
-                    }
+                    flushBatch(payload, ttl)
                 }
                 resultat
-                    .onSuccess {
-                        log.info("putMany {} lagret {} nøkler på {}ms", cache.fullName, innslag.size, varighet.inWholeMilliseconds)
-                    }
-                    .onFailure {
-                        log.info("Cache putMany feilet for ${cache.fullName} med ${innslag.size} nøkler: ${it.message}", it)
-                    }
+                    .onSuccess { log.info("putMany {} lagret {} nøkler på {}ms", cache.fullName, innslag.size, varighet.inWholeMilliseconds) }
+                    .onFailure { log.info("Cache putMany feilet for ${cache.fullName} med ${innslag.size} nøkler: ${it.message}", it) }
             }
         }
     }
+
+    private fun flushBatch(payload: Map<String, String>, ttl: Duration) =
+        runCatching {
+            val futures = synchronized(batchConn) {
+                batchConn.setAutoFlushCommands(false)
+                try {
+                    payload.map { (key, value) ->
+                        batchConn.async().setex(key, ttl.seconds, value)
+                    }.also { batchConn.flushCommands() }
+                } finally {
+                    batchConn.setAutoFlushCommands(true)
+                }
+            }
+            awaitAll(cfg.timeout, *futures.toTypedArray())
+        }
 
     private fun payload(innslag: Map<String, Any>,
                         cache: CacheNøkkelConfig): Map<String, String> =

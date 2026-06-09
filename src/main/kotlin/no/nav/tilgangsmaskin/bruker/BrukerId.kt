@@ -19,7 +19,7 @@ data class Identifikator(@JsonValue val verdi: String) {
     override fun toString() = verdi.maskFnr()
 }
 
-data class BrukerId(@JsonValue val verdi: String) {
+data class BrukerId(@JsonValue val verdi: String) : Comparable<BrukerId> {
     init {
         with(verdi) {
             requireDigits(this, BRUKERID_LENGTH)
@@ -45,6 +45,8 @@ data class BrukerId(@JsonValue val verdi: String) {
                 }
             }
     }
+
+    override fun compareTo(other: BrukerId) = verdi.compareTo(other.verdi)
 
     @NoCoverageAnalysis
     override fun toString() = verdi.maskFnr()

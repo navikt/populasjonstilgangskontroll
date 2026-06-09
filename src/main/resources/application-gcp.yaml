@@ -201,4 +201,5 @@ valkey:
 info:
   cluster: ${nais.cluster.name:local}
   name: ${spring.application.name}
+  image: ${nais.app.image:unknown}
 

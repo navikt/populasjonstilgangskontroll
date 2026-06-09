@@ -20,6 +20,7 @@ import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.stereotype.Service
 import kotlin.time.measureTime
 import kotlin.time.measureTimedValue
@@ -55,14 +56,19 @@ class RegelTjeneste(
     }
 
     private fun bruker(brukerId: String) =
-        try {
+        runCatching {
             brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
-        } catch (e: NotFoundRestException) {
-            auditor.info("${e.status}: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
-            null
-        } catch (e: Exception) {
-            log.warn("Feil ved oppslag av bruker for ${brukerId.maskFnr()}", e)
-            throw e
+        }.getOrElse { e ->
+            when (e) {
+                is NotFoundRestException -> {
+                    auditor.info("${e.status}: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
+                    null
+                }
+                else -> {
+                    log.warn("Feil ved oppslag av bruker for ${brukerId.maskFnr()}", e)
+                    throw e
+                }
+            }
         }
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])
@@ -103,27 +109,27 @@ class RegelTjeneste(
             }
         }.also {
             if (it.isNotEmpty()) {
-                auditor.info("404: Brukere med identer ${it.map { ident -> ident.brukerId.maskFnr() }} ikke funnet i PDL ved oppslag")
-                log.debug("${it.size} bulk elementer ikke funnet")
+                auditor.info("${it.size} brukere med identer ${it.map { ident -> ident.brukerId}} ikke funnet i PDL ved oppslag")
+                log.debug("${it.size} ikke funnet i bulk ({}",it.map { ident -> ident.brukerId.maskFnr() })
             }
         }
 
     private fun avviste(ansatt: Ansatt, godkjente: Set<EnkeltBulkRespons>, resultater: Set<BulkResultat>, brukere: Set<BrukerOgRegelsett>) =
         buildSet {
-        val godkjenteIds = buildSet { godkjente.forEach { add(it.brukerId) } }
-        for (resultat in resultater) {
-            log.trace("Bulk Sjekker enkelttilgang for avvist {}", resultat.bruker.oppslagId.maskFnr())
-            if (resultat.status == HttpStatus.FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
-                log.trace("Bulk resultat for {} har ingen enkelttilgangqq", resultat.bruker.oppslagId.maskFnr())
-                add(EnkeltBulkRespons(RegelException(ansatt,
-                    brukere.finnBruker(resultat.bruker.oppslagId),
-                    resultat.regel!!,
-                    status = resultat.status)))
+            val godkjenteIds = buildSet { godkjente.forEach { add(it.brukerId) } }
+            for (resultat in resultater) {
+                log.trace("Bulk sjekker enkelttilgang for avvist {}", resultat.bruker.oppslagId.maskFnr())
+                if (resultat.status == FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
+                    log.trace("Bulk ident {} har ingen enkelttilgang", resultat.bruker.oppslagId.maskFnr())
+                    add(EnkeltBulkRespons(RegelException(ansatt,
+                        brukere.finnBruker(resultat.bruker.oppslagId),
+                        resultat.regel!!,
+                        status = resultat.status)))
+                }
             }
-        }
-    }.also {
+        }.also {
             if (it.isNotEmpty()) {
-                log.debug("Bulk avviste {}", it)
+                log.debug("${it.size} avvist av bulk ({})", it.map { ident -> ident.brukerId.maskFnr() })
             }
         }
 
@@ -136,7 +142,7 @@ class RegelTjeneste(
                 .forEach { add(EnkeltBulkRespons.ok(it.verdi)) }
         }.also { respons ->
             if (respons.isNotEmpty()) {
-                log.debug("Bulk godkjente oppslagId(s) {}", respons.map { it.brukerId.maskFnr() })
+                log.debug("${respons.size} godkjent av bulk ({})", respons.map { it.brukerId.maskFnr() })
             }
         }
 

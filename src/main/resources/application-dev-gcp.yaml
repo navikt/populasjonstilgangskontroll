@@ -16,4 +16,3 @@ management:
         include: '*'
 info:
   client-id: ${azure.app.client.id}
-  spring-boot-version: ${spring-boot.version}

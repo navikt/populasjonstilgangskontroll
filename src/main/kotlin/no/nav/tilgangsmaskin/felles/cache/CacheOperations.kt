@@ -12,7 +12,8 @@ interface CacheOperations {
     fun tilNøkkel(cache: CacheNøkkelConfig, id: String): String
     fun clear(cache: CacheNøkkelConfig)
     fun clear(caches: Set<CacheNøkkelConfig>) = caches.forEach { clear(it) }
-    fun size(cache: CacheNøkkelConfig): Long = sizes(cache).values.single()
+    fun size(cache: CacheNøkkelConfig): Long =
+        sizes(cache).values.single()
     fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long>
 }
 

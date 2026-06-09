@@ -1,4 +1,7 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+import org.springframework.boot.gradle.tasks.buildinfo.BuildInfo
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+import org.springframework.core.SpringVersion
 import java.lang.System.getProperty
 
 val javaVersion = JavaLanguageVersion.of(25)
@@ -39,9 +42,20 @@ springBoot {
             additional = mapOf(
                 "kotlin.version" to "2.3.21",
                 "jdk.version" to javaVersion.asInt().toString(),
-                "jdk.vendor" to getProperty("java.vendor")
+                "jdk.vendor" to getProperty("java.vendor"),
+                "spring-boot.version" to plugins.getPlugin(SpringBootPlugin::class).javaClass.`package`.implementationVersion
             )
         }
+    }
+}
+
+tasks.named<BuildInfo>("bootBuildInfo") {
+    properties {
+        additional.put("spring.version", provider {
+            configurations.runtimeClasspath.get().resolvedConfiguration.resolvedArtifacts
+                .firstOrNull { it.moduleVersion.id.group == "org.springframework" && it.moduleVersion.id.name == "spring-core" }
+                ?.moduleVersion?.id?.version ?: "unknown"
+        })
     }
 }
 

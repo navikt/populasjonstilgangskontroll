@@ -70,8 +70,8 @@ class ValkeyCacheOperations(client: RedisClient,
                             .associate {
                                 it.fraJsonEntry(mapper, clazz)
                             }
-                    }.getOrElse { ex ->
-                        log.info("Cache getMany feilet for ${cache.fullName} med ${ids.size} nøkler, faller tilbake til tjenestekall: ${ex.message}")
+                    }.getOrElse {
+                        log.info("Cache getMany feilet for ${cache.fullName} med ${ids.size} nøkler, faller tilbake til tjenestekall: ${it.message}",it)
                         emptyMap()
                     }
                 }
@@ -102,8 +102,8 @@ class ValkeyCacheOperations(client: RedisClient,
                                 batchConn.setAutoFlushCommands(true)
                             }
                         }
-                    }.onFailure { ex ->
-                        log.info("Cache putMany feilet for ${cache.fullName} med ${innslag.size} nøkler: ${ex.message}")
+                    }.onFailure {
+                        log.info("Cache putMany feilet for ${cache.fullName} med ${innslag.size} nøkler: $it.message}",it)
                     }
                 }
                 log.info("putMany {} lagret {} nøkler på {}ms", cache.fullName, innslag.size, elapsed.inWholeMilliseconds)

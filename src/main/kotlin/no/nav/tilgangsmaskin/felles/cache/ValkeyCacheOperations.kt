@@ -77,7 +77,9 @@ class ValkeyCacheOperations(client: RedisClient,
                         emptyMap()
                     }
                 }
-                result.also { tellOgLog(cache.fullName, it.size, ids.size, elapsed) }
+                result.also {
+                    tellOgLog(cache.fullName, it.size, ids.size, elapsed)
+                }
             }
         }
 
@@ -94,7 +96,7 @@ class ValkeyCacheOperations(client: RedisClient,
                 }
                 resultat
                     .onSuccess {
-                        log.info("putMany {} lagret {} nøkler på {}ms", cache.fullName, innslag.size, varighet.inWholeMilliseconds)
+                        log.info("Cache putMany {} lagret {} nøkler på {}ms", cache.fullName, innslag.size, varighet.inWholeMilliseconds)
                     }
                     .onFailure {
                         log.info("Cache putMany feilet for ${cache.fullName} med ${innslag.size} nøkler: ${it.message}", it)

@@ -24,11 +24,11 @@ import kotlin.text.Charsets.UTF_8
 import kotlin.time.measureTimedValue
 
 @RetryingWhenRecoverableRestService
-class ValkeyCacheClient(client: RedisClient,
-                        private val mapper: CacheNøkkelMapper,
-                        private val alleTreffTeller: BulkCacheSuksessTeller,
-                        private val teller: BulkCacheTeller,
-                        private val cfg: CacheConfig) : CacheOperations {
+class ValkeyCacheOperations(client: RedisClient,
+                            private val mapper: CacheNøkkelMapper,
+                            private val alleTreffTeller: BulkCacheSuksessTeller,
+                            private val teller: BulkCacheTeller,
+                            private val cfg: CacheConfig) : CacheOperations {
 
     private val log = getLogger(javaClass)
     private val countScript  = script()

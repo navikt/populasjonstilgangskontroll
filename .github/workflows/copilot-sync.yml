@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   sync:
-    uses: navikt/copilot/.github/workflows/copilot-customization-sync.yml@7acbe01f5609d6079a1a05d6187079a772705a95 # main
+    uses: navikt/copilot/.github/workflows/copilot-customization-sync.yml@6d4adbb21ff83b37908c3b2d4018b497e31e919d # v0.5.0
     permissions:
       contents: write       # committe oppdaterte Copilot-customization-filer
       pull-requests: write  # opprette PR med endringene

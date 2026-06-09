@@ -21,6 +21,7 @@ import java.time.Duration.ofSeconds
 import kotlin.collections.emptyMap
 import kotlin.reflect.KClass
 import kotlin.text.Charsets.UTF_8
+import kotlin.time.measureTime
 import kotlin.time.measureTimedValue
 
 @RetryingWhenRecoverableRestService
@@ -85,10 +86,8 @@ class ValkeyCacheOperations(client: RedisClient,
             innslag.isEmpty() -> return
             innslag.size == 1 -> putOne(cache, innslag.keys.single(), innslag.values.single(), ttl)
             else -> {
-                val (_, elapsed) = measureTimedValue {
-                    val payload = innslag.entries.associate {
-                            (key, value) -> mapper.tilJsonEntry(cache, key, value)
-                    }
+                val payload = payload(innslag, cache)
+                val elapsed = measureTime {
                     runCatching {
                         synchronized(batchConn) {
                             batchConn.setAutoFlushCommands(false)
@@ -111,7 +110,13 @@ class ValkeyCacheOperations(client: RedisClient,
         }
     }
 
-    fun tellOgLog(navn: String, funnet: Int, etterspurt: Int, elapsed: kotlin.time.Duration) {
+    private fun payload(innslag: Map<String, Any>,
+                        cache: CacheNøkkelConfig): Map<String, String> =
+        innslag.entries.associate { (key, value) ->
+            mapper.tilJsonEntry(cache, key, value)
+        }
+
+    private fun tellOgLog(navn: String, funnet: Int, etterspurt: Int, elapsed: kotlin.time.Duration) {
         alleTreffTeller.tell(of("name", navn, "suksess", (funnet == etterspurt).toString()))
         teller.tell(of("cache", navn, "result", "miss"), etterspurt - funnet)
         teller.tell(of("cache", navn, "result", "hit"), funnet)

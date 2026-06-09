@@ -78,7 +78,7 @@ class ValkeyCacheOperations(client: RedisClient,
                     }
                 }
                 result.also {
-                    tellOgLog(cache.fullName, it.size, ids.size, elapsed)
+                    tellOgLog(cache.fullName,it.size, ids.size, elapsed)
                 }
             }
         }

@@ -20,11 +20,10 @@ jobs:
     permissions:
       pages: write     # actions/deploy-pages publiserer JaCoCo + testrapport
       checks: write    # publisere test-resultater til Checks API
-      contents: write  # gradle/actions/dependency-submission skriver dependency graph
-      id-token: write  # nais/login + nais/attest-sign (OIDC mot GAR + Sigstore)
-    uses: ./.github/workflows/build-attest.yml
+      contents: read   # checkout kode
+      id-token: write  # nais/docker-build-push + nais/attest-sign (OIDC mot GAR + Sigstore)
+    uses: ./.github/workflows/build.yml
     with:
-      base-image: europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/jre:openjdk-25
       publish-pages: true
       cache-read-only: true
 
@@ -49,4 +48,6 @@ jobs:
       IMAGE: ${{needs.build.outputs.image}}
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
       - uses: nais/deploy/actions/deploy@ab841e4d99cbb00edd996d3ae39bd4cea6b8e2c2 # v2

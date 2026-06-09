@@ -85,21 +85,9 @@ jobs:
       - name: Setter tag-navn
         run: echo "TAG=$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
 
-      - name: Configure Gradle for GPR
-        env:
-          GH_ACTOR: ${{ github.actor }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          mkdir -p ~/.gradle
-          echo "gpr.user=${GH_ACTOR}" >> ~/.gradle/gradle.properties
-          echo "gpr.key=${GH_TOKEN}" >> ~/.gradle/gradle.properties
 
       - name: Test og bygg
-        run: |
-          ./gradlew --warning-mode all test jacocoTestReport cyclonedxBom bootJar
-        env:
-          ORG_GRADLE_PROJECT_githubUser: x-access-token
-          ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew --warning-mode all test jacocoTestReport cyclonedxBom bootJar
 
       - name: Bygg og push Docker-image
         id: docker-push

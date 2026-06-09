@@ -31,7 +31,6 @@ class ValkeyCacheOperations(client: RedisClient,
                             private val cfg: CacheConfig) : CacheOperations {
 
     private val log = getLogger(javaClass)
-    private val countScript  = script()
     private val conn = connect(client)
     private val batchConn = connect(client)
 
@@ -169,7 +168,7 @@ class ValkeyCacheOperations(client: RedisClient,
 
     private fun eval(vararg prefixes: String) =
         measureTimedValue {
-            conn.sync().eval<List<Long>>(countScript, MULTI, emptyArray(), *prefixes)
+            conn.sync().eval<List<Long>>(SCRIPT, MULTI, emptyArray(), *prefixes)
         }
 
 
@@ -183,12 +182,15 @@ class ValkeyCacheOperations(client: RedisClient,
                 sync().configSet("notify-keyspace-events", "Exd")
             }
         }
-    private fun script() =
-        ClassPathResource("scripts/count-all-keys.lua").getContentAsString(UTF_8)
+
 
     @PreDestroy
     fun closeConnections() {
         conn.close()
         batchConn.close()
+    }
+
+    companion object {
+        private val SCRIPT = ClassPathResource("scripts/count-all-keys.lua").getContentAsString(UTF_8)
     }
 }

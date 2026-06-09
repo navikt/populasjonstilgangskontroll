@@ -105,7 +105,9 @@ class ValkeyCacheOperations(client: RedisClient,
                 try {
                     payload.map { (key, value) ->
                         batchConn.async().setex(key, ttl.seconds, value)
-                    }.also { batchConn.flushCommands() }
+                    }.also {
+                        batchConn.flushCommands()
+                    }
                 } finally {
                     batchConn.setAutoFlushCommands(true)
                 }

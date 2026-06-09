@@ -21,7 +21,6 @@ import java.time.Duration.ofSeconds
 import kotlin.collections.emptyMap
 import kotlin.reflect.KClass
 import kotlin.text.Charsets.UTF_8
-import kotlin.time.measureTime
 import kotlin.time.measureTimedValue
 
 @RetryingWhenRecoverableRestService
@@ -83,7 +82,7 @@ class ValkeyCacheOperations(client: RedisClient,
         }
 
     @WithSpan
-    override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) =
+    override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
         when {
             innslag.isEmpty() -> Unit
             innslag.size == 1 ->
@@ -92,27 +91,33 @@ class ValkeyCacheOperations(client: RedisClient,
                 }
             else -> {
                 val payload = payload(innslag, cache)
-                val varighet = measureTime {
+                val (resultat, varighet) = measureTimedValue {
                     runCatching {
-                        synchronized(batchConn) {
+                        val futures = synchronized(batchConn) {
                             batchConn.setAutoFlushCommands(false)
                             try {
-                                val futures = payload.map {
+                                val f = payload.map {
                                         (key, value) -> batchConn.async().setex(key, ttl.seconds, value)
                                 }
                                 batchConn.flushCommands()
-                                awaitAll(cfg.timeout, *futures.toTypedArray())
+                                f
                             } finally {
                                 batchConn.setAutoFlushCommands(true)
                             }
                         }
-                    }.onFailure {
-                        log.info("Cache putMany feilet for ${cache.fullName} med ${innslag.size} nøkler: $it.message}",it)
+                        awaitAll(cfg.timeout, *futures.toTypedArray())
                     }
                 }
-                log.info("putMany {} lagret {} nøkler på {}ms", cache.fullName, innslag.size, varighet.inWholeMilliseconds)
+                resultat
+                    .onSuccess {
+                        log.info("putMany {} lagret {} nøkler på {}ms", cache.fullName, innslag.size, varighet.inWholeMilliseconds)
+                    }
+                    .onFailure {
+                        log.info("Cache putMany feilet for ${cache.fullName} med ${innslag.size} nøkler: ${it.message}", it)
+                    }
             }
         }
+    }
 
     private fun payload(innslag: Map<String, Any>,
                         cache: CacheNøkkelConfig): Map<String, String> =

@@ -6,6 +6,7 @@ import io.lettuce.core.RedisClient
 import io.lettuce.core.ScanArgs
 import io.lettuce.core.ScanCursor.INITIAL
 import io.lettuce.core.ScriptOutputType.MULTI
+import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import jakarta.annotation.PreDestroy
@@ -28,7 +29,8 @@ class ValkeyCacheOperations(client: RedisClient,
                             private val mapper: CacheNøkkelMapper,
                             private val alleTreffTeller: BulkCacheSuksessTeller,
                             private val teller: BulkCacheTeller,
-                            private val cfg: CacheConfig) : CacheOperations {
+                            private val cfg: CacheConfig,
+                            private val meterRegistry: MeterRegistry) : CacheOperations {
 
     private val log = getLogger(javaClass)
     private val conn = connect(client)
@@ -45,6 +47,7 @@ class ValkeyCacheOperations(client: RedisClient,
                 mapper.fraJson(json, clazz)
             }
         }.getOrElse { ex ->
+            meterRegistry.counter("cache.deserialize.failed", "cache", cache.name).increment()
             log.info("Cache getOne feilet for {}, faller tilbake til tjenestekall", cache.name, ex)
             null
         }
@@ -72,6 +75,7 @@ class ValkeyCacheOperations(client: RedisClient,
                                 it.fraJsonEntry(mapper, clazz)
                             }
                     }.getOrElse {
+                        meterRegistry.counter("cache.deserialize.failed", "cache", cache.name).increment(ids.size.toDouble())
                         log.info("Cache getMany feilet for ${cache.fullName} med ${ids.size} nøkler, faller tilbake til tjenestekall: ${it.message}",it)
                         emptyMap()
                     }

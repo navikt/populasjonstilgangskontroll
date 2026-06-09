@@ -30,6 +30,7 @@ import org.slf4j.MDC
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.CONTENT_TOO_LARGE
 import org.springframework.http.HttpStatus.MULTI_STATUS
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.HttpStatus.PAYLOAD_TOO_LARGE
@@ -127,7 +128,7 @@ class TilgangController(
         val ansatt = ansattId()
         MDC.put(USER_ID, ansatt.verdi)
         return if (specs.isNotEmpty()) {
-            sjekk(specs.size <= 1000, PAYLOAD_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
+            sjekk(specs.size <= 1000, CONTENT_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
             sjekk(specs.none { it.brukerId.isBlank() }, BAD_REQUEST, "brukerId kan ikke være tom")
             tell("bulk")
             regelTjeneste.bulkRegler(ansatt, specs)

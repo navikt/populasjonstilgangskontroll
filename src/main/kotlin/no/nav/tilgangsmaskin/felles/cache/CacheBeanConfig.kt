@@ -19,6 +19,8 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
+import tools.jackson.core.StreamReadFeature
+import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.KotlinModule.Builder
 
@@ -74,6 +76,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory, private val meterR
 
     companion object {
         val VALKEY_MAPPER = JsonMapper.builder().polymorphicTypeValidator(NavPolymorphicTypeValidator()).apply {
+            enable(INCLUDE_SOURCE_IN_LOCATION)
             addModule(Builder().build())
             addModule(JacksonTypeInfoAddingValkeyModule())
         }.build()

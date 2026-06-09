@@ -20,7 +20,7 @@ class VergemålTjeneste(private val nom: NomTjeneste, private val client: Vergem
             client.vergemål(VergemålIdent(fnr.verdi))
                 .map { it.vergehaver }
                 .toSortedSet(compareBy { it.verdi })
-        } ?: emptySet()
+        }.orEmpty()
 
 
     @NoCoverageAnalysis

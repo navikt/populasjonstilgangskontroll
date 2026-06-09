@@ -60,7 +60,9 @@ class ValkeyCacheOperations(client: RedisClient,
     override fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>) =
         when {
             ids.isEmpty() -> emptyMap()
-            ids.size == 1 -> getOne(cache, ids.first(), clazz)?.let { mapOf(ids.first() to it) } ?: emptyMap()
+            ids.size == 1 -> ids.single().let { id ->
+                getOne(cache, id, clazz)?.let { mapOf(id to it) }.orEmpty()
+            }
             else -> {
                 val (result, elapsed) = measureTimedValue {
                     runCatching {
@@ -81,10 +83,13 @@ class ValkeyCacheOperations(client: RedisClient,
         }
 
     @WithSpan
-    override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
+    override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) =
         when {
-            innslag.isEmpty() -> return
-            innslag.size == 1 -> putOne(cache, innslag.keys.single(), innslag.values.single(), ttl)
+            innslag.isEmpty() -> Unit
+            innslag.size == 1 ->
+                with(innslag.entries.single()) {
+                    putOne(cache, key, value, ttl)
+                }
             else -> {
                 val payload = payload(innslag, cache)
                 val varighet = measureTime {
@@ -108,7 +113,6 @@ class ValkeyCacheOperations(client: RedisClient,
                 log.info("putMany {} lagret {} nøkler på {}ms", cache.fullName, innslag.size, varighet.inWholeMilliseconds)
             }
         }
-    }
 
     private fun payload(innslag: Map<String, Any>,
                         cache: CacheNøkkelConfig): Map<String, String> =

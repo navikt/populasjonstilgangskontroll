@@ -1,16 +1,11 @@
 name: Build and attest (reusable)
 
-# Gjenbrukbar workflow som kompilerer, tester, bygger image med Jib,
+# Gjenbrukbar workflow som kompilerer, tester, bygger image med Dockerfile,
 # genererer SBOM og signerer/attesterer image mot Navs registry.
 
 on:
   workflow_call:
     inputs:
-      base-image:
-        description: "Jib base image (FROM)"
-        required: false
-        type: string
-        default: europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/jre:openjdk-25
       publish-pages:
         description: "Publiser JaCoCo + testrapport til GitHub Pages"
         required: false
@@ -64,12 +59,9 @@ jobs:
       checks: write    # publisere test-resultater til Checks API
       contents: write  # gradle/actions/dependency-submission skriver dependency graph
       id-token: write  # nais/login + nais/attest-sign (OIDC mot GAR + Sigstore)
-    env:
-      IMAGE: europe-north1-docker.pkg.dev/nais-management-233d/tilgangsmaskin/${{ github.event.repository.name }}
-      BASE: ${{ inputs.base-image }}
     outputs:
-      image: ${{ steps.kompiler.outputs.image }}
-      digest: ${{ steps.kompiler.outputs.digest }}
+      image: ${{ steps.docker-push.outputs.image }}
+      digest: ${{ steps.docker-push.outputs.digest }}
     steps:
       - name: Sjekker ut kode
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -90,18 +82,8 @@ jobs:
           java-version: 25
           distribution: temurin
 
-      - name: Installer cosign
-        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
-        with:
-          cosign-release: v2.4.1
-
       - name: Setter tag-navn
         run: echo "TAG=$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
-
-      - name: Login GAR
-        uses: nais/login@d6ab5d83f735e9f155eb9d7d29cd20ae46820ea9 # v0
-        with:
-          team: tilgangsmaskin
 
       - name: Configure Gradle for GPR
         env:
@@ -113,19 +95,18 @@ jobs:
           echo "gpr.key=${GH_TOKEN}" >> ~/.gradle/gradle.properties
 
       - name: Test og bygg
-        id: kompiler
         run: |
-          echo "image=${IMAGE}:${TAG}" >> "$GITHUB_OUTPUT"
-          ./gradlew --warning-mode all test jacocoTestReport cyclonedxBom jib \
-            -Djib.to.tags=latest,"${TAG}" \
-            -Djib.from.image="${BASE}" \
-            -Djib.to.image="${IMAGE}:${TAG}"
-          DIGEST=$(cat build/jib-image.digest)
-          echo "DIGEST=${DIGEST}" >> "$GITHUB_ENV"
-          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
+          ./gradlew --warning-mode all test jacocoTestReport cyclonedxBom bootJar
         env:
           ORG_GRADLE_PROJECT_githubUser: x-access-token
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bygg og push Docker-image
+        id: docker-push
+        uses: nais/docker-build-push@v0
+        with:
+          team: tilgangsmaskin
+          tag: ${{ env.TAG }}
 
       - name: Prepare Pages artifact
         if: ${{ inputs.publish-pages }}
@@ -175,5 +156,5 @@ jobs:
       - name: Attest and sign
         uses: nais/attest-sign@c839bd87ba71207e36341b6e9b6d8aabdcbc86c2 # v2.0.12
         with:
-          image_ref: ${{ env.IMAGE }}@${{ env.DIGEST }}
+          image_ref: ${{ steps.docker-push.outputs.image }}
           sbom: build/reports/cyclonedx/application.cdx.json

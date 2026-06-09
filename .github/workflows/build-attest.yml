@@ -156,5 +156,5 @@ jobs:
       - name: Attest and sign
         uses: nais/attest-sign@c839bd87ba71207e36341b6e9b6d8aabdcbc86c2 # v2.0.12
         with:
-          image_ref: ${{ steps.docker-push.outputs.image }}
+          image_ref: ${{ steps.docker-push.outputs.image }}@${{ steps.docker-push.outputs.digest }}
           sbom: build/reports/cyclonedx/application.cdx.json

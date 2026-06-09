@@ -115,7 +115,7 @@ class RegelTjeneste(
         for (resultat in resultater) {
             log.trace("Bulk Sjekker enkelttilgang for avvist {}", resultat.bruker.oppslagId.maskFnr())
             if (resultat.status == FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
-                log.trace("Bulk resultat for {} har ingen enkelttilgang", resultat.bruker.oppslagId.maskFnr())
+                log.trace("Bulk ident {} har ingen enkelttilgang", resultat.bruker.oppslagId.maskFnr())
                 add(EnkeltBulkRespons(RegelException(ansatt,
                     brukere.finnBruker(resultat.bruker.oppslagId),
                     resultat.regel!!,
@@ -137,7 +137,7 @@ class RegelTjeneste(
                 .forEach { add(EnkeltBulkRespons.ok(it.verdi)) }
         }.also { respons ->
             if (respons.isNotEmpty()) {
-                log.debug("Bulk godkjente oppslagId(s) {}", respons.map { it.brukerId.maskFnr() })
+                log.debug("Bulk godkjente ${respons.size} oppslagId(s) {}", respons.map { it.brukerId.maskFnr() })
             }
         }
 

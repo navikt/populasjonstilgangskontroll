@@ -113,7 +113,7 @@ class RegelTjeneste(
         buildSet {
         val godkjenteIds = buildSet { godkjente.forEach { add(it.brukerId) } }
         for (resultat in resultater) {
-            log.trace("Bulk Sjekker enkelttilgang for avvist {}", resultat.bruker.oppslagId.maskFnr())
+            log.trace("Bulk sjekker enkelttilgang for avvist {}", resultat.bruker.oppslagId.maskFnr())
             if (resultat.status == FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
                 log.trace("Bulk ident {} har ingen enkelttilgang", resultat.bruker.oppslagId.maskFnr())
                 add(EnkeltBulkRespons(RegelException(ansatt,

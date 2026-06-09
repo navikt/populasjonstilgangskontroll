@@ -85,11 +85,12 @@ class ValkeyCacheOperations(client: RedisClient,
     override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
         when {
             innslag.isEmpty() -> return
-            innslag.size == 1 -> with(innslag.entries.single()) { putOne(cache, key, value, ttl) }
+            innslag.size == 1 -> with(innslag.entries.single()) {
+                putOne(cache, key, value, ttl)
+            }
             else -> {
-                val payload = payload(innslag, cache)
                 val (resultat, varighet) = measureTimedValue {
-                    flushBatch(payload, ttl)
+                    flushBatch(payload(innslag, cache), ttl)
                 }
                 resultat
                     .onSuccess { log.info("putMany {} lagret {} nøkler på {}ms", cache.fullName, innslag.size, varighet.inWholeMilliseconds) }

@@ -104,7 +104,7 @@ class RegelTjeneste(
             }
         }.also {
             if (it.isNotEmpty()) {
-                auditor.info("404: Brukere med identer ${it.map { ident -> ident.brukerId.maskFnr() }} ikke funnet i PDL ved oppslag")
+                auditor.info("${it.size} brukere med identer ${it.map { ident -> ident.brukerId.maskFnr() }} ikke funnet i PDL ved oppslag")
                 log.debug("${it.size} bulk elementer ikke funnet")
             }
         }

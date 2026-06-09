@@ -87,7 +87,7 @@ class ValkeyCacheOperations(client: RedisClient,
             innslag.size == 1 -> putOne(cache, innslag.keys.single(), innslag.values.single(), ttl)
             else -> {
                 val payload = payload(innslag, cache)
-                val elapsed = measureTime {
+                val varighet = measureTime {
                     runCatching {
                         synchronized(batchConn) {
                             batchConn.setAutoFlushCommands(false)
@@ -105,7 +105,7 @@ class ValkeyCacheOperations(client: RedisClient,
                         log.info("Cache putMany feilet for ${cache.fullName} med ${innslag.size} nøkler: $it.message}",it)
                     }
                 }
-                log.info("putMany {} lagret {} nøkler på {}ms", cache.fullName, innslag.size, elapsed.inWholeMilliseconds)
+                log.info("putMany {} lagret {} nøkler på {}ms", cache.fullName, innslag.size, varighet.inWholeMilliseconds)
             }
         }
     }

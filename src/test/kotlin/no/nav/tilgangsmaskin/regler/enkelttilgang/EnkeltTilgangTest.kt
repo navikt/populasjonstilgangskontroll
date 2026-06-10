@@ -229,7 +229,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
         }
 
         Given("enkeltTilgangEntityListener") {
-            When("@PrePersist kalles") {
+            When("entity persisteres") {
                 Then("settes created, updated, oppretter og system") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
@@ -244,8 +244,8 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     }
                 }
             }
-            When("@PostLoad kalles") {
-                Then("lastes entity med korrekte felter fra database") {
+            When("entity lastes fra database") {
+                Then("lastes entity med korrekte felter") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
@@ -262,8 +262,8 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     }
                 }
             }
-            When("@PreUpdate kalles") {
-                Then("nullstilles system og oppretter til tokenverdi") {
+            When("entity oppdateres") {
+                Then("resettes system og oppretter til tokenverdi") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
@@ -280,7 +280,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     }
                 }
             }
-            When("@PreRemove og @PostRemove kalles") {
+            When("entity slettes") {
                 Then("fjernes entity fra database") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker

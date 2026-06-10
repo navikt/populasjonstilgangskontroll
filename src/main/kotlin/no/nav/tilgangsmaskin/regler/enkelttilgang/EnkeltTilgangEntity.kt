@@ -11,6 +11,8 @@ import jakarta.persistence.Index
 import jakarta.persistence.Table
 import no.nav.tilgangsmaskin.ansatt.AnsattId.Companion.ANSATTID_LENGTH
 import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.Instant
 import kotlin.annotation.AnnotationRetention.RUNTIME
@@ -34,15 +36,15 @@ class EnkeltTilgangEntity(
     @GeneratedValue(strategy = IDENTITY)
     val id: Long = 0
 
-    @CreatedDato
+    @CreatedDate
     @Column(nullable = false)
     var created: Instant? = null
 
-    @LastModifiedDato
+    @LastModifiedDate
     @Column(nullable = false)
     var updated: Instant? = null
 
-    @Column(name = "oppretter", length = 7)
+    @Column(name = "oppretter", length = ANSATTID_LENGTH)
     @CreatedByAnsatt
     var oppretter: String? = null
 
@@ -51,7 +53,6 @@ class EnkeltTilgangEntity(
     var system: String? = null
 }
 
-
 @Target(FIELD)
 @Retention(RUNTIME)
 annotation class CreatedBySystem
@@ -59,11 +60,3 @@ annotation class CreatedBySystem
 @Target(FIELD)
 @Retention(RUNTIME)
 annotation class CreatedByAnsatt
-
-@Target(FIELD)
-@Retention(RUNTIME)
-annotation class CreatedDato
-
-@Target(FIELD)
-@Retention(RUNTIME)
-annotation class LastModifiedDato

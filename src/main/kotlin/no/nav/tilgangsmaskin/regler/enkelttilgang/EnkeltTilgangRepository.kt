@@ -1,12 +1,10 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
-import io.micrometer.core.annotation.Timed
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import java.time.Instant
 
-@Timed
 interface EnkeltTilgangRepository : JpaRepository<EnkeltTilgangEntity, Long> {
 
     @Query("""

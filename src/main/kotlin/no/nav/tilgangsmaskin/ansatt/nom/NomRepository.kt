@@ -11,7 +11,7 @@ interface NomRepository : JpaRepository<NomEntity, Long> {
     fun findFnrByNavidAndGyldigtilGreaterThanEqual(navid: String, gyldigtil: Instant = now()): FnrProjection?
     fun deleteByGyldigtilBefore(before: Instant = now()): Int
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query(value = """
         INSERT INTO Ansatte (navid, fnr, startdato, gyldigtil, created, updated)
         VALUES (:navid, :fnr, :startdato, :gyldigtil, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)

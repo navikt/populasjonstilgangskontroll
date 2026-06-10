@@ -32,7 +32,7 @@ class EnkeltTilgangEntity(
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    val id: Long = 0
+    val id: Long? = null
 
     @CreatedDate
     @Column(nullable = false)

@@ -250,7 +250,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
-                    val lastet = repository.findById(entity.id)
+                    val lastet = repository.findById(entity.id!!)
                     lastet.isPresent.shouldBeTrue()
                     with(lastet.get()) {
                         navid shouldBe ansattId.verdi
@@ -272,7 +272,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     entity.system = "ukjent-system"
                     entity.oppretter = "X000000"
                     repository.saveAndFlush(entity)
-                    val oppdatert = repository.findById(entity.id).get()
+                    val oppdatert = repository.findById(entity.id!!).get()
                     assertSoftly(oppdatert) {
                         system shouldBe "test"
                         oppretter shouldBe ansattId.verdi
@@ -287,7 +287,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     repository.delete(entity)
-                    repository.findById(entity.id).isPresent shouldBe false
+                    repository.findById(entity.id!!).isPresent shouldBe false
                 }
             }
         }

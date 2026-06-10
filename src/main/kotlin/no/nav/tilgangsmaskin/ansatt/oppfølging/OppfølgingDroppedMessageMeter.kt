@@ -6,9 +6,5 @@ import org.springframework.stereotype.Component
 
 @Component
 class OppfølgingDroppedMessageMeter(registry: MeterRegistry) :
-    TypedKafkaDroppedMessageMeter<OppfølgingHendelse>(registry, OppfølgingHendelse::class.java) {
-
-    override fun formatEvent(event: OppfølgingHendelse) =
-        "type=${event.sisteEndringsType}, uuid=${event.oppfolgingsperiodeUuid}"
-}
+    TypedKafkaDroppedMessageMeter<OppfølgingHendelse>(registry, OppfølgingHendelse::class.java)
 

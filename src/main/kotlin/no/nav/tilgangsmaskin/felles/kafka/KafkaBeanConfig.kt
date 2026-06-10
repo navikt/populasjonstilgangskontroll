@@ -70,7 +70,7 @@ abstract class TypedKafkaDroppedMessageMeter<T :Any>(
     /**
      * Formater hendelsen for logging. Implementasjoner bør maskere sensitive felt.
      */
-    protected abstract fun formatEvent(event: T): String
+    protected open fun formatEvent(event: T) = "$event"
 
     override fun recovered(record: ConsumerRecord<*, *>, ex: Exception?) {
         val event = typedValue(record) ?: return
@@ -86,8 +86,7 @@ abstract class TypedKafkaDroppedMessageMeter<T :Any>(
     override fun failedDelivery(record: ConsumerRecord<*, *>, ex: Exception?, deliveryAttempt: Int) {
         typedValue(record) ?: return
         log.warn(
-            "Forsøk $deliveryAttempt feilet for melding på topic=${record.topic()} " +
-                "offset=${record.offset()}: ${ex?.message}"
+            "Forsøk $deliveryAttempt feilet for melding på topic=${record.topic()} offset=${record.offset()}: ${ex?.message}"
         )
     }
 

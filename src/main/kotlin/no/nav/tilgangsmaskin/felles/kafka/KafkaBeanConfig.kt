@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.felles.kafka
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import org.apache.kafka.clients.consumer.ConsumerRecord
-import org.slf4j.LoggerFactory
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.kafka.autoconfigure.DefaultKafkaConsumerFactoryCustomizer
 import org.springframework.context.annotation.Bean
@@ -12,7 +11,6 @@ import org.springframework.kafka.listener.DefaultErrorHandler
 import org.springframework.kafka.listener.RetryListener
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer
-import org.springframework.stereotype.Component
 import org.springframework.util.backoff.ExponentialBackOff
 import tools.jackson.databind.json.JsonMapper
 
@@ -25,8 +23,8 @@ import tools.jackson.databind.json.JsonMapper
  * Når retries er gitt opp, inkrementeres metrikken `kafka.message.dropped`
  * og hendelsen logges på ERROR-nivå.
  *
- * Spring Boot plukker commonErrorHandler-bønnen opp automatisk for autokonfigurert
- * ConcurrentKafkaListenerContainerFactory. Egne factories må injisere den eksplisitt.
+ * Hver konsument har sin egen [TypedKafkaDroppedMessageMeter] for typesikker logging
+ * av hendelser som ikke kan prosesseres.
  */
 @Configuration
 @NoCoverageAnalysis
@@ -41,29 +39,60 @@ class KafkaBeanConfig {
         }
 
     @Bean
-    fun commonErrorHandler(listener: KafkaDroppedMessageMeter) =
-        DefaultErrorHandler(
-            ExponentialBackOff(1_000L, 2.0).apply {
-                maxInterval = 30_000L
-                maxElapsedTime = 60_000L
+    fun commonErrorHandler(listeners: List<TypedKafkaDroppedMessageMeter<*>>) =
+        createErrorHandler(*listeners.toTypedArray())
+
+    companion object {
+        fun createErrorHandler(vararg listeners: RetryListener) =
+            DefaultErrorHandler(
+                ExponentialBackOff(1_000L, 2.0).apply {
+                    maxInterval = 30_000L
+                    maxElapsedTime = 60_000L
+                }
+            ).apply {
+                setRetryListeners(*listeners)
             }
-        ).apply {
-            setRetryListeners(listener)
-        }
+    }
 }
 
-@Component
-class KafkaDroppedMessageMeter(private val registry: MeterRegistry) : RetryListener {
+/**
+ * Typesikker [RetryListener] som logger droppede meldinger med kjent hendelsestype.
+ *
+ * Subklasser spesifiserer [eventType] og implementerer [formatEvent] for
+ * domenespesifikk logging uten å eksponere sensitive data.
+ */
+abstract class TypedKafkaDroppedMessageMeter<T :Any>(
+    private val registry: MeterRegistry,
+    private val eventType: Class<T>) : RetryListener {
+
     private val log = getLogger(javaClass)
 
+    /**
+     * Formater hendelsen for logging. Implementasjoner bør maskere sensitive felt.
+     */
+    protected abstract fun formatEvent(event: T): String
+
     override fun recovered(record: ConsumerRecord<*, *>, ex: Exception?) {
-        registry.counter("kafka.message.dropped",
+        val event = typedValue(record) ?: return
+        registry.counter(
+            "kafka.message.dropped",
             "topic", record.topic(),
-            "exception", ex?.javaClass?.simpleName ?: "unknown").increment()
-        log.error("Ga opp Kafka-melding på topic=${record.topic()} partition=${record.partition()} offset=${record.offset()}: ${ex?.message}", ex)
+            "exception", ex?.javaClass?.simpleName ?: "unknown"
+        ).increment()
+        log.error(
+            "Ga opp Kafka-melding på topic=${record.topic()} partition=${record.partition()} offset=${record.offset()} hendelse=[${formatEvent(event)}]: ${ex?.message}", ex)
     }
 
     override fun failedDelivery(record: ConsumerRecord<*, *>, ex: Exception?, deliveryAttempt: Int) {
-        log.warn("Forsøk $deliveryAttempt feilet for melding på topic=${record.topic()} offset=${record.offset()}: ${ex?.message}")
+        typedValue(record) ?: return
+        log.warn(
+            "Forsøk $deliveryAttempt feilet for melding på topic=${record.topic()} " +
+                "offset=${record.offset()}: ${ex?.message}"
+        )
     }
+
+    private fun typedValue(record: ConsumerRecord<*, *>): T? =
+        record.value()?.let { value ->
+            if (eventType.isInstance(value)) eventType.cast(value) else null
+        }
 }

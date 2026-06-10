@@ -36,7 +36,7 @@ class EnkeltTilgangEntity(
     val id: Long? = null
 
     @CreatedDate
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     var created: Instant? = null
 
     @LastModifiedDate

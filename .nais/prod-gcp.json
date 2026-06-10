@@ -208,6 +208,20 @@
       "name": "sokos-oppgjorsrapporter",
       "namespace": "oppgjorsrapporter",
       "cluster": "prod-gcp"
+    },
+    {
+      "name": "historisk-tidsbegrenset-uforestonad",
+      "namespace": "historisk",
+      "cluster": "prod-gcp"
+    },{
+      "name": "historisk-pensjon",
+      "namespace": "historisk",
+      "cluster": "prod-gcp"
+    },
+    {
+      "name": "historisk-regnskap",
+      "namespace": "historisk",
+      "cluster": "prod-gcp"
     }
 
   ],

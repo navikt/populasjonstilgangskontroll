@@ -15,8 +15,6 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.Instant
-import kotlin.annotation.AnnotationRetention.RUNTIME
-import kotlin.annotation.AnnotationTarget.FIELD
 
 @Entity(name = "overstyring")
 @Table(
@@ -45,18 +43,9 @@ class EnkeltTilgangEntity(
     var updated: Instant? = null
 
     @Column(name = "oppretter", length = ANSATTID_LENGTH)
-    @CreatedByAnsatt
     var oppretter: String? = null
 
     @Column(name = "system", length = 50)
-    @CreatedBySystem
     var system: String? = null
 }
 
-@Target(FIELD)
-@Retention(RUNTIME)
-annotation class CreatedBySystem
-
-@Target(FIELD)
-@Retention(RUNTIME)
-annotation class CreatedByAnsatt

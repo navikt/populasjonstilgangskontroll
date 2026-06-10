@@ -17,15 +17,7 @@ class EnkeltTilgangEntityListener(private val token: Token) {
 
 
     fun setSource(target: EnkeltTilgangEntity) {
-        target::class.java.declaredFields.forEach {
-            if (it.isAnnotationPresent(CreatedBySystem::class.java)) {
-                it.isAccessible = true
-                it.set(target, token.system)
-            }
-            if (it.isAnnotationPresent(CreatedByAnsatt::class.java)) {
-                it.isAccessible = true
-                it.set(target, token.ansattId?.verdi ?: token.system)
-            }
-        }
+        target.system = token.system
+        target.oppretter = token.ansattId?.verdi ?: token.system
     }
 }

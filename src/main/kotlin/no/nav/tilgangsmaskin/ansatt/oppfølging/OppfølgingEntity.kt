@@ -24,7 +24,7 @@ import java.util.*
 class OppfølgingEntity(@NaturalId @Id val id: UUID) {
 
     @Column(length = BRUKERID_LENGTH, nullable = false)
-    var brukerid: String? = null
+    val brukerid: String? = null
 
     @Column(length = AKTØRID_LENGTH, nullable = false)
     var aktoerid: String? = null

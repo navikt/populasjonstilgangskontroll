@@ -75,7 +75,7 @@ class TypedKafkaDroppedMessageMeterTest : BehaviorSpec({
 private data class TestHendelse(val felt: String)
 
 private class TestHendelseMeter(registry: SimpleMeterRegistry) :
-    TypedKafkaDroppedMessageMeter<TestHendelse>(registry, TestHendelse::class.java) {
+    TypedKafkaDroppedMessageMeter<TestHendelse>(registry, TestHendelse::class) {
 
     var lastFormatted: String? = null
 

@@ -6,5 +6,4 @@ import org.springframework.stereotype.Component
 
 @Component
 class NomDroppedMessageMeter(registry: MeterRegistry) :
-    TypedKafkaDroppedMessageMeter<NomHendelse>(registry, NomHendelse::class.java)
-
+    TypedKafkaDroppedMessageMeter<NomHendelse>(registry, NomHendelse::class)

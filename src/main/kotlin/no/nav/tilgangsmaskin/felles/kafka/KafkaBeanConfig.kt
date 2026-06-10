@@ -13,6 +13,7 @@ import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer
 import org.springframework.util.backoff.ExponentialBackOff
 import tools.jackson.databind.json.JsonMapper
+import kotlin.reflect.KClass
 
 /**
  * Felles Kafka-konfigurasjon: deserializer-oppsett og feilhåndtering.
@@ -61,37 +62,32 @@ class KafkaBeanConfig {
  * Subklasser spesifiserer [eventType] og implementerer [formatEvent] for
  * domenespesifikk logging uten å eksponere sensitive data.
  */
-abstract class TypedKafkaDroppedMessageMeter<T :Any>(
+abstract class TypedKafkaDroppedMessageMeter<T : Any>(
     private val registry: MeterRegistry,
-    private val eventType: Class<T>) : RetryListener {
+    private val eventType: KClass<T>) : RetryListener {
 
     private val log = getLogger(javaClass)
 
-    /**
-     * Formater hendelsen for logging. Implementasjoner bør maskere sensitive felt.
-     */
     protected open fun formatEvent(event: T) = "$event"
 
-    override fun recovered(record: ConsumerRecord<*, *>, ex: Exception?) {
+    override fun recovered(record: ConsumerRecord<*, *>, e: Exception?) {
         val event = typedValue(record) ?: return
         registry.counter(
             "kafka.message.dropped",
             "topic", record.topic(),
-            "exception", ex?.javaClass?.simpleName ?: "unknown"
+            "exception", e?.javaClass?.simpleName ?: "unknown"
         ).increment()
-        log.error(
-            "Ga opp Kafka-melding på topic=${record.topic()} partition=${record.partition()} offset=${record.offset()} hendelse=[${formatEvent(event)}]: ${ex?.message}", ex)
+        log.error("Ga opp Kafka-melding på topic=${record.topic()} partition=${record.partition()} offset=${record.offset()} hendelse=[${formatEvent(event)}]: ${e?.message}", e)
     }
 
-    override fun failedDelivery(record: ConsumerRecord<*, *>, ex: Exception?, deliveryAttempt: Int) {
+    override fun failedDelivery(record: ConsumerRecord<*, *>, e: Exception?, deliveryAttempt: Int) {
         typedValue(record) ?: return
-        log.warn(
-            "Forsøk $deliveryAttempt feilet for melding på topic=${record.topic()} offset=${record.offset()}: ${ex?.message}"
+        log.warn("Forsøk $deliveryAttempt feilet for melding på topic=${record.topic()} offset=${record.offset()}: ${e?.message}"
         )
     }
 
     private fun typedValue(record: ConsumerRecord<*, *>): T? =
         record.value()?.let { value ->
-            if (eventType.isInstance(value)) eventType.cast(value) else null
+            if (eventType.isInstance(value)) eventType.java.cast(value) else null
         }
 }

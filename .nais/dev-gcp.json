@@ -331,6 +331,20 @@
       "name": "sokos-oppgjorsrapporter",
       "namespace": "oppgjorsrapporter",
       "cluster": "dev-gcp"
+    },
+    {
+      "name": "historisk-tidsbegrenset-uforestonad",
+      "namespace": "historisk",
+      "cluster": "dev-gcp"
+    },{
+      "name": "historisk-pensjon",
+      "namespace": "historisk",
+      "cluster": "dev-gcp"
+    },
+    {
+      "name": "historisk-regnskap",
+      "namespace": "historisk",
+      "cluster": "dev-gcp"
     }
   ],
   "nais": {

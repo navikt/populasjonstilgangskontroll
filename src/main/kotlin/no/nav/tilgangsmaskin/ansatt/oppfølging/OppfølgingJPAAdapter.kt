@@ -17,7 +17,7 @@ class OppfølgingJPAAdapter(private val repo: OppfølgingRepository) {
         }
 
     fun enhetFor(id: String) =
-        repo.findByBrukeridOrAktoerid(id, id)?.kontor?.let(::Enhetsnummer)
+        repo.findByBrukeridOrAktoerid(id, id)?.let { Enhetsnummer(it.kontor) }
 
     fun registrer(id: UUID, brukerId: String, aktørId: String, start: Instant, kontor: String) =
         repo.upsert(id, brukerId, aktørId, start, kontor)

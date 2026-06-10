@@ -23,9 +23,9 @@ import java.time.Instant
 @EntityListeners(AuditingEntityListener::class)
 class NomEntity(
     @Column(length = ANSATTID_LENGTH, nullable = false) val navid: String,
-    @Column(length = BRUKERID_LENGTH, nullable = false) var fnr: String,
-    @Column(nullable = false) var startdato: Instant,
-    @Column(nullable = false) var gyldigtil: Instant) {
+    @Column(length = BRUKERID_LENGTH, nullable = false) val fnr: String,
+    @Column(nullable = false) val startdato: Instant,
+    @Column(nullable = false) val gyldigtil: Instant) {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)

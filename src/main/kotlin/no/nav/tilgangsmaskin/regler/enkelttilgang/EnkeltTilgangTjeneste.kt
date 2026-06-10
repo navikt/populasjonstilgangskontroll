@@ -33,11 +33,9 @@ class EnkeltTilgangTjeneste(
 
     private val log = getLogger(javaClass)
 
-    @Transactional(readOnly = true)
     fun tilganger(ansattId: AnsattId, brukerIds: Set<BrukerId>) =
         adapter.gjeldendeTilganger(ansattId.verdi, brukerIds.map { it.verdi }.toSet())
 
-    @Transactional(readOnly = true)
     fun harEnkeltTilgang(ansattId: AnsattId, brukerId: BrukerId) =
         gjeldendeEnkeltTilgang(ansattId, brukerId)
             ?.also {

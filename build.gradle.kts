@@ -6,7 +6,7 @@ import java.lang.System.getProperty
 
 val javaVersion = JavaLanguageVersion.of(25)
 val springdocVersion = "3.0.3"
-val tokenSupportVersion = "6.0.7"
+val tokenSupportVersion = "6.0.9"
 val mockkVersion = "1.14.9"
 val kotestVersion = "6.1.11"
 val otelVersion = "2.27.0"

@@ -18,7 +18,7 @@ import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
-import no.nav.tilgangsmaskin.regler.motor.TokenTypeTeller
+import no.nav.tilgangsmaskin.regler.motor.Tellere
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
@@ -52,7 +52,7 @@ class TilgangController(
     private val token: Token,
     private val guard: TokenTypeGuard,
     private val konsumentValidator: EnkeltTilgangKonsumentValidator,
-    private val teller: TokenTypeTeller) {
+    private val tellere: Tellere) {
 
     private val log = getLogger(javaClass)
 
@@ -157,7 +157,7 @@ class TilgangController(
         }
 
     private fun tell(type: String) =
-        teller.tell(Tags.of("type",type,"token",TokenType.from(token).name.lowercase()))
+        tellere.tokenType.tell(Tags.of("type",type,"token",TokenType.from(token).name.lowercase()))
 
 
     private fun sjekk(predikat: Boolean, status: HttpStatus, message: String) {

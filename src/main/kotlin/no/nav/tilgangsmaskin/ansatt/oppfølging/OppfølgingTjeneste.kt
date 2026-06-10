@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPF
 import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.Avsluttet
 import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.MedKontor
 import no.nav.tilgangsmaskin.bruker.Identifikator
-import no.nav.tilgangsmaskin.regler.motor.OppfølgingkontorTeller
+import no.nav.tilgangsmaskin.regler.motor.Tellere
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
@@ -15,13 +15,13 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
-class OppfølgingTjeneste(private val adapter: OppfølgingJPAAdapter, private val teller: OppfølgingkontorTeller) {
+class OppfølgingTjeneste(private val adapter: OppfølgingJPAAdapter, private val tellere: Tellere) {
 
     @Cacheable(cacheNames = [OPPFØLGING], key = "#id.verdi")
     @Transactional(readOnly = true)
     fun enhetFor(id: Identifikator) =
         adapter.enhetFor(id.verdi).also { enhet ->
-            teller.tell(Tags.of("resultat", "${enhet != null}"))
+            tellere.oppfølgingkontor.tell(Tags.of("resultat", "${enhet != null}"))
         }
 
     @Caching(

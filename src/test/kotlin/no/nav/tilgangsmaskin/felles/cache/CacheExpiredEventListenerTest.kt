@@ -7,7 +7,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetHendelse
-import no.nav.tilgangsmaskin.regler.motor.CacheOppfriskerTeller
+import no.nav.tilgangsmaskin.regler.motor.Tellere
 import no.nav.tilgangsmaskin.tilgang.Token
 
 class CacheExpiredEventListenerTest : BehaviorSpec({
@@ -17,7 +17,7 @@ class CacheExpiredEventListenerTest : BehaviorSpec({
         every { it.clusterAndSystem } returns "test:dev-gcp"
     }
 
-    fun teller() = CacheOppfriskerTeller(SimpleMeterRegistry(), token)
+    fun tellere() = Tellere(SimpleMeterRegistry(), token)
 
     fun oppfrisker(navn: String) = mockk<CacheOppfrisker>().also {
         every { it.cacheName } returns navn
@@ -32,7 +32,7 @@ class CacheExpiredEventListenerTest : BehaviorSpec({
         When("lytteren er startet") {
             Then("kaller oppfrisk på riktig oppfrisker") {
                 val oppfrisker = oppfrisker("pdl")
-                val listener = CacheExpiredEventListener(teller(), true, oppfrisker)
+                val listener = CacheExpiredEventListener(tellere(), true, oppfrisker)
                 listener.start()
                 listener.cacheInnslagFjernet(hendelse)
                 verify {
@@ -44,7 +44,7 @@ class CacheExpiredEventListenerTest : BehaviorSpec({
         When("lytteren ikke er startet") {
             Then("kaller ikke oppfrisk") {
                 val oppfrisker = oppfrisker("pdl")
-                val listener = CacheExpiredEventListener(teller(), true, oppfrisker)
+                val listener = CacheExpiredEventListener(tellere(), true, oppfrisker)
                 listener.cacheInnslagFjernet(hendelse)
                 verify(exactly = 0) {
                     oppfrisker.oppfrisk(any())
@@ -55,7 +55,7 @@ class CacheExpiredEventListenerTest : BehaviorSpec({
         When("lytteren er stoppet") {
             Then("kaller ikke oppfrisk") {
                 val oppfrisker = oppfrisker("pdl")
-                val listener = CacheExpiredEventListener(teller(), erLeder = true, oppfrisker)
+                val listener = CacheExpiredEventListener(tellere(), erLeder = true, oppfrisker)
                 listener.start()
                 listener.stop()
                 listener.cacheInnslagFjernet(hendelse)
@@ -68,7 +68,7 @@ class CacheExpiredEventListenerTest : BehaviorSpec({
         When("instansen ikke er leder") {
             Then("kaller ikke oppfrisk") {
                 val oppfrisker = oppfrisker("pdl")
-                val listener = CacheExpiredEventListener(teller(), false, oppfrisker)
+                val listener = CacheExpiredEventListener(tellere(), false, oppfrisker)
                 listener.start()
                 listener.cacheInnslagFjernet(hendelse)
                 verify(exactly = 0) {
@@ -80,7 +80,7 @@ class CacheExpiredEventListenerTest : BehaviorSpec({
         When("ingen oppfrisker matcher cache-navnet") {
             Then("kaller ikke oppfrisk") {
                 val oppfrisker = oppfrisker("annen-cache")
-                val listener = CacheExpiredEventListener(teller(), erLeder = true, oppfrisker)
+                val listener = CacheExpiredEventListener(tellere(), erLeder = true, oppfrisker)
                 listener.start()
                 listener.cacheInnslagFjernet(hendelse)
                 verify(exactly = 0) {
@@ -93,7 +93,7 @@ class CacheExpiredEventListenerTest : BehaviorSpec({
             Then("bruker bare første matchende oppfrisker") {
                 val første = oppfrisker("pdl")
                 val andre = oppfrisker("pdl")
-                val listener = CacheExpiredEventListener(teller(), erLeder = true, første, andre)
+                val listener = CacheExpiredEventListener(tellere(), erLeder = true, første, andre)
                 listener.start()
                 listener.cacheInnslagFjernet(hendelse)
                 verify { første.oppfrisk(any()) }
@@ -107,7 +107,7 @@ class CacheExpiredEventListenerTest : BehaviorSpec({
             Then("oppdaterer teller med cache-navn og metode") {
                 val registry = SimpleMeterRegistry()
                 val oppfrisker = oppfrisker("pdl")
-                val listener = CacheExpiredEventListener(CacheOppfriskerTeller(registry, token), erLeder = true, oppfrisker)
+                val listener = CacheExpiredEventListener(Tellere(registry, token), erLeder = true, oppfrisker)
                 listener.start()
                 listener.cacheInnslagFjernet(hendelse)
                 registry.find("cache.oppfrisker")

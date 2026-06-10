@@ -30,7 +30,7 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
-import no.nav.tilgangsmaskin.regler.motor.EnkeltTilgangTeller
+import no.nav.tilgangsmaskin.regler.motor.Tellere
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
@@ -104,7 +104,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
             every { token.clusterAndSystem } returns "cluster:test"
             every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
             every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-            enkeltTilgang = EnkeltTilgangTjeneste(ansatte, brukere, adapter, motor, proxy, EnkeltTilgangTeller(registry, token))
+            enkeltTilgang = EnkeltTilgangTjeneste(ansatte, brukere, adapter, motor, proxy, Tellere(registry, token))
         }
 
 

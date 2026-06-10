@@ -14,15 +14,15 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.motor.NasjonalGruppeTeller
+import no.nav.tilgangsmaskin.regler.motor.Tellere
 
 class AnsattTjenesteTest : BehaviorSpec({
 
     val nom      = mockk<NomTjeneste>(relaxed = true)
     val brukere  = mockk<BrukerTjeneste>(relaxed = true)
     val resolver = mockk<EntraAnsattGruppeResolver>(relaxed = true)
-    val teller   = mockk<NasjonalGruppeTeller>(relaxed = true)
-    val tjeneste = AnsattTjeneste(nom, brukere, resolver, teller)
+    val tellere  = mockk<Tellere>(relaxed = true)
+    val tjeneste = AnsattTjeneste(nom, brukere, resolver, tellere)
 
     val ansattId = AnsattId("Z999999")
     val brukerId = BrukerId("08526835670")
@@ -66,7 +66,7 @@ class AnsattTjenesteTest : BehaviorSpec({
             Then("telles false for nasjonal gruppemedlemskap") {
                 every { resolver.grupperForAnsatt(ansattId) } returns emptySet()
                 tjeneste.ansatt(ansattId)
-                verify { teller.tell(match<Tags> { it.stream().anyMatch { tag -> tag.key == "medlem" && tag.value == "false" } }) }
+                verify { tellere.nasjonalGruppe.tell(match<Tags> { it.stream().anyMatch { tag -> tag.key == "medlem" && tag.value == "false" } }) }
             }
         }
 
@@ -74,7 +74,7 @@ class AnsattTjenesteTest : BehaviorSpec({
             Then("telles true for nasjonal gruppemedlemskap") {
                 every { resolver.grupperForAnsatt(ansattId) } returns AnsattBuilder(ansattId).medMedlemskapI(NASJONAL).build().grupper
                 tjeneste.ansatt(ansattId)
-                verify { teller.tell(match<Tags> { it.stream().anyMatch { tag -> tag.key == "medlem" && tag.value == "true" } }) }
+                verify { tellere.nasjonalGruppe.tell(match<Tags> { it.stream().anyMatch { tag -> tag.key == "medlem" && tag.value == "true" } }) }
             }
         }
     }

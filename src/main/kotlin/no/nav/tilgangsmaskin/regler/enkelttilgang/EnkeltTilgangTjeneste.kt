@@ -9,7 +9,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
-import no.nav.tilgangsmaskin.regler.motor.EnkeltTilgangTeller
+import no.nav.tilgangsmaskin.regler.motor.Tellere
 import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.INGEN_REGEL_TAG
 import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.regelTag
 import no.nav.tilgangsmaskin.regler.motor.RegelException
@@ -29,7 +29,7 @@ class EnkeltTilgangTjeneste(
     private val adapter: EnkeltTilgangJPAAdapter,
     private val motor: RegelMotor,
     private val proxy: EntraProxyTjeneste,
-    private val teller: EnkeltTilgangTeller) {
+    private val tellere: Tellere) {
 
     private val log = getLogger(javaClass)
 
@@ -50,14 +50,14 @@ class EnkeltTilgangTjeneste(
             val bruker = brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi)
             motor.kjerneregler(ansatt, bruker)
             adapter.enkeltTilgang(ansattId.verdi, enhetFor(ansattId), data)
-            teller.tell(INGEN_REGEL_TAG, OVERSTYRT)
+            tellere.enkelttilgang.tell(INGEN_REGEL_TAG, OVERSTYRT)
             log.info("Enkelttilgang til og med ${data.gyldigtil} ble registrert for $ansattId og ${data.brukerId}")
             true
         }.onFailure { e ->
             when (e) {
                 is RegelException -> {
                     log.warn("Enkelttilgang er avvist av kjerneregler for $ansattId og ${data.brukerId}", e)
-                    teller.tell(regelTag(e.regel), IKKE_OVERSTYRT, tokenSystemTag(konsument))
+                    tellere.enkelttilgang.tell(regelTag(e.regel), IKKE_OVERSTYRT, tokenSystemTag(konsument))
                 }
             }
         }.getOrThrow()

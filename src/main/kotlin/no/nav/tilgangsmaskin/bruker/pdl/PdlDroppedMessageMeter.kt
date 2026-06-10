@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class PdlDroppedMessageMeter(registry: MeterRegistry) :
-    TypedKafkaDroppedMessageMeter<Personhendelse>(registry, Personhendelse::class.java) {
+    TypedKafkaDroppedMessageMeter<Personhendelse>(registry, Personhendelse::class) {
 
     override fun formatEvent(event: Personhendelse) =
         "gradering=${event.adressebeskyttelse?.gradering ?: "UGRADERT"}, " +

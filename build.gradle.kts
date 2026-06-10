@@ -28,7 +28,7 @@ plugins {
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
-    id("org.springframework.boot") version "4.0.6"
+    id("org.springframework.boot") version "4.1.0"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.cyclonedx.bom") version "3.2.4"
     id("io.kotest") version "6.1.11"
@@ -67,20 +67,6 @@ repositories {
     }
 }
 
-configurations.all {
-    resolutionStrategy {
-        failOnNonReproducibleResolution()
-        eachDependency {  // TODO rethink on next boot version
-            if (requested.group == "org.postgresql" && requested.name == "postgresql") {
-                val minimum = "42.7.11"
-                if ((requested.version ?: "0") < minimum) {
-                    useVersion(minimum)
-                    because("CVE-2025-49146, CVE-2026-42198 — minimum $minimum required")
-                }
-            }
-        }
-    }
-}
 
 dependencies {
     implementation("io.confluent:kafka-avro-serializer:$confluentVersion") {

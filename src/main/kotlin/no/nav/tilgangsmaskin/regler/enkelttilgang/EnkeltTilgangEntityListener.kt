@@ -16,7 +16,7 @@ class EnkeltTilgangEntityListener(private val token: Token) {
     private fun oppdaterer(entity: EnkeltTilgangEntity) = setSource(entity)
 
 
-    fun setSource(target: EnkeltTilgangEntity) {
+    private fun setSource(target: EnkeltTilgangEntity) {
         target.system = token.system
         target.oppretter = token.ansattId?.verdi ?: token.system
     }

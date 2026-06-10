@@ -18,6 +18,7 @@ import java.time.Instant
 
 @Entity(name = "overstyring")
 @Table(
+    name = "overstyring",
     indexes = [Index(name = "idx_overstyringentity_navid", columnList = "navid, fnr")],
     check = [CheckConstraint(constraint = "char_length(begrunnelse) >= 10 AND char_length(begrunnelse) <= 255")
     ]

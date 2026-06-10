@@ -78,6 +78,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                 "classpath:openapi-dev-ansatt",
                 "classpath:openapi-dev-bruker",
                 "classpath:openapi-dev-cache",
+                "classpath:openapi-dev-enkelt",
                 "classpath:openapi-dev-regel",
                 "classpath:openapi-dev-skjerming",
                 "classpath:openapi-dev-tilgang",

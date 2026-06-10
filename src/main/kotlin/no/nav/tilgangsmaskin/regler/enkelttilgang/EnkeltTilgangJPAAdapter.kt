@@ -13,8 +13,8 @@ class EnkeltTilgangJPAAdapter(private val repo: EnkeltTilgangRepository) {
             Unit
         }
 
-    fun gjeldendeOverstyring(ansattId: String, brukerId: String, brukerIds: List<String>) =
-        repo.gjeldendeOverstyring(ansattId, setOf(brukerId) + brukerIds)
+    fun gjeldende(ansattId: String, brukerId: String, brukerIds: List<String>) =
+        repo.gjeldende(ansattId, setOf(brukerId) + brukerIds)
 
     fun gjeldendeTilganger(ansattId: String, brukerIds: Set<String>): Set<BrukerId> =
         repo.gjeldendeOverstyringer(ansattId, brukerIds)

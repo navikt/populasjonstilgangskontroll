@@ -5,7 +5,6 @@ import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.assertions.assertSoftly
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
@@ -69,8 +68,6 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
     private lateinit var nom: NomTjeneste
 
     @MockkBean
-    lateinit var validator: EnkeltTilgangKonsumentValidator
-    @MockkBean
     lateinit var proxy: EntraProxyTjeneste
     @MockkBean
     lateinit var token: Token
@@ -99,7 +96,6 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
         beforeEach {
             every { nom.fnrForAnsatt(any()) } returns vanligBrukerId
             every { vergemål.vergemål(any()) } returns emptySet()
-            every { validator.valider(any()) } returns Unit
             every { token.erObo } returns false
             every { token.erCC } returns true
             every { token.system } returns "test"
@@ -108,20 +104,9 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
             every { token.clusterAndSystem } returns "cluster:test"
             every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
             every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-            enkeltTilgang = EnkeltTilgangTjeneste(ansatte, brukere, adapter, motor, proxy, validator, EnkeltTilgangTeller(registry, token))
+            enkeltTilgang = EnkeltTilgangTjeneste(ansatte, brukere, adapter, motor, proxy, EnkeltTilgangTeller(registry, token))
         }
 
-        Given("enkelttilgang av tilgangsresultat") {
-
-            When("EnkeltTilgangException kastes fra validator") {
-                Then("kastes exception videre") {
-                    every { validator.valider(any()) } throws EnkeltTilgangKonsumentException("ukjent system")
-                    shouldThrow<EnkeltTilgangKonsumentException> {
-                        enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(vanligBrukerId, "Dette er test", IMORGEN))
-                    }
-                }
-            }
-        }
 
         Given("OverstyringEntity felter") {
             When("enkelttilgang registreres") {
@@ -129,7 +114,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
-                    val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     assertSoftly(entity) {
                         navid shouldBe ansattId.verdi
                         fnr shouldBe vanligBrukerId.verdi
@@ -249,7 +234,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
-                    val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     assertSoftly(entity) {
                         created shouldNotBe null
                         updated shouldNotBe null
@@ -264,7 +249,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
-                    val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     val lastet = repository.findById(entity.id)
                     lastet.isPresent.shouldBeTrue()
                     with(lastet.get()) {
@@ -282,7 +267,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
-                    val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     val createdFør = entity.created
                     entity.system = "ukjent-system"
                     entity.oppretter = "X000000"
@@ -300,7 +285,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
-                    val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     repository.delete(entity)
                     repository.findById(entity.id).isPresent shouldBe false
                 }

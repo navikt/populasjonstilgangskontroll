@@ -18,6 +18,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
+import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.FORBIDDEN
@@ -105,7 +106,7 @@ class RegelTjeneste(
     private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) =
         buildSet {
             for (item in (oppgitt - funnet)) {
-                add(EnkeltBulkRespons.ok(item.brukerId))
+                add(ok(item.brukerId))
             }
         }.also {
             if (it.isNotEmpty()) {
@@ -136,10 +137,10 @@ class RegelTjeneste(
     private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) =
         buildSet {
             val (godkjente, avviste) = resultater.partition { it.status.is2xxSuccessful }
-            godkjente.forEach { add(EnkeltBulkRespons.ok(it.bruker.oppslagId)) }
+            godkjente.forEach { add(ok(it.bruker.oppslagId)) }
             enkeltTilgangTjeneste
                 .tilganger(ansatt.ansattId, avviste.map { it.bruker.brukerId }.toSet())
-                .forEach { add(EnkeltBulkRespons.ok(it.verdi)) }
+                .forEach { add(ok(it.verdi)) }
         }.also { respons ->
             if (respons.isNotEmpty()) {
                 log.debug("${respons.size} godkjent av bulk ({})", respons.map { it.brukerId.maskFnr() })

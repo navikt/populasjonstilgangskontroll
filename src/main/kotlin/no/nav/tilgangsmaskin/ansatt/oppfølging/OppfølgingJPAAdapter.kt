@@ -1,14 +1,14 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
-import jakarta.persistence.EntityManager
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.util.*
 
 @Component
-class OppfølgingJPAAdapter(private val repo: OppfølgingRepository, val entityManager: EntityManager) {
+class OppfølgingJPAAdapter(private val repo: OppfølgingRepository) {
 
     private val log = getLogger(javaClass)
 
@@ -17,27 +17,10 @@ class OppfølgingJPAAdapter(private val repo: OppfølgingRepository, val entityM
             log.info("Oppfølging avsluttet for $id")
         }
 
+    @Transactional(readOnly = true)
     fun enhetFor(id: String) =
-        (repo.findByBrukerid(id) ?: repo.findByAktoerid(id))?.kontor?.let(::Enhetsnummer)
+        repo.findByBrukeridOrAktoerid(id, id)?.kontor?.let(::Enhetsnummer)
 
     fun registrer(id: UUID, brukerId: String, aktørId: String, start: Instant, kontor: String) =
-        entityManager.createNativeQuery(UPSERT_QUERY)
-            .setParameter("id", id)
-            .setParameter("brukerid", brukerId)
-            .setParameter("aktoerid", aktørId)
-            .setParameter("startdato", start)
-            .setParameter("kontor", kontor)
-            .executeUpdate()
-
-    companion object {
-        private const val UPSERT_QUERY = """
-            INSERT INTO OPPFOLGING (id, brukerid, aktoerid, start_tidspunkt, kontor, created, updated)
-            VALUES (:id, :brukerid, :aktoerid, :startdato, :kontor,  CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-            ON CONFLICT (id)
-            DO UPDATE SET
-                kontor = EXCLUDED.kontor,
-                start_tidspunkt = EXCLUDED.start_tidspunkt,
-                updated = CURRENT_TIMESTAMP
-        """
-    }
+        repo.upsert(id, brukerId, aktørId, start, kontor)
 }

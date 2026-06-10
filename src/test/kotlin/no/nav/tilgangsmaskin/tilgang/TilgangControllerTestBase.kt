@@ -10,6 +10,7 @@ import io.mockk.justRun
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.motor.TokenTypeTeller
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup
@@ -29,6 +30,9 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
     @MockK
     protected lateinit var teller: TokenTypeTeller
 
+    @MockK(relaxed = true)
+    protected lateinit var konsumentValidator: EnkeltTilgangKonsumentValidator
+
     protected val ansattId = AnsattId("Z999999")
     protected val brukerId = "08526835670"
 
@@ -39,7 +43,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
 
         beforeEach {
             clearAllMocks()
-            mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, TokenTypeGuard(token), teller))
+            mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, TokenTypeGuard(token), konsumentValidator, teller))
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
                 .build()
             justRun { teller.tell(any<Tags>()) }

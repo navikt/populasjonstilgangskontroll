@@ -20,6 +20,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.TokenTypeTeller
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangGyldig
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
@@ -33,7 +34,6 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.CONTENT_TOO_LARGE
 import org.springframework.http.HttpStatus.MULTI_STATUS
 import org.springframework.http.HttpStatus.NO_CONTENT
-import org.springframework.http.HttpStatus.PAYLOAD_TOO_LARGE
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -51,6 +51,7 @@ class TilgangController(
     private val enkeltTilgangTjeneste: EnkeltTilgangTjeneste,
     private val token: Token,
     private val guard: TokenTypeGuard,
+    private val konsumentValidator: EnkeltTilgangKonsumentValidator,
     private val teller: TokenTypeTeller) {
 
     private val log = getLogger(javaClass)
@@ -91,6 +92,7 @@ class TilgangController(
     @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
     fun overstyr(@RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData, req: HttpServletRequest) {
         guard.krev(OBO, req.requestURI)
+        konsumentValidator.valider(token.systemNavn)
         enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattIdFraToken(), data, token.systemNavn)
     }
 

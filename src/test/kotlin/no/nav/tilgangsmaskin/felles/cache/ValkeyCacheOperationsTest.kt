@@ -36,8 +36,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheOperationsTest.ValkeyCacheTestConfig
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 
-import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
-import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
+import no.nav.tilgangsmaskin.regler.motor.Tellere
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
@@ -96,16 +95,12 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
             CacheNøkkelMapper(mgr.cacheConfigurations)
 
         @Bean
-        fun bulkCacheSuksessTeller(meterRegistry: MeterRegistry, token: Token) =
-            BulkCacheSuksessTeller(meterRegistry, token)
+        fun tellere(meterRegistry: MeterRegistry, token: Token) =
+            Tellere(meterRegistry, token)
 
         @Bean
-        fun bulkCacheTeller(meterRegistry: MeterRegistry, token: Token) =
-            BulkCacheTeller(meterRegistry, token)
-
-        @Bean
-        fun valkeyCacheOperations(client: RedisClient, handler: CacheNøkkelMapper, cfg: CacheConfig, alle: BulkCacheSuksessTeller, bulk: BulkCacheTeller, meterRegistry: MeterRegistry) =
-            ValkeyCacheOperations(client, handler, alle, bulk, cfg, meterRegistry)
+        fun valkeyCacheOperations(client: RedisClient, handler: CacheNøkkelMapper, cfg: CacheConfig, tellere: Tellere, meterRegistry: MeterRegistry) =
+            ValkeyCacheOperations(client, handler, tellere, cfg, meterRegistry)
 
         @Bean
         fun cacheElementUtløptLytter(client: RedisClient, publisher: ApplicationEventPublisher) =

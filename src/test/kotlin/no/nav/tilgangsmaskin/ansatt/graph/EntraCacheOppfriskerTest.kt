@@ -15,7 +15,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
-import no.nav.tilgangsmaskin.regler.motor.OppfriskingTeller
+import no.nav.tilgangsmaskin.regler.motor.Tellere
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import java.net.URI
@@ -23,7 +23,8 @@ import java.util.UUID
 
 @ApplyExtension(SpringExtension::class)
 @RestClientTest(components = [EntraCacheOppfrisker::class])
-class EntraCacheOppfriskerTest : BehaviorSpec() {
+class
+EntraCacheOppfriskerTest : BehaviorSpec() {
 
     @MockkBean(relaxed = true)
     private lateinit var entra: EntraTjeneste
@@ -34,8 +35,8 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
     @MockkBean(relaxed = true)
     private lateinit var cache: CacheOperations
 
-    @MockkBean
-    private lateinit var teller: OppfriskingTeller
+    @MockkBean(relaxed = true)
+    private lateinit var tellere: Tellere
 
     @Autowired
     private lateinit var oppfrisker: EntraCacheOppfrisker
@@ -82,7 +83,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
 
                 Then("teller oppdateres") {
                     oppfrisker.oppfrisk(nøkkel(GEO))
-                    verify { teller.tell() }
+                    verify { tellere.oppfrisking.tell() }
                 }
             }
 
@@ -92,7 +93,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
 
                     oppfrisker.oppfrisk(nøkkel(GEO))
 
-                    verify(exactly = 0) { teller.tell() }
+                    verify(exactly = 0) { tellere.oppfrisking.tell() }
                     verify(exactly = 0) { cache.delete(any(), any()) }
                 }
             }
@@ -117,7 +118,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
 
                     verify { cache.delete(OID_CACHE, ansattId.verdi) }
                     verify { entra.geoOgGlobaleGrupper(ansattId, NY_OID) }
-                    verify { teller.tell() }
+                    verify { tellere.oppfrisking.tell() }
                 }
             }
         }
@@ -134,7 +135,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                     verify(exactly = 0) { entra.geoGrupper(any(), any()) }
                     verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
                     verify(exactly = 0) { cache.delete(any(), any()) }
-                    verify(exactly = 0) { teller.tell() }
+                    verify(exactly = 0) { tellere.oppfrisking.tell() }
                 }
             }
         }
@@ -152,7 +153,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                     verify { cache.delete(OID_CACHE, ansattId.verdi) }
                     verify(exactly = 2) { oid.oid(ansattId) }
                     verify { entra.geoGrupper(ansattId, NY_OID) }
-                    verify { teller.tell() }
+                    verify { tellere.oppfrisking.tell() }
                 }
             }
 
@@ -168,7 +169,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                     verify { cache.delete(OID_CACHE, ansattId.verdi) }
                     verify(exactly = 2) { oid.oid(ansattId) }
                     verify { entra.geoOgGlobaleGrupper(ansattId, NY_OID) }
-                    verify { teller.tell() }
+                    verify { tellere.oppfrisking.tell() }
                 }
             }
 
@@ -183,7 +184,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                     }
 
                     verify { cache.delete(OID_CACHE, ansattId.verdi) }
-                    verify(exactly = 0) { teller.tell() }
+                    verify(exactly = 0) { tellere.oppfrisking.tell() }
                 }
             }
         }

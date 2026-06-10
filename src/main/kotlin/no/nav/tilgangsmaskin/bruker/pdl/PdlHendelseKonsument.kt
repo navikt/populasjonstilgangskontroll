@@ -11,7 +11,7 @@ import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
-import no.nav.tilgangsmaskin.regler.motor.PdlCacheTømmerTeller
+import no.nav.tilgangsmaskin.regler.motor.Tellere
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component
 @Component
 class PdlHendelseKonsument(private val pdl: PdlTjeneste,
                            private val client: CacheOperations,
-                           private val teller: PdlCacheTømmerTeller) {
+                           private val tellere: Tellere) {
     private val log = getLogger(javaClass)
 
     @KafkaListener(
@@ -39,7 +39,7 @@ class PdlHendelseKonsument(private val pdl: PdlTjeneste,
 
     private fun slett(cache: CacheNøkkelConfig, id: String, gradering: String, endringsType: String) {
         if (client.delete(cache, id) > 0) {
-            teller.tell(cache, gradering, endringsType)
+            tellere.pdlCacheTømmer.tell(cache, gradering, endringsType)
             log.trace(CONFIDENTIAL,
                 "Slettet nøkkel ${client.tilNøkkel(cache, id)} fra cache ${cache.name} etter hendelse av type: {}",
                 id.maskFnr(),

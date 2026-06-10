@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
-import no.nav.tilgangsmaskin.regler.motor.OppfriskingTeller
+import no.nav.tilgangsmaskin.regler.motor.Tellere
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
@@ -18,7 +18,7 @@ import java.util.*
 class EntraCacheOppfrisker(private val entra: EntraTjeneste,
                            private val oidTjeneste: EntraOidTjeneste,
                            private val cache: CacheOperations,
-                           private val teller: OppfriskingTeller) : AbstractCacheOppfrisker() {
+                           private val tellere: Tellere) : AbstractCacheOppfrisker() {
 
     private val log = LoggerFactory.getLogger(javaClass)
     override val cacheName = EntraGrupperConfig.GRAPH
@@ -45,7 +45,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste,
             log.info("Oppfrisking av oid OK for ${ansattId.verdi}, ny verdi er $this")
             oppfriskFor(ansattId, this, metode)
         }
-        teller.tell()
+        tellere.oppfrisking.tell()
     }
 
     private fun oppfriskFor(ansattId: AnsattId, oid: UUID, metode: String?) =

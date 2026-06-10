@@ -7,7 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
-import no.nav.tilgangsmaskin.regler.motor.NasjonalGruppeTeller
+import no.nav.tilgangsmaskin.regler.motor.Tellere
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service
 class AnsattTjeneste(private val ansatte: NomTjeneste,
                      private val brukere: BrukerTjeneste,
                      private val resolver: EntraAnsattGruppeResolver,
-                     private val teller: NasjonalGruppeTeller) {
+                     private val tellere: Tellere) {
 
     private val log = getLogger(javaClass)
 
@@ -36,7 +36,7 @@ class AnsattTjeneste(private val ansatte: NomTjeneste,
         }
 
     private fun tell(status: Boolean) =
-        teller.tell(Tags.of(MEDLEM, "$status"))
+        tellere.nasjonalGruppe.tell(Tags.of(MEDLEM, "$status"))
 
     companion object {
         private const val MEDLEM = "medlem"

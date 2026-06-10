@@ -13,8 +13,7 @@ import jakarta.annotation.PreDestroy
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
-import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
-import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
+import no.nav.tilgangsmaskin.regler.motor.Tellere
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import java.time.Duration
@@ -27,8 +26,7 @@ import kotlin.time.measureTimedValue
 @RetryingWhenRecoverableRestService
 class ValkeyCacheOperations(client: RedisClient,
                             private val mapper: CacheNøkkelMapper,
-                            private val alleTreffTeller: BulkCacheSuksessTeller,
-                            private val teller: BulkCacheTeller,
+                            private val tellere: Tellere,
                             private val cfg: CacheConfig,
                             private val meterRegistry: MeterRegistry) : CacheOperations {
 
@@ -132,9 +130,9 @@ class ValkeyCacheOperations(client: RedisClient,
         }
 
     private fun tellOgLog(navn: String, funnet: Int, etterspurt: Int, elapsed: kotlin.time.Duration) {
-        alleTreffTeller.tell(of("name", navn, "suksess", (funnet == etterspurt).toString()))
-        teller.tell(of("cache", navn, "result", "miss"), etterspurt - funnet)
-        teller.tell(of("cache", navn, "result", "hit"), funnet)
+        tellere.bulkCacheSuksess.tell(of("name", navn, "suksess", (funnet == etterspurt).toString()))
+        tellere.bulkCache.tell(of("cache", navn, "result", "miss"), etterspurt - funnet)
+        tellere.bulkCache.tell(of("cache", navn, "result", "hit"), funnet)
         log.info("getMany {} hentet {} av {} nøkler på {}ms", navn, funnet, etterspurt, elapsed.inWholeMilliseconds)
     }
 

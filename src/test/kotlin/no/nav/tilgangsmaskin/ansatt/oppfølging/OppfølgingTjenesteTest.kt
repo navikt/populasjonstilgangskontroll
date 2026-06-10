@@ -21,7 +21,7 @@ import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.getMany
-import no.nav.tilgangsmaskin.regler.motor.OppfølgingkontorTeller
+import no.nav.tilgangsmaskin.regler.motor.Tellere
 import no.nav.tilgangsmaskin.tilgang.Token
 
 
@@ -55,7 +55,7 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
 
     @MockkBean private lateinit var token: Token
 
-    @MockkBean(relaxed = true) private lateinit var teller: OppfølgingkontorTeller
+    @MockkBean(relaxed = true) private lateinit var tellere: Tellere
 
     @MockkSpyBean
     private lateinit var adapter: OppfølgingJPAAdapter

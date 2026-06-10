@@ -9,7 +9,8 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.justRun
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
-import no.nav.tilgangsmaskin.regler.motor.TokenTypeTeller
+import no.nav.tilgangsmaskin.regler.motor.Tellere
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup
@@ -26,8 +27,11 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
     @MockK(relaxed = true)
     protected lateinit var token: Token
 
-    @MockK
-    protected lateinit var teller: TokenTypeTeller
+    @MockK(relaxed = true)
+    protected lateinit var tellere: Tellere
+
+    @MockK(relaxed = true)
+    protected lateinit var konsumentValidator: EnkeltTilgangKonsumentValidator
 
     protected val ansattId = AnsattId("Z999999")
     protected val brukerId = "08526835670"
@@ -39,10 +43,9 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
 
         beforeEach {
             clearAllMocks()
-            mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, TokenTypeGuard(token), teller))
+            mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, TokenTypeGuard(token), konsumentValidator, tellere))
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
                 .build()
-            justRun { teller.tell(any<Tags>()) }
             every { token.ansattId } returns ansattId
         }
     }

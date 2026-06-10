@@ -3,13 +3,13 @@ package no.nav.tilgangsmaskin.felles.cache
 import io.micrometer.core.instrument.Tags.of
 import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetHendelse
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
-import no.nav.tilgangsmaskin.regler.motor.CacheOppfriskerTeller
+import no.nav.tilgangsmaskin.regler.motor.Tellere
 import org.springframework.context.SmartLifecycle
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
 @Component
-class CacheExpiredEventListener(private val teller: CacheOppfriskerTeller,
+class CacheExpiredEventListener(private val tellere: Tellere,
                                 erLeder: Boolean = true,
                                 private vararg val oppfriskere: CacheOppfrisker) : LeaderAware(erLeder),
     SmartLifecycle {
@@ -23,7 +23,7 @@ class CacheExpiredEventListener(private val teller: CacheOppfriskerTeller,
                 with(nøkkel) {
                     oppfriskere.firstOrNull { it.cacheName == cacheName }?.run {
                         oppfrisk(nøkkel)
-                        teller.tell(of("cache", cacheName, "result", "expired", "method", metode ?: "ingen"))
+                        tellere.cacheOppfrisker.tell(of("cache", cacheName, "result", "expired", "method", metode ?: "ingen"))
                     }
                 }
             }

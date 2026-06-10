@@ -9,11 +9,10 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
-import no.nav.tilgangsmaskin.regler.motor.EnkeltTilgangTeller
+import no.nav.tilgangsmaskin.regler.motor.Tellere
 import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.INGEN_REGEL_TAG
 import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.regelTag
 import no.nav.tilgangsmaskin.regler.motor.RegelException
-import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.OVERSTYRING_MESSAGE_CODE
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
@@ -30,8 +29,7 @@ class EnkeltTilgangTjeneste(
     private val adapter: EnkeltTilgangJPAAdapter,
     private val motor: RegelMotor,
     private val proxy: EntraProxyTjeneste,
-    private val validator: EnkeltTilgangKonsumentValidator,
-    private val teller: EnkeltTilgangTeller) {
+    private val tellere: Tellere) {
 
     private val log = getLogger(javaClass)
 
@@ -46,30 +44,23 @@ class EnkeltTilgangTjeneste(
 
 
     @Transactional
-    fun registrerEnkeltTilgang(ansattId: AnsattId, data: EnkeltTilgangData, konsument: String = "Ukjent"): Boolean {
-        try {
-            validator.valider(konsument)
+    fun registrerEnkeltTilgang(ansattId: AnsattId, data: EnkeltTilgangData, konsument: String = "Ukjent") =
+        runCatching {
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val bruker = brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi)
             motor.kjerneregler(ansatt, bruker)
             adapter.enkeltTilgang(ansattId.verdi, enhetFor(ansattId), data)
-            teller.tell(INGEN_REGEL_TAG, OVERSTYRT)
+            tellere.enkelttilgang.tell(INGEN_REGEL_TAG, OVERSTYRT)
             log.info("Enkelttilgang til og med ${data.gyldigtil} ble registrert for $ansattId og ${data.brukerId}")
-            return true
-        } catch (e: RegelException) {
-            log.warn("Enkelttilgang er avvist av kjerneregler for $ansattId og ${data.brukerId}", e)
-            teller.tell(regelTag(e.regel), IKKE_OVERSTYRT, tokenSystemTag(UTILGJENGELIG))
-            throw RegelException(
-                OVERSTYRING_MESSAGE_CODE,
-                arrayOf(e.regel.kortNavn, ansattId.verdi, data.brukerId.verdi),
-                e = e
-            )
-        } catch (e: EnkeltTilgangKonsumentException) {
-            log.warn("Enkelttilgang feilet pga klientvalidering ${e.message} for $ansattId og ${data.brukerId}", e)
-            teller.tell(INGEN_REGEL_TAG, IKKE_OVERSTYRT, tokenSystemTag(konsument))
-            throw e
-        }
-    }
+            true
+        }.onFailure { e ->
+            when (e) {
+                is RegelException -> {
+                    log.warn("Enkelttilgang er avvist av kjerneregler for $ansattId og ${data.brukerId}", e)
+                    tellere.enkelttilgang.tell(regelTag(e.regel), IKKE_OVERSTYRT, tokenSystemTag(konsument))
+                }
+            }
+        }.getOrThrow()
 
     private fun gjeldendeEnkeltTilgang(ansattId: AnsattId, brukerId: BrukerId): Instant? =
         adapter.gjeldendeOverstyring(ansattId.verdi, brukerId.verdi,

@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 import java.time.Instant
 import java.util.*
@@ -9,12 +8,9 @@ import java.util.*
 @Component
 class OppfølgingJPAAdapter(private val repo: OppfølgingRepository) {
 
-    private val log = getLogger(javaClass)
 
     fun avslutt(id: UUID) =
-        repo.deleteById(id).also {
-            log.info("Oppfølging avsluttet for $id")
-        }
+        repo.deleteById(id)
 
     fun enhetFor(id: String) =
         repo.findByBrukeridOrAktoerid(id, id)?.let { Enhetsnummer(it.kontor) }

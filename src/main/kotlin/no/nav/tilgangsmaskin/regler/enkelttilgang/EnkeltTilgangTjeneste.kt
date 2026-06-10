@@ -57,7 +57,7 @@ class EnkeltTilgangTjeneste(
             when (e) {
                 is RegelException -> {
                     log.warn("Enkelttilgang er avvist av kjerneregler for $ansattId og ${data.brukerId}", e)
-                    teller.tell(regelTag(e.regel), IKKE_OVERSTYRT, tokenSystemTag(konsument))
+                    teller.tell(regelTag(e.regel), IKKE_OVERSTYRT)
                 }
             }
         }.getOrThrow()
@@ -75,7 +75,6 @@ class EnkeltTilgangTjeneste(
 
 
     companion object {
-        private fun tokenSystemTag(system: String) = Tag.of("system",system)
         private const val TAG = "overstyrt"
         private val OVERSTYRT = Tag.of(TAG, "true")
         private val IKKE_OVERSTYRT = Tag.of(TAG, "false")

@@ -36,7 +36,7 @@ class DevEnkelttilgangController(private val enkelt: EnkeltTilgangTjeneste, priv
     @GetMapping("gjeldende/{ansattId}/{brukerId}")
     @Operation(summary = SUMMARY_GJELDENDE, description = DESCRIPTION_GJELDENDE)
     fun gjeldende(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
-        adapter.gjeldendeTilganger(ansattId.verdi, setOf(brukerId.verdi))
+        adapter.gjeldende(ansattId.verdi, brukerId.verdi, emptyList())
 
     companion object {
         private const val DEV_ENKELT_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.enkelt.tag.description"

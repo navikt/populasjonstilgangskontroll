@@ -19,7 +19,7 @@ interface EnkeltTilgangRepository : JpaRepository<EnkeltTilgangEntity, Long> {
               WHERE o2.navid = :ansattId AND o2.fnr IN :brukerIds
           )
     """)
-    fun gjeldendeOverstyring(
+    fun gjeldende(
             @Param("ansattId") ansattId: String,
             @Param("brukerIds") brukerIds: Set<String>,
             @Param("now") now: Instant = Instant.now()): EnkeltTilgangEntity?

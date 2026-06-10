@@ -65,7 +65,7 @@ class EnkeltTilgangTjeneste(
         }.getOrThrow()
 
     private fun gjeldendeEnkeltTilgang(ansattId: AnsattId, brukerId: BrukerId): Instant? =
-        adapter.gjeldendeOverstyring(ansattId.verdi, brukerId.verdi,
+        adapter.gjeldende(ansattId.verdi, brukerId.verdi,
         brukerTjeneste.brukerMedNærmesteFamilie(brukerId.verdi).historiskeIds.map {
             it.verdi
         })?.expires

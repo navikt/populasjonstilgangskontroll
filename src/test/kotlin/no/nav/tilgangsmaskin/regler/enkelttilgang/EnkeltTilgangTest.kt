@@ -114,7 +114,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
-                    val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     assertSoftly(entity) {
                         navid shouldBe ansattId.verdi
                         fnr shouldBe vanligBrukerId.verdi
@@ -234,7 +234,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
-                    val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     assertSoftly(entity) {
                         created shouldNotBe null
                         updated shouldNotBe null
@@ -249,7 +249,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
-                    val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     val lastet = repository.findById(entity.id)
                     lastet.isPresent.shouldBeTrue()
                     with(lastet.get()) {
@@ -267,7 +267,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
-                    val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     val createdFør = entity.created
                     entity.system = "ukjent-system"
                     entity.oppretter = "X000000"
@@ -285,7 +285,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
-                    val entity = adapter.gjeldendeOverstyring(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     repository.delete(entity)
                     repository.findById(entity.id).isPresent shouldBe false
                 }

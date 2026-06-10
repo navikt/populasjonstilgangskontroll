@@ -1,11 +1,14 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.tilgangsmaskin.felles.kafka.KafkaTypedDroppedMessageMeter
+import no.nav.tilgangsmaskin.felles.kafka.TypedKafkaDroppedMessageMeter
 import org.springframework.stereotype.Component
 
 @Component
 class OppfølgingDroppedMessageMeter(registry: MeterRegistry) :
-    KafkaTypedDroppedMessageMeter<OppfølgingHendelse>(registry, OppfølgingHendelse::class) {
+    TypedKafkaDroppedMessageMeter<OppfølgingHendelse>(registry, OppfølgingHendelse::class.java) {
 
+    override fun formatEvent(event: OppfølgingHendelse) =
+        "type=${event.sisteEndringsType}, uuid=${event.oppfolgingsperiodeUuid}"
 }
+

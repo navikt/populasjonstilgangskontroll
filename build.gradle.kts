@@ -1,5 +1,6 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.core.SpringVersion
+import java.lang.Runtime.getRuntime
 import java.lang.System.getProperty
 
 val javaVersion = JavaLanguageVersion.of(25)
@@ -121,7 +122,7 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 
     maxHeapSize = "4g"
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+    maxParallelForks = (getRuntime().availableProcessors() / 2).coerceAtLeast(1)
     jvmArgs =
         listOf(
             "--add-opens",

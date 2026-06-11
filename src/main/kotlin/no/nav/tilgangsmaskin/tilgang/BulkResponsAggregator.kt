@@ -18,8 +18,7 @@ import org.springframework.stereotype.Component
 @Component
 class BulkResponsAggregator(
     private val enkeltTilgangTjeneste: EnkeltTilgangTjeneste,
-    private val auditor: Auditor
-) {
+    private val auditor: Auditor) {
     private val log = getLogger(javaClass)
 
     fun aggreger(ansattId: AnsattId, ansatt: Ansatt, resultater: Set<BulkResultat>, oppgitt: Set<BrukerIdOgRegelsett>, brukere: Set<BrukerOgRegelsett>): AggregertBulkRespons {
@@ -48,7 +47,6 @@ class BulkResponsAggregator(
         buildSet {
             val godkjenteIds = godkjente.map { it.brukerId }.toSet()
             for (resultat in resultater) {
-                log.trace("Bulk sjekker om avvist ident {} har enkelttilgang", resultat.bruker.oppslagId.maskFnr())
                 if (resultat.status == FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
                     log.trace("Bulk avvist ident {} har ingen enkelttilgang", resultat.bruker.oppslagId.maskFnr())
                     add(EnkeltBulkRespons(RegelException(ansatt,

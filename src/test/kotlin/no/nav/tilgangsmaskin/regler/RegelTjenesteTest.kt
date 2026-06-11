@@ -22,6 +22,7 @@ import no.nav.tilgangsmaskin.regler.motor.Regel
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
+import no.nav.tilgangsmaskin.regler.motor.BulkResponsAggregator
 import java.net.URI
 
 class RegelTjenesteTest : BehaviorSpec() {
@@ -41,7 +42,7 @@ class RegelTjenesteTest : BehaviorSpec() {
         beforeEach {
             clearAllMocks()
             every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-            regler = RegelTjeneste(motor, brukere, ansatte, enkeltTilgang, LocalAuditor())
+            regler = RegelTjeneste(motor, brukere, ansatte, enkeltTilgang, LocalAuditor(), BulkResponsAggregator(enkeltTilgang, LocalAuditor()))
         }
 
         Given("bulk-tilgangskontroll") {

@@ -1,10 +1,9 @@
-package no.nav.tilgangsmaskin.tilgang
+package no.nav.tilgangsmaskin.regler.motor
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
-import no.nav.tilgangsmaskin.regler.motor.RegelException
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.NOT_FOUND

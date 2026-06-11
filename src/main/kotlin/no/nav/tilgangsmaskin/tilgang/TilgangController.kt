@@ -23,6 +23,7 @@ import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangGyldig
+import no.nav.tilgangsmaskin.regler.motor.AggregertBulkRespons
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
 import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
 import no.nav.tilgangsmaskin.tilgang.TokenType.OBO

@@ -45,7 +45,7 @@ class RegelTjeneste(
                         log.trace("Tilgang avvist ved kjøring av ${KOMPLETT_REGELTYPE.beskrivelse} for {} og {}", ansattId, brukerId.maskFnr(), e)
                         throw e
                     }
-                    log.trace("Enkelttilgang registrert for {} og {}", ansattId, brukerId.maskFnr(), e)
+                    log.trace("Enkelttilgang registrert ved kjøring av ${KOMPLETT_REGELTYPE.beskrivelse} for {} og {}", ansattId, brukerId.maskFnr(), e)
                 }
             }
                 ?: log.info("${KOMPLETT_REGELTYPE.beskrivelse} ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")

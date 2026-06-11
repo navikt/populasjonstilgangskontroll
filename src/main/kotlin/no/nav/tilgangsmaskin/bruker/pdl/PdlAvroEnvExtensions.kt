@@ -1,11 +1,11 @@
-package no.nav.tilgangsmaskin.felles.utils.extensions
+package no.nav.tilgangsmaskin.bruker.pdl
 
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import org.springframework.core.env.Environment
 import org.springframework.core.env.getRequiredProperty
 
 @NoCoverageAnalysis
-object EnvExtensions {
+object PdlAvroEnvExtensions {
     fun Environment.schemaRegistryUrl() =
         getRequiredProperty<String>("kafka.schema.registry")
 

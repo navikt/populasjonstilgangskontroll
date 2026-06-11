@@ -39,7 +39,7 @@ springBoot {
     buildInfo {
         properties {
             additional = mapOf(
-                "kotlin.version" to "2.3.21",
+                "kotlin.version" to KotlinVersion.CURRENT.toString(),
                 "jdk.version" to javaVersion.asInt().toString(),
                 "jdk.vendor" to getProperty("java.vendor"),
                 "spring-boot.version" to plugins.getPlugin(SpringBootPlugin::class).javaClass.`package`.implementationVersion

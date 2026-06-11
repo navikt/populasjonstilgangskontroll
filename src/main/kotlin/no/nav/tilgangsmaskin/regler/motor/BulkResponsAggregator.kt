@@ -7,17 +7,20 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.motor.AggregertBulkRespons.EnkeltBulkRespons
 import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
+import kotlin.collections.map
 
 @Component
 class BulkResponsAggregator(
     private val enkeltTilgangTjeneste: EnkeltTilgangTjeneste,
     private val auditor: Auditor
 ) {
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val log = getLogger(javaClass)
 
     fun aggreger(ansattId: AnsattId, ansatt: Ansatt, resultater: Set<BulkResultat>, oppgitt: Set<BrukerIdOgRegelsett>, brukere: Set<BrukerOgRegelsett>): AggregertBulkRespons {
+            log.debug("${resultater.size} bulk resultater {}", resultater.map { resultat -> "${resultat.bruker.oppslagId.maskFnr()}: ${resultat.status}" })
         val godkjente = godkjente(ansatt, resultater)
         val avviste = avviste(ansatt, godkjente, resultater, brukere)
         val ikkeFunnet = ikkeFunnet(oppgitt, resultater)

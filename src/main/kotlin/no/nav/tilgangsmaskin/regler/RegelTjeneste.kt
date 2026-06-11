@@ -52,6 +52,39 @@ class RegelTjeneste(
         log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
     }
 
+
+
+    @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])
+    @WithSpan
+    fun kjerneregler(ansattId: AnsattId, brukerId: String) =
+        bruker(brukerId)?.let { bruker ->
+            motor.kjerneregler(ansattTjeneste.ansatt(ansattId), bruker)
+        } ?: log.info("Kjerneregler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
+
+    @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
+    @WithSpan
+    fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): AggregertBulkRespons {
+        val (respons, elapsedTime) = measureTimedValue {
+            log.debug("Eksekverer bulk for {} med størrelse {}", ansattId, idOgType.size)
+            val ansatt = ansattTjeneste.ansatt(ansattId)
+            val brukere = idOgType.brukerOgRegelsett()
+            val resultater = motor.bulkRegler(ansatt, brukere)
+            aggregator.aggreger(ansattId, ansatt, resultater, idOgType, brukere)
+        }
+        log.info("Tid brukt på bulk for $ansattId med størrelse ${idOgType.size}: ${elapsedTime.inWholeMilliseconds}ms")
+        return respons
+    }
+
+    private fun Set<BrukerIdOgRegelsett>.brukerOgRegelsett() =
+        with(associate { it.brukerId to it }) {
+            val brukere = brukerTjeneste.brukere(keys)
+            log.debug("Fant {} av {} brukere", brukere.size, keys.size)
+            brukere.map { bruker ->
+                val idOgType = this[bruker.oppslagId]
+                BrukerOgRegelsett(bruker, idOgType!!.type)
+            }.toSet()
+        }
+
     private fun bruker(brukerId: String) =
         runCatching {
             brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
@@ -67,40 +100,4 @@ class RegelTjeneste(
                 }
             }
         }
-
-    @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])
-    @WithSpan
-    fun kjerneregler(ansattId: AnsattId, brukerId: String) =
-        bruker(brukerId)?.let { bruker ->
-            motor.kjerneregler(ansattTjeneste.ansatt(ansattId), bruker)
-        } ?: log.info("Kjerneregler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
-
-    @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
-    @WithSpan
-    fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): AggregertBulkRespons {
-        val (respons, elapsedTime) = measureTimedValue {
-            log.debug("Bulk regler for {} med {} ident(er)", ansattId, idOgType.size)
-            val ansatt = ansattTjeneste.ansatt(ansattId)
-            val brukere = idOgType.brukerOgRegelsett()
-            val resultater = motor.bulkRegler(ansatt, brukere).also {
-                log.debug("${it.size} bulk resultater {}",
-                    it.map { resultat -> "${resultat.bruker.oppslagId.maskFnr()}: ${resultat.status}" })
-            }
-            aggregator.aggreger(ansattId, ansatt, resultater, idOgType, brukere)
-        }
-        log.info("Tid brukt på bulk med størrelse ${idOgType.size} for $ansattId: ${elapsedTime.inWholeMilliseconds}ms")
-        return respons
-    }
-
-    private fun Set<BrukerIdOgRegelsett>.brukerOgRegelsett() =
-        with(associate { it.brukerId to it }) {
-            val brukere = brukerTjeneste.brukere(keys)
-            log.debug("Fant {} av {} brukere", brukere.size, keys.size)
-            brukere.map { bruker ->
-                val idOgType = this[bruker.oppslagId]
-                BrukerOgRegelsett(bruker, idOgType!!.type)
-            }.toSet()
-        }
-
-
 }

@@ -42,15 +42,15 @@ class RegelTjeneste(
                 } catch (e: RegelException) {
                     log.trace("Sjekker om det er registrert enkelttilgang for {} og {}", ansattId, brukerId.maskFnr(),e)
                     if (!enkeltTilgangTjeneste.harEnkeltTilgang(ansattId, bruker.brukerId)) {
-                        log.trace("Tilgang avvist ved kjøring av komplette regler for {} og {}", ansattId, brukerId.maskFnr(), e)
+                        log.trace("Tilgang avvist ved kjøring av ${KOMPLETT_REGELTYPE.beskrivelse} for {} og {}", ansattId, brukerId.maskFnr(), e)
                         throw e
                     }
                     log.trace("Enkelttilgang registrert for {} og {}", ansattId, brukerId.maskFnr(), e)
                 }
             }
-                ?: log.info("Komplette regler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
+                ?: log.info("${KOMPLETT_REGELTYPE.beskrivelse} ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
         }
-        log.info("Tid brukt på komplett regelsett for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
+        log.info("Tid brukt på ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
     }
 
 

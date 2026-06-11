@@ -40,6 +40,7 @@ class RegelTjeneste(
                 try {
                     motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
                 } catch (e: RegelException) {
+                    log.trace("Sjekker om det er registrert enkelttilgang for {} og {}", ansattId, brukerId.maskFnr(),e)
                     if (!enkeltTilgangTjeneste.harEnkeltTilgang(ansattId, bruker.brukerId)) {
                         log.trace("Tilgang avvist ved kjøring av komplette regler for {} og {}", ansattId, brukerId.maskFnr(), e)
                         throw e

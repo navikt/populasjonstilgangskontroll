@@ -86,7 +86,7 @@ data class BulkResultat(val bruker: Bruker,val status: HttpStatus, val regel: Re
         private val log = getLogger(javaClass)
         fun ok(bruker: Bruker) = BulkResultat( bruker,NO_CONTENT)
         fun avvist(bruker: Bruker,e: RegelException) = BulkResultat( bruker,FORBIDDEN, e.regel).also {
-            log.trace("Tilgang til {} for {} ble avvist av {}", e.bruker.brukerId, e.ansatt.ansattId, e.regel.kortNavn, e)
+            log.trace("Tilgang til {} for {} ble avvist av {}", e.bruker.brukerId.verdi.maskFnr(), e.ansatt.ansattId, e.regel.kortNavn, e)
         }
     }
 }

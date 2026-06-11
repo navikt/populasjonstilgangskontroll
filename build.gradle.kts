@@ -100,7 +100,6 @@ dependencies {
 
 dependencyManagement {
     imports {
-        mavenBom(libs.netty.bom.get().toString())  // TODO rethink on next boot version
         mavenBom(libs.opentelemetry.instrumentation.bom.get().toString())
     }
 }

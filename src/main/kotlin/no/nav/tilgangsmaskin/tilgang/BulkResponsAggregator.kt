@@ -10,8 +10,9 @@ import no.nav.tilgangsmaskin.regler.motor.BrukerOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
+import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.stereotype.Component
 
 @Component
@@ -22,7 +23,9 @@ class BulkResponsAggregator(
     private val log = getLogger(javaClass)
 
     fun aggreger(ansattId: AnsattId, ansatt: Ansatt, resultater: Set<BulkResultat>, oppgitt: Set<BrukerIdOgRegelsett>, brukere: Set<BrukerOgRegelsett>): AggregertBulkRespons {
-            log.debug("${resultater.size} bulk resultater {}", resultater.map { resultat -> "${resultat.bruker.oppslagId.maskFnr()}: ${resultat.status}" })
+            log.debug("${resultater.size} bulk resultater {}", resultater.map {
+                resultat -> "${resultat.bruker.oppslagId.maskFnr()}: ${resultat.status}"
+            })
         val godkjente = godkjente(ansatt, resultater)
         val avviste = avviste(ansatt, godkjente, resultater, brukere)
         val ikkeFunnet = ikkeFunnet(oppgitt, resultater)
@@ -32,10 +35,9 @@ class BulkResponsAggregator(
     private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) =
         buildSet {
             val (godkjente, avviste) = resultater.partition { it.status.is2xxSuccessful }
-            godkjente.forEach { add(EnkeltBulkRespons.ok(it.bruker.oppslagId)) }
-            enkeltTilgangTjeneste
-                .tilganger(ansatt.ansattId, avviste.map { it.bruker.brukerId }.toSet())
-                .forEach { add(EnkeltBulkRespons.ok(it.verdi)) }
+            godkjente.forEach { add(ok(it.bruker.oppslagId)) }
+            enkeltTilgangTjeneste.tilganger(ansatt.ansattId, avviste.map { it.bruker.brukerId }.toSet())
+                .forEach { add(ok(it.verdi)) }
         }.also { respons ->
             if (respons.isNotEmpty()) {
                 log.debug("${respons.size} godkjent av bulk ({})", respons.map { it.brukerId.maskFnr() })
@@ -47,7 +49,7 @@ class BulkResponsAggregator(
             val godkjenteIds = godkjente.map { it.brukerId }.toSet()
             for (resultat in resultater) {
                 log.trace("Bulk sjekker om avvist ident {} har enkelttilgang", resultat.bruker.oppslagId.maskFnr())
-                if (resultat.status == HttpStatus.FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
+                if (resultat.status == FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
                     log.trace("Bulk avvist ident {} har ingen enkelttilgang", resultat.bruker.oppslagId.maskFnr())
                     add(EnkeltBulkRespons(RegelException(ansatt,
                         brukere.finnBruker(resultat.bruker.oppslagId),
@@ -64,7 +66,7 @@ class BulkResponsAggregator(
     private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) =
         buildSet {
             for (item in (oppgitt - funnet)) {
-                add(EnkeltBulkRespons.ok(item.brukerId))
+                add(ok(item.brukerId))
             }
         }.also {
             if (it.isNotEmpty()) {

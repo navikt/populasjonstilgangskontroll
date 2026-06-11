@@ -15,7 +15,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons
-import no.nav.tilgangsmaskin.tilgang.BulkResponsAggregator
+import no.nav.tilgangsmaskin.regler.BulkResponsAggregator
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import kotlin.time.measureTime
@@ -40,7 +40,6 @@ class RegelTjeneste(
                 try {
                     motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
                 } catch (e: RegelException) {
-                    log.trace("Sjekker om det er registrert enkelttilgang for {} og {}", ansattId, brukerId.maskFnr(),e)
                     if (!enkeltTilgangTjeneste.harEnkeltTilgang(ansattId, bruker.brukerId)) {
                         log.trace("Tilgang avvist ved kjøring av ${KOMPLETT_REGELTYPE.beskrivelse} for {} og {}", ansattId, brukerId.maskFnr(), e)
                         throw e
@@ -87,18 +86,10 @@ class RegelTjeneste(
         }
 
     private fun bruker(brukerId: String) =
-        runCatching {
+        try {
             brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
-        }.getOrElse { e ->
-            when (e) {
-                is NotFoundRestException -> {
-                    auditor.info("${e.status}: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
-                    null
-                }
-                else -> {
-                    log.warn("Feil ved oppslag av bruker for ${brukerId.maskFnr()}", e)
-                    throw e
-                }
-            }
+        } catch (e: NotFoundRestException) {
+            auditor.info("${e.status}: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
+            null
         }
 }

@@ -22,7 +22,7 @@ import no.nav.tilgangsmaskin.regler.motor.Regel
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
-import no.nav.tilgangsmaskin.tilgang.BulkResponsAggregator
+import no.nav.tilgangsmaskin.regler.BulkResponsAggregator
 import java.net.URI
 
 class RegelTjenesteTest : BehaviorSpec() {

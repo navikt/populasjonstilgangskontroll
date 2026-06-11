@@ -16,7 +16,7 @@ import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BrukerOgRegelsett
-import no.nav.tilgangsmaskin.tilgang.BulkResponsAggregator
+import no.nav.tilgangsmaskin.regler.BulkResponsAggregator
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.avvist
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.ok

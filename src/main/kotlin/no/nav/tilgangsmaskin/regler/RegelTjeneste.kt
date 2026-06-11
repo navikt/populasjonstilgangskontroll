@@ -15,7 +15,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.motor.AggregertBulkRespons
-import no.nav.tilgangsmaskin.regler.motor.BulkResponsAggregator
+import no.nav.tilgangsmaskin.tilgang.BulkResponsAggregator
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import kotlin.time.measureTime

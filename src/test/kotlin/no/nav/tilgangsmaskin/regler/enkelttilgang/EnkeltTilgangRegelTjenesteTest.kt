@@ -39,6 +39,7 @@ import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
+import no.nav.tilgangsmaskin.tilgang.BulkResponsAggregator
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -56,7 +57,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @EnableJpaAuditing
 @TestPropertySource(locations = ["classpath:test.properties"])
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [TestApp::class, EnkeltTilgangTjeneste::class,EnkeltTilgangJPAAdapter::class,RegelTjeneste::class,LocalAuditor::class])
+@ContextConfiguration(classes = [TestApp::class, EnkeltTilgangTjeneste::class, EnkeltTilgangJPAAdapter::class, RegelTjeneste::class, BulkResponsAggregator::class, LocalAuditor::class])
 @AutoConfigureMetrics
 @Testcontainers
 @ComponentScan("no.nav.tilgangsmaskin.regler.motor")

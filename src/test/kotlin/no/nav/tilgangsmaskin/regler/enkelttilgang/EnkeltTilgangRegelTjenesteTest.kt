@@ -29,7 +29,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.bruker.Identifikator
-import no.nav.tilgangsmaskin.felles.utils.LocalAuditor
+import no.nav.tilgangsmaskin.felles.LocalAuditor
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder

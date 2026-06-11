@@ -10,7 +10,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.utils.Auditor
+import no.nav.tilgangsmaskin.felles.Auditor
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste

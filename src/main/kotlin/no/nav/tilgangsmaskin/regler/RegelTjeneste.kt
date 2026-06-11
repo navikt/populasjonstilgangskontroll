@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
-import no.nav.tilgangsmaskin.felles.utils.Auditor
+import no.nav.tilgangsmaskin.felles.Auditor
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BrukerOgRegelsett
@@ -15,7 +15,6 @@ import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons
-import no.nav.tilgangsmaskin.regler.BulkResponsAggregator
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import kotlin.time.measureTime

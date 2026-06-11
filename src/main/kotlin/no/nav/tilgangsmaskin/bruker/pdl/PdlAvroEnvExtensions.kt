@@ -9,7 +9,6 @@ object PdlAvroEnvExtensions {
     fun Environment.schemaRegistryUrl() =
         getRequiredProperty<String>("kafka.schema.registry")
 
-    @NoCoverageAnalysis
     fun Environment.userInfo() =
         "${getRequiredProperty<String>("kafka.schema.registry.user")}:${getRequiredProperty<String>("kafka.schema.registry.password")}"
 

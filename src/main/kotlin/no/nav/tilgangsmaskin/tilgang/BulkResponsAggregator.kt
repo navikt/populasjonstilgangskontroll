@@ -9,8 +9,7 @@ import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BrukerOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat
 import no.nav.tilgangsmaskin.regler.motor.RegelException
-import no.nav.tilgangsmaskin.regler.motor.AggregertBulkRespons
-import no.nav.tilgangsmaskin.regler.motor.AggregertBulkRespons.EnkeltBulkRespons
+import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component

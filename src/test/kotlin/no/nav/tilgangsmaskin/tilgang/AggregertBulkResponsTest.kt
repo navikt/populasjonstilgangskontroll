@@ -6,9 +6,8 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.regler.motor.AggregertBulkRespons
-import no.nav.tilgangsmaskin.regler.motor.AggregertBulkRespons.EnkeltBulkRespons
-import no.nav.tilgangsmaskin.regler.motor.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
+import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
+import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatus.NO_CONTENT

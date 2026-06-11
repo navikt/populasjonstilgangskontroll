@@ -1,13 +1,11 @@
-package no.nav.tilgangsmaskin.regler.motor
+package no.nav.tilgangsmaskin.tilgang
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.regler.motor.RegelException
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatus.FORBIDDEN
-import org.springframework.http.HttpStatus.NOT_FOUND
-import org.springframework.http.HttpStatus.NO_CONTENT
 
 data class AggregertBulkRespons(val ansattId: AnsattId, val resultater: Set<EnkeltBulkRespons> = emptySet()) {
     data class EnkeltBulkRespons(val brukerId: String, @JsonIgnore val httpStatus: HttpStatus, val detaljer: Any? = null ) {
@@ -16,7 +14,7 @@ data class AggregertBulkRespons(val ansattId: AnsattId, val resultater: Set<Enke
 
         companion object {
             fun ok(brukerId: String) =
-                EnkeltBulkRespons(brukerId, NO_CONTENT)
+                EnkeltBulkRespons(brukerId, HttpStatus.NO_CONTENT)
         }
 
         @NoCoverageAnalysis
@@ -24,11 +22,11 @@ data class AggregertBulkRespons(val ansattId: AnsattId, val resultater: Set<Enke
             "${javaClass.simpleName}(oppslagId='${brukerId.maskFnr()}', httpStatus=$httpStatus, detaljer=$detaljer, status=$status)"
     }
     @JsonIgnore
-    val ukjente = filter(NOT_FOUND)
+    val ukjente = filter(HttpStatus.NOT_FOUND)
     @JsonIgnore
-    val godkjente = filter(NO_CONTENT)
+    val godkjente = filter(HttpStatus.NO_CONTENT)
     @JsonIgnore
-    val avviste = filter(FORBIDDEN)
+    val avviste = filter(HttpStatus.FORBIDDEN)
 
     private fun filter(status: HttpStatus) = resultater.filter { it.httpStatus == status }.toSet()
 

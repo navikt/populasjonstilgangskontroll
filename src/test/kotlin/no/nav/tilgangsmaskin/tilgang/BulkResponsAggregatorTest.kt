@@ -156,6 +156,92 @@ class BulkResponsAggregatorTest : BehaviorSpec({
         }
     }
 
+    Given("alle resultater er avvist og ingen har enkelttilgang") {
+        val resultater = setOf(
+            avvist(bruker1, RegelException(ansatt, bruker1, testRegel)),
+            avvist(bruker2, RegelException(ansatt, bruker2, testRegel))
+        )
+        val oppgitt = setOf(
+            BrukerIdOgRegelsett(brukerId1.verdi, KOMPLETT_REGELTYPE),
+            BrukerIdOgRegelsett(brukerId2.verdi, KOMPLETT_REGELTYPE)
+        )
+        val brukere = setOf(
+            BrukerOgRegelsett(bruker1, KOMPLETT_REGELTYPE),
+            BrukerOgRegelsett(bruker2, KOMPLETT_REGELTYPE)
+        )
+
+        every { enkeltTilgangTjeneste.tilganger(ansattId, setOf(brukerId1, brukerId2)) } returns emptySet()
+
+        When("aggreger kalles") {
+            val respons = aggregator.aggreger(ansattId, ansatt, resultater, oppgitt, brukere)
+
+            Then("alle er avvist") {
+                assertSoftly(respons) {
+                    avviste shouldHaveSize 2
+                    godkjente.shouldBeEmpty()
+                    ukjente.shouldBeEmpty()
+                    avviste.map { it.brukerId } shouldContainExactlyInAnyOrder listOf(brukerId1.verdi, brukerId2.verdi)
+                    avviste.all { it.status == FORBIDDEN.value() } shouldBe true
+                }
+            }
+        }
+    }
+
+    Given("flere avviste der noen har og noen mangler enkelttilgang") {
+        val resultater = setOf(
+            ok(bruker1),
+            avvist(bruker2, RegelException(ansatt, bruker2, testRegel)),
+            avvist(bruker3, RegelException(ansatt, bruker3, testRegel))
+        )
+        val oppgitt = setOf(
+            BrukerIdOgRegelsett(brukerId1.verdi, KOMPLETT_REGELTYPE),
+            BrukerIdOgRegelsett(brukerId2.verdi, KOMPLETT_REGELTYPE),
+            BrukerIdOgRegelsett(brukerId3.verdi, KOMPLETT_REGELTYPE)
+        )
+        val brukere = setOf(
+            BrukerOgRegelsett(bruker1, KOMPLETT_REGELTYPE),
+            BrukerOgRegelsett(bruker2, KOMPLETT_REGELTYPE),
+            BrukerOgRegelsett(bruker3, KOMPLETT_REGELTYPE)
+        )
+
+        every { enkeltTilgangTjeneste.tilganger(ansattId, setOf(brukerId2, brukerId3)) } returns setOf(brukerId2)
+
+        When("aggreger kalles") {
+            val respons = aggregator.aggreger(ansattId, ansatt, resultater, oppgitt, brukere)
+
+            Then("brukere med enkelttilgang godkjennes, øvrige avvises") {
+                assertSoftly(respons) {
+                    godkjente shouldHaveSize 2
+                    godkjente.map { it.brukerId } shouldContainExactlyInAnyOrder listOf(brukerId1.verdi, brukerId2.verdi)
+                    avviste shouldHaveSize 1
+                    avviste.first().brukerId shouldBe brukerId3.verdi
+                }
+            }
+        }
+    }
+
+    Given("en bruker oppgis med historisk id som er funnet i PDL under ny id") {
+        val historiskId = BrukerId("01010112345")
+        val brukerMedHistoriskId = BrukerBuilder(brukerId1).historiske(setOf(historiskId)).build()
+        val resultater = setOf(ok(brukerMedHistoriskId))
+        val oppgitt = setOf(BrukerIdOgRegelsett(historiskId.verdi, KOMPLETT_REGELTYPE))
+        val brukere = setOf(BrukerOgRegelsett(brukerMedHistoriskId, KOMPLETT_REGELTYPE))
+
+        every { enkeltTilgangTjeneste.tilganger(ansattId, emptySet()) } returns emptySet()
+
+        When("aggreger kalles med den historiske id-en") {
+            val respons = aggregator.aggreger(ansattId, ansatt, resultater, oppgitt, brukere)
+
+            Then("brukeren regnes som funnet og godkjennes") {
+                assertSoftly(respons) {
+                    godkjente shouldHaveSize 1
+                    ukjente.shouldBeEmpty()
+                    avviste.shouldBeEmpty()
+                }
+            }
+        }
+    }
+
     Given("tom resultatliste") {
         val resultater = emptySet<BulkResultat>()
         val oppgitt = emptySet<BrukerIdOgRegelsett>()

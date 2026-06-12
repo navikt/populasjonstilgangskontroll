@@ -44,7 +44,7 @@ class EnkeltTilgangTjeneste(
 
 
     @Transactional
-    fun registrerEnkeltTilgang(ansattId: AnsattId, data: EnkeltTilgangData, konsument: String = "Ukjent") =
+    fun registrerEnkeltTilgang(ansattId: AnsattId, data: EnkeltTilgangData, _konsument: String = "Ukjent") =
         runCatching {
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val bruker = brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi)

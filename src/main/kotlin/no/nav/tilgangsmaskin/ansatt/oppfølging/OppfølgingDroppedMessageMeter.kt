@@ -6,4 +6,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class OppfølgingDroppedMessageMeter(registry: MeterRegistry) :
-    TypedKafkaDroppedMessageMeter<OppfølgingHendelse>(registry, OppfølgingHendelse::class)
+    TypedKafkaDroppedMessageMeter<OppfølgingHendelse>(registry, OppfølgingHendelse::class) {
+
+    override fun formatEvent(event: OppfølgingHendelse) = "redacted"
+}

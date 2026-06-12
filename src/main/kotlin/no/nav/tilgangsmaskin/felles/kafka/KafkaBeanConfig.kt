@@ -68,7 +68,7 @@ abstract class TypedKafkaDroppedMessageMeter<T : Any>(
 
     private val log = getLogger(javaClass)
 
-    protected abstract fun formatEvent(event: T)
+    protected open fun formatEvent(event: T) = event.toString()
 
     override fun recovered(record: ConsumerRecord<*, *>, e: Exception?) {
         val event = typedValue(record) ?: return

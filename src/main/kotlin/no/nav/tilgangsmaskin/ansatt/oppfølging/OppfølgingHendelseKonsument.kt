@@ -8,6 +8,7 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.Avsluttet
 import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.KontorEndret
 import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.Startet
 import no.nav.tilgangsmaskin.bruker.Identer
+import no.nav.tilgangsmaskin.bruker.Identifikator
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
@@ -25,15 +26,19 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
         when (val endring = hendelse.tilDomene()) {
             is Startet -> {
                 oppfølging.registrer(endring)
-                log.info("Oppfølging startet for kontor {} og id {}", endring.kontor.kontorId.verdi, endring.uuid)
+                log.info("Oppfølging startet med kontor {} og id {}", endring.kontor.kontorId.verdi, endring.uuid)
             }
             is KontorEndret -> {
+                val tidligereKontor = oppfølging.enhetFor(Identifikator(endring.identer.brukerId.verdi))
+                if (tidligereKontor == null) {
+                    log.warn("Mottok KontorEndret for id {} uten eksisterende kontor — ingen tidligere oppfølging funnet", endring.uuid)
+                }
                 oppfølging.registrer(endring)
-                log.info("Oppfølging endret for kontor {} og id {}", endring.kontor.kontorId.verdi, endring.uuid)
+                log.info("Oppfølging endret fra kontor {} til kontor {} for id {}", tidligereKontor?.verdi, endring.kontor.kontorId.verdi, endring.uuid)
             }
             is Avsluttet -> {
                 oppfølging.avslutt(endring)
-                log.info("Oppfølging avsluttet for {}", endring.uuid)
+                log.info("Oppfølging avsluttet for id {}", endring.uuid)
             }
         }
 

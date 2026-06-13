@@ -1,11 +1,11 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.tilgangsmaskin.felles.kafka.TypedKafkaDroppedMessageMeter
+import no.nav.tilgangsmaskin.felles.kafka.KafkaTypedDroppedMessageMeter
 import org.springframework.stereotype.Component
 
 @Component
 class OppfølgingDroppedMessageMeter(registry: MeterRegistry) :
-    TypedKafkaDroppedMessageMeter<OppfølgingHendelse>(registry, OppfølgingHendelse::class) {
+    KafkaTypedDroppedMessageMeter<OppfølgingHendelse>(registry, OppfølgingHendelse::class) {
 
 }

@@ -3,12 +3,13 @@ package no.nav.tilgangsmaskin.ansatt.nom
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.toInstant
 import org.springframework.stereotype.Component
+import java.time.Instant.now
 
 @Component
 class NomJPAAdapter(private val repo: NomRepository) {
 
     fun ryddOpp() =
-        repo.deleteByGyldigtilBefore()
+        repo.deleteByGyldigtilBefore(now())
 
     fun upsert(data: NomAnsattData) =
         with(data) {
@@ -16,5 +17,5 @@ class NomJPAAdapter(private val repo: NomRepository) {
         }
 
     fun fnrForAnsatt(ansattId: String) =
-        repo.findFnrByNavidAndGyldigtilGreaterThanEqual(ansattId)?.let { BrukerId(it.fnr) }
+        repo.findFnrByNavidAndGyldigtilGreaterThanEqual(ansattId, now())?.let { BrukerId(it.fnr) }
 }

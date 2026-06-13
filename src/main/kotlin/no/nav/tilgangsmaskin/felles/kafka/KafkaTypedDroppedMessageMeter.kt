@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.felles.kafka
 import io.micrometer.core.instrument.MeterRegistry
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.listener.RetryListener
 import kotlin.reflect.KClass
 
@@ -11,7 +12,7 @@ abstract class KafkaTypedDroppedMessageMeter<T : Any>(
     registry: MeterRegistry,
     private val eventType: KClass<T>) : RetryListener {
 
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val log = getLogger(javaClass)
     private val counter = KafkaDroppedMessageCounter(registry)
 
     protected open fun formatEvent(event: T) = "$event"
@@ -23,7 +24,7 @@ abstract class KafkaTypedDroppedMessageMeter<T : Any>(
     }
 
     override fun failedDelivery(record: ConsumerRecord<*, *>, e: Exception?, n: Int) {
-        log.warn("Forsøk $n feilet for melding på topic=${record.topic()} offset=${record.offset()}: ${e?.message}")
+        log.warn("Forsøk $n feilet for melding på topic=${record.topic()} offset=${record.offset()}: ${e?.message}",e)
     }
 
     private fun typedValue(record: ConsumerRecord<*, *>): T? =

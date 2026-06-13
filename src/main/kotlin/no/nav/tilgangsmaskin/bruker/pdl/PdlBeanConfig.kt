@@ -14,8 +14,8 @@ import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
-import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.schemaRegistryUrl
-import no.nav.tilgangsmaskin.felles.utils.extensions.EnvExtensions.userInfo
+import no.nav.tilgangsmaskin.bruker.pdl.PdlAvroEnvExtensions.schemaRegistryUrl
+import no.nav.tilgangsmaskin.bruker.pdl.PdlAvroEnvExtensions.userInfo
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties

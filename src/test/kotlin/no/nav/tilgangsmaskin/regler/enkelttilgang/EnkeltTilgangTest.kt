@@ -24,7 +24,7 @@ import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
-import no.nav.tilgangsmaskin.felles.utils.LocalAuditor
+import no.nav.tilgangsmaskin.felles.LocalAuditor
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
@@ -229,7 +229,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
         }
 
         Given("enkeltTilgangEntityListener") {
-            When("@PrePersist kalles") {
+            When("entity persisteres") {
                 Then("settes created, updated, oppretter og system") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
@@ -244,13 +244,13 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     }
                 }
             }
-            When("@PostLoad kalles") {
-                Then("lastes entity med korrekte felter fra database") {
+            When("entity lastes fra database") {
+                Then("lastes entity med korrekte felter") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
-                    val lastet = repository.findById(entity.id)
+                    val lastet = repository.findById(entity.id!!)
                     lastet.isPresent.shouldBeTrue()
                     with(lastet.get()) {
                         navid shouldBe ansattId.verdi
@@ -262,8 +262,8 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     }
                 }
             }
-            When("@PreUpdate kalles") {
-                Then("nullstilles system og oppretter til tokenverdi") {
+            When("entity oppdateres") {
+                Then("resettes system og oppretter til tokenverdi") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
@@ -272,7 +272,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     entity.system = "ukjent-system"
                     entity.oppretter = "X000000"
                     repository.saveAndFlush(entity)
-                    val oppdatert = repository.findById(entity.id).get()
+                    val oppdatert = repository.findById(entity.id!!).get()
                     assertSoftly(oppdatert) {
                         system shouldBe "test"
                         oppretter shouldBe ansattId.verdi
@@ -280,14 +280,14 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
                     }
                 }
             }
-            When("@PreRemove og @PostRemove kalles") {
+            When("entity slettes") {
                 Then("fjernes entity fra database") {
                     val bruker = BrukerBuilder(vanligBrukerId).build()
                     every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
                     val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     repository.delete(entity)
-                    repository.findById(entity.id).isPresent shouldBe false
+                    repository.findById(entity.id!!).isPresent shouldBe false
                 }
             }
         }

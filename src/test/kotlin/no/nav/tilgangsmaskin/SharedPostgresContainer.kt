@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin
 
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.testcontainers.postgresql.PostgreSQLContainer
 
 /**
@@ -8,8 +7,10 @@ import org.testcontainers.postgresql.PostgreSQLContainer
  * Unngår å starte en ny container per testklasse (~5-8s per oppstart).
  */
 object SharedPostgresContainer {
-    val postgreSQLContainer = PostgreSQLContainer("postgres:18").apply {
-        start()
+    val postgreSQLContainer by lazy {
+        PostgreSQLContainer("postgres:18").apply {
+            start()
+        }
     }
 }
 

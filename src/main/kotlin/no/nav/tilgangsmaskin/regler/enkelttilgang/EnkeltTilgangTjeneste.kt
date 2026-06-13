@@ -39,12 +39,12 @@ class EnkeltTilgangTjeneste(
     fun harEnkeltTilgang(ansattId: AnsattId, brukerId: BrukerId) =
         gjeldendeEnkeltTilgang(ansattId, brukerId)
             ?.also {
-                log.trace("Overstyring er gyldig i {} til for {} og {}", it.diffFromNow(), ansattId, brukerId)
+                log.trace("Enkelttilgang er gyldig i {} til for {} og {}", it.diffFromNow(), ansattId, brukerId)
             } != null
 
 
     @Transactional
-    fun registrerEnkeltTilgang(ansattId: AnsattId, data: EnkeltTilgangData, konsument: String = "Ukjent") =
+    fun registrerEnkeltTilgang(ansattId: AnsattId, data: EnkeltTilgangData, _konsument: String = "Ukjent") =
         runCatching {
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val bruker = brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi)
@@ -57,7 +57,7 @@ class EnkeltTilgangTjeneste(
             when (e) {
                 is RegelException -> {
                     log.warn("Enkelttilgang er avvist av kjerneregler for $ansattId og ${data.brukerId}", e)
-                    teller.tell(regelTag(e.regel), IKKE_OVERSTYRT, tokenSystemTag(konsument))
+                    teller.tell(regelTag(e.regel), IKKE_OVERSTYRT)
                 }
             }
         }.getOrThrow()
@@ -75,7 +75,6 @@ class EnkeltTilgangTjeneste(
 
 
     companion object {
-        private fun tokenSystemTag(system: String) = Tag.of("system",system)
         private const val TAG = "overstyrt"
         private val OVERSTYRT = Tag.of(TAG, "true")
         private val IKKE_OVERSTYRT = Tag.of(TAG, "false")

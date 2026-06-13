@@ -31,15 +31,13 @@ class OppfølgingTjeneste(private val adapter: OppfølgingJPAAdapter, private va
         ]
     )
     fun registrer(endring: MedKontor) =
-        endring.kontor.kontorId.also {
-            adapter.registrer(
-                endring.uuid,
-                endring.identer.brukerId.verdi,
-                endring.identer.aktorId.verdi,
-                endring.tidspunkt,
-                it.verdi,
-            )
+        with(endring) {
+            kontor.kontorId.also {
+                adapter.registrer(uuid, identer.brukerId.verdi,
+                    identer.aktorId.verdi, tidspunkt, it.verdi, )
+            }
         }
+
 
     @Caching(
         evict = [

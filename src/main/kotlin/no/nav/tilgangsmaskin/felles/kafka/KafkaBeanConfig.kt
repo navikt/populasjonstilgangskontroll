@@ -1,33 +1,19 @@
 package no.nav.tilgangsmaskin.felles.kafka
 
-import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import org.apache.kafka.clients.consumer.ConsumerRecord
-import org.slf4j.LoggerFactory
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.kafka.autoconfigure.DefaultKafkaConsumerFactoryCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.listener.DefaultErrorHandler
-import org.springframework.kafka.listener.RetryListener
+import org.springframework.kafka.support.serializer.DeserializationException
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer
-import org.springframework.stereotype.Component
+import org.springframework.messaging.converter.MessageConversionException
+import org.springframework.util.backoff.BackOff
 import org.springframework.util.backoff.ExponentialBackOff
 import tools.jackson.databind.json.JsonMapper
 
-/**
- * Felles Kafka-konfigurasjon: deserializer-oppsett og feilhåndtering.
- *
- * Feilhåndtering erstatter Spring sin default (9 umiddelbare retries) med eksponensiell backoff:
- * 1s → 2s → 4s → 8s → 16s → 30s, opp til 1 min totalt.
- *
- * Når retries er gitt opp, inkrementeres metrikken `kafka.message.dropped`
- * og hendelsen logges på ERROR-nivå.
- *
- * Spring Boot plukker commonErrorHandler-bønnen opp automatisk for autokonfigurert
- * ConcurrentKafkaListenerContainerFactory. Egne factories må injisere den eksplisitt.
- */
+
 @Configuration
 @NoCoverageAnalysis
 class KafkaBeanConfig {
@@ -41,29 +27,19 @@ class KafkaBeanConfig {
         }
 
     @Bean
-    fun commonErrorHandler(listener: KafkaDroppedMessageMeter) =
-        DefaultErrorHandler(
-            ExponentialBackOff(1_000L, 2.0).apply {
-                maxInterval = 30_000L
-                maxElapsedTime = 60_000L
-            }
-        ).apply {
-            setRetryListeners(listener)
+    fun kafkaBackOff() =
+        ExponentialBackOff(1_000L, 2.0).apply {
+            maxInterval = 30_000L
+            maxElapsedTime = 60_000L
         }
-}
 
-@Component
-class KafkaDroppedMessageMeter(private val registry: MeterRegistry) : RetryListener {
-    private val log = getLogger(javaClass)
-
-    override fun recovered(record: ConsumerRecord<*, *>, ex: Exception?) {
-        registry.counter("kafka.message.dropped",
-            "topic", record.topic(),
-            "exception", ex?.javaClass?.simpleName ?: "unknown").increment()
-        log.error("Ga opp Kafka-melding på topic=${record.topic()} partition=${record.partition()} offset=${record.offset()}: ${ex?.message}", ex)
-    }
-
-    override fun failedDelivery(record: ConsumerRecord<*, *>, ex: Exception?, deliveryAttempt: Int) {
-        log.warn("Forsøk $deliveryAttempt feilet for melding på topic=${record.topic()} offset=${record.offset()}: ${ex?.message}")
-    }
+    @Bean
+    fun commonErrorHandler(backOff: BackOff, vararg listeners: KafkaTypedDroppedMessageMeter<*>) =
+        DefaultErrorHandler(backOff).apply {
+            setRetryListeners(*listeners)
+            addNotRetryableExceptions(
+                DeserializationException::class.java,
+                MessageConversionException::class.java,
+            )
+        }
 }

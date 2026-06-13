@@ -11,13 +11,14 @@ import jakarta.persistence.Index
 import jakarta.persistence.Table
 import no.nav.tilgangsmaskin.ansatt.AnsattId.Companion.ANSATTID_LENGTH
 import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.Instant
-import kotlin.annotation.AnnotationRetention.RUNTIME
-import kotlin.annotation.AnnotationTarget.FIELD
 
 @Entity(name = "overstyring")
 @Table(
+    name = "overstyring",
     indexes = [Index(name = "idx_overstyringentity_navid", columnList = "navid, fnr")],
     check = [CheckConstraint(constraint = "char_length(begrunnelse) >= 10 AND char_length(begrunnelse) <= 255")
     ]
@@ -32,38 +33,20 @@ class EnkeltTilgangEntity(
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    val id: Long = 0
+    val id: Long? = null
 
-    @CreatedDato
-    @Column(nullable = false)
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
     var created: Instant? = null
 
-    @LastModifiedDato
+    @LastModifiedDate
     @Column(nullable = false)
     var updated: Instant? = null
 
-    @Column(name = "oppretter", length = 7)
-    @CreatedByAnsatt
+    @Column(name = "oppretter", length = ANSATTID_LENGTH)
     var oppretter: String? = null
 
     @Column(name = "system", length = 50)
-    @CreatedBySystem
     var system: String? = null
 }
 
-
-@Target(FIELD)
-@Retention(RUNTIME)
-annotation class CreatedBySystem
-
-@Target(FIELD)
-@Retention(RUNTIME)
-annotation class CreatedByAnsatt
-
-@Target(FIELD)
-@Retention(RUNTIME)
-annotation class CreatedDato
-
-@Target(FIELD)
-@Retention(RUNTIME)
-annotation class LastModifiedDato

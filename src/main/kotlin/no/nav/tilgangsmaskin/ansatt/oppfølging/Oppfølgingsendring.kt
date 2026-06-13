@@ -41,15 +41,4 @@ sealed interface Oppfølgingsendring {
     ) : Oppfølgingsendring
 }
 
-fun OppfølgingHendelse.tilDomene(): Oppfølgingsendring {
-    val identer = Identer(ident, aktorId)
-    fun krevKontor() = requireNotNull(kontor) {
-        "kontor mangler for $sisteEndringsType (uuid=$oppfolgingsperiodeUuid)"
-    }
-    return when (sisteEndringsType) {
-        OPPFOLGING_STARTET -> Startet(oppfolgingsperiodeUuid, identer, krevKontor(), startTidspunkt)
-        ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> KontorEndret(oppfolgingsperiodeUuid, identer, krevKontor(), startTidspunkt)
-        OPPFOLGING_AVSLUTTET -> Avsluttet(oppfolgingsperiodeUuid, identer)
-    }
-}
 

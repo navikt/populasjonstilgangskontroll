@@ -10,7 +10,6 @@ Prod: https://tilgangsmaskin.intern.nav.no/swagger-ui/index.html#/
 
 Dev: https://tilgangsmaskin.intern.dev.nav.no/swagger-ui/index.html#/
 
-
 ## Informasjon om cacher i løsningen
 
 Løsningen har flere cacher for å optimalisere ytelse og redusere belastning på underliggende systemer:

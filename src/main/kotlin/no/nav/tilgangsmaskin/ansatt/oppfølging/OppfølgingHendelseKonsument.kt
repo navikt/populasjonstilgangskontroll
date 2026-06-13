@@ -8,6 +8,7 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.Avsluttet
 import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.KontorEndret
 import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.Startet
 import no.nav.tilgangsmaskin.bruker.Identer
+import no.nav.tilgangsmaskin.bruker.Identifikator
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
@@ -25,33 +26,38 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
         when (val endring = hendelse.tilDomene()) {
             is Startet -> {
                 oppfølging.registrer(endring)
-                log.info("Oppfølging startet for kontor {} og id {}", endring.kontor.kontorId.verdi, endring.uuid)
+                log.info("Oppfølging startet med kontor {} og id {}", endring.kontor.kontorId.verdi, endring.uuid)
             }
             is KontorEndret -> {
+                val tidligereKontor = oppfølging.enhetFor(Identifikator(endring.identer.brukerId.verdi))
+                if (tidligereKontor == null) {
+                    log.warn("Mottok KontorEndret for id {} uten eksisterende kontor — ingen tidligere oppfølging funnet", endring.uuid)
+                }
                 oppfølging.registrer(endring)
-                log.info("Oppfølging endret for kontor {} og id {}", endring.kontor.kontorId.verdi, endring.uuid)
+                log.info("Oppfølging endret fra kontor {} til kontor {} for id {}", tidligereKontor?.verdi, endring.kontor.kontorId.verdi, endring.uuid)
             }
             is Avsluttet -> {
                 oppfølging.avslutt(endring)
-                log.info("Oppfølging avsluttet for {}", endring.uuid)
+                log.info("Oppfølging avsluttet for id {}", endring.uuid)
             }
         }
-
-    private fun OppfølgingHendelse.tilDomene(): Oppfølgingsendring {
-        val identer = Identer(ident, aktorId)
-        fun krevKontor() = requireNotNull(kontor) {
-            "kontor mangler for $sisteEndringsType (uuid=$oppfolgingsperiodeUuid)"
-        }
-        return when (sisteEndringsType) {
-            OPPFOLGING_STARTET -> Startet(oppfolgingsperiodeUuid, identer, krevKontor(), startTidspunkt)
-            ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> KontorEndret(oppfolgingsperiodeUuid, identer, krevKontor(), startTidspunkt)
-            OPPFOLGING_AVSLUTTET -> Avsluttet(oppfolgingsperiodeUuid, identer)
-        }
-    }
 
     companion object {
         private const val OPPFØLGING_TOPIC = "poao.siste-oppfolgingsperiode-v3"
     }
 }
+
+fun OppfølgingHendelse.tilDomene(): Oppfølgingsendring {
+    val identer = Identer(ident, aktorId)
+    fun krevKontor() = requireNotNull(kontor) {
+        "kontor mangler for $sisteEndringsType (uuid=$oppfolgingsperiodeUuid)"
+    }
+    return when (sisteEndringsType) {
+        OPPFOLGING_STARTET -> Startet(oppfolgingsperiodeUuid, identer, krevKontor(), startTidspunkt)
+        ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> KontorEndret(oppfolgingsperiodeUuid, identer, krevKontor(), startTidspunkt)
+        OPPFOLGING_AVSLUTTET -> Avsluttet(oppfolgingsperiodeUuid, identer)
+    }
+}
+
 
 

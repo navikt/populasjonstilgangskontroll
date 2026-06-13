@@ -10,7 +10,6 @@ class EnkeltTilgangJPAAdapter(private val repo: EnkeltTilgangRepository) {
     fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData) =
         with(data) {
             repo.save(EnkeltTilgangEntity(ansattId, brukerId.verdi, begrunnelse, enhetsnummer,gyldigtil.atStartOfDay(systemDefault()).toInstant()))
-            Unit
         }
 
     fun gjeldende(ansattId: String, brukerId: String, brukerIds: List<String>) =

@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import io.lettuce.core.LettuceFutures.awaitAll
-import io.lettuce.core.KeyValue
 import io.lettuce.core.RedisClient
 import io.lettuce.core.ScanArgs
 import io.lettuce.core.ScanCursor.INITIAL
@@ -83,10 +82,10 @@ class ValkeyCacheOperations(client: RedisClient,
                         conn.sync()
                             .mget(*keys)
                             .filter { it.hasValue() }
-                            .associate { it.fraJsonEntry(mapper, clazz) }
+                            .associate { mapper.tilEntry(it, clazz) }
                     }.getOrElse {
                         teller.tell(getMany, cache.name, feilet, ids.size)
-                        log.info("Cache getMany feilet for ${cache.fullName} med ${ids.size} nøkler, faller tilbake til tjenestekall: ${it.message}", it)
+                        log.info("${this.javaClass.simpleName} getMany feilet for ${cache.fullName} med ${ids.size} nøkler, faller tilbake til tjenestekall: ${it.message}", it)
                         emptyMap()
                     }
                 }
@@ -168,7 +167,7 @@ class ValkeyCacheOperations(client: RedisClient,
         return caches.zip(results).associate {
             (cache, count) -> cache.fullName to count
         }.also {
-            log.info("Cache sizes completed in single operation: {}, took {}ms", it, totalDuration.inWholeMilliseconds)
+            log.info("Cache størrelser {} slått opp, tok {}ms", it, totalDuration.inWholeMilliseconds)
         }
     }
 
@@ -177,9 +176,6 @@ class ValkeyCacheOperations(client: RedisClient,
             conn.sync().eval<List<Long>>(SCRIPT, MULTI, emptyArray(), *prefixes)
         }
 
-
-    private fun <T : Any> KeyValue<String, String>.fraJsonEntry(mapper: CacheNøkkelMapper, clazz: KClass<T>) =
-        mapper.tilEntry(this, clazz)
 
     private fun connect(client: RedisClient) =
         client.connect().apply {

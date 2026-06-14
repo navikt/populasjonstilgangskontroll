@@ -21,19 +21,13 @@ import java.util.*
     UniqueConstraint(name = "uc_oppfølgingentity_brukerid", columnNames = ["brukerid"])
 ])
 @EntityListeners(AuditingEntityListener::class)
-class OppfølgingEntity(@NaturalId @Id val id: UUID) {
-
-    @Column(length = BRUKERID_LENGTH, nullable = false)
-    var brukerid: String? = null
-
-    @Column(length = AKTØRID_LENGTH, nullable = false)
-    var aktoerid: String? = null
-
-    @Column(nullable = false)
-    var startTidspunkt: Instant? = null
-
-    @Column(length = 4, nullable = false)
-    var kontor: String? = null
+class OppfølgingEntity(
+    @NaturalId @Id val id: UUID,
+    @Column(length = BRUKERID_LENGTH, nullable = false) val brukerid: String,
+    @Column(length = AKTØRID_LENGTH, nullable = false) val aktoerid: String,
+    @Column(nullable = false) val startTidspunkt: Instant,
+    @Column(length = 4, nullable = false) var kontor: String,
+) {
 
     @Column(nullable = false, updatable = false)
     @CreatedDate
@@ -43,4 +37,3 @@ class OppfølgingEntity(@NaturalId @Id val id: UUID) {
     @LastModifiedDate
     var updated: Instant? = null
 }
-

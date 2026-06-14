@@ -8,10 +8,10 @@ import java.time.Instant
 import java.time.Instant.now
 
 interface NomRepository : JpaRepository<NomEntity, Long> {
-    fun findFnrByNavidAndGyldigtilGreaterThanEqual(navid: String, gyldigtil: Instant = now()): FnrProjection?
-    fun deleteByGyldigtilBefore(before: Instant = now()): Int
+    fun findFnrByNavidAndGyldigtilGreaterThanEqual(navid: String, gyldigtil: Instant): FnrProjection?
+    fun deleteByGyldigtilBefore(before: Instant): Int
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query(value = """
         INSERT INTO Ansatte (navid, fnr, startdato, gyldigtil, created, updated)
         VALUES (:navid, :fnr, :startdato, :gyldigtil, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)

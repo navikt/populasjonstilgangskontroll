@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.OVERSTYRBAR_REGELTYPE
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.FORBIDDEN
@@ -82,7 +83,10 @@ class RegelMotor(
 
 data class BulkResultat(val bruker: Bruker,val status: HttpStatus, val regel: Regel? = null) {
     companion object {
+        private val log = getLogger(javaClass)
         fun ok(bruker: Bruker) = BulkResultat( bruker,NO_CONTENT)
-        fun avvist(bruker: Bruker,e: RegelException) = BulkResultat( bruker,FORBIDDEN, e.regel)
+        fun avvist(bruker: Bruker,e: RegelException) = BulkResultat( bruker,FORBIDDEN, e.regel).also {
+            log.trace("Tilgang til {} for {} ble avvist av {}", e.bruker.brukerId.verdi.maskFnr(), e.ansatt.ansattId, e.regel.kortNavn, e)
+        }
     }
 }

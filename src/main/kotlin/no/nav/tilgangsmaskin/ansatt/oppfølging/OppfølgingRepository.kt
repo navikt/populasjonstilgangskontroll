@@ -10,7 +10,7 @@ import java.util.*
 interface OppfølgingRepository : JpaRepository<OppfølgingEntity, UUID> {
     fun findByBrukeridOrAktoerid(brukerid: String, aktoerid: String): OppfølgingEntity?
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query(value = """
         INSERT INTO OPPFOLGING (id, brukerid, aktoerid, start_tidspunkt, kontor, created, updated)
         VALUES (:id, :brukerid, :aktoerid, :startdato, :kontor, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)

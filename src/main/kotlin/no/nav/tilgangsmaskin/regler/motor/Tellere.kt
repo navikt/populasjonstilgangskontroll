@@ -26,16 +26,9 @@ class EvalueringTypeTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "evalueringtype.resultat", "Evalueringsresultat pr type og begrunnelse")
 
 @Component
-class BulkCacheTeller(registry: MeterRegistry, token: Token) :
-    AbstractTeller(registry, token, "bulk.cache", "Cache treff/bom for bulk")
-
-@Component
 class CacheOppfriskerTeller(registry: MeterRegistry, token: Token) :
     AbstractTeller(registry, token, "cache.oppfrisker", "Antall oppfriskninger av cache etter utløp")
 
-@Component
-class BulkCacheSuksessTeller(registry: MeterRegistry, token: Token) :
-    AbstractTeller(registry, token, "bulk.cache.suksess", "Treff/bom for hele bulken")
 
 @Component
 class TokenTypeTeller(registry: MeterRegistry, token: Token) :

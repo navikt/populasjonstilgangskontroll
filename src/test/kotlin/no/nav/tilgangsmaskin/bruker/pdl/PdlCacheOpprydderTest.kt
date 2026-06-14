@@ -23,9 +23,8 @@ class PdlCacheOpprydderTest : BehaviorSpec({
         every { it.system } returns "test"
         every { it.clusterAndSystem } returns "test:dev-gcp"
     }
-    val pdl = mockk<PdlTjeneste>(relaxed = true)
     val client = mockk<CacheOperations>()
-    val opprydder = PdlHendelseKonsument(pdl, client, PdlCacheTømmerTeller(SimpleMeterRegistry(), token))
+    val opprydder = PdlHendelseKonsument(client, PdlCacheTømmerTeller(SimpleMeterRegistry(), token))
 
     fun hendelse(identer: List<String>, endringstype: Endringstype = OPPRETTET,
         gradering: Adressebeskyttelse? = null) =
@@ -48,11 +47,9 @@ class PdlCacheOpprydderTest : BehaviorSpec({
 
         entries.forEach { endringstype ->
             When("endringstype er $endringstype") {
-                Then("slettes cache og refresh utføres") {
+                Then("slettes cache for alle PDL-cacher") {
                     opprydder.listen(hendelse(listOf(I1), endringstype))
                     PDL_CACHES.forEach { cache -> verify { client.delete(cache, I1) } }
-                    verify { pdl.medFamilie(I1) }
-                    verify { pdl.medUtvidetFamilie(I1) }
                 }
             }
         }
@@ -68,26 +65,6 @@ class PdlCacheOpprydderTest : BehaviorSpec({
             Then("slettes fra alle PDL-cacher") {
                 opprydder.listen(hendelse(listOf(I1), gradering = Adressebeskyttelse(FORTROLIG)))
                 PDL_CACHES.forEach { cache -> verify { client.delete(cache, I1) } }
-            }
-        }
-    }
-
-    Given("oppfrisking av cache etter endring") {
-        When("hendelsen inneholder to identer") {
-            Then("kalles medFamilie og medUtvidetFamilie for begge") {
-                opprydder.listen(hendelse(listOf(I1, I2)))
-                verify { pdl.medFamilie(I1) }
-                verify { pdl.medFamilie(I2) }
-                verify { pdl.medUtvidetFamilie(I1) }
-                verify { pdl.medUtvidetFamilie(I2) }
-            }
-        }
-
-        When("ingen cache-innslag ble slettet") {
-            Then("utføres refresh likevel") {
-                opprydder.listen(hendelse(listOf(I1)))
-                verify { pdl.medFamilie(I1) }
-                verify { pdl.medUtvidetFamilie(I1) }
             }
         }
     }

@@ -17,8 +17,7 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 
 @Component
-class PdlHendelseKonsument(private val pdl: PdlTjeneste,
-                           private val client: CacheOperations,
+class PdlHendelseKonsument(private val client: CacheOperations,
                            private val teller: PdlCacheTømmerTeller) {
     private val log = getLogger(javaClass)
 
@@ -33,7 +32,6 @@ class PdlHendelseKonsument(private val pdl: PdlTjeneste,
             hendelse.personidenter.forEach { id ->
                 slett(cache, id, gradering, endringsType)
             }
-            refresh(hendelse.personidenter, gradering)
         }
     }
 
@@ -47,13 +45,6 @@ class PdlHendelseKonsument(private val pdl: PdlTjeneste,
             log.info("Slettet innslag fra cache ${cache.name} etter hendelse med gradering: {}", gradering)
         }
     }
-
-    private fun refresh(identer: List<String>, gradering: String) =
-        identer.forEach { id ->
-            pdl.medFamilie(id)
-            pdl.medUtvidetFamilie(id)
-            log.info("Oppdaterte PDL caches for identer etter hendelse av type $gradering")
-        }
 
     private companion object {
         private const val PDL_LEESAH_TOPIC = "pdl.leesah-v1"

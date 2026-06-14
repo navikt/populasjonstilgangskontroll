@@ -1,20 +1,25 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import io.lettuce.core.LettuceFutures.awaitAll
-import io.lettuce.core.KeyValue
 import io.lettuce.core.RedisClient
 import io.lettuce.core.ScanArgs
 import io.lettuce.core.ScanCursor.INITIAL
 import io.lettuce.core.ScriptOutputType.MULTI
-import io.micrometer.core.instrument.MeterRegistry
-import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import jakarta.annotation.PreDestroy
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.clear
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.delete
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.getMany
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.getOne
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.putMany
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.putOne
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.feilet
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.hit
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.miss
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.ok
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
-import no.nav.tilgangsmaskin.regler.motor.BulkCacheSuksessTeller
-import no.nav.tilgangsmaskin.regler.motor.BulkCacheTeller
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import java.time.Duration
@@ -27,10 +32,8 @@ import kotlin.time.measureTimedValue
 @RetryingWhenRecoverableRestService
 class ValkeyCacheOperations(client: RedisClient,
                             private val mapper: CacheNøkkelMapper,
-                            private val alleTreffTeller: BulkCacheSuksessTeller,
-                            private val teller: BulkCacheTeller,
-                            private val cfg: CacheConfig,
-                            private val meterRegistry: MeterRegistry) : CacheOperations {
+                            private val teller: ValkeyCacheTeller,
+                            private val cfg: CacheConfig) : CacheOperations {
 
     private val log = getLogger(javaClass)
     private val conn = connect(client)
@@ -39,15 +42,22 @@ class ValkeyCacheOperations(client: RedisClient,
     @WithSpan
     override fun delete(cache: CacheNøkkelConfig, id: String) =
         conn.sync().del(mapper.tilNøkkel(cache, id))
+            .also {
+                teller.tell(delete, cache.name, ok)
+            }
 
     @WithSpan
     override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? =
         runCatching {
             conn.sync().get(mapper.tilNøkkel(cache, id))?.let { json ->
                 mapper.fraJson(json, clazz)
+                    .also { teller.tell(getOne, cache.name, hit) }
+            } ?: run {
+                teller.tell(getOne, cache.name, miss)
+                null
             }
         }.getOrElse { ex ->
-            meterRegistry.counter("cache.deserialize.failed", "cache", cache.name).increment()
+            teller.tell(getOne, cache.name, feilet)
             log.info("Cache getOne feilet for {}, faller tilbake til tjenestekall", cache.name, ex)
             null
         }
@@ -55,6 +65,7 @@ class ValkeyCacheOperations(client: RedisClient,
     @WithSpan
     override fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration) {
         conn.async().setex(mapper.tilNøkkel(cache, id), ttl.seconds, mapper.tilJson(value))
+        teller.tell(putOne, cache.name, ok)
     }
 
     @WithSpan
@@ -71,17 +82,17 @@ class ValkeyCacheOperations(client: RedisClient,
                         conn.sync()
                             .mget(*keys)
                             .filter { it.hasValue() }
-                            .associate {
-                                it.fraJsonEntry(mapper, clazz)
-                            }
+                            .associate { mapper.tilEntry(it, clazz) }
                     }.getOrElse {
-                        meterRegistry.counter("cache.deserialize.failed", "cache", cache.name).increment(ids.size.toDouble())
-                        log.info("Cache getMany feilet for ${cache.fullName} med ${ids.size} nøkler, faller tilbake til tjenestekall: ${it.message}",it)
+                        teller.tell(getMany, cache.name, feilet, ids.size)
+                        log.info("${this.javaClass.simpleName} getMany feilet for ${cache.fullName} med ${ids.size} nøkler, faller tilbake til tjenestekall: ${it.message}", it)
                         emptyMap()
                     }
                 }
                 result.also {
-                    tellOgLog(cache.fullName,it.size, ids.size, elapsed)
+                    teller.tell(getMany, cache.name, hit, it.size)
+                    teller.tell(getMany, cache.name, miss, ids.size - it.size)
+                    log.info("getMany {} hentet {} av {} nøkler på {}ms", cache.fullName, it.size, ids.size, elapsed.inWholeMilliseconds)
                 }
             }
         }
@@ -90,18 +101,16 @@ class ValkeyCacheOperations(client: RedisClient,
     override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
         when {
             innslag.isEmpty() -> return
-            innslag.size == 1 -> with(innslag.entries.single()) {
-                putOne(cache, key, value, ttl)
-            }
+            innslag.size == 1 -> with(innslag.entries.single()) { putOne(cache, key, value, ttl) }
             else -> {
-                val (resultat, varighet) = measureTimedValue {
-                    flushBatch(payload(innslag, cache), ttl)
-                }
+                val (resultat, varighet) = measureTimedValue { flushBatch(payload(innslag, cache), ttl) }
                 resultat
                     .onSuccess {
+                        teller.tell(putMany, cache.name, ok, innslag.size)
                         log.info("Cache putMany {} lagret {} nøkler på {}ms", cache.fullName, innslag.size, varighet.inWholeMilliseconds)
                     }
                     .onFailure {
+                        teller.tell(putMany, cache.name, feilet, innslag.size)
                         log.info("Cache putMany feilet for ${cache.fullName} med ${innslag.size} nøkler: ${it.message}", it)
                     }
             }
@@ -125,18 +134,8 @@ class ValkeyCacheOperations(client: RedisClient,
             awaitAll(cfg.timeout, *futures.toTypedArray())
         }
 
-    private fun payload(innslag: Map<String, Any>,
-                        cache: CacheNøkkelConfig): Map<String, String> =
-        innslag.entries.associate { (key, value) ->
-            mapper.tilJsonEntry(cache, key, value)
-        }
-
-    private fun tellOgLog(navn: String, funnet: Int, etterspurt: Int, elapsed: kotlin.time.Duration) {
-        alleTreffTeller.tell(of("name", navn, "suksess", (funnet == etterspurt).toString()))
-        teller.tell(of("cache", navn, "result", "miss"), etterspurt - funnet)
-        teller.tell(of("cache", navn, "result", "hit"), funnet)
-        log.info("getMany {} hentet {} av {} nøkler på {}ms", navn, funnet, etterspurt, elapsed.inWholeMilliseconds)
-    }
+    private fun payload(innslag: Map<String, Any>, cache: CacheNøkkelConfig): Map<String, String> =
+        innslag.entries.associate { (key, value) -> mapper.tilJsonEntry(cache, key, value) }
 
     override fun tilNøkkel(cache: CacheNøkkelConfig, id: String) = mapper.tilNøkkel(cache, id)
 
@@ -148,13 +147,15 @@ class ValkeyCacheOperations(client: RedisClient,
         val prefix = mapper.tilNøkkel(cache, "")
         var cursor = INITIAL
         val args = ScanArgs().match("$prefix*").limit(10000)
+        var slettet = 0L
         do {
             val result = conn.sync().scan(cursor, args)
             if (result.keys.isNotEmpty()) {
-                conn.sync().del(*result.keys.toTypedArray())
+                slettet += conn.sync().del(*result.keys.toTypedArray())
             }
             cursor = result
         } while (!result.isFinished)
+        teller.tell(clear, cache.name, ok, slettet.toInt())
     }
 
 
@@ -166,7 +167,7 @@ class ValkeyCacheOperations(client: RedisClient,
         return caches.zip(results).associate {
             (cache, count) -> cache.fullName to count
         }.also {
-            log.info("Cache sizes completed in single operation: {}, took {}ms", it, totalDuration.inWholeMilliseconds)
+            log.info("Cache størrelser {} slått opp, tok {}ms", it, totalDuration.inWholeMilliseconds)
         }
     }
 
@@ -175,9 +176,6 @@ class ValkeyCacheOperations(client: RedisClient,
             conn.sync().eval<List<Long>>(SCRIPT, MULTI, emptyArray(), *prefixes)
         }
 
-
-    private fun <T : Any> KeyValue<String, String>.fraJsonEntry(mapper: CacheNøkkelMapper, clazz: KClass<T>) =
-        mapper.tilEntry(this, clazz)
 
     private fun connect(client: RedisClient) =
         client.connect().apply {

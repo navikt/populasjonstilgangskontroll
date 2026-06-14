@@ -3,6 +3,9 @@ package no.nav.tilgangsmaskin.felles.utils
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.tilgangsmaskin.felles.AbstractAuditor
+import no.nav.tilgangsmaskin.felles.LocalAuditor
+import no.nav.tilgangsmaskin.felles.SecureAuditor
 import org.slf4j.Logger
 
 class AuditorTest : BehaviorSpec({

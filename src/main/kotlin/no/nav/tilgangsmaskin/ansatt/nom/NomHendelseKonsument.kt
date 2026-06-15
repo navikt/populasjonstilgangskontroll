@@ -34,7 +34,7 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
         with(hendelse.ansattData()) {
             log.info("Behandler hendelse $hendelse for $ansattId fra NOM, partition $partition og offset $offset")
             val id = nom.lagre(this)
-            log.info("$ansattId hendelse på partition $partition, offset $offset for $brukerId fra NOM ferdig behandlet og lagret med id $id")
+            log.info("$ansattId hendelse ${hendelse} på partition $partition, offset $offset ferdig behandlet og lagret med id $id")
     }
 
 

@@ -10,7 +10,7 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_STARTET
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.MedKontor
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.StartetEllerEndret
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
@@ -22,13 +22,13 @@ class OppfølgingMappingTest : BehaviorSpec({
 
     Given("OPPFOLGING_STARTET med kontor") {
         Then("mapper til MedKontor") {
-            hendelse(OPPFOLGING_STARTET, KONTOR).tilDomene() shouldBe MedKontor(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, TIDSPUNKT, OPPFOLGING_STARTET)
+            hendelse(OPPFOLGING_STARTET, KONTOR).tilDomene() shouldBe StartetEllerEndret(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, TIDSPUNKT, OPPFOLGING_STARTET)
         }
     }
 
     Given("ARBEIDSOPPFOLGINGSKONTOR_ENDRET med kontor") {
         Then("mapper til MedKontor") {
-            hendelse(ARBEIDSOPPFOLGINGSKONTOR_ENDRET, KONTOR).tilDomene() shouldBe MedKontor(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, TIDSPUNKT, ARBEIDSOPPFOLGINGSKONTOR_ENDRET)
+            hendelse(ARBEIDSOPPFOLGINGSKONTOR_ENDRET, KONTOR).tilDomene() shouldBe StartetEllerEndret(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, TIDSPUNKT, ARBEIDSOPPFOLGINGSKONTOR_ENDRET)
         }
     }
 

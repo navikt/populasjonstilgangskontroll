@@ -10,7 +10,7 @@ sealed interface OppfølgingEndring {
     val uuid: UUID
     val identer: Identer
 
-    data class MedKontor(
+    data class StartetEllerEndret(
         override val uuid: UUID,
         override val identer: Identer,
         val kontor: Kontor,

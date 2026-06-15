@@ -42,7 +42,7 @@ class OppfølgingHendelseKonsumentTest : BehaviorSpec({
             Then("kalles registrer med MedKontor-domeneobjekt") {
                 konsument.listen(hendelse(OPPFOLGING_STARTET))
                 verify {
-                    oppfølging.registrer(OppfølgingEndring.MedKontor(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, START_TIDSPUNKT, OPPFOLGING_STARTET))
+                    oppfølging.registrer(OppfølgingEndring.StartetEllerEndret(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, START_TIDSPUNKT, OPPFOLGING_STARTET))
                 }
             }
         }
@@ -53,7 +53,7 @@ class OppfølgingHendelseKonsumentTest : BehaviorSpec({
             Then("kalles registrer med MedKontor-domeneobjekt") {
                 konsument.listen(hendelse(ARBEIDSOPPFOLGINGSKONTOR_ENDRET))
                 verify {
-                    oppfølging.registrer(OppfølgingEndring.MedKontor(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, START_TIDSPUNKT, ARBEIDSOPPFOLGINGSKONTOR_ENDRET))
+                    oppfølging.registrer(OppfølgingEndring.StartetEllerEndret(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, START_TIDSPUNKT, ARBEIDSOPPFOLGINGSKONTOR_ENDRET))
                 }
             }
         }

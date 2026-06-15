@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.ansatt.oppfølging
 import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.MedKontor
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.StartetEllerEndret
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.CachePut
@@ -29,7 +29,7 @@ class OppfølgingTjeneste(private val adapter: OppfølgingJPAAdapter, private va
             CachePut(cacheNames = [OPPFØLGING], key = "#endring.identer.brukerId.verdi")
         ]
     )
-    fun registrer(endring: MedKontor) =
+    fun registrer(endring: StartetEllerEndret) =
         with(endring) {
             kontor.kontorId.also {
                 adapter.registrer(uuid, identer.brukerId.verdi,

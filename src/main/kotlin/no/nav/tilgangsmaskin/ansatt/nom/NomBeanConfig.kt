@@ -4,7 +4,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.ansatt.nom.NomHendelseKonsument.Companion.NOM_FNR_FILTER_STRATEGY
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.kafka.TypedKafkaDroppedMessageMeter
+import no.nav.tilgangsmaskin.felles.kafka.KafkaTypedDroppedMessageMeter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.listener.adapter.RecordFilterStrategy
@@ -23,6 +23,6 @@ class NomBeanConfig {
 
     @Bean
     fun nomDroppedMessageMeter(registry: MeterRegistry) =
-        object : TypedKafkaDroppedMessageMeter<NomHendelse>(registry, NomHendelse::class) {}
+        object : KafkaTypedDroppedMessageMeter<NomHendelse>(registry, NomHendelse::class) {}
 }
 

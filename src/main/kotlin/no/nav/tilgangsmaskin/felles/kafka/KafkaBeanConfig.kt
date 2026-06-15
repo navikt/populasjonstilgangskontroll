@@ -20,7 +20,7 @@ import tools.jackson.databind.json.JsonMapper
  * Når retries er gitt opp, inkrementeres metrikken `kafka.message.dropped`
  * og hendelsen logges på ERROR-nivå.
  *
- * Hver konsument har sin egen [TypedKafkaDroppedMessageMeter] for typesikker logging
+ * Hver konsument har sin egen [KafkaTypedDroppedMessageMeter] for typesikker logging
  * av hendelser som ikke kan prosesseres.
  */
 @Configuration
@@ -36,7 +36,7 @@ class KafkaBeanConfig {
         }
 
     @Bean
-    fun commonErrorHandler(listeners: List<TypedKafkaDroppedMessageMeter<*>>) =
+    fun commonErrorHandler(listeners: List<KafkaTypedDroppedMessageMeter<*>>) =
         createErrorHandler(*listeners.toTypedArray())
 
     companion object {

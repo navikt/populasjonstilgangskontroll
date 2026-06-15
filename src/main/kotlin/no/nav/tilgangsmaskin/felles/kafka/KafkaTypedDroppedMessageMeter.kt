@@ -12,7 +12,7 @@ import kotlin.reflect.KClass
  * Subklasser spesifiserer [eventType] og implementerer [formatEvent] for
  * domenespesifikk logging uten å eksponere sensitive data.
  */
-abstract class TypedKafkaDroppedMessageMeter<T : Any>(
+abstract class KafkaTypedDroppedMessageMeter<T : Any>(
     registry: MeterRegistry,
     private val eventType: KClass<T>) : RetryListener {
 

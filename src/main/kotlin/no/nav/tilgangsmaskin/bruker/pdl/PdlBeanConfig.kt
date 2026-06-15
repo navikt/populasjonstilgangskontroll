@@ -13,7 +13,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNU
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
-import no.nav.tilgangsmaskin.felles.kafka.TypedKafkaDroppedMessageMeter
+import no.nav.tilgangsmaskin.felles.kafka.KafkaTypedDroppedMessageMeter
 import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
@@ -94,7 +94,7 @@ class PdlBeanConfig {
 
     @Bean
     fun pdlDroppedMessageMeter(registry: MeterRegistry) =
-        object : TypedKafkaDroppedMessageMeter<Personhendelse>(registry, Personhendelse::class) {
+        object : KafkaTypedDroppedMessageMeter<Personhendelse>(registry, Personhendelse::class) {
             override fun formatEvent(event: Personhendelse) =
                 "gradering=${event.adressebeskyttelse?.gradering ?: "UGRADERT"}, " +
                     "endringstype=${event.endringstype}, " +

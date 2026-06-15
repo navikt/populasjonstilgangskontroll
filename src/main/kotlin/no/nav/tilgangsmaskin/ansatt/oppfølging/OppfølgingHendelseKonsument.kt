@@ -30,11 +30,11 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
                         log.warn("Mottok KontorEndret for id {} uten eksisterende kontor — ingen tidligere oppfølging funnet", endring.uuid)
                     }
                     oppfølging.registrer(endring).also {
-                        log.info("Oppfølging endret fra kontor {} til kontor {} for id {}", tidligereKontor?.verdi, endring.kontor.kontorId.verdi, endring.uuid)
+                        log.info("Oppfølging endret fra kontor {} til kontor {} for id {}", tidligereKontor?.verdi, endring.kontor, endring.uuid)
                     }
                 } else {
                     oppfølging.registrer(endring).also {
-                        log.info("Oppfølging startet med kontor {} og id {}", endring.kontor.kontorId.verdi, endring.uuid)
+                        log.info("Oppfølging startet med kontor {} og id {}", endring.kontor, endring.uuid)
                     }
                 }
             }

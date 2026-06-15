@@ -16,3 +16,4 @@ class KafkaDroppedMessageCounter(private val registry: MeterRegistry) {
             "exception", e?.javaClass?.simpleName ?: "unknown"
         ).increment()
 }
+

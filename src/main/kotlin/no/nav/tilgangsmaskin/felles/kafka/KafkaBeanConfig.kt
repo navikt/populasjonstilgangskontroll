@@ -1,9 +1,6 @@
 package no.nav.tilgangsmaskin.felles.kafka
 
-import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import org.apache.kafka.clients.consumer.ConsumerRecord
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.kafka.autoconfigure.DefaultKafkaConsumerFactoryCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -13,7 +10,6 @@ import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer
 import org.springframework.util.backoff.ExponentialBackOff
 import tools.jackson.databind.json.JsonMapper
-import kotlin.reflect.KClass
 
 /**
  * Felles Kafka-konfigurasjon: deserializer-oppsett og feilhåndtering.
@@ -56,38 +52,3 @@ class KafkaBeanConfig {
     }
 }
 
-/**
- * Typesikker [RetryListener] som logger droppede meldinger med kjent hendelsestype.
- *
- * Subklasser spesifiserer [eventType] og implementerer [formatEvent] for
- * domenespesifikk logging uten å eksponere sensitive data.
- */
-abstract class TypedKafkaDroppedMessageMeter<T : Any>(
-    private val registry: MeterRegistry,
-    private val eventType: KClass<T>) : RetryListener {
-
-    private val log = getLogger(javaClass)
-
-    protected open fun formatEvent(event: T) = "$event"
-
-    override fun recovered(record: ConsumerRecord<*, *>, e: Exception?) {
-        val event = typedValue(record) ?: return
-        registry.counter(
-            "kafka.message.dropped",
-            "topic", record.topic(),
-            "exception", e?.javaClass?.simpleName ?: "unknown"
-        ).increment()
-        log.error("Ga opp Kafka-melding på topic=${record.topic()} partition=${record.partition()} offset=${record.offset()} hendelse=[${formatEvent(event)}]: ${e?.message}", e)
-    }
-
-    override fun failedDelivery(record: ConsumerRecord<*, *>, e: Exception?, deliveryAttempt: Int) {
-        typedValue(record) ?: return
-        log.warn("Forsøk $deliveryAttempt feilet for melding på topic=${record.topic()} offset=${record.offset()}: ${e?.message}"
-        )
-    }
-
-    private fun typedValue(record: ConsumerRecord<*, *>): T? =
-        record.value()?.let { value ->
-            if (eventType.isInstance(value)) eventType.java.cast(value) else null
-        }
-}

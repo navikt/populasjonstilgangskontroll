@@ -22,6 +22,7 @@ class TypedKafkaDroppedMessageMeterTest : BehaviorSpec({
                 val count = registry.counter(
                     "kafka.message.dropped",
                     "topic", "test-topic",
+                    "partition", "0",
                     "exception", "RuntimeException"
                 ).count()
                 count shouldBeExactly 1.0
@@ -38,6 +39,7 @@ class TypedKafkaDroppedMessageMeterTest : BehaviorSpec({
                 val count = registryForFeilType.counter(
                     "kafka.message.dropped",
                     "topic", "annen-topic",
+                    "partition", "0",
                     "exception", "RuntimeException"
                 ).count()
                 count shouldBeExactly 0.0

@@ -1,45 +1,31 @@
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 import org.springframework.boot.gradle.tasks.buildinfo.BuildInfo
 import org.springframework.boot.gradle.tasks.bundling.BootJar
-import org.springframework.core.SpringVersion
 import java.lang.System.getProperty
 
 val javaVersion = JavaLanguageVersion.of(25)
-val springdocVersion = "3.0.3"
-val tokenSupportVersion = "6.0.7"
-val mockkVersion = "1.14.9"
-val kotestVersion = "6.1.11"
-val otelVersion = "2.27.0"
-val conditionalsVersion = "6.0.5"
-val logstashVersion = "9.0"
-val coroutinesVersion = "1.9.0"
-val poolsVersion = "2.13.1"
-val springMockkVersion = "5.0.1"
-val confluentVersion = "8.2.0"
-
 
 group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
 version = "1.0.1"
 
 plugins {
-    val kotlinVersion = "2.3.21"
     id("jacoco")
-    id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
-    kotlin("jvm") version kotlinVersion
-    kotlin("plugin.spring") version kotlinVersion
-    kotlin("plugin.jpa") version kotlinVersion
-    id("org.springframework.boot") version "4.1.0"
-    id("io.spring.dependency-management") version "1.1.7"
-    id("org.cyclonedx.bom") version "3.2.4"
-    id("io.kotest") version "6.1.11"
-    id("com.gorylenko.gradle-git-properties") version "2.5.7"
+    alias(libs.plugins.avro)
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.spring)
+    alias(libs.plugins.kotlin.jpa)
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.cyclonedx)
+    alias(libs.plugins.kotest)
+    alias(libs.plugins.git.properties)
     application
 }
 springBoot {
     buildInfo {
         properties {
             additional = mapOf(
-                "kotlin.version" to "2.3.21",
+                "kotlin.version" to libs.versions.kotlin.get(),
                 "jdk.version" to javaVersion.asInt().toString(),
                 "jdk.vendor" to getProperty("java.vendor"),
                 "spring-boot.version" to plugins.getPlugin(SpringBootPlugin::class).javaClass.`package`.implementationVersion
@@ -69,65 +55,64 @@ repositories {
 
 
 dependencies {
-    implementation("io.confluent:kafka-avro-serializer:$confluentVersion") {
+    implementation(libs.confluent.kafka.avro.serializer) {
         exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
     }
-    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations")
-    implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$otelVersion-alpha")
-    implementation("io.micrometer:micrometer-core")
-    implementation("io.micrometer:micrometer-registry-prometheus")
-    implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
-    implementation("no.nav.boot:boot-conditionals:$conditionalsVersion")
-    implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
-    implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
-    implementation("org.flywaydb:flyway-database-postgresql")
-    implementation("org.apache.commons:commons-pool2:$poolsVersion")
-    implementation("org.hibernate.orm:hibernate-micrometer")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-    implementation("org.postgresql:postgresql")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
-    implementation("org.springframework.boot:spring-boot-starter-flyway")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-cache")
-    implementation("com.github.ben-manes.caffeine:caffeine")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-data-redis")
-    implementation("org.springframework.boot:spring-boot-starter-graphql")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-web") {
+    implementation(libs.opentelemetry.instrumentation.annotations)
+    implementation(libs.opentelemetry.logback.mdc)
+    implementation(libs.micrometer.core)
+    implementation(libs.micrometer.registry.prometheus)
+    implementation(libs.logstash.logback.encoder)
+    implementation(libs.boot.conditionals)
+    implementation(libs.token.client.spring)
+    implementation(libs.token.validation.spring)
+    implementation(libs.flyway.database.postgresql)
+    implementation(libs.commons.pool2)
+    implementation(libs.hibernate.micrometer)
+    implementation(libs.kotlin.reflect)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.postgresql)
+    implementation(libs.springdoc.openapi.webmvc.ui)
+    implementation(libs.spring.boot.starter.flyway)
+    implementation(libs.spring.boot.starter.actuator)
+    implementation(libs.spring.boot.starter.cache)
+    implementation(libs.caffeine)
+    implementation(libs.spring.boot.starter.data.jpa)
+    implementation(libs.spring.boot.starter.data.redis)
+    implementation(libs.spring.boot.starter.graphql)
+    implementation(libs.spring.boot.starter.validation)
+    implementation(libs.spring.boot.starter.web) {
         exclude(group = "org.springframework.boot", "spring-boot-starter-tomcat")
     }
-    implementation("org.springframework.boot:spring-boot-starter-jetty")
-    implementation("org.springframework.boot:spring-boot-starter-restclient")
-    implementation("org.springframework.boot:spring-boot-starter-webclient")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
-    implementation("org.springframework.boot:spring-boot-starter-kafka")
-    implementation("org.springframework:spring-aspects")
-    testImplementation("org.springframework.boot:spring-boot-micrometer-metrics-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-test") {
-        exclude(group = "org.junit.vintage",  "junit-vintage-engine")
+    implementation(libs.spring.boot.starter.jetty)
+    implementation(libs.spring.boot.starter.restclient)
+    implementation(libs.spring.boot.starter.webclient)
+    implementation(libs.spring.boot.starter.webflux)
+    implementation(libs.spring.boot.starter.kafka)
+    implementation(libs.spring.aspects)
+    testImplementation(libs.spring.boot.micrometer.metrics.test)
+    testImplementation(libs.spring.boot.starter.test) {
+        exclude(group = "org.junit.vintage", "junit-vintage-engine")
     }
-    testImplementation("org.springframework.boot:spring-boot-testcontainers")
-    testImplementation("com.redis:testcontainers-redis")
-    testImplementation("org.testcontainers:testcontainers-junit-jupiter")
-    testImplementation("org.testcontainers:testcontainers-postgresql")
-    testImplementation("org.springframework.boot:spring-boot-starter-data-redis-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-kafka-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-restclient-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
-    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
-    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
-    testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
-    testImplementation("io.mockk:mockk:$mockkVersion")
-    testImplementation("io.kotest:kotest-extensions-spring:$kotestVersion")
+    testImplementation(libs.spring.boot.testcontainers)
+    testImplementation(libs.testcontainers.redis)
+    testImplementation(libs.testcontainers.junit.jupiter)
+    testImplementation(libs.testcontainers.postgresql)
+    testImplementation(libs.spring.boot.starter.data.redis.test)
+    testImplementation(libs.spring.boot.starter.kafka.test)
+    testImplementation(libs.spring.boot.starter.restclient.test)
+    testImplementation(libs.spring.boot.starter.data.jpa.test)
+    testImplementation(libs.kotest.runner.junit5)
+    testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.springmockk)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotest.extensions.spring)
 }
 
 
 dependencyManagement {
     imports {
-        mavenBom("io.netty:netty-bom:4.2.13.Final")  // TODO rethink on next boot version
-        mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:$otelVersion")
+        mavenBom(libs.opentelemetry.instrumentation.bom.get().toString())
     }
 }
 

@@ -5,8 +5,7 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_AVSLUTTET
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_STARTET
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.KontorEndret
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Startet
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.MedKontor
 import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import org.slf4j.LoggerFactory.getLogger
@@ -24,17 +23,18 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
         groupId = OPPFØLGING)
     fun listen(hendelse: OppfølgingHendelse) =
         when (val endring = hendelse.tilDomene()) {
-            is Startet -> {
-                oppfølging.registrer(endring)
-                log.info("Oppfølging startet med kontor {} og id {}", endring.kontor.kontorId.verdi, endring.uuid)
-            }
-            is KontorEndret -> {
-                val tidligereKontor = oppfølging.enhetFor(Identifikator(endring.identer.brukerId.verdi))
-                if (tidligereKontor == null) {
-                    log.warn("Mottok KontorEndret for id {} uten eksisterende kontor — ingen tidligere oppfølging funnet", endring.uuid)
+            is MedKontor -> {
+                if (endring.type == ARBEIDSOPPFOLGINGSKONTOR_ENDRET) {
+                    val tidligereKontor = oppfølging.enhetFor(Identifikator(endring.identer.brukerId.verdi))
+                    if (tidligereKontor == null) {
+                        log.warn("Mottok KontorEndret for id {} uten eksisterende kontor — ingen tidligere oppfølging funnet", endring.uuid)
+                    }
+                    oppfølging.registrer(endring)
+                    log.info("Oppfølging endret fra kontor {} til kontor {} for id {}", tidligereKontor?.verdi, endring.kontor.kontorId.verdi, endring.uuid)
+                } else {
+                    oppfølging.registrer(endring)
+                    log.info("Oppfølging startet med kontor {} og id {}", endring.kontor.kontorId.verdi, endring.uuid)
                 }
-                oppfølging.registrer(endring)
-                log.info("Oppfølging endret fra kontor {} til kontor {} for id {}", tidligereKontor?.verdi, endring.kontor.kontorId.verdi, endring.uuid)
             }
             is Avsluttet -> {
                 oppfølging.avslutt(endring)
@@ -53,8 +53,8 @@ fun OppfølgingHendelse.tilDomene(): OppfølgingEndring {
         "kontor mangler for $sisteEndringsType (uuid=$oppfolgingsperiodeUuid)"
     }
     return when (sisteEndringsType) {
-        OPPFOLGING_STARTET -> Startet(oppfolgingsperiodeUuid, identer, krevKontor(), startTidspunkt)
-        ARBEIDSOPPFOLGINGSKONTOR_ENDRET -> KontorEndret(oppfolgingsperiodeUuid, identer, krevKontor(), startTidspunkt)
+        OPPFOLGING_STARTET, ARBEIDSOPPFOLGINGSKONTOR_ENDRET ->
+            MedKontor(oppfolgingsperiodeUuid, identer, krevKontor(), startTidspunkt, sisteEndringsType)
         OPPFOLGING_AVSLUTTET -> Avsluttet(oppfolgingsperiodeUuid, identer)
     }
 }

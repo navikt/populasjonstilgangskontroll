@@ -10,6 +10,7 @@ import io.mockk.verify
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING_CACHE
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_STARTET
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjenesteTest.OppfølgingTestConfig
 import no.nav.tilgangsmaskin.bruker.AktørId
@@ -33,7 +34,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Startet
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.MedKontor
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Instant.parse
@@ -69,7 +70,7 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
         beforeEach { cache.clear(OPPFØLGING_CACHE) }
 
         fun startet(periode: UUID = randomUUID(), kontor: Kontor = KONTOR) =
-            Startet(periode, IDENTER, kontor, parse("2024-01-01T09:00:00Z"))
+            MedKontor(periode, IDENTER, kontor, parse("2024-01-01T09:00:00Z"), OPPFOLGING_STARTET)
 
         Given("enhetFor") {
             When("det ikke finnes oppfølging") {
@@ -121,7 +122,7 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, brukerId.verdi) shouldBe kontor
 
                     val nyEnhet = Enhetsnummer("5678")
-                    tjeneste.registrer(Startet(id, IDENTER, Kontor(nyEnhet, "Ny enhet"), parse("2024-06-01T09:00:00Z")))
+                    tjeneste.registrer(MedKontor(id, IDENTER, Kontor(nyEnhet, "Ny enhet"), parse("2024-06-01T09:00:00Z"), OPPFOLGING_STARTET))
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, brukerId.verdi) shouldBe nyEnhet
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, aktørId.verdi) shouldBe nyEnhet
                 }

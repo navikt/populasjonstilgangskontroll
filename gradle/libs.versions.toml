@@ -6,7 +6,7 @@ springdoc = "3.0.3"
 token-support = "6.0.10"
 mockk = "1.14.9"
 kotest = "6.1.11"
-opentelemetry = "2.27.0"
+opentelemetry = "2.28.0"
 boot-conditionals = "6.0.5"
 logstash = "9.0"
 coroutines = "1.9.0"
@@ -17,7 +17,7 @@ avro-plugin = "1.9.1"
 cyclonedx = "3.2.4"
 git-properties = "2.5.7"
 
-opentelemetry-alpha = "2.27.0-alpha"
+opentelemetry-alpha = "2.28.0-alpha"
 
 [libraries]
 # Implementation

@@ -2,8 +2,8 @@ package no.nav.tilgangsmaskin.ansatt.oppfølging
 
 import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
-import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.Avsluttet
-import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.MedKontor
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.MedKontor
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.CachePut

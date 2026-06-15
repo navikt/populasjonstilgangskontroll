@@ -1,22 +1,16 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.ARBEIDSOPPFOLGINGSKONTOR_ENDRET
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_AVSLUTTET
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_STARTET
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
-import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.Avsluttet
-import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.KontorEndret
-import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.Startet
 import no.nav.tilgangsmaskin.bruker.Identer
 import java.time.Instant
 import java.util.UUID
 
-sealed interface Oppfølgingsendring {
+sealed interface OppfølgingEndring {
     val uuid: UUID
     val identer: Identer
 
     /** Felles type for hendelser som har et kontor — brukes som ett-arg signatur i tjenestelaget. */
-    sealed interface MedKontor : Oppfølgingsendring {
+    sealed interface MedKontor : OppfølgingEndring {
         val kontor: Kontor
         val tidspunkt: Instant
     }
@@ -38,7 +32,7 @@ sealed interface Oppfølgingsendring {
     data class Avsluttet(
         override val uuid: UUID,
         override val identer: Identer,
-    ) : Oppfølgingsendring
+    ) : OppfølgingEndring
 }
 
 

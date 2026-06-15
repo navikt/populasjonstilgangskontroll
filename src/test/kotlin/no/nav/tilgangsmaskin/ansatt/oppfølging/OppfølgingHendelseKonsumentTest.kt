@@ -42,7 +42,7 @@ class OppfølgingHendelseKonsumentTest : BehaviorSpec({
             Then("kalles registrer med Startet-domeneobjekt") {
                 konsument.listen(hendelse(OPPFOLGING_STARTET))
                 verify {
-                    oppfølging.registrer(Oppfølgingsendring.Startet(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, START_TIDSPUNKT))
+                    oppfølging.registrer(OppfølgingEndring.Startet(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, START_TIDSPUNKT))
                 }
             }
         }
@@ -53,7 +53,7 @@ class OppfølgingHendelseKonsumentTest : BehaviorSpec({
             Then("kalles registrer med KontorEndret-domeneobjekt") {
                 konsument.listen(hendelse(ARBEIDSOPPFOLGINGSKONTOR_ENDRET))
                 verify {
-                    oppfølging.registrer(Oppfølgingsendring.KontorEndret(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, START_TIDSPUNKT))
+                    oppfølging.registrer(OppfølgingEndring.KontorEndret(ID, Identer(BRUKER_ID, AKTOR_ID), KONTOR, START_TIDSPUNKT))
                 }
             }
         }
@@ -65,7 +65,7 @@ class OppfølgingHendelseKonsumentTest : BehaviorSpec({
                 konsument.listen(hendelse(OPPFOLGING_AVSLUTTET,  null,  Instant.now()))
 
                 verify {
-                    oppfølging.avslutt(Oppfølgingsendring.Avsluttet(ID, Identer(BRUKER_ID, AKTOR_ID)))
+                    oppfølging.avslutt(OppfølgingEndring.Avsluttet(ID, Identer(BRUKER_ID, AKTOR_ID)))
                 }
             }
         }

@@ -4,9 +4,9 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPF
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.ARBEIDSOPPFOLGINGSKONTOR_ENDRET
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_AVSLUTTET
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_STARTET
-import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.Avsluttet
-import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.KontorEndret
-import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring.Startet
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.KontorEndret
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Startet
 import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import org.slf4j.LoggerFactory.getLogger
@@ -47,7 +47,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
     }
 }
 
-fun OppfølgingHendelse.tilDomene(): Oppfølgingsendring {
+fun OppfølgingHendelse.tilDomene(): OppfølgingEndring {
     val identer = Identer(ident, aktorId)
     fun krevKontor() = requireNotNull(kontor) {
         "kontor mangler for $sisteEndringsType (uuid=$oppfolgingsperiodeUuid)"

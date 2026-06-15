@@ -10,7 +10,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomJPAAdapter
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
-import no.nav.tilgangsmaskin.ansatt.oppfølging.Oppfølgingsendring
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
@@ -43,7 +43,7 @@ class DevTilgangController(
     @PostMapping("oppfolging/{uuid}/avslutt")
     @Operation(summary = SUMMARY_OPPFOLGING_AVSLUTT, description = DESCRIPTION_OPPFOLGING_AVSLUTT)
     fun oppfølgingAvslutt(@RequestBody identer : Identer, @PathVariable uuid: UUID) =
-        oppfølging.avslutt(Oppfølgingsendring.Avsluttet(uuid, identer))
+        oppfølging.avslutt(OppfølgingEndring.Avsluttet(uuid, identer))
 
     @GetMapping("oppfolging/enhet")
     @Operation(summary = SUMMARY_OPPFOLGING_ENHET, description = DESCRIPTION_OPPFOLGING_ENHET)

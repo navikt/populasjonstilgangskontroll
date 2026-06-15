@@ -72,7 +72,6 @@ springmockk = { module = "com.ninja-squad:springmockk", version.ref = "springmoc
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 
 # BOMs
-netty-bom = { module = "io.netty:netty-bom", version.ref = "netty" }
 opentelemetry-instrumentation-bom = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom", version.ref = "opentelemetry" }
 
 [plugins]

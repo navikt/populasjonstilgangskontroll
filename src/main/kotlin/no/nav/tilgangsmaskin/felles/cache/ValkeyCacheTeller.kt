@@ -2,6 +2,8 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.stereotype.Component
+import java.util.Locale
+import java.util.Locale.getDefault
 
 /**
  * Teller for alle cache-operasjoner i [ValkeyCacheOperations].
@@ -16,13 +18,13 @@ class ValkeyCacheTeller(private val registry: MeterRegistry) {
     fun tell(operasjon: Operasjon, cache: String, resultat: Resultat, n: Int = 1) =
         registry.counter(
             "valkey.cache.operasjoner",
-            "operasjon", operasjon.name,
+            "operasjon", operasjon.name.lowercase(getDefault()),
             "cache", cache,
-            "resultat", resultat.name
+            "resultat", resultat.name.lowercase(getDefault())
         ).increment(n.toDouble())
 
 
-    enum class Operasjon { getOne, getMany, putOne, putMany, delete, clear }
-    enum class Resultat { hit, miss, ok, feilet }
+    enum class Operasjon { GET_ONE, GET_MANY, PUT_ONE, PUT_MANY, DELETE, CLEAR }
+    enum class Resultat { HIT, MISS, OK, FEILET }
 }
 

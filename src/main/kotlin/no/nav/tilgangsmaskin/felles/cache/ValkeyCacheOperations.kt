@@ -7,33 +7,31 @@ import io.lettuce.core.ScanCursor.INITIAL
 import io.lettuce.core.ScriptOutputType.MULTI
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import jakarta.annotation.PreDestroy
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.clear
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.delete
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.getMany
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.getOne
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.putMany
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.putOne
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.feilet
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.hit
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.miss
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.ok
+import no.nav.tilgangsmaskin.felles.cache.CacheBeanConfig.Companion.VALKEY_MAPPER
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.CLEAR
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.DELETE
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.GET_MANY
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.GET_ONE
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.PUT_MANY
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.PUT_ONE
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.FEILET
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.HIT
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.MISS
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.OK
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import java.time.Duration
 import java.time.Duration.ofSeconds
-import kotlin.collections.emptyMap
 import kotlin.reflect.KClass
 import kotlin.text.Charsets.UTF_8
 import kotlin.time.measureTimedValue
 
 @RetryingWhenRecoverableRestService
-class ValkeyCacheOperations(client: RedisClient,
-                            private val mapper: CacheNøkkelMapper,
-                            private val teller: ValkeyCacheTeller,
-                            private val cfg: CacheConfig) : CacheOperations {
+class ValkeyCacheOperations(client: RedisClient, private val cfg: CacheConfig,
+                            private val teller: ValkeyCacheTeller) : CacheOperations {
 
     private val log = getLogger(javaClass)
     private val conn = connect(client)
@@ -41,110 +39,90 @@ class ValkeyCacheOperations(client: RedisClient,
 
     @WithSpan
     override fun delete(cache: CacheNøkkelConfig, id: String) =
-        conn.sync().del(mapper.tilNøkkel(cache, id))
-            .also {
-                teller.tell(delete, cache.name, ok)
-            }
+        conn.sync().del(cache.tilNøkkel(id)).also {
+            teller.tell(DELETE, cache.name, OK)
+        }
 
     @WithSpan
     override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? =
         runCatching {
-            conn.sync().get(mapper.tilNøkkel(cache, id))?.let { json ->
-                mapper.fraJson(json, clazz)
-                    .also { teller.tell(getOne, cache.name, hit) }
+            conn.sync().get(cache.tilNøkkel(id))?.let {
+                VALKEY_MAPPER.readValue(it, clazz.java).also {
+                    teller.tell(GET_ONE, cache.name, HIT)
+                }
             } ?: run {
-                teller.tell(getOne, cache.name, miss)
+                teller.tell(GET_ONE, cache.name, MISS);
                 null
             }
-        }.getOrElse { ex ->
-            teller.tell(getOne, cache.name, feilet)
-            log.info("Cache getOne feilet for {}, faller tilbake til tjenestekall", cache.name, ex)
+        }.getOrElse { e ->
+            teller.tell(GET_ONE, cache.name, FEILET)
+            log.info("Cache getOne feilet for {}, faller tilbake til tjenestekall", cache.name, e)
             null
         }
 
     @WithSpan
     override fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration) {
-        conn.async().setex(mapper.tilNøkkel(cache, id), ttl.seconds, mapper.tilJson(value))
-        teller.tell(putOne, cache.name, ok)
+        conn.async().setex(cache.tilNøkkel(id), ttl.seconds, VALKEY_MAPPER.writeValueAsString(value))
+        teller.tell(PUT_ONE, cache.name, OK)
     }
 
     @WithSpan
     override fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>) =
         when {
             ids.isEmpty() -> emptyMap()
-            ids.size == 1 -> ids.single().let { id ->
-                getOne(cache, id, clazz)?.let { mapOf(id to it) }.orEmpty()
-            }
-            else -> {
-                val (result, elapsed) = measureTimedValue {
-                    runCatching {
-                        val keys = ids.map { mapper.tilNøkkel(cache, it) }.toTypedArray()
-                        conn.sync()
-                            .mget(*keys)
-                            .filter { it.hasValue() }
-                            .associate { mapper.tilEntry(it, clazz) }
-                    }.getOrElse {
-                        teller.tell(getMany, cache.name, feilet, ids.size)
-                        log.info("${this.javaClass.simpleName} getMany feilet for ${cache.fullName} med ${ids.size} nøkler, faller tilbake til tjenestekall: ${it.message}", it)
-                        emptyMap()
-                    }
-                }
-                result.also {
-                    teller.tell(getMany, cache.name, hit, it.size)
-                    teller.tell(getMany, cache.name, miss, ids.size - it.size)
-                    log.info("getMany {} hentet {} av {} nøkler på {}ms", cache.fullName, it.size, ids.size, elapsed.inWholeMilliseconds)
-                }
-            }
+            ids.size == 1 -> doGetOne(cache, ids, clazz)
+            else -> doGetMany(cache, ids, clazz)
         }
 
     @WithSpan
     override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
         when {
             innslag.isEmpty() -> return
-            innslag.size == 1 -> with(innslag.entries.single()) { putOne(cache, key, value, ttl) }
-            else -> {
-                val (resultat, varighet) = measureTimedValue { flushBatch(payload(innslag, cache), ttl) }
-                resultat
-                    .onSuccess {
-                        teller.tell(putMany, cache.name, ok, innslag.size)
-                        log.info("Cache putMany {} lagret {} nøkler på {}ms", cache.fullName, innslag.size, varighet.inWholeMilliseconds)
-                    }
-                    .onFailure {
-                        teller.tell(putMany, cache.name, feilet, innslag.size)
-                        log.info("Cache putMany feilet for ${cache.fullName} med ${innslag.size} nøkler: ${it.message}", it)
-                    }
-            }
+            innslag.size == 1 -> doPutOne(cache, innslag, ttl)
+            else -> doPutMany(cache, innslag, ttl.seconds)
         }
     }
-
-    private fun flushBatch(payload: Map<String, String>, ttl: Duration) =
-        runCatching {
-            val futures = synchronized(batchConn) {
-                batchConn.setAutoFlushCommands(false)
-                try {
-                    payload.map { (key, value) ->
-                        batchConn.async().setex(key, ttl.seconds, value)
-                    }.also {
-                        batchConn.flushCommands()
+    private fun <T : Any> doGetMany(cache: CacheNøkkelConfig,
+                                    ids: Set<String>,
+                                    clazz: KClass<T>): Map<String, T?> =
+        measureTimedValue {
+            runCatching {
+                conn.sync()
+                    .mget(*ids.map {
+                        cache.tilNøkkel(it)
+                    }.toTypedArray())
+                    .filter {
+                        it.hasValue()
                     }
-                } finally {
-                    batchConn.setAutoFlushCommands(true)
-                }
+                    .associate {
+                        CacheNøkkel(it.key).id to VALKEY_MAPPER.readValue(it.value, clazz.java)
+                    }
+            }.getOrElse {
+                teller.tell(GET_MANY, cache.name, FEILET, ids.size)
+                log.info("{} getMany feilet for {} med {} nøkler: {}", javaClass.simpleName, cache.fullName, ids.size, it.message, it)
+                emptyMap()
             }
-            awaitAll(cfg.timeout, *futures.toTypedArray())
+        }.let {
+            teller.tell(GET_MANY, cache.name, HIT, it.value.size)
+            teller.tell(GET_MANY, cache.name, MISS, ids.size - it.value.size)
+            log.info("getMany {} hentet {} av {} nøkler på {}ms", cache.fullName, it.value.size, ids.size,it.duration.inWholeMilliseconds)
+            it.value
         }
 
-    private fun payload(innslag: Map<String, Any>, cache: CacheNøkkelConfig): Map<String, String> =
-        innslag.entries.associate { (key, value) -> mapper.tilJsonEntry(cache, key, value) }
+    private fun <T : Any> doGetOne(cache: CacheNøkkelConfig,
+                                   ids: Set<String>,
+                                   clazz: KClass<T>): Map<String, T> =
+        ids.single().let { id ->
+        getOne(cache, id, clazz)?.let { mapOf(id to it) }.orEmpty()
+    }
 
-    override fun tilNøkkel(cache: CacheNøkkelConfig, id: String) = mapper.tilNøkkel(cache, id)
+
+
 
     override fun clear(cache: CacheNøkkelConfig) {
-        check(!isProd) {
-            "Clear er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold"
-        }
+        check(!isProd) { "Clear er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold" }
         log.info("Tømmer cache {}", cache.name)
-        val prefix = mapper.tilNøkkel(cache, "")
+        val prefix = cache.tilNøkkel("")
         var cursor = INITIAL
         val args = ScanArgs().match("$prefix*").limit(10000)
         var slettet = 0L
@@ -155,14 +133,11 @@ class ValkeyCacheOperations(client: RedisClient,
             }
             cursor = result
         } while (!result.isFinished)
-        teller.tell(clear, cache.name, ok, slettet.toInt())
+        teller.tell(CLEAR, cache.name, OK, slettet.toInt())
     }
 
-
     override fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long> {
-        val prefixes = caches.map {
-            "${mapper.tilNøkkel(it, "")}*"
-        }.toTypedArray()
+        val prefixes = caches.map { "${it.tilNøkkel("")}*" }.toTypedArray()
         val (results, totalDuration) = eval(*prefixes)
         return caches.zip(results).associate {
             (cache, count) -> cache.fullName to count
@@ -171,11 +146,56 @@ class ValkeyCacheOperations(client: RedisClient,
         }
     }
 
+    private fun doPutOne(cache: CacheNøkkelConfig,
+                         innslag: Map<String, Any>,
+                         ttl: Duration) {
+        with(innslag.entries.single()) {
+            putOne(cache, key, value, ttl)
+        }
+    }
+
+    private fun doPutMany(cache: CacheNøkkelConfig,
+                          innslag: Map<String, Any>,
+                          ttl: Long) {
+        val payload = innslag.entries.associate { (key, value) ->
+            cache.tilNøkkel(key) to VALKEY_MAPPER.writeValueAsString(value)
+        }
+        val (resultat, varighet) = measureTimedValue {
+            flushBatch(payload, ttl)
+        }
+        resultat.onSuccess {
+                teller.tell(PUT_MANY, cache.name, OK, innslag.size)
+                log.info("Cache putMany {} lagret {} nøkler på {}ms",
+                    cache.fullName,
+                    innslag.size,
+                    varighet.inWholeMilliseconds)
+            }
+            .onFailure {
+                teller.tell(PUT_MANY, cache.name, FEILET, innslag.size)
+                log.info("Cache putMany feilet for {} med {} nøkler: {}", cache.fullName, innslag.size, it.message, it)
+            }
+    }
+
+    private fun flushBatch(payload: Map<String, String>, ttl: Long) =
+        runCatching {
+            val futures = synchronized(batchConn) {
+                batchConn.setAutoFlushCommands(false)
+                try {
+                    payload.map { (key, value) ->
+                        batchConn.async().setex(key, ttl, value)
+                    }.also { batchConn.flushCommands() }
+                } finally {
+                    batchConn.setAutoFlushCommands(true)
+                }
+            }
+            awaitAll(cfg.timeout, *futures.toTypedArray())
+        }
+
+
     private fun eval(vararg prefixes: String) =
         measureTimedValue {
             conn.sync().eval<List<Long>>(SCRIPT, MULTI, emptyArray(), *prefixes)
         }
-
 
     private fun connect(client: RedisClient) =
         client.connect().apply {

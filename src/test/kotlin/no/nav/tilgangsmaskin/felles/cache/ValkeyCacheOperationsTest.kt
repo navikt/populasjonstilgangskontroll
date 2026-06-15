@@ -44,7 +44,6 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
-import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.boot.test.context.TestConfiguration
@@ -90,16 +89,12 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                 .build()
 
         @Bean
-        fun cacheNøkkelHandler(mgr: RedisCacheManager) =
-            CacheNøkkelMapper(mgr.cacheConfigurations)
-
-        @Bean
         fun valkeyCacheTeller(meterRegistry: MeterRegistry) =
             ValkeyCacheTeller(meterRegistry)
 
         @Bean
-        fun valkeyCacheOperations(client: RedisClient, handler: CacheNøkkelMapper, cfg: CacheConfig, teller: ValkeyCacheTeller) =
-            ValkeyCacheOperations(client, handler, teller, cfg)
+        fun valkeyCacheOperations(client: RedisClient, cfg: CacheConfig, teller: ValkeyCacheTeller) =
+            ValkeyCacheOperations(client, cfg, teller)
 
         @Bean
         fun cacheElementUtløptLytter(client: RedisClient, publisher: ApplicationEventPublisher) =

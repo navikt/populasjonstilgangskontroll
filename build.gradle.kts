@@ -48,7 +48,6 @@ dependencies {
     }
     implementation(libs.opentelemetry.instrumentation.annotations)
     implementation(libs.opentelemetry.logback.mdc)
-    implementation(libs.micrometer.core)
     implementation(libs.micrometer.registry.prometheus)
     implementation(libs.logstash.logback.encoder)
     implementation(libs.boot.conditionals)
@@ -58,7 +57,6 @@ dependencies {
     implementation(libs.commons.pool2)
     implementation(libs.hibernate.micrometer)
     implementation(libs.kotlin.reflect)
-    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.postgresql)
     implementation(libs.springdoc.openapi.webmvc.ui)
     implementation(libs.spring.boot.starter.flyway)

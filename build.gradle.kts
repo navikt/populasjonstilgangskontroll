@@ -91,9 +91,7 @@ dependencies {
     implementation(libs.spring.boot.starter.kafka)
     implementation(libs.spring.aspects)
     testImplementation(libs.spring.boot.micrometer.metrics.test)
-    testImplementation(libs.spring.boot.starter.test) {
-        exclude(group = "org.junit.vintage", "junit-vintage-engine")
-    }
+    testImplementation(libs.spring.boot.starter.test) 
     testImplementation(libs.spring.boot.testcontainers)
     testImplementation(libs.testcontainers.redis)
     testImplementation(libs.testcontainers.junit.jupiter)

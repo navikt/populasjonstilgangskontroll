@@ -6,6 +6,9 @@ metadata:
   name: populasjonstilgangskontroll
   namespace: tilgangsmaskin
 spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
   valkey:
     - instance: {{nais.cluster.cache}}
       access: readwrite

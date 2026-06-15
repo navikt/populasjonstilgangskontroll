@@ -16,7 +16,6 @@ confluent = "8.2.0"
 avro-plugin = "1.9.1"
 cyclonedx = "3.2.4"
 git-properties = "2.5.7"
-netty = "4.2.13.Final"
 
 opentelemetry-alpha = "2.27.0-alpha"
 

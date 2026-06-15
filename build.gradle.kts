@@ -1,5 +1,3 @@
-import org.springframework.boot.gradle.plugin.SpringBootPlugin
-import org.springframework.boot.gradle.tasks.buildinfo.BuildInfo
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import java.lang.System.getProperty
 
@@ -28,19 +26,9 @@ springBoot {
                 "kotlin.version" to libs.versions.kotlin.get(),
                 "jdk.version" to javaVersion.asInt().toString(),
                 "jdk.vendor" to getProperty("java.vendor"),
-                "spring-boot.version" to plugins.getPlugin(SpringBootPlugin::class).javaClass.`package`.implementationVersion
+                "spring-boot.version" to libs.versions.spring.boot.get(),
             )
         }
-    }
-}
-
-tasks.named<BuildInfo>("bootBuildInfo") {
-    properties {
-        additional.put("spring.version", provider {
-            configurations.runtimeClasspath.get().resolvedConfiguration.resolvedArtifacts
-                .firstOrNull { it.moduleVersion.id.group == "org.springframework" && it.moduleVersion.id.name == "spring-core" }
-                ?.moduleVersion?.id?.version ?: "unknown"
-        })
     }
 }
 
@@ -91,7 +79,7 @@ dependencies {
     implementation(libs.spring.boot.starter.kafka)
     implementation(libs.spring.aspects)
     testImplementation(libs.spring.boot.micrometer.metrics.test)
-    testImplementation(libs.spring.boot.starter.test) 
+    testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.spring.boot.testcontainers)
     testImplementation(libs.testcontainers.redis)
     testImplementation(libs.testcontainers.junit.jupiter)

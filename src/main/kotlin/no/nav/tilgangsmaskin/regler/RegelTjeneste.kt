@@ -40,13 +40,11 @@ class RegelTjeneste(
                     motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
                 } catch (e: RegelException) {
                     if (!enkeltTilgangTjeneste.harEnkeltTilgang(ansattId, bruker.brukerId)) {
-                        log.trace("Tilgang avvist ved kjøring av ${KOMPLETT_REGELTYPE.beskrivelse} for {} og {}", ansattId, brukerId.maskFnr(), e)
                         throw e
                     }
                     log.trace("Enkelttilgang registrert ved kjøring av ${KOMPLETT_REGELTYPE.beskrivelse} for {} og {}", ansattId, brukerId.maskFnr(), e)
                 }
-            }
-                ?: log.info("${KOMPLETT_REGELTYPE.beskrivelse} ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
+            } ?: log.info("${KOMPLETT_REGELTYPE.beskrivelse} ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
         }
         log.info("Tid brukt på ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
     }
@@ -58,7 +56,7 @@ class RegelTjeneste(
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
         bruker(brukerId)?.let { bruker ->
             motor.kjerneregler(ansattTjeneste.ansatt(ansattId), bruker)
-        } ?: log.info("Kjerneregler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
+        } ?: log.info("Kjerneregler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang ble likevel gitt")
 
     @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
     @WithSpan

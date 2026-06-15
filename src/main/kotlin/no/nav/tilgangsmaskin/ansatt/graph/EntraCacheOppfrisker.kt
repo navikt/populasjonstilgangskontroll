@@ -2,11 +2,13 @@ package no.nav.tilgangsmaskin.ansatt.graph
 
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig
+import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOppfrisker
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
+import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
@@ -24,7 +26,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste,
 
     override fun doOppfrisk(nøkkel: CacheNøkkel) {
         val ansattId = AnsattId(nøkkel.id)
-        MDC.put(ConsumerAwareHandlerInterceptor.USER_ID, ansattId.verdi)
+        MDC.put(USER_ID, ansattId.verdi)
         val oid = oidTjeneste.oid(ansattId)
         runCatching {
             oppfriskFor(ansattId, oid, nøkkel.metode)
@@ -39,7 +41,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste,
 
     private fun tømOgOppfrisk(ansattId: AnsattId, oid: UUID, metode: String?) {
         log.warn("${ansattId.verdi} med oid $oid ikke funnet i Entra, sletter og oppfrisker cache-innslag")
-        cache.delete(EntraOidConfig.OID_CACHE, ansattId.verdi)
+        cache.delete(OID_CACHE, ansattId.verdi)
         with(oidTjeneste.oid(ansattId)) {
             log.info("Oppfrisking av oid OK for ${ansattId.verdi}, ny verdi er $this")
             oppfriskFor(ansattId, this, metode)

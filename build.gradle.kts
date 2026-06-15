@@ -71,7 +71,7 @@ dependencies {
         exclude(group = "org.springframework.boot", "spring-boot-starter-tomcat")
     }
     implementation(libs.spring.boot.starter.jetty)
-    implementation(libs.spring.boot.starter.restclient)
+    //implementation(libs.spring.boot.starter.restclient)
     implementation(libs.spring.boot.starter.webclient)
     //implementation(libs.spring.boot.starter.webflux)
     implementation(libs.spring.boot.starter.kafka)

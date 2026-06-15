@@ -16,8 +16,8 @@ interface CacheOperations {
     fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long>
 }
 
-inline fun <reified T : Any> CacheOperations.getOne(cache: CacheNøkkelConfig, id: String): T? =
-    getOne(cache, id, T::class)
+inline fun <reified T : Any> CacheOperations.getOne(cfg: CacheNøkkelConfig, id: String): T? =
+    getOne(cfg, id, T::class)
 
-inline fun <reified T : Any> CacheOperations.getMany(cache: CacheNøkkelConfig, ids: Set<String>): Map<String, T?> =
-    getMany(cache, ids, T::class)
+inline fun <reified T : Any> CacheOperations.getMany(cfg: CacheNøkkelConfig, ids: Set<String>): Map<String, T?> =
+    getMany(cfg, ids, T::class)

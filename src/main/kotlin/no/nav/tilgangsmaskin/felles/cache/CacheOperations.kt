@@ -9,7 +9,6 @@ interface CacheOperations {
     fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration)
     fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T?>
     fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration)
-    fun tilNøkkel(cache: CacheNøkkelConfig, id: String): String
     fun clear(cache: CacheNøkkelConfig)
     fun clear(caches: Set<CacheNøkkelConfig>) = caches.forEach { clear(it) }
     fun size(cache: CacheNøkkelConfig): Long =
@@ -17,8 +16,8 @@ interface CacheOperations {
     fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long>
 }
 
-inline fun <reified T : Any> CacheOperations.getOne(cache: CacheNøkkelConfig, id: String): T? =
-    getOne(cache, id, T::class)
+inline fun <reified T : Any> CacheOperations.getOne(cfg: CacheNøkkelConfig, id: String): T? =
+    getOne(cfg, id, T::class)
 
-inline fun <reified T : Any> CacheOperations.getMany(cache: CacheNøkkelConfig, ids: Set<String>): Map<String, T?> =
-    getMany(cache, ids, T::class)
+inline fun <reified T : Any> CacheOperations.getMany(cfg: CacheNøkkelConfig, ids: Set<String>): Map<String, T?> =
+    getMany(cfg, ids, T::class)

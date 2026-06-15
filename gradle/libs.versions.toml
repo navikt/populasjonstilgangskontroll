@@ -6,7 +6,7 @@ springdoc = "3.0.3"
 token-support = "6.0.10"
 mockk = "1.14.9"
 kotest = "6.1.11"
-opentelemetry = "2.27.0"
+opentelemetry = "2.28.0"
 boot-conditionals = "6.0.5"
 logstash = "9.0"
 coroutines = "1.9.0"
@@ -17,14 +17,13 @@ avro-plugin = "1.9.1"
 cyclonedx = "3.2.4"
 git-properties = "2.5.7"
 
-opentelemetry-alpha = "2.27.0-alpha"
+opentelemetry-alpha = "2.28.0-alpha"
 
 [libraries]
 # Implementation
 confluent-kafka-avro-serializer = { module = "io.confluent:kafka-avro-serializer", version.ref = "confluent" }
 opentelemetry-instrumentation-annotations = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations" }
 opentelemetry-logback-mdc = { module = "io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0", version.ref = "opentelemetry-alpha" }
-micrometer-core = { module = "io.micrometer:micrometer-core" }
 micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
 logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logstash" }
 boot-conditionals = { module = "no.nav.boot:boot-conditionals", version.ref = "boot-conditionals" }
@@ -34,7 +33,6 @@ flyway-database-postgresql = { module = "org.flywaydb:flyway-database-postgresql
 commons-pool2 = { module = "org.apache.commons:commons-pool2", version.ref = "commons-pool2" }
 hibernate-micrometer = { module = "org.hibernate.orm:hibernate-micrometer" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 postgresql = { module = "org.postgresql:postgresql" }
 springdoc-openapi-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
 spring-boot-starter-flyway = { module = "org.springframework.boot:spring-boot-starter-flyway" }

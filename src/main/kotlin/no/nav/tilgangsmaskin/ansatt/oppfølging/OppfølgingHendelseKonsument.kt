@@ -51,12 +51,12 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
 
 fun OppfølgingHendelse.tilDomene(): OppfølgingEndring {
     val identer = Identer(ident, aktorId)
-    fun krevKontor() = requireNotNull(kontor) {
+    fun kontor() = requireNotNull(kontor) {
         "kontor mangler for $sisteEndringsType (uuid=$oppfolgingsperiodeUuid)"
     }
     return when (sisteEndringsType) {
         OPPFOLGING_STARTET, ARBEIDSOPPFOLGINGSKONTOR_ENDRET ->
-            StartetEllerEndret(oppfolgingsperiodeUuid, identer, krevKontor(), startTidspunkt, sisteEndringsType)
+            StartetEllerEndret(oppfolgingsperiodeUuid, identer, kontor(), startTidspunkt, sisteEndringsType)
         OPPFOLGING_AVSLUTTET -> Avsluttet(oppfolgingsperiodeUuid, identer)
     }
 }

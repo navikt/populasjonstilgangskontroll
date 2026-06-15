@@ -21,7 +21,6 @@ import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.getMany
-import no.nav.tilgangsmaskin.regler.motor.OppfølgingkontorTeller
 import no.nav.tilgangsmaskin.tilgang.Token
 
 

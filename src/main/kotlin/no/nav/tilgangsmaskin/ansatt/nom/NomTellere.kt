@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.tilgangsmaskin.regler.motor.AbstractAsyncTeller
+import no.nav.tilgangsmaskin.felles.AbstractAsyncTeller
 import org.springframework.stereotype.Component
 
 @Component

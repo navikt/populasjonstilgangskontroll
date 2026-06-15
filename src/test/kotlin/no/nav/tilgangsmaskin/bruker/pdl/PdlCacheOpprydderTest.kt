@@ -13,7 +13,6 @@ import no.nav.person.pdl.leesah.adressebeskyttelse.Adressebeskyttelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.regler.motor.PdlCacheTømmerTeller
 import no.nav.tilgangsmaskin.tilgang.Token
 import java.time.Instant
 

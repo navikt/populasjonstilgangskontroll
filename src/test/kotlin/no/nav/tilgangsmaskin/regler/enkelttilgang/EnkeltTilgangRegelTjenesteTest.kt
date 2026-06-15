@@ -60,7 +60,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @ContextConfiguration(classes = [TestApp::class, EnkeltTilgangTjeneste::class, EnkeltTilgangJPAAdapter::class, RegelTjeneste::class, BulkResponsAggregator::class, LocalAuditor::class])
 @AutoConfigureMetrics
 @Testcontainers
-@ComponentScan("no.nav.tilgangsmaskin.regler.motor")
+@ComponentScan("no.nav.tilgangsmaskin.regler.motor", "no.nav.tilgangsmaskin.regler.enkelttilgang")
 @ApplyExtension(SpringExtension::class)
 class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
 

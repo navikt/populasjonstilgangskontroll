@@ -7,7 +7,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetHendelse
-import no.nav.tilgangsmaskin.regler.motor.CacheOppfriskerTeller
 import no.nav.tilgangsmaskin.tilgang.Token
 
 class CacheExpiredEventListenerTest : BehaviorSpec({

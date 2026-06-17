@@ -1,7 +1,16 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.mockk.every
+import no.nav.tilgangsmaskin.ansatt.Ansatt
+import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.regler.AnsattBuilder
+import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.regler.motor.OverstyrbarRegel
+import no.nav.tilgangsmaskin.regler.motor.RegelException
+import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
@@ -75,8 +84,15 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
             }
 
             When("bulk/obo returnerer avvist resultat") {
-                Then("returnerer 207 med status 403 på avvist bruker") {
-                    val avvistRespons = AggregertBulkRespons(ansattId, setOf(EnkeltBulkRespons(brukerId, FORBIDDEN)))
+                Then("returnerer 207 med status 403 og komplett detaljer på avvist bruker") {
+                    val testAnsatt = AnsattBuilder(ansattId).build()
+                    val testBruker = BrukerBuilder(BrukerId(brukerId)).build()
+                    val testRegel = object : OverstyrbarRegel {
+                        override val metadata = RegelMetadata(STRENGT_FORTROLIG)
+                        override fun evaluer(ansatt: Ansatt, bruker: Bruker) = false
+                    }
+                    val regelException = RegelException(testAnsatt, testBruker, testRegel)
+                    val avvistRespons = AggregertBulkRespons(ansattId, setOf(EnkeltBulkRespons(regelException)))
                     every { regelTjeneste.bulkRegler(ansattId, specs) } returns avvistRespons
                     mockMvc.post("/api/v1/bulk/obo") {
                         contentType = APPLICATION_JSON
@@ -84,6 +100,10 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                     }.andExpect {
                         status { isMultiStatus() }
                         jsonPath("$.resultater[0].status") { value(403) }
+                        jsonPath("$.resultater[0].detaljer.title") { value("AVVIST_STRENGT_FORTROLIG_ADRESSE") }
+                        jsonPath("$.resultater[0].detaljer.brukerIdent") { value(brukerId) }
+                        jsonPath("$.resultater[0].detaljer.navIdent") { value(ansattId.verdi) }
+                        jsonPath("$.resultater[0].detaljer.kanOverstyres") { value(true) }
                     }.andDo { handle(document("obo-bulk-avvist")) }
                 }
             }

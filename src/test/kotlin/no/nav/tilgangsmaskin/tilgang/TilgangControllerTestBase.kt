@@ -13,10 +13,17 @@ import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidato
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
+import org.springframework.restdocs.payload.JsonFieldType.NUMBER
+import org.springframework.restdocs.payload.JsonFieldType.STRING
+import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
+import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
+import org.springframework.restdocs.payload.ResponseFieldsSnippet
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
+import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 abstract class TilgangControllerTestBase : BehaviorSpec() {
 
@@ -42,6 +49,19 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
 
     private val restDocumentation = ManualRestDocumentation()
 
+    @RestControllerAdvice
+    private class ProblemDetailExceptionHandler : ResponseEntityExceptionHandler()
+
+    protected companion object {
+        val problemDetailFields: ResponseFieldsSnippet = responseFields(
+            fieldWithPath("type").type(STRING).description("URI-referanse som identifiserer problemtypen").optional(),
+            fieldWithPath("title").type(STRING).description("Kort beskrivelse av feilkategorien (HTTP status)"),
+            fieldWithPath("status").type(NUMBER).description("HTTP-statuskode"),
+            fieldWithPath("detail").type(STRING).description("Detaljert beskrivelse av feilen"),
+            fieldWithPath("instance").type(STRING).description("URI som identifiserer den spesifikke forekomsten av feilen")
+        )
+    }
+
     init {
         beforeSpec { MockKAnnotations.init(this@TilgangControllerTestBase) }
 
@@ -49,6 +69,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             clearAllMocks()
             restDocumentation.beforeTest(TilgangControllerTestBase::class.java, case.name.name)
             mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, TokenTypeGuard(token), konsumentValidator, teller))
+                .setControllerAdvice(ProblemDetailExceptionHandler())
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
                 .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation))
                 .build()

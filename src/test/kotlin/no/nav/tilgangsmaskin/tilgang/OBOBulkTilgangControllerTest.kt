@@ -55,7 +55,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect { status { isForbidden() } }
-                        .andDo { handle(document("obo-bulk-feil-token")) }
+                        .andDo { handle(document("obo-bulk-feil-token", problemDetailFields)) }
                 }
             }
 
@@ -70,7 +70,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                             """{"brukerId":"${it.brukerId}","type":"KOMPLETT_REGELTYPE"}"""
                         }
                     }.andExpect { status { isContentTooLarge() } }
-                        .andDo { handle(document("obo-bulk-for-mange")) }
+                        .andDo { handle(document("obo-bulk-for-mange", problemDetailFields)) }
                 }
             }
 
@@ -94,7 +94,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"   ","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect { status { isBadRequest() } }
-                        .andDo { handle(document("obo-bulk-validering")) }
+                        .andDo { handle(document("obo-bulk-validering", problemDetailFields)) }
                 }
             }
 

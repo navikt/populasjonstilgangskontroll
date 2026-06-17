@@ -21,6 +21,7 @@ plugins {
     alias(libs.plugins.asciidoctor)
     application
 }
+
 springBoot {
     buildInfo {
         properties {
@@ -180,6 +181,11 @@ val generateRestDocsIndex by tasks.registering {
                 sb.appendLine("include::{snippets}/$name/curl-request.adoc[]")
                 sb.appendLine("include::{snippets}/$name/http-request.adoc[]")
                 sb.appendLine("include::{snippets}/$name/http-response.adoc[]")
+                if (snippets.resolve(name).resolve("response-fields.adoc").exists()) {
+                    sb.appendLine()
+                    sb.appendLine(".Response fields")
+                    sb.appendLine("include::{snippets}/$name/response-fields.adoc[]")
+                }
                 sb.appendLine()
             }
         }

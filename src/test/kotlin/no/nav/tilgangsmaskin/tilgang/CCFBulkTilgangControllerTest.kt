@@ -41,7 +41,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect { status { isForbidden() } }
-                        .andDo { handle(document("ccf-bulk-feil-token")) }
+                        .andDo { handle(document("ccf-bulk-feil-token", problemDetailFields)) }
                 }
             }
 
@@ -65,7 +65,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                             """{"brukerId":"$it","type":"KOMPLETT_REGELTYPE"}"""
                         }
                     }.andExpect { status { isContentTooLarge() } }
-                        .andDo { handle(document("ccf-bulk-for-mange")) }
+                        .andDo { handle(document("ccf-bulk-for-mange", problemDetailFields)) }
                 }
             }
 
@@ -75,7 +75,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"   ","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect { status { isBadRequest() } }
-                        .andDo { handle(document("ccf-bulk-validering")) }
+                        .andDo { handle(document("ccf-bulk-validering", problemDetailFields)) }
                 }
             }
 

@@ -13,10 +13,11 @@ import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidato
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
+import org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint
 import org.springframework.restdocs.payload.JsonFieldType.NUMBER
 import org.springframework.restdocs.payload.JsonFieldType.STRING
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
+import org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields
 import org.springframework.restdocs.payload.ResponseFieldsSnippet
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup
@@ -53,12 +54,17 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
     private class ProblemDetailExceptionHandler : ResponseEntityExceptionHandler()
 
     protected companion object {
-        val problemDetailFields: ResponseFieldsSnippet = responseFields(
-            fieldWithPath("type").type(STRING).description("URI-referanse som identifiserer problemtypen").optional(),
+        val problemDetailFields: ResponseFieldsSnippet = relaxedResponseFields(
             fieldWithPath("title").type(STRING).description("Kort beskrivelse av feilkategorien (HTTP status)"),
             fieldWithPath("status").type(NUMBER).description("HTTP-statuskode"),
             fieldWithPath("detail").type(STRING).description("Detaljert beskrivelse av feilen"),
-            fieldWithPath("instance").type(STRING).description("URI som identifiserer den spesifikke forekomsten av feilen")
+            fieldWithPath("instance").type(STRING).description("URI som identifiserer den spesifikke forekomsten av feilen"),
+            fieldWithPath("type").type(STRING).description("URI-referanse som identifiserer problemtypen (RFC 9457)").optional(),
+            fieldWithPath("brukerIdent").type(STRING).description("Fødselsnummer/d-nummer til bruker det gjelder").optional(),
+            fieldWithPath("navIdent").type(STRING).description("NAV-ident til ansatt som ble avvist").optional(),
+            fieldWithPath("begrunnelse").type(STRING).description("Menneskelesbar begrunnelse for avvisning").optional(),
+            fieldWithPath("traceId").type(STRING).description("OpenTelemetry trace-ID for feilsøking").optional(),
+            fieldWithPath("kanOverstyres").type(STRING).description("Om regelen kan overstyres med enkelttilgang").optional()
         )
     }
 
@@ -71,7 +77,10 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, TokenTypeGuard(token), konsumentValidator, teller))
                 .setControllerAdvice(ProblemDetailExceptionHandler())
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
-                .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation))
+                .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation)
+                    .operationPreprocessors()
+                    .withResponseDefaults(prettyPrint())
+                )
                 .build()
             justRun { teller.tell(any<Tags>()) }
             every { token.ansattId } returns ansattId

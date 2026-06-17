@@ -126,12 +126,76 @@ tasks.named<Test>("test") {
         )
 }
 
-tasks.named("asciidoctor") {
+val generateRestDocsIndex by tasks.registering {
+    description = "Generates index.adoc from REST Docs snippets"
     dependsOn(tasks.test)
+
+    val snippetsDir = layout.buildDirectory.dir("generated-snippets")
+    val outputDir = layout.buildDirectory.dir("generated-restdocs-index")
+
+    inputs.dir(snippetsDir)
+    outputs.dir(outputDir)
+
+    doLast {
+        val snippets = snippetsDir.get().asFile
+        if (!snippets.isDirectory) return@doLast
+
+        val dirs = snippets.listFiles { f -> f.isDirectory }
+            ?.map { it.name }
+            ?.sorted()
+            ?: return@doLast
+
+        val grouped = dirs.groupBy { it.substringBefore("-") }
+
+        val sb = StringBuilder()
+        sb.appendLine("= Populasjonstilgangskontroll API")
+        sb.appendLine(":doctype: book")
+        sb.appendLine(":icons: font")
+        sb.appendLine(":toc: left")
+        sb.appendLine(":toclevels: 3")
+        sb.appendLine(":sectlinks:")
+        sb.appendLine()
+        sb.appendLine("== Oversikt")
+        sb.appendLine()
+        sb.appendLine("REST API-dokumentasjon for Populasjonstilgangskontroll (Tilgangsmaskinen).")
+        sb.appendLine()
+        sb.appendLine("Tjenesten avgj\u00f8r om en Nav-ansatt har tilgang til en bruker basert p\u00e5 populasjonsniv\u00e5-regler.")
+        sb.appendLine()
+
+        for ((prefix, names) in grouped) {
+            val heading = when (prefix) {
+                "obo" -> "OBO (On-Behalf-Of)"
+                "ccf" -> "CCF (Client Credentials Flow)"
+                else -> prefix.uppercase()
+            }
+            sb.appendLine("== $heading")
+            sb.appendLine()
+
+            for (name in names) {
+                val title = name.substringAfter("-").replace("-", " ")
+                    .replaceFirstChar { it.uppercase() }
+                sb.appendLine("=== $title")
+                sb.appendLine()
+                sb.appendLine("include::{snippets}/$name/curl-request.adoc[]")
+                sb.appendLine("include::{snippets}/$name/http-request.adoc[]")
+                sb.appendLine("include::{snippets}/$name/http-response.adoc[]")
+                sb.appendLine()
+            }
+        }
+
+        val outDir = outputDir.get().asFile
+        outDir.mkdirs()
+        outDir.resolve("index.adoc").writeText(sb.toString(), Charsets.UTF_8)
+    }
+}
+
+tasks.named("asciidoctor") {
+    dependsOn(generateRestDocsIndex)
     inputs.dir(layout.buildDirectory.dir("generated-snippets"))
 }
 
 tasks.withType<org.asciidoctor.gradle.jvm.AsciidoctorTask> {
+    sourceDir(layout.buildDirectory.dir("generated-restdocs-index"))
     baseDirFollowsSourceDir()
     sources {
         include("index.adoc")

@@ -45,9 +45,9 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
     init {
         beforeSpec { MockKAnnotations.init(this@TilgangControllerTestBase) }
 
-        beforeEach {
+        beforeEach { case ->
             clearAllMocks()
-            restDocumentation.beforeTest(this@TilgangControllerTestBase::class.java, it.name.name)
+            restDocumentation.beforeTest(TilgangControllerTestBase::class.java, case.name.name)
             mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, TokenTypeGuard(token), konsumentValidator, teller))
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
                 .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation))

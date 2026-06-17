@@ -13,13 +13,13 @@ import io.mockk.verify
 import org.springframework.data.redis.serializer.RedisSerializer
 import org.springframework.data.redis.serializer.SerializationException
 
-class ResilientRedisSerializerTest : BehaviorSpec({
+class ResilientValkeySerializerTest : BehaviorSpec({
 
     val bytes = "data".toByteArray()
     val obj = "verdi"
 
     fun serializer(delegate: RedisSerializer<Any>, registry: SimpleMeterRegistry = SimpleMeterRegistry()) =
-        ResilientRedisSerializer(delegate, registry)
+        ResilientValkeySerializer(delegate, registry)
 
     Given("deserialisering") {
 

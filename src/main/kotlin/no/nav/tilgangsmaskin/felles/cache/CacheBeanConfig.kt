@@ -19,7 +19,6 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
-import tools.jackson.core.StreamReadFeature
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.KotlinModule.Builder
@@ -34,9 +33,6 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory, private val meterR
         errorHandler
 
 
-    @Bean
-    fun cacheSizeBean(cache: CacheOperations) =
-        CacheSizeAware(cache,*cfgs)
 
     @Bean
     override fun cacheManager() =
@@ -67,7 +63,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory, private val meterR
             .entryTtl(cfg.varighet)
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))
             .serializeValuesWith(fromSerializer(
-                ResilientRedisSerializer(GenericJacksonJsonRedisSerializer(VALKEY_MAPPER), meterRegistry))).apply {
+                ResilientValkeySerializer(GenericJacksonJsonRedisSerializer(VALKEY_MAPPER), meterRegistry))).apply {
                 if (!cfg.cacheNulls) disableCachingNullValues()
             }
 

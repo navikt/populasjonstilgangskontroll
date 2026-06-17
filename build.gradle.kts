@@ -1,3 +1,4 @@
+import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import java.lang.System.getProperty
 
@@ -159,7 +160,7 @@ val generateRestDocsIndex by tasks.registering {
         sb.appendLine()
         sb.appendLine("REST API-dokumentasjon for Populasjonstilgangskontroll (Tilgangsmaskinen).")
         sb.appendLine()
-        sb.appendLine("Tjenesten avgj\u00f8r om en Nav-ansatt har tilgang til en bruker basert p\u00e5 populasjonsniv\u00e5-regler.")
+        sb.appendLine("Tjenesten avgjør om en Nav-ansatt har tilgang til en bruker")
         sb.appendLine()
 
         for ((prefix, names) in grouped) {
@@ -194,7 +195,7 @@ tasks.named("asciidoctor") {
     inputs.dir(layout.buildDirectory.dir("generated-snippets"))
 }
 
-tasks.withType<org.asciidoctor.gradle.jvm.AsciidoctorTask> {
+tasks.withType<AsciidoctorTask> {
     sourceDir(layout.buildDirectory.dir("generated-restdocs-index"))
     baseDirFollowsSourceDir()
     sources {

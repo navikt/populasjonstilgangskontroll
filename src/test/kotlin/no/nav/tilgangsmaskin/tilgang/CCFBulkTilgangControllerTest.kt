@@ -88,7 +88,6 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                             """{"brukerId":"$it","type":"KOMPLETT_REGELTYPE"}"""
                         }
                     }.andExpect { status { isContentTooLarge() } }
-                        .andDo { handle(document("ccf-bulk-for-mange", problemDetailFields)) }
                 }
             }
 

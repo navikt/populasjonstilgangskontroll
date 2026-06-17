@@ -78,7 +78,6 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                             """{"brukerId":"${it.brukerId}","type":"KOMPLETT_REGELTYPE"}"""
                         }
                     }.andExpect { status { isContentTooLarge() } }
-                        .andDo { handle(document("obo-bulk-for-mange", problemDetailFields)) }
                 }
             }
 

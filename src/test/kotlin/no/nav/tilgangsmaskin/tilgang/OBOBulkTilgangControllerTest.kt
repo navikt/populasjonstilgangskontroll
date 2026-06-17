@@ -64,7 +64,6 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect { status { isForbidden() } }
-                        .andDo { handle(document("obo-bulk-feil-token", problemDetailFields)) }
                 }
             }
 

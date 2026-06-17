@@ -73,7 +73,6 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/komplett") {
                         contentType = TEXT_PLAIN; content = brukerId
                     }.andExpect { status { isForbidden() } }
-                        .andDo { handle(document("obo-komplett-feil-token", problemDetailFields)) }
                 }
             }
 
@@ -83,7 +82,6 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/kjerne") {
                         contentType = TEXT_PLAIN; content = brukerId
                     }.andExpect { status { isForbidden() } }
-                        .andDo { handle(document("obo-kjerne-feil-token", problemDetailFields)) }
                 }
             }
 
@@ -162,7 +160,6 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
                     }.andExpect { status { isForbidden() } }
-                        .andDo { handle(document("obo-overstyr-feil-token", problemDetailFields)) }
                 }
             }
 

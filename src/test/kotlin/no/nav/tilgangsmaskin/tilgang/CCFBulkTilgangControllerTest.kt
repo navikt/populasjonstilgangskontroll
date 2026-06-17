@@ -64,7 +64,6 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect { status { isForbidden() } }
-                        .andDo { handle(document("ccf-bulk-feil-token", problemDetailFields)) }
                 }
             }
 

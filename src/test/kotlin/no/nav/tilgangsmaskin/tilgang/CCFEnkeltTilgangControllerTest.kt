@@ -40,6 +40,7 @@ class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/ccf/komplett/${ansattId.verdi}") {
                         contentType = TEXT_PLAIN; content = brukerId
                     }.andExpect { status { isForbidden() } }
+                        .andDo { handle(document("ccf-komplett-feil-token")) }
                 }
             }
 
@@ -49,6 +50,7 @@ class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/ccf/kjerne/${ansattId.verdi}") {
                         contentType = TEXT_PLAIN; content = brukerId
                     }.andExpect { status { isForbidden() } }
+                        .andDo { handle(document("ccf-kjerne-feil-token")) }
                 }
             }
 
@@ -57,6 +59,7 @@ class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/ccf/komplett/${ansattId.verdi}") {
                         contentType = TEXT_PLAIN; content = ""
                     }.andExpect { status { isBadRequest() } }
+                        .andDo { handle(document("ccf-komplett-tom-brukerid")) }
                 }
             }
 

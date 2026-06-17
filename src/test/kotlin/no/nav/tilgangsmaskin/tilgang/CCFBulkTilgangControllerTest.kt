@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.post
 
 class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
@@ -29,7 +30,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                         status { isMultiStatus() }
                         jsonPath("$.ansattId") { value(ansattId.verdi) }
                         jsonPath("$.resultater[0].status") { value(204) }
-                    }
+                    }.andDo { handle(document("ccf-bulk")) }
                 }
             }
 
@@ -50,6 +51,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON; content = """["$brukerId"]"""
                     }.andExpect { status { isMultiStatus() } }
+                        .andDo { handle(document("ccf-bulk-regeltype")) }
                 }
             }
 

@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.justRun
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.TEXT_PLAIN
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.post
 import java.time.LocalDate
 
@@ -21,6 +22,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/komplett") {
                         contentType = TEXT_PLAIN; content = brukerId
                     }.andExpect { status { isNoContent() } }
+                        .andDo { handle(document("obo-komplett")) }
                 }
             }
 
@@ -30,6 +32,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/kjerne") {
                         contentType = TEXT_PLAIN; content = brukerId
                     }.andExpect { status { isNoContent() } }
+                        .andDo { handle(document("obo-kjerne")) }
                 }
             }
 
@@ -113,6 +116,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
                     }.andExpect { status { isAccepted() } }
+                        .andDo { handle(document("obo-overstyr")) }
                 }
             }
 

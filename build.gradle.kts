@@ -17,6 +17,7 @@ plugins {
     alias(libs.plugins.cyclonedx)
     alias(libs.plugins.kotest)
     alias(libs.plugins.git.properties)
+    alias(libs.plugins.asciidoctor)
     application
 }
 springBoot {
@@ -89,6 +90,7 @@ dependencies {
     testImplementation(libs.springmockk)
     testImplementation(libs.mockk)
     testImplementation(libs.kotest.extensions.spring)
+    testImplementation(libs.spring.restdocs.mockmvc)
 }
 
 
@@ -122,6 +124,27 @@ tasks.named<Test>("test") {
             "java.base/java.util=ALL-UNNAMED",
             "-Dkotlinx.coroutines.debug=off",
         )
+}
+
+tasks.named("asciidoctor") {
+    dependsOn(tasks.test)
+    inputs.dir(layout.buildDirectory.dir("generated-snippets"))
+}
+
+tasks.withType<org.asciidoctor.gradle.jvm.AsciidoctorTask> {
+    baseDirFollowsSourceDir()
+    sources {
+        include("index.adoc")
+    }
+    attributes(
+        mapOf(
+            "snippets" to layout.buildDirectory.dir("generated-snippets").get().asFile.absolutePath,
+            "source-highlighter" to "highlight.js",
+            "toc" to "left",
+            "toclevels" to "3",
+            "sectlinks" to "",
+        )
+    )
 }
 
 tasks.jacocoTestReport {

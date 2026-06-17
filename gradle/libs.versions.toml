@@ -15,6 +15,7 @@ confluent = "8.2.1"
 avro-plugin = "1.9.1"
 cyclonedx = "3.2.4"
 git-properties = "2.5.7"
+asciidoctor = "4.0.4"
 
 opentelemetry-alpha = "2.28.0-alpha"
 
@@ -61,6 +62,7 @@ spring-boot-starter-data-redis-test = { module = "org.springframework.boot:sprin
 spring-boot-starter-kafka-test = { module = "org.springframework.boot:spring-boot-starter-kafka-test" }
 spring-boot-starter-restclient-test = { module = "org.springframework.boot:spring-boot-starter-restclient-test" }
 spring-boot-starter-data-jpa-test = { module = "org.springframework.boot:spring-boot-starter-data-jpa-test" }
+spring-restdocs-mockmvc = { module = "org.springframework.restdocs:spring-restdocs-mockmvc" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-extensions-spring = { module = "io.kotest:kotest-extensions-spring", version.ref = "kotest" }
@@ -80,6 +82,7 @@ avro = { id = "com.github.davidmc24.gradle.plugin.avro", version.ref = "avro-plu
 cyclonedx = { id = "org.cyclonedx.bom", version.ref = "cyclonedx" }
 kotest = { id = "io.kotest", version.ref = "kotest" }
 git-properties = { id = "com.gorylenko.gradle-git-properties", version.ref = "git-properties" }
+asciidoctor = { id = "org.asciidoctor.jvm.convert", version.ref = "asciidoctor" }
 
 
 

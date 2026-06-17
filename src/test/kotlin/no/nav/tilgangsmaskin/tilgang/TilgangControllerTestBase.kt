@@ -11,8 +11,11 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
+import org.springframework.restdocs.ManualRestDocumentation
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup
+import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
 
 abstract class TilgangControllerTestBase : BehaviorSpec() {
@@ -37,16 +40,24 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
 
     protected lateinit var mockMvc: MockMvc
 
+    private val restDocumentation = ManualRestDocumentation()
+
     init {
         beforeSpec { MockKAnnotations.init(this@TilgangControllerTestBase) }
 
         beforeEach {
             clearAllMocks()
+            restDocumentation.beforeTest(this@TilgangControllerTestBase::class.java, it.name.name)
             mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, TokenTypeGuard(token), konsumentValidator, teller))
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
+                .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation))
                 .build()
             justRun { teller.tell(any<Tags>()) }
             every { token.ansattId } returns ansattId
+        }
+
+        afterEach {
+            restDocumentation.afterTest()
         }
     }
 }

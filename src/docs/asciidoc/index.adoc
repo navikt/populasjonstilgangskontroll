@@ -1,0 +1,103 @@
+= Populasjonstilgangskontroll API
+:doctype: book
+:icons: font
+:toc: left
+:toclevels: 3
+:sectlinks:
+
+== Oversikt
+
+REST API-dokumentasjon for Populasjonstilgangskontroll (Tilgangsmaskinen).
+
+Tjenesten avgjør om en Nav-ansatt har tilgang til en bruker basert på populasjonsnivå-regler.
+
+== OBO (On-Behalf-Of)
+
+Endepunkter som krever OBO-token. Ansatt-ID hentes fra token.
+
+=== Komplett regelsett
+
+Sjekker alle regler (kjerne + overstyrbare).
+
+==== Eksempel
+
+include::{snippets}/obo-komplett/curl-request.adoc[]
+include::{snippets}/obo-komplett/http-request.adoc[]
+include::{snippets}/obo-komplett/http-response.adoc[]
+
+=== Kjerneregler
+
+Sjekker kun kjerneregler (minimum tilgangskrav).
+
+==== Eksempel
+
+include::{snippets}/obo-kjerne/curl-request.adoc[]
+include::{snippets}/obo-kjerne/http-request.adoc[]
+include::{snippets}/obo-kjerne/http-response.adoc[]
+
+=== Overstyr (EnkeltTilgang)
+
+Registrerer en enkelttilgang-overstyring for en ansatt til en bruker.
+
+==== Eksempel
+
+include::{snippets}/obo-overstyr/curl-request.adoc[]
+include::{snippets}/obo-overstyr/http-request.adoc[]
+include::{snippets}/obo-overstyr/http-response.adoc[]
+
+=== Bulk OBO
+
+Sjekker tilgang for flere brukere i én forespørsel.
+
+==== Eksempel
+
+include::{snippets}/obo-bulk/curl-request.adoc[]
+include::{snippets}/obo-bulk/http-request.adoc[]
+include::{snippets}/obo-bulk/http-response.adoc[]
+
+=== Bulk OBO med regeltype
+
+Sjekker tilgang for flere brukere med en spesifisert regeltype.
+
+==== Eksempel
+
+include::{snippets}/obo-bulk-regeltype/curl-request.adoc[]
+include::{snippets}/obo-bulk-regeltype/http-request.adoc[]
+include::{snippets}/obo-bulk-regeltype/http-response.adoc[]
+
+== CCF (Client Credentials Flow)
+
+Endepunkter som krever CCF-token. Ansatt-ID sendes som path-parameter.
+
+=== Komplett regelsett
+
+==== Eksempel
+
+include::{snippets}/ccf-komplett/curl-request.adoc[]
+include::{snippets}/ccf-komplett/http-request.adoc[]
+include::{snippets}/ccf-komplett/http-response.adoc[]
+
+=== Kjerneregler
+
+==== Eksempel
+
+include::{snippets}/ccf-kjerne/curl-request.adoc[]
+include::{snippets}/ccf-kjerne/http-request.adoc[]
+include::{snippets}/ccf-kjerne/http-response.adoc[]
+
+=== Bulk CCF
+
+==== Eksempel
+
+include::{snippets}/ccf-bulk/curl-request.adoc[]
+include::{snippets}/ccf-bulk/http-request.adoc[]
+include::{snippets}/ccf-bulk/http-response.adoc[]
+
+=== Bulk CCF med regeltype
+
+==== Eksempel
+
+include::{snippets}/ccf-bulk-regeltype/curl-request.adoc[]
+include::{snippets}/ccf-bulk-regeltype/http-request.adoc[]
+include::{snippets}/ccf-bulk-regeltype/http-response.adoc[]
+

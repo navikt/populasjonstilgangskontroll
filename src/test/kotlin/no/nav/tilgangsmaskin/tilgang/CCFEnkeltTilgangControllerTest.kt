@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.tilgang
 import io.mockk.every
 import io.mockk.justRun
 import org.springframework.http.MediaType.TEXT_PLAIN
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.post
 
 class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
@@ -19,6 +20,7 @@ class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/ccf/komplett/${ansattId.verdi}") {
                         contentType = TEXT_PLAIN; content = brukerId
                     }.andExpect { status { isNoContent() } }
+                        .andDo { handle(document("ccf-komplett")) }
                 }
             }
 
@@ -28,6 +30,7 @@ class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/ccf/kjerne/${ansattId.verdi}") {
                         contentType = TEXT_PLAIN; content = brukerId
                     }.andExpect { status { isNoContent() } }
+                        .andDo { handle(document("ccf-kjerne")) }
                 }
             }
 

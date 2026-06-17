@@ -8,6 +8,7 @@ import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.post
 
 class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
@@ -32,7 +33,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                         jsonPath("$.ansattId") { value(ansattId.verdi) }
                         jsonPath("$.resultater[0].brukerId") { value(brukerId) }
                         jsonPath("$.resultater[0].status") { value(204) }
-                    }
+                    }.andDo { handle(document("obo-bulk")) }
                 }
             }
 
@@ -128,7 +129,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                         status { isMultiStatus() }
                         jsonPath("$.ansattId") { value(ansattId.verdi) }
                         jsonPath("$.resultater[0].status") { value(204) }
-                    }
+                    }.andDo { handle(document("obo-bulk-regeltype")) }
                 }
             }
 

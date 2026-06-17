@@ -12,7 +12,6 @@ import no.nav.tilgangsmaskin.regler.motor.OverstyrbarRegel
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.http.MediaType.TEXT_PLAIN
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.post
 import java.time.LocalDate
@@ -29,7 +28,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                 Then("returnerer 204 ved tilgang") {
                     justRun { regelTjeneste.kompletteRegler(ansattId, brukerId) }
                     mockMvc.post("/api/v1/komplett") {
-                        contentType = TEXT_PLAIN; content = brukerId
+                        contentType = APPLICATION_JSON; content = "\"$brukerId\""
                     }.andExpect { status { isNoContent() } }
                         .andDo { handle(document("obo-komplett")) }
                 }
@@ -46,7 +45,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     every { regelTjeneste.kompletteRegler(ansattId, brukerId) } throws
                         RegelException(testAnsatt, testBruker, testRegel)
                     mockMvc.post("/api/v1/komplett") {
-                        contentType = TEXT_PLAIN; content = brukerId
+                        contentType = APPLICATION_JSON; content = "\"$brukerId\""
                     }.andExpect {
                         status { isForbidden() }
                         jsonPath("$.title") { value("AVVIST_STRENGT_FORTROLIG_ADRESSE") }
@@ -61,7 +60,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                 Then("returnerer 204 ved tilgang") {
                     justRun { regelTjeneste.kjerneregler(ansattId, brukerId) }
                     mockMvc.post("/api/v1/kjerne") {
-                        contentType = TEXT_PLAIN; content = brukerId
+                        contentType = APPLICATION_JSON; content = "\"$brukerId\""
                     }.andExpect { status { isNoContent() } }
                         .andDo { handle(document("obo-kjerne")) }
                 }
@@ -71,7 +70,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                 Then("returnerer 403") {
                     every { token.erObo } returns false
                     mockMvc.post("/api/v1/komplett") {
-                        contentType = TEXT_PLAIN; content = brukerId
+                        contentType = APPLICATION_JSON; content = "\"$brukerId\""
                     }.andExpect { status { isForbidden() } }
                 }
             }
@@ -80,7 +79,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                 Then("returnerer 403") {
                     every { token.erObo } returns false
                     mockMvc.post("/api/v1/kjerne") {
-                        contentType = TEXT_PLAIN; content = brukerId
+                        contentType = APPLICATION_JSON; content = "\"$brukerId\""
                     }.andExpect { status { isForbidden() } }
                 }
             }
@@ -88,7 +87,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
             When("komplett kalles med tom brukerId") {
                 Then("returnerer 400") {
                     mockMvc.post("/api/v1/komplett") {
-                        contentType = TEXT_PLAIN; content = ""
+                        contentType = APPLICATION_JSON; content = "\"\""
                     }.andExpect { status { isBadRequest() } }
                         .andDo { handle(document("obo-komplett-tom-brukerid", problemDetailFields)) }
                 }
@@ -97,7 +96,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
             When("komplett kalles med blank brukerId") {
                 Then("returnerer 400") {
                     mockMvc.post("/api/v1/komplett") {
-                        contentType = TEXT_PLAIN; content = "   "
+                        contentType = APPLICATION_JSON; content = "\"   \""
                     }.andExpect { status { isBadRequest() } }
                 }
             }
@@ -105,7 +104,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
             When("kjerne kalles med tom brukerId") {
                 Then("returnerer 400") {
                     mockMvc.post("/api/v1/kjerne") {
-                        contentType = TEXT_PLAIN; content = ""
+                        contentType = APPLICATION_JSON; content = "\"\""
                     }.andExpect { status { isBadRequest() } }
                 }
             }
@@ -113,7 +112,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
             When("kjerne kalles med blank brukerId") {
                 Then("returnerer 400") {
                     mockMvc.post("/api/v1/kjerne") {
-                        contentType = TEXT_PLAIN; content = "   "
+                        contentType = APPLICATION_JSON; content = "\"   \""
                     }.andExpect { status { isBadRequest() } }
                 }
             }
@@ -121,7 +120,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
             When("komplett kalles uten body") {
                 Then("returnerer 400") {
                     mockMvc.post("/api/v1/komplett") {
-                        contentType = TEXT_PLAIN
+                        contentType = APPLICATION_JSON
                     }.andExpect { status { isBadRequest() } }
                 }
             }
@@ -129,7 +128,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
             When("kjerne kalles uten body") {
                 Then("returnerer 400") {
                     mockMvc.post("/api/v1/kjerne") {
-                        contentType = TEXT_PLAIN
+                        contentType = APPLICATION_JSON
                     }.andExpect { status { isBadRequest() } }
                 }
             }

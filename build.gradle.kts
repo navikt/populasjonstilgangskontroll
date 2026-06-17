@@ -178,7 +178,6 @@ val generateRestDocsIndex by tasks.registering {
                     .replaceFirstChar { it.uppercase() }
                 sb.appendLine("=== $title")
                 sb.appendLine()
-                sb.appendLine("include::{snippets}/$name/curl-request.adoc[]")
                 sb.appendLine("include::{snippets}/$name/http-request.adoc[]")
                 sb.appendLine("include::{snippets}/$name/http-response.adoc[]")
                 if (snippets.resolve(name).resolve("response-fields.adoc").exists()) {

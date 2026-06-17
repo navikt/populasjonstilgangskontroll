@@ -1,6 +1,8 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
@@ -11,7 +13,8 @@ import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatus.NO_CONTENT
 
 data class AggregertBulkRespons(val ansattId: AnsattId, val resultater: Set<EnkeltBulkRespons> = emptySet()) {
-    data class EnkeltBulkRespons(val brukerId: String, @JsonIgnore val httpStatus: HttpStatus, val detaljer: Any? = null ) {
+    data class EnkeltBulkRespons(val brukerId: String, @JsonIgnore val httpStatus: HttpStatus, @param:JsonInclude(
+        NON_NULL) val detaljer: Any? = null ) {
         constructor(e: RegelException) : this(e.bruker.oppslagId, e.status,e.body)
         val status = httpStatus.value()
 

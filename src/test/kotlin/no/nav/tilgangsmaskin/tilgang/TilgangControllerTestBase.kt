@@ -11,9 +11,12 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
+import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
+import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 import org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint
+import org.springframework.restdocs.payload.JsonFieldType.BOOLEAN
 import org.springframework.restdocs.payload.JsonFieldType.NUMBER
 import org.springframework.restdocs.payload.JsonFieldType.STRING
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
@@ -55,21 +58,27 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
 
     protected companion object {
         val problemDetailFields: ResponseFieldsSnippet = relaxedResponseFields(
-            fieldWithPath("title").type(STRING).description("Kort beskrivelse av feilkategorien (HTTP status)"),
+            fieldWithPath("title").type(STRING).description("Avvisningskode eller HTTP status-tittel"),
             fieldWithPath("status").type(NUMBER).description("HTTP-statuskode"),
-            fieldWithPath("detail").type(STRING).description("Detaljert beskrivelse av feilen"),
-            fieldWithPath("instance").type(STRING).description("URI som identifiserer den spesifikke forekomsten av feilen"),
+            fieldWithPath("instance").type(STRING).description("Identifikator for forekomsten (ansattId/brukerId eller request-URI)"),
+            fieldWithPath("detail").type(STRING).description("Detaljert beskrivelse av feilen").optional(),
             fieldWithPath("type").type(STRING).description("URI-referanse som identifiserer problemtypen (RFC 9457)").optional(),
             fieldWithPath("brukerIdent").type(STRING).description("Fødselsnummer/d-nummer til bruker det gjelder").optional(),
             fieldWithPath("navIdent").type(STRING).description("NAV-ident til ansatt som ble avvist").optional(),
             fieldWithPath("begrunnelse").type(STRING).description("Menneskelesbar begrunnelse for avvisning").optional(),
             fieldWithPath("traceId").type(STRING).description("OpenTelemetry trace-ID for feilsøking").optional(),
-            fieldWithPath("kanOverstyres").type(STRING).description("Om regelen kan overstyres med enkelttilgang").optional()
+            fieldWithPath("kanOverstyres").type(BOOLEAN).description("Om regelen kan overstyres med enkelttilgang").optional()
         )
     }
 
     init {
-        beforeSpec { MockKAnnotations.init(this@TilgangControllerTestBase) }
+        beforeSpec {
+            RegelMetadata.messageSource = ReloadableResourceBundleMessageSource().apply {
+                setBasename("classpath:regel-messages")
+                setDefaultEncoding("UTF-8")
+            }
+            MockKAnnotations.init(this@TilgangControllerTestBase)
+        }
 
         beforeEach { case ->
             clearAllMocks()

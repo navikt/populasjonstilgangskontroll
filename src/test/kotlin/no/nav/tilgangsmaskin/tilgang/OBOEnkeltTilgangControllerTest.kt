@@ -2,6 +2,15 @@ package no.nav.tilgangsmaskin.tilgang
 
 import io.mockk.every
 import io.mockk.justRun
+import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.regler.AnsattBuilder
+import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.regler.motor.RegelException
+import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
+import no.nav.tilgangsmaskin.regler.motor.OverstyrbarRegel
+import no.nav.tilgangsmaskin.ansatt.Ansatt
+import no.nav.tilgangsmaskin.bruker.Bruker
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.TEXT_PLAIN
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
@@ -23,6 +32,28 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = TEXT_PLAIN; content = brukerId
                     }.andExpect { status { isNoContent() } }
                         .andDo { handle(document("obo-komplett")) }
+                }
+            }
+
+            When("komplett avviser tilgang") {
+                Then("returnerer 403 med komplett ProblemDetail") {
+                    val testAnsatt = AnsattBuilder(ansattId).build()
+                    val testBruker = BrukerBuilder(BrukerId(brukerId)).build()
+                    val testRegel = object : OverstyrbarRegel {
+                        override val metadata = RegelMetadata(STRENGT_FORTROLIG)
+                        override fun evaluer(ansatt: Ansatt, bruker: Bruker) = false
+                    }
+                    every { regelTjeneste.kompletteRegler(ansattId, brukerId) } throws
+                        RegelException(testAnsatt, testBruker, testRegel)
+                    mockMvc.post("/api/v1/komplett") {
+                        contentType = TEXT_PLAIN; content = brukerId
+                    }.andExpect {
+                        status { isForbidden() }
+                        jsonPath("$.title") { value("AVVIST_STRENGT_FORTROLIG_ADRESSE") }
+                        jsonPath("$.brukerIdent") { value(brukerId) }
+                        jsonPath("$.navIdent") { value(ansattId.verdi) }
+                        jsonPath("$.kanOverstyres") { value(true) }
+                    }.andDo { handle(document("obo-komplett-avvist", problemDetailFields)) }
                 }
             }
 

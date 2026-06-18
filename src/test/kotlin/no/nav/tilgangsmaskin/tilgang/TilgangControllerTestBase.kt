@@ -87,10 +87,14 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
                 .setControllerAdvice(ProblemDetailExceptionHandler())
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
                 .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation)
+                    .uris()
+                    .withScheme("https")
+                    .withHost("tilgangsmaskin.intern.nav.no")
+                    .and()
                     .operationPreprocessors()
                     .withRequestDefaults(
                         modifyHeaders()
-                            .remove("Host")
+                          //  .remove("Host")
                             .set("Authorization", "Bearer ey....."),
                         prettyPrint()
                     )

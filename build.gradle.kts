@@ -173,17 +173,30 @@ val generateRestDocsIndex by tasks.registering {
             }
         }
 
-        // Map snippet names to property keys (only keys, values come from properties)
-        val endpointDescriptionKeys = mapOf(
-            "obo-komplett" to "openapi.tilgang.komplett.obo.summary",
-            "obo-kjerne" to "openapi.tilgang.kjerne.obo.summary",
-            "obo-overstyr" to "openapi.tilgang.overstyr.summary",
-            "obo-bulk" to "openapi.tilgang.bulk.summary",
-            "obo-bulk-regeltype" to "openapi.tilgang.bulk.obo.regeltype.description",
-            "ccf-komplett" to "openapi.tilgang.komplett.ccf.summary",
-            "ccf-kjerne" to "openapi.tilgang.kjerne.ccf.summary",
-            "ccf-bulk" to "openapi.tilgang.bulk.summary",
-            "ccf-bulk-regeltype" to "openapi.tilgang.bulk.ccf.regeltype.description"
+        // Parse constants from TilgangController.kt
+        val controllerFile = file("src/main/kotlin/no/nav/tilgangsmaskin/tilgang/TilgangController.kt")
+        val controllerConstants = mutableMapOf<String, String>()
+        if (controllerFile.exists()) {
+            val content = controllerFile.readText(UTF_8)
+            // Match constants that may span multiple lines - use [\s\n] to include newlines
+            val pattern = """private const val (\w+)\s*=\s*"([^"]+)"""".toRegex()
+            pattern.findAll(content.replace("\n", " ")).forEach { match ->
+                val (name, value) = match.destructured
+                controllerConstants[name] = value.trim()
+            }
+        }
+
+        // Map snippet names to property keys using constants from TilgangController
+        val endpointDescriptionKeys: Map<String, String> = mapOf(
+            "obo-komplett" to (controllerConstants["SUMMARY_KOMPLETT_OBO"] ?: "openapi.tilgang.komplett.obo.summary"),
+            "obo-kjerne" to (controllerConstants["SUMMARY_KJERNE_OBO"] ?: "openapi.tilgang.kjerne.obo.summary"),
+            "obo-overstyr" to (controllerConstants["SUMMARY_OVERSTYR"] ?: "openapi.tilgang.overstyr.summary"),
+            "obo-bulk" to (controllerConstants["SUMMARY_BULK"] ?: "openapi.tilgang.bulk.summary"),
+            "obo-bulk-regeltype" to (controllerConstants["DESCRIPTION_BULK_OBO_REGELTYPE"] ?: "openapi.tilgang.bulk.obo.regeltype.description"),
+            "ccf-komplett" to (controllerConstants["SUMMARY_KOMPLETT_CCF"] ?: "openapi.tilgang.komplett.ccf.summary"),
+            "ccf-kjerne" to (controllerConstants["SUMMARY_KJERNE_CCF"] ?: "openapi.tilgang.kjerne.ccf.summary"),
+            "ccf-bulk" to (controllerConstants["SUMMARY_BULK"] ?: "openapi.tilgang.bulk.summary"),
+            "ccf-bulk-regeltype" to (controllerConstants["DESCRIPTION_BULK_CCF_REGELTYPE"] ?: "openapi.tilgang.bulk.ccf.regeltype.description")
         )
 
         fun sectionTitle(name: String, prefix: String) =

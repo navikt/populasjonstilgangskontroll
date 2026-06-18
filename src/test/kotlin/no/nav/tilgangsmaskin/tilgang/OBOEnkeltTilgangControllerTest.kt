@@ -150,17 +150,6 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                 }
             }
 
-            When("enkelttilgang kalles med gyldig request og OBO-token") {
-                Then("returnerer 202") {
-                    every { enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattId, any(), any()) } returns true
-                    mockMvc.post("/api/v1/overstyr") {
-                        contentType = APPLICATION_JSON
-                        content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
-                    }.andExpect { status { isAccepted() } }
-                        .andDo { handle(document("obo-enkelttilgang")) }
-                }
-            }
-
             When("enkelttilgang kalles med CCF-token") {
                 Then("returnerer 403") {
                     every { token.erCC } returns true
@@ -169,6 +158,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
                     }.andExpect { status { isForbidden() } }
+                        .andDo { handle(document("obo-overstyr-feil-token", problemDetailFields)) }
                 }
             }
 
@@ -178,6 +168,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"For kort","gyldigtil":"$gyldigTil"}"""
                     }.andExpect { status { isBadRequest() } }
+                        .andDo { handle(document("obo-overstyr-validering-begrunnelse", problemDetailFields)) }
                 }
             }
 
@@ -196,6 +187,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"${LocalDate.now().minusDays(1)}"}"""
                     }.andExpect { status { isBadRequest() } }
+                        .andDo { handle(document("obo-overstyr-validering-gyldigtil", problemDetailFields)) }
                 }
             }
 

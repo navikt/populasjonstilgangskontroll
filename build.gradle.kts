@@ -150,6 +150,23 @@ val generateRestDocsIndex by tasks.registering {
         val grouped = dirs.groupBy { it.substringBefore("-") }
 
         val sb = StringBuilder()
+
+        fun sectionTitle(name: String, prefix: String) =
+            name.substringAfter("$prefix-")
+                .replace("-", " ")
+                .replaceFirstChar { it.uppercase() }
+
+        fun appendSnippetIncludes(name: String) {
+            sb.appendLine("include::{snippets}/$name/http-request.adoc[]")
+            sb.appendLine("include::{snippets}/$name/http-response.adoc[]")
+            if (snippets.resolve(name).resolve("response-fields.adoc").exists()) {
+                sb.appendLine()
+                sb.appendLine(".Response fields")
+                sb.appendLine("include::{snippets}/$name/response-fields.adoc[]")
+            }
+            sb.appendLine()
+        }
+
         sb.appendLine("= Populasjonstilgangskontroll API")
         sb.appendLine(":doctype: book")
         sb.appendLine(":icons: font")
@@ -173,19 +190,39 @@ val generateRestDocsIndex by tasks.registering {
             sb.appendLine("== $heading")
             sb.appendLine()
 
-            for (name in names) {
-                val title = name.substringAfter("-").replace("-", " ")
-                    .replaceFirstChar { it.uppercase() }
+            val sortedNames = names.sorted()
+            val overstyrRoot = "$prefix-overstyr"
+            val overstyrRelated = sortedNames.filter { it == overstyrRoot || it.startsWith("$overstyrRoot-") }
+            val remaining = sortedNames.filterNot { it in overstyrRelated }
+
+            for (name in remaining) {
+                val title = sectionTitle(name, prefix)
                 sb.appendLine("=== $title")
                 sb.appendLine()
-                sb.appendLine("include::{snippets}/$name/http-request.adoc[]")
-                sb.appendLine("include::{snippets}/$name/http-response.adoc[]")
-                if (snippets.resolve(name).resolve("response-fields.adoc").exists()) {
-                    sb.appendLine()
-                    sb.appendLine(".Response fields")
-                    sb.appendLine("include::{snippets}/$name/response-fields.adoc[]")
-                }
+                appendSnippetIncludes(name)
+            }
+
+            if (overstyrRelated.isNotEmpty()) {
+                sb.appendLine("=== Overstyr")
                 sb.appendLine()
+
+                if (overstyrRelated.contains(overstyrRoot)) {
+                    appendSnippetIncludes(overstyrRoot)
+                }
+
+                val alternatives = overstyrRelated.filter { it != overstyrRoot }
+                if (alternatives.isNotEmpty()) {
+                    sb.appendLine("==== Alternative responser")
+                    sb.appendLine()
+                    for (name in alternatives) {
+                        val altTitle = name.removePrefix("$overstyrRoot-")
+                            .replace("-", " ")
+                            .replaceFirstChar { it.uppercase() }
+                        sb.appendLine("===== $altTitle")
+                        sb.appendLine()
+                        appendSnippetIncludes(name)
+                    }
+                }
             }
         }
 

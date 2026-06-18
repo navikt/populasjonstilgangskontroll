@@ -1,6 +1,7 @@
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import java.lang.System.getProperty
+import kotlin.text.Charsets.UTF_8
 
 val javaVersion = JavaLanguageVersion.of(25)
 
@@ -154,7 +155,7 @@ val generateRestDocsIndex by tasks.registering {
             snippets.resolve(it).resolve("response-fields.adoc").exists()
         }
         val sharedProblemDetailContent = sharedProblemDetailSnippet?.let {
-            snippets.resolve(it).resolve("response-fields.adoc").readText(Charsets.UTF_8)
+            snippets.resolve(it).resolve("response-fields.adoc").readText(UTF_8)
         }
 
         fun sectionTitle(name: String, prefix: String) =
@@ -166,7 +167,7 @@ val generateRestDocsIndex by tasks.registering {
             sb.appendLine("include::{snippets}/$name/http-request.adoc[]")
             sb.appendLine("include::{snippets}/$name/http-response.adoc[]")
             val responseFields = snippets.resolve(name).resolve("response-fields.adoc")
-            if (responseFields.exists() && responseFields.readText(Charsets.UTF_8) != sharedProblemDetailContent) {
+            if (responseFields.exists() && responseFields.readText(UTF_8) != sharedProblemDetailContent) {
                 sb.appendLine()
                 sb.appendLine(".Response fields")
                 sb.appendLine("include::{snippets}/$name/response-fields.adoc[]")
@@ -188,7 +189,7 @@ val generateRestDocsIndex by tasks.registering {
         sb.appendLine("Tjenesten avgjør om en Nav-ansatt har tilgang til en bruker")
         sb.appendLine()
         if (sharedProblemDetailSnippet != null) {
-            sb.appendLine("=== Felles ProblemDetail-felter")
+            sb.appendLine("=== Felles ProblemDetail-felter for enkeltoppslag og enkelttilgang")
             sb.appendLine()
             sb.appendLine("include::{snippets}/$sharedProblemDetailSnippet/response-fields.adoc[]")
             sb.appendLine()
@@ -241,7 +242,7 @@ val generateRestDocsIndex by tasks.registering {
 
         val outDir = outputDir.get().asFile
         outDir.mkdirs()
-        outDir.resolve("index.adoc").writeText(sb.toString(), Charsets.UTF_8)
+        outDir.resolve("index.adoc").writeText(sb.toString(), UTF_8)
     }
 }
 

@@ -63,7 +63,6 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             fieldWithPath("title").type(STRING).description("Avvisningskode eller HTTP status-tittel"),
             fieldWithPath("status").type(NUMBER).description("HTTP-statuskode"),
             fieldWithPath("instance").type(STRING).description("Identifikator for forekomsten (ansattId/brukerId eller request-URI)"),
-            fieldWithPath("detail").type(STRING).description("Detaljert beskrivelse av feilen").optional(),
             fieldWithPath("type").type(STRING).description("URI-referanse som identifiserer problemtypen (RFC 9457)").optional(),
             fieldWithPath("brukerIdent").type(STRING).description("Fødselsnummer/d-nummer til bruker det gjelder").optional(),
             fieldWithPath("navIdent").type(STRING).description("NAV-ident til ansatt som ble avvist").optional(),

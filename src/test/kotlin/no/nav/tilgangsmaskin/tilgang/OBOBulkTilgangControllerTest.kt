@@ -135,8 +135,12 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
         Given("OBO bulk med regelType") {
 
-            val kjerneSpecs = setOf(BrukerIdOgRegelsett(brukerId, KJERNE_REGELTYPE))
-            val respons = AggregertBulkRespons(ansattId, setOf(ok(brukerId)))
+            val annenBrukerId = "12345678901"
+            val kjerneSpecs = setOf(
+                BrukerIdOgRegelsett(brukerId, KJERNE_REGELTYPE),
+                BrukerIdOgRegelsett(annenBrukerId, KJERNE_REGELTYPE)
+            )
+            val respons = AggregertBulkRespons(ansattId, setOf(ok(brukerId), ok(annenBrukerId)))
 
             beforeEach { every { token.erObo } returns true }
 
@@ -144,7 +148,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                 Then("returnerer 207 med resultater for gitt regeltype") {
                     every { regelTjeneste.bulkRegler(ansattId, kjerneSpecs) } returns respons
                     mockMvc.post("/api/v1/bulk/obo/KJERNE_REGELTYPE") {
-                        contentType = APPLICATION_JSON; content = """["$brukerId"]"""
+                        contentType = APPLICATION_JSON; content = """["$brukerId","$annenBrukerId"]"""
                     }.andExpect {
                         status { isMultiStatus() }
                         jsonPath("$.ansattId") { value(ansattId.verdi) }

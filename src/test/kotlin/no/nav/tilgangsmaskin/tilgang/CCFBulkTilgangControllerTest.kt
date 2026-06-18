@@ -69,11 +69,15 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/ccf/{ansattId}/{regelType} kalles med KJERNE_REGELTYPE") {
                 Then("returnerer 207") {
-                    val kjerneSpecs = setOf(BrukerIdOgRegelsett(brukerId, KJERNE_REGELTYPE))
-                    val kjerneRespons = AggregertBulkRespons(ansattId, setOf(ok(brukerId)))
+                    val annenBrukerId = "12345678901"
+                    val kjerneSpecs = setOf(
+                        BrukerIdOgRegelsett(brukerId, KJERNE_REGELTYPE),
+                        BrukerIdOgRegelsett(annenBrukerId, KJERNE_REGELTYPE)
+                    )
+                    val kjerneRespons = AggregertBulkRespons(ansattId, setOf(ok(brukerId), ok(annenBrukerId)))
                     every { regelTjeneste.bulkRegler(ansattId, kjerneSpecs) } returns kjerneRespons
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}/KJERNE_REGELTYPE") {
-                        contentType = APPLICATION_JSON; content = """["$brukerId"]"""
+                        contentType = APPLICATION_JSON; content = """["$brukerId","$annenBrukerId"]"""
                     }.andExpect { status { isMultiStatus() } }
                         .andDo { handle(document("ccf-bulk-regeltype")) }
                 }

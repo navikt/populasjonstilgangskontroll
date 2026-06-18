@@ -137,7 +137,9 @@ class ValkeyCacheOperations(client: RedisClient, private val cfg: CacheConfig,
     }
 
     override fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long> {
-        val prefixes = caches.map { "${it.tilNøkkel("")}*" }.toTypedArray()
+        val prefixes = caches.map {
+            "${it.tilNøkkel("")}*"
+        }.toTypedArray()
         val (results, totalDuration) = eval(*prefixes)
         return caches.zip(results).associate {
             (cache, count) -> cache.fullName to count

@@ -167,7 +167,6 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"For kort","gyldigtil":"$gyldigTil"}"""
                     }.andExpect { status { isBadRequest() } }
-                        .andDo { handle(document("obo-overstyr-validering-begrunnelse", problemDetailFields)) }
                 }
             }
 
@@ -186,7 +185,6 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"${LocalDate.now().minusDays(1)}"}"""
                     }.andExpect { status { isBadRequest() } }
-                        .andDo { handle(document("obo-overstyr-validering-gyldigtil", problemDetailFields)) }
                 }
             }
 

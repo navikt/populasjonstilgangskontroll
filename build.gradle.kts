@@ -207,9 +207,10 @@ val generateRestDocsIndex by tasks.registering {
         fun getDescription(name: String): String {
             val key = endpointDescriptionKeys[name]
             return if (key != null) {
-                properties[key] ?: sectionTitle(name, name.substringBefore("-"))
+                properties[key] ?: "null"// sectionTitle(name, name.substringBefore("-"))
             } else {
-                sectionTitle(name, name.substringBefore("-"))
+                "else"
+               // sectionTitle(name, name.substringBefore("-"))
             }
         }
 

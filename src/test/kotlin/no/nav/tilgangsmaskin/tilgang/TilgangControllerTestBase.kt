@@ -89,7 +89,12 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
                 .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation)
                     .operationPreprocessors()
-                    .withRequestDefaults(modifyHeaders().remove("Host"), prettyPrint())
+                    .withRequestDefaults(
+                        modifyHeaders()
+                            .remove("Host")
+                            .set("Authorization", "Bearer ey....."),
+                        prettyPrint()
+                    )
                     .withResponseDefaults(prettyPrint())
                 )
                 .build()

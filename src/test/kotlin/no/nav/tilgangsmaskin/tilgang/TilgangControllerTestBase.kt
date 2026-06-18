@@ -27,9 +27,8 @@ import org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponse
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
+import no.nav.tilgangsmaskin.felles.rest.GlobalExceptionHandler
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
-import org.springframework.web.bind.annotation.RestControllerAdvice
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 abstract class TilgangControllerTestBase : BehaviorSpec() {
 
@@ -55,8 +54,6 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
 
     private val restDocumentation = ManualRestDocumentation()
 
-    @RestControllerAdvice
-    private class ProblemDetailExceptionHandler : ResponseEntityExceptionHandler()
 
     protected companion object {
         val problemDetailFields = relaxedResponseFields(
@@ -67,7 +64,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             fieldWithPath("brukerIdent").type(STRING).description("Fødselsnummer/d-nummer til bruker det gjelder").optional(),
             fieldWithPath("navIdent").type(STRING).description("NAV-ident til ansatt som ble avvist").optional(),
             fieldWithPath("begrunnelse").type(STRING).description("Menneskelesbar begrunnelse for avvisning").optional(),
-            fieldWithPath("traceId").type(STRING).description("OpenTelemetry trace-ID for feilsøking").optional(),
+            fieldWithPath("traceId").type(STRING).description("OTEL trace-ID for feilsøking").optional(),
             fieldWithPath("kanOverstyres").type(BOOLEAN).description("Om regelen kan overstyres med enkelttilgang").optional()
         )
     }
@@ -85,7 +82,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             clearAllMocks()
             restDocumentation.beforeTest(TilgangControllerTestBase::class.java, case.name.name)
             mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, TokenTypeGuard(token), konsumentValidator, teller))
-                .setControllerAdvice(ProblemDetailExceptionHandler())
+                .setControllerAdvice(GlobalExceptionHandler())
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
                 .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation)
                     .uris()

@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
+import org.springframework.restdocs.operation.preprocess.Preprocessors.modifyHeaders
 import org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint
 import org.springframework.restdocs.payload.JsonFieldType.BOOLEAN
 import org.springframework.restdocs.payload.JsonFieldType.NUMBER
@@ -88,7 +89,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
                 .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation)
                     .operationPreprocessors()
-                    .withRequestDefaults(prettyPrint())
+                    .withRequestDefaults(modifyHeaders().remove("Host"), prettyPrint())
                     .withResponseDefaults(prettyPrint())
                 )
                 .build()

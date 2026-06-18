@@ -57,7 +57,6 @@ class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/ccf/komplett/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON; content = "\"\""
                     }.andExpect { status { isBadRequest() } }
-                        .andDo { handle(document("ccf-komplett-tom-brukerid", problemDetailFields)) }
                 }
             }
 

@@ -89,7 +89,6 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/komplett") {
                         contentType = APPLICATION_JSON; content = "\"\""
                     }.andExpect { status { isBadRequest() } }
-                        .andDo { handle(document("obo-komplett-tom-brukerid", problemDetailFields)) }
                 }
             }
 

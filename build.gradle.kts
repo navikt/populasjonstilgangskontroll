@@ -150,6 +150,12 @@ val generateRestDocsIndex by tasks.registering {
         val grouped = dirs.groupBy { it.substringBefore("-") }
 
         val sb = StringBuilder()
+        val sharedProblemDetailSnippet = dirs.firstOrNull {
+            snippets.resolve(it).resolve("response-fields.adoc").exists()
+        }
+        val sharedProblemDetailContent = sharedProblemDetailSnippet?.let {
+            snippets.resolve(it).resolve("response-fields.adoc").readText(Charsets.UTF_8)
+        }
 
         fun sectionTitle(name: String, prefix: String) =
             name.substringAfter("$prefix-")
@@ -159,7 +165,8 @@ val generateRestDocsIndex by tasks.registering {
         fun appendSnippetIncludes(name: String) {
             sb.appendLine("include::{snippets}/$name/http-request.adoc[]")
             sb.appendLine("include::{snippets}/$name/http-response.adoc[]")
-            if (snippets.resolve(name).resolve("response-fields.adoc").exists()) {
+            val responseFields = snippets.resolve(name).resolve("response-fields.adoc")
+            if (responseFields.exists() && responseFields.readText(Charsets.UTF_8) != sharedProblemDetailContent) {
                 sb.appendLine()
                 sb.appendLine(".Response fields")
                 sb.appendLine("include::{snippets}/$name/response-fields.adoc[]")
@@ -180,6 +187,12 @@ val generateRestDocsIndex by tasks.registering {
         sb.appendLine()
         sb.appendLine("Tjenesten avgjør om en Nav-ansatt har tilgang til en bruker")
         sb.appendLine()
+        if (sharedProblemDetailSnippet != null) {
+            sb.appendLine("=== Felles ProblemDetail-felter")
+            sb.appendLine()
+            sb.appendLine("include::{snippets}/$sharedProblemDetailSnippet/response-fields.adoc[]")
+            sb.appendLine()
+        }
 
         for ((prefix, names) in grouped) {
             val heading = when (prefix) {

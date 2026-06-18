@@ -13,6 +13,8 @@ import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidato
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
+import org.springframework.http.HttpHeaders.AUTHORIZATION
+import org.springframework.http.HttpHeaders.HOST
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 import org.springframework.restdocs.operation.preprocess.Preprocessors.modifyHeaders
@@ -94,8 +96,8 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
                     .operationPreprocessors()
                     .withRequestDefaults(
                         modifyHeaders()
-                          //  .remove("Host")
-                            .set("Authorization", "Bearer ey....."),
+                            .set(HOST, "tilgangsmaskin.intern.nav.no")
+                            .set(AUTHORIZATION, "Bearer ey....."),
                         prettyPrint()
                     )
                     .withResponseDefaults(prettyPrint())

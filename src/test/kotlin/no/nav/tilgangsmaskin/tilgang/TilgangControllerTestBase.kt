@@ -11,6 +11,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
+import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.http.HttpHeaders.AUTHORIZATION
@@ -59,8 +60,11 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
     private class ProblemDetailExceptionHandler : ResponseEntityExceptionHandler()
 
     protected companion object {
+        private val avvisningskoder = AvvisningsKode.entries.joinToString(", ") { it.name }
+
         val problemDetailFields = relaxedResponseFields(
-            fieldWithPath("title").type(STRING).description("Avvisningskode eller HTTP status-tittel"),
+            fieldWithPath("title").type(STRING)
+                .description("Avvisningskode eller HTTP status-tittel. Mulige avvisningskoder: $avvisningskoder"),
             fieldWithPath("status").type(NUMBER).description("HTTP-statuskode"),
             fieldWithPath("instance").type(STRING).description("Identifikator for forekomsten (ansattId/brukerId eller request-URI)"),
             fieldWithPath("type").type(STRING).description("URI-referanse som identifiserer problemtypen (RFC 9457)").optional(),

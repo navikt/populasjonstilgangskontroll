@@ -112,7 +112,6 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"   ","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect { status { isBadRequest() } }
-                        .andDo { handle(document("obo-bulk-validering", problemDetailFields)) }
                 }
             }
 

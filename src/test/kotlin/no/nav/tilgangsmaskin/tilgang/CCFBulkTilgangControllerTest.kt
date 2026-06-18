@@ -97,7 +97,6 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"   ","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect { status { isBadRequest() } }
-                        .andDo { handle(document("ccf-bulk-validering", problemDetailFields)) }
                 }
             }
 

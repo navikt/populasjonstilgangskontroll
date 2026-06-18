@@ -158,10 +158,47 @@ val generateRestDocsIndex by tasks.registering {
             snippets.resolve(it).resolve("response-fields.adoc").readText(UTF_8)
         }
 
+        // Load descriptions from openapi properties
+        val propsFile = file("src/main/resources/openapi-prod-tilgang.properties")
+        val properties = mutableMapOf<String, String>()
+        if (propsFile.exists()) {
+            propsFile.readLines().forEach { line ->
+                val trimmed = line.trim()
+                if (trimmed.isNotEmpty() && !trimmed.startsWith("#")) {
+                    val parts = trimmed.split("=", limit = 2)
+                    if (parts.size == 2) {
+                        properties[parts[0]] = parts[1]
+                    }
+                }
+            }
+        }
+
+        // Map snippet names to property keys (only keys, values come from properties)
+        val endpointDescriptionKeys = mapOf(
+            "obo-komplett" to "openapi.tilgang.komplett.obo.summary",
+            "obo-kjerne" to "openapi.tilgang.kjerne.obo.summary",
+            "obo-overstyr" to "openapi.tilgang.overstyr.summary",
+            "obo-bulk" to "openapi.tilgang.bulk.summary",
+            "obo-bulk-regeltype" to "openapi.tilgang.bulk.obo.regeltype.description",
+            "ccf-komplett" to "openapi.tilgang.komplett.ccf.summary",
+            "ccf-kjerne" to "openapi.tilgang.kjerne.ccf.summary",
+            "ccf-bulk" to "openapi.tilgang.bulk.summary",
+            "ccf-bulk-regeltype" to "openapi.tilgang.bulk.ccf.regeltype.description"
+        )
+
         fun sectionTitle(name: String, prefix: String) =
             name.substringAfter("$prefix-")
                 .replace("-", " ")
                 .replaceFirstChar { it.uppercase() }
+
+        fun getDescription(name: String): String {
+            val key = endpointDescriptionKeys[name]
+            return if (key != null) {
+                properties[key] ?: sectionTitle(name, name.substringBefore("-"))
+            } else {
+                sectionTitle(name, name.substringBefore("-"))
+            }
+        }
 
         fun appendSnippetIncludes(name: String) {
             sb.appendLine("include::{snippets}/$name/http-request.adoc[]")
@@ -197,8 +234,8 @@ val generateRestDocsIndex by tasks.registering {
 
         for ((prefix, names) in grouped) {
             val heading = when (prefix) {
-                "obo" -> "OBO (On-Behalf-Of)"
-                "ccf" -> "CCF (Client Credentials Flow)"
+                "obo" -> "On-Behalf-Of flow"
+                "ccf" -> "Client Credentials Flow"
                 else -> prefix.uppercase()
             }
             sb.appendLine("== $heading")
@@ -210,7 +247,7 @@ val generateRestDocsIndex by tasks.registering {
             val remaining = sortedNames.filterNot { it in overstyrRelated }
 
             for (name in remaining) {
-                val title = sectionTitle(name, prefix)
+                val title = getDescription(name)
                 sb.appendLine("=== $title")
                 sb.appendLine()
                 appendSnippetIncludes(name)
@@ -229,9 +266,7 @@ val generateRestDocsIndex by tasks.registering {
                     sb.appendLine("==== Alternative responser")
                     sb.appendLine()
                     for (name in alternatives) {
-                        val altTitle = name.removePrefix("$overstyrRoot-")
-                            .replace("-", " ")
-                            .replaceFirstChar { it.uppercase() }
+                        val altTitle = getDescription(name)
                         sb.appendLine("===== $altTitle")
                         sb.appendLine()
                         appendSnippetIncludes(name)

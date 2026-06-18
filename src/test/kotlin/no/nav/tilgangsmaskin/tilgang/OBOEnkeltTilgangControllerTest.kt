@@ -146,7 +146,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
                     }.andExpect { status { isAccepted() } }
-                        .andDo { handle(document("obo-overstyr")) }
+                        .andDo { handle(document("obo-enkelttilgang")) }
                 }
             }
 

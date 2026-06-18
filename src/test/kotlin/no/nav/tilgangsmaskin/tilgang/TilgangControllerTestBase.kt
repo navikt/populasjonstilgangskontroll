@@ -22,7 +22,6 @@ import org.springframework.restdocs.payload.JsonFieldType.NUMBER
 import org.springframework.restdocs.payload.JsonFieldType.STRING
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields
-import org.springframework.restdocs.payload.ResponseFieldsSnippet
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
@@ -58,7 +57,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
     private class ProblemDetailExceptionHandler : ResponseEntityExceptionHandler()
 
     protected companion object {
-        val problemDetailFields: ResponseFieldsSnippet = relaxedResponseFields(
+        val problemDetailFields = relaxedResponseFields(
             fieldWithPath("title").type(STRING).description("Avvisningskode eller HTTP status-tittel"),
             fieldWithPath("status").type(NUMBER).description("HTTP-statuskode"),
             fieldWithPath("instance").type(STRING).description("Identifikator for forekomsten (ansattId/brukerId eller request-URI)"),

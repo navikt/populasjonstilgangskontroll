@@ -170,7 +170,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
                     }.andExpect {
                         status { isForbidden() }
-                        jsonPath("$.title") { value("403") }
+                        jsonPath("$.title") { value("Forbidden") }
                         jsonPath("$.status") { value(403) }
                         jsonPath("$.instance") { value("/api/v1/overstyr") }
                         jsonPath("$.type") { value("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett") }
@@ -188,7 +188,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         content = """{"brukerId":"$brukerId","begrunnelse":"For kort","gyldigtil":"$gyldigTil"}"""
                     }.andExpect {
                         status { isBadRequest() }
-                        jsonPath("$.title") { value("400") }
+                        jsonPath("$.title") { value("Bad Request") }
                         jsonPath("$.status") { value(400) }
                         jsonPath("$.instance") { value("/api/v1/overstyr") }
                         jsonPath("$.type") { value("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett") }
@@ -216,7 +216,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"${LocalDate.now().minusDays(1)}"}"""
                     }.andExpect {
                         status { isBadRequest() }
-                        jsonPath("$.title") { value("400") }
+                        jsonPath("$.title") { value("Bad Request") }
                         jsonPath("$.status") { value(400) }
                         jsonPath("$.instance") { value("/api/v1/overstyr") }
                         jsonPath("$.type") { value("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett") }

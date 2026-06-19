@@ -4,6 +4,7 @@ import io.opentelemetry.api.trace.Span
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.TYPE_URI
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatusCode
@@ -74,7 +75,7 @@ class GlobalProblemDetailExceptionHandler(private val token: Token) : ResponseEn
 
     private fun problemDetail(status: HttpStatusCode, detail: String, request: WebRequest) =
         ProblemDetail.forStatusAndDetail(status, detail).apply {
-            title = "${status.value()}"
+            title = HttpStatus.resolve(status.value())?.reasonPhrase ?: "${status.value()}"
             type = TYPE_URI
             instance = URI.create((request as ServletWebRequest).request.requestURI)
             setProperty("begrunnelse", detail)

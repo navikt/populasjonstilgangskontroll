@@ -18,8 +18,12 @@ import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpHeaders.HOST
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
+import org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest
+import org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse
 import org.springframework.restdocs.operation.preprocess.Preprocessors.modifyHeaders
 import org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint
+import org.springframework.restdocs.snippet.Snippet
 import org.springframework.restdocs.payload.JsonFieldType.BOOLEAN
 import org.springframework.restdocs.payload.JsonFieldType.NUMBER
 import org.springframework.restdocs.payload.JsonFieldType.STRING
@@ -33,6 +37,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 abstract class TilgangControllerTestBase : BehaviorSpec() {
+
+    protected fun dokumenterMedAuth(identifier: String, vararg snippets: Snippet) =
+        document(
+            identifier,
+            preprocessRequest(
+                modifyHeaders()
+                    .set(HOST, "tilgangsmaskin.intern.nav.no")
+                    .set(AUTHORIZATION, "Bearer ey....."),
+                prettyPrint()
+            ),
+            preprocessResponse(prettyPrint()),
+            *snippets
+        )
 
     @MockK
     protected lateinit var regelTjeneste: RegelTjeneste
@@ -99,8 +116,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
                     .operationPreprocessors()
                     .withRequestDefaults(
                         modifyHeaders()
-                            .set(HOST, "tilgangsmaskin.intern.nav.no")
-                            .set(AUTHORIZATION, "Bearer ey....."),
+                            .set(HOST, "tilgangsmaskin.intern.nav.no"),
                         prettyPrint()
                     )
                     .withResponseDefaults(prettyPrint())

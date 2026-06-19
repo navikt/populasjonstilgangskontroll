@@ -11,13 +11,8 @@ import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
 import no.nav.tilgangsmaskin.regler.motor.OverstyrbarRegel
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
-import org.springframework.http.HttpHeaders.AUTHORIZATION
-import org.springframework.http.HttpHeaders.HOST
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
-import org.springframework.restdocs.operation.preprocess.Preprocessors.modifyHeaders
-import org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest
-import org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint
 import org.springframework.test.web.servlet.post
 import java.time.LocalDate
 
@@ -35,7 +30,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/komplett") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
                     }.andExpect { status { isNoContent() } }
-                        .andDo { handle(document("obo-komplett")) }
+                        .andDo { handle(dokumenterMedAuth("obo-komplett")) }
                 }
             }
 
@@ -57,7 +52,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         jsonPath("$.brukerIdent") { value(brukerId) }
                         jsonPath("$.navIdent") { value(ansattId.verdi) }
                         jsonPath("$.kanOverstyres") { value(true) }
-                    }.andDo { handle(document("obo-komplett-avvist", problemDetailFields)) }
+                    }.andDo { handle(dokumenterMedAuth("obo-komplett-avvist", problemDetailFields)) }
                 }
             }
 
@@ -67,7 +62,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/kjerne") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
                     }.andExpect { status { isNoContent() } }
-                        .andDo { handle(document("obo-kjerne")) }
+                        .andDo { handle(dokumenterMedAuth("obo-kjerne")) }
                 }
             }
 
@@ -151,7 +146,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
                     }.andExpect { status { isAccepted() } }
-                        .andDo { handle(document("obo-overstyr")) }
+                        .andDo { handle(dokumenterMedAuth("obo-overstyr")) }
                 }
             }
 
@@ -174,18 +169,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
                     }.andExpect { status { isForbidden() } }
-                        .andDo {
-                            handle(document(
-                                "obo-overstyr-uten-token",
-                                preprocessRequest(
-                                    modifyHeaders()
-                                        .set(HOST, "tilgangsmaskin.intern.nav.no")
-                                        .remove(AUTHORIZATION),
-                                    prettyPrint()
-                                ),
-                                problemDetailFields
-                            ))
-                        }
+                        .andDo { handle(document("obo-overstyr-uten-token", problemDetailFields)) }
                 }
             }
 
@@ -195,7 +179,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"For kort","gyldigtil":"$gyldigTil"}"""
                     }.andExpect { status { isBadRequest() } }
-                        .andDo { handle(document("obo-overstyr-begrunnelse-for-kort", problemDetailFields)) }
+                        .andDo { handle(dokumenterMedAuth("obo-overstyr-begrunnelse-for-kort", problemDetailFields)) }
                 }
             }
 
@@ -214,7 +198,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"${LocalDate.now().minusDays(1)}"}"""
                     }.andExpect { status { isBadRequest() } }
-                        .andDo { handle(document("obo-overstyr-validering-gyldigtil", problemDetailFields)) }
+                        .andDo { handle(dokumenterMedAuth("obo-overstyr-validering-gyldigtil", problemDetailFields)) }
                 }
             }
 

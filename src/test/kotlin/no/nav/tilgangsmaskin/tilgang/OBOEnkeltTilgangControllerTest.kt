@@ -167,7 +167,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"For kort","gyldigtil":"$gyldigTil"}"""
                     }.andExpect { status { isBadRequest() } }
-                        .andDo { handle(document("obo-overstyr-validering-begrunnelse", problemDetailFields)) }
+                        .andDo { handle(document("obo-overstyr-badrequest-too-short-description", problemDetailFields)) }
                 }
             }
 

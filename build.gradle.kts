@@ -140,6 +140,7 @@ tasks.named<Test>("test") {
 
 val generateRestDocsIndex = tasks.register("generateRestDocsIndex") {
     description = "Generates index.adoc from REST Docs snippets"
+    notCompatibleWithConfigurationCache("generateRestDocsIndex captures project references in doLast action")
     dependsOn(tasks.test)
 
     val snippetsDir = layout.buildDirectory.dir("generated-snippets")
@@ -351,6 +352,7 @@ tasks.named("asciidoctor") {
 }
 
 tasks.withType<AsciidoctorTask> {
+    notCompatibleWithConfigurationCache("Asciidoctor plugin is not compatible with Gradle configuration cache")
     sourceDir(layout.buildDirectory.dir("generated-restdocs-index"))
     baseDirFollowsSourceDir()
     sources {

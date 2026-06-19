@@ -47,6 +47,9 @@ repositories {
 
 
 dependencies {
+    constraints {
+        add("implementation", libs.plexus.utils) // TODO reconider on next bump of cyclone-dx-plugin
+    }
     implementation(libs.confluent.kafka.avro.serializer) {
         exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
     }

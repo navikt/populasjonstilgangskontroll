@@ -288,6 +288,7 @@ val generateRestDocsIndex by tasks.registering {
                         val altTitle = getDescription(name)
                         sb.appendLine("===== $altTitle")
                         sb.appendLine()
+                        sb.appendLine("include::{snippets}/$name/http-request.adoc[]")
                         sb.appendLine("include::{snippets}/$name/http-response.adoc[]")
                         sb.appendLine()
                     }

@@ -66,12 +66,12 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             fieldWithPath("title").type(STRING)
                 .description("Avvisningskode, En av: $avvisningskoder"),
             fieldWithPath("status").type(NUMBER).description("HTTP-statuskode"),
-            fieldWithPath("instance").type(STRING).description("Identifikator for forekomsten (ansattId/brukerId eller request-URI)"),
+            fieldWithPath("instance").type(STRING).description("ansattId/brukerId"),
             fieldWithPath("type").type(STRING).description("Se link:https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett[regelsett-dokumentasjon]").optional(),
-            fieldWithPath("brukerIdent").type(STRING).description("Fødselsnummer/d-nummer til bruker det gjelder").optional(),
-            fieldWithPath("navIdent").type(STRING).description("NAV-ident til ansatt som ble avvist").optional(),
+            fieldWithPath("brukerIdent").type(STRING).description("Fødselsnummer/d-nummer til bruker").optional(),
+            fieldWithPath("navIdent").type(STRING).description("NAV-ident den ansatte").optional(),
             fieldWithPath("begrunnelse").type(STRING).description("Menneskelesbar begrunnelse for avvisning").optional(),
-            fieldWithPath("traceId").type(STRING).description("OpenTelemetry trace-ID for feilsøking").optional(),
+            fieldWithPath("traceId").type(STRING).description("OTEL trace-ID for feilsøking").optional(),
             fieldWithPath("kanOverstyres").type(BOOLEAN).description("Om regelen kan overstyres med enkelttilgang").optional()
         )
     }

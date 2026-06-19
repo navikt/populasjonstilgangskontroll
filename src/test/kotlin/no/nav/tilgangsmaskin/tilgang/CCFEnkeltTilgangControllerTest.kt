@@ -20,7 +20,7 @@ class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/ccf/komplett/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
                     }.andExpect { status { isNoContent() } }
-                        .andDo { handle(document("ccf-komplett")) }
+                        .andDo { handle(dokumenterMedAuth("ccf-komplett")) }
                 }
             }
 
@@ -30,7 +30,7 @@ class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/ccf/kjerne/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
                     }.andExpect { status { isNoContent() } }
-                        .andDo { handle(document("ccf-kjerne")) }
+                        .andDo { handle(dokumenterMedAuth("ccf-kjerne")) }
                 }
             }
 

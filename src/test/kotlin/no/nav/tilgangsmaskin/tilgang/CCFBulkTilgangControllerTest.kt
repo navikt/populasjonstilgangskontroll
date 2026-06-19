@@ -53,7 +53,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                     }.andExpect {
                         status { isMultiStatus() }
                         jsonPath("$.ansattId") { value(ansattId.verdi) }
-                    }.andDo { handle(document("ccf-bulk")) }
+                    }.andDo { handle(dokumenterMedAuth("ccf-bulk")) }
                 }
             }
 
@@ -79,7 +79,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON; content = """["$brukerId","$annenBrukerId"]"""
                     }.andExpect { status { isMultiStatus() } }
-                        .andDo { handle(document("ccf-bulk-regeltype")) }
+                        .andDo { handle(dokumenterMedAuth("ccf-bulk-regeltype")) }
                 }
             }
 

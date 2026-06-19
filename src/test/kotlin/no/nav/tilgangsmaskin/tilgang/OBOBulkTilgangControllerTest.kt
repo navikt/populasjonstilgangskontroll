@@ -15,9 +15,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
-import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.post
 
 class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
@@ -34,7 +32,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
             When("bulk/obo kalles med gyldige specs") {
                 Then("returnerer 207 med resultater") {
                     every { regelTjeneste.bulkRegler(ansattId, specs) } returns respons
-                    mockMvc.post("/api/v1/bulk/obo") {
+                    mockMvc.post("$DEFAULT_PREFIX/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect {
@@ -48,7 +46,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/obo kalles med tom liste") {
                 Then("returnerer 207 med tom resultatliste") {
-                    mockMvc.post("/api/v1/bulk/obo") {
+                    mockMvc.post("$DEFAULT_PREFIX/bulk/obo") {
                         contentType = APPLICATION_JSON; content = "[]"
                     }.andExpect {
                         status { isMultiStatus() }
@@ -60,7 +58,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
             When("bulk/obo kalles med CCF-token") {
                 Then("returnerer 401") {
                     every { token.erObo } returns false
-                    mockMvc.post("/api/v1/bulk/obo") {
+                    mockMvc.post("$DEFAULT_PREFIX/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect { status { isUnauthorized() } }
@@ -72,7 +70,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                     val mangeSpecs = (1..1001).map {
                         BrukerIdOgRegelsett("0${it.toString().padStart(10, '0')}", KOMPLETT_REGELTYPE)
                     }
-                    mockMvc.post("/api/v1/bulk/obo") {
+                    mockMvc.post("$DEFAULT_PREFIX/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = mangeSpecs.joinToString(prefix = "[", postfix = "]") {
                             """{"brukerId":"${it.brukerId}","type":"KOMPLETT_REGELTYPE"}"""
@@ -92,7 +90,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                     val regelException = RegelException(testAnsatt, testBruker, testRegel)
                     val avvistRespons = AggregertBulkRespons(ansattId, setOf(EnkeltBulkRespons(regelException)))
                     every { regelTjeneste.bulkRegler(ansattId, specs) } returns avvistRespons
-                    mockMvc.post("/api/v1/bulk/obo") {
+                    mockMvc.post("$DEFAULT_PREFIX/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect {
@@ -108,7 +106,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/obo kalles med blank brukerId") {
                 Then("returnerer 400") {
-                    mockMvc.post("/api/v1/bulk/obo") {
+                    mockMvc.post("$DEFAULT_PREFIX/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"   ","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect { status { isBadRequest() } }
@@ -117,7 +115,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/obo kalles med tom brukerId") {
                 Then("returnerer 400") {
-                    mockMvc.post("/api/v1/bulk/obo") {
+                    mockMvc.post("$DEFAULT_PREFIX/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect { status { isBadRequest() } }
@@ -126,7 +124,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/obo kalles uten body") {
                 Then("returnerer 400") {
-                    mockMvc.post("/api/v1/bulk/obo") {
+                    mockMvc.post("$DEFAULT_PREFIX/bulk/obo") {
                         contentType = APPLICATION_JSON
                     }.andExpect { status { isBadRequest() } }
                 }
@@ -147,7 +145,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
             When("bulk/obo/{regelType} kalles med KJERNE_REGELTYPE") {
                 Then("returnerer 207 med resultater for gitt regeltype") {
                     every { regelTjeneste.bulkRegler(ansattId, kjerneSpecs) } returns respons
-                    mockMvc.post("/api/v1/bulk/obo/KJERNE_REGELTYPE") {
+                    mockMvc.post("$DEFAULT_PREFIX/bulk/obo/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON; content = """["$brukerId","$annenBrukerId"]"""
                     }.andExpect {
                         status { isMultiStatus() }
@@ -160,7 +158,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
             When("bulk/obo/{regelType} kalles med CCF-token") {
                 Then("returnerer 401") {
                     every { token.erObo } returns false
-                    mockMvc.post("/api/v1/bulk/obo/KJERNE_REGELTYPE") {
+                    mockMvc.post("$DEFAULT_PREFIX/bulk/obo/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON; content = """["$brukerId"]"""
                     }.andExpect { status { isUnauthorized() } }
                 }
@@ -168,7 +166,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/obo/{regelType} kalles med blank brukerId") {
                 Then("returnerer 400") {
-                    mockMvc.post("/api/v1/bulk/obo/KJERNE_REGELTYPE") {
+                    mockMvc.post("$DEFAULT_PREFIX/bulk/obo/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON; content = """["   "]"""
                     }.andExpect { status { isBadRequest() } }
                 }
@@ -176,7 +174,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/obo/{regelType} kalles med tom brukerId") {
                 Then("returnerer 400") {
-                    mockMvc.post("/api/v1/bulk/obo/KJERNE_REGELTYPE") {
+                    mockMvc.post("$DEFAULT_PREFIX/bulk/obo/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON; content = """[""]"""
                     }.andExpect { status { isBadRequest() } }
                 }
@@ -184,7 +182,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/obo/{regelType} kalles uten body") {
                 Then("returnerer 400") {
-                    mockMvc.post("/api/v1/bulk/obo/KJERNE_REGELTYPE") {
+                    mockMvc.post("$DEFAULT_PREFIX/bulk/obo/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON
                     }.andExpect { status { isBadRequest() } }
                 }

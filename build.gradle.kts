@@ -276,7 +276,10 @@ val generateRestDocsIndex by tasks.registering {
                 }
 
                 val alternatives = overstyrRelated.filter {
-                    it != overstyrRoot && it.contains("badrequest-too-short-description")
+                    it != overstyrRoot && (
+                        it.contains("begrunnelse-kort") ||
+                            it.contains("uten-token")
+                        )
                 }
                 if (alternatives.isNotEmpty()) {
                     sb.appendLine("==== Alternative responser")

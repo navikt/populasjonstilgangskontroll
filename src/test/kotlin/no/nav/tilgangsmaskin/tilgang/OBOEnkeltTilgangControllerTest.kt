@@ -161,6 +161,18 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                 }
             }
 
+            When("enkelttilgang kalles uten token") {
+                Then("returnerer 403") {
+                    every { token.erCC } returns false
+                    every { token.erObo } returns false
+                    mockMvc.post("/api/v1/overstyr") {
+                        contentType = APPLICATION_JSON
+                        content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
+                    }.andExpect { status { isForbidden() } }
+                        .andDo { handle(document("obo-overstyr-uten-token", problemDetailFields)) }
+                }
+            }
+
             When("begrunnelse er for kort") {
                 Then("returnerer 400") {
                     mockMvc.post("/api/v1/overstyr") {

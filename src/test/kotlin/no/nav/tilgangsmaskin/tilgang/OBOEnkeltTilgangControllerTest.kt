@@ -133,13 +133,13 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
             }
         }
 
-        Given("Overstyr") {
+        Given("Enkelttilgang") {
 
             val gyldigTil = LocalDate.now().plusMonths(2)
 
             beforeEach { every { token.erObo } returns true }
 
-            When("overstyr kalles med gyldig request og OBO-token") {
+            When("enkelttilgang kalles med gyldig request og OBO-token") {
                 Then("returnerer 202 og dokumenteres i rest docs") {
                     every { enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattId, any(), any()) } returns true
                     mockMvc.post("/api/v1/overstyr") {
@@ -167,7 +167,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"For kort","gyldigtil":"$gyldigTil"}"""
                     }.andExpect { status { isBadRequest() } }
-                        .andDo { handle(document("obo-overstyr-badrequest-too-short-description", problemDetailFields)) }
+                        .andDo { handle(document("obo-overstyr-begrunnelse-kort", problemDetailFields)) }
                 }
             }
 

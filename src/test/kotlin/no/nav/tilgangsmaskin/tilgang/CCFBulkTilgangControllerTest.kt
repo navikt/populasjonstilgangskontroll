@@ -58,12 +58,12 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
             }
 
             When("bulk/ccf kalles med OBO-token") {
-                Then("returnerer 403") {
+                Then("returnerer 401") {
                     every { token.erCC } returns false
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""
-                    }.andExpect { status { isForbidden() } }
+                    }.andExpect { status { isUnauthorized() } }
                 }
             }
 

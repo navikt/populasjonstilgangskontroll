@@ -49,8 +49,12 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     }.andExpect {
                         status { isForbidden() }
                         jsonPath("$.title") { value("AVVIST_STRENGT_FORTROLIG_ADRESSE") }
+                        jsonPath("$.status") { value(403) }
+                        jsonPath("$.instance") { isString() }
+                        jsonPath("$.type") { value("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett") }
                         jsonPath("$.brukerIdent") { value(brukerId) }
                         jsonPath("$.navIdent") { value(ansattId.verdi) }
+                        jsonPath("$.traceId") { isString() }
                         jsonPath("$.kanOverstyres") { value(true) }
                     }.andDo { handle(dokumenterMedAuth("obo-komplett-avvist", problemDetailFields)) }
                 }
@@ -67,20 +71,20 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
             }
 
             When("komplett kalles med CCF-token") {
-                Then("returnerer 403") {
+                Then("returnerer 401") {
                     every { token.erObo } returns false
                     mockMvc.post("/api/v1/komplett") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
-                    }.andExpect { status { isForbidden() } }
+                    }.andExpect { status { isUnauthorized() } }
                 }
             }
 
             When("kjerne kalles med CCF-token") {
-                Then("returnerer 403") {
+                Then("returnerer 401") {
                     every { token.erObo } returns false
                     mockMvc.post("/api/v1/kjerne") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
-                    }.andExpect { status { isForbidden() } }
+                    }.andExpect { status { isUnauthorized() } }
                 }
             }
 
@@ -151,27 +155,27 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
             }
 
             When("enkelttilgang kalles med CCF-token") {
-                Then("returnerer 403") {
+                Then("returnerer 401") {
                     every { token.erCC } returns true
                     every { token.erObo } returns false
                     mockMvc.post("/api/v1/overstyr") {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
-                    }.andExpect { status { isForbidden() } }
+                    }.andExpect { status { isUnauthorized() } }
                 }
             }
 
             When("enkelttilgang kalles uten token") {
-                Then("returnerer 403") {
+                Then("returnerer 401") {
                     every { token.erCC } returns false
                     every { token.erObo } returns false
                     mockMvc.post("/api/v1/overstyr") {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
                     }.andExpect {
-                        status { isForbidden() }
-                        jsonPath("$.title") { value("Forbidden") }
-                        jsonPath("$.status") { value(403) }
+                        status { isUnauthorized() }
+                        jsonPath("$.title") { value("Unauthorized") }
+                        jsonPath("$.status") { value(401) }
                         jsonPath("$.instance") { value("/api/v1/overstyr") }
                         jsonPath("$.type") { value("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett") }
                         jsonPath("$.brukerIdent") { value(brukerId) }

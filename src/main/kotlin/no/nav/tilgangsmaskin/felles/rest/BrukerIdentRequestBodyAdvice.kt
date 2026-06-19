@@ -15,27 +15,16 @@ import java.lang.reflect.Type
 @RestControllerAdvice
 class BrukerIdentRequestBodyAdvice : RequestBodyAdviceAdapter() {
 
-    override fun supports(
-        methodParameter: MethodParameter,
-        targetType: Type,
-        converterType: Class<out HttpMessageConverter<*>>,
-    ): Boolean = methodParameter.containingClass == TilgangController::class.java &&
+    override fun supports(methodParameter: MethodParameter, targetType: Type, converterType: Class<out HttpMessageConverter<*>>): Boolean = methodParameter.containingClass == TilgangController::class.java &&
         (targetType == String::class.java || targetType == EnkeltTilgangData::class.java)
 
-    override fun afterBodyRead(
-        body: Any,
-        inputMessage: HttpInputMessage,
-        parameter: MethodParameter,
-        targetType: Type,
-        converterType: Class<out HttpMessageConverter<*>>,
-    ): Any {
+    override fun afterBodyRead(body: Any, inputMessage: HttpInputMessage, parameter: MethodParameter, targetType: Type, converterType: Class<out HttpMessageConverter<*>>, ): Any {
         val request = (RequestContextHolder.getRequestAttributes() as? ServletRequestAttributes)?.request ?: return body
         val brukerIdent = when (body) {
             is String -> body.trim('"')
             is EnkeltTilgangData -> body.brukerId.verdi
             else -> null
         }
-
         brukerIdent
             ?.takeIf { it.isNotBlank() }
             ?.let { request.setAttribute(BRUKER_IDENT, it) }

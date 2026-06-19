@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
+import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
@@ -66,7 +67,7 @@ class GlobalProblemDetailExceptionHandler(private val token: Token) : ResponseEn
         status: HttpStatusCode,
         request: WebRequest,
     ): ResponseEntity<Any>? {
-        val erStottetStatus = status == BAD_REQUEST || status == FORBIDDEN
+        val erStottetStatus = status == BAD_REQUEST || status == UNAUTHORIZED || status == FORBIDDEN
         if (!erStottetStatus || ex !is ResponseStatusException) {
             return super.handleErrorResponseException(ex, headers, status, request)
         }

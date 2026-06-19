@@ -35,20 +35,20 @@ class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
             }
 
             When("komplett kalles med OBO-token") {
-                Then("returnerer 403") {
+                Then("returnerer 401") {
                     every { token.erCC } returns false
                     mockMvc.post("/api/v1/ccf/komplett/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
-                    }.andExpect { status { isForbidden() } }
+                    }.andExpect { status { isUnauthorized() } }
                 }
             }
 
             When("kjerne kalles med OBO-token") {
-                Then("returnerer 403") {
+                Then("returnerer 401") {
                     every { token.erCC } returns false
                     mockMvc.post("/api/v1/ccf/kjerne/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
-                    }.andExpect { status { isForbidden() } }
+                    }.andExpect { status { isUnauthorized() } }
                 }
             }
 

@@ -146,7 +146,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
                     }.andExpect { status { isAccepted() } }
-                        .andDo { handle(dokumenterMedAuth("obo-overstyr")) }
+                        .andDo { handle(dokumenterMedAuth("obo-enkelttilgang")) }
                 }
             }
 
@@ -169,7 +169,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
                     }.andExpect { status { isForbidden() } }
-                        .andDo { handle(document("obo-overstyr-uten-token", problemDetailFields)) }
+                        .andDo { handle(document("obo-enkelttilgang-uten-token", problemDetailFields)) }
                 }
             }
 
@@ -179,7 +179,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"For kort","gyldigtil":"$gyldigTil"}"""
                     }.andExpect { status { isBadRequest() } }
-                        .andDo { handle(dokumenterMedAuth("obo-overstyr-begrunnelse-for-kort", problemDetailFields)) }
+                        .andDo { handle(dokumenterMedAuth("obo-enkelttilgang-begrunnelse-for-kort", problemDetailFields)) }
                 }
             }
 
@@ -198,7 +198,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"${LocalDate.now().minusDays(1)}"}"""
                     }.andExpect { status { isBadRequest() } }
-                        .andDo { handle(dokumenterMedAuth("obo-overstyr-validering-gyldigtil", problemDetailFields)) }
+                        .andDo { handle(dokumenterMedAuth("obo-enkelttilgang-validering-gyldigtil", problemDetailFields)) }
                 }
             }
 

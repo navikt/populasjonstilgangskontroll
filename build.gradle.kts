@@ -119,6 +119,11 @@ java {
 tasks.named<Test>("test") {
     useJUnitPlatform()
 
+    doFirst {
+        delete(layout.buildDirectory.dir("generated-snippets"))
+        delete(layout.buildDirectory.dir("generated-restdocs-index"))
+    }
+
     maxHeapSize = "4g"
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
     jvmArgs =
@@ -190,7 +195,7 @@ val generateRestDocsIndex by tasks.registering {
         val endpointDescriptionKeys: Map<String, String> = mapOf(
             "obo-komplett" to (controllerConstants["SUMMARY_KOMPLETT_OBO"] ?: "openapi.tilgang.komplett.obo.summary"),
             "obo-kjerne" to (controllerConstants["SUMMARY_KJERNE_OBO"] ?: "openapi.tilgang.kjerne.obo.summary"),
-            "obo-overstyr" to (controllerConstants["SUMMARY_OVERSTYR"] ?: "openapi.tilgang.overstyr.summary"),
+            "obo-enkelttilgang" to (controllerConstants["SUMMARY_OVERSTYR"] ?: "openapi.tilgang.overstyr.summary"),
             "obo-bulk" to (controllerConstants["SUMMARY_BULK"] ?: "openapi.tilgang.bulk.summary"),
             "obo-bulk-regeltype" to (controllerConstants["DESCRIPTION_BULK_OBO_REGELTYPE"] ?: "openapi.tilgang.bulk.obo.regeltype.description"),
             "ccf-komplett" to (controllerConstants["SUMMARY_KOMPLETT_CCF"] ?: "openapi.tilgang.komplett.ccf.summary"),
@@ -204,13 +209,22 @@ val generateRestDocsIndex by tasks.registering {
                 .replace("-", " ")
                 .replaceFirstChar { it.uppercase() }
 
+        fun docsTitle(name: String, prefix: String): String {
+            val title = sectionTitle(name, prefix)
+            return if (name.contains("-overstyr")) {
+                title.replaceFirst("Overstyr", "Enkelttilgang")
+            } else {
+                title
+            }
+        }
+
         fun getDescription(name: String): String {
             val key = endpointDescriptionKeys[name]
             return if (key != null) {
                 val normalizedKey = key.removePrefix("msg:")
                 properties[normalizedKey] ?: properties[key] ?: key
             } else {
-                sectionTitle(name, name.substringBefore("-"))
+                docsTitle(name, name.substringBefore("-"))
             }
         }
 
@@ -256,7 +270,7 @@ val generateRestDocsIndex by tasks.registering {
             sb.appendLine()
 
             val sortedNames = names.sorted()
-            val overstyrRoot = "$prefix-overstyr"
+            val overstyrRoot = "$prefix-enkelttilgang"
             val overstyrRelated = sortedNames.filter { it == overstyrRoot || it.startsWith("$overstyrRoot-") }
             val remaining = sortedNames.filterNot { it in overstyrRelated }
 
@@ -268,7 +282,7 @@ val generateRestDocsIndex by tasks.registering {
             }
 
             if (overstyrRelated.isNotEmpty()) {
-                sb.appendLine("=== Overstyr")
+                sb.appendLine("=== Enkelttilgang")
                 sb.appendLine()
 
                 if (overstyrRelated.contains(overstyrRoot)) {
@@ -277,7 +291,7 @@ val generateRestDocsIndex by tasks.registering {
 
                 val alternatives = overstyrRelated.filter {
                     it != overstyrRoot && (
-                        it.contains("begrunnelse-kort") ||
+                        it.contains("begrunnelse-for-kort") ||
                             it.contains("uten-token")
                         )
                 }

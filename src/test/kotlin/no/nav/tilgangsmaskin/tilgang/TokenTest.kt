@@ -90,6 +90,7 @@ class TokenTest : BehaviorSpec({
         }
     }
 
+
     Given("oid-oppslag fra token") {
         When("oid finnes") {
             Then("returnerer oid") {

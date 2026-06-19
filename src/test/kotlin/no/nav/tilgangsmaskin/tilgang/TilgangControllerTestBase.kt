@@ -8,6 +8,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.justRun
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.felles.rest.BrukerIdentRequestBodyAdvice
 import no.nav.tilgangsmaskin.felles.rest.GlobalProblemDetailExceptionHandler
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator
@@ -102,7 +103,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             clearAllMocks()
             restDocumentation.beforeTest(TilgangControllerTestBase::class.java, case.name.name)
             mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, TokenTypeGuard(token), konsumentValidator, teller))
-                .setControllerAdvice(GlobalProblemDetailExceptionHandler(token))
+                .setControllerAdvice(BrukerIdentRequestBodyAdvice(), GlobalProblemDetailExceptionHandler(token))
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
                 .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation)
                     .uris()

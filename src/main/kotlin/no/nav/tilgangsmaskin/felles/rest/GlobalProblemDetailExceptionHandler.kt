@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import io.opentelemetry.api.trace.Span
+import no.nav.tilgangsmaskin.felles.rest.RequestAttributter.BRUKER_IDENT
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.TYPE_URI
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.http.HttpHeaders
@@ -75,17 +76,15 @@ class GlobalProblemDetailExceptionHandler(private val token: Token) : ResponseEn
 
     private fun problemDetail(status: HttpStatusCode, detail: String, request: WebRequest) =
         ProblemDetail.forStatusAndDetail(status, detail).apply {
+            val servletRequest = (request as ServletWebRequest).request
             title = HttpStatus.resolve(status.value())?.reasonPhrase ?: "${status.value()}"
             type = TYPE_URI
-            instance = URI.create((request as ServletWebRequest).request.requestURI)
-            setProperty("begrunnelse", detail)
+            instance = URI.create(servletRequest.requestURI)
             setProperty("traceId", Span.current().spanContext.traceId)
             token.ansattId?.let { setProperty("navIdent", it.verdi) }
+            servletRequest.getAttribute(BRUKER_IDENT)
+                ?.toString()
+                ?.takeIf { it.isNotBlank() }
+                ?.let { setProperty("brukerIdent", it) }
         }
 }
-
-
-
-
-
-

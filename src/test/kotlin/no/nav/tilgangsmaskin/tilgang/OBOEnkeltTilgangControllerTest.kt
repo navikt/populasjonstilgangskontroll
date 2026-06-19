@@ -174,8 +174,8 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         jsonPath("$.status") { value(403) }
                         jsonPath("$.instance") { value("/api/v1/overstyr") }
                         jsonPath("$.type") { value("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett") }
+                        jsonPath("$.brukerIdent") { value(brukerId) }
                         jsonPath("$.traceId") { isString() }
-                        jsonPath("$.begrunnelse") { exists() }
                     }
                         .andDo { handle(document("obo-enkelttilgang-uten-token", problemDetailFields)) }
                 }
@@ -192,9 +192,9 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         jsonPath("$.status") { value(400) }
                         jsonPath("$.instance") { value("/api/v1/overstyr") }
                         jsonPath("$.type") { value("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett") }
+                        jsonPath("$.brukerIdent") { value(brukerId) }
                         jsonPath("$.navIdent") { value(ansattId.verdi) }
                         jsonPath("$.traceId") { isString() }
-                        jsonPath("$.begrunnelse") { exists() }
                     }
                         .andDo { handle(dokumenterMedAuth("obo-enkelttilgang-begrunnelse-for-kort", problemDetailFields)) }
                 }
@@ -222,7 +222,6 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         jsonPath("$.type") { value("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett") }
                         jsonPath("$.navIdent") { value(ansattId.verdi) }
                         jsonPath("$.traceId") { isString() }
-                        jsonPath("$.begrunnelse") { exists() }
                     }
                         .andDo { handle(dokumenterMedAuth("obo-enkelttilgang-validering-gyldigtil", problemDetailFields)) }
                 }

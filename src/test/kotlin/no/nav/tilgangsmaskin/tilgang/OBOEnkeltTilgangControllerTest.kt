@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
-import no.nav.tilgangsmaskin.regler.motor.OverstyrbarRegel
+import no.nav.tilgangsmaskin.regler.motor.KjerneRegel
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -36,7 +36,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                 Then("returnerer 403 med komplett ProblemDetail") {
                     val testAnsatt = AnsattBuilder(ansattId).build()
                     val testBruker = BrukerBuilder(BrukerId(brukerId)).build()
-                    val testRegel = object : OverstyrbarRegel {
+                    val testRegel = object : KjerneRegel {
                         override val metadata = RegelMetadata(STRENGT_FORTROLIG)
                         override fun evaluer(ansatt: Ansatt, bruker: Bruker) = false
                     }
@@ -53,7 +53,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         jsonPath("$.brukerIdent") { value(brukerId) }
                         jsonPath("$.navIdent") { value(ansattId.verdi) }
                         jsonPath("$.traceId") { isString() }
-                        jsonPath("$.kanOverstyres") { value(true) }
+                        jsonPath("$.kanOverstyres") { value(false) }
                     }.andDo { handle(dokumenterMedAuth("obo-komplett-avvist", problemDetailFields)) }
                 }
             }

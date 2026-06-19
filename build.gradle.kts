@@ -198,6 +198,7 @@ val generateRestDocsIndex by tasks.registering {
         val endpointDescriptionKeys: Map<String, String> = mapOf(
             "obo-komplett" to (controllerConstants["SUMMARY_KOMPLETT_OBO"] ?: "openapi.tilgang.komplett.obo.summary"),
             "obo-kjerne" to (controllerConstants["SUMMARY_KJERNE_OBO"] ?: "openapi.tilgang.kjerne.obo.summary"),
+            "obo-enkeltilgang" to (controllerConstants["SUMMARY_OVERSTYR"] ?: "openapi.tilgang.overstyr.summary"),
             "obo-enkelttilgang" to (controllerConstants["SUMMARY_OVERSTYR"] ?: "openapi.tilgang.overstyr.summary"),
             "obo-bulk" to (controllerConstants["SUMMARY_BULK"] ?: "openapi.tilgang.bulk.summary"),
             "obo-bulk-regeltype" to (controllerConstants["DESCRIPTION_BULK_OBO_REGELTYPE"] ?: "openapi.tilgang.bulk.obo.regeltype.description"),
@@ -275,8 +276,13 @@ val generateRestDocsIndex by tasks.registering {
             val sortedNames = names.sorted()
             val komplettRoot = "$prefix-komplett"
             val komplettRelated = sortedNames.filter { it == komplettRoot || it.startsWith("$komplettRoot-") }
-            val overstyrRoot = "$prefix-enkelttilgang"
-            val overstyrRelated = sortedNames.filter { it == overstyrRoot || it.startsWith("$overstyrRoot-") }
+            val overstyrRoot = listOf("$prefix-enkeltilgang", "$prefix-enkelttilgang")
+                .firstOrNull { it in sortedNames }
+            val overstyrRelated = if (overstyrRoot != null) {
+                sortedNames.filter { it == overstyrRoot || it.startsWith("$overstyrRoot-") }
+            } else {
+                emptyList()
+            }
             val remaining = sortedNames.filterNot { it in overstyrRelated || it in komplettRelated }
 
             for (name in remaining) {
@@ -309,21 +315,14 @@ val generateRestDocsIndex by tasks.registering {
                 }
             }
 
-            if (overstyrRelated.isNotEmpty()) {
+            if (overstyrRoot != null && overstyrRelated.isNotEmpty()) {
                 sb.appendLine("=== Enkelttilgang")
                 sb.appendLine()
 
-                if (overstyrRelated.contains(overstyrRoot)) {
-                    appendSnippetIncludes(overstyrRoot)
-                }
+                appendSnippetIncludes(overstyrRoot)
 
-                val alternatives = overstyrRelated.filter {
-                    it != overstyrRoot && (
-                        it.contains("avvist") ||
-                        it.contains("begrunnelse-for-kort") ||
-                            it.contains("uten-token")
-                        )
-                }
+                // Group all enkeltilgang variants except the 202/root response under alternatives.
+                val alternatives = overstyrRelated.filter { it != overstyrRoot }
                 if (alternatives.isNotEmpty()) {
                     sb.appendLine("==== Alternative responser")
                     sb.appendLine()

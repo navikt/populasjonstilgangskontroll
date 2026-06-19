@@ -270,15 +270,40 @@ val generateRestDocsIndex by tasks.registering {
             sb.appendLine()
 
             val sortedNames = names.sorted()
+            val komplettRoot = "$prefix-komplett"
+            val komplettRelated = sortedNames.filter { it == komplettRoot || it.startsWith("$komplettRoot-") }
             val overstyrRoot = "$prefix-enkelttilgang"
             val overstyrRelated = sortedNames.filter { it == overstyrRoot || it.startsWith("$overstyrRoot-") }
-            val remaining = sortedNames.filterNot { it in overstyrRelated }
+            val remaining = sortedNames.filterNot { it in overstyrRelated || it in komplettRelated }
 
             for (name in remaining) {
                 val title = getDescription(name)
                 sb.appendLine("=== $title")
                 sb.appendLine()
                 appendSnippetIncludes(name)
+            }
+
+            if (komplettRelated.isNotEmpty()) {
+                sb.appendLine("=== ${getDescription(komplettRoot)}")
+                sb.appendLine()
+
+                if (komplettRelated.contains(komplettRoot)) {
+                    appendSnippetIncludes(komplettRoot)
+                }
+
+                val alternatives = komplettRelated.filter { it != komplettRoot }
+                if (alternatives.isNotEmpty()) {
+                    sb.appendLine("==== Alternative responser")
+                    sb.appendLine()
+                    for (name in alternatives) {
+                        val altTitle = getDescription(name)
+                        sb.appendLine("===== $altTitle")
+                        sb.appendLine()
+                        sb.appendLine("include::{snippets}/$name/http-request.adoc[]")
+                        sb.appendLine("include::{snippets}/$name/http-response.adoc[]")
+                        sb.appendLine()
+                    }
+                }
             }
 
             if (overstyrRelated.isNotEmpty()) {
@@ -291,6 +316,7 @@ val generateRestDocsIndex by tasks.registering {
 
                 val alternatives = overstyrRelated.filter {
                     it != overstyrRoot && (
+                        it.contains("avvist") ||
                         it.contains("begrunnelse-for-kort") ||
                             it.contains("uten-token")
                         )

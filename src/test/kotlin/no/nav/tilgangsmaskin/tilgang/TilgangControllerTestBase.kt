@@ -11,7 +11,6 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.BrukerIdentRequestBodyAdvice
 import no.nav.tilgangsmaskin.felles.rest.GlobalProblemDetailExceptionHandler
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
@@ -63,9 +62,6 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
     @MockK
     protected lateinit var teller: TokenTypeTeller
 
-    @MockK(relaxed = true)
-    protected lateinit var konsumentValidator: EnkeltTilgangKonsumentValidator
-
     protected val ansattId = AnsattId("Z999999")
     protected val brukerId = "08526835670"
 
@@ -102,7 +98,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
         beforeEach { case ->
             clearAllMocks()
             restDocumentation.beforeTest(TilgangControllerTestBase::class.java, case.name.name)
-            mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, TokenTypeGuard(token), konsumentValidator, teller))
+            mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, TokenTypeGuard(token), teller))
                 .setControllerAdvice(BrukerIdentRequestBodyAdvice(), GlobalProblemDetailExceptionHandler(token))
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
                 .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation)
@@ -121,6 +117,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
                 .build()
             justRun { teller.tell(any<Tags>()) }
             every { token.ansattId } returns ansattId
+            every { token.systemNavn } returns "gosys"
         }
 
         afterEach {

@@ -19,7 +19,6 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangGyldig
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
@@ -41,8 +40,10 @@ import org.springframework.web.server.ResponseStatusException
 
 private const val TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.tilgang.tag.description"
 
+const val DEFAULT_PREFIX = "/api/v1"
+
 @SecurityScheme(bearerFormat = "JWT", name = "bearerAuth", scheme = "bearer", type = HTTP)
-@ProtectedRestController(value = ["/api/v1"], issuer = AAD_ISSUER, claimMap = [])
+@ProtectedRestController(value = [DEFAULT_PREFIX], issuer = AAD_ISSUER, claimMap = [])
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "TilgangController", description = TILGANG_CONTROLLER_TAG_DESCRIPTION)
 class TilgangController(
@@ -50,7 +51,6 @@ class TilgangController(
     private val enkeltTilgangTjeneste: EnkeltTilgangTjeneste,
     private val token: Token,
     private val guard: TokenTypeGuard,
-    private val konsumentValidator: EnkeltTilgangKonsumentValidator,
     private val teller: TokenTypeTeller) {
 
     private val log = getLogger(javaClass)
@@ -95,7 +95,6 @@ class TilgangController(
     @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
     fun overstyr(@RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData, req: HttpServletRequest) {
         guard.krev(OBO, req.requestURI)
-        konsumentValidator.valider(token.systemNavn)
         enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattIdFraToken(), data, token.systemNavn)
     }
 

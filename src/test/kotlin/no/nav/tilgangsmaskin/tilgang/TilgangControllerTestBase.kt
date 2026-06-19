@@ -67,7 +67,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
                 .description("Avvisningskode, En av: $avvisningskoder"),
             fieldWithPath("status").type(NUMBER).description("HTTP-statuskode"),
             fieldWithPath("instance").type(STRING).description("Identifikator for forekomsten (ansattId/brukerId eller request-URI)"),
-            fieldWithPath("type").type(STRING).description("Se link:https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett[regelsett-dokumentasjon]"),
+            fieldWithPath("type").type(STRING).description("Se link:https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett[regelsett-dokumentasjon]").optional(),
             fieldWithPath("brukerIdent").type(STRING).description("Fødselsnummer/d-nummer til bruker det gjelder").optional(),
             fieldWithPath("navIdent").type(STRING).description("NAV-ident til ansatt som ble avvist").optional(),
             fieldWithPath("begrunnelse").type(STRING).description("Menneskelesbar begrunnelse for avvisning").optional(),

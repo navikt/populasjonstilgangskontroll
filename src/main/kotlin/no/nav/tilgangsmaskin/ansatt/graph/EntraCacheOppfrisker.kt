@@ -34,7 +34,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste,
             if (it is NotFoundRestException) {
                 tømOgOppfrisk(ansattId, oid, nøkkel.metode)
             } else {
-                log.warn("Oppfrisking av ${nøkkel.maskert} feilet", it)
+                log.info("Oppfrisking av ${nøkkel.maskert} feilet", it)
             }
         }
     }

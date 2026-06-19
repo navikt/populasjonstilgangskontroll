@@ -8,6 +8,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.justRun
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.felles.rest.GlobalProblemDetailExceptionHandler
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
@@ -33,8 +34,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
-import org.springframework.web.bind.annotation.RestControllerAdvice
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 abstract class TilgangControllerTestBase : BehaviorSpec() {
 
@@ -73,9 +72,6 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
 
     private val restDocumentation = ManualRestDocumentation()
 
-    @RestControllerAdvice
-    private class ProblemDetailExceptionHandler : ResponseEntityExceptionHandler()
-
     protected companion object {
         private val avvisningskoder = AvvisningsKode.entries.joinToString(", ") { it.name }
 
@@ -106,7 +102,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             clearAllMocks()
             restDocumentation.beforeTest(TilgangControllerTestBase::class.java, case.name.name)
             mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, TokenTypeGuard(token), konsumentValidator, teller))
-                .setControllerAdvice(ProblemDetailExceptionHandler())
+                .setControllerAdvice(GlobalProblemDetailExceptionHandler(token))
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
                 .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation)
                     .uris()

@@ -168,7 +168,15 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/overstyr") {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
-                    }.andExpect { status { isForbidden() } }
+                    }.andExpect {
+                        status { isForbidden() }
+                        jsonPath("$.title") { value("403") }
+                        jsonPath("$.status") { value(403) }
+                        jsonPath("$.instance") { value("/api/v1/overstyr") }
+                        jsonPath("$.type") { value("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett") }
+                        jsonPath("$.traceId") { isString() }
+                        jsonPath("$.begrunnelse") { exists() }
+                    }
                         .andDo { handle(document("obo-enkelttilgang-uten-token", problemDetailFields)) }
                 }
             }
@@ -178,7 +186,16 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/overstyr") {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"For kort","gyldigtil":"$gyldigTil"}"""
-                    }.andExpect { status { isBadRequest() } }
+                    }.andExpect {
+                        status { isBadRequest() }
+                        jsonPath("$.title") { value("400") }
+                        jsonPath("$.status") { value(400) }
+                        jsonPath("$.instance") { value("/api/v1/overstyr") }
+                        jsonPath("$.type") { value("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett") }
+                        jsonPath("$.navIdent") { value(ansattId.verdi) }
+                        jsonPath("$.traceId") { isString() }
+                        jsonPath("$.begrunnelse") { exists() }
+                    }
                         .andDo { handle(dokumenterMedAuth("obo-enkelttilgang-begrunnelse-for-kort", problemDetailFields)) }
                 }
             }
@@ -197,7 +214,16 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/overstyr") {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"${LocalDate.now().minusDays(1)}"}"""
-                    }.andExpect { status { isBadRequest() } }
+                    }.andExpect {
+                        status { isBadRequest() }
+                        jsonPath("$.title") { value("400") }
+                        jsonPath("$.status") { value(400) }
+                        jsonPath("$.instance") { value("/api/v1/overstyr") }
+                        jsonPath("$.type") { value("https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett") }
+                        jsonPath("$.navIdent") { value(ansattId.verdi) }
+                        jsonPath("$.traceId") { isString() }
+                        jsonPath("$.begrunnelse") { exists() }
+                    }
                         .andDo { handle(dokumenterMedAuth("obo-enkelttilgang-validering-gyldigtil", problemDetailFields)) }
                 }
             }

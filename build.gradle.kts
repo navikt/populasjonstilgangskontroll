@@ -274,18 +274,6 @@ val generateRestDocsIndex by tasks.registering {
                 if (overstyrRelated.contains(overstyrRoot)) {
                     appendSnippetIncludes(overstyrRoot)
                 }
-
-                val alternatives = overstyrRelated.filter { it != overstyrRoot }
-                if (alternatives.isNotEmpty()) {
-                    sb.appendLine("==== Alternative responser")
-                    sb.appendLine()
-                    for (name in alternatives) {
-                        val altTitle = getDescription(name)
-                        sb.appendLine("===== $altTitle")
-                        sb.appendLine()
-                        appendSnippetIncludes(name)
-                    }
-                }
             }
         }
 

@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.STRENGT_FORTROLIG
-import no.nav.tilgangsmaskin.regler.motor.OverstyrbarRegel
+import no.nav.tilgangsmaskin.regler.motor.KjerneRegel
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
@@ -83,7 +83,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                 Then("returnerer 207 med status 403 og komplett detaljer på avvist bruker") {
                     val testAnsatt = AnsattBuilder(ansattId).build()
                     val testBruker = BrukerBuilder(BrukerId(brukerId)).build()
-                    val testRegel = object : OverstyrbarRegel {
+                    val testRegel = object : KjerneRegel {
                         override val metadata = RegelMetadata(STRENGT_FORTROLIG)
                         override fun evaluer(ansatt: Ansatt, bruker: Bruker) = false
                     }
@@ -99,7 +99,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                         jsonPath("$.resultater[0].detaljer.title") { value("AVVIST_STRENGT_FORTROLIG_ADRESSE") }
                         jsonPath("$.resultater[0].detaljer.brukerIdent") { value(brukerId) }
                         jsonPath("$.resultater[0].detaljer.navIdent") { value(ansattId.verdi) }
-                        jsonPath("$.resultater[0].detaljer.kanOverstyres") { value(true) }
+                        jsonPath("$.resultater[0].detaljer.kanOverstyres") { value(false) }
                     }.andDo { handle(dokumenterMedAuth("obo-bulk-avvist")) }
                 }
             }

@@ -48,7 +48,7 @@ repositories {
 
 dependencies {
     constraints {
-        add("implementation", libs.plexus.utils) // TODO reconider on next bump of cyclone-dx-plugin
+        add("implementation", libs.plexus.utils) // TODO reconsider on next bump of cyclone-dx-plugin
     }
     implementation(libs.confluent.kafka.avro.serializer) {
         exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
@@ -113,6 +113,11 @@ tasks.withType<BootJar> {
     archiveFileName = "app.jar"
 }
 
+val cleanGeneratedRestDocsArtifacts = tasks.register<Delete>("cleanGeneratedRestDocsArtifacts") {
+    delete(layout.buildDirectory.dir("generated-snippets"))
+    delete(layout.buildDirectory.dir("generated-restdocs-index"))
+}
+
 java {
     toolchain {
         languageVersion.set(javaVersion)
@@ -121,11 +126,7 @@ java {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
-
-    doFirst {
-        delete(layout.buildDirectory.dir("generated-snippets"))
-        delete(layout.buildDirectory.dir("generated-restdocs-index"))
-    }
+    dependsOn(cleanGeneratedRestDocsArtifacts)
 
     maxHeapSize = "4g"
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
@@ -137,7 +138,7 @@ tasks.named<Test>("test") {
         )
 }
 
-val generateRestDocsIndex by tasks.registering {
+val generateRestDocsIndex = tasks.register("generateRestDocsIndex") {
     description = "Generates index.adoc from REST Docs snippets"
     dependsOn(tasks.test)
 

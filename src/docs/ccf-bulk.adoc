@@ -1,0 +1,7 @@
+// Legg til egendefinert tekst for On-Behalf-Of-seksjonen her.
+// Vises rett etter seksjonsoverskriften "== On-Behalf-Of flow".
+//
+// Eksempel:
+//
+ CCF-bulk
+

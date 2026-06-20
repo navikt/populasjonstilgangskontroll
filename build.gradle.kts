@@ -147,6 +147,7 @@ val generateRestDocsIndex = tasks.register("generateRestDocsIndex") {
     val outputDir = layout.buildDirectory.dir("generated-restdocs-index")
 
     inputs.dir(snippetsDir)
+    inputs.dir(layout.projectDirectory.dir("src/docs")).optional(true)
     outputs.dir(outputDir)
 
     doLast {
@@ -234,6 +235,23 @@ val generateRestDocsIndex = tasks.register("generateRestDocsIndex") {
             }
         }
 
+        // Read a custom partial from src/docs/<name>.adoc if it exists.
+        // Naming convention:
+        //   src/docs/oversikt.adoc          — appended inside the "Oversikt" section
+        //   src/docs/obo.adoc               — appended after the OBO flow heading
+        //   src/docs/ccf.adoc               — appended after the CCF flow heading
+        //   src/docs/<snippet-name>.adoc    — appended after each endpoint section
+        //                                     e.g. src/docs/obo-komplett.adoc
+        val docsDir = file("src/docs")
+        fun appendCustomText(name: String) {
+            val partial = docsDir.resolve("$name.adoc")
+            if (partial.exists()) {
+                sb.appendLine()
+                sb.appendLine(partial.readText(UTF_8).trimEnd())
+                sb.appendLine()
+            }
+        }
+
         fun appendSnippetIncludes(name: String) {
             sb.appendLine("include::{snippets}/$name/http-request.adoc[]")
             sb.appendLine("include::{snippets}/$name/http-response.adoc[]")
@@ -259,6 +277,7 @@ val generateRestDocsIndex = tasks.register("generateRestDocsIndex") {
         sb.appendLine()
         sb.appendLine("Tjenesten avgjør om en Nav-ansatt har tilgang til en bruker")
         sb.appendLine()
+        appendCustomText("oversikt")
         if (sharedProblemDetailSnippet != null) {
             sb.appendLine("=== Felles ProblemDetail-felter for enkeltoppslag og enkelttilgang")
             sb.appendLine()
@@ -274,6 +293,7 @@ val generateRestDocsIndex = tasks.register("generateRestDocsIndex") {
             }
             sb.appendLine("== $heading")
             sb.appendLine()
+            appendCustomText(prefix)
 
             val sortedNames = names.sorted()
             val komplettRoot = "$prefix-komplett"
@@ -291,12 +311,14 @@ val generateRestDocsIndex = tasks.register("generateRestDocsIndex") {
                 val title = getDescription(name)
                 sb.appendLine("=== $title")
                 sb.appendLine()
+                appendCustomText(name)
                 appendSnippetIncludes(name)
             }
 
             if (komplettRelated.isNotEmpty()) {
                 sb.appendLine("=== ${getDescription(komplettRoot)}")
                 sb.appendLine()
+                appendCustomText(komplettRoot)
 
                 if (komplettRelated.contains(komplettRoot)) {
                     appendSnippetIncludes(komplettRoot)
@@ -320,6 +342,7 @@ val generateRestDocsIndex = tasks.register("generateRestDocsIndex") {
             if (overstyrRoot != null && overstyrRelated.isNotEmpty()) {
                 sb.appendLine("=== Enkelttilgang")
                 sb.appendLine()
+                appendCustomText("$prefix-enkelttilgang")
 
                 appendSnippetIncludes(overstyrRoot)
 

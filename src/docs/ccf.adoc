@@ -1,0 +1,8 @@
+// Legg til egendefinert tekst for Client Credentials Flow-seksjonen her.
+// Vises rett etter seksjonsoverskriften "== Client Credentials Flow".
+//
+// Eksempel:
+//
+ CCF-flyten brukes av bakgrunnssystemer som kaller tjenesten uten en innlogget bruker.
+ AnsattId må sendes eksplisitt som path-parameter.
+

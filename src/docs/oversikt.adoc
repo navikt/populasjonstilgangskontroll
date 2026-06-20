@@ -3,7 +3,6 @@
 //
 // Eksempel:
 //
- NOTE: Tilgangsmaskinen returnerer HTTP 204 for tilgang og HTTP 403 for avvisning.
-
- Se link:https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett[intern dokumentasjon] for mer informasjon.
+ Tilgangsmaskinen returnerer HTTP 204 ved tilgang og HTTP 403 ved avvisning for enkeltoppslag.
+For bulk-oppslag er hovedresponsen alltid 207, og individielle innslag i respons-body er enten 204 eller 403
 

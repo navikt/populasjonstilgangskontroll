@@ -3,6 +3,5 @@
 //
 // Eksempel:
 //
- CCF-flyten brukes av bakgrunnssystemer som kaller tjenesten uten en innlogget bruker.
  AnsattId må sendes eksplisitt som path-parameter.
 

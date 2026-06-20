@@ -4,5 +4,5 @@
 // Eksempel:
 //
  OBO-flyten brukes når innloggede Nav-ansatte kaller tjenesten på vegne av seg selv via en klient.
- Token må inneholde et gyldig Azure AD OBO-token.
+ Token må inneholde et gyldig OBO-token.
 

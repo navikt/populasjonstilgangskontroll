@@ -3,5 +3,5 @@
 //
 // Eksempel:
 //
- ccf-komplett
+ Dette e3ndepunkter evaluerer et komplett regelsett for en gitt ident, og forutsetter et Client Credentials-token.
 

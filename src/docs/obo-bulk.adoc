@@ -3,5 +3,5 @@
 //
 // Eksempel:
 //
- OBO-bulk
+ Dette endepunktet gjør det mulig å spesifisere regelsett pr ident, og forutsetter et OBO-token
 

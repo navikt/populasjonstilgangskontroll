@@ -49,6 +49,9 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
+import no.nav.tilgangsmaskin.tilgang.TokenType
+import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
+import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.test.context.TestPropertySource
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -109,8 +112,7 @@ class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
             every { token.ansattId } returns ansattId
             every { token.clusterAndSystem } returns "cluster:test"
             every { token.systemNavn } returns "test"
-            every { token.erObo } returns false
-            every { token.erCC } returns true
+            every { token.type } returns CCF
         }
 
         Given("bulk-oppslag med enkelttilgang") {

@@ -32,6 +32,7 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.CONTENT_TOO_LARGE
 import org.springframework.http.HttpStatus.MULTI_STATUS
 import org.springframework.http.HttpStatus.NO_CONTENT
+import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -51,7 +52,7 @@ class TilgangController(
     private val enkeltTilgangTjeneste: EnkeltTilgangTjeneste,
     private val token: Token,
     private val teller: TokenTypeTeller,
-    private val guard: TokenTypeGuard = TokenTypeGuard(token)) {
+) {
 
     private val log = getLogger(javaClass)
 
@@ -94,7 +95,7 @@ class TilgangController(
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
     fun overstyr(@RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData, req: HttpServletRequest) {
-        guard.krev(OBO, req.requestURI)
+        krev(forventet = OBO, uri = req.requestURI)
         enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattIdFraToken(), data, token.systemNavn)
     }
 
@@ -128,7 +129,7 @@ class TilgangController(
         bulkOppslag({ ansattId }, CCF, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(),req.requestURI)
 
     private fun bulkOppslag(ansattId: () -> AnsattId, forventet: TokenType, specs: Set<BrukerIdOgRegelsett>, uri: String): AggregertBulkRespons {
-        guard.krev(forventet, uri)
+        krev(forventet, uri)
         val ansatt = ansattId()
         MDC.put(USER_ID, ansatt.verdi)
         return if (specs.isNotEmpty()) {
@@ -145,7 +146,7 @@ class TilgangController(
     private fun enkeltOppslag(ansattId: () -> AnsattId, forventet: TokenType, brukerId: String, regelType: RegelType, uri: String) =
         with(brukerId.trim('"')) {
             sjekk(isNotBlank(), BAD_REQUEST, "brukerId kan ikke være tom")
-            guard.krev(forventet, uri)
+            krev(forventet, uri)
             val ansatt = ansattId()
             MDC.put(USER_ID, ansatt.verdi)
             log.trace(CONFIDENTIAL,"Kjører {} regler for {} og {}", regelType, ansatt, this.maskFnr())
@@ -159,7 +160,13 @@ class TilgangController(
         }
 
     private fun tell(type: String) =
-        teller.tell(Tags.of("type",type,"token",TokenType.from(token).name.lowercase()))
+        teller.tell(Tags.of("type",type,"token",token.type.name.lowercase()))
+
+    private fun krev(forventet: TokenType, uri: String) {
+        if (token.type != forventet) {
+            throw ResponseStatusException(UNAUTHORIZED, "Forventet token type $forventet for $uri, fikk ${token.type}")
+        }
+    }
 
 
     private fun sjekk(predikat: Boolean, status: HttpStatus, message: String) {

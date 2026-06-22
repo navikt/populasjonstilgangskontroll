@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletResponse
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangConfig
 import no.nav.tilgangsmaskin.tilgang.DEFAULT_PREFIX
 import no.nav.tilgangsmaskin.tilgang.Token
+import no.nav.tilgangsmaskin.tilgang.TokenType
+import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
@@ -24,7 +26,7 @@ class ConsumerAwareHandlerInterceptor(
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         val konsument = token.systemNavn
         
-        if (request.requestURI.endsWith("$DEFAULT_PREFIX/overstyr") && token.erObo && konsument !in config.systemer) {
+        if (request.requestURI.endsWith("$DEFAULT_PREFIX/overstyr") && token.type == OBO && konsument !in config.systemer) {
             val tillatte = config.systemer.joinToString(", ")
             throw ResponseStatusException(
                 FORBIDDEN,

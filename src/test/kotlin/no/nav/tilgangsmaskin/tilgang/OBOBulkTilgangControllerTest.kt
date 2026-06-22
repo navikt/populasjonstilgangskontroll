@@ -15,6 +15,8 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
+import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
+import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.post
 
@@ -27,7 +29,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
             val specs = setOf(BrukerIdOgRegelsett(brukerId, KOMPLETT_REGELTYPE))
             val respons = AggregertBulkRespons(ansattId, setOf(ok(brukerId)))
 
-            beforeEach { every { token.erObo } returns true }
+            beforeEach { every { token.type } returns OBO }
 
             When("bulk/obo kalles med gyldige specs") {
                 Then("returnerer 207 med resultater") {
@@ -57,7 +59,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/obo kalles med CCF-token") {
                 Then("returnerer 401") {
-                    every { token.erObo } returns false
+                    every { token.type } returns CCF
                     mockMvc.post("$DEFAULT_PREFIX/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""
@@ -140,7 +142,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
             )
             val respons = AggregertBulkRespons(ansattId, setOf(ok(brukerId), ok(annenBrukerId)))
 
-            beforeEach { every { token.erObo } returns true }
+            beforeEach { every { token.type } returns OBO }
 
             When("bulk/obo/{regelType} kalles med KJERNE_REGELTYPE") {
                 Then("returnerer 207 med resultater for gitt regeltype") {
@@ -157,7 +159,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/obo/{regelType} kalles med CCF-token") {
                 Then("returnerer 401") {
-                    every { token.erObo } returns false
+                    every { token.type } returns CCF
                     mockMvc.post("$DEFAULT_PREFIX/bulk/obo/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON; content = """["$brukerId"]"""
                     }.andExpect { status { isUnauthorized() } }

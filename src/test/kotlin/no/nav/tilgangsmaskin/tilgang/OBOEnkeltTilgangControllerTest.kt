@@ -11,6 +11,8 @@ import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
 import no.nav.tilgangsmaskin.regler.motor.KjerneRegel
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
+import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.post
 
@@ -20,7 +22,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
         Given("OBO enkeltoppslag") {
 
-            beforeEach { every { token.erObo } returns true }
+            beforeEach { every { token.type } returns OBO }
 
             When("komplett kalles med OBO-token") {
                 Then("returnerer 204 ved tilgang") {
@@ -70,7 +72,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
             When("komplett kalles med CCF-token") {
                 Then("returnerer 401") {
-                    every { token.erObo } returns false
+                    every { token.type } returns CCF
                     mockMvc.post("$DEFAULT_PREFIX/komplett") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
                     }.andExpect { status { isUnauthorized() } }
@@ -79,7 +81,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
             When("kjerne kalles med CCF-token") {
                 Then("returnerer 401") {
-                    every { token.erObo } returns false
+                    every { token.type } returns CCF
                     mockMvc.post("$DEFAULT_PREFIX/kjerne") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
                     }.andExpect { status { isUnauthorized() } }

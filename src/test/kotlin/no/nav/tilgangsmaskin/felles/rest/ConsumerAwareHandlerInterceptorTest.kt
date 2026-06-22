@@ -13,6 +13,8 @@ import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Compani
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangConfig
 import no.nav.tilgangsmaskin.tilgang.Token
+import no.nav.tilgangsmaskin.tilgang.TokenType
+import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
 import org.slf4j.MDC
 import org.springframework.http.HttpStatus
 import org.springframework.mock.web.MockHttpServletRequest
@@ -32,7 +34,6 @@ class ConsumerAwareHandlerInterceptorTest : BehaviorSpec({
         every { token.systemAndNs } returns "tilgangsmaskin:my-app"
         every { token.systemNavn } returns "my-app"
         every { token.ansattId } returns null
-        every { token.erObo } returns false
         every { config.systemer } returns setOf("gosys", "histark")
         MDC.clear()
     }
@@ -69,7 +70,7 @@ class ConsumerAwareHandlerInterceptorTest : BehaviorSpec({
 
         When("overstyr kalles med ugyldig OBO-konsument") {
             Then("kastes FORBIDDEN") {
-                every { token.erObo } returns true
+                every { token.type } returns OBO
                 every { token.systemNavn } returns "ukjent-system"
 
                 val ex = shouldThrow<ResponseStatusException> {
@@ -86,7 +87,7 @@ class ConsumerAwareHandlerInterceptorTest : BehaviorSpec({
 
         When("overstyr kalles med godkjent OBO-konsument") {
             Then("slipper gjennom") {
-                every { token.erObo } returns true
+                every { token.type } returns OBO
                 every { token.systemNavn } returns "gosys"
 
                 interceptor.preHandle(

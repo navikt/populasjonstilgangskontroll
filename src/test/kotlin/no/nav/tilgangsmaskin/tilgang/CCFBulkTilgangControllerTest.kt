@@ -15,6 +15,8 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
+import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
+import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.post
@@ -31,7 +33,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                 BrukerIdOgRegelsett(avvistBrukerId, KOMPLETT_REGELTYPE)
             )
 
-            beforeEach { every { token.erCC } returns true }
+            beforeEach { every { token.type } returns CCF }
 
             When("bulk/ccf kalles med gyldige specs") {
                 Then("returnerer 207 med mix av godkjente og avviste") {
@@ -59,7 +61,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/ccf kalles med OBO-token") {
                 Then("returnerer 401") {
-                    every { token.erCC } returns false
+                    every { token.type } returns OBO
                     mockMvc.post("$DEFAULT_PREFIX/bulk/ccf/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""

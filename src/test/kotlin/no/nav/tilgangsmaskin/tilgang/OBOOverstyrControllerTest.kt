@@ -10,6 +10,9 @@ import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.regler.motor.KjerneRegel
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
+import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
+import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
+import no.nav.tilgangsmaskin.tilgang.TokenType.UNAUTHENTICATED
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.post
@@ -22,7 +25,7 @@ class OBOOverstyrControllerTest : TilgangControllerTestBase() {
 
             val gyldigTil = now().plusMonths(2)
 
-            beforeEach { every { token.erObo } returns true }
+            beforeEach {every { token.type } returns OBO }
 
             When("engelttilgang kalles med gyldig request og OBO-token") {
                 Then("returnerer 202 og dokumenteres i rest docs") {
@@ -66,8 +69,7 @@ class OBOOverstyrControllerTest : TilgangControllerTestBase() {
 
             When("enkelttilgang kalles med CCF-token") {
                 Then("returnerer 401") {
-                    every { token.erCC } returns true
-                    every { token.erObo } returns false
+                    every { token.type } returns CCF
                     mockMvc.post("$DEFAULT_PREFIX/overstyr") {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
@@ -77,8 +79,8 @@ class OBOOverstyrControllerTest : TilgangControllerTestBase() {
 
             When("enkelttilgang kalles uten token") {
                 Then("returnerer 401") {
-                    every { token.erCC } returns false
-                    every { token.erObo } returns false
+                    every { token.type } returns UNAUTHENTICATED
+
                     mockMvc.post("$DEFAULT_PREFIX/overstyr") {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""

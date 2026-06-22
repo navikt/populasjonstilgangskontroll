@@ -30,8 +30,11 @@ import kotlin.text.Charsets.UTF_8
 import kotlin.time.measureTimedValue
 
 @RetryingWhenRecoverableRestService
-class ValkeyCacheOperations(client: RedisClient, private val cfg: CacheConfig,
-                            private val teller: ValkeyCacheTeller) : CacheOperations {
+class ValkeyCacheOperations(
+    client: RedisClient,
+    private val cfg: CacheConfig,
+    private val teller: ValkeyCacheTeller,
+) : CacheOperations {
 
     private val log = getLogger(javaClass)
     private val conn = connect(client)
@@ -51,7 +54,7 @@ class ValkeyCacheOperations(client: RedisClient, private val cfg: CacheConfig,
                     teller.tell(GET_ONE, cache.name, HIT)
                 }
             } ?: run {
-                teller.tell(GET_ONE, cache.name, MISS);
+                teller.tell(GET_ONE, cache.name, MISS)
                 null
             }
         }.getOrElse { e ->

@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.tilgang
 
 import io.swagger.v3.oas.models.Operation
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
+import org.slf4j.LoggerFactory.getLogger
 import org.springdoc.core.customizers.OpenApiCustomizer
 import org.springframework.context.MessageSource
 import org.springframework.context.annotation.Bean

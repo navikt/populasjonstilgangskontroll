@@ -45,6 +45,8 @@ import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.tilgang.Token
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
+import no.nav.tilgangsmaskin.tilgang.TokenType
+import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
@@ -93,8 +95,7 @@ class RegelMotorTest : BehaviorSpec() {
             every { vergemål.vergemål(any()) } returns emptySet()
             every { token.system } returns "test"
             every { token.system } returns "test"
-            every { token.erObo } returns false
-            every { token.erCC } returns true
+            every { token.type } returns CCF
             every { token.systemNavn } returns "test"
             every { token.clusterAndSystem } returns "cluster:test"
         }

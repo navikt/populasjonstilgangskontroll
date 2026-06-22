@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
-import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
@@ -16,14 +14,12 @@ import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomize
 import org.springframework.boot.restclient.RestClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.data.auditing.DateTimeProvider
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.client5.http.config.ConnectionConfig
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder
-import org.apache.hc.core5.util.Timeout
 import org.apache.hc.core5.util.Timeout.ofSeconds
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
@@ -59,33 +55,6 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     @JsonIgnoreProperties(ignoreUnknown = true)
     private interface IgnoreUnknownMixin
 
-    @Bean("messageSource")
-    @ConditionalOnProd
-    fun prodMessageSource() =
-        ReloadableResourceBundleMessageSource().apply {
-            setBasenames("classpath:messages", "classpath:regel-messages", "classpath:openapi-prod-tilgang")
-            setDefaultEncoding("UTF-8")
-        }
-
-    @Bean("messageSource")
-    @ConditionalOnNotProd
-    fun notProdMessageSource() =
-        ReloadableResourceBundleMessageSource().apply {
-            setBasenames(
-                "classpath:messages",
-                "classpath:regel-messages",
-                "classpath:openapi-prod-tilgang",
-                "classpath:openapi-dev-ansatt",
-                "classpath:openapi-dev-bruker",
-                "classpath:openapi-dev-cache",
-                "classpath:openapi-dev-enkelt",
-                "classpath:openapi-dev-regel",
-                "classpath:openapi-dev-skjerming",
-                "classpath:openapi-dev-tilgang",
-                "classpath:openapi-dev-vergemal",
-            )
-            setDefaultEncoding("UTF-8")
-        }
 
     @Bean
     fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor) =
@@ -123,18 +92,10 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                     token.systemNavn)
             })
 
-    /**
-     * Sentral klokke-bønne. Injiser `Clock` i komponenter som trenger nåtid
-     * (i stedet for `Instant.now()` / `LocalDate.now()` direkte) — så blir tid testbart
-     * med `Clock.fixed(...)` eller en mutbar test-klokke.
-     */
+
     @Bean
     fun clock(): Clock = systemDefaultZone()
 
-    /**
-     * Brukes av JPA-auditing (@CreatedDate / @LastModifiedDate) og er knyttet
-     * via `@EnableJpaAuditing(dateTimeProviderRef = AUDITING_TIME_PROVIDER)`.
-     */
     @Bean(AUDITING_TIME_PROVIDER)
     fun auditingDateTimeProvider(clock: Clock) =
         DateTimeProvider { Optional.of(Instant.now(clock)) }
@@ -158,5 +119,3 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 @Target(FUNCTION, CONSTRUCTOR, CLASS)
 annotation class Generated
 typealias NoCoverageAnalysis = Generated
-
-

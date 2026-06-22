@@ -1,0 +1,8 @@
+// Legg til egendefinert tekst for On-Behalf-Of-seksjonen her.
+// Vises rett etter seksjonsoverskriften "== On-Behalf-Of flow".
+//
+// Eksempel:
+//
+ OBO-flyten brukes når innloggede Nav-ansatte kaller tjenesten på vegne av seg selv via en klient.
+ Token må inneholde et gyldig OBO-token.
+

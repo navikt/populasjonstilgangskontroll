@@ -1,0 +1,8 @@
+// Legg til egendefinert tekst som vises i "Oversikt"-seksjonen her.
+// AsciiDoc-syntaks støttes fullt ut.
+//
+// Eksempel:
+//
+Tilgangsmaskinen returnerer HTTP 204 ved tilgang og HTTP 403 ved avvisning for enkeltoppslag.
+For bulk-oppslag er hovedresponsen alltid 207, og individuelle innslag i respons-body er enten 204 eller 403. I sistnevnte tilfelle vill detaljer-strukturen for den avviste identen inneholde informasjon om årsaken til avvisningen, på samme måte og i samme format som ved enkeltoppslag.
+

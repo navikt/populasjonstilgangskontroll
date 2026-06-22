@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldBeNull
@@ -10,23 +11,30 @@ import io.mockk.mockk
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangConfig
 import no.nav.tilgangsmaskin.tilgang.Token
+import no.nav.tilgangsmaskin.tilgang.TokenType
+import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
 import org.slf4j.MDC
+import org.springframework.http.HttpStatus
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
+import org.springframework.web.server.ResponseStatusException
 
 class ConsumerAwareHandlerInterceptorTest : BehaviorSpec({
 
     val token = mockk<Token>()
+    val config = mockk<EnkeltTilgangConfig>()
     lateinit var registry: SimpleMeterRegistry
     lateinit var interceptor: ConsumerAwareHandlerInterceptor
 
     beforeEach {
         registry = SimpleMeterRegistry()
-        interceptor = ConsumerAwareHandlerInterceptor(token, registry)
+        interceptor = ConsumerAwareHandlerInterceptor(token, registry, config)
         every { token.systemAndNs } returns "tilgangsmaskin:my-app"
         every { token.systemNavn } returns "my-app"
         every { token.ansattId } returns null
+        every { config.systemer } returns setOf("gosys", "histark")
         MDC.clear()
     }
 
@@ -57,6 +65,36 @@ class ConsumerAwareHandlerInterceptorTest : BehaviorSpec({
             Then("settes ikke userId i MDC av interceptoren — controlleren gjør det nedstrøms") {
                 interceptor.preHandle(MockHttpServletRequest(), MockHttpServletResponse(), Any())
                 MDC.get(USER_ID).shouldBeNull()
+            }
+        }
+
+        When("overstyr kalles med ugyldig OBO-konsument") {
+            Then("kastes FORBIDDEN") {
+                every { token.type } returns OBO
+                every { token.systemNavn } returns "ukjent-system"
+
+                val ex = shouldThrow<ResponseStatusException> {
+                    interceptor.preHandle(
+                        MockHttpServletRequest().apply { requestURI = "/api/v1/overstyr" },
+                        MockHttpServletResponse(),
+                        Any(),
+                    )
+                }
+
+                ex.statusCode shouldBe HttpStatus.FORBIDDEN
+            }
+        }
+
+        When("overstyr kalles med godkjent OBO-konsument") {
+            Then("slipper gjennom") {
+                every { token.type } returns OBO
+                every { token.systemNavn } returns "gosys"
+
+                interceptor.preHandle(
+                    MockHttpServletRequest().apply { requestURI = "/api/v1/overstyr" },
+                    MockHttpServletResponse(),
+                    Any(),
+                ).shouldBeTrue()
             }
         }
     }

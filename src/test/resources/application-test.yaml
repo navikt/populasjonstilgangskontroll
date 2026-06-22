@@ -1,6 +1,9 @@
 spring:
-  mvc:
-    log-request-details: true
+  datasource:
+    url: jdbc:h2://mem:db;MODE=PostgreSQL
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
   messages:
     basename:
       - messages
@@ -14,18 +17,3 @@ spring:
       - openapi/dev/skjerming
       - openapi/dev/tilgang
       - openapi/dev/vergemal
-management:
-  endpoint:
-    env:
-      show-values: always
-    configprops:
-      show-values: always
-    health:
-      show-details: always
-      show-components: always
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-info:
-  client-id: ${azure.app.client.id}

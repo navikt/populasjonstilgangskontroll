@@ -1,7 +1,8 @@
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
+import no.nav.tilgangsmaskin.build.GenerateRestDocsIndexTask
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+import java.lang.Runtime.getRuntime
 import java.lang.System.getProperty
-import kotlin.text.Charsets.UTF_8
 
 val javaVersion = JavaLanguageVersion.of(25)
 
@@ -125,12 +126,13 @@ java {
     }
 }
 
+
 tasks.named<Test>("test") {
     useJUnitPlatform()
     dependsOn(cleanGeneratedRestDocsArtifacts)
 
     maxHeapSize = "4g"
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+    maxParallelForks = (getRuntime().availableProcessors() / 2).coerceAtLeast(1)
     jvmArgs =
         listOf(
             "--add-opens",
@@ -140,256 +142,15 @@ tasks.named<Test>("test") {
         )
 }
 
-val generateRestDocsIndex = tasks.register("generateRestDocsIndex") {
+val generateRestDocsIndex = tasks.register<GenerateRestDocsIndexTask>("generateRestDocsIndex") {
     description = "Generates index.adoc from REST Docs snippets"
-    notCompatibleWithConfigurationCache("generateRestDocsIndex captures project references in doLast action")
     dependsOn(tasks.test)
 
-    val snippetsDir = layout.buildDirectory.dir("generated-snippets")
-    val outputDir = layout.buildDirectory.dir("generated-restdocs-index")
-
-    inputs.dir(snippetsDir)
-    inputs.dir(layout.projectDirectory.dir("src/docs")).optional(true)
-    outputs.dir(outputDir)
-
-    doLast {
-        val snippets = snippetsDir.get().asFile
-        if (!snippets.isDirectory) return@doLast
-
-        val dirs = snippets.listFiles { f -> f.isDirectory }
-            ?.map { it.name }
-            ?.sorted()
-            ?: return@doLast
-
-        val grouped = dirs.groupBy { it.substringBefore("-") }
-
-        val sb = StringBuilder()
-        val sharedProblemDetailSnippet = dirs.firstOrNull {
-            !it.contains("-bulk") && snippets.resolve(it).resolve("response-fields.adoc").exists()
-        }
-        val sharedProblemDetailContent = sharedProblemDetailSnippet?.let {
-            snippets.resolve(it).resolve("response-fields.adoc").readText(UTF_8)
-        }
-        val sharedProblemDetailBulkSnippet = dirs.firstOrNull {
-            it.contains("-bulk") && snippets.resolve(it).resolve("response-fields.adoc").exists()
-        }
-        val sharedProblemDetailBulkContent = sharedProblemDetailBulkSnippet?.let {
-            snippets.resolve(it).resolve("response-fields.adoc").readText(UTF_8)
-        }
-
-        // Load descriptions from openapi properties
-        val propsFile = file("src/main/resources/openapi-prod-tilgang.properties")
-        val properties = mutableMapOf<String, String>()
-        if (propsFile.exists()) {
-            propsFile.readLines().forEach { line ->
-                val trimmed = line.trim()
-                if (trimmed.isNotEmpty() && !trimmed.startsWith("#")) {
-                    val parts = trimmed.split("=", limit = 2)
-                    if (parts.size == 2) {
-                        properties[parts[0]] = parts[1]
-                    }
-                }
-            }
-        }
-
-        // Parse constants from TilgangController.kt
-        val controllerFile = file("src/main/kotlin/no/nav/tilgangsmaskin/tilgang/TilgangController.kt")
-        val controllerConstants = mutableMapOf<String, String>()
-        if (controllerFile.exists()) {
-            val content = controllerFile.readText(UTF_8)
-            // Match constants that may span multiple lines - use [\s\n] to include newlines
-            val pattern = """private const val (\w+)\s*=\s*"([^"]+)"""".toRegex()
-            pattern.findAll(content.replace("\n", " ")).forEach { match ->
-                val (name, value) = match.destructured
-                controllerConstants[name] = value.trim()
-            }
-        }
-
-        // Map snippet names to property keys using constants from TilgangController
-        val endpointDescriptionKeys: Map<String, String> = mapOf(
-            "obo-komplett" to (controllerConstants["SUMMARY_KOMPLETT_OBO"] ?: "openapi.tilgang.komplett.obo.summary"),
-            "obo-kjerne" to (controllerConstants["SUMMARY_KJERNE_OBO"] ?: "openapi.tilgang.kjerne.obo.summary"),
-            "obo-enkeltilgang" to (controllerConstants["SUMMARY_OVERSTYR"] ?: "openapi.tilgang.overstyr.summary"),
-            "obo-enkelttilgang" to (controllerConstants["SUMMARY_OVERSTYR"] ?: "openapi.tilgang.overstyr.summary"),
-            "obo-bulk" to (controllerConstants["SUMMARY_BULK"] ?: "openapi.tilgang.bulk.summary"),
-            "obo-bulk-regeltype" to (controllerConstants["DESCRIPTION_BULK_OBO_REGELTYPE"] ?: "openapi.tilgang.bulk.obo.regeltype.description"),
-            "ccf-komplett" to (controllerConstants["SUMMARY_KOMPLETT_CCF"] ?: "openapi.tilgang.komplett.ccf.summary"),
-            "ccf-kjerne" to (controllerConstants["SUMMARY_KJERNE_CCF"] ?: "openapi.tilgang.kjerne.ccf.summary"),
-            "ccf-bulk" to (controllerConstants["SUMMARY_BULK"] ?: "openapi.tilgang.bulk.summary"),
-            "ccf-bulk-regeltype" to (controllerConstants["DESCRIPTION_BULK_CCF_REGELTYPE"] ?: "openapi.tilgang.bulk.ccf.regeltype.description")
-        )
-
-        fun sectionTitle(name: String, prefix: String) =
-            name.substringAfter("$prefix-")
-                .replace("-", " ")
-                .replaceFirstChar { it.uppercase() }
-
-        fun docsTitle(name: String, prefix: String): String {
-            val title = sectionTitle(name, prefix)
-            return if (name.contains("-overstyr")) {
-                title.replaceFirst("Overstyr", "Enkelttilgang")
-            } else {
-                title
-            }
-        }
-
-        fun getDescription(name: String): String {
-            val key = endpointDescriptionKeys[name]
-            return if (key != null) {
-                val normalizedKey = key.removePrefix("msg:")
-                properties[normalizedKey] ?: properties[key] ?: key
-            } else {
-                docsTitle(name, name.substringBefore("-"))
-            }
-        }
-
-        // Read a custom partial from src/docs/<name>.adoc if it exists.
-        // Naming convention:
-        //   src/docs/oversikt.adoc          — appended inside the "Oversikt" section
-        //   src/docs/obo.adoc               — appended after the OBO flow heading
-        //   src/docs/ccf.adoc               — appended after the CCF flow heading
-        //   src/docs/<snippet-name>.adoc    — appended after each endpoint section
-        //                                     e.g. src/docs/obo-komplett.adoc
-        val docsDir = file("src/docs")
-        fun appendCustomText(name: String) {
-            val partial = docsDir.resolve("$name.adoc")
-            if (partial.exists()) {
-                sb.appendLine()
-                sb.appendLine(partial.readText(UTF_8).trimEnd())
-                sb.appendLine()
-            }
-        }
-
-        fun appendSnippetIncludes(name: String) {
-            sb.appendLine("include::{snippets}/$name/http-request.adoc[]")
-            sb.appendLine("include::{snippets}/$name/http-response.adoc[]")
-            val responseFields = snippets.resolve(name).resolve("response-fields.adoc")
-            if (
-                responseFields.exists() &&
-                responseFields.readText(UTF_8) != sharedProblemDetailContent &&
-                responseFields.readText(UTF_8) != sharedProblemDetailBulkContent
-            ) {
-                sb.appendLine()
-                sb.appendLine(".Response fields")
-                sb.appendLine("include::{snippets}/$name/response-fields.adoc[]")
-            }
-            sb.appendLine()
-        }
-
-        sb.appendLine("= Populasjonstilgangskontroll API")
-        sb.appendLine(":doctype: book")
-        sb.appendLine(":icons: font")
-        sb.appendLine(":toc: left")
-        sb.appendLine(":toclevels: 3")
-        sb.appendLine(":sectlinks:")
-        sb.appendLine()
-        sb.appendLine("== Oversikt")
-        sb.appendLine()
-        sb.appendLine("REST API-dokumentasjon for Populasjonstilgangskontroll (Tilgangsmaskinen).")
-        sb.appendLine()
-        sb.appendLine("Tjenesten avgjør om en Nav-ansatt har tilgang til en bruker")
-        sb.appendLine()
-        appendCustomText("oversikt")
-        if (sharedProblemDetailSnippet != null || sharedProblemDetailBulkSnippet != null) {
-            sb.appendLine("=== Felles problem detail-felter")
-            sb.appendLine()
-
-            if (sharedProblemDetailSnippet != null) {
-                sb.appendLine("[[problemdetail-enkeltoppslag]]")
-                sb.appendLine(".Eksempel for enkeltoppslag og enkelttilgang")
-                sb.appendLine("include::{snippets}/$sharedProblemDetailSnippet/response-fields.adoc[]")
-                sb.appendLine()
-            }
-
-            if (sharedProblemDetailBulkSnippet != null && sharedProblemDetailBulkContent != sharedProblemDetailContent) {
-                sb.appendLine(".Eksempel for bulk")
-                sb.appendLine("include::{snippets}/$sharedProblemDetailBulkSnippet/response-fields.adoc[]")
-                sb.appendLine()
-            }
-        }
-
-        for ((prefix, names) in grouped) {
-            val heading = when (prefix) {
-                "obo" -> "On-Behalf-Of flow"
-                "ccf" -> "Client Credentials Flow"
-                else -> prefix.uppercase()
-            }
-            sb.appendLine("== $heading")
-            sb.appendLine()
-            appendCustomText(prefix)
-
-            val sortedNames = names.sorted()
-            val komplettRoot = "$prefix-komplett"
-            val komplettRelated = sortedNames.filter { it == komplettRoot || it.startsWith("$komplettRoot-") }
-            val overstyrRoot = listOf("$prefix-enkeltilgang", "$prefix-enkelttilgang")
-                .firstOrNull { it in sortedNames }
-            val overstyrRelated = if (overstyrRoot != null) {
-                sortedNames.filter { it == overstyrRoot || it.startsWith("$overstyrRoot-") }
-            } else {
-                emptyList()
-            }
-            val remaining = sortedNames.filterNot { it in overstyrRelated || it in komplettRelated }
-
-            for (name in remaining) {
-                val title = getDescription(name)
-                sb.appendLine("=== $title")
-                sb.appendLine()
-                appendCustomText(name)
-                appendSnippetIncludes(name)
-            }
-
-            if (komplettRelated.isNotEmpty()) {
-                sb.appendLine("=== ${getDescription(komplettRoot)}")
-                sb.appendLine()
-                appendCustomText(komplettRoot)
-
-                if (komplettRelated.contains(komplettRoot)) {
-                    appendSnippetIncludes(komplettRoot)
-                }
-
-                val alternatives = komplettRelated.filter { it != komplettRoot }
-                if (alternatives.isNotEmpty()) {
-                    sb.appendLine("==== Alternative responser")
-                    sb.appendLine()
-                    for (name in alternatives) {
-                        val altTitle = getDescription(name)
-                        sb.appendLine("===== $altTitle")
-                        sb.appendLine()
-                        sb.appendLine("include::{snippets}/$name/http-request.adoc[]")
-                        sb.appendLine("include::{snippets}/$name/http-response.adoc[]")
-                        sb.appendLine()
-                    }
-                }
-            }
-
-            if (overstyrRoot != null && overstyrRelated.isNotEmpty()) {
-                sb.appendLine("=== Enkelttilgang")
-                sb.appendLine()
-                appendCustomText("$prefix-enkelttilgang")
-
-                appendSnippetIncludes(overstyrRoot)
-
-                // Group all enkeltilgang variants except the 202/root response under alternatives.
-                val alternatives = overstyrRelated.filter { it != overstyrRoot }
-                if (alternatives.isNotEmpty()) {
-                    sb.appendLine("==== Alternative responser")
-                    sb.appendLine()
-                    for (name in alternatives) {
-                        val altTitle = getDescription(name)
-                        sb.appendLine("===== $altTitle")
-                        sb.appendLine()
-                        sb.appendLine("include::{snippets}/$name/http-request.adoc[]")
-                        sb.appendLine("include::{snippets}/$name/http-response.adoc[]")
-                        sb.appendLine()
-                    }
-                }
-            }
-        }
-
-        val outDir = outputDir.get().asFile
-        outDir.mkdirs()
-        outDir.resolve("index.adoc").writeText(sb.toString(), UTF_8)
-    }
+    snippetsDir.set(layout.buildDirectory.dir("generated-snippets"))
+    docsDir.set(layout.projectDirectory.dir("src/docs"))
+    openApiPropertiesFile.set(layout.projectDirectory.file("src/main/resources/openapi-prod-tilgang.properties"))
+    controllerFile.set(layout.projectDirectory.file("src/main/kotlin/no/nav/tilgangsmaskin/tilgang/TilgangController.kt"))
+    outputDir.set(layout.buildDirectory.dir("generated-restdocs-index"))
 }
 
 tasks.named("asciidoctor") {

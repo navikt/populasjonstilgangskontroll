@@ -25,6 +25,7 @@ import org.springframework.restdocs.operation.preprocess.Preprocessors.preproces
 import org.springframework.restdocs.operation.preprocess.Preprocessors.modifyHeaders
 import org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint
 import org.springframework.restdocs.snippet.Snippet
+import org.springframework.restdocs.payload.JsonFieldType.ARRAY
 import org.springframework.restdocs.payload.JsonFieldType.BOOLEAN
 import org.springframework.restdocs.payload.JsonFieldType.NUMBER
 import org.springframework.restdocs.payload.JsonFieldType.STRING
@@ -83,6 +84,28 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             fieldWithPath("begrunnelse").type(STRING).description("Menneskelesbar begrunnelse for avvisning").optional(),
             fieldWithPath("traceId").type(STRING).description("OTEL trace-ID for feilsøking").optional(),
             fieldWithPath("kanOverstyres").type(BOOLEAN).description("Om regelen kan overstyres med enkelttilgang").optional()
+        )
+
+        val bulkProblemDetailFields = relaxedResponseFields(
+            fieldWithPath("ansattId").type(STRING).description("NAV-ident for ansatt forespørselen kjøres for"),
+            fieldWithPath("resultater").type(ARRAY).description("Resultater per oppslått bruker"),
+            fieldWithPath("resultater[].brukerId").type(STRING).description("Fødselsnummer/d-nummer til bruker"),
+            fieldWithPath("resultater[].status").type(NUMBER).description("HTTP-status for resultatet (204 eller 403)"),
+            fieldWithPath("resultater[].detaljer.title").type(STRING)
+                .description("Avvisningskode, En av: $avvisningskoder")
+                .optional(),
+            fieldWithPath("resultater[].detaljer.status").type(NUMBER).description("HTTP-statuskode for avvisning").optional(),
+            fieldWithPath("resultater[].detaljer.instance").type(STRING).description("ansattId/brukerId for avvisning").optional(),
+            fieldWithPath("resultater[].detaljer.type").type(STRING)
+                .description("Link til regelsett-dokumentasjon for avvist regel")
+                .optional(),
+            fieldWithPath("resultater[].detaljer.brukerIdent").type(STRING).description("Fødselsnummer/d-nummer til bruker").optional(),
+            fieldWithPath("resultater[].detaljer.navIdent").type(STRING).description("NAV-ident den ansatte").optional(),
+            fieldWithPath("resultater[].detaljer.begrunnelse").type(STRING).description("Menneskelesbar begrunnelse for avvisning").optional(),
+            fieldWithPath("resultater[].detaljer.traceId").type(STRING).description("OTEL trace-ID for feilsøking").optional(),
+            fieldWithPath("resultater[].detaljer.kanOverstyres").type(BOOLEAN)
+                .description("Om regelen kan overstyres med enkelttilgang")
+                .optional()
         )
     }
 

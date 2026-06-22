@@ -58,14 +58,14 @@ class TokenTest : BehaviorSpec({
     Given("erObo") {
         When("oid finnes og idtyp ikke er 'app'") {
             Then("OBO er true") {
-                every { claims.getStringClaim(OID) } returns oid.toString()
+                every { claims.getStringClaim(OID) } returns "$oid"
                 token.erObo.shouldBeTrue()
             }
         }
         When("token er CC (idtyp=app)") {
             Then("OBO er false") {
                 every { claims.getStringClaim(IDTYP) } returns APP
-                every { claims.getStringClaim(OID) } returns oid.toString()
+                every { claims.getStringClaim(OID) } returns "$oid"
                 token.erObo shouldBe false
             }
         }
@@ -94,7 +94,7 @@ class TokenTest : BehaviorSpec({
     Given("oid-oppslag fra token") {
         When("oid finnes") {
             Then("returnerer oid") {
-                every { claims.getStringClaim(OID) } returns oid.toString()
+                every { claims.getStringClaim(OID) } returns "$oid"
                 token.oid shouldBe oid
             }
         }
@@ -259,7 +259,7 @@ class TokenTest : BehaviorSpec({
     Given("TokenType.from") {
         When("token er OBO") {
             Then("returnerer OBO") {
-                every { claims.getStringClaim(OID) } returns oid.toString()
+                every { claims.getStringClaim(OID) } returns "$oid"
                 TokenType.from(token) shouldBe TokenType.OBO
             }
         }

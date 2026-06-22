@@ -4,5 +4,5 @@
 // Eksempel:
 //
 Tilgangsmaskinen returnerer HTTP 204 ved tilgang og HTTP 403 ved avvisning for enkeltoppslag.
-For bulk-oppslag er hovedresponsen alltid 207, og individielle innslag i respons-body er enten 204 eller 403
+For bulk-oppslag er hovedresponsen alltid 207, og individuelle innslag i respons-body er enten 204 eller 403
 

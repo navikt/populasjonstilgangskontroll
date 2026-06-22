@@ -100,7 +100,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                         jsonPath("$.resultater[0].detaljer.brukerIdent") { value(brukerId) }
                         jsonPath("$.resultater[0].detaljer.navIdent") { value(ansattId.verdi) }
                         jsonPath("$.resultater[0].detaljer.kanOverstyres") { value(false) }
-                    }.andDo { handle(dokumenterMedAuth("obo-bulk-avvist")) }
+                    }.andDo { handle(dokumenterMedAuth("obo-bulk-avvist", bulkProblemDetailFields)) }
                 }
             }
 

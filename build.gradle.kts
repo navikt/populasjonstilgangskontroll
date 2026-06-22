@@ -163,9 +163,15 @@ val generateRestDocsIndex = tasks.register("generateRestDocsIndex") {
 
         val sb = StringBuilder()
         val sharedProblemDetailSnippet = dirs.firstOrNull {
-            snippets.resolve(it).resolve("response-fields.adoc").exists()
+            !it.contains("-bulk") && snippets.resolve(it).resolve("response-fields.adoc").exists()
         }
         val sharedProblemDetailContent = sharedProblemDetailSnippet?.let {
+            snippets.resolve(it).resolve("response-fields.adoc").readText(UTF_8)
+        }
+        val sharedProblemDetailBulkSnippet = dirs.firstOrNull {
+            it.contains("-bulk") && snippets.resolve(it).resolve("response-fields.adoc").exists()
+        }
+        val sharedProblemDetailBulkContent = sharedProblemDetailBulkSnippet?.let {
             snippets.resolve(it).resolve("response-fields.adoc").readText(UTF_8)
         }
 
@@ -256,7 +262,11 @@ val generateRestDocsIndex = tasks.register("generateRestDocsIndex") {
             sb.appendLine("include::{snippets}/$name/http-request.adoc[]")
             sb.appendLine("include::{snippets}/$name/http-response.adoc[]")
             val responseFields = snippets.resolve(name).resolve("response-fields.adoc")
-            if (responseFields.exists() && responseFields.readText(UTF_8) != sharedProblemDetailContent) {
+            if (
+                responseFields.exists() &&
+                responseFields.readText(UTF_8) != sharedProblemDetailContent &&
+                responseFields.readText(UTF_8) != sharedProblemDetailBulkContent
+            ) {
                 sb.appendLine()
                 sb.appendLine(".Response fields")
                 sb.appendLine("include::{snippets}/$name/response-fields.adoc[]")
@@ -278,11 +288,21 @@ val generateRestDocsIndex = tasks.register("generateRestDocsIndex") {
         sb.appendLine("Tjenesten avgjør om en Nav-ansatt har tilgang til en bruker")
         sb.appendLine()
         appendCustomText("oversikt")
-        if (sharedProblemDetailSnippet != null) {
-            sb.appendLine("=== Felles ProblemDetail-felter for enkeltoppslag og enkelttilgang")
+        if (sharedProblemDetailSnippet != null || sharedProblemDetailBulkSnippet != null) {
+            sb.appendLine("=== Felles problem detail-felter")
             sb.appendLine()
-            sb.appendLine("include::{snippets}/$sharedProblemDetailSnippet/response-fields.adoc[]")
-            sb.appendLine()
+
+            if (sharedProblemDetailSnippet != null) {
+                sb.appendLine(".Eksempel for enkeltoppslag og enkelttilgang")
+                sb.appendLine("include::{snippets}/$sharedProblemDetailSnippet/response-fields.adoc[]")
+                sb.appendLine()
+            }
+
+            if (sharedProblemDetailBulkSnippet != null && sharedProblemDetailBulkContent != sharedProblemDetailContent) {
+                sb.appendLine(".Eksempel for bulk")
+                sb.appendLine("include::{snippets}/$sharedProblemDetailBulkSnippet/response-fields.adoc[]")
+                sb.appendLine()
+            }
         }
 
         for ((prefix, names) in grouped) {

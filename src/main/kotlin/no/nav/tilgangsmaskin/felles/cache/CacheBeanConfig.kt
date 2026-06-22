@@ -26,7 +26,12 @@ import tools.jackson.module.kotlin.KotlinModule.Builder
 @Configuration(proxyBeanMethods = true)
 @ConditionalOnGCP
 @NoCoverageAnalysis
-class CacheBeanConfig(private val cf: RedisConnectionFactory, private val meterRegistry: MeterRegistry,  private val errorHandler: CacheErrorHandler, private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
+class CacheBeanConfig(
+    private val cf: RedisConnectionFactory,
+    private val meterRegistry: MeterRegistry,
+    private val errorHandler: CacheErrorHandler,
+    private vararg val cfgs: CachableRestConfig,
+) : CachingConfigurer {
 
 
     override fun errorHandler() =
@@ -58,22 +63,25 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory, private val meterR
     fun cacheHealthIndicator(pingable: CachePingable) =
         PingableHealthIndicator(pingable)
 
+    @Bean
+    fun valkeyMapper() =
+        JsonMapper.builder()
+            .polymorphicTypeValidator(NavPolymorphicTypeValidator())
+            .apply {
+                enable(INCLUDE_SOURCE_IN_LOCATION)
+                addModule(Builder().build())
+                addModule(JacksonTypeInfoAddingValkeyModule())
+            }
+            .build()
+
     private fun cacheConfig(cfg: CachableRestConfig) =
         defaultCacheConfig()
             .entryTtl(cfg.varighet)
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))
             .serializeValuesWith(fromSerializer(
-                ResilientValkeySerializer(GenericJacksonJsonRedisSerializer(VALKEY_MAPPER), meterRegistry))).apply {
+                ResilientValkeySerializer(GenericJacksonJsonRedisSerializer(valkeyMapper()), meterRegistry))).apply {
                 if (!cfg.cacheNulls) disableCachingNullValues()
             }
-
-    companion object {
-        val VALKEY_MAPPER = JsonMapper.builder().polymorphicTypeValidator(NavPolymorphicTypeValidator()).apply {
-            enable(INCLUDE_SOURCE_IN_LOCATION)
-            addModule(Builder().build())
-            addModule(JacksonTypeInfoAddingValkeyModule())
-        }.build()
-    }
 }
 
 

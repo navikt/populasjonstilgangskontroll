@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration debug="false" scan="true" scanPeriod="30 seconds">
+<configuration debug="false" scan="false">
     <!-- Shutdown hook: flush and close appenders gracefully on JVM shutdown -->
     <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook">
         <delay>5000</delay>

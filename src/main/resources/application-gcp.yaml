@@ -49,10 +49,6 @@ spring:
     virtual:
       enabled: true
   messages:
-    basename:
-      - messages
-      - regel-messages
-      - openapi-prod-tilgang
     encoding: UTF-8
   jpa:
     properties:

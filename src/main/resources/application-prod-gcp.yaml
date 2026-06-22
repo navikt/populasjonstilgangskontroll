@@ -1,3 +1,9 @@
+spring:
+  messages:
+    basename:
+      - messages
+      - regel-messages
+      - openapi-prod-tilgang
 management:
   endpoint:
     env:

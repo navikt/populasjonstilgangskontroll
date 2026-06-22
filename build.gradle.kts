@@ -114,6 +114,7 @@ tasks.withType<BootJar> {
 }
 
 val cleanGeneratedRestDocsArtifacts = tasks.register<Delete>("cleanGeneratedRestDocsArtifacts") {
+    description = "Cleans generated REST Docs snippets and index"
     delete(layout.buildDirectory.dir("generated-snippets"))
     delete(layout.buildDirectory.dir("generated-restdocs-index"))
 }
@@ -134,6 +135,7 @@ tasks.named<Test>("test") {
         listOf(
             "--add-opens",
             "java.base/java.util=ALL-UNNAMED",
+            "-XX:+EnableDynamicAgentLoading",
             "-Dkotlinx.coroutines.debug=off",
         )
 }

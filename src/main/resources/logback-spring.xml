@@ -67,10 +67,7 @@
         <logger name="io.lettuce.core.protocol.ReconnectionHandler" level="warn"/>
         <logger name="io.lettuce.core.protocol.ConnectionWatchdog" level="warn"/>
         <logger name="org.hibernate.orm.connections.pooling" level="warn"/>
-        <logger name="org.springframework.cache" level="info" />
-        <logger name="org.apache.kafka" level="info" />
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
-        <logger name="no.nav.security" level="info"/>
         <logger name="no.nav.tilgangsmaskin.felles.rest.RestLoggingRequestInterceptor" level="trace"/>
         <logger name="secureLog" level="info" additivity="false">
             <appender-ref ref="secure-async"/>
@@ -97,7 +94,6 @@
             <Marker>CONFIDENTIAL</Marker>
             <OnMatch>DENY</OnMatch>
         </turboFilter>
-        <logger name="no.nav.tilgangsmaskin" level="info"/>
         <logger name="io.lettuce.core.protocol.ReconnectionHandler" level="warn"/>
         <logger name="io.lettuce.core.protocol.ConnectionWatchdog" level="warn"/>
         <logger name="org.hibernate.orm.connections.pooling" level="warn"/>

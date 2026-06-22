@@ -63,25 +63,22 @@ class CacheBeanConfig(
     fun cacheHealthIndicator(pingable: CachePingable) =
         PingableHealthIndicator(pingable)
 
-    @Bean
-    fun valkeyMapper() =
-        JsonMapper.builder()
-            .polymorphicTypeValidator(NavPolymorphicTypeValidator())
-            .apply {
-                enable(INCLUDE_SOURCE_IN_LOCATION)
-                addModule(Builder().build())
-                addModule(JacksonTypeInfoAddingValkeyModule())
-            }
-            .build()
-
     private fun cacheConfig(cfg: CachableRestConfig) =
         defaultCacheConfig()
             .entryTtl(cfg.varighet)
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))
             .serializeValuesWith(fromSerializer(
-                ResilientValkeySerializer(GenericJacksonJsonRedisSerializer(valkeyMapper()), meterRegistry))).apply {
+                ResilientValkeySerializer(GenericJacksonJsonRedisSerializer(VALKEY_MAPPER), meterRegistry))).apply {
                 if (!cfg.cacheNulls) disableCachingNullValues()
             }
+
+    companion object {
+        val VALKEY_MAPPER = JsonMapper.builder().polymorphicTypeValidator(NavPolymorphicTypeValidator()).apply {
+            enable(INCLUDE_SOURCE_IN_LOCATION)
+            addModule(Builder().build())
+            addModule(JacksonTypeInfoAddingValkeyModule())
+        }.build()
+    }
 }
 
 

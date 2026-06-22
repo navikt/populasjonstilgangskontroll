@@ -7,6 +7,7 @@ import io.lettuce.core.ScanCursor.INITIAL
 import io.lettuce.core.ScriptOutputType.MULTI
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import jakarta.annotation.PreDestroy
+import no.nav.tilgangsmaskin.felles.cache.CacheBeanConfig.Companion.VALKEY_MAPPER
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.CLEAR
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.DELETE
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.GET_MANY
@@ -27,14 +28,12 @@ import java.time.Duration.ofSeconds
 import kotlin.reflect.KClass
 import kotlin.text.Charsets.UTF_8
 import kotlin.time.measureTimedValue
-import tools.jackson.databind.json.JsonMapper
 
 @RetryingWhenRecoverableRestService
 class ValkeyCacheOperations(
     client: RedisClient,
     private val cfg: CacheConfig,
     private val teller: ValkeyCacheTeller,
-    private val valkeyMapper: JsonMapper,
 ) : CacheOperations {
 
     private val log = getLogger(javaClass)
@@ -51,7 +50,7 @@ class ValkeyCacheOperations(
     override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? =
         runCatching {
             conn.sync().get(cache.tilNøkkel(id))?.let {
-                valkeyMapper.readValue(it, clazz.java).also {
+                VALKEY_MAPPER.readValue(it, clazz.java).also {
                     teller.tell(GET_ONE, cache.name, HIT)
                 }
             } ?: run {
@@ -66,7 +65,7 @@ class ValkeyCacheOperations(
 
     @WithSpan
     override fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration) {
-        conn.async().setex(cache.tilNøkkel(id), ttl.seconds, valkeyMapper.writeValueAsString(value))
+        conn.async().setex(cache.tilNøkkel(id), ttl.seconds, VALKEY_MAPPER.writeValueAsString(value))
         teller.tell(PUT_ONE, cache.name, OK)
     }
 
@@ -99,7 +98,7 @@ class ValkeyCacheOperations(
                         it.hasValue()
                     }
                     .associate {
-                        CacheNøkkel(it.key).id to valkeyMapper.readValue(it.value, clazz.java)
+                        CacheNøkkel(it.key).id to VALKEY_MAPPER.readValue(it.value, clazz.java)
                     }
             }.getOrElse {
                 teller.tell(GET_MANY, cache.name, FEILET, ids.size)
@@ -164,7 +163,7 @@ class ValkeyCacheOperations(
                           innslag: Map<String, Any>,
                           ttl: Long) {
         val payload = innslag.entries.associate { (key, value) ->
-            cache.tilNøkkel(key) to valkeyMapper.writeValueAsString(value)
+            cache.tilNøkkel(key) to VALKEY_MAPPER.writeValueAsString(value)
         }
         val (resultat, varighet) = measureTimedValue {
             flushBatch(payload, ttl)

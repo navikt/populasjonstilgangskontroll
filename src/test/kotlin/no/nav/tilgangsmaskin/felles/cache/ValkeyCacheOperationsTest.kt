@@ -50,8 +50,6 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import io.kotest.matchers.comparables.shouldBeLessThan
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry
-import io.mockk.mockk
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.MOR
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
@@ -61,7 +59,6 @@ import java.time.Duration.ofSeconds
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
-import tools.jackson.databind.json.JsonMapper
 
 @DataRedisTest
 @AutoConfigureMetrics
@@ -96,14 +93,8 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
             ValkeyCacheTeller(meterRegistry)
 
         @Bean
-        fun valkeyMapper() =
-            CacheBeanConfig(cf, SimpleMeterRegistry(),
-                mockk(relaxed = true),
-            ).valkeyMapper()
-
-        @Bean
-        fun valkeyCacheOperations(client: RedisClient, cfg: CacheConfig, teller: ValkeyCacheTeller, valkeyMapper: JsonMapper) =
-            ValkeyCacheOperations(client, cfg, teller, valkeyMapper)
+        fun valkeyCacheOperations(client: RedisClient, cfg: CacheConfig, teller: ValkeyCacheTeller) =
+            ValkeyCacheOperations(client, cfg, teller)
 
         @Bean
         fun cacheElementUtløptLytter(client: RedisClient, publisher: ApplicationEventPublisher) =

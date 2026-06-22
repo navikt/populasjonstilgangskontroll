@@ -42,7 +42,6 @@ class UtlandRegel : GlobalGruppeMedlemskapRegel(UTENLANDSK), OverstyrbarRegel {
 
 
 @SortertRegel(RegelRekkefølge.AVDØD)
-@ConditionalOnNotProd
 class AvdødBrukerRegel : OverstyrbarRegel {
 
     override val metadata = RegelMetadata(AVDØD_MER_ENN_ETT_ÅR)

@@ -59,16 +59,13 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 
     @Bean("messageSource")
     fun messageSource(
-        @Value("\${app.messages.base-basenames:messages,regel-messages,openapi-prod-tilgang}") baseBasenames: List<String>,
-        @Value("\${app.messages.dev-basenames:}") devBasenames: List<String>,
-    ) = ReloadableResourceBundleMessageSource().apply {
-        val basenames = (baseBasenames + devBasenames)
-            .filter { it.isNotBlank() }
-            .map { if (it.startsWith("classpath:")) it else "classpath:$it" }
-            .toTypedArray()
-        setBasenames(*basenames)
-        setDefaultEncoding("UTF-8")
-    }
+        @Value("\${app.messages.basenames}") basenames: List<String>) =
+        ReloadableResourceBundleMessageSource().apply {
+            setBasenames(*basenames
+                .map { "classpath:$it" }
+                .toTypedArray<String>())
+            setDefaultEncoding("UTF-8")
+        }
 
     @Bean
     fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor) =
@@ -106,18 +103,10 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                     token.systemNavn)
             })
 
-    /**
-     * Sentral klokke-bønne. Injiser `Clock` i komponenter som trenger nåtid
-     * (i stedet for `Instant.now()` / `LocalDate.now()` direkte) — så blir tid testbart
-     * med `Clock.fixed(...)` eller en mutbar test-klokke.
-     */
+
     @Bean
     fun clock(): Clock = systemDefaultZone()
 
-    /**
-     * Brukes av JPA-auditing (@CreatedDate / @LastModifiedDate) og er knyttet
-     * via `@EnableJpaAuditing(dateTimeProviderRef = AUDITING_TIME_PROVIDER)`.
-     */
     @Bean(AUDITING_TIME_PROVIDER)
     fun auditingDateTimeProvider(clock: Clock) =
         DateTimeProvider { Optional.of(Instant.now(clock)) }

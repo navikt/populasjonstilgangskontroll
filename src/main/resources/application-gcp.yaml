@@ -48,6 +48,11 @@ spring:
   threads:
     virtual:
       enabled: true
+  messages:
+    basename:
+      - messages
+      - regel-messages
+      - openapi-prod-tilgang
   jpa:
     properties:
       hibernate:
@@ -201,10 +206,3 @@ info:
   cluster: ${nais.cluster.name:local}
   name: ${spring.application.name}
   image: ${nais.app.image:unknown}
-
-app:
-  messages:
-    basenames:
-      - messages
-      - regel-messages
-      - openapi-prod-tilgang

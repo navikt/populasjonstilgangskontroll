@@ -9,13 +9,11 @@ import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInt
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.RestLoggingRequestInterceptor
 import no.nav.tilgangsmaskin.tilgang.Token
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.endpoint.SanitizingFunction
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
 import org.springframework.boot.restclient.RestClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.data.auditing.DateTimeProvider
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
@@ -57,15 +55,6 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     @JsonIgnoreProperties(ignoreUnknown = true)
     private interface IgnoreUnknownMixin
 
-    @Bean("messageSource")
-    fun messageSource(
-        @Value("\${app.messages.basenames}") basenames: List<String>) =
-        ReloadableResourceBundleMessageSource().apply {
-            setBasenames(*basenames
-                .map { "classpath:$it" }
-                .toTypedArray<String>())
-            setDefaultEncoding("UTF-8")
-        }
 
     @Bean
     fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor) =

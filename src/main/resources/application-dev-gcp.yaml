@@ -1,6 +1,19 @@
 spring:
   mvc:
     log-request-details: true
+  messages:
+    basename:
+      - messages
+      - regel-messages
+      - openapi-prod-tilgang
+      - openapi/dev/ansatt
+      - openapi/dev/bruker
+      - openapi/dev/cache
+      - openapi/dev/enkelt
+      - openapi/dev/regel
+      - openapi/dev/skjerming
+      - openapi/dev/tilgang
+      - openapi/dev/vergemal
 management:
   endpoint:
     env:
@@ -16,18 +29,3 @@ management:
         include: '*'
 info:
   client-id: ${azure.app.client.id}
-
-app:
-  messages:
-    basenames:
-      - messages
-      - regel-messages
-      - openapi-prod-tilgang
-      - openapi/dev/openapi-dev-ansatt
-      - openapi/dev/openapi-dev-bruker
-      - openapi/dev/openapi-dev-cache
-      - openapi/dev/openapi-dev-enkelt
-      - openapi/dev/openapi-dev-regel
-      - openapi/dev/openapi-dev-skjerming
-      - openapi/dev/openapi-dev-tilgang
-      - openapi/dev/openapi-dev-vergemal

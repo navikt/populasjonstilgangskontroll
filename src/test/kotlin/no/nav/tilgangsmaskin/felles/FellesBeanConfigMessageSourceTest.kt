@@ -1,28 +1,19 @@
 package no.nav.tilgangsmaskin.felles
 
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
-import io.mockk.mockk
-import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
+import org.springframework.context.support.ResourceBundleMessageSource
 import java.util.Locale
 
 class FellesBeanConfigMessageSourceTest : BehaviorSpec({
 
-    val config = FellesBeanConfig(mockk<ConsumerAwareHandlerInterceptor>(relaxed = true))
-
-    Given("messageSource") {
-        When("basenames konfigureres") {
-            Then("inneholder basenameSet forventede classpath-entries") {
-                val source = config.messageSource(listOf("messages", "regel-messages"))
-                source.basenameSet shouldContain "classpath:messages"
-                source.basenameSet shouldContain "classpath:regel-messages"
-            }
-        }
-
+    Given("messageSource auto-konfigurert med spring.messages.basename") {
         When("en kjent message key finnes") {
             Then("resolves key til forventet tekst") {
-                val source = config.messageSource(listOf("messages"))
+                val source = ResourceBundleMessageSource().apply {
+                    setBasenames("messages")
+                    setDefaultEncoding("UTF-8")
+                }
                 val key = "problemDetail.no.nav.tilgangsmaskin.populasjonstilgangskontroll.regelmotor.RegelException.kjerneregler"
 
                 val resolved = source.getMessage(

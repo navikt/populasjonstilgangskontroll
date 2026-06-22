@@ -93,7 +93,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             fieldWithPath("resultater[].brukerId").type(STRING).description("Fødselsnummer/d-nummer til bruker"),
             fieldWithPath("resultater[].status").type(NUMBER).description("HTTP-status for resultatet (204 eller 403)"),
             subsectionWithPath("resultater[].detaljer")
-                .description("Feildetaljer for avviste oppslag. Feltstruktur er identisk med responsen for enkeltoppslag (se felles ProblemDetail-dokumentasjon).")
+                .description("Feildetaljer for avviste oppslag. Feltstruktur er identisk med responsen for enkeltoppslag (se <<problemdetail-enkeltoppslag, ProblemDetail for enkeltoppslag>>).")
                 .optional()
         )
     }
@@ -110,7 +110,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
         beforeEach { case ->
             clearAllMocks()
             restDocumentation.beforeTest(TilgangControllerTestBase::class.java, case.name.name)
-            mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, TokenTypeGuard(token), teller))
+            mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, teller))
                 .setControllerAdvice(BrukerIdentRequestBodyAdvice(), GlobalProblemDetailExceptionHandler(token))
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
                 .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation)

@@ -293,6 +293,7 @@ val generateRestDocsIndex = tasks.register("generateRestDocsIndex") {
             sb.appendLine()
 
             if (sharedProblemDetailSnippet != null) {
+                sb.appendLine("[[problemdetail-enkeltoppslag]]")
                 sb.appendLine(".Eksempel for enkeltoppslag og enkelttilgang")
                 sb.appendLine("include::{snippets}/$sharedProblemDetailSnippet/response-fields.adoc[]")
                 sb.appendLine()

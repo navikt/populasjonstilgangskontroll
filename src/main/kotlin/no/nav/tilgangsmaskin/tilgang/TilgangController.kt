@@ -50,8 +50,8 @@ class TilgangController(
     private val regelTjeneste: RegelTjeneste,
     private val enkeltTilgangTjeneste: EnkeltTilgangTjeneste,
     private val token: Token,
-    private val guard: TokenTypeGuard,
-    private val teller: TokenTypeTeller) {
+    private val teller: TokenTypeTeller,
+    private val guard: TokenTypeGuard = TokenTypeGuard(token)) {
 
     private val log = getLogger(javaClass)
 

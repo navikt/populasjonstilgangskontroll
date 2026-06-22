@@ -2,6 +2,8 @@
 .gradle
 **/build/
 !src/**/build/
+!buildSrc/src/main/kotlin/no/nav/tilgangsmaskin/build/
+!buildSrc/src/main/kotlin/no/nav/tilgangsmaskin/build/**
 
 # Ignore Gradle GUI config
 gradle-app.setting

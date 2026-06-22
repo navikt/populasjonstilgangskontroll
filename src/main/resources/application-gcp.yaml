@@ -53,6 +53,7 @@ spring:
       - messages
       - regel-messages
       - openapi-prod-tilgang
+    encoding: UTF-8
   jpa:
     properties:
       hibernate:

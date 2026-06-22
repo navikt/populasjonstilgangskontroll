@@ -29,6 +29,7 @@ spring:
       - openapi/dev/skjerming
       - openapi/dev/tilgang
       - openapi/dev/vergemal
+    encoding: UTF-8
 
 microsoft:
     graph:

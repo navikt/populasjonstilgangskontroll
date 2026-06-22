@@ -16,3 +16,15 @@ management:
         include: '*'
 info:
   client-id: ${azure.app.client.id}
+
+app:
+  messages:
+    dev-basenames:
+      - openapi-dev-ansatt
+      - openapi-dev-bruker
+      - openapi-dev-cache
+      - openapi-dev-enkelt
+      - openapi-dev-regel
+      - openapi-dev-skjerming
+      - openapi-dev-tilgang
+      - openapi-dev-vergemal

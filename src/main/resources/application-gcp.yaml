@@ -1,4 +1,3 @@
-
 server:
   shutdown: graceful
   jetty:
@@ -203,3 +202,9 @@ info:
   name: ${spring.application.name}
   image: ${nais.app.image:unknown}
 
+app:
+  messages:
+    base-basenames:
+      - messages
+      - regel-messages
+      - openapi-prod-tilgang

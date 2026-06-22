@@ -4,13 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
-import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.RestLoggingRequestInterceptor
 import no.nav.tilgangsmaskin.tilgang.Token
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.endpoint.SanitizingFunction
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
 import org.springframework.boot.restclient.RestClientCustomizer
@@ -23,7 +22,6 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.client5.http.config.ConnectionConfig
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder
-import org.apache.hc.core5.util.Timeout
 import org.apache.hc.core5.util.Timeout.ofSeconds
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
@@ -60,32 +58,17 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     private interface IgnoreUnknownMixin
 
     @Bean("messageSource")
-    @ConditionalOnProd
-    fun prodMessageSource() =
-        ReloadableResourceBundleMessageSource().apply {
-            setBasenames("classpath:messages", "classpath:regel-messages", "classpath:openapi-prod-tilgang")
-            setDefaultEncoding("UTF-8")
-        }
-
-    @Bean("messageSource")
-    @ConditionalOnNotProd
-    fun notProdMessageSource() =
-        ReloadableResourceBundleMessageSource().apply {
-            setBasenames(
-                "classpath:messages",
-                "classpath:regel-messages",
-                "classpath:openapi-prod-tilgang",
-                "classpath:openapi-dev-ansatt",
-                "classpath:openapi-dev-bruker",
-                "classpath:openapi-dev-cache",
-                "classpath:openapi-dev-enkelt",
-                "classpath:openapi-dev-regel",
-                "classpath:openapi-dev-skjerming",
-                "classpath:openapi-dev-tilgang",
-                "classpath:openapi-dev-vergemal",
-            )
-            setDefaultEncoding("UTF-8")
-        }
+    fun messageSource(
+        @Value("\${app.messages.base-basenames:messages,regel-messages,openapi-prod-tilgang}") baseBasenames: List<String>,
+        @Value("\${app.messages.dev-basenames:}") devBasenames: List<String>,
+    ) = ReloadableResourceBundleMessageSource().apply {
+        val basenames = (baseBasenames + devBasenames)
+            .filter { it.isNotBlank() }
+            .map { if (it.startsWith("classpath:")) it else "classpath:$it" }
+            .toTypedArray()
+        setBasenames(*basenames)
+        setDefaultEncoding("UTF-8")
+    }
 
     @Bean
     fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor) =
@@ -158,5 +141,3 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 @Target(FUNCTION, CONSTRUCTOR, CLASS)
 annotation class Generated
 typealias NoCoverageAnalysis = Generated
-
-

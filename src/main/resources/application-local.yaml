@@ -21,3 +21,15 @@ microsoft:
     graph:
       url: https://graph.microsoft.com/v1.0
       scope: https://graph.microsoft.com/.default
+
+app:
+  messages:
+    dev-basenames:
+      - openapi-dev-ansatt
+      - openapi-dev-bruker
+      - openapi-dev-cache
+      - openapi-dev-enkelt
+      - openapi-dev-regel
+      - openapi-dev-skjerming
+      - openapi-dev-tilgang
+      - openapi-dev-vergemal

@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:h2://mem:db;MODE=PostgreSQL
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+app:
+  messages:
+    dev-basenames:
+      - openapi-dev-ansatt
+      - openapi-dev-bruker
+      - openapi-dev-cache
+      - openapi-dev-enkelt
+      - openapi-dev-regel
+      - openapi-dev-skjerming
+      - openapi-dev-tilgang
+      - openapi-dev-vergemal
+

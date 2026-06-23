@@ -15,7 +15,7 @@ class ValkeyListener {
         val key = body.toString(UTF_8)
         val cachePrefix = key.substringBefore("::", missingDelimiterValue = "")
         val rawKey = key.substringAfter("::", missingDelimiterValue = key)
-        log.info("Valkey expired cachePrefix={}, key={}", cachePrefix, rawKey)
+        log.info("Valkey expired key={}, cachePrefix={}, rawKey={}", key,cachePrefix, rawKey)
     }
     companion object {
         const val CHANNEL = "__keyevent@0__:expired"

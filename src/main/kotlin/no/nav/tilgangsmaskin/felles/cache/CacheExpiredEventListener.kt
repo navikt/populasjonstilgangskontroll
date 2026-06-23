@@ -7,7 +7,7 @@ import org.springframework.context.SmartLifecycle
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
-@Component
+//@Component
 class CacheExpiredEventListener(private val teller: CacheOppfriskerTeller,
                                 erLeder: Boolean = true,
                                 private vararg val oppfriskere: CacheOppfrisker) : LeaderAware(erLeder),

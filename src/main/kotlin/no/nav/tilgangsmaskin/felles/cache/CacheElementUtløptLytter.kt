@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 
-@Component
+//@Component
 class CacheElementUtløptLytter(client: RedisClient, private val publiserer: ApplicationEventPublisher) :
     RedisPubSubAdapter<String, String>() {
     private val log = getLogger(javaClass)

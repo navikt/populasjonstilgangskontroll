@@ -1,13 +1,12 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOppfrisker
+import no.nav.tilgangsmaskin.felles.cache.CacheOppfriskerTeller
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import org.slf4j.LoggerFactory
@@ -19,7 +18,8 @@ import java.util.*
 class EntraCacheOppfrisker(private val entra: EntraTjeneste,
                            private val oidTjeneste: EntraOidTjeneste,
                            private val cache: CacheOperations,
-                           private val teller: OppfriskingTeller) : AbstractCacheOppfrisker() {
+                           private val teller: OppfriskingTeller,
+                           cacheOppfriskerTeller: CacheOppfriskerTeller) : AbstractCacheOppfrisker(cacheOppfriskerTeller) {
 
     private val log = LoggerFactory.getLogger(javaClass)
     override val cacheName = EntraGrupperConfig.GRAPH

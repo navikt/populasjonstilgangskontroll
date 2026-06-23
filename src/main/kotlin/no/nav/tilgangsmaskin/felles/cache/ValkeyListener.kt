@@ -11,7 +11,7 @@ class ValkeyListener(erLeder: Boolean = true,
 
     @RedisListener(CHANNEL)
     fun onEvent(body: ByteArray) {
-        val nøkkel = CacheNøkkel(body.toString(UTF_8))
+        val nøkkel = body.tilNøkkel()
         somLeder("Håndterer utløpt cache-innslag for $nøkkel", {
                 oppfriskere.firstOrNull { it.cacheName == nøkkel.cacheName }?.run {
                     oppfrisk(nøkkel)
@@ -22,4 +22,8 @@ class ValkeyListener(erLeder: Boolean = true,
     companion object {
          const val CHANNEL = "__keyevent@0__:expired"
     }
+
+    private fun ByteArray.tilNøkkel() = CacheNøkkel(toString(UTF_8))
+
 }
+

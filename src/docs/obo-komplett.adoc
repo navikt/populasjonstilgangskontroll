@@ -3,5 +3,5 @@
 //
 // Eksempel:
 //
- Dette e3ndepunkter evaluerer et komplett regelsett for en gitt ident, og forutsetter et OBO-token.
+ Dette endepunktet evaluerer et komplett regelsett for en gitt ident, og forutsetter et OBO-token.
 

@@ -165,7 +165,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                 Then("Valkey publiserer expired-event som håndteres av ValkeyListener") {
 
                     redisClient.connect().use { connection ->
-                        connection.sync().configSet("notify-keyspace-events", "Ex")
+                        connection.sync().configSet("notify-keyspace-events", "Exd")
                     }
 
                     cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(1))

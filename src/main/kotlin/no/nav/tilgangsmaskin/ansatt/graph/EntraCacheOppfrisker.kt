@@ -18,7 +18,7 @@ import java.util.*
 class EntraCacheOppfrisker(private val entra: EntraTjeneste,
                            private val oidTjeneste: EntraOidTjeneste,
                            private val cache: CacheOperations,
-                           private val teller: OppfriskingTeller,
+                           private val teller: OIDEndringTeller,
                            cacheOppfriskerTeller: CacheOppfriskerTeller) : AbstractCacheOppfrisker(cacheOppfriskerTeller) {
 
     private val log = LoggerFactory.getLogger(javaClass)

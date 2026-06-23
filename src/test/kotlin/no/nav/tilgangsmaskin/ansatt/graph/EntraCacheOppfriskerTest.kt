@@ -35,7 +35,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
     private lateinit var cache: CacheOperations
 
     @MockkBean
-    private lateinit var teller: OppfriskingTeller
+    private lateinit var teller: OIDEndringTeller
 
     @MockkBean(relaxed = true)
     private lateinit var cacheOppfriskerTeller: CacheOppfriskerTeller

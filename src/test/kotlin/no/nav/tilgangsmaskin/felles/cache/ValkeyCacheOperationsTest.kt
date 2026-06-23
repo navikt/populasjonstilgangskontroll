@@ -16,11 +16,8 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisClient.create
-import io.lettuce.core.pubsub.RedisPubSubAdapter
 import io.micrometer.core.instrument.MeterRegistry
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.every
-import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
@@ -42,7 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
-import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import org.springframework.data.redis.connection.RedisConnectionFactory
@@ -57,16 +53,13 @@ import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.UGRADERT
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.springframework.context.annotation.Primary
 import java.time.Duration.ofSeconds
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit.SECONDS
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
 @DataRedisTest
 @AutoConfigureMetrics
-@Import(ValkeyCacheTestConfig::class)
+@Import(ValkeyCacheTestConfig::class, ValkeyListener::class)
 @ApplyExtension(SpringExtension::class)
 class ValkeyCacheOperationsTest : BehaviorSpec() {
 
@@ -97,15 +90,19 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
             ValkeyCacheTeller(meterRegistry)
 
         @Bean
+        fun cacheOppfriskerTeller(meterRegistry: MeterRegistry, token: Token) =
+            CacheOppfriskerTeller(meterRegistry, token)
+
+        @Bean
         fun valkeyCacheOperations(client: RedisClient, cfg: CacheConfig, teller: ValkeyCacheTeller) =
             ValkeyCacheOperations(client, cfg, teller)
     }
 
-    @Autowired
-    private lateinit var ctx: ConfigurableApplicationContext
-
     @MockkBean
     private lateinit var token: Token
+
+    @MockkBean
+    private lateinit var oppfrisker: CacheOppfrisker
 
     @Autowired
     private lateinit var cache: CacheOperations
@@ -118,6 +115,8 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
         beforeEach {
             every { token.system } returns "test"
             every { token.clusterAndSystem } returns "test:dev-gcp"
+            every { oppfrisker.cacheName } returns PDL_MED_FAMILIE_CACHE.name
+            every { oppfrisker.oppfrisk(any()) } returns Unit
             cache.clear(PDL_MED_FAMILIE_CACHE)
         }
 
@@ -163,45 +162,19 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
 
         Given("cache-utløp") {
             When("TTL løper ut") {
-                Then("ValkeyListener kaller oppfrisker") {
-                    val oppfrisker = mockk<CacheOppfrisker>().also {
-                        every { it.cacheName } returns PDL_MED_FAMILIE_CACHE.name
-                        every { it.oppfrisk(any()) } returns Unit
-                    }
-                    val listener = ValkeyListener(CacheOppfriskerTeller(SimpleMeterRegistry(), token), true, oppfrisker)
-
-                    cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(1))
-                    eventually(TIMEOUTS) {
-                        listener.onEvent("${PDL_MED_FAMILIE_CACHE.name}::$I1".toByteArray())
-                        verify { oppfrisker.oppfrisk(CacheNøkkel("${PDL_MED_FAMILIE_CACHE.name}::$I1")) }
-                    }
-                }
-
-                Then("Valkey publiserer faktisk expired-event med cache-nøkkelen") {
-                    val expiredChannel = "__keyevent@0__:expired"
-                    val receivedMessage = AtomicReference<String?>()
-                    val latch = CountDownLatch(1)
+                Then("Valkey publiserer expired-event som håndteres av ValkeyListener") {
 
                     redisClient.connect().use { connection ->
                         connection.sync().configSet("notify-keyspace-events", "Ex")
                     }
 
-                    redisClient.connectPubSub().use { pubsub ->
-                        pubsub.addListener(object : RedisPubSubAdapter<String, String>() {
-                            override fun message(channel: String, messageBody: String) {
-                                if (channel == expiredChannel) {
-                                    receivedMessage.set(messageBody)
-                                    latch.countDown()
-                                }
-                            }
-                        })
+                    cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(1))
 
-                        pubsub.sync().subscribe(expiredChannel)
-                        cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(1))
-
-                        eventually(VALKEY_EVENT_TIMEOUTS) {
-                            latch.await(1, SECONDS) shouldBe true
-                            receivedMessage.get() shouldContain ":$I1"
+                    eventually(VALKEY_EVENT_TIMEOUTS) {
+                        verify {
+                            oppfrisker.oppfrisk(match {
+                                it.cacheName == PDL_MED_FAMILIE_CACHE.name && it.id == I1
+                            })
                         }
                     }
                 }

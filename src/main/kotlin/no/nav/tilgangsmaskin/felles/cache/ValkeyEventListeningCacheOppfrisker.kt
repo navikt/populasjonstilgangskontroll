@@ -12,7 +12,7 @@ class ValkeyEventListeningCacheOppfrisker(erLeder: Boolean = true,
     @RedisListener(CHANNEL)
     fun onEvent(body: ByteArray) {
         val nøkkel = body.tilNøkkel()
-        somLeder("Håndterer oppfrisking for $nøkkel", {
+        somLeder("Håndterer oppfrisking for ${nøkkel.maskert}", {
                 oppfriskere.firstOrNull {
                     it.cacheName == nøkkel.cacheName
                 }?.run {

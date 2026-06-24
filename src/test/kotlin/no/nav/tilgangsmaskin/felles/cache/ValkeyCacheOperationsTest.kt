@@ -9,20 +9,18 @@ import io.kotest.assertions.nondeterministic.eventuallyConfig
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
-import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import no.nav.tilgangsmaskin.felles.cache.CacheElementUtløptLytter.CacheInnslagFjernetHendelse
-import java.util.concurrent.CopyOnWriteArrayList
 import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisClient.create
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
+import io.mockk.verify
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie
@@ -41,8 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
-import org.springframework.context.ApplicationEventPublisher
-import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import org.springframework.data.redis.connection.RedisConnectionFactory
@@ -54,6 +50,7 @@ import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.MOR
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.UGRADERT
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.springframework.context.annotation.Primary
 import java.time.Duration.ofSeconds
 import kotlin.time.Duration.Companion.milliseconds
@@ -62,7 +59,7 @@ import kotlin.time.measureTime
 
 @DataRedisTest
 @AutoConfigureMetrics
-@Import(ValkeyCacheTestConfig::class)
+@Import(ValkeyCacheTestConfig::class, ValkeyEventListeningCacheOppfrisker::class)
 @ApplyExtension(SpringExtension::class)
 class ValkeyCacheOperationsTest : BehaviorSpec() {
 
@@ -93,38 +90,33 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
             ValkeyCacheTeller(meterRegistry)
 
         @Bean
-        fun valkeyCacheOperations(client: RedisClient, cfg: CacheConfig, teller: ValkeyCacheTeller) =
-            ValkeyCacheOperations(client, cfg, teller)
+        fun cacheOppfriskerTeller(meterRegistry: MeterRegistry, token: Token) =
+            CacheOppfriskerTeller(meterRegistry, token)
 
         @Bean
-        fun cacheElementUtløptLytter(client: RedisClient, publisher: ApplicationEventPublisher) =
-            CacheElementUtløptLytter(client, publisher)
+        fun valkeyCacheOperations(client: RedisClient, cfg: CacheConfig, teller: ValkeyCacheTeller) =
+            ValkeyCacheOperations(client, cfg, teller)
     }
-
-    @Autowired
-    private lateinit var ctx: ConfigurableApplicationContext
 
     @MockkBean
     private lateinit var token: Token
 
+    @MockkBean
+    private lateinit var oppfrisker: CacheOppfrisker
+
     @Autowired
     private lateinit var cache: CacheOperations
 
-
-    private val events = CopyOnWriteArrayList<CacheInnslagFjernetHendelse>()
+    @Autowired
+    private lateinit var redisClient: RedisClient
 
     init {
-
-        beforeSpec {
-            ctx.addApplicationListener { event ->
-                if (event is CacheInnslagFjernetHendelse) events.add(event)
-            }
-        }
 
         beforeEach {
             every { token.system } returns "test"
             every { token.clusterAndSystem } returns "test:dev-gcp"
-            events.clear()
+            every { oppfrisker.cacheName } returns PDL_MED_FAMILIE_CACHE.name
+            every { oppfrisker.oppfrisk(any()) } returns Unit
             cache.clear(PDL_MED_FAMILIE_CACHE)
         }
 
@@ -170,10 +162,20 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
 
         Given("cache-utløp") {
             When("TTL løper ut") {
-                Then("CacheInnslagFjernetHendelse publiseres") {
+                Then("Valkey publiserer expired-event som håndteres av ValkeyListener") {
+
+                    redisClient.connect().use { connection ->
+                        connection.sync().configSet("notify-keyspace-events", "Exd")
+                    }
+
                     cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(1))
-                    eventually(TIMEOUTS) {
-                        events.any { I1 in it.nøkkel }.shouldBeTrue()
+
+                    eventually(VALKEY_EVENT_TIMEOUTS) {
+                        verify {
+                            oppfrisker.oppfrisk(match {
+                                it.cacheName == PDL_MED_FAMILIE_CACHE.name && it.id == I1
+                            })
+                        }
                     }
                 }
             }
@@ -199,7 +201,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
         Given("clear i prod-miljø") {
             beforeEach {
                 mockkObject(ClusterUtils.Companion)
-                every { ClusterUtils.isProd } returns true
+                every { isProd } returns true
             }
             afterEach { unmockkObject(ClusterUtils.Companion) }
 
@@ -327,7 +329,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                 Then("alle felter deserialiseres korrekt") {
                     val person = Person(
                         brukerId = BrukerId(I1),
-                        aktørId = AktørId(AKTØR_ID),
+                        aktørId = AktørId(AKTOR_ID),
                         geoTilknytning = KommuneTilknytning(Kommune("0301")),
                         graderinger = listOf(UGRADERT),
                         familie = Familie(
@@ -342,7 +344,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
 assertSoftly(retrieved!!) {
     this shouldBe person
     brukerId.verdi shouldBe I1
-    aktørId.verdi shouldBe AKTØR_ID
+    aktørId.verdi shouldBe AKTOR_ID
     geoTilknytning shouldBe KommuneTilknytning(Kommune("0301"))
     graderinger shouldBe listOf(UGRADERT)
     familie.foreldre.first().brukerId shouldBe BrukerId(I2)
@@ -370,13 +372,17 @@ assertSoftly(retrieved!!) {
         private val redis = RedisContainer(DEFAULT_IMAGE_NAME)
         private const val I1 = "03508331575"
         private const val I2 = "20478606614"
-        private const val AKTØR_ID = "1234567890123"
-        private const val AKTØR_ID_2 = "9876543210123"
+        private const val AKTOR_ID = "1234567890123"
+        private const val AKTOR_ID_2 = "9876543210123"
         private val IDS = setOf(I1, I2)
-        private val P1 = Person(BrukerId(I1), I1, AktørId(AKTØR_ID), BydelTilknytning(Bydel("030101")), listOf(FORTROLIG))
-        private val P2 = Person(BrukerId(I2), I2, AktørId(AKTØR_ID_2), UkjentBosted())
+        private val P1 = Person(BrukerId(I1), I1, AktørId(AKTOR_ID), BydelTilknytning(Bydel("030101")), listOf(FORTROLIG))
+        private val P2 = Person(BrukerId(I2), I2, AktørId(AKTOR_ID_2), UkjentBosted())
         private val TIMEOUTS = eventuallyConfig {
             duration = 2.seconds
+            interval = 100.milliseconds
+        }
+        private val VALKEY_EVENT_TIMEOUTS = eventuallyConfig {
+            duration = 5.seconds
             interval = 100.milliseconds
         }
     }

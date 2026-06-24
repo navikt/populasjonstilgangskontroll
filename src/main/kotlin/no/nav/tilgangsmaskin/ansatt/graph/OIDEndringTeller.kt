@@ -6,6 +6,6 @@ import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.stereotype.Component
 
 @Component
-class OppfriskingTeller(registry: MeterRegistry, token: Token) :
-    AbstractTeller(registry, token, "endringer", "Endrede user oids")
+class OIDEndringTeller(registry: MeterRegistry, token: Token) :
+    AbstractTeller(registry, token, "endringer", "Endrede oids")
 

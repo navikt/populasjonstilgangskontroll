@@ -50,6 +50,9 @@ dependencies {
     constraints {
         add("implementation", libs.plexus.utils) // TODO reconsider on next bump of cyclone-dx-plugin
     }
+    // Force newer jackson-databind version (required by gradle-avro-plugin)
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.22.0")
+
     implementation(libs.confluent.kafka.avro.serializer) {
         exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
     }
@@ -103,6 +106,7 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom(libs.opentelemetry.instrumentation.bom.get().toString())
+        mavenBom(libs.kotest.bom.get().toString())
     }
 }
 

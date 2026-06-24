@@ -20,8 +20,13 @@ abstract class LeaderAware(private var erLeder: Boolean = false) {
         }) { log.info("Denne instansen ($hostname) er ikke leder, lederen er ${event.leder}") }
     }
 
-    protected fun <T> somLeder(beskrivelse: String, block: () -> T, default: () -> T): T = if (erLeder) {
-        log.trace("Leder kjører $beskrivelse")
+    protected fun somLeder(beskrivelse: String, block: () -> Unit) =
+        somLeder(beskrivelse, block) {}
+
+
+    protected fun <T> somLeder(beskrivelse: String, block: () -> T, default: () -> T): T =
+        if (erLeder) {
+        log.trace(beskrivelse)
         block()
     } else {
         default()

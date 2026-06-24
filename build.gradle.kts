@@ -47,6 +47,9 @@ repositories {
 
 
 dependencies {
+    // Force newer jackson-databind version (required by gradle-avro-plugin)
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.22.0")
+
     implementation(libs.confluent.kafka.avro.serializer) {
         exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
     }

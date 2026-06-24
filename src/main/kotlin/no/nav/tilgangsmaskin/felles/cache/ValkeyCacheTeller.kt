@@ -5,13 +5,6 @@ import org.springframework.stereotype.Component
 import java.util.Locale
 import java.util.Locale.getDefault
 
-/**
- * Teller for alle cache-operasjoner i [ValkeyCacheOperations].
- * Gir full observabilitet over alle operasjoner og resultater — inkludert feil.
- *
- * Metrikknavn: `valkey.cache.operasjoner`
- * Tagger: `operasjon` (getOne/getMany/putOne/putMany/delete/clear), `cache` (cachenavn), `resultat` (hit/miss/ok/feilet)
- */
 @Component
 class ValkeyCacheTeller(private val registry: MeterRegistry) {
 

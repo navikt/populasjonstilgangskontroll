@@ -14,6 +14,7 @@ interface CacheOperations {
     fun size(cache: CacheNøkkelConfig): Long =
         sizes(cache).values.single()
     fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long>
+
 }
 
 inline fun <reified T : Any> CacheOperations.getOne(cfg: CacheNøkkelConfig, id: String): T? =

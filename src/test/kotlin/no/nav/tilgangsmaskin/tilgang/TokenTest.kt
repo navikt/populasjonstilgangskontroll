@@ -2,8 +2,8 @@ package no.nav.tilgangsmaskin.tilgang
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
-import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.security.token.support.core.context.TokenValidationContext
@@ -17,6 +17,9 @@ import no.nav.tilgangsmaskin.tilgang.Token.Companion.AZP_NAME
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.IDTYP
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.OID
+import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
+import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
+import no.nav.tilgangsmaskin.tilgang.TokenType.UNAUTHENTICATED
 import java.util.*
 
 class TokenTest : BehaviorSpec({
@@ -39,18 +42,18 @@ class TokenTest : BehaviorSpec({
         When("idtyp er 'app'") {
             Then("CC er true") {
                 every { claims.getStringClaim(IDTYP) } returns APP
-                token.erCC.shouldBeTrue()
+                token.type shouldBe CCF
             }
         }
         When("idtyp ikke er 'app'") {
             Then("CC er false") {
                 every { claims.getStringClaim(IDTYP) } returns "user"
-                token.erCC shouldBe false
+                token.type shouldNotBe CCF
             }
         }
         When("idtyp mangler") {
             Then("CC er false") {
-                token.erCC shouldBe false
+                token.type shouldNotBe CCF
             }
         }
     }
@@ -58,20 +61,20 @@ class TokenTest : BehaviorSpec({
     Given("erObo") {
         When("oid finnes og idtyp ikke er 'app'") {
             Then("OBO er true") {
-                every { claims.getStringClaim(OID) } returns oid.toString()
-                token.erObo.shouldBeTrue()
+                every { claims.getStringClaim(OID) } returns "$oid"
+                token.type shouldBe OBO
             }
         }
         When("token er CC (idtyp=app)") {
             Then("OBO er false") {
                 every { claims.getStringClaim(IDTYP) } returns APP
-                every { claims.getStringClaim(OID) } returns oid.toString()
-                token.erObo shouldBe false
+                every { claims.getStringClaim(OID) } returns "$oid"
+                token.type shouldBe CCF
             }
         }
         When("oid mangler") {
             Then("OBO er false") {
-                token.erObo shouldBe false
+                token.type shouldNotBe CCF
             }
         }
     }
@@ -90,10 +93,11 @@ class TokenTest : BehaviorSpec({
         }
     }
 
+
     Given("oid-oppslag fra token") {
         When("oid finnes") {
             Then("returnerer oid") {
-                every { claims.getStringClaim(OID) } returns oid.toString()
+                every { claims.getStringClaim(OID) } returns "$oid"
                 token.oid shouldBe oid
             }
         }
@@ -244,10 +248,10 @@ class TokenTest : BehaviorSpec({
         }
         When("getClaims kaster exception") {
             Then("erCC er false") {
-                token.erCC shouldBe false
+                token.type shouldNotBe CCF
             }
             Then("erObo er false") {
-                token.erObo shouldBe false
+                token.type shouldNotBe OBO
             }
             Then("ansattId er null") {
                 token.ansattId shouldBe null
@@ -258,20 +262,20 @@ class TokenTest : BehaviorSpec({
     Given("TokenType.from") {
         When("token er OBO") {
             Then("returnerer OBO") {
-                every { claims.getStringClaim(OID) } returns oid.toString()
-                TokenType.from(token) shouldBe TokenType.OBO
+                every { claims.getStringClaim(OID) } returns "$oid"
+                token.type shouldBe OBO
             }
         }
         When("token er CC") {
             Then("returnerer CCF") {
                 every { claims.getStringClaim(IDTYP) } returns APP
-                TokenType.from(token) shouldBe TokenType.CCF
+                token.type shouldBe CCF
             }
         }
         When("ingen claims finnes") {
             Then("returnerer UNAUTHENTICATED") {
                 every { validationContext.getClaims(AAD_ISSUER) } throws RuntimeException("ingen token")
-                TokenType.from(token) shouldBe TokenType.UNAUTHENTICATED
+                token.type shouldBe UNAUTHENTICATED
             }
         }
     }

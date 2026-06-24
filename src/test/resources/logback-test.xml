@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration>
+<configuration debug="false" scan="false">
+    <!-- Shutdown hook: flush and close appenders gracefully on JVM shutdown -->
+    <shutdownHook class="ch.qos.logback.core.hook.DefaultShutdownHook">
+        <delay>2000</delay>
+    </shutdownHook>
+    <!-- Status listener for test diagnostics -->
+    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
+
     <appender name="stdout-appender" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>%d{yyyy-MM-dd HH:mm:ss} %X{Nav-CallId} [%thread] %-5level %logger{70} - %msg%n</Pattern>
-        </layout>
+        <immediateFlush>true</immediateFlush>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %X{Nav-CallId} [%thread] %-5level %logger{70} - %msg%n</pattern>
+        </encoder>
     </appender>
+
     <appender name="secure-appender" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>%d{yyyy-MM-dd HH:mm:ss} %X{Nav-CallId} [%thread] %-5level %logger{70} - %msg%n</Pattern>
-        </layout>
+        <immediateFlush>true</immediateFlush>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %X{Nav-CallId} [%thread] %-5level %logger{70} - %msg%n</pattern>
+        </encoder>
     </appender>
+
+    <!-- Noise suppression for tests -->
+    <logger name="org.springframework.boot.autoconfigure" level="warn"/>
+    <logger name="org.springframework.web" level="warn"/>
+    <logger name="org.hibernate" level="warn"/>
+    <logger name="io.lettuce.core.protocol" level="warn"/>
 
     <logger name="org.springframework.cache" level="trace" />
     <logger name="org.springframework.core.retry.RetryTemplate" level="trace"/>
@@ -17,6 +33,7 @@
     <logger name="secureLog" level="INFO" additivity="false">
         <appender-ref ref="secure-appender"/>
     </logger>
+
     <root level="info">
         <appender-ref ref="stdout-appender"/>
     </root>

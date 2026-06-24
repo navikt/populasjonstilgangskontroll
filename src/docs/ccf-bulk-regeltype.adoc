@@ -1,0 +1,1 @@
+Dette endepunktet ekesekverer det gitte regelsettet for et sett med indenter. Forutsetter Client Credentials-token.

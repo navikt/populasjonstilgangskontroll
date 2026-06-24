@@ -47,6 +47,9 @@ repositories {
 
 
 dependencies {
+    constraints {
+        add("implementation", libs.plexus.utils) // TODO reconsider on next bump of cyclone-dx-plugin
+    }
     // Force newer jackson-databind version (required by gradle-avro-plugin)
     implementation("com.fasterxml.jackson.core:jackson-databind:2.22.0")
 
@@ -114,6 +117,12 @@ tasks.withType<BootJar> {
     archiveFileName = "app.jar"
 }
 
+val cleanGeneratedRestDocsArtifacts = tasks.register<Delete>("cleanGeneratedRestDocsArtifacts") {
+    description = "Cleans generated REST Docs snippets and index"
+    delete(layout.buildDirectory.dir("generated-snippets"))
+    delete(layout.buildDirectory.dir("generated-restdocs-index"))
+}
+
 java {
     toolchain {
         languageVersion.set(javaVersion)
@@ -122,11 +131,7 @@ java {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
-
-    doFirst {
-        delete(layout.buildDirectory.dir("generated-snippets"))
-        delete(layout.buildDirectory.dir("generated-restdocs-index"))
-    }
+    dependsOn(cleanGeneratedRestDocsArtifacts)
 
     maxHeapSize = "4g"
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
@@ -134,18 +139,21 @@ tasks.named<Test>("test") {
         listOf(
             "--add-opens",
             "java.base/java.util=ALL-UNNAMED",
+            "-XX:+EnableDynamicAgentLoading",
             "-Dkotlinx.coroutines.debug=off",
         )
 }
 
-val generateRestDocsIndex by tasks.registering {
+val generateRestDocsIndex = tasks.register("generateRestDocsIndex") {
     description = "Generates index.adoc from REST Docs snippets"
+    notCompatibleWithConfigurationCache("generateRestDocsIndex captures project references in doLast action")
     dependsOn(tasks.test)
 
     val snippetsDir = layout.buildDirectory.dir("generated-snippets")
     val outputDir = layout.buildDirectory.dir("generated-restdocs-index")
 
     inputs.dir(snippetsDir)
+    inputs.dir(layout.projectDirectory.dir("src/docs")).optional(true)
     outputs.dir(outputDir)
 
     doLast {
@@ -161,9 +169,15 @@ val generateRestDocsIndex by tasks.registering {
 
         val sb = StringBuilder()
         val sharedProblemDetailSnippet = dirs.firstOrNull {
-            snippets.resolve(it).resolve("response-fields.adoc").exists()
+            !it.contains("-bulk") && snippets.resolve(it).resolve("response-fields.adoc").exists()
         }
         val sharedProblemDetailContent = sharedProblemDetailSnippet?.let {
+            snippets.resolve(it).resolve("response-fields.adoc").readText(UTF_8)
+        }
+        val sharedProblemDetailBulkSnippet = dirs.firstOrNull {
+            it.contains("-bulk") && snippets.resolve(it).resolve("response-fields.adoc").exists()
+        }
+        val sharedProblemDetailBulkContent = sharedProblemDetailBulkSnippet?.let {
             snippets.resolve(it).resolve("response-fields.adoc").readText(UTF_8)
         }
 
@@ -199,6 +213,7 @@ val generateRestDocsIndex by tasks.registering {
         val endpointDescriptionKeys: Map<String, String> = mapOf(
             "obo-komplett" to (controllerConstants["SUMMARY_KOMPLETT_OBO"] ?: "openapi.tilgang.komplett.obo.summary"),
             "obo-kjerne" to (controllerConstants["SUMMARY_KJERNE_OBO"] ?: "openapi.tilgang.kjerne.obo.summary"),
+            "obo-enkeltilgang" to (controllerConstants["SUMMARY_OVERSTYR"] ?: "openapi.tilgang.overstyr.summary"),
             "obo-enkelttilgang" to (controllerConstants["SUMMARY_OVERSTYR"] ?: "openapi.tilgang.overstyr.summary"),
             "obo-bulk" to (controllerConstants["SUMMARY_BULK"] ?: "openapi.tilgang.bulk.summary"),
             "obo-bulk-regeltype" to (controllerConstants["DESCRIPTION_BULK_OBO_REGELTYPE"] ?: "openapi.tilgang.bulk.obo.regeltype.description"),
@@ -232,11 +247,32 @@ val generateRestDocsIndex by tasks.registering {
             }
         }
 
+        // Read a custom partial from src/docs/<name>.adoc if it exists.
+        // Naming convention:
+        //   src/docs/oversikt.adoc          — appended inside the "Oversikt" section
+        //   src/docs/obo.adoc               — appended after the OBO flow heading
+        //   src/docs/ccf.adoc               — appended after the CCF flow heading
+        //   src/docs/<snippet-name>.adoc    — appended after each endpoint section
+        //                                     e.g. src/docs/obo-komplett.adoc
+        val docsDir = file("src/docs")
+        fun appendCustomText(name: String) {
+            val partial = docsDir.resolve("$name.adoc")
+            if (partial.exists()) {
+                sb.appendLine()
+                sb.appendLine(partial.readText(UTF_8).trimEnd())
+                sb.appendLine()
+            }
+        }
+
         fun appendSnippetIncludes(name: String) {
             sb.appendLine("include::{snippets}/$name/http-request.adoc[]")
             sb.appendLine("include::{snippets}/$name/http-response.adoc[]")
             val responseFields = snippets.resolve(name).resolve("response-fields.adoc")
-            if (responseFields.exists() && responseFields.readText(UTF_8) != sharedProblemDetailContent) {
+            if (
+                responseFields.exists() &&
+                responseFields.readText(UTF_8) != sharedProblemDetailContent &&
+                responseFields.readText(UTF_8) != sharedProblemDetailBulkContent
+            ) {
                 sb.appendLine()
                 sb.appendLine(".Response fields")
                 sb.appendLine("include::{snippets}/$name/response-fields.adoc[]")
@@ -257,11 +293,23 @@ val generateRestDocsIndex by tasks.registering {
         sb.appendLine()
         sb.appendLine("Tjenesten avgjør om en Nav-ansatt har tilgang til en bruker")
         sb.appendLine()
-        if (sharedProblemDetailSnippet != null) {
-            sb.appendLine("=== Felles ProblemDetail-felter for enkeltoppslag og enkelttilgang")
+        appendCustomText("oversikt")
+        if (sharedProblemDetailSnippet != null || sharedProblemDetailBulkSnippet != null) {
+            sb.appendLine("=== Felles problem detail-felter")
             sb.appendLine()
-            sb.appendLine("include::{snippets}/$sharedProblemDetailSnippet/response-fields.adoc[]")
-            sb.appendLine()
+
+            if (sharedProblemDetailSnippet != null) {
+                sb.appendLine("[[problemdetail-enkeltoppslag]]")
+                sb.appendLine(".Eksempel for enkeltoppslag og enkelttilgang")
+                sb.appendLine("include::{snippets}/$sharedProblemDetailSnippet/response-fields.adoc[]")
+                sb.appendLine()
+            }
+
+            if (sharedProblemDetailBulkSnippet != null && sharedProblemDetailBulkContent != sharedProblemDetailContent) {
+                sb.appendLine(".Eksempel for bulk")
+                sb.appendLine("include::{snippets}/$sharedProblemDetailBulkSnippet/response-fields.adoc[]")
+                sb.appendLine()
+            }
         }
 
         for ((prefix, names) in grouped) {
@@ -272,33 +320,61 @@ val generateRestDocsIndex by tasks.registering {
             }
             sb.appendLine("== $heading")
             sb.appendLine()
+            appendCustomText(prefix)
 
             val sortedNames = names.sorted()
-            val overstyrRoot = "$prefix-enkelttilgang"
-            val overstyrRelated = sortedNames.filter { it == overstyrRoot || it.startsWith("$overstyrRoot-") }
-            val remaining = sortedNames.filterNot { it in overstyrRelated }
+            val komplettRoot = "$prefix-komplett"
+            val komplettRelated = sortedNames.filter { it == komplettRoot || it.startsWith("$komplettRoot-") }
+            val overstyrRoot = listOf("$prefix-enkeltilgang", "$prefix-enkelttilgang")
+                .firstOrNull { it in sortedNames }
+            val overstyrRelated = if (overstyrRoot != null) {
+                sortedNames.filter { it == overstyrRoot || it.startsWith("$overstyrRoot-") }
+            } else {
+                emptyList()
+            }
+            val remaining = sortedNames.filterNot { it in overstyrRelated || it in komplettRelated }
 
             for (name in remaining) {
                 val title = getDescription(name)
                 sb.appendLine("=== $title")
                 sb.appendLine()
+                appendCustomText(name)
                 appendSnippetIncludes(name)
             }
 
-            if (overstyrRelated.isNotEmpty()) {
+            if (komplettRelated.isNotEmpty()) {
+                sb.appendLine("=== ${getDescription(komplettRoot)}")
+                sb.appendLine()
+                appendCustomText(komplettRoot)
+
+                if (komplettRelated.contains(komplettRoot)) {
+                    appendSnippetIncludes(komplettRoot)
+                }
+
+                val alternatives = komplettRelated.filter { it != komplettRoot }
+                if (alternatives.isNotEmpty()) {
+                    sb.appendLine("==== Alternative responser")
+                    sb.appendLine()
+                    for (name in alternatives) {
+                        val altTitle = getDescription(name)
+                        sb.appendLine("===== $altTitle")
+                        sb.appendLine()
+                        sb.appendLine("include::{snippets}/$name/http-request.adoc[]")
+                        sb.appendLine("include::{snippets}/$name/http-response.adoc[]")
+                        sb.appendLine()
+                    }
+                }
+            }
+
+            if (overstyrRoot != null && overstyrRelated.isNotEmpty()) {
                 sb.appendLine("=== Enkelttilgang")
                 sb.appendLine()
+                appendCustomText("$prefix-enkelttilgang")
 
-                if (overstyrRelated.contains(overstyrRoot)) {
-                    appendSnippetIncludes(overstyrRoot)
-                }
+                appendSnippetIncludes(overstyrRoot)
 
-                val alternatives = overstyrRelated.filter {
-                    it != overstyrRoot && (
-                        it.contains("begrunnelse-for-kort") ||
-                            it.contains("uten-token")
-                        )
-                }
+                // Group all enkeltilgang variants except the 202/root response under alternatives.
+                val alternatives = overstyrRelated.filter { it != overstyrRoot }
                 if (alternatives.isNotEmpty()) {
                     sb.appendLine("==== Alternative responser")
                     sb.appendLine()
@@ -326,6 +402,7 @@ tasks.named("asciidoctor") {
 }
 
 tasks.withType<AsciidoctorTask> {
+    notCompatibleWithConfigurationCache("Asciidoctor plugin is not compatible with Gradle configuration cache")
     sourceDir(layout.buildDirectory.dir("generated-restdocs-index"))
     baseDirFollowsSourceDir()
     sources {

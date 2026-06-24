@@ -8,8 +8,9 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.justRun
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.felles.rest.BrukerIdentRequestBodyAdvice
+import no.nav.tilgangsmaskin.felles.rest.GlobalProblemDetailExceptionHandler
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
@@ -24,17 +25,17 @@ import org.springframework.restdocs.operation.preprocess.Preprocessors.preproces
 import org.springframework.restdocs.operation.preprocess.Preprocessors.modifyHeaders
 import org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint
 import org.springframework.restdocs.snippet.Snippet
+import org.springframework.restdocs.payload.JsonFieldType.ARRAY
 import org.springframework.restdocs.payload.JsonFieldType.BOOLEAN
 import org.springframework.restdocs.payload.JsonFieldType.NUMBER
 import org.springframework.restdocs.payload.JsonFieldType.STRING
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields
+import org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
-import org.springframework.web.bind.annotation.RestControllerAdvice
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 abstract class TilgangControllerTestBase : BehaviorSpec() {
 
@@ -63,18 +64,12 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
     @MockK
     protected lateinit var teller: TokenTypeTeller
 
-    @MockK(relaxed = true)
-    protected lateinit var konsumentValidator: EnkeltTilgangKonsumentValidator
-
     protected val ansattId = AnsattId("Z999999")
     protected val brukerId = "08526835670"
 
     protected lateinit var mockMvc: MockMvc
 
     private val restDocumentation = ManualRestDocumentation()
-
-    @RestControllerAdvice
-    private class ProblemDetailExceptionHandler : ResponseEntityExceptionHandler()
 
     protected companion object {
         private val avvisningskoder = AvvisningsKode.entries.joinToString(", ") { it.name }
@@ -91,6 +86,16 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             fieldWithPath("traceId").type(STRING).description("OTEL trace-ID for feilsøking").optional(),
             fieldWithPath("kanOverstyres").type(BOOLEAN).description("Om regelen kan overstyres med enkelttilgang").optional()
         )
+
+        val bulkProblemDetailFields = relaxedResponseFields(
+            fieldWithPath("ansattId").type(STRING).description("NAV-ident for ansatt forespørselen kjøres for"),
+            fieldWithPath("resultater").type(ARRAY).description("Resultater per oppslått bruker"),
+            fieldWithPath("resultater[].brukerId").type(STRING).description("Fødselsnummer/d-nummer til bruker"),
+            fieldWithPath("resultater[].status").type(NUMBER).description("HTTP-status for resultatet (204 eller 403)"),
+            subsectionWithPath("resultater[].detaljer")
+                .description("Feildetaljer for avviste oppslag. Feltstruktur er identisk med responsen for enkeltoppslag (se <<problemdetail-enkeltoppslag, ProblemDetail for enkeltoppslag>>).")
+                .optional()
+        )
     }
 
     init {
@@ -105,8 +110,8 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
         beforeEach { case ->
             clearAllMocks()
             restDocumentation.beforeTest(TilgangControllerTestBase::class.java, case.name.name)
-            mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, TokenTypeGuard(token), konsumentValidator, teller))
-                .setControllerAdvice(ProblemDetailExceptionHandler())
+            mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, teller))
+                .setControllerAdvice(BrukerIdentRequestBodyAdvice(), GlobalProblemDetailExceptionHandler(token))
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
                 .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation)
                     .uris()
@@ -124,6 +129,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
                 .build()
             justRun { teller.tell(any<Tags>()) }
             every { token.ansattId } returns ansattId
+            every { token.systemNavn } returns "gosys"
         }
 
         afterEach {

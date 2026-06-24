@@ -26,7 +26,12 @@ import tools.jackson.module.kotlin.KotlinModule.Builder
 @Configuration(proxyBeanMethods = true)
 @ConditionalOnGCP
 @NoCoverageAnalysis
-class CacheBeanConfig(private val cf: RedisConnectionFactory, private val meterRegistry: MeterRegistry,  private val errorHandler: CacheErrorHandler, private vararg val cfgs: CachableRestConfig) : CachingConfigurer {
+class CacheBeanConfig(
+    private val cf: RedisConnectionFactory,
+    private val meterRegistry: MeterRegistry,
+    private val errorHandler: CacheErrorHandler,
+    private vararg val cfgs: CachableRestConfig,
+) : CachingConfigurer {
 
 
     override fun errorHandler() =

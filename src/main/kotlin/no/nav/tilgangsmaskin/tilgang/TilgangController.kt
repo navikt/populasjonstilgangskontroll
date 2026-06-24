@@ -19,7 +19,6 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangGyldig
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
@@ -33,6 +32,7 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.CONTENT_TOO_LARGE
 import org.springframework.http.HttpStatus.MULTI_STATUS
 import org.springframework.http.HttpStatus.NO_CONTENT
+import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -41,17 +41,18 @@ import org.springframework.web.server.ResponseStatusException
 
 private const val TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.tilgang.tag.description"
 
+const val DEFAULT_PREFIX = "/api/v1"
+
 @SecurityScheme(bearerFormat = "JWT", name = "bearerAuth", scheme = "bearer", type = HTTP)
-@ProtectedRestController(value = ["/api/v1"], issuer = AAD_ISSUER, claimMap = [])
+@ProtectedRestController(value = [DEFAULT_PREFIX], issuer = AAD_ISSUER, claimMap = [])
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "TilgangController", description = TILGANG_CONTROLLER_TAG_DESCRIPTION)
 class TilgangController(
     private val regelTjeneste: RegelTjeneste,
     private val enkeltTilgangTjeneste: EnkeltTilgangTjeneste,
     private val token: Token,
-    private val guard: TokenTypeGuard,
-    private val konsumentValidator: EnkeltTilgangKonsumentValidator,
-    private val teller: TokenTypeTeller) {
+    private val teller: TokenTypeTeller,
+) {
 
     private val log = getLogger(javaClass)
 
@@ -59,30 +60,34 @@ class TilgangController(
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
-    fun kompletteRegler(@RequestBody brukerId: String, req: HttpServletRequest) =
-        enkeltOppslag({ ansattIdFraToken() }, OBO, brukerId, KOMPLETT_REGELTYPE,req.requestURI)
+    fun kompletteRegler(@RequestBody brukerId: String, req: HttpServletRequest) {
+        enkeltOppslag({ ansattIdFraToken() }, OBO, brukerId, KOMPLETT_REGELTYPE, req.requestURI)
+    }
 
     @PostMapping("/ccf/komplett/{ansattId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KOMPLETT_CCF, description = DESCRIPTION_KOMPLETT_CCF)
-    fun kompletteReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String, req: HttpServletRequest) =
-        enkeltOppslag({ansattId}, CCF, brukerId, KOMPLETT_REGELTYPE, req.requestURI)
+    fun kompletteReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String, req: HttpServletRequest) {
+        enkeltOppslag({ ansattId }, CCF, brukerId, KOMPLETT_REGELTYPE, req.requestURI)
+    }
 
     @PostMapping("kjerne")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KJERNE_OBO, description = DESCRIPTION_KJERNE_OBO)
-    fun kjerneregler(@RequestBody brukerId: String, req: HttpServletRequest) =
+    fun kjerneregler(@RequestBody brukerId: String, req: HttpServletRequest) {
         enkeltOppslag({ ansattIdFraToken() }, OBO, brukerId, KJERNE_REGELTYPE, req.requestURI)
+    }
 
 
     @PostMapping("/ccf/kjerne/{ansattId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KJERNE_CCF, description = DESCRIPTION_KJERNE_CCF)
-    fun kjerneReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String, req: HttpServletRequest) =
-        enkeltOppslag({ansattId}, CCF, brukerId, KJERNE_REGELTYPE,req.requestURI)
+    fun kjerneReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String, req: HttpServletRequest) {
+        enkeltOppslag({ ansattId }, CCF, brukerId, KJERNE_REGELTYPE, req.requestURI)
+    }
 
 
     @PostMapping("overstyr")
@@ -90,8 +95,7 @@ class TilgangController(
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
     fun overstyr(@RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData, req: HttpServletRequest) {
-        guard.krev(OBO, req.requestURI)
-        konsumentValidator.valider(token.systemNavn)
+        krev(forventet = OBO, uri = req.requestURI)
         enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattIdFraToken(), data, token.systemNavn)
     }
 
@@ -125,7 +129,7 @@ class TilgangController(
         bulkOppslag({ ansattId }, CCF, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(),req.requestURI)
 
     private fun bulkOppslag(ansattId: () -> AnsattId, forventet: TokenType, specs: Set<BrukerIdOgRegelsett>, uri: String): AggregertBulkRespons {
-        guard.krev(forventet, uri)
+        krev(forventet, uri)
         val ansatt = ansattId()
         MDC.put(USER_ID, ansatt.verdi)
         return if (specs.isNotEmpty()) {
@@ -142,7 +146,7 @@ class TilgangController(
     private fun enkeltOppslag(ansattId: () -> AnsattId, forventet: TokenType, brukerId: String, regelType: RegelType, uri: String) =
         with(brukerId.trim('"')) {
             sjekk(isNotBlank(), BAD_REQUEST, "brukerId kan ikke være tom")
-            guard.krev(forventet, uri)
+            krev(forventet, uri)
             val ansatt = ansattId()
             MDC.put(USER_ID, ansatt.verdi)
             log.trace(CONFIDENTIAL,"Kjører {} regler for {} og {}", regelType, ansatt, this.maskFnr())
@@ -156,7 +160,13 @@ class TilgangController(
         }
 
     private fun tell(type: String) =
-        teller.tell(Tags.of("type",type,"token",TokenType.from(token).name.lowercase()))
+        teller.tell(Tags.of("type",type,"token",token.type.name.lowercase()))
+
+    private fun krev(forventet: TokenType, uri: String) {
+        if (token.type != forventet) {
+            throw ResponseStatusException(UNAUTHORIZED, "Forventet token type $forventet for $uri, fikk ${token.type}")
+        }
+    }
 
 
     private fun sjekk(predikat: Boolean, status: HttpStatus, message: String) {

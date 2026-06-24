@@ -1,4 +1,3 @@
-
 server:
   shutdown: graceful
   jetty:
@@ -49,6 +48,8 @@ spring:
   threads:
     virtual:
       enabled: true
+  messages:
+    encoding: UTF-8
   jpa:
     properties:
       hibernate:
@@ -202,4 +203,3 @@ info:
   cluster: ${nais.cluster.name:local}
   name: ${spring.application.name}
   image: ${nais.app.image:unknown}
-

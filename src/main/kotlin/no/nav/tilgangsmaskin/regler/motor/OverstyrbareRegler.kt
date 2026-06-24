@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.AVDØD
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
@@ -16,6 +15,7 @@ import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.VERGEMÅL
 
 @SortertRegel(RegelRekkefølge.GEOGRAFISK)
 class GeografiskRegel(private val oppfølging: OppfølgingTjeneste) : GlobalGruppeMedlemskapRegel(NASJONAL), OverstyrbarRegel {
+
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         godtaHvis {
             ansatt erMedlemAv NASJONAL
@@ -61,6 +61,9 @@ class VergemålRegel(private val vergemål: VergemålTjeneste) : OverstyrbarRege
         avvisHvis {
             runCatching {
                 bruker.brukerId in vergemål.vergemål(ansatt.ansattId)
-            }.getOrDefault(false)
+            }.getOrElse {e ->
+                log.warn("Feil ved oppslag av vergemål for ansattId={} og brukerId={}. aksepterer tilgang.", ansatt.ansattId, bruker.brukerId,e)
+                false
+            }
         }
 }

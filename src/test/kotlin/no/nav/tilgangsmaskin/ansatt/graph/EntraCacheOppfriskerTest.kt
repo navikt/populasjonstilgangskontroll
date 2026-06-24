@@ -51,15 +51,18 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
         Given("cache-innslag går ut på tid") {
             When("innslag var fra $GEO") {
                 Then("kaller $GEO med riktig ansattId og oid") {
-                    oppfrisker.oppfrisk(nøkkel(GEO))
-
+                    shouldNotThrowAny {
+                        oppfrisker.oppfrisk(nøkkel(GEO))
+                    }
                     verify { entra.geoGrupper(ansattId, OID) }
                     verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
                 }
             }
             When("innslaget var fra $GEO_OG_GLOBALE") {
                 Then("kaller $GEO_OG_GLOBALE med riktig ansattId og oid") {
-                    oppfrisker.oppfrisk(nøkkel(GEO_OG_GLOBALE))
+                    shouldNotThrowAny {
+                        oppfrisker.oppfrisk(nøkkel(GEO_OG_GLOBALE))
+                    }
 
                     verify { entra.geoOgGlobaleGrupper(ansattId, OID) }
                     verify(exactly = 0) { entra.geoGrupper(any(), any()) }
@@ -73,7 +76,7 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                 }
 
                 Then("sletter OID-cache og henter ny OID") {
-                    oppfrisker.oppfrisk(nøkkel("geoGrupper"))
+                    oppfrisker.oppfrisk(nøkkel(GEO))
                     verify { cache.delete(OID_CACHE, ansattId.verdi) }
                     verify(exactly = 2) { oid.oid(ansattId) }
                 }

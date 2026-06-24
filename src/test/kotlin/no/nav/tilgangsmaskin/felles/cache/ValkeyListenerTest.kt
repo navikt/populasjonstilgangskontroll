@@ -19,7 +19,7 @@ class ValkeyListenerTest : BehaviorSpec({
         When("lytteren er leder og cache-navnet matcher") {
             Then("kaller oppfrisk på riktig oppfrisker") {
                 val oppfrisker = oppfrisker("pdl")
-                val listener = ValkeyListener(true, oppfrisker)
+                val listener = ValkeyEventListeningCacheOppfrisker(true, oppfrisker)
 
                 listener.onEvent(nokkel.toByteArray(UTF_8))
 
@@ -32,7 +32,7 @@ class ValkeyListenerTest : BehaviorSpec({
         When("lytteren ikke er leder") {
             Then("kaller ikke oppfrisk") {
                 val oppfrisker = oppfrisker("pdl")
-                val listener = ValkeyListener(false, oppfrisker)
+                val listener = ValkeyEventListeningCacheOppfrisker(false, oppfrisker)
 
                 listener.onEvent(nokkel.toByteArray(UTF_8))
 
@@ -45,7 +45,7 @@ class ValkeyListenerTest : BehaviorSpec({
         When("ingen oppfrisker matcher cache-navnet") {
             Then("kaller ikke oppfrisk") {
                 val oppfrisker = oppfrisker("annen-cache")
-                val listener = ValkeyListener(true, oppfrisker)
+                val listener = ValkeyEventListeningCacheOppfrisker(true, oppfrisker)
 
                 listener.onEvent(nokkel.toByteArray(UTF_8))
 
@@ -59,7 +59,7 @@ class ValkeyListenerTest : BehaviorSpec({
             Then("bruker bare første matchende oppfrisker") {
                 val forste = oppfrisker("pdl")
                 val andre = oppfrisker("pdl")
-                val listener = ValkeyListener(true, forste, andre)
+                val listener = ValkeyEventListeningCacheOppfrisker(true, forste, andre)
 
                 listener.onEvent(nokkel.toByteArray(UTF_8))
 

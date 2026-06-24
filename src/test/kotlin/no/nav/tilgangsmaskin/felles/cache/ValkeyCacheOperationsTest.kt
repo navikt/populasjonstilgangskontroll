@@ -59,7 +59,7 @@ import kotlin.time.measureTime
 
 @DataRedisTest
 @AutoConfigureMetrics
-@Import(ValkeyCacheTestConfig::class, ValkeyListener::class)
+@Import(ValkeyCacheTestConfig::class, ValkeyEventListeningCacheOppfrisker::class)
 @ApplyExtension(SpringExtension::class)
 class ValkeyCacheOperationsTest : BehaviorSpec() {
 

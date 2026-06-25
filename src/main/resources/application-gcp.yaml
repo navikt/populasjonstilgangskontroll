@@ -119,6 +119,7 @@ spring:
       idle-timeout: 600000
       connection-test-query: SELECT 1
       maximum-pool-size: ${db.poolsize}
+    connection-fetch: lazy
   main:
     banner-mode: off
   jackson:

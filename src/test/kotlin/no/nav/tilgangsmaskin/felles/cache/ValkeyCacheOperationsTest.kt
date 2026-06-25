@@ -48,8 +48,10 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager.builder
+import org.springframework.data.redis.config.RedisListenerConfigurer
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.StringRedisTemplate
+import org.springframework.data.redis.serializer.RedisMessageConverters
 import java.time.Duration.ofSeconds
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -63,8 +65,12 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
 
 
     @TestConfiguration
-    class ValkeyCacheTestConfig(private val cf: RedisConnectionFactory) {
+    class ValkeyCacheTestConfig(private val cf: RedisConnectionFactory) : RedisListenerConfigurer{
 
+
+        override fun configureMessageConverters(builder: RedisMessageConverters.Builder) {
+            builder.addCustomConverter(CacheNøkkelMessageConverter())
+        }
 
         @Bean
         fun cacheManager() =

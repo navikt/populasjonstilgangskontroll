@@ -64,7 +64,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     fun prodMessageSource() =
         ReloadableResourceBundleMessageSource().apply {
             setBasenames("classpath:messages", "classpath:regel-messages", "classpath:openapi-prod-tilgang")
-            setDefaultEncoding("UTF-8")
+            defaultEncoding = "UTF-8"
         }
 
     @Bean("messageSource")
@@ -84,7 +84,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                 "classpath:openapi-dev-tilgang",
                 "classpath:openapi-dev-vergemal",
             )
-            setDefaultEncoding("UTF-8")
+            defaultEncoding = "UTF-8"
         }
 
     @Bean

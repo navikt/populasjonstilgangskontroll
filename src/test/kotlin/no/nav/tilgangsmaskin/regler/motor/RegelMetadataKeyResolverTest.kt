@@ -11,7 +11,7 @@ class RegelMetadataKeyResolverTest : BehaviorSpec({
     beforeSpec {
         RegelMetadata.messageSource = ReloadableResourceBundleMessageSource().apply {
             setBasename("classpath:regel-messages")
-            setDefaultEncoding("UTF-8")
+            defaultEncoding = "UTF-8"
         }
     }
 

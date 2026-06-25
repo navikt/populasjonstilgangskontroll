@@ -26,9 +26,7 @@ class RegelException(val ansatt: Ansatt,
         type = TYPE_URI
         instance = URI.create("${ansatt.ansattId.verdi}/${bruker.brukerId.verdi}")
         properties = entries(bruker.oppslagId, ansatt.ansattId, regel)
-    }, null, messageCode, arguments) {
-
-}
+    }, null, messageCode, arguments)
 
 private fun entries(oppslagId: String, ansattId: AnsattId, regel: Regel) = mapOf(
         "brukerIdent" to oppslagId,

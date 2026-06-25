@@ -23,6 +23,17 @@ class ValkeyCacheTeller(private val registry: MeterRegistry) {
             .register(registry)
             .record(varighet.inWholeNanoseconds, NANOSECONDS)
 
+    fun tellMedTid(
+        operasjon: Operasjon,
+        cache: String,
+        resultat: Resultat,
+        varighet: Duration,
+        n: Int = 1,
+    ) {
+        tell(operasjon, cache, resultat, n)
+        tellTid(operasjon, cache, resultat, varighet)
+    }
+
     private fun tags(operasjon: Operasjon, cache: String, resultat: Resultat) = arrayOf(
         "operasjon", operasjon.name.lowercase(getDefault()),
         "cache", cache,

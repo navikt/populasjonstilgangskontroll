@@ -10,12 +10,12 @@ class CaffeineCacheClient(private val cacheManager: CacheManager) : CacheOperati
 
     private val log = getLogger(javaClass)
 
-    override fun delete(cache: CacheNøkkelConfig, id: String): Long {
+    override fun delete(cache: CacheNøkkelConfig, id: String) : Boolean {
         val key = caffeineNøkkel(cache, id)
-        val springCache = cacheManager.getCache(cache.name) ?: return 0L
+        val springCache = cacheManager.getCache(cache.name) ?: return false
         val existed = springCache.get(key) != null
         springCache.evict(key)
-        return if (existed) 1L else 0L
+        return existed
     }
 
     @Suppress("UNCHECKED_CAST")

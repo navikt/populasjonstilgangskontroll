@@ -6,12 +6,13 @@ import com.redis.testcontainers.RedisContainer.DEFAULT_IMAGE_NAME
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.nondeterministic.eventually
 import io.kotest.assertions.nondeterministic.eventuallyConfig
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
+import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.lettuce.core.RedisClient
@@ -25,33 +26,32 @@ import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.MOR
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Bydel
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.Person
+import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
+import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.UGRADERT
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheOperationsTest.ValkeyCacheTestConfig
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
-
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Import
+import org.springframework.context.annotation.Primary
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Import
-import io.kotest.matchers.comparables.shouldBeLessThan
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.MOR
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
-import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
-import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.UGRADERT
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
-import org.springframework.context.annotation.Primary
+import org.springframework.data.redis.core.StringRedisTemplate
 import java.time.Duration.ofSeconds
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -62,6 +62,7 @@ import kotlin.time.measureTime
 @Import(ValkeyCacheTestConfig::class, ValkeyEventListeningCacheOppfrisker::class)
 @ApplyExtension(SpringExtension::class)
 class ValkeyCacheOperationsTest : BehaviorSpec() {
+
 
     @TestConfiguration
     class ValkeyCacheTestConfig(private val cf: RedisConnectionFactory) {
@@ -94,8 +95,12 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
             CacheOppfriskerTeller(meterRegistry, token)
 
         @Bean
-        fun valkeyCacheOperations(client: RedisClient, cfg: CacheConfig, teller: ValkeyCacheTeller) =
-            ValkeyCacheOperations(client, cfg, teller)
+        fun valkeyCacheOperations(
+            client: RedisClient,
+            cfg: CacheConfig,
+            valkey: StringRedisTemplate,
+            teller: ValkeyCacheTeller,
+        ) = ValkeyCacheOperations(client, cfg, valkey, teller)
     }
 
     @MockkBean
@@ -141,20 +146,20 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
 
         Given("sletting av enkeltinnslag") {
             When("nøkkelen eksisterer") {
-                Then("returnerer 1 og verdien er fjernet") {
+                Then("returnerer true og verdien er fjernet") {
                     cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(2))
                     assertSoftly {
                         cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, I1) shouldBe P1
-                        cache.delete(PDL_MED_FAMILIE_CACHE, I1) shouldBe 1L
+                        cache.delete(PDL_MED_FAMILIE_CACHE, I1) shouldBe true
                         cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, I1).shouldBeNull()
                     }
                 }
             }
             When("nøkkelen ikke eksisterer") {
-                Then("returnerer 0") {
+                Then("returnerer false") {
                     assertSoftly {
                         cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, I1).shouldBeNull()
-                        cache.delete(PDL_MED_FAMILIE_CACHE, I1) shouldBe 0
+                        cache.delete(PDL_MED_FAMILIE_CACHE, I1) shouldBe false
                     }
                 }
             }
@@ -305,11 +310,13 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                 Then("size returnerer 5000 og clear tømmer alt") {
                     val batchSize = 5_000
                     (1..5000).chunked(batchSize).forEach { chunk ->
-                        val entries = chunk.associate { "id-$it" to Person(
-                            brukerId = BrukerId("%011d".format(it)),
-                            aktørId = AktørId("%013d".format(it)),
-                            geoTilknytning = UkjentBosted()
-                        ) }
+                        val entries = chunk.associate {
+                            "id-$it" to Person(
+                                brukerId = BrukerId("%011d".format(it)),
+                                aktørId = AktørId("%013d".format(it)),
+                                geoTilknytning = UkjentBosted()
+                            )
+                        }
                         cache.putMany(PDL_MED_FAMILIE_CACHE, entries, ofSeconds(60))
                     }
 
@@ -317,6 +324,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                         cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 5000
                     }
                     elapsed shouldBeLessThan 5.seconds
+                    cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 5000
 
                     cache.clear(PDL_MED_FAMILIE_CACHE)
                     cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 0
@@ -341,26 +349,25 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     cache.putOne(PDL_MED_FAMILIE_CACHE, person.brukerId.verdi, person, ofSeconds(5))
                     val retrieved = cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, person.brukerId.verdi)
 
-assertSoftly(retrieved!!) {
-    this shouldBe person
-    brukerId.verdi shouldBe I1
-    aktørId.verdi shouldBe AKTOR_ID
-    geoTilknytning shouldBe KommuneTilknytning(Kommune("0301"))
-    graderinger shouldBe listOf(UGRADERT)
-    familie.foreldre.first().brukerId shouldBe BrukerId(I2)
-    historiskeIds shouldBe setOf(BrukerId(I2))
-}
+                    assertSoftly(cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, person.brukerId.verdi)!!) {
+                        this shouldBe person
+                        brukerId.verdi shouldBe I1
+                        aktørId.verdi shouldBe AKTOR_ID
+                        geoTilknytning shouldBe KommuneTilknytning(Kommune("0301"))
+                        graderinger shouldBe listOf(UGRADERT)
+                        familie.foreldre.first().brukerId shouldBe BrukerId(I2)
+                        historiskeIds shouldBe setOf(BrukerId(I2))
+                    }
                 }
             }
             When("Person lagres og hentes via putMany/getMany") {
                 Then("korrekt Person returneres for hver nøkkel") {
                     val entries = mapOf(I1 to P1, I2 to P2)
                     cache.putMany(PDL_MED_FAMILIE_CACHE, entries, ofSeconds(5))
-                    val result = cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, IDS)
 
-                    assertSoftly {
-                        result[I1] shouldBe P1
-                        result[I2] shouldBe P2
+                    assertSoftly(cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, IDS)) {
+                        this[I1] shouldBe P1
+                        this[I2] shouldBe P2
                     }
                 }
             }
@@ -375,7 +382,8 @@ assertSoftly(retrieved!!) {
         private const val AKTOR_ID = "1234567890123"
         private const val AKTOR_ID_2 = "9876543210123"
         private val IDS = setOf(I1, I2)
-        private val P1 = Person(BrukerId(I1), I1, AktørId(AKTOR_ID), BydelTilknytning(Bydel("030101")), listOf(FORTROLIG))
+        private val P1 =
+            Person(BrukerId(I1), I1, AktørId(AKTOR_ID), BydelTilknytning(Bydel("030101")), listOf(FORTROLIG))
         private val P2 = Person(BrukerId(I2), I2, AktørId(AKTOR_ID_2), UkjentBosted())
         private val TIMEOUTS = eventuallyConfig {
             duration = 2.seconds

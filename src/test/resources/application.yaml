@@ -1,3 +1,8 @@
 retry:
   delay: 0ms
 
+spring:
+  data:
+    redis:
+      timeout: 2s
+      connect-timeout: 2s

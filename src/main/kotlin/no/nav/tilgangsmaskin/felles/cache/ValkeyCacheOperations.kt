@@ -38,8 +38,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
             runCatching { valkey.unlink(cache.tilNøkkel(id)) }
                 .onFailure {
                     log.info("Cache delete feilet for {} nøkkel {}: {}", cache.fullName, id.maskFnr(), it.message, it)
-                }
-                .getOrElse { false }
+                }.getOrElse { false }
 
     @WithSpan
     override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? {
@@ -92,7 +91,6 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
                 log.info("getMany {} hentet {} av {} nøkler på {}ms",
                     cache.fullName, verdier.size, requestedIds.size, varighet.inWholeMilliseconds)
             }.onFailure {
-                val varighet = start.elapsedNow()
                 log.info("{} getMany feilet for {} med {} nøkler: {}",
                     javaClass.simpleName, cache.fullName, requestedIds.size, it.message, it)
             }.getOrElse { emptyMap() }
@@ -117,7 +115,6 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
         val scanOptions = scanOptions().match("$prefix*").count(10_000).build()
             runCatching {
                 valkey.executeWithStickyConnection { connection ->
-                    @Suppress("UNCHECKED_CAST")
                     (connection.keyCommands().scan(scanOptions) as Cursor<ByteArray>).use { cursor ->
                         val batch = mutableListOf<String>()
 

@@ -18,7 +18,6 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import org.springframework.data.redis.core.Cursor
-import org.springframework.data.redis.core.ScanOptions
 import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.core.script.RedisScript
@@ -26,8 +25,8 @@ import org.springframework.stereotype.Component
 import java.time.Duration
 import kotlin.reflect.KClass
 import kotlin.text.Charsets.UTF_8
-import kotlin.time.measureTimedValue
 import kotlin.time.TimeSource.Monotonic
+import kotlin.time.measureTimedValue
 
 @Component
 class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val teller: ValkeyCacheTeller) :
@@ -54,8 +53,9 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val
                 .onFailure {
                     teller.tell(DELETE, cache.name, FEILET)
                     teller.tellTid(DELETE, cache.name, FEILET, start.elapsedNow())
+                    log.info("Cache delete feilet for {} nøkkel {}: {}", cache.name, id, it.message, it)
                 }
-                .getOrThrow()
+                .getOrElse { false }
         }
 
     @WithSpan
@@ -71,7 +71,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val
             teller.tell(GET_ONE, cache.name, FEILET)
             teller.tellTid(GET_ONE, cache.name, FEILET, start.elapsedNow())
             log.info("Cache getOne feilet for {}, faller tilbake til tjenestekall", cache.name, it)
-        }.getOrElse { null }
+        }.getOrNull()
     }
 
     @WithSpan

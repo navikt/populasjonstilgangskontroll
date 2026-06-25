@@ -20,8 +20,7 @@ import kotlin.time.TimeSource.Monotonic.markNow
 
 @Component
 class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
-                            private val mapper: JsonMapper = VALKEY_MAPPER) :
-    CacheOperations {
+                            private val mapper: JsonMapper = VALKEY_MAPPER) : CacheOperations {
 
     private val log = getLogger(javaClass)
 
@@ -117,11 +116,10 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
                 valkey.executeWithStickyConnection { connection ->
                     (connection.keyCommands().scan(scanOptions) as Cursor<ByteArray>).use { cursor ->
                         val batch = mutableListOf<String>()
-
                         cursor.forEach { keyBytes ->
                             batch += keyBytes.toString(UTF_8)
                             if (batch.size >= 10_000) {
-                                slettet += valkey.delete(batch) ?: 0L
+                                slettet += valkey.unlink(batch) ?: 0L
                                 batch.clear()
                             }
                         }

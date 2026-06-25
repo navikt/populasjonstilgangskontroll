@@ -97,7 +97,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
         beforeSpec {
             RegelMetadata.messageSource = ReloadableResourceBundleMessageSource().apply {
                 setBasename("classpath:regel-messages")
-                defaultEncoding = "UTF-8"
+                setDefaultEncoding("UTF-8")
             }
             MockKAnnotations.init(this@TilgangControllerTestBase)
         }

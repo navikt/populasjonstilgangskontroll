@@ -36,9 +36,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
     @WithSpan
     override fun delete(cache: CacheNøkkelConfig, id: String) =
         markNow().let { start ->
-            runCatching { valkey.delete(cache.tilNøkkel(id)) }
-                .onSuccess {
-                }
+            runCatching { valkey.unlink(cache.tilNøkkel(id)) }
                 .onFailure {
                     log.info("Cache delete feilet for {} nøkkel {}: {}", cache.fullName, id.maskFnr(), it.message, it)
                 }

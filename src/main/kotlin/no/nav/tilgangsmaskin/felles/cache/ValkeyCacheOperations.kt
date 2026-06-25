@@ -35,34 +35,28 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
 
     @WithSpan
     override fun delete(cache: CacheNøkkelConfig, id: String) =
-        markNow().let { start ->
             runCatching { valkey.unlink(cache.tilNøkkel(id)) }
                 .onFailure {
                     log.info("Cache delete feilet for {} nøkkel {}: {}", cache.fullName, id.maskFnr(), it.message, it)
                 }
                 .getOrElse { false }
-        }
 
     @WithSpan
     override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? {
-        markNow().let { start ->
             return runCatching {
                 valkey.opsForValue().get(cache.tilNøkkel(id))?.let { mapper.readValue(it, clazz.java) }
             }.onFailure {
                 log.info("Cache getOne feilet for {}, faller tilbake til tjenestekall", cache.fullName, it)
             }.getOrNull()
-        }
     }
 
     @WithSpan
     override fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration) {
-        markNow().let { start ->
             runCatching {
                 valkey.opsForValue().set(cache.tilNøkkel(id), mapper.writeValueAsString(value), ttl)
             }.onFailure {
                 log.info("Cache putOne feilet for {} nøkkel {}: {}", cache.fullName, id, it.message, it)
             }
-        }
     }
 
     @WithSpan
@@ -121,7 +115,6 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
         val prefix = cache.tilNøkkel("")
         var slettet = 0L
         val scanOptions = scanOptions().match("$prefix*").count(10_000).build()
-        markNow().let { start ->
             runCatching {
                 valkey.executeWithStickyConnection { connection ->
                     @Suppress("UNCHECKED_CAST")
@@ -143,7 +136,6 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
                     null
                 }
             }.getOrThrow()
-        }
     }
 
     override fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long> {

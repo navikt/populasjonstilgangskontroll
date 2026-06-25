@@ -23,14 +23,14 @@ import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.core.script.RedisScript
 import org.springframework.stereotype.Component
+import tools.jackson.databind.json.JsonMapper
 import java.time.Duration
 import kotlin.reflect.KClass
 import kotlin.text.Charsets.UTF_8
-import kotlin.time.TimeSource.Monotonic
-import kotlin.time.measureTimedValue
+import kotlin.time.TimeSource.Monotonic.markNow
 
 @Component
-class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val teller: ValkeyCacheTeller) :
+class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val teller: ValkeyCacheTeller, private val mapper: JsonMapper = VALKEY_MAPPER) :
     CacheOperations {
 
     private val log = getLogger(javaClass)
@@ -45,7 +45,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val
 
     @WithSpan
     override fun delete(cache: CacheNøkkelConfig, id: String) =
-        Monotonic.markNow().let { start ->
+        markNow().let { start ->
             runCatching { valkey.delete(cache.tilNøkkel(id)) }
                 .onSuccess {
                     teller.tell(DELETE, cache.name, OK)
@@ -61,9 +61,9 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val
 
     @WithSpan
     override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? {
-        val start = Monotonic.markNow()
+        val start = markNow()
         return runCatching {
-            valkey.opsForValue().get(cache.tilNøkkel(id))?.let { VALKEY_MAPPER.readValue(it, clazz.java) }
+            valkey.opsForValue().get(cache.tilNøkkel(id))?.let { mapper.readValue(it, clazz.java) }
         }.onSuccess { verdi ->
             val resultat = if (verdi != null) HIT else MISS
             teller.tell(GET_ONE, cache.name, resultat)
@@ -77,9 +77,9 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val
 
     @WithSpan
     override fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration) {
-        val start = Monotonic.markNow()
+        val start = markNow()
         runCatching {
-            valkey.opsForValue().set(cache.tilNøkkel(id), VALKEY_MAPPER.writeValueAsString(value), ttl)
+            valkey.opsForValue().set(cache.tilNøkkel(id), mapper.writeValueAsString(value), ttl)
         }.onSuccess {
             teller.tell(PUT_ONE, cache.name, OK)
             teller.tellTid(PUT_ONE, cache.name, OK, start.elapsedNow())
@@ -110,13 +110,13 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val
     private fun <T : Any> doGetMany(cache: CacheNøkkelConfig,
                                     requestedIds: List<String>,
                                     clazz: KClass<T>): Map<String, T?> {
-        val start = Monotonic.markNow()
+        val start = markNow()
         return runCatching {
             val keys = requestedIds.map(cache::tilNøkkel)
             val values = valkey.opsForValue().multiGet(keys).orEmpty()
             requestedIds.mapIndexedNotNull { index, id ->
                 values.getOrNull(index)?.let { value ->
-                    id to VALKEY_MAPPER.readValue(value, clazz.java)
+                    id to mapper.readValue(value, clazz.java)
                 }
             }.toMap()
         }.onSuccess { verdier ->
@@ -152,7 +152,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val
         val prefix = cache.tilNøkkel("")
         var slettet = 0L
         val scanOptions = scanOptions().match("$prefix*").count(10_000).build()
-        val start = Monotonic.markNow()
+        val start = markNow()
 
         runCatching {
             valkey.executeWithStickyConnection { connection ->
@@ -184,11 +184,11 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val
     }
 
     override fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long> {
+        val start = markNow()
         val prefixes = caches.map { "${it.tilNøkkel("")}*" }
-        val (results, totalDuration) = measureTimedValue {
-            @Suppress("UNCHECKED_CAST")
-            valkey.execute(SCRIPT, emptyList(), *prefixes.toTypedArray()) as List<Long>
-        }
+        @Suppress("UNCHECKED_CAST")
+        val results = valkey.execute(SCRIPT, emptyList(), *prefixes.toTypedArray()) as List<Long>
+        val totalDuration = start.elapsedNow()
         return caches.zip(results).associate { (cache, count) -> cache.fullName to count }
             .also { log.info("Cache størrelser {} slått opp, tok {}ms", it, totalDuration.inWholeMilliseconds) }
     }
@@ -204,13 +204,14 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val
     private fun doPutMany(cache: CacheNøkkelConfig,
                           innslag: Map<String, Any>,
                           ttl: Long) {
-        val start = Monotonic.markNow()
-        val payload = innslag.entries.associate { (key, value) ->
-            cache.tilNøkkel(key) to VALKEY_MAPPER.writeValueAsString(value)
+        val start = markNow()
+        val payload = innslag.entries.associate {
+            (key, value) ->
+            cache.tilNøkkel(key) to mapper.writeValueAsString(value)
         }
-        val resultat = batch(payload, ttl)
+        val resultat = pipeline(payload, ttl)
+        val varighet = start.elapsedNow()
         resultat.onSuccess {
-            val varighet = start.elapsedNow()
             teller.tell(PUT_MANY, cache.name, OK, innslag.size)
             teller.tellTid(PUT_MANY, cache.name, OK, varighet)
             log.info("Cache putMany {} lagret {} nøkler på {}ms",
@@ -219,13 +220,13 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val
                 varighet.inWholeMilliseconds)
         }
             .onFailure {
-                teller.tellTid(PUT_MANY, cache.name, FEILET, start.elapsedNow())
+                teller.tellTid(PUT_MANY, cache.name, FEILET, varighet)
                 teller.tell(PUT_MANY, cache.name, FEILET, innslag.size)
                 log.info("Cache putMany feilet for {} med {} nøkler: {}", cache.fullName, innslag.size, it.message, it)
             }
     }
 
-    private fun batch(payload: Map<String, String>, ttl: Long) =
+    private fun pipeline(payload: Map<String, String>, ttl: Long) =
         runCatching {
             valkey.executePipelined { connection ->
                 payload.forEach { (key, value) ->
@@ -244,6 +245,6 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val
 
 
     companion object {
-        private val SCRIPT = RedisScript.of<List<*>>(ClassPathResource("scripts/count-all-keys.lua"), List::class.java)
+        private val SCRIPT = RedisScript.of(ClassPathResource("scripts/count-all-keys.lua"), List::class.java)
     }
 }

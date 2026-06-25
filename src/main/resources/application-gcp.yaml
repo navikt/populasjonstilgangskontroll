@@ -22,6 +22,7 @@ management:
         '[komplette_regler]': true
         '[pdl_tjeneste]': true
         '[entra]': true
+        '[valkey.cache.varighet]': true
     enable:
       cache: true
   observations:

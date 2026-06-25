@@ -8,6 +8,7 @@ import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.GET_MANY
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.GET_ONE
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.PUT_MANY
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.PUT_ONE
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.DELVIS
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.FEILET
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.HIT
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.MISS
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import org.springframework.data.redis.core.Cursor
 import org.springframework.data.redis.core.ScanOptions
+import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.core.script.RedisScript
 import org.springframework.stereotype.Component
@@ -25,6 +27,7 @@ import java.time.Duration
 import kotlin.reflect.KClass
 import kotlin.text.Charsets.UTF_8
 import kotlin.time.measureTimedValue
+import kotlin.time.TimeSource.Monotonic
 
 @Component
 class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val teller: ValkeyCacheTeller) :
@@ -42,36 +45,46 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val
 
     @WithSpan
     override fun delete(cache: CacheNøkkelConfig, id: String) =
-        valkey.delete(cache.tilNøkkel(id))
-            .also {
-                teller.tell(DELETE, cache.name, OK)
-            }
-
-    @WithSpan
-    override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? =
-        runCatching {
-            valkey.opsForValue().get(cache.tilNøkkel(id))?.let {
-                VALKEY_MAPPER.readValue(it, clazz.java).also {
-                    teller.tell(GET_ONE, cache.name, HIT)
+        Monotonic.markNow().let { start ->
+            runCatching { valkey.delete(cache.tilNøkkel(id)) }
+                .onSuccess {
+                    teller.tell(DELETE, cache.name, OK)
+                    teller.tellTid(DELETE, cache.name, OK, start.elapsedNow())
                 }
-            } ?: run {
-                teller.tell(GET_ONE, cache.name, MISS)
-                null
-            }
-        }.getOrElse { e ->
-            teller.tell(GET_ONE, cache.name, FEILET)
-            log.info("Cache getOne feilet for {}, faller tilbake til tjenestekall", cache.name, e)
-            null
+                .onFailure {
+                    teller.tell(DELETE, cache.name, FEILET)
+                    teller.tellTid(DELETE, cache.name, FEILET, start.elapsedNow())
+                }
+                .getOrThrow()
         }
 
     @WithSpan
+    override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? {
+        val start = Monotonic.markNow()
+        return runCatching {
+            valkey.opsForValue().get(cache.tilNøkkel(id))?.let { VALKEY_MAPPER.readValue(it, clazz.java) }
+        }.onSuccess { verdi ->
+            val resultat = if (verdi != null) HIT else MISS
+            teller.tell(GET_ONE, cache.name, resultat)
+            teller.tellTid(GET_ONE, cache.name, resultat, start.elapsedNow())
+        }.onFailure {
+            teller.tell(GET_ONE, cache.name, FEILET)
+            teller.tellTid(GET_ONE, cache.name, FEILET, start.elapsedNow())
+            log.info("Cache getOne feilet for {}, faller tilbake til tjenestekall", cache.name, it)
+        }.getOrElse { null }
+    }
+
+    @WithSpan
     override fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration) {
+        val start = Monotonic.markNow()
         runCatching {
             valkey.opsForValue().set(cache.tilNøkkel(id), VALKEY_MAPPER.writeValueAsString(value), ttl)
         }.onSuccess {
             teller.tell(PUT_ONE, cache.name, OK)
+            teller.tellTid(PUT_ONE, cache.name, OK, start.elapsedNow())
         }.onFailure {
             teller.tell(PUT_ONE, cache.name, FEILET)
+            teller.tellTid(PUT_ONE, cache.name, FEILET, start.elapsedNow())
             log.info("Cache putOne feilet for {} nøkkel {}: {}", cache.fullName, id, it.message, it)
         }
     }
@@ -95,37 +108,32 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val
 
     private fun <T : Any> doGetMany(cache: CacheNøkkelConfig,
                                     requestedIds: List<String>,
-                                    clazz: KClass<T>): Map<String, T?> =
-        measureTimedValue {
-            runCatching {
-                val keys = requestedIds.map(cache::tilNøkkel)
-                val values = valkey.opsForValue().multiGet(keys).orEmpty()
-
-                requestedIds.mapIndexedNotNull { index, id ->
-                    values.getOrNull(index)?.let { value ->
-                        id to VALKEY_MAPPER.readValue(value, clazz.java)
-                    }
-                }.toMap()
-            }.getOrElse {
-                teller.tell(GET_MANY, cache.name, FEILET, requestedIds.size)
-                log.info("{} getMany feilet for {} med {} nøkler: {}",
-                    javaClass.simpleName,
-                    cache.fullName,
-                    requestedIds.size,
-                    it.message,
-                    it)
-                emptyMap()
-            }
-        }.let {
-            teller.tell(GET_MANY, cache.name, HIT, it.value.size)
-            teller.tell(GET_MANY, cache.name, MISS, requestedIds.size - it.value.size)
+                                    clazz: KClass<T>): Map<String, T?> {
+        val start = Monotonic.markNow()
+        return runCatching {
+            val keys = requestedIds.map(cache::tilNøkkel)
+            val values = valkey.opsForValue().multiGet(keys).orEmpty()
+            requestedIds.mapIndexedNotNull { index, id ->
+                values.getOrNull(index)?.let { value ->
+                    id to VALKEY_MAPPER.readValue(value, clazz.java)
+                }
+            }.toMap()
+        }.onSuccess { verdier ->
+            val varighet = start.elapsedNow()
+            teller.tell(GET_MANY, cache.name, HIT, verdier.size)
+            teller.tell(GET_MANY, cache.name, MISS, requestedIds.size - verdier.size)
+            teller.tellTid(GET_MANY, cache.name, resultatForGetMany(verdier.size, requestedIds.size), varighet)
             log.info("getMany {} hentet {} av {} nøkler på {}ms",
-                cache.fullName,
-                it.value.size,
-                requestedIds.size,
-                it.duration.inWholeMilliseconds)
-            it.value
-        }
+                cache.fullName, verdier.size, requestedIds.size, varighet.inWholeMilliseconds)
+        }.onFailure {
+            val varighet = start.elapsedNow()
+            teller.tell(GET_MANY, cache.name, FEILET, requestedIds.size)
+            teller.tell(GET_MANY, cache.name, MISS, requestedIds.size)
+            teller.tellTid(GET_MANY, cache.name, FEILET, varighet)
+            log.info("{} getMany feilet for {} med {} nøkler: {}",
+                javaClass.simpleName, cache.fullName, requestedIds.size, it.message, it)
+        }.getOrElse { emptyMap() }
+    }
 
     private fun <T : Any> doGetOne(cache: CacheNøkkelConfig,
                                    ids: Set<String>,
@@ -142,28 +150,36 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val
         log.info("Tømmer cache {}", cache.name)
         val prefix = cache.tilNøkkel("")
         var slettet = 0L
-        val scanOptions = ScanOptions.scanOptions().match("$prefix*").count(10_000).build()
+        val scanOptions = scanOptions().match("$prefix*").count(10_000).build()
+        val start = Monotonic.markNow()
 
-        valkey.executeWithStickyConnection { connection ->
-            @Suppress("UNCHECKED_CAST")
-            (connection.keyCommands().scan(scanOptions) as Cursor<ByteArray>).use { cursor ->
-                val batch = mutableListOf<String>()
+        runCatching {
+            valkey.executeWithStickyConnection { connection ->
+                @Suppress("UNCHECKED_CAST")
+                (connection.keyCommands().scan(scanOptions) as Cursor<ByteArray>).use { cursor ->
+                    val batch = mutableListOf<String>()
 
-                cursor.forEach { keyBytes ->
-                    batch += keyBytes.toString(UTF_8)
-                    if (batch.size >= 10_000) {
+                    cursor.forEach { keyBytes ->
+                        batch += keyBytes.toString(UTF_8)
+                        if (batch.size >= 10_000) {
+                            slettet += valkey.delete(batch) ?: 0L
+                            batch.clear()
+                        }
+                    }
+
+                    if (batch.isNotEmpty()) {
                         slettet += valkey.delete(batch) ?: 0L
-                        batch.clear()
                     }
                 }
-
-                if (batch.isNotEmpty()) {
-                    slettet += valkey.delete(batch) ?: 0L
-                }
+                null
             }
-            null
-        }
-        teller.tell(CLEAR, cache.name, OK, slettet.toInt())
+        }.onSuccess {
+            teller.tell(CLEAR, cache.name, OK, slettet.toInt())
+            teller.tellTid(CLEAR, cache.name, OK, start.elapsedNow())
+        }.onFailure {
+            teller.tell(CLEAR, cache.name, FEILET)
+            teller.tellTid(CLEAR, cache.name, FEILET, start.elapsedNow())
+        }.getOrThrow()
     }
 
     override fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long> {
@@ -187,20 +203,22 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val
     private fun doPutMany(cache: CacheNøkkelConfig,
                           innslag: Map<String, Any>,
                           ttl: Long) {
+        val start = Monotonic.markNow()
         val payload = innslag.entries.associate { (key, value) ->
             cache.tilNøkkel(key) to VALKEY_MAPPER.writeValueAsString(value)
         }
-        val (resultat, varighet) = measureTimedValue {
-            batch(payload, ttl)
-        }
+        val resultat = batch(payload, ttl)
         resultat.onSuccess {
+            val varighet = start.elapsedNow()
             teller.tell(PUT_MANY, cache.name, OK, innslag.size)
+            teller.tellTid(PUT_MANY, cache.name, OK, varighet)
             log.info("Cache putMany {} lagret {} nøkler på {}ms",
                 cache.fullName,
                 innslag.size,
                 varighet.inWholeMilliseconds)
         }
             .onFailure {
+                teller.tellTid(PUT_MANY, cache.name, FEILET, start.elapsedNow())
                 teller.tell(PUT_MANY, cache.name, FEILET, innslag.size)
                 log.info("Cache putMany feilet for {} med {} nøkler: {}", cache.fullName, innslag.size, it.message, it)
             }
@@ -214,6 +232,13 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val
                 }
                 null
             }
+        }
+
+    private fun resultatForGetMany(hits: Int, requested: Int) =
+        when {
+            hits == requested -> HIT
+            hits == 0 -> MISS
+            else -> DELVIS
         }
 
 

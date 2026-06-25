@@ -11,6 +11,7 @@ import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.comparables.shouldBeLessThan
+import io.kotest.matchers.longs.shouldBeGreaterThan
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
@@ -98,6 +99,9 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
 
     @Autowired
     private lateinit var cache: CacheOperations
+
+    @Autowired
+    private lateinit var registry: MeterRegistry
 
 
     init {
@@ -260,6 +264,53 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
             }
         }
 
+        Given("cache-metrikker") {
+            When("getOne treffer cache") {
+                Then("registreres varighet med cache, operasjon og hit-resultat") {
+                    cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(5))
+
+                    cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, I1) shouldBe P1
+
+                    registry.get("valkey.cache.varighet")
+                        .tag("cache", PDL_MED_FAMILIE_CACHE.name)
+                        .tag("operasjon", "get_one")
+                        .tag("resultat", "hit")
+                        .timer().count() shouldBeGreaterThan 0L
+                }
+            }
+
+            When("getMany gir både treff og miss") {
+                Then("registreres varighet med delvis-resultat") {
+                    cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(5))
+
+                    cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, setOf(I1, I2)).keys shouldBe setOf(I1)
+
+                    registry.get("valkey.cache.varighet")
+                        .tag("cache", PDL_MED_FAMILIE_CACHE.name)
+                        .tag("operasjon", "get_many")
+                        .tag("resultat", "delvis")
+                        .timer().count() shouldBeGreaterThan 0L
+                }
+            }
+
+            When("putOne feiler mot utilgjengelig Redis") {
+                Then("registreres varighet med feilet-resultat") {
+                    redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
+                    try {
+                        cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(30))
+                    } finally {
+                        redis.dockerClient.unpauseContainerCmd(redis.containerId).exec()
+                    }
+
+                    registry.get("valkey.cache.varighet")
+                        .tag("cache", PDL_MED_FAMILIE_CACHE.name)
+                        .tag("operasjon", "put_one")
+                        .tag("resultat", "feilet")
+                        .timer().count() shouldBeGreaterThan 0L
+                }
+            }
+        }
+
         Given("antall innslag i cache") {
             When("cache er tom") {
                 Then("returnerer 0") {
@@ -329,7 +380,6 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     )
 
                     cache.putOne(PDL_MED_FAMILIE_CACHE, person.brukerId.verdi, person, ofSeconds(5))
-                    val retrieved = cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, person.brukerId.verdi)
 
                     assertSoftly(cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, person.brukerId.verdi)!!) {
                         this shouldBe person

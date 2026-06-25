@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import org.springframework.stereotype.Component
 import java.time.Clock
-import java.time.Instant
+import java.time.Instant.now
 import java.time.ZoneId.systemDefault
 
 @Component
@@ -24,5 +24,5 @@ class EnkeltTilgangJPAAdapter(
         repo.gjeldendeOverstyringer(ansattId, brukerIds, cutoff())
             .mapTo(mutableSetOf()) { BrukerId(it.fnr) }
 
-    private fun cutoff() = Instant.now(clock)
+    private fun cutoff() = now(clock)
 }

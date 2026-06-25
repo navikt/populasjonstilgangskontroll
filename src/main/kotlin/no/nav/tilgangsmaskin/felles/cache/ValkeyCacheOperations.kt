@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.MISS
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.OK
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import org.springframework.data.redis.core.Cursor
@@ -53,7 +54,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val
                 .onFailure {
                     teller.tell(DELETE, cache.name, FEILET)
                     teller.tellTid(DELETE, cache.name, FEILET, start.elapsedNow())
-                    log.info("Cache delete feilet for {} nøkkel {}: {}", cache.name, id, it.message, it)
+                    log.info("Cache delete feilet for {} nøkkel {}: {}", cache.fullName, id.maskFnr(), it.message, it)
                 }
                 .getOrElse { false }
         }
@@ -70,7 +71,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val
         }.onFailure {
             teller.tell(GET_ONE, cache.name, FEILET)
             teller.tellTid(GET_ONE, cache.name, FEILET, start.elapsedNow())
-            log.info("Cache getOne feilet for {}, faller tilbake til tjenestekall", cache.name, it)
+            log.info("Cache getOne feilet for {}, faller tilbake til tjenestekall", cache.fullName, it)
         }.getOrNull()
     }
 

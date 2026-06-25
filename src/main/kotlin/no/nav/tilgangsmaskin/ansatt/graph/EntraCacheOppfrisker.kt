@@ -4,7 +4,6 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOppfrisker
-import no.nav.tilgangsmaskin.felles.cache.CacheOppfriskerTeller
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
@@ -18,8 +17,7 @@ import java.util.*
 class EntraCacheOppfrisker(private val entra: EntraTjeneste,
                            private val oidTjeneste: EntraOidTjeneste,
                            private val cache: CacheOperations,
-                           private val teller: OIDEndringTeller,
-                           cacheOppfriskerTeller: CacheOppfriskerTeller) : AbstractCacheOppfrisker(cacheOppfriskerTeller) {
+                           private val teller: OIDEndringTeller) : AbstractCacheOppfrisker() {
 
     private val log = LoggerFactory.getLogger(javaClass)
     override val cacheName = EntraGrupperConfig.GRAPH

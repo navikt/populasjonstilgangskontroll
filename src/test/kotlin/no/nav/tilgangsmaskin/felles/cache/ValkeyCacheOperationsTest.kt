@@ -81,11 +81,6 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                 )
                 .build()
 
-
-        @Bean
-        fun cacheOppfriskerTeller(meterRegistry: MeterRegistry, token: Token) =
-            CacheOppfriskerTeller(meterRegistry, token)
-
         @Bean
         fun valkeyCacheOperations(valkey: StringRedisTemplate) =
             ValkeyCacheOperations(valkey)

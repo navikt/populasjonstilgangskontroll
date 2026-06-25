@@ -2,17 +2,6 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.felles.cache.CacheBeanConfig.Companion.VALKEY_MAPPER
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.CLEAR
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.DELETE
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.GET_MANY
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.GET_ONE
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.PUT_MANY
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.PUT_ONE
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.DELVIS
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.FEILET
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.HIT
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.MISS
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.OK
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
@@ -31,7 +20,6 @@ import kotlin.time.TimeSource.Monotonic.markNow
 
 @Component
 class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
-                            private val teller: ValkeyCacheTeller,
                             private val mapper: JsonMapper = VALKEY_MAPPER) :
     CacheOperations {
 
@@ -50,10 +38,8 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
         markNow().let { start ->
             runCatching { valkey.delete(cache.tilNøkkel(id)) }
                 .onSuccess {
-                    teller.tellMedTid(DELETE, cache.name, OK, start.elapsedNow())
                 }
                 .onFailure {
-                    teller.tellMedTid(DELETE, cache.name, FEILET, start.elapsedNow())
                     log.info("Cache delete feilet for {} nøkkel {}: {}", cache.fullName, id.maskFnr(), it.message, it)
                 }
                 .getOrElse { false }
@@ -64,11 +50,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
         markNow().let { start ->
             return runCatching {
                 valkey.opsForValue().get(cache.tilNøkkel(id))?.let { mapper.readValue(it, clazz.java) }
-            }.onSuccess { verdi ->
-                val resultat = if (verdi != null) HIT else MISS
-                teller.tellMedTid(GET_ONE, cache.name, resultat, start.elapsedNow())
             }.onFailure {
-                teller.tellMedTid(GET_ONE, cache.name, FEILET, start.elapsedNow())
                 log.info("Cache getOne feilet for {}, faller tilbake til tjenestekall", cache.fullName, it)
             }.getOrNull()
         }
@@ -79,10 +61,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
         markNow().let { start ->
             runCatching {
                 valkey.opsForValue().set(cache.tilNøkkel(id), mapper.writeValueAsString(value), ttl)
-            }.onSuccess {
-                teller.tellMedTid(PUT_ONE, cache.name, OK, start.elapsedNow())
             }.onFailure {
-                teller.tellMedTid(PUT_ONE, cache.name, FEILET, start.elapsedNow())
                 log.info("Cache putOne feilet for {} nøkkel {}: {}", cache.fullName, id, it.message, it)
             }
         }
@@ -118,19 +97,10 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
                 }.toMap()
             }.onSuccess { verdier ->
                 val varighet = start.elapsedNow()
-                teller.tell(GET_MANY, cache.name, HIT, verdier.size)
-                teller.tell(GET_MANY, cache.name, MISS, requestedIds.size - verdier.size)
-                teller.tellMedTid(GET_MANY,
-                    cache.name,
-                    resultatForGetMany(verdier.size, requestedIds.size),
-                    varighet,
-                    0)
                 log.info("getMany {} hentet {} av {} nøkler på {}ms",
                     cache.fullName, verdier.size, requestedIds.size, varighet.inWholeMilliseconds)
             }.onFailure {
                 val varighet = start.elapsedNow()
-                teller.tell(GET_MANY, cache.name, FEILET, requestedIds.size)
-                teller.tellMedTid(GET_MANY, cache.name, FEILET, varighet, 0)
                 log.info("{} getMany feilet for {} med {} nøkler: {}",
                     javaClass.simpleName, cache.fullName, requestedIds.size, it.message, it)
             }.getOrElse { emptyMap() }
@@ -174,10 +144,6 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
                     }
                     null
                 }
-            }.onSuccess {
-                teller.tellMedTid(CLEAR, cache.name, OK, start.elapsedNow(), slettet.toInt())
-            }.onFailure {
-                teller.tellMedTid(CLEAR, cache.name, FEILET, start.elapsedNow())
             }.getOrThrow()
         }
     }
@@ -212,15 +178,12 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
             val resultat = pipeline(payload, ttl)
             val varighet = start.elapsedNow()
             resultat.onSuccess {
-                teller.tellMedTid(PUT_MANY, cache.name, OK, varighet, innslag.size)
                 log.info("Cache putMany {} lagret {} nøkler på {}ms",
                     cache.fullName,
                     innslag.size,
                     varighet.inWholeMilliseconds)
             }
                 .onFailure {
-                    teller.tell(PUT_MANY, cache.name, FEILET, innslag.size)
-                    teller.tellTid(PUT_MANY, cache.name, FEILET, varighet)
                     log.info("Cache putMany feilet for {} med {} nøkler: {}",
                         cache.fullName,
                         innslag.size,
@@ -238,13 +201,6 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
                 }
                 null
             }
-        }
-
-    private fun resultatForGetMany(hits: Int, requested: Int) =
-        when {
-            hits == requested -> HIT
-            hits == 0 -> MISS
-            else -> DELVIS
         }
 
 

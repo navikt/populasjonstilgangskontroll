@@ -11,7 +11,6 @@ import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.comparables.shouldBeLessThan
-import io.kotest.matchers.longs.shouldBeGreaterThan
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
@@ -82,19 +81,14 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                 )
                 .build()
 
-        @Bean
-        fun valkeyCacheTeller(meterRegistry: MeterRegistry) =
-            ValkeyCacheTeller(meterRegistry)
 
         @Bean
         fun cacheOppfriskerTeller(meterRegistry: MeterRegistry, token: Token) =
             CacheOppfriskerTeller(meterRegistry, token)
 
         @Bean
-        fun valkeyCacheOperations(
-            valkey: StringRedisTemplate,
-            teller: ValkeyCacheTeller,
-        ) = ValkeyCacheOperations(valkey, teller)
+        fun valkeyCacheOperations(valkey: StringRedisTemplate) =
+            ValkeyCacheOperations(valkey)
     }
 
     @MockkBean
@@ -277,11 +271,6 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
 
                     cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, I1) shouldBe P1
 
-                    registry.get("valkey.cache.varighet")
-                        .tag("cache", PDL_MED_FAMILIE_CACHE.name)
-                        .tag("operasjon", "get_one")
-                        .tag("resultat", "hit")
-                        .timer().count() shouldBeGreaterThan 0L
                 }
             }
 
@@ -290,12 +279,6 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(5))
 
                     cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, setOf(I1, I2)).keys shouldBe setOf(I1)
-
-                    registry.get("valkey.cache.varighet")
-                        .tag("cache", PDL_MED_FAMILIE_CACHE.name)
-                        .tag("operasjon", "get_many")
-                        .tag("resultat", "delvis")
-                        .timer().count() shouldBeGreaterThan 0L
                 }
             }
 
@@ -307,12 +290,6 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     } finally {
                         redis.dockerClient.unpauseContainerCmd(redis.containerId).exec()
                     }
-
-                    registry.get("valkey.cache.varighet")
-                        .tag("cache", PDL_MED_FAMILIE_CACHE.name)
-                        .tag("operasjon", "put_one")
-                        .tag("resultat", "feilet")
-                        .timer().count() shouldBeGreaterThan 0L
                 }
             }
         }

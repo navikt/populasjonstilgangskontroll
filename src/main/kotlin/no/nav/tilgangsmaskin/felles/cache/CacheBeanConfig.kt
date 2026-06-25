@@ -1,14 +1,10 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import io.lettuce.core.ClientOptions
-import io.lettuce.core.RedisClient
-import io.lettuce.core.SocketOptions
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
-import org.springframework.boot.data.redis.autoconfigure.LettuceClientConfigurationBuilderCustomizer
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.interceptor.CacheErrorHandler
 import org.springframework.context.annotation.Bean
@@ -23,7 +19,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.KotlinModule.Builder
-import java.time.Duration
 
 @Configuration(proxyBeanMethods = true)
 @ConditionalOnGCP
@@ -41,18 +36,6 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory, private val meterR
             .withInitialCacheConfigurations(cfgs.associate { it.navn to cacheConfig(it) })
             .enableStatistics()
             .build()
-
-    @Bean
-    fun redisClient(cfg: CacheConfig) =
-        RedisClient.create(cfg.cacheURI).apply {
-            options = ClientOptions.builder()
-                .socketOptions(
-                    SocketOptions.builder()
-                        .connectTimeout(cfg.connectTimeout)
-                        .build()
-                )
-                .build()
-        }
 
 
     @Bean

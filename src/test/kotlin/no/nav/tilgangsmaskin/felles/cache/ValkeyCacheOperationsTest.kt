@@ -15,8 +15,6 @@ import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import io.lettuce.core.RedisClient
-import io.lettuce.core.RedisClient.create
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import io.mockk.mockkObject
@@ -47,7 +45,6 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
-import org.springframework.context.annotation.Primary
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import org.springframework.data.redis.connection.RedisConnectionFactory
@@ -67,14 +64,6 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
     @TestConfiguration
     class ValkeyCacheTestConfig(private val cf: RedisConnectionFactory) {
 
-        @Bean
-        @Primary
-        fun cacheConfig() =
-            CacheConfig("unused", "unused", redis.host, redis.firstMappedPort, ofSeconds(5))
-
-        @Bean
-        fun redisClient(cfg: CacheConfig) =
-            create("redis://${cfg.host}:${cfg.port}")
 
         @Bean
         fun cacheManager() =
@@ -96,11 +85,9 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
 
         @Bean
         fun valkeyCacheOperations(
-            client: RedisClient,
-            cfg: CacheConfig,
             valkey: StringRedisTemplate,
             teller: ValkeyCacheTeller,
-        ) = ValkeyCacheOperations(client, cfg, valkey, teller)
+        ) = ValkeyCacheOperations(valkey, teller)
     }
 
     @MockkBean
@@ -112,8 +99,6 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
     @Autowired
     private lateinit var cache: CacheOperations
 
-    @Autowired
-    private lateinit var redisClient: RedisClient
 
     init {
 
@@ -169,9 +154,6 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
             When("TTL løper ut") {
                 Then("Valkey publiserer expired-event som håndteres av ValkeyListener") {
 
-                    redisClient.connect().use { connection ->
-                        connection.sync().configSet("notify-keyspace-events", "Exd")
-                    }
 
                     cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(1))
 
@@ -219,7 +201,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
         }
 
         Given("graceful degradation ved Redis-feil") {
-            When("getOne kalles mot pauset Redis") {
+            When("getOne kalles mot utilgjengelig Redis") {
                 Then("returnerer null i stedet for å kaste exception") {
                     cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(30))
                     cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, I1) shouldBe P1
@@ -231,7 +213,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     }
                 }
             }
-            When("getMany kalles mot pauset Redis") {
+            When("getMany kalles mot utilgjengelig Redis") {
                 Then("returnerer tomt map i stedet for å kaste exception") {
                     cache.putMany(PDL_MED_FAMILIE_CACHE, mapOf(I1 to P1, I2 to P2), ofSeconds(30))
                     redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
@@ -242,7 +224,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     }
                 }
             }
-            When("putOne kalles mot pauset Redis") {
+            When("putOne kalles mot utilgjengelig Redis") {
                 Then("kaster ikke exception") {
                     redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
                     try {
@@ -252,7 +234,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     }
                 }
             }
-            When("putMany kalles mot pauset Redis") {
+            When("putMany kalles mot utilgjengelig Redis") {
                 Then("kaster ikke exception") {
                     redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
                     try {
@@ -262,7 +244,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     }
                 }
             }
-            When("putMany feiler mot pauset Redis og Redis gjenopprettes") {
+            When("putMany feiler mot utilgjengelig Redis og Redis gjenopprettes") {
                 Then("tilkoblingen er fortsatt brukbar og neste putMany lagrer riktig") {
                     redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
                     try {

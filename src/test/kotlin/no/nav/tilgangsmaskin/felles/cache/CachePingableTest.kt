@@ -7,7 +7,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.springframework.data.redis.connection.RedisConnection
 import org.springframework.data.redis.connection.RedisConnectionFactory
-import java.time.Duration.ofSeconds
 
 class CachePingableTest : BehaviorSpec({
 
@@ -15,9 +14,7 @@ class CachePingableTest : BehaviorSpec({
     val connectionFactory = mockk<RedisConnectionFactory> {
         every { this@mockk.connection } returns connection
     }
-    val cfg = CacheConfig("user","pass","localhost", 6379, ofSeconds(1)
-    )
-    val pingable = CachePingable(connectionFactory, cfg)
+    val pingable = CachePingable(connectionFactory, "localhost", 6379)
 
     Given("ping mot cache-tilkobling") {
         When("Redis returnerer PONG") {

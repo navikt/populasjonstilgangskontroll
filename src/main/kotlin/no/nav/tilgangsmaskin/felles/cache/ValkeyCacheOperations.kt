@@ -1,9 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import io.lettuce.core.RedisClient
-import io.lettuce.core.ScriptOutputType.MULTI
 import io.opentelemetry.instrumentation.annotations.WithSpan
-import jakarta.annotation.PreDestroy
 import no.nav.tilgangsmaskin.felles.cache.CacheBeanConfig.Companion.VALKEY_MAPPER
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.CLEAR
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Operasjon.DELETE
@@ -15,7 +12,6 @@ import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.FEILET
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.HIT
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.MISS
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheTeller.Resultat.OK
-import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.slf4j.LoggerFactory.getLogger
@@ -23,20 +19,26 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.data.redis.core.Cursor
 import org.springframework.data.redis.core.ScanOptions
 import org.springframework.data.redis.core.StringRedisTemplate
+import org.springframework.data.redis.core.script.RedisScript
+import org.springframework.stereotype.Component
 import java.time.Duration
-import java.time.Duration.ofSeconds
 import kotlin.reflect.KClass
 import kotlin.text.Charsets.UTF_8
 import kotlin.time.measureTimedValue
 
-@RetryingWhenRecoverableRestService
-class ValkeyCacheOperations(client: RedisClient,
-                            private val cfg: CacheConfig,
-                            private val valkey: StringRedisTemplate,
-                            private val teller: ValkeyCacheTeller) : CacheOperations {
+@Component
+class ValkeyCacheOperations(private val valkey: StringRedisTemplate, private val teller: ValkeyCacheTeller) :
+    CacheOperations {
 
     private val log = getLogger(javaClass)
-    private val conn = connect(client)
+
+    init {
+        if (isLocalOrTest) {
+            valkey.execute { connection ->
+                connection.serverCommands().setConfig("notify-keyspace-events", "Exd")
+            }
+        }
+    }
 
     @WithSpan
     override fun delete(cache: CacheNøkkelConfig, id: String) =
@@ -90,6 +92,7 @@ class ValkeyCacheOperations(client: RedisClient,
             else -> doPutMany(cache, innslag, ttl.seconds)
         }
     }
+
     private fun <T : Any> doGetMany(cache: CacheNøkkelConfig,
                                     requestedIds: List<String>,
                                     clazz: KClass<T>): Map<String, T?> =
@@ -105,13 +108,22 @@ class ValkeyCacheOperations(client: RedisClient,
                 }.toMap()
             }.getOrElse {
                 teller.tell(GET_MANY, cache.name, FEILET, requestedIds.size)
-                log.info("{} getMany feilet for {} med {} nøkler: {}", javaClass.simpleName, cache.fullName, requestedIds.size, it.message, it)
+                log.info("{} getMany feilet for {} med {} nøkler: {}",
+                    javaClass.simpleName,
+                    cache.fullName,
+                    requestedIds.size,
+                    it.message,
+                    it)
                 emptyMap()
             }
         }.let {
             teller.tell(GET_MANY, cache.name, HIT, it.value.size)
             teller.tell(GET_MANY, cache.name, MISS, requestedIds.size - it.value.size)
-            log.info("getMany {} hentet {} av {} nøkler på {}ms", cache.fullName, it.value.size, requestedIds.size,it.duration.inWholeMilliseconds)
+            log.info("getMany {} hentet {} av {} nøkler på {}ms",
+                cache.fullName,
+                it.value.size,
+                requestedIds.size,
+                it.duration.inWholeMilliseconds)
             it.value
         }
 
@@ -123,8 +135,6 @@ class ValkeyCacheOperations(client: RedisClient,
                 mapOf(id to it)
             }.orEmpty()
         }
-
-
 
 
     override fun clear(cache: CacheNøkkelConfig) {
@@ -157,15 +167,13 @@ class ValkeyCacheOperations(client: RedisClient,
     }
 
     override fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long> {
-        val prefixes = caches.map {
-            "${it.tilNøkkel("")}*"
-        }.toTypedArray()
-        val (results, totalDuration) = eval(*prefixes)
-        return caches.zip(results).associate {
-            (cache, count) -> cache.fullName to count
-        }.also {
-            log.info("Cache størrelser {} slått opp, tok {}ms", it, totalDuration.inWholeMilliseconds)
+        val prefixes = caches.map { "${it.tilNøkkel("")}*" }
+        val (results, totalDuration) = measureTimedValue {
+            @Suppress("UNCHECKED_CAST")
+            valkey.execute(SCRIPT, emptyList(), *prefixes.toTypedArray()) as List<Long>
         }
+        return caches.zip(results).associate { (cache, count) -> cache.fullName to count }
+            .also { log.info("Cache størrelser {} slått opp, tok {}ms", it, totalDuration.inWholeMilliseconds) }
     }
 
     private fun doPutOne(cache: CacheNøkkelConfig,
@@ -186,12 +194,12 @@ class ValkeyCacheOperations(client: RedisClient,
             batch(payload, ttl)
         }
         resultat.onSuccess {
-                teller.tell(PUT_MANY, cache.name, OK, innslag.size)
-                log.info("Cache putMany {} lagret {} nøkler på {}ms",
-                    cache.fullName,
-                    innslag.size,
-                    varighet.inWholeMilliseconds)
-            }
+            teller.tell(PUT_MANY, cache.name, OK, innslag.size)
+            log.info("Cache putMany {} lagret {} nøkler på {}ms",
+                cache.fullName,
+                innslag.size,
+                varighet.inWholeMilliseconds)
+        }
             .onFailure {
                 teller.tell(PUT_MANY, cache.name, FEILET, innslag.size)
                 log.info("Cache putMany feilet for {} med {} nøkler: {}", cache.fullName, innslag.size, it.message, it)
@@ -202,33 +210,14 @@ class ValkeyCacheOperations(client: RedisClient,
         runCatching {
             valkey.executePipelined { connection ->
                 payload.forEach { (key, value) ->
-                    connection.stringCommands().setEx(key.toByteArray(UTF_8), ttl, value.toByteArray(UTF_8))
+                    connection.stringCommands().setEx(key.toByteArray(), ttl, value.toByteArray())
                 }
                 null
             }
         }
 
 
-    private fun eval(vararg prefixes: String) =
-        measureTimedValue {
-            conn.sync().eval<List<Long>>(SCRIPT, MULTI, emptyArray(), *prefixes)
-        }
-
-    private fun connect(client: RedisClient) =
-        client.connect().apply {
-            timeout = ofSeconds(cfg.timeout.seconds)
-            if (isLocalOrTest) {
-                sync().configSet("notify-keyspace-events", "Exd")
-            }
-        }
-
-
-    @PreDestroy
-    fun closeConnections() {
-        conn.close()
-    }
-
     companion object {
-        private val SCRIPT = ClassPathResource("scripts/count-all-keys.lua").getContentAsString(UTF_8)
+        private val SCRIPT = RedisScript.of<List<*>>(ClassPathResource("scripts/count-all-keys.lua"), List::class.java)
     }
 }

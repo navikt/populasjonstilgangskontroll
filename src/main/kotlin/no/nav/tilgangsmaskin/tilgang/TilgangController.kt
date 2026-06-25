@@ -48,7 +48,6 @@ private const val TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.tilgang.tag.
 class TilgangController(
     private val regelTjeneste: RegelTjeneste,
     private val enkeltTilgangTjeneste: EnkeltTilgangTjeneste,
-    private val token: Token,
     private val guard: TokenTypeGuard,
     private val konsumentValidator: EnkeltTilgangKonsumentValidator,
     private val teller: TokenTypeTeller) {
@@ -91,8 +90,8 @@ class TilgangController(
     @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
     fun overstyr(@RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData, req: HttpServletRequest) {
         guard.krev(OBO, req.requestURI)
-        konsumentValidator.valider(token.systemNavn)
-        enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattIdFraToken(), data, token.systemNavn)
+        konsumentValidator.valider(guard.token.systemNavn)
+        enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattIdFraToken(), data, guard.token.systemNavn)
     }
 
     @PostMapping("bulk/obo")
@@ -156,7 +155,7 @@ class TilgangController(
         }
 
     private fun tell(type: String) =
-        teller.tell(Tags.of("type",type,"token",TokenType.from(token).name.lowercase()))
+        teller.tell(Tags.of("type",type,"token",TokenType.from(guard.token).name.lowercase()))
 
 
     private fun sjekk(predikat: Boolean, status: HttpStatus, message: String) {
@@ -164,7 +163,7 @@ class TilgangController(
     }
 
     private fun ansattIdFraToken(): AnsattId =
-        requireNotNull(token.ansattId) { "Mangler ansattId i OBO-token" }
+        requireNotNull(guard.token.ansattId) { "Mangler ansattId i OBO-token" }
 
     companion object {
         private const val SUMMARY_KOMPLETT_OBO =

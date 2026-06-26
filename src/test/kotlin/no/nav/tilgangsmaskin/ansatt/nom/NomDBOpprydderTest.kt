@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger
 @DataJpaTest
 @Testcontainers
 @AutoConfigureMetrics
-@ContextConfiguration(classes = [TestApp::class, NomTjeneste::class, NomJPAAdapter::class, NomDBOpprydder::class, NomRaderFjernetTeller::class, NomKallTeller::class])
+@ContextConfiguration(classes = [TestApp::class, NomTjeneste::class, NomJPAAdapter::class, NomDBOpprydder::class])
 @ApplyExtension(SpringExtension::class)
 class NomDBOpprydderTest : BehaviorSpec() {
 
@@ -44,16 +44,7 @@ class NomDBOpprydderTest : BehaviorSpec() {
 
     @Autowired
     private lateinit var txManager: PlatformTransactionManager
-
-    @Autowired
-    private lateinit var antallKall: NomKallTeller
-
-    @Autowired
-    private lateinit var raderFjernet: NomRaderFjernetTeller
-
-
-
-
+    
     init {
         beforeEach {
             TransactionTemplate(txManager).execute { repo.deleteAll() }

@@ -62,10 +62,8 @@ import kotlin.time.measureTime
 @ApplyExtension(SpringExtension::class)
 class ValkeyCacheOperationsTest : BehaviorSpec() {
 
-
     @TestConfiguration
     class ValkeyCacheTestConfig(private val cf: RedisConnectionFactory) : RedisListenerConfigurer{
-
 
         override fun configureMessageConverters(builder: RedisMessageConverters.Builder) {
             builder.addCustomConverter(CacheNøkkelMessageConverter())
@@ -116,7 +114,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     val many = cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, IDS)
                     many.keys shouldBe IDS
                     many.values shouldBe listOf(P1, P2)
-                    eventually(TIMEOUTS) {
+                    eventually(TIMEOUT) {
                         cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, IDS).shouldBeEmpty()
                     }
                 }
@@ -243,7 +241,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     }
                 }
             }
-            When("putMany feiler mot utilgjengelig Redis og Redis gjenopprettes") {
+            When("putMany feiler først mot utilgjengelig Redis og Redis blir tilgjengelig igjen") {
                 Then("tilkoblingen er fortsatt brukbar og neste putMany lagrer riktig") {
                     redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
                     try {
@@ -252,7 +250,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                         redis.dockerClient.unpauseContainerCmd(redis.containerId).exec()
                     }
                     cache.putMany(PDL_MED_FAMILIE_CACHE, mapOf(I2 to P2), ofSeconds(30))
-                    eventually(TIMEOUTS) {
+                    eventually(TIMEOUT) {
                         cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, I2) shouldBe P2
                     }
                 }
@@ -395,7 +393,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
         private val P1 =
             Person(BrukerId(I1), I1, AktørId(AKTOR_ID), BydelTilknytning(Bydel("030101")), listOf(FORTROLIG))
         private val P2 = Person(BrukerId(I2), I2, AktørId(AKTOR_ID_2), UkjentBosted())
-        private val TIMEOUTS = eventuallyConfig {
+        private val TIMEOUT = eventuallyConfig {
             duration = 2.seconds
             interval = 100.milliseconds
         }

@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
@@ -19,27 +20,43 @@ class CachePingableTest : BehaviorSpec({
     Given("ping mot cache-tilkobling") {
         When("Redis returnerer PONG") {
             Then("kaster ingen feil og lukker connection") {
-                every { connection.ping() } returns "PONG"
-                pingable.ping()
-                verify { connection.close() }
+                every {
+                    connection.ping()
+                } returns "PONG"
+                shouldNotThrowAny {
+                    pingable.ping()
+                }
+                verify {
+                    connection.close()
+                }
             }
         }
         When("Redis returnerer pong lowercase") {
             Then("kaster ingen feil") {
                 every { connection.ping() } returns "pong"
-                pingable.ping()
+                shouldNotThrowAny {
+                    pingable.ping()
+                }
             }
         }
         When("Redis returnerer noe annet enn pong") {
             Then("kaster IllegalStateException") {
-                every { connection.ping() } returns "ERROR"
-                val ex = shouldThrow<IllegalStateException> { pingable.ping() }
+                every {
+                    connection.ping()
+                } returns "ERROR"
+                shouldThrow<IllegalStateException> {
+                    pingable.ping()
+                }
             }
         }
         When("Redis returnerer null") {
             Then("kaster IllegalStateException") {
-                every { connection.ping() } returns null
-                shouldThrow<IllegalStateException> { pingable.ping() }
+                every {
+                    connection.ping()
+                } returns null
+                shouldThrow<IllegalStateException> {
+                    pingable.ping()
+                }
             }
         }
     }

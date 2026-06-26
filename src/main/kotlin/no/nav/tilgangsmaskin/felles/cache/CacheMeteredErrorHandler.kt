@@ -9,20 +9,18 @@ import org.springframework.stereotype.Component
 @Component
 class CacheMeteredErrorHandler(private val registry: MeterRegistry) : CacheErrorHandler {
     private val log = getLogger(javaClass)
-    override fun handleCacheGetError(ex: RuntimeException, cache: Cache, key: Any) =
-        record("get", cache, ex)
+    override fun handleCacheGetError(e: RuntimeException, cache: Cache, key: Any) =
+        record("get", cache, e)
 
-    override fun handleCachePutError(ex: RuntimeException, cache: Cache, key: Any, value: Any?) =
-        record("put", cache, ex)
+    override fun handleCachePutError(e: RuntimeException, cache: Cache, key: Any, value: Any?) =
+        record("put", cache, e)
 
-    override fun handleCacheEvictError(ex: RuntimeException, cache: Cache, key: Any) =
-        record("evict", cache, ex).also {
-            throw ex
-        }
+    override fun handleCacheEvictError(e: RuntimeException, cache: Cache, key: Any) =
+        record("evict", cache, e)
 
-    override fun handleCacheClearError(ex: RuntimeException, cache: Cache) =
-        record("clear", cache, ex).also {
-            throw ex
+    override fun handleCacheClearError(e: RuntimeException, cache: Cache) =
+        record("clear", cache, e).also {
+            throw e
         }
 
     private fun record(op: String, cache: Cache, ex: RuntimeException) {

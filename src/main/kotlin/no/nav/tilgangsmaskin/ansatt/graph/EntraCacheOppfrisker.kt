@@ -16,8 +16,7 @@ import java.util.*
 @Component
 class EntraCacheOppfrisker(private val entra: EntraTjeneste,
                            private val oidTjeneste: EntraOidTjeneste,
-                           private val cache: CacheOperations,
-                           private val teller: OIDEndringTeller) : AbstractCacheOppfrisker() {
+                           private val cache: CacheOperations) : AbstractCacheOppfrisker() {
 
     private val log = LoggerFactory.getLogger(javaClass)
     override val cacheName = EntraGrupperConfig.GRAPH
@@ -44,7 +43,6 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste,
             log.info("Oppfrisking av oid OK for ${ansattId.verdi}, ny verdi er $this")
             oppfriskFor(ansattId, this, metode)
         }
-        teller.tell()
     }
 
     private fun oppfriskFor(ansattId: AnsattId, oid: UUID, metode: String?) =

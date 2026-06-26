@@ -44,7 +44,7 @@ class NomDBOpprydderTest : BehaviorSpec() {
 
     @Autowired
     private lateinit var txManager: PlatformTransactionManager
-    
+
     init {
         beforeEach {
             TransactionTemplate(txManager).execute { repo.deleteAll() }

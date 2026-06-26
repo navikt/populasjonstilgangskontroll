@@ -33,9 +33,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
     @MockkBean(relaxed = true)
     private lateinit var cache: CacheOperations
 
-    @MockkBean
-    private lateinit var teller: OIDEndringTeller
-
     @Autowired
     private lateinit var oppfrisker: EntraCacheOppfrisker
 
@@ -81,11 +78,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                     oppfrisker.oppfrisk(nøkkel(GEO))
                     verify { entra.geoGrupper(ansattId, NY_OID) }
                 }
-
-                Then("teller oppdateres") {
-                    oppfrisker.oppfrisk(nøkkel(GEO))
-                    verify { teller.tell() }
-                }
             }
 
             When("Uforventet feil ved oppslag i Entra") {
@@ -94,7 +86,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
 
                     oppfrisker.oppfrisk(nøkkel(GEO))
 
-                    verify(exactly = 0) { teller.tell() }
                     verify(exactly = 0) { cache.delete(any(), any()) }
                 }
             }
@@ -119,7 +110,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
 
                     verify { cache.delete(OID_CACHE, ansattId.verdi) }
                     verify { entra.geoOgGlobaleGrupper(ansattId, NY_OID) }
-                    verify { teller.tell() }
                 }
             }
         }
@@ -136,7 +126,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                     verify(exactly = 0) { entra.geoGrupper(any(), any()) }
                     verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
                     verify(exactly = 0) { cache.delete(any(), any()) }
-                    verify(exactly = 0) { teller.tell() }
                 }
             }
         }
@@ -154,7 +143,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                     verify { cache.delete(OID_CACHE, ansattId.verdi) }
                     verify(exactly = 2) { oid.oid(ansattId) }
                     verify { entra.geoGrupper(ansattId, NY_OID) }
-                    verify { teller.tell() }
                 }
             }
 
@@ -170,7 +158,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                     verify { cache.delete(OID_CACHE, ansattId.verdi) }
                     verify(exactly = 2) { oid.oid(ansattId) }
                     verify { entra.geoOgGlobaleGrupper(ansattId, NY_OID) }
-                    verify { teller.tell() }
                 }
             }
 
@@ -185,7 +172,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                     }
 
                     verify { cache.delete(OID_CACHE, ansattId.verdi) }
-                    verify(exactly = 0) { teller.tell() }
                 }
             }
         }

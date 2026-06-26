@@ -19,7 +19,7 @@ class CachePingable(
     override fun ping() =
         cf.connection.use {
             if (it.ping().equals(PONG, ignoreCase = true)) {
-               Unit
+                Unit
             } else {
                 error("$name ping failed")
             }

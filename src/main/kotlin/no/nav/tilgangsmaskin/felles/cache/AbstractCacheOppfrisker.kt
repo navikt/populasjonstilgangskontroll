@@ -1,13 +1,12 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import io.micrometer.core.instrument.Tags.of
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import org.slf4j.LoggerFactory.getLogger
 
 abstract class AbstractCacheOppfrisker : CacheOppfrisker {
     private val log = getLogger(javaClass)
 
-    protected abstract fun doOppfrisk(nøkkel: CacheNøkkel) : Any?
+    protected abstract fun doOppfrisk(nøkkel: CacheNøkkel): Any?
 
     @WithSpan
     final override fun oppfrisk(nøkkel: CacheNøkkel) =

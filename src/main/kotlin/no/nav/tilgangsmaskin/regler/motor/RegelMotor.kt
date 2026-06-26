@@ -35,17 +35,16 @@ class RegelMotor(
     fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, kjerne, ENKELT)
 
     @WithSpan
-    private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett,type: EvalueringType) {
+    private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, type: EvalueringType) {
         regelSett.regler.forEach { regel ->
             if (!regel.evaluer(ansatt, bruker)) {
-                logger.avvist(ansatt, bruker, regelSett, regel,type)
+                logger.avvist(ansatt, bruker, regelSett, regel, type)
                 throw RegelException(ansatt, bruker, regel)
-            }
-            else {
-                logger.godkjent(ansatt, bruker, regel,type)
+            } else {
+                logger.godkjent(ansatt, bruker, regel, type)
             }
         }
-        logger.ok(ansatt, bruker,regelSett,type)
+        logger.ok(ansatt, bruker, regelSett, type)
     }
 
     @WithSpan
@@ -73,7 +72,8 @@ class RegelMotor(
         when (this) {
             KJERNE_REGELTYPE -> kjerne
             KOMPLETT_REGELTYPE -> komplett
-            OVERSTYRBAR_REGELTYPE -> komplett.regler.filterIsInstance<OverstyrbarRegel>().let { RegelSett(OVERSTYRBAR_REGELTYPE to it) }
+            OVERSTYRBAR_REGELTYPE -> komplett.regler.filterIsInstance<OverstyrbarRegel>()
+                .let { RegelSett(OVERSTYRBAR_REGELTYPE to it) }
         }
 
     @NoCoverageAnalysis
@@ -81,12 +81,16 @@ class RegelMotor(
 
 }
 
-data class BulkResultat(val bruker: Bruker,val status: HttpStatus, val regel: Regel? = null) {
+data class BulkResultat(val bruker: Bruker, val status: HttpStatus, val regel: Regel? = null) {
     companion object {
         private val log = getLogger(javaClass)
-        fun ok(bruker: Bruker) = BulkResultat( bruker,NO_CONTENT)
-        fun avvist(bruker: Bruker,e: RegelException) = BulkResultat( bruker,FORBIDDEN, e.regel).also {
-            log.trace("Tilgang til {} for {} ble avvist av {}", e.bruker.brukerId.verdi.maskFnr(), e.ansatt.ansattId, e.regel.kortNavn, e)
+        fun ok(bruker: Bruker) = BulkResultat(bruker, NO_CONTENT)
+        fun avvist(bruker: Bruker, e: RegelException) = BulkResultat(bruker, FORBIDDEN, e.regel).also {
+            log.trace("Tilgang til {} for {} ble avvist av {}",
+                e.bruker.brukerId.verdi.maskFnr(),
+                e.ansatt.ansattId,
+                e.regel.kortNavn,
+                e)
         }
     }
 }

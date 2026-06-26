@@ -18,9 +18,7 @@ class ValkeyEventListeningCacheOppfrisker(erLeder: Boolean = true,
     }
 
     private companion object {
-         private const val CHANNEL = "__keyevent@0__:expired"
+        private const val CHANNEL = "__keyevent@0__:expired"
     }
-
-
 }
 

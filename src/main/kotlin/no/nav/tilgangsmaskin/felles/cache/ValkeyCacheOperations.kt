@@ -12,15 +12,13 @@ import org.springframework.data.redis.core.ScanOptions.scanOptions
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.core.script.RedisScript
 import org.springframework.stereotype.Component
-import tools.jackson.databind.json.JsonMapper
 import java.time.Duration
 import kotlin.reflect.KClass
 import kotlin.text.Charsets.UTF_8
 import kotlin.time.TimeSource.Monotonic.markNow
 
 @Component
-class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
-                            private val mapper: JsonMapper = VALKEY_MAPPER) : CacheOperations {
+class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOperations {
 
     private val log = getLogger(javaClass)
 
@@ -34,27 +32,27 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
 
     @WithSpan
     override fun delete(cache: CacheNøkkelConfig, id: String) =
-            runCatching { valkey.unlink(cache.tilNøkkel(id)) }
-                .onFailure {
-                    log.info("Cache delete feilet for {} nøkkel {}: {}", cache.fullName, id.maskFnr(), it.message, it)
-                }.getOrElse { false }
+        runCatching { valkey.unlink(cache.tilNøkkel(id)) }
+            .onFailure {
+                log.info("Cache delete feilet for {} nøkkel {}: {}", cache.fullName, id.maskFnr(), it.message, it)
+            }.getOrElse { false }
 
     @WithSpan
     override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? {
-            return runCatching {
-                valkey.opsForValue().get(cache.tilNøkkel(id))?.let { mapper.readValue(it, clazz.java) }
-            }.onFailure {
-                log.info("Cache getOne feilet for {}, faller tilbake til tjenestekall", cache.fullName, it)
-            }.getOrNull()
+        return runCatching {
+            valkey.opsForValue().get(cache.tilNøkkel(id))?.let { VALKEY_MAPPER.readValue(it, clazz.java) }
+        }.onFailure {
+            log.info("Cache getOne feilet for {}, faller tilbake til tjenestekall", cache.fullName, it)
+        }.getOrNull()
     }
 
     @WithSpan
     override fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration) {
-            runCatching {
-                valkey.opsForValue().set(cache.tilNøkkel(id), mapper.writeValueAsString(value), ttl)
-            }.onFailure {
-                log.info("Cache putOne feilet for {} nøkkel {}: {}", cache.fullName, id, it.message, it)
-            }
+        runCatching {
+            valkey.opsForValue().set(cache.tilNøkkel(id), VALKEY_MAPPER.writeValueAsString(value), ttl)
+        }.onFailure {
+            log.info("Cache putOne feilet for {} nøkkel {}: {}", cache.fullName, id, it.message, it)
+        }
     }
 
     @WithSpan
@@ -82,7 +80,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
                 val values = valkey.opsForValue().multiGet(requestedIds.map(cache::tilNøkkel)).orEmpty()
                 requestedIds.mapIndexedNotNull { index, id ->
                     values.getOrNull(index)?.let { value ->
-                        id to mapper.readValue(value, clazz.java)
+                        id to VALKEY_MAPPER.readValue<T>(value, clazz.java)
                     }
                 }.toMap()
             }.onSuccess { verdier ->
@@ -98,7 +96,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
 
     private fun <T : Any> doGetOne(cache: CacheNøkkelConfig,
                                    ids: Set<String>,
-                                   clazz: KClass<T>): Map<String, T> =
+                                   clazz: KClass<T>) =
         ids.single().let { id ->
             getOne(cache, id, clazz)?.let {
                 mapOf(id to it)
@@ -112,25 +110,25 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
         val prefix = cache.tilNøkkel("")
         var slettet = 0L
         val scanOptions = scanOptions().match("$prefix*").count(10_000).build()
-            runCatching {
-                valkey.executeWithStickyConnection { connection ->
-                    (connection.keyCommands().scan(scanOptions) as Cursor<ByteArray>).use { cursor ->
-                        val batch = mutableListOf<String>()
-                        cursor.forEach { keyBytes ->
-                            batch += keyBytes.toString(UTF_8)
-                            if (batch.size >= 10_000) {
-                                slettet += valkey.unlink(batch) ?: 0L
-                                batch.clear()
-                            }
-                        }
-
-                        if (batch.isNotEmpty()) {
-                            slettet += valkey.delete(batch) ?: 0L
+        runCatching {
+            valkey.executeWithStickyConnection { connection ->
+                (connection.keyCommands().scan(scanOptions) as Cursor<ByteArray>).use { cursor ->
+                    val batch = mutableListOf<String>()
+                    cursor.forEach { keyBytes ->
+                        batch += keyBytes.toString(UTF_8)
+                        if (batch.size >= 10_000) {
+                            slettet += valkey.unlink(batch) ?: 0L
+                            batch.clear()
                         }
                     }
-                    null
+
+                    if (batch.isNotEmpty()) {
+                        slettet += valkey.delete(batch) ?: 0L
+                    }
                 }
-            }.getOrThrow()
+                null
+            }
+        }.getOrThrow()
     }
 
     override fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long> {
@@ -158,7 +156,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate,
                           ttl: Long) {
         markNow().let { start ->
             val payload = innslag.entries.associate { (key, value) ->
-                cache.tilNøkkel(key) to mapper.writeValueAsString(value)
+                cache.tilNøkkel(key) to VALKEY_MAPPER.writeValueAsString(value)
             }
             val resultat = pipeline(payload, ttl)
             val varighet = start.elapsedNow()

@@ -63,9 +63,9 @@ class EnkeltTilgangTjeneste(
 
     private fun gjeldendeEnkeltTilgang(ansattId: AnsattId, brukerId: BrukerId): Instant? =
         adapter.gjeldende(ansattId.verdi, brukerId.verdi,
-        brukerTjeneste.brukerMedNærmesteFamilie(brukerId.verdi).historiskeIds.map {
-            it.verdi
-        })?.expires
+            brukerTjeneste.brukerMedNærmesteFamilie(brukerId.verdi).historiskeIds.map {
+                it.verdi
+            })?.expires
 
     private fun enhetFor(ansattId: AnsattId) =
         runCatching {

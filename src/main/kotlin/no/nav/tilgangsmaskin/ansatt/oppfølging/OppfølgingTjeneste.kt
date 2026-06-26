@@ -32,8 +32,10 @@ class OppfølgingTjeneste(private val adapter: OppfølgingJPAAdapter, private va
     fun registrer(endring: StartetEllerEndret) =
         with(endring) {
             kontor.kontorId.also {
-                adapter.registrer(uuid, identer.brukerId.verdi,
-                    identer.aktorId.verdi, tidspunkt, it.verdi, )
+                adapter.registrer(
+                    uuid, identer.brukerId.verdi,
+                    identer.aktorId.verdi, tidspunkt, it.verdi,
+                )
             }
         }
 

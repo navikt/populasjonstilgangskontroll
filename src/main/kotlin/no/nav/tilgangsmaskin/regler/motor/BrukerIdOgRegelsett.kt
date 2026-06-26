@@ -6,8 +6,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 
 
-
-@Schema(requiredProperties = ["brukerId"],  description = "Sett av identifikatorer og regelsett", example = """
+@Schema(requiredProperties = ["brukerId"], description = "Sett av identifikatorer og regelsett", example = """
   {
     "brukerId": "22420094160",
     "type": "KOMPLETT_REGELTYPE"

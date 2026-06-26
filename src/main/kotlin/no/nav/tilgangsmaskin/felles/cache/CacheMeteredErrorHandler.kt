@@ -2,8 +2,8 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import io.micrometer.core.instrument.MeterRegistry
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.cache.interceptor.CacheErrorHandler
 import org.springframework.cache.Cache
+import org.springframework.cache.interceptor.CacheErrorHandler
 import org.springframework.stereotype.Component
 
 @Component

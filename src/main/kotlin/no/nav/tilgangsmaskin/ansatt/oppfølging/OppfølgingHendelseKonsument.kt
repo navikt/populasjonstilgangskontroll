@@ -1,11 +1,11 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.StartetEllerEndret
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.ARBEIDSOPPFOLGINGSKONTOR_ENDRET
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_AVSLUTTET
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_STARTET
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.StartetEllerEndret
 import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import org.slf4j.LoggerFactory.getLogger
@@ -27,10 +27,14 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
                 if (endring.type == ARBEIDSOPPFOLGINGSKONTOR_ENDRET) {
                     val tidligereKontor = oppfølging.enhetFor(Identifikator(endring.identer.brukerId.verdi))
                     if (tidligereKontor == null) {
-                        log.warn("Mottok KontorEndret for id {} uten eksisterende kontor — ingen tidligere oppfølging funnet", endring.uuid)
+                        log.warn("Mottok KontorEndret for id {} uten eksisterende kontor — ingen tidligere oppfølging funnet",
+                            endring.uuid)
                     }
                     oppfølging.registrer(endring).also {
-                        log.info("Oppfølging endret fra kontor {} til kontor {} for id {}", tidligereKontor?.verdi, endring.kontor, endring.uuid)
+                        log.info("Oppfølging endret fra kontor {} til kontor {} for id {}",
+                            tidligereKontor?.verdi,
+                            endring.kontor,
+                            endring.uuid)
                     }
                 } else {
                     oppfølging.registrer(endring).also {
@@ -41,7 +45,7 @@ class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste)
             is Avsluttet ->
                 oppfølging.avslutt(endring).also {
                     log.info("Oppfølging avsluttet for id {}", endring.uuid)
-            }
+                }
         }
 
     companion object {

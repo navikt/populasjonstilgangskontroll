@@ -5,8 +5,8 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
-import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
 import no.nav.tilgangsmaskin.felles.Auditor
+import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withMDC
 import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.INGEN_REGEL_TAG
@@ -18,7 +18,10 @@ import org.slf4j.MDC
 import org.springframework.stereotype.Component
 
 @Component
-class RegelMotorLogger(private val registry: MeterRegistry, private val token: Token, private val teller: EvalueringTypeTeller, private val auditor: Auditor) {
+class RegelMotorLogger(private val registry: MeterRegistry,
+                       private val token: Token,
+                       private val teller: EvalueringTypeTeller,
+                       private val auditor: Auditor) {
 
     private val log = getLogger(RegelMotor::class.java)
 
@@ -33,18 +36,28 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
             .register(registry)
     }
 
-    fun avvist(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, regel: Regel,type: EvalueringType) =
-        withMDC(Pair(BESLUTNING, regel.kode),Pair(REGELSETT, regelSett.type.beskrivelse),Pair(OPPSLAGTYPE, type.name)) {
+    fun avvist(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, regel: Regel, type: EvalueringType) =
+        withMDC(Pair(BESLUTNING, regel.kode),
+            Pair(REGELSETT, regelSett.type.beskrivelse),
+            Pair(OPPSLAGTYPE, type.name)) {
             log.info("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for ${bruker.brukerId} ${konsument()}")
             auditor.info("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' ${konsument()}")
-            teller.tell(TILGANG_AVVIST_TAG, beskrivelseTag(regelSett),regelTag(regel),tokenTag(token),evaltypeTag(type))
+            teller.tell(TILGANG_AVVIST_TAG,
+                beskrivelseTag(regelSett),
+                regelTag(regel),
+                tokenTag(token),
+                evaltypeTag(type))
         }
 
-    fun ok(ansatt: Ansatt, bruker: Bruker,regelSett: RegelSett, type: EvalueringType) =
-        withMDC(Pair(BESLUTNING, OK),Pair(REGELSETT, regelSett.type.beskrivelse),Pair(OPPSLAGTYPE, type.name)) {
+    fun ok(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, type: EvalueringType) =
+        withMDC(Pair(BESLUTNING, OK), Pair(REGELSETT, regelSett.type.beskrivelse), Pair(OPPSLAGTYPE, type.name)) {
             log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} ${konsument()}")
             auditor.info("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} ${konsument()}")
-            teller.tell(TILGANG_AKSEPTERT_TAG, beskrivelseTag(regelSett),INGEN_REGEL_TAG,tokenTag(token),evaltypeTag(type))
+            teller.tell(TILGANG_AKSEPTERT_TAG,
+                beskrivelseTag(regelSett),
+                INGEN_REGEL_TAG,
+                tokenTag(token),
+                evaltypeTag(type))
         }
 
 
@@ -52,11 +65,18 @@ class RegelMotorLogger(private val registry: MeterRegistry, private val token: T
 
     fun tellBulkSize(size: Int) = bulkHistogram.record(size.toDouble())
     fun godkjent(ansatt: Ansatt, bruker: Bruker, regel: Regel, type: EvalueringType) {
-        log.trace("Evaluert regel '{}' OK for {} for {} og {} {}", regel.kortNavn, ansatt.ansattId, bruker.oppslagId.maskFnr(), type.name,konsument())
+        log.trace("Evaluert regel '{}' OK for {} for {} og {} {}",
+            regel.kortNavn,
+            ansatt.ansattId,
+            bruker.oppslagId.maskFnr(),
+            type.name,
+            konsument())
     }
 
-    companion object   {
-        private fun konsument(): String = MDC.get(CONSUMER_ID)?.let { "for konsument $it" } ?: "(for uautentisert konsument)"
+    companion object {
+        private fun konsument(): String =
+            MDC.get(CONSUMER_ID)?.let { "for konsument $it" } ?: "(for uautentisert konsument)"
+
         private fun evaltypeTag(type: EvalueringType) = Tag.of(OPPSLAGTYPE, type.name.lowercase())
         private fun beskrivelseTag(regelsett: RegelSett) = Tag.of(BESKRIVELSE, regelsett.beskrivelse)
         private val TILGANG_AKSEPTERT_TAG = Tag.of(RESULTAT, OK)

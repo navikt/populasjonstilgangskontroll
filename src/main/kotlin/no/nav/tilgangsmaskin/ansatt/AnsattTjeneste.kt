@@ -3,8 +3,8 @@ package no.nav.tilgangsmaskin.ansatt
 import io.micrometer.core.annotation.Timed
 import io.micrometer.core.instrument.Tags
 import no.nav.boot.conditionals.ConditionalOnGCP
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import org.slf4j.LoggerFactory.getLogger

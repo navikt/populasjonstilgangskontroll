@@ -14,14 +14,14 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangGyldig
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangGyldig
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
 import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
 import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
@@ -59,14 +59,14 @@ class TilgangController(
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
     fun kompletteRegler(@RequestBody brukerId: String, req: HttpServletRequest) =
-        enkeltOppslag({ ansattIdFraToken() }, OBO, brukerId, KOMPLETT_REGELTYPE,req.requestURI)
+        enkeltOppslag({ ansattIdFraToken() }, OBO, brukerId, KOMPLETT_REGELTYPE, req.requestURI)
 
     @PostMapping("/ccf/komplett/{ansattId}")
     @ResponseStatus(NO_CONTENT)
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KOMPLETT_CCF, description = DESCRIPTION_KOMPLETT_CCF)
     fun kompletteReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String, req: HttpServletRequest) =
-        enkeltOppslag({ansattId}, CCF, brukerId, KOMPLETT_REGELTYPE, req.requestURI)
+        enkeltOppslag({ ansattId }, CCF, brukerId, KOMPLETT_REGELTYPE, req.requestURI)
 
     @PostMapping("kjerne")
     @ResponseStatus(NO_CONTENT)
@@ -81,7 +81,7 @@ class TilgangController(
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KJERNE_CCF, description = DESCRIPTION_KJERNE_CCF)
     fun kjerneReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String, req: HttpServletRequest) =
-        enkeltOppslag({ansattId}, CCF, brukerId, KJERNE_REGELTYPE,req.requestURI)
+        enkeltOppslag({ ansattId }, CCF, brukerId, KJERNE_REGELTYPE, req.requestURI)
 
 
     @PostMapping("overstyr")
@@ -98,32 +98,42 @@ class TilgangController(
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO)
-    fun bulkOBO(@RequestBody  specs: Set<BrukerIdOgRegelsett>, req: HttpServletRequest) =
-        bulkOppslag({ ansattIdFraToken() }, OBO, specs,req.requestURI)
+    fun bulkOBO(@RequestBody specs: Set<BrukerIdOgRegelsett>, req: HttpServletRequest) =
+        bulkOppslag({ ansattIdFraToken() }, OBO, specs, req.requestURI)
 
     @PostMapping("bulk/obo/{regelType}")
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO_REGELTYPE)
-    fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>, req: HttpServletRequest) =
+    fun bulkOBOForRegelType(@PathVariable regelType: RegelType,
+                            @RequestBody brukerIds: Set<String>,
+                            req: HttpServletRequest) =
         bulkOppslag({ ansattIdFraToken() },
-            OBO, brukerIds.map { BrukerIdOgRegelsett(it,regelType) }.toSet(),req.requestURI)
+            OBO, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(), req.requestURI)
 
     @PostMapping("bulk/ccf/{ansattId}")
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_CCF)
-    fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody specs: Set<BrukerIdOgRegelsett>, req: HttpServletRequest) =
-        bulkOppslag({ansattId}, CCF, specs,req.requestURI)
+    fun bulkCCF(@PathVariable ansattId: AnsattId,
+                @RequestBody specs: Set<BrukerIdOgRegelsett>,
+                req: HttpServletRequest) =
+        bulkOppslag({ ansattId }, CCF, specs, req.requestURI)
 
     @PostMapping("bulk/ccf/{ansattId}/{regelType}")
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_CCF_REGELTYPE)
-    fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>, req: HttpServletRequest) =
-        bulkOppslag({ ansattId }, CCF, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(),req.requestURI)
+    fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId,
+                            @PathVariable regelType: RegelType,
+                            @RequestBody brukerIds: Set<String>,
+                            req: HttpServletRequest) =
+        bulkOppslag({ ansattId }, CCF, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(), req.requestURI)
 
-    private fun bulkOppslag(ansattId: () -> AnsattId, forventet: TokenType, specs: Set<BrukerIdOgRegelsett>, uri: String): AggregertBulkRespons {
+    private fun bulkOppslag(ansattId: () -> AnsattId,
+                            forventet: TokenType,
+                            specs: Set<BrukerIdOgRegelsett>,
+                            uri: String): AggregertBulkRespons {
         guard.krev(forventet, uri)
         val ansatt = ansattId()
         MDC.put(USER_ID, ansatt.verdi)
@@ -138,14 +148,18 @@ class TilgangController(
         }
     }
 
-    private fun enkeltOppslag(ansattId: () -> AnsattId, forventet: TokenType, brukerId: String, regelType: RegelType, uri: String) =
+    private fun enkeltOppslag(ansattId: () -> AnsattId,
+                              forventet: TokenType,
+                              brukerId: String,
+                              regelType: RegelType,
+                              uri: String) =
         with(brukerId.trim('"')) {
             sjekk(isNotBlank(), BAD_REQUEST, "brukerId kan ikke være tom")
             guard.krev(forventet, uri)
             val ansatt = ansattId()
             MDC.put(USER_ID, ansatt.verdi)
-            log.trace(CONFIDENTIAL,"Kjører {} regler for {} og {}", regelType, ansatt, this.maskFnr())
-            sjekk(regelType in listOf(KJERNE_REGELTYPE,KOMPLETT_REGELTYPE),
+            log.trace(CONFIDENTIAL, "Kjører {} regler for {} og {}", regelType, ansatt, this.maskFnr())
+            sjekk(regelType in listOf(KJERNE_REGELTYPE, KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")
             tell("single")
             when (regelType) {
@@ -155,11 +169,11 @@ class TilgangController(
         }
 
     private fun tell(type: String) =
-        teller.tell(Tags.of("type",type,"token",TokenType.from(guard.token).name.lowercase()))
+        teller.tell(Tags.of("type", type, "token", TokenType.from(guard.token).name.lowercase()))
 
 
     private fun sjekk(predikat: Boolean, status: HttpStatus, message: String) {
-        if (!predikat) throw ResponseStatusException(status,message)
+        if (!predikat) throw ResponseStatusException(status, message)
     }
 
     private fun ansattIdFraToken(): AnsattId =

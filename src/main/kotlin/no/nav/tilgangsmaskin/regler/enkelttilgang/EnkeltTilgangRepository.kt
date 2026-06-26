@@ -18,9 +18,9 @@ interface EnkeltTilgangRepository : JpaRepository<EnkeltTilgangEntity, Long> {
           )
     """)
     fun gjeldende(
-            @Param("ansattId") ansattId: String,
-            @Param("brukerIds") brukerIds: Set<String>,
-            @Param("cutoff") cutoff: Instant): EnkeltTilgangEntity?
+        @Param("ansattId") ansattId: String,
+        @Param("brukerIds") brukerIds: Set<String>,
+        @Param("cutoff") cutoff: Instant): EnkeltTilgangEntity?
 
     @Query("""
     SELECT o FROM overstyring o

@@ -8,6 +8,6 @@ class EnkeltTilgangConfig(val systemer: Set<String> = SYSTEMER) {
 
     companion object {
         const val OVERSTYRING = "overstyring"
-        val SYSTEMER = setOf("histark","gosys")
+        val SYSTEMER = setOf("histark", "gosys")
     }
 }

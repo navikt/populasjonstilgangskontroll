@@ -35,7 +35,7 @@ class PdlHendelseKonsument(private val client: CacheOperations,
     }
 
     private fun slett(cache: CacheNøkkelConfig, id: String, gradering: String, endringsType: String) {
-        if (client.delete(cache, id))  {
+        if (client.delete(cache, id)) {
             teller.tell(cache, gradering, endringsType)
             log.trace(CONFIDENTIAL,
                 "Slettet nøkkel ${cache.tilNøkkel(id)} fra cache ${cache.name} etter hendelse av type $gradering",

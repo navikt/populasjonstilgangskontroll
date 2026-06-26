@@ -14,8 +14,8 @@ import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.nonLockingRedisCacheWriter
 import org.springframework.data.redis.config.RedisListenerConfigurer
 import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.data.redis.serializer.RedisMessageConverters
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer
+import org.springframework.data.redis.serializer.RedisMessageConverters
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
 import org.springframework.http.MediaType.APPLICATION_OCTET_STREAM
@@ -29,7 +29,10 @@ import kotlin.text.Charsets.UTF_8
 @Configuration(proxyBeanMethods = true)
 @ConditionalOnGCP
 @NoCoverageAnalysis
-class CacheBeanConfig(private val cf: RedisConnectionFactory, private val meterRegistry: MeterRegistry,  private val errorHandler: CacheErrorHandler, private vararg val cfgs: CachableRestConfig) : CachingConfigurer, RedisListenerConfigurer {
+class CacheBeanConfig(private val cf: RedisConnectionFactory,
+                      private val meterRegistry: MeterRegistry,
+                      private val errorHandler: CacheErrorHandler,
+                      private vararg val cfgs: CachableRestConfig) : CachingConfigurer, RedisListenerConfigurer {
 
 
     override fun errorHandler() =
@@ -40,13 +43,12 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory, private val meterR
     }
 
 
-
-
     @Bean
     override fun cacheManager() =
         RedisCacheManager.builder(nonLockingRedisCacheWriter(cf))
-            .withInitialCacheConfigurations(cfgs.associate { it.navn to cacheConfig(it) })
-            .enableStatistics()
+            .withInitialCacheConfigurations(cfgs.associate {
+                it.navn to cacheConfig(it)
+            }).enableStatistics()
             .build()
 
 
@@ -67,8 +69,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory, private val meterR
     companion object {
         val VALKEY_MAPPER = JsonMapper.builder().polymorphicTypeValidator(NavPolymorphicTypeValidator()).apply {
             enable(INCLUDE_SOURCE_IN_LOCATION)
-            addModule(Builder().build())
-            addModule(JacksonTypeInfoAddingValkeyModule())
+            addModules(Builder().build(),JacksonTypeInfoAddingValkeyModule())
         }.build()
     }
 }
@@ -78,7 +79,7 @@ class CacheNøkkelMessageConverter : AbstractMessageConverter(APPLICATION_OCTET_
     override fun supports(clazz: Class<*>) =
         clazz == CacheNøkkel::class.java
 
-    override fun convertFromInternal(message: Message<*>, targetClass: Class<*>, conversionHint: Any?): Any? =
+    override fun convertFromInternal(message: Message<*>, targetClass: Class<*>, conversionHint: Any?) =
         (message.payload as? ByteArray)
             ?.takeIf { targetClass == CacheNøkkel::class.java }
             ?.toString(UTF_8)

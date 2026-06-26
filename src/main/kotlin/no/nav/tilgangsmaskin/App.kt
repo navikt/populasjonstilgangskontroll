@@ -38,14 +38,17 @@ fun main(args: Array<String>) {
 }
 
 @Component
-class StartupInfoContributor(private val caches : CacheSizeAware, private val ctx: ConfigurableApplicationContext, vararg val regelsett: RegelSett) :
+class StartupInfoContributor(private val caches: CacheSizeAware,
+                             private val ctx: ConfigurableApplicationContext,
+                             vararg val regelsett: RegelSett) :
     InfoContributor {
 
     override fun contribute(builder: Builder) {
         builder.withDetail("startup", ctx.startupDate.local())
         builder.withDetail("cache størrelser", caches.sizes())
         regelsett.filter { it.regler.isNotEmpty() }.forEach {
-            builder.withDetail(it.beskrivelse, it.regler.map { regel -> "(${regel.javaClass.simpleName}) ${regel.kortNavn}" })
+            builder.withDetail(it.beskrivelse,
+                it.regler.map { regel -> "(${regel.javaClass.simpleName}) ${regel.kortNavn}" })
         }
     }
 }

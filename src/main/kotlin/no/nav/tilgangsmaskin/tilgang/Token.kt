@@ -19,20 +19,22 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
                 .orEmpty()
 
 
-    val system get() = stringClaim(AZP_NAME)  ?: UTILGJENGELIG
+    val system get() = stringClaim(AZP_NAME) ?: UTILGJENGELIG
     val oid get() = stringClaim(OID)?.let { runCatching { UUID.fromString(it) }.getOrNull() }
     val ansattId get() = stringClaim(NAVIDENT)?.let { AnsattId(it) }
     private fun stringClaim(name: String) = claimSet()?.getStringClaim(name)
     private fun claimSet() = runCatching { contextHolder.getTokenValidationContext().getClaims(AAD_ISSUER) }.getOrNull()
-    val clusterAndSystem get() = system.split(":").let { parts ->
-        if (parts.size == 3) "${parts[2]}:${parts[0]}" else system
-    }
+    val clusterAndSystem
+        get() = system.split(":").let { parts ->
+            if (parts.size == 3) "${parts[2]}:${parts[0]}" else system
+        }
 
     val systemNavn get() = system.split(":").last()
     val systemAndNs get() = system.split(":").drop(1).joinToString(separator = ":")
     val cluster get() = system.split(":").first()
     val erCC get() = stringClaim(IDTYP) == APP
-    val erObo get()  = !erCC && oid != null
+    val erObo get() = !erCC && oid != null
+
     companion object {
         private const val FLOW = "flow"
         const val AAD_ISSUER: String = "azuread"

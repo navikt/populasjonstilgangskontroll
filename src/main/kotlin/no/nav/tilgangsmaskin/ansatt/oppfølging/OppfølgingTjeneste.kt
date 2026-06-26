@@ -14,14 +14,12 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
-class OppfølgingTjeneste(private val adapter: OppfølgingJPAAdapter, private val teller: OppfølgingkontorTeller) {
+class OppfølgingTjeneste(private val adapter: OppfølgingJPAAdapter) {
 
     @Cacheable(cacheNames = [OPPFØLGING], key = "#id.verdi")
     @Transactional(readOnly = true)
     fun enhetFor(id: Identifikator) =
-        adapter.enhetFor(id.verdi).also { enhet ->
-            teller.tell(Tags.of("resultat", "${enhet != null}"))
-        }
+        adapter.enhetFor(id.verdi)
 
     @Caching(
         put = [

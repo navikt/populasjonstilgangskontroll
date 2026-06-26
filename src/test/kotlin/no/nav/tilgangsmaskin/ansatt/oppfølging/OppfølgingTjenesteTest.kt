@@ -55,8 +55,6 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
 
     @MockkBean private lateinit var token: Token
 
-    @MockkBean(relaxed = true) private lateinit var teller: OppfølgingkontorTeller
-
     @MockkSpyBean
     private lateinit var adapter: OppfølgingJPAAdapter
 

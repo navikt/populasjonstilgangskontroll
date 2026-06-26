@@ -59,6 +59,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
         }
     }
 
+
     @WithSpan
     override fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>) =
         when {
@@ -168,9 +169,8 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
                 log.info("Cache putMany {} lagret {} nøkler på {}ms",
                     cache.fullName,
                     innslag.size,
-                    varighet.inWholeMilliseconds)
-            }
-                .onFailure {
+                    start.elapsedNow().inWholeMilliseconds)
+            }.onFailure {
                     log.info("Cache putMany feilet for {} med {} nøkler: {}",
                         cache.fullName,
                         innslag.size,

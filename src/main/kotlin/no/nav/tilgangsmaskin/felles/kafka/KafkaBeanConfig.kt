@@ -25,13 +25,12 @@ import org.springframework.util.backoff.ExponentialBackOff
 class KafkaBeanConfig {
 
     @Bean
-    fun commonErrorHandler(listeners: List<KafkaTypedDroppedMessageMeter<*>>, recoverer: ConsumerRecordRecoverer) =
-        createErrorHandler(recoverer, *listeners.toTypedArray())
+    fun commonErrorHandler(listeners: List<KafkaTypedDroppedMessageMeter<*>>) =
+        createErrorHandler( *listeners.toTypedArray())
 
     companion object {
-        fun createErrorHandler(recoverer: ConsumerRecordRecoverer, vararg listeners: RetryListener) =
-            DefaultErrorHandler(recoverer,
-                ExponentialBackOff(1_000L, 2.0).apply {
+        fun createErrorHandler( vararg listeners: RetryListener) =
+            DefaultErrorHandler(ExponentialBackOff(1_000L, 2.0).apply {
                     maxInterval = 30_000L
                     maxElapsedTime = 60_000L
                 }

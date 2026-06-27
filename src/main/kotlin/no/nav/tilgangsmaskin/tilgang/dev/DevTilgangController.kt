@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
+import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangGyldig
@@ -38,7 +39,12 @@ class DevTilgangController(
     private val graphql: PdlSyncGraphQLClientAdapter,
     private val enkeltTilgang: EnkeltTilgangTjeneste,
     private val oppfølging: OppfølgingTjeneste,
-    private val nom: NomJPAAdapter) {
+    private val nom: NomJPAAdapter,
+    private val slack: SlackMessagePublisher) {
+
+    init {
+        slack.publish("Tilgangsmaskin kjører i DEV, og DevTilgangController er tilgjengelig")
+    }
 
     @PostMapping("oppfolging/{uuid}/avslutt")
     @Operation(summary = SUMMARY_OPPFOLGING_AVSLUTT, description = DESCRIPTION_OPPFOLGING_AVSLUTT)

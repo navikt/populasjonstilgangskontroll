@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.checkerframework.checker.units.qual.m
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.listener.ConsumerRecordRecoverer
@@ -14,63 +15,31 @@ import org.springframework.web.client.RestClient.Builder
 @Component
 class SlackMessagePublisher(
     builder: Builder,
-    @Value("\${slack.webhook:}") private val webhookUrl: String
-) : ConsumerRecordRecoverer {
+    @param:Value("\${slack.webhook:}") private val webhookUrl: String)  {
 
     private val client = builder.build()
     private val log = getLogger(javaClass)
 
-    override fun accept(record: ConsumerRecord<*, *>, exception: Exception) {
+     fun publish(msg: String) {
         if (webhookUrl.isBlank()) {
             log.debug("Slack webhook URL not configured, skipping Slack notification")
             return
         }
 
         try {
-            val message = buildMessage(record, exception)
+            val message = buildMessage(msg)
             client.post()
                 .uri(webhookUrl)
                 .body(message)
                 .retrieve()
                 .toBodilessEntity()
 
-            log.info("Sent Kafka recovery notification to Slack for topic=${record.topic()} partition=${record.partition()} offset=${record.offset()}")
+            log.info("Sent Kafka recovery notification to Slack for $msg ")
         } catch (ex: Exception) {
-            log.error("Failed to send Slack notification for failed Kafka message", ex)
+            log.error("Failed to send Slack notification for $msg", ex)
         }
     }
 
-    private fun buildMessage(record: ConsumerRecord<*, *>, exception: Exception): SlackMessage {
-        val errorDetails = """
-            *Topic:* ${record.topic()}
-            *Partition:* ${record.partition()}
-            *Offset:* ${record.offset()}
-            *Error:* ${exception.javaClass.simpleName}
-            *Message:* ${exception.message ?: "Unknown error"}
-        """.trimIndent()
-
-        return SlackMessage(
-            blocks = listOf(
-                SlackBlock(
-                    type = "section",
-                    text = SlackText(
-                        type = "mrkdwn",
-                        text = ":warning: *Kafka Message Recovery Failed*\n$errorDetails"
-                    )
-                )
-            )
-        )
-    }
+    private fun buildMessage(msg: String) =
+         mapOf("text" to msg)
 }
-
-data class SlackMessage(val blocks: List<SlackBlock>)
-
-data class SlackBlock(
-    val type: String,
-    val text: SlackText
-)
-
-data class SlackText(
-    val type: String,
-    val text: String
-)

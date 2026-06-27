@@ -10,6 +10,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomJPAAdapter
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Identer
@@ -49,13 +50,13 @@ class DevTilgangController(
         runCatching {
         slack.publish("Tilgangsmaskin kjører i DEV, og DevTilgangController er tilgjengelig")
     }.getOrElse {
-        log.warn("Kunne ikke publisere til Slack: ${it.message}",it }
-    }
+        log.warn("Kunne ikke publisere til Slack: ${it.message}",it)
+    } }
 
     @PostMapping("oppfolging/{uuid}/avslutt")
     @Operation(summary = SUMMARY_OPPFOLGING_AVSLUTT, description = DESCRIPTION_OPPFOLGING_AVSLUTT)
     fun oppfølgingAvslutt(@RequestBody identer: Identer, @PathVariable uuid: UUID) =
-        oppfølging.avslutt(OppfølgingEndring.Avsluttet(uuid, identer))
+        oppfølging.avslutt(Avsluttet(uuid, identer))
 
     @GetMapping("oppfolging/enhet")
     @Operation(summary = SUMMARY_OPPFOLGING_ENHET, description = DESCRIPTION_OPPFOLGING_ENHET)

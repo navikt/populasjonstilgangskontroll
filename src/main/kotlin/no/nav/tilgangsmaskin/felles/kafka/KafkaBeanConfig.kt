@@ -8,7 +8,10 @@ import org.springframework.kafka.listener.RetryListener
 import org.springframework.util.backoff.ExponentialBackOff
 
 /**
- * Felles Kafka-konfigurasjon: deserializer-oppsett og feilhåndtering.
+ * Felles Kafka-konfigurasjon: feilhåndtering.
+ *
+ * Deserializer-oppsett (ErrorHandlingDeserializer med JacksonJsonDeserializer) konfigureres
+ * via application-gcp.yaml properties, ikke via bean.
  *
  * Feilhåndtering erstatter Spring sin default (9 umiddelbare retries) med eksponensiell backoff:
  * 1s → 2s → 4s → 8s → 16s → 30s, opp til 1 min totalt.

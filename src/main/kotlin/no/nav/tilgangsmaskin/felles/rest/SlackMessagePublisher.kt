@@ -4,7 +4,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.checkerframework.checker.units.qual.m
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.kafka.listener.ConsumerRecordRecoverer
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient.Builder
 
@@ -33,8 +32,7 @@ class SlackMessagePublisher(
                 .body(message)
                 .retrieve()
                 .toBodilessEntity()
-
-            log.info("Sent Kafka recovery notification to Slack for $msg ")
+            log.info("Sent Slack notification to Slack for $msg ")
         } catch (ex: Exception) {
             log.error("Failed to send Slack notification for $msg", ex)
         }

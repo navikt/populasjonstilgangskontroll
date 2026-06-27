@@ -7,7 +7,7 @@ import org.springframework.web.server.ResponseStatusException
 
 
 @Component
-class TokenTypeGuard(private val token: Token) {
+class TokenTypeGuard(val token: Token) {
     fun krev(forventet: TokenType, uri: String) =
         with(from(token)) {
             if (this != forventet) {

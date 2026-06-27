@@ -9,16 +9,16 @@ import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomJPAAdapter
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangGyldig
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
 import no.nav.tilgangsmaskin.tilgang.dev.DevTilgangController.Companion.DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.http.HttpStatus.ACCEPTED
@@ -40,10 +40,11 @@ class DevTilgangController(
     private val oppfølging: OppfølgingTjeneste,
     private val nom: NomJPAAdapter) {
 
+
     @PostMapping("oppfolging/{uuid}/avslutt")
     @Operation(summary = SUMMARY_OPPFOLGING_AVSLUTT, description = DESCRIPTION_OPPFOLGING_AVSLUTT)
-    fun oppfølgingAvslutt(@RequestBody identer : Identer, @PathVariable uuid: UUID) =
-        oppfølging.avslutt(OppfølgingEndring.Avsluttet(uuid, identer))
+    fun oppfølgingAvslutt(@RequestBody identer: Identer, @PathVariable uuid: UUID) =
+        oppfølging.avslutt(Avsluttet(uuid, identer))
 
     @GetMapping("oppfolging/enhet")
     @Operation(summary = SUMMARY_OPPFOLGING_ENHET, description = DESCRIPTION_OPPFOLGING_ENHET)
@@ -52,7 +53,7 @@ class DevTilgangController(
 
     @GetMapping("sivilstand/{id}")
     @Operation(summary = SUMMARY_SIVILSTAND, description = DESCRIPTION_SIVILSTAND)
-    fun sivilstand(@PathVariable  id: String) =
+    fun sivilstand(@PathVariable id: String) =
         graphql.partnere(id)
 
     @Operation(summary = SUMMARY_KOBLING, description = DESCRIPTION_KOBLING)
@@ -72,8 +73,9 @@ class DevTilgangController(
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_ENKELTTILGANG, description = DESCRIPTION_ENKELTTILGANG)
     @Valid
-    fun enkelttilgang(@PathVariable ansattId: AnsattId, @RequestBody  @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData) =
-        enkeltTilgang.registrerEnkeltTilgang(ansattId, data,"alle")
+    fun enkelttilgang(@PathVariable ansattId: AnsattId,
+                      @RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData) =
+        enkeltTilgang.registrerEnkeltTilgang(ansattId, data, "alle")
 
     @PostMapping("enkelttilganger/{ansattId}")
     @ResponseStatus(ACCEPTED)

@@ -15,7 +15,7 @@ private const val DEV_VERGEMAL_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.ver
 @UnprotectedRestController(value = ["/${DEV}/skjermning"])
 @ConditionalOnNotProd
 @Tag(name = "DevVergemålController", description = DEV_VERGEMAL_CONTROLLER_TAG_DESCRIPTION)
-class DevVergemålController(private val vergemål: VergemålTjeneste){
+class DevVergemålController(private val vergemål: VergemålTjeneste) {
 
 
     @PostMapping("vergemål")

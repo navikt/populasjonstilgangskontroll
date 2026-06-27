@@ -14,8 +14,9 @@ import org.springframework.http.HttpStatus.NO_CONTENT
 
 data class AggregertBulkRespons(val ansattId: AnsattId, val resultater: Set<EnkeltBulkRespons> = emptySet()) {
     data class EnkeltBulkRespons(val brukerId: String, @JsonIgnore val httpStatus: HttpStatus, @param:JsonInclude(
-        NON_NULL) val detaljer: Any? = null ) {
-        constructor(e: RegelException) : this(e.bruker.oppslagId, e.status,e.body)
+        NON_NULL) val detaljer: Any? = null) {
+        constructor(e: RegelException) : this(e.bruker.oppslagId, e.status, e.body)
+
         val status = httpStatus.value()
 
         companion object {
@@ -27,10 +28,13 @@ data class AggregertBulkRespons(val ansattId: AnsattId, val resultater: Set<Enke
         override fun toString(): String =
             "${javaClass.simpleName}(oppslagId='${brukerId.maskFnr()}', httpStatus=$httpStatus, detaljer=$detaljer, status=$status)"
     }
+
     @JsonIgnore
     val ukjente = filter(NOT_FOUND)
+
     @JsonIgnore
     val godkjente = filter(NO_CONTENT)
+
     @JsonIgnore
     val avviste = filter(FORBIDDEN)
 

@@ -12,8 +12,8 @@ data class RegelMetadata(val gruppeMetadata: GruppeMetadata) {
     val navn = gruppeMetadata.name
 
     private fun resolve(suffix: String) =
-         with("${gruppeMetadata.meldingsnøkkel}.$suffix") {
-             messageSource.getMessage(this, null, this, getLocale())!!
+        with("${gruppeMetadata.meldingsnøkkel}.$suffix") {
+            messageSource.getMessage(this, null, this, getLocale())!!
         }
 
     companion object {

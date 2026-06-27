@@ -14,7 +14,8 @@ import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD_MER_ENN_ETT_ÅR
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.VERGEMÅL
 
 @SortertRegel(RegelRekkefølge.GEOGRAFISK)
-class GeografiskRegel(private val oppfølging: OppfølgingTjeneste) : GlobalGruppeMedlemskapRegel(NASJONAL), OverstyrbarRegel {
+class GeografiskRegel(private val oppfølging: OppfølgingTjeneste) : GlobalGruppeMedlemskapRegel(NASJONAL),
+    OverstyrbarRegel {
 
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         godtaHvis {
@@ -46,7 +47,7 @@ class AvdødBrukerRegel : OverstyrbarRegel {
 
     override val metadata = RegelMetadata(AVDØD_MER_ENN_ETT_ÅR)
 
-    override fun evaluer(ansatt: Ansatt, bruker: Bruker)  =
+    override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis {
             bruker harVærtDødMerEnn 1.år && ansatt ikkeErMedlemAv AVDØD
         }
@@ -61,8 +62,11 @@ class VergemålRegel(private val vergemål: VergemålTjeneste) : OverstyrbarRege
         avvisHvis {
             runCatching {
                 bruker.brukerId in vergemål.vergemål(ansatt.ansattId)
-            }.getOrElse {e ->
-                log.warn("Feil ved oppslag av vergemål for ansattId={} og brukerId={}. aksepterer tilgang.", ansatt.ansattId, bruker.brukerId,e)
+            }.getOrElse { e ->
+                log.warn("Feil ved oppslag av vergemål for ansattId={} og brukerId={}. aksepterer tilgang.",
+                    ansatt.ansattId,
+                    bruker.brukerId,
+                    e)
                 false
             }
         }

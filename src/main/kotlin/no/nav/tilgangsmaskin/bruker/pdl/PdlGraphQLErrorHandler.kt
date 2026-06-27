@@ -15,7 +15,10 @@ interface PdlGraphQLErrorHandler {
     fun handle(uri: URI, e: Throwable): Nothing =
         when (e) {
             is FieldAccessException -> throw e.oversett(uri)
-            is GraphQlTransportException -> throw RecoverableRestException(INTERNAL_SERVER_ERROR, uri,e.message ?: "Uventet respons", e)
+            is GraphQlTransportException -> throw RecoverableRestException(INTERNAL_SERVER_ERROR,
+                uri,
+                e.message ?: "Uventet respons",
+                e)
             else -> throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, uri, e.message ?: "Uventet respons", e)
         }
 

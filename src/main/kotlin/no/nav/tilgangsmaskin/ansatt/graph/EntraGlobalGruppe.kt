@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.graph
 
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata
 import no.nav.tilgangsmaskin.tilgang.Token
-import java.util.UUID
+import java.util.*
 
 enum class EntraGlobalGruppe(val property: String, val metadata: GruppeMetadata) {
     AVDØD("gruppe.dead", GruppeMetadata.AVDØD_MER_ENN_ETT_ÅR),

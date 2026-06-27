@@ -17,8 +17,7 @@ import org.springframework.cache.annotation.Cacheable
 class PdlTjeneste(
     private val pip: PdlPipClient,
     private val graphQL: PdlSyncGraphQLClientAdapter,
-    private val cache: CacheOperations,
-    private val cf: PdlConfig,
+    private val cache: CacheOperations
 ) {
 
     private val log = getLogger(PdlTjeneste::class.java)
@@ -51,7 +50,7 @@ class PdlTjeneste(
             log.info("Hentet ${it.size} person(er) av ${identer.size - fraCache.size} mulige fra REST")
         }
 
-        cache.putMany(PDL_MED_FAMILIE_CACHE, fraRest, cf.varighet)
+        cache.putMany(PDL_MED_FAMILIE_CACHE, fraRest)
         return (fraCache.values + fraRest.values).toSet()
     }
 

@@ -4,7 +4,7 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
 import no.nav.tilgangsmaskin.bruker.Identer
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 
 sealed interface OppfølgingEndring {
     val uuid: UUID

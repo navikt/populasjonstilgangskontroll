@@ -25,7 +25,9 @@ class CacheNøkkelTest : BehaviorSpec({
             }
         }
         When("masked genereres") {
-            Then("id maskeres ikke for kort id") { nøkkel.maskert shouldBe "graph::geoGrupper:Z999999" }
+            Then("id maskeres ikke for kort id") {
+                nøkkel.maskert shouldBe "graph::geoGrupper:Z999999"
+            }
         }
     }
 
@@ -34,16 +36,24 @@ class CacheNøkkelTest : BehaviorSpec({
         val nøkkel = CacheNøkkel("oppfolging::08526835670")
 
         When("cacheName parses") {
-            Then("cacheName er oppfolging") { nøkkel.cacheName shouldBe "oppfolging" }
+            Then("cacheName er oppfolging") {
+                nøkkel.cacheName shouldBe "oppfolging"
+            }
         }
         When("metode parses") {
-            Then("metode er null") { nøkkel.metode shouldBe null }
+            Then("metode er null") {
+                nøkkel.metode shouldBe null
+            }
         }
         When("id parses") {
-            Then("id er fnr") { nøkkel.id shouldBe "08526835670" }
+            Then("id er fnr") {
+                nøkkel.id shouldBe "08526835670"
+            }
         }
         When("masked genereres") {
-            Then("fnr maskeres") { nøkkel.maskert shouldBe "oppfolging::0852*******" }
+            Then("fnr maskeres") {
+                nøkkel.maskert shouldBe "oppfolging::0852*******"
+            }
         }
     }
 

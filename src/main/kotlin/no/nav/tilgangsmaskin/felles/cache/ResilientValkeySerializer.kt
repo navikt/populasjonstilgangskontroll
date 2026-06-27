@@ -4,7 +4,8 @@ import io.micrometer.core.instrument.MeterRegistry
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.redis.serializer.RedisSerializer
 
-class ResilientValkeySerializer(private val delegate: RedisSerializer<Any>, private val meterRegistry: MeterRegistry) : RedisSerializer<Any> {
+class ResilientValkeySerializer(private val delegate: RedisSerializer<Any>,
+                                private val meterRegistry: MeterRegistry) : RedisSerializer<Any> {
 
     private val log = getLogger(javaClass)
 

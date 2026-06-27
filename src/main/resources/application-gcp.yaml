@@ -46,6 +46,10 @@ management:
     web:
       base-path: /monitoring
 
+kafka:
+  slack:
+    webhook-url: ${KAFKA_SLACK_WEBHOOK_URL:}
+
 spring:
   threads:
     virtual:

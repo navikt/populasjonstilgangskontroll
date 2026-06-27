@@ -49,7 +49,7 @@ class DevTilgangController(
         runCatching {
         slack.publish("Tilgangsmaskin kjører i DEV, og DevTilgangController er tilgjengelig")
     }.getOrElse {
-        log.warn("Kunne ikke publisere til Slack: ${it.message}"),it }
+        log.warn("Kunne ikke publisere til Slack: ${it.message}",it }
     }
 
     @PostMapping("oppfolging/{uuid}/avslutt")

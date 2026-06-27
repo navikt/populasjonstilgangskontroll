@@ -22,7 +22,7 @@ class CaffeineCacheClient(private val cacheManager: CacheManager) : CacheOperati
     override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? =
         cacheManager.getCache(cache.name)?.get(caffeineNøkkel(cache, id))?.get() as T?
 
-    override fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration) {
+    override fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration?) {
         cacheManager.getCache(cache.name)?.put(caffeineNøkkel(cache, id), value)
     }
 
@@ -35,7 +35,7 @@ class CaffeineCacheClient(private val cacheManager: CacheManager) : CacheOperati
         }.filterValues { it != null }
     }
 
-    override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
+    override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration?) {
         val springCache = cacheManager.getCache(cache.name) ?: return
         log.trace("Caffeine bulk lagrer {} verdier for cache {}", innslag.size, cache.name)
         innslag.forEach { (id, value) -> springCache.put(caffeineNøkkel(cache, id), value) }

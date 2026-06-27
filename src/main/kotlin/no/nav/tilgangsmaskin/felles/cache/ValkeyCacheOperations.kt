@@ -51,9 +51,14 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
     }
 
     @WithSpan
-    override fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration) {
+    override fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration?) {
         runCatching {
-            valkey.opsForValue().set(cache.tilNøkkel(id), VALKEY_MAPPER.writeValueAsString(value), ttl)
+            val key = cache.tilNøkkel(id)
+            val json = VALKEY_MAPPER.writeValueAsString(value)
+            val ops = valkey.opsForValue()
+            ttl?.let {
+                ops.set(key, json, ttl)
+            } ?: ops.set(key, json)
         }.onFailure {
             log.info("Cache putOne feilet for {} nøkkel {}: {}", cache.fullName, id, it.message, it)
         }
@@ -69,11 +74,11 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
         }
 
     @WithSpan
-    override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
+    override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration?) {
         when {
             innslag.isEmpty() -> return
             innslag.size == 1 -> doPutOne(cache, innslag, ttl)
-            else -> doPutMany(cache, innslag, ttl.seconds)
+            else -> doPutMany(cache, innslag, ttl?.seconds)
         }
     }
 
@@ -150,7 +155,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
 
     private fun doPutOne(cache: CacheNøkkelConfig,
                          innslag: Map<String, Any>,
-                         ttl: Duration) {
+                         ttl: Duration?) {
         with(innslag.entries.single()) {
             putOne(cache, key, value, ttl)
         }
@@ -158,7 +163,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
 
     private fun doPutMany(cache: CacheNøkkelConfig,
                           innslag: Map<String, Any>,
-                          ttl: Long) {
+                          ttl: Long?) {
         markNow().let { start ->
             val payload = innslag.entries.associate { (key, value) ->
                 cache.tilNøkkel(key) to VALKEY_MAPPER.writeValueAsString(value)
@@ -180,17 +185,22 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
         }
     }
 
-    private fun pipeline(payload: Map<String, String>, ttl: Long) =
+    private fun pipeline(payload: Map<String, String>, ttl: Long?) =
         runCatching {
             valkey.executePipelined { connection ->
                 payload.forEach { (key, value) ->
-                    connection.stringCommands().setEx(key.toByteArray(), ttl, value.toByteArray())
+                    if (ttl != null) {
+                        connection.stringCommands().setEx(key.toByteArray(), ttl, value.toByteArray())
+                    }
+                    else {
+                        payload.forEach { (key, value) ->
+                            connection.stringCommands().set(key.toByteArray(), value.toByteArray())
+                        }
+                    }
+                    null
                 }
-                null
             }
         }
-
-
     companion object {
         private val SCRIPT = RedisScript.of(ClassPathResource("scripts/count-all-keys.lua"), List::class.java)
     }

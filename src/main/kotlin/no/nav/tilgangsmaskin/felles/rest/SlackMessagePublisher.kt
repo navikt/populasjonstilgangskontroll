@@ -7,6 +7,7 @@ import com.slack.api.model.block.Blocks.divider
 import com.slack.api.model.block.Blocks.section
 import com.slack.api.model.block.LayoutBlock
 import com.slack.api.model.block.composition.BlockCompositions.markdownText
+import com.slack.api.model.block.composition.BlockCompositions.plainText
 import com.slack.api.webhook.Payload
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
@@ -17,8 +18,7 @@ import org.springframework.stereotype.Component
  */
 @Component
 class SlackMessagePublisher(
-    @param:Value("\${slack.webhook:}") private val webhookUrl: String,
-) {
+    @param:Value("\${slack.webhook:}") private val webhookUrl: String) {
 
     private val log = getLogger(javaClass)
 
@@ -26,9 +26,9 @@ class SlackMessagePublisher(
         publish(asBlocks(
             section { section -> section
                 .blockId("intro-section")
-                .text(markdownText(msg))
+                .text(plainText(msg))
             }))
-    
+
 
     fun publish(blocks: List<LayoutBlock>) {
         publish(Payload.builder().blocks(blocks).build())

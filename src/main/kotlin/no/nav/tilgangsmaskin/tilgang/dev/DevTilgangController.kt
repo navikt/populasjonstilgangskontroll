@@ -40,7 +40,7 @@ class DevTilgangController(
     private val enkeltTilgang: EnkeltTilgangTjeneste,
     private val oppfølging: OppfølgingTjeneste,
     private val nom: NomJPAAdapter,
-    private val slack: SlackMessagePublisher) {
+    slack: SlackMessagePublisher) {
 
     init {
         slack.publish("Tilgangsmaskin kjører i DEV, og DevTilgangController er tilgjengelig")

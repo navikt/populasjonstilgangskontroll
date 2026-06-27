@@ -52,6 +52,8 @@ dependencies {
     implementation(libs.confluent.kafka.avro.serializer) {
         exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
     }
+    implementation(libs.slack.api)
+    implementation(libs.slack.api.kotlin)
     implementation(libs.opentelemetry.instrumentation.annotations)
     implementation(libs.opentelemetry.logback.mdc)
     implementation(libs.micrometer.registry.prometheus)

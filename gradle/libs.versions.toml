@@ -16,12 +16,14 @@ avro-plugin = "1.9.1"
 cyclonedx = "3.2.4"
 git-properties = "4.0.1"
 asciidoctor = "4.0.5"
-
+slack-api-client = "1.49.0"
 opentelemetry-alpha = "2.28.1-alpha"
 
 [libraries]
 # Implementation
 confluent-kafka-avro-serializer = { module = "io.confluent:kafka-avro-serializer", version.ref = "confluent" }
+slack-api = { module = "com.slack.api:slack-api-client", version.ref = "slack-api-client" }
+slack-api-kotlin = { module = "com.slack.api:slack-api-client-kotlin-extension", version.ref = "slack-api-client" }
 opentelemetry-instrumentation-annotations = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations" }
 opentelemetry-logback-mdc = { module = "io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0", version.ref = "opentelemetry-alpha" }
 micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }

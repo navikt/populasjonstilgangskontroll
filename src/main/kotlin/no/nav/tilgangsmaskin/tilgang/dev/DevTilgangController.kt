@@ -9,21 +9,18 @@ import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomJPAAdapter
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
-import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangGyldig
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
 import no.nav.tilgangsmaskin.tilgang.dev.DevTilgangController.Companion.DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -41,17 +38,8 @@ class DevTilgangController(
     private val graphql: PdlSyncGraphQLClientAdapter,
     private val enkeltTilgang: EnkeltTilgangTjeneste,
     private val oppfølging: OppfølgingTjeneste,
-    private val nom: NomJPAAdapter,
-    slack: SlackMessagePublisher) {
+    private val nom: NomJPAAdapter) {
 
-    private val log = getLogger(javaClass)
-
-    init {
-        runCatching {
-        slack.publish("Tilgangsmaskin kjører i DEV, og DevTilgangController er tilgjengelig")
-    }.getOrElse {
-        log.warn("Kunne ikke publisere til Slack: ${it.message}",it)
-    } }
 
     @PostMapping("oppfolging/{uuid}/avslutt")
     @Operation(summary = SUMMARY_OPPFOLGING_AVSLUTT, description = DESCRIPTION_OPPFOLGING_AVSLUTT)

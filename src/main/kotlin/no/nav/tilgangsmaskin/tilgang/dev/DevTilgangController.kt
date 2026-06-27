@@ -22,6 +22,7 @@ import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangGyldig
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
 import no.nav.tilgangsmaskin.tilgang.dev.DevTilgangController.Companion.DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -42,8 +43,13 @@ class DevTilgangController(
     private val nom: NomJPAAdapter,
     slack: SlackMessagePublisher) {
 
+    private val log = getLogger(javaClass)
+
     init {
+        runCatching {
         slack.publish("Tilgangsmaskin kjører i DEV, og DevTilgangController er tilgjengelig")
+    }.getOrElse {
+        log.warn("Kunne ikke publisere til Slack: ${it.message}"),it }
     }
 
     @PostMapping("oppfolging/{uuid}/avslutt")

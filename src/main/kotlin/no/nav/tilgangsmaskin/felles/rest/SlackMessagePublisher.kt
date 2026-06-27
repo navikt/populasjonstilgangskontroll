@@ -1,23 +1,23 @@
-package no.nav.tilgangsmaskin.felles.kafka
+package no.nav.tilgangsmaskin.felles.rest
 
 import org.apache.kafka.clients.consumer.ConsumerRecord
-import org.slf4j.LoggerFactory
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.listener.ConsumerRecordRecoverer
 import org.springframework.stereotype.Component
-import org.springframework.web.client.RestClient
+import org.springframework.web.client.RestClient.Builder
 
 /**
  * Sends failed Kafka messages to a Slack channel after all retries are exhausted.
  * Requires `kafka.slack.webhook-url` to be configured.
  */
 @Component
-class KafkaSlackRecoverer(
-    private val restClient: RestClient,
+class SlackMessagePublisher(
+    builder: Builder,
     @Value("\${slack.webhook:}") private val webhookUrl: String
 ) : ConsumerRecordRecoverer {
 
+    private val client = builder.build()
     private val log = getLogger(javaClass)
 
     override fun accept(record: ConsumerRecord<*, *>, exception: Exception) {
@@ -28,7 +28,7 @@ class KafkaSlackRecoverer(
 
         try {
             val message = buildMessage(record, exception)
-            restClient.post()
+            client.post()
                 .uri(webhookUrl)
                 .body(message)
                 .retrieve()

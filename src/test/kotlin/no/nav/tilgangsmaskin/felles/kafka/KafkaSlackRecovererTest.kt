@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.felles.kafka
 
 import io.kotest.core.spec.style.BehaviorSpec
-import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.springframework.web.client.RestClient
 
@@ -11,7 +11,7 @@ class KafkaSlackRecovererTest : BehaviorSpec({
 
     Given("KafkaSlackRecoverer med webhook-URL konfigurert") {
         val restClient = mockk<RestClient>(relaxed = true)
-        val recoverer = KafkaSlackRecoverer(restClient, "https://hooks.slack.com/services/xxx/yyy/zzz")
+        val recoverer = SlackMessagePublisher(restClient, "https://hooks.slack.com/services/xxx/yyy/zzz")
 
         When("accept kalles med en mislykket melding") {
             val record = ConsumerRecord(
@@ -35,7 +35,7 @@ class KafkaSlackRecovererTest : BehaviorSpec({
 
     Given("KafkaSlackRecoverer uten webhook-URL") {
         val restClient = mockk<RestClient>(relaxed = true)
-        val recoverer = KafkaSlackRecoverer(restClient, "")
+        val recoverer = SlackMessagePublisher(restClient, "")
 
         When("accept kalles") {
             val record = ConsumerRecord("topic", 0, 1L, "key", "value")

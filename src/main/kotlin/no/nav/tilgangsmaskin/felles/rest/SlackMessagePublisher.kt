@@ -6,36 +6,35 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 
 /**
- * Sends failed Kafka messages to a Slack channel after all retries are exhausted.
- * Requires `kafka.slack.webhook-url` to be configured.
+ * Publiserer meldinger til Slack via incoming webhook.
  */
 @Component
 class SlackMessagePublisher(
-    @param:Value("\${slack.webhook:}") private val webhookUrl: String)  {
+    @param:Value("\${slack.webhook:}") private val webhookUrl: String,
+) {
 
     private val client = RestClient.builder().build()
     private val log = getLogger(javaClass)
 
-     fun publish(msg: String) {
+    fun publish(msg: String) =
+        publish(SlackMessagePayload(msg))
+
+    fun publish(message: SlackMessagePayload) {
         if (webhookUrl.isBlank()) {
             log.debug("Slack webhook URL not configured, skipping Slack notification")
             return
         }
 
         try {
-            log.info("Sending Slack notification to Slack for $msg ")
-            val message = buildMessage(msg)
+            log.info("Sending Slack notification")
             client.post()
                 .uri(webhookUrl)
                 .body(message)
                 .retrieve()
                 .toBodilessEntity()
-            log.info("Sent Slack notification to Slack for $msg ")
+            log.info("Sent Slack notification")
         } catch (ex: Exception) {
-            log.error("Failed to send Slack notification for $msg", ex)
+            log.error("Failed to send Slack notification", ex)
         }
     }
-
-    private fun buildMessage(msg: String) =
-         mapOf("text" to msg)
 }

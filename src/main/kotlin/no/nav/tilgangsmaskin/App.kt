@@ -26,7 +26,6 @@ import org.springframework.stereotype.Component
 @EnableOAuth2Client(cacheEnabled = true)
 @EnableCaching
 @EnableResilientMethods
-@EnableRedisListeners
 @EnableJpaAuditing(dateTimeProviderRef = AUDITING_TIME_PROVIDER)
 @EnableScheduling
 @ConditionalOnGCP

@@ -40,7 +40,7 @@ fun main(args: Array<String>) {
 @Component
 class StartupInfoContributor(private val caches: CacheSizeAware,
                              private val ctx: ConfigurableApplicationContext,
-                             vararg val regelsett: RegelSett) :
+                             private vararg val regelsett: RegelSett) :
     InfoContributor {
 
     override fun contribute(builder: Builder) {

@@ -4,7 +4,6 @@ import io.micrometer.core.annotation.Timed
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import org.slf4j.LoggerFactory.getLogger
 
-@Timed("jallajalla")
 abstract class AbstractCacheOppfrisker : CacheOppfrisker {
     private val log = getLogger(javaClass)
 

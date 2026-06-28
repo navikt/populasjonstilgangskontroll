@@ -115,6 +115,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
         TimedAspect(meterRegistry,
             Function { pjp ->
                 Tags.of("cluster",
+                    "class", pjp.target.javaClass.simpleName,
                     token.cluster,
                     "method",
                     pjp.signature.name,

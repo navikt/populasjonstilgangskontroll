@@ -9,7 +9,6 @@ import com.slack.api.webhook.Payload
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import org.springframework.web.client.RestClient
 
 /**
  * Publiserer meldinger til Slack via incoming webhook.
@@ -36,18 +35,10 @@ class SlackMessagePublisher(
         if (webhookUrl.isNotBlank()) {
             runCatching {
                 log.info("Sending Slack notification $payload")
-/*
-                 RestClient.builder().build().post()
-                     .uri(webhookUrl)
-                     .body(payload)
-                     .retrieve()
-                     .toBodilessEntity()
-                     */
-
                 val response = getInstance().send(webhookUrl, payload)
                 log.info("Sent Slack notification, response: $response")
             }.getOrElse {
-                log.error("Failed to send Slack notification", it)
+                log.warn("Failed to send Slack notification", it)
             }
         }
     }

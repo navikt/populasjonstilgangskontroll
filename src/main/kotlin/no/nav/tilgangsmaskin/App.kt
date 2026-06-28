@@ -63,6 +63,6 @@ class StartupSlackNotifier(
 ) {
     @EventListener(ApplicationReadyEvent::class)
     fun onReady() {
-        slack.publish("populasjonstilgangskontroll deployment ok")
+        slack.publish("Deployment","OK")
     }
 }

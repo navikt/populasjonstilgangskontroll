@@ -22,6 +22,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_OG_GL
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.tilgangsmaskin.felles.rest.MessagePublisher
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
@@ -40,7 +41,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
     val oid       = UUID.randomUUID()
     val geoGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_1234")
 
-    val resolver = EntraAnsattGruppeResolver(entra, token, oidTjeneste, cache)
+    val resolver = EntraAnsattGruppeResolver(entra, token, oidTjeneste, cache,mockk<MessagePublisher>(relaxed = true))
 
     beforeEach {
         clearAllMocks()

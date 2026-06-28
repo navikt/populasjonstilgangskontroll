@@ -5,7 +5,9 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.girNasjona
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.globaleGrupper
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.tilgangsmaskin.felles.rest.MessagePublisher
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
+import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory
@@ -15,7 +17,8 @@ import org.springframework.stereotype.Component
 class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
                                 private val token: Token,
                                 private val oid: EntraOidTjeneste,
-                                private val cache: CacheOperations) {
+                                private val cache: CacheOperations,
+                                private val publisher: MessagePublisher) {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -33,6 +36,7 @@ class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
             }
         }.getOrElse {
             if (it is NotFoundRestException) {
+                publisher.publish(":warn: OID endret", "${it.identifikator} ikke funnet, tømmer cache og prøver på nytt")
                 cache.delete(EntraGrupperConfig.GEO_OG_GLOBALE_CACHE, ansattId.verdi)
                 val nyoid = oid.oid(ansattId)
                 entra.geoOgGlobaleGrupper(ansattId, nyoid).also {

@@ -17,22 +17,22 @@ import org.springframework.stereotype.Component
  */
 @Component
 class SlackMessagePublisher(
-    @param:Value("\${slack.webhook:}") private val webhookUrl: String) {
+    @param:Value("\${slack.webhook:}") private val webhookUrl: String) : MessagePublisher{
 
     private val log = getLogger(javaClass)
 
-    fun publish(msg: String) =
+    override fun publish(header: String, msg: String) =
         publish(asBlocks(
-            header { it.text(plainText("🚀 New Project Deployment")) },
+            header { it.text(plainText("🚀 $header")) },
             section { alert -> alert
-                .blockId("alert-section")
+                .blockId("text-section")
                 .text(markdownText(":info: \n$msg"))
             }))
 
-    fun publish(blocks: List<LayoutBlock>) =
+    private fun publish(blocks: List<LayoutBlock>) =
         publish(Payload.builder().blocks(blocks).build())
 
-    open fun publish(payload: Payload) =
+    private fun publish(payload: Payload) =
         if (webhookUrl.isNotBlank()) {
             runCatching {
                 log.info("Sending Slack notification $payload")
@@ -45,4 +45,9 @@ class SlackMessagePublisher(
         else {
             log.info("Not sending Slack notification")
         }
+}
+
+interface MessagePublisher {
+
+    fun publish(header: String, msg: String)
 }

@@ -33,18 +33,18 @@ class SlackMessagePublisher(
             })).build())
 
     private fun publish(payload: Payload) =
-        if (webhookUrl.isNotBlank()) {
-            with(getInstance().send(webhookUrl, payload)) {
-                if (code != OK.value()) {
-                    log.warn("Failed to send Slack notification ($code/$message)")
-                }
-                else  {
-                    log.info("Sent Slack notification OK")
-                }
-            }
+        if (webhookUrl.isBlank()) {
+            log.info("Ingen Slack notifikasjon")
         }
         else {
-            log.info("Not sending Slack notification")
+            with(getInstance().send(webhookUrl, payload)) {
+                if (code != OK.value()) {
+                    log.warn("Kunne ikke sende Slack notifikasjon ($code/$message)")
+                }
+                else  {
+                    log.info("Sendte Slack notifikasjon OK")
+                }
+            }
         }
 }
 

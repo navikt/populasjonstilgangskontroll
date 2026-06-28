@@ -4,13 +4,13 @@ import io.micrometer.core.annotation.Timed
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import org.slf4j.LoggerFactory.getLogger
 
+@Timed("jallajalla")
 abstract class AbstractCacheOppfrisker : CacheOppfrisker {
     private val log = getLogger(javaClass)
 
     protected abstract fun doOppfrisk(nøkkel: CacheNøkkel): Any?
 
     @WithSpan
-    @Timed("jallajalla")
     final override fun oppfrisk(nøkkel: CacheNøkkel) =
         runCatching {
             doOppfrisk(nøkkel)

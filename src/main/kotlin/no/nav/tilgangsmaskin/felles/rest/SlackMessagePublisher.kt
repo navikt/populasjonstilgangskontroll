@@ -26,12 +26,10 @@ class SlackMessagePublisher(
                 .text(plainText("🚀 $msg"))
             }))
 
-
-    fun publish(blocks: List<LayoutBlock>) {
+    fun publish(blocks: List<LayoutBlock>) =
         publish(Payload.builder().blocks(blocks).build())
-    }
 
-    open fun publish(payload: Payload) {
+    open fun publish(payload: Payload) =
         if (webhookUrl.isNotBlank()) {
             runCatching {
                 log.info("Sending Slack notification $payload")
@@ -41,6 +39,7 @@ class SlackMessagePublisher(
                 log.warn("Failed to send Slack notification", it)
             }
         }
-    }
-
+        else {
+            log.info("Not sending Slack notification")
+        }
 }

@@ -46,8 +46,9 @@ class StartupInfoContributor(private val caches: CacheSizeAware,
     InfoContributor {
 
     override fun contribute(builder: Builder) {
-        builder.withDetail("startup", ctx.startupDate.local())
-        builder.withDetail("cache størrelser", caches.sizes())
+        builder.withDetails(mapOf(
+            "startup" to ctx.startupDate.local(),
+            "cache størrelser" to caches.sizes()))
         regelsett.filter { it.regler.isNotEmpty() }.forEach {
             builder.withDetail(it.beskrivelse,
                 it.regler.map { regel -> "(${regel.javaClass.simpleName}) ${regel.kortNavn}" })

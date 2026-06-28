@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class VergemålCacheOppfrisker(private val vergemål: VergemålTjeneste) : AbstractCacheOppfrisker() {
-    @Timed("jallajalla")
     override fun doOppfrisk(nøkkel: CacheNøkkel) {
         vergemål.vergemål(AnsattId(nøkkel.id))
     }

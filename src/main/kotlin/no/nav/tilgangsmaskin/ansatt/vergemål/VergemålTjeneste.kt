@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.vergemål
 
+import io.micrometer.core.annotation.Timed
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
@@ -11,6 +12,7 @@ import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.springframework.cache.annotation.Cacheable
 
 @RetryingWhenRecoverableRestService
+@Timed
 class VergemålTjeneste(private val nom: NomTjeneste, private val client: VergemålClient) {
 
     @WithSpan

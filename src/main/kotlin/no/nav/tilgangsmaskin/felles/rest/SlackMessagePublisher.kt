@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.rest
 
 import com.slack.api.Slack.getInstance
 import com.slack.api.model.block.Blocks.asBlocks
+import com.slack.api.model.block.Blocks.header
 import com.slack.api.model.block.Blocks.section
 import com.slack.api.model.block.LayoutBlock
 import com.slack.api.model.block.composition.BlockCompositions.markdownText
@@ -22,6 +23,7 @@ class SlackMessagePublisher(
 
     fun publish(msg: String) =
         publish(asBlocks(
+            header { it.text(plainText("🚀 New Project Deployment")) },
             section { alert -> alert
                 .blockId("alert-section")
                 .text(markdownText(":info: \n$msg"))

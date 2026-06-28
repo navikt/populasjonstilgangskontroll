@@ -19,6 +19,7 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.event.EventListener
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
+import org.springframework.data.redis.annotation.EnableRedisListeners
 import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.stereotype.Component
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component
 @EnableOAuth2Client(cacheEnabled = true)
 @EnableCaching
 @EnableResilientMethods
+@EnableRedisListeners
 @EnableJpaAuditing(dateTimeProviderRef = AUDITING_TIME_PROVIDER)
 @EnableScheduling
 @ConditionalOnGCP

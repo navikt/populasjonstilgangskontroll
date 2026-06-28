@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.rest
 
 import com.slack.api.Slack.getInstance
 import com.slack.api.model.block.Blocks.asBlocks
+import com.slack.api.model.block.Blocks.markdown
 import com.slack.api.model.block.Blocks.section
 import com.slack.api.model.block.LayoutBlock
 import com.slack.api.model.block.composition.BlockCompositions.markdownText
@@ -22,9 +23,10 @@ class SlackMessagePublisher(
 
     fun publish(msg: String) =
         publish(asBlocks(
-            section { alert -> alert
+            markdown { alert -> alert
                 .blockId("alert-section")
-                .text(markdownText(":warning: *Alert*\n$msg"))            }))
+                .text(":warning: *Alert*\n$msg")
+            }))
 
     fun publish(blocks: List<LayoutBlock>) =
         publish(Payload.builder().blocks(blocks).build())

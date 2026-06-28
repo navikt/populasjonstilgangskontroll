@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
+import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
@@ -21,6 +22,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste,
     private val log = LoggerFactory.getLogger(javaClass)
     override val cacheName = EntraGrupperConfig.GRAPH
 
+    @Timed
     override fun doOppfrisk(nøkkel: CacheNøkkel) {
         val ansattId = AnsattId(nøkkel.id)
         MDC.put(USER_ID, ansattId.verdi)

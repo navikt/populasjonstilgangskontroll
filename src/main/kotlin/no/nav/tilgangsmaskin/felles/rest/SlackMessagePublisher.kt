@@ -8,6 +8,7 @@ import com.slack.api.model.block.composition.BlockCompositions.markdownText
 import com.slack.api.model.block.composition.BlockCompositions.plainText
 import com.slack.api.webhook.Payload
 import com.slack.api.webhook.Payload.builder
+import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus.OK
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Component
  */
 @Component
 class SlackMessagePublisher(
-    @param:Value("\${slack.webhook:}") private val webhookUrl: String) : MessagePublisher{
+    @param:Value("\${slack.webhook:}") private val webhookUrl: String) : MessagePublisher {
 
     private val log = getLogger(javaClass)
 
@@ -47,7 +48,3 @@ class SlackMessagePublisher(
         }
 }
 
-interface MessagePublisher {
-
-    fun publish(header: String, msg: String)
-}

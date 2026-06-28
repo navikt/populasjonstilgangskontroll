@@ -4,6 +4,7 @@ import com.slack.api.Slack.getInstance
 import com.slack.api.model.block.Blocks.asBlocks
 import com.slack.api.model.block.Blocks.section
 import com.slack.api.model.block.LayoutBlock
+import com.slack.api.model.block.composition.BlockCompositions.markdownText
 import com.slack.api.model.block.composition.BlockCompositions.plainText
 import com.slack.api.webhook.Payload
 import org.slf4j.LoggerFactory.getLogger
@@ -21,10 +22,9 @@ class SlackMessagePublisher(
 
     fun publish(msg: String) =
         publish(asBlocks(
-            section { section -> section
-                .blockId("intro-section")
-                .text(plainText("🚀 $msg"))
-            }))
+            section { alert -> alert
+                .blockId("alert-section")
+                .text(markdownText(":warning: *Alert*\n$msg"))            }))
 
     fun publish(blocks: List<LayoutBlock>) =
         publish(Payload.builder().blocks(blocks).build())

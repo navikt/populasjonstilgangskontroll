@@ -24,7 +24,7 @@ class SlackMessagePublisher(
         publish(asBlocks(
             section { section -> section
                 .blockId("intro-section")
-                .text(plainText(msg))
+                .text(plainText("🚀 $msg"))
             }))
 
 

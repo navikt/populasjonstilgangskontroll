@@ -35,7 +35,7 @@ class SlackMessagePublisher(
         if (webhookUrl.isNotBlank()) {
             with(getInstance().send(webhookUrl, payload)) {
                 if (code != OK.value()) {
-                    log.warn("Failed to send Slack notification ($code)")
+                    log.warn("Failed to send Slack notification ($code/$message)")
                 }
                 else  {
                     log.info("Sent Slack notification OK")

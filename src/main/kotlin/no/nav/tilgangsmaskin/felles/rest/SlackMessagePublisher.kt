@@ -24,7 +24,8 @@ class SlackMessagePublisher(
         publish(asBlocks(
             section { alert -> alert
                 .blockId("alert-section")
-                .text(markdownText(":warning: *Alert*\n$msg"))            }))
+                .text(markdownText(":info: \n$msg"))
+            }))
 
     fun publish(blocks: List<LayoutBlock>) =
         publish(Payload.builder().blocks(blocks).build())

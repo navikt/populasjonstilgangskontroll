@@ -29,12 +29,12 @@
   "inbound": [
     {
       "name": "sokos-dare-poc",
-      "namespace": "teamsykmelding",
+      "namespace": "okonomi",
       "cluster": "dev-gcp"
     },
     {
       "name": "syfosmmanuell-backend",
-      "namespace": "okonomi",
+      "namespace":"teamsykmelding",
       "cluster": "dev-gcp"
     },
     {

@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.ansatt.graph
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.girNasjonalTilgang
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.globaleGrupper
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_OG_GLOBALE_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
@@ -35,7 +36,11 @@ class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
             }
         }.getOrElse {
             if (it is NotFoundRestException) {
-                cache.delete(EntraGrupperConfig.GEO_OG_GLOBALE_CACHE, ansattId.verdi)
+                val deleted = cache.delete(GEO_OG_GLOBALE_CACHE, ansattId.verdi)
+                if (!deleted) {
+                    publisher.publish(":warn: entra OID-problemer","Kunne ikke fjerne entra cache innslag for ${ansattId.verdi}")
+                }
+                publisher.publish(":warn: entra OID problemer", "${it.identifikator}, tømmer cache og prøver på nytt")
                 val nyoid = oid.oid(ansattId)
                 publisher.publish(":warn: OID endret til $nyoid", "${it.identifikator} ikke funnet, tømte cache og prøvde på nytt")
                 entra.geoOgGlobaleGrupper(ansattId, nyoid).also {

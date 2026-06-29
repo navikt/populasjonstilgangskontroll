@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
+import io.micrometer.core.annotation.Timed
 import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
+@Timed
 class OppfølgingTjeneste(private val adapter: OppfølgingJPAAdapter) {
 
     @Cacheable(cacheNames = [OPPFØLGING], key = "#id.verdi")

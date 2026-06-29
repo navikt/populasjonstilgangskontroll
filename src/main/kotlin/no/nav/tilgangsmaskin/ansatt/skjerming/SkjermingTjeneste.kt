@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
+import io.micrometer.core.annotation.Timed
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
@@ -12,6 +13,7 @@ import org.springframework.cache.annotation.Cacheable
 
 
 @RetryingWhenRecoverableRestService
+@Timed
 class SkjermingTjeneste(private val client: SkjermingClient,
                         private val cache: CacheOperations) {
 

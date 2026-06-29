@@ -2,6 +2,7 @@ spring:
   messages:
     basename:
       - messages
+        openapi/regel
       - regel-messages
       - openapi/prod/tilgang
     encoding: UTF-8

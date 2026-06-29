@@ -20,10 +20,6 @@ class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
                                 private val cache: CacheOperations,
                                 private val publisher: MessagePublisher) {
 
-    init {
-       publisher.publish("Testing","123")
-    }
-
     private val log = LoggerFactory.getLogger(javaClass)
 
     fun grupperForAnsatt(ansattId: AnsattId) =

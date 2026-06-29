@@ -34,7 +34,7 @@
     },
     {
       "name": "syfosmmanuell-backend",
-      "namespace": "teamsykmelding",
+      "namespace":"teamsykmelding",
       "cluster": "dev-gcp"
     },
     {

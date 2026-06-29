@@ -57,34 +57,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private interface IgnoreUnknownMixin
-
-    @Bean("messageSource")
-    @ConditionalOnProd
-    fun prodMessageSource() =
-        ReloadableResourceBundleMessageSource().apply {
-            setBasenames("classpath:messages", "classpath:regel-messages", "classpath:openapi-prod-tilgang")
-            setDefaultEncoding("UTF-8")
-        }
-
-    @Bean("messageSource")
-    @ConditionalOnNotProd
-    fun notProdMessageSource() =
-        ReloadableResourceBundleMessageSource().apply {
-            setBasenames(
-                "classpath:messages",
-                "classpath:regel-messages",
-                "classpath:openapi-prod-tilgang",
-                "classpath:openapi-dev-ansatt",
-                "classpath:openapi-dev-bruker",
-                "classpath:openapi-dev-cache",
-                "classpath:openapi-dev-enkelt",
-                "classpath:openapi-dev-regel",
-                "classpath:openapi-dev-skjerming",
-                "classpath:openapi-dev-tilgang",
-                "classpath:openapi-dev-vergemal",
-            )
-            setDefaultEncoding("UTF-8")
-        }
+    
 
     @Bean
     fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor) =

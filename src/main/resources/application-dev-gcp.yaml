@@ -3,7 +3,7 @@ spring:
     basename:
       - messages
       - regel-messages
-      - openapi-prod-tilgang
+      - openapi/prod/tilgang
       - openapi/dev/ansatt
       - openapi/dev/bruker
       - openapi/dev/cache

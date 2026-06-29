@@ -1,13 +1,13 @@
 {
   "collection": "kotlin-backend",
-  "version": "2026.06.12-113744-10c4a25",
+  "version": "2026.06.26-055820-fa64632",
   "scope": "repo",
-  "source_sha": "1cc0f58",
+  "source_sha": "c4773d6",
   "installed_at": "2026-05-06T05:49:37Z",
   "files": [
     {
       "path": ".github/agents/auth.agent.md",
-      "hash": "fb975bbc3b6d9cd4"
+      "hash": "275b0d834d2a75f3"
     },
     {
       "path": ".github/agents/kafka.agent.md",
@@ -19,7 +19,7 @@
     },
     {
       "path": ".github/agents/observability.agent.md",
-      "hash": "dc896b1966b009c0"
+      "hash": "790f7e03f52e44d8"
     },
     {
       "path": ".github/agents/security-champion.agent.md",
@@ -27,7 +27,7 @@
     },
     {
       "path": ".github/agents/nav-pilot.agent.md",
-      "hash": "f490eb3f9ca1e9a3"
+      "hash": "09c7351bf3ceb03b"
     },
     {
       "path": ".github/skills/api-design/",
@@ -91,7 +91,7 @@
     },
     {
       "path": ".github/instructions/kotlin-spring.instructions.md",
-      "hash": "bdf9d1bfd4121803"
+      "hash": "9c5bc41afd68d962"
     },
     {
       "path": ".github/instructions/security-owasp.instructions.md",
@@ -100,11 +100,11 @@
     },
     {
       "path": ".github/instructions/testing.instructions.md",
-      "hash": "4a6a7547a3701ce1"
+      "hash": "ca2a23744bef3a2c"
     },
     {
       "path": ".github/instructions/testing-kotlin.instructions.md",
-      "hash": "13a5a10d86577f84"
+      "hash": "183e7a28acecdbb5"
     },
     {
       "path": ".github/instructions/github-actions.instructions.md",
@@ -116,7 +116,7 @@
     },
     {
       "path": ".github/instructions/database.instructions.md",
-      "hash": "5b4639fd54c7b4f3"
+      "hash": "9fb524bf4111f25f"
     },
     {
       "path": ".github/prompts/ktor-endpoint.prompt.md",

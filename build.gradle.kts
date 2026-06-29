@@ -144,7 +144,7 @@ val generateRestDocsIndex = tasks.register<GenerateRestDocsIndexTask>("generateR
     dependsOn(tasks.test)
     snippetsDir = layout.buildDirectory.dir("generated-snippets")
     outputDir = layout.buildDirectory.dir("generated-restdocs-index")
-    openApiPropertiesFile = layout.projectDirectory.file("src/main/resources/openapi-prod-tilgang.properties")
+    openApiPropertiesFile = layout.projectDirectory.file("src/main/resources/openapi/prod/tilgang.properties")
     tilgangControllerFile = layout.projectDirectory.file("src/main/kotlin/no/nav/tilgangsmaskin/tilgang/TilgangController.kt")
 }
 

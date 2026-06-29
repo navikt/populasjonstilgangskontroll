@@ -35,9 +35,9 @@ class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
             }
         }.getOrElse {
             if (it is NotFoundRestException) {
-                publisher.publish(":warn: OID endret", "${it.identifikator} ikke funnet, tømmer cache og prøver på nytt")
                 cache.delete(EntraGrupperConfig.GEO_OG_GLOBALE_CACHE, ansattId.verdi)
                 val nyoid = oid.oid(ansattId)
+                publisher.publish(":warn: OID endret til $nyoid", "${it.identifikator} ikke funnet, tømte cache og prøvde på nytt")
                 entra.geoOgGlobaleGrupper(ansattId, nyoid).also {
                     log.info("CC-flow: {} slo opp globale og GEO-grupper i Entra med ny oid {}", ansattId, nyoid)
                 }

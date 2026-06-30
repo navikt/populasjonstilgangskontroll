@@ -29,13 +29,11 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste,
         val oid = oidTjeneste.oid(ansattId)
         runCatching {
             oppfriskFor(ansattId, oid, nøkkel.metode)
-        }.getOrElse {
-            if (it is NotFoundRestException) {
+        }.recoverCatching { e ->
+            (e as? NotFoundRestException)?.let {
                 tømOgOppfrisk(ansattId, oid, nøkkel.metode)
-            } else {
-                log.warn("Oppfrisking av ${nøkkel.maskert} feilet", it)
-            }
-        }
+            } ?: log.warn("Oppfrisking av ${nøkkel.maskert} feilet", e)
+        }.getOrThrow()
     }
 
     private fun tømOgOppfrisk(ansattId: AnsattId, oid: UUID, metode: String?) {

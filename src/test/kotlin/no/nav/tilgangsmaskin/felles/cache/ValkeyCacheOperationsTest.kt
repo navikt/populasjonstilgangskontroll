@@ -350,7 +350,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                         geoTilknytning = KommuneTilknytning(Kommune("0301")),
                         graderinger = listOf(UGRADERT),
                         familie = Familie(
-                            foreldre = setOf(FamilieMedlem(BrukerId(I2), MOR))
+                             setOf(FamilieMedlem(BrukerId(I2), MOR))
                         ),
                         historiskeIds = setOf(BrukerId(I2))
                     )

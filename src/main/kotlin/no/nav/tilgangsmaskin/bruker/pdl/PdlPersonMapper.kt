@@ -119,14 +119,14 @@ object PdlPersonMapper {
 
     private fun tilDødsdato(dødsfall: List<PdlDødsfall>) = dødsfall.mapNotNull { it.doedsdato }.maxOrNull()
 
-    private fun tilFamilie(relasjoner: List<PdlFamilierelasjon>): Familie {
-        val (foreldre, barn) = relasjoner
-            .mapNotNull { it.relatertPersonsIdent?.let { ident -> it.relatertPersonsRolle to ident } }
-            .partition { it.first != BARN }
-        return Familie(
-            foreldre.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet(),
-            barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet())
-    }
+    private fun tilFamilie(relasjoner: List<PdlFamilierelasjon>) =
+        Familie(relasjoner
+            .mapNotNull {
+                it.relatertPersonsIdent?.let { ident ->
+                    FamilieMedlem(ident, tilRelasjon(it.relatertPersonsRolle))
+                }
+            }.toSet())
+
 
     private fun tilHistoriskeBrukerIds(identer: PdlIdenter) = identer.identer
         .filter { it.historisk }

@@ -12,7 +12,6 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withMDC
 import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.INGEN_REGEL_TAG
 import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.regelTag
 import no.nav.tilgangsmaskin.tilgang.Token
-import no.nav.tilgangsmaskin.tilgang.Token.Companion.tokenTag
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
@@ -77,10 +76,12 @@ class RegelMotorLogger(private val registry: MeterRegistry,
         private fun konsument(): String =
             MDC.get(CONSUMER_ID)?.let { "for konsument $it" } ?: "(for uautentisert konsument)"
 
+        private fun tokenTag(token: Token) = Tag.of(FLOW, token.type.name.lowercase())
         private fun evaltypeTag(type: EvalueringType) = Tag.of(OPPSLAGTYPE, type.name.lowercase())
         private fun beskrivelseTag(regelsett: RegelSett) = Tag.of(BESKRIVELSE, regelsett.beskrivelse)
         private val TILGANG_AKSEPTERT_TAG = Tag.of(RESULTAT, OK)
         private val TILGANG_AVVIST_TAG = Tag.of(RESULTAT, AVVIST)
+        private const val FLOW = "flow"
         private const val BESKRIVELSE = "type"
         private const val OPPSLAGTYPE = "oppslagtype"
         private const val REGELSETT = "regelsett"
@@ -90,6 +91,5 @@ class RegelMotorLogger(private val registry: MeterRegistry,
         private const val AVVIST = "TILGANG_AVVIST"
     }
 }
-
 
 

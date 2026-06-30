@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.tilgang
 
-import io.micrometer.core.instrument.Tag
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
@@ -16,7 +15,7 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
 
     val globaleGruppeIds
         get() =
-            claimSet()?.getAsList("groups")
+            claimSet()?.getAsList(GROUPS)
                 ?.mapNotNull { runCatching { UUID.fromString(it) }.getOrNull() }
                 ?.toSet()
                 .orEmpty()
@@ -37,24 +36,21 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
     val cluster get() = system.split(":").first()
     private val erCC get() = stringClaim(IDTYP) == APP
     private val erObo get() = !erCC && oid != null
-    val type get() = from(this)
+    val type
+        get() = when {
+            erObo -> OBO
+            erCC -> CCF
+            else -> UNAUTHENTICATED
+        }
 
     companion object {
-        private const val FLOW = "flow"
+        private const val GROUPS = "groups"
         const val AAD_ISSUER: String = "azuread"
         const val APP = "app"
         const val OID = "oid"
         const val IDTYP = "idtyp"
         const val AZP_NAME = "azp_name"
         const val NAVIDENT = "NAVident"
-        fun tokenTag(token: Token) = Tag.of(FLOW, token.type.name.lowercase())
-
-        private fun from(token: Token): TokenType = when {
-            token.erObo -> OBO
-            token.erCC -> CCF
-            else -> UNAUTHENTICATED
-        }
-
     }
 }
 

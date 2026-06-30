@@ -7,10 +7,9 @@ import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.Auditor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withMDC
-import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.INGEN_REGEL_TAG
-import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.regelTag
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
@@ -42,10 +41,10 @@ class RegelMotorLogger(private val registry: MeterRegistry,
             log.info("Tilgang avvist av regel '${regel.kortNavn}'. (${regel.begrunnelse}) for ${ansatt.ansattId} for ${bruker.brukerId} ${konsument()}")
             auditor.info("Tilgang til ${bruker.oppslagId} med GT '${bruker.geografiskTilknytning}' avvist av regel '${regel.kortNavn}' for ${ansatt.ansattId} med gruppetilhørigheter '${ansatt.grupper.map { it.displayName }}' ${konsument()}")
             teller.tell(TILGANG_AVVIST_TAG,
-                beskrivelseTag(regelSett),
-                regelTag(regel),
-                tokenTag(token),
-                evaltypeTag(type))
+                regelSett.tag(),
+                regel.tag(),
+                token.tag(),
+                type.tag())
         }
 
     fun ok(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, type: EvalueringType) =
@@ -53,10 +52,10 @@ class RegelMotorLogger(private val registry: MeterRegistry,
             log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} ${konsument()}")
             auditor.info("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} ${konsument()}")
             teller.tell(TILGANG_AKSEPTERT_TAG,
-                beskrivelseTag(regelSett),
+                regelSett.tag(),
                 INGEN_REGEL_TAG,
-                tokenTag(token),
-                evaltypeTag(type))
+                token.tag(),
+                type.tag())
         }
 
 
@@ -76,9 +75,12 @@ class RegelMotorLogger(private val registry: MeterRegistry,
         private fun konsument(): String =
             MDC.get(CONSUMER_ID)?.let { "for konsument $it" } ?: "(for uautentisert konsument)"
 
-        private fun tokenTag(token: Token) = Tag.of(FLOW, token.type.name.lowercase())
-        private fun evaltypeTag(type: EvalueringType) = Tag.of(OPPSLAGTYPE, type.name.lowercase())
-        private fun beskrivelseTag(regelsett: RegelSett) = Tag.of(BESKRIVELSE, regelsett.beskrivelse)
+        private const val REGEL = "regel"
+        val INGEN_REGEL_TAG = Tag.of(REGEL, UTILGJENGELIG)
+        fun Regel.tag() = Tag.of(REGEL, kortNavn)
+        private fun Token.tag() = Tag.of(FLOW, type.name.lowercase())
+        private fun EvalueringType.tag() = Tag.of(OPPSLAGTYPE, name.lowercase())
+        private fun RegelSett.tag() = Tag.of(BESKRIVELSE, beskrivelse)
         private val TILGANG_AKSEPTERT_TAG = Tag.of(RESULTAT, OK)
         private val TILGANG_AVVIST_TAG = Tag.of(RESULTAT, AVVIST)
         private const val FLOW = "flow"

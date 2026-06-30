@@ -9,10 +9,10 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
-import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.INGEN_REGEL_TAG
-import no.nav.tilgangsmaskin.regler.motor.Regel.Companion.regelTag
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
+import no.nav.tilgangsmaskin.regler.motor.RegelMotorLogger.Companion.INGEN_REGEL_TAG
+import no.nav.tilgangsmaskin.regler.motor.RegelMotorLogger.Companion.tag
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -43,7 +43,7 @@ class EnkeltTilgangTjeneste(
 
 
     @Transactional
-    fun registrerEnkeltTilgang(ansattId: AnsattId, data: EnkeltTilgangData, _konsument: String = "Ukjent") =
+    fun registrerEnkeltTilgang(ansattId: AnsattId, data: EnkeltTilgangData) =
         runCatching {
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val bruker = brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi)
@@ -56,7 +56,7 @@ class EnkeltTilgangTjeneste(
             when (e) {
                 is RegelException -> {
                     log.warn("Enkelttilgang er avvist av kjerneregler for $ansattId og ${data.brukerId}", e)
-                    teller.tell(regelTag(e.regel), IKKE_OVERSTYRT)
+                    teller.tell(e.regel.tag(), IKKE_OVERSTYRT)
                 }
             }
         }.getOrThrow()

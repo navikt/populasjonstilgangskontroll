@@ -91,7 +91,7 @@ class TilgangController(
     fun overstyr(@RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData, req: HttpServletRequest) {
         guard.krev(OBO, req.requestURI)
         konsumentValidator.valider(guard.token.systemNavn)
-        enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattIdFraToken(), data, guard.token.systemNavn)
+        enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattIdFraToken(), data)
     }
 
     @PostMapping("bulk/obo")

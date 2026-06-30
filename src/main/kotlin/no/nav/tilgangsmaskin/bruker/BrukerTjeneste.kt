@@ -16,10 +16,6 @@ class BrukerTjeneste(private val personTjeneste: PdlTjeneste, val skjermingTjene
 
     @WithSpan
     fun brukere(brukerIds: Set<String>): Set<Bruker> {
-        if (brukerIds.isEmpty()) {
-            log.info("Bulk ingen personer å slå opp")
-            return emptySet()
-        }
         val personer = personTjeneste.personer(brukerIds)
         if (personer.size != brukerIds.size) {
             val mangler = (brukerIds - personer.map { it.brukerId.verdi }.toSet()).map { it.maskFnr() }

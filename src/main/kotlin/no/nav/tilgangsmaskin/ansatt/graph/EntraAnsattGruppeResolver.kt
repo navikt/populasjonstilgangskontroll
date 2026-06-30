@@ -34,22 +34,26 @@ class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
             entra.geoOgGlobaleGrupper(ansattId, oid.oid(ansattId)).also {
                 log.trace("CC-flow: {} slo opp globale og GEO-grupper i Entra", ansattId)
             }
-        }.getOrElse {
-            if (it is NotFoundRestException) {
-                val deleted = cache.delete(GEO_OG_GLOBALE_CACHE, ansattId.verdi)
-                if (!deleted) {
-                    publisher.publish(":warn: entra OID-problemer","Kunne ikke fjerne entra cache innslag for ${ansattId.verdi}")
-                }
-                publisher.publish(":warn: entra OID problemer", "${it.identifikator}, tømmer cache og prøver på nytt")
-                val nyoid = oid.oid(ansattId)
-                publisher.publish(":warn: OID endret til $nyoid", "${it.identifikator} ikke funnet, tømte cache og prøvde på nytt")
-                entra.geoOgGlobaleGrupper(ansattId, nyoid).also {
-                    log.info("CC-flow: {} slo opp globale og GEO-grupper i Entra med ny oid {}", ansattId, nyoid)
-                }
-            } else {
-                throw it
-            }
+        }.recoverCatching { e ->
+            (e as? NotFoundRestException)?.let { notFound(ansattId, it) } ?: throw e
+        }.getOrThrow()
+
+
+    private fun notFound(ansattId: AnsattId,
+                        exception: NotFoundRestException): Set<EntraGruppe> {
+        val deleted = cache.delete(GEO_OG_GLOBALE_CACHE, ansattId.verdi)
+        if (!deleted) {
+            publisher.publish(":warn: entra OID-problemer",
+                "Kunne ikke fjerne entra cache innslag for ${ansattId.verdi}")
         }
+        publisher.publish(":warn: entra OID problemer", "${exception.identifikator}, tømmer cache og prøver på nytt")
+        val nyoid = oid.oid(ansattId)
+        publisher.publish(":warn: OID endret til $nyoid",
+            "${exception.identifikator} ikke funnet, tømte cache og prøvde på nytt")
+        return entra.geoOgGlobaleGrupper(ansattId, nyoid).also {
+            log.info("CC-flow: {} slo opp globale og GEO-grupper i Entra med ny oid {}", ansattId, nyoid)
+        }
+    }
 
     private fun grupperForObo(ansattId: AnsattId) = with(token.globaleGrupper()) {
         if (girNasjonalTilgang()) {

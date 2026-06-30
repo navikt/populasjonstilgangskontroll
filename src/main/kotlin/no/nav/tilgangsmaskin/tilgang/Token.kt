@@ -32,8 +32,9 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
     val systemNavn get() = system.split(":").last()
     val systemAndNs get() = system.split(":").drop(1).joinToString(separator = ":")
     val cluster get() = system.split(":").first()
-    val erCC get() = stringClaim(IDTYP) == APP
-    val erObo get() = !erCC && oid != null
+    private val erCC get() = stringClaim(IDTYP) == APP
+    private val erObo get() = !erCC && oid != null
+    val type get() = from(this)
 
     companion object {
         private const val FLOW = "flow"
@@ -43,19 +44,17 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
         const val IDTYP = "idtyp"
         const val AZP_NAME = "azp_name"
         const val NAVIDENT = "NAVident"
-        fun tokenTag(token: Token) = Tag.of(FLOW, TokenType.from(token).name.lowercase())
+        fun tokenTag(token: Token) = Tag.of(FLOW, token.type.name.lowercase())
+
+        private fun from(token: Token): TokenType = when {
+            token.erObo -> TokenType.OBO
+            token.erCC -> TokenType.CCF
+            else -> TokenType.UNAUTHENTICATED
+        }
 
     }
 }
 
 enum class TokenType {
-    OBO, CCF, UNAUTHENTICATED;
-
-    companion object {
-        fun from(token: Token): TokenType = when {
-            token.erObo -> OBO
-            token.erCC -> CCF
-            else -> UNAUTHENTICATED
-        }
-    }
+    OBO, CCF, UNAUTHENTICATED
 }

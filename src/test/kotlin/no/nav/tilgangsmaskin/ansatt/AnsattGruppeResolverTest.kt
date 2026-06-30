@@ -27,6 +27,7 @@ import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.tilgang.Token
+import no.nav.tilgangsmaskin.tilgang.TokenType
 import java.net.URI
 import java.util.*
 
@@ -49,7 +50,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
     }
 
     Given("CC-flow") {
-        beforeEach { every { token.erCC } returns true }
+        beforeEach { every { token.type } returns TokenType.CCF }
 
         When("token inneholder kjente og ukjente gruppe-IDer") {
             Then("Token.globaleGrupper returnerer kun kjente EntraGrupper") {
@@ -116,8 +117,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
     Given("OBO-flow") {
         beforeEach {
-            every { token.erCC }  returns false
-            every { token.erObo } returns true
+            every { token.type } returns TokenType.OBO
             every { token.oid }   returns oid
         }
 
@@ -156,8 +156,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
     Given("uautentisert") {
         beforeEach {
-            every { token.erCC }  returns false
-            every { token.erObo } returns false
+            every { token.type } returns TokenType.UNAUTHENTICATED
         }
 
         When("miljø er dev/test") {

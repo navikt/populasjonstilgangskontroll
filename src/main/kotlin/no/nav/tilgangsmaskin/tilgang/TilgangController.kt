@@ -169,7 +169,7 @@ class TilgangController(
         }
 
     private fun tell(type: String) =
-        teller.tell(Tags.of("type", type, "token", TokenType.from(guard.token).name.lowercase()))
+        teller.tell(Tags.of("type", type, "token", guard.token.type.name.lowercase()))
 
 
     private fun sjekk(predikat: Boolean, status: HttpStatus, message: String) {

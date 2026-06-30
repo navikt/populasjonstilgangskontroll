@@ -20,8 +20,7 @@ class TokenTypeGuardTest : BehaviorSpec({
     Given("guarden krever OBO") {
         When("tokenet er OBO") {
             Then("kastes ingen exception") {
-                every { token.erObo } returns true
-                every { token.erCC } returns false
+                every { token.type } returns OBO
                 shouldNotThrowAny {
                     guard.krev(OBO, uri)
                 }
@@ -30,8 +29,7 @@ class TokenTypeGuardTest : BehaviorSpec({
 
         When("tokenet er CCF") {
             Then("kastes 403 Forbidden") {
-                every { token.erObo } returns false
-                every { token.erCC } returns true
+                every { token.type } returns CCF
                 shouldThrow<ResponseStatusException> {
                     guard.krev(OBO, uri)
                 }.statusCode shouldBe FORBIDDEN
@@ -40,8 +38,7 @@ class TokenTypeGuardTest : BehaviorSpec({
 
         When("tokenet er uautentisert") {
             Then("kastes 403 Forbidden") {
-                every { token.erObo } returns false
-                every { token.erCC } returns false
+                every { token.type } returns TokenType.UNAUTHENTICATED
                 shouldThrow<ResponseStatusException> {
                     guard.krev(OBO, uri)
                 }.statusCode shouldBe FORBIDDEN
@@ -52,8 +49,7 @@ class TokenTypeGuardTest : BehaviorSpec({
     Given("guarden krever CCF") {
         When("tokenet er CCF") {
             Then("kastes ingen exception") {
-                every { token.erObo } returns false
-                every { token.erCC } returns true
+                every { token.type } returns CCF
                shouldNotThrowAny {
                    guard.krev(CCF, uri)
                }
@@ -62,8 +58,7 @@ class TokenTypeGuardTest : BehaviorSpec({
 
         When("tokenet er OBO") {
             Then("kastes 403 Forbidden") {
-                every { token.erObo } returns true
-                every { token.erCC } returns false
+                every { token.type } returns OBO
                 shouldThrow<ResponseStatusException> {
                     guard.krev(CCF, uri)
                 }.statusCode shouldBe FORBIDDEN
@@ -71,4 +66,3 @@ class TokenTypeGuardTest : BehaviorSpec({
         }
     }
 })
-

@@ -32,6 +32,7 @@ import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.tilgang.Token
+import no.nav.tilgangsmaskin.tilgang.TokenType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
@@ -95,8 +96,7 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
         beforeEach {
             every { nom.fnrForAnsatt(any()) } returns vanligBrukerId
             every { vergemål.vergemål(any()) } returns emptySet()
-            every { token.erObo } returns false
-            every { token.erCC } returns true
+            every { token.type } returns TokenType.CCF
             every { token.system } returns "test"
             every { token.ansattId } returns ansattId
             every { token.systemNavn } returns "test"

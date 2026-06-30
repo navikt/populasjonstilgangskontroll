@@ -4,6 +4,9 @@ import io.micrometer.core.instrument.Tag
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
+import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
+import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
+import no.nav.tilgangsmaskin.tilgang.TokenType.UNAUTHENTICATED
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -47,9 +50,9 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
         fun tokenTag(token: Token) = Tag.of(FLOW, token.type.name.lowercase())
 
         private fun from(token: Token): TokenType = when {
-            token.erObo -> TokenType.OBO
-            token.erCC -> TokenType.CCF
-            else -> TokenType.UNAUTHENTICATED
+            token.erObo -> OBO
+            token.erCC -> CCF
+            else -> UNAUTHENTICATED
         }
 
     }

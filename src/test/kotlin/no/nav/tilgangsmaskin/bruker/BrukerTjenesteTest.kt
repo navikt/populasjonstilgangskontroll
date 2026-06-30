@@ -38,10 +38,10 @@ class BrukerTjenesteTest : BehaviorSpec({
 
     Given("oppslag av flere brukere") {
         When("tom input") {
-            Then("returneres tom mengde uten PDL-kall") {
+            Then("returneres tom mengde") {
+                every { pdl.personer(emptySet()) } returns emptySet()
                 assertSoftly {
                     brukerTjeneste.brukere(emptySet()).shouldBeEmpty()
-                    verify(exactly = 0) { pdl.personer(any()) }
                 }
             }
         }

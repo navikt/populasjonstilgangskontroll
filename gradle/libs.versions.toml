@@ -17,7 +17,7 @@ cyclonedx = "3.2.4"
 git-properties = "4.0.1"
 asciidoctor = "4.0.5"
 
-opentelemetry-alpha = "2.28.1-alpha"
+opentelemetry-alpha = "2.29.0-alpha"
 
 [libraries]
 # Implementation

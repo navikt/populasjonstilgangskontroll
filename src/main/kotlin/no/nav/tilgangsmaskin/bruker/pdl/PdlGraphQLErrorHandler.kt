@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
+import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.graphql.ResponseError
@@ -8,6 +9,7 @@ import org.springframework.graphql.client.FieldAccessException
 import org.springframework.graphql.client.GraphQlTransportException
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import org.springframework.http.HttpStatus.NOT_FOUND
 import java.net.URI
 import java.util.*
 
@@ -35,7 +37,12 @@ interface PdlGraphQLErrorHandler {
             }
 
         private fun oversett(kode: String, msg: String, uri: URI) =
-            IrrecoverableRestException(kode.tilStatus(), uri, msg)
+            kode.tilStatus().let { status ->
+                when (status) {
+                    NOT_FOUND -> NotFoundRestException(uri, msg = msg)
+                    else -> IrrecoverableRestException(status, uri, msg)
+                }
+            }
 
         private fun String.tilStatus() =
             if (this.uppercase() == "UNAUTHENTICATED") HttpStatus.UNAUTHORIZED else HttpStatus.valueOf(

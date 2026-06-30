@@ -12,7 +12,6 @@ spring:
       - openapi/dev/skjerming
       - openapi/dev/tilgang
       - openapi/dev/vergemal
-    encoding: UTF-8
   mvc:
     log-request-details: true
 management:

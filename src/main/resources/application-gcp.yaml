@@ -46,6 +46,12 @@ management:
       base-path: /monitoring
 
 spring:
+  messages:
+    fallback-to-system-locale: false
+    encoding: UTF-8
+  web:
+    locale: no_NO
+    locale-resolver: fixed
   threads:
     virtual:
       enabled: true

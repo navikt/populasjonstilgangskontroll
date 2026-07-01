@@ -23,12 +23,12 @@ class PdlSyncGraphQLClientAdapter(
 
     fun partnere(ident: String): Set<FamilieMedlem> =
         runCatching {
-            query<Partnere>(SIVILSTAND_QUERY, ident(ident)).sivilstand.mapNotNull {
+            query<Partnere>(SIVILSTAND_QUERY, ident(ident)).sivilstand.mapNotNullTo(mutableSetOf()) {
                 it.relatertVedSivilstand?.let { brukerId ->
                     FamilieMedlem(BrukerId(brukerId), tilPartner(it.type))
                 }
-            }.toSet()
-        }.recoverCatching { e ->
+            }
+        }.recover { e ->
             (e as? NotFoundRestException)?.let {
                 log.trace("Fant ingen partnere for $ident")
                 emptySet()

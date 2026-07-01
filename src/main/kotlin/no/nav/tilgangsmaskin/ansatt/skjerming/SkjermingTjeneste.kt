@@ -26,7 +26,7 @@ class SkjermingTjeneste(private val client: SkjermingClient,
 
     @WithSpan
     fun skjerminger(brukerIds: List<BrukerId>): Map<BrukerId, Boolean> {
-        val ids = brukerIds.map { it.verdi }.toSet()
+        val ids = brukerIds.mapTo(mutableSetOf()) { it.verdi }
         val fraCache = fraCache(ids)
         log.trace("Hentet ${fraCache.size} skjerming(er) av ${ids.size} mulige fra $SKJERMING")
         if (fraCache.size == ids.size) return fraCache.mapKeys { BrukerId(it.key) }.mapValues { it.value }

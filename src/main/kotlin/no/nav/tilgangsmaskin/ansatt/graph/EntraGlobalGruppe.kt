@@ -23,13 +23,13 @@ enum class EntraGlobalGruppe(val property: String, val metadata: GruppeMetadata)
         private fun navnFor(id: UUID) =
             entries.first { it.id == id }.name
 
-        fun uuids() =
+        fun uuids() : Set<UUID> =
             entries.mapTo(mutableSetOf()) { it.id }
 
         fun setIDs(grupper: Map<String, UUID>) =
             entries.forEach { it.id = checkNotNull(grupper[it.property]) { "Mangler id for ${it.property}" } }
 
-        fun Token.globaleGrupper() =
+        fun Token.globaleGrupper() : Set<EntraGruppe> =
             globaleGruppeIds.intersect(uuids()).mapTo(mutableSetOf()) { uuid ->
                 EntraGruppe(uuid, navnFor(uuid))
             }

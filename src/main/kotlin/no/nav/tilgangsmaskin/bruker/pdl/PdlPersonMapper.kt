@@ -121,17 +121,17 @@ object PdlPersonMapper {
 
     private fun tilFamilie(relasjoner: List<PdlFamilierelasjon>) =
         Familie(relasjoner
-            .mapNotNull {
+            .mapNotNullTo(mutableSetOf()) {
                 it.relatertPersonsIdent?.let { ident ->
                     FamilieMedlem(ident, tilRelasjon(it.relatertPersonsRolle))
                 }
-            }.toSet())
+            })
 
 
     private fun tilHistoriskeBrukerIds(identer: PdlIdenter) = identer.identer
         .filter { it.historisk }
         .filter { it.gruppe in listOf(FOLKEREGISTERIDENT, NPID) }
-        .map { (BrukerId(it.ident)) }.toSet()
+        .mapTo(mutableSetOf()) { (BrukerId(it.ident)) }
 
     private fun tilRelasjon(relasjon: PdlFamilieRelasjonRolle?) =
         when (relasjon) {

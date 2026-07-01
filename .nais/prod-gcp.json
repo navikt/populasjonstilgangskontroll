@@ -25,6 +25,11 @@
   },
   "inbound": [
     {
+      "name": "spesialist",
+      "namespace": "tbd",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "syfosmmanuell-backend",
       "namespace": "teamsykmelding",
       "cluster": "prod-gcp"

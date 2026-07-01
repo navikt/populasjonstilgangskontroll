@@ -28,6 +28,11 @@
   },
   "inbound": [
     {
+      "name": "spesialist",
+      "namespace": "tbd",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "sokos-dare-poc",
       "namespace": "okonomi",
       "cluster": "dev-gcp"

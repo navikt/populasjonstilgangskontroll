@@ -16,8 +16,7 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
     val globaleGruppeIds
         get() =
             claimSet()?.getAsList(GROUPS)
-                ?.mapNotNull { runCatching { UUID.fromString(it) }.getOrNull() }
-                ?.toSet()
+                ?.mapNotNullTo(mutableSetOf()) { runCatching { UUID.fromString(it) }.getOrNull() }
                 .orEmpty()
 
 

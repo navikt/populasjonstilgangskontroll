@@ -98,26 +98,35 @@ object PdlPersonMapper {
 
     fun tilGeoTilknytning(geo: PdlGeografiskTilknytning?): GeografiskTilknytning =
         when (geo?.gtType) {
-            UTLAND -> geo.gtLand?.let {
-                UtenlandskTilknytning()
-            } ?: UkjentBosted()
-
-            KOMMUNE -> geo.gtKommune?.let {
-                KommuneTilknytning(Kommune(it.verdi))
-            } ?: UkjentBosted().also {
-                log.warn("Kommunal tilknytning uten kommunekode, antar ukjent bosted")
-            }
-
-            BYDEL -> geo.gtBydel?.let {
-                BydelTilknytning(Bydel(it.verdi))
-            } ?: UkjentBosted().also {
-                log.warn("Bydelstilknytning uten bydelskode, antar ukjent bosted")
-            }
-
+            UTLAND -> tilUtland(geo)
+            KOMMUNE -> tilKommune(geo)
+            BYDEL -> tilBydel(geo)
             else -> UdefinertTilknytning()
         }
 
-    private fun tilDødsdato(dødsfall: List<PdlDødsfall>) = dødsfall.mapNotNull { it.doedsdato }.maxOrNull()
+    private fun tilBydel(geo: PdlGeografiskTilknytning): GeografiskTilknytning =
+        geo.gtBydel?.let {
+            BydelTilknytning(Bydel(it.verdi))
+        } ?: UkjentBosted().also {
+            log.warn("Bydelstilknytning uten bydelskode, antar ukjent bosted")
+        }
+
+    private fun tilKommune(geo: PdlGeografiskTilknytning): GeografiskTilknytning =
+        geo.gtKommune?.let {
+            KommuneTilknytning(Kommune(it.verdi))
+        } ?: UkjentBosted().also {
+            log.warn("Kommunal tilknytning uten kommunekode, antar ukjent bosted")
+        }
+
+    private fun tilUtland(geo: PdlGeografiskTilknytning): GeografiskTilknytning =
+        geo.gtLand?.let {
+            UtenlandskTilknytning()
+        } ?: UkjentBosted().also {
+            log.warn("Utenland tilknytning uten land, antar ukjent bosted")
+        }
+
+    private fun tilDødsdato(dødsfall: List<PdlDødsfall>) =
+        dødsfall.mapNotNull { it.doedsdato }.maxOrNull()
 
     private fun tilFamilie(relasjoner: List<PdlFamilierelasjon>) =
         Familie(relasjoner

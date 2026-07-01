@@ -122,7 +122,7 @@ object PdlPersonMapper {
         geo.gtLand?.let {
             UtenlandskTilknytning()
         } ?: UkjentBosted().also {
-            log.warn("Utenland tilknytning uten land, antar ukjent bosted")
+            log.warn("Utenlandsk tilknytning uten landkode, antar ukjent bosted")
         }
 
     private fun tilDødsdato(dødsfall: List<PdlDødsfall>) =

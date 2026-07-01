@@ -13,6 +13,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
 import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
 import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -25,8 +26,10 @@ private const val TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.tilgang.tag.
 @ResponseStatus(NO_CONTENT)
 @Tag(name = "TilgangController", description = TILGANG_CONTROLLER_TAG_DESCRIPTION)
 class TilgangController(
-    private val regelTjeneste: RegelTjeneste, guard: TokenTypeGuard,
-    teller: TokenTypeTeller) : TilgangControllerBase(guard, teller) {
+    private val regelTjeneste: RegelTjeneste,
+    token: Token,
+    teller: TokenTypeTeller,
+) : TilgangControllerBase(token, teller) {
 
 
     @PostMapping("komplett")
@@ -62,7 +65,7 @@ class TilgangController(
     ) =
         with(brukerId.trim('"')) {
             sjekk(isNotBlank(), BAD_REQUEST, "brukerId kan ikke være tom")
-            guard.krev(forventet, uri)
+            sjekk(token.type == forventet, FORBIDDEN, "Forventet token type $forventet for $uri, fikk ${token.type}")
             val ansatt = ansattId()
             logSingle(regelType, ansatt, this)
             sjekk(

@@ -11,6 +11,7 @@ import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
 import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.CONTENT_TOO_LARGE
+import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.MULTI_STATUS
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -24,8 +25,9 @@ private const val BULK_TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.tilgang
 @Tag(name = "BulkTilgangController", description = BULK_TILGANG_CONTROLLER_TAG_DESCRIPTION)
 class BulkTilgangController(
     private val regelTjeneste: RegelTjeneste,
-    guard: TokenTypeGuard,
-    teller: TokenTypeTeller) : TilgangControllerBase(guard, teller) {
+    token: Token,
+    teller: TokenTypeTeller,
+) : TilgangControllerBase(token, teller) {
 
     @PostMapping("bulk/obo")
     @BulkSwaggerApiRespons
@@ -69,7 +71,7 @@ class BulkTilgangController(
         forventet: TokenType,
         specs: Set<BrukerIdOgRegelsett>,
         uri: String): AggregertBulkRespons {
-        guard.krev(forventet, uri)
+        sjekk(token.type == forventet, FORBIDDEN, "Forventet token type $forventet for $uri, fikk ${token.type}")
         val ansatt = ansattId()
         return withAnsattContext(ansatt) {
             if (specs.isNotEmpty()) {

@@ -23,7 +23,7 @@ import kotlin.annotation.AnnotationTarget.CLASS
 annotation class TilgangApiController
 
 abstract class TilgangControllerBase(
-    protected val guard: TokenTypeGuard,
+    protected val token: Token,
     private val teller: TokenTypeTeller) {
 
     protected val log = getLogger(javaClass)
@@ -41,5 +41,5 @@ abstract class TilgangControllerBase(
     }
 
     protected fun ansattIdFraToken(): AnsattId =
-        requireNotNull(guard.token.ansattId) { "Mangler ansattId i OBO-token" }
+        requireNotNull(token.ansattId) { "Mangler ansattId i OBO-token" }
 }

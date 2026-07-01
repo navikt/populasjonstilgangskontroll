@@ -105,12 +105,11 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
 
         beforeEach { case ->
             clearAllMocks()
-            val guard = TokenTypeGuard(token)
             restDocumentation.beforeTest(TilgangControllerTestBase::class.java, case.name.name)
             mockMvc = standaloneSetup(
-                TilgangController(regelTjeneste, guard, teller),
-                EnkeltTilgangController(enkeltTilgangTjeneste, konsumentValidator, guard, teller),
-                BulkTilgangController(regelTjeneste, guard, teller)
+                TilgangController(regelTjeneste, token, teller),
+                EnkeltTilgangController(enkeltTilgangTjeneste, konsumentValidator, token, teller),
+                BulkTilgangController(regelTjeneste, token, teller)
             )
                 .setControllerAdvice(ProblemDetailExceptionHandler())
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })

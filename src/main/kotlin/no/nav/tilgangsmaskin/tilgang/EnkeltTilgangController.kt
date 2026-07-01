@@ -15,16 +15,11 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseStatus
 
-private const val OVERSTYR_TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.tilgang.tag.description"
+private const val ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.tilgang.tag.description"
 
 @TilgangApiController
-@Tag(name = "EnkeltTilgangController", description = OVERSTYR_TILGANG_CONTROLLER_TAG_DESCRIPTION)
-class EnkeltTilgangController(
-    private val enkeltTilgangTjeneste: EnkeltTilgangTjeneste,
-    private val konsumentValidator: EnkeltTilgangKonsumentValidator,
-    token: Token,
-    teller: TokenTypeTeller,
-) : TilgangControllerBase(token, teller) {
+@Tag(name = "EnkeltTilgangController", description = ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION)
+class EnkeltTilgangController(private val enkeltTilgangTjeneste: EnkeltTilgangTjeneste, private val validator: EnkeltTilgangKonsumentValidator, token: Token, teller: TokenTypeTeller) : TilgangControllerBase(token, teller) {
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)
@@ -32,7 +27,7 @@ class EnkeltTilgangController(
     @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
     fun enkeltTilgang(@RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData, req: HttpServletRequest) {
         sjekk(token.type == OBO, FORBIDDEN, "Forventet token type $OBO for ${req.requestURI}, fikk ${token.type}")
-        konsumentValidator.valider(token.systemNavn)
+        validator.valider(token.systemNavn)
         enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattIdFraToken(), data)
     }
 

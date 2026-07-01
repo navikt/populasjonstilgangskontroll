@@ -7,7 +7,6 @@ import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
-import no.nav.tilgangsmaskin.regler.motor.RegelSett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
@@ -26,12 +25,7 @@ private const val TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.tilgang.tag.
 @TilgangApiController
 @ResponseStatus(NO_CONTENT)
 @Tag(name = "TilgangController", description = TILGANG_CONTROLLER_TAG_DESCRIPTION)
-class TilgangController(
-    private val regelTjeneste: RegelTjeneste,
-    token: Token,
-    teller: TokenTypeTeller,
-) : TilgangControllerBase(token, teller) {
-
+class TilgangController(private val regelTjeneste: RegelTjeneste, token: Token, teller: TokenTypeTeller) : TilgangControllerBase(token, teller) {
 
     @PostMapping("komplett")
     @ProblemDetailApiResponse
@@ -62,7 +56,7 @@ class TilgangController(
             sjekk(isNotBlank(), BAD_REQUEST, "brukerId kan ikke være tom")
             sjekk(token.type == forventet, FORBIDDEN, "Forventet token type $forventet for $uri, fikk ${token.type}")
             sjekk(regelType in listOf(KJERNE_REGELTYPE, KOMPLETT_REGELTYPE), BAD_REQUEST, "Ugyldig regeltype: $regelType")
-            logSingle(ansatt, this, regelType)
+            log.trace(CONFIDENTIAL, "Kjører {} regler for {} og {}", regelType, ansatt, maskFnr())
             tell("single", forventet)
             when (regelType) {
                 KJERNE_REGELTYPE -> regelTjeneste.kjerneregler(ansatt, this)
@@ -70,10 +64,7 @@ class TilgangController(
             }
         }
 
-    private fun logSingle(ansatt: AnsattId, brukerId: String, regelType: RegelType) =
-        log.trace(CONFIDENTIAL, "Kjører {} regler for {} og {}", regelType, ansatt, brukerId.maskFnr())
-
-    companion object {
+    private companion object {
         private const val SUMMARY_KOMPLETT_OBO = "msg:openapi.tilgang.komplett.obo.summary"
         private const val DESCRIPTION_KOMPLETT_OBO = "msg:openapi.tilgang.komplett.obo.description"
         private const val SUMMARY_KOMPLETT_CCF = "msg:openapi.tilgang.komplett.ccf.summary"

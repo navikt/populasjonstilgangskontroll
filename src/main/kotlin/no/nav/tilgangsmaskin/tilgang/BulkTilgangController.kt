@@ -23,56 +23,34 @@ private const val BULK_TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.tilgang
 @TilgangApiController
 @ResponseStatus(MULTI_STATUS)
 @Tag(name = "BulkTilgangController", description = BULK_TILGANG_CONTROLLER_TAG_DESCRIPTION)
-class BulkTilgangController(
-    private val regelTjeneste: RegelTjeneste,
-    token: Token,
-    teller: TokenTypeTeller,
-) : TilgangControllerBase(token, teller) {
+class BulkTilgangController(private val regelTjeneste: RegelTjeneste, token: Token, teller: TokenTypeTeller) : TilgangControllerBase(token, teller) {
 
     @PostMapping("bulk/obo")
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO)
     fun bulkOBO(@RequestBody specs: Set<BrukerIdOgRegelsett>, req: HttpServletRequest) =
-        bulkOppslag({ ansattIdFraToken() }, OBO, specs, req.requestURI)
+        bulkOppslag(ansattIdFraToken(), OBO, specs, req.requestURI)
 
     @PostMapping("bulk/obo/{regelType}")
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO_REGELTYPE)
-    fun bulkOBOForRegelType(
-        @PathVariable regelType: RegelType,
-        @RequestBody brukerIds: Set<String>,
-        req: HttpServletRequest,
-    ) =
-        bulkOppslag({ ansattIdFraToken() }, OBO, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(), req.requestURI)
+    fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>, req: HttpServletRequest) =
+        bulkOppslag(ansattIdFraToken(), OBO, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(), req.requestURI)
 
     @PostMapping("bulk/ccf/{ansattId}")
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_CCF)
-    fun bulkCCF(
-        @PathVariable ansattId: AnsattId,
-        @RequestBody specs: Set<BrukerIdOgRegelsett>,
-        req: HttpServletRequest,
-    ) =
-        bulkOppslag({ ansattId }, CCF, specs, req.requestURI)
+    fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody specs: Set<BrukerIdOgRegelsett>, req: HttpServletRequest) =
+        bulkOppslag( ansattId, CCF, specs, req.requestURI)
 
     @PostMapping("bulk/ccf/{ansattId}/{regelType}")
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_CCF_REGELTYPE)
-    fun bulkCCFForRegelType(
-        @PathVariable ansattId: AnsattId,
-        @PathVariable regelType: RegelType,
-        @RequestBody brukerIds: Set<String>,
-        req: HttpServletRequest,
-    ) =
-        bulkOppslag({ ansattId }, CCF, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(), req.requestURI)
+    fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>, req: HttpServletRequest) =
+        bulkOppslag(ansattId , CCF, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(), req.requestURI)
 
-    private fun bulkOppslag(
-        ansattId: () -> AnsattId,
-        forventet: TokenType,
-        specs: Set<BrukerIdOgRegelsett>,
-        uri: String): AggregertBulkRespons {
+    private fun bulkOppslag(ansatt: AnsattId, forventet: TokenType, specs: Set<BrukerIdOgRegelsett>, uri: String): AggregertBulkRespons {
         sjekk(token.type == forventet, FORBIDDEN, "Forventet token type $forventet for $uri, fikk ${token.type}")
-        val ansatt = ansattId()
         return withAnsattContext(ansatt) {
             if (specs.isNotEmpty()) {
                 sjekk(specs.size <= 1000, CONTENT_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
@@ -80,14 +58,11 @@ class BulkTilgangController(
                 tell("bulk", forventet)
                 regelTjeneste.bulkRegler(ansatt, specs)
             } else {
-                logBulkEmpty(ansatt)
+                log.debug("Ingen brukerId-er oppgitt i bulk forespørsel for {}", ansatt)
                 AggregertBulkRespons(ansatt)
             }
         }
     }
-
-    private fun logBulkEmpty(ansatt: AnsattId) =
-        log.debug("Ingen brukerId-er oppgitt i bulk forespørsel for {}", ansatt)
 
     companion object {
         private const val SUMMARY_BULK = "msg:openapi.tilgang.bulk.summary"

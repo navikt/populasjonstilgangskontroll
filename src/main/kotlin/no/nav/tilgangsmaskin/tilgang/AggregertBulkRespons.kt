@@ -43,4 +43,5 @@ data class AggregertBulkRespons(val ansattId: AnsattId, val resultater: Set<Enke
     @NoCoverageAnalysis
     override fun toString(): String =
         "${javaClass.simpleName}(ansattId=$ansattId, resultater=$resultater)"
+
 }

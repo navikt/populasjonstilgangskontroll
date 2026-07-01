@@ -5,7 +5,7 @@ package no.nav.tilgangsmaskin.regler.motor
  * Lavere verdi evalueres først. Gap på 100 mellom hvert trinn gir rom for nye regler.
  *
  * Kjerneregler (blokkerende, fast):  100–900
- * Overstyrbareule regler (mykere):  1000–1400
+ * Overstyrbare regler (mykere):  1000–1400
  */
 object RegelRekkefølge {
     const val STRENGT_FORTROLIG = 100

@@ -16,7 +16,7 @@ data class Familie(val medlemmer: Set<FamilieMedlem> = emptySet()) {
         }
 
     companion object {
-        val INGEN = Familie()
+        val INGEN_FAMILIE = Familie()
     }
 
     data class FamilieMedlem(val brukerId: BrukerId, val relasjon: FamilieRelasjon) {

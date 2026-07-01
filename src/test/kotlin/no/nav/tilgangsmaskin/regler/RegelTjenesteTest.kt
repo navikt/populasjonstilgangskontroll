@@ -123,7 +123,7 @@ class RegelTjenesteTest : BehaviorSpec() {
         Given("kjerneregler") {
             When("bruker ikke finnes i PDL") {
                 Then("gis tilgang") {
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } throws NotFoundRestException(URI.create("http://pdl"))
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } throws NotFoundRestException(URI.create("http://pdl"))
                     shouldNotThrowAny {
                         regler.kjerneregler(ansattId, vanligBrukerId.verdi)
                     }
@@ -131,7 +131,7 @@ class RegelTjenesteTest : BehaviorSpec() {
             }
             When("PDL-oppslag kaster annen exception") {
                 Then("kastes exception videre") {
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } throws RuntimeException("PDL er nede")
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } throws RuntimeException("PDL er nede")
                     shouldThrow<RuntimeException> {
                         regler.kjerneregler(ansattId, vanligBrukerId.verdi)
                     }
@@ -142,7 +142,7 @@ class RegelTjenesteTest : BehaviorSpec() {
         Given("kompletteRegler") {
             When("bruker ikke finnes i PDL") {
                 Then("gis tilgang") {
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } throws NotFoundRestException(URI.create("http://pdl"))
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } throws NotFoundRestException(URI.create("http://pdl"))
                     shouldNotThrowAny {
                         regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
                     }
@@ -150,7 +150,7 @@ class RegelTjenesteTest : BehaviorSpec() {
             }
             When("PDL-oppslag kaster annen exception") {
                 Then("kastes exception videre") {
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } throws RuntimeException("PDL er nede")
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } throws RuntimeException("PDL er nede")
                     shouldThrow<RuntimeException> {
                         regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
                     }
@@ -159,8 +159,8 @@ class RegelTjenesteTest : BehaviorSpec() {
             When("enkelttilgang er registrert men motor kaster annen exception") {
                 Then("kastes exception videre") {
                     val funnetBruker = BrukerBuilder(vanligBrukerId).build()
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns funnetBruker
-                    every { enkeltTilgang.harEnkeltTilgang(ansattId, funnetBruker.brukerId) } returns true
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns funnetBruker
+                    every { enkeltTilgang.harTilgang(ansattId, funnetBruker.brukerId) } returns true
                     every { motor.kompletteRegler(any(), any()) } throws RuntimeException("noe gikk galt")
                     shouldThrow<RuntimeException> {
                         regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
@@ -171,9 +171,9 @@ class RegelTjenesteTest : BehaviorSpec() {
                 Then("gis tilgang") {
                     val funnetBruker = BrukerBuilder(vanligBrukerId).build()
                     val regelException = RegelException(AnsattBuilder(ansattId).build(), funnetBruker, mockk<Regel>(relaxed = true))
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns funnetBruker
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns funnetBruker
                     every { motor.kompletteRegler(any(), any()) } throws regelException
-                    every { enkeltTilgang.harEnkeltTilgang(ansattId, vanligBrukerId) } returns true
+                    every { enkeltTilgang.harTilgang(ansattId, vanligBrukerId) } returns true
                     shouldNotThrowAny {
                         regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
                     }

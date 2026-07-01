@@ -111,21 +111,21 @@ class BrukerTjenesteTest : BehaviorSpec({
             Then("returneres bruker med riktig id") {
                 every { pdl.medFamilie(id1.verdi) } returns person(id1, aktørId1)
                 every { skjerming.skjerming(id1) } returns false
-                brukerTjeneste.brukerMedNærmesteFamilie(id1.verdi).brukerId shouldBe id1
+                brukerTjeneste.medNærmesteFamilie(id1.verdi).brukerId shouldBe id1
             }
         }
         When("bruker er skjermet") {
             Then("settes SKJERMING-gruppe") {
                 every { pdl.medFamilie(id1.verdi) } returns person(id1, aktørId1)
                 every { skjerming.skjerming(id1) } returns true
-                (brukerTjeneste.brukerMedNærmesteFamilie(id1.verdi) kreverMedlemskapI SKJERMING).shouldBeTrue()
+                (brukerTjeneste.medNærmesteFamilie(id1.verdi) kreverMedlemskapI SKJERMING).shouldBeTrue()
             }
         }
         When("brukerMedNærmesteFamilie kalles") {
             Then("kalles medFamilie, ikke medUtvidetFamilie") {
                 every { pdl.medFamilie(id1.verdi) } returns person(id1, aktørId1)
                 every { skjerming.skjerming(id1) } returns false
-                brukerTjeneste.brukerMedNærmesteFamilie(id1.verdi)
+                brukerTjeneste.medNærmesteFamilie(id1.verdi)
                 assertSoftly {
                     verify { pdl.medFamilie(id1.verdi) }
                     verify(exactly = 0) { pdl.medUtvidetFamilie(any()) }
@@ -139,21 +139,21 @@ class BrukerTjenesteTest : BehaviorSpec({
             Then("returneres bruker med riktig id") {
                 every { pdl.medUtvidetFamilie(id1.verdi) } returns person(id1, aktørId1)
                 every { skjerming.skjerming(id1) } returns false
-                brukerTjeneste.brukerMedUtvidetFamilie(id1.verdi).brukerId shouldBe id1
+                brukerTjeneste.medUtvidetFamilie(id1.verdi).brukerId shouldBe id1
             }
         }
         When("bruker er skjermet") {
             Then("settes SKJERMING-gruppe") {
                 every { pdl.medUtvidetFamilie(id1.verdi) } returns person(id1, aktørId1)
                 every { skjerming.skjerming(id1) } returns true
-                (brukerTjeneste.brukerMedUtvidetFamilie(id1.verdi) kreverMedlemskapI SKJERMING).shouldBeTrue()
+                (brukerTjeneste.medUtvidetFamilie(id1.verdi) kreverMedlemskapI SKJERMING).shouldBeTrue()
             }
         }
         When("brukerMedUtvidetFamilie kalles") {
             Then("kalles medUtvidetFamilie, ikke medFamilie") {
                 every { pdl.medUtvidetFamilie(id1.verdi) } returns person(id1, aktørId1)
                 every { skjerming.skjerming(id1) } returns false
-                brukerTjeneste.brukerMedUtvidetFamilie(id1.verdi)
+                brukerTjeneste.medUtvidetFamilie(id1.verdi)
                 assertSoftly {
                     verify { pdl.medUtvidetFamilie(id1.verdi) }
                     verify(exactly = 0) { pdl.medFamilie(any()) }

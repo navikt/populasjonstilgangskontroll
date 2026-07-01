@@ -142,7 +142,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
             When("enkelttilgang kalles med gyldig request og OBO-token") {
                 Then("returnerer 202 og dokumenteres i rest docs") {
-                    every { enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattId, any()) } returns true
+                    every { enkeltTilgangTjeneste.registrerTilgang(ansattId, any()) } returns true
                     mockMvc.post("/api/v1/overstyr") {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""

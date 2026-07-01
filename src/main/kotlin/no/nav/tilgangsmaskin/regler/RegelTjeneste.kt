@@ -39,7 +39,7 @@ class RegelTjeneste(
                 try {
                     motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
                 } catch (e: RegelException) {
-                    if (!enkeltTilgangTjeneste.harEnkeltTilgang(ansattId, bruker.brukerId)) {
+                    if (!enkeltTilgangTjeneste.harTilgang(ansattId, bruker.brukerId)) {
                         throw e
                     }
                     log.trace("Enkelttilgang registrert ved kjøring av ${KOMPLETT_REGELTYPE.beskrivelse} for {} og {}",
@@ -88,7 +88,7 @@ class RegelTjeneste(
 
     private fun bruker(brukerId: String) =
         try {
-            brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
+            brukerTjeneste.medNærmesteFamilie(brukerId)
         } catch (_: NotFoundRestException) {
             auditor.info("Bruker med id $brukerId ikke funnet i PDL ved oppslag")
             null

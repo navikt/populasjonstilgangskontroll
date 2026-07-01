@@ -61,7 +61,7 @@ class VergemålRegel(private val vergemål: VergemålTjeneste) : OverstyrbarRege
     override fun evaluer(ansatt: Ansatt, bruker: Bruker) =
         avvisHvis {
             runCatching {
-                bruker.brukerId in vergemål.vergemål(ansatt.ansattId)
+                bruker.brukerId in vergemål.alle(ansatt.ansattId)
             }.getOrElse { e ->
                 log.warn("Feil ved oppslag av vergemål for ansattId={} og brukerId={}. aksepterer tilgang.",
                     ansatt.ansattId,

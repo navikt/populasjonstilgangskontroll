@@ -31,7 +31,7 @@ class AnsattTjeneste(private val ansatte: NomTjeneste,
 
     private fun ansattBruker(ansattId: AnsattId) =
         ansatte.fnrForAnsatt(ansattId)?.let {
-            runCatching { brukere.brukerMedUtvidetFamilie(it.verdi) }.getOrNull()
+            runCatching { brukere.medUtvidetFamilie(it.verdi) }.getOrNull()
         }
 
     private fun tell(status: Boolean) =

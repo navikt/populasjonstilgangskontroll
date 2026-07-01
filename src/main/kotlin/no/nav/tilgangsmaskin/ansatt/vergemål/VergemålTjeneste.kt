@@ -17,11 +17,10 @@ class VergemålTjeneste(private val nom: NomTjeneste, private val client: Vergem
 
     @WithSpan
     @Cacheable(cacheNames = [VERGEMÅL], key = "#ansattId.verdi")
-    fun vergemål(ansattId: AnsattId): Set<BrukerId> =
+    fun alle(ansattId: AnsattId): Set<BrukerId> =
         nom.fnrForAnsatt(ansattId)?.let { fnr ->
             client.vergemål(VergemålIdent(fnr.verdi))
-                .map { it.vergehaver }
-                .toSortedSet(compareBy { it.verdi })
+                .mapTo(sortedSetOf(compareBy { it.verdi })) { it.vergehaver }
         }.orEmpty()
 
 

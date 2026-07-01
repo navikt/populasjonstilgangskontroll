@@ -24,7 +24,7 @@ import java.time.Instant
 @Timed
 class EnkeltTilgangTjeneste(
     private val ansattTjeneste: AnsattTjeneste,
-    private val brukerTjeneste: BrukerTjeneste,
+    private val bruker: BrukerTjeneste,
     private val adapter: EnkeltTilgangJPAAdapter,
     private val motor: RegelMotor,
     private val proxy: EntraProxyTjeneste,
@@ -35,7 +35,7 @@ class EnkeltTilgangTjeneste(
     fun tilganger(ansattId: AnsattId, brukerIds: Set<BrukerId>) =
         adapter.gjeldendeTilganger(ansattId.verdi, brukerIds.map { it.verdi }.toSet())
 
-    fun harEnkeltTilgang(ansattId: AnsattId, brukerId: BrukerId) =
+    fun harTilgang(ansattId: AnsattId, brukerId: BrukerId) =
         gjeldendeEnkeltTilgang(ansattId, brukerId)
             ?.also {
                 log.trace("Enkelttilgang er gyldig i {} til for {} og {}", it.diffFromNow(), ansattId, brukerId)
@@ -43,27 +43,26 @@ class EnkeltTilgangTjeneste(
 
 
     @Transactional
-    fun registrerEnkeltTilgang(ansattId: AnsattId, data: EnkeltTilgangData) =
+    fun registrerTilgang(ansattId: AnsattId, data: EnkeltTilgangData) =
         runCatching {
-            val ansatt = ansattTjeneste.ansatt(ansattId)
-            val bruker = brukerTjeneste.brukerMedNærmesteFamilie(data.brukerId.verdi)
-            motor.kjerneregler(ansatt, bruker)
+            motor.kjerneregler(ansattTjeneste.ansatt(ansattId),
+                bruker.medNærmesteFamilie(data.brukerId.verdi))
             adapter.enkeltTilgang(ansattId.verdi, enhetFor(ansattId), data)
-            teller.tell(INGEN_REGEL_TAG, OVERSTYRT)
+            teller.tell(INGEN_REGEL_TAG, ENKELTTILGANG_GITT)
             log.info("Enkelttilgang til og med ${data.gyldigtil} ble registrert for $ansattId og ${data.brukerId}")
             true
         }.onFailure { e ->
             when (e) {
                 is RegelException -> {
                     log.warn("Enkelttilgang er avvist av kjerneregler for $ansattId og ${data.brukerId}", e)
-                    teller.tell(e.regel.tag(), IKKE_OVERSTYRT)
+                    teller.tell(e.regel.tag(), ENKELTTILGANG_AVVIST)
                 }
             }
         }.getOrThrow()
 
     private fun gjeldendeEnkeltTilgang(ansattId: AnsattId, brukerId: BrukerId): Instant? =
-        adapter.gjeldende(ansattId.verdi, brukerId.verdi,
-            brukerTjeneste.brukerMedNærmesteFamilie(brukerId.verdi).historiskeIds.map {
+        adapter.gjeldendeTilgang(ansattId.verdi, brukerId.verdi,
+            bruker.medNærmesteFamilie(brukerId.verdi).historiskeIds.map {
                 it.verdi
             })?.expires
 
@@ -73,9 +72,9 @@ class EnkeltTilgangTjeneste(
         }.getOrDefault(UTILGJENGELIG)
 
 
-    companion object {
+    private companion object {
         private const val TAG = "overstyrt"
-        private val OVERSTYRT = Tag.of(TAG, "true")
-        private val IKKE_OVERSTYRT = Tag.of(TAG, "false")
+        private val ENKELTTILGANG_GITT = Tag.of(TAG, "true")
+        private val ENKELTTILGANG_AVVIST = Tag.of(TAG, "false")
     }
 }

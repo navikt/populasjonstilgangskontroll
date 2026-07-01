@@ -37,11 +37,11 @@ class BrukerTjeneste(private val personTjeneste: PdlTjeneste, val skjermingTjene
     }
 
     @WithSpan
-    fun brukerMedNærmesteFamilie(brukerId: String) =
+    fun medNærmesteFamilie(brukerId: String) =
         brukerMedSkjerming(brukerId, personTjeneste::medFamilie)
 
     @WithSpan
-    fun brukerMedUtvidetFamilie(brukerId: String) =
+    fun medUtvidetFamilie(brukerId: String) =
         brukerMedSkjerming(brukerId, personTjeneste::medUtvidetFamilie)
 
     @WithSpan

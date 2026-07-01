@@ -28,7 +28,7 @@ class EnkeltTilgangController(private val enkeltTilgangTjeneste: EnkeltTilgangTj
     fun enkeltTilgang(@RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData, req: HttpServletRequest) {
         sjekk(token.type == OBO, FORBIDDEN, "Forventet token type $OBO for ${req.requestURI}, fikk ${token.type}")
         validator.valider(token.systemNavn)
-        enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattIdFraToken(), data)
+        enkeltTilgangTjeneste.registrerTilgang(ansattIdFraToken(), data)
     }
 
     companion object {

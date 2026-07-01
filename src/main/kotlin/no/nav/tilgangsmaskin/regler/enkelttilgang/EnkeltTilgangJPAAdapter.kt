@@ -21,7 +21,7 @@ class EnkeltTilgangJPAAdapter(
                 gyldigtil.atStartOfDay(systemDefault()).toInstant()))
         }
 
-    fun gjeldende(ansattId: String, brukerId: String, brukerIds: List<String>) =
+    fun gjeldendeTilgang(ansattId: String, brukerId: String, brukerIds: List<String>) =
         repo.gjeldende(ansattId, setOf(brukerId) + brukerIds, cutoff())
 
     fun gjeldendeTilganger(ansattId: String, brukerIds: Set<String>): Set<BrukerId> =

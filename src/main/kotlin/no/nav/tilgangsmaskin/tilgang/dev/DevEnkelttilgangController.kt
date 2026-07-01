@@ -25,17 +25,17 @@ class DevEnkelttilgangController(private val enkelt: EnkeltTilgangTjeneste,
     @PostMapping("{ansattId}/{brukerId}")
     @Operation(summary = SUMMARY_ENKELT, description = DESCRIPTION_ENKELT)
     fun enkelt(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
-        enkelt.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(brukerId, "test"))
+        enkelt.registrerTilgang(ansattId, EnkeltTilgangData(brukerId, "test"))
 
     @GetMapping("sjekk/{ansattId}/{brukerId}")
     @Operation(summary = SUMMARY_HAR, description = DESCRIPTION_HAR)
     fun harTilgang(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
-        enkelt.harEnkeltTilgang(ansattId, brukerId)
+        enkelt.harTilgang(ansattId, brukerId)
 
     @GetMapping("gjeldende/{ansattId}/{brukerId}")
     @Operation(summary = SUMMARY_GJELDENDE, description = DESCRIPTION_GJELDENDE)
-    fun gjeldende(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
-        adapter.gjeldende(ansattId.verdi, brukerId.verdi, emptyList())
+    fun gjeldendeTilgang(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
+        adapter.gjeldendeTilgang(ansattId.verdi, brukerId.verdi, emptyList())
 
     companion object {
         private const val DEV_ENKELT_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.enkelt.tag.description"

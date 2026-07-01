@@ -80,7 +80,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
                             ]
                         """.trimIndent(), APPLICATION_JSON))
 
-                    tjeneste.vergemål(ANSATT_ID) shouldBe setOf(BRUKER1, BRUKER2)
+                    tjeneste.alle(ANSATT_ID) shouldBe setOf(BRUKER1, BRUKER2)
                 }
             }
 
@@ -90,7 +90,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
                         .andExpect(method(POST))
                         .andRespond(withSuccess("[]", APPLICATION_JSON))
 
-                    tjeneste.vergemål(ANSATT_ID).shouldBeEmpty()
+                    tjeneste.alle(ANSATT_ID).shouldBeEmpty()
                 }
             }
         }
@@ -100,7 +100,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
                 Then("returnerer tom liste uten HTTP-kall") {
                     every { nom.fnrForAnsatt(ANSATT_ID) } returns null
 
-                    tjeneste.vergemål(ANSATT_ID).shouldBeEmpty()
+                    tjeneste.alle(ANSATT_ID).shouldBeEmpty()
                 }
             }
         }
@@ -114,7 +114,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
                         .andExpect(method(POST))
                         .andRespond(withStatus(NOT_FOUND))
 
-                    shouldThrow<NotFoundRestException> { tjeneste.vergemål(ANSATT_ID) }
+                    shouldThrow<NotFoundRestException> { tjeneste.alle(ANSATT_ID) }
                 }
             }
 
@@ -124,7 +124,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
                         .andExpect(method(POST))
                         .andRespond(withStatus(UNAUTHORIZED))
 
-                    shouldThrow<IrrecoverableRestException> { tjeneste.vergemål(ANSATT_ID) }
+                    shouldThrow<IrrecoverableRestException> { tjeneste.alle(ANSATT_ID) }
                 }
             }
 
@@ -134,7 +134,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
                         .andExpect(method(POST))
                         .andRespond(withStatus(INTERNAL_SERVER_ERROR))
 
-                    shouldThrow<RecoverableRestException> { tjeneste.vergemål(ANSATT_ID) }
+                    shouldThrow<RecoverableRestException> { tjeneste.alle(ANSATT_ID) }
                 }
             }
         }

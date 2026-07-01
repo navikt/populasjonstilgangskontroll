@@ -5,15 +5,15 @@ import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
-import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.Auditor
+import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BrukerOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -30,7 +30,7 @@ class RegelTjeneste(
     private val aggregator: BulkResponsAggregator) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "komplett"])
+    @Timed(value = "regel_tjeneste", histogram = true, extraTags = ["type", "komplett"])
     @WithSpan
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
@@ -39,26 +39,30 @@ class RegelTjeneste(
                 try {
                     motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
                 } catch (e: RegelException) {
-                    if (!enkeltTilgangTjeneste.harEnkeltTilgang(ansattId, bruker.brukerId)) {
+                    if (!enkeltTilgangTjeneste.harTilgang(ansattId, bruker.brukerId)) {
                         throw e
                     }
-                    log.trace("Enkelttilgang registrert ved kjøring av ${KOMPLETT_REGELTYPE.beskrivelse} for {} og {}", ansattId, brukerId.maskFnr(), e)
+                    log.trace("Enkelttilgang registrert ved kjøring av ${KOMPLETT_REGELTYPE.beskrivelse} for {} og {}",
+                        ansattId,
+                        brukerId.maskFnr(),
+                        e)
                 }
-            } ?: log.info("${KOMPLETT_REGELTYPE.beskrivelse} ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
+            }
+                ?: log.info("${KOMPLETT_REGELTYPE.beskrivelse} ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")
         }
         log.info("Tid brukt på ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
     }
 
 
-
-    @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])
+    @Timed(value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])
     @WithSpan
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
         bruker(brukerId)?.let { bruker ->
             motor.kjerneregler(ansattTjeneste.ansatt(ansattId), bruker)
-        } ?: log.info("Kjerneregler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang ble likevel gitt")
+        }
+            ?: log.info("Kjerneregler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang ble likevel gitt")
 
-    @Timed( value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
+    @Timed(value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
     @WithSpan
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): AggregertBulkRespons {
         val (respons, elapsedTime) = measureTimedValue {
@@ -76,17 +80,17 @@ class RegelTjeneste(
         with(associate { it.brukerId to it }) {
             val brukere = brukerTjeneste.brukere(keys)
             log.debug("Fant {} av {} brukere", brukere.size, keys.size)
-            brukere.map { bruker ->
+            brukere.mapTo(mutableSetOf()) { bruker ->
                 val idOgType = this[bruker.oppslagId]
                 BrukerOgRegelsett(bruker, idOgType!!.type)
-            }.toSet()
+            }
         }
 
     private fun bruker(brukerId: String) =
         try {
-            brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
-        } catch (e: NotFoundRestException) {
-            auditor.info("${e.status}: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
+            brukerTjeneste.medNærmesteFamilie(brukerId)
+        } catch (_: NotFoundRestException) {
+            auditor.info("Bruker med id $brukerId ikke funnet i PDL ved oppslag")
             null
         }
 }

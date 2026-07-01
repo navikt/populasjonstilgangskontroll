@@ -10,7 +10,7 @@ import org.springframework.cache.annotation.Cacheable
 import java.util.*
 
 @RetryingWhenRecoverableRestService
-@Timed(value = "entra", histogram = true)
+@Timed
 class EntraTjeneste(private val adapter: EntraGrupperRestClientAdapter) {
 
     @Cacheable(cacheNames = [GRAPH], key = "#root.methodName + ':' + #ansattId.verdi")

@@ -9,7 +9,9 @@ import org.springframework.stereotype.Component
 class EnkeltTilgangProdKonsumentValidator(private val cfg: EnkeltTilgangConfig) : EnkeltTilgangKonsumentValidator {
     override fun valider(konsument: String) {
         if (!cfg.systemer.contains(konsument)) {
-            throw EnkeltTilgangKonsumentException("Konsument $konsument har ikke tilgang til enkelttilgang, kun ${cfg.systemer.joinToString(", ")}")
+            throw EnkeltTilgangKonsumentException("Konsument $konsument har ikke tilgang til enkelttilgang, kun ${
+                cfg.systemer.joinToString(", ")
+            }")
         }
     }
 }

@@ -45,13 +45,15 @@ class DevRegelController(private val regler: RegelTjeneste) {
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK)
     fun bulkregler(@PathVariable ansattId: AnsattId, @RequestBody specs: Set<BrukerIdOgRegelsett>) =
-        regler.bulkRegler( ansattId, specs)
+        regler.bulkRegler(ansattId, specs)
 
     @PostMapping("bulk/{ansattId}/{regelType}")
     @ResponseStatus(MULTI_STATUS)
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK_REGELTYPE, description = DESCRIPTION_BULK_REGELTYPE)
-    fun bulkreglerForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody brukerIds: Set<BrukerId>) =
+    fun bulkreglerForRegelType(@PathVariable ansattId: AnsattId,
+                               @PathVariable regelType: RegelType,
+                               @RequestBody brukerIds: Set<BrukerId>) =
         regler.bulkRegler(ansattId, brukerIds.map { BrukerIdOgRegelsett(it.verdi, regelType) }.toSet())
 
     companion object {

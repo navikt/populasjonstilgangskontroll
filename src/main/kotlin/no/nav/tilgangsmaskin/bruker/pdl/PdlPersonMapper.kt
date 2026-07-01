@@ -98,40 +98,49 @@ object PdlPersonMapper {
 
     fun tilGeoTilknytning(geo: PdlGeografiskTilknytning?): GeografiskTilknytning =
         when (geo?.gtType) {
-            UTLAND -> geo.gtLand?.let {
-                UtenlandskTilknytning()
-            } ?: UkjentBosted()
-
-            KOMMUNE -> geo.gtKommune?.let {
-                KommuneTilknytning(Kommune(it.verdi))
-            } ?: UkjentBosted().also {
-                log.warn("Kommunal tilknytning uten kommunekode, antar ukjent bosted")
-            }
-
-            BYDEL -> geo.gtBydel?.let {
-                BydelTilknytning(Bydel(it.verdi))
-            } ?: UkjentBosted().also {
-                log.warn("Bydelstilknytning uten bydelskode, antar ukjent bosted")
-            }
-
+            UTLAND -> tilUtland(geo)
+            KOMMUNE -> tilKommune(geo)
+            BYDEL -> tilBydel(geo)
             else -> UdefinertTilknytning()
         }
 
-    private fun tilDødsdato(dødsfall: List<PdlDødsfall>) = dødsfall.mapNotNull { it.doedsdato }.maxOrNull()
+    private fun tilBydel(geo: PdlGeografiskTilknytning): GeografiskTilknytning =
+        geo.gtBydel?.let {
+            BydelTilknytning(Bydel(it.verdi))
+        } ?: UkjentBosted().also {
+            log.warn("Bydelstilknytning uten bydelskode, antar ukjent bosted")
+        }
 
-    private fun tilFamilie(relasjoner: List<PdlFamilierelasjon>): Familie {
-        val (foreldre, barn) = relasjoner
-            .mapNotNull { it.relatertPersonsIdent?.let { ident -> it.relatertPersonsRolle to ident } }
-            .partition { it.first != BARN }
-        return Familie(
-            foreldre.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet(),
-            barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet())
-    }
+    private fun tilKommune(geo: PdlGeografiskTilknytning): GeografiskTilknytning =
+        geo.gtKommune?.let {
+            KommuneTilknytning(Kommune(it.verdi))
+        } ?: UkjentBosted().also {
+            log.warn("Kommunal tilknytning uten kommunekode, antar ukjent bosted")
+        }
+
+    private fun tilUtland(geo: PdlGeografiskTilknytning): GeografiskTilknytning =
+        geo.gtLand?.let {
+            UtenlandskTilknytning()
+        } ?: UkjentBosted().also {
+            log.warn("Utenlandsk tilknytning uten landkode, antar ukjent bosted")
+        }
+
+    private fun tilDødsdato(dødsfall: List<PdlDødsfall>) =
+        dødsfall.mapNotNull { it.doedsdato }.maxOrNull()
+
+    private fun tilFamilie(relasjoner: List<PdlFamilierelasjon>) =
+        Familie(relasjoner
+            .mapNotNullTo(mutableSetOf()) {
+                it.relatertPersonsIdent?.let { ident ->
+                    FamilieMedlem(ident, tilRelasjon(it.relatertPersonsRolle))
+                }
+            })
+
 
     private fun tilHistoriskeBrukerIds(identer: PdlIdenter) = identer.identer
         .filter { it.historisk }
         .filter { it.gruppe in listOf(FOLKEREGISTERIDENT, NPID) }
-        .map { (BrukerId(it.ident)) }.toSet()
+        .mapTo(mutableSetOf()) { (BrukerId(it.ident)) }
 
     private fun tilRelasjon(relasjon: PdlFamilieRelasjonRolle?) =
         when (relasjon) {

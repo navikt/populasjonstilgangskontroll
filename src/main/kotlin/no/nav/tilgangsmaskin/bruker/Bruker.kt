@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.bruker
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
-import no.nav.tilgangsmaskin.bruker.Familie.Companion.INGEN
+import no.nav.tilgangsmaskin.bruker.Familie.Companion.INGEN_FAMILIE
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
@@ -15,7 +15,7 @@ data class Bruker(
     val brukerIds: BrukerIds,
     val geografiskTilknytning: GeografiskTilknytning,
     val påkrevdeGrupper: Set<EntraGlobalGruppe> = emptySet(),
-    val familie: Familie = INGEN,
+    val familie: Familie = INGEN_FAMILIE,
     val dødsdato: LocalDate? = null) {
 
     @JsonIgnore

@@ -7,6 +7,7 @@ import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
+import no.nav.tilgangsmaskin.regler.motor.RegelSett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
@@ -36,43 +37,32 @@ class TilgangController(
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
     fun kompletteRegler(@RequestBody brukerId: String, req: HttpServletRequest) =
-        enkeltOppslag({ ansattIdFraToken() }, OBO, brukerId, KOMPLETT_REGELTYPE, req.requestURI)
+        enkeltOppslag(ansattIdFraToken(), OBO, brukerId, KOMPLETT_REGELTYPE, req.requestURI)
 
     @PostMapping("/ccf/komplett/{ansattId}")
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KOMPLETT_CCF, description = DESCRIPTION_KOMPLETT_CCF)
     fun kompletteReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String, req: HttpServletRequest) =
-        enkeltOppslag({ ansattId }, CCF, brukerId, KOMPLETT_REGELTYPE, req.requestURI)
+        enkeltOppslag(ansattId , CCF, brukerId, KOMPLETT_REGELTYPE, req.requestURI)
 
     @PostMapping("kjerne")
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KJERNE_OBO, description = DESCRIPTION_KJERNE_OBO)
     fun kjerneregler(@RequestBody brukerId: String, req: HttpServletRequest) =
-        enkeltOppslag({ ansattIdFraToken() }, OBO, brukerId, KJERNE_REGELTYPE, req.requestURI)
+        enkeltOppslag(ansattIdFraToken(), OBO, brukerId, KJERNE_REGELTYPE, req.requestURI)
 
     @PostMapping("/ccf/kjerne/{ansattId}")
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KJERNE_CCF, description = DESCRIPTION_KJERNE_CCF)
     fun kjerneReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String, req: HttpServletRequest) =
-        enkeltOppslag({ ansattId }, CCF, brukerId, KJERNE_REGELTYPE, req.requestURI)
+        enkeltOppslag(ansattId, CCF, brukerId, KJERNE_REGELTYPE, req.requestURI)
 
-    private fun enkeltOppslag(
-        ansattId: () -> AnsattId,
-        forventet: TokenType,
-        brukerId: String,
-        regelType: RegelType,
-        uri: String,
-    ) =
+    private fun enkeltOppslag(ansatt: AnsattId, forventet: TokenType, brukerId: String, regelType: RegelType, uri: String) =
         with(brukerId.trim('"')) {
             sjekk(isNotBlank(), BAD_REQUEST, "brukerId kan ikke være tom")
             sjekk(token.type == forventet, FORBIDDEN, "Forventet token type $forventet for $uri, fikk ${token.type}")
-            val ansatt = ansattId()
-            logSingle(regelType, ansatt, this)
-            sjekk(
-                regelType in listOf(KJERNE_REGELTYPE, KOMPLETT_REGELTYPE),
-                BAD_REQUEST,
-                "Ugyldig regeltype: $regelType",
-            )
+            sjekk(regelType in listOf(KJERNE_REGELTYPE, KOMPLETT_REGELTYPE), BAD_REQUEST, "Ugyldig regeltype: $regelType")
+            logSingle(ansatt, this, regelType)
             tell("single", forventet)
             when (regelType) {
                 KJERNE_REGELTYPE -> regelTjeneste.kjerneregler(ansatt, this)
@@ -80,7 +70,7 @@ class TilgangController(
             }
         }
 
-    private fun logSingle(regelType: RegelType, ansatt: AnsattId, brukerId: String) =
+    private fun logSingle(ansatt: AnsattId, brukerId: String, regelType: RegelType) =
         log.trace(CONFIDENTIAL, "Kjører {} regler for {} og {}", regelType, ansatt, brukerId.maskFnr())
 
     companion object {

@@ -16,9 +16,6 @@ import org.springframework.stereotype.Component
 /**
  * Publiserer meldinger til Slack via incoming webhook.
  */
-/**
- * Publiserer meldinger til Slack via incoming webhook.
- */
 @Component
 class SlackMessagePublisher(
     @param:Value("\${slack.webhook:}") private val url: String) : MessagePublisher {

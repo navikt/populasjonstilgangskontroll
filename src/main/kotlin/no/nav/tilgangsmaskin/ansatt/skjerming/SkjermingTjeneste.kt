@@ -38,9 +38,11 @@ class SkjermingTjeneste(private val client: SkjermingClient,
     }
 
     private fun fraCache(ids: Set<String>) =
-        cache.getMany<Boolean>(SKJERMING_CACHE, ids)
-            .mapNotNull { (id, value) -> value?.let { id to it } }
-            .toMap()
+        buildMap {
+            cache.getMany<Boolean>(SKJERMING_CACHE, ids).forEach { (id, value) ->
+                if (value != null) put(id, value)
+            }
+        }
 
     private companion object {
         private const val IDENT = "personident"

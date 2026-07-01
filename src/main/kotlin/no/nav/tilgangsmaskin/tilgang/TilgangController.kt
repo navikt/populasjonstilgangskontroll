@@ -140,7 +140,7 @@ class TilgangController(
         return if (specs.isNotEmpty()) {
             sjekk(specs.size <= 1000, CONTENT_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
             sjekk(specs.none { it.brukerId.isBlank() }, BAD_REQUEST, "brukerId kan ikke være tom")
-            tell("bulk")
+            tell("bulk", forventet)
             regelTjeneste.bulkRegler(ansatt, specs)
         } else {
             log.debug("Ingen brukerId-er oppgitt i bulk forespørsel for {}", ansatt)
@@ -161,16 +161,15 @@ class TilgangController(
             log.trace(CONFIDENTIAL, "Kjører {} regler for {} og {}", regelType, ansatt, this.maskFnr())
             sjekk(regelType in listOf(KJERNE_REGELTYPE, KOMPLETT_REGELTYPE),
                 BAD_REQUEST, "Ugyldig regeltype: $regelType")
-            tell("single")
+            tell("single", forventet)
             when (regelType) {
                 KJERNE_REGELTYPE -> regelTjeneste.kjerneregler(ansatt, this)
                 else -> regelTjeneste.kompletteRegler(ansatt, this)
             }
         }
 
-    private fun tell(type: String) =
-        teller.tell(Tags.of("type", type, "token", guard.token.type.name.lowercase()))
-
+    private fun tell(type: String, tokenType: TokenType) =
+        teller.tell(Tags.of("type", type, "token", tokenType.name.lowercase()))
 
     private fun sjekk(predikat: Boolean, status: HttpStatus, message: String) {
         if (!predikat) throw ResponseStatusException(status, message)

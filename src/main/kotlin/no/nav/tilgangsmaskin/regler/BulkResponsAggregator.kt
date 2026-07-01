@@ -60,7 +60,7 @@ class BulkResponsAggregator(
                     add(EnkeltBulkRespons(RegelException(ansatt,
                         brukere.finnBruker(resultat.bruker.oppslagId),
                         resultat.regel!!,
-                        status = resultat.status)))
+                        resultat.status)))
                 }
             }
         }.also {

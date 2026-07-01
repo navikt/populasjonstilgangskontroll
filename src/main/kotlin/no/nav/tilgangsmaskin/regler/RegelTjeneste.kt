@@ -80,17 +80,17 @@ class RegelTjeneste(
         with(associate { it.brukerId to it }) {
             val brukere = brukerTjeneste.brukere(keys)
             log.debug("Fant {} av {} brukere", brukere.size, keys.size)
-            brukere.map { bruker ->
+            brukere.mapTo(mutableSetOf()) { bruker ->
                 val idOgType = this[bruker.oppslagId]
                 BrukerOgRegelsett(bruker, idOgType!!.type)
-            }.toSet()
+            }
         }
 
     private fun bruker(brukerId: String) =
         try {
             brukerTjeneste.brukerMedNærmesteFamilie(brukerId)
-        } catch (e: NotFoundRestException) {
-            auditor.info("${e.status}: Bruker med id $brukerId ikke funnet i PDL ved oppslag")
+        } catch (_: NotFoundRestException) {
+            auditor.info("Bruker med id $brukerId ikke funnet i PDL ved oppslag")
             null
         }
 }

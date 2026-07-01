@@ -78,7 +78,6 @@ class RegelMotor(
 
     @NoCoverageAnalysis
     override fun toString() = "${javaClass.simpleName} [kjerneregler=$kjerne,kompletteregler=$komplett]"
-
 }
 
 data class BulkResultat(val bruker: Bruker, val status: HttpStatus, val regel: Regel? = null) {

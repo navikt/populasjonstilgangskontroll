@@ -25,6 +25,11 @@
   },
   "inbound": [
     {
+      "name": "hm-saksbehandling",
+      "namespace": "teamdigihot",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "spesialist",
       "namespace": "tbd",
       "cluster": "prod-gcp"

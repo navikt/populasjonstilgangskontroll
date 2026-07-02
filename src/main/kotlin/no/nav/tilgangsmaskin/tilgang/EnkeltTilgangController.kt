@@ -19,7 +19,7 @@ private const val ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.tilgan
 
 @TilgangApiController
 @Tag(name = "EnkeltTilgangController", description = ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION)
-class EnkeltTilgangController(private val enkeltTilgangTjeneste: EnkeltTilgangTjeneste, private val validator: EnkeltTilgangKonsumentValidator, token: Token, teller: TokenTypeTeller) : TilgangControllerBase(token, teller) {
+class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste, private val validator: EnkeltTilgangKonsumentValidator, token: Token, teller: TokenTypeTeller) : TilgangControllerBase(token, teller) {
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)
@@ -28,7 +28,7 @@ class EnkeltTilgangController(private val enkeltTilgangTjeneste: EnkeltTilgangTj
     fun enkeltTilgang(@RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData, req: HttpServletRequest) {
         sjekk(token.type == OBO, FORBIDDEN, "Forventet token type $OBO for ${req.requestURI}, fikk ${token.type}")
         validator.valider(token.systemNavn)
-        enkeltTilgangTjeneste.registrerTilgang(ansattIdFraToken(), data)
+        enkelt.registrerTilgang(ansattIdFraToken(), data)
     }
 
     companion object {

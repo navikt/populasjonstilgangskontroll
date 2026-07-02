@@ -163,6 +163,22 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     }
                 }
             }
+
+            When("nøkkel slettes") {
+                Then("Valkey publiserer del-event som håndteres av ValkeyListener") {
+                    cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(10))
+                    cache.delete(PDL_MED_FAMILIE_CACHE, I1) shouldBe true
+
+                    eventually(VALKEY_EVENT_TIMEOUTS) {
+                        verify {
+                            oppfrisker.oppfrisk(match {
+                                it.cacheName == PDL_MED_FAMILIE_CACHE.name && it.id == I1
+                            })
+                        }
+                    }
+                }
+            }
+
         }
 
         Given("tømming av cache") {

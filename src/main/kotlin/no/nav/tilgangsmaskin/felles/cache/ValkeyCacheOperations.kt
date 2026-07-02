@@ -26,10 +26,10 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
         if (isLocalOrTest) {
             runCatching {
                 valkey.execute { connection ->
-                    connection.serverCommands().setConfig("notify-keyspace-events", "Exd")
+                    connection.serverCommands().setConfig("notify-keyspace-events", "Exg")
                 }
             }.onFailure {
-                log.warn("Klarte ikke å sette notify-keyspace-events=Exd for Valkey i lokal/test", it)
+                log.warn("Klarte ikke å sette notify-keyspace-events=Exg for Valkey i lokal/test", it)
             }
         }
     }

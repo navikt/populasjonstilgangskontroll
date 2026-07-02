@@ -40,6 +40,6 @@ abstract class TilgangControllerBase(
         if (!predikat) throw ResponseStatusException(status, message)
     }
 
-    protected fun ansattIdFraToken(): AnsattId =
+    protected fun ansattIdFraToken()  =
         requireNotNull(token.ansattId) { "Mangler ansattId i OBO-token" }
 }

@@ -69,7 +69,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
     override fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>) =
         when {
             ids.isEmpty() -> emptyMap()
-            ids.size == 1 -> doGetOne(cache, ids, clazz)
+            ids.size == 1 -> doGetOne(cache, ids.single(), clazz)
             else -> doGetMany(cache, ids.toList(), clazz)
         }
 
@@ -104,16 +104,11 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
         }
     }
 
-    private fun <T : Any> doGetOne(cache: CacheNøkkelConfig,
-                                   ids: Set<String>,
-                                   clazz: KClass<T>) =
-        ids.single().let { id ->
+    private fun <T : Any> doGetOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>) =
             getOne(cache, id, clazz)?.let {
                 mapOf(id to it)
             }.orEmpty()
-        }
-
-
+    
     override fun clear(cache: CacheNøkkelConfig) {
         check(!isProd) { "Clear er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold" }
         log.info("Tømmer cache {}", cache.name)

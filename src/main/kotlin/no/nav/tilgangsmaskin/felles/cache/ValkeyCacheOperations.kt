@@ -108,7 +108,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
             getOne(cache, id, clazz)?.let {
                 mapOf(id to it)
             }.orEmpty()
-    
+
     override fun clear(cache: CacheNøkkelConfig) {
         check(!isProd) { "Clear er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold" }
         log.info("Tømmer cache {}", cache.name)
@@ -128,7 +128,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
                     }
 
                     if (batch.isNotEmpty()) {
-                        slettet += valkey.delete(batch) ?: 0L
+                        slettet += valkey.unlink(batch) ?: 0L
                     }
                 }
                 null

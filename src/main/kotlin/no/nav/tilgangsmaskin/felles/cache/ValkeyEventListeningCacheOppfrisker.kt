@@ -2,8 +2,6 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import org.springframework.data.redis.annotation.RedisListener
-import org.springframework.data.redis.annotation.RedisListeners
-import org.springframework.data.redis.listener.support.PubSubHeaders
 import org.springframework.data.redis.listener.support.PubSubHeaders.CHANNEL
 import org.springframework.messaging.handler.annotation.Header
 import org.springframework.stereotype.Component

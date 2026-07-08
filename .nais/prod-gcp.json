@@ -25,6 +25,11 @@
   },
   "inbound": [
     {
+      "name": "journalforing-frontend",
+      "namespace": "isa",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "dp-stpeter",
       "namespace": "teamdagpenger",
       "cluster": "prod-gcp"

@@ -190,7 +190,7 @@
     {
       "name": "localauth",
       "namespace": "isa",
-      "cluster": "dev-fss"
+      "cluster": "dev-gcp"
     },
     {
       "name": "ida",

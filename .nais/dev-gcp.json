@@ -183,6 +183,16 @@
       "cluster": "dev-fss"
     },
     {
+      "name": "gosys-backend-q2",
+      "namespace": "isa",
+      "cluster": "dev-gcp"
+    },
+    {
+      "name": "localauth",
+      "namespace": "isa",
+      "cluster": "dev-fss"
+    },
+    {
       "name": "ida",
       "namespace": "traktor",
       "cluster": "prod-fss"

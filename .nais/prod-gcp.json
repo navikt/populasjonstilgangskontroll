@@ -135,6 +135,11 @@
       "cluster": "prod-fss"
     },
     {
+      "name": "gosys-backend",
+      "namespace": "isa",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "tilgang",
       "namespace": "aap",
       "cluster": "prod-gcp"

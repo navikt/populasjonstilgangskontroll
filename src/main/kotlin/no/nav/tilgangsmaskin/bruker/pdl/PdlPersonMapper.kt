@@ -103,7 +103,6 @@ object PdlPersonMapper {
             } ?: UkjentBosted()
 
             KOMMUNE -> geo.gtKommune?.let {
-                KommuneTilknytning(Kommune(it.verdi))
                 runCatching { KommuneTilknytning(Kommune(it.verdi)) }
                     .getOrElse {
                         log.warn("Kommunal tilknytning med ugyldig kommunekode, antar ukjent bosted")

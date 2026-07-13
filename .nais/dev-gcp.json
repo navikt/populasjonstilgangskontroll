@@ -28,6 +28,16 @@
   },
   "inbound": [
     {
+      "name": "journalforing-frontend-q2",
+      "namespace": "isa",
+      "cluster": "dev-gcp"
+    },
+    {
+      "name": "dp-stpeter",
+      "namespace": "teamdagpenger",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "hm-saksbehandling",
       "namespace": "teamdigihot",
       "cluster": "dev-gcp"
@@ -176,6 +186,16 @@
       "name": "gosys-q2",
       "namespace": "isa",
       "cluster": "dev-fss"
+    },
+    {
+      "name": "gosys-backend-q2",
+      "namespace": "isa",
+      "cluster": "dev-gcp"
+    },
+    {
+      "name": "localauth",
+      "namespace": "isa",
+      "cluster": "dev-gcp"
     },
     {
       "name": "ida",

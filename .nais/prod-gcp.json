@@ -25,6 +25,16 @@
   },
   "inbound": [
     {
+      "name": "journalforing-frontend",
+      "namespace": "isa",
+      "cluster": "prod-gcp"
+    },
+    {
+      "name": "dp-stpeter",
+      "namespace": "teamdagpenger",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "hm-saksbehandling",
       "namespace": "teamdigihot",
       "cluster": "prod-gcp"
@@ -128,6 +138,11 @@
       "name": "gosys",
       "namespace": "isa",
       "cluster": "prod-fss"
+    },
+    {
+      "name": "gosys-backend",
+      "namespace": "isa",
+      "cluster": "prod-gcp"
     },
     {
       "name": "tilgang",

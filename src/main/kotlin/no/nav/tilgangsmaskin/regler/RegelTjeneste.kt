@@ -63,6 +63,7 @@ class RegelTjeneste(
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): AggregertBulkRespons {
         val (respons, elapsedTime) = measureTimedValue {
             log.debug("Eksekverer bulk for {} med størrelse {}", ansattId, idOgType.size)
+            auditor.info("Bulk-regler for $ansattId med størrelse ${idOgType.size} og brukere ${idOgType.map { it.brukerId }}")
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val brukere = idOgType.brukerOgRegelsett()
             val resultater = motor.bulkRegler(ansatt, brukere)
@@ -74,7 +75,9 @@ class RegelTjeneste(
 
     private fun Set<BrukerIdOgRegelsett>.brukerOgRegelsett() =
         with(associate { it.brukerId to it }) {
+
             val brukere = brukerTjeneste.brukere(keys)
+            //auditor.info("Bulk fant ${brukere.size} av ${keys.size} brukere: ${brukere.map { it.brukerId.verdi}}")
             log.debug("Fant {} av {} brukere", brukere.size, keys.size)
             brukere.map { bruker ->
                 val idOgType = this[bruker.oppslagId]

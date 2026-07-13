@@ -104,12 +104,21 @@ object PdlPersonMapper {
 
             KOMMUNE -> geo.gtKommune?.let {
                 KommuneTilknytning(Kommune(it.verdi))
+                runCatching { KommuneTilknytning(Kommune(it.verdi)) }
+                    .getOrElse {
+                        log.warn("Kommunal tilknytning med ugyldig kommunekode, antar ukjent bosted")
+                        UkjentBosted()
+                    }
             } ?: UkjentBosted().also {
                 log.warn("Kommunal tilknytning uten kommunekode, antar ukjent bosted")
             }
 
             BYDEL -> geo.gtBydel?.let {
-                BydelTilknytning(Bydel(it.verdi))
+                runCatching { BydelTilknytning(Bydel(it.verdi)) }
+                    .getOrElse {
+                        log.warn("Bydelstilknytning med ugyldig bydelskode, antar ukjent bosted")
+                        UkjentBosted()
+                    }
             } ?: UkjentBosted().also {
                 log.warn("Bydelstilknytning uten bydelskode, antar ukjent bosted")
             }

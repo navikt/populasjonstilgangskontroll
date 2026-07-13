@@ -95,6 +95,8 @@ class PdlPersonMapperTest : BehaviorSpec({
                     .shouldBeInstanceOf<BydelTilknytning>().bydel.verdi shouldBe "030101"
             }
         }
+        When("BYDEL med ugyldig kode") { Then("mappes til UkjentBosted") { tilGeoTilknytning(PdlGeografiskTilknytning(BYDEL, gtBydel = GTBydel("03010X"))).shouldBeInstanceOf<UkjentBosted>() } }
+        When("BYDEL med 5 siffer i stedet for 6") { Then("mappes til UkjentBosted") { tilGeoTilknytning(PdlGeografiskTilknytning(BYDEL, gtBydel = GTBydel("03010"))).shouldBeInstanceOf<UkjentBosted>() } }
         When("BYDEL uten kode") { Then("mappes til UkjentBosted") { tilGeoTilknytning(PdlGeografiskTilknytning(BYDEL)).shouldBeInstanceOf<UkjentBosted>() } }
     }
 

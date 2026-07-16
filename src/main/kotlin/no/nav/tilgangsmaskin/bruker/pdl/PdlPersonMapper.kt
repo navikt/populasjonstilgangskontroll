@@ -98,31 +98,32 @@ object PdlPersonMapper {
 
     fun tilGeoTilknytning(geo: PdlGeografiskTilknytning?): GeografiskTilknytning =
         when (geo?.gtType) {
-            UTLAND -> tilUtland(geo)
-            KOMMUNE -> tilKommune(geo)
-            BYDEL -> tilBydel(geo)
-            else -> UdefinertTilknytning()
-        }
+            UTLAND -> geo.gtLand?.let {
+                UtenlandskTilknytning()
+            } ?: UkjentBosted()
 
-    private fun tilBydel(geo: PdlGeografiskTilknytning): GeografiskTilknytning =
-        geo.gtBydel?.let {
-            BydelTilknytning(Bydel(it.verdi))
-        } ?: UkjentBosted().also {
-            log.warn("Bydelstilknytning uten bydelskode, antar ukjent bosted")
-        }
+            KOMMUNE -> geo.gtKommune?.let {
+                runCatching { KommuneTilknytning(Kommune(it.verdi)) }
+                    .getOrElse {
+                        log.warn("Kommunal tilknytning med ugyldig kommunekode, antar ukjent bosted")
+                        UkjentBosted()
+                    }
+            } ?: UkjentBosted().also {
+                log.warn("Kommunal tilknytning uten kommunekode, antar ukjent bosted")
+            }
 
-    private fun tilKommune(geo: PdlGeografiskTilknytning): GeografiskTilknytning =
-        geo.gtKommune?.let {
-            KommuneTilknytning(Kommune(it.verdi))
-        } ?: UkjentBosted().also {
-            log.warn("Kommunal tilknytning uten kommunekode, antar ukjent bosted")
-        }
-
-    private fun tilUtland(geo: PdlGeografiskTilknytning): GeografiskTilknytning =
-        geo.gtLand?.let {
-            UtenlandskTilknytning()
-        } ?: UkjentBosted().also {
-            log.warn("Utenlandsk tilknytning uten landkode, antar ukjent bosted")
+            BYDEL -> geo.gtBydel?.let {
+                runCatching { BydelTilknytning(Bydel(it.verdi)) }
+                    .getOrElse {
+                        log.warn("Bydelstilknytning med ugyldig bydelskode, antar ukjent bosted")
+                        UkjentBosted()
+                    }
+            } ?: UkjentBosted().also {
+                log.warn("Bydelstilknytning uten bydelskode, antar ukjent bosted")
+            }
+            else -> {
+                UdefinertTilknytning()
+            }
         }
 
     private fun tilDødsdato(dødsfall: List<PdlDødsfall>) =

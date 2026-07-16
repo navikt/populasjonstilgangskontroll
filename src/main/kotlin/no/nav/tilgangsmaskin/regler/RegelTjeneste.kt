@@ -67,6 +67,7 @@ class RegelTjeneste(
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): AggregertBulkRespons {
         val (respons, elapsedTime) = measureTimedValue {
             log.debug("Eksekverer bulk for {} med størrelse {}", ansattId, idOgType.size)
+            auditor.info("Bulk-regler for $ansattId med størrelse ${idOgType.size} og brukere ${idOgType.map { it.brukerId }}") //TODO logger bulk-bruker til teamlogs, bør kanskje fjernes, ble brukt til feilsøking
             val ansatt = ansattTjeneste.ansatt(ansattId)
             val brukere = idOgType.brukerOgRegelsett()
             val resultater = motor.bulkRegler(ansatt, brukere)
@@ -78,6 +79,7 @@ class RegelTjeneste(
 
     private fun Set<BrukerIdOgRegelsett>.brukerOgRegelsett() =
         with(associate { it.brukerId to it }) {
+
             val brukere = brukerTjeneste.brukere(keys)
             log.debug("Fant {} av {} brukere", brukere.size, keys.size)
             brukere.mapTo(mutableSetOf()) { bruker ->

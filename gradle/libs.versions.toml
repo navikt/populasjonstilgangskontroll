@@ -14,7 +14,6 @@ springmockk = "5.0.1"
 confluent = "8.2.1"
 avro-plugin = "1.9.1"
 cyclonedx = "3.2.4"
-git-properties = "4.0.1"
 asciidoctor = "4.0.5"
 slack-api-client = "1.49.0"
 opentelemetry-alpha = "2.29.0-alpha"
@@ -84,7 +83,6 @@ spring-dependency-management = { id = "io.spring.dependency-management", version
 avro = { id = "com.github.davidmc24.gradle.plugin.avro", version.ref = "avro-plugin" }
 cyclonedx = { id = "org.cyclonedx.bom", version.ref = "cyclonedx" }
 kotest = { id = "io.kotest", version.ref = "kotest" }
-git-properties = { id = "com.gorylenko.gradle-git-properties", version.ref = "git-properties" }
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version.ref = "asciidoctor" }
 
 

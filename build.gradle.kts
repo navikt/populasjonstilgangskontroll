@@ -50,7 +50,7 @@ repositories {
 
 dependencies {
     // Force newer jackson-databind version (required by gradle-avro-plugin)
-   x'' implementation("com.fasterxml.jackson.core:jackson-databind:2.22.1")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.22.1")
 
     implementation(libs.confluent.kafka.avro.serializer)
     implementation(libs.slack.api)

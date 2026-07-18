@@ -143,6 +143,7 @@ tasks.named<Test>("test") {
         listOf(
             "--add-opens",
             "java.base/java.util=ALL-UNNAMED",
+            "--enable-native-access=ALL-UNNAMED",
             "-Dkotlinx.coroutines.debug=off",
             "-Xshare:off",
         )

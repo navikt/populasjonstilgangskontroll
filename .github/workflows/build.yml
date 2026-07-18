@@ -82,7 +82,7 @@ jobs:
           distribution: temurin
 
       - name: Setter tag-navn
-        run: echo "TAG=$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+        run: echo "TAG=$(date +%Y.%m.%d-%H.%M)" >> $GITHUB_ENV
 
 
       - name: Test og bygg

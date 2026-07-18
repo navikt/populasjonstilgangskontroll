@@ -81,10 +81,6 @@ jobs:
           java-version: 26
           distribution: temurin
 
-      - name: Setter tag-navn
-        run: echo "TAG=$(date +%Y.%m.%d-%H.%M)" >> $GITHUB_ENV
-
-
       - name: Test og bygg
         run: ./gradlew --warning-mode all test jacocoTestReport asciidoctor cyclonedxBom bootJar
 

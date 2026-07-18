@@ -1,12 +1,10 @@
 package no.nav.tilgangsmaskin.ansatt.`oppfølging`
 
 import com.ninjasquad.springmockk.MockkBean
-import com.ninjasquad.springmockk.MockkSpyBean
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
-import io.mockk.verify
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING_CACHE
@@ -23,8 +21,6 @@ import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.getMany
 import no.nav.tilgangsmaskin.tilgang.Token
-
-
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -55,43 +51,44 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
 
     @MockkBean private lateinit var token: Token
 
-    @MockkSpyBean
-    private lateinit var adapter: OppfølgingJPAAdapter
-
     @Autowired
     private lateinit var tjeneste: OppfølgingTjeneste
+
+    @Autowired
+    private lateinit var repo: OppfølgingRepository
 
     @Autowired
     private lateinit var cache: CacheOperations
 
     init {
-        beforeEach { cache.clear(OPPFØLGING_CACHE) }
+        beforeEach {
+            repo.deleteAll()
+            cache.clear(OPPFØLGING_CACHE)
+        }
 
         fun startet(periode: UUID = randomUUID(), kontor: Kontor = KONTOR) =
             StartetEllerEndret(periode, IDENTER, kontor, parse("2024-01-01T09:00:00Z"), OPPFOLGING_STARTET)
 
         Given("enhetFor") {
             When("det ikke finnes oppfølging") {
-                Then("returneres null og adapter kalles") {
+                Then("returneres null") {
                     tjeneste.enhetFor(Identifikator(brukerId.verdi)) shouldBe null
-                    verify(exactly = 1) { adapter.enhetFor(brukerId.verdi) }
                 }
             }
 
             When("oppfølging er registrert via registrer()") {
-                Then("returneres enhet fra cache uten adapter-kall") {
+                Then("returneres enhet fra cache uten DB-kall") {
                     tjeneste.registrer(startet())
+                    repo.deleteAll()
                     tjeneste.enhetFor(Identifikator(brukerId.verdi)) shouldBe kontor
-                    verify(exactly = 0) { adapter.enhetFor(brukerId.verdi) }
                 }
             }
 
             When("oppfølging finnes i DB men ikke i cache") {
-                Then("hentes fra adapter og lagres i cache") {
+                Then("hentes fra DB og lagres i cache") {
                     tjeneste.registrer(startet())
                     cache.clear(OPPFØLGING_CACHE)
                     tjeneste.enhetFor(Identifikator(brukerId.verdi)) shouldBe kontor
-                    verify(exactly = 1) { adapter.enhetFor(brukerId.verdi) }
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, brukerId.verdi) shouldBe kontor
                 }
             }
@@ -99,8 +96,8 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
             When("oppslag via aktørId") {
                 Then("returneres enhet fra cache populert ved registrering") {
                     tjeneste.registrer(startet())
+                    repo.deleteAll()
                     tjeneste.enhetFor(Identifikator(aktørId.verdi)) shouldBe kontor
-                    verify(exactly = 0) { adapter.enhetFor(aktørId.verdi) }
                 }
             }
         }

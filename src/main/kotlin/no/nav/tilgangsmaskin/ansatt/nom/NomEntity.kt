@@ -29,7 +29,7 @@ class NomEntity(
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    val id: Long? = null
+    var id: Long? = null
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

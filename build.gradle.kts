@@ -144,6 +144,7 @@ tasks.named<Test>("test") {
             "--add-opens",
             "java.base/java.util=ALL-UNNAMED",
             "-Dkotlinx.coroutines.debug=off",
+            "-Xshare:off",
         )
 }
 

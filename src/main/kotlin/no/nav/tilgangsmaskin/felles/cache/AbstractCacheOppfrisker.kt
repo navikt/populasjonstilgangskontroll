@@ -10,7 +10,7 @@ abstract class AbstractCacheOppfrisker : CacheOppfrisker {
     protected abstract fun doOppfrisk(nøkkel: CacheNøkkel): Any?
 
     @WithSpan
-    final override fun oppfrisk(nøkkel: CacheNøkkel) =
+    override fun oppfrisk(nøkkel: CacheNøkkel) =
         runCatching {
             doOppfrisk(nøkkel)
         }.onSuccess {

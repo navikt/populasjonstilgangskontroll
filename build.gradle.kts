@@ -189,6 +189,7 @@ kotlin {
     jvmToolchain(javaVersion.asInt())
 
     compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_26)
         freeCompilerArgs.add("-Xjsr305=strict")
     }
 }

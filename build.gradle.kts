@@ -53,7 +53,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.22.0")
 
     implementation(libs.confluent.kafka.avro.serializer) {
-        exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
+       // exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
     }
     implementation(libs.slack.api)
     implementation(libs.slack.api.kotlin)

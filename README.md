@@ -8,7 +8,6 @@ Slack-kanal: [team-tilgangsmaskinen-værsågod](https://nav-it.slack.com/archive
 ## Swagger
 Prod: https://tilgangsmaskin.intern.nav.no/swagger-ui/index.html#/
 
-
 Dev: https://tilgangsmaskin.intern.dev.nav.no/swagger-ui/index.html#/
 
 ## Informasjon om cacher i løsningen

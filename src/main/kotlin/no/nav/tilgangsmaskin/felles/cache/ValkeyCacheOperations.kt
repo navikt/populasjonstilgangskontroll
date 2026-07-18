@@ -192,7 +192,6 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
                             connection.stringCommands().set(key.toByteArray(), value.toByteArray())
                         }
                     }
-                    null
                 }
             }
         }

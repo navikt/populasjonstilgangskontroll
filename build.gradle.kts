@@ -1,4 +1,7 @@
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
+import org.gradle.api.file.DuplicatesStrategy.EXCLUDE
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_26
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import java.lang.System.getProperty
 
@@ -113,6 +116,11 @@ application {
 }
 tasks.withType<BootJar> {
     archiveFileName = "app.jar"
+    duplicatesStrategy = EXCLUDE
+}
+
+tasks.withType<Jar> {
+    duplicatesStrategy = EXCLUDE
 }
 
 java {
@@ -189,7 +197,7 @@ kotlin {
     jvmToolchain(javaVersion.asInt())
 
     compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_26)
+        jvmTarget.set(JVM_26)
         freeCompilerArgs.add("-Xjsr305=strict")
     }
 }

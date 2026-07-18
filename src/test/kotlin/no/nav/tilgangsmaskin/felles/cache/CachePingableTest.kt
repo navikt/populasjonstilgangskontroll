@@ -36,7 +36,7 @@ class CachePingableTest : BehaviorSpec({
                 every { connection.ping() } returns "pong"
                 shouldNotThrowAny {
                     pingable.ping()
-                }
+                }   
             }
         }
         When("Redis returnerer noe annet enn pong") {

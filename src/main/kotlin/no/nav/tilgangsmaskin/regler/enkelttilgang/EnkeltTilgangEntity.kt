@@ -25,15 +25,15 @@ import java.time.Instant
 )
 @EntityListeners(EnkeltTilgangEntityListener::class, AuditingEntityListener::class)
 class EnkeltTilgangEntity(
-        @Column(length = ANSATTID_LENGTH, nullable = false) val navid: String,
-        @Column(length = BRUKERID_LENGTH, nullable = false) val fnr: String,
-        @Column(length = 400, nullable = false) val begrunnelse: String,
-        @Column(length = 6) val enhet: String,
-        @Column(nullable = false) val expires: Instant) {
+    @Column(length = ANSATTID_LENGTH, nullable = false) var navid: String,
+    @Column(length = BRUKERID_LENGTH, nullable = false) var fnr: String,
+    @Column(length = 400, nullable = false) var begrunnelse: String,
+    @Column(length = 6) var enhet: String,
+    @Column(nullable = false) var expires: Instant) {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    val id: Long? = null
+    var id: Long? = null
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

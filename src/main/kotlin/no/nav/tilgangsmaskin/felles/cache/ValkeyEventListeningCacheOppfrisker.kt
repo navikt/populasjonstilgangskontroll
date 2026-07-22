@@ -2,30 +2,27 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import org.springframework.data.redis.annotation.RedisListener
+import org.springframework.data.redis.listener.support.PubSubHeaders.CHANNEL
+import org.springframework.messaging.handler.annotation.Header
 import org.springframework.stereotype.Component
-import kotlin.text.Charsets.UTF_8
 
 @Component
 class ValkeyEventListeningCacheOppfrisker(erLeder: Boolean = true,
                                           private vararg val oppfriskere: CacheOppfrisker) : LeaderAware(erLeder) {
 
-    @RedisListener(CHANNEL)
-    fun onEvent(body: ByteArray) {
-        val nøkkel = body.tilNøkkel()
-        somLeder("Håndterer oppfrisking for ${nøkkel.maskert}", {
-                oppfriskere.firstOrNull {
-                    it.cacheName == nøkkel.cacheName
-                }?.run {
-                    oppfrisk(nøkkel)
-                }
-        })
+    @RedisListener(CHANNEL_EXPIRED)
+    @RedisListener(CHANNEL_DELETED)
+    fun onEvent(nokkel: CacheNøkkel,@Header(CHANNEL) channel: String) {
+
+        somLeder("Håndterer oppfrisking for ${nokkel.maskert} på kanal $channel") {
+            oppfriskere.firstOrNull { it.cacheName == nokkel.cacheName }?.run {
+                oppfrisk(nokkel)
+            }
+        }
     }
 
     private companion object {
-         private const val CHANNEL = "__keyevent@0__:expired"
+        private const val CHANNEL_EXPIRED = "__keyevent@0__:expired"
+        private const val CHANNEL_DELETED = "__keyevent@0__:del"
     }
-
-    private fun ByteArray.tilNøkkel() = CacheNøkkel(toString(UTF_8))
-
 }
-

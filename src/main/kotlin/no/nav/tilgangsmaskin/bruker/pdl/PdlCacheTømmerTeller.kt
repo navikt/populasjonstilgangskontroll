@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.felles.AbstractTeller
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.springframework.stereotype.Component
-import java.util.Locale.getDefault
+import java.util.Locale.*
 
 @Component
 class PdlCacheTømmerTeller(registry: MeterRegistry, token: Token) :

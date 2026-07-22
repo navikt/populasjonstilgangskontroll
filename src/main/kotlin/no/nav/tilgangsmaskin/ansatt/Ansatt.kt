@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt
 
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem

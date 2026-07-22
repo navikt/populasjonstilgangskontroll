@@ -10,19 +10,12 @@ import org.slf4j.Logger
 
 class AuditorTest : BehaviorSpec({
 
-    fun <T : AbstractAuditor> T.withLogger(logger: Logger) = also {
-        AbstractAuditor::class.java.getDeclaredField("logger").apply {
-            isAccessible = true
-            set(it, logger)
-        }
-    }
-
     Given("LocalAuditor") {
 
         When("info kalles med melding") {
             Then("logger melding via klassens logger") {
                 val logger = mockk<Logger>(relaxed = true)
-                LocalAuditor().withLogger(logger).info("test melding")
+                LocalAuditor(logger).info("test melding")
                 verify { logger.info("test melding", null) }
             }
         }
@@ -31,7 +24,7 @@ class AuditorTest : BehaviorSpec({
             Then("logger melding med throwable") {
                 val logger = mockk<Logger>(relaxed = true)
                 val throwable = RuntimeException("feil")
-                LocalAuditor().withLogger(logger).info("test melding", throwable)
+                LocalAuditor(logger).info("test melding", throwable)
                 verify { logger.info("test melding", throwable) }
             }
         }
@@ -42,7 +35,7 @@ class AuditorTest : BehaviorSpec({
         When("info kalles med sensitiv melding") {
             Then("logger melding via secureLog-loggeren") {
                 val logger = mockk<Logger>(relaxed = true)
-                SecureAuditor().withLogger(logger).info("sensitiv melding")
+                SecureAuditor(logger).info("sensitiv melding")
                 verify { logger.info("sensitiv melding", null) }
             }
         }
@@ -51,7 +44,7 @@ class AuditorTest : BehaviorSpec({
             Then("logger melding med throwable") {
                 val logger = mockk<Logger>(relaxed = true)
                 val throwable = RuntimeException("feil")
-                SecureAuditor().withLogger(logger).info("sensitiv melding", throwable)
+                SecureAuditor(logger).info("sensitiv melding", throwable)
                 verify { logger.info("sensitiv melding", throwable) }
             }
         }

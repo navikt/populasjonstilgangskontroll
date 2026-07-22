@@ -1,4 +1,3 @@
-
 server:
   shutdown: graceful
   jetty:
@@ -22,6 +21,7 @@ management:
         '[komplette_regler]': true
         '[pdl_tjeneste]': true
         '[entra]': true
+        '[valkey.cache.varighet]': true
     enable:
       cache: true
   observations:
@@ -46,6 +46,12 @@ management:
       base-path: /monitoring
 
 spring:
+  messages:
+    fallback-to-system-locale: false
+    encoding: UTF-8
+  web:
+    locale: no_NO
+    locale-resolver: fixed
   threads:
     virtual:
       enabled: true
@@ -93,12 +99,12 @@ spring:
           max-active: 24
           max-idle: 24
 
-      host: ${valkey.host}
-      port: ${valkey.port}
-      connect-timeout: ${valkey.connect-timeout}
-      timeout: ${valkey.timeout}
-      username: ${valkey.username}
-      password: ${valkey.password}
+      host: ${valkey.host.${nais.cluster.cache}}
+      port: ${valkey.port.${nais.cluster.cache}}
+      connect-timeout: 10s
+      timeout: 5s
+      username: ${valkey.username.${nais.cluster.cache}}
+      password: ${valkey.password.${nais.cluster.cache}}
       ssl:
         enabled: true
   cache:
@@ -118,6 +124,7 @@ spring:
       idle-timeout: 600000
       connection-test-query: SELECT 1
       maximum-pool-size: ${db.poolsize}
+    connection-fetch: lazy
   main:
     banner-mode: off
   jackson:
@@ -191,13 +198,6 @@ springdoc:
       client-id: ${azure.app.client.id}
     csrf:
       enabled: true
-valkey:
-  timeout: 5s
-  connect-timeout: 10s
-  username: ${valkey.username.${nais.cluster.cache}}
-  password: ${valkey.password.${nais.cluster.cache}}
-  port: ${valkey.port.${nais.cluster.cache}}
-  host: ${valkey.host.${nais.cluster.cache}}
 info:
   cluster: ${nais.cluster.name:local}
   name: ${spring.application.name}

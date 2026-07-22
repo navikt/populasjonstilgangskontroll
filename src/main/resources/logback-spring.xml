@@ -19,6 +19,7 @@
     </appender>
 
     <springProfile name="dev">
+        <logger name="com.slack.api" level="trace"/>
         <logger name="io.lettuce.core.protocol.ReconnectionHandler" level="warn"/>
         <logger name="io.lettuce.core.protocol.ConnectionWatchdog" level="warn"/>
         <logger name="org.hibernate.orm.connections.pooling" level="warn"/>

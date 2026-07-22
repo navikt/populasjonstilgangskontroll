@@ -31,7 +31,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                 BrukerIdOgRegelsett(avvistBrukerId, KOMPLETT_REGELTYPE)
             )
 
-            beforeEach { every { token.erCC } returns true }
+            beforeEach { every { token.type } returns TokenType.CCF }
 
             When("bulk/ccf kalles med gyldige specs") {
                 Then("returnerer 207 med mix av godkjente og avviste") {
@@ -59,7 +59,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/ccf kalles med OBO-token") {
                 Then("returnerer 403") {
-                    every { token.erCC } returns false
+                    every { token.type } returns TokenType.OBO
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""

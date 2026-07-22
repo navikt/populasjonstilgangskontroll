@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.vergemål
 
+import io.micrometer.core.annotation.Timed
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
@@ -11,15 +12,15 @@ import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.springframework.cache.annotation.Cacheable
 
 @RetryingWhenRecoverableRestService
+@Timed
 class VergemålTjeneste(private val nom: NomTjeneste, private val client: VergemålClient) {
 
     @WithSpan
     @Cacheable(cacheNames = [VERGEMÅL], key = "#ansattId.verdi")
-    fun vergemål(ansattId: AnsattId): Set<BrukerId> =
+    fun alle(ansattId: AnsattId): Set<BrukerId> =
         nom.fnrForAnsatt(ansattId)?.let { fnr ->
             client.vergemål(VergemålIdent(fnr.verdi))
-                .map { it.vergehaver }
-                .toSortedSet(compareBy { it.verdi })
+                .mapTo(sortedSetOf(compareBy { it.verdi })) { it.vergehaver }
         }.orEmpty()
 
 

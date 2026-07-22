@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.3.21"
+kotlin = "2.4.0"
 spring-boot = "4.1.0"
 spring-dependency-management = "1.1.7"
 springdoc = "3.0.3"
@@ -11,17 +11,18 @@ boot-conditionals = "6.0.7"
 logstash = "9.0"
 commons-pool2 = "2.13.1"
 springmockk = "5.0.1"
-confluent = "8.2.1"
+confluent = "8.3.0"
 avro-plugin = "1.9.1"
-cyclonedx = "3.2.4"
-git-properties = "4.0.1"
+cyclonedx = "3.3.0"
 asciidoctor = "4.0.5"
-
+slack-api-client = "1.49.0"
 opentelemetry-alpha = "2.29.0-alpha"
 
 [libraries]
 # Implementation
 confluent-kafka-avro-serializer = { module = "io.confluent:kafka-avro-serializer", version.ref = "confluent" }
+slack-api = { module = "com.slack.api:slack-api-client", version.ref = "slack-api-client" }
+slack-api-kotlin = { module = "com.slack.api:slack-api-client-kotlin-extension", version.ref = "slack-api-client" }
 opentelemetry-instrumentation-annotations = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations" }
 opentelemetry-logback-mdc = { module = "io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0", version.ref = "opentelemetry-alpha" }
 micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
@@ -45,9 +46,7 @@ spring-boot-starter-graphql = { module = "org.springframework.boot:spring-boot-s
 spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
 spring-boot-starter-jetty = { module = "org.springframework.boot:spring-boot-starter-jetty" }
-spring-boot-starter-restclient = { module = "org.springframework.boot:spring-boot-starter-restclient" }
 spring-boot-starter-webclient = { module = "org.springframework.boot:spring-boot-starter-webclient" }
-spring-boot-starter-webflux = { module = "org.springframework.boot:spring-boot-starter-webflux" }
 spring-boot-starter-kafka = { module = "org.springframework.boot:spring-boot-starter-kafka" }
 spring-aspects = { module = "org.springframework:spring-aspects" }
 
@@ -82,7 +81,6 @@ spring-dependency-management = { id = "io.spring.dependency-management", version
 avro = { id = "com.github.davidmc24.gradle.plugin.avro", version.ref = "avro-plugin" }
 cyclonedx = { id = "org.cyclonedx.bom", version.ref = "cyclonedx" }
 kotest = { id = "io.kotest", version.ref = "kotest" }
-git-properties = { id = "com.gorylenko.gradle-git-properties", version.ref = "git-properties" }
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version.ref = "asciidoctor" }
 
 

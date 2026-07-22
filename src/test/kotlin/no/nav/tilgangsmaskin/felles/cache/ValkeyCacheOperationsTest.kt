@@ -395,6 +395,17 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     }
                 }
             }
+            When("Person lagres via putMany uten TTL") {
+                Then("korrekt Person returneres for hver nøkkel") {
+                    val entries = mapOf(I1 to P1, I2 to P2)
+                    cache.putMany(PDL_MED_FAMILIE_CACHE, entries)
+
+                    assertSoftly(cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, IDS)) {
+                        this[I1] shouldBe P1
+                        this[I2] shouldBe P2
+                    }
+                }
+            }
         }
     }
 

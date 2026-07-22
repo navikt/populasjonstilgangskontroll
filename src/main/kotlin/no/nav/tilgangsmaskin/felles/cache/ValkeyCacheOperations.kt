@@ -66,12 +66,8 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
 
 
     @WithSpan
-    override fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>) =
-        when {
-            ids.isEmpty() -> emptyMap()
-            ids.size == 1 -> doGetOne(cache, ids.single(), clazz)
-            else -> doGetMany(cache, ids.toList(), clazz)
-        }
+    override fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>) =  doGetMany(cache, ids.toList(), clazz)
+
 
     @WithSpan
     override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration?) {
@@ -104,37 +100,27 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
         }
     }
 
-    private fun <T : Any> doGetOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>) =
-            getOne(cache, id, clazz)?.let {
-                mapOf(id to it)
-            }.orEmpty()
-
     override fun clear(cache: CacheNøkkelConfig) {
         check(!isProd) { "Clear er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold" }
         log.info("Tømmer cache {}", cache.name)
-        val prefix = cache.tilNøkkel("")
-        var slettet = 0L
-        val scanOptions = scanOptions().match("$prefix*").count(10_000).build()
-        runCatching {
-            valkey.executeWithStickyConnection { connection ->
-                (connection.keyCommands().scan(scanOptions) as Cursor<ByteArray>).use { cursor ->
-                    val batch = mutableListOf<String>()
-                    cursor.forEach { keyBytes ->
-                        batch += keyBytes.toString(UTF_8)
-                        if (batch.size >= 10_000) {
-                            slettet += valkey.unlink(batch) ?: 0L
-                            batch.clear()
-                        }
-                    }
-
-                    if (batch.isNotEmpty()) {
-                        slettet += valkey.unlink(batch) ?: 0L
+        valkey.execute {
+            (it.keyCommands().scan(scanOptions(cache)) as Cursor<ByteArray>).use { cursor ->
+                val batch = mutableListOf<String>()
+                cursor.forEach { keyBytes ->
+                    batch += keyBytes.toString(UTF_8)
+                    if (batch.size == BATCH_SIZE) {
+                        valkey.unlink(batch)
+                        batch.clear()
                     }
                 }
-                null
+                valkey.unlink(batch)
             }
-        }.getOrThrow()
+            null
+        }
     }
+
+    private fun scanOptions(cache: CacheNøkkelConfig) =
+        scanOptions().match("${cache.tilNøkkel("")}*").count(BATCH_SIZE.toLong()).build()
 
     override fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long> {
         markNow().let { start ->
@@ -184,18 +170,18 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
         runCatching {
             valkey.executePipelined { connection ->
                 payload.forEach { (key, value) ->
+                    val keyBytes = key.toByteArray()
+                    val valueBytes = value.toByteArray()
                     if (ttl != null) {
-                        connection.stringCommands().setEx(key.toByteArray(), ttl, value.toByteArray())
-                    }
-                    else {
-                        payload.forEach { (key, value) ->
-                            connection.stringCommands().set(key.toByteArray(), value.toByteArray())
-                        }
+                        connection.stringCommands().setEx(keyBytes, ttl, valueBytes)
+                    } else {
+                        connection.stringCommands().set(keyBytes, valueBytes)
                     }
                 }
             }
         }
     companion object {
+        private val BATCH_SIZE  = 10_000
         private val SCRIPT = RedisScript.of(ClassPathResource("scripts/count-all-keys.lua"), List::class.java)
     }
 }

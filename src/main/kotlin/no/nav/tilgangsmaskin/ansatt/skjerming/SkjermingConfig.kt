@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component
 import java.net.URI
 
 @Component
-class SkjermingConfig : CachableRestConfig,
-    RestConfig(SKJERMING_BASE, SKJERMING_PING_PATH, SKJERMING) {
+class SkjermingConfig :
+    CachableRestConfig, RestConfig(SKJERMING_BASE, SKJERMING_PING_PATH, SKJERMING) {
 
     override val navn = name
     override val caches = setOf(SKJERMING_CACHE)

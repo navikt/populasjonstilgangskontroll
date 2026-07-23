@@ -1,30 +1,23 @@
 package no.nav.tilgangsmaskin.felles
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
-import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.boot.conditionals.ConditionalOnProd
-import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
-import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.RestLoggingRequestInterceptor
 import no.nav.tilgangsmaskin.tilgang.Token
+import org.apache.hc.client5.http.config.ConnectionConfig
+import org.apache.hc.client5.http.impl.classic.HttpClients
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder
+import org.apache.hc.core5.util.Timeout.ofSeconds
 import org.springframework.boot.actuate.endpoint.SanitizingFunction
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
 import org.springframework.boot.restclient.RestClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.data.auditing.DateTimeProvider
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
-import org.apache.hc.client5.http.impl.classic.HttpClients
-import org.apache.hc.client5.http.config.ConnectionConfig
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder
-import org.apache.hc.core5.util.Timeout
-import org.apache.hc.core5.util.Timeout.ofSeconds
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -32,7 +25,7 @@ import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 import java.time.Clock
 import java.time.Clock.systemDefaultZone
 import java.time.Instant
-import java.util.Optional
+import java.util.*
 import java.util.function.Function
 import kotlin.annotation.AnnotationRetention.BINARY
 import kotlin.annotation.AnnotationTarget.CLASS
@@ -46,49 +39,17 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 
     @Bean
     fun jackson3Customizer() = JsonMapperBuilderCustomizer {
-        it.addMixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
         it.enable(INCLUDE_SOURCE_IN_LOCATION)
     }
-
 
     @Bean
     fun sanitizingFunction() = SanitizingFunction { data ->
         if (SENSITIVE_KEYS.any { data.key.contains(it, ignoreCase = true) }) data.withValue("******") else data
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    private interface IgnoreUnknownMixin
-
-    @Bean("messageSource")
-    @ConditionalOnProd
-    fun prodMessageSource() =
-        ReloadableResourceBundleMessageSource().apply {
-            setBasenames("classpath:messages", "classpath:regel-messages", "classpath:openapi-prod-tilgang")
-            setDefaultEncoding("UTF-8")
-        }
-
-    @Bean("messageSource")
-    @ConditionalOnNotProd
-    fun notProdMessageSource() =
-        ReloadableResourceBundleMessageSource().apply {
-            setBasenames(
-                "classpath:messages",
-                "classpath:regel-messages",
-                "classpath:openapi-prod-tilgang",
-                "classpath:openapi-dev-ansatt",
-                "classpath:openapi-dev-bruker",
-                "classpath:openapi-dev-cache",
-                "classpath:openapi-dev-enkelt",
-                "classpath:openapi-dev-regel",
-                "classpath:openapi-dev-skjerming",
-                "classpath:openapi-dev-tilgang",
-                "classpath:openapi-dev-vergemal",
-            )
-            setDefaultEncoding("UTF-8")
-        }
 
     @Bean
-    fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor) =
+    fun restClientCustomizer() =
         RestClientCustomizer { c ->
             val connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
                 .setDefaultConnectionConfig(
@@ -105,7 +66,6 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                 setReadTimeout(5000)
             })
             c.requestInterceptors {
-                it.addFirst(interceptor)
                 it.add(RestLoggingRequestInterceptor())
             }
         }
@@ -117,6 +77,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             Function { pjp ->
                 Tags.of("cluster",
                     token.cluster,
+                    "class", pjp.target.javaClass.simpleName,
                     "method",
                     pjp.signature.name,
                     "client",

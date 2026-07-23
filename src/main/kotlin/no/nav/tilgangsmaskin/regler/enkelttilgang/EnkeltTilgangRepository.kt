@@ -11,22 +11,22 @@ interface EnkeltTilgangRepository : JpaRepository<EnkeltTilgangEntity, Long> {
         SELECT o FROM overstyring o
         WHERE o.navid = :ansattId
           AND o.fnr IN :brukerIds
-          AND o.expires > :now
+          AND o.expires > :cutoff
           AND o.created = (
               SELECT MAX(o2.created) FROM overstyring o2
               WHERE o2.navid = :ansattId AND o2.fnr IN :brukerIds
           )
     """)
     fun gjeldende(
-            @Param("ansattId") ansattId: String,
-            @Param("brukerIds") brukerIds: Set<String>,
-            @Param("now") now: Instant = Instant.now()): EnkeltTilgangEntity?
+        @Param("ansattId") ansattId: String,
+        @Param("brukerIds") brukerIds: Set<String>,
+        @Param("cutoff") cutoff: Instant): EnkeltTilgangEntity?
 
     @Query("""
     SELECT o FROM overstyring o
     WHERE o.navid = :ansattId
       AND o.fnr IN :brukerIds
-      AND o.expires > :now
+      AND o.expires > :cutoff
       AND o.created = (
           SELECT MAX(o2.created) FROM overstyring o2
           WHERE o2.fnr = o.fnr AND o2.navid = o.navid
@@ -35,6 +35,6 @@ interface EnkeltTilgangRepository : JpaRepository<EnkeltTilgangEntity, Long> {
     fun gjeldendeOverstyringer(
         @Param("ansattId") ansattId: String,
         @Param("brukerIds") brukerIds: Set<String>,
-        @Param("now") now: Instant = Instant.now()): Set<EnkeltTilgangEntity>
+        @Param("cutoff") cutoff: Instant): Set<EnkeltTilgangEntity>
 
 }

@@ -8,6 +8,8 @@ import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.person.pdl.leesah.Personhendelse
+import no.nav.tilgangsmaskin.bruker.pdl.PdlAvroEnvExtensions.schemaRegistryUrl
+import no.nav.tilgangsmaskin.bruker.pdl.PdlAvroEnvExtensions.userInfo
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
@@ -16,11 +18,11 @@ import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.kafka.KafkaTypedDroppedMessageMeter
 import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
+import no.nav.tilgangsmaskin.felles.rest.TexasTokenProvider
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
-import no.nav.tilgangsmaskin.bruker.pdl.PdlAvroEnvExtensions.schemaRegistryUrl
-import no.nav.tilgangsmaskin.bruker.pdl.PdlAvroEnvExtensions.userInfo
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -40,8 +42,10 @@ class PdlBeanConfig {
 
     @Bean
     @Qualifier(PDLGRAPH)
-    fun pdlGraphRestClient(builder: Builder) =
+    fun pdlGraphRestClient(builder: Builder, cfg: PdlGraphQLConfig, texas: TexasTokenProvider,
+                           @Value("\${texas.scope.pdl-graph}") scope: String) =
         builder.requestInterceptors {
+            it.add(texas.interceptorFor(scope))
             it.add(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
         }.build()
 
@@ -54,12 +58,14 @@ class PdlBeanConfig {
             }.build()
 
     @Bean
-    fun pdlPipClient(builder: Builder, cfg: PdlConfig) =
-        createClient<PdlPipClient>(cfg, builder)
+    fun pdlPipClient(builder: Builder, cfg: PdlConfig, texas: TexasTokenProvider,
+                     @Value("\${texas.scope.pdl-pip}") scope: String) =
+        createClient<PdlPipClient>(cfg, builder, interceptors = arrayOf(texas.interceptorFor(scope)))
 
     @Bean
-    fun pdlGraphQLPingClient(builder: Builder, cfg: PdlGraphQLConfig) =
-        createClient<PdlGraphQLPingClient>(cfg, builder)
+    fun pdlGraphQLPingClient(builder: Builder, cfg: PdlGraphQLConfig, texas: TexasTokenProvider,
+                             @Value("\${texas.scope.pdl-graph}") scope: String) =
+        createClient<PdlGraphQLPingClient>(cfg, builder, interceptors = arrayOf(texas.interceptorFor(scope)))
 
     @Bean
     fun pdlGraphHealthIndicator(cfg: PdlGraphQLConfig, client: PdlGraphQLPingClient) =
@@ -97,8 +103,8 @@ class PdlBeanConfig {
         object : KafkaTypedDroppedMessageMeter<Personhendelse>(registry, Personhendelse::class) {
             override fun formatEvent(event: Personhendelse) =
                 "gradering=${event.adressebeskyttelse?.gradering ?: "UGRADERT"}, " +
-                    "endringstype=${event.endringstype}, " +
-                    "identer=${event.personidenter.map { it.maskFnr() }}"
+                        "endringstype=${event.endringstype}, " +
+                        "identer=${event.personidenter.map { it.maskFnr() }}"
         }
 
     companion object {

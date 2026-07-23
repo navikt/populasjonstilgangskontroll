@@ -2,13 +2,14 @@ package no.nav.tilgangsmaskin.felles.rest
 
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.ClientHttpResponse
 
 class RestLoggingRequestInterceptor : ClientHttpRequestInterceptor {
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val log = getLogger(javaClass)
     override fun intercept(req: HttpRequest,
                            body: ByteArray,
                            execution: ClientHttpRequestExecution): ClientHttpResponse {

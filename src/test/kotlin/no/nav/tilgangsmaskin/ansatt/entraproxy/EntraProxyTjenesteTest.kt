@@ -29,8 +29,15 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.request
 import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
+import com.ninjasquad.springmockk.MockkBean
+
+
+import no.nav.tilgangsmaskin.felles.rest.TexasTestConfig
+
+import org.springframework.context.annotation.Import
 
 @RestClientTest(components = [EntraProxyClient::class, EntraProxyBeanConfig::class, EntraProxyTjeneste::class, EntraProxyConfig::class])
+@Import(TexasTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class EntraProxyTjenesteTest : BehaviorSpec() {
 

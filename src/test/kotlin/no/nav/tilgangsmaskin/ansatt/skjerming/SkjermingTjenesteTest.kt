@@ -36,9 +36,13 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.request
 import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
+import com.ninjasquad.springmockk.MockkBean
+
+
+import no.nav.tilgangsmaskin.felles.rest.TexasTestConfig
 
 @RestClientTest(components = [SkjermingClient::class,SkjermingBeanConfig::class, SkjermingTjeneste::class, SkjermingConfig::class])
-@Import(SkjermingTestConfig::class)
+@Import(SkjermingTestConfig::class, TexasTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class SkjermingTjenesteTest : BehaviorSpec() {
 
@@ -49,8 +53,6 @@ class SkjermingTjenesteTest : BehaviorSpec() {
     lateinit var tjeneste: SkjermingTjeneste
     @Autowired
     lateinit var server: MockRestServiceServer
-    @Autowired
-    lateinit var cfg: SkjermingConfig
     @Autowired
     lateinit var cache: CacheOperations
 
@@ -78,7 +80,7 @@ class SkjermingTjenesteTest : BehaviorSpec() {
         Given("cache - skjerminger (CacheOperations)") {
             When("én er i cache og én er cache-miss") {
                 Then("hentes treff fra cache og kun misser fra REST") {
-                    cache.putOne(SKJERMING_CACHE, I1, true, cfg.varighet)
+                    cache.putOne(SKJERMING_CACHE, I1, true)
                     server.expect(once(), requestTo(SKJERMINGER_URI))
                         .andRespond(withSuccess("""{"$I2":false}""", APPLICATION_JSON))
                     tjeneste.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to true, ID2 to false)
@@ -87,14 +89,14 @@ class SkjermingTjenesteTest : BehaviorSpec() {
             }
             When("alle er i cache") {
                 Then("kalles ikke REST") {
-                    cache.putMany(SKJERMING_CACHE, mapOf(I1 to true, I2 to false), cfg.varighet)
+                    cache.putMany(SKJERMING_CACHE, mapOf(I1 to true, I2 to false))
                     server.expect(never(), requestTo(SKJERMINGER_URI))
                     tjeneste.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to true, ID2 to false)
                 }
             }
             When("et cache-innslag er slettet") {
                 Then("REST kalles igjen for det slettede innslaget") {
-                    cache.putMany(SKJERMING_CACHE, mapOf(I1 to true, I2 to false), cfg.varighet)
+                    cache.putMany(SKJERMING_CACHE, mapOf(I1 to true, I2 to false))
                     cache.delete(SKJERMING_CACHE, I2)
                     server.expect(once(), requestTo(SKJERMINGER_URI))
                         .andRespond(withSuccess("""{"$I2":false}""", APPLICATION_JSON))
@@ -130,7 +132,7 @@ class SkjermingTjenesteTest : BehaviorSpec() {
             When("cache har partial data og resten mangler") {
                 Then("REST kalles kun for manglende nøkler og resultat kombineres") {
                     cache.clear(SKJERMING_CACHE)
-                    cache.putOne(SKJERMING_CACHE, I1, true, cfg.varighet)
+                    cache.putOne(SKJERMING_CACHE, I1, true)
                     server.expect(once(), requestTo(SKJERMINGER_URI))
                         .andRespond(withSuccess("""{"$I2":false}""", APPLICATION_JSON))
                     tjeneste.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to true, ID2 to false)

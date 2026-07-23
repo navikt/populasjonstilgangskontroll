@@ -1,8 +1,9 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
+import io.micrometer.core.annotation.Timed
 import io.opentelemetry.instrumentation.annotations.WithSpan
+import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
@@ -14,11 +15,11 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
 
 @RetryingWhenRecoverableRestService
+@Timed
 class PdlTjeneste(
     private val pip: PdlPipClient,
     private val graphQL: PdlSyncGraphQLClientAdapter,
-    private val cache: CacheOperations,
-    private val cf: PdlConfig,
+    private val cache: CacheOperations
 ) {
 
     private val log = getLogger(PdlTjeneste::class.java)
@@ -29,7 +30,7 @@ class PdlTjeneste(
         val person = person(id)
         val søsken = søsken(person)
         val partnere = graphQL.partnere(id)
-        return person.copy(familie = person.familie.copy(søsken = søsken, partnere = partnere))
+        return person.copy(familie = Familie(person.familie.medlemmer + søsken + partnere))
     }
 
     @WithSpan
@@ -51,7 +52,7 @@ class PdlTjeneste(
             log.info("Hentet ${it.size} person(er) av ${identer.size - fraCache.size} mulige fra REST")
         }
 
-        cache.putMany(PDL_MED_FAMILIE_CACHE, fraRest, cf.varighet)
+        cache.putMany(PDL_MED_FAMILIE_CACHE, fraRest)
         return (fraCache.values + fraRest.values).toSet()
     }
 
@@ -67,7 +68,7 @@ class PdlTjeneste(
             hentPersoner(person.foreldre.map { it.brukerId.verdi }.toSet())
                 .flatMap { it.value.barn }
                 .filterNot { it.brukerId.verdi == person.brukerId.verdi }
-                .mapTo(this) { FamilieMedlem(it.brukerId, SØSKEN) }
+                .mapTo(this) { FamilieMedlem(it.brukerId, FamilieMedlem.FamilieRelasjon.SØSKEN) }
         }
     }
 

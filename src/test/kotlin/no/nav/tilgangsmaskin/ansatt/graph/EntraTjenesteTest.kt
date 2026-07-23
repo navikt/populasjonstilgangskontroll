@@ -31,10 +31,11 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.request
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import java.util.*
 
-import no.nav.tilgangsmaskin.felles.rest.TexasTokenProvider
 
-@RestClientTest(components = [EntraGrupperRestClientAdapter::class, EntraTjeneste::class, EntraGrupperConfig::class, EntraGruppeBeanConfig::class, EntraOidBeanConfig::class, TexasTokenProvider::class])
-@Import(EntraTestConfig::class)
+import no.nav.tilgangsmaskin.felles.rest.TexasTestConfig
+
+@RestClientTest(components = [EntraGrupperRestClientAdapter::class, EntraTjeneste::class, EntraGrupperConfig::class, EntraGruppeBeanConfig::class, EntraOidBeanConfig::class])
+@Import(EntraTestConfig::class, TexasTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class EntraTjenesteTest : BehaviorSpec() {
 

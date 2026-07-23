@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
@@ -35,10 +36,12 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
 
-import no.nav.tilgangsmaskin.felles.rest.TexasTokenProvider
 
-@RestClientTest(components = [VergemålBeanConfig::class, VergemålTjeneste::class, TexasTokenProvider::class])
+import no.nav.tilgangsmaskin.felles.rest.TexasTestConfig
+
+@RestClientTest(components = [VergemålBeanConfig::class, VergemålTjeneste::class])
 @EnableConfigurationProperties(VergemålConfig::class)
+@Import(TexasTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class VergemålTjenesteTest : BehaviorSpec() {
 

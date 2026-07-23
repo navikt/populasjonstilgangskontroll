@@ -29,10 +29,11 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import java.util.UUID
 import com.ninjasquad.springmockk.MockkBean
 
-import no.nav.tilgangsmaskin.felles.rest.TexasTokenProvider
 
-@RestClientTest(components = [EntraOidTjeneste::class, EntraOidConfig::class, EntraGrupperConfig::class, EntraOidBeanConfig::class, TexasTokenProvider::class])
-@Import(EntraTestConfig::class)
+import no.nav.tilgangsmaskin.felles.rest.TexasTestConfig
+
+@RestClientTest(components = [EntraOidTjeneste::class, EntraOidConfig::class, EntraGrupperConfig::class, EntraOidBeanConfig::class])
+@Import(EntraTestConfig::class, TexasTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class OidTjenesteTest : BehaviorSpec() {
 

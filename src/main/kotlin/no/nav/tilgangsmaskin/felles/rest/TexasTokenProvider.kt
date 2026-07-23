@@ -4,6 +4,7 @@ import io.micrometer.observation.ObservationRegistry
 import io.micrometer.observation.ObservationRegistry.NOOP
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 
@@ -17,5 +18,5 @@ class TexasTokenProvider(
         .observationRegistry(observationRegistry.getIfAvailable { NOOP })
         .build()
 
-    fun interceptorFor(scope: String) = TexasTokenInterceptor(texasClient, scope)
+    fun interceptorFor(scope: String): ClientHttpRequestInterceptor = TexasTokenInterceptor(texasClient, scope)
 }

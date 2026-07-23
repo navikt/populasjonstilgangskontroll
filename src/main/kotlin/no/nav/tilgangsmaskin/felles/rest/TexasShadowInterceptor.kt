@@ -11,7 +11,7 @@ import org.springframework.web.client.body
 import tools.jackson.databind.json.JsonMapper
 import java.util.Base64
 
-class TexasShadowInterceptor(private val scope: String, private val texasClient: RestClient) :
+class TexasShadowInterceptor(private val texasClient: RestClient, private val scope: String) :
     ClientHttpRequestInterceptor {
 
     override fun intercept(request: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution) =

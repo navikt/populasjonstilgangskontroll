@@ -22,6 +22,7 @@ import no.nav.tilgangsmaskin.felles.rest.TexasTokenProvider
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -41,9 +42,10 @@ class PdlBeanConfig {
 
     @Bean
     @Qualifier(PDLGRAPH)
-    fun pdlGraphRestClient(builder: Builder, cfg: PdlGraphQLConfig, texas: TexasTokenProvider) =
+    fun pdlGraphRestClient(builder: Builder, cfg: PdlGraphQLConfig, texas: TexasTokenProvider,
+                           @Value("\${texas.scope.pdl-graph}") scope: String) =
         builder.requestInterceptors {
-            it.add(texas.interceptorFor(cfg.scope))
+            it.add(texas.interceptorFor(scope))
             it.add(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
         }.build()
 
@@ -56,12 +58,14 @@ class PdlBeanConfig {
             }.build()
 
     @Bean
-    fun pdlPipClient(builder: Builder, cfg: PdlConfig, texas: TexasTokenProvider) =
-        createClient<PdlPipClient>(cfg, builder, interceptors = arrayOf(texas.interceptorFor(cfg.scope)))
+    fun pdlPipClient(builder: Builder, cfg: PdlConfig, texas: TexasTokenProvider,
+                     @Value("\${texas.scope.pdl-pip}") scope: String) =
+        createClient<PdlPipClient>(cfg, builder, interceptors = arrayOf(texas.interceptorFor(scope)))
 
     @Bean
-    fun pdlGraphQLPingClient(builder: Builder, cfg: PdlGraphQLConfig, texas: TexasTokenProvider) =
-        createClient<PdlGraphQLPingClient>(cfg, builder, interceptors = arrayOf(texas.interceptorFor(cfg.scope)))
+    fun pdlGraphQLPingClient(builder: Builder, cfg: PdlGraphQLConfig, texas: TexasTokenProvider,
+                             @Value("\${texas.scope.pdl-graph}") scope: String) =
+        createClient<PdlGraphQLPingClient>(cfg, builder, interceptors = arrayOf(texas.interceptorFor(scope)))
 
     @Bean
     fun pdlGraphHealthIndicator(cfg: PdlGraphQLConfig, client: PdlGraphQLPingClient) =

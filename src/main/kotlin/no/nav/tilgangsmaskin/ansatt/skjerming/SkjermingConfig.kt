@@ -5,12 +5,11 @@ import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.RestConfig
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.net.URI
 
 @Component
-class SkjermingConfig(@Value("\${texas.scope.skjerming}") val scope: String) :
+class SkjermingConfig :
     CachableRestConfig, RestConfig(SKJERMING_BASE, SKJERMING_PING_PATH, SKJERMING) {
 
     override val navn = name

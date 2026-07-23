@@ -36,12 +36,11 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.request
 import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
-import io.mockk.*
 import com.ninjasquad.springmockk.MockkBean
-import no.nav.tilgangsmaskin.felles.rest.TexasShadowProvider
-import org.springframework.http.client.ClientHttpRequestInterceptor
 
-@RestClientTest(components = [SkjermingClient::class,SkjermingBeanConfig::class, SkjermingTjeneste::class, SkjermingConfig::class])
+import no.nav.tilgangsmaskin.felles.rest.TexasShadowProvider
+
+@RestClientTest(components = [SkjermingClient::class,SkjermingBeanConfig::class, SkjermingTjeneste::class, SkjermingConfig::class, TexasShadowProvider::class])
 @Import(SkjermingTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class SkjermingTjenesteTest : BehaviorSpec() {
@@ -56,13 +55,7 @@ class SkjermingTjenesteTest : BehaviorSpec() {
     @Autowired
     lateinit var cache: CacheOperations
 
-    @MockkBean
-    private lateinit var shadow: TexasShadowProvider
-
     init {
-        beforeSpec {
-            every { shadow.interceptorFor(ofType<String>()) } returns ClientHttpRequestInterceptor { req, body, exec -> exec.execute(req, body) }
-        }
 
         beforeEach {
             server.reset()

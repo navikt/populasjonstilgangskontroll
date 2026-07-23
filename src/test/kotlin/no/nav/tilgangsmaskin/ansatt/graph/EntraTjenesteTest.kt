@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
-import io.mockk.*
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
@@ -31,10 +30,10 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import java.util.*
-import no.nav.tilgangsmaskin.felles.rest.TexasShadowProvider
-import org.springframework.http.client.ClientHttpRequestInterceptor
 
-@RestClientTest(components = [EntraGrupperRestClientAdapter::class, EntraTjeneste::class, EntraGrupperConfig::class, EntraGruppeBeanConfig::class, EntraOidBeanConfig::class])
+import no.nav.tilgangsmaskin.felles.rest.TexasShadowProvider
+
+@RestClientTest(components = [EntraGrupperRestClientAdapter::class, EntraTjeneste::class, EntraGrupperConfig::class, EntraGruppeBeanConfig::class, EntraOidBeanConfig::class, TexasShadowProvider::class])
 @Import(EntraTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class EntraTjenesteTest : BehaviorSpec() {
@@ -51,9 +50,6 @@ class EntraTjenesteTest : BehaviorSpec() {
     @Suppress("unused")
     private lateinit var entraOidClient: EntraOidClient
 
-    @MockkBean
-    private lateinit var shadow: TexasShadowProvider
-
     @Autowired
     private lateinit var tjeneste: EntraTjeneste
 
@@ -68,9 +64,6 @@ class EntraTjenesteTest : BehaviorSpec() {
 
 
     init {
-        beforeSpec {
-            every { shadow.interceptorFor(ofType<String>()) } returns ClientHttpRequestInterceptor { req, body, exec -> exec.execute(req, body) }
-        }
 
         beforeEach {
             server.reset()

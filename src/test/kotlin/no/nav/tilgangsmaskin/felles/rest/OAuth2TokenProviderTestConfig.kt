@@ -7,9 +7,9 @@ import org.springframework.context.annotation.Bean
 import org.springframework.http.client.ClientHttpRequestInterceptor
 
 @TestConfiguration
-class TexasTestConfig {
+class OAuth2TokenProviderTestConfig {
     @Bean
-    fun texasTokenProvider(): TexasTokenProvider = mockk {
+    fun oauth2TokenProvider(): OAuth2TokenProvider = mockk {
         every { interceptorFor(any()) } returns ClientHttpRequestInterceptor { req, body, exec -> exec.execute(req, body) }
     }
 }

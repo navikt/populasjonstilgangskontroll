@@ -32,12 +32,12 @@ import org.springframework.web.util.UriComponentsBuilder.fromUriString
 import com.ninjasquad.springmockk.MockkBean
 
 
-import no.nav.tilgangsmaskin.felles.rest.TexasTestConfig
+import no.nav.tilgangsmaskin.felles.rest.OAuth2TokenProviderTestConfig
 
 import org.springframework.context.annotation.Import
 
 @RestClientTest(components = [EntraProxyClient::class, EntraProxyBeanConfig::class, EntraProxyTjeneste::class, EntraProxyConfig::class])
-@Import(TexasTestConfig::class)
+@Import(OAuth2TokenProviderTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class EntraProxyTjenesteTest : BehaviorSpec() {
 

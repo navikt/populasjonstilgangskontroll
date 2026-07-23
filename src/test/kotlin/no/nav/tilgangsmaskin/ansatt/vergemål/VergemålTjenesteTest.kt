@@ -37,11 +37,11 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
 
 
-import no.nav.tilgangsmaskin.felles.rest.TexasTestConfig
+import no.nav.tilgangsmaskin.felles.rest.OAuth2TokenProviderTestConfig
 
 @RestClientTest(components = [VergemålBeanConfig::class, VergemålTjeneste::class])
 @EnableConfigurationProperties(VergemålConfig::class)
-@Import(TexasTestConfig::class)
+@Import(OAuth2TokenProviderTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class VergemålTjenesteTest : BehaviorSpec() {
 

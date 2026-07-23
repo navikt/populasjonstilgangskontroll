@@ -30,10 +30,10 @@ import java.util.UUID
 import com.ninjasquad.springmockk.MockkBean
 
 
-import no.nav.tilgangsmaskin.felles.rest.TexasTestConfig
+import no.nav.tilgangsmaskin.felles.rest.OAuth2TokenProviderTestConfig
 
 @RestClientTest(components = [EntraOidTjeneste::class, EntraOidConfig::class, EntraGrupperConfig::class, EntraOidBeanConfig::class])
-@Import(EntraTestConfig::class, TexasTestConfig::class)
+@Import(EntraTestConfig::class, OAuth2TokenProviderTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class OidTjenesteTest : BehaviorSpec() {
 

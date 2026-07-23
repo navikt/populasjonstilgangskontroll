@@ -79,6 +79,7 @@ dependencies {
     }
     implementation(libs.spring.boot.starter.jetty)
     implementation(libs.spring.boot.starter.webclient)
+    implementation(libs.spring.boot.starter.oauth2.client)
     implementation(libs.spring.boot.starter.kafka)
     testImplementation(libs.spring.boot.micrometer.metrics.test)
     testImplementation(libs.spring.boot.starter.test)

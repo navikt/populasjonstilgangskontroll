@@ -32,10 +32,10 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import java.util.*
 
 
-import no.nav.tilgangsmaskin.felles.rest.TexasTestConfig
+import no.nav.tilgangsmaskin.felles.rest.OAuth2TokenProviderTestConfig
 
 @RestClientTest(components = [EntraGrupperRestClientAdapter::class, EntraTjeneste::class, EntraGrupperConfig::class, EntraGruppeBeanConfig::class, EntraOidBeanConfig::class])
-@Import(EntraTestConfig::class, TexasTestConfig::class)
+@Import(EntraTestConfig::class, OAuth2TokenProviderTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class EntraTjenesteTest : BehaviorSpec() {
 

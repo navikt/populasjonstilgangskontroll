@@ -39,10 +39,10 @@ import org.springframework.web.util.UriComponentsBuilder.fromUriString
 import com.ninjasquad.springmockk.MockkBean
 
 
-import no.nav.tilgangsmaskin.felles.rest.TexasTestConfig
+import no.nav.tilgangsmaskin.felles.rest.OAuth2TokenProviderTestConfig
 
 @RestClientTest(components = [SkjermingClient::class,SkjermingBeanConfig::class, SkjermingTjeneste::class, SkjermingConfig::class])
-@Import(SkjermingTestConfig::class, TexasTestConfig::class)
+@Import(SkjermingTestConfig::class, OAuth2TokenProviderTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class SkjermingTjenesteTest : BehaviorSpec() {
 

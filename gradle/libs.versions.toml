@@ -26,7 +26,7 @@ slack-api-kotlin = { module = "com.slack.api:slack-api-client-kotlin-extension",
 opentelemetry-instrumentation-annotations = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations" }
 opentelemetry-logback-mdc = { module = "io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0", version.ref = "opentelemetry-alpha" }
 micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
-jackson-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin", version = "3.1.4" }
+jackson-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin" }
 logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logstash" }
 boot-conditionals = { module = "no.nav.boot:boot-conditionals", version.ref = "boot-conditionals" }
 token-client-spring = { module = "no.nav.security:token-client-spring", version.ref = "token-support" }

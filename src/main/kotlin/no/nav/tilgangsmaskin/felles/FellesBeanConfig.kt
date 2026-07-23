@@ -1,11 +1,8 @@
 package no.nav.tilgangsmaskin.felles
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
-import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
-import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.RestLoggingRequestInterceptor
 import no.nav.tilgangsmaskin.tilgang.Token
@@ -42,22 +39,17 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
 
     @Bean
     fun jackson3Customizer() = JsonMapperBuilderCustomizer {
-        it.addMixIn(OAuth2AccessTokenResponse::class.java, IgnoreUnknownMixin::class.java)
         it.enable(INCLUDE_SOURCE_IN_LOCATION)
     }
-
 
     @Bean
     fun sanitizingFunction() = SanitizingFunction { data ->
         if (SENSITIVE_KEYS.any { data.key.contains(it, ignoreCase = true) }) data.withValue("******") else data
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    private interface IgnoreUnknownMixin
-    
 
     @Bean
-    fun restClientCustomizer(interceptor: OAuth2ClientRequestInterceptor) =
+    fun restClientCustomizer() =
         RestClientCustomizer { c ->
             val connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
                 .setDefaultConnectionConfig(
@@ -74,7 +66,6 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                 setReadTimeout(5000)
             })
             c.requestInterceptors {
-                it.addFirst(interceptor)
                 it.add(RestLoggingRequestInterceptor())
             }
         }

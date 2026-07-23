@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin
 
 import no.nav.boot.conditionals.ConditionalOnGCP
-import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.AUDITING_TIME_PROVIDER
 import no.nav.tilgangsmaskin.felles.cache.CacheSizeAware
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Component
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
-@EnableOAuth2Client(cacheEnabled = true)
 @EnableCaching
 @EnableResilientMethods
 @EnableJpaAuditing(dateTimeProviderRef = AUDITING_TIME_PROVIDER)

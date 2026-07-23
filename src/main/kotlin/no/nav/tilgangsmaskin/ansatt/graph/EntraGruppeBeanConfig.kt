@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.ansatt.graph
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.CONSISTENCY_LEVEL
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
-import no.nav.tilgangsmaskin.felles.rest.TexasShadowProvider
+import no.nav.tilgangsmaskin.felles.rest.TexasTokenProvider
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -14,10 +14,10 @@ class EntraGruppeBeanConfig {
 
     @Bean
     @Qualifier(GRAPH)
-    fun graphRestClient(builder: Builder, cfg: EntraGrupperConfig, shadow: TexasShadowProvider) =
+    fun graphRestClient(builder: Builder, cfg: EntraGrupperConfig, texas: TexasTokenProvider) =
         builder.baseUrl(cfg.baseUri)
             .requestInterceptors {
-                it.add(shadow.interceptorFor(cfg.scope))
+                it.add(texas.interceptorFor(cfg.scope))
                 it.add(RestHeaderAddingRequestInterceptor(CONSISTENCY_LEVEL))
             }.build()
 }

@@ -31,9 +31,9 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
 import com.ninjasquad.springmockk.MockkBean
 
-import no.nav.tilgangsmaskin.felles.rest.TexasShadowProvider
+import no.nav.tilgangsmaskin.felles.rest.TexasTokenProvider
 
-@RestClientTest(components = [EntraProxyClient::class, EntraProxyBeanConfig::class, EntraProxyTjeneste::class, EntraProxyConfig::class, TexasShadowProvider::class])
+@RestClientTest(components = [EntraProxyClient::class, EntraProxyBeanConfig::class, EntraProxyTjeneste::class, EntraProxyConfig::class, TexasTokenProvider::class])
 @ApplyExtension(SpringExtension::class)
 class EntraProxyTjenesteTest : BehaviorSpec() {
 

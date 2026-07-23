@@ -58,9 +58,9 @@ dependencies {
     implementation(libs.opentelemetry.instrumentation.annotations)
     implementation(libs.opentelemetry.logback.mdc)
     implementation(libs.micrometer.registry.prometheus)
+    implementation(libs.jackson.module.kotlin)
     implementation(libs.logstash.logback.encoder)
     implementation(libs.boot.conditionals)
-    implementation(libs.token.client.spring)
     implementation(libs.token.validation.spring)
     implementation(libs.flyway.database.postgresql)
     implementation(libs.commons.pool2)
@@ -94,6 +94,7 @@ dependencies {
     testImplementation(libs.springmockk)
     testImplementation(libs.kotest.extensions.spring)
     testImplementation(libs.spring.restdocs.mockmvc)
+    testImplementation("com.github.ben-manes.caffeine:caffeine")
 }
 
 

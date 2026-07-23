@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 
 @Component
-class TexasShadowProvider(
+class TexasTokenProvider(
     @Value("\${texas.token-endpoint}") endpoint: String,
     observationRegistry: ObjectProvider<ObservationRegistry>,
 ) {
@@ -17,6 +17,5 @@ class TexasShadowProvider(
         .observationRegistry(observationRegistry.getIfAvailable { NOOP })
         .build()
 
-    fun interceptorFor(scope: String) =
-        TexasShadowInterceptor(texasClient, scope)
+    fun interceptorFor(scope: String) = TexasTokenInterceptor(texasClient, scope)
 }

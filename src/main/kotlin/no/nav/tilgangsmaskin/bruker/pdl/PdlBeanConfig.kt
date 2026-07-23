@@ -18,7 +18,7 @@ import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.kafka.KafkaTypedDroppedMessageMeter
 import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
-import no.nav.tilgangsmaskin.felles.rest.TexasShadowProvider
+import no.nav.tilgangsmaskin.felles.rest.TexasTokenProvider
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
 import org.springframework.beans.factory.annotation.Qualifier
@@ -41,9 +41,9 @@ class PdlBeanConfig {
 
     @Bean
     @Qualifier(PDLGRAPH)
-    fun pdlGraphRestClient(builder: Builder, cfg: PdlGraphQLConfig, shadow: TexasShadowProvider) =
+    fun pdlGraphRestClient(builder: Builder, cfg: PdlGraphQLConfig, texas: TexasTokenProvider) =
         builder.requestInterceptors {
-            it.add(shadow.interceptorFor(cfg.scope))
+            it.add(texas.interceptorFor(cfg.scope))
             it.add(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
         }.build()
 
@@ -56,12 +56,12 @@ class PdlBeanConfig {
             }.build()
 
     @Bean
-    fun pdlPipClient(builder: Builder, cfg: PdlConfig, shadow: TexasShadowProvider) =
-        createClient<PdlPipClient>(cfg, builder, interceptors = arrayOf(shadow.interceptorFor(cfg.scope)))
+    fun pdlPipClient(builder: Builder, cfg: PdlConfig, texas: TexasTokenProvider) =
+        createClient<PdlPipClient>(cfg, builder, interceptors = arrayOf(texas.interceptorFor(cfg.scope)))
 
     @Bean
-    fun pdlGraphQLPingClient(builder: Builder, cfg: PdlGraphQLConfig, shadow: TexasShadowProvider) =
-        createClient<PdlGraphQLPingClient>(cfg, builder, interceptors = arrayOf(shadow.interceptorFor(cfg.scope)))
+    fun pdlGraphQLPingClient(builder: Builder, cfg: PdlGraphQLConfig, texas: TexasTokenProvider) =
+        createClient<PdlGraphQLPingClient>(cfg, builder, interceptors = arrayOf(texas.interceptorFor(cfg.scope)))
 
     @Bean
     fun pdlGraphHealthIndicator(cfg: PdlGraphQLConfig, client: PdlGraphQLPingClient) =

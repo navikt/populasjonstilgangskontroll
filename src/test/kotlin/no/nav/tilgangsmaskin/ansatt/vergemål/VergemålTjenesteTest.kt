@@ -35,9 +35,9 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
 
-import no.nav.tilgangsmaskin.felles.rest.TexasShadowProvider
+import no.nav.tilgangsmaskin.felles.rest.TexasTokenProvider
 
-@RestClientTest(components = [VergemålBeanConfig::class, VergemålTjeneste::class, TexasShadowProvider::class])
+@RestClientTest(components = [VergemålBeanConfig::class, VergemålTjeneste::class, TexasTokenProvider::class])
 @EnableConfigurationProperties(VergemålConfig::class)
 @ApplyExtension(SpringExtension::class)
 class VergemålTjenesteTest : BehaviorSpec() {

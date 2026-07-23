@@ -18,9 +18,8 @@ class EntraGruppeBeanConfig {
     fun graphRestClient(builder: Builder, cfg: EntraGrupperConfig, texas: TexasTokenProvider,
                         @Value("\${texas.scope.graph}") scope: String) =
         builder.baseUrl(cfg.baseUri)
-            .requestInterceptors {
-                it.add(texas.interceptorFor(scope))
-                it.add(RestHeaderAddingRequestInterceptor(CONSISTENCY_LEVEL))
-            }.build()
+            .requestInterceptor(texas.interceptorFor(scope))
+            .requestInterceptor(RestHeaderAddingRequestInterceptor(CONSISTENCY_LEVEL))
+            .build()
 }
 

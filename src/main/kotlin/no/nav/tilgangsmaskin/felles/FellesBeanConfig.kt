@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
-import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.spring.oauth2.OAuth2ClientRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
@@ -20,7 +18,6 @@ import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomize
 import org.springframework.boot.restclient.RestClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.data.auditing.DateTimeProvider
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory

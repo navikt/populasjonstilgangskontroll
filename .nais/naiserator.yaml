@@ -16,6 +16,7 @@ spec:
     - instance: {{nais.cluster.cache}}
       access: readwrite
   leaderElection: true
+  
   kafka:
     pool: nav-{{nais.cluster.type}}
   gcp:

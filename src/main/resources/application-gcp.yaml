@@ -146,9 +146,7 @@ texas:
     skjerming: "api://${nais.cluster.type}-gcp.nom.skjermede-personer-pip/.default"
     pdl-pip: "api://${nais.cluster.type}-fss.pdl.pdl-pip-api/.default"
     pdl-graph: "api://${nais.cluster.type}-fss.pdl.pdl-api/.default"
-
-verge:
-  scope: "api://${nais.cluster.type}-gcp.repr.repr-api/.default"
+    verge: "api://${nais.cluster.type}-gcp.repr.repr-api/.default"
 
 springdoc:
   swagger-ui:

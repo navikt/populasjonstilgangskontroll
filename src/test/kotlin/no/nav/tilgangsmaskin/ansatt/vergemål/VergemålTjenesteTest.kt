@@ -1,6 +1,7 @@
 
 package no.nav.tilgangsmaskin.ansatt.vergemål
 
+import io.mockk.*
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.ApplyExtension
@@ -8,7 +9,6 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
-import io.mockk.every
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålClient.Companion.VERGEMÅL_PATH
@@ -34,6 +34,8 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.request
 import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
+import no.nav.tilgangsmaskin.felles.rest.TexasShadowProvider
+import org.springframework.http.client.ClientHttpRequestInterceptor
 
 @RestClientTest(components = [VergemålBeanConfig::class, VergemålTjeneste::class])
 @EnableConfigurationProperties(VergemålConfig::class)
@@ -47,6 +49,9 @@ class VergemålTjenesteTest : BehaviorSpec() {
     @MockkBean
     private lateinit var nom: NomTjeneste
 
+    @MockkBean
+    private lateinit var shadow: TexasShadowProvider
+
     @Autowired
     lateinit var tjeneste: VergemålTjeneste
 
@@ -54,6 +59,9 @@ class VergemålTjenesteTest : BehaviorSpec() {
     lateinit var server: MockRestServiceServer
 
     init {
+        beforeSpec {
+            every { shadow.interceptorFor(ofType<String>()) } returns ClientHttpRequestInterceptor { req, body, exec -> exec.execute(req, body) }
+        }
         afterEach { server.verify() }
 
         Given("oppslag av vergemål for ansatt") {

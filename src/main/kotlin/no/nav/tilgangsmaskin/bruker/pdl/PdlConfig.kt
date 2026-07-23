@@ -13,9 +13,10 @@ import java.net.URI.create
 
 
 @Component
-class PdlConfig(@Value("\${PDL}") hostname: String
-) : CachableRestConfig, RestConfig(create(
-    "https://$hostname"), PDL_PIP_PING_PATH, PDL) {
+class PdlConfig(
+    @Value("\${PDL}") hostname: String,
+    @Value("\${texas.scope.pdl-pip}") val scope: String,
+) : CachableRestConfig, RestConfig(create("https://$hostname"), PDL_PIP_PING_PATH, PDL) {
 
     override val caches = PDL_CACHES
     override val navn = name

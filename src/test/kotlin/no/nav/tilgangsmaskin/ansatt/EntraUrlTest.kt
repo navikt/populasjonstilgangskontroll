@@ -13,7 +13,7 @@ class EntraUrlTest : BehaviorSpec({
     Given("grupperURI") {
         When("isCCF er true") {
             Then("inneholder globale gruppe-IDer i OData-filter") {
-                val uri = EntraGrupperConfig().grupperURI("Z999999", true)
+                val uri = EntraGrupperConfig(scope = "ignored").grupperURI("Z999999", true)
                 val filter = uri.query.substringAfter("\$filter=").substringBefore("&")
 
                 EntraGlobalGruppe.entries.forEach { gruppe ->
@@ -26,7 +26,7 @@ class EntraUrlTest : BehaviorSpec({
 
         When("isCCF er false") {
             Then("inneholder kun GEO-prefix uten globale grupper") {
-                val uri = EntraGrupperConfig().grupperURI("Z999999", false)
+                val uri = EntraGrupperConfig(scope = "ignored").grupperURI("Z999999", false)
                 val filter = uri.query.substringAfter("\$filter=").substringBefore("&")
 
                 filter shouldContain "startswith(displayName,'0000-GA-GEO')"
@@ -38,7 +38,7 @@ class EntraUrlTest : BehaviorSpec({
 
         When("ansattId settes i path") {
             Then("erstatter {ansattId} i URI-path") {
-                val uri = EntraGrupperConfig().grupperURI("Z999999", false)
+                val uri = EntraGrupperConfig(scope = "ignored").grupperURI("Z999999", false)
                 uri.path shouldContain "Z999999"
             }
         }

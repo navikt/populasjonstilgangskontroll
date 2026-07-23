@@ -5,6 +5,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.CONSISTEN
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
+import no.nav.tilgangsmaskin.felles.rest.TexasShadowProvider
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.RestClient.Builder
@@ -13,10 +14,12 @@ import org.springframework.web.client.RestClient.Builder
 class EntraOidBeanConfig {
 
     @Bean
-    fun entraOidClient(builder: Builder, cfg: EntraGrupperConfig) =
-        createClient<EntraOidClient>(cfg,
-            builder,
-            interceptors = arrayOf(RestHeaderAddingRequestInterceptor(CONSISTENCY_LEVEL)))
+    fun entraOidClient(builder: Builder, cfg: EntraGrupperConfig, shadow: TexasShadowProvider) =
+        createClient<EntraOidClient>(cfg, builder,
+            interceptors = arrayOf(
+                shadow.interceptorFor(cfg.scope),
+                RestHeaderAddingRequestInterceptor(CONSISTENCY_LEVEL),
+            ))
 
     @Bean
     fun graphHealthIndicator(cfg: EntraGrupperConfig, client: EntraOidClient) =

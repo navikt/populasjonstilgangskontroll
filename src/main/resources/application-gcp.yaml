@@ -192,6 +192,19 @@ no.nav.security.jwt:
           client-id: ${azure.app.client.id}
           client-jwk: ${azure.app.jwk}
           client-auth-method: private_key_jwt
+
+texas:
+  token-endpoint: ${NAIS_TOKEN_ENDPOINT}
+  scope:
+    entraproxy: "api://${nais.cluster.type}-gcp.sikkerhetstjenesten.entra-proxy/.default"
+    graph: "https://graph.microsoft.com/.default"
+    skjerming: "api://${nais.cluster.type}-gcp.nom.skjermede-personer-pip/.default"
+    pdl-pip: "api://${nais.cluster.type}-fss.pdl.pdl-pip-api/.default"
+    pdl-graph: "api://${nais.cluster.type}-fss.pdl.pdl-api/.default"
+
+verge:
+  scope: "api://${nais.cluster.type}-gcp.repr.repr-api/.default"
+
 springdoc:
   swagger-ui:
     oauth:

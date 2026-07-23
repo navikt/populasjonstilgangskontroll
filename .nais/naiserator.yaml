@@ -7,6 +7,8 @@ metadata:
   name: populasjonstilgangskontroll
   namespace: tilgangsmaskin
 spec:
+  texas:
+    enabled: true
   envFrom:
       - secret: slack
   strategy:

@@ -6,3 +6,15 @@ spring:
     redis:
       timeout: 2s
       connect-timeout: 2s
+
+texas:
+  token-endpoint: http://localhost:8888/api/v1/token
+  scope:
+    entraproxy: entraproxy-scope
+    graph: graph-scope
+    skjerming: skjerming-scope
+    pdl-pip: pdl-pip-scope
+    pdl-graph: pdl-graph-scope
+
+verge:
+  scope: verge-scope

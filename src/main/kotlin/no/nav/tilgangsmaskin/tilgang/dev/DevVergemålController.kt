@@ -15,12 +15,13 @@ private const val DEV_VERGEMAL_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.ver
 @UnprotectedRestController(value = ["/${DEV}/skjermning"])
 @ConditionalOnNotProd
 @Tag(name = "DevVergemålController", description = DEV_VERGEMAL_CONTROLLER_TAG_DESCRIPTION)
-class DevVergemålController(private val vergemål: VergemålTjeneste){
+class DevVergemålController(private val vergemål: VergemålTjeneste) {
 
 
     @PostMapping("vergemål")
     @Operation(summary = SUMMARY_VERGEMAL, description = DESCRIPTION_VERGEMAL)
-    fun vergemål(@RequestBody ansattId: AnsattId) = vergemål.vergemål(ansattId)
+    fun vergemål(@RequestBody ansattId: AnsattId) =
+        vergemål.alle(ansattId)
 
     companion object {
         private const val SUMMARY_VERGEMAL = "msg:openapi.dev.vergemal.vergemal.summary"

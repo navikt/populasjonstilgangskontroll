@@ -1,0 +1,13 @@
+management:
+  endpoint:
+    env:
+      show-values: never
+    configprops:
+      show-values: never
+    health:
+      show-details: always
+      show-components: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,caches

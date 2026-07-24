@@ -45,7 +45,7 @@ data class BrukerBuilder(
     fun build() = Bruker(
             BrukerIds(id, oppslagId,historiskeIds, aktørId),
             gt, grupper,
-            Familie(setOfNotNull(mor, far), barn, søsken, partnere),
+            Familie(setOfNotNull(mor, far) + barn + søsken + partnere),
             dødsdato)
 
 }

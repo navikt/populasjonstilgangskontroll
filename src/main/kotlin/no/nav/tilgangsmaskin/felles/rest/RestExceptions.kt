@@ -12,7 +12,10 @@ open class IrrecoverableRestException(
     val status: HttpStatusCode, uri: URI, msg: String = (status as HttpStatus).reasonPhrase,
     cause: Throwable? = null) : ErrorResponseException(status, problemDetail(status, msg, uri), cause)
 
-class NotFoundRestException(val uri: URI, val identifikator: String? = null, msg: String = "Ikke funnet", cause: Throwable? = null) :
+class NotFoundRestException(val uri: URI,
+                            val identifikator: String? = null,
+                            msg: String = "Ikke funnet",
+                            cause: Throwable? = null) :
     IrrecoverableRestException(NOT_FOUND, uri, msg, cause)
 
 class ConflictRestException(val uri: URI, msg: String = "Konflikt", cause: Throwable? = null) :

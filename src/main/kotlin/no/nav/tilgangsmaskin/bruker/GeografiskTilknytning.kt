@@ -31,6 +31,7 @@ sealed class GeografiskTilknytning {
     class UkjentBosted : GeografiskTilknytning() {
         @NoCoverageAnalysis
         override fun equals(other: Any?) = other is UkjentBosted
+
         @NoCoverageAnalysis
         override fun hashCode() = javaClass.hashCode()
     }
@@ -38,6 +39,7 @@ sealed class GeografiskTilknytning {
     class UtenlandskTilknytning : GeografiskTilknytning() {
         @NoCoverageAnalysis
         override fun equals(other: Any?) = other is UtenlandskTilknytning
+
         @NoCoverageAnalysis
         override fun hashCode() = javaClass.hashCode()
     }
@@ -45,6 +47,7 @@ sealed class GeografiskTilknytning {
     class UdefinertTilknytning : GeografiskTilknytning() {
         @NoCoverageAnalysis
         override fun equals(other: Any?) = other is UdefinertTilknytning
+
         @NoCoverageAnalysis
         override fun hashCode() = javaClass.hashCode()
     }

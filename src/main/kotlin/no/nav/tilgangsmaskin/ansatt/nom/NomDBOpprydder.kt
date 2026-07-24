@@ -7,9 +7,7 @@ import java.util.concurrent.TimeUnit.*
 
 @Component
 class NomDBOpprydder(
-    private val nom: NomTjeneste,
-    private val antallKall: NomKallTeller,
-    private val raderFjernet: NomRaderFjernetTeller) : LeaderAware() {
+    private val nom: NomTjeneste) : LeaderAware() {
 
 
     override fun doHandleLeaderChange() {
@@ -19,10 +17,7 @@ class NomDBOpprydder(
     @Scheduled(fixedRate = 24, timeUnit = HOURS)
     fun ryddOpp() =
         somLeder("daglig opprydding i Nom-databasen", {
-            val antall = nom.ryddOpp()
-            antallKall.tell()
-            raderFjernet.tell(antall)
-            antall
+            nom.ryddOpp()
         }) { 0 }
 }
 

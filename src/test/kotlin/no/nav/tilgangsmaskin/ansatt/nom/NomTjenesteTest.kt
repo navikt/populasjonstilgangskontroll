@@ -1,13 +1,11 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import com.ninjasquad.springmockk.MockkBean
-import com.ninjasquad.springmockk.MockkSpyBean
-import io.mockk.verify
+import io.mockk.every
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
-import io.mockk.every
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
@@ -49,8 +47,6 @@ class NomTjenesteTest : BehaviorSpec() {
     @Autowired
     @Qualifier("cacheOperations")
     private lateinit var cache: CacheOperations
-    @MockkSpyBean
-    private lateinit var adapter: NomJPAAdapter
 
     private val ansattId = AnsattId("Z999999")
     private val brukerId = BrukerId("08526835670")
@@ -123,9 +119,9 @@ class NomTjenesteTest : BehaviorSpec() {
                     val id = AnsattId("Z100010")
                     tjeneste.lagre(NomAnsattData(id, brukerId, NomAnsattPeriode(now(), now().plusYears(1))))
                     tjeneste.fnrForAnsatt(id) shouldBe brukerId
+                    repo.deleteAll()
                     tjeneste.fnrForAnsatt(id) shouldBe brukerId
                     cache.getOne<BrukerId>(NOM_CACHE, id.verdi) shouldBe brukerId
-                    verify(exactly = 1) { adapter.fnrForAnsatt(id.verdi) }
                 }
             }
 

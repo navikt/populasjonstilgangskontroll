@@ -1,11 +1,12 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata
+import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD_MER_ENN_ETT_ÅR
 import no.nav.tilgangsmaskin.tilgang.Token
-import java.util.UUID
+import java.util.*
 
 enum class EntraGlobalGruppe(val property: String, val metadata: GruppeMetadata) {
-    AVDØD("gruppe.dead", GruppeMetadata.AVDØD_MER_ENN_ETT_ÅR),
+    AVDØD("gruppe.dead", AVDØD_MER_ENN_ETT_ÅR),
     STRENGT_FORTROLIG("gruppe.strengt", GruppeMetadata.STRENGT_FORTROLIG),
     STRENGT_FORTROLIG_UTLAND("gruppe.strengt", GruppeMetadata.STRENGT_FORTROLIG_UTLAND),
     FORTROLIG("gruppe.fortrolig", GruppeMetadata.FORTROLIG),
@@ -22,13 +23,13 @@ enum class EntraGlobalGruppe(val property: String, val metadata: GruppeMetadata)
         private fun navnFor(id: UUID) =
             entries.first { it.id == id }.name
 
-        fun uuids() =
+        fun uuids() : Set<UUID> =
             entries.mapTo(mutableSetOf()) { it.id }
 
         fun setIDs(grupper: Map<String, UUID>) =
             entries.forEach { it.id = checkNotNull(grupper[it.property]) { "Mangler id for ${it.property}" } }
 
-        fun Token.globaleGrupper() =
+        fun Token.globaleGrupper() : Set<EntraGruppe> =
             globaleGruppeIds.intersect(uuids()).mapTo(mutableSetOf()) { uuid ->
                 EntraGruppe(uuid, navnFor(uuid))
             }

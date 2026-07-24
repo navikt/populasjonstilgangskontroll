@@ -7,9 +7,7 @@ import io.kotest.matchers.booleans.shouldBeTrue
 import io.mockk.MockKAnnotations.init
 import io.mockk.clearAllMocks
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import java.time.LocalDate.now
@@ -62,7 +60,6 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
         }
 
         Given("Bruker er død for mer enn ett år siden og ansatt er ikke i AVDØD-gruppen") {
-            val enhet = Enhet(Enhetsnummer("1234"), NAV_TESTKONTOR)
             When("dødsdato er mellom ett og to år siden") {
                 val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(15)).build()
                 Then("tilgang blokkeres, men telles med enhetsnavn for 13-24 måneder") {

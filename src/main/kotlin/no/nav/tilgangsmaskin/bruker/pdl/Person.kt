@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie
-import no.nav.tilgangsmaskin.bruker.Familie.Companion.INGEN
+import no.nav.tilgangsmaskin.bruker.Familie.Companion.INGEN_FAMILIE
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
@@ -18,7 +18,7 @@ data class Person(
     val aktørId: AktørId,
     val geoTilknytning: GeografiskTilknytning,
     val graderinger: List<Gradering> = emptyList(),
-    val familie: Familie = INGEN,
+    val familie: Familie = INGEN_FAMILIE,
     val dødsdato: LocalDate? = null,
     val historiskeIds: Set<BrukerId> = emptySet()) {
 

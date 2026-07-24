@@ -18,23 +18,21 @@ class RegelException(val ansatt: Ansatt,
                      val status: HttpStatus = FORBIDDEN,
                      messageCode: String = DETAIL_MESSAGE_CODE,
                      arguments: Array<String> = arrayOf(
-                             ansatt.ansattId.verdi,
-                             bruker.brukerId.verdi,
-                             regel.begrunnelse)) :
+                         ansatt.ansattId.verdi,
+                         bruker.brukerId.verdi,
+                         regel.begrunnelse)) :
     ErrorResponseException(status, forStatus(status).apply {
         title = regel.kode
         type = TYPE_URI
         instance = URI.create("${ansatt.ansattId.verdi}/${bruker.brukerId.verdi}")
         properties = entries(bruker.oppslagId, ansatt.ansattId, regel)
-    }, null, messageCode, arguments) {
-
-}
+    }, null, messageCode, arguments)
 
 private fun entries(oppslagId: String, ansattId: AnsattId, regel: Regel) = mapOf(
-        "brukerIdent" to oppslagId,
-        "navIdent" to ansattId.verdi,
-        "begrunnelse" to regel.begrunnelse,
-        "traceId" to Span.current().spanContext.traceId,
-        "kanOverstyres" to regel.erOverstyrbar)
+    "brukerIdent" to oppslagId,
+    "navIdent" to ansattId.verdi,
+    "begrunnelse" to regel.begrunnelse,
+    "traceId" to Span.current().spanContext.traceId,
+    "kanOverstyres" to regel.erOverstyrbar)
 
 

@@ -1,19 +1,19 @@
 package no.nav.tilgangsmaskin.felles
 
 import no.nav.boot.conditionals.ConditionalOnGCP
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.annotation.Fallback
 import org.springframework.stereotype.Component
 
 @ConditionalOnGCP
-class SecureAuditor : AbstractAuditor("secureLog")
+class SecureAuditor(logger: Logger = getLogger("secureLog")) : AbstractAuditor(logger)
 
 @Fallback
 @Component
-class LocalAuditor : AbstractAuditor(LocalAuditor::class.java.simpleName)
+class LocalAuditor(logger: Logger = getLogger(LocalAuditor::class.java.simpleName)) : AbstractAuditor(logger)
 
-abstract class AbstractAuditor(loggerName: String) : Auditor {
-    private val logger = getLogger(loggerName)
+abstract class AbstractAuditor(protected val logger: Logger) : Auditor {
     override fun info(message: String, t: Throwable?) = logger.info(message, t)
 }
 

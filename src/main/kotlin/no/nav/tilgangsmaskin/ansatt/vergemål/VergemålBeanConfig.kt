@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.vergemål
 
+import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.VERGEMÅL
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
@@ -14,7 +15,7 @@ class VergemålBeanConfig {
 
     @Bean
     fun vergemålClient(builder: Builder, cfg: VergemålConfig, oauth2: OAuth2TokenProvider) =
-        createClient<VergemålClient>(cfg, builder, interceptors = arrayOf(oauth2.interceptorFor("verge")))
+        createClient<VergemålClient>(cfg, builder, oauth2.interceptorFor(VERGEMÅL))
 
     @Bean
     fun vergeHealthIndicator(client: VergemålClient, cfg: VergemålConfig) =

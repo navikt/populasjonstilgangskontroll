@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
 
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRAPROXY
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import no.nav.tilgangsmaskin.felles.rest.OAuth2TokenProvider
@@ -12,7 +13,7 @@ class EntraProxyBeanConfig {
 
     @Bean
     fun entraProxyClient(cfg: EntraProxyConfig, builder: Builder, oauth2: OAuth2TokenProvider) =
-        createClient<EntraProxyClient>(cfg, builder, interceptors = arrayOf(oauth2.interceptorFor("entraproxy")))
+        createClient<EntraProxyClient>(cfg, builder,  oauth2.interceptorFor(ENTRAPROXY))
 
     @Bean
     fun entraProxyHealthIndicator(cfg: EntraProxyConfig, client: EntraProxyClient) =

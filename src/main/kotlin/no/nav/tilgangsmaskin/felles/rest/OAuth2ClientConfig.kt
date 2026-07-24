@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles
+package no.nav.tilgangsmaskin.felles.rest
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -14,8 +14,8 @@ class OAuth2ClientConfig {
     fun authorizedClientManager(repo: ClientRegistrationRepository) =
         AuthorizedClientServiceOAuth2AuthorizedClientManager(
             repo, InMemoryOAuth2AuthorizedClientService(repo)
-        ).also {
-            it.setAuthorizedClientProvider(
+        ).apply {
+            setAuthorizedClientProvider(
                 OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().build()
             )
         }

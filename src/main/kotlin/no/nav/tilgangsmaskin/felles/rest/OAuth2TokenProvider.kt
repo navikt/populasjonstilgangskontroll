@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component
 @Component
 class OAuth2TokenProvider(private val manager: OAuth2AuthorizedClientManager) {
     fun interceptorFor(registrationId: String): ClientHttpRequestInterceptor =
-        OAuth2ClientHttpRequestInterceptor(manager)
-            .also { it.setClientRegistrationIdResolver { registrationId } }
+        OAuth2ClientHttpRequestInterceptor(manager).apply {
+            setClientRegistrationIdResolver { registrationId }
+        }
 }

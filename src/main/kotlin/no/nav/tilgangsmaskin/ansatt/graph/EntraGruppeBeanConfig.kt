@@ -16,7 +16,7 @@ class EntraGruppeBeanConfig {
     @Qualifier(GRAPH)
     fun graphRestClient(builder: Builder, cfg: EntraGrupperConfig, oauth2: OAuth2TokenProvider) =
         builder.baseUrl(cfg.baseUri)
-            .requestInterceptor(oauth2.interceptorFor("graph"))
+            .requestInterceptor(oauth2.interceptorFor(GRAPH))
             .requestInterceptor(RestHeaderAddingRequestInterceptor(CONSISTENCY_LEVEL))
             .build()
 }

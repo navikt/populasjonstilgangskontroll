@@ -13,6 +13,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlAvroEnvExtensions.userInfo
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PDLPIP
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.kafka.KafkaTypedDroppedMessageMeter
@@ -43,7 +44,7 @@ class PdlBeanConfig {
     @Qualifier(PDLGRAPH)
     fun pdlGraphRestClient(builder: Builder, cfg: PdlGraphQLConfig, oauth2: OAuth2TokenProvider) =
         builder.requestInterceptors {
-            it.add(oauth2.interceptorFor("pdl-graph"))
+            it.add(oauth2.interceptorFor(PDLGRAPH))
             it.add(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
         }.build()
 
@@ -57,11 +58,11 @@ class PdlBeanConfig {
 
     @Bean
     fun pdlPipClient(builder: Builder, cfg: PdlConfig, oauth2: OAuth2TokenProvider) =
-        createClient<PdlPipClient>(cfg, builder, interceptors = arrayOf(oauth2.interceptorFor("pdl-pip")))
+        createClient<PdlPipClient>(cfg, builder, oauth2.interceptorFor(PDLPIP))
 
     @Bean
     fun pdlGraphQLPingClient(builder: Builder, cfg: PdlGraphQLConfig, oauth2: OAuth2TokenProvider) =
-        createClient<PdlGraphQLPingClient>(cfg, builder, interceptors = arrayOf(oauth2.interceptorFor("pdl-graph")))
+        createClient<PdlGraphQLPingClient>(cfg, builder, interceptors = arrayOf(oauth2.interceptorFor(PDLGRAPH)))
 
     @Bean
     fun pdlGraphHealthIndicator(cfg: PdlGraphQLConfig, client: PdlGraphQLPingClient) =

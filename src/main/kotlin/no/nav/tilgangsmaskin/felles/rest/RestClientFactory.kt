@@ -26,8 +26,8 @@ object RestClientFactory {
 
     inline fun <reified T : Any> createClient(cfg: RestConfig,
                                               builder: Builder,
-                                              errorHandler: ErrorHandler = RestDefaultErrorHandler(),
-                                              vararg interceptors: ClientHttpRequestInterceptor) =
+                                              vararg interceptors: ClientHttpRequestInterceptor,
+                                              errorHandler: ErrorHandler = RestDefaultErrorHandler(),) =
         createProxyFactory(cfg.baseUri, builder, errorHandler, *interceptors).createClient(T::class.java)
 }
 

@@ -11,7 +11,7 @@ Prod: https://tilgangsmaskin.intern.nav.no/swagger-ui/index.html#/
 Dev: https://tilgangsmaskin.intern.dev.nav.no/swagger-ui/index.html#/
 
 ## Informasjon om cacher i løsningen
-
+SS-client
 
 Løsningen har flere cacher for å optimalisere ytelse og redusere belastning på underliggende systemer:
 * EntraOID til NavIdent : Informasjon caches i 365 dager.

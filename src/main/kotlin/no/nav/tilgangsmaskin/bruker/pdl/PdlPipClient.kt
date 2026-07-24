@@ -7,7 +7,6 @@ import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
-@HttpExchange
 interface PdlPipClient {
 
     @GetExchange(PDL_PIP_PERSON_PATH)

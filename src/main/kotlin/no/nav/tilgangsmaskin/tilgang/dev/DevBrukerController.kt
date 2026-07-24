@@ -19,30 +19,32 @@ private const val DEV_BRUKER_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.bruke
 @UnprotectedRestController(value = ["/${ClusterConstants.DEV}/bruker/"])
 @ConditionalOnNotProd
 @Tag(name = "DevBrukerController", description = DEV_BRUKER_CONTROLLER_TAG_DESCRIPTION)
-class DevBrukerController(private val brukere: BrukerTjeneste,
-                          private val pdl: PdlTjeneste,
-                          private val pip: PdlPipClient) {
+class DevBrukerController(private val bruker: BrukerTjeneste, private val pdl: PdlTjeneste, private val pip: PdlPipClient) {
 
     @GetMapping("person/pip/{id}")
     @Operation(summary = SUMMARY_PERSON_PIP, description = DESCRIPTION_PERSON_PIP)
-    fun pip(@PathVariable id: String) = pip.person(id, id)
-
+    fun pip(@PathVariable id: String) =
+        pip.person(id, id)
 
     @GetMapping("person/{id}")
     @Operation(summary = SUMMARY_PERSON, description = DESCRIPTION_PERSON)
-    fun person(@PathVariable id: String) = pdl.medUtvidetFamilie(id)
+    fun person(@PathVariable id: String) =
+        pdl.medUtvidetFamilie(id)
 
     @PostMapping("brukere")
     @Operation(summary = SUMMARY_BRUKERE, description = DESCRIPTION_BRUKERE)
-    fun brukere(@RequestBody ids: Set<String>) = brukere.brukere(ids)
+    fun brukere(@RequestBody ids: Set<String>) =
+        bruker.brukere(ids)
 
     @PostMapping("brukeridentifikator")
     @Operation(summary = SUMMARY_BRUKERIDENTIFIKATOR, description = DESCRIPTION_BRUKERIDENTIFIKATOR)
-    fun brukerIdentifikator(@RequestBody id: Identifikator) = brukere.brukerMedUtvidetFamilie(id.verdi)
+    fun brukerIdentifikator(@RequestBody id: Identifikator) =
+        bruker.medUtvidetFamilie(id.verdi)
 
     @GetMapping("bruker/{id}")
     @Operation(summary = SUMMARY_BRUKER, description = DESCRIPTION_BRUKER)
-    fun bruker(@PathVariable id: String) = brukere.brukerMedUtvidetFamilie(id)
+    fun bruker(@PathVariable id: String) =
+        bruker.medUtvidetFamilie(id)
 
     companion object {
         private const val SUMMARY_PERSON_PIP = "msg:openapi.dev.bruker.person.pip.summary"

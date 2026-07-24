@@ -7,6 +7,8 @@ metadata:
   name: populasjonstilgangskontroll
   namespace: tilgangsmaskin
 spec:
+  envFrom:
+      - secret: slack
   strategy:
     rollingUpdate:
       maxSurge: 50%
@@ -14,6 +16,7 @@ spec:
     - instance: {{nais.cluster.cache}}
       access: readwrite
   leaderElection: true
+  
   kafka:
     pool: nav-{{nais.cluster.type}}
   gcp:
@@ -87,6 +90,7 @@ spec:
         - application: logging
           namespace: nais-system
       external:
+        - host: hooks.slack.com
         - host: {{pdl}}
         - host: {{pdlgraph}}
 

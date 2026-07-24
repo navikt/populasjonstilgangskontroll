@@ -14,29 +14,29 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
 @Target(FUNCTION)
 @Retention(RUNTIME)
 @ApiResponses(
-        value = [
-            ApiResponse(
-                responseCode = "404",
-                content = [Content(mediaType = APPLICATION_JSON_VALUE, schema = Schema(
-                    example = """{
+    value = [
+        ApiResponse(
+            responseCode = "404",
+            content = [Content(mediaType = APPLICATION_JSON_VALUE, schema = Schema(
+                example = """{
                 "detail": "Fant ingen oid for navident A222222, er den fremdeles gyldig?",
                 "instance": "/api/v1/ccf/komplett/A222222",
                 "status": 404,
                 "title": "Uventet respons fra Entra",
                 "navident": "A222222"
               }"""))],
-                description = "navident ikke funnet i Entra (gjelder kun Client Credentials Flow der navident oppgis som path-parameter)"),
-            ApiResponse(
-                    responseCode = "204",
-                    description = "Tilgang ble godkjent"),
-            ApiResponse(
-                    responseCode = "403",
-                    description = "Tilgang ble avvist",
-                    content = [Content(
-                            mediaType = APPLICATION_PROBLEM_JSON_VALUE,
-                            schema = Schema(
-                                    implementation = ProblemSwaggerDetailResponse::class,
-                                    example = """{
+            description = "navident ikke funnet i Entra (gjelder kun Client Credentials Flow der navident oppgis som path-parameter)"),
+        ApiResponse(
+            responseCode = "204",
+            description = "Tilgang ble godkjent"),
+        ApiResponse(
+            responseCode = "403",
+            description = "Tilgang ble avvist",
+            content = [Content(
+                mediaType = APPLICATION_PROBLEM_JSON_VALUE,
+                schema = Schema(
+                    implementation = ProblemSwaggerDetailResponse::class,
+                    example = """{
                         "type": "https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett",
                         "title": "AVVIST_STRENGT_FORTROLIG_ADRESSE",
                         "status": 403,
@@ -48,15 +48,16 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
                         "kanOverstyres": false
                     }"""))])])
 annotation class ProblemDetailApiResponse
+
 @Schema(description = "Problem Detail")
 internal data class ProblemSwaggerDetailResponse(
-        val type: URI,
-        val title: AvvisningsKode,
-        val status: Int,
-        val instance: String,
-        val brukerIdent: String,
-        val navIdent: String,
-        val begrunnelse: String,
-        val traceId: String,
-        val kanOverstyres: Boolean)
+    val type: URI,
+    val title: AvvisningsKode,
+    val status: Int,
+    val instance: String,
+    val brukerIdent: String,
+    val navIdent: String,
+    val begrunnelse: String,
+    val traceId: String,
+    val kanOverstyres: Boolean)
 

@@ -3,7 +3,9 @@ package no.nav.tilgangsmaskin.bruker.pdl
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
+import io.kotest.assertions.throwables.shouldThrow
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLClientPingTest.TestConfig
+import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -17,6 +19,7 @@ import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
+import org.springframework.test.web.client.response.MockRestResponseCreators.withServerError
 import org.springframework.web.client.RestClient.Builder
 
 @RestClientTest(components = [PdlGraphQLConfig::class])
@@ -49,7 +52,17 @@ class PdlGraphQLClientPingTest : BehaviorSpec() {
                     client.ping()
                 }
             }
+
+            When("ping kalles og PDL svarer 500") {
+                Then("kastes RecoverableRestException") {
+                    server.expect(requestTo(cfg.baseUri))
+                        .andExpect(method(OPTIONS))
+                        .andRespond(withServerError())
+                    shouldThrow<RecoverableRestException> {
+                        client.ping()
+                    }
+                }
+            }
         }
     }
 }
-

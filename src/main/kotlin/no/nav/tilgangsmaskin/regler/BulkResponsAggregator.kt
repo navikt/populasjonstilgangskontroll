@@ -22,10 +22,14 @@ class BulkResponsAggregator(
     private val auditor: Auditor) {
     private val log = getLogger(javaClass)
 
-    fun aggreger(ansattId: AnsattId, ansatt: Ansatt, resultater: Set<BulkResultat>, oppgitt: Set<BrukerIdOgRegelsett>, brukere: Set<BrukerOgRegelsett>): AggregertBulkRespons {
-            log.debug("${resultater.size} bulk resultater {}", resultater.map {
-                resultat -> "${resultat.bruker.oppslagId.maskFnr()}: ${resultat.status}"
-            })
+    fun aggreger(ansattId: AnsattId,
+                 ansatt: Ansatt,
+                 resultater: Set<BulkResultat>,
+                 oppgitt: Set<BrukerIdOgRegelsett>,
+                 brukere: Set<BrukerOgRegelsett>): AggregertBulkRespons {
+        log.debug("${resultater.size} bulk resultater {}", resultater.map { resultat ->
+            "${resultat.bruker.oppslagId.maskFnr()}: ${resultat.status}"
+        })
         val godkjente = godkjente(ansatt, resultater)
         val avviste = avviste(ansatt, godkjente, resultater, brukere)
         val ikkeFunnet = ikkeFunnet(oppgitt, resultater)
@@ -44,7 +48,10 @@ class BulkResponsAggregator(
             }
         }
 
-    private fun avviste(ansatt: Ansatt, godkjente: Set<EnkeltBulkRespons>, resultater: Set<BulkResultat>, brukere: Set<BrukerOgRegelsett>) =
+    private fun avviste(ansatt: Ansatt,
+                        godkjente: Set<EnkeltBulkRespons>,
+                        resultater: Set<BulkResultat>,
+                        brukere: Set<BrukerOgRegelsett>) =
         buildSet {
             val godkjenteIds = godkjente.map { it.brukerId }.toSet()
             for (resultat in resultater) {
@@ -53,7 +60,7 @@ class BulkResponsAggregator(
                     add(EnkeltBulkRespons(RegelException(ansatt,
                         brukere.finnBruker(resultat.bruker.oppslagId),
                         resultat.regel!!,
-                        status = resultat.status)))
+                        resultat.status)))
                 }
             }
         }.also {
@@ -69,7 +76,7 @@ class BulkResponsAggregator(
             }
         }.also {
             if (it.isNotEmpty()) {
-                auditor.info("${it.size} brukere med identer ${it.map { ident -> ident.brukerId}} ikke funnet i PDL ved oppslag")
+                auditor.info("${it.size} brukere med identer ${it.map { ident -> ident.brukerId }} ikke funnet i PDL ved oppslag")
                 log.debug("${it.size} ikke funnet i bulk ({})", it.map { ident -> ident.brukerId.maskFnr() })
             }
         }

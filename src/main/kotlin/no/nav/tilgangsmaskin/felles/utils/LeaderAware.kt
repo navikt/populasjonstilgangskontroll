@@ -26,9 +26,9 @@ abstract class LeaderAware(private var erLeder: Boolean = false) {
 
     protected fun <T> somLeder(beskrivelse: String, block: () -> T, default: () -> T): T =
         if (erLeder) {
-        log.trace(beskrivelse)
-        block()
-    } else {
-        default()
-    }
+            log.trace(beskrivelse)
+            block()
+        } else {
+            default()
+        }
 }

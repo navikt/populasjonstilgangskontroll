@@ -24,16 +24,3 @@ abstract class AbstractTeller(
             .register(registry)
             .increment(n.toDouble())
 }
-
-abstract class AbstractAsyncTeller(
-    private val registry: MeterRegistry,
-    private val navn: String,
-    private val beskrivelse: String) {
-
-    fun tell(n: Int = 1) =
-        Counter.builder(navn)
-            .description(beskrivelse)
-            .register(registry)
-            .increment(n.toDouble())
-}
-

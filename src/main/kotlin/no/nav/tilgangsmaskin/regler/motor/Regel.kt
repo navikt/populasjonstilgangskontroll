@@ -21,13 +21,8 @@ interface Regel {
     fun godtaHvis(predikat: () -> Boolean) = predikat.invoke()
     fun avvisHvis(predikat: () -> Boolean) = !godtaHvis(predikat)
 
-    val log get() =  getLogger(javaClass)
+    val log get() = getLogger(javaClass)
 
-    companion object {
-        private const val REGEL = "regel"
-        fun regelTag(regel: Regel) = Tag.of(REGEL, regel.kortNavn)
-        val INGEN_REGEL_TAG = Tag.of(REGEL, UTILGJENGELIG)
-    }
 }
 
 interface OverstyrbarRegel : Regel

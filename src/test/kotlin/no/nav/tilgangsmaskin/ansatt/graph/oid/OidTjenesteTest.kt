@@ -27,8 +27,11 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import java.util.UUID
+import com.ninjasquad.springmockk.MockkBean
 
-@RestClientTest(components = [EntraOidTjeneste::class, EntraOidConfig::class, EntraGrupperConfig::class, EntraOidBeanConfig::class])
+import no.nav.tilgangsmaskin.felles.rest.TexasShadowProvider
+
+@RestClientTest(components = [EntraOidTjeneste::class, EntraOidConfig::class, EntraGrupperConfig::class, EntraOidBeanConfig::class, TexasShadowProvider::class])
 @Import(EntraTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class OidTjenesteTest : BehaviorSpec() {

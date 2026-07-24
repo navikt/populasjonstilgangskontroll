@@ -22,10 +22,12 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_OG_GL
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.tilgang.Token
+import no.nav.tilgangsmaskin.tilgang.TokenType
 import java.net.URI
 import java.util.*
 
@@ -40,7 +42,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
     val oid       = UUID.randomUUID()
     val geoGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_1234")
 
-    val resolver = EntraAnsattGruppeResolver(entra, token, oidTjeneste, cache)
+    val resolver = EntraAnsattGruppeResolver(entra, token, oidTjeneste, cache,mockk<MessagePublisher>(relaxed = true))
 
     beforeEach {
         clearAllMocks()
@@ -48,7 +50,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
     }
 
     Given("CC-flow") {
-        beforeEach { every { token.erCC } returns true }
+        beforeEach { every { token.type } returns TokenType.CCF }
 
         When("token inneholder kjente og ukjente gruppe-IDer") {
             Then("Token.globaleGrupper returnerer kun kjente EntraGrupper") {
@@ -115,8 +117,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
     Given("OBO-flow") {
         beforeEach {
-            every { token.erCC }  returns false
-            every { token.erObo } returns true
+            every { token.type } returns TokenType.OBO
             every { token.oid }   returns oid
         }
 
@@ -155,8 +156,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
     Given("uautentisert") {
         beforeEach {
-            every { token.erCC }  returns false
-            every { token.erObo } returns false
+            every { token.type } returns TokenType.UNAUTHENTICATED
         }
 
         When("miljø er dev/test") {

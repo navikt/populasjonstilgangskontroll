@@ -12,7 +12,7 @@ class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
         Given("CCF enkeltoppslag") {
 
-            beforeEach { every { token.erCC } returns true }
+            beforeEach { every { token.type } returns TokenType.CCF }
 
             When("komplett kalles med CCF-token") {
                 Then("returnerer 204 ved tilgang") {
@@ -36,7 +36,7 @@ class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
             When("komplett kalles med OBO-token") {
                 Then("returnerer 403") {
-                    every { token.erCC } returns false
+                    every { token.type } returns TokenType.OBO
                     mockMvc.post("/api/v1/ccf/komplett/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
                     }.andExpect { status { isForbidden() } }
@@ -45,7 +45,7 @@ class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
             When("kjerne kalles med OBO-token") {
                 Then("returnerer 403") {
-                    every { token.erCC } returns false
+                    every { token.type } returns TokenType.OBO
                     mockMvc.post("/api/v1/ccf/kjerne/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
                     }.andExpect { status { isForbidden() } }

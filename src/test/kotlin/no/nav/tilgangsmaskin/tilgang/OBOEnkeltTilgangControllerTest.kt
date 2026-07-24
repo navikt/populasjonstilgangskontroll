@@ -8,9 +8,10 @@ import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
-import no.nav.tilgangsmaskin.regler.motor.OverstyrbarRegel
+import no.nav.tilgangsmaskin.regler.motor.KjerneRegel
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
+import no.nav.tilgangsmaskin.tilgang.TokenType.UNAUTHENTICATED
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.post
@@ -22,7 +23,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
         Given("OBO enkeltoppslag") {
 
-            beforeEach { every { token.erObo } returns true }
+            beforeEach { every { token.type } returns TokenType.OBO }
 
             When("komplett kalles med OBO-token") {
                 Then("returnerer 204 ved tilgang") {
@@ -38,7 +39,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                 Then("returnerer 403 med komplett ProblemDetail") {
                     val testAnsatt = AnsattBuilder(ansattId).build()
                     val testBruker = BrukerBuilder(BrukerId(brukerId)).build()
-                    val testRegel = object : OverstyrbarRegel {
+                    val testRegel = object : KjerneRegel {
                         override val metadata = RegelMetadata(STRENGT_FORTROLIG)
                         override fun evaluer(ansatt: Ansatt, bruker: Bruker) = false
                     }
@@ -51,7 +52,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         jsonPath("$.title") { value("AVVIST_STRENGT_FORTROLIG_ADRESSE") }
                         jsonPath("$.brukerIdent") { value(brukerId) }
                         jsonPath("$.navIdent") { value(ansattId.verdi) }
-                        jsonPath("$.kanOverstyres") { value(true) }
+                        jsonPath("$.kanOverstyres") { value(false) }
                     }.andDo { handle(dokumenterMedAuth("obo-komplett-avvist", problemDetailFields)) }
                 }
             }
@@ -68,7 +69,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
             When("komplett kalles med CCF-token") {
                 Then("returnerer 403") {
-                    every { token.erObo } returns false
+                    every { token.type } returns TokenType.CCF
                     mockMvc.post("/api/v1/komplett") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
                     }.andExpect { status { isForbidden() } }
@@ -77,7 +78,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
             When("kjerne kalles med CCF-token") {
                 Then("returnerer 403") {
-                    every { token.erObo } returns false
+                    every { token.type } returns TokenType.CCF
                     mockMvc.post("/api/v1/kjerne") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
                     }.andExpect { status { isForbidden() } }
@@ -137,11 +138,11 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
             val gyldigTil = LocalDate.now().plusMonths(2)
 
-            beforeEach { every { token.erObo } returns true }
+            beforeEach { every { token.type } returns TokenType.OBO }
 
             When("enkelttilgang kalles med gyldig request og OBO-token") {
                 Then("returnerer 202 og dokumenteres i rest docs") {
-                    every { enkeltTilgangTjeneste.registrerEnkeltTilgang(ansattId, any(), any()) } returns true
+                    every { enkeltTilgangTjeneste.registrerTilgang(ansattId, any()) } returns true
                     mockMvc.post("/api/v1/overstyr") {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
@@ -152,8 +153,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
             When("enkelttilgang kalles med CCF-token") {
                 Then("returnerer 403") {
-                    every { token.erCC } returns true
-                    every { token.erObo } returns false
+                    every { token.type } returns TokenType.CCF
                     mockMvc.post("/api/v1/overstyr") {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
@@ -163,8 +163,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
             When("enkelttilgang kalles uten token") {
                 Then("returnerer 403") {
-                    every { token.erCC } returns false
-                    every { token.erObo } returns false
+                    every { token.type } returns UNAUTHENTICATED
                     mockMvc.post("/api/v1/overstyr") {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""

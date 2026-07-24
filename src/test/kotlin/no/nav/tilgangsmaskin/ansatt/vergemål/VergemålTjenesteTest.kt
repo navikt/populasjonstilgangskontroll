@@ -2,13 +2,13 @@
 package no.nav.tilgangsmaskin.ansatt.vergemål
 
 import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
-import io.mockk.every
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålClient.Companion.VERGEMÅL_PATH
@@ -35,7 +35,9 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
 
-@RestClientTest(components = [VergemålBeanConfig::class, VergemålTjeneste::class])
+import no.nav.tilgangsmaskin.felles.rest.TexasShadowProvider
+
+@RestClientTest(components = [VergemålBeanConfig::class, VergemålTjeneste::class, TexasShadowProvider::class])
 @EnableConfigurationProperties(VergemålConfig::class)
 @ApplyExtension(SpringExtension::class)
 class VergemålTjenesteTest : BehaviorSpec() {
@@ -80,7 +82,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
                             ]
                         """.trimIndent(), APPLICATION_JSON))
 
-                    tjeneste.vergemål(ANSATT_ID) shouldBe setOf(BRUKER1, BRUKER2)
+                    tjeneste.alle(ANSATT_ID) shouldBe setOf(BRUKER1, BRUKER2)
                 }
             }
 
@@ -90,7 +92,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
                         .andExpect(method(POST))
                         .andRespond(withSuccess("[]", APPLICATION_JSON))
 
-                    tjeneste.vergemål(ANSATT_ID).shouldBeEmpty()
+                    tjeneste.alle(ANSATT_ID).shouldBeEmpty()
                 }
             }
         }
@@ -100,7 +102,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
                 Then("returnerer tom liste uten HTTP-kall") {
                     every { nom.fnrForAnsatt(ANSATT_ID) } returns null
 
-                    tjeneste.vergemål(ANSATT_ID).shouldBeEmpty()
+                    tjeneste.alle(ANSATT_ID).shouldBeEmpty()
                 }
             }
         }
@@ -114,7 +116,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
                         .andExpect(method(POST))
                         .andRespond(withStatus(NOT_FOUND))
 
-                    shouldThrow<NotFoundRestException> { tjeneste.vergemål(ANSATT_ID) }
+                    shouldThrow<NotFoundRestException> { tjeneste.alle(ANSATT_ID) }
                 }
             }
 
@@ -124,7 +126,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
                         .andExpect(method(POST))
                         .andRespond(withStatus(UNAUTHORIZED))
 
-                    shouldThrow<IrrecoverableRestException> { tjeneste.vergemål(ANSATT_ID) }
+                    shouldThrow<IrrecoverableRestException> { tjeneste.alle(ANSATT_ID) }
                 }
             }
 
@@ -134,7 +136,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
                         .andExpect(method(POST))
                         .andRespond(withStatus(INTERNAL_SERVER_ERROR))
 
-                    shouldThrow<RecoverableRestException> { tjeneste.vergemål(ANSATT_ID) }
+                    shouldThrow<RecoverableRestException> { tjeneste.alle(ANSATT_ID) }
                 }
             }
         }

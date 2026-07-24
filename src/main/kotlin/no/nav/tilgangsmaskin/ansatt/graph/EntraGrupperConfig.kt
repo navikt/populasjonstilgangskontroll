@@ -1,18 +1,20 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.uuids
 import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO
 import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO_OG_GLOBALE
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.uuids
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient.Companion.ENTRA_PING_PATH
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.RestConfig
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.net.URI
 import java.time.Duration.ofHours
 
 @Component
-class EntraGrupperConfig : CachableRestConfig, RestConfig(ENTRA_BASE_URI, ENTRA_PING_PATH, GRAPH) {
+class EntraGrupperConfig(@Value("\${texas.scope.graph}") val scope: String) :
+    CachableRestConfig, RestConfig(ENTRA_BASE_URI, ENTRA_PING_PATH, GRAPH) {
 
     override val caches = ENTRA_CACHES
     override val navn = name

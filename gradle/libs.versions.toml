@@ -3,7 +3,6 @@ kotlin = "2.4.0"
 spring-boot = "4.1.0"
 spring-dependency-management = "1.1.7"
 springdoc = "3.0.3"
-token-support = "6.0.11"
 mockk = "1.14.11"
 kotest = "6.2.2"
 opentelemetry = "2.29.0"
@@ -29,8 +28,6 @@ micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-p
 jackson-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin" }
 logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logstash" }
 boot-conditionals = { module = "no.nav.boot:boot-conditionals", version.ref = "boot-conditionals" }
-token-client-spring = { module = "no.nav.security:token-client-spring", version.ref = "token-support" }
-token-validation-spring = { module = "no.nav.security:token-validation-spring", version.ref = "token-support" }
 flyway-database-postgresql = { module = "org.flywaydb:flyway-database-postgresql" }
 commons-pool2 = { module = "org.apache.commons:commons-pool2", version.ref = "commons-pool2" }
 hibernate-micrometer = { module = "org.hibernate.orm:hibernate-micrometer" }
@@ -47,7 +44,9 @@ spring-boot-starter-graphql = { module = "org.springframework.boot:spring-boot-s
 spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
 spring-boot-starter-jetty = { module = "org.springframework.boot:spring-boot-starter-jetty" }
+spring-boot-starter-restclient = { module = "org.springframework.boot:spring-boot-starter-restclient" }
 spring-boot-starter-webclient = { module = "org.springframework.boot:spring-boot-starter-webclient" }
+spring-boot-starter-oauth2-resource-server = { module = "org.springframework.boot:spring-boot-starter-oauth2-resource-server" }
 spring-boot-starter-oauth2-client = { module = "org.springframework.boot:spring-boot-starter-oauth2-client" }
 spring-boot-starter-kafka = { module = "org.springframework.boot:spring-boot-starter-kafka" }
 spring-aspects = { module = "org.springframework:spring-aspects" }
@@ -84,7 +83,6 @@ avro = { id = "com.github.davidmc24.gradle.plugin.avro", version.ref = "avro-plu
 cyclonedx = { id = "org.cyclonedx.bom", version.ref = "cyclonedx" }
 kotest = { id = "io.kotest", version.ref = "kotest" }
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version.ref = "asciidoctor" }
-
 
 
 

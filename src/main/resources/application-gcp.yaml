@@ -48,6 +48,11 @@ management:
 spring:
   security:
     oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${azure.openid.config.issuer}
+          audiences:
+            - ${azure.app.client.id}
       client:
         provider:
           azuread:
@@ -181,11 +186,6 @@ spring:
       fail-on-unknown-properties: true
     default-property-inclusion: non_null
 
-no.nav.security.jwt:
-  issuer:
-    azuread:
-      discovery-url: ${azure.app.well.known.url}
-      accepted_audience: ${azure.app.client.id}
 
 springdoc:
   swagger-ui:

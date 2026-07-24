@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin
 
 import no.nav.boot.conditionals.ConditionalOnGCP
-import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.AUDITING_TIME_PROVIDER
 import no.nav.tilgangsmaskin.felles.cache.CacheSizeAware
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.profiler
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Component
 @EnableJpaAuditing(dateTimeProviderRef = AUDITING_TIME_PROVIDER)
 @EnableScheduling
 @ConditionalOnGCP
-@EnableJwtTokenValidation(ignore = ["org.springdoc", "org.springframework"])
 class App
 
 fun main(args: Array<String>) {

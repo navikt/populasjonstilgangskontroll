@@ -6,11 +6,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
-import no.nav.security.token.support.spring.ProtectedRestController
-import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 import kotlin.annotation.AnnotationRetention.RUNTIME
 import kotlin.annotation.AnnotationTarget.CLASS
@@ -18,7 +18,8 @@ import kotlin.annotation.AnnotationTarget.CLASS
 @Target(CLASS)
 @Retention(RUNTIME)
 @SecurityScheme(bearerFormat = "JWT", name = "bearerAuth", scheme = "bearer", type = HTTP)
-@ProtectedRestController(value = ["/api/v1"], issuer = AAD_ISSUER, claimMap = [])
+@RestController
+@RequestMapping("/api/v1")
 @SecurityRequirement(name = "bearerAuth")
 annotation class TilgangApiController
 

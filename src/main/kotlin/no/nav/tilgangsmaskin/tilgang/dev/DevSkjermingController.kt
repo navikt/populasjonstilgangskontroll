@@ -3,7 +3,8 @@ package no.nav.tilgangsmaskin.tilgang.dev
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.security.token.support.spring.UnprotectedRestController
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
@@ -12,7 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
 
-@UnprotectedRestController(value = ["/${DEV}/skjerming"])
+@RestController
+@RequestMapping("/${DEV}/skjerming")
 @ConditionalOnNotProd
 @Tag(name = "DevSkjermingController", description = DEV_SKJERMING_CONTROLLER_TAG_DESCRIPTION)
 class DevSkjermingController(private val skjerming: SkjermingTjeneste) {

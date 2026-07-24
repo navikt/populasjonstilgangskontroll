@@ -3,7 +3,8 @@ package no.nav.tilgangsmaskin.tilgang.dev
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.security.token.support.spring.UnprotectedRestController
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient
@@ -16,7 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody
 
 private const val DEV_BRUKER_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.bruker.tag.description"
 
-@UnprotectedRestController(value = ["/${ClusterConstants.DEV}/bruker/"])
+@RestController
+@RequestMapping("/${ClusterConstants.DEV}/bruker/")
 @ConditionalOnNotProd
 @Tag(name = "DevBrukerController", description = DEV_BRUKER_CONTROLLER_TAG_DESCRIPTION)
 class DevBrukerController(private val bruker: BrukerTjeneste, private val pdl: PdlTjeneste, private val pip: PdlPipClient) {

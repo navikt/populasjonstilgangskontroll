@@ -61,7 +61,7 @@ dependencies {
     implementation(libs.jackson.module.kotlin)
     implementation(libs.logstash.logback.encoder)
     implementation(libs.boot.conditionals)
-    implementation(libs.token.validation.spring)
+    implementation(libs.spring.boot.starter.oauth2.resource.server)
     implementation(libs.flyway.database.postgresql)
     implementation(libs.commons.pool2)
     implementation(libs.hibernate.micrometer)
@@ -78,6 +78,7 @@ dependencies {
         exclude(group = "org.springframework.boot", "spring-boot-starter-tomcat")
     }
     implementation(libs.spring.boot.starter.jetty)
+    implementation(libs.spring.boot.starter.restclient)
     implementation(libs.spring.boot.starter.webclient)
     implementation(libs.spring.boot.starter.oauth2.client)
     implementation(libs.spring.boot.starter.kafka)

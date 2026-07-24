@@ -3,7 +3,8 @@ package no.nav.tilgangsmaskin.tilgang.dev
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.security.token.support.spring.UnprotectedRestController
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
@@ -22,7 +23,8 @@ import org.springframework.web.bind.annotation.ResponseStatus
 
 private const val DEV_REGEL_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.regel.tag.description"
 
-@UnprotectedRestController(value = ["/${DEV}/regel/"])
+@RestController
+@RequestMapping("/${DEV}/regel/")
 @ConditionalOnNotProd
 @Tag(name = "DevRegelController", description = DEV_REGEL_CONTROLLER_TAG_DESCRIPTION)
 class DevRegelController(private val regler: RegelTjeneste) {

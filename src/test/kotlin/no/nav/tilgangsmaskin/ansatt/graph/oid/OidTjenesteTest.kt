@@ -27,13 +27,11 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import java.util.UUID
-import com.ninjasquad.springmockk.MockkBean
 
 
-import no.nav.tilgangsmaskin.felles.rest.OAuth2TokenProviderTestConfig
 
 @RestClientTest(components = [EntraOidTjeneste::class, EntraOidConfig::class, EntraGrupperConfig::class, EntraOidBeanConfig::class])
-@Import(EntraTestConfig::class, OAuth2TokenProviderTestConfig::class)
+@Import(EntraTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class OidTjenesteTest : BehaviorSpec() {
 

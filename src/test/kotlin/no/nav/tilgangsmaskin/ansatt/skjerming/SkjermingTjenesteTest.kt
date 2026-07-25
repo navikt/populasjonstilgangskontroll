@@ -36,13 +36,12 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.request
 import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
-import com.ninjasquad.springmockk.MockkBean
 
 
-import no.nav.tilgangsmaskin.felles.rest.OAuth2TokenProviderTestConfig
+import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 
 @RestClientTest(components = [SkjermingClient::class,SkjermingBeanConfig::class, SkjermingTjeneste::class, SkjermingConfig::class])
-@Import(SkjermingTestConfig::class, OAuth2TokenProviderTestConfig::class)
+@Import(SkjermingTestConfig::class, OAuth2ClientTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class SkjermingTjenesteTest : BehaviorSpec() {
 

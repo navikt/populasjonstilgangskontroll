@@ -11,20 +11,27 @@ import java.util.*
 
 @RetryingWhenRecoverableRestService
 @Timed
-class EntraTjeneste(private val adapter: EntraGrupperRestClientAdapter) {
+class EntraTjeneste(
+    private val client: EntraGrupperClient,
+    private val cfg: EntraGrupperConfig
+) {
 
     @Cacheable(cacheNames = [GRAPH], key = "#root.methodName + ':' + #ansattId.verdi")
     @WithSpan
     fun geoOgGlobaleGrupper(ansattId: AnsattId, oid: UUID) =
-        adapter.grupper("$oid", true)
+        grupper("$oid", true)
 
     @Cacheable(cacheNames = [GRAPH], key = "#root.methodName + ':' + #ansattId.verdi")
     @WithSpan
     fun geoGrupper(ansattId: AnsattId, oid: UUID) =
-        adapter.grupper("$oid", false)
+        grupper("$oid", false)
+
+    private fun grupper(ansattId: String, trengerGlobaleGrupper: Boolean): Set<EntraGruppe> =
+        generateSequence(client.grupper(cfg.grupperURI(ansattId, trengerGlobaleGrupper))) { bolk ->
+            bolk.next?.let(client::grupper)
+        }.flatMapTo(mutableSetOf()) { it.value }
 
     @NoCoverageAnalysis
-    override fun toString() = "${javaClass.simpleName} [adapter=$adapter]"
+    override fun toString() = "${javaClass.simpleName} [client=$client, config=$cfg]"
 }
-
 

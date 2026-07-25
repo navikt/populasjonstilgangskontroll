@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.RestLoggingRequestInterceptor
+import no.nav.tilgangsmaskin.felles.rest.RestDefaultErrorHandler
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.apache.hc.client5.http.config.ConnectionConfig
 import org.apache.hc.client5.http.impl.classic.HttpClients
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.auditing.DateTimeProvider
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
@@ -68,8 +70,8 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
             c.requestInterceptors {
                 it.add(RestLoggingRequestInterceptor())
             }
+            c.defaultStatusHandler(HttpStatusCode::isError, RestDefaultErrorHandler()::handle)
         }
-
 
     @Bean
     fun clusterAddingTimedAspect(meterRegistry: MeterRegistry, token: Token) =
@@ -115,9 +117,8 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 }
 
-@Retention(BINARY)  // = CLASS in bytecode — enough for JaCoCo
+@Retention(BINARY)  
 @Target(FUNCTION, CONSTRUCTOR, CLASS)
 annotation class Generated
 typealias NoCoverageAnalysis = Generated
-
 

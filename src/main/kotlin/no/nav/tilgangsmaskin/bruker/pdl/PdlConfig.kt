@@ -26,9 +26,10 @@ class PdlConfig(
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
+        const val PDLPIP = "pdlpip"
         const val PDL = "pdl"
-        val MED_FAMILIE = "medFamilie"
-        val MED_UTVIDET_FAMILIE = "medUtvidetFamilie"
+        const val MED_FAMILIE = "medFamilie"
+        const val MED_UTVIDET_FAMILIE = "medUtvidetFamilie"
         val PDL_MED_FAMILIE_CACHE = CacheNøkkelConfig(PDL, MED_FAMILIE)
         val PDL_MED_UTVIDET_FAMILIE_CACHE = CacheNøkkelConfig(PDL, MED_UTVIDET_FAMILIE)
         val PDL_CACHES = setOf(PDL_MED_FAMILIE_CACHE, PDL_MED_UTVIDET_FAMILIE_CACHE)

@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.assertions.throwables.shouldThrow
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLClientPingTest.TestConfig
+import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,7 +25,7 @@ import org.springframework.web.client.RestClient.Builder
 
 @RestClientTest(components = [PdlGraphQLConfig::class])
 @TestPropertySource(properties = ["PDLGRAPH=pdlgraph"])
-@Import(TestConfig::class)
+@Import(TestConfig::class, OAuth2ClientTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class PdlGraphQLClientPingTest : BehaviorSpec() {
 

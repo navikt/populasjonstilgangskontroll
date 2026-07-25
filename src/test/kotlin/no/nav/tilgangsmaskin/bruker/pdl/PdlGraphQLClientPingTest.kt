@@ -7,7 +7,6 @@ import io.kotest.assertions.throwables.shouldThrow
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLClientPingTest.TestConfig
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
-import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
@@ -22,6 +21,8 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.request
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.test.web.client.response.MockRestResponseCreators.withServerError
 import org.springframework.web.client.RestClient.Builder
+import org.springframework.web.client.support.RestClientAdapter.create
+import org.springframework.web.service.invoker.HttpServiceProxyFactory.builderFor
 
 @RestClientTest(components = [PdlGraphQLConfig::class])
 @TestPropertySource(properties = ["PDLGRAPH=pdlgraph"])
@@ -33,7 +34,7 @@ class PdlGraphQLClientPingTest : BehaviorSpec() {
     class TestConfig {
         @Bean
         fun pdlGraphQLClient(b: Builder, cfg: PdlGraphQLConfig) =
-            createClient<PdlGraphQLPingClient>(cfg, b)
+            builderFor(create(b.baseUrl(cfg.baseUri).build())).build().createClient(PdlGraphQLPingClient::class.java)
     }
 
     @Autowired @Qualifier("pdlGraphQLClient") lateinit var client: PdlGraphQLPingClient

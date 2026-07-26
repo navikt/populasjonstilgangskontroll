@@ -1,12 +1,11 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
 
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.rest.createOAuth2Client
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.RestClient.Builder
 import org.springframework.web.client.support.RestClientAdapter
-import org.springframework.web.service.invoker.HttpServiceProxyFactory
-import org.springframework.web.service.invoker.createClient
 
 @Configuration
 class EntraProxyBeanConfig {
@@ -15,12 +14,8 @@ class EntraProxyBeanConfig {
     fun entraProxyClient(
         cfg: EntraProxyConfig,
         builder: Builder
-    ) = HttpServiceProxyFactory.builderFor(
-        RestClientAdapter.create(builder
-                .baseUrl(cfg.baseUri)
-                .build()
-        )
-    ).build().createClient<EntraProxyClient>()
+    ) = RestClientAdapter.create(builder.baseUrl(cfg.baseUri).build())
+        .createOAuth2Client<EntraProxyClient>()
 
     @Bean
     fun entraProxyHealthIndicator(cfg: EntraProxyConfig, client: EntraProxyClient) =

@@ -17,6 +17,7 @@ import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.kafka.KafkaTypedDroppedMessageMeter
 import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
+import no.nav.tilgangsmaskin.felles.rest.createOAuth2Client
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
 import org.springframework.beans.factory.annotation.Qualifier
@@ -30,11 +31,10 @@ import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.listener.CommonErrorHandler
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS
+import org.springframework.security.oauth2.client.web.ClientAttributes
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
 import org.springframework.web.client.support.RestClientAdapter
-import org.springframework.web.service.invoker.HttpServiceProxyFactory
-import org.springframework.web.service.invoker.createClient
 
 @Configuration
 @NoCoverageAnalysis
@@ -45,6 +45,7 @@ class PdlBeanConfig {
     fun pdlGraphRestClient(builder: Builder) =
         builder
             .requestInterceptor(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
+            .requestInitializer { ClientAttributes.clientRegistrationId(PDLGRAPH).accept(it.attributes) }
             .build()
 
     @Bean
@@ -57,23 +58,13 @@ class PdlBeanConfig {
 
     @Bean
     fun pdlPipClient(builder: Builder, cfg: PdlConfig) =
-        HttpServiceProxyFactory.builderFor(
-            RestClientAdapter.create(
-                builder
-                    .baseUrl(cfg.baseUri)
-                    .build()
-            )
-        ).build().createClient<PdlPipClient>()
+        RestClientAdapter.create(builder.baseUrl(cfg.baseUri).build())
+            .createOAuth2Client<PdlPipClient>()
 
     @Bean
     fun pdlGraphQLPingClient(builder: Builder, cfg: PdlGraphQLConfig) =
-        HttpServiceProxyFactory.builderFor(
-            RestClientAdapter.create(
-                builder
-                    .baseUrl(cfg.baseUri)
-                    .build()
-            )
-        ).build().createClient<PdlGraphQLPingClient>()
+        RestClientAdapter.create(builder.baseUrl(cfg.baseUri).build())
+            .createOAuth2Client<PdlGraphQLPingClient>()
 
     @Bean
     fun pdlGraphHealthIndicator(cfg: PdlGraphQLConfig, client: PdlGraphQLPingClient) =

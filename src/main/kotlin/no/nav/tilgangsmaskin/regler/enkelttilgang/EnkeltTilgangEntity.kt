@@ -46,7 +46,7 @@ class EnkeltTilgangEntity(
     @Column(name = "oppretter", length = ANSATTID_LENGTH)
     var oppretter: String? = null
 
-    @Column(name = "system", length = 50)
+    @Column(name = "system", length = 75)
     var system: String? = null
 }
 

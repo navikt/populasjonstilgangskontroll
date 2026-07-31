@@ -5,8 +5,8 @@ spring-dependency-management = "1.1.7"
 springdoc = "3.0.3"
 token-support = "6.0.11"
 mockk = "1.14.11"
-kotest = "6.2.2"
-opentelemetry = "2.29.0"
+kotest = "6.2.3"
+opentelemetry = "2.30.0"
 boot-conditionals = "6.0.7"
 logstash = "9.0"
 commons-pool2 = "2.13.1"
@@ -15,8 +15,8 @@ confluent = "8.3.0"
 avro-plugin = "1.9.1"
 cyclonedx = "3.3.0"
 asciidoctor = "4.0.5"
-slack-api-client = "1.49.0"
-opentelemetry-alpha = "2.29.0-alpha"
+
+opentelemetry-alpha = "2.30.0-alpha"
 
 [libraries]
 # Implementation
@@ -47,6 +47,7 @@ spring-boot-starter-graphql = { module = "org.springframework.boot:spring-boot-s
 spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
 spring-boot-starter-jetty = { module = "org.springframework.boot:spring-boot-starter-jetty" }
+spring-boot-starter-restclient = { module = "org.springframework.boot:spring-boot-starter-restclient" }
 spring-boot-starter-webclient = { module = "org.springframework.boot:spring-boot-starter-webclient" }
 spring-boot-starter-oauth2-client = { module = "org.springframework.boot:spring-boot-starter-oauth2-client" }
 spring-boot-starter-kafka = { module = "org.springframework.boot:spring-boot-starter-kafka" }

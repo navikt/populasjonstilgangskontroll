@@ -1,0 +1,2 @@
+ALTER TABLE overstyring
+    ALTER COLUMN system TYPE VARCHAR(75) USING (system::VARCHAR(75));

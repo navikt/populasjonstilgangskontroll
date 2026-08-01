@@ -15,7 +15,11 @@ class SecurityConfig {
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
             .logout { it.disable() }
-            .authorizeHttpRequests { it.anyRequest().permitAll() }
+            .authorizeHttpRequests {
+                it.requestMatchers("/api/v1/**").authenticated()
+                    .anyRequest().permitAll()
+            }
+            .oauth2ResourceServer { it.jwt { } }
             .build()
 
     @Bean

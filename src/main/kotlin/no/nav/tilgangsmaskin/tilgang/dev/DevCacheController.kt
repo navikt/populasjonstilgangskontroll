@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.tilgang.dev
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
@@ -16,9 +15,12 @@ import no.nav.tilgangsmaskin.tilgang.MSG
 import no.nav.tilgangsmaskin.tilgang.dev.DevCacheController.Companion.DEV_CACHE_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 
-@UnprotectedRestController(value = ["/${DEV}/cache"])
+@RestController
+@RequestMapping("/${DEV}/cache")
 @ConditionalOnNotProd
 @Tag(name = "DevCacheController", description = DEV_CACHE_CONTROLLER_TAG_DESCRIPTION)
 class DevCacheController(private val cache: CacheOperations) {

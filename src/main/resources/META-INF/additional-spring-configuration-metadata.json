@@ -1,13 +1,13 @@
 {
   "properties": [
     {
-      "name": "no.nav.security.jwt.issuer.azuread.accepted_audience",
+      "name": "spring.security.oauth2.resourceserver.jwt.jwk-set-uri",
       "type": "java.lang.String",
-      "description": "Description for no.nav.security.jwt.issuer.azuread.accepted_audience."
+      "description": "JWKS endpoint for validating inbound JWT access tokens."
     },
     {
-      "name": "no.nav.security.jwt.issuer.azuread.discoveryurl",
-      "type": "java.lang.String",
-      "description": "Description for no.nav.security.jwt.issuer.azuread.discoveryurl."
+      "name": "spring.security.oauth2.resourceserver.jwt.audiences",
+      "type": "java.util.List<java.lang.String>",
+      "description": "Accepted audiences for inbound JWT access tokens."
     }
   ] }

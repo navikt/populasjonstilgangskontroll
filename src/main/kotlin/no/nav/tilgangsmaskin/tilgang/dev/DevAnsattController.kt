@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.tilgang.dev
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
@@ -12,9 +11,12 @@ import no.nav.tilgangsmaskin.tilgang.MSG
 import no.nav.tilgangsmaskin.tilgang.dev.DevAnsattController.Companion.DEV_ANSATT_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 
-@UnprotectedRestController(value = ["/${DEV}/ansatt/"])
+@RestController
+@RequestMapping("/${DEV}/ansatt/")
 @ConditionalOnNotProd
 @Tag(name = "DevAnsattController", description = DEV_ANSATT_CONTROLLER_TAG_DESCRIPTION)
 class DevAnsattController(

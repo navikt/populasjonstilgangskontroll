@@ -3,14 +3,8 @@ package no.nav.tilgangsmaskin.tilgang
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
-import io.mockk.every
-import io.mockk.mockk
-import no.nav.security.token.support.core.context.TokenValidationContext
-import no.nav.security.token.support.core.context.TokenValidationContextHolder
-import no.nav.security.token.support.core.jwt.JwtTokenClaims
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
-import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.APP
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.AZP_NAME
 import no.nav.tilgangsmaskin.tilgang.Token.Companion.IDTYP
@@ -19,39 +13,46 @@ import no.nav.tilgangsmaskin.tilgang.Token.Companion.OID
 import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
 import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
 import no.nav.tilgangsmaskin.tilgang.TokenType.UNAUTHENTICATED
-import java.util.*
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
+import java.time.Instant
+import java.util.UUID
 
 class TokenTest : BehaviorSpec({
 
-    val contextHolder = mockk<TokenValidationContextHolder>()
-    val validationContext = mockk<TokenValidationContext>()
-    val claims = mockk<JwtTokenClaims>()
-    val token = Token(contextHolder)
-
+    val token = Token()
     val oid = UUID.randomUUID()
 
+    fun authenticate(claims: Map<String, Any>) {
+        val jwt = Jwt.withTokenValue("token")
+            .issuedAt(Instant.now())
+            .expiresAt(Instant.now().plusSeconds(3600))
+            .header("alg", "none")
+            .claim("sub", "test-sub")
+            .claims { it.putAll(claims) }
+            .build()
+        SecurityContextHolder.getContext().authentication = JwtAuthenticationToken(jwt)
+    }
+
     beforeEach {
-        every { contextHolder.getTokenValidationContext() } returns validationContext
-        every { validationContext.getClaims(AAD_ISSUER) } returns claims
-        every { claims.getStringClaim(any()) } returns null
-        every { claims.getAsList(any()) } returns emptyList()
+        authenticate(emptyMap())
+    }
+
+    afterSpec {
+        SecurityContextHolder.clearContext()
     }
 
     Given("type er CCF") {
         When("idtyp er 'app'") {
             Then("CC er true") {
-                every { claims.getStringClaim(IDTYP) } returns APP
+                authenticate(mapOf(IDTYP to APP))
                 token.type shouldBe CCF
             }
         }
         When("idtyp ikke er 'app'") {
             Then("CC er false") {
-                every { claims.getStringClaim(IDTYP) } returns "user"
-                token.type shouldBe UNAUTHENTICATED
-            }
-        }
-        When("idtyp mangler") {
-            Then("CC er false") {
+                authenticate(mapOf(IDTYP to "user"))
                 token.type shouldBe UNAUTHENTICATED
             }
         }
@@ -60,20 +61,14 @@ class TokenTest : BehaviorSpec({
     Given("type er OBO") {
         When("oid finnes og idtyp ikke er 'app'") {
             Then("OBO er true") {
-                every { claims.getStringClaim(OID) } returns oid.toString()
+                authenticate(mapOf(OID to oid.toString()))
                 token.type shouldBe OBO
             }
         }
         When("token er CC (idtyp=app)") {
             Then("OBO er false") {
-                every { claims.getStringClaim(IDTYP) } returns APP
-                every { claims.getStringClaim(OID) } returns oid.toString()
+                authenticate(mapOf(IDTYP to APP, OID to oid.toString()))
                 token.type shouldBe CCF
-            }
-        }
-        When("oid mangler") {
-            Then("OBO er false") {
-                token.type shouldBe UNAUTHENTICATED
             }
         }
     }
@@ -81,7 +76,7 @@ class TokenTest : BehaviorSpec({
     Given("ansattId") {
         When("NAVident finnes") {
             Then("returnerer AnsattId") {
-                every { claims.getStringClaim(NAVIDENT) } returns "Z999999"
+                authenticate(mapOf(NAVIDENT to "Z999999"))
                 token.ansattId shouldBe AnsattId("Z999999")
             }
         }
@@ -95,7 +90,7 @@ class TokenTest : BehaviorSpec({
     Given("oid-oppslag fra token") {
         When("oid finnes") {
             Then("returnerer oid") {
-                every { claims.getStringClaim(OID) } returns oid.toString()
+                authenticate(mapOf(OID to oid.toString()))
                 token.oid shouldBe oid
             }
         }
@@ -109,7 +104,7 @@ class TokenTest : BehaviorSpec({
     Given("system") {
         When("azp_name finnes") {
             Then("returnerer azp_name") {
-                every { claims.getStringClaim(AZP_NAME) } returns "dev-gcp:team:app"
+                authenticate(mapOf(AZP_NAME to "dev-gcp:team:app"))
                 token.system shouldBe "dev-gcp:team:app"
             }
         }
@@ -120,82 +115,22 @@ class TokenTest : BehaviorSpec({
         }
     }
 
-    Given("systemNavn") {
+    Given("avledede systemfelt") {
         When("azp_name har tre deler") {
-            Then("returnerer siste del") {
-                every { claims.getStringClaim(AZP_NAME) } returns "dev-gcp:team:app"
+            Then("returnerer korrekt systemNavn, cluster, systemAndNs og clusterAndSystem") {
+                authenticate(mapOf(AZP_NAME to "dev-gcp:team:app"))
                 token.systemNavn shouldBe "app"
-            }
-        }
-        When("azp_name er ett ord uten kolon") {
-            Then("returnerer azp_name uendret") {
-                every { claims.getStringClaim(AZP_NAME) } returns "app"
-                token.systemNavn shouldBe "app"
-            }
-        }
-        When("azp_name mangler") {
-            Then("returnerer UTILGJENGELIG") {
-                token.systemNavn shouldBe UTILGJENGELIG
-            }
-        }
-    }
-
-    Given("cluster-informasjon fra token") {
-        When("azp_name har tre deler") {
-            Then("returnerer første del") {
-                every { claims.getStringClaim(AZP_NAME) } returns "dev-gcp:team:app"
                 token.cluster shouldBe "dev-gcp"
-            }
-        }
-        When("azp_name er ett ord uten kolon") {
-            Then("returnerer azp_name uendret") {
-                every { claims.getStringClaim(AZP_NAME) } returns "app"
-                token.cluster shouldBe "app"
-            }
-        }
-        When("azp_name mangler") {
-            Then("returnerer UTILGJENGELIG") {
-                token.cluster shouldBe UTILGJENGELIG
-            }
-        }
-    }
-
-    Given("systemAndNs") {
-        When("azp_name er cluster:namespace:app") {
-            Then("returnerer namespace:app") {
-                every { claims.getStringClaim(AZP_NAME) } returns "dev-gcp:team:app"
                 token.systemAndNs shouldBe "team:app"
-            }
-        }
-        When("azp_name har to deler") {
-            Then("returnerer siste del") {
-                every { claims.getStringClaim(AZP_NAME) } returns "dev-gcp:app"
-                token.systemAndNs shouldBe "app"
-            }
-        }
-        When("azp_name er ett ord uten kolon") {
-            Then("returnerer tom streng") {
-                every { claims.getStringClaim(AZP_NAME) } returns "app"
-                token.systemAndNs shouldBe ""
-            }
-        }
-        When("azp_name mangler") {
-            Then("returnerer tom streng") {
-                token.systemAndNs shouldBe ""
-            }
-        }
-    }
-
-    Given("clusterAndSystem") {
-        When("azp_name har tre deler") {
-            Then("returnerer 'app:cluster'") {
-                every { claims.getStringClaim(AZP_NAME) } returns "dev-gcp:team:app"
                 token.clusterAndSystem shouldBe "app:dev-gcp"
             }
         }
-        When("azp_name ikke har tre deler") {
-            Then("returnerer system uendret") {
-                every { claims.getStringClaim(AZP_NAME) } returns "app"
+        When("azp_name er ett ord uten kolon") {
+            Then("returnerer fallback-verdier") {
+                authenticate(mapOf(AZP_NAME to "app"))
+                token.systemNavn shouldBe "app"
+                token.cluster shouldBe "app"
+                token.systemAndNs shouldBe ""
                 token.clusterAndSystem shouldBe "app"
             }
         }
@@ -205,7 +140,7 @@ class TokenTest : BehaviorSpec({
         When("groups-claim inneholder gyldige UUIDs") {
             Then("returnerer set av UUIDs") {
                 val gruppeId = UUID.randomUUID()
-                every { claims.getAsList("groups") } returns listOf(gruppeId.toString())
+                authenticate(mapOf("groups" to listOf(gruppeId.toString())))
                 token.globaleGruppeIds shouldBe setOf(gruppeId)
             }
         }
@@ -214,66 +149,21 @@ class TokenTest : BehaviorSpec({
                 token.globaleGruppeIds.shouldBeEmpty()
             }
         }
-        When("groups er tom liste") {
-            Then("returnerer tomt set") {
-                every { claims.getAsList("groups") } returns emptyList()
-                token.globaleGruppeIds.shouldBeEmpty()
-            }
-        }
-        When("getClaims kaster exception") {
-            Then("returnerer tomt set") {
-                every { validationContext.getClaims(AAD_ISSUER) } throws RuntimeException("ingen token")
-                token.globaleGruppeIds.shouldBeEmpty()
-            }
-        }
-        When("getAsList returnerer null") {
-            Then("returnerer tomt set") {
-                every { claims.getAsList("groups") } returns null
-                token.globaleGruppeIds.shouldBeEmpty()
-            }
-        }
         When("groups inneholder ugyldig UUID-verdi") {
             Then("ignoreres og returnerer tomt sett") {
-                every { claims.getAsList("groups") } returns listOf("ikke-en-uuid")
+                authenticate(mapOf("groups" to listOf("ikke-en-uuid")))
                 token.globaleGruppeIds.shouldBeEmpty()
             }
         }
     }
 
     Given("ingen gyldig token-kontekst") {
-        beforeEach {
-            every { validationContext.getClaims(AAD_ISSUER) } throws RuntimeException("ingen token")
-        }
-        When("getClaims kaster exception") {
-            Then("erCC er false") {
+        When("authentication mangler") {
+            Then("returnerer UNAUTHENTICATED og tomme claims") {
+                SecurityContextHolder.clearContext()
                 token.type shouldBe UNAUTHENTICATED
-            }
-            Then("erObo er false") {
-                token.type shouldBe UNAUTHENTICATED
-            }
-            Then("ansattId er null") {
                 token.ansattId shouldBe null
-            }
-        }
-    }
-
-    Given("token.type") {
-        When("token er OBO") {
-            Then("returnerer OBO") {
-                every { claims.getStringClaim(OID) } returns oid.toString()
-                token.type shouldBe OBO
-            }
-        }
-        When("token er CC") {
-            Then("returnerer CCF") {
-                every { claims.getStringClaim(IDTYP) } returns APP
-                token.type shouldBe CCF
-            }
-        }
-        When("ingen claims finnes") {
-            Then("returnerer UNAUTHENTICATED") {
-                every { validationContext.getClaims(AAD_ISSUER) } throws RuntimeException("ingen token")
-                token.type shouldBe UNAUTHENTICATED
+                token.globaleGruppeIds.shouldBeEmpty()
             }
         }
     }

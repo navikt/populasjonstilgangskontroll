@@ -28,9 +28,6 @@ class SecurityConfig {
     fun oauth2GroupConfigurer(manager: OAuth2AuthorizedClientManager) =
         OAuth2RestClientHttpServiceGroupConfigurer.from(manager)
 
-    @Bean
-    fun oauth2AuthorizedClientService(repo: ClientRegistrationRepository) =
-        InMemoryOAuth2AuthorizedClientService(repo)
 
     @Bean
     fun oauth2AuthorizationFailureHandler(service: OAuth2AuthorizedClientService) =

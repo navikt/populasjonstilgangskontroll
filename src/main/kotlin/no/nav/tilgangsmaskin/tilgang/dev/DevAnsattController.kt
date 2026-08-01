@@ -8,10 +8,10 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
+import no.nav.tilgangsmaskin.tilgang.dev.DevAnsattController.Companion.DEV_ANSATT_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 
-private const val DEV_ANSATT_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.ansatt.tag.description"
 
 @UnprotectedRestController(value = ["/${DEV}/ansatt/"])
 @ConditionalOnNotProd
@@ -33,6 +33,8 @@ class DevAnsattController(
     fun enheter(@PathVariable ansattId: AnsattId) = proxy.enheter(ansattId)
 
     companion object {
+        private const val DEV_ANSATT_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.ansatt.tag.description"
+
         private const val SUMMARY_ANSATT = "msg:openapi.dev.ansatt.ansatt.summary"
         private const val DESCRIPTION_ANSATT = "msg:openapi.dev.ansatt.ansatt.description"
         private const val SUMMARY_PROXY_ENHET = "msg:openapi.dev.ansatt.proxy.enhet.summary"

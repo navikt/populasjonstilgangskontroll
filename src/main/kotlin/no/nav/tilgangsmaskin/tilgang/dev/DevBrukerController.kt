@@ -9,12 +9,12 @@ import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjeneste
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants
+import no.nav.tilgangsmaskin.tilgang.dev.DevBrukerController.Companion.DEV_BRUKER_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
-private const val DEV_BRUKER_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.bruker.tag.description"
 
 @UnprotectedRestController(value = ["/${ClusterConstants.DEV}/bruker/"])
 @ConditionalOnNotProd
@@ -47,6 +47,7 @@ class DevBrukerController(private val bruker: BrukerTjeneste, private val pdl: P
         bruker.medUtvidetFamilie(id)
 
     companion object {
+        private const val DEV_BRUKER_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.bruker.tag.description"
         private const val SUMMARY_PERSON_PIP = "msg:openapi.dev.bruker.person.pip.summary"
         private const val DESCRIPTION_PERSON_PIP = "msg:openapi.dev.bruker.person.pip.description"
         private const val SUMMARY_PERSON = "msg:openapi.dev.bruker.person.summary"

@@ -69,7 +69,7 @@ class ClusterAddingTimedAspectTest : BehaviorSpec() {
         @Bean fun timedService() = TimedService()
 
         @Bean fun timedAspect(registry: MeterRegistry, token: Token) =
-            FellesBeanConfig(mockk(relaxed = true)).clusterAddingTimedAspect(registry, token)
+            FellesBeanConfig(mockk(relaxed = true), mockk(relaxed = true)).clusterAddingTimedAspect(registry, token)
     }
 
     open class TimedService {

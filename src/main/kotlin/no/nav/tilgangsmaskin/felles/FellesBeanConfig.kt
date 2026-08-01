@@ -20,6 +20,7 @@ import org.springframework.data.auditing.DateTimeProvider
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -37,7 +38,7 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
 
 @Configuration
 @NoCoverageAnalysis
-class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor) : WebMvcConfigurer {
+class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor, private val handler: ErrorHandler) : WebMvcConfigurer {
 
     @Bean
     fun jackson3Customizer() = JsonMapperBuilderCustomizer {
@@ -53,24 +54,22 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     @Bean
     fun restClientCustomizer() =
         RestClientCustomizer { c ->
-            val connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
-                .setDefaultConnectionConfig(
-                    ConnectionConfig.custom()
-                        .setValidateAfterInactivity(ofSeconds(2))
-                        .build()
-                )
-                .build()
-            val httpClient = HttpClients.custom()
-                .setConnectionManager(connectionManager)
-                .build()
-            c.requestFactory(HttpComponentsClientHttpRequestFactory(httpClient).apply {
+            c.requestFactory(HttpComponentsClientHttpRequestFactory(HttpClients.custom()
+                .setConnectionManager(PoolingHttpClientConnectionManagerBuilder.create()
+                    .setDefaultConnectionConfig(
+                        ConnectionConfig.custom()
+                            .setValidateAfterInactivity(ofSeconds(2))
+                            .build()
+                    )
+                    .build())
+                .build()).apply {
                 setConnectionRequestTimeout(3000)
                 setReadTimeout(5000)
             })
             c.requestInterceptors {
                 it.add(RestLoggingRequestInterceptor())
             }
-            c.defaultStatusHandler(HttpStatusCode::isError, RestDefaultErrorHandler()::handle)
+            c.defaultStatusHandler(HttpStatusCode::isError, handler::handle)
         }
 
     @Bean

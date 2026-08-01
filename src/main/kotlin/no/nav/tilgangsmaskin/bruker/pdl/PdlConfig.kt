@@ -14,7 +14,7 @@ import java.net.URI.create
 
 
 @Component
-class PdlConfig( @Value("\${spring.http.serviceclient.pdl.base-url}") baseUrl: URI) : CachableRestConfig, RestConfig(baseUrl, PDL_PIP_PING_PATH, PDL) {
+class PdlConfig( @Value("\${spring.http.serviceclient.pdlpip.base-url}") baseUrl: URI) : CachableRestConfig, RestConfig(baseUrl, PDL_PIP_PING_PATH, PDL) {
 
     override val caches = PDL_CACHES
     override val navn = name

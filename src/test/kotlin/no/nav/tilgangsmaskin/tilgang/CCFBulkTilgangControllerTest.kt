@@ -16,7 +16,6 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
 import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.post
 
 class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
@@ -46,7 +45,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                         ok(brukerId),
                         EnkeltBulkRespons(regelException)
                     ))
-                    every { regelTjeneste.bulkRegler(ansattId, specs) } returns respons
+                    every { regelTjeneste.bulkRegler(any(), specs) } returns respons
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"},{"brukerId":"$avvistBrukerId","type":"KOMPLETT_REGELTYPE"}]"""
@@ -75,7 +74,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                         BrukerIdOgRegelsett(annenBrukerId, KJERNE_REGELTYPE)
                     )
                     val kjerneRespons = AggregertBulkRespons(ansattId, setOf(ok(brukerId), ok(annenBrukerId)))
-                    every { regelTjeneste.bulkRegler(ansattId, kjerneSpecs) } returns kjerneRespons
+                    every { regelTjeneste.bulkRegler(any(), kjerneSpecs) } returns kjerneRespons
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON; content = """["$brukerId","$annenBrukerId"]"""
                     }.andExpect { status { isMultiStatus() } }

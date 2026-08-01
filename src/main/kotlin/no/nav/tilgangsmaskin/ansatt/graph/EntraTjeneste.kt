@@ -7,10 +7,12 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.web.service.registry.ImportHttpServices
 import java.util.*
 
 @RetryingWhenRecoverableRestService
 @Timed
+@ImportHttpServices(types = [EntraGrupperClient::class], group = GRAPH)
 class EntraTjeneste(
     private val client: EntraGrupperClient,
     private val cfg: EntraGrupperConfig

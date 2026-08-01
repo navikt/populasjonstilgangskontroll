@@ -10,7 +10,6 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyClient.Companion.ENTRA_PROXY_ANSATT_PATH
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyClient.Companion.ENTRA_PROXY_ENHETER_PATH
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRA_PROXY_BASE_URI
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
@@ -31,9 +30,10 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.request
 import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
+import java.net.URI
 
 
-@RestClientTest(components = [EntraProxyClient::class, EntraProxyBeanConfig::class, EntraProxyTjeneste::class, EntraProxyConfig::class])
+@RestClientTest(components = [EntraProxyBeanConfig::class, EntraProxyTjeneste::class, EntraProxyConfig::class])
 @ApplyExtension(SpringExtension::class)
 @Import(OAuth2ClientTestConfig::class)
 class EntraProxyTjenesteTest : BehaviorSpec() {
@@ -42,6 +42,8 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
     lateinit var tjeneste: EntraProxyTjeneste
     @Autowired
     lateinit var server: MockRestServiceServer
+    @Autowired
+    lateinit var cfg: EntraProxyConfig
 
     init {
         afterEach {
@@ -51,7 +53,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
         Given("oppslag av enhet for ansatt") {
             When("ansatt eksisterer") {
                 Then("returnerer enhet for ansatt") {
-                    server.expect(requestTo(ANSATT_URI))
+                    server.expect(requestTo(ansattUri))
                         .andExpect(method(GET))
                         .andRespond(withSuccess("""
                             {
@@ -71,7 +73,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
         Given("oppslag av enheter for ansatt") {
             When("ansatt er tilknyttet enheter") {
                 Then("returnerer liste av enheter for ansatt") {
-                    server.expect(requestTo(ENHETER_URI))
+                    server.expect(requestTo(enheterUri))
                         .andExpect(method(GET))
                         .andRespond(withSuccess("""
                             [
@@ -88,7 +90,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
 
             When("ansatt ikke er tilknyttet enheter") {
                 Then("returneres tom liste") {
-                    server.expect(requestTo(ENHETER_URI))
+                    server.expect(requestTo(enheterUri))
                         .andExpect(method(GET))
                         .andRespond(withSuccess("[]", APPLICATION_JSON))
 
@@ -100,7 +102,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
         Given("feilhaandtering") {
             When("tjenesten returnerer 404") {
                 Then("kaster NotFoundRestException uten retry") {
-                    server.expect(requestTo(ANSATT_URI))
+                    server.expect(requestTo(ansattUri))
                         .andExpect(method(GET))
                         .andRespond(withStatus(NOT_FOUND))
 
@@ -112,7 +114,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
 
             When("tjenesten returnerer 401") {
                 Then("kaster IrrecoverableRestException uten retry") {
-                    server.expect(requestTo(ANSATT_URI))
+                    server.expect(requestTo(ansattUri))
                         .andExpect(method(GET))
                         .andRespond(withStatus(UNAUTHORIZED))
 
@@ -124,7 +126,7 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
 
             When("tjenesten returnerer 500") {
                 Then("kaster RecoverableRestException etter 4 forsøk") {
-                    server.expect(times(4), requestTo(ANSATT_URI))
+                    server.expect(times(4), requestTo(ansattUri))
                         .andExpect(method(GET))
                         .andRespond(withStatus(INTERNAL_SERVER_ERROR))
 
@@ -136,11 +138,13 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
         }
     }
 
+    private val ansattUri: URI get() = uri(ENTRA_PROXY_ANSATT_PATH)
+    private val enheterUri: URI get() = uri(ENTRA_PROXY_ENHETER_PATH)
+
+    private fun uri(path: String) = fromUriString("${cfg.baseUri}$path")
+        .buildAndExpand(ANSATTID.verdi).toUri()
+
     companion object  {
         private val ANSATTID = AnsattId("Z999999")
-        private val ANSATT_URI = uri(ENTRA_PROXY_ANSATT_PATH)
-        private val ENHETER_URI = uri(ENTRA_PROXY_ENHETER_PATH)
-        private fun uri(path: String) =fromUriString("$ENTRA_PROXY_BASE_URI$path")
-            .buildAndExpand(ANSATTID.verdi).toUri()
     }
 }

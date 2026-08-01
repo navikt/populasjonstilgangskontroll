@@ -4,9 +4,11 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withAnsattContext
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
+import no.nav.tilgangsmaskin.tilgang.BulkTilgangController.Companion.BULK_TILGANG_CONTROLLER_TAG_DESCRIPTION
 import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
 import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -18,7 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseStatus
 
-private const val BULK_TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.tilgang.tag.description"
 
 @TilgangApiController
 @ResponseStatus(MULTI_STATUS)
@@ -29,13 +30,13 @@ class BulkTilgangController(private val regelTjeneste: RegelTjeneste, token: Tok
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO)
     fun bulkOBO(@RequestBody specs: Set<BrukerIdOgRegelsett>, req: HttpServletRequest) =
-        bulkOppslag(ansattIdFraToken(), OBO, specs, req.requestURI)
+        bulkOppslag(token.requiredAnsattId, OBO, specs, req.requestURI)
 
     @PostMapping("bulk/obo/{regelType}")
     @BulkSwaggerApiRespons
     @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO_REGELTYPE)
     fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>, req: HttpServletRequest) =
-        bulkOppslag(ansattIdFraToken(), OBO, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(), req.requestURI)
+        bulkOppslag(token.requiredAnsattId, OBO, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(), req.requestURI)
 
     @PostMapping("bulk/ccf/{ansattId}")
     @BulkSwaggerApiRespons
@@ -65,10 +66,11 @@ class BulkTilgangController(private val regelTjeneste: RegelTjeneste, token: Tok
     }
 
     companion object {
-        private const val SUMMARY_BULK = "msg:openapi.tilgang.bulk.summary"
-        private const val DESCRIPTION_BULK_OBO = "msg:openapi.tilgang.bulk.obo.description"
-        private const val DESCRIPTION_BULK_OBO_REGELTYPE = "msg:openapi.tilgang.bulk.obo.regeltype.description"
-        private const val DESCRIPTION_BULK_CCF = "msg:openapi.tilgang.bulk.ccf.description"
-        private const val DESCRIPTION_BULK_CCF_REGELTYPE = "msg:openapi.tilgang.bulk.ccf.regeltype.description"
+        private const val BULK_TILGANG_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.tilgang.tag.description"
+        private const val SUMMARY_BULK = "${MSG}openapi.tilgang.bulk.summary"
+        private const val DESCRIPTION_BULK_OBO = "${MSG}openapi.tilgang.bulk.obo.description"
+        private const val DESCRIPTION_BULK_OBO_REGELTYPE = "${MSG}openapi.tilgang.bulk.obo.regeltype.description"
+        private const val DESCRIPTION_BULK_CCF = "${MSG}openapi.tilgang.bulk.ccf.description"
+        private const val DESCRIPTION_BULK_CCF_REGELTYPE = "${MSG}openapi.tilgang.bulk.ccf.regeltype.description"
     }
 }

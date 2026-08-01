@@ -7,6 +7,7 @@ import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
+import no.nav.tilgangsmaskin.tilgang.MSG
 import no.nav.tilgangsmaskin.tilgang.dev.DevVergemålController.Companion.DEV_VERGEMAL_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -24,8 +25,8 @@ class DevVergemålController(private val vergemål: VergemålTjeneste) {
         vergemål.alle(ansattId)
 
     companion object {
-        private const val DEV_VERGEMAL_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.vergemal.tag.description"
-        private const val SUMMARY_VERGEMAL = "msg:openapi.dev.vergemal.vergemal.summary"
-        private const val DESCRIPTION_VERGEMAL = "msg:openapi.dev.vergemal.vergemal.description"
+        private const val DEV_VERGEMAL_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.dev.vergemal.tag.description"
+        private const val SUMMARY_VERGEMAL = "${MSG}openapi.dev.vergemal.vergemal.summary"
+        private const val DESCRIPTION_VERGEMAL = "${MSG}openapi.dev.vergemal.vergemal.description"
     }
 }

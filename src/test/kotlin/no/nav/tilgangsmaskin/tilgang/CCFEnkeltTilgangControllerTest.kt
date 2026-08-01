@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.tilgang
 import io.mockk.every
 import io.mockk.justRun
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.post
 
 class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {

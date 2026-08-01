@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjeneste
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants
+import no.nav.tilgangsmaskin.tilgang.MSG
 import no.nav.tilgangsmaskin.tilgang.dev.DevBrukerController.Companion.DEV_BRUKER_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -47,17 +48,17 @@ class DevBrukerController(private val bruker: BrukerTjeneste, private val pdl: P
         bruker.medUtvidetFamilie(id)
 
     companion object {
-        private const val DEV_BRUKER_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.bruker.tag.description"
-        private const val SUMMARY_PERSON_PIP = "msg:openapi.dev.bruker.person.pip.summary"
-        private const val DESCRIPTION_PERSON_PIP = "msg:openapi.dev.bruker.person.pip.description"
-        private const val SUMMARY_PERSON = "msg:openapi.dev.bruker.person.summary"
-        private const val DESCRIPTION_PERSON = "msg:openapi.dev.bruker.person.description"
-        private const val SUMMARY_BRUKERE = "msg:openapi.dev.bruker.brukere.summary"
-        private const val DESCRIPTION_BRUKERE = "msg:openapi.dev.bruker.brukere.description"
-        private const val SUMMARY_BRUKERIDENTIFIKATOR = "msg:openapi.dev.bruker.brukeridentifikator.summary"
-        private const val DESCRIPTION_BRUKERIDENTIFIKATOR = "msg:openapi.dev.bruker.brukeridentifikator.description"
-        private const val SUMMARY_BRUKER = "msg:openapi.dev.bruker.bruker.summary"
-        private const val DESCRIPTION_BRUKER = "msg:openapi.dev.bruker.bruker.description"
+        private const val DEV_BRUKER_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.dev.bruker.tag.description"
+        private const val SUMMARY_PERSON_PIP = "${MSG}openapi.dev.bruker.person.pip.summary"
+        private const val DESCRIPTION_PERSON_PIP = "${MSG}openapi.dev.bruker.person.pip.description"
+        private const val SUMMARY_PERSON = "${MSG}openapi.dev.bruker.person.summary"
+        private const val DESCRIPTION_PERSON = "${MSG}openapi.dev.bruker.person.description"
+        private const val SUMMARY_BRUKERE = "${MSG}openapi.dev.bruker.brukere.summary"
+        private const val DESCRIPTION_BRUKERE = "${MSG}openapi.dev.bruker.brukere.description"
+        private const val SUMMARY_BRUKERIDENTIFIKATOR = "${MSG}openapi.dev.bruker.brukeridentifikator.summary"
+        private const val DESCRIPTION_BRUKERIDENTIFIKATOR = "${MSG}openapi.dev.bruker.brukeridentifikator.description"
+        private const val SUMMARY_BRUKER = "${MSG}openapi.dev.bruker.bruker.summary"
+        private const val DESCRIPTION_BRUKER = "${MSG}openapi.dev.bruker.bruker.description"
     }
 
 

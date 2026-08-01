@@ -11,13 +11,13 @@ import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.tilgangsmaskin.bruker.pdl.PdlAvroEnvExtensions.schemaRegistryUrl
 import no.nav.tilgangsmaskin.bruker.pdl.PdlAvroEnvExtensions.userInfo
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
+import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDLPIP
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.kafka.KafkaTypedDroppedMessageMeter
 import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
-import no.nav.tilgangsmaskin.felles.rest.createOAuth2Client
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
 import org.springframework.beans.factory.annotation.Qualifier
@@ -31,22 +31,35 @@ import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.listener.CommonErrorHandler
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS
-import org.springframework.security.oauth2.client.web.ClientAttributes
+import org.springframework.security.oauth2.client.web.ClientAttributes.clientRegistrationId
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
-import org.springframework.web.client.support.RestClientAdapter
+import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
+import org.springframework.web.service.registry.ImportHttpServices
+import java.util.function.Consumer
 
 @Configuration
 @NoCoverageAnalysis
+@ImportHttpServices(PdlGraphQLRestClient::class, group = PDLGRAPH)
 class PdlBeanConfig {
 
     @Bean
     @Qualifier(PDLGRAPH)
-    fun pdlGraphRestClient(builder: Builder) =
-        builder
-            .requestInterceptor(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
-            .requestInitializer { ClientAttributes.clientRegistrationId(PDLGRAPH).accept(it.attributes) }
-            .build()
+    fun pdlGraphRestClient(builder: Builder, pdlGraphRestClientCustomizer: Consumer<Builder>) =
+        builder.also(pdlGraphRestClientCustomizer::accept).build()
+
+    @Bean
+    fun pdlGraphRestClientCustomizer() = Consumer<Builder> { builder ->
+        builder.requestInterceptor(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
+        builder.requestInitializer { clientRegistrationId(PDLGRAPH).accept(it.attributes) }
+    }
+
+    @Bean
+    fun graphGroupConfigurer() = RestClientHttpServiceGroupConfigurer { groups ->
+        groups.filterByName(PDLPIP,PDLGRAPH).forEachClient { _, builder ->
+            builder.requestInterceptor(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
+        }
+    }
 
     @Bean
     fun syncPdlGraphQLClient(@Qualifier(PDLGRAPH) client: RestClient, cfg: PdlGraphQLConfig) =
@@ -56,18 +69,9 @@ class PdlBeanConfig {
                 it.addFirst(PdlGraphQLLoggingInterceptor())
             }.build()
 
-    @Bean
-    fun pdlPipClient(builder: Builder, cfg: PdlConfig) =
-        RestClientAdapter.create(builder.baseUrl(cfg.baseUri).build())
-            .createOAuth2Client<PdlPipClient>()
 
     @Bean
-    fun pdlGraphQLPingClient(builder: Builder, cfg: PdlGraphQLConfig) =
-        RestClientAdapter.create(builder.baseUrl(cfg.baseUri).build())
-            .createOAuth2Client<PdlGraphQLPingClient>()
-
-    @Bean
-    fun pdlGraphHealthIndicator(cfg: PdlGraphQLConfig, client: PdlGraphQLPingClient) =
+    fun pdlGraphHealthIndicator(cfg: PdlGraphQLConfig, client: PdlGraphQLRestClient) =
         PingableHealthIndicator(cfg, client::ping)
 
     @Bean

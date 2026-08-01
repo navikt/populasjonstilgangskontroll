@@ -5,7 +5,7 @@ import org.springframework.security.oauth2.client.annotation.ClientRegistrationI
 import org.springframework.web.service.annotation.HttpExchange
 
 @ClientRegistrationId(PDLGRAPH)
-interface PdlGraphQLPingClient {
+interface PdlGraphQLRestClient {
 
     @HttpExchange(method = "OPTIONS")
     fun ping()

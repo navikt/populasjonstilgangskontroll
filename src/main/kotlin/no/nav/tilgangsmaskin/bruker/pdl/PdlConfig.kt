@@ -9,12 +9,12 @@ import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import java.net.URI
 import java.net.URI.create
 
 
 @Component
-class PdlConfig(
-    @Value("\${PDL}") hostname: String) : CachableRestConfig, RestConfig(create("https://$hostname"), PDL_PIP_PING_PATH, PDL) {
+class PdlConfig( @Value("\${spring.http.serviceclient.pdl.base-url}") baseUrl: URI) : CachableRestConfig, RestConfig(baseUrl, PDL_PIP_PING_PATH, PDL) {
 
     override val caches = PDL_CACHES
     override val navn = name

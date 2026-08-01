@@ -27,7 +27,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
             When("komplett kalles med OBO-token") {
                 Then("returnerer 204 ved tilgang") {
-                    justRun { regelTjeneste.kompletteRegler(ansattId, brukerId) }
+                    justRun { regelTjeneste.kompletteRegler(any(), brukerId) }
                     mockMvc.post("/api/v1/komplett") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
                     }.andExpect { status { isNoContent() } }
@@ -43,7 +43,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         override val metadata = RegelMetadata(STRENGT_FORTROLIG)
                         override fun evaluer(ansatt: Ansatt, bruker: Bruker) = false
                     }
-                    every { regelTjeneste.kompletteRegler(ansattId, brukerId) } throws
+                    every { regelTjeneste.kompletteRegler(any(), brukerId) } throws
                         RegelException(testAnsatt, testBruker, testRegel)
                     mockMvc.post("/api/v1/komplett") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
@@ -59,7 +59,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
             When("kjerne kalles med OBO-token") {
                 Then("returnerer 204 ved tilgang") {
-                    justRun { regelTjeneste.kjerneregler(ansattId, brukerId) }
+                    justRun { regelTjeneste.kjerneregler(any(), brukerId) }
                     mockMvc.post("/api/v1/kjerne") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
                     }.andExpect { status { isNoContent() } }
@@ -142,7 +142,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
             When("enkelttilgang kalles med gyldig request og OBO-token") {
                 Then("returnerer 202 og dokumenteres i rest docs") {
-                    every { enkeltTilgangTjeneste.registrerTilgang(ansattId, any()) } returns true
+                    every { enkeltTilgangTjeneste.registrerTilgang(any(), any()) } returns true
                     mockMvc.post("/api/v1/overstyr") {
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""

@@ -10,6 +10,7 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangJPAAdapter
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
+import no.nav.tilgangsmaskin.tilgang.MSG
 import no.nav.tilgangsmaskin.tilgang.dev.DevEnkelttilgangController.Companion.DEV_ENKELT_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -38,13 +39,13 @@ class DevEnkelttilgangController(private val enkelt: EnkeltTilgangTjeneste,
         adapter.gjeldendeTilgang(ansattId.verdi, brukerId.verdi, emptyList())
 
     companion object {
-        private const val DEV_ENKELT_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.enkelt.tag.description"
-        private const val DESCRIPTION_ENKELT = "msg:openapi.dev.enkelt.description"
-        private const val SUMMARY_ENKELT = "msg:openapi.dev.enkelt.summary"
-        private const val SUMMARY_HAR = "msg:openapi.dev.enkelt.har"
-        private const val DESCRIPTION_HAR = "msg:openapi.dev.enkelt.har.description"
-        private const val SUMMARY_GJELDENDE = "msg:openapi.dev.enkelt.gjeldende.summary"
-        private const val DESCRIPTION_GJELDENDE = "msg:openapi.dev.enkelt.gjeldende.description"
+        private const val DEV_ENKELT_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.dev.enkelt.tag.description"
+        private const val DESCRIPTION_ENKELT = "${MSG}openapi.dev.enkelt.description"
+        private const val SUMMARY_ENKELT = "${MSG}openapi.dev.enkelt.summary"
+        private const val SUMMARY_HAR = "${MSG}openapi.dev.enkelt.har"
+        private const val DESCRIPTION_HAR = "${MSG}openapi.dev.enkelt.har.description"
+        private const val SUMMARY_GJELDENDE = "${MSG}openapi.dev.enkelt.gjeldende.summary"
+        private const val DESCRIPTION_GJELDENDE = "${MSG}openapi.dev.enkelt.gjeldende.description"
 
     }
 }

@@ -14,6 +14,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNU
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapterTest.GraphQLTestConfig
 import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
+import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
@@ -33,7 +34,7 @@ import org.springframework.web.client.RestClient.Builder
 
 @RestClientTest(components = [PdlSyncGraphQLClientAdapter::class, PdlGraphQLConfig::class])
 @TestPropertySource(properties = ["PDLGRAPH=pdlgraph"])
-@Import(GraphQLTestConfig::class)
+@Import(GraphQLTestConfig::class, OAuth2ClientTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
 
@@ -208,4 +209,3 @@ class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
         """.trimIndent()
     }
 }
-

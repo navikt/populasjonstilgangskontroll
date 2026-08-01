@@ -46,6 +46,21 @@ management:
       base-path: /monitoring
 
 spring:
+  http:
+    serviceclient:
+        pdlgraph:
+          base-url: "https://${pdlgraph}/graphql"
+        pdlpip:
+          base-url: "https://${pdl}"
+        verge:
+          base-url: "http://repr-api.repr"
+        skjerming:
+          base-url: "http://skjermede-personer-pip.nom"
+        entraproxy:
+          base-url: "http://entra-proxy.sikkerhetstjenesten"
+        graph:
+          base-url: "https://graph.microsoft.com/v1.0"
+
   security:
     oauth2:
       client:

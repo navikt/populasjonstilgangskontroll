@@ -1,7 +1,9 @@
 package no.nav.tilgangsmaskin.felles.utils.extensions
 
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.AktørId.Companion.AKTØRID_LENGTH
 import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
+import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import org.slf4j.MDC
 
 
@@ -9,6 +11,11 @@ object DomainExtensions {
     fun requireDigits(verdi: String, len: Int) {
         require(verdi.all { it.isDigit() }) { "Ugyldig(e) tegn i $verdi, forventet $len siffer" }
         require(verdi.length == len) { "Ugyldig lengde ${verdi.length} for $verdi, forventet $len siffer" }
+    }
+
+    fun <T> withAnsattContext(ansattId: AnsattId, block: () -> T): T {
+        MDC.put(USER_ID, ansattId.verdi)
+        return block()
     }
 
     fun String.upcase() = this.replaceFirstChar { it.uppercaseChar() }

@@ -10,10 +10,12 @@ import no.nav.tilgangsmaskin.felles.cache.getMany
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.web.service.registry.ImportHttpServices
 
 
 @RetryingWhenRecoverableRestService
 @Timed
+@ImportHttpServices(types = [SkjermingClient::class], group = SKJERMING)
 class SkjermingTjeneste(private val client: SkjermingClient,
                         private val cache: CacheOperations) {
 

@@ -12,6 +12,7 @@ import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.getMany
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
+import no.nav.tilgangsmaskin.tilgang.MSG
 import no.nav.tilgangsmaskin.tilgang.dev.DevCacheController.Companion.DEV_CACHE_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -33,10 +34,10 @@ class DevCacheController(private val cache: CacheOperations) {
         cache.getMany<Person>(CacheNøkkelConfig(PDL), navIds.mapTo(mutableSetOf()) { it.verdi })
 
     companion object {
-        private const val DEV_CACHE_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.cache.tag.description"
-        private const val SUMMARY_CACHE_SKJERMINGER = "msg:openapi.dev.cache.skjerminger.summary"
-        private const val DESCRIPTION_CACHE_SKJERMINGER = "msg:openapi.dev.cache.skjerminger.description"
-        private const val SUMMARY_CACHE_PERSONER = "msg:openapi.dev.cache.personer.summary"
-        private const val DESCRIPTION_CACHE_PERSONER = "msg:openapi.dev.cache.personer.description"
+        private const val DEV_CACHE_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.dev.cache.tag.description"
+        private const val SUMMARY_CACHE_SKJERMINGER = "${MSG}openapi.dev.cache.skjerminger.summary"
+        private const val DESCRIPTION_CACHE_SKJERMINGER = "${MSG}openapi.dev.cache.skjerminger.description"
+        private const val SUMMARY_CACHE_PERSONER = "${MSG}openapi.dev.cache.personer.summary"
+        private const val DESCRIPTION_CACHE_PERSONER = "${MSG}openapi.dev.cache.personer.description"
     }
 }

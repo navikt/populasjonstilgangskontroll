@@ -31,7 +31,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/obo kalles med gyldige specs") {
                 Then("returnerer 207 med resultater") {
-                    every { regelTjeneste.bulkRegler(ansattId, specs) } returns respons
+                    every { regelTjeneste.bulkRegler(any(), specs) } returns respons
                     mockMvc.post("/api/v1/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""
@@ -89,7 +89,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                     }
                     val regelException = RegelException(testAnsatt, testBruker, testRegel)
                     val avvistRespons = AggregertBulkRespons(ansattId, setOf(EnkeltBulkRespons(regelException)))
-                    every { regelTjeneste.bulkRegler(ansattId, specs) } returns avvistRespons
+                    every { regelTjeneste.bulkRegler(any(), specs) } returns avvistRespons
                     mockMvc.post("/api/v1/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""
@@ -144,7 +144,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/obo/{regelType} kalles med KJERNE_REGELTYPE") {
                 Then("returnerer 207 med resultater for gitt regeltype") {
-                    every { regelTjeneste.bulkRegler(ansattId, kjerneSpecs) } returns respons
+                    every { regelTjeneste.bulkRegler(any(), kjerneSpecs) } returns respons
                     mockMvc.post("/api/v1/bulk/obo/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON; content = """["$brukerId","$annenBrukerId"]"""
                     }.andExpect {

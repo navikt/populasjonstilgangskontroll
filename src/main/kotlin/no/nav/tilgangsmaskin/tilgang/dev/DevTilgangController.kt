@@ -19,6 +19,7 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangGyldig
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
+import no.nav.tilgangsmaskin.tilgang.MSG
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
 import no.nav.tilgangsmaskin.tilgang.dev.DevTilgangController.Companion.DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.http.HttpStatus.ACCEPTED
@@ -85,21 +86,21 @@ class DevTilgangController(
         enkeltTilgang.tilganger(ansattId, brukerIds)
 
     companion object {
-        private const val DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.tilgang.tag.description"
+        private const val DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.dev.tilgang.tag.description"
 
-        private const val SUMMARY_OPPFOLGING_AVSLUTT = "msg:openapi.dev.tilgang.oppfolging.avslutt.summary"
-        private const val DESCRIPTION_OPPFOLGING_AVSLUTT = "msg:openapi.dev.tilgang.oppfolging.avslutt.description"
-        private const val SUMMARY_OPPFOLGING_ENHET = "msg:openapi.dev.tilgang.oppfolging.enhet.summary"
-        private const val DESCRIPTION_OPPFOLGING_ENHET = "msg:openapi.dev.tilgang.oppfolging.enhet.description"
-        private const val SUMMARY_SIVILSTAND = "msg:openapi.dev.tilgang.sivilstand.summary"
-        private const val DESCRIPTION_SIVILSTAND = "msg:openapi.dev.tilgang.sivilstand.description"
-        private const val SUMMARY_KOBLING = "msg:openapi.dev.tilgang.kobling.summary"
-        private const val DESCRIPTION_KOBLING = "msg:openapi.dev.tilgang.kobling.description"
-        private const val SUMMARY_NOM_FNR = "msg:openapi.dev.tilgang.nom.fnr.summary"
-        private const val DESCRIPTION_NOM_FNR = "msg:openapi.dev.tilgang.nom.fnr.description"
-        private const val SUMMARY_ENKELTTILGANG = "msg:openapi.dev.tilgang.enkelttilgang.summary"
-        private const val DESCRIPTION_ENKELTTILGANG = "msg:openapi.dev.tilgang.enkelttilgang.description"
-        private const val SUMMARY_HENT_ENKELTTILGANGER = "msg:openapi.dev.tilgang.enkelttilganger.summary"
-        private const val DESCRIPTION_HENT_ENKELTTILGANGER = "msg:openapi.dev.tilgang.enkelttilganger.description"
+        private const val SUMMARY_OPPFOLGING_AVSLUTT = "${MSG}openapi.dev.tilgang.oppfolging.avslutt.summary"
+        private const val DESCRIPTION_OPPFOLGING_AVSLUTT = "${MSG}openapi.dev.tilgang.oppfolging.avslutt.description"
+        private const val SUMMARY_OPPFOLGING_ENHET = "${MSG}openapi.dev.tilgang.oppfolging.enhet.summary"
+        private const val DESCRIPTION_OPPFOLGING_ENHET = "${MSG}openapi.dev.tilgang.oppfolging.enhet.description"
+        private const val SUMMARY_SIVILSTAND = "${MSG}openapi.dev.tilgang.sivilstand.summary"
+        private const val DESCRIPTION_SIVILSTAND = "${MSG}openapi.dev.tilgang.sivilstand.description"
+        private const val SUMMARY_KOBLING = "${MSG}openapi.dev.tilgang.kobling.summary"
+        private const val DESCRIPTION_KOBLING = "${MSG}openapi.dev.tilgang.kobling.description"
+        private const val SUMMARY_NOM_FNR = "${MSG}openapi.dev.tilgang.nom.fnr.summary"
+        private const val DESCRIPTION_NOM_FNR = "${MSG}openapi.dev.tilgang.nom.fnr.description"
+        private const val SUMMARY_ENKELTTILGANG = "${MSG}openapi.dev.tilgang.enkelttilgang.summary"
+        private const val DESCRIPTION_ENKELTTILGANG = "${MSG}openapi.dev.tilgang.enkelttilgang.description"
+        private const val SUMMARY_HENT_ENKELTTILGANGER = "${MSG}openapi.dev.tilgang.enkelttilganger.summary"
+        private const val DESCRIPTION_HENT_ENKELTTILGANGER = "${MSG}openapi.dev.tilgang.enkelttilganger.description"
     }
 }

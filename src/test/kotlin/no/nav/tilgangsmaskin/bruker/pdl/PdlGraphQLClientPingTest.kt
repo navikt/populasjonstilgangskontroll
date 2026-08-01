@@ -23,6 +23,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.web.client.RestClient.Builder
 import org.springframework.web.client.support.RestClientAdapter.create
 import org.springframework.web.service.invoker.HttpServiceProxyFactory.builderFor
+import org.springframework.web.service.invoker.createClient
 
 @RestClientTest(components = [PdlGraphQLConfig::class])
 @TestPropertySource(properties = ["PDLGRAPH=pdlgraph"])
@@ -34,10 +35,10 @@ class PdlGraphQLClientPingTest : BehaviorSpec() {
     class TestConfig {
         @Bean
         fun pdlGraphQLClient(b: Builder, cfg: PdlGraphQLConfig) =
-            builderFor(create(b.baseUrl(cfg.baseUri).build())).build().createClient(PdlGraphQLPingClient::class.java)
+            builderFor(create(b.baseUrl(cfg.baseUri).build())).build().createClient<PdlGraphQLRestClient>()
     }
 
-    @Autowired @Qualifier("pdlGraphQLClient") lateinit var client: PdlGraphQLPingClient
+    @Autowired @Qualifier("pdlGraphQLClient") lateinit var client: PdlGraphQLRestClient
     @Autowired lateinit var server: MockRestServiceServer
     @Autowired lateinit var cfg: PdlGraphQLConfig
 

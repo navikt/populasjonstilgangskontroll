@@ -7,6 +7,7 @@ import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
+import no.nav.tilgangsmaskin.tilgang.MSG
 import no.nav.tilgangsmaskin.tilgang.dev.DevSkjermingController.Companion.DEV_SKJERMING_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -28,11 +29,11 @@ class DevSkjermingController(private val skjerming: SkjermingTjeneste) {
         skjerming.skjerminger(ids)
 
     companion object {
-        private const val DEV_SKJERMING_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.skjerming.tag.description"
-        private const val SUMMARY_SKJERMING = "msg:openapi.dev.skjerming.skjerming.summary"
-        private const val DESCRIPTION_SKJERMING = "msg:openapi.dev.skjerming.skjerming.description"
-        private const val SUMMARY_SKJERMINGER = "msg:openapi.dev.skjerming.skjerminger.summary"
-        private const val DESCRIPTION_SKJERMINGER = "msg:openapi.dev.skjerming.skjerminger.description"
+        private const val DEV_SKJERMING_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.dev.skjerming.tag.description"
+        private const val SUMMARY_SKJERMING = "${MSG}openapi.dev.skjerming.skjerming.summary"
+        private const val DESCRIPTION_SKJERMING = "${MSG}openapi.dev.skjerming.skjerming.description"
+        private const val SUMMARY_SKJERMINGER = "${MSG}openapi.dev.skjerming.skjerminger.summary"
+        private const val DESCRIPTION_SKJERMINGER = "${MSG}openapi.dev.skjerming.skjerminger.description"
     }
 
 }

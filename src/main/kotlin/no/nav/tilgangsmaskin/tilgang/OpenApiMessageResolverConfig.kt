@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.util.Locale.*
 
+internal const val MSG = "msg:"
+
 @Configuration
 @NoCoverageAnalysis
 class OpenApiMessageResolverConfig(private val messageSource: MessageSource) {
@@ -31,13 +33,8 @@ class OpenApiMessageResolverConfig(private val messageSource: MessageSource) {
     }
 
     private fun resolve(text: String?): String? {
-        if (text.isNullOrBlank() || !text.startsWith(MSG_PREFIX)) return text
-        val key = text.removePrefix(MSG_PREFIX)
+        if (text.isNullOrBlank() || !text.startsWith(MSG)) return text
+        val key = text.removePrefix(MSG)
         return messageSource.getMessage(key, null, key, getDefault())
     }
-
-    private companion object {
-        const val MSG_PREFIX = "msg:"
-    }
 }
-

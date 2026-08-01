@@ -27,47 +27,40 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlTjenesteTest.PdlTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.*
+import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
-import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.client.ExpectedCount.never
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
-import org.springframework.web.client.RestClient.Builder
-import org.springframework.web.client.support.RestClientAdapter.create
-import org.springframework.web.service.invoker.HttpServiceProxyFactory.builderFor
 import tools.jackson.databind.json.JsonMapper
 import java.time.Duration.ofSeconds
 
 @RestClientTest(components = [PdlConfig::class, PdlTjeneste::class])
-@Import(PdlTestConfig::class)
-@TestPropertySource(properties = ["PDL=pdl"])
+@Import(PdlTestConfig::class, OAuth2ClientTestConfig::class)
 @EnableResilientMethods
 @ApplyExtension(SpringExtension::class)
 class PdlTjenesteTest : BehaviorSpec() {
 
     @TestConfiguration
     class PdlTestConfig : CacheTestConfig(PDL) {
-
-        @Bean
-        fun pdlClient(builder: Builder, cfg: PdlConfig) =
-            builderFor(create(builder.baseUrl(cfg.baseUri).build())).build().createClient(PdlPipClient::class.java)
     }
 
-    @MockkBean lateinit var graphQL: PdlSyncGraphQLClientAdapter
-
-    @Autowired lateinit var pdl: PdlTjeneste
+    @MockkBean
+    lateinit var graphQL: PdlSyncGraphQLClientAdapter
+    @Autowired
+    lateinit var pdl: PdlTjeneste
     @Autowired
     lateinit var server: MockRestServiceServer
-    @Autowired lateinit var cfg: PdlConfig
+    @Autowired
+    lateinit var cfg: PdlConfig
     @Qualifier("cacheOperations") @Autowired lateinit var cache: CacheOperations
     @Autowired lateinit var mapper: JsonMapper
 

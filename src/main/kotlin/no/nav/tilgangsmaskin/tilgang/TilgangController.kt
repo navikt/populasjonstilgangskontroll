@@ -10,6 +10,7 @@ import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
+import no.nav.tilgangsmaskin.tilgang.TilgangController.Companion.TILGANG_CONTROLLER_TAG_DESCRIPTION
 import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
 import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseStatus
 
-private const val TILGANG_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.tilgang.tag.description"
 
 @TilgangApiController
 @ResponseStatus(NO_CONTENT)
@@ -31,7 +31,7 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, token: Token, 
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
     fun kompletteRegler(@RequestBody brukerId: String, req: HttpServletRequest) =
-        enkeltOppslag(ansattIdFraToken(), OBO, brukerId, KOMPLETT_REGELTYPE, req.requestURI)
+        enkeltOppslag(token.requiredAnsattId, OBO, brukerId, KOMPLETT_REGELTYPE, req.requestURI)
 
     @PostMapping("/ccf/komplett/{ansattId}")
     @ProblemDetailApiResponse
@@ -43,7 +43,7 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, token: Token, 
     @ProblemDetailApiResponse
     @Operation(summary = SUMMARY_KJERNE_OBO, description = DESCRIPTION_KJERNE_OBO)
     fun kjerneregler(@RequestBody brukerId: String, req: HttpServletRequest) =
-        enkeltOppslag(ansattIdFraToken(), OBO, brukerId, KJERNE_REGELTYPE, req.requestURI)
+        enkeltOppslag(token.requiredAnsattId, OBO, brukerId, KJERNE_REGELTYPE, req.requestURI)
 
     @PostMapping("/ccf/kjerne/{ansattId}")
     @ProblemDetailApiResponse
@@ -65,13 +65,14 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, token: Token, 
         }
 
     private companion object {
-        private const val SUMMARY_KOMPLETT_OBO = "msg:openapi.tilgang.komplett.obo.summary"
-        private const val DESCRIPTION_KOMPLETT_OBO = "msg:openapi.tilgang.komplett.obo.description"
-        private const val SUMMARY_KOMPLETT_CCF = "msg:openapi.tilgang.komplett.ccf.summary"
-        private const val DESCRIPTION_KOMPLETT_CCF = "msg:openapi.tilgang.komplett.ccf.description"
-        private const val SUMMARY_KJERNE_OBO = "msg:openapi.tilgang.kjerne.obo.summary"
-        private const val SUMMARY_KJERNE_CCF = "msg:openapi.tilgang.kjerne.ccf.summary"
-        private const val DESCRIPTION_KJERNE_OBO = "msg:openapi.tilgang.kjerne.obo.description"
-        private const val DESCRIPTION_KJERNE_CCF = "msg:openapi.tilgang.kjerne.ccf.description"
+         private const val TILGANG_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.tilgang.tag.description"
+        private const val SUMMARY_KOMPLETT_OBO = "${MSG}openapi.tilgang.komplett.obo.summary"
+        private const val DESCRIPTION_KOMPLETT_OBO = "${MSG}openapi.tilgang.komplett.obo.description"
+        private const val SUMMARY_KOMPLETT_CCF = "${MSG}openapi.tilgang.komplett.ccf.summary"
+        private const val DESCRIPTION_KOMPLETT_CCF = "${MSG}openapi.tilgang.komplett.ccf.description"
+        private const val SUMMARY_KJERNE_OBO = "${MSG}openapi.tilgang.kjerne.obo.summary"
+        private const val SUMMARY_KJERNE_CCF = "${MSG}openapi.tilgang.kjerne.ccf.summary"
+        private const val DESCRIPTION_KJERNE_OBO = "${MSG}openapi.tilgang.kjerne.obo.description"
+        private const val DESCRIPTION_KJERNE_CCF = "${MSG}openapi.tilgang.kjerne.ccf.description"
     }
 }

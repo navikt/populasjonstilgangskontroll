@@ -34,7 +34,7 @@ import java.util.*
 
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 
-@RestClientTest(components = [EntraTjeneste::class, EntraGrupperConfig::class, EntraGruppeBeanConfig::class, EntraOidBeanConfig::class])
+@RestClientTest(components = [EntraTjeneste::class, EntraGrupperConfig::class, EntraOidBeanConfig::class])
 @Import(EntraTestConfig::class, OAuth2ClientTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class EntraTjenesteTest : BehaviorSpec() {

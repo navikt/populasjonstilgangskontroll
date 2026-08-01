@@ -10,9 +10,11 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.web.service.registry.ImportHttpServices
 
 @RetryingWhenRecoverableRestService
 @Timed
+@ImportHttpServices(types = [VergemålClient::class], group = VERGEMÅL)
 class VergemålTjeneste(private val nom: NomTjeneste, private val client: VergemålClient) {
 
     @WithSpan

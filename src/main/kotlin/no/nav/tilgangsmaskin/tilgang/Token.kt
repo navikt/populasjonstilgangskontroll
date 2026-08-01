@@ -42,6 +42,9 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
             else -> UNAUTHENTICATED
         }
 
+    val requiredAnsattId  get() =
+        requireNotNull(ansattId) { "Mangler ansattId i OBO-token" }
+
     companion object {
         private const val GROUPS = "groups"
         const val AAD_ISSUER: String = "azuread"
@@ -53,6 +56,3 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
     }
 }
 
-enum class TokenType {
-    OBO, CCF, UNAUTHENTICATED
-}

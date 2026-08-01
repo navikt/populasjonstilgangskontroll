@@ -12,7 +12,6 @@ import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålClient.Companion.VERGEMÅL_PATH
-import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.VERGEMÅL_BASE
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
@@ -38,10 +37,10 @@ import org.springframework.web.util.UriComponentsBuilder.fromUriString
 
 
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
+import java.net.URI
 
-@RestClientTest(components = [VergemålBeanConfig::class, VergemålTjeneste::class])
-@EnableConfigurationProperties(VergemålConfig::class)
-@Import(OAuth2ClientTestConfig::class)
+@RestClientTest(components = [VergemålBeanConfig::class, VergemålTjeneste::class, VergemålConfig::class])
+@Import(OAuth2ClientTestConfig::class, VergemålConfig::class)
 @ApplyExtension(SpringExtension::class)
 class VergemålTjenesteTest : BehaviorSpec() {
 
@@ -56,6 +55,9 @@ class VergemålTjenesteTest : BehaviorSpec() {
     lateinit var tjeneste: VergemålTjeneste
 
     @Autowired
+    lateinit var cfg: VergemålConfig
+
+    @Autowired
     lateinit var server: MockRestServiceServer
 
     init {
@@ -66,7 +68,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
 
             When("ansatt har vergemål") {
                 Then("returnerer brukerId-er for vergehavere") {
-                    server.expect(requestTo(VERGEMÅL_URI))
+                    server.expect(requestTo(uri(cfg.baseUri)))
                         .andExpect(method(POST))
                         .andRespond(withSuccess("""
                             [
@@ -91,7 +93,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
 
             When("ansatt har ingen vergemål") {
                 Then("returnerer tom liste") {
-                    server.expect(requestTo(VERGEMÅL_URI))
+                    server.expect(requestTo(uri(cfg.baseUri)))
                         .andExpect(method(POST))
                         .andRespond(withSuccess("[]", APPLICATION_JSON))
 
@@ -115,7 +117,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
 
             When("tjenesten returnerer 404") {
                 Then("kaster NotFoundRestException uten retry") {
-                    server.expect(requestTo(VERGEMÅL_URI))
+                    server.expect(requestTo(uri(cfg.baseUri)))
                         .andExpect(method(POST))
                         .andRespond(withStatus(NOT_FOUND))
 
@@ -125,7 +127,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
 
             When("tjenesten returnerer 401") {
                 Then("kaster IrrecoverableRestException uten retry") {
-                    server.expect(requestTo(VERGEMÅL_URI))
+                    server.expect(requestTo(uri(cfg.baseUri)))
                         .andExpect(method(POST))
                         .andRespond(withStatus(UNAUTHORIZED))
 
@@ -135,7 +137,7 @@ class VergemålTjenesteTest : BehaviorSpec() {
 
             When("tjenesten returnerer 500") {
                 Then("kaster RecoverableRestException etter 4 forsøk") {
-                    server.expect(times(4), requestTo(VERGEMÅL_URI))
+                    server.expect(times(4), requestTo(uri(cfg.baseUri)))
                         .andExpect(method(POST))
                         .andRespond(withStatus(INTERNAL_SERVER_ERROR))
 
@@ -151,6 +153,6 @@ class VergemålTjenesteTest : BehaviorSpec() {
         private val BRUKER1 = BrukerId("20478606614")
         private val BRUKER2 = BrukerId("03508331575")
 
-        private val VERGEMÅL_URI = fromUriString("$VERGEMÅL_BASE$VERGEMÅL_PATH").build().toUri()
+        private fun uri(base: URI) = fromUriString("$base$VERGEMÅL_PATH").build().toUri()
     }
 }

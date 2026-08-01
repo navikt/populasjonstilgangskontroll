@@ -11,6 +11,7 @@ import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.tilgang.BulkSwaggerApiRespons
+import no.nav.tilgangsmaskin.tilgang.MSG
 import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
 import no.nav.tilgangsmaskin.tilgang.dev.DevRegelController.Companion.DEV_REGEL_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.http.HttpStatus.MULTI_STATUS
@@ -57,15 +58,15 @@ class DevRegelController(private val regler: RegelTjeneste) {
         regler.bulkRegler(ansattId, brukerIds.map { BrukerIdOgRegelsett(it.verdi, regelType) }.toSet())
 
     companion object {
-        private const val DEV_REGEL_CONTROLLER_TAG_DESCRIPTION = "msg:openapi.dev.regel.tag.description"
-        private const val SUMMARY_KOMPLETT = "msg:openapi.dev.regel.komplett.summary"
-        private const val DESCRIPTION_KOMPLETT = "msg:openapi.dev.regel.komplett.description"
-        private const val SUMMARY_KJERNE = "msg:openapi.dev.regel.kjerne.summary"
-        private const val DESCRIPTION_KJERNE = "msg:openapi.dev.regel.kjerne.description"
-        private const val SUMMARY_BULK = "msg:openapi.dev.regel.bulk.summary"
-        private const val DESCRIPTION_BULK = "msg:openapi.dev.regel.bulk.description"
-        private const val SUMMARY_BULK_REGELTYPE = "msg:openapi.dev.regel.bulk.regeltype.summary"
-        private const val DESCRIPTION_BULK_REGELTYPE = "msg:openapi.dev.regel.bulk.regeltype.description"
+        private const val DEV_REGEL_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.dev.regel.tag.description"
+        private const val SUMMARY_KOMPLETT = "${MSG}openapi.dev.regel.komplett.summary"
+        private const val DESCRIPTION_KOMPLETT = "${MSG}openapi.dev.regel.komplett.description"
+        private const val SUMMARY_KJERNE = "${MSG}openapi.dev.regel.kjerne.summary"
+        private const val DESCRIPTION_KJERNE = "${MSG}openapi.dev.regel.kjerne.description"
+        private const val SUMMARY_BULK = "${MSG}openapi.dev.regel.bulk.summary"
+        private const val DESCRIPTION_BULK = "${MSG}openapi.dev.regel.bulk.description"
+        private const val SUMMARY_BULK_REGELTYPE = "${MSG}openapi.dev.regel.bulk.regeltype.summary"
+        private const val DESCRIPTION_BULK_REGELTYPE = "${MSG}openapi.dev.regel.bulk.regeltype.description"
     }
 
 }

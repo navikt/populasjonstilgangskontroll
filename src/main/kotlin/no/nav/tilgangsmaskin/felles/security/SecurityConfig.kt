@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.security
 
+import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase.Companion.PROD_PREFIX
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -16,7 +17,7 @@ class SecurityConfig {
             .httpBasic { it.disable() }
             .logout { it.disable() }
             .authorizeHttpRequests {
-                it.requestMatchers("/api/v1/**").authenticated()
+                it.requestMatchers("$PROD_PREFIX/**").authenticated()
                     .anyRequest().permitAll()
             }
             .oauth2ResourceServer { it.jwt { } }

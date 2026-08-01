@@ -31,6 +31,7 @@ import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.listener.CommonErrorHandler
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor
 import org.springframework.web.client.RestClient
@@ -45,12 +46,15 @@ class PdlBeanConfig {
 
     @Bean
     @Qualifier(PDLGRAPH)
-    fun pdlGraphRestClient(builder: Builder, mgr: OAuth2AuthorizedClientManager) =
+    fun pdlGraphRestClient(builder: Builder,
+                           mgr: OAuth2AuthorizedClientManager,
+                           service: OAuth2AuthorizedClientService) =
         builder
             .requestInterceptors {
                 it.add(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
                 it.add(OAuth2ClientHttpRequestInterceptor(mgr).apply {
                     setClientRegistrationIdResolver { PDLGRAPH }
+                    setAuthorizationFailureHandler(OAuth2ClientHttpRequestInterceptor.authorizationFailureHandler(service))
                 })
             }
             .build()

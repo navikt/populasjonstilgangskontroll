@@ -9,8 +9,8 @@ import java.net.URI
 @Component
 class CachePingable(
     private val cf: RedisConnectionFactory,
-    @Value("\${spring.data.redis.host}") host: String,
-    @Value("\${spring.data.redis.port}") port: Int,
+    @Value("\${spring.data.redis.host:localhost}") host: String,
+    @Value("\${spring.data.redis.port:6379}") port: Int,
 ) : Pingable {
 
     override val pingEndpoint = URI.create("$host:$port")

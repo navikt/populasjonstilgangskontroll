@@ -85,7 +85,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
                 .description("Avvisningskode, En av: $avvisningskoder"),
             fieldWithPath("status").type(NUMBER).description("HTTP-statuskode"),
             fieldWithPath("instance").type(STRING).description("ansattId/brukerId"),
-            fieldWithPath("type").type(STRING).description("Link til utdypende link:$TYPE_URI]").optional(),
+            fieldWithPath("type").type(STRING).description("Link til utdypende info: $TYPE_URI").optional(),
             fieldWithPath("brukerIdent").type(STRING).description("Identen til bruker").optional(),
             fieldWithPath("navIdent").type(STRING).description("NAV-identen til den ansatte").optional(),
             fieldWithPath("begrunnelse").type(STRING).description("Menneskelesbar begrunnelse for avvisning").optional(),

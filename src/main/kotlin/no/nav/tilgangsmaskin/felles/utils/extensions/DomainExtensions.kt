@@ -13,10 +13,8 @@ object DomainExtensions {
         require(verdi.length == len) { "Ugyldig lengde ${verdi.length} for $verdi, forventet $len siffer" }
     }
 
-    fun <T> withAnsattContext(ansattId: AnsattId, block: () -> T): T {
-        MDC.put(USER_ID, ansattId.verdi)
-        return block()
-    }
+    fun <T> withAnsattContext(ansattId: AnsattId, block: () -> T): T =
+        withMDC(USER_ID to ansattId.verdi, block = block)
 
     fun String.upcase() = this.replaceFirstChar { it.uppercaseChar() }
     fun String.maskFnr() =

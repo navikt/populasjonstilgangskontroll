@@ -16,7 +16,9 @@ class CacheMeteredErrorHandler(private val registry: MeterRegistry) : CacheError
         record("put", cache, e)
 
     override fun handleCacheEvictError(e: RuntimeException, cache: Cache, key: Any) =
-        record("evict", cache, e)
+        record("evict", cache, e).also {
+            throw e
+        }
 
     override fun handleCacheClearError(e: RuntimeException, cache: Cache) =
         record("clear", cache, e).also {

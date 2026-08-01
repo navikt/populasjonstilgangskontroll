@@ -66,6 +66,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                 setConnectionRequestTimeout(3000)
                 setReadTimeout(5000)
             })
+            c.defaultHeader("Jalla", "42")
             c.requestInterceptors {
                 it.add(RestLoggingRequestInterceptor())
             }

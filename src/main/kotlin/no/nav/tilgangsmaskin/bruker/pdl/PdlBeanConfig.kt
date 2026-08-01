@@ -31,12 +31,12 @@ import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.listener.CommonErrorHandler
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS
-import org.springframework.security.oauth2.client.web.ClientAttributes.clientRegistrationId
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
+import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 import org.springframework.web.service.registry.ImportHttpServices
-import java.util.function.Consumer
 
 @Configuration
 @NoCoverageAnalysis
@@ -45,21 +45,23 @@ class PdlBeanConfig {
 
     @Bean
     @Qualifier(PDLGRAPH)
-    fun pdlGraphRestClient(builder: Builder, pdlGraphRestClientCustomizer: Consumer<Builder>) =
-        builder.also(pdlGraphRestClientCustomizer::accept).build()
+    fun pdlGraphRestClient(builder: Builder, mgr: OAuth2AuthorizedClientManager) =
+        builder
+            .requestInterceptors {
+                it.add(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
+                it.add(OAuth2ClientHttpRequestInterceptor(mgr).apply {
+                    setClientRegistrationIdResolver { PDLGRAPH }
+                })
+            }
+            .build()
 
     @Bean
-    fun pdlGraphRestClientCustomizer() = Consumer<Builder> { builder ->
-        builder.requestInterceptor(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
-        builder.requestInitializer { clientRegistrationId(PDLGRAPH).accept(it.attributes) }
-    }
-
-    @Bean
-    fun graphGroupConfigurer() = RestClientHttpServiceGroupConfigurer { groups ->
-        groups.filterByName(PDLPIP,PDLGRAPH).forEachClient { _, builder ->
-            builder.requestInterceptor(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
+    fun graphGroupConfigurer() =
+        RestClientHttpServiceGroupConfigurer {
+            it.filterByName(PDLPIP,PDLGRAPH).forEachClient { _, builder ->
+                builder.requestInterceptor(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
+            }
         }
-    }
 
     @Bean
     fun syncPdlGraphQLClient(@Qualifier(PDLGRAPH) client: RestClient, cfg: PdlGraphQLConfig) =

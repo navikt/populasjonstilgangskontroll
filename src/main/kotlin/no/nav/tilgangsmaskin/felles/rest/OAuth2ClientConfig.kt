@@ -22,10 +22,4 @@ class OAuth2ClientConfig {
                 OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().build()
             )
         }
-
-    @Bean
-    fun oauth2RestClientCustomizer(manager: OAuth2AuthorizedClientManager) =
-        RestClientCustomizer { builder ->
-            builder.requestInterceptor(OAuth2ClientHttpRequestInterceptor(manager))
-        }
 }

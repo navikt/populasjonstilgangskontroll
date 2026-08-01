@@ -13,7 +13,7 @@ import org.springframework.web.client.support.RestClientHttpServiceGroupConfigur
 class EntraOidBeanConfig {
 
     @Bean
-    fun graphGroupConfigurer() = RestClientHttpServiceGroupConfigurer { groups ->
+    fun entraGraphGroupConfigurer() = RestClientHttpServiceGroupConfigurer { groups ->
         groups.filterByName(GRAPH).forEachClient { _, builder ->
             builder.requestInterceptor(RestHeaderAddingRequestInterceptor(CONSISTENCY_LEVEL))
         }

@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.security
 
-import org.slf4j.LoggerFactory
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.client.OAuth2AuthorizationSuccessHandler
@@ -19,8 +18,9 @@ class LoggingOAuth2AuthorizationSuccessHandler(
         principal: Authentication,
         attributes: Map<String, Any>
     ) {
+        val downstreamUri = OAuth2DownstreamUriContext.currentUri() ?: "unknown"
         val registrationId = authorizedClient.clientRegistration.registrationId
-        val previous = service.loadAuthorizedClient<OAuth2AuthorizedClient>(registrationId, principal.name)
+        val previous: OAuth2AuthorizedClient? = service.loadAuthorizedClient(registrationId, principal.name)
         val prevToken = previous?.accessToken?.tokenValue
         val newToken = authorizedClient.accessToken.tokenValue
         val prevExp = previous?.accessToken?.expiresAt
@@ -28,11 +28,26 @@ class LoggingOAuth2AuthorizationSuccessHandler(
 
         when {
             previous == null ->
-                log.info("OAuth2 first authorization: clientRegistrationId={}, expiresAt={}", registrationId, newExp)
+                log.info(
+                    "OAuth2 first authorization: clientRegistrationId={}, expiresAt={}, downstreamUri={}",
+                    registrationId,
+                    newExp,
+                    downstreamUri
+                )
             prevToken != newToken || prevExp != newExp ->
-                log.info("OAuth2 token renewed: clientRegistrationId={}, oldExpiresAt={}, newExpiresAt={}", registrationId, prevExp, newExp)
+                log.info(
+                    "OAuth2 token renewed: clientRegistrationId={}, oldExpiresAt={}, newExpiresAt={}, downstreamUri={}",
+                    registrationId,
+                    prevExp,
+                    newExp,
+                    downstreamUri
+                )
             else ->
-                log.debug("OAuth2 authorization success without token change: clientRegistrationId={}", registrationId)
+                log.debug(
+                    "OAuth2 authorization success without token change: clientRegistrationId={}, downstreamUri={}",
+                    registrationId,
+                    downstreamUri
+                )
         }
 
         delegate.onAuthorizationSuccess(authorizedClient, principal, attributes) // saves client

@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.security
 
+import no.nav.tilgangsmaskin.felles.security.OAuth2DownstreamUriContext.currentUri
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.client.ClientAuthorizationException
@@ -7,24 +8,16 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizationFailureHand
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException
 
 class LoggingOAuth2AuthorizationFailureHandler(
-    private val delegate: OAuth2AuthorizationFailureHandler
-) : OAuth2AuthorizationFailureHandler {
-
+    private val delegate: OAuth2AuthorizationFailureHandler) : OAuth2AuthorizationFailureHandler {
     private val log = getLogger(javaClass)
 
-    override fun onAuthorizationFailure(
-        authorizationException: OAuth2AuthorizationException,
-        principal: Authentication,
-        attributes: Map<String, Any>
-    ) {
-        val registrationId = (authorizationException as? ClientAuthorizationException)?.clientRegistrationId ?: "unknown"
+    override fun onAuthorizationFailure(e: OAuth2AuthorizationException, principal: Authentication, attr: Map<String, Any>) {
         log.debug(
-            "OAuth2 authorization failed for clientRegistrationId={}, principalType={}, errorCode={}, downstreamUri={}",
-            registrationId,
-            principal.javaClass.simpleName,
-            authorizationException.error.errorCode,
-            OAuth2DownstreamUriContext.currentUri() ?: "unknown"
+            "OAuth2 authorization feilet for id={}, errorCode={}, uri={}",
+            (e as? ClientAuthorizationException)?.clientRegistrationId ?: "unknown",
+            e.error.errorCode,
+            currentUri() ?: "unknown"
         )
-        delegate.onAuthorizationFailure(authorizationException, principal, attributes)
+        delegate.onAuthorizationFailure(e, principal, attr)
     }
 }

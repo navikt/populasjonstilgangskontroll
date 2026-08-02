@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.security
 
+import no.nav.tilgangsmaskin.felles.security.OAuth2DownstreamUriContext.currentUri
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.client.OAuth2AuthorizationSuccessHandler
@@ -14,44 +15,19 @@ class LoggingOAuth2AuthorizationSuccessHandler(
 
     private val log = getLogger(javaClass)
 
-    override fun onAuthorizationSuccess(
-        authorizedClient: OAuth2AuthorizedClient,
-        principal: Authentication,
-        attributes: Map<String, Any>
-    ) {
-        val downstreamUri = OAuth2DownstreamUriContext.currentUri() ?: "unknown"
-        val registrationId = authorizedClient.clientRegistration.registrationId
-        val previous: OAuth2AuthorizedClient? = service.loadAuthorizedClient(registrationId, principal.name)
-        val prevToken = previous?.accessToken?.tokenValue
-        val newToken = authorizedClient.accessToken.tokenValue
-        val prevExp = previous?.accessToken?.expiresAt?.atZone(OSLO_ZONE_ID)
-        val newExp = authorizedClient.accessToken.expiresAt?.atZone(OSLO_ZONE_ID)
+    override fun onAuthorizationSuccess(denne: OAuth2AuthorizedClient, principal: Authentication, attr: Map<String, Any>) {
+        val uri = currentUri() ?: "unknown"
+        val id = denne.clientRegistration.registrationId
+        val forrige: OAuth2AuthorizedClient? = service.loadAuthorizedClient(id, principal.name)
+        val prevExp = forrige?.accessToken?.expiresAt?.atZone(OSLO_ZONE_ID)
+        val newExp = denne.accessToken.expiresAt?.atZone(OSLO_ZONE_ID)
 
-        when {
-            previous == null ->
-                log.info(
-                    "OAuth2 first authorization: clientRegistrationId={}, expiresAt={}, downstreamUri={}",
-                    registrationId,
-                    newExp,
-                    downstreamUri
-                )
-            prevToken != newToken || prevExp != newExp ->
-                log.info(
-                    "OAuth2 token renewed: clientRegistrationId={}, oldExpiresAt={}, newExpiresAt={}, downstreamUri={}",
-                    registrationId,
-                    prevExp,
-                    newExp,
-                    downstreamUri
-                )
-            else ->
-                log.debug(
-                    "OAuth2 authorization success without token change: clientRegistrationId={}, downstreamUri={}",
-                    registrationId,
-                    downstreamUri
-                )
+        if (forrige == null) {
+            log.info("OAuth2 første autorisering: id={}, expiresAt={}, uri={}", id, newExp, uri)
+        } else {
+            log.info("OAuth2 token fornyelse: id={}, oldExpiresAt={}, newExpiresAt={}, uri={}", id,prevExp,newExp,uri)
         }
-
-        delegate.onAuthorizationSuccess(authorizedClient, principal, attributes) // saves client
+        delegate.onAuthorizationSuccess(denne, principal, attr)
     }
 
     companion object {

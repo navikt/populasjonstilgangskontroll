@@ -9,16 +9,17 @@ import no.nav.security.token.support.core.context.TokenValidationContext
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.security.token.support.core.jwt.JwtTokenClaims
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
-import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
-import no.nav.tilgangsmaskin.tilgang.Token.Companion.APP
-import no.nav.tilgangsmaskin.tilgang.Token.Companion.AZP_NAME
-import no.nav.tilgangsmaskin.tilgang.Token.Companion.IDTYP
-import no.nav.tilgangsmaskin.tilgang.Token.Companion.NAVIDENT
-import no.nav.tilgangsmaskin.tilgang.Token.Companion.OID
-import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
-import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
-import no.nav.tilgangsmaskin.tilgang.TokenType.UNAUTHENTICATED
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.AAD_ISSUER
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.APP
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.AZP_NAME
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.IDTYP
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
+import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
+import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
+import no.nav.tilgangsmaskin.felles.rest.TokenType.UNAUTHENTICATED
 import java.util.*
 
 class TokenTest : BehaviorSpec({

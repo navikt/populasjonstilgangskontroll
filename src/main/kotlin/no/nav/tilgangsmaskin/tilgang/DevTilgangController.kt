@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.tilgang.dev
+package no.nav.tilgangsmaskin.tilgang
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -19,9 +19,9 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangGyldig
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
-import no.nav.tilgangsmaskin.tilgang.MSG
-import no.nav.tilgangsmaskin.tilgang.ProblemDetailApiResponse
-import no.nav.tilgangsmaskin.tilgang.dev.DevTilgangController.Companion.DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION
+import no.nav.tilgangsmaskin.tilgang.DevTilgangController.Companion.DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION
+import no.nav.tilgangsmaskin.tilgang.openapi.MSG
+import no.nav.tilgangsmaskin.tilgang.openapi.ProblemDetailApiResponse
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable

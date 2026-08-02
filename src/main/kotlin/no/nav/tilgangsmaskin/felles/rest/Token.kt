@@ -1,11 +1,11 @@
-package no.nav.tilgangsmaskin.tilgang
+package no.nav.tilgangsmaskin.felles.rest
 
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
-import no.nav.tilgangsmaskin.tilgang.TokenType.CCF
-import no.nav.tilgangsmaskin.tilgang.TokenType.OBO
-import no.nav.tilgangsmaskin.tilgang.TokenType.UNAUTHENTICATED
+import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
+import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
+import no.nav.tilgangsmaskin.felles.rest.TokenType.UNAUTHENTICATED
 import org.springframework.stereotype.Component
 import java.util.*
 

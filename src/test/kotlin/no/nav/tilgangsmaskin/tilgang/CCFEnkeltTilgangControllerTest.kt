@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.tilgang
 
 import io.mockk.every
 import io.mockk.justRun
+import no.nav.tilgangsmaskin.felles.rest.TokenType
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.post
 

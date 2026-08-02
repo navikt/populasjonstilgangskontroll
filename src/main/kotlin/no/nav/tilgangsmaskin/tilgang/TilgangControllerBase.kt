@@ -5,7 +5,10 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeType.HTTP
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import no.nav.security.token.support.spring.ProtectedRestController
-import no.nav.tilgangsmaskin.tilgang.Token.Companion.AAD_ISSUER
+import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.rest.TokenType
+import no.nav.tilgangsmaskin.felles.rest.TokenTypeTeller
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.AAD_ISSUER
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException

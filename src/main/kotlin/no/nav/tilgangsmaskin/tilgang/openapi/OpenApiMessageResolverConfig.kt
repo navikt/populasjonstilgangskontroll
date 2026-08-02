@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.tilgang
+package no.nav.tilgangsmaskin.tilgang.openapi
 
 import io.swagger.v3.oas.models.Operation
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis

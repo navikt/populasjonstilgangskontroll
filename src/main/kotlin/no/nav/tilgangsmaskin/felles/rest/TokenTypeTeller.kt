@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.tilgang
+package no.nav.tilgangsmaskin.felles.rest
 
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.felles.AbstractTeller

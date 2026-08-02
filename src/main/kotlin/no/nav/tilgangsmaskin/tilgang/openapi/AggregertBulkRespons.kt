@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.tilgang
+package no.nav.tilgangsmaskin.tilgang.openapi
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude

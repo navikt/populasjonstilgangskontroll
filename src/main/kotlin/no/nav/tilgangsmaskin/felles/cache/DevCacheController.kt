@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.tilgang.dev
+package no.nav.tilgangsmaskin.felles.cache
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -8,12 +8,9 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMIN
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.Person
-import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
-import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.cache.getMany
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
-import no.nav.tilgangsmaskin.tilgang.MSG
-import no.nav.tilgangsmaskin.tilgang.dev.DevCacheController.Companion.DEV_CACHE_CONTROLLER_TAG_DESCRIPTION
+import no.nav.tilgangsmaskin.tilgang.openapi.MSG
+import no.nav.tilgangsmaskin.felles.cache.DevCacheController.Companion.DEV_CACHE_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 

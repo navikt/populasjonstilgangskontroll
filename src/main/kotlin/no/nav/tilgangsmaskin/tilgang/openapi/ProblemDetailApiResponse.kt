@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.tilgang
+package no.nav.tilgangsmaskin.tilgang.openapi
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content

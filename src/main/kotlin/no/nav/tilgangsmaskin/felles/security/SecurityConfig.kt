@@ -57,7 +57,7 @@ class SecurityConfig {
 
     @Bean
     fun oauth2AuthorizationSuccessHandler(service: OAuth2AuthorizedClientService)  =
-        LoggingOAuth2AuthorizationSuccessHandler { authorizedClient, principal, _ ->
+        LoggingOAuth2AuthorizationSuccessHandler(service) { authorizedClient, principal, _ ->
             service.saveAuthorizedClient(authorizedClient, principal)
         }
 

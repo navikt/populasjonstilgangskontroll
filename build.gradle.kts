@@ -7,6 +7,7 @@ import java.lang.System.getProperty
 val javaVersion = JavaLanguageVersion.of(26)
 
 group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
+extra["netty.version"] = "4.2.16.Final"  // TODO Midlertidig
 version = "1.0.1"
 
 plugins {

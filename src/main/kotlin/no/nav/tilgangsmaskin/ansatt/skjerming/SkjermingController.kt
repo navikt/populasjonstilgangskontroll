@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
 
-@UnprotectedRestController(value = ["/${DEV}/skjerming"])
+@UnprotectedRestController(["/${DEV}/skjerming"])
 @ConditionalOnNotProd
 @Tag(name = "SkjermingController", description = DEV_SKJERMING_CONTROLLER_TAG_DESCRIPTION)
 class SkjermingController(private val skjerming: SkjermingTjeneste) {

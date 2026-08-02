@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 
 
-@UnprotectedRestController(value = ["/${DEV}/ansatt/"])
+@UnprotectedRestController(["/${DEV}/ansatt/"])
 @ConditionalOnNotProd
 @Tag(name = "AnsattController", description = DEV_ANSATT_CONTROLLER_TAG_DESCRIPTION)
 class AnsattController(

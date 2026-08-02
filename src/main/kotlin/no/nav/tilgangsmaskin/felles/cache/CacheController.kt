@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
 
-@UnprotectedRestController(value = ["/${DEV}/cache"])
+@UnprotectedRestController( ["/${DEV}/cache"])
 @ConditionalOnNotProd
-@Tag(name = "DevCacheController", description = DEV_CACHE_CONTROLLER_TAG_DESCRIPTION)
+@Tag(name = "CacheController", description = DEV_CACHE_CONTROLLER_TAG_DESCRIPTION)
 class CacheController(private val cache: CacheOperations) {
 
     @PostMapping("cache/skjerminger")

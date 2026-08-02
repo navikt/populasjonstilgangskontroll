@@ -9,13 +9,14 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlTjeneste
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import no.nav.tilgangsmaskin.bruker.BrukerController.Companion.DEV_BRUKER_CONTROLLER_TAG_DESCRIPTION
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
 
-@UnprotectedRestController(value = ["/${ClusterConstants.DEV}/bruker/"])
+@UnprotectedRestController(["/${DEV}/bruker/"])
 @ConditionalOnNotProd
 @Tag(name = "BrukerController", description = DEV_BRUKER_CONTROLLER_TAG_DESCRIPTION)
 class BrukerController(private val bruker: BrukerTjeneste, private val pdl: PdlTjeneste, private val pip: PdlPipClient) {

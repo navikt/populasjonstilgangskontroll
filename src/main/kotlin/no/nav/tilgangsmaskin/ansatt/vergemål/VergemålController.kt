@@ -7,15 +7,15 @@ import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
-import no.nav.tilgangsmaskin.ansatt.vergemål.DevVergemålController.Companion.DEV_VERGEMAL_CONTROLLER_TAG_DESCRIPTION
+import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålController.Companion.DEV_VERGEMAL_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
 
-@UnprotectedRestController(value = ["/${DEV}/skjermning"])
+@UnprotectedRestController(["/${DEV}/skjermning"])
 @ConditionalOnNotProd
-@Tag(name = "DevVergemålController", description = DEV_VERGEMAL_CONTROLLER_TAG_DESCRIPTION)
-class DevVergemålController(private val vergemål: VergemålTjeneste) {
+@Tag(name = "VergemålController", description = DEV_VERGEMAL_CONTROLLER_TAG_DESCRIPTION)
+class VergemålController(private val vergemål: VergemålTjeneste) {
 
 
     @PostMapping("vergemål")

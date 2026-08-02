@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import java.util.*
 
 
-@UnprotectedRestController(value = ["/${DEV}"])
+@UnprotectedRestController(["/${DEV}"])
 @ConditionalOnNotProd
 @Tag(name = "DevTilgangController", description = DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION)
 class DevTilgangController(

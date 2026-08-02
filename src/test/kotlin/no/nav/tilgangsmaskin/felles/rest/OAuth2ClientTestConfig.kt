@@ -18,6 +18,7 @@ class OAuth2ClientTestConfig {
 
     @Bean
     fun restClientCustomizer() = RestClientCustomizer { c ->
+        c.defaultHeader("Jalla", "42")
         c.defaultStatusHandler(HttpStatusCode::isError, RestDefaultErrorHandler()::handle)
     }
 

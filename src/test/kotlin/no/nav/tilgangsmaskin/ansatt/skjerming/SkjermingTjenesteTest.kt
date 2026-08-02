@@ -39,6 +39,7 @@ import java.net.URI
 
 
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
+import org.springframework.test.web.client.match.MockRestRequestMatchers.header
 
 @RestClientTest(components = [SkjermingClient::class,SkjermingBeanConfig::class, SkjermingTjeneste::class, SkjermingConfig::class])
 @Import(SkjermingTestConfig::class, OAuth2ClientTestConfig::class)
@@ -70,6 +71,7 @@ class SkjermingTjenesteTest : BehaviorSpec() {
             When("samme brukerId slås opp to ganger") {
                 Then("andre kall returneres fra cache uten REST-kall") {
                     server.expect(once(), requestTo(skjermingUri))
+                        .andExpect(header("jalla", "42"))
                         .andRespond(withSuccess("true", APPLICATION_JSON))
                     tjeneste.skjerming(ID1).shouldBeTrue()
                     tjeneste.skjerming(ID1).shouldBeTrue()

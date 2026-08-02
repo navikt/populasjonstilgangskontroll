@@ -16,8 +16,7 @@ class RestLoggingRequestInterceptor : ClientHttpRequestInterceptor {
         if (req.uri.path.contains("monitoring")) {
             return execution.execute(req, body)
         }
-        log.info("Headers er ${req.headers}")
-        if (!body.isEmpty()) {
+        if (body.isNotEmpty()) {
             log.trace(CONFIDENTIAL, "Body for {} {} : {} ", req.method, req.uri, String(body))
         }
         val res = execution.execute(req, body)

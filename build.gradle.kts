@@ -8,7 +8,7 @@ val javaVersion = JavaLanguageVersion.of(26)
 
 group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
 extra["netty.version"] = "4.2.16.Final"  // TODO Midlertidig
-extra["jackson.version"] = "3.2.0"       // TODO Midlertidig
+extra["jackson3.version"] = "3.2.0"       // TODO Midlertidig
 
 version = "1.0.1"
 
@@ -49,6 +49,9 @@ repositories {
 
 
 dependencies {
+    // Force newer jackson-databind version (required by gradle-avro-plugin)
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.22.1")
+
     implementation(libs.boot.conditionals)
     implementation(libs.bundles.observability)
     implementation(libs.bundles.slack)
@@ -94,13 +97,11 @@ dependencyManagement {
     imports {
         mavenBom(libs.opentelemetry.instrumentation.bom.get().toString())
         mavenBom(libs.kotest.bom.get().toString())
-        mavenBom("tools.jackson:jackson-bom:${dependencyManagement.importedProperties["jackson.version"]}")
+        mavenBom("tools.jackson:jackson-bom:${dependencyManagement.importedProperties["jackson3.version"]}")
     }
 }
 
-application {
-    mainClass.set("no.nav.tilgangsmaskin.AppKt")
-}
+
 tasks.withType<BootJar> {
     archiveFileName = "app.jar"
     duplicatesStrategy = EXCLUDE
@@ -117,6 +118,7 @@ java {
 }
 
 val generateGitProperties = tasks.register("generateGitProperties") {
+    description = "Generates git.properties file with Git metadata"
     val outputFile = layout.buildDirectory.file("resources/main/git.properties")
     outputs.file(outputFile)
 

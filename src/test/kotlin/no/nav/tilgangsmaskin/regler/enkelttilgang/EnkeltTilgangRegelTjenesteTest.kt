@@ -50,6 +50,7 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
+import no.nav.tilgangsmaskin.felles.rest.TokenTypeTeller
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.test.context.TestPropertySource
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -58,7 +59,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @EnableJpaAuditing
 @TestPropertySource(locations = ["classpath:test.properties"])
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [TestApp::class, EnkeltTilgangTjeneste::class, EnkeltTilgangJPAAdapter::class, RegelTjeneste::class, BulkResponsAggregator::class, LocalAuditor::class])
+@ContextConfiguration(classes = [TestApp::class, TokenTypeTeller::class,EnkeltTilgangTjeneste::class, EnkeltTilgangJPAAdapter::class, RegelTjeneste::class, BulkResponsAggregator::class, LocalAuditor::class])
 @AutoConfigureMetrics
 @Testcontainers
 @ComponentScan("no.nav.tilgangsmaskin.regler.motor", "no.nav.tilgangsmaskin.regler.enkelttilgang")
@@ -79,7 +80,7 @@ class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
     private lateinit var nom: NomTjeneste
 
     @MockkBean
-    lateinit var token: Token
+    private lateinit var token: Token
     @MockkBean
     lateinit var oppfølging: OppfølgingTjeneste
     @MockkBean

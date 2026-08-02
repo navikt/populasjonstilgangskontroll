@@ -28,6 +28,11 @@
   },
   "inbound": [
     {
+      "name": "familie-ks-sak",
+      "namespace": "teamfamilie",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "journalforing-frontend-q2",
       "namespace": "isa",
       "cluster": "dev-gcp"

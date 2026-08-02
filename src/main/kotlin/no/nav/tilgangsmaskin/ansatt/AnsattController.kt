@@ -1,10 +1,8 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import no.nav.tilgangsmaskin.felles.rest.DevController
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import no.nav.tilgangsmaskin.ansatt.AnsattController.Companion.DEV_ANSATT_CONTROLLER_TAG_DESCRIPTION
@@ -12,9 +10,11 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 
 
-@UnprotectedRestController(["/${DEV}/ansatt/"])
-@ConditionalOnNotProd
-@Tag(name = "AnsattController", description = DEV_ANSATT_CONTROLLER_TAG_DESCRIPTION)
+@DevController(
+    value = ["/${DEV}/ansatt/"],
+    name = "AnsattController",
+    description = DEV_ANSATT_CONTROLLER_TAG_DESCRIPTION
+)
 class AnsattController(
     private val ansatte: AnsattTjeneste,
     private val proxy: EntraProxyTjeneste) {

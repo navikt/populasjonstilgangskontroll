@@ -1,12 +1,9 @@
 package no.nav.tilgangsmaskin.bruker
 
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjeneste
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants
+import no.nav.tilgangsmaskin.felles.rest.DevController
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import no.nav.tilgangsmaskin.bruker.BrukerController.Companion.DEV_BRUKER_CONTROLLER_TAG_DESCRIPTION
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
@@ -16,9 +13,11 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
 
-@UnprotectedRestController(["/${DEV}/bruker/"])
-@ConditionalOnNotProd
-@Tag(name = "BrukerController", description = DEV_BRUKER_CONTROLLER_TAG_DESCRIPTION)
+@DevController(
+    value = ["/${DEV}/bruker/"],
+    name = "BrukerController",
+    description = DEV_BRUKER_CONTROLLER_TAG_DESCRIPTION
+)
 class BrukerController(private val bruker: BrukerTjeneste, private val pdl: PdlTjeneste, private val pip: PdlPipClient) {
 
     @GetMapping("person/pip/{id}")

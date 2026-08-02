@@ -1,10 +1,8 @@
 package no.nav.tilgangsmaskin.regler
 
-import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.rest.DevController
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -21,9 +19,11 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseStatus
 
 
-@UnprotectedRestController(value = ["/${DEV}/regel/"])
-@ConditionalOnNotProd
-@Tag(name = "DevRegelController", description = DEV_REGEL_CONTROLLER_TAG_DESCRIPTION)
+@DevController(
+    value = ["/${DEV}/regel/"],
+    name = "DevRegelController",
+    description = DEV_REGEL_CONTROLLER_TAG_DESCRIPTION
+)
 class RegelController(private val regler: RegelTjeneste) {
     @GetMapping("komplett/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)

@@ -1,11 +1,8 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.transaction.Transactional
 import jakarta.validation.Valid
-import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomJPAAdapter
@@ -15,6 +12,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
+import no.nav.tilgangsmaskin.felles.rest.DevController
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangGyldig
@@ -32,9 +30,11 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import java.util.*
 
 
-@UnprotectedRestController(["/${DEV}"])
-@ConditionalOnNotProd
-@Tag(name = "DevTilgangController", description = DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION)
+@DevController(
+    value = ["/${DEV}"],
+    name = "DevTilgangController",
+    description = DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION
+)
 class DevTilgangController(
     private val graphql: PdlSyncGraphQLClientAdapter,
     private val enkeltTilgang: EnkeltTilgangTjeneste,

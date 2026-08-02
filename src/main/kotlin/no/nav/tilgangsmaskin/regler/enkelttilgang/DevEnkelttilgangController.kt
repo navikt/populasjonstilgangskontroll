@@ -1,11 +1,9 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.rest.DevController
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import no.nav.tilgangsmaskin.regler.enkelttilgang.DevEnkelttilgangController.Companion.DEV_ENKELT_CONTROLLER_TAG_DESCRIPTION
@@ -14,9 +12,11 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 
 
-@UnprotectedRestController(value = ["/${DEV}/enkelt/"])
-@ConditionalOnNotProd
-@Tag(name = "DevEnkelttilgangController", description = DEV_ENKELT_CONTROLLER_TAG_DESCRIPTION)
+@DevController(
+    value = ["/${DEV}/enkelt/"],
+    name = "DevEnkelttilgangController",
+    description = DEV_ENKELT_CONTROLLER_TAG_DESCRIPTION
+)
 class DevEnkelttilgangController(private val enkelt: EnkeltTilgangTjeneste,
                                  private val adapter: EnkeltTilgangJPAAdapter) {
 

@@ -19,7 +19,7 @@ class ResilientValkeySerializerTest : BehaviorSpec({
     val obj = "verdi"
 
     fun serializer(delegate: RedisSerializer<Any>, registry: SimpleMeterRegistry = SimpleMeterRegistry()) =
-        ResilientValkeySerializer(delegate, registry)
+        ResilientValkeySerializer(delegate)
 
     Given("deserialisering") {
 

@@ -1,7 +1,9 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.felles.AbstractTeller
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
@@ -56,3 +58,10 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
     }
 }
 
+enum class TokenType {
+    OBO, CCF, UNAUTHENTICATED
+}
+
+@Component
+class TokenTypeTeller(registry: MeterRegistry, token: Token) :
+    AbstractTeller(registry, token, "token.type", "Token type")

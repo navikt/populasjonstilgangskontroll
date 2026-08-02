@@ -62,7 +62,7 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
             .entryTtl(cfg.varighet)
             .serializeKeysWith(fromSerializer(StringRedisSerializer()))
             .serializeValuesWith(fromSerializer(
-                ResilientValkeySerializer(GenericJacksonJsonRedisSerializer(VALKEY_MAPPER), meterRegistry))).apply {
+                ResilientValkeySerializer(GenericJacksonJsonRedisSerializer(VALKEY_MAPPER)))).apply {
                 if (!cfg.cacheNulls) disableCachingNullValues()
             }
 

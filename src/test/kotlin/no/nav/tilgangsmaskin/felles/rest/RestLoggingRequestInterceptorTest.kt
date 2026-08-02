@@ -10,6 +10,7 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldMatch
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -29,15 +30,16 @@ class RestLoggingRequestInterceptorTest : BehaviorSpec({
     fun withLogCapture(level: Level = TRACE, block: () -> Unit): List<ILoggingEvent> {
         val logger = getLogger(RestLoggingRequestInterceptor::class.java) as Logger
         val originalLevel = logger.level
+        val appender = ListAppender<ILoggingEvent>().apply { start() }
         logger.level = level
-        val appender = ListAppender<ILoggingEvent>().apply { start(); logger.addAppender(this) }
-        return try {
+        logger.addAppender(appender)
+        return runCatching {
             block()
             appender.list.toList()
-        } finally {
+        }.also {
             logger.detachAppender(appender)
             logger.level = originalLevel
-        }
+        }.getOrThrow()
     }
 
     Given("en vanlig request med body") {
@@ -54,9 +56,8 @@ class RestLoggingRequestInterceptorTest : BehaviorSpec({
                 }
 
                 events shouldHaveSize 2
-                events[0].formattedMessage shouldContain """{"felt": "verdi"}"""
-                events[0].formattedMessage shouldContain "POST"
-                events[1].formattedMessage shouldContain "200"
+                events[0].formattedMessage shouldMatch Regex(""".*POST.*\{"felt": "verdi"}.*""")
+                events[1].formattedMessage shouldMatch Regex(""".*200.*""")
             }
 
             Then("kaller execution med request og body") {
@@ -79,8 +80,7 @@ class RestLoggingRequestInterceptorTest : BehaviorSpec({
                 }
 
                 events shouldHaveSize 1
-                events[0].formattedMessage shouldContain "200"
-                events[0].formattedMessage shouldContain "GET"
+                events.single().formattedMessage shouldMatch Regex(""".*GET.*200.*""")
             }
         }
     }

@@ -25,14 +25,19 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import java.util.*
 
-@RestClientTest(components = [EntraGrupperRestClientAdapter::class, EntraTjeneste::class, EntraGrupperConfig::class, EntraGruppeBeanConfig::class, EntraOidBeanConfig::class])
-@Import(EntraTestConfig::class)
+
+import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
+
+@RestClientTest(components = [EntraTjeneste::class, EntraGrupperConfig::class, EntraOidBeanConfig::class])
+@Import(EntraTestConfig::class, OAuth2ClientTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 class EntraTjenesteTest : BehaviorSpec() {
 
@@ -205,7 +210,11 @@ class EntraTjenesteTest : BehaviorSpec() {
         }
     """.trimIndent()
 
-    private companion object {
+    companion object {
+        @JvmStatic
+        @DynamicPropertySource
+        fun dynamicProperties(registry: DynamicPropertyRegistry) =
+            OAuth2ClientTestConfig.registerServiceClientBaseUrls(registry)
 
         private val OID       = UUID.randomUUID()
         private val OID2     = UUID.randomUUID()

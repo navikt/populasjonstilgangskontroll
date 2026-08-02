@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
@@ -11,7 +10,6 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
-import org.springframework.kafka.support.KafkaHeaders
 import org.springframework.kafka.support.KafkaHeaders.OFFSET
 import org.springframework.kafka.support.KafkaHeaders.RECEIVED_PARTITION
 import org.springframework.messaging.handler.annotation.Header
@@ -35,12 +33,15 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
             log.info("Behandler hendelse $hendelse for $ansattId fra NOM, partition $partition og offset $offset")
             val id = nom.lagre(this)
             log.info("$ansattId hendelse ${hendelse} på partition $partition, offset $offset ferdig behandlet og lagret med id $id")
-    }
+        }
 
 
     companion object {
         fun NomHendelse.ansattData() =
-            NomAnsattData(AnsattId(navident), BrukerId(personident), NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: ALLTID))
+            NomAnsattData(AnsattId(navident),
+                BrukerId(personident),
+                NomAnsattPeriode(startdato ?: EPOCH, sluttdato ?: ALLTID))
+
         const val NOM_FNR_FILTER_STRATEGY = "nomFnrFilterStrategy"
         private const val NOM_TOPIC = "org.nom.api-ressurs-state-v4"
     }

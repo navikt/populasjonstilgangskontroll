@@ -24,7 +24,9 @@ abstract class KafkaTypedDroppedMessageMeter<T : Any>(
     override fun recovered(record: ConsumerRecord<*, *>, e: Exception?) {
         val event = typedValue(record) ?: return
         counter.increment(record, e)
-        log.error("Ga opp Kafka-melding på topic=${record.topic()} partition=${record.partition()} offset=${record.offset()} hendelse=[${formatEvent(event)}]: ${e?.message}", e)
+        log.error("Ga opp Kafka-melding på topic=${record.topic()} partition=${record.partition()} offset=${record.offset()} hendelse=[${
+            formatEvent(event)
+        }]: ${e?.message}", e)
     }
 
     override fun failedDelivery(record: ConsumerRecord<*, *>, e: Exception?, deliveryAttempt: Int) {

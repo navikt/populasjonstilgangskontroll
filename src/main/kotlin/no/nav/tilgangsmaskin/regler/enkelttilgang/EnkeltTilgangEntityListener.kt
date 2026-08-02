@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import jakarta.persistence.PrePersist
 import jakarta.persistence.PreUpdate
-import no.nav.tilgangsmaskin.tilgang.Token
+import no.nav.tilgangsmaskin.felles.rest.Token
 import org.springframework.stereotype.Component
 
 @Component

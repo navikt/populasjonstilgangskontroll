@@ -9,7 +9,7 @@ import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import no.nav.tilgangsmaskin.TestApp
-import no.nav.tilgangsmaskin.tilgang.Token
+import no.nav.tilgangsmaskin.felles.rest.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger
 @DataJpaTest
 @Testcontainers
 @AutoConfigureMetrics
-@ContextConfiguration(classes = [TestApp::class, NomTjeneste::class, NomJPAAdapter::class, NomDBOpprydder::class, NomRaderFjernetTeller::class, NomKallTeller::class])
+@ContextConfiguration(classes = [TestApp::class, NomTjeneste::class, NomJPAAdapter::class, NomDBOpprydder::class])
 @ApplyExtension(SpringExtension::class)
 class NomDBOpprydderTest : BehaviorSpec() {
 
@@ -44,15 +44,6 @@ class NomDBOpprydderTest : BehaviorSpec() {
 
     @Autowired
     private lateinit var txManager: PlatformTransactionManager
-
-    @Autowired
-    private lateinit var antallKall: NomKallTeller
-
-    @Autowired
-    private lateinit var raderFjernet: NomRaderFjernetTeller
-
-
-
 
     init {
         beforeEach {

@@ -1,20 +1,22 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
 
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRAPROXY
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
 import no.nav.tilgangsmaskin.felles.rest.RestDefaultErrorHandler.Companion.IDENTIFIKATOR
+import org.springframework.security.oauth2.client.annotation.ClientRegistrationId
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.service.annotation.GetExchange
-import org.springframework.web.service.annotation.HttpExchange
 
-@HttpExchange
 interface EntraProxyClient {
 
     @GetExchange(ENTRA_PROXY_ANSATT_PATH)
+    @ClientRegistrationId(ENTRAPROXY)
     fun enhet(@PathVariable navIdent: String,
               @RequestHeader(IDENTIFIKATOR) identifikator: String = navIdent): EntraProxyEnhet
 
     @GetExchange(ENTRA_PROXY_ENHETER_PATH)
+    @ClientRegistrationId(ENTRAPROXY)
     fun enheter(@PathVariable navIdent: String,
                 @RequestHeader(IDENTIFIKATOR) identifikator: String = navIdent): Set<Enhet>
 

@@ -1,19 +1,17 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
+import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.graphql.client.GraphQlClient
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
-import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.stereotype.Component
 
 @Component
-@Timed(value = "pdl_tjeneste", histogram = true, extraTags = ["backend", "graphql"])
 class PdlSyncGraphQLClientAdapter(
     private val cfg: PdlGraphQLConfig,
     private val client: GraphQlClient,
@@ -23,17 +21,17 @@ class PdlSyncGraphQLClientAdapter(
 
     fun partnere(ident: String): Set<FamilieMedlem> =
         runCatching {
-            query<Partnere>(SIVILSTAND_QUERY, ident(ident)).sivilstand.mapNotNull {
+            query<Partnere>(SIVILSTAND_QUERY, ident(ident)).sivilstand.mapNotNullTo(mutableSetOf()) {
                 it.relatertVedSivilstand?.let { brukerId ->
                     FamilieMedlem(BrukerId(brukerId), tilPartner(it.type))
                 }
-            }.toSet()
-        }.getOrElse {
-            if (it is IrrecoverableRestException && it.statusCode == NOT_FOUND) {
+            }
+        }.recover { e ->
+            (e as? NotFoundRestException)?.let {
                 log.trace("Fant ingen partnere for $ident")
-                return emptySet()
-            } else throw it
-        }
+                emptySet()
+            } ?: throw e
+        }.getOrThrow()
 
     private inline fun <reified T : Any> query(query: Pair<String, String>, vars: Map<String, String>) =
         runCatching {

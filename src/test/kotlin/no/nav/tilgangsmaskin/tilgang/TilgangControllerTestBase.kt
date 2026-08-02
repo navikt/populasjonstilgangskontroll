@@ -8,11 +8,15 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.justRun
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.rest.TokenTypeTeller
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
+import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.TYPE_URI
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpHeaders.HOST
@@ -84,9 +88,9 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
                 .description("Avvisningskode, En av: $avvisningskoder"),
             fieldWithPath("status").type(NUMBER).description("HTTP-statuskode"),
             fieldWithPath("instance").type(STRING).description("ansattId/brukerId"),
-            fieldWithPath("type").type(STRING).description("Link til utdypende link:https://confluence.adeo.no/display/TM/Tilgangsmaskin+API+og+regelsett[regelsett-dokumentasjon]").optional(),
-            fieldWithPath("brukerIdent").type(STRING).description("Fødselsnummer/d-nummer til bruker").optional(),
-            fieldWithPath("navIdent").type(STRING).description("NAV-ident den ansatte").optional(),
+            fieldWithPath("type").type(STRING).description("Link til utdypende info: $TYPE_URI").optional(),
+            fieldWithPath("brukerIdent").type(STRING).description("Identen til bruker").optional(),
+            fieldWithPath("navIdent").type(STRING).description("NAV-identen til den ansatte").optional(),
             fieldWithPath("begrunnelse").type(STRING).description("Menneskelesbar begrunnelse for avvisning").optional(),
             fieldWithPath("traceId").type(STRING).description("OTEL trace-ID for feilsøking").optional(),
             fieldWithPath("kanOverstyres").type(BOOLEAN).description("Om regelen kan overstyres med enkelttilgang").optional()
@@ -105,7 +109,11 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
         beforeEach { case ->
             clearAllMocks()
             restDocumentation.beforeTest(TilgangControllerTestBase::class.java, case.name.name)
-            mockMvc = standaloneSetup(TilgangController(regelTjeneste, enkeltTilgangTjeneste, token, TokenTypeGuard(token), konsumentValidator, teller))
+            mockMvc = standaloneSetup(
+                TilgangController(regelTjeneste, token, teller),
+                EnkeltTilgangController(enkeltTilgangTjeneste, konsumentValidator, token, teller),
+                BulkTilgangController(regelTjeneste, token, teller)
+            )
                 .setControllerAdvice(ProblemDetailExceptionHandler())
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
                 .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation)

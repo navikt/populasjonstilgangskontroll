@@ -23,7 +23,7 @@ jobs:
       id-token: write  # nais/docker-build-push + nais/attest-sign (OIDC mot GAR + Sigstore)
     uses: ./.github/workflows/build.yml
     with:
-      publish-pages: true
+      publish-pages: false
       cache-read-only: false
       checkout-ref: ${{ github.event.pull_request.head.ref }}
       checkout-repository: ${{ github.event.pull_request.head.repo.full_name }}

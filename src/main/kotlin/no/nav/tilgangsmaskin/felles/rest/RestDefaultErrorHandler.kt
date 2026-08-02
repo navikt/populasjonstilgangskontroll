@@ -4,8 +4,10 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.client.ClientHttpResponse
+import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
+@Component
 class RestDefaultErrorHandler : ErrorHandler {
     private val log = getLogger(javaClass)
 

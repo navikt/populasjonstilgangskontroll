@@ -2,6 +2,7 @@
 
 Arkitekturbeslutninger for populasjonstilgangskontroll, dokumentert etter [Architecture Advice Process](https://sikkerhet.nav.no).
 
+
 ## Oversikt
 
 | # | Beslutning | Status | Dato |

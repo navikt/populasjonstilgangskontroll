@@ -6,7 +6,7 @@ import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.longs.shouldBeGreaterThan
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilgangsmaskin.tilgang.Token
+import no.nav.tilgangsmaskin.felles.rest.Token
 import com.ninjasquad.springmockk.MockkBean
 import io.micrometer.core.annotation.Timed
 import io.micrometer.core.instrument.MeterRegistry
@@ -69,7 +69,7 @@ class ClusterAddingTimedAspectTest : BehaviorSpec() {
         @Bean fun timedService() = TimedService()
 
         @Bean fun timedAspect(registry: MeterRegistry, token: Token) =
-            FellesBeanConfig(mockk(relaxed = true)).clusterAddingTimedAspect(registry, token)
+            FellesBeanConfig(mockk(relaxed = true), mockk(relaxed = true)).clusterAddingTimedAspect(registry, token)
     }
 
     open class TimedService {

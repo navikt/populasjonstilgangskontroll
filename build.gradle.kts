@@ -8,10 +8,11 @@ val javaVersion = JavaLanguageVersion.of(26)
 
 group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
 extra["netty.version"] = "4.2.16.Final"  // TODO Midlertidig
+extra["jackson.version"] = "3.2.0"       // TODO Midlertidig
+
 version = "1.0.1"
 
 plugins {
-    application
     jacoco
     alias(libs.plugins.avro)
     alias(libs.plugins.kotlin.jvm)

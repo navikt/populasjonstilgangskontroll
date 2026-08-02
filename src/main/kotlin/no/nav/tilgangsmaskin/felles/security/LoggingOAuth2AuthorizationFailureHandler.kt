@@ -19,10 +19,11 @@ class LoggingOAuth2AuthorizationFailureHandler(
     ) {
         val registrationId = (authorizationException as? ClientAuthorizationException)?.clientRegistrationId ?: "unknown"
         log.debug(
-            "OAuth2 authorization failed for clientRegistrationId={}, principalType={}, errorCode={}",
+            "OAuth2 authorization failed for clientRegistrationId={}, principalType={}, errorCode={}, downstreamUri={}",
             registrationId,
             principal.javaClass.simpleName,
-            authorizationException.error.errorCode
+            authorizationException.error.errorCode,
+            OAuth2DownstreamUriContext.currentUri() ?: "unknown"
         )
         delegate.onAuthorizationFailure(authorizationException, principal, attributes)
     }

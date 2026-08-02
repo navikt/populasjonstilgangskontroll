@@ -17,6 +17,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.kafka.KafkaTypedDroppedMessageMeter
+import no.nav.tilgangsmaskin.felles.security.OAuth2DownstreamUriCapturingInterceptor
 import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
@@ -51,6 +52,7 @@ class PdlBeanConfig {
                            oauth2AuthorizationFailureHandler: OAuth2AuthorizationFailureHandler) =
         builder
             .requestInterceptors {
+                it.add(OAuth2DownstreamUriCapturingInterceptor())
                 it.add(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
                 it.add(OAuth2ClientHttpRequestInterceptor(mgr).apply {
                     setClientRegistrationIdResolver { PDLGRAPH }

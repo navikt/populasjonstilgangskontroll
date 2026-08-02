@@ -17,9 +17,10 @@ class LoggingOAuth2AuthorizationSuccessHandler(
         attributes: Map<String, Any>
     ) {
         log.debug(
-            "OAuth2 authorization succeeded for clientRegistrationId={}, principalType={}",
+            "OAuth2 authorization succeeded for clientRegistrationId={}, principalType={}, downstreamUri={}",
             authorizedClient.clientRegistration.registrationId,
-            principal.javaClass.simpleName
+            principal.javaClass.simpleName,
+            OAuth2DownstreamUriContext.currentUri() ?: "unknown"
         )
         delegate.onAuthorizationSuccess(authorizedClient, principal, attributes)
     }

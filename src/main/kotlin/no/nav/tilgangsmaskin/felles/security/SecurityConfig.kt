@@ -30,8 +30,10 @@ class SecurityConfig {
 
 
     @Bean
-    fun oauth2AuthorizationFailureHandler(service: OAuth2AuthorizedClientService) =
-        OAuth2ClientHttpRequestInterceptor.authorizationFailureHandler(service)
+    fun oauth2AuthorizationFailureHandler(service: OAuth2AuthorizedClientService): OAuth2AuthorizationFailureHandler =
+        LoggingOAuth2AuthorizationFailureHandler(
+            OAuth2ClientHttpRequestInterceptor.authorizationFailureHandler(service)
+        )
 
     @Bean
     fun oauth2AuthorizationSuccessHandler(service: OAuth2AuthorizedClientService)  =

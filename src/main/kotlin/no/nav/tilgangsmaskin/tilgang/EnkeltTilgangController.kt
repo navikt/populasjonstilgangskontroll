@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.tilgang
 
-import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
@@ -23,8 +22,7 @@ class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste, private
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)
-    @ProblemDetailApiResponse
-    @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
+    @ProblemDetailApiResponse(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
     fun enkeltTilgang(@RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData, req: HttpServletRequest) {
         sjekk(token.type == OBO, FORBIDDEN, "Forventet token type $OBO for ${req.requestURI}, fikk ${token.type}")
         validator.valider(token.systemNavn)

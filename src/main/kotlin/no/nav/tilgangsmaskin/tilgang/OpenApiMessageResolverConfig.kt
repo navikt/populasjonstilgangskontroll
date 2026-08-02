@@ -22,17 +22,18 @@ class OpenApiMessageResolverConfig(private val messageSource: MessageSource) {
             tag.description = resolve(tag.description)
         }
 
-        @Bean
-        fun bulkSwaggerOperationCustomizer(): OperationCustomizer = OperationCustomizer { operation, handlerMethod ->
-            applyBulkSwaggerOperation(operation, handlerMethod)
-            operation
-        }
-
         openApi.paths?.values?.forEach { pathItem ->
             pathItem.readOperations().forEach { operation ->
                 resolveOperation(operation)
             }
         }
+    }
+
+    @Bean
+    fun compositeOperationCustomizer(): OperationCustomizer = OperationCustomizer { operation, handlerMethod ->
+        applyBulkSwaggerOperation(operation, handlerMethod)
+        applyProblemDetailOperation(operation, handlerMethod)
+        operation
     }
 
     private fun resolveOperation(operation: Operation) {
@@ -48,6 +49,17 @@ class OpenApiMessageResolverConfig(private val messageSource: MessageSource) {
         }
         if (bulkSwaggerApiRespons.description.isNotBlank()) {
             operation.description = bulkSwaggerApiRespons.description
+        }
+    }
+
+    private fun applyProblemDetailOperation(operation: Operation, handlerMethod: HandlerMethod) {
+        val problemDetailApiResponse = handlerMethod.getMethodAnnotation(ProblemDetailApiResponse::class.java) ?: return
+
+        if (problemDetailApiResponse.summary.isNotBlank()) {
+            operation.summary = problemDetailApiResponse.summary
+        }
+        if (problemDetailApiResponse.description.isNotBlank()) {
+            operation.description = problemDetailApiResponse.description
         }
     }
 

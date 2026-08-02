@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.tilgang
 
+import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -13,6 +14,7 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
 
 @Target(FUNCTION)
 @Retention(RUNTIME)
+@Operation
 @ApiResponses(
     value = [
         ApiResponse(
@@ -47,7 +49,10 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
                         "begrunnelse": "Du har ikke tilgang til brukere med strengt fortrolig adresse",
                         "kanOverstyres": false
                     }"""))])])
-annotation class ProblemDetailApiResponse
+annotation class ProblemDetailApiResponse(
+    val summary: String = "",
+    val description: String = ""
+)
 
 @Schema(description = "Problem Detail")
 internal data class ProblemSwaggerDetailResponse(
@@ -60,4 +65,3 @@ internal data class ProblemSwaggerDetailResponse(
     val begrunnelse: String,
     val traceId: String,
     val kanOverstyres: Boolean)
-

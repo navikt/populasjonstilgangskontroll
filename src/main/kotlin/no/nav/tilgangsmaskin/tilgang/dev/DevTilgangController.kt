@@ -71,8 +71,7 @@ class DevTilgangController(
 
     @PostMapping("enkelttilgang/{ansattId}")
     @ResponseStatus(ACCEPTED)
-    @ProblemDetailApiResponse
-    @Operation(summary = SUMMARY_ENKELTTILGANG, description = DESCRIPTION_ENKELTTILGANG)
+    @ProblemDetailApiResponse(summary = SUMMARY_ENKELTTILGANG, description = DESCRIPTION_ENKELTTILGANG)
     @Valid
     fun enkelttilgang(@PathVariable ansattId: AnsattId,
                       @RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData) =
@@ -80,8 +79,7 @@ class DevTilgangController(
 
     @PostMapping("enkelttilganger/{ansattId}")
     @ResponseStatus(ACCEPTED)
-    @ProblemDetailApiResponse
-    @Operation(summary = SUMMARY_HENT_ENKELTTILGANGER, description = DESCRIPTION_HENT_ENKELTTILGANGER)
+    @ProblemDetailApiResponse(summary = SUMMARY_HENT_ENKELTTILGANGER, description = DESCRIPTION_HENT_ENKELTTILGANGER)
     fun enkelttilganger(@PathVariable ansattId: AnsattId, @RequestBody brukerIds: Set<BrukerId>) =
         enkeltTilgang.tilganger(ansattId, brukerIds)
 

@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.tilgang.dev
 
-import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.security.token.support.spring.UnprotectedRestController
@@ -29,15 +28,13 @@ import org.springframework.web.bind.annotation.ResponseStatus
 class DevRegelController(private val regler: RegelTjeneste) {
     @GetMapping("komplett/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)
-    @ProblemDetailApiResponse
-    @Operation(summary = SUMMARY_KOMPLETT, description = DESCRIPTION_KOMPLETT)
+    @ProblemDetailApiResponse(summary = SUMMARY_KOMPLETT, description = DESCRIPTION_KOMPLETT)
     fun kompletteRegler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: String) =
         regler.kompletteRegler(ansattId, brukerId.trim('"'))
 
     @GetMapping("kjerne/{ansattId}/{brukerId}")
     @ResponseStatus(NO_CONTENT)
-    @ProblemDetailApiResponse
-    @Operation(summary = SUMMARY_KJERNE, description = DESCRIPTION_KJERNE)
+    @ProblemDetailApiResponse(summary = SUMMARY_KJERNE, description = DESCRIPTION_KJERNE)
     fun kjerneregler(@PathVariable ansattId: AnsattId, @PathVariable brukerId: String) =
         regler.kjerneregler(ansattId, brukerId.trim('"'))
 

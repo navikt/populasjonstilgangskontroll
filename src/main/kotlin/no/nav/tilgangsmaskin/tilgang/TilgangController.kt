@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.tilgang
 
-import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
@@ -28,26 +27,22 @@ import org.springframework.web.bind.annotation.ResponseStatus
 class TilgangController(private val regelTjeneste: RegelTjeneste, token: Token, teller: TokenTypeTeller) : TilgangControllerBase(token, teller) {
 
     @PostMapping("komplett")
-    @ProblemDetailApiResponse
-    @Operation(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
+    @ProblemDetailApiResponse(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
     fun kompletteRegler(@RequestBody brukerId: String, req: HttpServletRequest) =
         enkeltOppslag(token.requiredAnsattId, OBO, brukerId, KOMPLETT_REGELTYPE, req.requestURI)
 
     @PostMapping("/ccf/komplett/{ansattId}")
-    @ProblemDetailApiResponse
-    @Operation(summary = SUMMARY_KOMPLETT_CCF, description = DESCRIPTION_KOMPLETT_CCF)
+    @ProblemDetailApiResponse(summary = SUMMARY_KOMPLETT_CCF, description = DESCRIPTION_KOMPLETT_CCF)
     fun kompletteReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String, req: HttpServletRequest) =
         enkeltOppslag(ansattId , CCF, brukerId, KOMPLETT_REGELTYPE, req.requestURI)
 
     @PostMapping("kjerne")
-    @ProblemDetailApiResponse
-    @Operation(summary = SUMMARY_KJERNE_OBO, description = DESCRIPTION_KJERNE_OBO)
+    @ProblemDetailApiResponse(summary = SUMMARY_KJERNE_OBO, description = DESCRIPTION_KJERNE_OBO)
     fun kjerneregler(@RequestBody brukerId: String, req: HttpServletRequest) =
         enkeltOppslag(token.requiredAnsattId, OBO, brukerId, KJERNE_REGELTYPE, req.requestURI)
 
     @PostMapping("/ccf/kjerne/{ansattId}")
-    @ProblemDetailApiResponse
-    @Operation(summary = SUMMARY_KJERNE_CCF, description = DESCRIPTION_KJERNE_CCF)
+    @ProblemDetailApiResponse(summary = SUMMARY_KJERNE_CCF, description = DESCRIPTION_KJERNE_CCF)
     fun kjerneReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String, req: HttpServletRequest) =
         enkeltOppslag(ansattId, CCF, brukerId, KJERNE_REGELTYPE, req.requestURI)
 

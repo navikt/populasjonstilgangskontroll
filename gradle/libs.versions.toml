@@ -54,7 +54,6 @@ spring-boot-starter-jetty = { module = "org.springframework.boot:spring-boot-sta
 spring-boot-starter-kafka = { module = "org.springframework.boot:spring-boot-starter-kafka" }
 spring-boot-starter-kafka-test = { module = "org.springframework.boot:spring-boot-starter-kafka-test" }
 spring-boot-starter-oauth2-client = { module = "org.springframework.boot:spring-boot-starter-oauth2-client" }
-spring-boot-starter-restclient = { module = "org.springframework.boot:spring-boot-starter-restclient" }
 spring-boot-starter-restclient-test = { module = "org.springframework.boot:spring-boot-starter-restclient-test" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
@@ -67,7 +66,6 @@ springmockk = { module = "com.ninja-squad:springmockk", version.ref = "springmoc
 testcontainers-junit-jupiter = { module = "org.testcontainers:testcontainers-junit-jupiter" }
 testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql" }
 testcontainers-redis = { module = "com.redis:testcontainers-redis" }
-token-client-spring = { module = "no.nav.security:token-client-spring", version.ref = "token-support" }
 token-validation-spring = { module = "no.nav.security:token-validation-spring", version.ref = "token-support" }
 
 [bundles]

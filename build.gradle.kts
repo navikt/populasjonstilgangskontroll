@@ -97,7 +97,6 @@ dependencyManagement {
     imports {
         mavenBom(libs.opentelemetry.instrumentation.bom.get().toString())
         mavenBom(libs.kotest.bom.get().toString())
-        mavenBom("tools.jackson:jackson-bom:${dependencyManagement.importedProperties["jackson3.version"]}")
     }
 }
 

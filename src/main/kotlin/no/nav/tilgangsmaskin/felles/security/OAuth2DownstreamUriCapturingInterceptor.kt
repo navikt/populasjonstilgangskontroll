@@ -7,9 +7,9 @@ import org.springframework.http.client.ClientHttpRequestInterceptor
 class OAuth2DownstreamUriCapturingInterceptor : ClientHttpRequestInterceptor {
     override fun intercept(request: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution) =
         try {
-            OAuth2DownstreamUriContext.set(request.uri.toString())
+            OAuth2DownstreamURIContext.set(request.uri.toString())
             execution.execute(request, body)
         } finally {
-            OAuth2DownstreamUriContext.clear()
+            OAuth2DownstreamURIContext.clear()
         }
 }

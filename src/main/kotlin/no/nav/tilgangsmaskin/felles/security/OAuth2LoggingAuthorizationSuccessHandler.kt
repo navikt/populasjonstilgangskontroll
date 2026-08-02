@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.felles.security
 
-import no.nav.tilgangsmaskin.felles.security.OAuth2DownstreamUriContext.currentUri
+import no.nav.tilgangsmaskin.felles.security.OAuth2DownstreamURIContext.currentUri
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.client.OAuth2AuthorizationSuccessHandler
@@ -8,7 +8,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
 import java.time.ZoneId
 
-class LoggingOAuth2AuthorizationSuccessHandler(
+class OAuth2LoggingAuthorizationSuccessHandler(
     private val service: OAuth2AuthorizedClientService,
     private val delegate: OAuth2AuthorizationSuccessHandler
 ) : OAuth2AuthorizationSuccessHandler {

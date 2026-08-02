@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.tilgang
 
+import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -13,6 +14,7 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
 
 @Target(FUNCTION)
 @Retention(RUNTIME)
+@Operation
 @ApiResponses(
     value = [ApiResponse(
         responseCode = "404",
@@ -63,7 +65,10 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
                            }
                        ]
                    }"""))])])
-annotation class BulkSwaggerApiRespons
+annotation class BulkSwaggerApiRespons(
+    val summary: String = "",
+    val description: String = ""
+)
 private data class BulkSwaggerResultater(val ansattId: String, val resultater: List<BulkSwaggerResultat>) {
     data class BulkSwaggerResultat(val brukerId: String, val status: Int, val detaljer: BulkSwaggerDetaljer? = null) {
         data class BulkSwaggerDetaljer(val type: String,
@@ -79,5 +84,4 @@ private data class BulkSwaggerResultater(val ansattId: String, val resultater: L
     }
 
 }
-
 

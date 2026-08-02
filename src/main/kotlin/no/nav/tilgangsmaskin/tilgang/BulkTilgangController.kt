@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.tilgang
 
-import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -27,28 +26,34 @@ import org.springframework.web.bind.annotation.ResponseStatus
 class BulkTilgangController(private val regelTjeneste: RegelTjeneste, token: Token, teller: TokenTypeTeller) : TilgangControllerBase(token, teller) {
 
     @PostMapping("bulk/obo")
-    @BulkSwaggerApiRespons
-    @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO)
+    @BulkSwaggerApiRespons(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO)
     fun bulkOBO(@RequestBody specs: Set<BrukerIdOgRegelsett>, req: HttpServletRequest) =
         bulkOppslag(token.requiredAnsattId, OBO, specs, req.requestURI)
 
     @PostMapping("bulk/obo/{regelType}")
-    @BulkSwaggerApiRespons
-    @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO_REGELTYPE)
+    @BulkSwaggerApiRespons(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO_REGELTYPE)
     fun bulkOBOForRegelType(@PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>, req: HttpServletRequest) =
-        bulkOppslag(token.requiredAnsattId, OBO, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(), req.requestURI)
+        bulkOppslag(
+            token.requiredAnsattId,
+            OBO,
+            brukerIds.mapTo(mutableSetOf()) { BrukerIdOgRegelsett(it, regelType) },
+            req.requestURI
+        )
 
     @PostMapping("bulk/ccf/{ansattId}")
-    @BulkSwaggerApiRespons
-    @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_CCF)
+    @BulkSwaggerApiRespons(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_CCF)
     fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody specs: Set<BrukerIdOgRegelsett>, req: HttpServletRequest) =
         bulkOppslag( ansattId, CCF, specs, req.requestURI)
 
     @PostMapping("bulk/ccf/{ansattId}/{regelType}")
-    @BulkSwaggerApiRespons
-    @Operation(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_CCF_REGELTYPE)
+    @BulkSwaggerApiRespons(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_CCF_REGELTYPE)
     fun bulkCCFForRegelType(@PathVariable ansattId: AnsattId, @PathVariable regelType: RegelType, @RequestBody brukerIds: Set<String>, req: HttpServletRequest) =
-        bulkOppslag(ansattId , CCF, brukerIds.map { BrukerIdOgRegelsett(it, regelType) }.toSet(), req.requestURI)
+        bulkOppslag(
+            ansattId,
+            CCF,
+            brukerIds.mapTo(mutableSetOf()) { BrukerIdOgRegelsett(it, regelType) },
+            req.requestURI
+        )
 
     private fun bulkOppslag(ansatt: AnsattId, forventet: TokenType, specs: Set<BrukerIdOgRegelsett>, uri: String): AggregertBulkRespons {
         sjekk(token.type == forventet, FORBIDDEN, "Forventet token type $forventet for $uri, fikk ${token.type}")

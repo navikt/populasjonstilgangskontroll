@@ -5,8 +5,8 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.RestLoggingRequestInterceptor
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.sekunder
 import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.sekunder
 import org.apache.hc.client5.http.config.ConnectionConfig
 import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder
@@ -16,8 +16,8 @@ import org.springframework.boot.restclient.RestClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.auditing.DateTimeProvider
-import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.HttpStatusCode
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
@@ -55,11 +55,8 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
         RestClientCustomizer { c ->
             c.requestFactory(HttpComponentsClientHttpRequestFactory(HttpClients.custom()
                 .setConnectionManager(PoolingHttpClientConnectionManagerBuilder.create()
-                    .setDefaultConnectionConfig(
-                        ConnectionConfig.custom()
-                            .setValidateAfterInactivity(2.sekunder)
-                            .build()
-                    )
+                    .setDefaultConnectionConfig(ConnectionConfig.custom()
+                        .setValidateAfterInactivity(2.sekunder).build())
                     .build())
                 .build()).apply {
                 setConnectionRequestTimeout(Duration.ofSeconds(3))
@@ -84,18 +81,9 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                     token.systemNavn)
             })
 
-    /**
-     * Sentral klokke-bønne. Injiser `Clock` i komponenter som trenger nåtid
-     * (i stedet for `Instant.now()` / `LocalDate.now()` direkte) — så blir tid testbart
-     * med `Clock.fixed(...)` eller en mutbar test-klokke.
-     */
     @Bean
     fun clock(): Clock = systemDefaultZone()
 
-    /**
-     * Brukes av JPA-auditing (@CreatedDate / @LastModifiedDate) og er knyttet
-     * via `@EnableJpaAuditing(dateTimeProviderRef = AUDITING_TIME_PROVIDER)`.
-     */
     @Bean(AUDITING_TIME_PROVIDER)
     fun auditingDateTimeProvider(clock: Clock) =
         DateTimeProvider { Optional.of(Instant.now(clock)) }
@@ -115,7 +103,7 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
     }
 }
 
-@Retention(BINARY)  
+@Retention(BINARY)
 @Target(FUNCTION, CONSTRUCTOR, CLASS)
 annotation class Generated
 typealias NoCoverageAnalysis = Generated

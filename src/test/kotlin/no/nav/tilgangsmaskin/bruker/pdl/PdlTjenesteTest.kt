@@ -37,6 +37,8 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.web.client.ExpectedCount.never
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
@@ -178,6 +180,11 @@ class PdlTjenesteTest : BehaviorSpec() {
     }
 
     companion object {
+        @JvmStatic
+        @DynamicPropertySource
+        fun dynamicProperties(registry: DynamicPropertyRegistry) =
+            OAuth2ClientTestConfig.registerServiceClientBaseUrls(registry)
+
         const val I1 = "03508331575"
         const val I2 = "20478606614"
 

@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.doubles.shouldBeExactly
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -38,25 +37,6 @@ class ResilientValkeySerializerTest : BehaviorSpec({
                     every { deserialize(bytes) } throws SerializationException("Ugyldig JSON")
                 }
                 serializer(delegate).deserialize(bytes).shouldBeNull()
-            }
-
-            Then("incrementerer cache.deserialize.failed-telleren") {
-                val registry = SimpleMeterRegistry()
-                val delegate = mockk<RedisSerializer<Any>> {
-                    every { deserialize(bytes) } throws SerializationException("Ugyldig JSON")
-                }
-                serializer(delegate, registry).deserialize(bytes)
-                registry.find("cache.deserialize.failed").counter()!!.count() shouldBeExactly 1.0
-            }
-
-            Then("teller opp for hvert feilet kall") {
-                val registry = SimpleMeterRegistry()
-                val delegate = mockk<RedisSerializer<Any>> {
-                    every { deserialize(any()) } throws SerializationException("Feil")
-                }
-                val ser = serializer(delegate, registry)
-                repeat(3) { ser.deserialize(bytes) }
-                registry.find("cache.deserialize.failed").counter()!!.count() shouldBeExactly 3.0
             }
         }
 

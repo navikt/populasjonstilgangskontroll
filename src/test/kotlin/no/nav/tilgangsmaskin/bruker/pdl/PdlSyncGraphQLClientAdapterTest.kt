@@ -25,6 +25,8 @@ import org.springframework.graphql.client.HttpSyncGraphQlClient
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.client.match.MockRestRequestMatchers.header
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
@@ -132,6 +134,11 @@ class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
     }
 
     companion object {
+        @JvmStatic
+        @DynamicPropertySource
+        fun dynamicProperties(registry: DynamicPropertyRegistry) =
+            OAuth2ClientTestConfig.registerServiceClientBaseUrls(registry)
+
         private fun sivilstandRespons(type: Sivilstandstype) = """
             {
                 "data": {

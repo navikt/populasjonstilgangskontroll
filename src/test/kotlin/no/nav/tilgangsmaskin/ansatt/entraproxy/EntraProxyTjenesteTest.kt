@@ -23,6 +23,8 @@ import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.client.ExpectedCount.times
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
@@ -33,7 +35,7 @@ import org.springframework.web.util.UriComponentsBuilder.fromUriString
 import java.net.URI
 
 
-@RestClientTest(components = [EntraProxyBeanConfig::class, EntraProxyTjeneste::class, EntraProxyConfig::class])
+@RestClientTest(components = [EntraProxyTjeneste::class, EntraProxyConfig::class])
 @ApplyExtension(SpringExtension::class)
 @Import(OAuth2ClientTestConfig::class)
 class EntraProxyTjenesteTest : BehaviorSpec() {
@@ -145,6 +147,11 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
         .buildAndExpand(ANSATTID.verdi).toUri()
 
     companion object  {
+        @JvmStatic
+        @DynamicPropertySource
+        fun dynamicProperties(registry: DynamicPropertyRegistry) =
+            OAuth2ClientTestConfig.registerServiceClientBaseUrls(registry)
+
         private val ANSATTID = AnsattId("Z999999")
     }
 }

@@ -23,6 +23,8 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
@@ -108,7 +110,12 @@ class OidTjenesteTest : BehaviorSpec() {
         {"value": [${ids.joinToString(",") { """{"id": "$it"}""" }}]}
         """.trimIndent()
 
-    private companion object {
+    companion object {
+        @JvmStatic
+        @DynamicPropertySource
+        fun dynamicProperties(registry: DynamicPropertyRegistry) =
+            OAuth2ClientTestConfig.registerServiceClientBaseUrls(registry)
+
         private val ANSATTID = AnsattId("Z999999")
         private val OID = UUID.randomUUID()
     }

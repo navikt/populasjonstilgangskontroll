@@ -17,7 +17,6 @@ import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
@@ -27,6 +26,8 @@ import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.client.ExpectedCount.times
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
@@ -39,7 +40,7 @@ import org.springframework.web.util.UriComponentsBuilder.fromUriString
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import java.net.URI
 
-@RestClientTest(components = [VergemålBeanConfig::class, VergemålTjeneste::class, VergemålConfig::class])
+@RestClientTest(components = [VergemålTjeneste::class, VergemålConfig::class])
 @Import(OAuth2ClientTestConfig::class, VergemålConfig::class)
 @ApplyExtension(SpringExtension::class)
 class VergemålTjenesteTest : BehaviorSpec() {
@@ -148,6 +149,11 @@ class VergemålTjenesteTest : BehaviorSpec() {
     }
 
     companion object {
+        @JvmStatic
+        @DynamicPropertySource
+        fun dynamicProperties(registry: DynamicPropertyRegistry) =
+            OAuth2ClientTestConfig.registerServiceClientBaseUrls(registry)
+
         private val ANSATT_ID = AnsattId("Z999999")
         private val IDENT = BrukerId("08526835670")
         private val BRUKER1 = BrukerId("20478606614")

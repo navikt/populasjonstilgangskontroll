@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt
 
-import io.micrometer.core.annotation.Timed
 import io.micrometer.core.instrument.Tags
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
@@ -11,7 +10,6 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 
 @Service
-@Timed
 @ConditionalOnGCP
 class AnsattTjeneste(private val ansatte: NomTjeneste,
                      private val brukere: BrukerTjeneste,

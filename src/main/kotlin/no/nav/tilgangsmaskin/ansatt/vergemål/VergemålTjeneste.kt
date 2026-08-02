@@ -1,7 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt.vergemål
 
-import io.micrometer.core.annotation.Timed
-import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålClient.VergemålIdent
@@ -13,11 +11,9 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.web.service.registry.ImportHttpServices
 
 @RetryingWhenRecoverableRestService
-@Timed
 @ImportHttpServices(types = [VergemålClient::class], group = VERGEMÅL)
 class VergemålTjeneste(private val nom: NomTjeneste, private val client: VergemålClient) {
 
-    @WithSpan
     @Cacheable(cacheNames = [VERGEMÅL], key = "#ansattId.verdi")
     fun alle(ansattId: AnsattId): Set<BrukerId> =
         nom.fnrForAnsatt(ansattId)?.let { fnr ->

@@ -1,7 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
-import io.micrometer.core.annotation.Timed
-import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
@@ -11,7 +9,6 @@ import org.springframework.web.service.registry.ImportHttpServices
 import java.util.*
 
 @RetryingWhenRecoverableRestService
-@Timed
 @ImportHttpServices(types = [EntraGrupperClient::class], group = GRAPH)
 class EntraTjeneste(
     private val client: EntraGrupperClient,
@@ -19,12 +16,10 @@ class EntraTjeneste(
 ) {
 
     @Cacheable(cacheNames = [GRAPH], key = "#root.methodName + ':' + #ansattId.verdi")
-    @WithSpan
     fun geoOgGlobaleGrupper(ansattId: AnsattId, oid: UUID) =
         grupper("$oid", true)
 
     @Cacheable(cacheNames = [GRAPH], key = "#root.methodName + ':' + #ansattId.verdi")
-    @WithSpan
     fun geoGrupper(ansattId: AnsattId, oid: UUID) =
         grupper("$oid", false)
 

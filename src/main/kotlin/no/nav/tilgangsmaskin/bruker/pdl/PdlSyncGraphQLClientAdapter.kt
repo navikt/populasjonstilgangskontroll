@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
@@ -13,7 +12,6 @@ import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.stereotype.Component
 
 @Component
-@Timed(value = "pdl_tjeneste", histogram = true, extraTags = ["backend", "graphql"])
 class PdlSyncGraphQLClientAdapter(
     private val cfg: PdlGraphQLConfig,
     private val client: GraphQlClient,

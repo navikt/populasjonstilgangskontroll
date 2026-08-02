@@ -1,7 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
-import io.micrometer.core.annotation.Timed
-import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -14,7 +12,6 @@ import org.springframework.web.service.registry.ImportHttpServices
 
 
 @RetryingWhenRecoverableRestService
-@Timed
 @ImportHttpServices(types = [SkjermingClient::class], group = SKJERMING)
 class SkjermingTjeneste(private val client: SkjermingClient,
                         private val cache: CacheOperations) {
@@ -22,11 +19,9 @@ class SkjermingTjeneste(private val client: SkjermingClient,
     private val log = getLogger(SkjermingTjeneste::class.java)
 
     @Cacheable(cacheNames = [SKJERMING], key = "#brukerId.verdi")
-    @WithSpan
     fun skjerming(brukerId: BrukerId) =
         client.skjerming(mapOf(IDENT to brukerId.verdi))
 
-    @WithSpan
     fun skjerminger(brukerIds: List<BrukerId>): Map<BrukerId, Boolean> {
         val ids = brukerIds.mapTo(mutableSetOf()) { it.verdi }
         val fraCache = fraCache(ids)

@@ -1,9 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import io.micrometer.core.annotation.Timed
-import io.opentelemetry.instrumentation.annotations.WithSpan
-import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålClient
-import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.VERGEMÅL
 import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
@@ -29,7 +26,6 @@ class PdlTjeneste(
 
     private val log = getLogger(PdlTjeneste::class.java)
 
-    @WithSpan
     @Cacheable(cacheNames = [PDL], key = "#root.methodName + ':' + #id")
     fun medUtvidetFamilie(id: String): Person {
         val person = person(id)
@@ -38,11 +34,9 @@ class PdlTjeneste(
         return person.copy(familie = Familie(person.familie.medlemmer + søsken + partnere))
     }
 
-    @WithSpan
     @Cacheable(cacheNames = [PDL], key = "#root.methodName + ':' + #id")
     fun medFamilie(id: String) = person(id)
 
-    @WithSpan
     fun personer(identer: Set<String>): Set<Person> {
         if (identer.isEmpty()) {
             log.info("Bulk ingen personer å slå opp")

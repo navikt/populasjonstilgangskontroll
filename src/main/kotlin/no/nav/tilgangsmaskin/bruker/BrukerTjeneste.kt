@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.bruker
 
-import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.PersonTilBrukerMapper.tilBruker
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjeneste
@@ -14,7 +13,6 @@ class BrukerTjeneste(private val personTjeneste: PdlTjeneste, val skjermingTjene
 
     private val log = getLogger(javaClass)
 
-    @WithSpan
     fun brukere(brukerIds: Set<String>): Set<Bruker> {
         val personer = personTjeneste.personer(brukerIds)
         if (personer.size != brukerIds.size) {
@@ -36,15 +34,12 @@ class BrukerTjeneste(private val personTjeneste: PdlTjeneste, val skjermingTjene
         }
     }
 
-    @WithSpan
     fun medNærmesteFamilie(brukerId: String) =
         brukerMedSkjerming(brukerId, personTjeneste::medFamilie)
 
-    @WithSpan
     fun medUtvidetFamilie(brukerId: String) =
         brukerMedSkjerming(brukerId, personTjeneste::medUtvidetFamilie)
 
-    @WithSpan
     private fun brukerMedSkjerming(id: String, hentFamilie: (String) -> Person) =
         with(hentFamilie(id)) {
             tilBruker(this, skjermingTjeneste.skjerming(brukerId)).also {

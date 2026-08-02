@@ -6,10 +6,13 @@ import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.tilgangsmaskin.felles.rest.RestLoggingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.RestDefaultErrorHandler
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.sekunder
 import no.nav.tilgangsmaskin.tilgang.Token
 import org.apache.hc.client5.http.config.ConnectionConfig
 import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder
+import org.apache.hc.core5.util.Timeout
+import org.apache.hc.core5.util.Timeout.of
 import org.apache.hc.core5.util.Timeout.ofSeconds
 import org.springframework.boot.actuate.endpoint.SanitizingFunction
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
@@ -27,8 +30,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 import java.time.Clock
 import java.time.Clock.systemDefaultZone
+import java.time.Duration
 import java.time.Instant
 import java.util.*
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.SECONDS
 import java.util.function.Function
 import kotlin.annotation.AnnotationRetention.BINARY
 import kotlin.annotation.AnnotationTarget.CLASS
@@ -50,7 +56,6 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
         if (SENSITIVE_KEYS.any { data.key.contains(it, ignoreCase = true) }) data.withValue("******") else data
     }
 
-
     @Bean
     fun restClientCustomizer() =
         RestClientCustomizer { c ->
@@ -58,13 +63,13 @@ class FellesBeanConfig(private val ansattIdAddingInterceptor: ConsumerAwareHandl
                 .setConnectionManager(PoolingHttpClientConnectionManagerBuilder.create()
                     .setDefaultConnectionConfig(
                         ConnectionConfig.custom()
-                            .setValidateAfterInactivity(ofSeconds(2))
+                            .setValidateAfterInactivity(2.sekunder)
                             .build()
                     )
                     .build())
                 .build()).apply {
-                setConnectionRequestTimeout(3000)
-                setReadTimeout(5000)
+                setConnectionRequestTimeout(Duration.ofSeconds(3))
+                setReadTimeout(Duration.ofSeconds(5))
             })
             c.requestInterceptors {
                 it.add(RestLoggingRequestInterceptor())

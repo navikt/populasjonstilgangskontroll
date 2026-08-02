@@ -5,6 +5,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.client.OAuth2AuthorizationSuccessHandler
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
+import java.time.ZoneId
 
 class LoggingOAuth2AuthorizationSuccessHandler(
     private val service: OAuth2AuthorizedClientService,
@@ -23,8 +24,8 @@ class LoggingOAuth2AuthorizationSuccessHandler(
         val previous: OAuth2AuthorizedClient? = service.loadAuthorizedClient(registrationId, principal.name)
         val prevToken = previous?.accessToken?.tokenValue
         val newToken = authorizedClient.accessToken.tokenValue
-        val prevExp = previous?.accessToken?.expiresAt
-        val newExp = authorizedClient.accessToken.expiresAt
+        val prevExp = previous?.accessToken?.expiresAt?.atZone(OSLO_ZONE_ID)
+        val newExp = authorizedClient.accessToken.expiresAt?.atZone(OSLO_ZONE_ID)
 
         when {
             previous == null ->
@@ -51,5 +52,9 @@ class LoggingOAuth2AuthorizationSuccessHandler(
         }
 
         delegate.onAuthorizationSuccess(authorizedClient, principal, attributes) // saves client
+    }
+
+    companion object {
+        private val OSLO_ZONE_ID: ZoneId = ZoneId.of("Europe/Oslo")
     }
 }

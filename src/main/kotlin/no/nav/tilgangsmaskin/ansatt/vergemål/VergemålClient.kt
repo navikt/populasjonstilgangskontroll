@@ -7,10 +7,10 @@ import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
-@ClientRegistrationId(VERGEMÅL)
 interface VergemålClient {
 
     @PostExchange(VERGEMÅL_PATH)
+    @ClientRegistrationId(VERGEMÅL)
     fun vergemål(@RequestBody body: VergemålIdent): List<Vergemål>
 
     @GetExchange(VERGEMÅL_PING_PATH)

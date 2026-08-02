@@ -10,7 +10,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
-import no.nav.tilgangsmaskin.felles.cache.DevCacheController.Companion.DEV_CACHE_CONTROLLER_TAG_DESCRIPTION
+import no.nav.tilgangsmaskin.felles.cache.CacheController.Companion.DEV_CACHE_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody
 @UnprotectedRestController(value = ["/${DEV}/cache"])
 @ConditionalOnNotProd
 @Tag(name = "DevCacheController", description = DEV_CACHE_CONTROLLER_TAG_DESCRIPTION)
-class DevCacheController(private val cache: CacheOperations) {
+class CacheController(private val cache: CacheOperations) {
 
     @PostMapping("cache/skjerminger")
     @Operation(summary = SUMMARY_CACHE_SKJERMINGER, description = DESCRIPTION_CACHE_SKJERMINGER)

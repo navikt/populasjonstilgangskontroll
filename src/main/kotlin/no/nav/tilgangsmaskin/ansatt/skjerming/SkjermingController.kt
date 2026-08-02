@@ -7,15 +7,15 @@ import no.nav.security.token.support.spring.UnprotectedRestController
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
-import no.nav.tilgangsmaskin.ansatt.skjerming.DevSkjermingController.Companion.DEV_SKJERMING_CONTROLLER_TAG_DESCRIPTION
+import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingController.Companion.DEV_SKJERMING_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
 
 @UnprotectedRestController(value = ["/${DEV}/skjerming"])
 @ConditionalOnNotProd
-@Tag(name = "DevSkjermingController", description = DEV_SKJERMING_CONTROLLER_TAG_DESCRIPTION)
-class DevSkjermingController(private val skjerming: SkjermingTjeneste) {
+@Tag(name = "SkjermingController", description = DEV_SKJERMING_CONTROLLER_TAG_DESCRIPTION)
+class SkjermingController(private val skjerming: SkjermingTjeneste) {
 
     @PostMapping("skjerming")
     @Operation(summary = SUMMARY_SKJERMING, description = DESCRIPTION_SKJERMING)

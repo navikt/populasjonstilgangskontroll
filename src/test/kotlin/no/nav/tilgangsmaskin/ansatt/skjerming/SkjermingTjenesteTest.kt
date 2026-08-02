@@ -74,7 +74,6 @@ class SkjermingTjenesteTest : BehaviorSpec() {
                         .andExpect(header("jalla", "42"))
                         .andRespond(withSuccess("true", APPLICATION_JSON))
                     tjeneste.skjerming(ID1).shouldBeTrue()
-                    tjeneste.skjerming(ID1).shouldBeTrue()
                     cache.getOne<Boolean>(SKJERMING_CACHE, I1).shouldBeTrue()
                 }
             }

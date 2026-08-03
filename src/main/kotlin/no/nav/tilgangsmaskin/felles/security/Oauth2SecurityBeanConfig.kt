@@ -10,13 +10,12 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizationSuccessHand
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder
 import org.springframework.security.oauth2.client.OAuth2AuthorizationFailureHandler
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
-import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor
 import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor.authorizationFailureHandler
 import org.springframework.security.oauth2.client.web.client.support.OAuth2RestClientHttpServiceGroupConfigurer
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 
 @Configuration
-class Oauth2SecurityConfig {
+class Oauth2SecurityBeanConfig {
     @Bean
     fun securityFilterChain(http: HttpSecurity) =
         http.csrf { it.disable() }

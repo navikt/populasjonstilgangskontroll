@@ -90,7 +90,7 @@ spec:
           namespace: nais-system
       external:
         - host: hooks.slack.com
-        - host: {{pdl}}
+        - host: {{pdlpip}}
         - host: {{pdlgraph}}
 
     inbound:

@@ -13,6 +13,8 @@ import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
@@ -20,6 +22,7 @@ import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.client.ExpectedCount.times
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
@@ -30,8 +33,11 @@ import org.springframework.web.util.UriComponentsBuilder.fromUriString
 import java.net.URI
 
 
-@RestClientTest(components = [EntraProxyTjeneste::class, EntraProxyConfig::class])
+@RestClientTest
+@ContextConfiguration(classes = [EntraProxyTjeneste::class, EntraProxyConfig::class])
 @Import(OAuth2ClientTestConfig::class)
+@ConfigurationPropertiesScan
+@EnableAutoConfiguration
 class EntraProxyTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest() {
 
     @Autowired

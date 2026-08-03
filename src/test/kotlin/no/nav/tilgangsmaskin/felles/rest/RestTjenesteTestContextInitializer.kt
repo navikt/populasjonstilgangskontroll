@@ -6,11 +6,11 @@ import org.springframework.context.ApplicationContextInitializer
 import org.springframework.boot.test.util.TestPropertyValues
 
 class RestTjenesteTestContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
-    override fun initialize(applicationContext: ConfigurableApplicationContext) {
+    override fun initialize(ctx: ConfigurableApplicationContext) {
         val values = serviceClientBaseUrls()
             .map { (client, url) -> "$SERVICE_CLIENT_PREFIX.$client.base-url=$url" }
             .toTypedArray()
-        TestPropertyValues.of(*values).applyTo(applicationContext)
+        TestPropertyValues.of(*values).applyTo(ctx)
     }
 
     companion object {

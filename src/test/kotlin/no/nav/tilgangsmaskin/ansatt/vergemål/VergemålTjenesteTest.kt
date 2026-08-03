@@ -33,15 +33,18 @@ import org.springframework.web.util.UriComponentsBuilder.fromUriString
 
 
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
+import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
+import org.springframework.test.context.ContextConfiguration
 import java.net.URI
 
-@RestClientTest(components = [VergemålTjeneste::class, VergemålConfig::class])
+@RestClientTest
 @Import(OAuth2ClientTestConfig::class, VergemålConfig::class)
-class VergemålTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest() {
-
-    @TestConfiguration
-    @EnableResilientMethods
-    class Config
+@ContextConfiguration(classes = [VergemålConfig::class, VergemålTjeneste::class])
+@EnableAutoConfiguration
+@ConfigurationPropertiesScan
+class VergemålTjenesteTest : RestTjenesteTest() {
 
     @MockkBean
     private lateinit var nom: NomTjeneste

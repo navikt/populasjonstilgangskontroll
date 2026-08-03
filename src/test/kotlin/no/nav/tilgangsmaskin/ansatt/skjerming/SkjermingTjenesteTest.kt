@@ -37,10 +37,15 @@ import java.net.URI
 
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
-import org.springframework.test.web.client.match.MockRestRequestMatchers.header
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
+import org.springframework.test.context.ContextConfiguration
 
-@RestClientTest(components = [SkjermingClient::class, SkjermingTjeneste::class, SkjermingConfig::class])
+@RestClientTest
+@ContextConfiguration(classes = [ SkjermingTjeneste::class, SkjermingConfig::class])
 @Import(SkjermingTestConfig::class, OAuth2ClientTestConfig::class)
+@ConfigurationPropertiesScan
+@EnableAutoConfiguration
 class SkjermingTjenesteTest : RestTjenesteTest() {
 
     @TestConfiguration

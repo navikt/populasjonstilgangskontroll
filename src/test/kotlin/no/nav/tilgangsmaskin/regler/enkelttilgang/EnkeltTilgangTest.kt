@@ -13,7 +13,6 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
@@ -42,6 +41,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import no.nav.tilgangsmaskin.felles.TimeBeanConfig
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestPropertySource
@@ -53,9 +53,10 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @AutoConfigureMetrics
 @TestPropertySource(locations = ["classpath:test.properties"])
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [TestApp::class, LocalAuditor::class,EnkeltTilgangJPAAdapter::class])
+@ContextConfiguration(classes = [LocalAuditor::class,EnkeltTilgangJPAAdapter::class])
 @ApplyExtension(SpringExtension::class)
 @Import(TimeBeanConfig::class)
+@EnableAutoConfiguration
 @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
 internal class EnkeltTilgangTest : BehaviorSpec() {
 

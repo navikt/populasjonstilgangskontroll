@@ -31,9 +31,15 @@ import java.util.*
 
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
+import org.springframework.test.context.ContextConfiguration
 
-@RestClientTest(components = [EntraTjeneste::class, EntraGrupperConfig::class, EntraOidBeanConfig::class])
+@RestClientTest
+@ContextConfiguration(classes = [EntraTjeneste::class, EntraGrupperConfig::class, EntraOidBeanConfig::class])
 @Import(EntraTestConfig::class, OAuth2ClientTestConfig::class)
+@ConfigurationPropertiesScan
+@EnableAutoConfiguration
 class EntraTjenesteTest : RestTjenesteTest() {
 
     @TestConfiguration

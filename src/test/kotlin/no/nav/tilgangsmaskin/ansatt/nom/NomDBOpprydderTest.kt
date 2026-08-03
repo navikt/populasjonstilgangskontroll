@@ -8,9 +8,9 @@ import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
-import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.felles.rest.Token
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
@@ -27,8 +27,9 @@ import java.util.concurrent.atomic.AtomicInteger
 @DataJpaTest
 @Testcontainers
 @AutoConfigureMetrics
-@ContextConfiguration(classes = [TestApp::class, NomTjeneste::class, NomJPAAdapter::class, NomDBOpprydder::class])
+@ContextConfiguration(classes = [NomTjeneste::class, NomJPAAdapter::class, NomDBOpprydder::class])
 @ApplyExtension(SpringExtension::class)
+@EnableAutoConfiguration
 class NomDBOpprydderTest : BehaviorSpec() {
 
     @MockkBean(relaxed = true)

@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.ansatt.`oppfølging`
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING_CACHE
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_STARTET
@@ -29,6 +28,8 @@ import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.StartetEllerEndret
 import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Instant.parse
@@ -39,7 +40,9 @@ import java.util.UUID.*
 @EnableJpaAuditing
 @Testcontainers
 @EnableCaching
-@ContextConfiguration(classes = [TestApp::class, OppfølgingTjeneste::class, OppfølgingJPAAdapter::class])
+@ContextConfiguration(classes = [OppfølgingTjeneste::class, OppfølgingJPAAdapter::class])
+@EnableAutoConfiguration
+@EnableConfigurationProperties
 @Import(OppfølgingTestConfig::class)
 class OppfølgingTjenesteTest : RestTjenesteTest() {
 

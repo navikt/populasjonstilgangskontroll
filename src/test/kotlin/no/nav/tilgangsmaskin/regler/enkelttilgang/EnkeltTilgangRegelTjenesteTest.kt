@@ -4,13 +4,11 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.mockk.every
-import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.FORTROLIG
@@ -50,6 +48,7 @@ import org.springframework.test.context.ContextConfiguration
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import no.nav.tilgangsmaskin.felles.TimeBeanConfig
 import no.nav.tilgangsmaskin.felles.rest.TokenTypeTeller
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestPropertySource
@@ -59,9 +58,10 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @EnableJpaAuditing
 @TestPropertySource(locations = ["classpath:test.properties"])
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [TestApp::class, TokenTypeTeller::class,EnkeltTilgangTjeneste::class, EnkeltTilgangJPAAdapter::class, RegelTjeneste::class, BulkResponsAggregator::class, LocalAuditor::class])
+@ContextConfiguration(classes = [TokenTypeTeller::class,EnkeltTilgangTjeneste::class, EnkeltTilgangJPAAdapter::class, RegelTjeneste::class, BulkResponsAggregator::class, LocalAuditor::class])
 @AutoConfigureMetrics
 @Testcontainers
+@EnableAutoConfiguration
 @Import(TimeBeanConfig::class)
 @ComponentScan("no.nav.tilgangsmaskin.regler.motor", "no.nav.tilgangsmaskin.regler.enkelttilgang")
 class EnkeltTilgangRegelTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest() {

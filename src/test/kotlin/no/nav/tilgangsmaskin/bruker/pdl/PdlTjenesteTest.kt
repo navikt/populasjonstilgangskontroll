@@ -25,14 +25,18 @@ import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.*
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
+import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.client.ExpectedCount.never
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
@@ -42,8 +46,10 @@ import java.time.Duration.ofSeconds
 
 @RestClientTest(components = [PdlPipConfig::class, PdlTjeneste::class])
 @Import(PdlTestConfig::class, OAuth2ClientTestConfig::class)
-@EnableResilientMethods
-class PdlTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest() {
+@ContextConfiguration(classes = [PdlTjeneste::class, PdlPipConfig::class])
+@ConfigurationPropertiesScan
+@EnableAutoConfiguration
+class PdlTjenesteTest : RestTjenesteTest() {
 
     @TestConfiguration
     class PdlTestConfig : CacheTestConfig(PDL) {

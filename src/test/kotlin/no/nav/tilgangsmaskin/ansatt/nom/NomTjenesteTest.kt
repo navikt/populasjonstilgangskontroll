@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.ansatt.nom
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
@@ -23,13 +22,17 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.ContextConfiguration
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDate.now
 
 @DataJpaTest
 @Testcontainers
-@ContextConfiguration(classes = [TestApp::class,NomTjeneste::class, NomJPAAdapter::class])
+@ContextConfiguration(classes = [NomTjeneste::class, NomJPAAdapter::class])
 @Import(NomTestConfig::class)
+@ConfigurationPropertiesScan
+@EnableAutoConfiguration
 class NomTjenesteTest : RestTjenesteTest() {
 
     @TestConfiguration

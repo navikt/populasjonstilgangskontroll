@@ -39,18 +39,20 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.rest.Token
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Import
 import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import org.springframework.data.redis.config.RedisListenerConfigurer
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.serializer.RedisMessageConverters
+import org.springframework.test.context.ContextConfiguration
 import java.time.Duration.ofSeconds
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -58,8 +60,10 @@ import kotlin.time.measureTime
 
 @DataRedisTest
 @AutoConfigureMetrics
-@Import(ValkeyCacheTestConfig::class, ValkeyEventListeningCacheOppfrisker::class)
+@ContextConfiguration(classes = [ValkeyCacheTestConfig::class,ValkeyEventListeningCacheOppfrisker::class])
 @ApplyExtension(SpringExtension::class)
+@EnableAutoConfiguration
+@EnableConfigurationProperties
 class ValkeyCacheOperationsTest : BehaviorSpec() {
 
     @TestConfiguration

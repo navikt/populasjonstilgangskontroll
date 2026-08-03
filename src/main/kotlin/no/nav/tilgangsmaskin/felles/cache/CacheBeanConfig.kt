@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.felles.cache
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.rest.health.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.interceptor.CacheErrorHandler

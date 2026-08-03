@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.bruker.pdl
 
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDLPIP
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.rest.health.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import org.springframework.context.annotation.Bean

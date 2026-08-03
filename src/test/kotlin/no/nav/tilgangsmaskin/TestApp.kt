@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin
 
 import no.nav.boot.conditionals.ConditionalOnLocalOrTest
-import no.nav.tilgangsmaskin.felles.FellesBeanConfig.Companion.AUDITING_TIME_PROVIDER
+import no.nav.tilgangsmaskin.felles.TimeBeanConfig.Companion.AUDITING_TIME_PROVIDER
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.profiler
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan

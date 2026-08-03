@@ -4,10 +4,10 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldExist
 import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.felles.Pingable
-import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
+import no.nav.tilgangsmaskin.felles.rest.health.Pingable
+import no.nav.tilgangsmaskin.felles.rest.health.PingableHealthIndicator
 import java.net.URI
-import no.nav.tilgangsmaskin.felles.PingableHealthIndicator.Companion.ENDPOINT
+import no.nav.tilgangsmaskin.felles.rest.health.PingableHealthIndicator.Companion.ENDPOINT
 import org.springframework.boot.health.contributor.Status.DOWN
 import org.springframework.boot.health.contributor.Status.UP
 

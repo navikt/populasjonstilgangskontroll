@@ -1,5 +1,6 @@
-package no.nav.tilgangsmaskin.felles
+package no.nav.tilgangsmaskin.felles.rest.health
 
+import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.health.contributor.Health

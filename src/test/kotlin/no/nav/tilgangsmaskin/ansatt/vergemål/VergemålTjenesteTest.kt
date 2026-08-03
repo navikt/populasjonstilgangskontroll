@@ -108,7 +108,7 @@ class VergemålTjenesteTest : RestTjenesteTest() {
             }
         }
 
-        Given("feilhaandtering") {
+        Given("feilhåndtering") {
             beforeEach { every { nom.fnrForAnsatt(ANSATT_ID) } returns IDENT }
 
             When("tjenesten returnerer 404") {

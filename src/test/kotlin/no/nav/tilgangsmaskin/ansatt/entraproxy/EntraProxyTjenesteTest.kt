@@ -5,13 +5,12 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyClient.Companion.ENTRA_PROXY_ANSATT_PATH
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyClient.Companion.ENTRA_PROXY_ENHETER_PATH
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
+import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
@@ -29,8 +28,6 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
-import org.springframework.web.util.UriComponentsBuilder.fromUriString
-import java.net.URI
 
 
 @RestClientTest
@@ -38,7 +35,7 @@ import java.net.URI
 @Import(OAuth2ClientTestConfig::class)
 @ConfigurationPropertiesScan
 @EnableAutoConfiguration
-class EntraProxyTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest() {
+class EntraProxyTjenesteTest : RestTjenesteTest() {
 
     @Autowired
     lateinit var tjeneste: EntraProxyTjeneste
@@ -55,7 +52,7 @@ class EntraProxyTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTes
         Given("oppslag av enhet for ansatt") {
             When("ansatt eksisterer") {
                 Then("returnerer enhet for ansatt") {
-                    server.expect(requestTo(ansattUri))
+                    server.expect(requestTo(cfg.ansattUri(ANSATTID.verdi)))
                         .andExpect(method(GET))
                         .andRespond(withSuccess("""
                             {
@@ -75,7 +72,7 @@ class EntraProxyTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTes
         Given("oppslag av enheter for ansatt") {
             When("ansatt er tilknyttet enheter") {
                 Then("returnerer liste av enheter for ansatt") {
-                    server.expect(requestTo(enheterUri))
+                    server.expect(requestTo(cfg.enheterUri(ANSATTID.verdi)))
                         .andExpect(method(GET))
                         .andRespond(withSuccess("""
                             [
@@ -92,7 +89,7 @@ class EntraProxyTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTes
 
             When("ansatt ikke er tilknyttet enheter") {
                 Then("returneres tom liste") {
-                    server.expect(requestTo(enheterUri))
+                    server.expect(requestTo(cfg.enheterUri(ANSATTID.verdi)))
                         .andExpect(method(GET))
                         .andRespond(withSuccess("[]", APPLICATION_JSON))
 
@@ -104,7 +101,7 @@ class EntraProxyTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTes
         Given("feilhaandtering") {
             When("tjenesten returnerer 404") {
                 Then("kaster NotFoundRestException uten retry") {
-                    server.expect(requestTo(ansattUri))
+                    server.expect(requestTo(cfg.ansattUri(ANSATTID.verdi)))
                         .andExpect(method(GET))
                         .andRespond(withStatus(NOT_FOUND))
 
@@ -116,7 +113,7 @@ class EntraProxyTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTes
 
             When("tjenesten returnerer 401") {
                 Then("kaster IrrecoverableRestException uten retry") {
-                    server.expect(requestTo(ansattUri))
+                    server.expect(requestTo(cfg.ansattUri(ANSATTID.verdi)))
                         .andExpect(method(GET))
                         .andRespond(withStatus(UNAUTHORIZED))
 
@@ -128,7 +125,7 @@ class EntraProxyTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTes
 
             When("tjenesten returnerer 500") {
                 Then("kaster RecoverableRestException etter 4 forsøk") {
-                    server.expect(times(4), requestTo(ansattUri))
+                    server.expect(times(4), requestTo(cfg.ansattUri(ANSATTID.verdi)))
                         .andExpect(method(GET))
                         .andRespond(withStatus(INTERNAL_SERVER_ERROR))
 
@@ -140,11 +137,6 @@ class EntraProxyTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTes
         }
     }
 
-    private val ansattUri: URI get() = uri(ENTRA_PROXY_ANSATT_PATH)
-    private val enheterUri: URI get() = uri(ENTRA_PROXY_ENHETER_PATH)
-
-    private fun uri(path: String) = fromUriString("${cfg.baseUri}$path")
-        .buildAndExpand(ANSATTID.verdi).toUri()
 
     companion object  {
         private val ANSATTID = AnsattId("Z999999")

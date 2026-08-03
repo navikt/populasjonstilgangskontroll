@@ -44,7 +44,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import tools.jackson.databind.json.JsonMapper
 import java.time.Duration.ofSeconds
 
-@RestClientTest(components = [PdlPipConfig::class, PdlTjeneste::class])
+@RestClientTest
 @Import(PdlTestConfig::class, OAuth2ClientTestConfig::class)
 @ContextConfiguration(classes = [PdlTjeneste::class, PdlPipConfig::class])
 @ConfigurationPropertiesScan

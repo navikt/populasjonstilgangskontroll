@@ -15,14 +15,12 @@ import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.web.client.ExpectedCount.times
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
@@ -40,7 +38,7 @@ import org.springframework.test.context.ContextConfiguration
 import java.net.URI
 
 @RestClientTest
-@Import(OAuth2ClientTestConfig::class, VergemålConfig::class)
+@Import(OAuth2ClientTestConfig::class)
 @ContextConfiguration(classes = [VergemålConfig::class, VergemålTjeneste::class])
 @EnableAutoConfiguration
 @ConfigurationPropertiesScan

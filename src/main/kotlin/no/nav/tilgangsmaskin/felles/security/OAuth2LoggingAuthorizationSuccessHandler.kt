@@ -34,5 +34,6 @@ class OAuth2LoggingAuthorizationSuccessHandler(
         delegate.onAuthorizationSuccess(authorizedClient, principal, attributes)
     }
 
-    private fun OAuth2AuthorizedClient.expiry() = accessToken.expiresAt?.atZone(OSLO)
+    private fun OAuth2AuthorizedClient.expiry() =
+        accessToken.expiresAt?.atZone(OSLO)
 }

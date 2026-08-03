@@ -5,13 +5,13 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.longs.shouldBeGreaterThan
 import io.mockk.every
-import io.mockk.mockk
 import no.nav.tilgangsmaskin.felles.rest.Token
 import com.ninjasquad.springmockk.MockkBean
 import io.micrometer.core.annotation.Timed
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.felles.ClusterAddingTimedAspectTest.TestConfig
+import no.nav.tilgangsmaskin.felles.rest.health.ObservabilityBeanConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.context.annotation.Bean

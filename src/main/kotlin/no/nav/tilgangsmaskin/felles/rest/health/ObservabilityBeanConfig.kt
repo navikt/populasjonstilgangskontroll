@@ -1,8 +1,9 @@
-package no.nav.tilgangsmaskin.felles
+package no.nav.tilgangsmaskin.felles.rest.health
 
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
+import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.Token
 import org.springframework.boot.actuate.endpoint.SanitizableData.SANITIZED_VALUE
 import org.springframework.boot.actuate.endpoint.SanitizingFunction

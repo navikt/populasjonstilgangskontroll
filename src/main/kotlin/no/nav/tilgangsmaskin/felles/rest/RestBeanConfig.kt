@@ -1,7 +1,6 @@
-package no.nav.tilgangsmaskin.felles
+package no.nav.tilgangsmaskin.felles.rest
 
-import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor
-import no.nav.tilgangsmaskin.felles.rest.RestLoggingRequestInterceptor
+import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.sekunder
 import org.apache.hc.client5.http.config.ConnectionConfig
 import org.apache.hc.client5.http.impl.classic.HttpClients

@@ -11,7 +11,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider
 import org.springframework.security.oauth2.client.OAuth2AuthorizationFailureHandler
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor.authorizationFailureHandler
-import org.springframework.security.oauth2.client.web.client.support.OAuth2RestClientHttpServiceGroupConfigurer
+import org.springframework.security.oauth2.client.web.client.support.OAuth2RestClientHttpServiceGroupConfigurer.from
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 
 @Configuration
@@ -28,10 +28,10 @@ class Oauth2SecurityBeanConfig {
     @Bean
     fun oauth2GroupConfigurer(manager: OAuth2AuthorizedClientManager) =
         RestClientHttpServiceGroupConfigurer { groups ->
-            OAuth2RestClientHttpServiceGroupConfigurer.from(manager).configureGroups(groups)
+            from(manager).configureGroups(groups)
             groups.forEachClient { _, builder ->
-                builder.requestInterceptors { interceptors ->
-                    interceptors.addFirst(OAuth2DownstreamUriCapturingInterceptor())
+                builder.requestInterceptors {
+                    it.addFirst(OAuth2DownstreamUriCapturingInterceptor())
                 }
             }
         }

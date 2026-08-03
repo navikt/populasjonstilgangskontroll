@@ -1,7 +1,8 @@
-package no.nav.tilgangsmaskin.felles
+package no.nav.tilgangsmaskin.felles.rest.health
 
 import io.micrometer.core.instrument.Gauge
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import org.springframework.boot.health.actuate.endpoint.HealthEndpoint
 import org.springframework.boot.health.contributor.Status.DOWN
 import org.springframework.boot.health.contributor.Status.OUT_OF_SERVICE

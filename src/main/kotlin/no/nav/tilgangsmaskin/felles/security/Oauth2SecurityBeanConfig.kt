@@ -31,30 +31,26 @@ class Oauth2SecurityBeanConfig {
             OAuth2RestClientHttpServiceGroupConfigurer.from(manager).configureGroups(groups)
             groups.forEachClient { _, builder ->
                 builder.requestInterceptors { interceptors ->
-                    interceptors.add(0, OAuth2DownstreamUriCapturingInterceptor())
+                    interceptors.addFirst(OAuth2DownstreamUriCapturingInterceptor())
                 }
             }
         }
 
-
     @Bean
-    fun oauth2AuthorizationFailureHandler(service: OAuth2AuthorizedClientService): OAuth2AuthorizationFailureHandler =
+    fun oauth2AuthorizationFailureHandler(service: OAuth2AuthorizedClientService) =
         OAuth2LoggingAuthorizationFailureHandler(authorizationFailureHandler(service))
 
     @Bean
     fun oauth2AuthorizationSuccessHandler(service: OAuth2AuthorizedClientService) =
-        OAuth2LoggingAuthorizationSuccessHandler(service) { authorizedClient, principal, _ ->
-            service.saveAuthorizedClient(authorizedClient, principal)
+        OAuth2LoggingAuthorizationSuccessHandler(service) { client, principal, _ ->
+            service.saveAuthorizedClient(client, principal)
         }
-
 
     @Bean
     fun authorizedClientManager(repo: ClientRegistrationRepository, service: OAuth2AuthorizedClientService, failureHandler: OAuth2AuthorizationFailureHandler, successHandler: OAuth2AuthorizationSuccessHandler) =
         AuthorizedClientServiceOAuth2AuthorizedClientManager(
             repo, service).apply {
-            setAuthorizedClientProvider(
-                OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().build()
-            )
+            setAuthorizedClientProvider(OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().build())
             setAuthorizationSuccessHandler(successHandler)
             setAuthorizationFailureHandler(failureHandler)
         }

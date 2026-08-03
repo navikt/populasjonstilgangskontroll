@@ -60,7 +60,7 @@ class PdlBeanConfig {
             .build()
 
     @Bean
-    fun graphGroupConfigurer() =
+    fun pdlPipGroupConfigurer() =
         RestClientHttpServiceGroupConfigurer {
             it.filterByName(PDLPIP).forEachClient { _, builder ->
                 builder.requestInterceptor(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))

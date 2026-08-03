@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider
 import org.springframework.security.oauth2.client.OAuth2AuthorizationFailureHandler
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor
+import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor.authorizationFailureHandler
 import org.springframework.security.oauth2.client.web.client.support.OAuth2RestClientHttpServiceGroupConfigurer
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 
@@ -40,7 +41,7 @@ class Oauth2SecurityConfig {
     @Bean
     fun oauth2AuthorizationFailureHandler(service: OAuth2AuthorizedClientService): OAuth2AuthorizationFailureHandler =
         OAuth2LoggingAuthorizationFailureHandler(
-            OAuth2ClientHttpRequestInterceptor.authorizationFailureHandler(service)
+            authorizationFailureHandler(service)
         )
 
     @Bean
@@ -49,6 +50,7 @@ class Oauth2SecurityConfig {
             service.saveAuthorizedClient(authorizedClient, principal)
         }
 
+    /*
     @Bean
     fun authorizedClientManager(repo: ClientRegistrationRepository, service: OAuth2AuthorizedClientService, failureHandler: OAuth2AuthorizationFailureHandler, successHandler: OAuth2AuthorizationSuccessHandler) =
         AuthorizedClientServiceOAuth2AuthorizedClientManager(
@@ -59,4 +61,6 @@ class Oauth2SecurityConfig {
             setAuthorizationSuccessHandler(successHandler)
             setAuthorizationFailureHandler(failureHandler)
         }
+
+     */
 }

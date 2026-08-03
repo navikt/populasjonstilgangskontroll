@@ -1,12 +1,12 @@
 package no.nav.tilgangsmaskin.felles.security
 
 import no.nav.tilgangsmaskin.felles.security.OAuth2DownstreamURIContext.currentUri
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.OSLO
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.client.OAuth2AuthorizationSuccessHandler
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
-import java.time.ZoneId
 
 class OAuth2LoggingAuthorizationSuccessHandler(
     private val service: OAuth2AuthorizedClientService,
@@ -15,22 +15,24 @@ class OAuth2LoggingAuthorizationSuccessHandler(
 
     private val log = getLogger(javaClass)
 
-    override fun onAuthorizationSuccess(denne: OAuth2AuthorizedClient, principal: Authentication, attr: Map<String, Any>) {
+    override fun onAuthorizationSuccess(
+        authorizedClient: OAuth2AuthorizedClient,
+        principal: Authentication,
+        attributes: Map<String, Any>
+    ) {
         val uri = currentUri() ?: "unknown"
-        val id = denne.clientRegistration.registrationId
-        val forrige: OAuth2AuthorizedClient? = service.loadAuthorizedClient(id, principal.name)
-        val prevExp = forrige?.accessToken?.expiresAt?.atZone(OSLO_ZONE_ID)
-        val newExp = denne.accessToken.expiresAt?.atZone(OSLO_ZONE_ID)
+        val registrationId = authorizedClient.clientRegistration.registrationId
+        val previousClient = service.loadAuthorizedClient<OAuth2AuthorizedClient>(registrationId, principal.name)
+        val previousExpiry = previousClient?.expiry()
+        val currentExpiry = authorizedClient.expiry()
 
-        if (forrige == null) {
-            log.info("OAuth2 første autorisering: id={}, expiresAt={}, uri={}", id, newExp, uri)
+        if (previousClient == null) {
+            log.info("OAuth2 første autorisering: id=$registrationId, expiresAt=$currentExpiry, uri=$uri")
         } else {
-            log.info("OAuth2 token fornyelse: id={}, oldExpiresAt={}, newExpiresAt={}, uri={}", id,prevExp,newExp,uri)
+            log.info("OAuth2 token fornyelse: id=$registrationId, oldExpiresAt=$previousExpiry, newExpiresAt=$currentExpiry, uri=$uri")
         }
-        delegate.onAuthorizationSuccess(denne, principal, attr)
+        delegate.onAuthorizationSuccess(authorizedClient, principal, attributes)
     }
 
-    companion object {
-        private val OSLO_ZONE_ID: ZoneId = ZoneId.of("Europe/Oslo")
-    }
+    private fun OAuth2AuthorizedClient.expiry() = accessToken.expiresAt?.atZone(OSLO)
 }

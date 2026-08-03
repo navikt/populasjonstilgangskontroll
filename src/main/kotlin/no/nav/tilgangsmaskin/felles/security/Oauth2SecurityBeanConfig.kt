@@ -39,12 +39,10 @@ class Oauth2SecurityBeanConfig {
 
     @Bean
     fun oauth2AuthorizationFailureHandler(service: OAuth2AuthorizedClientService): OAuth2AuthorizationFailureHandler =
-        OAuth2LoggingAuthorizationFailureHandler(
-            authorizationFailureHandler(service)
-        )
+        OAuth2LoggingAuthorizationFailureHandler(authorizationFailureHandler(service))
 
     @Bean
-    fun oauth2AuthorizationSuccessHandler(service: OAuth2AuthorizedClientService)  =
+    fun oauth2AuthorizationSuccessHandler(service: OAuth2AuthorizedClientService) =
         OAuth2LoggingAuthorizationSuccessHandler(service) { authorizedClient, principal, _ ->
             service.saveAuthorizedClient(authorizedClient, principal)
         }

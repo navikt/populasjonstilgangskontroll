@@ -63,7 +63,6 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
     private val ansattId = AnsattId("Z999999")
     private val historiskBrukerId = BrukerId("11111111111")
 
-
     @MockkBean
     private lateinit var vergemål: VergemålTjeneste
 

@@ -14,7 +14,6 @@ class RestTjenesteTestContextInitializer : ApplicationContextInitializer<Configu
     }
 
     companion object {
-        @JvmStatic
         private fun serviceClientBaseUrls() = mapOf(
             "pdl" to "http://pdl-api.pdl",
             "pdlpip" to "http://pdl-api.pdl",

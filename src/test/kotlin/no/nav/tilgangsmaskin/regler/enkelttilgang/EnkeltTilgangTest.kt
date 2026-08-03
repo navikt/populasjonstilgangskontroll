@@ -41,7 +41,9 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
+import no.nav.tilgangsmaskin.felles.TimeBeanConfig
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestPropertySource
 import org.testcontainers.junit.jupiter.Testcontainers
 
@@ -53,6 +55,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
 @ContextConfiguration(classes = [TestApp::class, LocalAuditor::class,EnkeltTilgangJPAAdapter::class])
 @ApplyExtension(SpringExtension::class)
+@Import(TimeBeanConfig::class)
 @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
 internal class EnkeltTilgangTest : BehaviorSpec() {
 

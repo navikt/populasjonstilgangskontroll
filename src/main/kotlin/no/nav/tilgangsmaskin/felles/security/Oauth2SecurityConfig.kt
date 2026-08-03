@@ -50,7 +50,7 @@ class Oauth2SecurityConfig {
             service.saveAuthorizedClient(authorizedClient, principal)
         }
 
-    /*
+
     @Bean
     fun authorizedClientManager(repo: ClientRegistrationRepository, service: OAuth2AuthorizedClientService, failureHandler: OAuth2AuthorizationFailureHandler, successHandler: OAuth2AuthorizationSuccessHandler) =
         AuthorizedClientServiceOAuth2AuthorizedClientManager(
@@ -61,6 +61,4 @@ class Oauth2SecurityConfig {
             setAuthorizationSuccessHandler(successHandler)
             setAuthorizationFailureHandler(failureHandler)
         }
-
-     */
 }

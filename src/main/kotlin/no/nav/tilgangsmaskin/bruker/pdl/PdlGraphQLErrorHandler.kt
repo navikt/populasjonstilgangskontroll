@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus.NOT_FOUND
 import java.net.URI
 import java.util.*
 
-interface PdlGraphQLErrorHandler {
+class PdlGraphQLErrorHandler {
     fun handle(uri: URI, e: Throwable): Nothing =
         when (e) {
             is FieldAccessException -> throw e.oversett(uri)

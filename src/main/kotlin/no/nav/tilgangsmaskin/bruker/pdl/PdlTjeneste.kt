@@ -3,11 +3,11 @@ package no.nav.tilgangsmaskin.bruker.pdl
 import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDLPIP
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPersoner
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDLPIP
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.getMany
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService

@@ -14,10 +14,10 @@ import no.nav.tilgangsmaskin.bruker.pdl.BrukerTilPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_UTVIDET_FAMILIE_CACHE
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_CACHES
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_MED_FAMILIE_CACHE
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_MED_UTVIDET_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.pdlRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.restRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjenesteTest.PdlTestConfig
@@ -40,7 +40,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import tools.jackson.databind.json.JsonMapper
 import java.time.Duration.ofSeconds
 
-@RestClientTest(components = [PdlConfig::class, PdlTjeneste::class])
+@RestClientTest(components = [PdlPipConfig::class, PdlTjeneste::class])
 @Import(PdlTestConfig::class, OAuth2ClientTestConfig::class)
 @EnableResilientMethods
 class PdlTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest() {
@@ -56,7 +56,7 @@ class PdlTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest() {
     @Autowired
     lateinit var server: MockRestServiceServer
     @Autowired
-    lateinit var cfg: PdlConfig
+    lateinit var cfg: PdlPipConfig
     @Qualifier("cacheOperations") @Autowired lateinit var cache: CacheOperations
     @Autowired lateinit var mapper: JsonMapper
 

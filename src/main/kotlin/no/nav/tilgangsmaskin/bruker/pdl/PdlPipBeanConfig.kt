@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDLPIP
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDLPIP
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
@@ -22,6 +22,6 @@ class PdlPipBeanConfig {
         }
 
     @Bean
-    fun pdlPipHealthIndicator(cfg: PdlConfig, client: PdlPipClient) =
+    fun pdlPipHealthIndicator(cfg: PdlPipConfig, client: PdlPipClient) =
         PingableHealthIndicator(cfg, client::ping)
 }

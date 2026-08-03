@@ -22,7 +22,7 @@ interface SkjermingClient {
     companion object {
         const val SKJERMING_PATH = "/skjermet"
         const val SKJERMING_BULK_PATH = "/skjermetBulk"
-        private const val SKJERMING_PING_PATH = "/internal/health/liveness"
+        const val SKJERMING_PING_PATH = "/internal/health/liveness"
     }
 }
 

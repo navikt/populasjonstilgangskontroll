@@ -1,9 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.maps.shouldContainExactly
@@ -27,8 +24,6 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.client.ExpectedCount.never
 import org.springframework.test.web.client.ExpectedCount.once
 import org.springframework.test.web.client.ExpectedCount.times
@@ -41,12 +36,12 @@ import java.net.URI
 
 
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
+import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
 import org.springframework.test.web.client.match.MockRestRequestMatchers.header
 
 @RestClientTest(components = [SkjermingClient::class, SkjermingTjeneste::class, SkjermingConfig::class])
 @Import(SkjermingTestConfig::class, OAuth2ClientTestConfig::class)
-@ApplyExtension(SpringExtension::class)
-class SkjermingTjenesteTest : BehaviorSpec() {
+class SkjermingTjenesteTest : RestTjenesteTest() {
 
     @TestConfiguration
     class SkjermingTestConfig : CacheTestConfig(SKJERMING)
@@ -73,7 +68,6 @@ class SkjermingTjenesteTest : BehaviorSpec() {
             When("samme brukerId slås opp to ganger") {
                 Then("andre kall returneres fra cache uten REST-kall") {
                     server.expect(once(), requestTo(skjermingUri))
-                        .andExpect(header("jalla", "42"))
                         .andRespond(withSuccess("true", APPLICATION_JSON))
                     tjeneste.skjerming(ID1).shouldBeTrue()
                     tjeneste.skjerming(ID1).shouldBeTrue()
@@ -174,11 +168,6 @@ class SkjermingTjenesteTest : BehaviorSpec() {
     private fun uri(path: String) = fromUriString("${cfg.baseUri}$path").build().toUri()
 
     companion object {
-        @JvmStatic
-        @DynamicPropertySource
-        fun dynamicProperties(registry: DynamicPropertyRegistry) =
-            OAuth2ClientTestConfig.registerServiceClientBaseUrls(registry)
-
         const val I1 = "08526835670"
         const val I2 = "20478606614"
         val IDS = setOf(I1, I2)

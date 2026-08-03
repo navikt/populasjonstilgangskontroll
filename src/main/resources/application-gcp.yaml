@@ -48,10 +48,8 @@ management:
 spring:
   http:
     serviceclient:
-        pdlgraph:
-          base-url: "https://${pdlgraph}/graphql"
         pdlpip:
-          base-url: "https://${pdl}"
+          base-url: "https://${pdlpip}"
         verge:
           base-url: "http://repr-api.repr"
         skjerming:
@@ -212,4 +210,3 @@ info:
   cluster: ${nais.cluster.name:local}
   name: ${spring.application.name}
   image: ${nais.app.image:unknown}
-

@@ -4,9 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.booleans.shouldBeTrue
@@ -63,8 +61,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @AutoConfigureMetrics
 @Testcontainers
 @ComponentScan("no.nav.tilgangsmaskin.regler.motor", "no.nav.tilgangsmaskin.regler.enkelttilgang")
-@ApplyExtension(SpringExtension::class)
-class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
+class EnkeltTilgangRegelTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest() {
 
     private val strengtFortroligAktørId = AktørId("1234567890123")
     private val strengtFortroligBrukerId = BrukerId("08526835671")

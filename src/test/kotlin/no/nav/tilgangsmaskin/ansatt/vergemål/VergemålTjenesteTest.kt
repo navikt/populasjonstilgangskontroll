@@ -4,9 +4,6 @@ package no.nav.tilgangsmaskin.ansatt.vergemål
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -26,8 +23,6 @@ import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.client.ExpectedCount.times
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
@@ -42,8 +37,7 @@ import java.net.URI
 
 @RestClientTest(components = [VergemålTjeneste::class, VergemålConfig::class])
 @Import(OAuth2ClientTestConfig::class, VergemålConfig::class)
-@ApplyExtension(SpringExtension::class)
-class VergemålTjenesteTest : BehaviorSpec() {
+class VergemålTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest() {
 
     @TestConfiguration
     @EnableResilientMethods
@@ -149,11 +143,6 @@ class VergemålTjenesteTest : BehaviorSpec() {
     }
 
     companion object {
-        @JvmStatic
-        @DynamicPropertySource
-        fun dynamicProperties(registry: DynamicPropertyRegistry) =
-            OAuth2ClientTestConfig.registerServiceClientBaseUrls(registry)
-
         private val ANSATT_ID = AnsattId("Z999999")
         private val IDENT = BrukerId("08526835670")
         private val BRUKER1 = BrukerId("20478606614")

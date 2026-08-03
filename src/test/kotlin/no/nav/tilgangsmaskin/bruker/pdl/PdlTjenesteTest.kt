@@ -1,9 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import com.ninjasquad.springmockk.MockkBean
-import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
@@ -37,8 +34,6 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.web.client.ExpectedCount.never
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
@@ -48,8 +43,7 @@ import java.time.Duration.ofSeconds
 @RestClientTest(components = [PdlConfig::class, PdlTjeneste::class])
 @Import(PdlTestConfig::class, OAuth2ClientTestConfig::class)
 @EnableResilientMethods
-@ApplyExtension(SpringExtension::class)
-class PdlTjenesteTest : BehaviorSpec() {
+class PdlTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest() {
 
     @TestConfiguration
     class PdlTestConfig : CacheTestConfig(PDL) {
@@ -180,11 +174,6 @@ class PdlTjenesteTest : BehaviorSpec() {
     }
 
     companion object {
-        @JvmStatic
-        @DynamicPropertySource
-        fun dynamicProperties(registry: DynamicPropertyRegistry) =
-            OAuth2ClientTestConfig.registerServiceClientBaseUrls(registry)
-
         const val I1 = "03508331575"
         const val I2 = "20478606614"
 

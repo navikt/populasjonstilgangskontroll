@@ -109,8 +109,8 @@ spec:
       value: {{nais.cluster.cache}}
     - name: PDLGRAPH
       value: {{pdlgraph}}
-    - name: PDL
-      value: {{pdl}}
+    - name: PDLPIP
+      value: {{pdlpip}}
     - name: GRUPPE_DEAD
       value: '{{grupper.dead}}'
     - name: GRUPPE_STRENGT

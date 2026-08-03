@@ -1,9 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
 import com.ninjasquad.springmockk.MockkBean
-import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -25,8 +22,6 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
@@ -35,11 +30,11 @@ import java.util.*
 
 
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
+import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
 
 @RestClientTest(components = [EntraTjeneste::class, EntraGrupperConfig::class, EntraOidBeanConfig::class])
 @Import(EntraTestConfig::class, OAuth2ClientTestConfig::class)
-@ApplyExtension(SpringExtension::class)
-class EntraTjenesteTest : BehaviorSpec() {
+class EntraTjenesteTest : RestTjenesteTest() {
 
     @TestConfiguration
     @EnableResilientMethods
@@ -211,11 +206,6 @@ class EntraTjenesteTest : BehaviorSpec() {
     """.trimIndent()
 
     companion object {
-        @JvmStatic
-        @DynamicPropertySource
-        fun dynamicProperties(registry: DynamicPropertyRegistry) =
-            OAuth2ClientTestConfig.registerServiceClientBaseUrls(registry)
-
         private val OID       = UUID.randomUUID()
         private val OID2     = UUID.randomUUID()
         private val ANSATTID  = AnsattId("Z999999")

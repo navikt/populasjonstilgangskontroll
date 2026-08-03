@@ -1,9 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.`oppfølging`
 
 import com.ninjasquad.springmockk.MockkBean
-import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.TestApp
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
@@ -31,6 +28,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.StartetEllerEndret
+import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Instant.parse
@@ -43,8 +41,7 @@ import java.util.UUID.*
 @EnableCaching
 @ContextConfiguration(classes = [TestApp::class, OppfølgingTjeneste::class, OppfølgingJPAAdapter::class])
 @Import(OppfølgingTestConfig::class)
-@ApplyExtension(SpringExtension::class)
-class OppfølgingTjenesteTest : BehaviorSpec() {
+class OppfølgingTjenesteTest : RestTjenesteTest() {
 
     @TestConfiguration
     class OppfølgingTestConfig : CacheTestConfig(OPPFØLGING)

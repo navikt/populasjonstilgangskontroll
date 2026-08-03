@@ -38,25 +38,23 @@ import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpReq
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
-import org.springframework.web.service.registry.ImportHttpServices
 
 @Configuration
 @NoCoverageAnalysis
-@ImportHttpServices(PdlGraphQLRestClient::class, group = PDLGRAPH)
 class PdlBeanConfig {
 
     @Bean
     @Qualifier(PDLGRAPH)
     fun pdlGraphRestClient(builder: Builder,
                            mgr: OAuth2AuthorizedClientManager,
-                           oauth2AuthorizationFailureHandler: OAuth2AuthorizationFailureHandler) =
+                           failureHandler: OAuth2AuthorizationFailureHandler) =
         builder
             .requestInterceptors {
                 it.add(OAuth2DownstreamUriCapturingInterceptor())
                 it.add(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
                 it.add(OAuth2ClientHttpRequestInterceptor(mgr).apply {
                     setClientRegistrationIdResolver { PDLGRAPH }
-                    setAuthorizationFailureHandler(oauth2AuthorizationFailureHandler)
+                    setAuthorizationFailureHandler(failureHandler)
                 })
             }
             .build()
@@ -64,7 +62,7 @@ class PdlBeanConfig {
     @Bean
     fun graphGroupConfigurer() =
         RestClientHttpServiceGroupConfigurer {
-            it.filterByName(PDLPIP,PDLGRAPH).forEachClient { _, builder ->
+            it.filterByName(PDLPIP).forEachClient { _, builder ->
                 builder.requestInterceptor(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
             }
         }
@@ -79,8 +77,13 @@ class PdlBeanConfig {
 
 
     @Bean
-    fun pdlGraphHealthIndicator(cfg: PdlGraphQLConfig, client: PdlGraphQLRestClient) =
-        PingableHealthIndicator(cfg, client::ping)
+    fun pdlGraphHealthIndicator(cfg: PdlGraphQLConfig, @Qualifier(PDLGRAPH) client: RestClient) =
+        PingableHealthIndicator(cfg) {
+            client.options()
+                .uri(cfg.baseUri)
+                .retrieve()
+                .toBodilessEntity()
+        }
 
     @Bean
     fun pdlPipHealthIndicator(cfg: PdlConfig, client: PdlPipClient) =

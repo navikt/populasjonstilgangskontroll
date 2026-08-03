@@ -24,7 +24,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import java.net.URI
 
-class RegelTjenesteTest : BehaviorSpec() {
+class RegelTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest() {
 
     private val motor      = mockk<RegelMotor>()
     private val brukere    = mockk<BrukerTjeneste>()

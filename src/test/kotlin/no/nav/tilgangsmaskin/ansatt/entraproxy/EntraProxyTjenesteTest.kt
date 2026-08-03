@@ -1,9 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -23,8 +20,6 @@ import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.client.ExpectedCount.times
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
@@ -36,9 +31,8 @@ import java.net.URI
 
 
 @RestClientTest(components = [EntraProxyTjeneste::class, EntraProxyConfig::class])
-@ApplyExtension(SpringExtension::class)
 @Import(OAuth2ClientTestConfig::class)
-class EntraProxyTjenesteTest : BehaviorSpec() {
+class EntraProxyTjenesteTest : no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest() {
 
     @Autowired
     lateinit var tjeneste: EntraProxyTjeneste
@@ -147,11 +141,6 @@ class EntraProxyTjenesteTest : BehaviorSpec() {
         .buildAndExpand(ANSATTID.verdi).toUri()
 
     companion object  {
-        @JvmStatic
-        @DynamicPropertySource
-        fun dynamicProperties(registry: DynamicPropertyRegistry) =
-            OAuth2ClientTestConfig.registerServiceClientBaseUrls(registry)
-
         private val ANSATTID = AnsattId("Z999999")
     }
 }

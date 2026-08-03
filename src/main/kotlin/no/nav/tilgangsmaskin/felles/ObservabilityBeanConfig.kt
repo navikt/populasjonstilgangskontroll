@@ -4,6 +4,7 @@ import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.felles.rest.Token
+import org.springframework.boot.actuate.endpoint.SanitizableData.SANITIZED_VALUE
 import org.springframework.boot.actuate.endpoint.SanitizingFunction
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -17,7 +18,7 @@ class ObservabilityBeanConfig {
 
     @Bean
     fun sanitizingFunction() = SanitizingFunction { data ->
-        if (SENSITIVE_KEYS.any { data.key.contains(it, ignoreCase = true) }) data.withValue("******") else data
+        if (SENSITIVE_KEYS.any { data.key.contains(it, ignoreCase = true) }) data.withValue(SANITIZED_VALUE) else data
     }
 
     @Bean

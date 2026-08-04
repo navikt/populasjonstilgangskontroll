@@ -31,7 +31,7 @@ class OAuth2SecurityBeanConfig {
                     requests.anyRequest().denyAll()
                 }
                     .oauth2ResourceServer { oauth2 ->
-                        oauth2.jwt { }
+                        oauth2.jwt { configurer -> configurer.jwtAuthenticationConverter(OAuth2LoggingJwtAuthenticationConverter()) }
                         oauth2.authenticationEntryPoint(HttpStatusEntryPoint(UNAUTHORIZED))
                     }
             }

@@ -14,12 +14,12 @@ import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.motor.RegelMotorLogger.Companion.INGEN_REGEL_TAG
 import no.nav.tilgangsmaskin.regler.motor.RegelMotorLogger.Companion.tag
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 
 
-@Component
+@Service
 @Transactional(readOnly = true)
 @Timed
 class EnkeltTilgangTjeneste(

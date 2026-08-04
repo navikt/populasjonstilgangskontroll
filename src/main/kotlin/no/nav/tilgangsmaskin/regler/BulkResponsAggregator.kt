@@ -14,9 +14,9 @@ import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons.EnkeltBulkResp
 import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.FORBIDDEN
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 
-@Component
+@Service
 class BulkResponsAggregator(
     private val enkeltTilgangTjeneste: EnkeltTilgangTjeneste,
     private val auditor: Auditor) {

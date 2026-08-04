@@ -20,9 +20,9 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.NO_CONTENT
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 
-@Component
+@Service
 class RegelMotor(
     @param:Qualifier(KJERNE) private val kjerne: RegelSett,
     @param:Qualifier(KOMPLETT) private val komplett: RegelSett,
@@ -34,7 +34,6 @@ class RegelMotor(
     @WithSpan
     fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, kjerne, ENKELT)
 
-    @WithSpan
     private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, type: EvalueringType) {
         regelSett.regler.forEach { regel ->
             if (!regel.evaluer(ansatt, bruker)) {

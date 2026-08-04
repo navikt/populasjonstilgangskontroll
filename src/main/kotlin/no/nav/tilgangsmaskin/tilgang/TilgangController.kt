@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.servlet.http.HttpServletRequest
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.Token
@@ -33,23 +32,23 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, token: Token, 
 
     @PostMapping("komplett")
     @ProblemDetailApiResponse(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
-    fun kompletteRegler(@RequestBody brukerId: String, req: HttpServletRequest) =
-        enkeltOppslag(token.requiredAnsattId, OBO, brukerId, KOMPLETT_REGELTYPE, req.requestURI)
+    fun kompletteRegler(@RequestBody brukerId: String) =
+        enkeltOppslag(token.requiredAnsattId, OBO, brukerId, KOMPLETT_REGELTYPE, "komplett")
 
     @PostMapping("/ccf/komplett/{ansattId}")
     @ProblemDetailApiResponse(summary = SUMMARY_KOMPLETT_CCF, description = DESCRIPTION_KOMPLETT_CCF)
-    fun kompletteReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String, req: HttpServletRequest) =
-        enkeltOppslag(ansattId , CCF, brukerId, KOMPLETT_REGELTYPE, req.requestURI)
+    fun kompletteReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String) =
+        enkeltOppslag(ansattId, CCF, brukerId, KOMPLETT_REGELTYPE, "ccf/komplett")
 
     @PostMapping("kjerne")
     @ProblemDetailApiResponse(summary = SUMMARY_KJERNE_OBO, description = DESCRIPTION_KJERNE_OBO)
-    fun kjerneregler(@RequestBody brukerId: String, req: HttpServletRequest) =
-        enkeltOppslag(token.requiredAnsattId, OBO, brukerId, KJERNE_REGELTYPE, req.requestURI)
+    fun kjerneregler(@RequestBody brukerId: String) =
+        enkeltOppslag(token.requiredAnsattId, OBO, brukerId, KJERNE_REGELTYPE, "kjerne")
 
     @PostMapping("/ccf/kjerne/{ansattId}")
     @ProblemDetailApiResponse(summary = SUMMARY_KJERNE_CCF, description = DESCRIPTION_KJERNE_CCF)
-    fun kjerneReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String, req: HttpServletRequest) =
-        enkeltOppslag(ansattId, CCF, brukerId, KJERNE_REGELTYPE, req.requestURI)
+    fun kjerneReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String) =
+        enkeltOppslag(ansattId, CCF, brukerId, KJERNE_REGELTYPE, "ccf/kjerne")
 
     private fun enkeltOppslag(ansatt: AnsattId, forventet: TokenType, brukerId: String, regelType: RegelType, uri: String) =
         with(brukerId.trim('"')) {

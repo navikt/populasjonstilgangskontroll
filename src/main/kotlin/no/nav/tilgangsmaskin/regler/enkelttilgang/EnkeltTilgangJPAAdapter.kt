@@ -1,12 +1,12 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Repository
 import java.time.Clock
 import java.time.Instant.now
 import java.time.ZoneId.systemDefault
 
-@Component
+@Repository
 class EnkeltTilgangJPAAdapter(
     private val repo: EnkeltTilgangRepository,
     private val clock: Clock,

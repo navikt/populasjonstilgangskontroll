@@ -8,11 +8,11 @@ import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidRespons.EntraOid
 import no.nav.tilgangsmaskin.felles.rest.ConflictRestException
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import org.springframework.cache.annotation.Cacheable
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import org.springframework.web.service.registry.ImportHttpServices
 import java.util.*
 
-@Component
+@Service
 @ImportHttpServices(types = [EntraOidClient::class], group = GRAPH)
 class EntraOidTjeneste(private val oidClient: EntraOidClient, private val cfg: EntraOidConfig) {
 

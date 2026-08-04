@@ -30,7 +30,6 @@ class RegelTjeneste(
     private val aggregator: BulkResponsAggregator) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    @Timed(value = "regel_tjeneste", histogram = true, extraTags = ["type", "komplett"])
     @WithSpan
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
@@ -53,8 +52,6 @@ class RegelTjeneste(
         log.info("Tid brukt på ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
     }
 
-
-    @Timed(value = "regel_tjeneste", histogram = true, extraTags = ["type", "kjerne"])
     @WithSpan
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
         bruker(brukerId)?.let { bruker ->

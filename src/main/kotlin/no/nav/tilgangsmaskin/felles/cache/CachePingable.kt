@@ -27,7 +27,6 @@ class CachePingable(
 
     companion object {
         private const val PONG = "pong"
-        const val VALKEY = "valkey"
     }
 }
 

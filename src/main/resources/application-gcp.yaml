@@ -16,23 +16,12 @@ management:
   auditevents:
     enabled: false
   metrics:
-    distribution:
-      percentiles-histogram:
-        '[komplette_regler]': true
-        '[pdl_tjeneste]': true
-        '[entra]': true
-        '[valkey.cache.varighet]': true
     enable:
       cache: true
   observations:
     annotations:
       enabled: true
   health:
-    group:
-      readiness:
-        show-components: never
-      liveness:
-        show-components: never
     redis:
       enabled: false
     ssl:

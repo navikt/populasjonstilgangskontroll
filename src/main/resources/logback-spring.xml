@@ -19,7 +19,6 @@
     </appender>
 
     <springProfile name="dev">
-        <logger name="org.springframework.security.oauth2" level="trace"/>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
         <logger name="no.nav.tilgangsmaskin.felles.rest.RestLoggingRequestInterceptor" level="trace"/>
     </springProfile>
@@ -35,6 +34,7 @@
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{70} - %msg%n</Pattern>
             </layout>
         </appender>
+        <logger name="org.springframework.security.oauth2" level="trace"/>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
     </springProfile>
 

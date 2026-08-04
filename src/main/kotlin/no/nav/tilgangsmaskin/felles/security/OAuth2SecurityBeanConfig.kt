@@ -31,6 +31,7 @@ class OAuth2SecurityBeanConfig {
                 oauth2.jwt { it.jwtAuthenticationConverter(OAuth2LoggingJwtAuthenticationConverter()) }
                 oauth2.authenticationEntryPoint(HttpStatusEntryPoint(UNAUTHORIZED))
             }
+            .csrf { it.disable() }
             .build()
 
     @Bean

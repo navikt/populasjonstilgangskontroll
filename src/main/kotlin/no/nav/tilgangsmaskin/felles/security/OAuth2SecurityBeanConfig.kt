@@ -15,14 +15,13 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizationFailureHand
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor.authorizationFailureHandler
 import org.springframework.security.oauth2.client.web.client.support.OAuth2RestClientHttpServiceGroupConfigurer.from
-import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.HttpStatusEntryPoint
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 
 @Configuration
 class OAuth2SecurityBeanConfig {
     @Bean
-    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain =
+    fun securityFilterChain(http: HttpSecurity) =
         http.authorizeHttpRequests { requests ->
                 requests.requestMatchers("${PROD_BASE_PATH}/**").authenticated()
                 requests.requestMatchers(*UNPROTECTED_ENDPOINTS).permitAll()

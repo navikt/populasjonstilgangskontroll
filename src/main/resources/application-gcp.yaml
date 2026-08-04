@@ -64,7 +64,8 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${azure.openid.config.issuer}
-          accepted-audience: ${azure.app.client.id}
+          audiences:
+            - ${azure.app.client.id}
       client:
         provider:
           azuread:

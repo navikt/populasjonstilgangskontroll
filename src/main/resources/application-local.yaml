@@ -4,7 +4,8 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8080/default
-          accepted-audience: client id
+          audiences:
+            - client id
   cache:
     type: caffeine
 

@@ -38,6 +38,7 @@ abstract class TilgangControllerBase(
     }
 
     companion object {
+        val UNPROTECTED_ENDPOINTS = arrayOf("/swagger-ui/**", "/v3/api-docs/**", "/monitoring/**")
         const val PROD_BASE_PATH = "/api/v1"
     }
 }

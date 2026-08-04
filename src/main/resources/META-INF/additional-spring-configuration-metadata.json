@@ -1,8 +1,8 @@
 {
   "properties": [
     {
-      "name": "spring.security.oauth2.resourceserver.jwt.accepted-audience",
-      "type": "java.lang.String",
-      "description": "Expected audience for incoming JWT tokens."
+      "name": "spring.security.oauth2.resourceserver.jwt.audiences",
+      "type": "java.util.List<java.lang.String>",
+      "description": "Expected audiences for incoming JWT tokens."
     }
   ] }

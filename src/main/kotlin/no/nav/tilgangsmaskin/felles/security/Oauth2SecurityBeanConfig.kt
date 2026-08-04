@@ -1,7 +1,9 @@
 package no.nav.tilgangsmaskin.felles.security
 
+import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase
 import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase.Companion.PROD_BASE_PATH
-import org.springframework.beans.factory.annotation.Value
+import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase.Companion.UNPROTECTED_ENDPOINTS
+import org.springframework.boot.security.oauth2.server.resource.autoconfigure.OAuth2ResourceServerProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus.UNAUTHORIZED
@@ -15,11 +17,6 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizationFailureHand
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor.authorizationFailureHandler
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
-import org.springframework.security.oauth2.core.OAuth2Error
-import org.springframework.security.oauth2.core.OAuth2TokenValidator
-import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult.failure
-import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult.success
-import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.client.web.client.support.OAuth2RestClientHttpServiceGroupConfigurer.from
@@ -40,7 +37,7 @@ class Oauth2SecurityBeanConfig {
             .let {
                 it.authorizeHttpRequests { requests ->
                     requests.requestMatchers("${PROD_BASE_PATH}/**").authenticated()
-                    requests.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/monitoring/**").permitAll()
+                    requests.requestMatchers(*UNPROTECTED_ENDPOINTS).permitAll()
                     requests.anyRequest().denyAll()
                 }
                     .oauth2ResourceServer { oauth2 ->
@@ -52,15 +49,14 @@ class Oauth2SecurityBeanConfig {
     }
 
     @Bean
-    fun jwtDecoder(
-        @Value("\${spring.security.oauth2.resourceserver.jwt.issuer-uri}") issuerUri: String,
-        @Value("\${spring.security.oauth2.resourceserver.jwt.accepted-audience:}") acceptedAudience: String,
-    ): JwtDecoder {
-        val issuerValidator = createDefaultWithIssuer(issuerUri)
-        val audienceValidator = AudienceValidator(acceptedAudience)
-        return (fromIssuerLocation(issuerUri) as NimbusJwtDecoder).apply {
-            setJwtValidator(DelegatingOAuth2TokenValidator(issuerValidator, audienceValidator))
-        }
+    fun jwtDecoder(p: OAuth2ResourceServerProperties) =
+        with(requireNotNull(p.jwt.issuerUri) {
+            "spring.security.oauth2.resourceserver.jwt.issuer-uri må være konfigurert"
+        }) {
+             (fromIssuerLocation(this) as NimbusJwtDecoder).apply {
+                setJwtValidator(DelegatingOAuth2TokenValidator(createDefaultWithIssuer(this@with),
+                    OAuth2AudienceValidator(p.jwt.audiences)))
+            }
     }
 
     @Bean
@@ -93,12 +89,4 @@ class Oauth2SecurityBeanConfig {
             setAuthorizationFailureHandler(failureHandler)
         }
 
-    class AudienceValidator(private val audience: String) : OAuth2TokenValidator<Jwt> {
-        override fun validate(token: Jwt) =
-            if (audience.isBlank() || token.audience?.contains(audience) == true) {
-                success()
-            } else {
-                failure(OAuth2Error("invalid_token", "Missing expected audience", null))
-            }
-    }
 }

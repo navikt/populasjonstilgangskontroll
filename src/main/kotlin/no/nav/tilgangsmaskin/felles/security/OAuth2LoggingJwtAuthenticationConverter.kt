@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.security
 
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.AZP_NAME
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.OSLO
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.convert.converter.Converter
 import org.springframework.security.authentication.AbstractAuthenticationToken
@@ -16,7 +17,7 @@ class OAuth2LoggingJwtAuthenticationConverter(
     private val log = getLogger(javaClass)
 
     override fun convert(jwt: Jwt): AbstractAuthenticationToken {
-        val exp = jwt.expiresAt
+        val exp = jwt.expiresAt?.atZone(OSLO)
         val system = jwt.getClaimAsString(AZP_NAME)
         val request = (getRequestAttributes() as? ServletRequestAttributes)?.request
         val url = request?.requestURI

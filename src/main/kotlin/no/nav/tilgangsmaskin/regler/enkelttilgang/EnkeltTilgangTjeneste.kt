@@ -17,8 +17,10 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
+import io.micrometer.observation.annotation.Observed
 
 
+@Observed
 @Service
 @Transactional(readOnly = true)
 @Timed

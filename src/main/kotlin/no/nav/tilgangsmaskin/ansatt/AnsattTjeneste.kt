@@ -8,7 +8,9 @@ import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
+import io.micrometer.observation.annotation.Observed
 
+@Observed
 @Service
 @ConditionalOnGCP
 class AnsattTjeneste(private val ansatte: NomTjeneste,

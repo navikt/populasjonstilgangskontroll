@@ -10,7 +10,9 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.cache.annotation.Caching
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import io.micrometer.observation.annotation.Observed
 
+@Observed
 @Service
 @Transactional
 class OppfølgingTjeneste(private val adapter: OppfølgingJPAAdapter) {

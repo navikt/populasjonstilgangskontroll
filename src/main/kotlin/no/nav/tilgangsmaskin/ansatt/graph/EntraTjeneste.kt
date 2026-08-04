@@ -7,7 +7,9 @@ import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.web.service.registry.ImportHttpServices
 import java.util.*
+import io.micrometer.observation.annotation.Observed
 
+@Observed
 @RetryingWhenRecoverableRestService
 @ImportHttpServices(types = [EntraGrupperClient::class], group = GRAPH)
 class EntraTjeneste(

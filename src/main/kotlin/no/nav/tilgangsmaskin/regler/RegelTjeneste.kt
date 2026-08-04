@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.regler
 
 import io.micrometer.core.annotation.Timed
-import io.opentelemetry.instrumentation.annotations.WithSpan
+import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service
 import kotlin.time.measureTime
 import kotlin.time.measureTimedValue
 
+@Observed
 @Service
 class RegelTjeneste(
     private val motor: RegelMotor,
@@ -30,7 +31,6 @@ class RegelTjeneste(
     private val aggregator: BulkResponsAggregator) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    @WithSpan
     fun kompletteRegler(ansattId: AnsattId, brukerId: String) {
         val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
@@ -52,7 +52,6 @@ class RegelTjeneste(
         log.info("Tid brukt på ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}: ${elapsedTime.inWholeMilliseconds}ms")
     }
 
-    @WithSpan
     fun kjerneregler(ansattId: AnsattId, brukerId: String) =
         bruker(brukerId)?.let { bruker ->
             motor.kjerneregler(ansattTjeneste.ansatt(ansattId), bruker)
@@ -60,7 +59,6 @@ class RegelTjeneste(
             ?: log.info("Kjerneregler ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang ble likevel gitt")
 
     @Timed(value = "regel_tjeneste", histogram = true, extraTags = ["type", "bulk"])
-    @WithSpan
     fun bulkRegler(ansattId: AnsattId, idOgType: Set<BrukerIdOgRegelsett>): AggregertBulkRespons {
         val (respons, elapsedTime) = measureTimedValue {
             log.debug("Eksekverer bulk for {} med størrelse {}", ansattId, idOgType.size)

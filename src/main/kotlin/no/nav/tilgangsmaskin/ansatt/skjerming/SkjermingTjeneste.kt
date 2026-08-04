@@ -9,8 +9,10 @@ import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.web.service.registry.ImportHttpServices
+import io.micrometer.observation.annotation.Observed
 
 
+@Observed
 @RetryingWhenRecoverableRestService
 @ImportHttpServices(types = [SkjermingClient::class], group = SKJERMING)
 class SkjermingTjeneste(private val client: SkjermingClient,

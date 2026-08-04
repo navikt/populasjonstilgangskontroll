@@ -7,7 +7,9 @@ import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
+import io.micrometer.observation.annotation.Observed
 
+@Observed
 @Service
 class BrukerTjeneste(private val personTjeneste: PdlTjeneste, val skjermingTjeneste: SkjermingTjeneste) {
 

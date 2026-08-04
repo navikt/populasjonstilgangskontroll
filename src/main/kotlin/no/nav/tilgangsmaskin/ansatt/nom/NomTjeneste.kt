@@ -6,7 +6,9 @@ import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.transaction.annotation.Transactional
+import io.micrometer.observation.annotation.Observed
 
+@Observed
 @RetryingWhenRecoverableRestService
 @Transactional
 class NomTjeneste(private val adapter: NomJPAAdapter) {

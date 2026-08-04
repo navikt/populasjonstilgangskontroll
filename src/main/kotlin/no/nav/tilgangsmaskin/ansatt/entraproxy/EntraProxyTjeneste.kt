@@ -5,7 +5,9 @@ import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRAP
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.springframework.web.service.registry.ImportHttpServices
+import io.micrometer.observation.annotation.Observed
 
+@Observed
 @RetryingWhenRecoverableRestService
 @ImportHttpServices(types = [EntraProxyClient::class], group = ENTRAPROXY)
 class EntraProxyTjeneste(private val client: EntraProxyClient) {

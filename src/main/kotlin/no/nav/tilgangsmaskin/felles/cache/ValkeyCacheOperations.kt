@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import io.opentelemetry.instrumentation.annotations.WithSpan
+import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.felles.cache.CacheBeanConfig.Companion.VALKEY_MAPPER
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
@@ -34,14 +34,14 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
         }
     }
 
-    @WithSpan
+    @Observed
     override fun delete(cache: CacheNøkkelConfig, id: String) =
         runCatching { valkey.unlink(cache.tilNøkkel(id)) }
             .onFailure {
                 log.info("Cache delete feilet for {} nøkkel {}: {}", cache.fullName, id.maskFnr(), it.message, it)
             }.getOrElse { false }
 
-    @WithSpan
+    @Observed
     override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? {
         return runCatching {
             valkey.opsForValue().get(cache.tilNøkkel(id))?.let { VALKEY_MAPPER.readValue(it, clazz.java) }
@@ -50,7 +50,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
         }.getOrNull()
     }
 
-    @WithSpan
+    @Observed
     override fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration?) {
         runCatching {
             val key = cache.tilNøkkel(id)
@@ -65,11 +65,11 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
     }
 
 
-    @WithSpan
+    @Observed
     override fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>) =  doGetMany(cache, ids.toList(), clazz)
 
 
-    @WithSpan
+    @Observed
     override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration?) {
         when {
             innslag.isEmpty() -> return

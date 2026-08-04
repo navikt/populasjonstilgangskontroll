@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import io.opentelemetry.instrumentation.annotations.WithSpan
+import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
@@ -22,16 +22,15 @@ import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.stereotype.Service
 
+@Observed
 @Service
 class RegelMotor(
     @param:Qualifier(KJERNE) private val kjerne: RegelSett,
     @param:Qualifier(KOMPLETT) private val komplett: RegelSett,
     private val logger: RegelMotorLogger) {
 
-    @WithSpan
     fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, komplett, ENKELT)
 
-    @WithSpan
     fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, kjerne, ENKELT)
 
     private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, type: EvalueringType) {
@@ -46,7 +45,6 @@ class RegelMotor(
         logger.ok(ansatt, bruker, regelSett, type)
     }
 
-    @WithSpan
     fun bulkRegler(ansatt: Ansatt, brukere: Set<BrukerOgRegelsett>) =
         buildSet {
             brukere.forEachIndexed { index, (bruker, type) ->

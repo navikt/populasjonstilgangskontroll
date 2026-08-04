@@ -11,7 +11,9 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.web.service.registry.ImportHttpServices
 import java.util.*
+import io.micrometer.observation.annotation.Observed
 
+@Observed
 @Service
 @ImportHttpServices(types = [EntraOidClient::class], group = GRAPH)
 class EntraOidTjeneste(private val oidClient: EntraOidClient, private val cfg: EntraOidConfig) {

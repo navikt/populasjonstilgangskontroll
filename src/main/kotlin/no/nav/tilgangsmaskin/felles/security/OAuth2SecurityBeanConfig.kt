@@ -24,9 +24,6 @@ class OAuth2SecurityBeanConfig {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         return http.csrf { it.disable() }
-            .formLogin { it.disable() }
-            .httpBasic { it.disable() }
-            .logout { it.disable() }
             .let {
                 it.authorizeHttpRequests { requests ->
                     requests.requestMatchers("${PROD_BASE_PATH}/**").authenticated()

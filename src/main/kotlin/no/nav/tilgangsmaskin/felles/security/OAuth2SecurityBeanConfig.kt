@@ -63,5 +63,4 @@ class OAuth2SecurityBeanConfig {
             setAuthorizationSuccessHandler(successHandler)
             setAuthorizationFailureHandler(failureHandler)
         }
-
 }

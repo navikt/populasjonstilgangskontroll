@@ -45,8 +45,9 @@ class PdlGraphBeanConfig {
     @Bean
     fun pdlGraphHealthIndicator(cfg: PdlGraphQLConfig, @Qualifier(PDLGRAPH) client: RestClient) =
         PingableHealthIndicator(cfg) {
-            client.options()
+            client.post()
                 .uri(cfg.baseUri)
+                .body("""{"query":"{__typename}"}""")
                 .retrieve()
                 .toBodilessEntity()
         }

@@ -22,21 +22,17 @@ import org.springframework.web.client.support.RestClientHttpServiceGroupConfigur
 @Configuration
 class OAuth2SecurityBeanConfig {
     @Bean
-    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        return http.csrf { it.disable() }
-            .let {
-                it.authorizeHttpRequests { requests ->
-                    requests.requestMatchers("${PROD_BASE_PATH}/**").authenticated()
-                    requests.requestMatchers(*UNPROTECTED_ENDPOINTS).permitAll()
-                    requests.anyRequest().denyAll()
-                }
-                    .oauth2ResourceServer { oauth2 ->
-                        oauth2.jwt { configurer -> configurer.jwtAuthenticationConverter(OAuth2LoggingJwtAuthenticationConverter()) }
-                        oauth2.authenticationEntryPoint(HttpStatusEntryPoint(UNAUTHORIZED))
-                    }
+    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain =
+        http.authorizeHttpRequests { requests ->
+                requests.requestMatchers("${PROD_BASE_PATH}/**").authenticated()
+                requests.requestMatchers(*UNPROTECTED_ENDPOINTS).permitAll()
+                requests.anyRequest().denyAll()
+            }
+            .oauth2ResourceServer { oauth2 ->
+                oauth2.jwt { it.jwtAuthenticationConverter(OAuth2LoggingJwtAuthenticationConverter()) }
+                oauth2.authenticationEntryPoint(HttpStatusEntryPoint(UNAUTHORIZED))
             }
             .build()
-    }
 
     @Bean
     fun oauth2GroupConfigurer(manager: OAuth2AuthorizedClientManager) =

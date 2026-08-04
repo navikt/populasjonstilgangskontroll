@@ -19,11 +19,10 @@ class OAuth2LoggingJwtAuthenticationConverter(
     override fun convert(jwt: Jwt): AbstractAuthenticationToken {
         val exp = jwt.expiresAt?.atZone(OSLO)
         val system = jwt.getClaimAsString(AZP_NAME)
-        val request = (getRequestAttributes() as? ServletRequestAttributes)?.request
-        val url = request?.requestURI
+        val uri = (getRequestAttributes() as? ServletRequestAttributes)?.request?.requestURI
         return runCatching { delegate.convert(jwt) }
-            .onSuccess { log.trace("JWT validert OK: system={}, expiresAt={}, authorities={}, url={}", system, exp, it.authorities, url) }
-            .onFailure { log.warn("JWT konvertering feilet: system=$system, url=$url, feil=${it.message}", it) }
+            .onSuccess { log.trace("JWT validert OK: system={}, expiresAt={}, authorities={}, url={}", system, exp, it.authorities, uri) }
+            .onFailure { log.warn("JWT konvertering feilet: system=$system, uri=$uri, feil=${it.message}", it) }
             .getOrThrow()
     }
 

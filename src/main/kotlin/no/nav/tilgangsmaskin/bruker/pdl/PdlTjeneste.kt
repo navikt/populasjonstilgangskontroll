@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import io.micrometer.core.annotation.Timed
 import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
@@ -18,7 +17,6 @@ import io.micrometer.observation.annotation.Observed
 
 @Observed
 @RetryingWhenRecoverableRestService
-@Timed
 @ImportHttpServices(types = [PdlPipClient::class], group = PDLPIP)
 class PdlTjeneste(
     private val pip: PdlPipClient,

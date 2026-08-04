@@ -14,7 +14,6 @@ import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.Token
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
@@ -45,7 +44,6 @@ class NomTjenesteTest : RestTjenesteTest() {
     @Autowired
     private lateinit var repo: NomRepository
     @Autowired
-    @Qualifier("cacheOperations")
     private lateinit var cache: CacheOperations
 
     private val ansattId = AnsattId("Z999999")

@@ -7,8 +7,6 @@ import org.springframework.core.convert.converter.Converter
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
-import org.springframework.web.context.request.RequestContextHolder.getRequestAttributes
-import org.springframework.web.context.request.ServletRequestAttributes
 
 class OAuth2LoggingJwtAuthenticationConverter(
     private val delegate: Converter<Jwt, AbstractAuthenticationToken> = JwtAuthenticationConverter()) : Converter<Jwt, AbstractAuthenticationToken> {
@@ -18,11 +16,9 @@ class OAuth2LoggingJwtAuthenticationConverter(
     override fun convert(jwt: Jwt): AbstractAuthenticationToken {
         val exp = jwt.expiresAt?.atZone(OSLO)
         val system = jwt.getClaimAsString(AZP_NAME)
-        val uri = (getRequestAttributes() as? ServletRequestAttributes)?.request?.requestURI
         return runCatching { delegate.convert(jwt) }
-            .onSuccess { log.trace("JWT validert OK: system={}, expiresAt={}, url={}", system, exp, uri) }
-            .onFailure { log.warn("JWT konvertering feilet: system=$system, uri=$uri, feil=${it.message}", it) }
+            .onSuccess { log.trace("JWT validert OK: system={}, expiresAt={}", system, exp) }
+            .onFailure { log.warn("JWT konvertering feilet: system=$system, feil=${it.message}", it) }
             .getOrThrow()
     }
-
 }

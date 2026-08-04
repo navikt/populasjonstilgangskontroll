@@ -11,8 +11,7 @@ import org.springframework.web.context.request.RequestContextHolder.getRequestAt
 import org.springframework.web.context.request.ServletRequestAttributes
 
 class OAuth2LoggingJwtAuthenticationConverter(
-    private val delegate: Converter<Jwt, AbstractAuthenticationToken> = JwtAuthenticationConverter()
-) : Converter<Jwt, AbstractAuthenticationToken> {
+    private val delegate: Converter<Jwt, AbstractAuthenticationToken> = JwtAuthenticationConverter()) : Converter<Jwt, AbstractAuthenticationToken> {
 
     private val log = getLogger(javaClass)
 

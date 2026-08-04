@@ -20,7 +20,7 @@ class OAuth2LoggingJwtAuthenticationConverter(
         val system = jwt.getClaimAsString(AZP_NAME)
         val uri = (getRequestAttributes() as? ServletRequestAttributes)?.request?.requestURI
         return runCatching { delegate.convert(jwt) }
-            .onSuccess { log.trace("JWT validert OK: system={}, expiresAt={}, authorities={}, url={}", system, exp, it.authorities, uri) }
+            .onSuccess { log.trace("JWT validert OK: system={}, expiresAt={}, url={}", system, exp, uri) }
             .onFailure { log.warn("JWT konvertering feilet: system=$system, uri=$uri, feil=${it.message}", it) }
             .getOrThrow()
     }

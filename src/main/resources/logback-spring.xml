@@ -19,29 +19,22 @@
     </appender>
 
     <springProfile name="dev">
-        <logger name="io.lettuce.core.protocol.ReconnectionHandler" level="warn"/>
-        <logger name="io.lettuce.core.protocol.ConnectionWatchdog" level="warn"/>
-        <logger name="org.hibernate.orm.connections.pooling" level="warn"/>
-        <logger name="org.springframework.cache" level="info" />
-        <logger name="org.apache.kafka" level="info" />
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
-        <logger name="no.nav.security" level="info"/>
         <logger name="no.nav.tilgangsmaskin.felles.rest.RestLoggingRequestInterceptor" level="trace"/>
     </springProfile>
 
     <springProfile name="local | test">
         <appender name="stdout-appender" class="ch.qos.logback.core.ConsoleAppender">
             <layout class="ch.qos.logback.classic.PatternLayout">
-                <Pattern>%d{yyyy-MM-dd HH:mm:ss} %X{Nav-CallId} [%thread] %-5level %logger{70} - %msg%n</Pattern>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{70} - %msg%n</Pattern>
             </layout>
         </appender>
         <appender name="secure-appender" class="ch.qos.logback.core.ConsoleAppender">
             <layout class="ch.qos.logback.classic.PatternLayout">
-                <Pattern>%d{yyyy-MM-dd HH:mm:ss} %X{Nav-CallId} [%thread] %-5level %logger{70} - %msg%n</Pattern>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{70} - %msg%n</Pattern>
             </layout>
         </appender>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
-        <logger name="no.nav.tilgangsmaskin.felles.rest.RestLoggingRequestInterceptor" level="trace"/>
     </springProfile>
 
     <springProfile name="prod">
@@ -50,16 +43,15 @@
             <Marker>CONFIDENTIAL</Marker>
             <OnMatch>DENY</OnMatch>
         </turboFilter>
-        <logger name="no.nav.tilgangsmaskin" level="info"/>
-        <logger name="io.lettuce.core.protocol.ReconnectionHandler" level="warn"/>
-        <logger name="io.lettuce.core.protocol.ConnectionWatchdog" level="warn"/>
-        <logger name="org.hibernate.orm.connections.pooling" level="warn"/>
         <logger name="org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration" level="error"/>
     </springProfile>
 
     <logger name="secureLog" level="info" additivity="false">
         <appender-ref ref="secure-appender"/>
     </logger>
+    <logger name="io.lettuce.core.protocol.ReconnectionHandler" level="warn"/>
+    <logger name="io.lettuce.core.protocol.ConnectionWatchdog" level="warn"/>
+    <logger name="org.hibernate.orm.connections.pooling" level="warn"/>
     <logger name="org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec" level="warn"/>
     <logger name="org.springdoc.core.events.SpringDocAppInitializer" level="error"/>
     <logger name="org.springframework.boot.webmvc.autoconfigure.ProblemDetailsExceptionHandler" level="error"/>

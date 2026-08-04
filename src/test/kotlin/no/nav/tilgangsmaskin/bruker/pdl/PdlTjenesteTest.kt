@@ -1,9 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import com.ninjasquad.springmockk.MockkBean
-import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
@@ -17,55 +14,55 @@ import no.nav.tilgangsmaskin.bruker.pdl.BrukerTilPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_UTVIDET_FAMILIE_CACHE
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_CACHES
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_MED_FAMILIE_CACHE
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_MED_UTVIDET_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.pdlRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.restRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjenesteTest.PdlTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.*
-import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
+import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
+import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
-import org.springframework.test.context.TestPropertySource
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.client.ExpectedCount.never
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
-import org.springframework.web.client.RestClient.Builder
 import tools.jackson.databind.json.JsonMapper
 import java.time.Duration.ofSeconds
 
-@RestClientTest(components = [PdlConfig::class, PdlTjeneste::class])
-@Import(PdlTestConfig::class)
-@TestPropertySource(properties = ["PDL=pdl"])
-@EnableResilientMethods
-@ApplyExtension(SpringExtension::class)
-class PdlTjenesteTest : BehaviorSpec() {
+@RestClientTest
+@Import(PdlTestConfig::class, OAuth2ClientTestConfig::class)
+@ContextConfiguration(classes = [PdlTjeneste::class, PdlPipConfig::class])
+@ConfigurationPropertiesScan
+@EnableAutoConfiguration
+class PdlTjenesteTest : RestTjenesteTest() {
 
     @TestConfiguration
     class PdlTestConfig : CacheTestConfig(PDL) {
-
-        @Bean
-        fun pdlClient(builder: Builder, cfg: PdlConfig) = createClient<PdlPipClient>(cfg, builder)
     }
 
-    @MockkBean lateinit var graphQL: PdlSyncGraphQLClientAdapter
-
-    @Autowired lateinit var pdl: PdlTjeneste
+    @MockkBean
+    lateinit var graphQL: PdlSyncGraphQLClientAdapter
+    @Autowired
+    lateinit var pdl: PdlTjeneste
     @Autowired
     lateinit var server: MockRestServiceServer
-    @Autowired lateinit var cfg: PdlConfig
+    @Autowired
+    lateinit var cfg: PdlPipConfig
     @Qualifier("cacheOperations") @Autowired lateinit var cache: CacheOperations
     @Autowired lateinit var mapper: JsonMapper
 

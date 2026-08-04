@@ -1,9 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
 import com.ninjasquad.springmockk.MockkBean
-import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -31,10 +28,19 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.request
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import java.util.*
 
-@RestClientTest(components = [EntraGrupperRestClientAdapter::class, EntraTjeneste::class, EntraGrupperConfig::class, EntraGruppeBeanConfig::class, EntraOidBeanConfig::class])
-@Import(EntraTestConfig::class)
-@ApplyExtension(SpringExtension::class)
-class EntraTjenesteTest : BehaviorSpec() {
+
+import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
+import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
+import org.springframework.test.context.ContextConfiguration
+
+@RestClientTest
+@ContextConfiguration(classes = [EntraTjeneste::class, EntraGrupperConfig::class, EntraOidBeanConfig::class])
+@Import(EntraTestConfig::class, OAuth2ClientTestConfig::class)
+@ConfigurationPropertiesScan
+@EnableAutoConfiguration
+class EntraTjenesteTest : RestTjenesteTest() {
 
     @TestConfiguration
     @EnableResilientMethods
@@ -205,8 +211,7 @@ class EntraTjenesteTest : BehaviorSpec() {
         }
     """.trimIndent()
 
-    private companion object {
-
+    companion object {
         private val OID       = UUID.randomUUID()
         private val OID2     = UUID.randomUUID()
         private val ANSATTID  = AnsattId("Z999999")

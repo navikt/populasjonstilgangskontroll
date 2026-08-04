@@ -1,0 +1,38 @@
+package no.nav.tilgangsmaskin.bruker.pdl
+
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PDL_PIP_PERSONER_PATH
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PDL_PIP_PERSON_PATH
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PDL_PIP_PING_PATH
+import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
+import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
+import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
+import no.nav.tilgangsmaskin.felles.rest.RestConfig
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
+import java.net.URI
+
+
+@Component
+class PdlPipConfig(@Value("\${spring.http.serviceclient.pdlpip.base-url}") baseUrl: URI) : CachableRestConfig, RestConfig(baseUrl, PDL_PIP_PING_PATH, PDL) {
+
+    override val caches = PDL_CACHES
+    override val navn = name
+
+    val personURI = uri(PDL_PIP_PERSON_PATH)
+    val personerURI = uri(PDL_PIP_PERSONER_PATH)
+
+    @NoCoverageAnalysis
+    override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
+
+    companion object {
+        const val PDLPIP = "pdlpip"
+        const val PDL = "pdl"
+        const val MED_FAMILIE = "medFamilie"
+        const val MED_UTVIDET_FAMILIE = "medUtvidetFamilie"
+        val PDL_MED_FAMILIE_CACHE = CacheNøkkelConfig(PDL, MED_FAMILIE)
+        val PDL_MED_UTVIDET_FAMILIE_CACHE = CacheNøkkelConfig(PDL, MED_UTVIDET_FAMILIE)
+        val PDL_CACHES = setOf(PDL_MED_FAMILIE_CACHE, PDL_MED_UTVIDET_FAMILIE_CACHE)
+
+    }
+}
+

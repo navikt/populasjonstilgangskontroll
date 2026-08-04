@@ -12,17 +12,22 @@ import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO
 import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO_OG_GLOBALE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
-import no.nav.tilgangsmaskin.felles.cache.CacheOppfriskerTeller
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
+import org.springframework.test.context.ContextConfiguration
 import java.net.URI
 import java.util.UUID
 
 @ApplyExtension(SpringExtension::class)
-@RestClientTest(components = [EntraCacheOppfrisker::class])
+@RestClientTest
+@ContextConfiguration(classes = [EntraCacheOppfrisker::class])
+@EnableAutoConfiguration
+@EnableConfigurationProperties
 class EntraCacheOppfriskerTest : BehaviorSpec() {
 
     @MockkBean(relaxed = true)
@@ -33,12 +38,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
 
     @MockkBean(relaxed = true)
     private lateinit var cache: CacheOperations
-
-    @MockkBean
-    private lateinit var teller: OIDEndringTeller
-
-    @MockkBean(relaxed = true)
-    private lateinit var cacheOppfriskerTeller: CacheOppfriskerTeller
 
     @Autowired
     private lateinit var oppfrisker: EntraCacheOppfrisker
@@ -85,11 +84,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                     oppfrisker.oppfrisk(nøkkel(GEO))
                     verify { entra.geoGrupper(ansattId, NY_OID) }
                 }
-
-                Then("teller oppdateres") {
-                    oppfrisker.oppfrisk(nøkkel(GEO))
-                    verify { teller.tell() }
-                }
             }
 
             When("Uforventet feil ved oppslag i Entra") {
@@ -98,7 +92,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
 
                     oppfrisker.oppfrisk(nøkkel(GEO))
 
-                    verify(exactly = 0) { teller.tell() }
                     verify(exactly = 0) { cache.delete(any(), any()) }
                 }
             }
@@ -123,7 +116,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
 
                     verify { cache.delete(OID_CACHE, ansattId.verdi) }
                     verify { entra.geoOgGlobaleGrupper(ansattId, NY_OID) }
-                    verify { teller.tell() }
                 }
             }
         }
@@ -140,7 +132,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                     verify(exactly = 0) { entra.geoGrupper(any(), any()) }
                     verify(exactly = 0) { entra.geoOgGlobaleGrupper(any(), any()) }
                     verify(exactly = 0) { cache.delete(any(), any()) }
-                    verify(exactly = 0) { teller.tell() }
                 }
             }
         }
@@ -158,7 +149,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                     verify { cache.delete(OID_CACHE, ansattId.verdi) }
                     verify(exactly = 2) { oid.oid(ansattId) }
                     verify { entra.geoGrupper(ansattId, NY_OID) }
-                    verify { teller.tell() }
                 }
             }
 
@@ -174,7 +164,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                     verify { cache.delete(OID_CACHE, ansattId.verdi) }
                     verify(exactly = 2) { oid.oid(ansattId) }
                     verify { entra.geoOgGlobaleGrupper(ansattId, NY_OID) }
-                    verify { teller.tell() }
                 }
             }
 
@@ -189,7 +178,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
                     }
 
                     verify { cache.delete(OID_CACHE, ansattId.verdi) }
-                    verify(exactly = 0) { teller.tell() }
                 }
             }
         }

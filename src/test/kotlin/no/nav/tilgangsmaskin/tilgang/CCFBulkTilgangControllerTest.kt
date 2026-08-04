@@ -4,6 +4,7 @@ import io.mockk.every
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.rest.TokenType
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
@@ -13,10 +14,10 @@ import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
-import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
-import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
+import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons
+import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons.EnkeltBulkRespons
+import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.post
 
 class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
@@ -31,7 +32,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                 BrukerIdOgRegelsett(avvistBrukerId, KOMPLETT_REGELTYPE)
             )
 
-            beforeEach { every { token.erCC } returns true }
+            beforeEach { every { token.type } returns TokenType.CCF }
 
             When("bulk/ccf kalles med gyldige specs") {
                 Then("returnerer 207 med mix av godkjente og avviste") {
@@ -46,7 +47,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                         ok(brukerId),
                         EnkeltBulkRespons(regelException)
                     ))
-                    every { regelTjeneste.bulkRegler(ansattId, specs) } returns respons
+                    every { regelTjeneste.bulkRegler(any(), specs) } returns respons
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"},{"brukerId":"$avvistBrukerId","type":"KOMPLETT_REGELTYPE"}]"""
@@ -59,7 +60,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/ccf kalles med OBO-token") {
                 Then("returnerer 403") {
-                    every { token.erCC } returns false
+                    every { token.type } returns TokenType.OBO
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""
@@ -75,7 +76,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                         BrukerIdOgRegelsett(annenBrukerId, KJERNE_REGELTYPE)
                     )
                     val kjerneRespons = AggregertBulkRespons(ansattId, setOf(ok(brukerId), ok(annenBrukerId)))
-                    every { regelTjeneste.bulkRegler(ansattId, kjerneSpecs) } returns kjerneRespons
+                    every { regelTjeneste.bulkRegler(any(), kjerneSpecs) } returns kjerneRespons
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON; content = """["$brukerId","$annenBrukerId"]"""
                     }.andExpect { status { isMultiStatus() } }

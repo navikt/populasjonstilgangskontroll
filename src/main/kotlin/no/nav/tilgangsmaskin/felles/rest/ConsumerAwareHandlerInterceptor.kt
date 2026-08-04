@@ -4,7 +4,6 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor

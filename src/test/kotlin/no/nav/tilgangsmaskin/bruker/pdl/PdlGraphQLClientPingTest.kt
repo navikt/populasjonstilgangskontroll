@@ -3,36 +3,49 @@ package no.nav.tilgangsmaskin.bruker.pdl
 import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
+import io.kotest.assertions.throwables.shouldThrow
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLClientPingTest.TestConfig
-import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
+import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
+import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
+import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTestContextInitializer
+import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.OPTIONS
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
+import org.springframework.test.web.client.response.MockRestResponseCreators.withServerError
+import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
 
-@RestClientTest(components = [PdlGraphQLConfig::class])
-@TestPropertySource(properties = ["PDLGRAPH=pdlgraph"])
-@Import(TestConfig::class)
+@RestClientTest
+@TestPropertySource(properties = ["pdlgraph=pdlgraph.pdl"])
+@ContextConfiguration(initializers = [RestTjenesteTestContextInitializer::class], classes = [PdlGraphQLConfig::class])
+@Import(TestConfig::class, OAuth2ClientTestConfig::class)
 @ApplyExtension(SpringExtension::class)
+@ConfigurationPropertiesScan
+@EnableAutoConfiguration
 class PdlGraphQLClientPingTest : BehaviorSpec() {
 
     @TestConfiguration
     class TestConfig {
         @Bean
-        fun pdlGraphQLClient(b: Builder, cfg: PdlGraphQLConfig) =
-            createClient<PdlGraphQLPingClient>(cfg, b)
+        @Qualifier(PDLGRAPH)
+        fun pdlGraphQLClient(b: Builder, cfg: PdlGraphQLConfig): RestClient =
+            b.baseUrl(cfg.baseUri).build()
     }
 
-    @Autowired @Qualifier("pdlGraphQLClient") lateinit var client: PdlGraphQLPingClient
+    @Autowired @Qualifier(PDLGRAPH) lateinit var client: RestClient
     @Autowired lateinit var server: MockRestServiceServer
     @Autowired lateinit var cfg: PdlGraphQLConfig
 
@@ -46,10 +59,27 @@ class PdlGraphQLClientPingTest : BehaviorSpec() {
                     server.expect(requestTo(cfg.baseUri))
                         .andExpect(method(OPTIONS))
                         .andRespond(withSuccess())
-                    client.ping()
+                    ping()
+                }
+            }
+
+            When("ping kalles og PDL svarer 500") {
+                Then("kastes RecoverableRestException") {
+                    server.expect(requestTo(cfg.baseUri))
+                        .andExpect(method(OPTIONS))
+                        .andRespond(withServerError())
+                    shouldThrow<RecoverableRestException> {
+                        ping()
+                    }
                 }
             }
         }
     }
-}
 
+    private fun ping() {
+        client.options()
+            .uri(cfg.baseUri)
+            .retrieve()
+            .toBodilessEntity()
+    }
+}

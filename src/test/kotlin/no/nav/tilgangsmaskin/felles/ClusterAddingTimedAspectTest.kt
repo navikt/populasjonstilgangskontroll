@@ -5,29 +5,31 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.longs.shouldBeGreaterThan
 import io.mockk.every
-import io.mockk.mockk
-import no.nav.tilgangsmaskin.tilgang.Token
+import no.nav.tilgangsmaskin.felles.rest.Token
 import com.ninjasquad.springmockk.MockkBean
 import io.micrometer.core.annotation.Timed
+import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.felles.ClusterAddingTimedAspectTest.TestConfig
+import no.nav.tilgangsmaskin.felles.rest.health.ObservabilityBeanConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.test.context.ContextConfiguration
 
-@ContextConfiguration(classes = [TestConfig::class])
+@ContextConfiguration(classes = [TestConfig::class, ObservabilityBeanConfig::class])
 @AutoConfigureMetrics
 @ApplyExtension(SpringExtension::class)
 class ClusterAddingTimedAspectTest : BehaviorSpec() {
 
     @MockkBean
     lateinit var token: Token
-
     @Autowired
     lateinit var registry: MeterRegistry
+
+    @Autowired
+    lateinit var aspect: TimedAspect
 
     @Autowired
     lateinit var timedService: TimedService
@@ -64,12 +66,9 @@ class ClusterAddingTimedAspectTest : BehaviorSpec() {
     }
 
     @Configuration
-    @EnableAspectJAutoProxy
     class TestConfig {
-        @Bean fun timedService() = TimedService()
-
-        @Bean fun timedAspect(registry: MeterRegistry, token: Token) =
-            FellesBeanConfig(mockk(relaxed = true)).clusterAddingTimedAspect(registry, token)
+        @Bean
+        fun timedService() = TimedService()
     }
 
     open class TimedService {

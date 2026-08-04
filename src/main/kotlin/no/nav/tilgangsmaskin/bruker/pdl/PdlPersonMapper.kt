@@ -121,25 +121,27 @@ object PdlPersonMapper {
             } ?: UkjentBosted().also {
                 log.warn("Bydelstilknytning uten bydelskode, antar ukjent bosted")
             }
-
-            else -> UdefinertTilknytning()
+            else -> {
+                UdefinertTilknytning()
+            }
         }
 
-    private fun tilDødsdato(dødsfall: List<PdlDødsfall>) = dødsfall.mapNotNull { it.doedsdato }.maxOrNull()
+    private fun tilDødsdato(dødsfall: List<PdlDødsfall>) =
+        dødsfall.mapNotNull { it.doedsdato }.maxOrNull()
 
-    private fun tilFamilie(relasjoner: List<PdlFamilierelasjon>): Familie {
-        val (foreldre, barn) = relasjoner
-            .mapNotNull { it.relatertPersonsIdent?.let { ident -> it.relatertPersonsRolle to ident } }
-            .partition { it.first != BARN }
-        return Familie(
-            foreldre.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet(),
-            barn.map { FamilieMedlem(it.second, tilRelasjon(it.first)) }.toSet())
-    }
+    private fun tilFamilie(relasjoner: List<PdlFamilierelasjon>) =
+        Familie(relasjoner
+            .mapNotNullTo(mutableSetOf()) {
+                it.relatertPersonsIdent?.let { ident ->
+                    FamilieMedlem(ident, tilRelasjon(it.relatertPersonsRolle))
+                }
+            })
+
 
     private fun tilHistoriskeBrukerIds(identer: PdlIdenter) = identer.identer
         .filter { it.historisk }
         .filter { it.gruppe in listOf(FOLKEREGISTERIDENT, NPID) }
-        .map { (BrukerId(it.ident)) }.toSet()
+        .mapTo(mutableSetOf()) { (BrukerId(it.ident)) }
 
     private fun tilRelasjon(relasjon: PdlFamilieRelasjonRolle?) =
         when (relasjon) {

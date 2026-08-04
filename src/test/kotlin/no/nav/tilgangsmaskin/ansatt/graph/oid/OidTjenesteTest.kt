@@ -1,9 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.graph.oid
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig
@@ -14,24 +11,33 @@ import no.nav.tilgangsmaskin.ansatt.graph.oid.OidTjenesteTest.EntraTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
+import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
+import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
 import org.hamcrest.Matchers.containsString
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import java.util.UUID
 
-@RestClientTest(components = [EntraOidTjeneste::class, EntraOidConfig::class, EntraGrupperConfig::class, EntraOidBeanConfig::class])
-@Import(EntraTestConfig::class)
-@ApplyExtension(SpringExtension::class)
-class OidTjenesteTest : BehaviorSpec() {
+
+
+@RestClientTest
+@Import(EntraTestConfig::class, OAuth2ClientTestConfig::class)
+@ContextConfiguration(classes = [EntraOidTjeneste::class, EntraOidConfig::class, EntraGrupperConfig::class, EntraOidBeanConfig::class])
+@ConfigurationPropertiesScan
+@EnableAutoConfiguration
+class OidTjenesteTest : RestTjenesteTest() {
 
     @TestConfiguration
     class EntraTestConfig : CacheTestConfig(ENTRA_OID)
@@ -105,7 +111,7 @@ class OidTjenesteTest : BehaviorSpec() {
         {"value": [${ids.joinToString(",") { """{"id": "$it"}""" }}]}
         """.trimIndent()
 
-    private companion object {
+    companion object {
         private val ANSATTID = AnsattId("Z999999")
         private val OID = UUID.randomUUID()
     }

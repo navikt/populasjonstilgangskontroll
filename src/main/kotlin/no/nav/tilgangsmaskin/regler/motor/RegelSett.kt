@@ -20,7 +20,4 @@ data class RegelSett(private val spec: Pair<RegelType, List<Regel>>) {
     }
 }
 
-enum class EvalueringType {
-    BULK,
-    ENKELT
-}
+enum class EvalueringType { BULK, ENKELT }

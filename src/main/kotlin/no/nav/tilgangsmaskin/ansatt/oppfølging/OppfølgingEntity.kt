@@ -22,10 +22,10 @@ import java.util.*
 ])
 @EntityListeners(AuditingEntityListener::class)
 class OppfølgingEntity(
-    @NaturalId @Id val id: UUID,
-    @Column(length = BRUKERID_LENGTH, nullable = false) val brukerid: String,
-    @Column(length = AKTØRID_LENGTH, nullable = false) val aktoerid: String,
-    @Column(nullable = false) val startTidspunkt: Instant,
+    @NaturalId @Id var id: UUID,
+    @Column(length = BRUKERID_LENGTH, nullable = false) var brukerid: String,
+    @Column(length = AKTØRID_LENGTH, nullable = false) var aktoerid: String,
+    @Column(nullable = false) var startTidspunkt: Instant,
     @Column(length = 4, nullable = false) var kontor: String,
 ) {
 

@@ -4,6 +4,7 @@ import io.mockk.every
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.rest.TokenType
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
@@ -13,8 +14,9 @@ import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
-import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons
-import no.nav.tilgangsmaskin.tilgang.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
+import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons
+import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons.EnkeltBulkRespons
+import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.post
 
@@ -27,11 +29,11 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
             val specs = setOf(BrukerIdOgRegelsett(brukerId, KOMPLETT_REGELTYPE))
             val respons = AggregertBulkRespons(ansattId, setOf(ok(brukerId)))
 
-            beforeEach { every { token.erObo } returns true }
+            beforeEach { every { token.type } returns TokenType.OBO }
 
             When("bulk/obo kalles med gyldige specs") {
                 Then("returnerer 207 med resultater") {
-                    every { regelTjeneste.bulkRegler(ansattId, specs) } returns respons
+                    every { regelTjeneste.bulkRegler(any(), specs) } returns respons
                     mockMvc.post("/api/v1/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""
@@ -57,7 +59,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/obo kalles med CCF-token") {
                 Then("returnerer 403") {
-                    every { token.erObo } returns false
+                    every { token.type } returns TokenType.CCF
                     mockMvc.post("/api/v1/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""
@@ -89,7 +91,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                     }
                     val regelException = RegelException(testAnsatt, testBruker, testRegel)
                     val avvistRespons = AggregertBulkRespons(ansattId, setOf(EnkeltBulkRespons(regelException)))
-                    every { regelTjeneste.bulkRegler(ansattId, specs) } returns avvistRespons
+                    every { regelTjeneste.bulkRegler(any(), specs) } returns avvistRespons
                     mockMvc.post("/api/v1/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""
@@ -140,11 +142,11 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
             )
             val respons = AggregertBulkRespons(ansattId, setOf(ok(brukerId), ok(annenBrukerId)))
 
-            beforeEach { every { token.erObo } returns true }
+            beforeEach { every { token.type } returns TokenType.OBO }
 
             When("bulk/obo/{regelType} kalles med KJERNE_REGELTYPE") {
                 Then("returnerer 207 med resultater for gitt regeltype") {
-                    every { regelTjeneste.bulkRegler(ansattId, kjerneSpecs) } returns respons
+                    every { regelTjeneste.bulkRegler(any(), kjerneSpecs) } returns respons
                     mockMvc.post("/api/v1/bulk/obo/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON; content = """["$brukerId","$annenBrukerId"]"""
                     }.andExpect {
@@ -157,7 +159,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/obo/{regelType} kalles med CCF-token") {
                 Then("returnerer 403") {
-                    every { token.erObo } returns false
+                    every { token.type } returns TokenType.CCF
                     mockMvc.post("/api/v1/bulk/obo/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON; content = """["$brukerId"]"""
                     }.andExpect { status { isForbidden() } }

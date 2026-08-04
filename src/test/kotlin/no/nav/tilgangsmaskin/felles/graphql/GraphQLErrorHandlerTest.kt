@@ -19,7 +19,7 @@ import java.net.URI
 
 class GraphQLErrorHandlerTest : BehaviorSpec({
 
-    val handler = object: PdlGraphQLErrorHandler { }
+    val handler =  PdlGraphQLErrorHandler()
     val uri = URI.create("http://test/graphql")
 
     fun fieldAccessException(vararg errors: ResponseError): FieldAccessException {

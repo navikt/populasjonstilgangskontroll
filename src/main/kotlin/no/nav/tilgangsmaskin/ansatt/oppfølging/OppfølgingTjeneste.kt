@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
-import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.StartetEllerEndret
@@ -14,14 +13,12 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
-class OppfølgingTjeneste(private val adapter: OppfølgingJPAAdapter, private val teller: OppfølgingkontorTeller) {
+class OppfølgingTjeneste(private val adapter: OppfølgingJPAAdapter) {
 
     @Cacheable(cacheNames = [OPPFØLGING], key = "#id.verdi")
     @Transactional(readOnly = true)
     fun enhetFor(id: Identifikator) =
-        adapter.enhetFor(id.verdi).also { enhet ->
-            teller.tell(Tags.of("resultat", "${enhet != null}"))
-        }
+        adapter.enhetFor(id.verdi)
 
     @Caching(
         put = [
@@ -32,8 +29,10 @@ class OppfølgingTjeneste(private val adapter: OppfølgingJPAAdapter, private va
     fun registrer(endring: StartetEllerEndret) =
         with(endring) {
             kontor.kontorId.also {
-                adapter.registrer(uuid, identer.brukerId.verdi,
-                    identer.aktorId.verdi, tidspunkt, it.verdi, )
+                adapter.registrer(
+                    uuid, identer.brukerId.verdi,
+                    identer.aktorId.verdi, tidspunkt, it.verdi,
+                )
             }
         }
 

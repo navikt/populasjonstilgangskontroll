@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.graphql.client.HttpSyncGraphQlClient.builder
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.OAuth2AuthorizationFailureHandler
 import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor
@@ -47,6 +48,7 @@ class PdlGraphBeanConfig {
         PingableHealthIndicator(cfg) {
             client.post()
                 .uri(cfg.baseUri)
+                .contentType(APPLICATION_JSON)
                 .body("""{"query":"{__typename}"}""")
                 .retrieve()
                 .toBodilessEntity()

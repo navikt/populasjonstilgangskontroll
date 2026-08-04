@@ -1,7 +1,10 @@
 package no.nav.tilgangsmaskin.felles.security
 
+import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase.Companion.PROD_BASE_PATH
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
@@ -11,19 +14,54 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider
 import org.springframework.security.oauth2.client.OAuth2AuthorizationFailureHandler
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor.authorizationFailureHandler
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
+import org.springframework.security.oauth2.core.OAuth2Error
+import org.springframework.security.oauth2.core.OAuth2TokenValidator
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult.failure
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult.success
+import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.security.oauth2.jwt.JwtDecoder
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.client.web.client.support.OAuth2RestClientHttpServiceGroupConfigurer.from
+import org.springframework.security.oauth2.jwt.JwtDecoders.fromIssuerLocation
+import org.springframework.security.oauth2.jwt.JwtValidators.createDefaultWithIssuer
+import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.HttpStatusEntryPoint
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 
 @Configuration
 class Oauth2SecurityBeanConfig {
     @Bean
-    fun securityFilterChain(http: HttpSecurity) =
-        http.csrf { it.disable() }
+    fun securityFilterChain(http: HttpSecurity, jwtDecoder: JwtDecoder): SecurityFilterChain {
+        return http.csrf { it.disable() }
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
             .logout { it.disable() }
-            .authorizeHttpRequests { it.anyRequest().permitAll() }
+            .let {
+                it.authorizeHttpRequests { requests ->
+                    requests.requestMatchers("${PROD_BASE_PATH}/**").authenticated()
+                    requests.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/monitoring/**").permitAll()
+                    requests.anyRequest().denyAll()
+                }
+                    .oauth2ResourceServer { oauth2 ->
+                        oauth2.jwt { jwt -> jwt.decoder(jwtDecoder) }
+                        oauth2.authenticationEntryPoint(HttpStatusEntryPoint(UNAUTHORIZED))
+                    }
+            }
             .build()
+    }
+
+    @Bean
+    fun jwtDecoder(
+        @Value("\${spring.security.oauth2.resourceserver.jwt.issuer-uri}") issuerUri: String,
+        @Value("\${spring.security.oauth2.resourceserver.jwt.accepted-audience:}") acceptedAudience: String,
+    ): JwtDecoder {
+        val issuerValidator = createDefaultWithIssuer(issuerUri)
+        val audienceValidator = AudienceValidator(acceptedAudience)
+        return (fromIssuerLocation(issuerUri) as NimbusJwtDecoder).apply {
+            setJwtValidator(DelegatingOAuth2TokenValidator(issuerValidator, audienceValidator))
+        }
+    }
 
     @Bean
     fun oauth2GroupConfigurer(manager: OAuth2AuthorizedClientManager) =
@@ -54,4 +92,13 @@ class Oauth2SecurityBeanConfig {
             setAuthorizationSuccessHandler(successHandler)
             setAuthorizationFailureHandler(failureHandler)
         }
+
+    class AudienceValidator(private val audience: String) : OAuth2TokenValidator<Jwt> {
+        override fun validate(token: Jwt) =
+            if (audience.isBlank() || token.audience?.contains(audience) == true) {
+                success()
+            } else {
+                failure(OAuth2Error("invalid_token", "Missing expected audience", null))
+            }
+    }
 }

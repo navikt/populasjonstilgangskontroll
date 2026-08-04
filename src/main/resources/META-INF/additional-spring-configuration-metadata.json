@@ -1,13 +1,8 @@
 {
   "properties": [
     {
-      "name": "no.nav.security.jwt.issuer.azuread.accepted_audience",
+      "name": "spring.security.oauth2.resourceserver.jwt.accepted-audience",
       "type": "java.lang.String",
-      "description": "Description for no.nav.security.jwt.issuer.azuread.accepted_audience."
-    },
-    {
-      "name": "no.nav.security.jwt.issuer.azuread.discoveryurl",
-      "type": "java.lang.String",
-      "description": "Description for no.nav.security.jwt.issuer.azuread.discoveryurl."
+      "description": "Expected audience for incoming JWT tokens."
     }
   ] }

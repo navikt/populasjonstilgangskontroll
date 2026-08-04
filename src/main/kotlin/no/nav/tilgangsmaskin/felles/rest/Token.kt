@@ -1,32 +1,40 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.AbstractTeller
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
 import no.nav.tilgangsmaskin.felles.rest.TokenType.UNAUTHENTICATED
+import org.springframework.security.core.context.SecurityContextHolder.getContext
+import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class Token(private val contextHolder: TokenValidationContextHolder) {
+class Token {
 
 
-    val globaleGruppeIds
+    val globaleGruppeIds: Set<UUID>
         get() =
-            claimSet()?.getAsList(GROUPS)
-                ?.mapNotNullTo(mutableSetOf()) { runCatching { UUID.fromString(it) }.getOrNull() }
-                .orEmpty()
+            listClaim(GROUPS)
+                .mapNotNullTo(mutableSetOf()) { value ->
+                    runCatching { UUID.fromString(value.toString()) }.getOrNull()
+                }
 
 
     val system get() = stringClaim(AZP_NAME) ?: UTILGJENGELIG
     val oid get() = stringClaim(OID)?.let { runCatching { UUID.fromString(it) }.getOrNull() }
     val ansattId get() = stringClaim(NAVIDENT)?.let { AnsattId(it) }
-    private fun stringClaim(name: String) = claimSet()?.getStringClaim(name)
-    private fun claimSet() = runCatching { contextHolder.getTokenValidationContext().getClaims(AAD_ISSUER) }.getOrNull()
+    private fun stringClaim(name: String) = jwt()?.claims?.get(name)?.toString()
+    private fun listClaim(name: String) = (jwt()?.claims?.get(name) as? List<*>) ?: emptyList<Any>()
+    private fun jwt() = getContext().authentication?.let { authentication ->
+        when (val principal = authentication.principal) {
+            is Jwt -> principal
+            else -> null
+        }
+    }
     val clusterAndSystem
         get() = system.split(":").let { parts ->
             if (parts.size == 3) "${parts[2]}:${parts[0]}" else system
@@ -49,7 +57,6 @@ class Token(private val contextHolder: TokenValidationContextHolder) {
 
     companion object {
         private const val GROUPS = "groups"
-        const val AAD_ISSUER: String = "azuread"
         const val APP = "app"
         const val OID = "oid"
         const val IDTYP = "idtyp"

@@ -71,13 +71,14 @@ dependencies {
     implementation(libs.spring.boot.starter.jetty)
     implementation(libs.spring.boot.starter.kafka)
     implementation(libs.spring.boot.starter.oauth2.client)
+    implementation(libs.spring.boot.starter.oauth2.resource.server)
+    implementation(libs.spring.boot.restclient)
     implementation(libs.spring.boot.starter.validation)
     implementation(libs.spring.boot.starter.web) {
         exclude(group = "org.springframework.boot", "spring-boot-starter-tomcat")
     }
     implementation(libs.spring.boot.starter.webclient)
     implementation(libs.springdoc.openapi.webmvc.ui)
-    implementation(libs.token.validation.spring)
     testImplementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation(libs.bundles.kotest)
     testImplementation(libs.spring.boot.micrometer.metrics.test)

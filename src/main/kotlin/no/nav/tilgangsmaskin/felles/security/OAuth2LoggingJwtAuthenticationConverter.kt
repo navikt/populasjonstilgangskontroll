@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.security
 
 import jakarta.servlet.http.HttpServletRequest
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.AZP_NAME
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.convert.converter.Converter
 import org.springframework.security.authentication.AbstractAuthenticationToken
@@ -20,13 +21,12 @@ class OAuth2LoggingJwtAuthenticationConverter(
         val iss = jwt.issuer
         val aud = jwt.audience
         val exp = jwt.expiresAt
+        val system = jwt.getClaimAsString(AZP_NAME)
         val request = currentRequest()
         val url = request?.requestURI
-        val caller = request?.getHeader("X-Forwarded-For") ?: request?.remoteAddr
-
         return runCatching { delegate.convert(jwt) }
-            .onSuccess { log.trace("JWT validert OK: sub={}, iss={}, aud={}, expiresAt={}, authorities={}, url={}, caller={}", sub, iss, aud, exp, it.authorities, url, caller) }
-            .onFailure { log.warn("JWT konvertering feilet: sub=$sub, iss=$iss, url=$url, caller=$caller, feil=${it.message}", it) }
+            .onSuccess { log.trace("JWT validert OK: sub={}, system={}, iss={}, aud={}, expiresAt={}, authorities={}, url={}", sub, system, iss, aud, exp, it.authorities, url) }
+            .onFailure { log.warn("JWT konvertering feilet: sub=$sub, system=$system, iss=$iss, url=$url, feil=${it.message}", it) }
             .getOrThrow()
     }
 

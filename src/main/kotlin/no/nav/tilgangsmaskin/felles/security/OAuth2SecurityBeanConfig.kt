@@ -1,9 +1,7 @@
 package no.nav.tilgangsmaskin.felles.security
 
-import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase
 import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase.Companion.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase.Companion.UNPROTECTED_ENDPOINTS
-import org.springframework.boot.security.oauth2.server.resource.autoconfigure.OAuth2ResourceServerProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus.UNAUTHORIZED
@@ -16,20 +14,15 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider
 import org.springframework.security.oauth2.client.OAuth2AuthorizationFailureHandler
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor.authorizationFailureHandler
-import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
-import org.springframework.security.oauth2.jwt.JwtDecoder
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.client.web.client.support.OAuth2RestClientHttpServiceGroupConfigurer.from
-import org.springframework.security.oauth2.jwt.JwtDecoders.fromIssuerLocation
-import org.springframework.security.oauth2.jwt.JwtValidators.createDefaultWithIssuer
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.HttpStatusEntryPoint
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 
 @Configuration
-class Oauth2SecurityBeanConfig {
+class OAuth2SecurityBeanConfig {
     @Bean
-    fun securityFilterChain(http: HttpSecurity, jwtDecoder: JwtDecoder): SecurityFilterChain {
+    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         return http.csrf { it.disable() }
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
@@ -41,22 +34,11 @@ class Oauth2SecurityBeanConfig {
                     requests.anyRequest().denyAll()
                 }
                     .oauth2ResourceServer { oauth2 ->
-                        oauth2.jwt { jwt -> jwt.decoder(jwtDecoder) }
+                        oauth2.jwt { }
                         oauth2.authenticationEntryPoint(HttpStatusEntryPoint(UNAUTHORIZED))
                     }
             }
             .build()
-    }
-
-    @Bean
-    fun jwtDecoder(p: OAuth2ResourceServerProperties) =
-        with(requireNotNull(p.jwt.issuerUri) {
-            "spring.security.oauth2.resourceserver.jwt.issuer-uri må være konfigurert"
-        }) {
-             (fromIssuerLocation(this) as NimbusJwtDecoder).apply {
-                setJwtValidator(DelegatingOAuth2TokenValidator(createDefaultWithIssuer(this@with),
-                    OAuth2AudienceValidator(p.jwt.audiences)))
-            }
     }
 
     @Bean

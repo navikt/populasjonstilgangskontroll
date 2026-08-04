@@ -17,16 +17,14 @@ class OAuth2LoggingJwtAuthenticationConverter(
     private val log = getLogger(javaClass)
 
     override fun convert(jwt: Jwt): AbstractAuthenticationToken {
-        val sub = jwt.subject
         val iss = jwt.issuer
-        val aud = jwt.audience
         val exp = jwt.expiresAt
         val system = jwt.getClaimAsString(AZP_NAME)
         val request = currentRequest()
         val url = request?.requestURI
         return runCatching { delegate.convert(jwt) }
-            .onSuccess { log.trace("JWT validert OK: sub={}, system={}, iss={}, aud={}, expiresAt={}, authorities={}, url={}", sub, system, iss, aud, exp, it.authorities, url) }
-            .onFailure { log.warn("JWT konvertering feilet: sub=$sub, system=$system, iss=$iss, url=$url, feil=${it.message}", it) }
+            .onSuccess { log.trace("JWT validert OK: system={}, iss={}, expiresAt={}, authorities={}, url={}", system, iss, exp, it.authorities, url) }
+            .onFailure { log.warn("JWT konvertering feilet: system=$system, iss=$iss, url=$url, feil=${it.message}", it) }
             .getOrThrow()
     }
 

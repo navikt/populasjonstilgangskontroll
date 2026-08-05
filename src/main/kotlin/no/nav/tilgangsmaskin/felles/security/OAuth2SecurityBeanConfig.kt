@@ -64,7 +64,7 @@ class OAuth2SecurityBeanConfig {
         }
 
     @Bean
-    fun authorizedClientManager(repo: ClientRegistrationRepository, service: OAuth2AuthorizedClientService, failureHandler: OAuth2AuthorizationFailureHandler, successHandler: OAuth2AuthorizationSuccessHandler) =
+    fun oauth2AuthorizedClientManager(repo: ClientRegistrationRepository, service: OAuth2AuthorizedClientService, successHandler: OAuth2AuthorizationSuccessHandler, failureHandler: OAuth2AuthorizationFailureHandler) =
         AuthorizedClientServiceOAuth2AuthorizedClientManager(
             repo, service).apply {
             setAuthorizedClientProvider(OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().build())

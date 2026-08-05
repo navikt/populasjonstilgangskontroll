@@ -7,7 +7,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLClientPingTest.TestConfig
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
-import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTestContextInitializer
+import no.nav.tilgangsmaskin.felles.rest.RestTjenestePropertySettingTestContextInitializer
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -30,7 +30,7 @@ import org.springframework.web.client.RestClient.Builder
 
 @RestClientTest
 @TestPropertySource(properties = ["pdlgraph=pdlgraph.pdl"])
-@ContextConfiguration(initializers = [RestTjenesteTestContextInitializer::class], classes = [PdlGraphQLConfig::class])
+@ContextConfiguration(initializers = [RestTjenestePropertySettingTestContextInitializer::class], classes = [PdlGraphQLConfig::class])
 @Import(TestConfig::class, OAuth2ClientTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 @ConfigurationPropertiesScan

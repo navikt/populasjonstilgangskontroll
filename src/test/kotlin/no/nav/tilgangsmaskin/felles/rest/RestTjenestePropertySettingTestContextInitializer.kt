@@ -5,7 +5,7 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.boot.test.util.TestPropertyValues
 
-class RestTjenesteTestContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
+class RestTjenestePropertySettingTestContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
     override fun initialize(ctx: ConfigurableApplicationContext) {
         val values = serviceClientBaseUrls()
             .map { (client, url) -> "$SERVICE_CLIENT_PREFIX.$client.base-url=$url" }

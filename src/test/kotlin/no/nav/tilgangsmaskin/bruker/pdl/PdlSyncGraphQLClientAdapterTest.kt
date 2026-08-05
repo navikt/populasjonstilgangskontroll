@@ -15,7 +15,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapterTest.GraphQLTestConfig
 import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
-import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTestContextInitializer
+import no.nav.tilgangsmaskin.felles.rest.RestTjenestePropertySettingTestContextInitializer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
@@ -38,7 +38,7 @@ import org.springframework.web.client.RestClient.Builder
 
 @RestClientTest
 @TestPropertySource(properties = ["pdlgraph=pdl-graph.pdl"])
-@ContextConfiguration(initializers = [RestTjenesteTestContextInitializer::class], classes = [PdlSyncGraphQLClientAdapter::class, PdlGraphQLConfig::class])
+@ContextConfiguration(initializers = [RestTjenestePropertySettingTestContextInitializer::class], classes = [PdlSyncGraphQLClientAdapter::class, PdlGraphQLConfig::class])
 @Import(GraphQLTestConfig::class, OAuth2ClientTestConfig::class)
 @ApplyExtension(SpringExtension::class)
 @EnableAutoConfiguration

@@ -33,6 +33,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.UGRADERT
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheOperationsTest.ValkeyCacheTestConfig
+import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
@@ -81,6 +82,16 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
         @Bean
         fun valkeyCacheOperations(valkey: StringRedisTemplate) =
             ValkeyCacheOperations(valkey)
+
+        @Bean
+        fun cacheSizeAware(cache: CacheOperations) =
+            CacheSizeAware(
+                cache,
+                object : CachableRestConfig {
+                    override val navn = "pdl-test"
+                    override val caches = setOf(PDL_MED_FAMILIE_CACHE)
+                }
+            )
     }
 
     @MockkBean
@@ -94,6 +105,9 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
 
     @Autowired
     private lateinit var registry: MeterRegistry
+
+    @Autowired
+    private lateinit var cacheSizeAware: CacheSizeAware
 
 
     init {
@@ -352,6 +366,20 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
 
                     cache.clear(PDL_MED_FAMILIE_CACHE)
                     cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 0
+                }
+            }
+        }
+
+        Given("antall innslag via CacheSizeAware") {
+            When("cache er tom") {
+                Then("returnerer cache-størrelse fra valkey") {
+                    cacheSizeAware.sizes() shouldBe mapOf(PDL_MED_FAMILIE_CACHE.fullName to 0L)
+                }
+            }
+            When("cache inneholder verdier") {
+                Then("returnerer antall innslag fra valkey") {
+                    cache.putMany(PDL_MED_FAMILIE_CACHE, mapOf(I1 to P1, I2 to P2), ofSeconds(5))
+                    cacheSizeAware.sizes() shouldBe mapOf(PDL_MED_FAMILIE_CACHE.fullName to 2L)
                 }
             }
         }

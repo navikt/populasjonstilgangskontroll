@@ -198,15 +198,18 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
             When("cache inneholder verdier") {
                 Then("alle verdier i cachen fjernes") {
                     cache.putMany(PDL_MED_FAMILIE_CACHE, mapOf(I1 to P1, I2 to P2), ofSeconds(1))
+                    cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 2
                     cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, IDS).keys shouldBe IDS
                     cache.clear(PDL_MED_FAMILIE_CACHE)
                     cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, IDS).shouldBeEmpty()
+                    cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 0
                 }
             }
             When("cache er tom") {
                 Then("clear kaster ikke exception") {
                     cache.clear(PDL_MED_FAMILIE_CACHE)
                     cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, IDS).shouldBeEmpty()
+                    cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 0
                 }
             }
         }

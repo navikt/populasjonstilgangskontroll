@@ -27,7 +27,6 @@ import org.springframework.graphql.client.SyncGraphQlClientInterceptor
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.client.match.MockRestRequestMatchers.header
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
@@ -38,7 +37,6 @@ import org.springframework.web.client.RestClient.Builder
 @ContextConfiguration(initializers = [PropertySettingTestContextInitializer::class], classes = [PdlSyncGraphQLClientAdapter::class, PdlGraphQLConfig::class])
 @Import(GraphQLTestConfig::class, OAuth2ClientTestConfig::class)
 @ApplyExtension(SpringExtension::class)
-@TestPropertySource(properties = ["pdlgraph=pdlgraph.pdl"])
 class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
 
     @TestConfiguration

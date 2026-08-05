@@ -40,6 +40,7 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.LocalAuditor
+import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.felles.rest.Token
@@ -53,14 +54,12 @@ import org.springframework.context.annotation.ComponentScan
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.TestPropertySource
 import java.time.LocalDate.now
 import java.util.UUID
 
-@TestPropertySource(locations = ["classpath:test.properties"])
 @AutoConfigureMetrics
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [LocalAuditor::class])
+@ContextConfiguration(initializers = [PropertySettingTestContextInitializer::class],classes = [LocalAuditor::class])
 @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
 @ApplyExtension(SpringExtension::class)
 class RegelMotorTest : BehaviorSpec() {

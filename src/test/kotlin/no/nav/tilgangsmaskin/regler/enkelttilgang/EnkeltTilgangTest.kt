@@ -41,6 +41,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import no.nav.tilgangsmaskin.felles.TimeBeanConfig
+import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Import
@@ -51,8 +52,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @EnableJpaAuditing
 @Testcontainers
 @AutoConfigureMetrics
-@TestPropertySource(locations = ["classpath:test.properties"])
-@ContextConfiguration(classes = [LocalAuditor::class,EnkeltTilgangJPAAdapter::class])
+@ContextConfiguration(initializers = [PropertySettingTestContextInitializer::class],classes = [LocalAuditor::class,EnkeltTilgangJPAAdapter::class])
 @ApplyExtension(SpringExtension::class)
 @Import(TimeBeanConfig::class)
 @EnableAutoConfiguration

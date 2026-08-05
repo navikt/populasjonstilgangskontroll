@@ -16,7 +16,6 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
 
 
     private lateinit var regel: AvdødBrukerRegel
-    private val NAV_TESTKONTOR = "NAV Testkontor"
     private val ansattId = AnsattId("Z999999")
     private val ansatt = AnsattBuilder(ansattId).build()
     private val brukerId = BrukerId("08526835670")

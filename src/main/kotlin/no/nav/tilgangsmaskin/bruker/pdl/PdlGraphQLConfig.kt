@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component
 import java.net.URI.create
 
 @Component
-class PdlGraphQLConfig(@Value("\${PDLGRAPH}") hostname: String) :
-    RestConfig(create("https://$hostname$DEFAULT_PING_PATH"), DEFAULT_PING_PATH, PDLGRAPH) {
+class PdlGraphQLConfig(
+    @Value("\${PDLGRAPH}") hostname: String) : RestConfig(create("https://$hostname$DEFAULT_PING_PATH"), DEFAULT_PING_PATH, PDLGRAPH) {
 
     @NoCoverageAnalysis
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"

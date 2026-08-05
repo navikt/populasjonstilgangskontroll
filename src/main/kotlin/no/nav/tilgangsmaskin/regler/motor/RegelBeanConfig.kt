@@ -30,7 +30,6 @@ class RegelBeanConfig(messageSource: MessageSource) {
         RegelSett(OVERSTYRBAR_REGELTYPE to regler.sortedWith(INSTANCE))
 
 
-
     @Bean
     @Qualifier(KOMPLETT)
     fun komplettRegelsett(@Qualifier(KJERNE) kjerne: RegelSett, @Qualifier(OVERSTYRBAR) overstyrbare: RegelSett) =

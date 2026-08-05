@@ -8,17 +8,17 @@ import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.person.pdl.leesah.Personhendelse
+import no.nav.tilgangsmaskin.bruker.pdl.PdlAvroEnvExtensions.schemaRegistryUrl
+import no.nav.tilgangsmaskin.bruker.pdl.PdlAvroEnvExtensions.userInfo
 import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.PingableHealthIndicator
 import no.nav.tilgangsmaskin.felles.kafka.KafkaTypedDroppedMessageMeter
-import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
+import no.nav.tilgangsmaskin.felles.rest.createOAuth2Client
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
-import no.nav.tilgangsmaskin.bruker.pdl.PdlAvroEnvExtensions.schemaRegistryUrl
-import no.nav.tilgangsmaskin.bruker.pdl.PdlAvroEnvExtensions.userInfo
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties
@@ -31,8 +31,10 @@ import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.listener.CommonErrorHandler
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS
+import org.springframework.security.oauth2.client.web.ClientAttributes
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
+import org.springframework.web.client.support.RestClientAdapter
 
 @Configuration
 @NoCoverageAnalysis
@@ -41,9 +43,10 @@ class PdlBeanConfig {
     @Bean
     @Qualifier(PDLGRAPH)
     fun pdlGraphRestClient(builder: Builder) =
-        builder.requestInterceptors {
-            it.add(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
-        }.build()
+        builder
+            .requestInterceptor(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
+            .requestInitializer { ClientAttributes.clientRegistrationId(PDLGRAPH).accept(it.attributes) }
+            .build()
 
     @Bean
     fun syncPdlGraphQLClient(@Qualifier(PDLGRAPH) client: RestClient, cfg: PdlGraphQLConfig) =
@@ -55,11 +58,13 @@ class PdlBeanConfig {
 
     @Bean
     fun pdlPipClient(builder: Builder, cfg: PdlConfig) =
-        createClient<PdlPipClient>(cfg, builder)
+        RestClientAdapter.create(builder.baseUrl(cfg.baseUri).build())
+            .createOAuth2Client<PdlPipClient>()
 
     @Bean
     fun pdlGraphQLPingClient(builder: Builder, cfg: PdlGraphQLConfig) =
-        createClient<PdlGraphQLPingClient>(cfg, builder)
+        RestClientAdapter.create(builder.baseUrl(cfg.baseUri).build())
+            .createOAuth2Client<PdlGraphQLPingClient>()
 
     @Bean
     fun pdlGraphHealthIndicator(cfg: PdlGraphQLConfig, client: PdlGraphQLPingClient) =
@@ -97,8 +102,8 @@ class PdlBeanConfig {
         object : KafkaTypedDroppedMessageMeter<Personhendelse>(registry, Personhendelse::class) {
             override fun formatEvent(event: Personhendelse) =
                 "gradering=${event.adressebeskyttelse?.gradering ?: "UGRADERT"}, " +
-                    "endringstype=${event.endringstype}, " +
-                    "identer=${event.personidenter.map { it.maskFnr() }}"
+                        "endringstype=${event.endringstype}, " +
+                        "identer=${event.personidenter.map { it.maskFnr() }}"
         }
 
     companion object {
@@ -107,4 +112,3 @@ class PdlBeanConfig {
         private val CREDENTIALS_SOURCE = UserInfoCredentialProvider().alias()
     }
 }
-

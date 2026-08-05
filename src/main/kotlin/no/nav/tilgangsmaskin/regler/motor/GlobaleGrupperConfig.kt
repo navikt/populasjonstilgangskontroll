@@ -6,7 +6,7 @@ import java.util.*
 
 @ConfigurationProperties("gruppe")
 data class GlobaleGrupperConfig(val strengt: UUID, val nasjonal: UUID, val utland: UUID,
-                                val udefinert: UUID, val fortrolig: UUID, val egenansatt: UUID,val dead: UUID) {
+                                val udefinert: UUID, val fortrolig: UUID, val egenansatt: UUID, val dead: UUID) {
     init {
         EntraGlobalGruppe.setIDs(
             mapOf(

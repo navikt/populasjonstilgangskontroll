@@ -43,6 +43,7 @@ import no.nav.tilgangsmaskin.felles.LocalAuditor
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.tilgang.Token
+import no.nav.tilgangsmaskin.tilgang.TokenType
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import org.springframework.beans.factory.annotation.Autowired
@@ -90,11 +91,10 @@ class RegelMotorTest : BehaviorSpec() {
 
         beforeEach {
             every { nom.fnrForAnsatt(any()) } returns brukerId
-            every { vergemål.vergemål(any()) } returns emptySet()
+            every { vergemål.alle(any()) } returns emptySet()
             every { token.system } returns "test"
             every { token.system } returns "test"
-            every { token.erObo } returns false
-            every { token.erCC } returns true
+            every { token.type } returns TokenType.CCF
             every { token.systemNavn } returns "test"
             every { token.clusterAndSystem } returns "cluster:test"
         }
@@ -505,7 +505,7 @@ class RegelMotorTest : BehaviorSpec() {
         Given("ansatt har vergemål for bruker") {
             When("vergemålstjenesten returnerer bruker") {
                 Then("tilgang avvises av VergemålDevRegel") {
-                    every { vergemål.vergemål(ansattId) } returns setOf(brukerId)
+                    every { vergemål.alle(ansattId) } returns setOf(brukerId)
                     val ansatt = AnsattBuilder(ansattId).build()
                     val bruker = BrukerBuilder(brukerId).build()
                     forventAvvistAv<VergemålRegel>(ansatt, bruker)
@@ -516,7 +516,7 @@ class RegelMotorTest : BehaviorSpec() {
         Given("ansatt har ikke vergemål for bruker") {
             When("vergemålstjenesten returnerer tom liste") {
                 Then("tilgang gis") {
-                    every { vergemål.vergemål(ansattId) } returns emptySet()
+                    every { vergemål.alle(ansattId) } returns emptySet()
                     val ansatt = AnsattBuilder(ansattId).build()
                     val bruker = BrukerBuilder(brukerId).build()
                     ansatt kanBehandle bruker
@@ -527,7 +527,7 @@ class RegelMotorTest : BehaviorSpec() {
         Given("vergemålstjenesten feiler") {
             When("oppslaget kaster exception") {
                 Then("tilgang gis (feilen svelges)") {
-                    every { vergemål.vergemål(ansattId) } throws RuntimeException("tjenesten er nede")
+                    every { vergemål.alle(ansattId) } throws RuntimeException("tjenesten er nede")
                     val ansatt = AnsattBuilder(ansattId).build()
                     val bruker = BrukerBuilder(brukerId).build()
                     ansatt kanBehandle bruker

@@ -1,4 +1,17 @@
 spring:
+  messages:
+    basename:
+      - messages
+      - regel-messages
+      - openapi/prod/tilgang
+      - openapi/dev/ansatt
+      - openapi/dev/bruker
+      - openapi/dev/cache
+      - openapi/dev/enkelt
+      - openapi/dev/regel
+      - openapi/dev/skjerming
+      - openapi/dev/tilgang
+      - openapi/dev/vergemal
   mvc:
     log-request-details: true
 management:

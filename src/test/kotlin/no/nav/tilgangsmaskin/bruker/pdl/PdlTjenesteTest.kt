@@ -27,7 +27,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlTjenesteTest.PdlTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.*
-import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -43,6 +42,8 @@ import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.client.RestClient.Builder
+import org.springframework.web.client.support.RestClientAdapter.create
+import org.springframework.web.service.invoker.HttpServiceProxyFactory.builderFor
 import tools.jackson.databind.json.JsonMapper
 import java.time.Duration.ofSeconds
 
@@ -57,7 +58,8 @@ class PdlTjenesteTest : BehaviorSpec() {
     class PdlTestConfig : CacheTestConfig(PDL) {
 
         @Bean
-        fun pdlClient(builder: Builder, cfg: PdlConfig) = createClient<PdlPipClient>(cfg, builder)
+        fun pdlClient(builder: Builder, cfg: PdlConfig) =
+            builderFor(create(builder.baseUrl(cfg.baseUri).build())).build().createClient(PdlPipClient::class.java)
     }
 
     @MockkBean lateinit var graphQL: PdlSyncGraphQLClientAdapter

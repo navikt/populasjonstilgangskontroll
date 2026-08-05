@@ -40,7 +40,7 @@ class AnsattTjenesteTest : BehaviorSpec({
         When("fnrForAnsatt returnerer en brukerId") {
             Then("returneres ansatt med bruker") {
                 every { nom.fnrForAnsatt(ansattId) } returns brukerId
-                every { brukere.brukerMedUtvidetFamilie(brukerId.verdi) } returns bruker
+                every { brukere.medUtvidetFamilie(brukerId.verdi) } returns bruker
                 tjeneste.ansatt(ansattId).bruker shouldBe bruker
             }
         }
@@ -48,7 +48,7 @@ class AnsattTjenesteTest : BehaviorSpec({
         When("brukeroppslag feiler") {
             Then("returneres ansatt uten bruker") {
                 every { nom.fnrForAnsatt(ansattId) } returns brukerId
-                every { brukere.brukerMedUtvidetFamilie(brukerId.verdi) } throws RuntimeException("PDL nede")
+                every { brukere.medUtvidetFamilie(brukerId.verdi) } throws RuntimeException("PDL nede")
                 tjeneste.ansatt(ansattId).bruker shouldBe null
             }
         }

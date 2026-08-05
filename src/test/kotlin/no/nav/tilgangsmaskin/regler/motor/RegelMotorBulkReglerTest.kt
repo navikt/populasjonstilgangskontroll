@@ -1,17 +1,22 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import io.kotest.assertions.assertSoftly
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import io.mockk.every
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
+import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.OVERSTYRBAR_REGELTYPE
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.NO_CONTENT
 
@@ -78,7 +83,32 @@ class RegelMotorBulkReglerTest : RegelMotorTestBase() {
                     komplett.single().regel.shouldBeInstanceOf<UtlandRegel>()
                 }
             }
+
+            When("samme bruker evalueres som komplett og overstyrbar") {
+                Then("kjerne-regler ignoreres for overstyrbar type") {
+                    val ansatt = AnsattBuilder(ansattId).build()
+                    val skjermetForKjerne = BrukerBuilder(BrukerId("08526835644")).kreverMedlemskapI(STRENGT_FORTROLIG).build()
+
+                    val komplett = regelMotor.bulkRegler(ansatt, setOf(BrukerOgRegelsett(skjermetForKjerne, KOMPLETT_REGELTYPE)))
+                    komplett.single().status shouldBe FORBIDDEN
+                    komplett.single().regel.shouldBeInstanceOf<StrengtFortroligRegel>()
+
+                    val overstyrbar = regelMotor.bulkRegler(ansatt, setOf(BrukerOgRegelsett(skjermetForKjerne, OVERSTYRBAR_REGELTYPE)))
+                    overstyrbar.single().status shouldBe NO_CONTENT
+                }
+            }
+
+            When("en regelkall feiler med annen exception enn RegelException") {
+                Then("exception videresendes") {
+                    every { oppfølging.enhetFor(any()) } throws IllegalStateException("uventet feil")
+                    val ansatt = AnsattBuilder(ansattId).build()
+                    val bruker = BrukerBuilder(BrukerId("08526835644")).gt(KommuneTilknytning(Kommune("9999"))).build()
+
+                    shouldThrow<IllegalStateException> {
+                        regelMotor.bulkRegler(ansatt, setOf(BrukerOgRegelsett(bruker, OVERSTYRBAR_REGELTYPE)))
+                    }
+                }
+            }
         }
     }
 }
-

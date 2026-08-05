@@ -31,6 +31,19 @@ class ForeldreOgBarnRegelTest : RegelMotorTestBase() {
                 }
             }
         }
+
+        Given("ansatt og bruker er ikke i foreldre/barn-relasjon") {
+            val ansattBrukerId = BrukerId("08526835644")
+            val ansattBarn = BrukerId("08526835649")
+            val bruker = BrukerBuilder(brukerId).build()
+            val ansattBruker = BrukerBuilder(ansattBrukerId).barn(setOf(ansattBarn)).build()
+            val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
+
+            When("regler evalueres") {
+                Then("tilgang gis") {
+                    ansatt kanBehandle bruker
+                }
+            }
+        }
     }
 }
-

@@ -34,7 +34,8 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
         Given("Bruker er død") {
             val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(1)).build()
             When("regel evalueres") {
-                Then("tilgang godkjennes") { regel.evaluer(ansattUtenAvdod, bruker).shouldBeTrue() }
+                Then("tilgang godkjennes") { regel.evaluer(ansattUtenAvdod, bruker).shouldBeTrue()
+                }
             }
         }
 
@@ -61,8 +62,8 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
                 }
             }
             When("dødsdato er mer enn to år siden") {
+                val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(30)).build()
                 Then("tilgang blokkeres, men telles med enhetsnavn for mer enn 24 måneder") {
-                    val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(30)).build()
                     regel.evaluer(ansattUtenAvdod, bruker).shouldBeFalse()
                 }
             }
@@ -79,8 +80,8 @@ class AvdødBrukerRegelTest : BehaviorSpec() {
 
             When("dødsdato er mer enn to år siden") {
                 val bruker = BrukerBuilder(brukerId).dødsdato(now().minusMonths(30)).build()
+                val ansattMedAvdod = AnsattBuilder(AnsattId("Z999998")).medMedlemskapI(AVDØD).build()
                 Then("tilgang godkjennes") {
-                    val ansattMedAvdod = AnsattBuilder(AnsattId("Z999998")).medMedlemskapI(AVDØD).build()
                     shouldNotThrowAny {
                         regel.evaluer(ansattMedAvdod, bruker).shouldBeTrue()
                     }

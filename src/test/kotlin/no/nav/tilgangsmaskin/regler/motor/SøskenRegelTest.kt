@@ -18,6 +18,19 @@ class SøskenRegelTest : RegelMotorTestBase() {
                 }
             }
         }
+
+        Given("ansatt er ikke søsken til bruker") {
+            val ansattBrukerId = BrukerId("08526835644")
+            val annetSøsken = BrukerId("08526835648")
+            val ansattBruker = BrukerBuilder(ansattBrukerId).søsken(setOf(annetSøsken)).build()
+            val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
+            val bruker = BrukerBuilder(brukerId).build()
+
+            When("regler evalueres") {
+                Then("tilgang gis") {
+                    ansatt kanBehandle bruker
+                }
+            }
+        }
     }
 }
-

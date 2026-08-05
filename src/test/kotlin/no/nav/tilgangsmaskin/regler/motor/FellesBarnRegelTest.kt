@@ -19,6 +19,20 @@ class FellesBarnRegelTest : RegelMotorTestBase() {
                 }
             }
         }
+
+        Given("ansatt og bruker har ikke felles barn") {
+            val ansattBrukerId = BrukerId("08526835644")
+            val ansattBarn = BrukerId("08526835649")
+            val brukerBarn = BrukerId("08526835648")
+            val ansattBruker = BrukerBuilder(ansattBrukerId).barn(setOf(ansattBarn)).build()
+            val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
+            val bruker = BrukerBuilder(brukerId).barn(setOf(brukerBarn)).build()
+
+            When("regler evalueres") {
+                Then("tilgang gis") {
+                    ansatt kanBehandle bruker
+                }
+            }
+        }
     }
 }
-

@@ -13,6 +13,7 @@ import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålClient.Companion.VERGEMÅL_PATH
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.VERGEMÅL
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.VERGE_CACHE
+import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjenesteTest.VergemålTestConfig
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
@@ -43,14 +44,16 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
 import java.net.URI
 
-@TestConfiguration
-class VergemålTestConfig : CacheTestConfig(VERGEMÅL)
 
 @RestClientTest
 @EnableResilientMethods
 @Import(VergemålTestConfig::class, OAuth2ClientTestConfig::class)
 @ContextConfiguration(classes = [VergemålConfig::class, VergemålTjeneste::class], initializers = [PropertySettingTestContextInitializer::class])
 class VergemålTjenesteTest : BehaviorSpec() {
+
+
+    @TestConfiguration
+    class VergemålTestConfig : CacheTestConfig(VERGEMÅL)
 
     @MockkBean
     private lateinit var nom: NomTjeneste

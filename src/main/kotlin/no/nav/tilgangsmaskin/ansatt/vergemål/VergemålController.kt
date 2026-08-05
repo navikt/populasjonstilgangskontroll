@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody
 
 
 @DevController(
-    value = ["/${DEV}/skjerming"],
+    value = ["/${DEV}/verge"],
     name = "VergemålController",
     description = DEV_VERGEMAL_CONTROLLER_TAG_DESCRIPTION
 )

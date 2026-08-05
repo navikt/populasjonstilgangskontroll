@@ -7,7 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient.Companion.ENTRA_USERS_PATH
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.ENTRA_OID
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
-import no.nav.tilgangsmaskin.ansatt.graph.oid.OidTjenesteTest.EntraTestConfig
+import no.nav.tilgangsmaskin.ansatt.graph.oid.OidTjenesteTest.OidTjenesteTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
@@ -16,8 +16,6 @@ import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
 import org.hamcrest.Matchers.containsString
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
@@ -33,14 +31,12 @@ import java.util.UUID
 
 
 @RestClientTest
-@Import(EntraTestConfig::class, OAuth2ClientTestConfig::class)
-@ContextConfiguration(classes = [EntraOidTjeneste::class, EntraOidConfig::class, EntraGrupperConfig::class, EntraOidBeanConfig::class])
-@ConfigurationPropertiesScan
-@EnableAutoConfiguration
+@Import(OidTjenesteTestConfig::class, OAuth2ClientTestConfig::class)
+@ContextConfiguration(classes = [EntraOidTjeneste::class, EntraOidConfig::class, EntraGrupperConfig::class])
 class OidTjenesteTest : RestTjenesteTest() {
 
     @TestConfiguration
-    class EntraTestConfig : CacheTestConfig(ENTRA_OID)
+    class OidTjenesteTestConfig : CacheTestConfig(ENTRA_OID)
 
     @Autowired
     private lateinit var tjeneste: EntraOidTjeneste
@@ -79,7 +75,6 @@ class OidTjenesteTest : RestTjenesteTest() {
                     tjeneste.oid(ANSATTID) shouldBe OID
                     tjeneste.oid(ANSATTID) shouldBe OID
                     cache.getOne<UUID>(OID_CACHE, ANSATTID.verdi) shouldBe OID
-
                 }
             }
 

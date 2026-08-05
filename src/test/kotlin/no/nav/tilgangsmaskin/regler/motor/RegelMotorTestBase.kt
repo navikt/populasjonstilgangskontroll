@@ -60,10 +60,14 @@ abstract class RegelMotorTestBase : BehaviorSpec() {
     }
 
     protected inline fun <reified T : Regel> forventAvvistAv(ansatt: Ansatt, bruker: Bruker) {
-        shouldThrow<RegelException> { regelMotor.kompletteRegler(ansatt, bruker) }.regel.shouldBeInstanceOf<T>()
+        shouldThrow<RegelException> {
+            regelMotor.kompletteRegler(ansatt, bruker)
+        }.regel.shouldBeInstanceOf<T>()
     }
 
     protected infix fun Ansatt.kanBehandle(bruker: Bruker) {
-        shouldNotThrowAny { regelMotor.kompletteRegler(this, bruker) }
+        shouldNotThrowAny {
+            regelMotor.kompletteRegler(this, bruker)
+        }
     }
 }

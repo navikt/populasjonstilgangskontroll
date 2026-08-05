@@ -52,7 +52,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @Testcontainers
 @AutoConfigureMetrics
 @TestPropertySource(locations = ["classpath:test.properties"])
-@EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
 @ContextConfiguration(classes = [LocalAuditor::class,EnkeltTilgangJPAAdapter::class])
 @ApplyExtension(SpringExtension::class)
 @Import(TimeBeanConfig::class)

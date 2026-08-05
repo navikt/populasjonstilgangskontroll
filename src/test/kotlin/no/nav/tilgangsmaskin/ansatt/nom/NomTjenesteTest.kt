@@ -22,7 +22,6 @@ import org.springframework.test.context.ContextConfiguration
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDate.now
 
@@ -30,7 +29,6 @@ import java.time.LocalDate.now
 @Testcontainers
 @ContextConfiguration(classes = [NomTjeneste::class, NomJPAAdapter::class])
 @Import(NomTestConfig::class)
-@ConfigurationPropertiesScan
 @EnableAutoConfiguration
 class NomTjenesteTest : RestTjenesteTest() {
 

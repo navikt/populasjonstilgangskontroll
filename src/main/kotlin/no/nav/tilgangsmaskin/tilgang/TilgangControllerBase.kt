@@ -24,9 +24,7 @@ import kotlin.annotation.AnnotationTarget.CLASS
 @SecurityRequirement(name = "bearerAuth")
 annotation class TilgangApiController
 
-abstract class TilgangControllerBase(
-    protected val token: Token,
-    private val teller: TokenTypeTeller) {
+abstract class TilgangControllerBase(protected val token: Token, private val teller: TokenTypeTeller) {
 
     protected val log = getLogger(javaClass)
 

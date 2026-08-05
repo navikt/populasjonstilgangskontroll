@@ -1,17 +1,13 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
-import com.ninjasquad.springmockk.MockkBean
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.ENTRA_CACHES
-import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_OG_GLOBALE_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjenesteTest.EntraTestConfig
-import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidBeanConfig
-import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
@@ -21,38 +17,22 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import java.util.*
-
-
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.test.context.ContextConfiguration
 
 @RestClientTest
-@ContextConfiguration(classes = [EntraTjeneste::class, EntraGrupperConfig::class, EntraOidBeanConfig::class])
+@ContextConfiguration(classes = [EntraTjeneste::class, EntraGrupperConfig::class])
 @Import(EntraTestConfig::class, OAuth2ClientTestConfig::class)
-@ConfigurationPropertiesScan
-@EnableAutoConfiguration
 class EntraTjenesteTest : RestTjenesteTest() {
 
     @TestConfiguration
-    @EnableResilientMethods
     class EntraTestConfig : CacheTestConfig(GRAPH)
-
-    @MockkBean
-    @Suppress("unused")
-    private lateinit var oidTjeneste: EntraOidTjeneste
-
-    @MockkBean
-    @Suppress("unused")
-    private lateinit var entraOidClient: EntraOidClient
 
     @Autowired
     private lateinit var tjeneste: EntraTjeneste

@@ -16,8 +16,6 @@ import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.test.context.ContextConfiguration
 import java.net.URI
@@ -26,8 +24,6 @@ import java.util.UUID
 @ApplyExtension(SpringExtension::class)
 @RestClientTest
 @ContextConfiguration(classes = [EntraCacheOppfrisker::class])
-@EnableAutoConfiguration
-@EnableConfigurationProperties
 class EntraCacheOppfriskerTest : BehaviorSpec() {
 
     @MockkBean(relaxed = true)

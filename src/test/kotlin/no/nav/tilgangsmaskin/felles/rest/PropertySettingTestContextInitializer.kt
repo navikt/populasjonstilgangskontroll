@@ -1,10 +1,9 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig.Companion.SERVICE_CLIENT_PREFIX
-import org.springframework.context.ConfigurableApplicationContext
-import org.springframework.context.ApplicationContextInitializer
 import org.springframework.boot.test.util.TestPropertyValues
-import org.springframework.test.context.support.TestPropertySourceUtils
+import org.springframework.context.ApplicationContextInitializer
+import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.test.context.support.TestPropertySourceUtils.addPropertiesFilesToEnvironment
 
 class PropertySettingTestContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {

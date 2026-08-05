@@ -19,7 +19,7 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 import reactor.core.publisher.Mono
 import java.net.URI
 import java.time.LocalDateTime
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.*
 
 class LederUtvelgerTest : BehaviorSpec({
 

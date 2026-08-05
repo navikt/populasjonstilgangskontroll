@@ -1,20 +1,18 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
+import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfigTest.TestConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Configuration
 import org.springframework.test.context.TestPropertySource
-import java.util.UUID
+import java.util.*
 
-@SpringBootTest(classes = [GlobaleGrupperConfigTest.TestConfig::class])
+@SpringBootTest(classes = [TestConfig::class])
 @TestPropertySource(locations = ["classpath:test.properties"])
-@ApplyExtension(SpringExtension::class)
 class GlobaleGrupperConfigTest : BehaviorSpec() {
 
     @Configuration

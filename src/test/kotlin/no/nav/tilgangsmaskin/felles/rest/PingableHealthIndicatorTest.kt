@@ -6,10 +6,10 @@ import io.kotest.matchers.collections.shouldExist
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.felles.rest.health.Pingable
 import no.nav.tilgangsmaskin.felles.rest.health.PingableHealthIndicator
-import java.net.URI
 import no.nav.tilgangsmaskin.felles.rest.health.PingableHealthIndicator.Companion.ENDPOINT
 import org.springframework.boot.health.contributor.Status.DOWN
 import org.springframework.boot.health.contributor.Status.UP
+import java.net.URI
 
 class PingableHealthIndicatorTest : BehaviorSpec({
 

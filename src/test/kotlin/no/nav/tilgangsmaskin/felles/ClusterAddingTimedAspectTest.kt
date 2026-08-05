@@ -1,16 +1,14 @@
 package no.nav.tilgangsmaskin.felles
 
-import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
-import io.kotest.matchers.longs.shouldBeGreaterThan
-import io.mockk.every
-import no.nav.tilgangsmaskin.felles.rest.Token
 import com.ninjasquad.springmockk.MockkBean
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.longs.shouldBeGreaterThan
 import io.micrometer.core.annotation.Timed
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
+import io.mockk.every
 import no.nav.tilgangsmaskin.felles.ClusterAddingTimedAspectTest.TestConfig
+import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.health.ObservabilityBeanConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
@@ -20,7 +18,6 @@ import org.springframework.test.context.ContextConfiguration
 
 @ContextConfiguration(classes = [TestConfig::class, ObservabilityBeanConfig::class])
 @AutoConfigureMetrics
-@ApplyExtension(SpringExtension::class)
 class ClusterAddingTimedAspectTest : BehaviorSpec() {
 
     @MockkBean

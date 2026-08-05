@@ -1,8 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -13,9 +11,9 @@ import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapterTest.GraphQLTestConfig
-import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
+import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
@@ -25,9 +23,9 @@ import org.springframework.context.annotation.Import
 import org.springframework.graphql.client.HttpSyncGraphQlClient
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.web.client.match.MockRestRequestMatchers.header
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.client.MockRestServiceServer
+import org.springframework.test.web.client.match.MockRestRequestMatchers.header
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.client.RestClient
@@ -36,7 +34,6 @@ import org.springframework.web.client.RestClient.Builder
 @RestClientTest
 @ContextConfiguration(initializers = [PropertySettingTestContextInitializer::class], classes = [PdlSyncGraphQLClientAdapter::class, PdlGraphQLConfig::class])
 @Import(GraphQLTestConfig::class, OAuth2ClientTestConfig::class)
-@ApplyExtension(SpringExtension::class)
 class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
 
     @TestConfiguration

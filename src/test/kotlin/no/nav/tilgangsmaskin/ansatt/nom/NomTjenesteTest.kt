@@ -1,6 +1,9 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import com.ninjasquad.springmockk.MockkBean
+import io.kotest.core.extensions.ApplyExtension
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.extensions.spring.SpringExtension
 import io.mockk.every
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -20,17 +23,17 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ContextConfiguration
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
-import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDate.now
 
 @DataJpaTest
 @Testcontainers
+@ApplyExtension(SpringExtension::class)
 @ContextConfiguration(classes = [NomTjeneste::class, NomJPAAdapter::class])
 @Import(NomTestConfig::class)
 @EnableAutoConfiguration
-class NomTjenesteTest : RestTjenesteTest() {
+class NomTjenesteTest : BehaviorSpec() {
 
     @TestConfiguration
     class NomTestConfig : CacheTestConfig(NOM)

@@ -1,5 +1,8 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
+import io.kotest.core.extensions.ApplyExtension
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -11,25 +14,28 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraTjenesteTest.EntraTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
+import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import java.util.*
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
-import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
 import org.springframework.test.context.ContextConfiguration
 
 @RestClientTest
-@ContextConfiguration(classes = [EntraTjeneste::class, EntraGrupperConfig::class])
+@ApplyExtension(SpringExtension::class)
+@EnableResilientMethods
+@ContextConfiguration(classes = [EntraTjeneste::class, EntraGrupperConfig::class], initializers = [PropertySettingTestContextInitializer::class])
 @Import(EntraTestConfig::class, OAuth2ClientTestConfig::class)
-class EntraTjenesteTest : RestTjenesteTest() {
+class EntraTjenesteTest : BehaviorSpec() {
 
     @TestConfiguration
     class EntraTestConfig : CacheTestConfig(GRAPH)

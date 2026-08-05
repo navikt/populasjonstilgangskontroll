@@ -18,9 +18,8 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UdefinertTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.Person
-import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
 
-class BrukerTjenesteTest : RestTjenesteTest({
+class BrukerTjenesteTest : BehaviorSpec({
 
     val pdl       = mockk<PdlTjeneste>()
     val skjerming = mockk<SkjermingTjeneste>()

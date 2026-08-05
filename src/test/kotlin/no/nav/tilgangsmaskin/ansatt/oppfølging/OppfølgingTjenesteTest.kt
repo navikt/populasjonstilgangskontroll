@@ -1,6 +1,9 @@
 package no.nav.tilgangsmaskin.ansatt.`oppfølging`
 
 import com.ninjasquad.springmockk.MockkBean
+import io.kotest.core.extensions.ApplyExtension
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING_CACHE
@@ -21,15 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
-import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.StartetEllerEndret
-import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Instant.parse
@@ -39,12 +39,11 @@ import java.util.UUID.*
 @DataJpaTest
 @EnableJpaAuditing
 @Testcontainers
-@EnableCaching
+@ApplyExtension(SpringExtension::class)
 @ContextConfiguration(classes = [OppfølgingTjeneste::class, OppfølgingJPAAdapter::class])
 @EnableAutoConfiguration
-@EnableConfigurationProperties
 @Import(OppfølgingTestConfig::class)
-class OppfølgingTjenesteTest : RestTjenesteTest() {
+class OppfølgingTjenesteTest : BehaviorSpec() {
 
     @TestConfiguration
     class OppfølgingTestConfig : CacheTestConfig(OPPFØLGING)

@@ -1,6 +1,9 @@
 package no.nav.tilgangsmaskin.ansatt.graph.oid
 
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.extensions.ApplyExtension
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig
@@ -13,7 +16,7 @@ import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
-import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
+import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import org.hamcrest.Matchers.containsString
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
@@ -21,6 +24,7 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
@@ -31,9 +35,11 @@ import java.util.UUID
 
 
 @RestClientTest
+@ApplyExtension(SpringExtension::class)
+@EnableResilientMethods
 @Import(OidTjenesteTestConfig::class, OAuth2ClientTestConfig::class)
-@ContextConfiguration(classes = [EntraOidTjeneste::class, EntraOidConfig::class, EntraGrupperConfig::class])
-class OidTjenesteTest : RestTjenesteTest() {
+@ContextConfiguration(classes = [EntraOidTjeneste::class, EntraOidConfig::class, EntraGrupperConfig::class], initializers = [PropertySettingTestContextInitializer::class])
+class OidTjenesteTest : BehaviorSpec() {
 
     @TestConfiguration
     class OidTjenesteTestConfig : CacheTestConfig(ENTRA_OID)

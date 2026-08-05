@@ -1,6 +1,9 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.extensions.ApplyExtension
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.maps.shouldContainExactly
@@ -16,6 +19,7 @@ import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.*
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
+import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
@@ -24,6 +28,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.web.client.ExpectedCount.never
 import org.springframework.test.web.client.ExpectedCount.once
 import org.springframework.test.web.client.ExpectedCount.times
@@ -36,17 +41,18 @@ import java.net.URI
 
 
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
-import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.test.context.ContextConfiguration
 
 @RestClientTest
-@ContextConfiguration(classes = [ SkjermingTjeneste::class, SkjermingConfig::class])
+@ApplyExtension(SpringExtension::class)
+@EnableResilientMethods
+@ContextConfiguration(classes = [SkjermingTjeneste::class, SkjermingConfig::class], initializers = [PropertySettingTestContextInitializer::class])
 @Import(SkjermingTestConfig::class, OAuth2ClientTestConfig::class)
 @ConfigurationPropertiesScan
 @EnableAutoConfiguration
-class SkjermingTjenesteTest : RestTjenesteTest() {
+class SkjermingTjenesteTest : BehaviorSpec() {
 
     @TestConfiguration
     class SkjermingTestConfig : CacheTestConfig(SKJERMING)

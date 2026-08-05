@@ -4,6 +4,9 @@ package no.nav.tilgangsmaskin.ansatt.vergemål
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.extensions.ApplyExtension
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -17,6 +20,7 @@ import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
+import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
@@ -27,6 +31,7 @@ import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.web.client.ExpectedCount.once
 import org.springframework.test.web.client.ExpectedCount.times
 import org.springframework.test.web.client.MockRestServiceServer
@@ -38,7 +43,6 @@ import org.springframework.web.util.UriComponentsBuilder.fromUriString
 
 
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
-import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.test.context.ContextConfiguration
@@ -48,11 +52,13 @@ import java.net.URI
 class VergemålTestConfig : CacheTestConfig(VERGEMÅL)
 
 @RestClientTest
+@ApplyExtension(SpringExtension::class)
+@EnableResilientMethods
 @Import(VergemålTestConfig::class, OAuth2ClientTestConfig::class)
-@ContextConfiguration(classes = [VergemålConfig::class, VergemålTjeneste::class])
+@ContextConfiguration(classes = [VergemålConfig::class, VergemålTjeneste::class], initializers = [PropertySettingTestContextInitializer::class])
 @EnableAutoConfiguration
 @ConfigurationPropertiesScan
-class VergemålTjenesteTest : RestTjenesteTest() {
+class VergemålTjenesteTest : BehaviorSpec() {
 
     @MockkBean
     private lateinit var nom: NomTjeneste

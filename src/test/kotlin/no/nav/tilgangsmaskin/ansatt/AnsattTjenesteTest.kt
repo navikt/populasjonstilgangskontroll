@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt
 
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -11,11 +12,10 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
-import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 
-class AnsattTjenesteTest : RestTjenesteTest({
+class AnsattTjenesteTest : BehaviorSpec({
 
     val nom      = mockk<NomTjeneste>(relaxed = true)
     val brukere  = mockk<BrukerTjeneste>(relaxed = true)

@@ -1,6 +1,9 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
 
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.extensions.ApplyExtension
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -9,8 +12,8 @@ import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
+import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
-import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.context.annotation.Import
@@ -19,6 +22,7 @@ import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.client.ExpectedCount.times
 import org.springframework.test.web.client.MockRestServiceServer
@@ -29,9 +33,11 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 
 
 @RestClientTest
-@ContextConfiguration(classes = [EntraProxyTjeneste::class, EntraProxyConfig::class])
+@ApplyExtension(SpringExtension::class)
+@EnableResilientMethods
+@ContextConfiguration(classes = [EntraProxyTjeneste::class, EntraProxyConfig::class], initializers = [PropertySettingTestContextInitializer::class])
 @Import(OAuth2ClientTestConfig::class)
-class EntraProxyTjenesteTest : RestTjenesteTest() {
+class EntraProxyTjenesteTest : BehaviorSpec() {
 
     @Autowired
     lateinit var tjeneste: EntraProxyTjeneste

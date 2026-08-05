@@ -1,6 +1,9 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import com.ninjasquad.springmockk.MockkBean
+import io.kotest.core.extensions.ApplyExtension
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
@@ -25,7 +28,7 @@ import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.*
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
-import no.nav.tilgangsmaskin.felles.rest.RestTjenesteTest
+import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -45,11 +48,13 @@ import tools.jackson.databind.json.JsonMapper
 import java.time.Duration.ofSeconds
 
 @RestClientTest
+@ApplyExtension(SpringExtension::class)
+@EnableResilientMethods
 @Import(PdlTestConfig::class, OAuth2ClientTestConfig::class)
-@ContextConfiguration(classes = [PdlTjeneste::class, PdlPipConfig::class])
+@ContextConfiguration(classes = [PdlTjeneste::class, PdlPipConfig::class], initializers = [PropertySettingTestContextInitializer::class])
 @ConfigurationPropertiesScan
 @EnableAutoConfiguration
-class PdlTjenesteTest : RestTjenesteTest() {
+class PdlTjenesteTest : BehaviorSpec() {
 
     @TestConfiguration
     class PdlTestConfig : CacheTestConfig(PDL)

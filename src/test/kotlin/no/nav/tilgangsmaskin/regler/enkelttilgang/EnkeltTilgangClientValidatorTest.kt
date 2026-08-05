@@ -3,38 +3,63 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.string.shouldContain
+import io.mockk.every
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator.EnkeltTilgangKonsumentException
 
 class EnkeltTilgangClientValidatorTest : BehaviorSpec({
 
     val cfg = EnkeltTilgangConfig()
-    val prodValidator = EnkeltTilgangProdKonsumentValidator(cfg)
-    val devValidator = EnkeltTilgangDevKonsumentValidator()
+    val validator = EnkeltTilgangKonsumentValidator(cfg)
 
-    Given("EnkeltTilgangProdClientValidator") {
+    Given("EnkeltTilgangKonsumentValidator i prod") {
+        beforeEach {
+            mockkObject(ClusterUtils.Companion)
+            every { ClusterUtils.isProd } returns true
+        }
+        afterEach {
+            unmockkObject(ClusterUtils.Companion)
+        }
+
         cfg.systemer.forEach { konsument ->
             When("konsument er godkjent ($konsument)") {
                 Then("slipper gjennom uten exception") {
                     shouldNotThrowAny {
-                        prodValidator.valider(konsument)
+                        validator.valider(konsument)
                     }
                 }
             }
         }
         When("konsument er ukjent") {
-            Then("kaster EnkeltTilgangException") {
-                shouldThrow<EnkeltTilgangKonsumentException> {
-                    prodValidator.valider("ukjent-system")
+            Then("kaster EnkeltTilgangKonsumentException med tillatte systemer i melding") {
+                val error = shouldThrow<EnkeltTilgangKonsumentException> {
+                    validator.valider("ukjent-system")
+                }
+                error.message shouldContain "ukjent-system"
+                cfg.systemer.forEach { system ->
+                    error.message shouldContain system
                 }
             }
         }
     }
 
-    Given("EnkeltTilgangDevClientValidator (fallback)") {
+    Given("EnkeltTilgangKonsumentValidator i ikke-prod") {
+        beforeEach {
+            mockkObject(ClusterUtils.Companion)
+            every { ClusterUtils.isProd } returns false
+        }
+        afterEach {
+            unmockkObject(ClusterUtils.Companion)
+        }
+
         When("hvilken som helst konsument") {
             Then("slipper alt gjennom") {
-                shouldNotThrowAny { devValidator.valider("ukjent-system") }
-                shouldNotThrowAny { devValidator.valider("") }
-                shouldNotThrowAny { devValidator.valider(cfg.systemer.first()) }
+                shouldNotThrowAny { validator.valider("ukjent-system") }
+                shouldNotThrowAny { validator.valider("") }
+                shouldNotThrowAny { validator.valider(cfg.systemer.first()) }
             }
         }
     }

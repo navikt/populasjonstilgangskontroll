@@ -58,7 +58,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @DataJpaTest
 @EnableJpaAuditing
 @TestPropertySource(locations = ["classpath:test.properties"])
-@EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
+@EnableConfigurationProperties(value = [GlobaleGrupperConfig::class, EnkeltTilgangConfig::class])
 @ContextConfiguration(classes = [TokenTypeTeller::class,EnkeltTilgangTjeneste::class, EnkeltTilgangJPAAdapter::class, RegelTjeneste::class, BulkResponsAggregator::class, LocalAuditor::class])
 @AutoConfigureMetrics
 @Testcontainers

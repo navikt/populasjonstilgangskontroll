@@ -5,7 +5,7 @@ import io.kotest.extensions.spring.SpringExtension
 import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.context.ContextConfiguration
 
-@ContextConfiguration(initializers = [RestTjenestePropertySettingTestContextInitializer::class])
+@ContextConfiguration(initializers = [PropertySettingTestContextInitializer::class])
 @EnableResilientMethods
 abstract class RestTjenesteTest(body: BehaviorSpec.() -> Unit = {}) : BehaviorSpec(body) {
     init {

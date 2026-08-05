@@ -4,9 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.booleans.shouldBeTrue
@@ -61,7 +59,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @EnableJpaAuditing
 @TestPropertySource(locations = ["classpath:test.properties"])
 @EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ApplyExtension(SpringExtension::class)
 @ContextConfiguration(classes = [TokenTypeTeller::class,EnkeltTilgangTjeneste::class, EnkeltTilgangJPAAdapter::class, RegelTjeneste::class, BulkResponsAggregator::class, LocalAuditor::class])
 @AutoConfigureMetrics
 @Testcontainers

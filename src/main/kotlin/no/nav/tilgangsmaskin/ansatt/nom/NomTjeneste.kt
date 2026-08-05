@@ -1,12 +1,12 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
+import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
 import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.transaction.annotation.Transactional
-import io.micrometer.observation.annotation.Observed
 
 @Observed
 @RetryingWhenRecoverableRestService

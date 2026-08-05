@@ -1,9 +1,7 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import io.micrometer.core.instrument.Tag
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.annotation.AliasFor
 import org.springframework.core.annotation.Order

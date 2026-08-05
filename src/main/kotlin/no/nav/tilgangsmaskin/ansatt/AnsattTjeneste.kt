@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import io.micrometer.core.instrument.Tags
+import io.micrometer.observation.annotation.Observed
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
@@ -8,7 +9,6 @@ import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
-import io.micrometer.observation.annotation.Observed
 
 @Observed
 @Service

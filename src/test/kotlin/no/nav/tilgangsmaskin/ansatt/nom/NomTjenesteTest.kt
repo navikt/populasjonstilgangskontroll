@@ -1,9 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import com.ninjasquad.springmockk.MockkBean
-import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.mockk.every
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -29,7 +27,6 @@ import java.time.LocalDate.now
 
 @DataJpaTest
 @Testcontainers
-@ApplyExtension(SpringExtension::class)
 @ContextConfiguration(classes = [NomTjeneste::class, NomJPAAdapter::class])
 @Import(NomTestConfig::class)
 @EnableAutoConfiguration

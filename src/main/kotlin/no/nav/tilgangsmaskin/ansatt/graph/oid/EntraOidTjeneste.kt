@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.graph.oid
 
+import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient.Companion.filter
@@ -11,7 +12,6 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.web.service.registry.ImportHttpServices
 import java.util.*
-import io.micrometer.observation.annotation.Observed
 
 @Observed
 @Service

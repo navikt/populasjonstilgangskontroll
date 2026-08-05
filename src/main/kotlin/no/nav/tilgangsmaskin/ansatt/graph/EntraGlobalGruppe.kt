@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
+import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD_MER_ENN_ETT_ÅR
-import no.nav.tilgangsmaskin.felles.rest.Token
 import java.util.*
 
 enum class EntraGlobalGruppe(val property: String, val metadata: GruppeMetadata) {

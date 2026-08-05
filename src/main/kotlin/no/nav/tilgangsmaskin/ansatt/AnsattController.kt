@@ -1,11 +1,11 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import io.swagger.v3.oas.annotations.Operation
+import no.nav.tilgangsmaskin.ansatt.AnsattController.Companion.DEV_ANSATT_CONTROLLER_TAG_DESCRIPTION
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.felles.rest.DevController
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
-import no.nav.tilgangsmaskin.ansatt.AnsattController.Companion.DEV_ANSATT_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 

@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
-import org.slf4j.LoggerFactory
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution

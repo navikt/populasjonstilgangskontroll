@@ -5,14 +5,14 @@ import jakarta.servlet.http.HttpServletRequest
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.TokenType
+import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
+import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
+import no.nav.tilgangsmaskin.felles.rest.TokenTypeTeller
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withAnsattContext
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.tilgang.BulkTilgangController.Companion.BULK_TILGANG_CONTROLLER_TAG_DESCRIPTION
-import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
-import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
-import no.nav.tilgangsmaskin.felles.rest.TokenTypeTeller
 import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons
 import no.nav.tilgangsmaskin.tilgang.openapi.BulkSwaggerApiRespons
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG

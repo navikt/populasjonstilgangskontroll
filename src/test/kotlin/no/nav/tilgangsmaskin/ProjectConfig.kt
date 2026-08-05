@@ -4,12 +4,13 @@ import io.kotest.core.config.AbstractProjectConfig
 import io.kotest.core.extensions.Extension
 import io.kotest.core.listeners.BeforeSpecListener
 import io.kotest.core.spec.Spec
+import io.kotest.extensions.spring.SpringExtension
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 class ProjectConfig : AbstractProjectConfig() {
-    override val extensions: List<Extension> = listOf(GruppeInitializer)
+    override val extensions: List<Extension> = listOf(SpringExtension(), GruppeInitializer)
 }
 
 private object GruppeInitializer : BeforeSpecListener {
@@ -28,4 +29,3 @@ private object GruppeInitializer : BeforeSpecListener {
         }
     }
 }
-

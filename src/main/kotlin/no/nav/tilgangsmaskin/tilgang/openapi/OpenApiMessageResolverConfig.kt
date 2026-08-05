@@ -2,8 +2,8 @@ package no.nav.tilgangsmaskin.tilgang.openapi
 
 import io.swagger.v3.oas.models.Operation
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import org.springdoc.core.customizers.OperationCustomizer
 import org.springdoc.core.customizers.OpenApiCustomizer
+import org.springdoc.core.customizers.OperationCustomizer
 import org.springframework.context.MessageSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

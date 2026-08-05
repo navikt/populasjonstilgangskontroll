@@ -4,12 +4,12 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.DevController
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
+import no.nav.tilgangsmaskin.regler.RegelController.Companion.DEV_REGEL_CONTROLLER_TAG_DESCRIPTION
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
 import no.nav.tilgangsmaskin.tilgang.openapi.BulkSwaggerApiRespons
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import no.nav.tilgangsmaskin.tilgang.openapi.ProblemDetailApiResponse
-import no.nav.tilgangsmaskin.regler.RegelController.Companion.DEV_REGEL_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.http.HttpStatus.MULTI_STATUS
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.web.bind.annotation.GetMapping

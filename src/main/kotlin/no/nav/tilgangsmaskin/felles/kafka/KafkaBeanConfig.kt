@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.felles.kafka
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.kafka.listener.ConsumerRecordRecoverer
 import org.springframework.kafka.listener.DefaultErrorHandler
 import org.springframework.kafka.listener.RetryListener
 import org.springframework.util.backoff.ExponentialBackOff

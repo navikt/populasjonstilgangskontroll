@@ -33,7 +33,6 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 
 
 @RestClientTest
-@ApplyExtension(SpringExtension::class)
 @EnableResilientMethods
 @ContextConfiguration(classes = [EntraProxyTjeneste::class, EntraProxyConfig::class], initializers = [PropertySettingTestContextInitializer::class])
 @Import(OAuth2ClientTestConfig::class)

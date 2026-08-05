@@ -41,17 +41,12 @@ import java.net.URI
 
 
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.test.context.ContextConfiguration
 
 @RestClientTest
-@ApplyExtension(SpringExtension::class)
 @EnableResilientMethods
 @ContextConfiguration(classes = [SkjermingTjeneste::class, SkjermingConfig::class], initializers = [PropertySettingTestContextInitializer::class])
 @Import(SkjermingTestConfig::class, OAuth2ClientTestConfig::class)
-@ConfigurationPropertiesScan
-@EnableAutoConfiguration
 class SkjermingTjenesteTest : BehaviorSpec() {
 
     @TestConfiguration

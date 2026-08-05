@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.regler
 
+import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.Auditor
@@ -15,7 +16,6 @@ import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons.EnkeltBulkResp
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.stereotype.Service
-import io.micrometer.observation.annotation.Observed
 
 @Observed
 @Service

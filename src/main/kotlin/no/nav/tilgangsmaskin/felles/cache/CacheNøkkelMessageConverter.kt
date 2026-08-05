@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_OCTET_STREAM
 import org.springframework.messaging.Message
 import org.springframework.messaging.converter.AbstractMessageConverter

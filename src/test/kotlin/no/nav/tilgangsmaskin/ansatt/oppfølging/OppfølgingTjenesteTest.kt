@@ -39,7 +39,6 @@ import java.util.UUID.*
 @DataJpaTest
 @EnableJpaAuditing
 @Testcontainers
-@ApplyExtension(SpringExtension::class)
 @ContextConfiguration(classes = [OppfølgingTjeneste::class, OppfølgingJPAAdapter::class])
 @EnableAutoConfiguration
 @Import(OppfølgingTestConfig::class)

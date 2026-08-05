@@ -28,7 +28,6 @@ import java.util.concurrent.atomic.AtomicInteger
 @Testcontainers
 @AutoConfigureMetrics
 @ContextConfiguration(classes = [NomTjeneste::class, NomJPAAdapter::class, NomDBOpprydder::class])
-@ApplyExtension(SpringExtension::class)
 @EnableAutoConfiguration
 class NomDBOpprydderTest : BehaviorSpec() {
 

@@ -31,7 +31,6 @@ import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import org.springframework.test.context.ContextConfiguration
 
 @RestClientTest
-@ApplyExtension(SpringExtension::class)
 @EnableResilientMethods
 @ContextConfiguration(classes = [EntraTjeneste::class, EntraGrupperConfig::class], initializers = [PropertySettingTestContextInitializer::class])
 @Import(EntraTestConfig::class, OAuth2ClientTestConfig::class)

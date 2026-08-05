@@ -52,12 +52,9 @@ import java.net.URI
 class VergemålTestConfig : CacheTestConfig(VERGEMÅL)
 
 @RestClientTest
-@ApplyExtension(SpringExtension::class)
 @EnableResilientMethods
 @Import(VergemålTestConfig::class, OAuth2ClientTestConfig::class)
 @ContextConfiguration(classes = [VergemålConfig::class, VergemålTjeneste::class], initializers = [PropertySettingTestContextInitializer::class])
-@EnableAutoConfiguration
-@ConfigurationPropertiesScan
 class VergemålTjenesteTest : BehaviorSpec() {
 
     @MockkBean

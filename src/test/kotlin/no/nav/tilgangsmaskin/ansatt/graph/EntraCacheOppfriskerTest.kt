@@ -1,9 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
 import com.ninjasquad.springmockk.MockkBean
-import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.mockk.every
 import io.mockk.verify
 import io.kotest.assertions.throwables.shouldNotThrowAny
@@ -20,7 +18,6 @@ import org.springframework.test.context.ContextConfiguration
 import java.net.URI
 import java.util.UUID
 
-@ApplyExtension(SpringExtension::class)
 @ContextConfiguration(classes = [EntraCacheOppfrisker::class])
 class EntraCacheOppfriskerTest : BehaviorSpec() {
 

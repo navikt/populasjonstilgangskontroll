@@ -53,7 +53,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @Testcontainers
 @AutoConfigureMetrics
 @ContextConfiguration(initializers = [PropertySettingTestContextInitializer::class],classes = [LocalAuditor::class,EnkeltTilgangJPAAdapter::class])
-@ApplyExtension(SpringExtension::class)
 @Import(TimeBeanConfig::class)
 @EnableAutoConfiguration
 @ComponentScan("no.nav.tilgangsmaskin.regler.motor")

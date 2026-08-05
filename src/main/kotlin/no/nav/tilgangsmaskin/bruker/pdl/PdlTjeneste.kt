@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
+import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
@@ -13,7 +14,6 @@ import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.web.service.registry.ImportHttpServices
-import io.micrometer.observation.annotation.Observed
 
 @Observed
 @RetryingWhenRecoverableRestService

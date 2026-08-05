@@ -2,10 +2,10 @@ package no.nav.tilgangsmaskin.ansatt.vergemål
 
 import io.swagger.v3.oas.annotations.Operation
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålController.Companion.DEV_VERGEMAL_CONTROLLER_TAG_DESCRIPTION
 import no.nav.tilgangsmaskin.felles.rest.DevController
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
-import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålController.Companion.DEV_VERGEMAL_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 

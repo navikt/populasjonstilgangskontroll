@@ -1,12 +1,12 @@
 package no.nav.tilgangsmaskin.bruker
 
 import io.swagger.v3.oas.annotations.Operation
+import no.nav.tilgangsmaskin.bruker.BrukerController.Companion.DEV_BRUKER_CONTROLLER_TAG_DESCRIPTION
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjeneste
 import no.nav.tilgangsmaskin.felles.rest.DevController
-import no.nav.tilgangsmaskin.tilgang.openapi.MSG
-import no.nav.tilgangsmaskin.bruker.BrukerController.Companion.DEV_BRUKER_CONTROLLER_TAG_DESCRIPTION
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
+import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping

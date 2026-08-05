@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component

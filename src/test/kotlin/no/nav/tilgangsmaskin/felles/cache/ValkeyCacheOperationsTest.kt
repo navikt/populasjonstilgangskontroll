@@ -7,9 +7,7 @@ import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.nondeterministic.eventually
 import io.kotest.assertions.nondeterministic.eventuallyConfig
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
@@ -40,7 +38,6 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.rest.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.test.context.TestConfiguration
@@ -61,9 +58,7 @@ import kotlin.time.measureTime
 @DataRedisTest
 @AutoConfigureMetrics
 @ContextConfiguration(classes = [ValkeyCacheTestConfig::class,ValkeyEventListeningCacheOppfrisker::class])
-@ApplyExtension(SpringExtension::class)
 @EnableAutoConfiguration
-@EnableConfigurationProperties
 class ValkeyCacheOperationsTest : BehaviorSpec() {
 
     @TestConfiguration

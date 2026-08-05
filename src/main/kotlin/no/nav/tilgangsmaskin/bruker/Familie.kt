@@ -1,7 +1,12 @@
 package no.nav.tilgangsmaskin.bruker
 
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.*
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.BARN
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.FAR
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.MOR
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.TIDLIGERE_PARTNER
 
 data class Familie(val medlemmer: Set<FamilieMedlem> = emptySet()) {
 

@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
+import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.StartetEllerEndret
@@ -10,7 +11,6 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.cache.annotation.Caching
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import io.micrometer.observation.annotation.Observed
 
 @Observed
 @Service

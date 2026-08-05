@@ -5,10 +5,10 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMIN
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.Person
+import no.nav.tilgangsmaskin.felles.cache.CacheController.Companion.DEV_CACHE_CONTROLLER_TAG_DESCRIPTION
 import no.nav.tilgangsmaskin.felles.rest.DevController
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
-import no.nav.tilgangsmaskin.felles.cache.CacheController.Companion.DEV_CACHE_CONTROLLER_TAG_DESCRIPTION
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 

@@ -3,10 +3,10 @@ package no.nav.tilgangsmaskin.felles.rest
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.AbstractTeller
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
 import no.nav.tilgangsmaskin.felles.rest.TokenType.UNAUTHENTICATED
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import org.springframework.security.core.context.SecurityContextHolder.getContext
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Component

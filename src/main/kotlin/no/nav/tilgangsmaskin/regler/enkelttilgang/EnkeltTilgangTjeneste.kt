@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import io.micrometer.core.annotation.Timed
 import io.micrometer.core.instrument.Tag
+import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
@@ -17,7 +18,6 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
-import io.micrometer.observation.annotation.Observed
 
 
 @Observed

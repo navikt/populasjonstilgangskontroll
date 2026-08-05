@@ -2,14 +2,14 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController.Companion.ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION
-import no.nav.tilgangsmaskin.tilgang.openapi.MSG
-import no.nav.tilgangsmaskin.tilgang.openapi.ProblemDetailApiResponse
-import no.nav.tilgangsmaskin.tilgang.TilgangApiController
-import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
 import no.nav.tilgangsmaskin.felles.rest.TokenTypeTeller
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController.Companion.ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION
+import no.nav.tilgangsmaskin.tilgang.TilgangApiController
+import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase
+import no.nav.tilgangsmaskin.tilgang.openapi.MSG
+import no.nav.tilgangsmaskin.tilgang.openapi.ProblemDetailApiResponse
 import org.springframework.http.HttpStatus.ACCEPTED
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.web.bind.annotation.PostMapping

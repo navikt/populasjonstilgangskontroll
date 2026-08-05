@@ -35,7 +35,6 @@ import java.util.UUID
 
 
 @RestClientTest
-@ApplyExtension(SpringExtension::class)
 @EnableResilientMethods
 @Import(OidTjenesteTestConfig::class, OAuth2ClientTestConfig::class)
 @ContextConfiguration(classes = [EntraOidTjeneste::class, EntraOidConfig::class, EntraGrupperConfig::class], initializers = [PropertySettingTestContextInitializer::class])

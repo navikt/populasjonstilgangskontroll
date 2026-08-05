@@ -52,8 +52,7 @@ import java.time.Duration.ofSeconds
 class PdlTjenesteTest : RestTjenesteTest() {
 
     @TestConfiguration
-    class PdlTestConfig : CacheTestConfig(PDL) {
-    }
+    class PdlTestConfig : CacheTestConfig(PDL)
 
     @MockkBean
     lateinit var graphQL: PdlSyncGraphQLClientAdapter
@@ -63,8 +62,10 @@ class PdlTjenesteTest : RestTjenesteTest() {
     lateinit var server: MockRestServiceServer
     @Autowired
     lateinit var cfg: PdlPipConfig
-    @Qualifier("cacheOperations") @Autowired lateinit var cache: CacheOperations
-    @Autowired lateinit var mapper: JsonMapper
+    @Autowired
+    lateinit var cache: CacheOperations
+    @Autowired
+    lateinit var mapper: JsonMapper
 
     init {
         beforeEach {

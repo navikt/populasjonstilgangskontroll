@@ -15,8 +15,7 @@ class RestTjenesteTestContextInitializer : ApplicationContextInitializer<Configu
 
     companion object {
         private fun serviceClientBaseUrls() = mapOf(
-            "pdl" to "http://pdl-api.pdl",
-            "pdlpip" to "http://pdl-api.pdl",
+            "pdlpip" to "http://pdlpip.pdl",
             "skjerming" to "http://skjermede-personer-pip.nom",
             "entraproxy" to "http://entra-proxy.sikkerhetstjenesten",
             "graph" to "https://graph.microsoft.com/v1.0",

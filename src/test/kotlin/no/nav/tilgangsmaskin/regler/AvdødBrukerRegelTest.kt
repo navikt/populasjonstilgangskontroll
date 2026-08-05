@@ -1,5 +1,5 @@
 
-package no.nav.tilgangsmaskin.regler.motor
+package no.nav.tilgangsmaskin.regler
 
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.core.spec.style.BehaviorSpec
@@ -8,8 +8,7 @@ import io.kotest.matchers.booleans.shouldBeTrue
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.AVDØD
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.regler.AnsattBuilder
-import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import no.nav.tilgangsmaskin.regler.motor.AvdødBrukerRegel
 import java.time.LocalDate.now
 
 class AvdødBrukerRegelTest : BehaviorSpec() {

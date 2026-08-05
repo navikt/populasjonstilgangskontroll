@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.regler.motor
+package no.nav.tilgangsmaskin.regler
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.booleans.shouldBeFalse
@@ -7,8 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
-import no.nav.tilgangsmaskin.regler.AnsattBuilder
-import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import no.nav.tilgangsmaskin.regler.motor.UtlandRegel
 
 class UtlandRegelTest : BehaviorSpec({
     val regel = UtlandRegel()

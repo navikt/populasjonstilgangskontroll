@@ -33,7 +33,6 @@ class RegelTjenesteTest : BehaviorSpec() {
 
     init {
         val vanligBrukerId = BrukerId("08526835670")
-        val vanligBruker = BrukerBuilder(vanligBrukerId).build()
         val ansattId = AnsattId("Z999999")
 
         lateinit var regler: RegelTjeneste

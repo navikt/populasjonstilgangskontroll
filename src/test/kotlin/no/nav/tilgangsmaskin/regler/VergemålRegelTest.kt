@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.regler.motor
+package no.nav.tilgangsmaskin.regler
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.booleans.shouldBeFalse
@@ -8,8 +8,7 @@ import io.mockk.mockk
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.regler.AnsattBuilder
-import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import no.nav.tilgangsmaskin.regler.motor.VergemålRegel
 
 class VergemålRegelTest : BehaviorSpec({
     val vergemål = mockk<VergemålTjeneste>()

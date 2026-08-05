@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.regler.motor
+package no.nav.tilgangsmaskin.regler
 
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.BehaviorSpec
@@ -20,8 +20,7 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.Identifikator
-import no.nav.tilgangsmaskin.regler.AnsattBuilder
-import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import no.nav.tilgangsmaskin.regler.motor.GeografiskRegel
 import java.util.UUID
 
 class GeografiskRegelTest : BehaviorSpec({

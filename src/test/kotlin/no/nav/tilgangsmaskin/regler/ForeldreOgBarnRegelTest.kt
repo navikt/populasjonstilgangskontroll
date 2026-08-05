@@ -1,12 +1,11 @@
-package no.nav.tilgangsmaskin.regler.motor
+package no.nav.tilgangsmaskin.regler
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.regler.AnsattBuilder
-import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import no.nav.tilgangsmaskin.regler.motor.ForeldreOgBarnRegel
 
 class ForeldreOgBarnRegelTest : BehaviorSpec({
     val regel = ForeldreOgBarnRegel()

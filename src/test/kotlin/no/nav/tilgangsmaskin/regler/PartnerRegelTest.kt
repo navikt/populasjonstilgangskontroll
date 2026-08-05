@@ -1,35 +1,34 @@
-package no.nav.tilgangsmaskin.regler.motor
+package no.nav.tilgangsmaskin.regler
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.regler.AnsattBuilder
-import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import no.nav.tilgangsmaskin.regler.motor.PartnerRegel
 
-class SøskenRegelTest : BehaviorSpec({
-    val regel = SøskenRegel()
+class PartnerRegelTest : BehaviorSpec({
+    val regel = PartnerRegel()
     val ansattId = AnsattId("Z999999")
     val brukerId = BrukerId("08526835670")
 
-    Given("ansatt er søsken til bruker") {
+    Given("ansatt er partner med bruker") {
         val ansattBrukerId = BrukerId("08526835644")
-        val ansattBruker = BrukerBuilder(ansattBrukerId).søsken(setOf(brukerId)).build()
+        val ansattBruker = BrukerBuilder(ansattBrukerId).partnere(setOf(brukerId)).build()
         val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
-        val søsken = BrukerBuilder(brukerId).build()
+        val partner = BrukerBuilder(brukerId).build()
 
         When("regelen evalueres") {
-            Then("avvises av SøskenRegel") {
-                regel.evaluer(ansatt, søsken).shouldBeFalse()
+            Then("avvises av PartnerRegel") {
+                regel.evaluer(ansatt, partner).shouldBeFalse()
             }
         }
     }
 
-    Given("ansatt er ikke søsken til bruker") {
+    Given("ansatt er ikke partner med bruker") {
         val ansattBrukerId = BrukerId("08526835644")
-        val annetSøsken = BrukerId("08526835648")
-        val ansattBruker = BrukerBuilder(ansattBrukerId).søsken(setOf(annetSøsken)).build()
+        val annenPartner = BrukerId("08526835648")
+        val ansattBruker = BrukerBuilder(ansattBrukerId).partnere(setOf(annenPartner)).build()
         val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
         val bruker = BrukerBuilder(brukerId).build()
 

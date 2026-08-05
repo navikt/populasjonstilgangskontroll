@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.regler.motor
+package no.nav.tilgangsmaskin.regler
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.booleans.shouldBeFalse
@@ -8,8 +8,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.regler.AnsattBuilder
-import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import no.nav.tilgangsmaskin.regler.motor.FortroligRegel
 
 class FortroligRegelTest : BehaviorSpec({
     val regel = FortroligRegel()

@@ -33,8 +33,6 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 @RestClientTest
 @ContextConfiguration(classes = [EntraProxyTjeneste::class, EntraProxyConfig::class])
 @Import(OAuth2ClientTestConfig::class)
-@ConfigurationPropertiesScan
-@EnableAutoConfiguration
 class EntraProxyTjenesteTest : RestTjenesteTest() {
 
     @Autowired

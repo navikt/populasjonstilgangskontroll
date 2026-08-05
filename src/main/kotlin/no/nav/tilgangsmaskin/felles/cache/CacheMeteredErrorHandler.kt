@@ -1,12 +1,14 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.Cache
 import org.springframework.cache.interceptor.CacheErrorHandler
 import org.springframework.stereotype.Component
 
 @Component
+@NoCoverageAnalysis
 class CacheMeteredErrorHandler(private val registry: MeterRegistry) : CacheErrorHandler {
     private val log = getLogger(javaClass)
     override fun handleCacheGetError(e: RuntimeException, cache: Cache, key: Any) =

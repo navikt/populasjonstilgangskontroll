@@ -22,6 +22,7 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
+import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
 
 @SpringBootTest(
@@ -43,6 +44,7 @@ class TilgangControllerMockOAuth2ServerTest : BehaviorSpec() {
     private lateinit var teller: TokenTypeTeller
 
     init {
+
         beforeSpec {
             if (oauthStarted.compareAndSet(false, true)) {
                 mockOAuth2.start()
@@ -78,7 +80,7 @@ class TilgangControllerMockOAuth2ServerTest : BehaviorSpec() {
                     val jwt = mockOAuth2.issueToken(ISSUER_ID, SUBJECT, AUDIENCE,
                         mapOf(
                             NAVIDENT to ANSATT_ID.verdi,
-                            OID to "11111111-1111-1111-1111-111111111111")
+                            OID to UUID.randomUUID().toString())
                     ).serialize()
 
                     mockMvc.post("/api/v1/komplett") {

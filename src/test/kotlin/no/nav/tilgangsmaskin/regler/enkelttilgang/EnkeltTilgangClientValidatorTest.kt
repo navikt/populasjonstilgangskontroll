@@ -9,7 +9,8 @@ import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.AZP_NAME
 import no.nav.tilgangsmaskin.felles.security.EnkeltTilgangAuthorizationManager
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.oauth2.jwt.Jwt
 import java.time.Instant.now
@@ -21,16 +22,16 @@ class EnkeltTilgangClientValidatorTest : BehaviorSpec({
     fun decisionFor(claims: Map<String, Any>) =
         manager.authorize(
             { TestingAuthenticationToken(jwt(claims), null) },
-            mockk(relaxed = true)
+            mockk()
         ).isGranted
 
     Given("autorisasjon for overstyring i prod") {
         beforeEach {
-            mockkObject(ClusterUtils.Companion)
-            every { ClusterUtils.isProd } returns true
+            mockkObject(Companion)
+            every { isProd } returns true
         }
         afterEach {
-            unmockkObject(ClusterUtils.Companion)
+            unmockkObject(Companion)
         }
 
         cfg.systemer.forEach { konsument ->
@@ -50,11 +51,11 @@ class EnkeltTilgangClientValidatorTest : BehaviorSpec({
 
     Given("autorisasjon for overstyring i ikke-prod") {
         beforeEach {
-            mockkObject(ClusterUtils.Companion)
-            every { ClusterUtils.isProd } returns false
+            mockkObject(Companion)
+            every { isProd } returns false
         }
         afterEach {
-            unmockkObject(ClusterUtils.Companion)
+            unmockkObject(Companion)
         }
 
         When("hvilken som helst konsument") {

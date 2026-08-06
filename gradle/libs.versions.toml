@@ -29,17 +29,14 @@ kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.
 kotest-bom = { module = "io.kotest:kotest-bom", version.ref = "kotest" }
 kotest-extensions-spring = { module = "io.kotest:kotest-extensions-spring", version.ref = "kotest" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logstash" }
 micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 opentelemetry-instrumentation-annotations = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations" }
 opentelemetry-instrumentation-bom = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom", version.ref = "opentelemetry" }
 opentelemetry-logback-mdc = { module = "io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0", version.ref = "opentelemetry-alpha" }
 postgresql = { module = "org.postgresql:postgresql" }
 slack-api = { module = "com.slack.api:slack-api-client", version.ref = "slack-api-client" }
 slack-api-kotlin = { module = "com.slack.api:slack-api-client-kotlin-extension", version.ref = "slack-api-client" }
-spring-aspects = { module = "org.springframework:spring-aspects" }
 spring-boot-micrometer-metrics-test = { module = "org.springframework.boot:spring-boot-micrometer-metrics-test" }
 spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 spring-boot-starter-cache = { module = "org.springframework.boot:spring-boot-starter-cache" }
@@ -57,10 +54,12 @@ spring-boot-starter-oauth2-resource-server = { module = "org.springframework.boo
 spring-boot-restclient = { module = "org.springframework.boot:spring-boot-restclient" }
 spring-boot-starter-restclient-test = { module = "org.springframework.boot:spring-boot-starter-restclient-test" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
 spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
 spring-boot-starter-webclient = { module = "org.springframework.boot:spring-boot-starter-webclient" }
 spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
+spring-security-test = { module = "org.springframework.security:spring-security-test" }
 spring-restdocs-mockmvc = { module = "org.springframework.restdocs:spring-restdocs-mockmvc" }
 springdoc-openapi-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
 springmockk = { module = "com.ninja-squad:springmockk", version.ref = "springmockk" }

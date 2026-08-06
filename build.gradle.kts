@@ -79,7 +79,7 @@ dependencies {
     }
     implementation(libs.spring.boot.starter.webclient)
     implementation(libs.springdoc.openapi.webmvc.ui)
-    testImplementation("com.github.ben-manes.caffeine:caffeine")
+    testImplementation(libs.caffeine)
     testImplementation(libs.bundles.kotest)
     testImplementation(libs.spring.boot.micrometer.metrics.test)
     testImplementation(libs.bundles.testcontainers)
@@ -87,8 +87,10 @@ dependencies {
     testImplementation(libs.spring.boot.starter.data.redis.test)
     testImplementation(libs.spring.boot.starter.kafka.test)
     testImplementation(libs.spring.boot.starter.restclient.test)
+    testImplementation(libs.spring.boot.starter.webmvc.test)
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.spring.boot.testcontainers)
+    testImplementation(libs.spring.security.test)
     testImplementation(libs.spring.restdocs.mockmvc)
     testImplementation(libs.springmockk)
 }

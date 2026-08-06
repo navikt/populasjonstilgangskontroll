@@ -9,6 +9,7 @@ kotlin = "2.4.0"
 kotest = "6.2.3"
 logstash = "9.0"
 mockk = "1.14.11"
+mock-oauth2-server = "2.2.1"
 opentelemetry = "2.30.0"
 opentelemetry-alpha = "2.30.0-alpha"
 slack-api-client = "1.49.0"
@@ -60,6 +61,7 @@ spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-start
 spring-boot-starter-webclient = { module = "org.springframework.boot:spring-boot-starter-webclient" }
 spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
 spring-security-test = { module = "org.springframework.security:spring-security-test" }
+mock-oauth2-server = { module = "no.nav.security:mock-oauth2-server", version.ref = "mock-oauth2-server" }
 spring-restdocs-mockmvc = { module = "org.springframework.restdocs:spring-restdocs-mockmvc" }
 springdoc-openapi-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
 springmockk = { module = "com.ninja-squad:springmockk", version.ref = "springmockk" }

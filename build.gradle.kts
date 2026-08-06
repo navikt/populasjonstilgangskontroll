@@ -91,6 +91,7 @@ dependencies {
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.spring.boot.testcontainers)
     testImplementation(libs.spring.security.test)
+    testImplementation(libs.mock.oauth2.server)
     testImplementation(libs.spring.restdocs.mockmvc)
     testImplementation(libs.springmockk)
 }

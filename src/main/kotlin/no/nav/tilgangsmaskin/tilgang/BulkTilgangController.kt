@@ -7,7 +7,6 @@ import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.TokenType
 import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
-import no.nav.tilgangsmaskin.felles.rest.TokenTypeTeller
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withAnsattContext
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
@@ -29,7 +28,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 @TilgangApiController
 @ResponseStatus(MULTI_STATUS)
 @Tag(name = "BulkTilgangController", description = BULK_TILGANG_CONTROLLER_TAG_DESCRIPTION)
-class BulkTilgangController(private val regelTjeneste: RegelTjeneste, token: Token, teller: TokenTypeTeller) : TilgangControllerBase(token, teller) {
+class BulkTilgangController(private val regelTjeneste: RegelTjeneste, token: Token) : TilgangControllerBase(token) {
 
     @PostMapping("bulk/obo")
     @BulkSwaggerApiRespons(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO)
@@ -67,7 +66,6 @@ class BulkTilgangController(private val regelTjeneste: RegelTjeneste, token: Tok
             if (specs.isNotEmpty()) {
                 sjekk(specs.size <= 1000, CONTENT_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
                 sjekk(specs.none { it.brukerId.isBlank() }, BAD_REQUEST, "brukerId kan ikke være tom")
-                tell("bulk", forventet)
                 regelTjeneste.bulkRegler(ansatt, specs)
             } else {
                 log.debug("Ingen brukerId-er oppgitt i bulk forespørsel for {}", ansatt)

@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
-import no.nav.tilgangsmaskin.felles.rest.TokenTypeTeller
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController.Companion.ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION
 import no.nav.tilgangsmaskin.tilgang.TilgangApiController
 import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 
 @TilgangApiController
 @Tag(name = "EnkeltTilgangController", description = ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION)
-class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste, token: Token, teller: TokenTypeTeller) : TilgangControllerBase(token, teller) {
+class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste, token: Token) : TilgangControllerBase(token) {
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)

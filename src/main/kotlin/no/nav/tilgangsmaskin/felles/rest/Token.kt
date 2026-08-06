@@ -1,8 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
-import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.felles.AbstractTeller
 import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
 import no.nav.tilgangsmaskin.felles.rest.TokenType.UNAUTHENTICATED
@@ -68,7 +66,3 @@ class Token {
 enum class TokenType {
     OBO, CCF, UNAUTHENTICATED
 }
-
-@Component
-class TokenTypeTeller(registry: MeterRegistry, token: Token) :
-    AbstractTeller(registry, token, "token.type", "Token type")

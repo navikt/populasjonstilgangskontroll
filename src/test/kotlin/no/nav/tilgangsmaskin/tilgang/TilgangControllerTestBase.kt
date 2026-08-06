@@ -1,15 +1,12 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.kotest.core.spec.style.BehaviorSpec
-import io.micrometer.core.instrument.Tags
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.justRun
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.Token
-import no.nav.tilgangsmaskin.felles.rest.TokenTypeTeller
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
@@ -63,9 +60,6 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
     @MockK(relaxed = true)
     protected lateinit var token: Token
 
-    @MockK
-    protected lateinit var teller: TokenTypeTeller
-
     protected val ansattId = AnsattId("Z999999")
     protected val brukerId = "08526835670"
 
@@ -106,9 +100,9 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             clearAllMocks()
             restDocumentation.beforeTest(TilgangControllerTestBase::class.java, case.name.name)
             mockMvc = standaloneSetup(
-                TilgangController(regelTjeneste, token, teller),
-                EnkeltTilgangController(enkeltTilgangTjeneste, token, teller),
-                BulkTilgangController(regelTjeneste, token, teller)
+                TilgangController(regelTjeneste, token),
+                EnkeltTilgangController(enkeltTilgangTjeneste, token),
+                BulkTilgangController(regelTjeneste, token)
             )
                 .setControllerAdvice(ProblemDetailExceptionHandler())
                 .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
@@ -126,7 +120,6 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
                     .withResponseDefaults(prettyPrint())
                 )
                 .build()
-            justRun { teller.tell(any<Tags>()) }
             every { token.ansattId } returns ansattId
         }
 

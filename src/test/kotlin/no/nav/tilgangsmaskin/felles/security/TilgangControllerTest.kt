@@ -12,7 +12,6 @@ import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
-import no.nav.tilgangsmaskin.felles.rest.TokenTypeTeller
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
@@ -30,7 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean
     classes = [SecurityTestApplication::class]
 )
 @AutoConfigureMockMvc
-class TilgangControllerMockOAuth2ServerTest : BehaviorSpec() {
+class TilgangControllerTest : BehaviorSpec() {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -40,9 +39,6 @@ class TilgangControllerMockOAuth2ServerTest : BehaviorSpec() {
 
     @MockkBean(relaxed = true)
     private lateinit var token: Token
-
-    @MockkBean(relaxed = true)
-    private lateinit var teller: TokenTypeTeller
 
     init {
 
@@ -78,15 +74,10 @@ class TilgangControllerMockOAuth2ServerTest : BehaviorSpec() {
 
             When("request has valid oauth2 token") {
                 Then("returns 204") {
-                    val jwt = mockOAuth2.issueToken(ISSUER_ID, SUBJECT, AUDIENCE,
-                        mapOf(
-                            NAVIDENT to ANSATT_ID.verdi,
-                            OID to UUID.randomUUID().toString())
-                    ).serialize()
 
                     mockMvc.post("/api/v1/komplett") {
                         headers {
-                            setBearerAuth(jwt)
+                            setBearerAuth(jwt(AUDIENCE))
                         }
                         contentType = APPLICATION_JSON
                         content = "\"${BRUKER_ID.verdi}\""
@@ -100,15 +91,9 @@ class TilgangControllerMockOAuth2ServerTest : BehaviorSpec() {
 
             When("request has token with invalid audience") {
                 Then("returns 401") {
-                    val jwt = mockOAuth2.issueToken(ISSUER_ID, SUBJECT, INVALID_AUDIENCE,
-                        mapOf(
-                            NAVIDENT to ANSATT_ID.verdi,
-                            OID to UUID.randomUUID().toString())
-                    ).serialize()
-
                     mockMvc.post("/api/v1/komplett") {
                         headers {
-                            setBearerAuth(jwt)
+                            setBearerAuth(jwt(INVALID_AUDIENCE))
                         }
                         contentType = APPLICATION_JSON
                         content = "\"${BRUKER_ID.verdi}\""
@@ -129,6 +114,12 @@ class TilgangControllerMockOAuth2ServerTest : BehaviorSpec() {
             }
         }
     }
+
+    private fun jwt(audience: String) = mockOAuth2.issueToken(ISSUER_ID, SUBJECT, audience,
+        mapOf(
+            NAVIDENT to ANSATT_ID.verdi,
+            OID to UUID.randomUUID().toString())
+    ).serialize()
 
     companion object {
         private val mockOAuth2 = MockOAuth2Server()

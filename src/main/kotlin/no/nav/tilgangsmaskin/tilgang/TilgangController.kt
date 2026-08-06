@@ -7,7 +7,6 @@ import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.TokenType
 import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
-import no.nav.tilgangsmaskin.felles.rest.TokenTypeTeller
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -28,7 +27,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 @TilgangApiController
 @ResponseStatus(NO_CONTENT)
 @Tag(name = "TilgangController", description = TILGANG_CONTROLLER_TAG_DESCRIPTION)
-class TilgangController(private val regelTjeneste: RegelTjeneste, token: Token, teller: TokenTypeTeller) : TilgangControllerBase(token, teller) {
+class TilgangController(private val regelTjeneste: RegelTjeneste, token: Token) : TilgangControllerBase(token) {
 
     @PostMapping("komplett")
     @ProblemDetailApiResponse(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
@@ -56,7 +55,6 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, token: Token, 
             sjekk(token.type == forventet, FORBIDDEN, "Forventet token type $forventet for $uri, fikk ${token.type}")
             sjekk(regelType in listOf(KJERNE_REGELTYPE, KOMPLETT_REGELTYPE), BAD_REQUEST, "Ugyldig regeltype: $regelType")
             log.trace(CONFIDENTIAL, "Kjører {} regler for {} og {}", regelType, ansatt, maskFnr())
-            tell("single", forventet)
             when (regelType) {
                 KJERNE_REGELTYPE -> regelTjeneste.kjerneregler(ansatt, this)
                 else -> regelTjeneste.kompletteRegler(ansatt, this)

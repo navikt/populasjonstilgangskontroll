@@ -1,12 +1,9 @@
 package no.nav.tilgangsmaskin.tilgang
 
-import io.micrometer.core.instrument.Tags
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType.HTTP
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import no.nav.tilgangsmaskin.felles.rest.Token
-import no.nav.tilgangsmaskin.felles.rest.TokenType
-import no.nav.tilgangsmaskin.felles.rest.TokenTypeTeller
 import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase.Companion.PROD_BASE_PATH
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus
@@ -24,12 +21,9 @@ import kotlin.annotation.AnnotationTarget.CLASS
 @SecurityRequirement(name = "bearerAuth")
 annotation class TilgangApiController
 
-abstract class TilgangControllerBase(protected val token: Token, private val teller: TokenTypeTeller) {
+abstract class TilgangControllerBase(protected val token: Token) {
 
     protected val log = getLogger(javaClass)
-
-    protected fun tell(type: String, tokenType: TokenType) =
-        teller.tell(Tags.of("type", type, "token", tokenType.name.lowercase()))
 
     protected fun sjekk(predikat: Boolean, status: HttpStatus, message: String) {
         if (!predikat) throw ResponseStatusException(status, message)

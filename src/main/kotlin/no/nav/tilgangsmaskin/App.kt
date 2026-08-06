@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin
 
 import no.nav.boot.conditionals.ConditionalOnGCP
+import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.TimeBeanConfig.Companion.AUDITING_TIME_PROVIDER
 import no.nav.tilgangsmaskin.felles.cache.CacheSizeAware
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.profiler
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Component
 @EnableJpaAuditing(dateTimeProviderRef = AUDITING_TIME_PROVIDER)
 @EnableScheduling
 @ConditionalOnGCP
+@NoCoverageAnalysis
 class App
 
 fun main(args: Array<String>) {

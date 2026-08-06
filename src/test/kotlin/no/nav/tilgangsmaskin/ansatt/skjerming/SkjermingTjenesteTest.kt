@@ -22,7 +22,6 @@ import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
@@ -45,19 +44,15 @@ import java.net.URI
 @EnableResilientMethods
 @ContextConfiguration(classes = [SkjermingTjeneste::class, SkjermingConfig::class], initializers = [PropertySettingTestContextInitializer::class])
 @Import(SkjermingTestConfig::class, OAuth2ClientTestConfig::class)
-class SkjermingTjenesteTest : BehaviorSpec() {
+class SkjermingTjenesteTest(
+    private val tjeneste: SkjermingTjeneste,
+    private val server: MockRestServiceServer,
+    private val cache: CacheOperations,
+    private val cfg: SkjermingConfig
+) : BehaviorSpec() {
 
     @TestConfiguration
     class SkjermingTestConfig : CacheTestConfig(SKJERMING)
-
-    @Autowired
-    lateinit var tjeneste: SkjermingTjeneste
-    @Autowired
-    lateinit var server: MockRestServiceServer
-    @Autowired
-    lateinit var cache: CacheOperations
-    @Autowired
-    lateinit var cfg: SkjermingConfig
 
     init {
 

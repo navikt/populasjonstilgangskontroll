@@ -16,7 +16,6 @@ import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import org.hamcrest.Matchers.containsString
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
@@ -35,17 +34,14 @@ import java.util.*
 @EnableResilientMethods
 @Import(OidTjenesteTestConfig::class, OAuth2ClientTestConfig::class)
 @ContextConfiguration(classes = [EntraOidTjeneste::class, EntraOidConfig::class, EntraGrupperConfig::class], initializers = [PropertySettingTestContextInitializer::class])
-class OidTjenesteTest : BehaviorSpec() {
+class OidTjenesteTest(
+    private val tjeneste: EntraOidTjeneste,
+    private val server: MockRestServiceServer,
+    private val cache: CacheOperations
+) : BehaviorSpec() {
 
     @TestConfiguration
     class OidTjenesteTestConfig : CacheTestConfig(ENTRA_OID)
-
-    @Autowired
-    private lateinit var tjeneste: EntraOidTjeneste
-    @Autowired
-    private lateinit var server: MockRestServiceServer
-    @Autowired
-    private lateinit var cache: CacheOperations
 
     init {
         beforeEach {

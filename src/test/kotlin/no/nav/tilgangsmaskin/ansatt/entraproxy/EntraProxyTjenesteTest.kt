@@ -12,7 +12,6 @@ import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
@@ -34,14 +33,11 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 @EnableResilientMethods
 @ContextConfiguration(classes = [EntraProxyTjeneste::class, EntraProxyConfig::class], initializers = [PropertySettingTestContextInitializer::class])
 @Import(OAuth2ClientTestConfig::class)
-class EntraProxyTjenesteTest : BehaviorSpec() {
-
-    @Autowired
-    lateinit var tjeneste: EntraProxyTjeneste
-    @Autowired
-    lateinit var server: MockRestServiceServer
-    @Autowired
-    lateinit var cfg: EntraProxyConfig
+class EntraProxyTjenesteTest(
+    private val tjeneste: EntraProxyTjeneste,
+    private val server: MockRestServiceServer,
+    private val cfg: EntraProxyConfig
+) : BehaviorSpec() {
 
     init {
         afterEach {

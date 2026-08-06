@@ -14,7 +14,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapterTest.GraphQLT
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -34,7 +33,11 @@ import org.springframework.web.client.RestClient.Builder
 @RestClientTest
 @ContextConfiguration(initializers = [PropertySettingTestContextInitializer::class], classes = [PdlSyncGraphQLClientAdapter::class, PdlGraphQLConfig::class])
 @Import(GraphQLTestConfig::class, OAuth2ClientTestConfig::class)
-class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
+class PdlSyncGraphQLClientAdapterTest(
+    private val adapter: PdlSyncGraphQLClientAdapter,
+    private val server: MockRestServiceServer,
+    private val cfg: PdlGraphQLConfig
+) : BehaviorSpec() {
 
     @TestConfiguration
     class GraphQLTestConfig {
@@ -54,13 +57,6 @@ class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
             .interceptors { it.addAll(interceptors) }
             .build()
     }
-
-    @Autowired
-    lateinit var adapter: PdlSyncGraphQLClientAdapter
-    @Autowired
-    lateinit var server: MockRestServiceServer
-    @Autowired
-    lateinit var cfg: PdlGraphQLConfig
 
     init {
         beforeEach { server.reset() }

@@ -28,7 +28,6 @@ import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
@@ -46,23 +45,19 @@ import java.time.Duration.ofSeconds
 @EnableResilientMethods
 @Import(PdlTestConfig::class, OAuth2ClientTestConfig::class)
 @ContextConfiguration(classes = [PdlTjeneste::class, PdlPipConfig::class], initializers = [PropertySettingTestContextInitializer::class])
-class PdlTjenesteTest : BehaviorSpec() {
+class PdlTjenesteTest(
+    private val pdl: PdlTjeneste,
+    private val server: MockRestServiceServer,
+    private val cfg: PdlPipConfig,
+    private val cache: CacheOperations,
+    private val mapper: JsonMapper
+) : BehaviorSpec() {
 
     @TestConfiguration
     class PdlTestConfig : CacheTestConfig(PDL)
 
     @MockkBean
     lateinit var graphQL: PdlSyncGraphQLClientAdapter
-    @Autowired
-    lateinit var pdl: PdlTjeneste
-    @Autowired
-    lateinit var server: MockRestServiceServer
-    @Autowired
-    lateinit var cfg: PdlPipConfig
-    @Autowired
-    lateinit var cache: CacheOperations
-    @Autowired
-    lateinit var mapper: JsonMapper
 
     init {
         beforeEach {

@@ -13,9 +13,14 @@ import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
-import org.springframework.beans.factory.annotation.Autowired
+import no.nav.tilgangsmaskin.tilgang.TilgangController
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration
+import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -29,10 +34,9 @@ import java.util.concurrent.atomic.AtomicBoolean
     classes = [SecurityTestApplication::class]
 )
 @AutoConfigureMockMvc
-class TilgangControllerTest : BehaviorSpec() {
-
-    @Autowired
-    private lateinit var mockMvc: MockMvc
+class TilgangControllerTest(
+    private val mockMvc: MockMvc
+) : BehaviorSpec() {
 
     @MockkBean
     private lateinit var regelTjeneste: RegelTjeneste
@@ -144,3 +148,7 @@ class TilgangControllerTest : BehaviorSpec() {
         }
     }
 }
+
+@SpringBootApplication(exclude = [DataSourceAutoConfiguration::class, HibernateJpaAutoConfiguration::class, FlywayAutoConfiguration::class])
+@Import(OAuth2SecurityBeanConfig::class, TilgangController::class)
+class SecurityTestApplication

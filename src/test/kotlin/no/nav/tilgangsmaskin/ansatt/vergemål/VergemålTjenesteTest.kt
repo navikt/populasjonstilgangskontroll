@@ -23,7 +23,6 @@ import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
@@ -49,7 +48,12 @@ import java.net.URI
 @EnableResilientMethods
 @Import(VergemålTestConfig::class, OAuth2ClientTestConfig::class)
 @ContextConfiguration(classes = [VergemålConfig::class, VergemålTjeneste::class], initializers = [PropertySettingTestContextInitializer::class])
-class VergemålTjenesteTest : BehaviorSpec() {
+class VergemålTjenesteTest(
+    private val tjeneste: VergemålTjeneste,
+    private val cfg: VergemålConfig,
+    private val server: MockRestServiceServer,
+    private val cache: CacheOperations
+) : BehaviorSpec() {
 
 
     @TestConfiguration
@@ -57,18 +61,6 @@ class VergemålTjenesteTest : BehaviorSpec() {
 
     @MockkBean
     private lateinit var nom: NomTjeneste
-
-    @Autowired
-    lateinit var tjeneste: VergemålTjeneste
-
-    @Autowired
-    lateinit var cfg: VergemålConfig
-
-    @Autowired
-    lateinit var server: MockRestServiceServer
-
-    @Autowired
-    lateinit var cache: CacheOperations
 
     init {
         beforeEach {

@@ -14,7 +14,6 @@ import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
@@ -32,22 +31,15 @@ import java.util.*
 @EnableResilientMethods
 @ContextConfiguration(classes = [EntraTjeneste::class, EntraGrupperConfig::class], initializers = [PropertySettingTestContextInitializer::class])
 @Import(EntraTestConfig::class, OAuth2ClientTestConfig::class)
-class EntraTjenesteTest : BehaviorSpec() {
+class EntraTjenesteTest(
+    private val tjeneste: EntraTjeneste,
+    private val server: MockRestServiceServer,
+    private val cfg: EntraGrupperConfig,
+    private val cache: CacheOperations
+) : BehaviorSpec() {
 
     @TestConfiguration
     class EntraTestConfig : CacheTestConfig(GRAPH)
-
-    @Autowired
-    private lateinit var tjeneste: EntraTjeneste
-
-    @Autowired
-    private lateinit var server: MockRestServiceServer
-
-    @Autowired
-    private lateinit var cfg: EntraGrupperConfig
-
-    @Autowired
-    private lateinit var cache: CacheOperations
 
 
     init {

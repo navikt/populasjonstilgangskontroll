@@ -31,19 +31,13 @@ import java.util.*
 @EnableResilientMethods
 @ContextConfiguration(classes = [EntraTjeneste::class, EntraGrupperConfig::class], initializers = [PropertySettingTestContextInitializer::class])
 @Import(EntraTestConfig::class, OAuth2ClientTestConfig::class)
-class EntraTjenesteTest(
-    private val tjeneste: EntraTjeneste,
-    private val server: MockRestServiceServer,
-    private val cfg: EntraGrupperConfig,
-    private val cache: CacheOperations
-) : BehaviorSpec() {
+class EntraTjenesteTest(private val tjeneste: EntraTjeneste, private val server: MockRestServiceServer, private val cfg: EntraGrupperConfig, private val cache: CacheOperations) : BehaviorSpec() {
 
     @TestConfiguration
     class EntraTestConfig : CacheTestConfig(GRAPH)
 
 
     init {
-
         beforeEach {
             server.reset()
             cache.clear(ENTRA_CACHES)

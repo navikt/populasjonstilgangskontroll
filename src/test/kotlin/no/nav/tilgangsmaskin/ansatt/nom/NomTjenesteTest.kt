@@ -15,7 +15,6 @@ import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.rest.Token
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -30,19 +29,17 @@ import java.time.LocalDate.now
 @ContextConfiguration(classes = [NomTjeneste::class, NomJPAAdapter::class])
 @Import(NomTestConfig::class)
 @EnableAutoConfiguration
-class NomTjenesteTest : BehaviorSpec() {
+class NomTjenesteTest(
+    private val tjeneste: NomTjeneste,
+    private val repo: NomRepository,
+    private val cache: CacheOperations,
+) : BehaviorSpec() {
 
     @TestConfiguration
     class NomTestConfig : CacheTestConfig(NOM)
 
     @MockkBean
     private lateinit var token: Token
-    @Autowired
-    private lateinit var tjeneste: NomTjeneste
-    @Autowired
-    private lateinit var repo: NomRepository
-    @Autowired
-    private lateinit var cache: CacheOperations
 
     private val ansattId = AnsattId("Z999999")
     private val brukerId = BrukerId("08526835670")

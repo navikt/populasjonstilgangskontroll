@@ -40,8 +40,6 @@ import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
 import no.nav.tilgangsmaskin.regler.motor.RegelException
-import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
@@ -64,7 +62,9 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @EnableAutoConfiguration
 @Import(TimeBeanConfig::class)
 @ComponentScan("no.nav.tilgangsmaskin.regler.motor", "no.nav.tilgangsmaskin.regler.enkelttilgang")
-class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
+class EnkeltTilgangRegelTjenesteTest(
+    private val enkeltTilgang: EnkeltTilgangTjeneste,
+    private val regler: RegelTjeneste) : BehaviorSpec() {
 
     private val strengtFortroligAktørId = AktørId("1234567890123")
     private val strengtFortroligBrukerId = BrukerId("08526835671")
@@ -90,13 +90,6 @@ class EnkeltTilgangRegelTjenesteTest : BehaviorSpec() {
     lateinit var brukere: BrukerTjeneste
     @MockkBean
     lateinit var ansatte: AnsattTjeneste
-
-    @Autowired
-    lateinit var motor: RegelMotor
-    @Autowired
-    lateinit var enkeltTilgang: EnkeltTilgangTjeneste
-    @Autowired
-    lateinit var regler: RegelTjeneste
 
 
     init {

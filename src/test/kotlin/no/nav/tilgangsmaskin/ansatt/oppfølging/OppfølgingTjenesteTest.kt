@@ -21,7 +21,6 @@ import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.getMany
 import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.rest.Token
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -40,21 +39,16 @@ import java.util.UUID.*
 @ContextConfiguration(classes = [OppfølgingTjeneste::class, OppfølgingJPAAdapter::class])
 @EnableAutoConfiguration
 @Import(OppfølgingTestConfig::class)
-class OppfølgingTjenesteTest : BehaviorSpec() {
+class OppfølgingTjenesteTest(
+    private val tjeneste: OppfølgingTjeneste,
+    private val repo: OppfølgingRepository,
+    private val cache: CacheOperations,
+) : BehaviorSpec() {
 
     @TestConfiguration
     class OppfølgingTestConfig : CacheTestConfig(OPPFØLGING)
 
     @MockkBean private lateinit var token: Token
-
-    @Autowired
-    private lateinit var tjeneste: OppfølgingTjeneste
-
-    @Autowired
-    private lateinit var repo: OppfølgingRepository
-
-    @Autowired
-    private lateinit var cache: CacheOperations
 
     init {
         beforeEach {

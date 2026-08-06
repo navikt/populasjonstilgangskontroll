@@ -1,21 +1,16 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
-import com.ninjasquad.springmockk.MockkBean
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
-import no.nav.tilgangsmaskin.felles.rest.Token
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.util.ReflectionTestUtils.setField
-import org.springframework.transaction.PlatformTransactionManager
-import org.springframework.transaction.support.TransactionTemplate
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Instant.now
 import java.time.LocalDate
@@ -27,25 +22,11 @@ import java.util.concurrent.atomic.*
 @AutoConfigureMetrics
 @ContextConfiguration(classes = [NomTjeneste::class, NomJPAAdapter::class, NomDBOpprydder::class])
 @EnableAutoConfiguration
-class NomDBOpprydderTest : BehaviorSpec() {
-
-    @MockkBean(relaxed = true)
-    @Suppress("unused")
-    private lateinit var token: Token
-
-    @Autowired
-    private lateinit var opprydder: NomDBOpprydder
-
-    @Autowired
-    private lateinit var repo: NomRepository
-
-
-    @Autowired
-    private lateinit var txManager: PlatformTransactionManager
+class NomDBOpprydderTest(private val opprydder: NomDBOpprydder, private val repo: NomRepository) : BehaviorSpec() {
 
     init {
         beforeEach {
-            TransactionTemplate(txManager).execute { repo.deleteAll() }
+            repo.deleteAll()
             setField(opprydder, "erLeder", false)
         }
 
@@ -101,12 +82,10 @@ class NomDBOpprydderTest : BehaviorSpec() {
     private fun lagre(fnr: String, gyldigTil: LocalDate): NomEntity {
         val now = now()
         val gyldigTilInstant = gyldigTil.atStartOfDay().toInstant(UTC)
-        return TransactionTemplate(txManager).execute {
-            repo.save(NomEntity(nyttNavId(), fnr, now, gyldigTilInstant).also {
-                it.created = now
-                it.updated = now
-            })
-        }
+        return repo.save(NomEntity(nyttNavId(), fnr, now, gyldigTilInstant).also {
+            it.created = now
+            it.updated = now
+        })
     }
 
     private fun bliLeder() = setField(opprydder, "erLeder", true)

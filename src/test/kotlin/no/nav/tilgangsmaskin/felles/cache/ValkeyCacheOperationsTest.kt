@@ -37,7 +37,6 @@ import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
@@ -60,7 +59,11 @@ import kotlin.time.measureTime
 @AutoConfigureMetrics
 @ContextConfiguration(classes = [ValkeyCacheTestConfig::class,ValkeyEventListeningCacheOppfrisker::class])
 @EnableAutoConfiguration
-class ValkeyCacheOperationsTest : BehaviorSpec() {
+class ValkeyCacheOperationsTest(
+    private val cache: CacheOperations,
+    private val registry: MeterRegistry,
+    private val cacheSizeAware: CacheSizeAware,
+) : BehaviorSpec() {
 
     @TestConfiguration
     class ValkeyCacheTestConfig(private val cf: RedisConnectionFactory) : RedisListenerConfigurer{
@@ -99,15 +102,6 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
 
     @MockkBean
     private lateinit var oppfrisker: CacheOppfrisker
-
-    @Autowired
-    private lateinit var cache: CacheOperations
-
-    @Autowired
-    private lateinit var registry: MeterRegistry
-
-    @Autowired
-    private lateinit var cacheSizeAware: CacheSizeAware
 
 
     init {

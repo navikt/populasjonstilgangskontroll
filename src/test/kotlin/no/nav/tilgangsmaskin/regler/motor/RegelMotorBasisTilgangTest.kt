@@ -9,7 +9,9 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 
-class RegelMotorBasisTilgangTest : RegelMotorTestBase() {
+class RegelMotorBasisTilgangTest(
+    regelMotor: RegelMotor,
+) : RegelMotorTestBase(regelMotor) {
     init {
         Given("bruker krever ingen spesialtilganger") {
             val bruker = BrukerBuilder(brukerId).build()

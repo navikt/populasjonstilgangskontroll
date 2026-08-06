@@ -4,7 +4,6 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfigTest.TestConfig
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Configuration
@@ -13,14 +12,13 @@ import java.util.*
 
 @SpringBootTest(classes = [TestConfig::class])
 @TestPropertySource(locations = ["classpath:test.properties"])
-class GlobaleGrupperConfigTest : BehaviorSpec() {
+class GlobaleGrupperConfigTest(
+    private val cfg: GlobaleGrupperConfig,
+) : BehaviorSpec() {
 
     @Configuration
     @EnableConfigurationProperties(GlobaleGrupperConfig::class)
     class TestConfig
-
-    @Autowired
-    lateinit var cfg: GlobaleGrupperConfig
 
     init {
         Given("GlobaleGrupperConfig lastet fra properties") {
@@ -58,7 +56,6 @@ class GlobaleGrupperConfigTest : BehaviorSpec() {
         }
     }
 }
-
 
 
 

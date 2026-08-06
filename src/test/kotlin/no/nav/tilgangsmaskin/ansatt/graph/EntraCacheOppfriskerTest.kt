@@ -13,13 +13,12 @@ import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import java.net.URI
 import java.util.*
 
 @ContextConfiguration(classes = [EntraCacheOppfrisker::class])
-class EntraCacheOppfriskerTest : BehaviorSpec() {
+class EntraCacheOppfriskerTest(private val oppfrisker: EntraCacheOppfrisker) : BehaviorSpec() {
 
     @MockkBean(relaxed = true)
     private lateinit var entra: EntraTjeneste
@@ -29,9 +28,6 @@ class EntraCacheOppfriskerTest : BehaviorSpec() {
 
     @MockkBean(relaxed = true)
     private lateinit var cache: CacheOperations
-
-    @Autowired
-    private lateinit var oppfrisker: EntraCacheOppfrisker
 
     init {
         beforeEach {

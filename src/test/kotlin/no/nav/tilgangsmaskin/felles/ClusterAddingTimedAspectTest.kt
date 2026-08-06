@@ -10,7 +10,6 @@ import io.mockk.every
 import no.nav.tilgangsmaskin.felles.ClusterAddingTimedAspectTest.TestConfig
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.health.ObservabilityBeanConfig
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,18 +17,14 @@ import org.springframework.test.context.ContextConfiguration
 
 @ContextConfiguration(classes = [TestConfig::class, ObservabilityBeanConfig::class])
 @AutoConfigureMetrics
-class ClusterAddingTimedAspectTest : BehaviorSpec() {
+class ClusterAddingTimedAspectTest(
+    private val registry: MeterRegistry,
+    private val aspect: TimedAspect,
+    private val timedService: TimedService,
+) : BehaviorSpec() {
 
     @MockkBean
     lateinit var token: Token
-    @Autowired
-    lateinit var registry: MeterRegistry
-
-    @Autowired
-    lateinit var aspect: TimedAspect
-
-    @Autowired
-    lateinit var timedService: TimedService
 
     init {
         beforeEach {
@@ -73,4 +68,3 @@ class ClusterAddingTimedAspectTest : BehaviorSpec() {
         open fun execute() {}
     }
 }
-

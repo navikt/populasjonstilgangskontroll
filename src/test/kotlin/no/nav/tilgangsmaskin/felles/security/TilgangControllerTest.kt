@@ -34,9 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean
     classes = [SecurityTestApplication::class]
 )
 @AutoConfigureMockMvc
-class TilgangControllerTest(
-    private val mockMvc: MockMvc
-) : BehaviorSpec() {
+class TilgangControllerTest(private val mockMvc: MockMvc) : BehaviorSpec() {
 
     @MockkBean
     private lateinit var regelTjeneste: RegelTjeneste

@@ -32,7 +32,6 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
@@ -51,7 +50,12 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @Import(TimeBeanConfig::class)
 @EnableAutoConfiguration
 @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
-internal class EnkeltTilgangTest : BehaviorSpec() {
+internal class EnkeltTilgangTest(
+    private val motor: RegelMotor,
+    private val registry: MeterRegistry,
+    private val adapter: EnkeltTilgangJPAAdapter,
+    private val repository: EnkeltTilgangRepository,
+) : BehaviorSpec() {
 
     private val vanligBrukerId = BrukerId("08526835670")
     private val ansattId = AnsattId("Z999999")
@@ -69,14 +73,6 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
     lateinit var token: Token
     @MockkBean
     lateinit var oppfølging: OppfølgingTjeneste
-    @Autowired
-    lateinit var motor: RegelMotor
-    @Autowired
-    lateinit var registry: MeterRegistry
-    @Autowired
-    lateinit var adapter: EnkeltTilgangJPAAdapter
-    @Autowired
-    lateinit var repository: EnkeltTilgangRepository
     @MockK
     lateinit var ansatte: AnsattTjeneste
     @MockK

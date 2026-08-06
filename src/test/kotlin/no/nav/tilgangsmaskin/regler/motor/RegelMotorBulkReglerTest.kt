@@ -20,7 +20,9 @@ import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.OVERSTYRBAR_REGELT
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.NO_CONTENT
 
-class RegelMotorBulkReglerTest : RegelMotorTestBase() {
+class RegelMotorBulkReglerTest(
+    regelMotor: RegelMotor,
+) : RegelMotorTestBase(regelMotor) {
     init {
         Given("bulkRegler") {
             When("alle brukere passerer reglene") {

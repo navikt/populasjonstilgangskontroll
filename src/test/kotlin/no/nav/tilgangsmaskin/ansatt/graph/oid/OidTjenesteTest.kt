@@ -34,11 +34,7 @@ import java.util.*
 @EnableResilientMethods
 @Import(OidTjenesteTestConfig::class, OAuth2ClientTestConfig::class)
 @ContextConfiguration(classes = [EntraOidTjeneste::class, EntraOidConfig::class, EntraGrupperConfig::class], initializers = [PropertySettingTestContextInitializer::class])
-class OidTjenesteTest(
-    private val tjeneste: EntraOidTjeneste,
-    private val server: MockRestServiceServer,
-    private val cache: CacheOperations
-) : BehaviorSpec() {
+class OidTjenesteTest(private val tjeneste: EntraOidTjeneste, private val server: MockRestServiceServer, private val cache: CacheOperations) : BehaviorSpec() {
 
     @TestConfiguration
     class OidTjenesteTestConfig : CacheTestConfig(ENTRA_OID)

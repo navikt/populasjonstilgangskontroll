@@ -18,7 +18,6 @@ import no.nav.tilgangsmaskin.felles.LocalAuditor
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.TokenType
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.test.context.ContextConfiguration
@@ -26,7 +25,9 @@ import org.springframework.test.context.ContextConfiguration
 @AutoConfigureMetrics
 @ContextConfiguration(initializers = [PropertySettingTestContextInitializer::class], classes = [LocalAuditor::class])
 @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
-abstract class RegelMotorTestBase : BehaviorSpec() {
+abstract class RegelMotorTestBase(
+    protected val regelMotor: RegelMotor,
+) : BehaviorSpec() {
     protected val brukerId = BrukerId("08526835670")
     protected val ansattId = AnsattId("Z999999")
 
@@ -44,9 +45,6 @@ abstract class RegelMotorTestBase : BehaviorSpec() {
 
     @MockkBean
     protected lateinit var token: Token
-
-    @Autowired
-    protected lateinit var regelMotor: RegelMotor
 
     init {
         beforeEach {

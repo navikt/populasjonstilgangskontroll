@@ -15,9 +15,12 @@ class OAuth2LoggingJwtAuthenticationConverter(
 
     override fun convert(jwt: Jwt): AbstractAuthenticationToken =
         with(jwt.getClaimAsString(AZP_NAME)) {
-            runCatching { delegate.convert(jwt) }
-                .onSuccess { log.trace("JWT validert OK: system={}, expiresAt={}", this, jwt.expiresAt?.atZone(OSLO)) }
-                .onFailure { log.warn("JWT konvertering feilet: system=$this, feil=${it.message}", it) }
-                .getOrThrow()
+            runCatching {
+                delegate.convert(jwt)
+            }.onSuccess {
+                    log.trace("JWT validert OK: system={}, expiresAt={}", this, jwt.expiresAt?.atZone(OSLO))
+            }.onFailure {
+                log.warn("JWT konvertering feilet: system=$this, feil=${it.message}", it)
+            }.getOrThrow()
         }
 }

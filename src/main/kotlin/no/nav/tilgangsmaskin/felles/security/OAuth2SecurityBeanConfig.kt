@@ -5,6 +5,7 @@ import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase.Companion.PROD_BASE_P
 import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase.Companion.UNPROTECTED_ENDPOINTS
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
@@ -23,8 +24,9 @@ import org.springframework.web.client.support.RestClientHttpServiceGroupConfigur
 @Configuration
 class OAuth2SecurityBeanConfig {
     @Bean
-    fun securityFilterChain(http: HttpSecurity) =
+    fun securityFilterChain(http: HttpSecurity, enkeltTilgangAuthorizationManager: EnkeltTilgangAuthorizationManager) =
         http.authorizeHttpRequests { requests ->
+                requests.requestMatchers(POST, "${PROD_BASE_PATH}/overstyr").access(enkeltTilgangAuthorizationManager)
                 requests.requestMatchers("${PROD_BASE_PATH}/**").authenticated()
                 requests.requestMatchers("/${DEV}/**").permitAll()
                 requests.requestMatchers(*UNPROTECTED_ENDPOINTS).permitAll()

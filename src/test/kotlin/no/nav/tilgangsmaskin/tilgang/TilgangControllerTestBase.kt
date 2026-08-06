@@ -12,7 +12,6 @@ import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.TokenTypeTeller
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangKonsumentValidator
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
@@ -67,9 +66,6 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
     @MockK
     protected lateinit var teller: TokenTypeTeller
 
-    @MockK(relaxed = true)
-    protected lateinit var konsumentValidator: EnkeltTilgangKonsumentValidator
-
     protected val ansattId = AnsattId("Z999999")
     protected val brukerId = "08526835670"
 
@@ -111,7 +107,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             restDocumentation.beforeTest(TilgangControllerTestBase::class.java, case.name.name)
             mockMvc = standaloneSetup(
                 TilgangController(regelTjeneste, token, teller),
-                EnkeltTilgangController(enkeltTilgangTjeneste, konsumentValidator, token, teller),
+                EnkeltTilgangController(enkeltTilgangTjeneste, token, teller),
                 BulkTilgangController(regelTjeneste, token, teller)
             )
                 .setControllerAdvice(ProblemDetailExceptionHandler())

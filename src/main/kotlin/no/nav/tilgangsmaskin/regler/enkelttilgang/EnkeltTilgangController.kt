@@ -19,14 +19,13 @@ import org.springframework.web.bind.annotation.ResponseStatus
 
 @TilgangApiController
 @Tag(name = "EnkeltTilgangController", description = ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION)
-class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste, private val validator: EnkeltTilgangKonsumentValidator, token: Token, teller: TokenTypeTeller) : TilgangControllerBase(token, teller) {
+class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste, token: Token, teller: TokenTypeTeller) : TilgangControllerBase(token, teller) {
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
     fun enkeltTilgang(@RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData) {
         sjekk(token.type == OBO, FORBIDDEN, "Forventet token type $OBO for overstyr, fikk ${token.type}")
-        validator.valider(token.systemNavn)
         enkelt.registrerTilgang(token.requiredAnsattId, data)
     }
 

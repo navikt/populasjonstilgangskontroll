@@ -21,6 +21,7 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
@@ -96,6 +97,36 @@ class TilgangControllerMockOAuth2ServerTest : BehaviorSpec() {
                     verify { regelTjeneste.kompletteRegler(ANSATT_ID, BRUKER_ID.verdi) }
                 }
             }
+
+            When("request has token with invalid audience") {
+                Then("returns 401") {
+                    val jwt = mockOAuth2.issueToken(ISSUER_ID, SUBJECT, INVALID_AUDIENCE,
+                        mapOf(
+                            NAVIDENT to ANSATT_ID.verdi,
+                            OID to UUID.randomUUID().toString())
+                    ).serialize()
+
+                    mockMvc.post("/api/v1/komplett") {
+                        headers {
+                            setBearerAuth(jwt)
+                        }
+                        contentType = APPLICATION_JSON
+                        content = "\"${BRUKER_ID.verdi}\""
+                    }.andExpect {
+                        status { isUnauthorized() }
+                    }
+                }
+            }
+        }
+
+        Given("open endpoint /v3/api-docs") {
+            When("request has no bearer token") {
+                Then("returns 200") {
+                    mockMvc.get("/v3/api-docs").andExpect {
+                        status { isOk() }
+                    }
+                }
+            }
         }
     }
 
@@ -107,6 +138,7 @@ class TilgangControllerMockOAuth2ServerTest : BehaviorSpec() {
         private const val ISSUER_ID = "azuread"
         private const val SUBJECT = "subject"
         private const val AUDIENCE = "test-audience"
+        private const val INVALID_AUDIENCE = "invalid-audience"
         private const val ISSUER_URI_PROPERTY = "spring.security.oauth2.resourceserver.jwt.issuer-uri"
         private const val AUDIENCES_PROPERTY = "spring.security.oauth2.resourceserver.jwt.audiences"
 

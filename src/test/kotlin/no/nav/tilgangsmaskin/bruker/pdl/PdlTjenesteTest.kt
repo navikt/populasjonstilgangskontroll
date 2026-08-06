@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import com.ninjasquad.springmockk.MockkBean
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -25,18 +26,25 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlTjenesteTest.PdlTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.getOne
+import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
+import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.client.ExpectedCount.never
+import org.springframework.test.web.client.ExpectedCount.once
+import org.springframework.test.web.client.ExpectedCount.times
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
+import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import tools.jackson.databind.json.JsonMapper
 import java.time.Duration.ofSeconds
@@ -167,6 +175,41 @@ class PdlTjenesteTest(
                 Then("REST kalles ikke") {
                     server.expect(never(), requestTo(cfg.personerURI))
                     pdl.personer(emptySet()).shouldBeEmpty()
+                }
+            }
+        }
+
+        Given("retry ved feil mot PDL") {
+            When("medFamilie får 500 på alle forsøk") {
+                Then("kastes RecoverableRestException etter 4 forsøk") {
+                    server.expect(times(4), requestTo(cfg.personURI))
+                        .andRespond(withStatus(INTERNAL_SERVER_ERROR))
+
+                    shouldThrow<RecoverableRestException> {
+                        pdl.medFamilie(I1)
+                    }
+                }
+            }
+
+            When("medFamilie får 404") {
+                Then("kastes NotFoundRestException uten retry") {
+                    server.expect(once(), requestTo(cfg.personURI))
+                        .andRespond(withStatus(NOT_FOUND))
+
+                    shouldThrow<NotFoundRestException> {
+                        pdl.medFamilie(I1)
+                    }
+                }
+            }
+
+            When("første forsøk feiler og andre lykkes") {
+                Then("returneres person fra vellykket retry") {
+                    server.expect(once(), requestTo(cfg.personURI))
+                        .andRespond(withStatus(INTERNAL_SERVER_ERROR))
+                    server.expect(once(), requestTo(cfg.personURI))
+                        .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
+
+                    pdl.medFamilie(I1) shouldBe P1
                 }
             }
         }

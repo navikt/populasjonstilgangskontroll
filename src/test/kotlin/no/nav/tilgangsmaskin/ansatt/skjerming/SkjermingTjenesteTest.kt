@@ -48,8 +48,7 @@ class SkjermingTjenesteTest(
     private val tjeneste: SkjermingTjeneste,
     private val server: MockRestServiceServer,
     private val cache: CacheOperations,
-    private val cfg: SkjermingConfig
-) : BehaviorSpec() {
+    private val cfg: SkjermingConfig) : BehaviorSpec() {
 
     @TestConfiguration
     class SkjermingTestConfig : CacheTestConfig(SKJERMING)

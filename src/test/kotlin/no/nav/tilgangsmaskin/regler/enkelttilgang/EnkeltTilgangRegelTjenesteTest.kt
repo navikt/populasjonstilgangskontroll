@@ -56,7 +56,6 @@ import java.time.LocalDate
 @DataJpaTest
 @EnableJpaAuditing
 @TestPropertySource(locations = ["classpath:test.properties"])
-@EnableConfigurationProperties(value = [GlobaleGrupperConfig::class, EnkeltTilgangConfig::class])
 @ContextConfiguration(classes = [EnkeltTilgangTjeneste::class, EnkeltTilgangJPAAdapter::class, RegelTjeneste::class, BulkResponsAggregator::class, LocalAuditor::class])
 @AutoConfigureMetrics
 @Testcontainers

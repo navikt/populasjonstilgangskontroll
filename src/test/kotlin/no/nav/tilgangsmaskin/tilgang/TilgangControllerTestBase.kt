@@ -1,10 +1,9 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.kotest.core.spec.style.BehaviorSpec
-import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
@@ -51,14 +50,11 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             *snippets
         )
 
-    @MockK
-    protected lateinit var regelTjeneste: RegelTjeneste
+    protected val regelTjeneste: RegelTjeneste = mockk()
 
-    @MockK
-    protected lateinit var enkeltTilgangTjeneste: EnkeltTilgangTjeneste
+    protected val enkeltTilgangTjeneste: EnkeltTilgangTjeneste = mockk()
 
-    @MockK(relaxed = true)
-    protected lateinit var token: Token
+    protected val token: Token = mockk(relaxed = true)
 
     protected val ansattId = AnsattId("Z999999")
     protected val brukerId = "08526835670"
@@ -93,7 +89,6 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
                 setBasename("classpath:regel-messages")
                 setDefaultEncoding("UTF-8")
             }
-            MockKAnnotations.init(this@TilgangControllerTestBase)
         }
 
         beforeEach { case ->

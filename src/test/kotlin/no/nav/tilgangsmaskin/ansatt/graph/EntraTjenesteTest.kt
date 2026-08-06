@@ -36,7 +36,6 @@ class EntraTjenesteTest(private val tjeneste: EntraTjeneste, private val server:
     @TestConfiguration
     class EntraTestConfig : CacheTestConfig(GRAPH)
 
-
     init {
         beforeEach {
             server.reset()

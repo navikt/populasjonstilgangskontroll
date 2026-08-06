@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.util.ReflectionTestUtils.setField
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -18,6 +19,7 @@ import java.time.ZoneOffset.UTC
 import java.util.concurrent.atomic.*
 
 @DataJpaTest
+@EnableJpaAuditing
 @Testcontainers
 @AutoConfigureMetrics
 @ContextConfiguration(classes = [NomTjeneste::class, NomJPAAdapter::class, NomDBOpprydder::class])
@@ -80,12 +82,8 @@ class NomDBOpprydderTest(private val opprydder: NomDBOpprydder, private val repo
     }
 
     private fun lagre(fnr: String, gyldigTil: LocalDate): NomEntity {
-        val now = now()
         val gyldigTilInstant = gyldigTil.atStartOfDay().toInstant(UTC)
-        return repo.save(NomEntity(nyttNavId(), fnr, now, gyldigTilInstant).also {
-            it.created = now
-            it.updated = now
-        })
+        return repo.save(NomEntity(nyttNavId(), fnr, now(), gyldigTilInstant))
     }
 
     private fun bliLeder() = setField(opprydder, "erLeder", true)

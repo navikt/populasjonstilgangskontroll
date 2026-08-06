@@ -52,8 +52,7 @@ class VergemålTjenesteTest(
     private val tjeneste: VergemålTjeneste,
     private val cfg: VergemålConfig,
     private val server: MockRestServiceServer,
-    private val cache: CacheOperations
-) : BehaviorSpec() {
+    private val cache: CacheOperations) : BehaviorSpec() {
 
 
     @TestConfiguration

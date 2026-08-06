@@ -78,7 +78,9 @@ class OidTjenesteTest(private val tjeneste: EntraOidTjeneste, private val server
                         .andExpect(method(GET))
                         .andRespond(withSuccess("""{"value": []}""", APPLICATION_JSON))
 
-                    shouldThrow<IrrecoverableRestException> { tjeneste.oid(ANSATTID) }
+                    shouldThrow<IrrecoverableRestException> {
+                        tjeneste.oid(ANSATTID)
+                    }
                 }
             }
 
@@ -89,7 +91,9 @@ class OidTjenesteTest(private val tjeneste: EntraOidTjeneste, private val server
                         .andExpect(method(GET))
                         .andRespond(withSuccess(oidRespons(OID, oid2), APPLICATION_JSON))
 
-                    shouldThrow<IrrecoverableRestException> { tjeneste.oid(ANSATTID) }
+                    shouldThrow<IrrecoverableRestException> {
+                        tjeneste.oid(ANSATTID)
+                    }
                 }
             }
         }

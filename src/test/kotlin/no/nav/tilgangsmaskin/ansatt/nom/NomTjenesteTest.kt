@@ -29,11 +29,7 @@ import java.time.LocalDate.now
 @ContextConfiguration(classes = [NomTjeneste::class, NomJPAAdapter::class])
 @Import(NomTestConfig::class)
 @EnableAutoConfiguration
-class NomTjenesteTest(
-    private val tjeneste: NomTjeneste,
-    private val repo: NomRepository,
-    private val cache: CacheOperations,
-) : BehaviorSpec() {
+class NomTjenesteTest(private val tjeneste: NomTjeneste, private val repo: NomRepository, private val cache: CacheOperations) : BehaviorSpec() {
 
     @TestConfiguration
     class NomTestConfig : CacheTestConfig(NOM)

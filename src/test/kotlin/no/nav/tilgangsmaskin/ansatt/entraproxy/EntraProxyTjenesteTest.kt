@@ -128,7 +128,6 @@ class EntraProxyTjenesteTest(private val tjeneste: EntraProxyTjeneste, private v
         }
     }
 
-
     companion object  {
         private val ANSATTID = AnsattId("Z999999")
     }

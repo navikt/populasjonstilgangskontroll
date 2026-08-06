@@ -2,11 +2,11 @@ package no.nav.tilgangsmaskin.ansatt
 
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.IsolationMode.InstancePerTest
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
-import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -25,6 +25,7 @@ import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.TokenType
+import no.nav.tilgangsmaskin.felles.rest.TokenType.UNAUTHENTICATED
 import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
@@ -32,6 +33,7 @@ import java.net.URI
 import java.util.*
 
 class AnsattGruppeResolverTest : BehaviorSpec({
+    isolationMode = InstancePerTest
 
     val entra       = mockk<EntraTjeneste>()
     val token       = mockk<Token>()
@@ -45,7 +47,6 @@ class AnsattGruppeResolverTest : BehaviorSpec({
     val resolver = EntraAnsattGruppeResolver(entra, token, oidTjeneste, cache,mockk<MessagePublisher>(relaxed = true))
 
     beforeEach {
-        clearAllMocks()
         every { oidTjeneste.oid(ansattId) } returns oid
     }
 
@@ -156,7 +157,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
     Given("uautentisert") {
         beforeEach {
-            every { token.type } returns TokenType.UNAUTHENTICATED
+            every { token.type } returns UNAUTHENTICATED
         }
 
         When("miljø er dev/test") {

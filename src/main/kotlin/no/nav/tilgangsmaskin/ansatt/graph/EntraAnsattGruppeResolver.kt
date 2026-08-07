@@ -45,12 +45,12 @@ class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
                         exception: NotFoundRestException): Set<EntraGruppe> {
         val deleted = cache.delete(GEO_OG_GLOBALE_CACHE, ansattId.verdi)
         if (!deleted) {
-            publisher.publish(":warn: entra OID-problemer",
+            publisher.warn("Entra OID-problemer",
                 "Kunne ikke fjerne entra cache innslag for ${ansattId.verdi}")
         }
-        publisher.publish(":warn: entra OID problemer", "${exception.identifikator}, tømmer cache og prøver på nytt")
+        publisher.warn("Entra OID-problemer", "${exception.identifikator}, tømmer cache og prøver på nytt")
         val nyoid = oid.oid(ansattId)
-        publisher.publish(":warn: OID endret til $nyoid",
+        publisher.warn("OID endret til $nyoid",
             "${exception.identifikator} ikke funnet, tømte cache og prøvde på nytt")
         return entra.geoOgGlobaleGrupper(ansattId, nyoid).also {
             log.info("CC-flow: {} slo opp globale og GEO-grupper i Entra med ny oid {}", ansattId, nyoid)

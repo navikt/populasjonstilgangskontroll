@@ -1,7 +1,14 @@
 package no.nav.tilgangsmaskin.felles.utils
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory.getLogger
+
 @FunctionalInterface
 interface MessagePublisher {
 
-    fun publish(header: String, msg: String)
+    private val logger: Logger
+        get() = getLogger(MessagePublisher::class.java)
+
+    fun warn(header: String, msg: String) = logger.warn("$header: $msg")
+
 }

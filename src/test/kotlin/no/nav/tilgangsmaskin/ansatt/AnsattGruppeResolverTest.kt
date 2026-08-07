@@ -25,6 +25,7 @@ import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.TokenType
+import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.rest.TokenType.UNAUTHENTICATED
 import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
@@ -35,6 +36,7 @@ import java.util.*
 class AnsattGruppeResolverTest : BehaviorSpec({
     isolationMode = InstancePerTest
 
+    val publisher = object: MessagePublisher {}
     val entra       = mockk<EntraTjeneste>()
     val token       = mockk<Token>()
     val oidTjeneste = mockk<EntraOidTjeneste>()
@@ -44,14 +46,14 @@ class AnsattGruppeResolverTest : BehaviorSpec({
     val oid       = UUID.randomUUID()
     val geoGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_1234")
 
-    val resolver = EntraAnsattGruppeResolver(entra, token, oidTjeneste, cache,mockk<MessagePublisher>(relaxed = true))
+    val resolver = EntraAnsattGruppeResolver(entra, token, oidTjeneste, cache, publisher)
 
     beforeEach {
         every { oidTjeneste.oid(ansattId) } returns oid
     }
 
     Given("CC-flow") {
-        beforeEach { every { token.type } returns TokenType.CCF }
+        beforeEach { every { token.type } returns CCF }
 
         When("token inneholder kjente og ukjente gruppe-IDer") {
             Then("Token.globaleGrupper returnerer kun kjente EntraGrupper") {

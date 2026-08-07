@@ -22,7 +22,9 @@ class SlackMessagePublisher(
 
     private val log = getLogger(javaClass)
 
-    override fun publish(header: String, msg: String) =
+    override fun warn(header: String, msg: String) = publish(":warn: $header", msg)
+
+     private fun publish(header: String, msg: String) =
         publish(builder().blocks(asBlocks(
             header { it.text(plainText("🚀 $header")) },
             section { info -> info.text(markdownText(":info: \n$msg")) })).build())

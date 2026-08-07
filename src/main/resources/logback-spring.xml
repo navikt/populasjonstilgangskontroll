@@ -21,6 +21,8 @@
     <springProfile name="dev">
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
         <logger name="org.zalando.logbook" level="trace"/>
+        <logger name="org.springframework.security.web.DefaultSecurityFilterChain" level="trace"/>
+
     </springProfile>
 
 

@@ -14,17 +14,11 @@ import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
 class OAuth2ClientTestConfig {
 
     @Bean
-    fun restClientCustomizer(logbookInterceptor: LogbookClientHttpRequestInterceptor) =
+    fun restClientCustomizer() =
         RestClientCustomizer { c ->
-            c.requestInterceptors { it.add(logbookInterceptor) }
+            c.requestInterceptors { it.add(LogbookClientHttpRequestInterceptor(Logbook.builder().build())) }
             c.defaultStatusHandler(HttpStatusCode::isError, RestDefaultErrorHandler()::handle)
         }
-
-    @Bean
-    fun logbook() = Logbook.builder().build()
-
-    @Bean
-    fun logbookClientHttpRequestInterceptor(logbook: Logbook) = LogbookClientHttpRequestInterceptor(logbook)
 
     @Bean
     fun restClientGroupCustomizer(

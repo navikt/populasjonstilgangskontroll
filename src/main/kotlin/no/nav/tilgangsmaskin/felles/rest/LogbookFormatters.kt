@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.rest
 
 import no.nav.boot.conditionals.ConditionalOnDev
 import no.nav.boot.conditionals.ConditionalOnDevOrLocal
+import no.nav.boot.conditionals.ConditionalOnLocalOrTest
 import org.springframework.stereotype.Component
 import org.zalando.logbook.Correlation
 import org.zalando.logbook.HttpLogFormatter
@@ -13,7 +14,7 @@ import org.zalando.logbook.json.JsonHttpLogFormatter
 import tools.jackson.databind.json.JsonMapper
 
 @Component
-@ConditionalOnDevOrLocal
+@ConditionalOnLocalOrTest
 class LocalLogbookFormatter : HttpLogFormatter {
     private val delegate  = DefaultHttpLogFormatter()
 

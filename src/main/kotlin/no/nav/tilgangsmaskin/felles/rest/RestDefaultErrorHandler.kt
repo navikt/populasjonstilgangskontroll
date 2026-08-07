@@ -3,6 +3,8 @@ package no.nav.tilgangsmaskin.felles.rest
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.REQUEST_TIMEOUT
+import org.springframework.http.HttpStatus.TOO_MANY_REQUESTS
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
@@ -18,6 +20,10 @@ class RestDefaultErrorHandler : ErrorHandler {
             res.statusCode == NOT_FOUND -> {
                 log.info("Not found exception etter ${res.statusCode.value()} fra ${req.uri}")
                 throw NotFoundRestException(req.uri, ident)
+            }
+            res.statusCode == REQUEST_TIMEOUT || res.statusCode == TOO_MANY_REQUESTS -> {
+                log.warn("Recoverable exception etter ${res.statusCode.value()} fra ${req.uri}")
+                throw RecoverableRestException(res.statusCode, req.uri, res.statusText)
             }
             res.statusCode.is4xxClientError -> {
                 log.warn("Irrecoverable exception etter ${res.statusCode.value()} fra ${req.uri}")

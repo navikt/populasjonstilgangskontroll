@@ -13,7 +13,9 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.REQUEST_TIMEOUT
 import org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE
+import org.springframework.http.HttpStatus.TOO_MANY_REQUESTS
 import org.springframework.mock.http.client.MockClientHttpRequest
 import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import java.net.URI
@@ -60,6 +62,16 @@ class DefaultRestErrorHandlerTest : BehaviorSpec({
         When("403 Forbidden") {
             Then("kastes IrrecoverableRestException") {
                 shouldThrow<IrrecoverableRestException> { handler.handle(req(), res(FORBIDDEN)) }
+            }
+        }
+        When("429 Too Many Requests") {
+            Then("kastes RecoverableRestException") {
+                shouldThrow<RecoverableRestException> { handler.handle(req(), res(TOO_MANY_REQUESTS)) }
+            }
+        }
+        When("408 Request Timeout") {
+            Then("kastes RecoverableRestException") {
+                shouldThrow<RecoverableRestException> { handler.handle(req(), res(REQUEST_TIMEOUT)) }
             }
         }
     }

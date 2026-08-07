@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import no.nav.boot.conditionals.ConditionalOnDevOrLocal
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.sekunder
@@ -18,6 +19,8 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import org.zalando.logbook.HeaderFilter
+import org.zalando.logbook.HeaderFilter.none
 import org.zalando.logbook.core.Conditions.exclude
 import org.zalando.logbook.core.Conditions.requestTo
 import org.zalando.logbook.HttpLogFormatter
@@ -38,8 +41,10 @@ class RestBeanConfig(
 ) : WebMvcConfigurer {
 
     @Bean
+    @ConditionalOnDevOrLocal
     fun logbook(formatter: HttpLogFormatter): Logbook =
         Logbook.builder()
+            .headerFilter(none())
             .condition(exclude(requestTo("**/actuator/**")))            .sink(DefaultSink(formatter, DefaultHttpLogWriter()))
             .build()
 

@@ -39,6 +39,7 @@
         </appender>
         <logger name="org.zalando.logbook" level="trace"/>
         <logger name="org.springframework.security.oauth2" level="trace"/>
+        <logger name="org.springframework.security.web.DefaultSecurityFilterChain" level="trace"/>
         <logger name="no.nav.tilgangsmaskin" level="trace"/>
     </springProfile>
 

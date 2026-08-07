@@ -8,9 +8,6 @@ import org.springframework.core.env.Environment
 import org.springframework.http.HttpStatusCode
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 import org.zalando.logbook.Logbook
-import org.zalando.logbook.core.DefaultHttpLogFormatter
-import org.zalando.logbook.core.DefaultHttpLogWriter
-import org.zalando.logbook.core.DefaultSink
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
 
 @TestConfiguration

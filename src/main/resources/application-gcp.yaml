@@ -200,5 +200,6 @@ info:
   image: ${nais.app.image:unknown}
 
 logbook:
-  exclude:
+  predicate:
+   exclude:
     - /monitoring/**

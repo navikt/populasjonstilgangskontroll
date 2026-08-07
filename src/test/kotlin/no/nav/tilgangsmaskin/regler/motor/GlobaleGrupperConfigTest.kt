@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.regler.motor
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfigTest.TestConfig
@@ -33,6 +34,20 @@ class GlobaleGrupperConfigTest(
                 }
             }
 
+            When("en påkrevd gruppe-id mangler") {
+                Then("kastes IllegalStateException med tydelig feilmelding") {
+                    val manglerDead = EntraGlobalGruppe.entries
+                        .filterNot { it.property == "gruppe.dead" }
+                        .associate { it.property to UUID.randomUUID() }
+
+                    val ex = shouldThrow<IllegalStateException> {
+                        EntraGlobalGruppe.setIDs(manglerDead)
+                    }
+
+                    ex.message shouldBe "Mangler id for gruppe.dead"
+                }
+            }
+
             When("@PostConstruct er kjørt") {
                 Then("settes STRENGT_FORTROLIG-IDen på GlobalGruppe") {
                     EntraGlobalGruppe.STRENGT_FORTROLIG.id shouldBe cfg.strengt
@@ -56,6 +71,5 @@ class GlobaleGrupperConfigTest(
         }
     }
 }
-
 
 

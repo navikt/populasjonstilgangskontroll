@@ -30,6 +30,7 @@ import org.zalando.logbook.core.DefaultSink
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 import java.time.Duration
+import java.time.Duration.ofSeconds
 
 
 @Configuration
@@ -45,7 +46,8 @@ class RestBeanConfig(
     fun logbook(formatter: HttpLogFormatter): Logbook =
         Logbook.builder()
             .headerFilter(none())
-            .condition(exclude(requestTo("**/actuator/**")))            .sink(DefaultSink(formatter, DefaultHttpLogWriter()))
+            .condition(exclude(requestTo("**/monitoring/**"),requestTo("**/actuator/**")))
+            .sink(DefaultSink(formatter, DefaultHttpLogWriter()))
             .build()
 
     @Bean
@@ -62,8 +64,8 @@ class RestBeanConfig(
                         .setValidateAfterInactivity(2.sekunder).build())
                     .build())
                 .build()).apply {
-                setConnectionRequestTimeout(Duration.ofSeconds(3))
-                setReadTimeout(Duration.ofSeconds(5))
+                setConnectionRequestTimeout(ofSeconds(3))
+                setReadTimeout(ofSeconds(5))
             })
             c.requestInterceptors {
                 if (!isProd) {

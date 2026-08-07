@@ -14,7 +14,7 @@ import tools.jackson.databind.json.JsonMapper
 @Component
 @ConditionalOnDev
 @Primary
-class ClusterAwareJsonLogbookFormatter(private val jsonMapper: JsonMapper) : HttpLogFormatter {
+class ClusterAwareJsonPrettyPrintingLogbookFormatter(private val jsonMapper: JsonMapper) : HttpLogFormatter {
     private val delegate = JsonHttpLogFormatter(jsonMapper, true)
 
     override fun format(precorrelation: Precorrelation, request: HttpRequest) =

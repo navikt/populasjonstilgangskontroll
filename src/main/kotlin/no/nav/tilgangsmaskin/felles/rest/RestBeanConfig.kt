@@ -18,6 +18,7 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import org.zalando.logbook.HttpLogFormatter
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 import java.time.Duration
@@ -35,6 +36,10 @@ class RestBeanConfig(
     fun jackson3Customizer() = JsonMapperBuilderCustomizer {
         it.enable(INCLUDE_SOURCE_IN_LOCATION)
     }
+
+    @Bean
+    fun logbookHttpLogFormatter() =
+        RequestResponsePrefixingLogbookFormatter()
 
     @Bean
     fun restClientCustomizer() =

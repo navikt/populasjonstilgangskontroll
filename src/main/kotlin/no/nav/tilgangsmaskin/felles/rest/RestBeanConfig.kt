@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.sekunder
 import org.apache.hc.client5.http.config.ConnectionConfig
@@ -18,7 +19,6 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import org.zalando.logbook.HttpLogFormatter
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 import java.time.Duration
@@ -39,7 +39,7 @@ class RestBeanConfig(
 
     @Bean
     fun logbookHttpLogFormatter() =
-        RequestResponsePrefixingLogbookFormatter()
+        FormatAwareLogbookFormatter(!isLocalOrTest)
 
     @Bean
     fun restClientCustomizer() =

@@ -24,7 +24,7 @@ class OAuth2ClientTestConfig {
 
     @Bean
     fun logbook() = Logbook.builder()
-        .sink(DefaultSink(RequestResponsePrefixingLogbookFormatter(), DefaultHttpLogWriter()))
+        .sink(DefaultSink(FormatAwareLogbookFormatter(false), DefaultHttpLogWriter()))
         .build()
 
     @Bean

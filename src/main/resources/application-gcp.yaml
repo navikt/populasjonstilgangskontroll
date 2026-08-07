@@ -202,4 +202,4 @@ info:
 logbook:
   predicate:
    exclude:
-    - /monitoring/**
+    -  path: /monitoring/**

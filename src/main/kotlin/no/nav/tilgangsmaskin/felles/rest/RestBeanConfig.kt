@@ -46,7 +46,10 @@ class RestBeanConfig(
     fun logbook(formatter: HttpLogFormatter): Logbook =
         Logbook.builder()
             .headerFilter(none())
-            .condition(exclude(requestTo("**/monitoring/**"),requestTo("**/actuator/**")))
+            .condition(exclude(
+                requestTo("**/internal/**"),
+                requestTo("**/monitoring/**"),
+                requestTo("**/actuator/**")))
             .sink(DefaultSink(formatter, DefaultHttpLogWriter()))
             .build()
 

@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import no.nav.boot.conditionals.ConditionalOnDev
+import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component
 import org.zalando.logbook.Correlation
 import org.zalando.logbook.HttpLogFormatter
@@ -12,6 +13,7 @@ import tools.jackson.databind.json.JsonMapper
 
 @Component
 @ConditionalOnDev
+@Primary
 class ClusterAwareLogbookFormatter(private val jsonMapper: JsonMapper) : HttpLogFormatter {
     private val delegate  = JsonHttpLogFormatter(jsonMapper, true)
 

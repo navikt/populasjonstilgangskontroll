@@ -59,6 +59,7 @@ import kotlin.time.measureTime
 class ValkeyCacheOperationsTest(
     private val cache: CacheOperations,
     private val cacheSizeAware: CacheSizeAware,
+    private val valkey: StringRedisTemplate,
 ) : BehaviorSpec() {
 
     @TestConfiguration
@@ -80,7 +81,14 @@ class ValkeyCacheOperationsTest(
 
         @Bean
         fun valkeyCacheOperations(valkey: StringRedisTemplate) =
-            ValkeyCacheOperations(valkey)
+            ValkeyCacheOperations(
+                valkey,
+                object : CachableRestConfig {
+                    override val navn = "pdl-test"
+                    override val caches = setOf(PDL_MED_FAMILIE_CACHE)
+                    override val varighet = ofSeconds(DEFAULT_TTL_SECONDS)
+                }
+            )
 
         @Bean
         fun cacheSizeAware(cache: CacheOperations) =
@@ -125,6 +133,17 @@ class ValkeyCacheOperationsTest(
             When("kalles med tomt set") {
                 Then("returnerer tomt map") {
                     cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, emptySet()).shouldBeEmpty()
+                }
+            }
+        }
+
+        Given("putOne uten eksplisitt TTL") {
+            When("verdien lagres") {
+                Then("settes TTL fra CachableRestConfig") {
+                    cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1)
+
+                    val ttl = valkey.getExpire(PDL_MED_FAMILIE_CACHE.tilNøkkel(I1))
+                    (ttl in 1..DEFAULT_TTL_SECONDS) shouldBe true
                 }
             }
         }
@@ -432,6 +451,7 @@ class ValkeyCacheOperationsTest(
     private companion object {
         @ServiceConnection
         private val redis = RedisContainer(DEFAULT_IMAGE_NAME)
+        private const val DEFAULT_TTL_SECONDS = 12L
         private const val I1 = "03508331575"
         private const val I2 = "20478606614"
         private const val AKTOR_ID = "1234567890123"

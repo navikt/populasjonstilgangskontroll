@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.felles.cache.CacheBeanConfig.Companion.VALKEY_MAPPER
+import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
@@ -18,9 +19,15 @@ import kotlin.text.Charsets.UTF_8
 import kotlin.time.TimeSource.Monotonic.markNow
 
 @Component
-class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOperations {
+class ValkeyCacheOperations(
+    private val valkey: StringRedisTemplate,
+    vararg cfgs: CachableRestConfig,
+) : CacheOperations {
 
     private val log = getLogger(javaClass)
+    private val defaultTtlForCache = cfgs.flatMap { cfg ->
+        cfg.caches.map { cache -> cache.fullName to cfg.varighet }
+    }.toMap()
 
     init {
         if (isLocalOrTest) {
@@ -56,8 +63,8 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
             val key = cache.tilNøkkel(id)
             val json = VALKEY_MAPPER.writeValueAsString(value)
             val ops = valkey.opsForValue()
-            ttl?.let {
-                ops.set(key, json, ttl)
+            effectiveTtl(cache, ttl)?.let { ttlToUse ->
+                ops.set(key, json, ttlToUse)
             } ?: ops.set(key, json)
         }.onFailure {
             log.info("Cache putOne feilet for {} nøkkel {}: {}", cache.fullName, id, it.message, it)
@@ -71,12 +78,16 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
 
     @Observed
     override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration?) {
+        val ttlToUse = effectiveTtl(cache, ttl)
         when {
             innslag.isEmpty() -> return
-            innslag.size == 1 -> doPutOne(cache, innslag, ttl)
-            else -> doPutMany(cache, innslag, ttl?.seconds)
+            innslag.size == 1 -> doPutOne(cache, innslag, ttlToUse)
+            else -> doPutMany(cache, innslag, ttlToUse?.seconds)
         }
     }
+
+    private fun effectiveTtl(cache: CacheNøkkelConfig, ttl: Duration?) =
+        ttl ?: defaultTtlForCache[cache.fullName]
 
     private fun <T : Any> doGetMany(cache: CacheNøkkelConfig,
                                     requestedIds: List<String>,

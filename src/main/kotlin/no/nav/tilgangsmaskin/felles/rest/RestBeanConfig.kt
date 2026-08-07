@@ -18,6 +18,12 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import org.zalando.logbook.core.Conditions.exclude
+import org.zalando.logbook.core.Conditions.requestTo
+import org.zalando.logbook.HttpLogFormatter
+import org.zalando.logbook.Logbook
+import org.zalando.logbook.core.DefaultHttpLogWriter
+import org.zalando.logbook.core.DefaultSink
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 import java.time.Duration
@@ -30,6 +36,13 @@ class RestBeanConfig(
     private val handler: ErrorHandler,
     private val logbookInterceptor: ObjectProvider<LogbookClientHttpRequestInterceptor>,
 ) : WebMvcConfigurer {
+
+    @Bean
+    fun logbook(formatter: HttpLogFormatter): Logbook =
+        Logbook.builder()
+            .condition(exclude(requestTo("/actuator/**")))
+            .sink(DefaultSink(formatter, DefaultHttpLogWriter()))
+            .build()
 
     @Bean
     fun jackson3Customizer() = JsonMapperBuilderCustomizer {

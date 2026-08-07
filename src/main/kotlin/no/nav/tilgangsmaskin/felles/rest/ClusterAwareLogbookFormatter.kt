@@ -1,34 +1,19 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import no.nav.boot.conditionals.ConditionalOnDev
-import no.nav.boot.conditionals.ConditionalOnDevOrLocal
-import no.nav.boot.conditionals.ConditionalOnLocalOrTest
 import org.springframework.stereotype.Component
 import org.zalando.logbook.Correlation
 import org.zalando.logbook.HttpLogFormatter
 import org.zalando.logbook.HttpRequest
 import org.zalando.logbook.HttpResponse
 import org.zalando.logbook.Precorrelation
-import org.zalando.logbook.core.DefaultHttpLogFormatter
 import org.zalando.logbook.json.JsonHttpLogFormatter
 import tools.jackson.databind.json.JsonMapper
 
 @Component
-@ConditionalOnLocalOrTest
-class LocalLogbookFormatter : HttpLogFormatter {
-    private val delegate  = DefaultHttpLogFormatter()
-
-    override fun format(precorrelation: Precorrelation, request: HttpRequest): String =
-        delegate.format(precorrelation, request)
-
-    override fun format(correlation: Correlation, response: HttpResponse): String =
-        delegate.format(correlation, response)
-
-}
-@Component
 @ConditionalOnDev
-class ClusterAwareLogbookFormatter(private val jsonMapper: JsonMapper) : HttpLogFormatter   {
-    private val delegate  = JsonHttpLogFormatter(jsonMapper,true)
+class ClusterAwareLogbookFormatter(private val jsonMapper: JsonMapper) : HttpLogFormatter {
+    private val delegate  = JsonHttpLogFormatter(jsonMapper, true)
 
     override fun format(precorrelation: Precorrelation, request: HttpRequest): String =
         format(delegate.format(precorrelation, request))

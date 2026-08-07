@@ -7,6 +7,7 @@ import com.slack.api.model.block.composition.BlockCompositions.markdownText
 import com.slack.api.model.block.composition.BlockCompositions.plainText
 import com.slack.api.webhook.Payload
 import com.slack.api.webhook.Payload.builder
+import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Component
  */
 @Component
 class SlackMessagePublisher(
-    @param:Value("\${slack.webhook:}") private val url: String) : MessagePublisher {
+    @param:Value("\${slack.webhook:}") private val url: String) : LeaderAware(), MessagePublisher {
 
     private val log = getLogger(javaClass)
 
@@ -32,17 +33,21 @@ class SlackMessagePublisher(
             section { info -> info.text(markdownText(msg)) })).build())
 
     private fun publish(payload: Payload) =
-        if (url.isBlank()) {
-            log.info("Ingen Slack notifikasjon")
-        }
-        else {
-            with(getInstance().send(url, payload)) {
-                if (code != OK.value()) {
-                    log.warn("Kunne ikke sende Slack notifikasjon _($code/$message)_")
-                }
-                else  {
-                    log.info("Sendte Slack notifikasjon OK")
+        somLeder("publiserer Slack-notifikasjon", {
+            if (url.isBlank()) {
+                log.info("Ingen Slack notifikasjon")
+            }
+            else {
+                with(getInstance().send(url, payload)) {
+                    if (code != OK.value()) {
+                        log.warn("Kunne ikke sende Slack notifikasjon _($code/$message)_")
+                    }
+                    else  {
+                        log.info("Sendte Slack notifikasjon OK")
+                    }
                 }
             }
+        }) {
+            log.trace("Ikke leder, hopper over Slack-notifikasjon")
         }
 }

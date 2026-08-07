@@ -31,5 +31,6 @@ class SlackApplicationReadyNotifier(
         if (firstPublisher) {
             publisher.info("Applikasjon klar", "$appName er startet i cluster '$cluster' med image '$image'")
         }
+        else log.info("IKKE first publisher, hopper over notifikasjon")
     }
 }

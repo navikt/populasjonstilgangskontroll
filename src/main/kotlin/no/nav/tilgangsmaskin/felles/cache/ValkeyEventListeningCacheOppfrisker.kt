@@ -14,7 +14,7 @@ class ValkeyEventListeningCacheOppfrisker(erLeder: Boolean = true,
     @RedisListener(CHANNEL_DELETED)
     fun onEvent(nokkel: CacheNøkkel,@Header(CHANNEL) channel: String) {
 
-        somLeder("Håndterer oppfrisking for ${nokkel.maskert} på kanal $channel") {
+        somLeder {
             oppfriskere.firstOrNull { it.cacheName == nokkel.cacheName }?.run {
                 oppfrisk(nokkel)
             }

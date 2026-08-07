@@ -13,7 +13,7 @@ abstract class AbstractCacheOppfrisker : CacheOppfrisker {
         runCatching {
             doOppfrisk(nøkkel)
         }.onSuccess {
-            log.trace("Oppfrisking av cache innslag ${nøkkel.maskert} OK")
+            log.trace("Oppfrisking av cache innslag ${nøkkel.maskert} OKOK")
         }.onFailure {
             log.warn("Oppfrisking av cache innslag ${nøkkel.maskert} feilet", it)
         }

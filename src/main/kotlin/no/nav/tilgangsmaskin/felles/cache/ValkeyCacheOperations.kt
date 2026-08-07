@@ -150,7 +150,6 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
                 cache.tilNøkkel(key) to VALKEY_MAPPER.writeValueAsString(value)
             }
             val resultat = pipeline(payload, ttl)
-            val varighet = start.elapsedNow()
             resultat.onSuccess {
                 log.info("Cache putMany {} lagret {} nøkler på {}ms",
                     cache.fullName,
@@ -178,6 +177,7 @@ class ValkeyCacheOperations(private val valkey: StringRedisTemplate) : CacheOper
                         connection.stringCommands().set(keyBytes, valueBytes)
                     }
                 }
+                null
             }
         }
     companion object {

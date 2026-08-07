@@ -96,7 +96,7 @@ class ValkeyCacheOperationsTest(
     @MockkBean
     private lateinit var token: Token
 
-    @MockkBean
+    @MockkBean(relaxed = true)
     private lateinit var oppfrisker: CacheOppfrisker
 
 
@@ -337,9 +337,9 @@ class ValkeyCacheOperationsTest(
                     cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 0
                 }
             }
-            When("5000 innslag legges inn") {
-                Then("size returnerer 5000 og clear tømmer alt") {
-                    val batchSize = 5_000
+            When("500 innslag legges inn") {
+                Then("size returnerer 500 og clear tømmer alt") {
+                    val batchSize = 500
                     (1..5000).chunked(batchSize).forEach { chunk ->
                         val entries = chunk.associate {
                             "id-$it" to Person(

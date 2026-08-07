@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
+import org.springframework.security.config.observation.SecurityObservationSettings
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.OAuth2AuthorizationFailureHandler
 import org.springframework.security.oauth2.client.OAuth2AuthorizationSuccessHandler
@@ -20,6 +21,7 @@ import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpReq
 import org.springframework.security.oauth2.client.web.client.support.OAuth2RestClientHttpServiceGroupConfigurer.from
 import org.springframework.security.web.authentication.HttpStatusEntryPoint
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
+
 
 @Configuration
 class OAuth2SecurityBeanConfig {
@@ -37,6 +39,11 @@ class OAuth2SecurityBeanConfig {
                 oauth2.authenticationEntryPoint(HttpStatusEntryPoint(UNAUTHORIZED))
             }
             .statelessApiDefaults()
+            .build()
+
+    @Bean
+    fun securityObservationSettings()  =
+        SecurityObservationSettings.withDefaults().shouldObserveRequests(false)
             .build()
 
     @Bean

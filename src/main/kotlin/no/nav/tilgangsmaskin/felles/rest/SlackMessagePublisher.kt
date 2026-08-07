@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component
  */
 @Component
 class SlackMessagePublisher(
-    @param:Value("\${slack.webhook:}") private val url: String) : LeaderAware(), MessagePublisher {
+    @param:Value("\${slack.webhook:}") private val url: String) : MessagePublisher {
 
     private val log = getLogger(javaClass)
 
@@ -33,7 +33,6 @@ class SlackMessagePublisher(
             section { info -> info.text(markdownText(msg)) })).build())
 
     private fun publish(payload: Payload) =
-        somLeder("publiserer Slack-notifikasjon", {
             if (url.isBlank()) {
                 log.info("Ingen Slack notifikasjon")
             }
@@ -47,7 +46,4 @@ class SlackMessagePublisher(
                     }
                 }
             }
-        }) {
-            log.trace("Ikke leder, hopper over Slack-notifikasjon")
-        }
 }

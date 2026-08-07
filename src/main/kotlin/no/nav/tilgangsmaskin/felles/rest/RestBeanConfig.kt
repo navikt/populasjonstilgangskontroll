@@ -40,8 +40,7 @@ class RestBeanConfig(
     @Bean
     fun logbook(formatter: HttpLogFormatter): Logbook =
         Logbook.builder()
-            .condition(exclude(requestTo("/actuator/**")))
-            .sink(DefaultSink(formatter, DefaultHttpLogWriter()))
+            .condition(exclude(requestTo("**/actuator/**")))            .sink(DefaultSink(formatter, DefaultHttpLogWriter()))
             .build()
 
     @Bean

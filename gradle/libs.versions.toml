@@ -8,7 +8,7 @@ cyclonedx = "3.3.0"
 kotlin = "2.4.0"
 kotest = "6.2.3"
 logstash = "9.0"
-mockk = "1.14.11"
+logbook = "4.1.0"
 mock-oauth2-server = "6.0.0"
 opentelemetry = "2.30.0"
 opentelemetry-alpha = "2.30.0-alpha"
@@ -31,6 +31,7 @@ kotest-bom = { module = "io.kotest:kotest-bom", version.ref = "kotest" }
 kotest-extensions-spring = { module = "io.kotest:kotest-extensions-spring", version.ref = "kotest" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logstash" }
+logbook-spring-boot-starter = { module = "org.zalando:logbook-spring-boot-starter", version.ref = "logbook" }
 micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
 opentelemetry-instrumentation-annotations = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations" }
 opentelemetry-instrumentation-bom = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom", version.ref = "opentelemetry" }

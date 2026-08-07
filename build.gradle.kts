@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.flyway.database.postgresql)
     implementation(libs.hibernate.micrometer)
     implementation(libs.jackson.module.kotlin)
+    implementation(libs.logbook.spring.boot.starter)
     implementation(libs.logstash.logback.encoder)
     implementation(libs.postgresql)
     implementation(libs.spring.boot.starter.actuator)

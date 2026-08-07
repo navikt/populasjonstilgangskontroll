@@ -33,7 +33,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 @EnableResilientMethods
 @ContextConfiguration(classes = [EntraProxyTjeneste::class, EntraProxyConfig::class], initializers = [PropertySettingTestContextInitializer::class])
 @Import(OAuth2ClientTestConfig::class)
-class   EntraProxyTjenesteTest(private val tjeneste: EntraProxyTjeneste, private val server: MockRestServiceServer, private val cfg: EntraProxyConfig) : BehaviorSpec() {
+class EntraProxyTjenesteTest(private val tjeneste: EntraProxyTjeneste, private val server: MockRestServiceServer, private val cfg: EntraProxyConfig) : BehaviorSpec() {
 
     init {
         afterEach {

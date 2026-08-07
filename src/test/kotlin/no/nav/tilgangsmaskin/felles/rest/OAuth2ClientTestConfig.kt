@@ -7,14 +7,24 @@ import org.springframework.context.annotation.Bean
 import org.springframework.core.env.Environment
 import org.springframework.http.HttpStatusCode
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
+import org.zalando.logbook.Logbook
+import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
 
 @TestConfiguration
 class OAuth2ClientTestConfig {
 
     @Bean
-    fun restClientCustomizer() = RestClientCustomizer { c ->
-        c.defaultStatusHandler(HttpStatusCode::isError, RestDefaultErrorHandler()::handle)
-    }
+    fun restClientCustomizer(logbookInterceptor: LogbookClientHttpRequestInterceptor) =
+        RestClientCustomizer { c ->
+            c.requestInterceptors { it.add(logbookInterceptor) }
+            c.defaultStatusHandler(HttpStatusCode::isError, RestDefaultErrorHandler()::handle)
+        }
+
+    @Bean
+    fun logbook() = Logbook.create()
+
+    @Bean
+    fun logbookClientHttpRequestInterceptor(logbook: Logbook) = LogbookClientHttpRequestInterceptor(logbook)
 
     @Bean
     fun restClientGroupCustomizer(

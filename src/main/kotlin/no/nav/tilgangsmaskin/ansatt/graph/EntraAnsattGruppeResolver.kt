@@ -12,7 +12,7 @@ import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
 import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
-import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
@@ -22,7 +22,7 @@ class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
                                 private val cache: CacheOperations,
                                 private val publisher: MessagePublisher) {
 
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val log = getLogger(javaClass)
 
     fun grupperForAnsatt(ansattId: AnsattId) =
         when (token.type) {

@@ -4,9 +4,11 @@ import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.upcase
+import org.slf4j.MDC
 
 class DomainExtensionsTest : BehaviorSpec({
 
@@ -123,6 +125,21 @@ class DomainExtensionsTest : BehaviorSpec({
         When("strengen er tom") {
             Then("returneres uendret") {
                 "".upcase() shouldBe ""
+            }
+        }
+    }
+
+    Given("withMDC") {
+        When("verdier sendes inn som map") {
+            Then("settes i MDC under block og fjernes etterpå") {
+                val traceId = "trace-id-test"
+                val userId = "user-id-test"
+                DomainExtensions.withMDC(verdier = mapOf("traceId" to traceId, "userId" to userId)) {
+                    MDC.get("traceId") shouldBe traceId
+                    MDC.get("userId") shouldBe userId
+                }
+                MDC.get("traceId") shouldBe null
+                MDC.get("userId") shouldBe null
             }
         }
     }

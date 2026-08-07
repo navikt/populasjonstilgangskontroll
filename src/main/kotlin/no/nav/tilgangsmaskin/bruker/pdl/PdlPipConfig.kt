@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.bruker.pdl
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PDL_PIP_PERSONER_PATH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PDL_PIP_PERSON_PATH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PDL_PIP_PING_PATH
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.RestConfig
@@ -21,7 +20,6 @@ class PdlPipConfig(@Value("\${spring.http.serviceclient.pdlpip.base-url}") baseU
     val personURI = uri(PDL_PIP_PERSON_PATH)
     val personerURI = uri(PDL_PIP_PERSONER_PATH)
 
-    @NoCoverageAnalysis
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
@@ -35,4 +33,3 @@ class PdlPipConfig(@Value("\${spring.http.serviceclient.pdlpip.base-url}") baseU
 
     }
 }
-

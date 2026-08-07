@@ -26,9 +26,9 @@ class OAuth2SecurityBeanConfig {
     @Bean
     fun securityFilterChain(http: HttpSecurity, enkeltTilgangAuthorizationManager: EnkeltTilgangAuthorizationManager) =
         http.authorizeHttpRequests { requests ->
-                requests.requestMatchers(POST, "${PROD_BASE_PATH}/overstyr").access(enkeltTilgangAuthorizationManager)
-                requests.requestMatchers("${PROD_BASE_PATH}/**").authenticated()
-                requests.requestMatchers("/${DEV}/**").permitAll()
+                requests.requestMatchers(POST, "$PROD_BASE_PATH/overstyr").access(enkeltTilgangAuthorizationManager)
+                requests.requestMatchers("$PROD_BASE_PATH/**").authenticated()
+                requests.requestMatchers("/$DEV/**").permitAll()
                 requests.requestMatchers(*UNPROTECTED_ENDPOINTS).permitAll()
                 requests.anyRequest().denyAll()
             }
@@ -36,12 +36,7 @@ class OAuth2SecurityBeanConfig {
                 oauth2.jwt { it.jwtAuthenticationConverter(OAuth2LoggingJwtAuthenticationConverter()) }
                 oauth2.authenticationEntryPoint(HttpStatusEntryPoint(UNAUTHORIZED))
             }
-            .requestCache { it.disable() }
-            .sessionManagement { it.sessionCreationPolicy(STATELESS) }
-            .csrf { it.disable() }
-            .formLogin { it.disable() }
-            .httpBasic { it.disable() }
-            .logout { it.disable() }
+            .statelessApiDefaults()
             .build()
 
     @Bean
@@ -73,4 +68,12 @@ class OAuth2SecurityBeanConfig {
             setAuthorizationSuccessHandler(successHandler)
             setAuthorizationFailureHandler(failureHandler)
         }
+
+    private fun HttpSecurity.statelessApiDefaults() =
+        requestCache { it.disable() }
+            .sessionManagement { it.sessionCreationPolicy(STATELESS) }
+            .csrf { it.disable() }
+            .formLogin { it.disable() }
+            .httpBasic { it.disable() }
+            .logout { it.disable() }
 }

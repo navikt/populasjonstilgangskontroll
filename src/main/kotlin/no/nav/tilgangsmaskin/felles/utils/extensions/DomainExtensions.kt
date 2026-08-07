@@ -24,7 +24,10 @@ object DomainExtensions {
             else -> this
         }
 
-    inline fun <T> withMDC(vararg verdier: Pair<String, String>, block: () -> T) =
+    inline fun <T> withMDC(vararg pairs: Pair<String, String>, block: () -> T) =
+        withMDC(verdier = pairs.toMap(), block = block)
+
+    inline fun <T> withMDC(verdier: Map<String, String>, block: () -> T) =
         try {
             verdier.forEach { (key, value) ->
                 MDC.put(key, value)

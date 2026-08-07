@@ -8,10 +8,12 @@ import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withMDC
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
 import java.util.*
+import kotlin.to
 
 @Component
 class EntraCacheOppfrisker(private val entra: EntraTjeneste,
@@ -23,15 +25,16 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste,
 
     override fun doOppfrisk(nøkkel: CacheNøkkel) {
         val ansattId = AnsattId(nøkkel.id)
-        MDC.put(USER_ID, ansattId.verdi)
-        val oid = oidTjeneste.oid(ansattId)
-        runCatching {
-            oppfriskFor(ansattId, oid, nøkkel.metode)
-        }.recoverCatching { e ->
-            (e as? NotFoundRestException)?.let {
-                tømOgOppfrisk(ansattId, oid, nøkkel.metode)
-            } ?: log.warn("Oppfrisking av ${nøkkel.maskert} feilet", e)
-        }.getOrThrow()
+        withMDC(USER_ID to ansattId.verdi) {
+            val oid = oidTjeneste.oid(ansattId)
+            runCatching {
+                oppfriskFor(ansattId, oid, nøkkel.metode)
+            }.recoverCatching { e ->
+                (e as? NotFoundRestException)?.let {
+                    tømOgOppfrisk(ansattId, oid, nøkkel.metode)
+                } ?: log.warn("Oppfrisking av ${nøkkel.maskert} feilet", e)
+            }.getOrThrow()
+        }
     }
 
     private fun tømOgOppfrisk(ansattId: AnsattId, oid: UUID, metode: String?) {

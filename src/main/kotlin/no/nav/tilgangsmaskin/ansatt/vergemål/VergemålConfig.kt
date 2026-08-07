@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.vergemål
 
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålClient.Companion.VERGEMÅL_PING_PATH
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.RestConfig
@@ -17,7 +16,6 @@ class VergemålConfig(@Value("\${spring.http.serviceclient.verge.base-url}") bas
     override val caches = setOf(VERGE_CACHE)
     override val varighet = Duration.ofHours(24)
 
-    @NoCoverageAnalysis
     override fun toString() =
         "${javaClass.simpleName} [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 

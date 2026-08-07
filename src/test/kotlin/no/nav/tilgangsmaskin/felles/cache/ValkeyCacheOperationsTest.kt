@@ -135,6 +135,13 @@ class ValkeyCacheOperationsTest(
                     cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, emptySet()).shouldBeEmpty()
                 }
             }
+            When("putMany kalles med tom map") {
+                Then("er kall et no-op uten sideeffekter") {
+                    cache.putMany(PDL_MED_FAMILIE_CACHE, emptyMap(), ofSeconds(5))
+                    cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 0
+                    cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, IDS).shouldBeEmpty()
+                }
+            }
         }
 
         Given("putOne uten eksplisitt TTL") {

@@ -16,6 +16,7 @@ plugins {
     jacoco
     alias(libs.plugins.avro)
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.allopen)
     alias(libs.plugins.kotlin.spring)
     alias(libs.plugins.kotlin.jpa)
     alias(libs.plugins.spring.boot)
@@ -23,6 +24,15 @@ plugins {
     alias(libs.plugins.cyclonedx)
     alias(libs.plugins.kotest)
     alias(libs.plugins.asciidoctor)
+}
+
+allOpen {
+    annotation("org.springframework.boot.test.context.SpringBootTest")
+    annotation("org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest")
+    annotation("org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest")
+    annotation("org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest")
+    annotation("org.springframework.boot.test.autoconfigure.web.client.RestClientTest")
+    annotation("org.springframework.test.context.ContextConfiguration")
 }
 
 springBoot {

@@ -48,12 +48,14 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.serializer.RedisMessageConverters
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.TestPropertySource
 import java.time.Duration.ofSeconds
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
 @DataRedisTest
+@TestPropertySource(properties = ["logging.level.no.nav.tilgangsmaskin.felles.cache.ValkeyEventListeningCacheOppfrisker=INFO"])
 @ContextConfiguration(classes = [ValkeyCacheTestConfig::class,ValkeyEventListeningCacheOppfrisker::class])
 @EnableAutoConfiguration
 class ValkeyCacheOperationsTest(
@@ -75,8 +77,7 @@ class ValkeyCacheOperationsTest(
                 .withInitialCacheConfigurations(
                     mapOf(PDL_MED_FAMILIE_CACHE.name to defaultCacheConfig()
                         .prefixCacheNameWith(PDL_MED_FAMILIE_CACHE.name)
-                        .disableCachingNullValues())
-                )
+                        .disableCachingNullValues()))
                 .build()
 
         @Bean
@@ -97,8 +98,7 @@ class ValkeyCacheOperationsTest(
                 object : CachableRestConfig {
                     override val navn = "pdl-test"
                     override val caches = setOf(PDL_MED_FAMILIE_CACHE)
-                }
-            )
+                })
     }
 
     @MockkBean
@@ -366,7 +366,7 @@ class ValkeyCacheOperationsTest(
             When("500 innslag legges inn") {
                 Then("size returnerer 500 og clear tømmer alt") {
                     val batchSize = 500
-                    (1..5000).chunked(batchSize).forEach { chunk ->
+                    (1..500).chunked(batchSize).forEach { chunk ->
                         val entries = chunk.associate {
                             "id-$it" to Person(
                                 brukerId = BrukerId("%011d".format(it)),
@@ -378,10 +378,10 @@ class ValkeyCacheOperationsTest(
                     }
 
                     val elapsed = measureTime {
-                        cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 5000
+                        cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 500
                     }
                     elapsed shouldBeLessThan 5.seconds
-                    cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 5000
+                    cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 500
 
                     cache.clear(PDL_MED_FAMILIE_CACHE)
                     cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 0

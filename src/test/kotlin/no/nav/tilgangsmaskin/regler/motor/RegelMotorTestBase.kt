@@ -2,9 +2,7 @@ package no.nav.tilgangsmaskin.regler.motor
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.assertions.throwables.shouldNotThrowAny
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.every
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -55,12 +53,6 @@ abstract class RegelMotorTestBase(
             every { token.systemNavn } returns "test"
             every { token.clusterAndSystem } returns "cluster:test"
         }
-    }
-
-    protected inline fun <reified T : Regel> forventAvvistAv(ansatt: Ansatt, bruker: Bruker) {
-        shouldThrow<RegelException> {
-            regelMotor.kompletteRegler(ansatt, bruker)
-        }.regel.shouldBeInstanceOf<T>()
     }
 
     protected infix fun Ansatt.kanBehandle(bruker: Bruker) {

@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.sekunder
 import org.apache.hc.client5.http.config.ConnectionConfig
@@ -36,10 +35,6 @@ class RestBeanConfig(
     fun jackson3Customizer() = JsonMapperBuilderCustomizer {
         it.enable(INCLUDE_SOURCE_IN_LOCATION)
     }
-
-    @Bean
-    fun logbookHttpLogFormatter() =
-        FormatAwareLogbookFormatter(!isLocalOrTest)
 
     @Bean
     fun restClientCustomizer() =

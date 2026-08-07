@@ -13,7 +13,6 @@ import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
@@ -39,7 +38,6 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
-import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.annotation.Bean
@@ -56,12 +54,10 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
 @DataRedisTest
-@AutoConfigureMetrics
 @ContextConfiguration(classes = [ValkeyCacheTestConfig::class,ValkeyEventListeningCacheOppfrisker::class])
 @EnableAutoConfiguration
 class ValkeyCacheOperationsTest(
     private val cache: CacheOperations,
-    private val registry: MeterRegistry,
     private val cacheSizeAware: CacheSizeAware,
 ) : BehaviorSpec() {
 

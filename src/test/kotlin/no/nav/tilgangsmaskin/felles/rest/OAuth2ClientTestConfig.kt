@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.rest
 
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.restclient.RestClientCustomizer
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.core.env.Environment
@@ -11,6 +12,7 @@ import org.zalando.logbook.Logbook
 import org.zalando.logbook.core.DefaultHttpLogWriter
 import org.zalando.logbook.core.DefaultSink
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
+import tools.jackson.databind.json.JsonMapper
 
 @TestConfiguration
 class OAuth2ClientTestConfig {
@@ -24,7 +26,7 @@ class OAuth2ClientTestConfig {
 
     @Bean
     fun logbook() = Logbook.builder()
-        .sink(DefaultSink(FormatAwareLogbookFormatter(false), DefaultHttpLogWriter()))
+        .sink(DefaultSink(LocalLogbookFormatter(), DefaultHttpLogWriter()))
         .build()
 
     @Bean

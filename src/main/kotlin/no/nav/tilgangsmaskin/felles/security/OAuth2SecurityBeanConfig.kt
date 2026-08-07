@@ -24,9 +24,9 @@ import org.springframework.web.client.support.RestClientHttpServiceGroupConfigur
 @Configuration
 class OAuth2SecurityBeanConfig {
     @Bean
-    fun securityFilterChain(http: HttpSecurity, enkeltTilgangAuthorizationManager: EnkeltTilgangAuthorizationManager) =
+    fun securityFilterChain(http: HttpSecurity, authorizationManager: EnkeltTilgangAuthorizationManager) =
         http.authorizeHttpRequests { requests ->
-                requests.requestMatchers(POST, "$PROD_BASE_PATH/overstyr").access(enkeltTilgangAuthorizationManager)
+                requests.requestMatchers(POST, "$PROD_BASE_PATH/overstyr").access(authorizationManager)
                 requests.requestMatchers("$PROD_BASE_PATH/**").authenticated()
                 requests.requestMatchers("/$DEV/**").permitAll()
                 requests.requestMatchers(*UNPROTECTED_ENDPOINTS).permitAll()

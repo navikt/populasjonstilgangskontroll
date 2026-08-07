@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.DevController
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
-import no.nav.tilgangsmaskin.regler.enkelttilgang.DevEnkelttilgangController.Companion.DEV_ENKELT_CONTROLLER_TAG_DESCRIPTION
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangDevController.Companion.DEV_ENKELT_CONTROLLER_TAG_DESCRIPTION
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping
     name = "DevEnkelttilgangController",
     description = DEV_ENKELT_CONTROLLER_TAG_DESCRIPTION
 )
-class DevEnkelttilgangController(private val enkelt: EnkeltTilgangTjeneste,
+class EnkeltTilgangDevController(private val enkelt: EnkeltTilgangTjeneste,
                                  private val adapter: EnkeltTilgangJPAAdapter) {
 
     @PostMapping("{ansattId}/{brukerId}")

@@ -22,12 +22,14 @@ class SlackMessagePublisher(
 
     private val log = getLogger(javaClass)
 
-    override fun warn(header: String, msg: String) = publish(":warn: $header", msg)
+    override fun warn(header: String, msg: String) = publish(":warn:", header, msg)
 
-     private fun publish(header: String, msg: String) =
+    override fun info(header: String, msg: String) = publish(":rocket:",header, msg)
+
+    private fun publish(emoji: String, header: String, msg: String) =
         publish(builder().blocks(asBlocks(
-            header { it.text(plainText("🚀 $header")) },
-            section { info -> info.text(markdownText(":info: \n$msg")) })).build())
+            header { it.text(plainText("$emoji $header")) },
+            section { info -> info.text(markdownText(msg)) })).build())
 
     private fun publish(payload: Payload) =
         if (url.isBlank()) {

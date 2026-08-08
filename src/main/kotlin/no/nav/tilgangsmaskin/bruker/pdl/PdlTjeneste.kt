@@ -75,6 +75,6 @@ class PdlTjeneste(
         cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, identer)
             .filterValues { it != null }
             .mapValues { it.value!! }.also {
-                log.info("Hentet ${it.size} person(er) av ${identer.size} mulige fra CACHE")
+                log.trace("Hentet ${it.size} person(er) av ${identer.size} mulige fra CACHE")
             }
 }

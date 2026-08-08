@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.bruker.pdl
 import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.*
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPersoner
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
@@ -39,8 +40,10 @@ class PdlTjeneste(
 
     fun personer(identer: Set<String>): Set<Person> {
         if (identer.isEmpty()) {
-            log.info("Bulk ingen personer å slå opp")
-            return emptySet()
+            return emptySet<Person>().also {
+                log.trace("Bulk ingen personer å slå opp")
+
+            }
         }
         val fraCache = fraCache(identer)
         if (fraCache.size == identer.size) {
@@ -48,7 +51,7 @@ class PdlTjeneste(
         }
 
         val fraRest = hentPersoner(identer - fraCache.keys).also {
-            log.info("Hentet ${it.size} person(er) av ${identer.size - fraCache.size} mulige fra REST")
+            log.trace("Hentet ${it.size} person(er) av ${identer.size - fraCache.size} mulige fra REST")
         }
 
         cache.putMany(PDL_MED_FAMILIE_CACHE, fraRest)
@@ -61,15 +64,18 @@ class PdlTjeneste(
     private fun hentPersoner(identer: Set<String>) =
         tilPersoner(pip.personer(identer))
 
-    private fun søsken(person: Person): Set<FamilieMedlem> {
-        if (person.foreldre.isEmpty()) return emptySet()
-        return buildSet {
-            hentPersoner(person.foreldre.map { it.brukerId.verdi }.toSet())
-                .flatMap { it.value.barn }
-                .filterNot { it.brukerId.verdi == person.brukerId.verdi }
-                .mapTo(this) { FamilieMedlem(it.brukerId, FamilieMedlem.FamilieRelasjon.SØSKEN) }
-        }
-    }
+    private fun søsken(person: Person) =
+        person.foreldre
+            .map { it.brukerId.verdi }
+            .toSet()
+            .takeIf { it.isNotEmpty() }
+            ?.let(::hentPersoner)
+            ?.values
+            ?.flatMap { it.barn }
+            ?.filterNot { it.brukerId == person.brukerId }
+            ?.map { FamilieMedlem(it.brukerId, SØSKEN) }
+            ?.toSet()
+            ?: emptySet()
 
     private fun fraCache(identer: Set<String>) =
         cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, identer)

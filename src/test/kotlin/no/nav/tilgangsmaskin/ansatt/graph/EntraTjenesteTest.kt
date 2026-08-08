@@ -1,68 +1,42 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
-import com.ninjasquad.springmockk.MockkBean
-import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.ENTRA_CACHES
-import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_OG_GLOBALE_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjenesteTest.EntraTestConfig
-import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidBeanConfig
-import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
-import org.springframework.beans.factory.annotation.Autowired
+import no.nav.tilgangsmaskin.felles.cache.getOne
+import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
+import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import java.util.*
 
-@RestClientTest(components = [EntraGrupperRestClientAdapter::class, EntraTjeneste::class, EntraGrupperConfig::class, EntraGruppeBeanConfig::class, EntraOidBeanConfig::class])
-@Import(EntraTestConfig::class)
-@ApplyExtension(SpringExtension::class)
-class EntraTjenesteTest : BehaviorSpec() {
+@RestClientTest
+@EnableResilientMethods
+@ContextConfiguration(classes = [EntraTjeneste::class, EntraGrupperConfig::class], initializers = [PropertySettingTestContextInitializer::class])
+@Import(EntraTestConfig::class, OAuth2ClientTestConfig::class)
+class EntraTjenesteTest(private val tjeneste: EntraTjeneste, private val server: MockRestServiceServer, private val cfg: EntraGrupperConfig, private val cache: CacheOperations) : BehaviorSpec() {
 
     @TestConfiguration
-    @EnableResilientMethods
     class EntraTestConfig : CacheTestConfig(GRAPH)
 
-    @MockkBean
-    @Suppress("unused")
-    private lateinit var oidTjeneste: EntraOidTjeneste
-
-    @MockkBean
-    @Suppress("unused")
-    private lateinit var entraOidClient: EntraOidClient
-
-    @Autowired
-    private lateinit var tjeneste: EntraTjeneste
-
-    @Autowired
-    private lateinit var server: MockRestServiceServer
-
-    @Autowired
-    private lateinit var cfg: EntraGrupperConfig
-
-    @Autowired
-    private lateinit var cache: CacheOperations
-
-
     init {
-
         beforeEach {
             server.reset()
             cache.clear(ENTRA_CACHES)
@@ -205,8 +179,7 @@ class EntraTjenesteTest : BehaviorSpec() {
         }
     """.trimIndent()
 
-    private companion object {
-
+    companion object {
         private val OID       = UUID.randomUUID()
         private val OID2     = UUID.randomUUID()
         private val ANSATTID  = AnsattId("Z999999")

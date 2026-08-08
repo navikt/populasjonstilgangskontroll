@@ -1,11 +1,11 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Repository
 import java.time.Instant
 import java.util.*
 
-@Component
+@Repository
 class OppfølgingJPAAdapter(private val repo: OppfølgingRepository) {
 
 

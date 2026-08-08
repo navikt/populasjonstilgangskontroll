@@ -11,9 +11,9 @@ import no.nav.person.pdl.leesah.Endringstype.entries
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Adressebeskyttelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.FORTROLIG
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_CACHES
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.tilgang.Token
+import no.nav.tilgangsmaskin.felles.rest.Token
 import java.time.Instant
 
 class PdlCacheOpprydderTest : BehaviorSpec({
@@ -30,7 +30,7 @@ class PdlCacheOpprydderTest : BehaviorSpec({
         Personhendelse("hendelse-id", identer, "PDL", Instant.now(), "PDL_HENDELSE", endringstype, null, gradering, null)
 
     beforeEach {
-        every { client.delete(any(), any()) } returns 1L
+        every { client.delete(any(), any()) } returns true
     }
 
     Given("sletting av cache ved personhendelse") {

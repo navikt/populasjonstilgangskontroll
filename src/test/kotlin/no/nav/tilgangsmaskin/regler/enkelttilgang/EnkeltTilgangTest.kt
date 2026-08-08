@@ -1,19 +1,16 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import com.ninjasquad.springmockk.MockkBean
-import io.kotest.core.extensions.ApplyExtension
-import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.assertions.assertSoftly
-import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.micrometer.core.instrument.MeterRegistry
-import io.mockk.MockKAnnotations
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
-import no.nav.tilgangsmaskin.TestApp
+import io.mockk.mockk
+import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
@@ -25,95 +22,80 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.felles.LocalAuditor
+import no.nav.tilgangsmaskin.felles.TimeBeanConfig
+import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
+import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfig
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
-import no.nav.tilgangsmaskin.tilgang.Token
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
+import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
-import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
-import org.springframework.context.annotation.ComponentScan
-import org.springframework.test.context.TestPropertySource
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.time.LocalDate
 
 @DataJpaTest
 @EnableJpaAuditing
 @Testcontainers
 @AutoConfigureMetrics
-@TestPropertySource(locations = ["classpath:test.properties"])
-@EnableConfigurationProperties(value = [GlobaleGrupperConfig::class])
-@ContextConfiguration(classes = [TestApp::class, LocalAuditor::class,EnkeltTilgangJPAAdapter::class])
-@ApplyExtension(SpringExtension::class)
+@ContextConfiguration(initializers = [PropertySettingTestContextInitializer::class],classes = [LocalAuditor::class,EnkeltTilgangJPAAdapter::class])
+@Import(TimeBeanConfig::class)
+@EnableAutoConfiguration
 @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
-internal class EnkeltTilgangTest : BehaviorSpec() {
+internal class EnkeltTilgangTest(
+    private val motor: RegelMotor,
+    private val registry: MeterRegistry,
+    private val adapter: EnkeltTilgangJPAAdapter,
+    private val repo: EnkeltTilgangRepository,
+) : BehaviorSpec() {
 
     private val vanligBrukerId = BrukerId("08526835670")
     private val ansattId = AnsattId("Z999999")
     private val historiskBrukerId = BrukerId("11111111111")
 
-
     @MockkBean
     private lateinit var vergemål: VergemålTjeneste
-
     @MockkBean
     private lateinit var nom: NomTjeneste
-
     @MockkBean
     lateinit var proxy: EntraProxyTjeneste
     @MockkBean
     lateinit var token: Token
     @MockkBean
     lateinit var oppfølging: OppfølgingTjeneste
-    @Autowired
-    lateinit var motor: RegelMotor
-    @Autowired
-    lateinit var registry: MeterRegistry
-    @Autowired
-    lateinit var adapter: EnkeltTilgangJPAAdapter
-    @Autowired
-    lateinit var repository: EnkeltTilgangRepository
-    @MockK
-    lateinit var ansatte: AnsattTjeneste
-    @MockK
-    lateinit var brukere: BrukerTjeneste
+    private val ansatte: AnsattTjeneste = mockk()
+    private val brukere: BrukerTjeneste = mockk()
+    private lateinit var enkeltTilgang: EnkeltTilgangTjeneste
 
     init {
-        lateinit var enkeltTilgang: EnkeltTilgangTjeneste
-
-        beforeSpec {
-            MockKAnnotations.init(this@EnkeltTilgangTest)
-        }
-
         beforeEach {
-            every { nom.fnrForAnsatt(any()) } returns vanligBrukerId
-            every { vergemål.vergemål(any()) } returns emptySet()
-            every { token.erObo } returns false
-            every { token.erCC } returns true
-            every { token.system } returns "test"
-            every { token.ansattId } returns ansattId
-            every { token.systemNavn } returns "test"
-            every { token.clusterAndSystem } returns "cluster:test"
-            every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
-            every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-            enkeltTilgang = EnkeltTilgangTjeneste(ansatte, brukere, adapter, motor, proxy, EnkeltTilgangTeller(registry, token))
+            stubStandardMocks()
+            enkeltTilgang = EnkeltTilgangTjeneste(
+                ansatte,
+                brukere,
+                adapter,
+                motor,
+                proxy,
+                EnkeltTilgangTeller(registry, token),
+            )
         }
 
 
         Given("OverstyringEntity felter") {
             When("enkelttilgang registreres") {
                 Then("settes alle felter korrekt") {
-                    val bruker = BrukerBuilder(vanligBrukerId).build()
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
-                    val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    val bruker = vanligBruker(vanligBrukerId)
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+                    registrerEnkelttilgang(bruker.brukerId, "Dette er en begrunnelse")
+                    val entity = adapter.gjeldendeTilgang(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     assertSoftly(entity) {
                         navid shouldBe ansattId.verdi
                         fnr shouldBe vanligBrukerId.verdi
@@ -134,43 +116,43 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
             When("gyldig enkelttilgang eksisterer via historisk ident") {
                 Then("returneres true") {
                     val brukerMedHistorikk = BrukerBuilder(vanligBrukerId).historiske(setOf(historiskBrukerId)).build()
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns brukerMedHistorikk
-                    every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns BrukerBuilder(historiskBrukerId).build()
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(historiskBrukerId, "Dette er en test", IMORGEN))
-                    enkeltTilgang.harEnkeltTilgang(ansattId, BrukerBuilder(vanligBrukerId).build().brukerId).shouldBeTrue()
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns brukerMedHistorikk
+                    every { brukere.medNærmesteFamilie(historiskBrukerId.verdi) } returns vanligBruker(historiskBrukerId)
+                    registrerEnkelttilgang(historiskBrukerId)
+                    enkeltTilgang.harTilgang(ansattId, vanligBruker(vanligBrukerId).brukerId).shouldBeTrue()
                 }
             }
             When("det finnes flere enkelttilganger") {
                 Then("gjelder den nyeste") {
-                    val bruker = BrukerBuilder(vanligBrukerId).build()
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er gammel", IGÅR))
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er ny", IMORGEN))
-                    enkeltTilgang.harEnkeltTilgang(ansattId, bruker.brukerId).shouldBeTrue()
+                    val bruker = vanligBruker(vanligBrukerId)
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+                    registrerEnkelttilgang(bruker.brukerId, "Denne er gammel", IGÅR)
+                    registrerEnkelttilgang(bruker.brukerId, "Denne er ny", IMORGEN)
+                    enkeltTilgang.harTilgang(ansattId, bruker.brukerId).shouldBeTrue()
                 }
             }
             When("nyeste enkelttilgang er utgått, eldre er aktiv") {
                 Then("returneres false — nyeste vinner") {
-                    val bruker = BrukerBuilder(vanligBrukerId).build()
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er aktiv men gammel", IMORGEN))
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er ny men utgått", IGÅR))
-                    enkeltTilgang.harEnkeltTilgang(ansattId, bruker.brukerId) shouldBe false
+                    val bruker = vanligBruker(vanligBrukerId)
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+                    registrerEnkelttilgang(bruker.brukerId, "Denne er aktiv men gammel", IMORGEN)
+                    registrerEnkelttilgang(bruker.brukerId, "Denne er ny men utgått", IGÅR)
+                    enkeltTilgang.harTilgang(ansattId, bruker.brukerId) shouldBe false
                 }
             }
             When("enkelttilgang er utgått") {
                 Then("returneres false") {
-                    val bruker = BrukerBuilder(vanligBrukerId).build()
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Denne er utgått", IGÅR))
-                    enkeltTilgang.harEnkeltTilgang(ansattId, bruker.brukerId) shouldBe false
+                    val bruker = vanligBruker(vanligBrukerId)
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+                    registrerEnkelttilgang(bruker.brukerId, "Denne er utgått", IGÅR)
+                    enkeltTilgang.harTilgang(ansattId, bruker.brukerId) shouldBe false
                 }
             }
             When("ingen enkelttilgang er registrert") {
                 Then("returneres false") {
-                    val bruker = BrukerBuilder(vanligBrukerId).build()
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.harEnkeltTilgang(ansattId, bruker.brukerId) shouldBe false
+                    val bruker = vanligBruker(vanligBrukerId)
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+                    enkeltTilgang.harTilgang(ansattId, bruker.brukerId) shouldBe false
                 }
             }
         }
@@ -178,43 +160,43 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
         Given("enkelttilganger (bulk)") {
             When("aktive enkelttilganger eksisterer for flere brukere") {
                 Then("returneres alle aktive brukerIds") {
-                    val bruker1 = BrukerBuilder(vanligBrukerId).build()
-                    val bruker2 = BrukerBuilder(historiskBrukerId).build()
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker1
-                    every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns bruker2
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker1.brukerId, "Aktiv enkelttilgang 1", IMORGEN))
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker2.brukerId, "Aktiv enkelttilgang 2", IMORGEN))
+                    val bruker1 = vanligBruker(vanligBrukerId)
+                    val bruker2 = vanligBruker(historiskBrukerId)
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns bruker1
+                    every { brukere.medNærmesteFamilie(historiskBrukerId.verdi) } returns bruker2
+                    registrerEnkelttilgang(bruker1.brukerId, "Aktiv enkelttilgang 1")
+                    registrerEnkelttilgang(bruker2.brukerId, "Aktiv enkelttilgang 2")
                     val resultat = enkeltTilgang.tilganger(ansattId, setOf(bruker1.brukerId, bruker2.brukerId))
                     resultat shouldBe listOf(bruker1.brukerId, bruker2.brukerId)
                 }
             }
             When("én enkelttilgang er aktiv og én er utgått") {
                 Then("returneres kun den aktive") {
-                    val bruker1 = BrukerBuilder(vanligBrukerId).build()
-                    val bruker2 = BrukerBuilder(historiskBrukerId).build()
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker1
-                    every { brukere.brukerMedNærmesteFamilie(historiskBrukerId.verdi) } returns bruker2
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker1.brukerId, "Aktiv enkelttilgang", IMORGEN))
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker2.brukerId, "Utgått enkelttilgang", IGÅR))
+                    val bruker1 = vanligBruker(vanligBrukerId)
+                    val bruker2 = vanligBruker(historiskBrukerId)
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns bruker1
+                    every { brukere.medNærmesteFamilie(historiskBrukerId.verdi) } returns bruker2
+                    registrerEnkelttilgang(bruker1.brukerId, "Aktiv enkelttilgang")
+                    registrerEnkelttilgang(bruker2.brukerId, "Utgått enkelttilgang", IGÅR)
                     val resultat = enkeltTilgang.tilganger(ansattId, setOf(bruker1.brukerId, bruker2.brukerId))
                     resultat shouldBe listOf(bruker1.brukerId)
                 }
             }
             When("nyeste enkelttilgang for en bruker er utgått, eldre er aktiv") {
                 Then("returneres tom liste for den brukeren — nyeste vinner") {
-                    val bruker = BrukerBuilder(vanligBrukerId).build()
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Aktiv men gammel", IMORGEN))
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Ny men utgått", IGÅR))
+                    val bruker = vanligBruker(vanligBrukerId)
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+                    registrerEnkelttilgang(bruker.brukerId, "Aktiv men gammel", IMORGEN)
+                    registrerEnkelttilgang(bruker.brukerId, "Ny men utgått", IGÅR)
                     val resultat = enkeltTilgang.tilganger(ansattId, setOf(bruker.brukerId))
                     resultat.shouldBeEmpty()
                 }
             }
             When("alle enkelttilganger er utgått") {
                 Then("returneres tom liste") {
-                    val bruker = BrukerBuilder(vanligBrukerId).build()
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Utgått enkelttilgang", IGÅR))
+                    val bruker = vanligBruker(vanligBrukerId)
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+                    registrerEnkelttilgang(bruker.brukerId, "Utgått enkelttilgang", IGÅR)
                     val resultat = enkeltTilgang.tilganger(ansattId, setOf(bruker.brukerId))
                     resultat.shouldBeEmpty()
                 }
@@ -230,10 +212,10 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
         Given("enkeltTilgangEntityListener") {
             When("entity persisteres") {
                 Then("settes created, updated, oppretter og system") {
-                    val bruker = BrukerBuilder(vanligBrukerId).build()
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
-                    val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    val bruker = vanligBruker(vanligBrukerId)
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+                    registrerEnkelttilgang(bruker.brukerId, "Dette er en begrunnelse")
+                    val entity = adapter.gjeldendeTilgang(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     assertSoftly(entity) {
                         created shouldNotBe null
                         updated shouldNotBe null
@@ -245,11 +227,11 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
             }
             When("entity lastes fra database") {
                 Then("lastes entity med korrekte felter") {
-                    val bruker = BrukerBuilder(vanligBrukerId).build()
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
-                    val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
-                    val lastet = repository.findById(entity.id!!)
+                    val bruker = vanligBruker(vanligBrukerId)
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+                    registrerEnkelttilgang(bruker.brukerId, "Dette er en begrunnelse")
+                    val entity = adapter.gjeldendeTilgang(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    val lastet = repo.findById(entity.id!!)
                     lastet.isPresent.shouldBeTrue()
                     with(lastet.get()) {
                         navid shouldBe ansattId.verdi
@@ -263,15 +245,15 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
             }
             When("entity oppdateres") {
                 Then("resettes system og oppretter til tokenverdi") {
-                    val bruker = BrukerBuilder(vanligBrukerId).build()
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
-                    val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    val bruker = vanligBruker(vanligBrukerId)
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+                    registrerEnkelttilgang(bruker.brukerId, "Dette er en begrunnelse")
+                    val entity = adapter.gjeldendeTilgang(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     val createdFør = entity.created
                     entity.system = "ukjent-system"
                     entity.oppretter = "X000000"
-                    repository.saveAndFlush(entity)
-                    val oppdatert = repository.findById(entity.id!!).get()
+                    repo.saveAndFlush(entity)
+                    val oppdatert = repo.findById(entity.id!!).get()
                     assertSoftly(oppdatert) {
                         system shouldBe "test"
                         oppretter shouldBe ansattId.verdi
@@ -281,12 +263,12 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
             }
             When("entity slettes") {
                 Then("fjernes entity fra database") {
-                    val bruker = BrukerBuilder(vanligBrukerId).build()
-                    every { brukere.brukerMedNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
-                    enkeltTilgang.registrerEnkeltTilgang(ansattId, EnkeltTilgangData(bruker.brukerId, "Dette er en begrunnelse", IMORGEN))
-                    val entity = adapter.gjeldende(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
-                    repository.delete(entity)
-                    repository.findById(entity.id!!).isPresent shouldBe false
+                    val bruker = vanligBruker(vanligBrukerId)
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
+                    registrerEnkelttilgang(bruker.brukerId, "Dette er en begrunnelse")
+                    val entity = adapter.gjeldendeTilgang(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
+                    repo.delete(entity)
+                    repo.findById(entity.id!!).isPresent shouldBe false
                 }
             }
         }
@@ -296,4 +278,24 @@ internal class EnkeltTilgangTest : BehaviorSpec() {
         @ServiceConnection
         private val postgres = postgreSQLContainer
     }
+
+    private fun stubStandardMocks() {
+        every { nom.fnrForAnsatt(any()) } returns vanligBrukerId
+        every { vergemål.alle(any()) } returns emptySet()
+        every { token.type } returns CCF
+        every { token.system } returns "test"
+        every { token.ansattId } returns ansattId
+        every { token.systemNavn } returns "test"
+        every { token.clusterAndSystem } returns "cluster:test"
+        every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
+        every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
+    }
+
+    private fun vanligBruker(brukerId: BrukerId) = BrukerBuilder(brukerId).build()
+
+    private fun registrerEnkelttilgang(
+        brukerId: BrukerId,
+        begrunnelse: String = "Dette er en test",
+        gyldigTil: LocalDate = IMORGEN,
+    ) = enkeltTilgang.registrerTilgang(ansattId, EnkeltTilgangData(brukerId, begrunnelse, gyldigTil))
 }

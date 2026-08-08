@@ -1,28 +1,25 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
-import org.springframework.beans.factory.annotation.Autowired
+import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfigTest.TestConfig
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Configuration
 import org.springframework.test.context.TestPropertySource
-import java.util.UUID
+import java.util.*
 
-@SpringBootTest(classes = [GlobaleGrupperConfigTest.TestConfig::class])
+@SpringBootTest(classes = [TestConfig::class])
 @TestPropertySource(locations = ["classpath:test.properties"])
-@ApplyExtension(SpringExtension::class)
-class GlobaleGrupperConfigTest : BehaviorSpec() {
+class GlobaleGrupperConfigTest(
+    private val cfg: GlobaleGrupperConfig,
+) : BehaviorSpec() {
 
     @Configuration
     @EnableConfigurationProperties(GlobaleGrupperConfig::class)
     class TestConfig
-
-    @Autowired
-    lateinit var cfg: GlobaleGrupperConfig
 
     init {
         Given("GlobaleGrupperConfig lastet fra properties") {
@@ -34,6 +31,20 @@ class GlobaleGrupperConfigTest : BehaviorSpec() {
                     cfg.udefinert shouldBe UUID.fromString("35d9d1ac-7fcb-4a22-9155-e0d1e57898a8")
                     cfg.fortrolig shouldBe UUID.fromString("ea930b6b-9397-44d9-b9e6-f4cf527a632a")
                     cfg.egenansatt shouldBe UUID.fromString("dbe4ad45-320b-4e9a-aaa1-73cca4ee124d")
+                }
+            }
+
+            When("en påkrevd gruppe-id mangler") {
+                Then("kastes IllegalStateException med tydelig feilmelding") {
+                    val manglerDead = EntraGlobalGruppe.entries
+                        .filterNot { it.property == "gruppe.dead" }
+                        .associate { it.property to UUID.randomUUID() }
+
+                    val ex = shouldThrow<IllegalStateException> {
+                        EntraGlobalGruppe.setIDs(manglerDead)
+                    }
+
+                    ex.message shouldBe "Mangler id for gruppe.dead"
                 }
             }
 
@@ -60,7 +71,5 @@ class GlobaleGrupperConfigTest : BehaviorSpec() {
         }
     }
 }
-
-
 
 

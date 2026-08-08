@@ -12,7 +12,7 @@ import kotlin.reflect.KClass
 @Target(FIELD, VALUE_PARAMETER)
 @Retention(RUNTIME)
 annotation class EnkeltTilgangGyldig(
-    val message: String = "Enkelttilgang må være fra nå og maks 3 måneder frem i tid",
+    val message: String = "EnkeltTilgang må være fra nå og maks 3 måneder frem i tid",
     val groups: Array<KClass<*>> = [],
     val months: Long = 3,
     val min: Int = 10,

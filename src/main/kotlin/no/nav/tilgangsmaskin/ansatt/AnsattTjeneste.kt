@@ -1,17 +1,17 @@
 package no.nav.tilgangsmaskin.ansatt
 
-import io.micrometer.core.annotation.Timed
 import io.micrometer.core.instrument.Tags
+import io.micrometer.observation.annotation.Observed
 import no.nav.boot.conditionals.ConditionalOnGCP
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 
+@Observed
 @Service
-@Timed
 @ConditionalOnGCP
 class AnsattTjeneste(private val ansatte: NomTjeneste,
                      private val brukere: BrukerTjeneste,
@@ -31,7 +31,7 @@ class AnsattTjeneste(private val ansatte: NomTjeneste,
 
     private fun ansattBruker(ansattId: AnsattId) =
         ansatte.fnrForAnsatt(ansattId)?.let {
-            runCatching { brukere.brukerMedUtvidetFamilie(it.verdi) }.getOrNull()
+            runCatching { brukere.medUtvidetFamilie(it.verdi) }.getOrNull()
         }
 
     private fun tell(status: Boolean) =

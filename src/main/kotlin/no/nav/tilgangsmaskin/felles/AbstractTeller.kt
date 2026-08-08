@@ -4,7 +4,7 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Tags
-import no.nav.tilgangsmaskin.tilgang.Token
+import no.nav.tilgangsmaskin.felles.rest.Token
 
 abstract class AbstractTeller(
     private val registry: MeterRegistry,
@@ -24,16 +24,3 @@ abstract class AbstractTeller(
             .register(registry)
             .increment(n.toDouble())
 }
-
-abstract class AbstractAsyncTeller(
-    private val registry: MeterRegistry,
-    private val navn: String,
-    private val beskrivelse: String) {
-
-    fun tell(n: Int = 1) =
-        Counter.builder(navn)
-            .description(beskrivelse)
-            .register(registry)
-            .increment(n.toDouble())
-}
-

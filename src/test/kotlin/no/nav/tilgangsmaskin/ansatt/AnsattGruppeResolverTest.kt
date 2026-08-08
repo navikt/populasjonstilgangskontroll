@@ -2,35 +2,41 @@ package no.nav.tilgangsmaskin.ansatt
 
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.IsolationMode.InstancePerTest
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
-import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
+import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.globaleGrupper
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG
-import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_OG_GLOBALE_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
+import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.rest.TokenType
+import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
+import no.nav.tilgangsmaskin.felles.rest.TokenType.UNAUTHENTICATED
+import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
-import no.nav.tilgangsmaskin.tilgang.Token
 import java.net.URI
 import java.util.*
 
 class AnsattGruppeResolverTest : BehaviorSpec({
+    isolationMode = InstancePerTest
 
+    val publisher = object: MessagePublisher {}
     val entra       = mockk<EntraTjeneste>()
     val token       = mockk<Token>()
     val oidTjeneste = mockk<EntraOidTjeneste>()
@@ -40,15 +46,14 @@ class AnsattGruppeResolverTest : BehaviorSpec({
     val oid       = UUID.randomUUID()
     val geoGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_1234")
 
-    val resolver = EntraAnsattGruppeResolver(entra, token, oidTjeneste, cache)
+    val resolver = EntraAnsattGruppeResolver(entra, token, oidTjeneste, cache, publisher)
 
     beforeEach {
-        clearAllMocks()
         every { oidTjeneste.oid(ansattId) } returns oid
     }
 
     Given("CC-flow") {
-        beforeEach { every { token.erCC } returns true }
+        beforeEach { every { token.type } returns CCF }
 
         When("token inneholder kjente og ukjente gruppe-IDer") {
             Then("Token.globaleGrupper returnerer kun kjente EntraGrupper") {
@@ -115,8 +120,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
     Given("OBO-flow") {
         beforeEach {
-            every { token.erCC }  returns false
-            every { token.erObo } returns true
+            every { token.type } returns TokenType.OBO
             every { token.oid }   returns oid
         }
 
@@ -155,8 +159,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
     Given("uautentisert") {
         beforeEach {
-            every { token.erCC }  returns false
-            every { token.erObo } returns false
+            every { token.type } returns UNAUTHENTICATED
         }
 
         When("miljø er dev/test") {

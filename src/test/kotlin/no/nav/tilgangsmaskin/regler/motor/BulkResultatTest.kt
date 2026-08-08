@@ -1,11 +1,14 @@
 package no.nav.tilgangsmaskin.regler.motor
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.avvist
+import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.ok
 import org.springframework.context.support.StaticMessageSource
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.NO_CONTENT
@@ -23,7 +26,7 @@ class BulkResultatTest : BehaviorSpec({
     Given("BulkResultat.ok") {
         When("opprettet via companion-funksjon") {
             Then("har status NO_CONTENT og ingen regel") {
-                val resultat = BulkResultat.ok(bruker)
+                val resultat = ok(bruker)
                 resultat.status shouldBe NO_CONTENT
                 resultat.bruker shouldBe bruker
                 resultat.regel shouldBe null
@@ -37,10 +40,12 @@ class BulkResultatTest : BehaviorSpec({
                 val ansatt = AnsattBuilder(ansattId).build()
                 val regel = StrengtFortroligRegel()
                 val exception = RegelException(ansatt, bruker, regel)
-                val resultat = BulkResultat.avvist(bruker, exception)
-                resultat.status shouldBe FORBIDDEN
-                resultat.bruker shouldBe bruker
-                resultat.regel shouldBe regel
+                val resultat = avvist(bruker, exception)
+                assertSoftly {
+                    resultat.status shouldBe FORBIDDEN
+                    resultat.bruker shouldBe bruker
+                    resultat.regel shouldBe regel
+                }
             }
         }
     }

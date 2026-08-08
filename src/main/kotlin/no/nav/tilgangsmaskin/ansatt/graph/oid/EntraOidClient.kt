@@ -1,15 +1,16 @@
 package no.nav.tilgangsmaskin.ansatt.graph.oid
 
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.PARAM_NAME_COUNT
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.PARAM_NAME_FILTER
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.PARAM_NAME_SELECT
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.PARAM_VALUE_SELECT_USER
+import org.springframework.security.oauth2.client.annotation.ClientRegistrationId
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.service.annotation.GetExchange
-import org.springframework.web.service.annotation.HttpExchange
 
-@HttpExchange
+@ClientRegistrationId(GRAPH)
 interface EntraOidClient {
 
     @GetExchange(ENTRA_PING_PATH)

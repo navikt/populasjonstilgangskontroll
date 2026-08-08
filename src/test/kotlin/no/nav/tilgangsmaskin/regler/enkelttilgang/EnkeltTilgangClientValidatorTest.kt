@@ -1,41 +1,77 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
-import io.kotest.assertions.throwables.shouldNotThrowAny
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.AZP_NAME
+import no.nav.tilgangsmaskin.felles.security.EnkeltTilgangAuthorizationManager
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
+import org.springframework.security.authentication.TestingAuthenticationToken
+import org.springframework.security.oauth2.jwt.Jwt
+import java.time.Instant.now
 
 class EnkeltTilgangClientValidatorTest : BehaviorSpec({
-
     val cfg = EnkeltTilgangConfig()
-    val prodValidator = EnkeltTilgangProdKonsumentValidator(cfg)
-    val devValidator = EnkeltTilgangDevKonsumentValidator()
+    val manager = EnkeltTilgangAuthorizationManager(cfg.systemer)
 
-    Given("EnkeltTilgangProdClientValidator") {
+    fun decisionFor(claims: Map<String, Any>) =
+        manager.authorize(
+            { TestingAuthenticationToken(jwt(claims), null) },
+            mockk()
+        ).isGranted
+
+    Given("autorisasjon for overstyring i prod") {
+        beforeEach {
+            mockkObject(Companion)
+            every { isProd } returns true
+        }
+        afterEach {
+            unmockkObject(Companion)
+        }
+
         cfg.systemer.forEach { konsument ->
             When("konsument er godkjent ($konsument)") {
-                Then("slipper gjennom uten exception") {
-                    shouldNotThrowAny {
-                        prodValidator.valider(konsument)
-                    }
+                Then("tilgang gis") {
+                    decisionFor(mapOf(AZP_NAME to "dev:gcp:$konsument")).shouldBeTrue()
                 }
             }
         }
+
         When("konsument er ukjent") {
-            Then("kaster EnkeltTilgangException") {
-                shouldThrow<EnkeltTilgangKonsumentException> {
-                    prodValidator.valider("ukjent-system")
-                }
+            Then("tilgang nektes") {
+                decisionFor(mapOf(AZP_NAME to "dev:gcp:ukjent-system")).shouldBeFalse()
             }
         }
     }
 
-    Given("EnkeltTilgangDevClientValidator (fallback)") {
+    Given("autorisasjon for overstyring i ikke-prod") {
+        beforeEach {
+            mockkObject(Companion)
+            every { isProd } returns false
+        }
+        afterEach {
+            unmockkObject(Companion)
+        }
+
         When("hvilken som helst konsument") {
-            Then("slipper alt gjennom") {
-                shouldNotThrowAny { devValidator.valider("ukjent-system") }
-                shouldNotThrowAny { devValidator.valider("") }
-                shouldNotThrowAny { devValidator.valider(cfg.systemer.first()) }
+            Then("tilgang gis") {
+                decisionFor(mapOf(AZP_NAME to "dev:gcp:ukjent-system")).shouldBeTrue()
+                decisionFor(emptyMap()).shouldBeTrue()
             }
         }
     }
 })
+
+private fun jwt(claims: Map<String, Any>) =
+    Jwt.withTokenValue("token")
+        .header("alg", "none")
+        .subject("subject")
+        .issuedAt(now())
+        .expiresAt(now().plusSeconds(3600))
+        .claims { it.putAll(claims) }
+        .build()

@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.ansatt
 
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.felles.AbstractTeller
-import no.nav.tilgangsmaskin.tilgang.Token
+import no.nav.tilgangsmaskin.felles.rest.Token
 import org.springframework.stereotype.Component
 
 @Component

@@ -1,73 +1,71 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import com.ninjasquad.springmockk.MockkBean
-import io.kotest.core.extensions.ApplyExtension
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
-import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.bruker.pdl.BrukerTilPersonMapper.tilPerson
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_UTVIDET_FAMILIE_CACHE
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_CACHES
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_MED_FAMILIE_CACHE
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_MED_UTVIDET_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.pdlRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.restRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjenesteTest.PdlTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
-import no.nav.tilgangsmaskin.felles.cache.*
-import no.nav.tilgangsmaskin.felles.rest.RestClientFactory.createClient
+import no.nav.tilgangsmaskin.felles.cache.getOne
+import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
+import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
+import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
+import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.resilience.annotation.EnableResilientMethods
-import org.springframework.test.context.TestPropertySource
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.client.ExpectedCount.never
+import org.springframework.test.web.client.ExpectedCount.once
+import org.springframework.test.web.client.ExpectedCount.times
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
+import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
-import org.springframework.web.client.RestClient.Builder
 import tools.jackson.databind.json.JsonMapper
 import java.time.Duration.ofSeconds
 
-@RestClientTest(components = [PdlConfig::class, PdlTjeneste::class])
-@Import(PdlTestConfig::class)
-@TestPropertySource(properties = ["PDL=pdl"])
+@RestClientTest
 @EnableResilientMethods
-@ApplyExtension(SpringExtension::class)
-class PdlTjenesteTest : BehaviorSpec() {
+@Import(PdlTestConfig::class, OAuth2ClientTestConfig::class)
+@ContextConfiguration(classes = [PdlTjeneste::class, PdlPipConfig::class], initializers = [PropertySettingTestContextInitializer::class])
+class PdlTjenesteTest(
+    private val pdl: PdlTjeneste,
+    private val server: MockRestServiceServer,
+    private val cfg: PdlPipConfig,
+    private val cache: CacheOperations,
+    private val mapper: JsonMapper
+) : BehaviorSpec() {
 
     @TestConfiguration
-    class PdlTestConfig : CacheTestConfig(PDL) {
+    class PdlTestConfig : CacheTestConfig(PDL)
 
-        @Bean
-        fun pdlClient(builder: Builder, cfg: PdlConfig) = createClient<PdlPipClient>(cfg, builder)
-    }
-
-    @MockkBean lateinit var graphQL: PdlSyncGraphQLClientAdapter
-
-    @Autowired lateinit var pdl: PdlTjeneste
-    @Autowired
-    lateinit var server: MockRestServiceServer
-    @Autowired lateinit var cfg: PdlConfig
-    @Qualifier("cacheOperations") @Autowired lateinit var cache: CacheOperations
-    @Autowired lateinit var mapper: JsonMapper
+    @MockkBean
+    lateinit var graphQL: PdlSyncGraphQLClientAdapter
 
     init {
         beforeEach {
@@ -177,6 +175,41 @@ class PdlTjenesteTest : BehaviorSpec() {
                 Then("REST kalles ikke") {
                     server.expect(never(), requestTo(cfg.personerURI))
                     pdl.personer(emptySet()).shouldBeEmpty()
+                }
+            }
+        }
+
+        Given("retry ved feil mot PDL") {
+            When("medFamilie får 500 på alle forsøk") {
+                Then("kastes RecoverableRestException etter 4 forsøk") {
+                    server.expect(times(4), requestTo(cfg.personURI))
+                        .andRespond(withStatus(INTERNAL_SERVER_ERROR))
+
+                    shouldThrow<RecoverableRestException> {
+                        pdl.medFamilie(I1)
+                    }
+                }
+            }
+
+            When("medFamilie får 404") {
+                Then("kastes NotFoundRestException uten retry") {
+                    server.expect(once(), requestTo(cfg.personURI))
+                        .andRespond(withStatus(NOT_FOUND))
+
+                    shouldThrow<NotFoundRestException> {
+                        pdl.medFamilie(I1)
+                    }
+                }
+            }
+
+            When("første forsøk feiler og andre lykkes") {
+                Then("returneres person fra vellykket retry") {
+                    server.expect(once(), requestTo(cfg.personURI))
+                        .andRespond(withStatus(INTERNAL_SERVER_ERROR))
+                    server.expect(once(), requestTo(cfg.personURI))
+                        .andRespond(withSuccess(mapper.writeValueAsString(pdlRespons(P1)), APPLICATION_JSON))
+
+                    pdl.medFamilie(I1) shouldBe P1
                 }
             }
         }

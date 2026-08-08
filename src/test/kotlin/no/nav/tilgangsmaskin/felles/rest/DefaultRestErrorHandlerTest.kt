@@ -13,7 +13,9 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.REQUEST_TIMEOUT
 import org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE
+import org.springframework.http.HttpStatus.TOO_MANY_REQUESTS
 import org.springframework.mock.http.client.MockClientHttpRequest
 import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import java.net.URI
@@ -32,17 +34,17 @@ class DefaultRestErrorHandlerTest : BehaviorSpec({
     Given("handle - 404 Not Found") {
         When("request uten identifikator") {
             Then("kastes NotFoundRestException med riktig URI og null identifikator") {
-                val ex = shouldThrow<NotFoundRestException> { handler.handle(req(), res(NOT_FOUND)) }
+                val e = shouldThrow<NotFoundRestException> { handler.handle(req(), res(NOT_FOUND)) }
                 assertSoftly {
-                    ex.uri shouldBe uri
-                    ex.identifikator shouldBe null
+                    e.uri shouldBe uri
+                    e.identifikator shouldBe null
                 }
             }
         }
         When("request med identifikator-header") {
             Then("kastes NotFoundRestException med identifikator fra header") {
-                val ex = shouldThrow<NotFoundRestException> { handler.handle(req("12345678901"), res(NOT_FOUND)) }
-                ex.identifikator shouldBe "12345678901"
+                val e = shouldThrow<NotFoundRestException> { handler.handle(req("12345678901"), res(NOT_FOUND)) }
+                e.identifikator shouldBe "12345678901"
             }
         }
     }
@@ -50,10 +52,10 @@ class DefaultRestErrorHandlerTest : BehaviorSpec({
     Given("handle - 4xx klientfeil (ikke 404)") {
         When("400 Bad Request") {
             Then("kastes IrrecoverableRestException, ikke NotFoundRestException") {
-                val ex = shouldThrow<IrrecoverableRestException> { handler.handle(req(), res(BAD_REQUEST)) }
+                val e = shouldThrow<IrrecoverableRestException> { handler.handle(req(), res(BAD_REQUEST)) }
                 assertSoftly {
-                    ex.shouldBeInstanceOf<IrrecoverableRestException>()
-                    ex.shouldNotBeInstanceOf<NotFoundRestException>()
+                    e.shouldBeInstanceOf<IrrecoverableRestException>()
+                    e.shouldNotBeInstanceOf<NotFoundRestException>()
                 }
             }
         }
@@ -62,13 +64,23 @@ class DefaultRestErrorHandlerTest : BehaviorSpec({
                 shouldThrow<IrrecoverableRestException> { handler.handle(req(), res(FORBIDDEN)) }
             }
         }
+        When("429 Too Many Requests") {
+            Then("kastes RecoverableRestException") {
+                shouldThrow<RecoverableRestException> { handler.handle(req(), res(TOO_MANY_REQUESTS)) }
+            }
+        }
+        When("408 Request Timeout") {
+            Then("kastes RecoverableRestException") {
+                shouldThrow<RecoverableRestException> { handler.handle(req(), res(REQUEST_TIMEOUT)) }
+            }
+        }
     }
 
     Given("handle - 5xx serverfeil") {
         When("500 Internal Server Error") {
             Then("kastes RecoverableRestException, ikke IrrecoverableRestException") {
-                val ex = shouldThrow<RecoverableRestException> { handler.handle(req(), res(INTERNAL_SERVER_ERROR)) }
-                ex.shouldNotBeInstanceOf<IrrecoverableRestException>()
+                val e = shouldThrow<RecoverableRestException> { handler.handle(req(), res(INTERNAL_SERVER_ERROR)) }
+                e.shouldNotBeInstanceOf<IrrecoverableRestException>()
             }
         }
         When("503 Service Unavailable") {

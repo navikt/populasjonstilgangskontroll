@@ -1,7 +1,7 @@
 {
   "ingresses": ["https://tilgangsmaskin.intern.nav.no"],
   "pdlgraph": "pdl-api.prod-fss-pub.nais.io",
-  "pdl": "pdl-pip-api.prod-fss-pub.nais.io",
+  "pdlpip": "pdl-pip-api.prod-fss-pub.nais.io",
   "grupper": {
     "fortrolig": "e98efc34-12d1-401f-b059-f17e62834065",
     "strengt": "2931da41-8b8e-42cd-99c0-04a169ddae40",

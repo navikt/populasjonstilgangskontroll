@@ -1,8 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -13,8 +11,9 @@ import no.nav.tilgangsmaskin.bruker.pdl.Partnere.Sivilstand.Sivilstandstype
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapterTest.GraphQLTestConfig
+import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
+import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -23,19 +22,22 @@ import org.springframework.context.annotation.Import
 import org.springframework.graphql.client.HttpSyncGraphQlClient
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.web.client.match.MockRestRequestMatchers.header
-import org.springframework.test.context.TestPropertySource
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.client.MockRestServiceServer
+import org.springframework.test.web.client.match.MockRestRequestMatchers.header
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
 
-@RestClientTest(components = [PdlSyncGraphQLClientAdapter::class, PdlGraphQLConfig::class])
-@TestPropertySource(properties = ["PDLGRAPH=pdlgraph"])
-@Import(GraphQLTestConfig::class)
-@ApplyExtension(SpringExtension::class)
-class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
+@RestClientTest
+@ContextConfiguration(initializers = [PropertySettingTestContextInitializer::class], classes = [PdlSyncGraphQLClientAdapter::class, PdlGraphQLConfig::class])
+@Import(GraphQLTestConfig::class, OAuth2ClientTestConfig::class)
+class PdlSyncGraphQLClientAdapterTest(
+    private val adapter: PdlSyncGraphQLClientAdapter,
+    private val server: MockRestServiceServer,
+    private val cfg: PdlGraphQLConfig
+) : BehaviorSpec() {
 
     @TestConfiguration
     class GraphQLTestConfig {
@@ -55,13 +57,6 @@ class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
             .interceptors { it.addAll(interceptors) }
             .build()
     }
-
-    @Autowired
-    lateinit var adapter: PdlSyncGraphQLClientAdapter
-    @Autowired
-    lateinit var server: MockRestServiceServer
-    @Autowired
-    lateinit var cfg: PdlGraphQLConfig
 
     init {
         beforeEach { server.reset() }
@@ -208,4 +203,3 @@ class PdlSyncGraphQLClientAdapterTest : BehaviorSpec() {
         """.trimIndent()
     }
 }
-

@@ -1,22 +1,17 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.net.URI.create
 
 @Component
-class PdlGraphQLConfig(@Value("\${PDLGRAPH}") hostname: String) :
-    RestConfig(create("https://$hostname$DEFAULT_PING_PATH"), DEFAULT_PING_PATH, PDLGRAPH) {
-
-    @NoCoverageAnalysis
-    override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
+class PdlGraphQLConfig(@Value("\${pdlgraph}") pdlHost: String) : RestConfig(create("https://$pdlHost$DEFAULT_GRAPHQL_PATH"), "", PDLGRAPH) {
 
     companion object {
         const val PDLGRAPH = "pdlgraph"
         private const val BID = "B897"
         val BEHANDLINGSNUMMER = "behandlingsnummer" to BID
-        private const val DEFAULT_PING_PATH = "/graphql"
+        private const val DEFAULT_GRAPHQL_PATH = "/graphql"
     }
 }

@@ -1,47 +1,43 @@
 package no.nav.tilgangsmaskin.ansatt.graph.oid
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient.Companion.ENTRA_USERS_PATH
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.ENTRA_OID
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
-import no.nav.tilgangsmaskin.ansatt.graph.oid.OidTjenesteTest.EntraTestConfig
+import no.nav.tilgangsmaskin.ansatt.graph.oid.OidTjenesteTest.OidTjenesteTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
+import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
+import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
+import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import org.hamcrest.Matchers.containsString
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.resilience.annotation.EnableResilientMethods
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
-import java.util.UUID
+import java.util.*
 
-@RestClientTest(components = [EntraOidTjeneste::class, EntraOidConfig::class, EntraGrupperConfig::class, EntraOidBeanConfig::class])
-@Import(EntraTestConfig::class)
-@ApplyExtension(SpringExtension::class)
-class OidTjenesteTest : BehaviorSpec() {
+
+@RestClientTest
+@EnableResilientMethods
+@Import(OidTjenesteTestConfig::class, OAuth2ClientTestConfig::class)
+@ContextConfiguration(classes = [EntraOidTjeneste::class, EntraOidConfig::class, EntraGrupperConfig::class], initializers = [PropertySettingTestContextInitializer::class])
+class OidTjenesteTest(private val tjeneste: EntraOidTjeneste, private val server: MockRestServiceServer, private val cache: CacheOperations) : BehaviorSpec() {
 
     @TestConfiguration
-    class EntraTestConfig : CacheTestConfig(ENTRA_OID)
-
-    @Autowired
-    private lateinit var tjeneste: EntraOidTjeneste
-    @Autowired
-    private lateinit var server: MockRestServiceServer
-    @Autowired
-    private lateinit var cache: CacheOperations
+    class OidTjenesteTestConfig : CacheTestConfig(ENTRA_OID)
 
     init {
         beforeEach {
@@ -73,7 +69,6 @@ class OidTjenesteTest : BehaviorSpec() {
                     tjeneste.oid(ANSATTID) shouldBe OID
                     tjeneste.oid(ANSATTID) shouldBe OID
                     cache.getOne<UUID>(OID_CACHE, ANSATTID.verdi) shouldBe OID
-
                 }
             }
 
@@ -83,7 +78,9 @@ class OidTjenesteTest : BehaviorSpec() {
                         .andExpect(method(GET))
                         .andRespond(withSuccess("""{"value": []}""", APPLICATION_JSON))
 
-                    shouldThrow<IrrecoverableRestException> { tjeneste.oid(ANSATTID) }
+                    shouldThrow<IrrecoverableRestException> {
+                        tjeneste.oid(ANSATTID)
+                    }
                 }
             }
 
@@ -94,7 +91,9 @@ class OidTjenesteTest : BehaviorSpec() {
                         .andExpect(method(GET))
                         .andRespond(withSuccess(oidRespons(OID, oid2), APPLICATION_JSON))
 
-                    shouldThrow<IrrecoverableRestException> { tjeneste.oid(ANSATTID) }
+                    shouldThrow<IrrecoverableRestException> {
+                        tjeneste.oid(ANSATTID)
+                    }
                 }
             }
         }
@@ -105,7 +104,7 @@ class OidTjenesteTest : BehaviorSpec() {
         {"value": [${ids.joinToString(",") { """{"id": "$it"}""" }}]}
         """.trimIndent()
 
-    private companion object {
+    companion object {
         private val ANSATTID = AnsattId("Z999999")
         private val OID = UUID.randomUUID()
     }

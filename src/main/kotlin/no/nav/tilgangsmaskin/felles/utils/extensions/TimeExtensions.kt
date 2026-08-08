@@ -4,6 +4,7 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_13_24
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_7_12
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_OVER_24
+import org.apache.hc.core5.util.Timeout.ofSeconds
 import java.time.Clock
 import java.time.Clock.systemDefaultZone
 import java.time.Duration.between
@@ -20,6 +21,9 @@ import kotlin.time.Duration
 import kotlin.time.toKotlinDuration
 
 object TimeExtensions {
+
+
+    val Int.sekunder get() = ofSeconds(this.toLong())
 
     val OSLO = ZoneId.of("Europe/Oslo")
 

@@ -1,15 +1,13 @@
 package no.nav.tilgangsmaskin.ansatt.`oppfølging`
 
 import com.ninjasquad.springmockk.MockkBean
-import com.ninjasquad.springmockk.MockkSpyBean
-import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
-import io.mockk.verify
-import no.nav.tilgangsmaskin.TestApp
+import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING_CACHE
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
+import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.StartetEllerEndret
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.OPPFOLGING_STARTET
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjenesteTest.OppfølgingTestConfig
@@ -20,80 +18,67 @@ import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
-import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.getMany
-import no.nav.tilgangsmaskin.tilgang.Token
-
-
-import org.springframework.beans.factory.annotation.Autowired
+import no.nav.tilgangsmaskin.felles.cache.getOne
+import no.nav.tilgangsmaskin.felles.rest.Token
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
-import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
-import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
-import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.StartetEllerEndret
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Instant.parse
-import java.util.UUID
+import java.util.*
 import java.util.UUID.*
 
 @DataJpaTest
 @EnableJpaAuditing
 @Testcontainers
-@EnableCaching
-@ContextConfiguration(classes = [TestApp::class, OppfølgingTjeneste::class, OppfølgingJPAAdapter::class])
+@ContextConfiguration(classes = [OppfølgingTjeneste::class, OppfølgingJPAAdapter::class])
+@EnableAutoConfiguration
 @Import(OppfølgingTestConfig::class)
-@ApplyExtension(SpringExtension::class)
-class OppfølgingTjenesteTest : BehaviorSpec() {
+class OppfølgingTjenesteTest(
+    private val tjeneste: OppfølgingTjeneste,
+    private val repo: OppfølgingRepository,
+    private val cache: CacheOperations,
+) : BehaviorSpec() {
 
     @TestConfiguration
     class OppfølgingTestConfig : CacheTestConfig(OPPFØLGING)
 
     @MockkBean private lateinit var token: Token
 
-    @MockkBean(relaxed = true) private lateinit var teller: OppfølgingkontorTeller
-
-    @MockkSpyBean
-    private lateinit var adapter: OppfølgingJPAAdapter
-
-    @Autowired
-    private lateinit var tjeneste: OppfølgingTjeneste
-
-    @Autowired
-    private lateinit var cache: CacheOperations
-
     init {
-        beforeEach { cache.clear(OPPFØLGING_CACHE) }
+        beforeEach {
+            repo.deleteAll()
+            cache.clear(OPPFØLGING_CACHE)
+        }
 
         fun startet(periode: UUID = randomUUID(), kontor: Kontor = KONTOR) =
             StartetEllerEndret(periode, IDENTER, kontor, parse("2024-01-01T09:00:00Z"), OPPFOLGING_STARTET)
 
         Given("enhetFor") {
             When("det ikke finnes oppfølging") {
-                Then("returneres null og adapter kalles") {
+                Then("returneres null") {
                     tjeneste.enhetFor(Identifikator(brukerId.verdi)) shouldBe null
-                    verify(exactly = 1) { adapter.enhetFor(brukerId.verdi) }
                 }
             }
 
             When("oppfølging er registrert via registrer()") {
-                Then("returneres enhet fra cache uten adapter-kall") {
+                Then("returneres enhet fra cache uten DB-kall") {
                     tjeneste.registrer(startet())
+                    repo.deleteAll()
                     tjeneste.enhetFor(Identifikator(brukerId.verdi)) shouldBe kontor
-                    verify(exactly = 0) { adapter.enhetFor(brukerId.verdi) }
                 }
             }
 
             When("oppfølging finnes i DB men ikke i cache") {
-                Then("hentes fra adapter og lagres i cache") {
+                Then("hentes fra DB og lagres i cache") {
                     tjeneste.registrer(startet())
                     cache.clear(OPPFØLGING_CACHE)
                     tjeneste.enhetFor(Identifikator(brukerId.verdi)) shouldBe kontor
-                    verify(exactly = 1) { adapter.enhetFor(brukerId.verdi) }
                     cache.getOne<Enhetsnummer>(OPPFØLGING_CACHE, brukerId.verdi) shouldBe kontor
                 }
             }
@@ -101,8 +86,8 @@ class OppfølgingTjenesteTest : BehaviorSpec() {
             When("oppslag via aktørId") {
                 Then("returneres enhet fra cache populert ved registrering") {
                     tjeneste.registrer(startet())
+                    repo.deleteAll()
                     tjeneste.enhetFor(Identifikator(aktørId.verdi)) shouldBe kontor
-                    verify(exactly = 0) { adapter.enhetFor(aktørId.verdi) }
                 }
             }
         }

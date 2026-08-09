@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.security
 
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase.Companion.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase.Companion.UNPROTECTED_ENDPOINTS
 import org.springframework.context.annotation.Bean
@@ -8,6 +7,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
 import org.springframework.security.config.observation.SecurityObservationSettings
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
@@ -24,22 +24,25 @@ import org.springframework.web.client.support.RestClientHttpServiceGroupConfigur
 
 
 @Configuration
+@EnableMethodSecurity
 class OAuth2SecurityBeanConfig {
     @Bean
-    fun securityFilterChain(http: HttpSecurity, authorizationManager: EnkeltTilgangAuthorizationManager) =
-        http.authorizeHttpRequests { requests ->
-                requests.requestMatchers(POST, "$PROD_BASE_PATH/overstyr").access(authorizationManager)
-                requests.requestMatchers("$PROD_BASE_PATH/**").authenticated()
-                requests.requestMatchers("/$DEV/**").permitAll()
-                requests.requestMatchers(*UNPROTECTED_ENDPOINTS).permitAll()
-                requests.anyRequest().denyAll()
-            }
-            .oauth2ResourceServer { oauth2 ->
-                oauth2.jwt { it.jwtAuthenticationConverter(OAuth2LoggingJwtAuthenticationConverter()) }
-                oauth2.authenticationEntryPoint(HttpStatusEntryPoint(UNAUTHORIZED))
-            }
-            .statelessApiDefaults()
-            .build()
+    fun securityFilterChain(
+        http: HttpSecurity,
+        authorizationManager: EnkeltTilgangAuthorizationManager,
+        accessDeniedHandler: OAuth2JsonAccessDeniedHandler
+    ) = http.authorizeHttpRequests { requests ->
+            requests.requestMatchers(POST, "$PROD_BASE_PATH/overstyr").access(authorizationManager)
+            requests.requestMatchers( *UNPROTECTED_ENDPOINTS).permitAll()
+            requests.anyRequest().authenticated()
+        }
+        .exceptionHandling { it.accessDeniedHandler(accessDeniedHandler) }
+        .oauth2ResourceServer { oauth2 ->
+            oauth2.jwt { it.jwtAuthenticationConverter(OAuth2LoggingJwtAuthenticationConverter()) }
+            oauth2.authenticationEntryPoint(HttpStatusEntryPoint(UNAUTHORIZED))
+        }
+        .statelessApiDefaults()
+        .build()
 
     @Bean
     fun securityObservationSettings()  =

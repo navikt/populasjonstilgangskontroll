@@ -68,24 +68,6 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                 }
             }
 
-            When("komplett kalles med CCF-token") {
-                Then("returnerer 403") {
-                    every { token.type } returns TokenType.CCF
-                    mockMvc.post("/api/v1/komplett") {
-                        contentType = APPLICATION_JSON; content = "\"$brukerId\""
-                    }.andExpect { status { isForbidden() } }
-                }
-            }
-
-            When("kjerne kalles med CCF-token") {
-                Then("returnerer 403") {
-                    every { token.type } returns TokenType.CCF
-                    mockMvc.post("/api/v1/kjerne") {
-                        contentType = APPLICATION_JSON; content = "\"$brukerId\""
-                    }.andExpect { status { isForbidden() } }
-                }
-            }
-
             When("komplett kalles med tom brukerId") {
                 Then("returnerer 400") {
                     mockMvc.post("/api/v1/komplett") {
@@ -149,27 +131,6 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
                     }.andExpect { status { isAccepted() } }
                         .andDo { handle(dokumenterMedAuth("obo-enkelttilgang")) }
-                }
-            }
-
-            When("enkelttilgang kalles med CCF-token") {
-                Then("returnerer 403") {
-                    every { token.type } returns TokenType.CCF
-                    mockMvc.post("/api/v1/overstyr") {
-                        contentType = APPLICATION_JSON
-                        content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
-                    }.andExpect { status { isForbidden() } }
-                }
-            }
-
-            When("enkelttilgang kalles uten token") {
-                Then("returnerer 403") {
-                    every { token.type } returns UNAUTHENTICATED
-                    mockMvc.post("/api/v1/overstyr") {
-                        contentType = APPLICATION_JSON
-                        content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
-                    }.andExpect { status { isForbidden() } }
-                        .andDo { handle(document("obo-enkelttilgang-uten-token", problemDetailFields)) }
                 }
             }
 

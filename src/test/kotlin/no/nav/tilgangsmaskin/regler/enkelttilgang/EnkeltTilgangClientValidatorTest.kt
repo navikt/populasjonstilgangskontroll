@@ -5,73 +5,43 @@ import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkObject
-import io.mockk.unmockkObject
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.AZP_NAME
-import no.nav.tilgangsmaskin.felles.security.EnkeltTilgangAuthorizationManager
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
+import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.security.StrictEnkeltTilgangAuthorizationManager
 import org.springframework.security.authentication.TestingAuthenticationToken
-import org.springframework.security.oauth2.jwt.Jwt
-import java.time.Instant.now
 
 class EnkeltTilgangClientValidatorTest : BehaviorSpec({
     val cfg = EnkeltTilgangConfig()
-    val manager = EnkeltTilgangAuthorizationManager(cfg.systemer)
+    val token = mockk<Token>()
+    val manager = StrictEnkeltTilgangAuthorizationManager(token, cfg.systemer)
 
-    fun decisionFor(claims: Map<String, Any>) =
+    fun decisionFor() =
         manager.authorize(
-            { TestingAuthenticationToken(jwt(claims), null) },
+            { TestingAuthenticationToken("principal", "credentials") },
             mockk()
         ).isGranted
 
-    Given("autorisasjon for overstyring i prod") {
-        beforeEach {
-            mockkObject(Companion)
-            every { isProd } returns true
-        }
-        afterEach {
-            unmockkObject(Companion)
-        }
-
+    Given("autorisasjon for overstyring") {
         cfg.systemer.forEach { konsument ->
             When("konsument er godkjent ($konsument)") {
                 Then("tilgang gis") {
-                    decisionFor(mapOf(AZP_NAME to "dev:gcp:$konsument")).shouldBeTrue()
+                    every { token.systemNavn } returns konsument
+                    decisionFor().shouldBeTrue()
                 }
             }
         }
 
         When("konsument er ukjent") {
             Then("tilgang nektes") {
-                decisionFor(mapOf(AZP_NAME to "dev:gcp:ukjent-system")).shouldBeFalse()
+                every { token.systemNavn } returns "ukjent-system"
+                decisionFor().shouldBeFalse()
             }
         }
-    }
 
-    Given("autorisasjon for overstyring i ikke-prod") {
-        beforeEach {
-            mockkObject(Companion)
-            every { isProd } returns false
-        }
-        afterEach {
-            unmockkObject(Companion)
-        }
-
-        When("hvilken som helst konsument") {
-            Then("tilgang gis") {
-                decisionFor(mapOf(AZP_NAME to "dev:gcp:ukjent-system")).shouldBeTrue()
-                decisionFor(emptyMap()).shouldBeTrue()
+        When("systemnavn er utilgjengelig") {
+            Then("tilgang nektes") {
+                every { token.systemNavn } returns "utilgjengelig"
+                decisionFor().shouldBeFalse()
             }
         }
     }
 })
-
-private fun jwt(claims: Map<String, Any>) =
-    Jwt.withTokenValue("token")
-        .header("alg", "none")
-        .subject("subject")
-        .issuedAt(now())
-        .expiresAt(now().plusSeconds(3600))
-        .claims { it.putAll(claims) }
-        .build()

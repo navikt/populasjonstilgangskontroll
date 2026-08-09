@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeType.HTTP
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase.Companion.PROD_BASE_PATH
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus
@@ -30,7 +31,7 @@ abstract class TilgangControllerBase(protected val token: Token) {
     }
 
     companion object {
-        val UNPROTECTED_ENDPOINTS = arrayOf("/swagger-ui/**", "/v3/api-docs/**", "/monitoring/**")
+        val UNPROTECTED_ENDPOINTS = arrayOf("/$DEV/**","/swagger-ui/**", "/v3/api-docs/**", "/monitoring/**")
         const val PROD_BASE_PATH = "/api/v1"
     }
 }

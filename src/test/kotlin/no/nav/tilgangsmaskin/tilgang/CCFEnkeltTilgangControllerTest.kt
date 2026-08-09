@@ -34,24 +34,6 @@ class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                 }
             }
 
-            When("komplett kalles med OBO-token") {
-                Then("returnerer 403") {
-                    every { token.type } returns TokenType.OBO
-                    mockMvc.post("/api/v1/ccf/komplett/${ansattId.verdi}") {
-                        contentType = APPLICATION_JSON; content = "\"$brukerId\""
-                    }.andExpect { status { isForbidden() } }
-                }
-            }
-
-            When("kjerne kalles med OBO-token") {
-                Then("returnerer 403") {
-                    every { token.type } returns TokenType.OBO
-                    mockMvc.post("/api/v1/ccf/kjerne/${ansattId.verdi}") {
-                        contentType = APPLICATION_JSON; content = "\"$brukerId\""
-                    }.andExpect { status { isForbidden() } }
-                }
-            }
-
             When("ccf/komplett kalles med tom brukerId") {
                 Then("returnerer 400") {
                     mockMvc.post("/api/v1/ccf/komplett/${ansattId.verdi}") {

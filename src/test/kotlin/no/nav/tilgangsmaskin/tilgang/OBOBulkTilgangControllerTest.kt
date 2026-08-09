@@ -57,16 +57,6 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                 }
             }
 
-            When("bulk/obo kalles med CCF-token") {
-                Then("returnerer 403") {
-                    every { token.type } returns TokenType.CCF
-                    mockMvc.post("/api/v1/bulk/obo") {
-                        contentType = APPLICATION_JSON
-                        content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""
-                    }.andExpect { status { isForbidden() } }
-                }
-            }
-
             When("bulk/obo kalles med mer enn 1000 brukere") {
                 Then("returnerer 413") {
                     val mangeSpecs = (1..1001).map {
@@ -154,15 +144,6 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                         jsonPath("$.ansattId") { value(ansattId.verdi) }
                         jsonPath("$.resultater[0].status") { value(204) }
                     }.andDo { handle(dokumenterMedAuth("obo-bulk-regeltype")) }
-                }
-            }
-
-            When("bulk/obo/{regelType} kalles med CCF-token") {
-                Then("returnerer 403") {
-                    every { token.type } returns TokenType.CCF
-                    mockMvc.post("/api/v1/bulk/obo/KJERNE_REGELTYPE") {
-                        contentType = APPLICATION_JSON; content = """["$brukerId"]"""
-                    }.andExpect { status { isForbidden() } }
                 }
             }
 

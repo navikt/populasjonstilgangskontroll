@@ -62,6 +62,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
     protected lateinit var mockMvc: MockMvc
 
     private val restDocumentation = ManualRestDocumentation()
+    private lateinit var validator: LocalValidatorFactoryBean
 
     @RestControllerAdvice
     private class ProblemDetailExceptionHandler : ResponseEntityExceptionHandler()
@@ -89,6 +90,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
                 setBasename("classpath:regel-messages")
                 setDefaultEncoding("UTF-8")
             }
+            validator = LocalValidatorFactoryBean().also { it.afterPropertiesSet() }
         }
 
         beforeEach { case ->
@@ -97,10 +99,10 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             mockMvc = standaloneSetup(
                 TilgangController(regelTjeneste, token),
                 EnkeltTilgangController(enkeltTilgangTjeneste, token),
-                BulkTilgangController(regelTjeneste, token)
+                BulkTilgangController(regelTjeneste, validator, token)
             )
                 .setControllerAdvice(ProblemDetailExceptionHandler())
-                .setValidator(LocalValidatorFactoryBean().also { it.afterPropertiesSet() })
+                .setValidator(validator)
                 .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation)
                     .uris()
                     .withScheme("https")

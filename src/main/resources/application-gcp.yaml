@@ -15,9 +15,6 @@ management:
       enabled: true
   auditevents:
     enabled: false
-  metrics:
-    enable:
-      cache: true
   observations:
     annotations:
       enabled: true
@@ -104,17 +101,12 @@ spring:
               - "api://${nais.cluster.type}-gcp.repr.repr-api/.default"
   messages:
     fallback-to-system-locale: false
-    encoding: UTF-8
   web:
     locale: no_NO
     locale-resolver: fixed
   threads:
     virtual:
       enabled: true
-  jpa:
-    properties:
-      hibernate:
-        generate_statistics: false
   application:
     name: populasjonstilgangskontroll
   kafka:

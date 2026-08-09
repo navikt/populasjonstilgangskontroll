@@ -11,9 +11,17 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
+import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
+import no.nav.tilgangsmaskin.felles.security.OAuth2TokenTypeAuthorization.Companion.forventetOBO
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
+import no.nav.tilgangsmaskin.tilgang.BulkTilgangController
 import no.nav.tilgangsmaskin.tilgang.TilgangController
+import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons
+import org.eclipse.jetty.http.HttpStatus
+import org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration
 import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration
@@ -27,6 +35,7 @@ import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
+import java.time.LocalDate
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -38,6 +47,9 @@ class TilgangControllerTest(private val mockMvc: MockMvc) : BehaviorSpec() {
 
     @MockkBean
     private lateinit var regelTjeneste: RegelTjeneste
+
+    @MockkBean
+    private lateinit var enkeltTilgangTjeneste: EnkeltTilgangTjeneste
 
     @MockkBean(relaxed = true)
     private lateinit var token: Token
@@ -57,14 +69,15 @@ class TilgangControllerTest(private val mockMvc: MockMvc) : BehaviorSpec() {
         }
 
         beforeEach {
-            every { token.type } returns OBO
-            every { token.requiredAnsattId } returns ANSATT_ID
             justRun { regelTjeneste.kompletteRegler(any(), any()) }
+            justRun { regelTjeneste.kjerneregler(any(), any()) }
+            every { regelTjeneste.bulkRegler(any(), any()) } returns AggregertBulkRespons(ANSATT_ID)
+            every { enkeltTilgangTjeneste.registrerTilgang(any(), any()) } returns true
         }
 
-        Given("protected endpoint /api/v1/komplett") {
-            When("request has no bearer token") {
-                Then("returns 401") {
+        Given("beskyttet endepunkt /api/v1/komplett") {
+            When("request mangler bearer-token") {
+                Then("returnerer 401") {
                     mockMvc.post("/api/v1/komplett") {
                         contentType = APPLICATION_JSON
                         content = "\"${BRUKER_ID.verdi}\""
@@ -74,9 +87,10 @@ class TilgangControllerTest(private val mockMvc: MockMvc) : BehaviorSpec() {
                 }
             }
 
-            When("request has valid oauth2 token") {
-                Then("returns 204") {
-
+            When("request har gyldig oauth2-token") {
+                Then("returnerer 204") {
+                    every { token.type } returns OBO
+                    every { token.requiredAnsattId } returns ANSATT_ID
                     mockMvc.post("/api/v1/komplett") {
                         headers {
                             setBearerAuth(jwt(AUDIENCE))
@@ -91,8 +105,8 @@ class TilgangControllerTest(private val mockMvc: MockMvc) : BehaviorSpec() {
                 }
             }
 
-            When("request has token with invalid audience") {
-                Then("returns 401") {
+            When("request har token med ugyldig audience") {
+                Then("returnerer 401") {
                     mockMvc.post("/api/v1/komplett") {
                         headers {
                             setBearerAuth(jwt(INVALID_AUDIENCE))
@@ -106,9 +120,77 @@ class TilgangControllerTest(private val mockMvc: MockMvc) : BehaviorSpec() {
             }
         }
 
-        Given("open endpoint /v3/api-docs") {
-            When("request has no bearer token") {
-                Then("returns 200") {
+        Given("method security på OBO-endepunkter") {
+            When("request bruker CCF-token") {
+                Then("returnerer 403 for komplett, bulk og overstyr") {
+                    every { token.type } returns CCF
+                    val gyldigTil = LocalDate.now().plusMonths(2)
+
+                    mockMvc.post("/api/v1/komplett") {
+                        headers { setBearerAuth(jwt(AUDIENCE)) }
+                        contentType = APPLICATION_JSON
+                        content = "\"${BRUKER_ID.verdi}\""
+                    }.andExpect {
+                        status {
+                            isForbidden()
+                        }
+                        jsonPath("$.message") { value(forventetOBO(CCF)) }
+                    }
+
+                    mockMvc.post("/api/v1/bulk/obo") {
+                        headers { setBearerAuth(jwt(AUDIENCE)) }
+                        contentType = APPLICATION_JSON
+                        content = """[{"brukerId":"${BRUKER_ID.verdi}","type":"KOMPLETT_REGELTYPE"}]"""
+                    }.andExpect {
+                        status { isForbidden() }
+                        jsonPath("$.status") { value(403) }
+                        jsonPath("$.error") { value("Forbidden") }
+                        jsonPath("$.message") { value(forventetOBO(CCF)) }
+                    }
+                 
+                    mockMvc.post("/api/v1/overstyr") {
+                        headers { setBearerAuth(jwt(AUDIENCE)) }
+                        contentType = APPLICATION_JSON
+                        content = """{"brukerId":"${BRUKER_ID.verdi}","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
+                    }.andExpect {
+                        status { isForbidden() }
+                        jsonPath("$.status") { value(403) }
+                        jsonPath("$.error") { value("Forbidden") }
+                        jsonPath("$.message") { value(forventetOBO(CCF)) }
+                    }
+                }
+            }
+        }
+
+        Given("method security på CCF-endepunkter") {
+            When("request bruker OBO-token") {
+                Then("returnerer 403 for komplett og bulk CCF-endepunkter") {
+                    every { token.type } returns OBO
+
+                    mockMvc.post("/api/v1/ccf/komplett/${ANSATT_ID.verdi}") {
+                        headers { setBearerAuth(jwt(AUDIENCE)) }
+                        contentType = APPLICATION_JSON
+                        content = "\"${BRUKER_ID.verdi}\""
+                    }.andExpect {
+                        status { isForbidden() }
+                        jsonPath("$.message") { value("Forventet CCF-token, fikk OBO") }
+                    }
+
+                    mockMvc.post("/api/v1/bulk/ccf/${ANSATT_ID.verdi}") {
+                        headers { setBearerAuth(jwt(AUDIENCE)) }
+                        contentType = APPLICATION_JSON
+                        content = """[{"brukerId":"${BRUKER_ID.verdi}","type":"KOMPLETT_REGELTYPE"}]"""
+                    }.andExpect {
+                        status { isForbidden() }
+                        jsonPath("$.message") { value("Forventet CCF-token, fikk OBO") }
+                    }
+                }
+            }
+        }
+
+        Given("åpent endepunkt /v3/api-docs") {
+            When("request mangler bearer-token") {
+                Then("returnerer 200") {
                     mockMvc.get("/v3/api-docs").andExpect {
                         status { isOk() }
                     }
@@ -148,5 +230,5 @@ class TilgangControllerTest(private val mockMvc: MockMvc) : BehaviorSpec() {
 }
 
 @SpringBootApplication(exclude = [DataSourceAutoConfiguration::class, HibernateJpaAutoConfiguration::class, FlywayAutoConfiguration::class])
-@Import(OAuth2SecurityBeanConfig::class, TilgangController::class)
+@Import(OAuth2SecurityBeanConfig::class, TilgangController::class, BulkTilgangController::class, EnkeltTilgangController::class)
 class SecurityTestApplication

@@ -13,15 +13,13 @@ import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
 import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
-import no.nav.tilgangsmaskin.felles.security.OAuth2TokenTypeAuthorization.Companion.forventetOBO
+import no.nav.tilgangsmaskin.felles.security.OAuth2TokenTypeAuthorization.Companion.mismatch
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.tilgang.BulkTilgangController
 import no.nav.tilgangsmaskin.tilgang.TilgangController
 import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons
-import org.eclipse.jetty.http.HttpStatus
-import org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration
 import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration
@@ -134,7 +132,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc) : BehaviorSpec() {
                         status {
                             isForbidden()
                         }
-                        jsonPath("$.message") { value(forventetOBO(CCF)) }
+                        jsonPath("$.message") { value(mismatch(OBO, CCF)) }
                     }
 
                     mockMvc.post("/api/v1/bulk/obo") {
@@ -145,7 +143,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc) : BehaviorSpec() {
                         status { isForbidden() }
                         jsonPath("$.status") { value(403) }
                         jsonPath("$.error") { value("Forbidden") }
-                        jsonPath("$.message") { value(forventetOBO(CCF)) }
+                        jsonPath("$.message") { value(mismatch(OBO, CCF)) }
                     }
                  
                     mockMvc.post("/api/v1/overstyr") {
@@ -156,7 +154,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc) : BehaviorSpec() {
                         status { isForbidden() }
                         jsonPath("$.status") { value(403) }
                         jsonPath("$.error") { value("Forbidden") }
-                        jsonPath("$.message") { value(forventetOBO(CCF)) }
+                        jsonPath("$.message") { value(mismatch(OBO, CCF)) }
                     }
                 }
             }

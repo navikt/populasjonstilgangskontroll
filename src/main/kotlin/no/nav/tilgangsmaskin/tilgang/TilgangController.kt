@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.tilgang
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.security.RequireCCF
 import no.nav.tilgangsmaskin.felles.security.RequireOBO
@@ -22,10 +23,10 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseStatus
 
 
-@TilgangApiController
+@ProdController
 @ResponseStatus(NO_CONTENT)
 @Tag(name = "TilgangController", description = TILGANG_CONTROLLER_TAG_DESCRIPTION)
-class TilgangController(private val regelTjeneste: RegelTjeneste, token: Token) : TilgangControllerBase(token) {
+class TilgangController(private val regelTjeneste: RegelTjeneste, private val token: Token) : TilgangControllerBase() {
 
     @PostMapping("komplett")
     @RequireOBO

@@ -5,6 +5,7 @@ import jakarta.validation.Valid
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotBlank
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.security.RequireCCF
 import no.nav.tilgangsmaskin.felles.security.RequireOBO
@@ -25,14 +26,14 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseStatus
 
 
-@TilgangApiController
+@ProdController
 @ResponseStatus(MULTI_STATUS)
 @Tag(name = "BulkTilgangController", description = BULK_TILGANG_CONTROLLER_TAG_DESCRIPTION)
 class BulkTilgangController(
     private val regelTjeneste: RegelTjeneste,
     private val validator: Validator,
-    token: Token
-) : TilgangControllerBase(token) {
+    private val token: Token
+) : TilgangControllerBase() {
 
     @PostMapping("bulk/obo")
     @RequireOBO
@@ -64,8 +65,7 @@ class BulkTilgangController(
     fun bulkCCFForRegelType(
         @PathVariable ansattId: AnsattId,
         @PathVariable regelType: RegelType,
-        @RequestBody @Valid brukerIds: Set<@NotBlank(message = "brukerId kan ikke være tom") String>
-    ) =
+        @RequestBody @Valid brukerIds: Set<@NotBlank(message = "brukerId kan ikke være tom") String>) =
         bulkOppslag(
             ansattId,
             brukerIds.mapTo(mutableSetOf()) { BrukerIdOgRegelsett(it, regelType) }

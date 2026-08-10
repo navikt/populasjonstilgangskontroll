@@ -2,8 +2,6 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import org.springframework.data.redis.annotation.RedisListener
-import org.springframework.data.redis.listener.support.PubSubHeaders.CHANNEL
-import org.springframework.messaging.handler.annotation.Header
 import org.springframework.stereotype.Component
 
 private const val CHANNEL_EXPIRED = "__keyevent@0__:expired"
@@ -15,7 +13,7 @@ class ValkeyEventListeningCacheOppfrisker(erLeder: Boolean = true,
 
     @RedisListener(CHANNEL_EXPIRED)
     @RedisListener(CHANNEL_DELETED)
-    fun onEvent(nokkel: CacheNøkkel,@Header(CHANNEL) channel: String) {
+    fun onEvent(nokkel: CacheNøkkel) {
 
         somLeder {
             oppfriskere.firstOrNull { it.cacheName == nokkel.cacheName }?.run {

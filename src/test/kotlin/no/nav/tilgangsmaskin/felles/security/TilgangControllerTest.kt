@@ -29,7 +29,9 @@ import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.FORBIDDEN
+import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
 import org.springframework.http.ProblemDetail
@@ -85,13 +87,12 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val jsonMapper
             When("request mangler bearer-token") {
                 Then("returnerer 401") {
                     mockMvc.post("/api/v1/komplett") {
-                        contentType = APPLICATION_JSON
-                        content = "\"${BRUKER_ID.verdi}\""
-                    }.andExpect {
-                        status {
-                            isUnauthorized()
-                        }
-                    }
+                                        contentType = APPLICATION_JSON
+                                        content = "\"${BRUKER_ID.verdi}\""
+                                    }.andExpect {
+                                        status { isUnauthorized() }
+                                        content { contentType(APPLICATION_PROBLEM_JSON) }
+                                    }.andReturn().shouldHaveBoody(UNAUTHORIZED)
                 }
             }
 
@@ -118,16 +119,13 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val jsonMapper
             When("request har token med ugyldig audience") {
                 Then("returnerer 401") {
                     mockMvc.post("/api/v1/komplett") {
-                        headers {
-                            setBearerAuth(jwt(INVALID_AUDIENCE))
-                        }
-                        contentType = APPLICATION_JSON
-                        content = "\"${BRUKER_ID.verdi}\""
-                    }.andExpect {
-                        status {
-                            isUnauthorized()
-                        }
-                    }
+                                        headers { setBearerAuth(jwt(INVALID_AUDIENCE)) }
+                                        contentType = APPLICATION_JSON
+                                        content = "\"${BRUKER_ID.verdi}\""
+                                    }.andExpect {
+                                        status { isUnauthorized() }
+                                        content { contentType(APPLICATION_PROBLEM_JSON) }
+                                    }.andReturn().shouldHaveBoody(UNAUTHORIZED)
                 }
             }
         }
@@ -139,45 +137,46 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val jsonMapper
                     val gyldigTil = LocalDate.now().plusMonths(2)
 
                     mockMvc.post("/api/v1/komplett") {
-                        headers { setBearerAuth(jwt(AUDIENCE)) }
-                        contentType = APPLICATION_JSON
-                        content = "\"${BRUKER_ID.verdi}\""
-                    }.andExpect {
-                        status {
-                            isForbidden()
-                        }
-                        content {
-                            contentType(APPLICATION_PROBLEM_JSON)
-                        }
-                    }.andReturn().shouldBeForbidden(mismatch(OBO, CCF))
+                                        headers { setBearerAuth(jwt(AUDIENCE)) }
+                                        contentType = APPLICATION_JSON
+                                        content = "\"${BRUKER_ID.verdi}\""
+                                    }.andExpect {
+                                        status {
+                                            isForbidden()
+                                        }
+                                        content {
+                                            contentType(APPLICATION_PROBLEM_JSON)
+                                        }
+                                    }.andReturn().shouldHaveBoody(FORBIDDEN, mismatch(OBO, CCF))
 
                     mockMvc.post("/api/v1/bulk/obo") {
-                        headers { setBearerAuth(jwt(AUDIENCE)) }
-                        contentType = APPLICATION_JSON
-                        content = """[{"brukerId":"${BRUKER_ID.verdi}","type":"KOMPLETT_REGELTYPE"}]"""
-                    }.andExpect {
-                        status {
-                            isForbidden()
-                        }
-                        content {
-                            contentType(APPLICATION_PROBLEM_JSON)
-                        }
-                    }.andReturn().shouldBeForbidden(mismatch(OBO, CCF))
-                 
+                                        headers { setBearerAuth(jwt(AUDIENCE)) }
+                                        contentType = APPLICATION_JSON
+                                        content = """[{"brukerId":"${BRUKER_ID.verdi}","type":"KOMPLETT_REGELTYPE"}]"""
+                                    }.andExpect {
+                                        status {
+                                            isForbidden()
+                                        }
+                                        content {
+                                            contentType(APPLICATION_PROBLEM_JSON)
+                                        }
+                                    }.andReturn().shouldHaveBoody(FORBIDDEN, mismatch(OBO, CCF))
+
                     mockMvc.post("/api/v1/overstyr") {
-                        headers {
-                            setBearerAuth(jwt(AUDIENCE))
-                        }
-                        contentType = APPLICATION_JSON
-                        content = """{"brukerId":"${BRUKER_ID.verdi}","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
-                    }.andExpect {
-                        status {
-                            isForbidden()
-                        }
-                        content {
-                            contentType(APPLICATION_PROBLEM_JSON)
-                        }
-                    }.andReturn().shouldBeForbidden(mismatch(OBO, CCF))
+                                        headers {
+                                            setBearerAuth(jwt(AUDIENCE))
+                                        }
+                                        contentType = APPLICATION_JSON
+                                        content =
+                                            """{"brukerId":"${BRUKER_ID.verdi}","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
+                                    }.andExpect {
+                                        status {
+                                            isForbidden()
+                                        }
+                                        content {
+                                            contentType(APPLICATION_PROBLEM_JSON)
+                                        }
+                                    }.andReturn().shouldHaveBoody(FORBIDDEN, mismatch(OBO, CCF))
                 }
             }
         }
@@ -188,34 +187,34 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val jsonMapper
                     every { token.type } returns OBO
 
                     mockMvc.post("/api/v1/ccf/komplett/${ANSATT_ID.verdi}") {
-                        headers {
-                            setBearerAuth(jwt(AUDIENCE))
-                        }
-                        contentType = APPLICATION_JSON
-                        content = "\"${BRUKER_ID.verdi}\""
-                    }.andExpect {
-                        status {
-                            isForbidden()
-                        }
-                        content {
-                            contentType(APPLICATION_PROBLEM_JSON)
-                        }
-                    }.andReturn().shouldBeForbidden(mismatch(CCF, OBO))
+                                        headers {
+                                            setBearerAuth(jwt(AUDIENCE))
+                                        }
+                                        contentType = APPLICATION_JSON
+                                        content = "\"${BRUKER_ID.verdi}\""
+                                    }.andExpect {
+                                        status {
+                                            isForbidden()
+                                        }
+                                        content {
+                                            contentType(APPLICATION_PROBLEM_JSON)
+                                        }
+                                    }.andReturn().shouldHaveBoody(FORBIDDEN, mismatch(CCF, OBO))
 
                     mockMvc.post("/api/v1/bulk/ccf/${ANSATT_ID.verdi}") {
-                        headers {
-                            setBearerAuth(jwt(AUDIENCE))
-                        }
-                        contentType = APPLICATION_JSON
-                        content = """[{"brukerId":"${BRUKER_ID.verdi}","type":"KOMPLETT_REGELTYPE"}]"""
-                    }.andExpect {
-                        status {
-                            isForbidden()
-                        }
-                        content {
-                            contentType(APPLICATION_PROBLEM_JSON)
-                        }
-                    }.andReturn().shouldBeForbidden(mismatch(CCF, OBO))
+                                        headers {
+                                            setBearerAuth(jwt(AUDIENCE))
+                                        }
+                                        contentType = APPLICATION_JSON
+                                        content = """[{"brukerId":"${BRUKER_ID.verdi}","type":"KOMPLETT_REGELTYPE"}]"""
+                                    }.andExpect {
+                                        status {
+                                            isForbidden()
+                                        }
+                                        content {
+                                            contentType(APPLICATION_PROBLEM_JSON)
+                                        }
+                                    }.andReturn().shouldHaveBoody(FORBIDDEN, mismatch(CCF, OBO))
                 }
             }
         }
@@ -239,11 +238,11 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val jsonMapper
             OID to UUID.randomUUID().toString())
     ).serialize()
 
-    private fun MvcResult.shouldBeForbidden(expectedDetail: String) =
+    private fun MvcResult.shouldHaveBoody(httpStatus: HttpStatus, expectedDetail: String? = null) =
         assertSoftly(jsonMapper.readValue<ProblemDetail>(response.contentAsByteArray)) {
-            status shouldBe FORBIDDEN.value()
-            title shouldBe FORBIDDEN.reasonPhrase
-            detail shouldBe expectedDetail
+            status shouldBe httpStatus.value()
+            title shouldBe httpStatus.reasonPhrase
+            expectedDetail?.let { detail shouldBe it }
         }
 
     companion object {

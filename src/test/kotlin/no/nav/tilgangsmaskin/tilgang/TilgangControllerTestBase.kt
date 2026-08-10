@@ -17,6 +17,8 @@ import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.TYPE_URI
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpHeaders.HOST
+import org.springframework.http.ProblemDetail
+import org.springframework.http.converter.json.ProblemDetailJacksonMixin
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
@@ -54,6 +56,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
 
     protected val mapper: JsonMapper = JsonMapper.builder()
         .addModule(KotlinModule.Builder().build())
+        .addMixIn(ProblemDetail::class.java, ProblemDetailJacksonMixin::class.java)
         .build()
 
     protected val regelTjeneste: RegelTjeneste = mockk()

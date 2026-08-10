@@ -46,7 +46,6 @@ import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.readValue
-import java.time.LocalDate
 import java.time.LocalDate.now
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
@@ -123,7 +122,9 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                         }
                     }
 
-                    verify { regelTjeneste.kompletteRegler(ANSATT_ID, BRUKER_ID.verdi) }
+                    verify {
+                        regelTjeneste.kompletteRegler(ANSATT_ID, BRUKER_ID.verdi)
+                    }
                 }
             }
 

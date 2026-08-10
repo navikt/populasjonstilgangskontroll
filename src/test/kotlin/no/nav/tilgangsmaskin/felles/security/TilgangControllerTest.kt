@@ -248,7 +248,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
     private fun MvcResult.shouldHaveBoody(httpStatus: HttpStatus, msg: String? = null) =
         assertSoftly(mapper.readValue<ProblemDetail>(response.contentAsByteArray)) {
             status shouldBe httpStatus.value()
-            title shouldBe httpStatus.reasonPhrase
+            title shouldBe "${httpStatus.value()}"
             msg?.let { detail shouldBe it }
         }
 

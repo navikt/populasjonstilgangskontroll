@@ -5,8 +5,8 @@ import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.rest.Token
-import no.nav.tilgangsmaskin.felles.security.RequireCCF
-import no.nav.tilgangsmaskin.felles.security.RequireOBO
+import no.nav.tilgangsmaskin.felles.security.OAuth2RequireCCF
+import no.nav.tilgangsmaskin.felles.security.OAuth2RequireOBO
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
@@ -41,25 +41,25 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, private val to
     private val log = getLogger(javaClass)
 
     @PostMapping("komplett")
-    @RequireOBO
+    @OAuth2RequireOBO
     @ProblemDetailApiResponse(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
     fun kompletteRegler(@RequestBody brukerId: String) =
         enkeltOppslag(token.requiredAnsattId, brukerId, KOMPLETT_REGELTYPE)
 
     @PostMapping("/ccf/komplett/{ansattId}")
-    @RequireCCF
+    @OAuth2RequireCCF
     @ProblemDetailApiResponse(summary = SUMMARY_KOMPLETT_CCF, description = DESCRIPTION_KOMPLETT_CCF)
     fun kompletteReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String) =
         enkeltOppslag(ansattId, brukerId, KOMPLETT_REGELTYPE)
 
     @PostMapping("kjerne")
-    @RequireOBO
+    @OAuth2RequireOBO
     @ProblemDetailApiResponse(summary = SUMMARY_KJERNE_OBO, description = DESCRIPTION_KJERNE_OBO)
     fun kjerneregler(@RequestBody brukerId: String) =
         enkeltOppslag(token.requiredAnsattId, brukerId, KJERNE_REGELTYPE)
 
     @PostMapping("/ccf/kjerne/{ansattId}")
-    @RequireCCF
+    @OAuth2RequireCCF
     @ProblemDetailApiResponse(summary = SUMMARY_KJERNE_CCF, description = DESCRIPTION_KJERNE_CCF)
     fun kjerneReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String) =
         enkeltOppslag(ansattId, brukerId, KJERNE_REGELTYPE)

@@ -7,8 +7,8 @@ import jakarta.validation.constraints.NotBlank
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.rest.Token
-import no.nav.tilgangsmaskin.felles.security.RequireCCF
-import no.nav.tilgangsmaskin.felles.security.RequireOBO
+import no.nav.tilgangsmaskin.felles.security.OAuth2RequireCCF
+import no.nav.tilgangsmaskin.felles.security.OAuth2RequireOBO
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withAnsattContext
 import org.slf4j.LoggerFactory.getLogger
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
@@ -45,13 +45,13 @@ class BulkTilgangController(
     private val log = getLogger(javaClass)
 
     @PostMapping("bulk/obo")
-    @RequireOBO
+    @OAuth2RequireOBO
     @BulkSwaggerApiRespons(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO)
     fun bulkOBO(@RequestBody @Valid specs: Set<@Valid BrukerIdOgRegelsett>) =
         bulkOppslag(token.requiredAnsattId, specs)
 
     @PostMapping("bulk/obo/{regelType}")
-    @RequireOBO
+    @OAuth2RequireOBO
     @BulkSwaggerApiRespons(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO_REGELTYPE)
     fun bulkOBOForRegelType(
         @PathVariable regelType: RegelType,
@@ -63,13 +63,13 @@ class BulkTilgangController(
         )
 
     @PostMapping("bulk/ccf/{ansattId}")
-    @RequireCCF
+    @OAuth2RequireCCF
     @BulkSwaggerApiRespons(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_CCF)
     fun bulkCCF(@PathVariable ansattId: AnsattId, @RequestBody @Valid specs: Set<@Valid BrukerIdOgRegelsett>) =
         bulkOppslag(ansattId, specs)
 
     @PostMapping("bulk/ccf/{ansattId}/{regelType}")
-    @RequireCCF
+    @OAuth2RequireCCF
     @BulkSwaggerApiRespons(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_CCF_REGELTYPE)
     fun bulkCCFForRegelType(
         @PathVariable ansattId: AnsattId,

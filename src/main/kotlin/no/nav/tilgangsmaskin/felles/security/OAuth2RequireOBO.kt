@@ -7,5 +7,5 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
 
 @Target(CLASS, FUNCTION)
 @Retention(RUNTIME)
-@PreAuthorize("@tokenTypeAuthorization.require(T(no.nav.tilgangsmaskin.felles.rest.TokenType).CCF)")
-annotation class RequireCCF
+@PreAuthorize("@tokenTypeAuthorization.require(T(no.nav.tilgangsmaskin.felles.rest.TokenType).OBO)")
+annotation class OAuth2RequireOBO

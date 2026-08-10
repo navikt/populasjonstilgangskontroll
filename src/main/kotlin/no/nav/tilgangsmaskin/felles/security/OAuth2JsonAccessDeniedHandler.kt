@@ -12,9 +12,10 @@ import org.springframework.stereotype.Component
 
 @Component
 class OAuth2JsonAccessDeniedHandler(private val mapper: JsonMapper) : AccessDeniedHandler {
-    override fun handle(req: HttpServletRequest, res: HttpServletResponse, e: AccessDeniedException) {
-        res.status = FORBIDDEN.value()
-        res.contentType = APPLICATION_PROBLEM_JSON_VALUE
-        res.writer.use { mapper.writeValue(it, forStatusAndDetail(FORBIDDEN, e.message ?: "Access denied")) }
-    }
+    override fun handle(req: HttpServletRequest, res: HttpServletResponse, e: AccessDeniedException) =
+        with(res) {
+            status = FORBIDDEN.value()
+            contentType = APPLICATION_PROBLEM_JSON_VALUE
+            mapper.writeValue(writer, forStatusAndDetail(FORBIDDEN, e.message ?: "Access denied"))
+        }
 }

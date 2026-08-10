@@ -4,6 +4,7 @@ import io.mockk.every
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
@@ -50,11 +51,13 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                     every {
                         regelTjeneste.bulkRegler(any(), specs)
                     } returns respons
-                    mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/ccf/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(setOf(BrukerIdOgRegelsett(brukerId), BrukerIdOgRegelsett(avvistBrukerId)))
                     }.andExpect {
-                        status { isMultiStatus() }
+                        status {
+                            isMultiStatus()
+                        }
                         jsonPath("$.ansattId") { value(ansattId.verdi) }
                     }.andDo {
                         handle(dokumenterMedAuth("ccf-bulk"))
@@ -71,7 +74,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                     )
                     val kjerneRespons = AggregertBulkRespons(ansattId, setOf(ok(brukerId), ok(annenBrukerId)))
                     every { regelTjeneste.bulkRegler(any(), kjerneSpecs) } returns kjerneRespons
-                    mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}/KJERNE_REGELTYPE") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/ccf/${ansattId.verdi}/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(setOf(brukerId, annenBrukerId))
                     }.andExpect {
@@ -87,7 +90,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
             When("bulk/ccf kalles med mer enn 1000 brukere") {
                 Then("returnerer 413") {
                     val mangeIds = (1..1001).map { "0${it.toString().padStart(10, '0')}" }
-                    mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/ccf/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON
                         content = mangeIds.joinToString(prefix = "[", postfix = "]") {
                             """{"brukerId":"$it","type":"KOMPLETT_REGELTYPE"}"""
@@ -101,7 +104,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/ccf kalles med blank brukerId") {
                 Then("returnerer 400") {
-                    mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/ccf/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"   ","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect {
@@ -114,7 +117,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/ccf kalles med tom brukerId") {
                 Then("returnerer 400") {
-                    mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/ccf/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect {
@@ -127,7 +130,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/ccf kalles uten body") {
                 Then("returnerer 400") {
-                    mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/ccf/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON
                     }.andExpect {
                         status {
@@ -139,7 +142,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/ccf/{ansattId}/{regelType} kalles med blank brukerId") {
                 Then("returnerer 400") {
-                    mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}/KJERNE_REGELTYPE") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/ccf/${ansattId.verdi}/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON
                         content = """["   "]"""
                     }.andExpect {
@@ -152,7 +155,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/ccf/{ansattId}/{regelType} kalles med tom brukerId") {
                 Then("returnerer 400") {
-                    mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}/KJERNE_REGELTYPE") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/ccf/${ansattId.verdi}/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON
                         content = """[""]"""
                     }.andExpect {
@@ -165,7 +168,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/ccf/{ansattId}/{regelType} kalles uten body") {
                 Then("returnerer 400") {
-                    mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}/KJERNE_REGELTYPE") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/ccf/${ansattId.verdi}/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON
                     }.andExpect {
                         status {

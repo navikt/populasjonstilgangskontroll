@@ -4,6 +4,7 @@ import io.mockk.every
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.rest.TokenType
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
@@ -34,7 +35,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
             When("bulk/obo kalles med gyldige specs") {
                 Then("returnerer 207 med resultater") {
                     every { regelTjeneste.bulkRegler(any(), specs) } returns respons
-                    mockMvc.post("/api/v1/bulk/obo") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(setOf(BrukerIdOgRegelsett(brukerId)))
                     }.andExpect {
@@ -50,7 +51,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/obo kalles med tom liste") {
                 Then("returnerer 207 med tom resultatliste") {
-                    mockMvc.post("/api/v1/bulk/obo") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/obo") {
                         contentType = APPLICATION_JSON; content = "[]"
                     }.andExpect {
                         status {
@@ -66,7 +67,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                     val mangeSpecs = (1..1001).map {
                         BrukerIdOgRegelsett("0${it.toString().padStart(10, '0')}", KOMPLETT_REGELTYPE)
                     }
-                    mockMvc.post("/api/v1/bulk/obo") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = mangeSpecs.joinToString(prefix = "[", postfix = "]") {
                             """{"brukerId":"${it.brukerId}","type":"KOMPLETT_REGELTYPE"}"""
@@ -90,7 +91,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                     val regelException = RegelException(testAnsatt, testBruker, testRegel)
                     val avvistRespons = AggregertBulkRespons(ansattId, setOf(EnkeltBulkRespons(regelException)))
                     every { regelTjeneste.bulkRegler(any(), specs) } returns avvistRespons
-                    mockMvc.post("/api/v1/bulk/obo") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(setOf(BrukerIdOgRegelsett(brukerId)))
                     }.andExpect {
@@ -110,7 +111,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/obo kalles med blank brukerId") {
                 Then("returnerer 400") {
-                    mockMvc.post("/api/v1/bulk/obo") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"   ","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect {
@@ -123,7 +124,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/obo kalles med tom brukerId") {
                 Then("returnerer 400") {
-                    mockMvc.post("/api/v1/bulk/obo") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect {
@@ -136,7 +137,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/obo kalles uten body") {
                 Then("returnerer 400") {
-                    mockMvc.post("/api/v1/bulk/obo") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/obo") {
                         contentType = APPLICATION_JSON
                     }.andExpect {
                         status {
@@ -161,10 +162,12 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
             When("bulk/obo/{regelType} kalles med KJERNE_REGELTYPE") {
                 Then("returnerer 207 med resultater for gitt regeltype") {
                     every { regelTjeneste.bulkRegler(any(), kjerneSpecs) } returns respons
-                    mockMvc.post("/api/v1/bulk/obo/KJERNE_REGELTYPE") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/obo/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON; content = mapper.writeValueAsString(setOf(brukerId, annenBrukerId))
                     }.andExpect {
-                        status { isMultiStatus() }
+                        status {
+                            isMultiStatus()
+                        }
                         jsonPath("$.ansattId") { value(ansattId.verdi) }
                         jsonPath("$.resultater[0].status") { value(204) }
                     }.andDo { handle(dokumenterMedAuth("obo-bulk-regeltype")) }
@@ -173,25 +176,37 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             When("bulk/obo/{regelType} kalles med blank brukerId") {
                 Then("returnerer 400") {
-                    mockMvc.post("/api/v1/bulk/obo/KJERNE_REGELTYPE") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/obo/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON; content = """["   "]"""
-                    }.andExpect { status { isBadRequest() } }
+                    }.andExpect {
+                        status {
+                            isBadRequest()
+                        }
+                    }
                 }
             }
 
             When("bulk/obo/{regelType} kalles med tom brukerId") {
                 Then("returnerer 400") {
-                    mockMvc.post("/api/v1/bulk/obo/KJERNE_REGELTYPE") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/obo/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON; content = """[""]"""
-                    }.andExpect { status { isBadRequest() } }
+                    }.andExpect {
+                        status {
+                            isBadRequest()
+                        }
+                    }
                 }
             }
 
             When("bulk/obo/{regelType} kalles uten body") {
                 Then("returnerer 400") {
-                    mockMvc.post("/api/v1/bulk/obo/KJERNE_REGELTYPE") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/obo/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON
-                    }.andExpect { status { isBadRequest() } }
+                    }.andExpect {
+                        status {
+                            isBadRequest()
+                        }
+                    }
                 }
             }
         }

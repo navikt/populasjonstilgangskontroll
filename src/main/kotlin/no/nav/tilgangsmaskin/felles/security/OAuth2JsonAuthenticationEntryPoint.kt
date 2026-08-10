@@ -12,9 +12,9 @@ import tools.jackson.databind.json.JsonMapper
 
 @Component
 class OAuth2JsonAuthenticationEntryPoint(private val jsonMapper: JsonMapper) : AuthenticationEntryPoint {
-    override fun commence(req: HttpServletRequest, res: HttpServletResponse, e: AuthenticationException) {
+    override fun commence(req: HttpServletRequest, res: HttpServletResponse, _: AuthenticationException) {
         res.status = UNAUTHORIZED.value()
         res.contentType = APPLICATION_PROBLEM_JSON_VALUE
-        res.writer.use { jsonMapper.writeValue(it, ProblemDetail.forStatusAndDetail(UNAUTHORIZED, e.message ?: "Unauthorized")) }
+        res.writer.use { jsonMapper.writeValue(it, ProblemDetail.forStatusAndDetail(UNAUTHORIZED, "Mangler gyldig Bearer-token")) }
     }
 }

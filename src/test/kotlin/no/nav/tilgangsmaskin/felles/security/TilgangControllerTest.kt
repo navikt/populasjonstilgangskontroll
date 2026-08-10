@@ -96,7 +96,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                                         content {
                                             contentType(APPLICATION_PROBLEM_JSON)
                                         }
-                                    }.andReturn().shouldHaveBoody(UNAUTHORIZED)
+                                    }.andReturn().shouldHaveBoody(UNAUTHORIZED, "Mangler gyldig Bearer-token")
                 }
             }
 
@@ -133,7 +133,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                                         content {
                                             contentType(APPLICATION_PROBLEM_JSON)
                                         }
-                                    }.andReturn().shouldHaveBoody(UNAUTHORIZED)
+                                    }.andReturn().shouldHaveBoody(UNAUTHORIZED, "Mangler gyldig Bearer-token")
                 }
             }
         }

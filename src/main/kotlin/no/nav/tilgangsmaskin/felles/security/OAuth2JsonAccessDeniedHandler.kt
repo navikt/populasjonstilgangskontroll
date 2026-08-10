@@ -9,15 +9,16 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.stereotype.Component
 import java.time.OffsetDateTime
+import java.time.OffsetDateTime.now
 
 
 @Component
 class OAuth2JsonAccessDeniedHandler(private val mapper: JsonMapper) : AccessDeniedHandler {
-    override fun handle(req: HttpServletRequest, res: HttpServletResponse, accessDeniedException: AccessDeniedException) {
+    override fun handle(req: HttpServletRequest, res: HttpServletResponse, e: AccessDeniedException) {
         res.status = FORBIDDEN.value()
         res.contentType = APPLICATION_JSON_VALUE
         res.writer.use { mapper.writeValue(it,
-            AccessDeniedResponse(OffsetDateTime.now(), FORBIDDEN.value(), FORBIDDEN.reasonPhrase, accessDeniedException.message ?: "Access denied")
+            AccessDeniedResponse(now(), FORBIDDEN.value(), FORBIDDEN.reasonPhrase, e.message ?: "Access denied")
         )}
     }
     private data class AccessDeniedResponse(val timestamp: OffsetDateTime, val status: Int, val error: String, val message: String)

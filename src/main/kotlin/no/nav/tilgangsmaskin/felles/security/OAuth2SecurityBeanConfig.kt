@@ -5,6 +5,7 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod.POST
+import org.springframework.security.authorization.AuthorizationManager
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
@@ -20,6 +21,7 @@ import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpReq
 import org.springframework.security.oauth2.client.web.client.support.OAuth2RestClientHttpServiceGroupConfigurer.from
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.access.AccessDeniedHandler
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 
 
@@ -31,11 +33,11 @@ class OAuth2SecurityBeanConfig {
     @Bean
     fun securityFilterChain(
         http: HttpSecurity,
-        authorizationManager: EnkeltTilgangAuthorizationManager,
+        authMgr: AuthorizationManager<RequestAuthorizationContext>,
         deniedHandler: AccessDeniedHandler,
         entryPoint: AuthenticationEntryPoint) =
         http.authorizeHttpRequests { requests ->
-            requests.requestMatchers(POST, "$PROD_BASE_PATH/overstyr").access(authorizationManager)
+            requests.requestMatchers(POST, "$PROD_BASE_PATH/overstyr").access(authMgr)
             requests.requestMatchers( *UNPROTECTED_ENDPOINTS).permitAll()
             requests.anyRequest().authenticated()
         }

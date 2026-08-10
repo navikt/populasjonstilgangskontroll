@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.security.OAuth2RequireCCF
-import no.nav.tilgangsmaskin.felles.security.RequireOBO
+import no.nav.tilgangsmaskin.felles.security.OOAuth2RequireOBO
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
@@ -41,7 +41,7 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, private val to
     private val log = getLogger(javaClass)
 
     @PostMapping("komplett")
-    @RequireOBO
+    @OOAuth2RequireOBO
     @ProblemDetailApiResponse(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
     fun kompletteRegler(@RequestBody brukerId: String) =
         enkeltOppslag(token.requiredAnsattId, brukerId, KOMPLETT_REGELTYPE)
@@ -53,7 +53,7 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, private val to
         enkeltOppslag(ansattId, brukerId, KOMPLETT_REGELTYPE)
 
     @PostMapping("kjerne")
-    @RequireOBO
+    @OOAuth2RequireOBO
     @ProblemDetailApiResponse(summary = SUMMARY_KJERNE_OBO, description = DESCRIPTION_KJERNE_OBO)
     fun kjerneregler(@RequestBody brukerId: String) =
         enkeltOppslag(token.requiredAnsattId, brukerId, KJERNE_REGELTYPE)

@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import no.nav.tilgangsmaskin.felles.rest.Token
-import no.nav.tilgangsmaskin.felles.security.RequireOBO
+import no.nav.tilgangsmaskin.felles.security.OOAuth2RequireOBO
 import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import no.nav.tilgangsmaskin.tilgang.openapi.ProblemDetailApiResponse
@@ -18,7 +18,7 @@ private const val DESCRIPTION_OVERSTYR = "${MSG}openapi.tilgang.overstyr.descrip
 
 
 @ProdController
-@RequireOBO
+@OOAuth2RequireOBO
 @Tag(name = "EnkeltTilgangController", description = ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION)
 class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste, private val token: Token) {
 

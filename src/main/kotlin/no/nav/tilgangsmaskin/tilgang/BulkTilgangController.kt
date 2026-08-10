@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.security.OAuth2RequireCCF
-import no.nav.tilgangsmaskin.felles.security.RequireOBO
+import no.nav.tilgangsmaskin.felles.security.OOAuth2RequireOBO
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withAnsattContext
 import org.slf4j.LoggerFactory.getLogger
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
@@ -45,13 +45,13 @@ class BulkTilgangController(
     private val log = getLogger(javaClass)
 
     @PostMapping("bulk/obo")
-    @RequireOBO
+    @OOAuth2RequireOBO
     @BulkSwaggerApiRespons(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO)
     fun bulkOBO(@RequestBody @Valid specs: Set<@Valid BrukerIdOgRegelsett>) =
         bulkOppslag(token.requiredAnsattId, specs)
 
     @PostMapping("bulk/obo/{regelType}")
-    @RequireOBO
+    @OOAuth2RequireOBO
     @BulkSwaggerApiRespons(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO_REGELTYPE)
     fun bulkOBOForRegelType(
         @PathVariable regelType: RegelType,

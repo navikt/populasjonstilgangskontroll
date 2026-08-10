@@ -4,6 +4,7 @@ import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.boot.conditionals.ConditionalOnProd
 import no.nav.tilgangsmaskin.felles.rest.Token
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Fallback
 import org.springframework.security.authorization.AuthorizationDecision
 import org.springframework.security.authorization.AuthorizationManager
 import org.springframework.security.core.Authentication
@@ -25,8 +26,8 @@ class StrictEnkeltTilgangAuthorizationManager(
 }
 
 @Component
-@ConditionalOnNotProd
-class LenientEnkeltTilgangAuthorizationManager : EnkeltTilgangAuthorizationManager {
+@Fallback
+class NoOpEnkeltTilgangAuthorizationManager : EnkeltTilgangAuthorizationManager {
     override fun authorize(authentication: Supplier<out Authentication>, context: RequestAuthorizationContext) =
         AuthorizationDecision(true)
 }

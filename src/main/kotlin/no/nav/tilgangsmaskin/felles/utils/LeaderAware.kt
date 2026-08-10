@@ -3,10 +3,10 @@ package no.nav.tilgangsmaskin.felles.utils
 import no.nav.tilgangsmaskin.felles.utils.LederUtvelger.LeaderChangedEvent
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.event.EventListener
-import java.net.InetAddress
+import java.net.InetAddress.getLocalHost
 
 abstract class LeaderAware(private var erLeder: Boolean = false) {
-    private val hostname = InetAddress.getLocalHost().hostName
+    private val hostname = getLocalHost().hostName
     protected open fun doHandleLeaderChange() = Unit
 
     private val log = getLogger(javaClass)

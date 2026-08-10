@@ -18,8 +18,11 @@ class OAuth2JsonAccessDeniedHandler(private val mapper: JsonMapper) : AccessDeni
         res.status = FORBIDDEN.value()
         res.contentType = APPLICATION_JSON_VALUE
         res.writer.use { mapper.writeValue(it,
-            AccessDeniedResponse(now(), FORBIDDEN.value(), FORBIDDEN.reasonPhrase, e.message ?: "Access denied")
+            AccessDeniedResponse(FORBIDDEN.value(), FORBIDDEN.reasonPhrase, e.message ?: "Access denied")
         )}
     }
-    private data class AccessDeniedResponse(val timestamp: OffsetDateTime, val status: Int, val error: String, val message: String)
+    private data class AccessDeniedResponse(val status: Int,
+                                            val error: String,
+                                            val message: String,
+                                            val timestamp: OffsetDateTime = now())
 }

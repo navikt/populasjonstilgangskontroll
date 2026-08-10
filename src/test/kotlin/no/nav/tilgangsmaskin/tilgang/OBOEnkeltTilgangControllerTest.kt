@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.TokenType
+import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
 import no.nav.tilgangsmaskin.felles.rest.TokenType.UNAUTHENTICATED
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
@@ -13,6 +14,7 @@ import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.regler.motor.KjerneRegel
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.post
@@ -24,15 +26,24 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
         Given("OBO enkeltoppslag") {
 
-            beforeEach { every { token.type } returns TokenType.OBO }
+            beforeEach {
+                every {
+                    token.type
+                } returns OBO
+            }
 
             When("komplett kalles med OBO-token") {
                 Then("returnerer 204 ved tilgang") {
                     justRun { regelTjeneste.kompletteRegler(any(), brukerId) }
                     mockMvc.post("/api/v1/komplett") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
-                    }.andExpect { status { isNoContent() } }
-                        .andDo { handle(dokumenterMedAuth("obo-komplett")) }
+                    }.andExpect {
+                        status {
+                            isNoContent()
+                        }
+                    }.andDo {
+                        handle(dokumenterMedAuth("obo-komplett"))
+                    }
                 }
             }
 
@@ -121,14 +132,14 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
             val gyldigTil = LocalDate.now().plusMonths(2)
 
-            beforeEach { every { token.type } returns TokenType.OBO }
+            beforeEach { every { token.type } returns OBO }
 
             When("enkelttilgang kalles med gyldig request og OBO-token") {
                 Then("returnerer 202 og dokumenteres i rest docs") {
                     every { enkeltTilgangTjeneste.registrerTilgang(any(), any()) } returns true
                     mockMvc.post("/api/v1/overstyr") {
                         contentType = APPLICATION_JSON
-                        content = """{"brukerId":"$brukerId","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
+                        content = mapper.writeValueAsString(EnkeltTilgangData(BrukerId(brukerId), "En god begrunnelse", gyldigTil))
                     }.andExpect { status { isAccepted() } }
                         .andDo { handle(dokumenterMedAuth("obo-enkelttilgang")) }
                 }

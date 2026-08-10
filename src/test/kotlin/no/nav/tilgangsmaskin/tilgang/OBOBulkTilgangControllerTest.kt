@@ -36,9 +36,11 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                     every { regelTjeneste.bulkRegler(any(), specs) } returns respons
                     mockMvc.post("/api/v1/bulk/obo") {
                         contentType = APPLICATION_JSON
-                        content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""
+                        content = mapper.writeValueAsString(setOf(BrukerIdOgRegelsett(brukerId)))
                     }.andExpect {
-                        status { isMultiStatus() }
+                        status {
+                            isMultiStatus()
+                        }
                         jsonPath("$.ansattId") { value(ansattId.verdi) }
                         jsonPath("$.resultater[0].brukerId") { value(brukerId) }
                         jsonPath("$.resultater[0].status") { value(204) }
@@ -51,7 +53,9 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/bulk/obo") {
                         contentType = APPLICATION_JSON; content = "[]"
                     }.andExpect {
-                        status { isMultiStatus() }
+                        status {
+                            isMultiStatus()
+                        }
                         jsonPath("$.resultater") { isEmpty() }
                     }
                 }
@@ -67,7 +71,11 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                         content = mangeSpecs.joinToString(prefix = "[", postfix = "]") {
                             """{"brukerId":"${it.brukerId}","type":"KOMPLETT_REGELTYPE"}"""
                         }
-                    }.andExpect { status { isContentTooLarge() } }
+                    }.andExpect {
+                        status {
+                            isContentTooLarge()
+                        }
+                    }
                 }
             }
 
@@ -84,15 +92,19 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                     every { regelTjeneste.bulkRegler(any(), specs) } returns avvistRespons
                     mockMvc.post("/api/v1/bulk/obo") {
                         contentType = APPLICATION_JSON
-                        content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"}]"""
+                        content = mapper.writeValueAsString(setOf(BrukerIdOgRegelsett(brukerId)))
                     }.andExpect {
-                        status { isMultiStatus() }
+                        status {
+                            isMultiStatus()
+                        }
                         jsonPath("$.resultater[0].status") { value(403) }
                         jsonPath("$.resultater[0].detaljer.title") { value("AVVIST_STRENGT_FORTROLIG_ADRESSE") }
                         jsonPath("$.resultater[0].detaljer.brukerIdent") { value(brukerId) }
                         jsonPath("$.resultater[0].detaljer.navIdent") { value(ansattId.verdi) }
                         jsonPath("$.resultater[0].detaljer.kanOverstyres") { value(true) }
-                    }.andDo { handle(dokumenterMedAuth("obo-bulk-avvist")) }
+                    }.andDo {
+                        handle(dokumenterMedAuth("obo-bulk-avvist"))
+                    }
                 }
             }
 
@@ -101,7 +113,11 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"   ","type":"KOMPLETT_REGELTYPE"}]"""
-                    }.andExpect { status { isBadRequest() } }
+                    }.andExpect {
+                        status {
+                            isBadRequest()
+                        }
+                    }
                 }
             }
 
@@ -110,7 +126,11 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/bulk/obo") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"","type":"KOMPLETT_REGELTYPE"}]"""
-                    }.andExpect { status { isBadRequest() } }
+                    }.andExpect {
+                        status {
+                            isBadRequest()
+                        }
+                    }
                 }
             }
 
@@ -118,7 +138,11 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                 Then("returnerer 400") {
                     mockMvc.post("/api/v1/bulk/obo") {
                         contentType = APPLICATION_JSON
-                    }.andExpect { status { isBadRequest() } }
+                    }.andExpect {
+                        status {
+                            isBadRequest()
+                        }
+                    }
                 }
             }
         }
@@ -138,7 +162,7 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                 Then("returnerer 207 med resultater for gitt regeltype") {
                     every { regelTjeneste.bulkRegler(any(), kjerneSpecs) } returns respons
                     mockMvc.post("/api/v1/bulk/obo/KJERNE_REGELTYPE") {
-                        contentType = APPLICATION_JSON; content = """["$brukerId","$annenBrukerId"]"""
+                        contentType = APPLICATION_JSON; content = mapper.writeValueAsString(setOf(brukerId, annenBrukerId))
                     }.andExpect {
                         status { isMultiStatus() }
                         jsonPath("$.ansattId") { value(ansattId.verdi) }

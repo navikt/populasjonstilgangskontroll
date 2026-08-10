@@ -52,7 +52,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                     } returns respons
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON
-                        content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"},{"brukerId":"$avvistBrukerId","type":"KOMPLETT_REGELTYPE"}]"""
+                        content = mapper.writeValueAsString(setOf(BrukerIdOgRegelsett(brukerId), BrukerIdOgRegelsett(avvistBrukerId)))
                     }.andExpect {
                         status { isMultiStatus() }
                         jsonPath("$.ansattId") { value(ansattId.verdi) }
@@ -73,7 +73,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                     every { regelTjeneste.bulkRegler(any(), kjerneSpecs) } returns kjerneRespons
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON
-                        content = """["$brukerId","$annenBrukerId"]"""
+                        content = mapper.writeValueAsString(setOf(brukerId, annenBrukerId))
                     }.andExpect {
                         status {
                             isMultiStatus()

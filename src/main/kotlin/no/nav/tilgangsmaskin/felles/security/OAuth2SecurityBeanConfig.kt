@@ -33,21 +33,21 @@ class OAuth2SecurityBeanConfig {
         http: HttpSecurity,
         authorizationManager: EnkeltTilgangAuthorizationManager,
         deniedHandler: AccessDeniedHandler,
-        entryPoint: AuthenticationEntryPoint
-    ) = http.authorizeHttpRequests { requests ->
+        entryPoint: AuthenticationEntryPoint) =
+        http.authorizeHttpRequests { requests ->
             requests.requestMatchers(POST, "$PROD_BASE_PATH/overstyr").access(authorizationManager)
             requests.requestMatchers( *UNPROTECTED_ENDPOINTS).permitAll()
             requests.anyRequest().authenticated()
         }
-        .exceptionHandling {
-            it.accessDeniedHandler(deniedHandler)
-        }
-        .oauth2ResourceServer { oauth2 ->
-            oauth2.jwt { it.jwtAuthenticationConverter(OAuth2LoggingJwtAuthenticationConverter()) }
-            oauth2.authenticationEntryPoint(entryPoint)
-        }
-        .statelessApiDefaults()
-        .build()
+            .exceptionHandling {
+                it.accessDeniedHandler(deniedHandler)
+            }
+            .oauth2ResourceServer { oauth2 ->
+                oauth2.jwt { it.jwtAuthenticationConverter(OAuth2LoggingJwtAuthenticationConverter()) }
+                oauth2.authenticationEntryPoint(entryPoint)
+            }
+            .statelessApiDefaults()
+            .build()
 
     @Bean
     fun securityObservationSettings()  =

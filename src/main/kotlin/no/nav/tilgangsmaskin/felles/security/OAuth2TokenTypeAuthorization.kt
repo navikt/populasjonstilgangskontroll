@@ -9,7 +9,7 @@ internal fun mismatch(required: TokenType, actual: TokenType) = "Forventet ${req
 
 @Component("tokenTypeAuthorization")
 class OAuth2TokenTypeAuthorization(private val token: Token) {
-    fun require(type: TokenType) = (token.type == type).also {
-        if (!it) throw AccessDeniedException(mismatch(type, token.type))
+    fun require(required: TokenType) = (token.type == required).also {
+        if (!it) throw AccessDeniedException(mismatch(required, token.type))
     }
 }

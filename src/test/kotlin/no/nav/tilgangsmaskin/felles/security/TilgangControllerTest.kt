@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
 import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
+import no.nav.tilgangsmaskin.felles.security.OAuth2TokenTypeAuthorization.Companion.mismatch
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
@@ -154,7 +155,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                                         content {
                                             contentType(APPLICATION_PROBLEM_JSON)
                                         }
-                                    }.andReturn().shouldHaveBoody(FORBIDDEN, mismatch(OBO, CCF))
+                                    }.andReturn().shouldHaveBoody(FORBIDDEN, mismatch(OBO, token.type))
 
                     mockMvc.post("/api/v1/bulk/obo") {
                                         headers { setBearerAuth(jwt(AUDIENCE)) }
@@ -167,7 +168,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                                         content {
                                             contentType(APPLICATION_PROBLEM_JSON)
                                         }
-                                    }.andReturn().shouldHaveBoody(FORBIDDEN, mismatch(OBO, CCF))
+                                    }.andReturn().shouldHaveBoody(FORBIDDEN, mismatch(OBO, token.type))
 
                     mockMvc.post("/api/v1/overstyr") {
                                         headers {
@@ -183,7 +184,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                                         content {
                                             contentType(APPLICATION_PROBLEM_JSON)
                                         }
-                                    }.andReturn().shouldHaveBoody(FORBIDDEN, mismatch(OBO, CCF))
+                                    }.andReturn().shouldHaveBoody(FORBIDDEN, mismatch(OBO, token.type))
                 }
             }
         }
@@ -206,7 +207,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                                         content {
                                             contentType(APPLICATION_PROBLEM_JSON)
                                         }
-                                    }.andReturn().shouldHaveBoody(FORBIDDEN, mismatch(CCF, OBO))
+                                    }.andReturn().shouldHaveBoody(FORBIDDEN, mismatch(CCF, token.type))
 
                     mockMvc.post("/api/v1/bulk/ccf/${ANSATT_ID.verdi}") {
                                         headers {
@@ -221,7 +222,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                                         content {
                                             contentType(APPLICATION_PROBLEM_JSON)
                                         }
-                                    }.andReturn().shouldHaveBoody(FORBIDDEN, mismatch(CCF, OBO))
+                                    }.andReturn().shouldHaveBoody(FORBIDDEN, mismatch(CCF, token.type))
                 }
             }
         }

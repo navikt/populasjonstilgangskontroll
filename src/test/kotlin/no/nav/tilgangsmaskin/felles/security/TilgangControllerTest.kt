@@ -47,6 +47,7 @@ import org.springframework.test.web.servlet.post
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate
+import java.time.LocalDate.now
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -148,10 +149,8 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
 
         Given("method security på OBO-endepunkter") {
             When("request bruker CCF-token") {
-                Then("returnerer 403 for komplett, bulk og overstyr") {
+                Then("returnerer 403 for komplett") {
                     every { token.type } returns CCF
-                    val gyldigTil = LocalDate.now().plusMonths(2)
-
                     mockMvc.post("$PROD_BASE_PATH/komplett") {
                         headers {
                             setBearerAuth(jwt(AUDIENCE))
@@ -166,7 +165,10 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
                     }.andReturn().withBody(FORBIDDEN, mismatch(OBO, token.type))
+                }
 
+                Then("returnerer 403 for bulk") {
+                    every { token.type } returns CCF
                     mockMvc.post("$PROD_BASE_PATH/bulk/obo") {
                         headers {
                             setBearerAuth(jwt(AUDIENCE))
@@ -181,7 +183,11 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
                     }.andReturn().withBody(FORBIDDEN, mismatch(OBO, token.type))
+                }
 
+                Then("returnerer 403 for overstyr") {
+                    val gyldigTil = now().plusMonths(2)
+                    every { token.type } returns CCF
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
                             setBearerAuth(jwt(AUDIENCE))
@@ -202,7 +208,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
 
         Given("method security på CCF-endepunkter") {
             When("request bruker OBO-token") {
-                Then("returnerer 403 for komplett og bulk CCF-endepunkter") {
+                Then("returnerer 403 for komplett CCF-endepunkt") {
                     every { token.type } returns OBO
 
                     mockMvc.post("$PROD_BASE_PATH/ccf/komplett/${ANSATT_ID.verdi}") {
@@ -219,6 +225,10 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
                     }.andReturn().withBody(FORBIDDEN, mismatch(CCF, token.type))
+                }
+
+                Then("returnerer 403 for bulk CCF-endepunkt") {
+                    every { token.type } returns OBO
 
                     mockMvc.post("$PROD_BASE_PATH/bulk/ccf/${ANSATT_ID.verdi}") {
                         headers {

@@ -47,14 +47,18 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                         ok(brukerId),
                         EnkeltBulkRespons(regelException)
                     ))
-                    every { regelTjeneste.bulkRegler(any(), specs) } returns respons
+                    every {
+                        regelTjeneste.bulkRegler(any(), specs)
+                    } returns respons
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"$brukerId","type":"KOMPLETT_REGELTYPE"},{"brukerId":"$avvistBrukerId","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect {
                         status { isMultiStatus() }
                         jsonPath("$.ansattId") { value(ansattId.verdi) }
-                    }.andDo { handle(dokumenterMedAuth("ccf-bulk")) }
+                    }.andDo {
+                        handle(dokumenterMedAuth("ccf-bulk"))
+                    }
                 }
             }
 
@@ -70,8 +74,13 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON
                         content = """["$brukerId","$annenBrukerId"]"""
-                    }.andExpect { status { isMultiStatus() } }
-                        .andDo { handle(dokumenterMedAuth("ccf-bulk-regeltype")) }
+                    }.andExpect {
+                        status {
+                            isMultiStatus()
+                        }
+                    }.andDo {
+                        handle(dokumenterMedAuth("ccf-bulk-regeltype"))
+                    }
                 }
             }
 
@@ -83,7 +92,10 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                         content = mangeIds.joinToString(prefix = "[", postfix = "]") {
                             """{"brukerId":"$it","type":"KOMPLETT_REGELTYPE"}"""
                         }
-                    }.andExpect { status { isContentTooLarge() } }
+                    }.andExpect {
+                        status { isContentTooLarge()
+                        }
+                    }
                 }
             }
 
@@ -92,7 +104,11 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"   ","type":"KOMPLETT_REGELTYPE"}]"""
-                    }.andExpect { status { isBadRequest() } }
+                    }.andExpect {
+                        status {
+                            isBadRequest()
+                        }
+                    }
                 }
             }
 
@@ -101,7 +117,11 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"","type":"KOMPLETT_REGELTYPE"}]"""
-                    }.andExpect { status { isBadRequest() } }
+                    }.andExpect {
+                        status {
+                            isBadRequest()
+                        }
+                    }
                 }
             }
 
@@ -109,7 +129,11 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                 Then("returnerer 400") {
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}") {
                         contentType = APPLICATION_JSON
-                    }.andExpect { status { isBadRequest() } }
+                    }.andExpect {
+                        status {
+                            isBadRequest()
+                        }
+                    }
                 }
             }
 
@@ -118,7 +142,11 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON
                         content = """["   "]"""
-                    }.andExpect { status { isBadRequest() } }
+                    }.andExpect {
+                        status {
+                            isBadRequest()
+                        }
+                    }
                 }
             }
 
@@ -127,7 +155,11 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON
                         content = """[""]"""
-                    }.andExpect { status { isBadRequest() } }
+                    }.andExpect {
+                        status {
+                            isBadRequest()
+                        }
+                    }
                 }
             }
 
@@ -135,7 +167,11 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                 Then("returnerer 400") {
                     mockMvc.post("/api/v1/bulk/ccf/${ansattId.verdi}/KJERNE_REGELTYPE") {
                         contentType = APPLICATION_JSON
-                    }.andExpect { status { isBadRequest() } }
+                    }.andExpect {
+                        status {
+                            isBadRequest()
+                        }
+                    }
                 }
             }
         }

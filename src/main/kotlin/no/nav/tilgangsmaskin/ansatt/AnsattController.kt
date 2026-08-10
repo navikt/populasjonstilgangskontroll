@@ -1,13 +1,20 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import io.swagger.v3.oas.annotations.Operation
-import no.nav.tilgangsmaskin.ansatt.AnsattController.Companion.DEV_ANSATT_CONTROLLER_TAG_DESCRIPTION
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.felles.rest.DevController
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+
+private const val DEV_ANSATT_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.dev.ansatt.tag.description"
+private const val SUMMARY_ANSATT = "${MSG}openapi.dev.ansatt.ansatt.summary"
+private const val DESCRIPTION_ANSATT = "${MSG}openapi.dev.ansatt.ansatt.description"
+private const val SUMMARY_PROXY_ENHET = "${MSG}openapi.dev.ansatt.proxy.enhet.summary"
+private const val DESCRIPTION_PROXY_ENHET = "${MSG}openapi.dev.ansatt.proxy.enhet.description"
+private const val SUMMARY_PROXY_ENHETER = "${MSG}openapi.dev.ansatt.proxy.enheter.summary"
+private const val DESCRIPTION_PROXY_ENHETER = "${MSG}openapi.dev.ansatt.proxy.enheter.description"
 
 
 @DevController(
@@ -30,16 +37,4 @@ class AnsattController(
     @GetMapping("enheter/{ansattId}")
     @Operation(summary = SUMMARY_PROXY_ENHETER, description = DESCRIPTION_PROXY_ENHETER)
     fun enheter(@PathVariable ansattId: AnsattId) = proxy.enheter(ansattId)
-
-    companion object {
-        private const val DEV_ANSATT_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.dev.ansatt.tag.description"
-
-        private const val SUMMARY_ANSATT = "${MSG}openapi.dev.ansatt.ansatt.summary"
-        private const val DESCRIPTION_ANSATT = "${MSG}openapi.dev.ansatt.ansatt.description"
-        private const val SUMMARY_PROXY_ENHET = "${MSG}openapi.dev.ansatt.proxy.enhet.summary"
-        private const val DESCRIPTION_PROXY_ENHET = "${MSG}openapi.dev.ansatt.proxy.enhet.description"
-        private const val SUMMARY_PROXY_ENHETER = "${MSG}openapi.dev.ansatt.proxy.enheter.summary"
-        private const val DESCRIPTION_PROXY_ENHETER = "${MSG}openapi.dev.ansatt.proxy.enheter.description"
-    }
-
 }

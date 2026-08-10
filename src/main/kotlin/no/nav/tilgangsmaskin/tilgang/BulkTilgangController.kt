@@ -10,10 +10,10 @@ import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.security.RequireCCF
 import no.nav.tilgangsmaskin.felles.security.RequireOBO
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withAnsattContext
+import org.slf4j.LoggerFactory.getLogger
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
-import no.nav.tilgangsmaskin.tilgang.BulkTilgangController.Companion.BULK_TILGANG_CONTROLLER_TAG_DESCRIPTION
 import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons
 import no.nav.tilgangsmaskin.tilgang.openapi.BulkSwaggerApiRespons
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
@@ -25,6 +25,13 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseStatus
 
+private const val BULK_TILGANG_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.tilgang.tag.description"
+private const val SUMMARY_BULK = "${MSG}openapi.tilgang.bulk.summary"
+private const val DESCRIPTION_BULK_OBO = "${MSG}openapi.tilgang.bulk.obo.description"
+private const val DESCRIPTION_BULK_OBO_REGELTYPE = "${MSG}openapi.tilgang.bulk.obo.regeltype.description"
+private const val DESCRIPTION_BULK_CCF = "${MSG}openapi.tilgang.bulk.ccf.description"
+private const val DESCRIPTION_BULK_CCF_REGELTYPE = "${MSG}openapi.tilgang.bulk.ccf.regeltype.description"
+
 
 @ProdController
 @ResponseStatus(MULTI_STATUS)
@@ -33,7 +40,9 @@ class BulkTilgangController(
     private val regelTjeneste: RegelTjeneste,
     private val validator: Validator,
     private val token: Token
-) : TilgangControllerBase() {
+) {
+
+    private val log = getLogger(javaClass)
 
     @PostMapping("bulk/obo")
     @RequireOBO
@@ -90,14 +99,5 @@ class BulkTilgangController(
             .flatMap { validator.validate(it).asSequence() }
             .firstOrNull()
             ?.let { sjekk(false, BAD_REQUEST, it.message) }
-    }
-
-    companion object {
-        private const val BULK_TILGANG_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.tilgang.tag.description"
-        private const val SUMMARY_BULK = "${MSG}openapi.tilgang.bulk.summary"
-        private const val DESCRIPTION_BULK_OBO = "${MSG}openapi.tilgang.bulk.obo.description"
-        private const val DESCRIPTION_BULK_OBO_REGELTYPE = "${MSG}openapi.tilgang.bulk.obo.regeltype.description"
-        private const val DESCRIPTION_BULK_CCF = "${MSG}openapi.tilgang.bulk.ccf.description"
-        private const val DESCRIPTION_BULK_CCF_REGELTYPE = "${MSG}openapi.tilgang.bulk.ccf.regeltype.description"
     }
 }

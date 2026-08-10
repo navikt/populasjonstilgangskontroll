@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.felles.security
 
-import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase.Companion.PROD_BASE_PATH
-import no.nav.tilgangsmaskin.tilgang.TilgangControllerBase.Companion.UNPROTECTED_ENDPOINTS
+import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod.POST
@@ -22,6 +22,8 @@ import org.springframework.security.oauth2.client.web.client.support.OAuth2RestC
 import org.springframework.security.web.authentication.HttpStatusEntryPoint
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 
+
+private val UNPROTECTED_ENDPOINTS = arrayOf("/$DEV/**", "/swagger-ui/**", "/v3/api-docs/**", "/monitoring/**")
 
 @Configuration
 @EnableMethodSecurity

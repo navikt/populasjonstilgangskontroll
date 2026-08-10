@@ -51,7 +51,7 @@ import java.util.concurrent.atomic.AtomicBoolean
     classes = [SecurityTestApplication::class]
 )
 @AutoConfigureMockMvc
-class TilgangControllerTest(private val mockMvc: MockMvc, private val jsonMapper: JsonMapper) : BehaviorSpec() {
+class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: JsonMapper) : BehaviorSpec() {
 
     @MockkBean
     private lateinit var regelTjeneste: RegelTjeneste
@@ -246,11 +246,11 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val jsonMapper
             OID to UUID.randomUUID().toString())
     ).serialize()
 
-    private fun MvcResult.shouldHaveBoody(httpStatus: HttpStatus, expectedDetail: String? = null) =
-        assertSoftly(jsonMapper.readValue<ProblemDetail>(response.contentAsByteArray)) {
+    private fun MvcResult.shouldHaveBoody(httpStatus: HttpStatus, msg: String? = null) =
+        assertSoftly(mapper.readValue<ProblemDetail>(response.contentAsByteArray)) {
             status shouldBe httpStatus.value()
             title shouldBe httpStatus.reasonPhrase
-            expectedDetail?.let { detail shouldBe it }
+            msg?.let { detail shouldBe it }
         }
 
     companion object {

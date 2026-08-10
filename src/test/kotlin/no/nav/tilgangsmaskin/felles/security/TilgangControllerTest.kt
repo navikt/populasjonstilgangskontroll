@@ -90,8 +90,12 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val jsonMapper
                                         contentType = APPLICATION_JSON
                                         content = "\"${BRUKER_ID.verdi}\""
                                     }.andExpect {
-                                        status { isUnauthorized() }
-                                        content { contentType(APPLICATION_PROBLEM_JSON) }
+                                        status {
+                                            isUnauthorized()
+                                        }
+                                        content {
+                                            contentType(APPLICATION_PROBLEM_JSON)
+                                        }
                                     }.andReturn().shouldHaveBoody(UNAUTHORIZED)
                 }
             }
@@ -123,8 +127,12 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val jsonMapper
                                         contentType = APPLICATION_JSON
                                         content = "\"${BRUKER_ID.verdi}\""
                                     }.andExpect {
-                                        status { isUnauthorized() }
-                                        content { contentType(APPLICATION_PROBLEM_JSON) }
+                                        status {
+                                            isUnauthorized()
+                                        }
+                                        content {
+                                            contentType(APPLICATION_PROBLEM_JSON)
+                                        }
                                     }.andReturn().shouldHaveBoody(UNAUTHORIZED)
                 }
             }

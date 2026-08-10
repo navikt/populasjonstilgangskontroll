@@ -10,11 +10,13 @@ import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.stereotype.Component
 import tools.jackson.databind.json.JsonMapper
 
+internal const val MANGLER_BEARER_TOKEN = "Mangler gyldig Bearer-token"
+
 @Component
 class OAuth2JsonAuthenticationEntryPoint(private val jsonMapper: JsonMapper) : AuthenticationEntryPoint {
     override fun commence(req: HttpServletRequest, res: HttpServletResponse, _: AuthenticationException) {
         res.status = UNAUTHORIZED.value()
         res.contentType = APPLICATION_PROBLEM_JSON_VALUE
-        res.writer.use { jsonMapper.writeValue(it, ProblemDetail.forStatusAndDetail(UNAUTHORIZED, "Mangler gyldig Bearer-token")) }
+        res.writer.use { jsonMapper.writeValue(it, ProblemDetail.forStatusAndDetail(UNAUTHORIZED, MANGLER_BEARER_TOKEN)) }
     }
 }

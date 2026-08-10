@@ -7,10 +7,12 @@ import org.springframework.stereotype.Component
 
 @Component("tokenTypeAuthorization")
 class OAuth2TokenTypeAuthorization(private val token: Token) {
-    fun require(type: TokenType): Boolean {
+    fun require(type: TokenType) =
         if (token.type != type) throw AccessDeniedException(mismatch(type, token.type))
-        return true
-    }
+        else  {
+            true
+        }
+
     companion object {
         fun mismatch(required: TokenType, actual: TokenType) =
             "Forventet ${required.name}-token, fikk ${actual.name}"

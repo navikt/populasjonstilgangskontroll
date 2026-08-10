@@ -1,7 +1,9 @@
 package no.nav.tilgangsmaskin.felles.security
 
 import com.ninjasquad.springmockk.MockkBean
+import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.verify
@@ -27,12 +29,18 @@ import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
+import org.springframework.http.ProblemDetail
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
@@ -41,7 +49,7 @@ import java.util.concurrent.atomic.AtomicBoolean
     classes = [SecurityTestApplication::class]
 )
 @AutoConfigureMockMvc
-class TilgangControllerTest(private val mockMvc: MockMvc) : BehaviorSpec() {
+class TilgangControllerTest(private val mockMvc: MockMvc, private val jsonMapper: JsonMapper) : BehaviorSpec() {
 
     @MockkBean
     private lateinit var regelTjeneste: RegelTjeneste
@@ -80,7 +88,9 @@ class TilgangControllerTest(private val mockMvc: MockMvc) : BehaviorSpec() {
                         contentType = APPLICATION_JSON
                         content = "\"${BRUKER_ID.verdi}\""
                     }.andExpect {
-                        status { isUnauthorized() }
+                        status {
+                            isUnauthorized()
+                        }
                     }
                 }
             }
@@ -96,7 +106,9 @@ class TilgangControllerTest(private val mockMvc: MockMvc) : BehaviorSpec() {
                         contentType = APPLICATION_JSON
                         content = "\"${BRUKER_ID.verdi}\""
                     }.andExpect {
-                        status { isNoContent() }
+                        status {
+                            isNoContent()
+                        }
                     }
 
                     verify { regelTjeneste.kompletteRegler(ANSATT_ID, BRUKER_ID.verdi) }
@@ -112,7 +124,9 @@ class TilgangControllerTest(private val mockMvc: MockMvc) : BehaviorSpec() {
                         contentType = APPLICATION_JSON
                         content = "\"${BRUKER_ID.verdi}\""
                     }.andExpect {
-                        status { isUnauthorized() }
+                        status {
+                            isUnauthorized()
+                        }
                     }
                 }
             }
@@ -132,30 +146,38 @@ class TilgangControllerTest(private val mockMvc: MockMvc) : BehaviorSpec() {
                         status {
                             isForbidden()
                         }
-                        jsonPath("$.message") { value(mismatch(OBO, CCF)) }
-                    }
+                        content {
+                            contentType(APPLICATION_PROBLEM_JSON)
+                        }
+                    }.andReturn().shouldBeForbidden(mismatch(OBO, CCF))
 
                     mockMvc.post("/api/v1/bulk/obo") {
                         headers { setBearerAuth(jwt(AUDIENCE)) }
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"${BRUKER_ID.verdi}","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect {
-                        status { isForbidden() }
-                        jsonPath("$.status") { value(403) }
-                        jsonPath("$.error") { value("Forbidden") }
-                        jsonPath("$.message") { value(mismatch(OBO, CCF)) }
-                    }
+                        status {
+                            isForbidden()
+                        }
+                        content {
+                            contentType(APPLICATION_PROBLEM_JSON)
+                        }
+                    }.andReturn().shouldBeForbidden(mismatch(OBO, CCF))
                  
                     mockMvc.post("/api/v1/overstyr") {
-                        headers { setBearerAuth(jwt(AUDIENCE)) }
+                        headers {
+                            setBearerAuth(jwt(AUDIENCE))
+                        }
                         contentType = APPLICATION_JSON
                         content = """{"brukerId":"${BRUKER_ID.verdi}","begrunnelse":"En god begrunnelse","gyldigtil":"$gyldigTil"}"""
                     }.andExpect {
-                        status { isForbidden() }
-                        jsonPath("$.status") { value(403) }
-                        jsonPath("$.error") { value("Forbidden") }
-                        jsonPath("$.message") { value(mismatch(OBO, CCF)) }
-                    }
+                        status {
+                            isForbidden()
+                        }
+                        content {
+                            contentType(APPLICATION_PROBLEM_JSON)
+                        }
+                    }.andReturn().shouldBeForbidden(mismatch(OBO, CCF))
                 }
             }
         }
@@ -166,22 +188,34 @@ class TilgangControllerTest(private val mockMvc: MockMvc) : BehaviorSpec() {
                     every { token.type } returns OBO
 
                     mockMvc.post("/api/v1/ccf/komplett/${ANSATT_ID.verdi}") {
-                        headers { setBearerAuth(jwt(AUDIENCE)) }
+                        headers {
+                            setBearerAuth(jwt(AUDIENCE))
+                        }
                         contentType = APPLICATION_JSON
                         content = "\"${BRUKER_ID.verdi}\""
                     }.andExpect {
-                        status { isForbidden() }
-                        jsonPath("$.message") { value("Forventet CCF-token, fikk OBO") }
-                    }
+                        status {
+                            isForbidden()
+                        }
+                        content {
+                            contentType(APPLICATION_PROBLEM_JSON)
+                        }
+                    }.andReturn().shouldBeForbidden(mismatch(CCF, OBO))
 
                     mockMvc.post("/api/v1/bulk/ccf/${ANSATT_ID.verdi}") {
-                        headers { setBearerAuth(jwt(AUDIENCE)) }
+                        headers {
+                            setBearerAuth(jwt(AUDIENCE))
+                        }
                         contentType = APPLICATION_JSON
                         content = """[{"brukerId":"${BRUKER_ID.verdi}","type":"KOMPLETT_REGELTYPE"}]"""
                     }.andExpect {
-                        status { isForbidden() }
-                        jsonPath("$.message") { value("Forventet CCF-token, fikk OBO") }
-                    }
+                        status {
+                            isForbidden()
+                        }
+                        content {
+                            contentType(APPLICATION_PROBLEM_JSON)
+                        }
+                    }.andReturn().shouldBeForbidden(mismatch(CCF, OBO))
                 }
             }
         }
@@ -190,7 +224,9 @@ class TilgangControllerTest(private val mockMvc: MockMvc) : BehaviorSpec() {
             When("request mangler bearer-token") {
                 Then("returnerer 200") {
                     mockMvc.get("/v3/api-docs").andExpect {
-                        status { isOk() }
+                        status {
+                            isOk()
+                        }
                     }
                 }
             }
@@ -202,6 +238,13 @@ class TilgangControllerTest(private val mockMvc: MockMvc) : BehaviorSpec() {
             NAVIDENT to ANSATT_ID.verdi,
             OID to UUID.randomUUID().toString())
     ).serialize()
+
+    private fun MvcResult.shouldBeForbidden(expectedDetail: String) =
+        assertSoftly(jsonMapper.readValue<ProblemDetail>(response.contentAsByteArray)) {
+            status shouldBe FORBIDDEN.value()
+            title shouldBe FORBIDDEN.reasonPhrase
+            detail shouldBe expectedDetail
+        }
 
     companion object {
         private val mockOAuth2 = MockOAuth2Server()

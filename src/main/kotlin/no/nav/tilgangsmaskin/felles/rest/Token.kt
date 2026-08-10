@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Component
 import java.util.*
 
+private const val GROUPS = "groups"
+
 @Component
 class Token {
 
@@ -54,7 +56,6 @@ class Token {
         requireNotNull(ansattId) { "Mangler ansattId i OBO-token" }
 
     companion object {
-        private const val GROUPS = "groups"
         const val APP = "app"
         const val OID = "oid"
         const val IDTYP = "idtyp"

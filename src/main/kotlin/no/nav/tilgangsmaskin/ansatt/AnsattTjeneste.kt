@@ -10,6 +10,8 @@ import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 
+private const val MEDLEM = "medlem"
+
 @Observed
 @Service
 @ConditionalOnGCP
@@ -37,9 +39,6 @@ class AnsattTjeneste(private val ansatte: NomTjeneste,
     private fun tell(status: Boolean) =
         teller.tell(Tags.of(MEDLEM, "$status"))
 
-    companion object {
-        private const val MEDLEM = "medlem"
-    }
 }
 
 

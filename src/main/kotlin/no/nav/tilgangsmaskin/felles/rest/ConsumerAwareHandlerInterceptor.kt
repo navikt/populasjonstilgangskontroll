@@ -8,6 +8,8 @@ import org.slf4j.MDC
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor
 
+private const val METRIC = "http_requests_by_remote_system"
+
 @Component
 class ConsumerAwareHandlerInterceptor(private val token: Token, private val registry: MeterRegistry) :
     HandlerInterceptor {
@@ -30,7 +32,6 @@ class ConsumerAwareHandlerInterceptor(private val token: Token, private val regi
     }
 
     companion object {
-        private const val METRIC = "http_requests_by_remote_system"
         const val CONSUMER_ID = "consumerId"
         const val USER_ID = "userId"
     }

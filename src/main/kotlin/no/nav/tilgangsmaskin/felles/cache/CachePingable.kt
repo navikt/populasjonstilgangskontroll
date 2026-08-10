@@ -6,6 +6,8 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.stereotype.Component
 import java.net.URI
 
+private const val PONG = "pong"
+
 @Component
 class CachePingable(
     private val cf: RedisConnectionFactory,
@@ -25,8 +27,5 @@ class CachePingable(
             }
         }
 
-    companion object {
-        private const val PONG = "pong"
-    }
 }
 

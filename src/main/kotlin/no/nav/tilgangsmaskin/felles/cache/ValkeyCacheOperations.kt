@@ -18,6 +18,9 @@ import kotlin.reflect.KClass
 import kotlin.text.Charsets.UTF_8
 import kotlin.time.TimeSource.Monotonic.markNow
 
+private val BATCH_SIZE = 10_000
+private val SCRIPT = RedisScript.of(ClassPathResource("scripts/count-all-keys.lua"), List::class.java)
+
 @Component
 class ValkeyCacheOperations(
     private val valkey: StringRedisTemplate,
@@ -191,8 +194,4 @@ class ValkeyCacheOperations(
                 null
             }
         }
-    companion object {
-        private val BATCH_SIZE  = 10_000
-        private val SCRIPT = RedisScript.of(ClassPathResource("scripts/count-all-keys.lua"), List::class.java)
-    }
 }

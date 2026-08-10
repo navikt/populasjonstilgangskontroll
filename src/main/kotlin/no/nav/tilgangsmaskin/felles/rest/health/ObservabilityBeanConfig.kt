@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.EnableAspectJAutoProxy
 import java.util.function.Function
 
+private val SENSITIVE_KEYS = setOf("password", "secret", "token", "key", "credentials", "jwk", "private_key")
+
 @Configuration
 @NoCoverageAnalysis
 @EnableAspectJAutoProxy
@@ -40,7 +42,4 @@ class ObservabilityBeanConfig {
             }
         )
 
-    companion object {
-        private val SENSITIVE_KEYS = setOf("password", "secret", "token", "key", "credentials", "jwk", "private_key")
-    }
 }

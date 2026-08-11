@@ -1,4 +1,3 @@
-import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import org.gradle.api.file.DuplicatesStrategy.EXCLUDE
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_26
 import org.springframework.boot.gradle.tasks.bundling.BootJar
@@ -24,7 +23,6 @@ plugins {
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.cyclonedx)
     alias(libs.plugins.kotest)
-    alias(libs.plugins.asciidoctor)
 }
 
 allOpen {
@@ -175,18 +173,12 @@ val generateRestDocsIndex = tasks.register<GenerateRestDocsIndexTask>("generateR
     tilgangControllerFile = layout.projectDirectory.file("src/main/kotlin/no/nav/tilgangsmaskin/tilgang/TilgangController.kt")
 }
 
-tasks.named("asciidoctor") {
+val asciidoctor = tasks.register<GenerateAsciiDocTask>("asciidoctor") {
     dependsOn(generateRestDocsIndex)
-    inputs.dir(layout.buildDirectory.dir("generated-snippets"))
-}
-
-tasks.withType<AsciidoctorTask> {
-    sourceDir(layout.buildDirectory.dir("generated-restdocs-index"))
-    baseDirFollowsSourceDir()
-    sources {
-        include("index.adoc")
-    }
-    attributes(
+    sourceFile = layout.buildDirectory.file("generated-restdocs-index/index.adoc")
+    sourceDir = layout.buildDirectory.dir("generated-restdocs-index")
+    outputDir = layout.buildDirectory.dir("docs/asciidoctor")
+    attributes.putAll(
         mapOf(
             "snippets" to layout.buildDirectory.dir("generated-snippets").get().asFile.absolutePath,
             "source-highlighter" to "highlight.js",

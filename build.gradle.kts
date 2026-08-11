@@ -60,7 +60,7 @@ repositories {
 
 dependencies {
     // Force newer jackson-databind version (required by gradle-avro-plugin)
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.22.1")
+    //implementation("com.fasterxml.jackson.core:jackson-databind:2.22.1")
 
     implementation(libs.boot.conditionals)
     implementation(libs.bundles.observability)

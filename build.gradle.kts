@@ -11,6 +11,7 @@ extra["netty.version"] = "4.2.16.Final"  // TODO Midlertidig
 extra["jackson3.version"] = "3.2.0"       // TODO Midlertidig
 
 version = "1.0.1"
+val buildVersionValue = version.toString()
 
 plugins {
     jacoco
@@ -131,35 +132,18 @@ java {
     }
 }
 
-val generateGitProperties = tasks.register("generateGitProperties") {
+val generateGitProperties = tasks.register<GenerateGitPropertiesTask>("generateGitProperties") {
     description = "Generates git.properties file with Git metadata"
-    val outputFile = layout.buildDirectory.file("resources/main/git.properties")
-    outputs.file(outputFile)
+    outputFile = layout.buildDirectory.file("resources/main/git.properties")
+    buildVersion = buildVersionValue
+}
 
-    fun git(vararg args: String) = providers.exec {
-        commandLine("git", *args)
-        isIgnoreExitValue = true
-    }.standardOutput.asText.map { it.trim() }
+val cleanGeneratedSnippets = tasks.register<Delete>("cleanGeneratedSnippets") {
+    delete(layout.buildDirectory.dir("generated-snippets"))
+}
 
-    val branch      = git("rev-parse", "--abbrev-ref", "HEAD")
-    val commitId    = git("rev-parse", "HEAD")
-    val commitShort = git("rev-parse", "--short", "HEAD")
-    val commitTime  = git("log", "-1", "--format=%cI")
-    val dirty       = git("status", "--porcelain").map { it.isNotEmpty() }
-
-    doLast {
-        outputFile.get().asFile.apply {
-            parentFile.mkdirs()
-            writeText(buildString {
-                appendLine("git.branch=${branch.get()}")
-                appendLine("git.commit.id=${commitId.get()}")
-                appendLine("git.commit.id.abbrev=${commitShort.get()}")
-                appendLine("git.commit.time=${commitTime.get()}")
-                appendLine("git.dirty=${dirty.get()}")
-                appendLine("git.build.version=${project.version}")
-            })
-        }
-    }
+val cleanGeneratedRestDocsIndex = tasks.register<Delete>("cleanGeneratedRestDocsIndex") {
+    delete(layout.buildDirectory.dir("generated-restdocs-index"))
 }
 
 tasks.named("processResources") {
@@ -168,11 +152,7 @@ tasks.named("processResources") {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
-
-    doFirst {
-        delete(layout.buildDirectory.dir("generated-snippets"))
-        delete(layout.buildDirectory.dir("generated-restdocs-index"))
-    }
+    dependsOn(cleanGeneratedSnippets, cleanGeneratedRestDocsIndex)
 
     maxHeapSize = "4g"
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)

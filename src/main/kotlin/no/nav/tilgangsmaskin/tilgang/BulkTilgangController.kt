@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.tilgang
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import jakarta.validation.Validator
 import jakarta.validation.constraints.NotBlank
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.ProdController
@@ -38,9 +37,7 @@ private const val DESCRIPTION_BULK_CCF_REGELTYPE = "${MSG}openapi.tilgang.bulk.c
 @Tag(name = "BulkTilgangController", description = BULK_TILGANG_CONTROLLER_TAG_DESCRIPTION)
 class BulkTilgangController(
     private val regelTjeneste: RegelTjeneste,
-    private val validator: Validator,
-    private val token: Token
-) {
+    private val token: Token) {
 
     private val log = getLogger(javaClass)
 
@@ -85,19 +82,11 @@ class BulkTilgangController(
             if (specs.isNotEmpty()) {
                 sjekk(specs.size <= 1000, CONTENT_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
                 sjekk(specs.none { it.brukerId.isBlank() }, BAD_REQUEST, "brukerId kan ikke være tom")
-                valider(specs)
                 regelTjeneste.bulkRegler(ansatt, specs)
             } else {
                 log.debug("Ingen brukerId-er oppgitt i bulk forespørsel for {}", ansatt)
                 AggregertBulkRespons(ansatt)
             }
         }
-    }
-
-    private fun valider(specs: Set<BrukerIdOgRegelsett>) {
-        specs.asSequence()
-            .flatMap { validator.validate(it).asSequence() }
-            .firstOrNull()
-            ?.let { sjekk(false, BAD_REQUEST, it.message) }
     }
 }

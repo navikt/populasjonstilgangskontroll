@@ -108,7 +108,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             mockMvc = standaloneSetup(
                 TilgangController(regelTjeneste, token),
                 EnkeltTilgangController(enkeltTilgangTjeneste, token),
-                BulkTilgangController(regelTjeneste, validator, token)
+                BulkTilgangController(regelTjeneste, token)
             )
                 .setControllerAdvice(ProblemDetailExceptionHandler())
                 .setValidator(validator)

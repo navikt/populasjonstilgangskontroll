@@ -138,6 +138,7 @@ val generateGitProperties = tasks.register("generateGitProperties") {
     description = "Generates git.properties file with Git metadata"
     val outputFile = layout.buildDirectory.file("resources/main/git.properties")
     outputs.file(outputFile)
+    val buildVersion = version.toString()
 
     fun git(vararg args: String) = providers.exec {
         commandLine("git", *args)
@@ -159,7 +160,7 @@ val generateGitProperties = tasks.register("generateGitProperties") {
                 appendLine("git.commit.id.abbrev=${commitShort.get()}")
                 appendLine("git.commit.time=${commitTime.get()}")
                 appendLine("git.dirty=${dirty.get()}")
-                appendLine("git.build.version=${project.version}")
+                appendLine("git.build.version=$buildVersion")
             })
         }
     }

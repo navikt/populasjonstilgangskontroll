@@ -93,7 +93,9 @@ dependencies {
     testImplementation(libs.caffeine)
     testImplementation(libs.bundles.kotest)
     testImplementation(libs.spring.boot.micrometer.metrics.test)
-    testImplementation(libs.bundles.testcontainers)
+    testImplementation(libs.testcontainers.redis)
+    testImplementation(libs.testcontainers.junit.jupiter)
+    testImplementation(libs.testcontainers.postgresql)
     testImplementation(libs.spring.boot.starter.data.jpa.test)
     testImplementation(libs.spring.boot.starter.data.redis.test)
     testImplementation(libs.spring.boot.starter.kafka.test)
@@ -110,6 +112,7 @@ dependencies {
 
 dependencyManagement {
     imports {
+        mavenBom(libs.testcontainers.bom.get().toString())
         mavenBom(libs.opentelemetry.instrumentation.bom.get().toString())
         mavenBom(libs.kotest.bom.get().toString())
     }

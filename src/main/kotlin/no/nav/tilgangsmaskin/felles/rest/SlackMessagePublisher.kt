@@ -7,6 +7,7 @@ import com.slack.api.model.block.composition.BlockCompositions.markdownText
 import com.slack.api.model.block.composition.BlockCompositions.plainText
 import com.slack.api.webhook.Payload
 import com.slack.api.webhook.Payload.builder
+import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
 import org.slf4j.LoggerFactory.getLogger
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component
 /**
  * Publiserer meldinger til Slack via incoming webhook.
  */
-@Component
+@ConditionalOnNotProd
 class SlackMessagePublisher(
     @param:Value("\${slack.webhook:}") private val url: String) : MessagePublisher {
 

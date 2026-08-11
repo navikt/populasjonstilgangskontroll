@@ -1,3 +1,4 @@
+import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import org.gradle.api.file.DuplicatesStrategy.EXCLUDE
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_26
 import org.springframework.boot.gradle.tasks.bundling.BootJar
@@ -10,7 +11,6 @@ extra["netty.version"] = "4.2.16.Final"  // TODO Midlertidig
 extra["jackson3.version"] = "3.2.0"       // TODO Midlertidig
 
 version = "1.0.1"
-val buildVersionValue = version.toString()
 
 plugins {
     jacoco
@@ -23,6 +23,7 @@ plugins {
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.cyclonedx)
     alias(libs.plugins.kotest)
+    alias(libs.plugins.asciidoctor)
 }
 
 allOpen {
@@ -130,18 +131,35 @@ java {
     }
 }
 
-val generateGitProperties = tasks.register<GenerateGitPropertiesTask>("generateGitProperties") {
+val generateGitProperties = tasks.register("generateGitProperties") {
     description = "Generates git.properties file with Git metadata"
-    outputFile = layout.buildDirectory.file("resources/main/git.properties")
-    buildVersion = buildVersionValue
-}
+    val outputFile = layout.buildDirectory.file("resources/main/git.properties")
+    outputs.file(outputFile)
 
-val cleanGeneratedSnippets = tasks.register<Delete>("cleanGeneratedSnippets") {
-    delete(layout.buildDirectory.dir("generated-snippets"))
-}
+    fun git(vararg args: String) = providers.exec {
+        commandLine("git", *args)
+        isIgnoreExitValue = true
+    }.standardOutput.asText.map { it.trim() }
 
-val cleanGeneratedRestDocsIndex = tasks.register<Delete>("cleanGeneratedRestDocsIndex") {
-    delete(layout.buildDirectory.dir("generated-restdocs-index"))
+    val branch      = git("rev-parse", "--abbrev-ref", "HEAD")
+    val commitId    = git("rev-parse", "HEAD")
+    val commitShort = git("rev-parse", "--short", "HEAD")
+    val commitTime  = git("log", "-1", "--format=%cI")
+    val dirty       = git("status", "--porcelain").map { it.isNotEmpty() }
+
+    doLast {
+        outputFile.get().asFile.apply {
+            parentFile.mkdirs()
+            writeText(buildString {
+                appendLine("git.branch=${branch.get()}")
+                appendLine("git.commit.id=${commitId.get()}")
+                appendLine("git.commit.id.abbrev=${commitShort.get()}")
+                appendLine("git.commit.time=${commitTime.get()}")
+                appendLine("git.dirty=${dirty.get()}")
+                appendLine("git.build.version=${project.version}")
+            })
+        }
+    }
 }
 
 tasks.named("processResources") {
@@ -150,7 +168,11 @@ tasks.named("processResources") {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
-    dependsOn(cleanGeneratedSnippets, cleanGeneratedRestDocsIndex)
+
+    doFirst {
+        delete(layout.buildDirectory.dir("generated-snippets"))
+        delete(layout.buildDirectory.dir("generated-restdocs-index"))
+    }
 
     maxHeapSize = "4g"
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
@@ -173,12 +195,18 @@ val generateRestDocsIndex = tasks.register<GenerateRestDocsIndexTask>("generateR
     tilgangControllerFile = layout.projectDirectory.file("src/main/kotlin/no/nav/tilgangsmaskin/tilgang/TilgangController.kt")
 }
 
-val asciidoctor = tasks.register<GenerateAsciiDocTask>("asciidoctor") {
+tasks.named("asciidoctor") {
     dependsOn(generateRestDocsIndex)
-    sourceFile = layout.buildDirectory.file("generated-restdocs-index/index.adoc")
-    sourceDir = layout.buildDirectory.dir("generated-restdocs-index")
-    outputDir = layout.buildDirectory.dir("docs/asciidoctor")
-    attributes.putAll(
+    inputs.dir(layout.buildDirectory.dir("generated-snippets"))
+}
+
+tasks.withType<AsciidoctorTask> {
+    sourceDir(layout.buildDirectory.dir("generated-restdocs-index"))
+    baseDirFollowsSourceDir()
+    sources {
+        include("index.adoc")
+    }
+    attributes(
         mapOf(
             "snippets" to layout.buildDirectory.dir("generated-snippets").get().asFile.absolutePath,
             "source-highlighter" to "highlight.js",

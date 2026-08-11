@@ -12,7 +12,7 @@ logbook = "4.1.0"
 mock-oauth2-server = "6.0.0"
 opentelemetry = "2.30.0"
 opentelemetry-alpha = "2.30.0-alpha"
-slack-api-client = "1.49.0"
+slack-api = "1.49.0"
 spring-boot = "4.1.0"
 spring-dependency-management = "1.1.7"
 springdoc = "3.1.0"
@@ -37,8 +37,7 @@ opentelemetry-instrumentation-annotations = { module = "io.opentelemetry.instrum
 opentelemetry-instrumentation-bom = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom", version.ref = "opentelemetry" }
 opentelemetry-logback-mdc = { module = "io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0", version.ref = "opentelemetry-alpha" }
 postgresql = { module = "org.postgresql:postgresql" }
-slack-api = { module = "com.slack.api:slack-api-client", version.ref = "slack-api-client" }
-slack-api-kotlin = { module = "com.slack.api:slack-api-client-kotlin-extension", version.ref = "slack-api-client" }
+slack = { module = "com.slack.api:slack-api-client-kotlin-extension", version.ref = "slack-api" }
 spring-boot-micrometer-metrics-test = { module = "org.springframework.boot:spring-boot-micrometer-metrics-test" }
 spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 spring-boot-starter-cache = { module = "org.springframework.boot:spring-boot-starter-cache" }
@@ -73,7 +72,6 @@ testcontainers-redis = { module = "com.redis:testcontainers-redis" }
 [bundles]
 kotest = ["kotest-runner-junit5", "kotest-assertions-core", "kotest-extensions-spring"]
 testcontainers = ["testcontainers-redis", "testcontainers-junit-jupiter", "testcontainers-postgresql"]
-slack = ["slack-api", "slack-api-kotlin"]
 observability = ["opentelemetry-instrumentation-annotations", "opentelemetry-logback-mdc", "micrometer-registry-prometheus"]
 
 [plugins]

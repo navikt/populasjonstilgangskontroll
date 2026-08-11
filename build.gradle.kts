@@ -64,7 +64,7 @@ dependencies {
 
     implementation(libs.boot.conditionals)
     implementation(libs.bundles.observability)
-    implementation(libs.bundles.slack)
+    implementation(libs.slack)
     implementation(libs.commons.pool2)
     implementation(libs.confluent.kafka.avro.serializer)
     implementation(libs.flyway.database.postgresql)

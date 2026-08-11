@@ -22,15 +22,17 @@ class SlackApplicationReadyNotifier(
     @EventListener(ApplicationReadyEvent::class)
     fun onApplicationReady() {
         val key = "startup-slack::$cluster::$appName::$image"
-        val firstPublisher = runCatching {
+
+        if (erFørstePublisher(key)) {
+            publisher.info("Applikasjon klar", "$appName er startet i cluster '$cluster' med image '$image'")
+        }
+        else log.trace("IKKE første publisher, hopper over notifikasjon")
+    }
+
+    private fun erFørstePublisher(key: String): Boolean =
+        runCatching {
             valkey.opsForValue().setIfAbsent(key, "sent", ofDays(30)) == true
         }.onFailure {
             log.warn("Kunne ikke reservere startup-slack nøkkel i Valkey", it)
         }.getOrDefault(false)
-
-        if (firstPublisher) {
-            publisher.info("Applikasjon klar", "$appName er startet i cluster '$cluster' med image '$image'")
-        }
-        else log.info("IKKE first publisher, hopper over notifikasjon")
-    }
 }

@@ -30,6 +30,7 @@ private const val DESCRIPTION_BULK_OBO = "${MSG}openapi.tilgang.bulk.obo.descrip
 private const val DESCRIPTION_BULK_OBO_REGELTYPE = "${MSG}openapi.tilgang.bulk.obo.regeltype.description"
 private const val DESCRIPTION_BULK_CCF = "${MSG}openapi.tilgang.bulk.ccf.description"
 private const val DESCRIPTION_BULK_CCF_REGELTYPE = "${MSG}openapi.tilgang.bulk.ccf.regeltype.description"
+private const val MAX = 1000
 
 
 @ProdController
@@ -80,7 +81,7 @@ class BulkTilgangController(
     private fun bulkOppslag(ansatt: AnsattId, specs: Set<BrukerIdOgRegelsett>): AggregertBulkRespons {
         return withAnsattContext(ansatt) {
             if (specs.isNotEmpty()) {
-                sjekk(specs.size <= 1000, CONTENT_TOO_LARGE, "Maksimalt 1000 brukerId-er kan sendes i en bulk forespørsel")
+                sjekk(specs.size <= MAX, CONTENT_TOO_LARGE, "Maksimalt $MAX brukerId-er kan sendes i en bulk forespørsel")
                 sjekk(specs.none { it.brukerId.isBlank() }, BAD_REQUEST, "brukerId kan ikke være tom")
                 regelTjeneste.bulkRegler(ansatt, specs)
             } else {

@@ -22,7 +22,7 @@ class OAuth2AuthorityAddingJwtAuthenticationConverterTest : BehaviorSpec({
         }
 
         When("azp_name mangler") {
-            Then("exception kastes") {
+            Then("inneholder ikke SYSTEM-authority") {
                val jwt = Jwt.withTokenValue("token")
                     .header("alg", "none")
                     .claim("sub", "subject")

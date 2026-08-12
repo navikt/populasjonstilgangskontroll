@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.security
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldNotContain
@@ -18,7 +17,7 @@ class OAuth2AuthorityAddingJwtAuthenticationConverterTest : BehaviorSpec({
                     .claim(AZP_NAME, "dev-gcp:tilgangsmaskin:gosys")
                     .build()
 
-                converter.convert(jwt).authorities.map { it.authority } shouldContain "SYSTEM_gosys"
+                converter.convert(jwt).authorities.map { it.authority } shouldContain "${SYSTEM_AUTHORITY_PREFIX}gosys"
             }
         }
 
@@ -29,7 +28,7 @@ class OAuth2AuthorityAddingJwtAuthenticationConverterTest : BehaviorSpec({
                     .claim("sub", "subject")
                     .build()
 
-                converter.convert(jwt).authorities.map { it.authority }.shouldNotContain("SYSTEM_gosys")
+                converter.convert(jwt).authorities.map { it.authority }.shouldNotContain("${SYSTEM_AUTHORITY_PREFIX}gosys")
             }
         }
     }

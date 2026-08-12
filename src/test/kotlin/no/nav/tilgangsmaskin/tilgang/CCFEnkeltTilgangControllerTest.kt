@@ -19,7 +19,8 @@ class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                 Then("returnerer 204 ved tilgang") {
                     justRun { regelTjeneste.kompletteRegler(ansattId, brukerId) }
                     mockMvc.post("$PROD_BASE_PATH/ccf/komplett/${ansattId.verdi}") {
-                        contentType = APPLICATION_JSON; content = "\"$brukerId\""
+                        contentType = APPLICATION_JSON
+                        content = "\"$brukerId\""
                     }.andExpect {
                         status {
                             isNoContent()

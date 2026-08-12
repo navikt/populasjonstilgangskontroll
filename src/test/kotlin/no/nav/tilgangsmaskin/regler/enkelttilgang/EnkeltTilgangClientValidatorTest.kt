@@ -9,8 +9,7 @@ import no.nav.tilgangsmaskin.felles.security.StrictEnkeltTilgangAuthorizationMan
 import org.springframework.security.authentication.TestingAuthenticationToken
 
 class EnkeltTilgangClientValidatorTest : BehaviorSpec({
-    val cfg = EnkeltTilgangConfig()
-    val manager = StrictEnkeltTilgangAuthorizationManager(cfg.systemer)
+    val manager = StrictEnkeltTilgangAuthorizationManager(EnkeltTilgangConfig().systemer)
 
     fun decisionFor(systemNavn: String?) =
         manager.authorize(
@@ -28,7 +27,7 @@ class EnkeltTilgangClientValidatorTest : BehaviorSpec({
         ).isGranted
 
     Given("autorisasjon for overstyring") {
-        cfg.systemer.forEach { konsument ->
+        EnkeltTilgangConfig().systemer.forEach { konsument ->
             When("konsument er godkjent ($konsument)") {
                 Then("tilgang gis") {
                     decisionFor(konsument).shouldBeTrue()

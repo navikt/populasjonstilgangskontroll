@@ -192,7 +192,7 @@ springdoc:
     csrf:
       enabled: true
 valkey:
-  timeout: 5s
+  timeout: 10s
   connect-timeout: 10s
   username: ${valkey.username.${nais.cluster.cache}}
   password: ${valkey.password.${nais.cluster.cache}}

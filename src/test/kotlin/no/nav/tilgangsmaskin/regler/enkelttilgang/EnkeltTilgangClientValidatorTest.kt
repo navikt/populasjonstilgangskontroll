@@ -3,20 +3,30 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
-import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.AZP_NAME
 import no.nav.tilgangsmaskin.felles.security.StrictEnkeltTilgangAuthorizationManager
 import org.springframework.security.authentication.TestingAuthenticationToken
+import org.springframework.security.oauth2.jwt.Jwt
 
 class EnkeltTilgangClientValidatorTest : BehaviorSpec({
     val cfg = EnkeltTilgangConfig()
-    val token = mockk<Token>()
-    val manager = StrictEnkeltTilgangAuthorizationManager(token, cfg.systemer)
+    val manager = StrictEnkeltTilgangAuthorizationManager(cfg.systemer)
 
-    fun decisionFor() =
+    fun decisionFor(azpName: String?) =
         manager.authorize(
-            { TestingAuthenticationToken("principal", "credentials") },
+            {
+                val principal: Any = azpName?.let {
+                    Jwt.withTokenValue("token")
+                        .header("alg", "none")
+                        .claim(AZP_NAME, it)
+                        .build()
+                } ?: "principal"
+                TestingAuthenticationToken(
+                    principal,
+                    "credentials"
+                )
+            },
             mockk()
         ).isGranted
 
@@ -24,23 +34,20 @@ class EnkeltTilgangClientValidatorTest : BehaviorSpec({
         cfg.systemer.forEach { konsument ->
             When("konsument er godkjent ($konsument)") {
                 Then("tilgang gis") {
-                    every { token.systemNavn } returns konsument
-                    decisionFor().shouldBeTrue()
+                    decisionFor("dev-gcp:tilgangsmaskin:$konsument").shouldBeTrue()
                 }
             }
         }
 
         When("konsument er ukjent") {
             Then("tilgang nektes") {
-                every { token.systemNavn } returns "ukjent-system"
-                decisionFor().shouldBeFalse()
+                decisionFor("dev-gcp:tilgangsmaskin:ukjent-system").shouldBeFalse()
             }
         }
 
         When("systemnavn er utilgjengelig") {
             Then("tilgang nektes") {
-                every { token.systemNavn } returns "utilgjengelig"
-                decisionFor().shouldBeFalse()
+                decisionFor(null).shouldBeFalse()
             }
         }
     }

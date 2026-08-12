@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import java.time.Duration
 import java.time.Duration.ofSeconds
+import kotlin.LazyThreadSafetyMode.SYNCHRONIZED
 import kotlin.reflect.KClass
 import kotlin.text.Charsets.UTF_8
 import kotlin.time.measureTimedValue
@@ -34,9 +35,11 @@ class ValkeyCacheOperations(client: RedisClient, private val cfg: CacheConfig,
                             private val teller: ValkeyCacheTeller) : CacheOperations {
 
     private val log = getLogger(javaClass)
-    private val conn = connect(client)
-    private val batchConn = connect(client)
+    private val connDelegate = lazy(SYNCHRONIZED) { connect(client) }
+    private val batchConnDelegate = lazy(SYNCHRONIZED) { connect(client) }
 
+    private val conn by connDelegate
+    private val batchConn by batchConnDelegate
     @WithSpan
     override fun delete(cache: CacheNøkkelConfig, id: String) =
         conn.sync().del(cache.tilNøkkel(id)).also {
@@ -210,8 +213,8 @@ class ValkeyCacheOperations(client: RedisClient, private val cfg: CacheConfig,
 
     @PreDestroy
     fun closeConnections() {
-        conn.close()
-        batchConn.close()
+        if (connDelegate.isInitialized()) conn.close()
+        if (batchConnDelegate.isInitialized()) batchConn.close()
     }
 
     companion object {

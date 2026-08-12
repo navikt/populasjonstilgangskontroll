@@ -24,6 +24,8 @@ import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 
+const val SYSTEM_AUTHORITY_PREFIX = "SYSTEM_"
+
 
 private val UNPROTECTED_ENDPOINTS = arrayOf("/$DEV/**", "/swagger-ui/**", "/v3/api-docs/**", "/monitoring/**")
 
@@ -45,9 +47,7 @@ class OAuth2SecurityBeanConfig {
                 it.accessDeniedHandler(deniedHandler)
             }
             .oauth2ResourceServer { oauth2 ->
-                oauth2.jwt {
-                    it.jwtAuthenticationConverter(OAuth2AuthorityAddingJwtAuthenticationConverter())
-                }
+                oauth2.jwt {}
                 oauth2.authenticationEntryPoint(entryPoint)
             }
             .statelessApiDefaults()

@@ -30,7 +30,6 @@ management:
   endpoints:
     web:
       base-path: /monitoring
-
 spring:
   http:
     serviceclient:

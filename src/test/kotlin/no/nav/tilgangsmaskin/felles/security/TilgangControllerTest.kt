@@ -18,8 +18,8 @@ import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
 import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
 import no.nav.tilgangsmaskin.felles.security.OAuth2TokenTypeAuthorization.Companion.mismatch
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.NAIS_CLUSTER_NAME
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
@@ -51,7 +51,6 @@ import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate.now
 import java.util.UUID
-import java.util.concurrent.atomic.AtomicBoolean
 
 private val ANSATT_ID = AnsattId("Z999999")
 private val BRUKER_ID = BrukerId("08526835670")
@@ -61,6 +60,12 @@ private const val AUDIENCE = "test-audience"
 private const val INVALID_AUDIENCE = "invalid-audience"
 private const val ISSUER_URI_PROPERTY = "spring.security.oauth2.resourceserver.jwt.issuer-uri"
 private const val AUDIENCES_PROPERTY = "spring.security.oauth2.resourceserver.jwt.audiences"
+private const val AUTHORITY_PREFIX_PROPERTY = "spring.security.oauth2.resourceserver.jwt.authority-prefix"
+private const val AUTHORITIES_CLAIM_EXPRESSION_PROPERTY =
+    "spring.security.oauth2.resourceserver.jwt.authorities-claim-expressions[0]"
+private const val AUTHORITY_PREFIX = "SYSTEM_"
+private const val AZP_NAME_LAST_SEGMENT_EXPRESSION =
+    "T(java.util.Collections).singletonList(#root['azp_name'].replaceAll('^.*:', ''))"
 
 @SpringBootTest(classes = [SecurityTestApplication::class])
 @AutoConfigureMockMvc
@@ -86,6 +91,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
         }
 
         beforeEach {
+            every { token.requiredAnsattId } returns ANSATT_ID
             justRun { regelTjeneste.kompletteRegler(any(), any()) }
             justRun { regelTjeneste.kjerneregler(any(), any()) }
             every { regelTjeneste.bulkRegler(any(), any()) } returns AggregertBulkRespons(ANSATT_ID)
@@ -335,6 +341,8 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
         fun configureJwt(registry: DynamicPropertyRegistry) {
             registry.add(ISSUER_URI_PROPERTY, mockOAuth2.issuerUrl(ISSUER_ID)::toString)
             registry.add(AUDIENCES_PROPERTY, AUDIENCE::toString)
+            registry.add(AUTHORITY_PREFIX_PROPERTY, AUTHORITY_PREFIX::toString)
+            registry.add(AUTHORITIES_CLAIM_EXPRESSION_PROPERTY, AZP_NAME_LAST_SEGMENT_EXPRESSION::toString)
             registry.add(NAIS_CLUSTER_NAME) { PROD_GCP }
         }
     }

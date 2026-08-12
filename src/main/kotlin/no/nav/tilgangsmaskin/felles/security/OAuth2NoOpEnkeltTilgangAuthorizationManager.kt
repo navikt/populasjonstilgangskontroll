@@ -1,9 +1,10 @@
 package no.nav.tilgangsmaskin.felles.security
 
 import no.nav.boot.conditionals.ConditionalOnProd
-import no.nav.tilgangsmaskin.felles.security.OAuth2AuthorityAddingJwtAuthenticationConverter.SystemAuthority
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Fallback
+import org.springframework.security.authorization.AuthorityAuthorizationManager.hasAnyAuthority
 import org.springframework.security.authorization.AuthorizationDecision
 import org.springframework.security.authorization.AuthorizationManager
 import org.springframework.security.core.Authentication
@@ -15,13 +16,15 @@ import java.util.function.Supplier
 @ConditionalOnProd
 class StrictEnkeltTilgangAuthorizationManager(
     @param:Value("\${overstyring.systemer:histark,gosys}")
-    private val tillatteSystemer: Set<String>) : AuthorizationManager<RequestAuthorizationContext> {
+    private val systemer: Set<String>) : AuthorizationManager<RequestAuthorizationContext> {
     override fun authorize(authentication: Supplier<out Authentication>, context: RequestAuthorizationContext) =
-        AuthorizationDecision(tillatteSystemer.any { tillattSystem ->
-            authentication.get().authorities.any {
-                it.authority == SystemAuthority(tillattSystem).authority
-            }
-        })
+        if (isProd) {
+            hasAnyAuthority<RequestAuthorizationContext>(
+                *systemer.map { "$SYSTEM_AUTHORITY_PREFIX$it" }.toTypedArray()
+            ).authorize(authentication, context)
+        } else {
+            AuthorizationDecision(true)
+        }
 }
 
 @Component

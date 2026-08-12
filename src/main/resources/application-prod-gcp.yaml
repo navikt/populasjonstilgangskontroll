@@ -1,4 +1,11 @@
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          authority-prefix: "SYSTEM_"
+          authorities-claim-expressions:
+            - "T(java.util.Collections).singletonList(#root['azp_name'].replaceAll('^.*:', ''))"
   messages:
     basename:
       - messages

@@ -12,11 +12,14 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.AZP_NAME
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
 import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
 import no.nav.tilgangsmaskin.felles.security.OAuth2TokenTypeAuthorization.Companion.mismatch
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.NAIS_CLUSTER_NAME
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
@@ -202,7 +205,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                         content {
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
-                    }.andReturn().withBody(FORBIDDEN, mismatch(OBO, token.type))
+                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
                 }
             }
         }
@@ -249,6 +252,54 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
             }
         }
 
+        Given("StrictEnkeltTilgangAuthorizationManager i security chain") {
+            When("request har OBO-token med tillatt SYSTEM-authority") {
+                Then("returnerer 202 for overstyr") {
+                    val gyldigTil = now().plusMonths(2)
+                    every { token.type } returns OBO
+                    every { token.requiredAnsattId } returns ANSATT_ID
+
+                    mockMvc.post("$PROD_BASE_PATH/overstyr") {
+                        headers {
+                            setBearerAuth(jwt(AUDIENCE, "dev-gcp:tilgangsmaskin:gosys"))
+                        }
+                        contentType = APPLICATION_JSON
+                        content = mapper.writeValueAsString(EnkeltTilgangData(BRUKER_ID, "En god begrunnelse", gyldigTil))
+                    }.andExpect {
+                        status {
+                            isAccepted()
+                        }
+                    }
+
+                    verify {
+                        enkeltTilgangTjeneste.registrerTilgang(any(), any())
+                    }
+                }
+            }
+
+            When("request har OBO-token med feil SYSTEM-authority") {
+                Then("avvises med 403 for overstyr") {
+                    val gyldigTil = now().plusMonths(2)
+                    every { token.type } returns OBO
+
+                    mockMvc.post("$PROD_BASE_PATH/overstyr") {
+                        headers {
+                            setBearerAuth(jwt(AUDIENCE, "dev-gcp:tilgangsmaskin:andre-system"))
+                        }
+                        contentType = APPLICATION_JSON
+                        content = mapper.writeValueAsString(EnkeltTilgangData(BRUKER_ID, "En god begrunnelse", gyldigTil))
+                    }.andExpect {
+                        status {
+                            isForbidden()
+                        }
+                        content {
+                            contentType(APPLICATION_PROBLEM_JSON)
+                        }
+                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
+                }
+            }
+        }
+
         Given("åpent endepunkt /v3/api-docs") {
             When("request mangler bearer-token") {
                 Then("returnerer 200") {
@@ -262,8 +313,11 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
         }
     }
 
-    private fun jwt(audience: String) = mockOAuth2.issueToken(
-        ISSUER_ID, SUBJECT, audience, mapOf(NAVIDENT to ANSATT_ID.verdi, OID to UUID.randomUUID().toString())
+    private fun jwt(audience: String, azpName: String? = null) = mockOAuth2.issueToken(
+        ISSUER_ID,
+        SUBJECT,
+        audience,
+        mapOf(NAVIDENT to ANSATT_ID.verdi, OID to UUID.randomUUID().toString()) + (azpName?.let { mapOf(AZP_NAME to it) }.orEmpty())
     ).serialize()
 
     private fun MvcResult.withBody(httpStatus: HttpStatus, msg: String? = null) =
@@ -275,13 +329,13 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
 
     companion object {
         private val mockOAuth2 = MockOAuth2Server()
-        private val oauthStarted = AtomicBoolean(false)
 
         @JvmStatic
         @DynamicPropertySource
         fun configureJwt(registry: DynamicPropertyRegistry) {
             registry.add(ISSUER_URI_PROPERTY, mockOAuth2.issuerUrl(ISSUER_ID)::toString)
             registry.add(AUDIENCES_PROPERTY, AUDIENCE::toString)
+            registry.add(NAIS_CLUSTER_NAME) { PROD_GCP }
         }
     }
 }

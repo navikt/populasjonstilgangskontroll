@@ -46,7 +46,7 @@ class OAuth2SecurityBeanConfig {
             }
             .oauth2ResourceServer { oauth2 ->
                 oauth2.jwt {
-                    it.jwtAuthenticationConverter(OAuth2LoggingJwtAuthenticationConverter())
+                    it.jwtAuthenticationConverter(OAuth2AuthorityAddingJwtAuthenticationConverter())
                 }
                 oauth2.authenticationEntryPoint(entryPoint)
             }

@@ -4,27 +4,26 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.mockk.mockk
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.AZP_NAME
+import no.nav.tilgangsmaskin.felles.security.OAuth2AuthorityAddingJwtAuthenticationConverter
 import no.nav.tilgangsmaskin.felles.security.StrictEnkeltTilgangAuthorizationManager
+import no.nav.tilgangsmaskin.felles.security.SystemAuthority
 import org.springframework.security.authentication.TestingAuthenticationToken
-import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 
 class EnkeltTilgangClientValidatorTest : BehaviorSpec({
     val cfg = EnkeltTilgangConfig()
     val manager = StrictEnkeltTilgangAuthorizationManager(cfg.systemer)
 
-    fun decisionFor(azpName: String?) =
+    fun decisionFor(systemNavn: String?) =
         manager.authorize(
             {
-                val principal: Any = azpName?.let {
-                    Jwt.withTokenValue("token")
-                        .header("alg", "none")
-                        .claim(AZP_NAME, it)
-                        .build()
-                } ?: "principal"
+                val authorities = systemNavn?.let {
+                    arrayOf((SystemAuthority(it)))
+                } ?: emptyArray()
                 TestingAuthenticationToken(
-                    principal,
-                    "credentials"
+                    "principal",
+                    "credentials",
+                    *authorities
                 )
             },
             mockk()
@@ -34,14 +33,14 @@ class EnkeltTilgangClientValidatorTest : BehaviorSpec({
         cfg.systemer.forEach { konsument ->
             When("konsument er godkjent ($konsument)") {
                 Then("tilgang gis") {
-                    decisionFor("dev-gcp:tilgangsmaskin:$konsument").shouldBeTrue()
+                    decisionFor(konsument).shouldBeTrue()
                 }
             }
         }
 
         When("konsument er ukjent") {
             Then("tilgang nektes") {
-                decisionFor("dev-gcp:tilgangsmaskin:ukjent-system").shouldBeFalse()
+                decisionFor("ukjent-system").shouldBeFalse()
             }
         }
 

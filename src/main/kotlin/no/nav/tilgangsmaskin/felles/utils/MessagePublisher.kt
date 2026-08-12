@@ -2,6 +2,8 @@ package no.nav.tilgangsmaskin.felles.utils
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.context.annotation.Fallback
+import org.springframework.stereotype.Component
 
 @FunctionalInterface
 interface MessagePublisher {
@@ -14,3 +16,7 @@ interface MessagePublisher {
     fun warn(header: String, msg: String) = logger.warn("$header: $msg")
 
 }
+
+@Component
+@Fallback
+class LoggingMessagePublisher : MessagePublisher

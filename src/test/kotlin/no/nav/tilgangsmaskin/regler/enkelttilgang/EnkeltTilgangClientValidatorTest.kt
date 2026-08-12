@@ -4,11 +4,9 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.mockk.mockk
-import no.nav.tilgangsmaskin.felles.security.OAuth2AuthorityAddingJwtAuthenticationConverter
+import no.nav.tilgangsmaskin.felles.security.OAuth2AuthorityAddingJwtAuthenticationConverter.SystemAuthority
 import no.nav.tilgangsmaskin.felles.security.StrictEnkeltTilgangAuthorizationManager
-import no.nav.tilgangsmaskin.felles.security.SystemAuthority
 import org.springframework.security.authentication.TestingAuthenticationToken
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 
 class EnkeltTilgangClientValidatorTest : BehaviorSpec({
     val cfg = EnkeltTilgangConfig()

@@ -1,9 +1,6 @@
 package no.nav.tilgangsmaskin.felles.security
 
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.AZP_NAME
-import no.nav.tilgangsmaskin.felles.security.OAuth2AuthorityAddingJwtAuthenticationConverter.Companion.SYSTEM_AUTHORITY_PREFIX
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.OSLO
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.convert.converter.Converter
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
@@ -11,35 +8,30 @@ import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 
+
+private const val SYSTEM_AUTHORITY_PREFIX = "SYSTEM_"
+
 class OAuth2AuthorityAddingJwtAuthenticationConverter : Converter<Jwt, AbstractAuthenticationToken> {
 
     private val delegate = JwtAuthenticationConverter()
-    private val log = getLogger(javaClass)
-
-    override fun convert(jwt: Jwt): AbstractAuthenticationToken {
-        val jwtToken = delegate.convert(jwt) as JwtAuthenticationToken
-        val authorities = linkedSetOf(*jwtToken.authorities.toTypedArray())
-        systemAuthority(jwtToken.token.getClaimAsString(AZP_NAME))?.let(authorities::add)
-        return JwtAuthenticationToken(jwtToken.token, authorities, jwtToken.name).also {
-            log.trace(
-                "JWT validert OK: system={}, authorities={}, expiresAt={}",
-                jwt.getClaimAsString(AZP_NAME),
-                it.authorities.map { a -> a.authority },
-                jwt.expiresAt?.atZone(OSLO))
+        .andThen {
+            val jwt = it as JwtAuthenticationToken
+            val authorities = linkedSetOf(*jwt.authorities.toTypedArray())
+            jwt.token.getClaimAsString(AZP_NAME)?.let { tilSystemAuthority(it) }?.let(authorities::add)
+            JwtAuthenticationToken(jwt.token, authorities, jwt.name)
         }
-    }
 
+    override fun convert(jwt: Jwt): AbstractAuthenticationToken =
+        delegate.convert(jwt) ?: throw IllegalArgumentException("JWT konvertering feilet for token med claims: ${jwt.claims}")
 
     companion object {
-        const val SYSTEM_AUTHORITY_PREFIX = "SYSTEM_"
 
-        fun systemAuthority(azpName: String?) =
-            azpName?.split(":")?.lastOrNull()?.takeIf { it.isNotBlank() }?.let { systemNavn ->
-                SystemAuthority(systemNavn)
-            }
+        fun tilSystemAuthority(azpName: String)  =
+            azpName.split(":").lastOrNull()?.takeIf { it.isNotBlank() }?.let { SystemAuthority(it) }
+
+    }
+    data class SystemAuthority(private val system: String) : GrantedAuthority {
+        override fun getAuthority() = "$SYSTEM_AUTHORITY_PREFIX$system"
     }
 }
 
-data class SystemAuthority(private val system: String) : GrantedAuthority {
-    override fun getAuthority() = "$SYSTEM_AUTHORITY_PREFIX$system"
-}

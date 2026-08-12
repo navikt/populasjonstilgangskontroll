@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.security
 
 import no.nav.boot.conditionals.ConditionalOnProd
+import no.nav.tilgangsmaskin.felles.security.OAuth2AuthorityAddingJwtAuthenticationConverter.SystemAuthority
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Fallback
 import org.springframework.security.authorization.AuthorizationDecision

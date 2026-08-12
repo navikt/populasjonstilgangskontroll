@@ -15,7 +15,7 @@ class AuditorTest : BehaviorSpec({
             Then("logger melding via klassens logger") {
                 val logger = mockk<Logger>(relaxed = true)
                 LocalAuditor(logger).info("test melding")
-                verify { logger.info("test melding", null) }
+                verify { logger.info("test melding") }
             }
         }
 
@@ -35,7 +35,7 @@ class AuditorTest : BehaviorSpec({
             Then("logger melding via secureLog-loggeren") {
                 val logger = mockk<Logger>(relaxed = true)
                 SecureAuditor(logger).info("sensitiv melding")
-                verify { logger.info("sensitiv melding", null) }
+                verify { logger.info("sensitiv melding") }
             }
         }
 

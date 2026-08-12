@@ -14,7 +14,7 @@ class SecureAuditor(logger: Logger = getLogger("secureLog")) : AbstractAuditor(l
 class LocalAuditor(logger: Logger = getLogger(LocalAuditor::class.java.simpleName)) : AbstractAuditor(logger)
 
 abstract class AbstractAuditor(protected val logger: Logger) : Auditor {
-    override fun info(message: String, t: Throwable?) = logger.info(message, t)
+    override fun info(message: String, t: Throwable?) = t?.let { logger.info(message, it) } ?: logger.info(message)
 }
 
 @FunctionalInterface

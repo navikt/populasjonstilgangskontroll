@@ -16,10 +16,10 @@ import java.util.function.Supplier
 @ConditionalOnProd
 class StrictEnkeltTilgangAuthorizationManager(
     @param:Value("\${overstyring.systemer:histark,gosys}")
-    private val systemer: Set<String>
+    private val tillatteSystemer: Set<String>
 ) : AuthorizationManager<RequestAuthorizationContext> {
     override fun authorize(authentication: Supplier<out Authentication>, context: RequestAuthorizationContext) =
-        AuthorizationDecision(authentication.get().systemNavn in systemer)
+        AuthorizationDecision(authentication.get().systemNavn in tillatteSystemer)
 
     private val Authentication.systemNavn
         get() = (principal as? Jwt)

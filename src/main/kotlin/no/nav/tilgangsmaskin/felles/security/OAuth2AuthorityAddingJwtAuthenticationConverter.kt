@@ -30,7 +30,7 @@ class OAuth2AuthorityAddingJwtAuthenticationConverter : Converter<Jwt, AbstractA
             azpName.split(":").lastOrNull()?.takeIf { it.isNotBlank() }?.let { SystemAuthority(it) }
 
     }
-    data class SystemAuthority(private val system: String) : GrantedAuthority {
+    data class SystemAuthority(val system: String) : GrantedAuthority {
         override fun getAuthority() = "$SYSTEM_AUTHORITY_PREFIX$system"
     }
 }

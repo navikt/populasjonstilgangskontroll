@@ -28,6 +28,11 @@
   },
   "inbound": [
     {
+      "name": "fpensjon-pen-q2",
+      "namespace": "pensjon-q2",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "familie-ks-sak",
       "namespace": "teamfamilie",
       "cluster": "dev-gcp"

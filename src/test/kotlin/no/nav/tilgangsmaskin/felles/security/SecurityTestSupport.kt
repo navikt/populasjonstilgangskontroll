@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
 import no.nav.tilgangsmaskin.felles.rest.PrettyPrintingLogbookFormatter
+import no.nav.tilgangsmaskin.felles.rest.TestLogbookConfig
 import no.nav.tilgangsmaskin.felles.security.SecurityTestOAuth2.server
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.NAIS_CLUSTER_NAME
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
@@ -49,5 +50,6 @@ internal fun DynamicPropertyRegistry.setProperties(clusterName: String? = null) 
     BulkTilgangController::class,
     EnkeltTilgangController::class,
     PrettyPrintingLogbookFormatter::class,
+    TestLogbookConfig::class,
 )
 class SecurityTestApplication

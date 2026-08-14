@@ -28,7 +28,7 @@
   },
   "inbound": [
     {
-      "name": "fpensjon-pen-q2",
+      "name": "pensjon-pen-q2",
       "namespace": "pensjon-q2",
       "cluster": "dev-gcp"
     },

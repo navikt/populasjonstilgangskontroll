@@ -13,6 +13,7 @@ import no.nav.tilgangsmaskin.felles.rest.DevController
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
@@ -44,7 +45,7 @@ class CacheController(private val cache: CacheOperations) {
     fun cachePersoner(@RequestBody navIds: Set<Identifikator>) =
         cache.getMany<Person>(CacheNøkkelConfig(PDL), navIds.mapTo(mutableSetOf()) { it.verdi })
 
-    @PostMapping("cache/flush/{id}/")
+    @DeleteMapping("cache/flush/{id}/")
     @Operation(summary = SUMMARY_CACHE_FLUSH, description = DESCRIPTION_CACHE_FLUSH)
     fun cacheFlush(@RequestBody id: AnsattId) =
         setOf(GEO_CACHE, GEO_OG_GLOBALE_CACHE, OID_CACHE).forEach { flush(it, id) }

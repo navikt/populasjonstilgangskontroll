@@ -45,7 +45,6 @@ class RestBeanConfig(
     @ConditionalOnDevOrLocal
     fun logbook(formatter: HttpLogFormatter): Logbook =
         Logbook.builder()
-            .headerFilter(none())
             .condition(exclude(
                 requestTo("**/internal/**"),
                 requestTo("**/monitoring/**"),

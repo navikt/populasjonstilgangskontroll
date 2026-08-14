@@ -99,11 +99,6 @@ spec:
             - application: '{{app.name}}'
               namespace: '{{app.namespace}}'
               cluster: '{{app.cluster}}'
-              {{#if app.role}}
-              permissions:
-                  roles :
-                   - '{{app.role}}'
-              {{/if}}
        {{/each}}
             - application: alloy
               namespace: nais-system

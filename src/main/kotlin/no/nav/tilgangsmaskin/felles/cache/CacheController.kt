@@ -52,8 +52,8 @@ class CacheController(private val cache: CacheOperations) {
 
     private fun flush(cfg: CacheNøkkelConfig, id: AnsattId) {
         cache.delete(cfg, id.verdi).also {
-            if (it) log.info("Slettet cache innslag i cache ${cfg.name} for ${id.verdi}")
-            else log.warn("Fant ikke cache innslag i cache ${cfg.name} for ${id.verdi}")
+            if (it) log.info("Slettet cache innslag i cache ${cfg.fullName} for ${id.verdi}")
+            else log.trace("Fant ikke cache innslag i cache ${cfg.fullName} for ${id.verdi}")
         }
     }
 

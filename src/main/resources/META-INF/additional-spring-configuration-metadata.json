@@ -4,5 +4,10 @@
       "name": "spring.security.oauth2.resourceserver.jwt.audiences",
       "type": "java.util.List<java.lang.String>",
       "description": "Expected audiences for incoming JWT tokens."
+    },
+    {
+      "name": "overstyrAuthorities",
+      "type": "java.lang.String",
+      "description": "Description for overstyrAuthorities."
     }
   ] }

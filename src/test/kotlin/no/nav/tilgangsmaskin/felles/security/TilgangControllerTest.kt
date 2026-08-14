@@ -7,34 +7,19 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.verify
-import no.nav.security.mock.oauth2.MockOAuth2Server
-import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.rest.Token
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.AZP_NAME
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
 import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
 import no.nav.tilgangsmaskin.felles.security.OAuth2TokenTypeAuthorization.Companion.mismatch
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.NAIS_CLUSTER_NAME
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
-import no.nav.tilgangsmaskin.tilgang.BulkTilgangController
-import no.nav.tilgangsmaskin.tilgang.TilgangController
 import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration
-import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration
-import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.annotation.Import
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.UNAUTHORIZED
@@ -50,22 +35,6 @@ import org.springframework.test.web.servlet.post
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate.now
-import java.util.UUID
-
-private val ANSATT_ID = AnsattId("Z999999")
-private val BRUKER_ID = BrukerId("08526835670")
-private const val ISSUER_ID = "azuread"
-private const val SUBJECT = "subject"
-private const val AUDIENCE = "test-audience"
-private const val INVALID_AUDIENCE = "invalid-audience"
-private const val ISSUER_URI_PROPERTY = "spring.security.oauth2.resourceserver.jwt.issuer-uri"
-private const val AUDIENCES_PROPERTY = "spring.security.oauth2.resourceserver.jwt.audiences"
-private const val AUTHORITY_PREFIX_PROPERTY = "spring.security.oauth2.resourceserver.jwt.authority-prefix"
-private const val AUTHORITIES_CLAIM_EXPRESSION_PROPERTY =
-    "spring.security.oauth2.resourceserver.jwt.authorities-claim-expressions[0]"
-private const val AUTHORITY_PREFIX = "SYSTEM_"
-private const val AZP_NAME_LAST_SEGMENT_EXPRESSION =
-    "T(java.util.Collections).singletonList(#root['azp_name'].replaceAll('^.*:', ''))"
 
 @SpringBootTest(classes = [SecurityTestApplication::class])
 @AutoConfigureMockMvc
@@ -81,20 +50,11 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
     private lateinit var token: Token
 
     init {
-
-        beforeSpec {
-                mockOAuth2.start()
-        }
-
-        afterSpec {
-                mockOAuth2.shutdown()
-        }
-
         beforeEach {
-            every { token.requiredAnsattId } returns ANSATT_ID
+            every { token.requiredAnsattId } returns TEST_ANSATT_ID
             justRun { regelTjeneste.kompletteRegler(any(), any()) }
             justRun { regelTjeneste.kjerneregler(any(), any()) }
-            every { regelTjeneste.bulkRegler(any(), any()) } returns AggregertBulkRespons(ANSATT_ID)
+            every { regelTjeneste.bulkRegler(any(), any()) } returns AggregertBulkRespons(TEST_ANSATT_ID)
             every { enkeltTilgangTjeneste.registrerTilgang(any(), any()) } returns true
         }
 
@@ -103,7 +63,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                 Then("returnerer 401") {
                     mockMvc.post("$PROD_BASE_PATH/komplett") {
                         contentType = APPLICATION_JSON
-                        content = mapper.writeValueAsString(BRUKER_ID)
+                        content = mapper.writeValueAsString(TEST_BRUKER_ID)
                     }.andExpect {
                         status {
                             isUnauthorized()
@@ -118,13 +78,13 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
             When("request har gyldig oauth2-token") {
                 Then("returnerer 204") {
                     every { token.type } returns OBO
-                    every { token.requiredAnsattId } returns ANSATT_ID
+                    every { token.requiredAnsattId } returns TEST_ANSATT_ID
                     mockMvc.post("$PROD_BASE_PATH/komplett") {
                         headers {
-                            setBearerAuth(jwt(AUDIENCE))
+                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID))
                         }
                         contentType = APPLICATION_JSON
-                        content = mapper.writeValueAsString(BRUKER_ID)
+                        content = mapper.writeValueAsString(TEST_BRUKER_ID)
                     }.andExpect {
                         status {
                             isNoContent()
@@ -132,7 +92,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                     }
 
                     verify {
-                        regelTjeneste.kompletteRegler(ANSATT_ID, BRUKER_ID.verdi)
+                        regelTjeneste.kompletteRegler(TEST_ANSATT_ID, TEST_BRUKER_ID.verdi)
                     }
                 }
             }
@@ -141,10 +101,10 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                 Then("returnerer 401") {
                     mockMvc.post("$PROD_BASE_PATH/komplett") {
                         headers {
-                            setBearerAuth(jwt(INVALID_AUDIENCE))
+                            setBearerAuth(jwt(INVALID_AUDIENCE,TEST_ANSATT_ID))
                         }
                         contentType = APPLICATION_JSON
-                        content = mapper.writeValueAsString(BRUKER_ID)
+                        content = mapper.writeValueAsString(TEST_BRUKER_ID)
                     }.andExpect {
                         status {
                             isUnauthorized()
@@ -163,10 +123,10 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                     every { token.type } returns CCF
                     mockMvc.post("$PROD_BASE_PATH/komplett") {
                         headers {
-                            setBearerAuth(jwt(AUDIENCE))
+                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID))
                         }
                         contentType = APPLICATION_JSON
-                        content = mapper.writeValueAsString(BRUKER_ID)
+                        content = mapper.writeValueAsString(TEST_BRUKER_ID)
                     }.andExpect {
                         status {
                             isForbidden()
@@ -181,10 +141,10 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                     every { token.type } returns CCF
                     mockMvc.post("$PROD_BASE_PATH/bulk/obo") {
                         headers {
-                            setBearerAuth(jwt(AUDIENCE))
+                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID))
                         }
                         contentType = APPLICATION_JSON
-                        content = mapper.writeValueAsString(setOf(BrukerIdOgRegelsett(BRUKER_ID.verdi)))
+                        content = mapper.writeValueAsString(setOf(BrukerIdOgRegelsett(TEST_BRUKER_ID.verdi)))
                     }.andExpect {
                         status {
                             isForbidden()
@@ -200,10 +160,10 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                     every { token.type } returns CCF
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(AUDIENCE))
+                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID))
                         }
                         contentType = APPLICATION_JSON
-                        content = mapper.writeValueAsString(EnkeltTilgangData(BRUKER_ID, "En god begrunnelse", gyldigTil))
+                        content = mapper.writeValueAsString(EnkeltTilgangData(TEST_BRUKER_ID, "En god begrunnelse", gyldigTil))
                     }.andExpect {
                         status {
                             isForbidden()
@@ -211,7 +171,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                         content {
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
-                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
+                    }.andReturn().withBody(FORBIDDEN, mismatch(OBO, token.type))
                 }
             }
         }
@@ -221,12 +181,12 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                 Then("returnerer 403 for komplett CCF-endepunkt") {
                     every { token.type } returns OBO
 
-                    mockMvc.post("$PROD_BASE_PATH/ccf/komplett/${ANSATT_ID.verdi}") {
+                    mockMvc.post("$PROD_BASE_PATH/ccf/komplett/${TEST_ANSATT_ID.verdi}") {
                         headers {
-                            setBearerAuth(jwt(AUDIENCE))
+                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID))
                         }
                         contentType = APPLICATION_JSON
-                        content = mapper.writeValueAsString(BRUKER_ID)
+                        content = mapper.writeValueAsString(TEST_BRUKER_ID)
                     }.andExpect {
                         status {
                             isForbidden()
@@ -240,12 +200,12 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                 Then("returnerer 403 for bulk CCF-endepunkt") {
                     every { token.type } returns OBO
 
-                    mockMvc.post("$PROD_BASE_PATH/bulk/ccf/${ANSATT_ID.verdi}") {
+                    mockMvc.post("$PROD_BASE_PATH/bulk/ccf/${TEST_ANSATT_ID.verdi}") {
                         headers {
-                            setBearerAuth(jwt(AUDIENCE))
+                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID))
                         }
                         contentType = APPLICATION_JSON
-                        content = mapper.writeValueAsString(setOf(BrukerIdOgRegelsett(BRUKER_ID.verdi)))
+                        content = mapper.writeValueAsString(setOf(BrukerIdOgRegelsett(TEST_BRUKER_ID.verdi)))
                     }.andExpect {
                         status {
                             isForbidden()
@@ -254,54 +214,6 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
                     }.andReturn().withBody(FORBIDDEN, mismatch(CCF, token.type))
-                }
-            }
-        }
-
-        Given("StrictEnkeltTilgangAuthorizationManager i security chain") {
-            When("request har OBO-token med tillatt SYSTEM-authority") {
-                Then("returnerer 202 for overstyr") {
-                    val gyldigTil = now().plusMonths(2)
-                    every { token.type } returns OBO
-                    every { token.requiredAnsattId } returns ANSATT_ID
-
-                    mockMvc.post("$PROD_BASE_PATH/overstyr") {
-                        headers {
-                            setBearerAuth(jwt(AUDIENCE, "dev-gcp:tilgangsmaskin:gosys"))
-                        }
-                        contentType = APPLICATION_JSON
-                        content = mapper.writeValueAsString(EnkeltTilgangData(BRUKER_ID, "En god begrunnelse", gyldigTil))
-                    }.andExpect {
-                        status {
-                            isAccepted()
-                        }
-                    }
-
-                    verify {
-                        enkeltTilgangTjeneste.registrerTilgang(any(), any())
-                    }
-                }
-            }
-
-            When("request har OBO-token med feil SYSTEM-authority") {
-                Then("avvises med 403 for overstyr") {
-                    val gyldigTil = now().plusMonths(2)
-                    every { token.type } returns OBO
-
-                    mockMvc.post("$PROD_BASE_PATH/overstyr") {
-                        headers {
-                            setBearerAuth(jwt(AUDIENCE, "dev-gcp:tilgangsmaskin:andre-system"))
-                        }
-                        contentType = APPLICATION_JSON
-                        content = mapper.writeValueAsString(EnkeltTilgangData(BRUKER_ID, "En god begrunnelse", gyldigTil))
-                    }.andExpect {
-                        status {
-                            isForbidden()
-                        }
-                        content {
-                            contentType(APPLICATION_PROBLEM_JSON)
-                        }
-                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
                 }
             }
         }
@@ -319,13 +231,6 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
         }
     }
 
-    private fun jwt(audience: String, azpName: String? = null) = mockOAuth2.issueToken(
-        ISSUER_ID,
-        SUBJECT,
-        audience,
-        mapOf(NAVIDENT to ANSATT_ID.verdi, OID to UUID.randomUUID().toString()) + (azpName?.let { mapOf(AZP_NAME to it) }.orEmpty())
-    ).serialize()
-
     private fun MvcResult.withBody(httpStatus: HttpStatus, msg: String? = null) =
         assertSoftly(mapper.readValue<ProblemDetail>(response.contentAsByteArray)) {
             status shouldBe httpStatus.value()
@@ -334,20 +239,10 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
         }
 
     companion object {
-        private val mockOAuth2 = MockOAuth2Server()
-
         @JvmStatic
         @DynamicPropertySource
-        fun configureJwt(registry: DynamicPropertyRegistry) {
-            registry.add(ISSUER_URI_PROPERTY, mockOAuth2.issuerUrl(ISSUER_ID)::toString)
-            registry.add(AUDIENCES_PROPERTY, AUDIENCE::toString)
-            registry.add(AUTHORITY_PREFIX_PROPERTY, AUTHORITY_PREFIX::toString)
-            registry.add(AUTHORITIES_CLAIM_EXPRESSION_PROPERTY, AZP_NAME_LAST_SEGMENT_EXPRESSION::toString)
-            registry.add(NAIS_CLUSTER_NAME) { PROD_GCP }
+        fun setProperties(registry: DynamicPropertyRegistry) {
+            registry.setProperties(PROD_GCP)
         }
     }
 }
-
-@SpringBootApplication(exclude = [DataSourceAutoConfiguration::class, HibernateJpaAutoConfiguration::class, FlywayAutoConfiguration::class])
-@Import(OAuth2SecurityBeanConfig::class, TilgangController::class, BulkTilgangController::class, EnkeltTilgangController::class)
-class SecurityTestApplication

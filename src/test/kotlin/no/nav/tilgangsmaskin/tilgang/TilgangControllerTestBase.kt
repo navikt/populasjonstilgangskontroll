@@ -97,7 +97,6 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
         beforeSpec {
             RegelMetadata.messageSource = ReloadableResourceBundleMessageSource().apply {
                 setBasename("classpath:regel-messages")
-                setDefaultEncoding("UTF-8")
             }
             validator = LocalValidatorFactoryBean().also { it.afterPropertiesSet() }
         }

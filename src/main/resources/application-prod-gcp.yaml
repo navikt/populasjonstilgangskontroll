@@ -3,9 +3,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          authority-prefix: "SYSTEM_"
-          authorities-claim-expressions:
-            - "T(java.util.Collections).singletonList(#root['azp_name'].replaceAll('^.*:', ''))"
+          authorities-claim-name: roles
+          authority-prefix: ROLE_
   messages:
     basename:
       - messages

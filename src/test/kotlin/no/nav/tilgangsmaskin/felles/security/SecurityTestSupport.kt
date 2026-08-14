@@ -5,6 +5,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
+import no.nav.tilgangsmaskin.felles.rest.PrettyPrintingLogbookFormatter
 import no.nav.tilgangsmaskin.felles.security.SecurityTestOAuth2.server
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.NAIS_CLUSTER_NAME
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
@@ -42,5 +43,11 @@ internal fun DynamicPropertyRegistry.setProperties(clusterName: String? = null) 
 }
 
 @SpringBootApplication(exclude = [DataSourceAutoConfiguration::class, HibernateJpaAutoConfiguration::class, FlywayAutoConfiguration::class])
-@Import(OAuth2SecurityBeanConfig::class, TilgangController::class, BulkTilgangController::class, EnkeltTilgangController::class)
+@Import(
+    OAuth2SecurityBeanConfig::class,
+    TilgangController::class,
+    BulkTilgangController::class,
+    EnkeltTilgangController::class,
+    PrettyPrintingLogbookFormatter::class,
+)
 class SecurityTestApplication

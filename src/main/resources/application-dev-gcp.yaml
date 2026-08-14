@@ -29,3 +29,10 @@ management:
         include: '*'
 info:
   client-id: ${azure.app.client.id}
+logbook:
+  filter:
+    enabled: true
+  secure-filter:
+    enabled: true
+  obfuscate:
+    headers: [ ]

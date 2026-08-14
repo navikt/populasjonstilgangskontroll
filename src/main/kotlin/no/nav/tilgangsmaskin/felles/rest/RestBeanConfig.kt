@@ -49,7 +49,6 @@ class RestBeanConfig(
                 requestTo("**/internal/**"),
                 requestTo("**/monitoring/**"),
                 requestTo("**/actuator/**")))
-            .headerFilter(none())
             .sink(DefaultSink(formatter, DefaultHttpLogWriter()))
             .build()
 

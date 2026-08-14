@@ -52,9 +52,7 @@ class OAuth2SecurityBeanConfig {
                             deniedHandler: AccessDeniedHandler,
                             entryPoint: AuthenticationEntryPoint) =
         http.authorizeHttpRequests { requests ->
-            requests.requestMatchers(POST, "$PROD_BASE_PATH/overstyr").access(
-                anyOf(hasRole(ENKELT),hasRole(DEV))
-            )
+            requests.requestMatchers(POST, "$PROD_BASE_PATH/overstyr").hasAnyRole(ENKELT, DEV)
             requests.requestMatchers( *UNPROTECTED_ENDPOINTS).permitAll()
             requests.anyRequest().authenticated()
         }

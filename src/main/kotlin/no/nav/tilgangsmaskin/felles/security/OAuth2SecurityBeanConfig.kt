@@ -116,7 +116,7 @@ class OAuth2SecurityBeanConfig {
 
     @Component
     @Profile("!prod-gcp")
-    class DefaultDevRoleAddingJwtAuthenticationConverter() : Converter<Jwt, AbstractAuthenticationToken> {
+    class DefaultDevRoleAddingJwtAuthenticationConverter : Converter<Jwt, AbstractAuthenticationToken> {
         override fun convert(source: Jwt): AbstractAuthenticationToken {
             return JwtAuthenticationToken(source, listOf(SimpleGrantedAuthority(DEV_ROLE)))
         }

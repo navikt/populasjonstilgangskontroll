@@ -17,6 +17,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
 import org.springframework.security.config.observation.SecurityObservationSettings
+import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.OAuth2AuthorizationFailureHandler
@@ -32,9 +33,14 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.access.AccessDeniedHandler
+import org.springframework.stereotype.Component
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 
 
+private const val ROLE = "ROLE_"
+private const val DEV = "DEV"
+private const val DEV_ROLE = "$ROLE$DEV"
+private const val ENKELT = "ENKELT"
 private val UNPROTECTED_ENDPOINTS = arrayOf("/$DEV/**", "/swagger-ui/**", "/v3/api-docs/**", "/monitoring/**")
 
 @Configuration
@@ -47,7 +53,7 @@ class OAuth2SecurityBeanConfig {
                             entryPoint: AuthenticationEntryPoint) =
         http.authorizeHttpRequests { requests ->
             requests.requestMatchers(POST, "$PROD_BASE_PATH/overstyr").access(
-                anyOf(hasRole("ENKELT"),hasRole("DEV"))
+                anyOf(hasRole(ENKELT),hasRole(DEV))
             )
             requests.requestMatchers( *UNPROTECTED_ENDPOINTS).permitAll()
             requests.anyRequest().authenticated()
@@ -107,11 +113,12 @@ class OAuth2SecurityBeanConfig {
             .httpBasic { it.disable() }
             .logout { it.disable() }
 
-    @Bean
+
+    @Component
     @Profile("!prod-gcp")
-    fun devRoleAddingJwtAuthenticationConverter(): Converter<Jwt, AbstractAuthenticationToken> =
-        object : Converter<Jwt, AbstractAuthenticationToken> {
-            override fun convert(source: Jwt) =
-                JwtAuthenticationToken(source, listOf(SimpleGrantedAuthority("ROLE_DEV")))
+    class DefaultDevRoleAddingJwtAuthenticationConverter() : Converter<Jwt, AbstractAuthenticationToken> {
+        override fun convert(source: Jwt): AbstractAuthenticationToken {
+            return JwtAuthenticationToken(source, listOf(SimpleGrantedAuthority(DEV_ROLE)))
         }
+    }
 }

@@ -48,7 +48,8 @@ class RestBeanConfig(
             .condition(exclude(
                 requestTo("**/internal/**"),
                 requestTo("**/monitoring/**"),
-                requestTo("**/actuator/**")))
+                requestTo("**/actuator/**"),
+                requestTo("https://graph.microsoft.com/v1.0/organization")))
             .sink(DefaultSink(formatter, DefaultHttpLogWriter()))
             .build()
 

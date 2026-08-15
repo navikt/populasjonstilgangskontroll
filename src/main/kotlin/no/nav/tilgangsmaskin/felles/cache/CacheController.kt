@@ -44,7 +44,8 @@ class CacheController(private val cache: CacheOperations) {
     fun cachePersoner(@RequestBody navIds: Set<Identifikator>) =
         cache.getMany<Person>(CacheNøkkelConfig(PDL), navIds.mapTo(mutableSetOf()) { it.verdi })
 
-    @DeleteMapping("/flush/{id}")
+    @DeleteMapping("/flush/{id}" +
+            "")
     //@Operation(summary = SUMMARY_CACHE_FLUSH, description = DESCRIPTION_CACHE_FLUSH)
     fun cacheFlush(@RequestBody id: AnsattId) =
         setOf(GEO_CACHE, GEO_OG_GLOBALE_CACHE, OID_CACHE).forEach { flush(it, id) }

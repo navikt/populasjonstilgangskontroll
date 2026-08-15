@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.rest
 
-import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import org.zalando.logbook.Correlation
@@ -13,8 +12,8 @@ import tools.jackson.databind.json.JsonMapper
 
 @Component
 @Profile("!gcp")
-class PrettyPrintingLogbookFormatter(private val jsonMapper: JsonMapper) : HttpLogFormatter {
-    private val delegate = JsonHttpLogFormatter(jsonMapper, true)
+class PrettyPrintingLogbookFormatter(private val mapper: JsonMapper) : HttpLogFormatter {
+    private val delegate = JsonHttpLogFormatter(mapper,true)
 
     override fun format(precorrelation: Precorrelation, request: HttpRequest) =
         prettyPrint(delegate.format(precorrelation, request))
@@ -23,6 +22,7 @@ class PrettyPrintingLogbookFormatter(private val jsonMapper: JsonMapper) : HttpL
         prettyPrint(delegate.format(correlation, response))
 
     private fun prettyPrint(raw: String) =
-        runCatching { jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonMapper.readTree(raw)) }
-            .getOrDefault(raw)
+        runCatching {
+            mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapper.readTree(raw))
+        }.getOrDefault(raw)
 }

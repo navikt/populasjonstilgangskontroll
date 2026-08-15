@@ -36,3 +36,6 @@ logbook:
     enabled: true
   obfuscate:
     headers: [ ]
+  filters:
+    body:
+      default-enabled: true

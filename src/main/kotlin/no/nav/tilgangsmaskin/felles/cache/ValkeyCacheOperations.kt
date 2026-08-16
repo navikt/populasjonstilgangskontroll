@@ -141,7 +141,7 @@ class ValkeyCacheOperations(
         val before = valkey.execute { it.serverCommands().dbSize() } ?: 0L
         log.info("Tømmer hele Valkey-databasen, størrelse før tømming: {}", before)
         valkey.execute { it.serverCommands().flushDb() }
-        return before
+        return valkey.execute { it.serverCommands().dbSize() } ?: 0L
     }
 
     private fun scanOptions(cache: CacheNøkkelConfig) =
@@ -152,7 +152,8 @@ class ValkeyCacheOperations(
             val prefixes = caches.map { "${it.tilNøkkel("")}*" }
 
             @Suppress("UNCHECKED_CAST")
-            val results = valkey.execute(SCRIPT, emptyList(), *prefixes.toTypedArray()) as List<Long>
+            val results = (valkey.execute(SCRIPT, emptyList(), *prefixes.toTypedArray()) as List<Number>)
+                .map(Number::toLong)
             val totalDuration = start.elapsedNow()
             return caches.zip(results).associate { (cache, count) -> cache.fullName to count }
                 .also { log.info("Cache størrelser {} slått opp, tok {}ms", it, totalDuration.inWholeMilliseconds) }

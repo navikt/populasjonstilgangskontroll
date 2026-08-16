@@ -146,6 +146,7 @@ spring:
           enabled: true
           max-active: 24
           max-idle: 24
+        shutdown-timeout: 2s
 
       host: ${valkey.host.${nais.cluster.cache}}
       port: ${valkey.port.${nais.cluster.cache}}

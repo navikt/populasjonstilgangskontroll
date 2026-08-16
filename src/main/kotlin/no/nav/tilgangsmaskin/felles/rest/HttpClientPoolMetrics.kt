@@ -17,6 +17,7 @@ class HttpClientPoolMetrics(private val registry: MeterRegistry) {
 
     private val log = getLogger(javaClass)
     private val connectionManagers = ConcurrentHashMap.newKeySet<PoolingHttpClientConnectionManager>()
+    private val registeredClients = ConcurrentHashMap.newKeySet<String>()
     private val warnedAboutMissingManager = AtomicBoolean(false)
     private val warnedAboutUnexpectedClient = AtomicBoolean(false)
     private val warnedAboutNonHttpComponentsFactory = AtomicBoolean(false)
@@ -24,9 +25,15 @@ class HttpClientPoolMetrics(private val registry: MeterRegistry) {
 
     init {
         Gauge.builder("tilgangsmaskin.http.client.pool", this) { metrics ->
-            metrics.connectionManagers.size.toDouble()
+            metrics.registeredClients.size.toDouble()
         }
             .tag("state", "managers")
+            .strongReference(true)
+            .register(registry)
+        Gauge.builder("tilgangsmaskin.http.client.pool", this) { metrics ->
+            metrics.connectionManagers.size.toDouble()
+        }
+            .tag("state", "pools")
             .strongReference(true)
             .register(registry)
     }
@@ -51,9 +58,10 @@ class HttpClientPoolMetrics(private val registry: MeterRegistry) {
             }
             return
         }
-        if (!connectionManagers.add(connectionManager)) return
 
         val managerName = sanitizeManagerName(beanName)
+        if (!registeredClients.add(managerName)) return
+        connectionManagers.add(connectionManager)
 
         Gauge.builder("tilgangsmaskin.http.client.pool", connectionManager) { cm ->
             cm.totalStats.leased.toDouble()

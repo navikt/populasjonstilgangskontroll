@@ -9,6 +9,10 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.client.ClientHttpRequestFactory
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.client.RestClient
+import java.text.Normalizer
+import java.text.Normalizer.Form
+import java.text.Normalizer.Form.NFKD
+import java.text.Normalizer.normalize
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
@@ -156,15 +160,9 @@ class HttpClientPoolMetrics(private val registry: MeterRegistry) {
     }
 
     private fun sanitizeManagerName(beanName: String): String {
-        val simpleName = beanName.substringAfterLast('.')
-        val withoutClientSuffix = simpleName.removeSuffix("Client")
-        val normalized = withoutClientSuffix
-            .replace('æ', 'a')
-            .replace('ø', 'o')
-            .replace('å', 'a')
-            .replace('Æ', 'A')
-            .replace('Ø', 'O')
-            .replace('Å', 'A')
+        val simpleName = beanName.substringAfterLast('.').removeSuffix("Client")
+        val normalized = normalize(simpleName, NFKD)
+            .replace(Regex("\\p{Mn}+"), "")
         return normalized.replace(Regex("[^a-zA-Z0-9._-]"), "_")
     }
 }

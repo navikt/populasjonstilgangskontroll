@@ -11,6 +11,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.client.RestClient
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 
 @NoCoverageAnalysis
 class HttpClientPoolMetrics(private val registry: MeterRegistry) {
@@ -18,6 +19,8 @@ class HttpClientPoolMetrics(private val registry: MeterRegistry) {
     private val log = getLogger(javaClass)
     private val connectionManagers = ConcurrentHashMap.newKeySet<PoolingHttpClientConnectionManager>()
     private val registeredClients = ConcurrentHashMap.newKeySet<String>()
+    private val pendingClients = ConcurrentHashMap.newKeySet<String>()
+    private val defaultManager = AtomicReference<PoolingHttpClientConnectionManager?>()
     private val warnedAboutMissingManager = AtomicBoolean(false)
     private val warnedAboutUnexpectedClient = AtomicBoolean(false)
     private val warnedAboutNonHttpComponentsFactory = AtomicBoolean(false)
@@ -58,10 +61,33 @@ class HttpClientPoolMetrics(private val registry: MeterRegistry) {
             }
             return
         }
+        connectionManagers.add(connectionManager)
+        defaultManager.compareAndSet(null, connectionManager)
+        registerClient(beanName, connectionManager)
+        bindPendingClients(connectionManager)
+    }
 
+    fun bindClient(beanName: String) {
+        val manager = defaultManager.get()
+        if (manager == null) {
+            pendingClients.add(sanitizeManagerName(beanName))
+            return
+        }
+        registerClient(beanName, manager)
+    }
+
+    private fun bindPendingClients(manager: PoolingHttpClientConnectionManager) {
+        val pending = pendingClients.toList()
+        pending.forEach { clientName ->
+            if (pendingClients.remove(clientName)) {
+                registerClient(clientName, manager)
+            }
+        }
+    }
+
+    private fun registerClient(beanName: String, connectionManager: PoolingHttpClientConnectionManager) {
         val managerName = sanitizeManagerName(beanName)
         if (!registeredClients.add(managerName)) return
-        connectionManagers.add(connectionManager)
 
         Gauge.builder("tilgangsmaskin.http.client.pool", connectionManager) { cm ->
             cm.totalStats.leased.toDouble()

@@ -10,6 +10,12 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.client.RestClient
+import org.springframework.web.service.annotation.DeleteExchange
+import org.springframework.web.service.annotation.GetExchange
+import org.springframework.web.service.annotation.HttpExchange
+import org.springframework.web.service.annotation.PatchExchange
+import org.springframework.web.service.annotation.PostExchange
+import org.springframework.web.service.annotation.PutExchange
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
@@ -67,9 +73,29 @@ class RestBeanConfig(
     @Bean
     fun httpClientPoolMetricsBinder(metrics: HttpClientPoolMetrics) = object : BeanPostProcessor {
         override fun postProcessAfterInitialization(bean: Any, beanName: String): Any {
-            if (bean is RestClient) metrics.bind(beanName, bean)
-            if (bean is HttpComponentsClientHttpRequestFactory) metrics.bind(beanName, bean)
+            when {
+                bean is RestClient -> metrics.bind(beanName, bean)
+                bean is HttpComponentsClientHttpRequestFactory -> metrics.bind(beanName, bean)
+                isHttpExchangeClient(bean) -> metrics.bindClient(beanName)
+            }
             return bean
+        }
+
+        private fun isHttpExchangeClient(bean: Any): Boolean {
+            val types = buildList {
+                add(bean.javaClass)
+                addAll(bean.javaClass.interfaces)
+            }
+            return types.any { type ->
+                type.methods.any { method ->
+                    method.isAnnotationPresent(HttpExchange::class.java) ||
+                        method.isAnnotationPresent(GetExchange::class.java) ||
+                        method.isAnnotationPresent(PostExchange::class.java) ||
+                        method.isAnnotationPresent(PutExchange::class.java) ||
+                        method.isAnnotationPresent(PatchExchange::class.java) ||
+                        method.isAnnotationPresent(DeleteExchange::class.java)
+                }
+            }
         }
     }
 

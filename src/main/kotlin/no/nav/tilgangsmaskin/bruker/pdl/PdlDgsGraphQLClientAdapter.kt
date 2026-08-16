@@ -5,6 +5,7 @@ import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
 import no.nav.tilgangsmaskin.bruker.pdl.generated.client.HentPersonGraphQLQuery
 import no.nav.tilgangsmaskin.bruker.pdl.generated.client.HentPersonProjectionRoot
+import no.nav.tilgangsmaskin.bruker.pdl.generated.types.Sivilstand
 import no.nav.tilgangsmaskin.bruker.pdl.generated.types.Sivilstandstype
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
@@ -24,8 +25,10 @@ class PdlDgsGraphQLClientAdapter(
     fun partnere(ident: String): Set<FamilieMedlem> =
         runCatching {
             hentSivilstand(ident).mapNotNullTo(mutableSetOf()) { sivilstand ->
-                sivilstand.relatertVedSivilstand?.let { relatertIdent ->
-                    FamilieMedlem(BrukerId(relatertIdent), tilPartner(sivilstand.type.toDomain()))
+                sivilstand.type?.let { type ->
+                    sivilstand.relatertVedSivilstand?.let { relatertIdent ->
+                        FamilieMedlem(BrukerId(relatertIdent), tilPartner(type.toDomain()))
+                    }
                 }
             }
         }.recover { e ->
@@ -35,7 +38,7 @@ class PdlDgsGraphQLClientAdapter(
             } ?: throw e
         }.getOrThrow()
 
-    private fun hentSivilstand(ident: String): List<DgsSivilstand> =
+    private fun hentSivilstand(ident: String): List<Sivilstand> =
         runCatching {
             dgsClient
                 .request(HentPersonGraphQLQuery.newRequest().ident(ident).build())
@@ -44,23 +47,13 @@ class PdlDgsGraphQLClientAdapter(
                         .sivilstand()
                         .relatertVedSivilstand()
                         .type()
-                        .parent()
-                        .metadata()
-                        .master()
-                        .historisk()
-                        .root()
                 )
                 .retrieveSync("hentPerson.sivilstand")
-                .toEntityList<DgsSivilstand>()
+                .toEntityList<Sivilstand>()
         }.getOrElse { e ->
             log.warn("Feil ved henting av sivilstand", e)
             errorHandler.handle(cfg.baseUri, e)
         }
-
-    private data class DgsSivilstand(
-        val type: Sivilstandstype,
-        val relatertVedSivilstand: String? = null,
-    )
 
     private fun Sivilstandstype.toDomain() =
         Partnere.Sivilstand.Sivilstandstype.valueOf(name)

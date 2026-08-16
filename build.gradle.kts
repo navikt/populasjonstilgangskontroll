@@ -196,6 +196,7 @@ tasks.named<GenerateJavaTask>("generateJava") {
     schemaPaths = mutableListOf(pdlSchemaFile.get().asFile.absolutePath)
     packageName = "no.nav.tilgangsmaskin.bruker.pdl.generated"
     generateClient = true
+    kotlinAllFieldsOptional = true
 }
 
 tasks.named<Test>("test") {

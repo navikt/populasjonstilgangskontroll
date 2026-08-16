@@ -5,7 +5,6 @@ boot-conditionals = "6.0.7"
 commons-pool2 = "2.13.1"
 confluent = "8.3.1"
 cyclonedx = "3.4.1"
-dgs-codegen = "8.6.0"
 kotlin = "2.4.0"
 kotest = "6.2.3"
 logstash = "9.0"
@@ -80,7 +79,6 @@ observability = ["opentelemetry-instrumentation-annotations", "opentelemetry-log
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version.ref = "asciidoctor" }
 avro = { id = "com.github.davidmc24.gradle.plugin.avro", version.ref = "avro-plugin" }
 cyclonedx = { id = "org.cyclonedx.bom", version.ref = "cyclonedx" }
-dgs-codegen = { id = "com.netflix.dgs.codegen", version.ref = "dgs-codegen" }
 kotest = { id = "io.kotest", version.ref = "kotest" }
 kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

@@ -1,10 +1,8 @@
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
-import com.netflix.graphql.dgs.codegen.gradle.GenerateJavaTask
 import org.gradle.api.file.DuplicatesStrategy.EXCLUDE
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_26
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import java.lang.System.getProperty
-import java.net.URI
 
 val javaVersion = JavaLanguageVersion.of(26)
 
@@ -24,7 +22,6 @@ plugins {
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.cyclonedx)
-    alias(libs.plugins.dgs.codegen)
     alias(libs.plugins.kotest)
     alias(libs.plugins.asciidoctor)
 }
@@ -171,36 +168,6 @@ val generateGitProperties = tasks.register("generateGitProperties") {
 
 tasks.named("processResources") {
     dependsOn(generateGitProperties)
-}
-
-val pdlSchemaUrl = "https://navikt.github.io/pdl/pdl-api-sdl.graphqls"
-val pdlSchemaFile = layout.buildDirectory.file("generated/graphql-schema/pdl-api-sdl.graphqls")
-
-val downloadPdlSchema = tasks.register("downloadPdlSchema") {
-    description = "Downloads latest PDL GraphQL schema used by DGS codegen"
-    outputs.file(pdlSchemaFile)
-
-    doLast {
-        val target = pdlSchemaFile.get().asFile
-        target.parentFile.mkdirs()
-        URI.create(pdlSchemaUrl).toURL().openStream().use { input ->
-            target.outputStream().use { output ->
-                input.copyTo(output)
-            }
-        }
-    }
-}
-
-tasks.named<GenerateJavaTask>("generateJava") {
-    dependsOn(downloadPdlSchema)
-    schemaPaths = mutableListOf(pdlSchemaFile.get().asFile.absolutePath)
-    packageName = "no.nav.tilgangsmaskin.bruker.pdl.generated"
-    generateClient = true
-    includeQueries = mutableListOf("hentPerson")
-    skipEntityQueries = true
-    generateDataTypes = false
-    shortProjectionNames = true
-    kotlinAllFieldsOptional = true
 }
 
 tasks.named<Test>("test") {

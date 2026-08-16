@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import no.nav.boot.conditionals.ConditionalOnDev
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
@@ -10,7 +9,6 @@ import no.nav.tilgangsmaskin.felles.security.OAuth2DownstreamUriCapturingInterce
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.graphql.client.DgsGraphQlClient
 import org.springframework.graphql.client.HttpSyncGraphQlClient.builder
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.security.oauth2.client.OAuth2AuthorizationFailureHandler
@@ -44,15 +42,6 @@ class PdlGraphBeanConfig {
             .interceptors {
                 it.addFirst(PdlGraphQLLoggingInterceptor())
             }.build()
-
-    @Bean
-    fun pdlDgsGraphQlClient(@Qualifier(PDLGRAPH) client: RestClient, cfg: PdlGraphQLConfig) =
-        DgsGraphQlClient.create(
-            builder(client)
-                .url(cfg.baseUri)
-                .interceptors { it.addFirst(PdlGraphQLLoggingInterceptor()) }
-                .build()
-        )
 
     @Bean
     fun pdlGraphHealthIndicator(cfg: PdlGraphQLConfig, @Qualifier(PDLGRAPH) client: RestClient) =

@@ -67,14 +67,10 @@ class PdlTjenesteTest(
     @MockkBean
     lateinit var graphQL: PdlSyncGraphQLClientAdapter
 
-    @MockkBean
-    lateinit var dgsGraphQL: PdlDgsGraphQLClientAdapter
-
     init {
         beforeEach {
             server.reset()
             cache.clear(PDL_CACHES)
-            every { dgsGraphQL.partnere(any()) } returns emptySet()
             every { graphQL.partnere(any()) } returns emptySet()
         }
 

@@ -69,6 +69,7 @@ class CacheController(
             ?: throw ResponseStatusException(NOT_FOUND, "Ukjent cache: $cacheName. Tilgjengelige cacher: ${alleNøkkelConfigs.keys}")
         log.info("Cache størrelse før tømming for {}: {}", cacheName, cache.size(cfg))
         cache.clear(cfg)
+        log.info("Cache størrelse etter tømming for {}: {}", cacheName, cache.size(cfg))
         log.info("Tømt hele cachen: $cacheName")
     }
 

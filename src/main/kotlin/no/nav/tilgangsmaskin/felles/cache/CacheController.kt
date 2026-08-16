@@ -61,27 +61,27 @@ class CacheController(
 
     @DeleteMapping("cache/flush/{id}/")
     @Operation(summary = SUMMARY_CACHE_FLUSH, description = DESCRIPTION_CACHE_FLUSH)
-    fun cacheFlush(@RequestBody id: AnsattId) =
+    fun cacheFlushSingle(@RequestBody id: AnsattId) =
         setOf(GEO_CACHE, GEO_OG_GLOBALE_CACHE, OID_CACHE).forEach { flush(it, id) }
 
     @DeleteMapping("cache/flush/{cacheName}/all")
     @Operation(summary = SUMMARY_CACHE_FLUSH_ALL, description = DESCRIPTION_CACHE_FLUSH_ALL)
-    fun cacheFlushAll(@PathVariable cacheName: String): Long {
-        val cfg = alleNøkkelConfigs[cacheName]
-            ?: throw ResponseStatusException(NOT_FOUND, "Ukjent cache: $cacheName. Tilgjengelige cacher: ${alleNøkkelConfigs.keys}")
-        log.info("Cache størrelse før tømming for {}: {}", cacheName, cache.size(cfg))
-        val deleted = cache.clear(cfg)
-        log.info("Tømte hele cachen {} og slettet {} nøkler", cacheName, deleted)
-        return deleted
-    }
+    fun cacheFlushAll(@PathVariable cacheName: String) =
+        with(alleNøkkelConfigs[cacheName]
+            ?: throw ResponseStatusException(NOT_FOUND,
+                "Ukjent cache: $cacheName. Tilgjengelige cacher: ${alleNøkkelConfigs.keys}")) {
+            log.info("Cache størrelse før tømming for {}: {}", cacheName, cache.size(this))
+             cache.clear(this).also {
+                log.info("Tømte hele cachen {} og slettet {} nøkler", cacheName, it)
+            }
+        }
 
     @DeleteMapping("db/flush")
     @Operation(summary = SUMMARY_CACHE_FLUSH_DB, description = DESCRIPTION_CACHE_FLUSH_DB)
-    fun cacheFlushDb(): Long {
-        val deleted = cache.clearAll()
-        log.info("Tømte hele databasen og slettet {} nøkler", deleted)
-        return deleted
-    }
+    fun cacheFlushDB() =
+        cache.clearAll().also {
+            log.info("Tømte hele databasen og slettet {} nøkler", it)
+        }
 
     private fun flush(cfg: CacheNøkkelConfig, id: AnsattId) {
         cache.delete(cfg, id.verdi).also {

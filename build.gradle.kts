@@ -4,7 +4,7 @@ import org.gradle.api.file.DuplicatesStrategy.EXCLUDE
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_26
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import java.lang.System.getProperty
-import java.net.URL
+import java.net.URI
 
 val javaVersion = JavaLanguageVersion.of(26)
 
@@ -183,7 +183,7 @@ val downloadPdlSchema = tasks.register("downloadPdlSchema") {
     doLast {
         val target = pdlSchemaFile.get().asFile
         target.parentFile.mkdirs()
-        URL(pdlSchemaUrl).openStream().use { input ->
+        URI.create(pdlSchemaUrl).toURL().openStream().use { input ->
             target.outputStream().use { output ->
                 input.copyTo(output)
             }
@@ -196,6 +196,10 @@ tasks.named<GenerateJavaTask>("generateJava") {
     schemaPaths = mutableListOf(pdlSchemaFile.get().asFile.absolutePath)
     packageName = "no.nav.tilgangsmaskin.bruker.pdl.generated"
     generateClient = true
+    includeQueries = mutableListOf("hentPerson")
+    skipEntityQueries = true
+    generateDataTypes = false
+    shortProjectionNames = true
     kotlinAllFieldsOptional = true
 }
 

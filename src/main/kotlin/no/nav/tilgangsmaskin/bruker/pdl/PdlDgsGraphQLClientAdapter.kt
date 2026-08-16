@@ -5,14 +5,16 @@ import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
 import no.nav.tilgangsmaskin.bruker.pdl.generated.client.HentPersonGraphQLQuery
 import no.nav.tilgangsmaskin.bruker.pdl.generated.client.HentPersonProjectionRoot
-import no.nav.tilgangsmaskin.bruker.pdl.generated.types.Sivilstand
-import no.nav.tilgangsmaskin.bruker.pdl.generated.types.Sivilstandstype
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.graphql.client.DgsGraphQlClient
 import org.springframework.graphql.client.toEntityList
 import org.springframework.stereotype.Component
+import  no.nav.tilgangsmaskin.bruker.pdl.generated.DgsConstants.QUERY.HentPerson
+import  no.nav.tilgangsmaskin.bruker.pdl.generated.DgsConstants.PERSON.Sivilstand
+
+private const val SIVILSTAND_PATH = "$HentPerson.$Sivilstand"
 
 @Component
 class PdlDgsGraphQLClientAdapter(
@@ -38,7 +40,7 @@ class PdlDgsGraphQLClientAdapter(
             } ?: throw e
         }.getOrThrow()
 
-    private fun hentSivilstand(ident: String): List<Sivilstand> =
+    private fun hentSivilstand(ident: String): List<DgsSivilstand> =
         runCatching {
             dgsClient
                 .request(HentPersonGraphQLQuery.newRequest().ident(ident).build())
@@ -46,18 +48,22 @@ class PdlDgsGraphQLClientAdapter(
                     HentPersonProjectionRoot<Nothing, Nothing>()
                         .sivilstand()
                         .relatertVedSivilstand()
-                        .gyldigFraOgMed()
                         .type()
                 )
-                .retrieveSync("hentPerson.sivilstand")
-                .toEntityList<Sivilstand>()
+                .retrieveSync(SIVILSTAND_PATH)
+                .toEntityList<DgsSivilstand>()
         }.getOrElse { e ->
             log.warn("Feil ved henting av sivilstand", e)
             errorHandler.handle(cfg.baseUri, e)
         }
 
-    private fun Sivilstandstype.toDomain() =
-        Partnere.Sivilstand.Sivilstandstype.valueOf(name)
+    private data class DgsSivilstand(
+        val type: String? = null,
+        val relatertVedSivilstand: String? = null,
+    )
+
+    private fun String.toDomain() =
+        Partnere.Sivilstand.Sivilstandstype.valueOf(this)
 
     @NoCoverageAnalysis
     override fun toString() =

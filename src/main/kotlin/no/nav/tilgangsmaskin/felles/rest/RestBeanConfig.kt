@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.felles.rest
 import no.nav.boot.conditionals.ConditionalOnDevOrLocal
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
-import org.apache.hc.core5.util.TimeValue
 import org.apache.hc.core5.util.TimeValue.ofSeconds
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.http.client.HttpComponentsClientHttpRequestFactoryBuilder
@@ -58,9 +57,7 @@ class RestBeanConfig(
     fun restClientCustomizer() =
         RestClientCustomizer { c ->
             c.requestInterceptors {
-                if (!isProd) {
-                    logbookInterceptor.ifAvailable { interceptor -> it.add(interceptor) }
-                }
+                logbookInterceptor.ifAvailable { interceptor -> it.add(interceptor) }
             }
             c.defaultStatusHandler(HttpStatusCode::isError, handler::handle)
         }
@@ -69,9 +66,14 @@ class RestBeanConfig(
     fun httpComponentsBuilderCustomizer():
             ClientHttpRequestFactoryBuilderCustomizer<HttpComponentsClientHttpRequestFactoryBuilder> =
         ClientHttpRequestFactoryBuilderCustomizer { builder ->
-            builder.withConnectionConfigCustomizer { cfg ->
-                cfg.setValidateAfterInactivity(ofSeconds(2))
-            }
+            builder
+                .withConnectionManagerCustomizer { cm ->
+                    cm.setMaxConnTotal(300)
+                    cm.setMaxConnPerRoute(50)
+                }
+                .withConnectionConfigCustomizer { cfg ->
+                    cfg.setValidateAfterInactivity(ofSeconds(2))
+                }
         }
 
     override fun addInterceptors(registry: InterceptorRegistry) {

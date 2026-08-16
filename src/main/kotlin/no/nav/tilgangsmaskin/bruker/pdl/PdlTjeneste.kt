@@ -22,6 +22,7 @@ import org.springframework.web.service.registry.ImportHttpServices
 class PdlTjeneste(
     private val pip: PdlPipClient,
     private val graphQL: PdlSyncGraphQLClientAdapter,
+    private val dgsGraphQL: PdlDgsGraphQLClientAdapter,
     private val cache: CacheOperations
 ) {
 
@@ -31,7 +32,10 @@ class PdlTjeneste(
     fun medUtvidetFamilie(id: String): Person {
         val person = person(id)
         val søsken = søsken(person)
-        val partnere = graphQL.partnere(id)
+        val partnere = graphQL.partnere(id).also { log.debug("GraphQL partnere: {}", it) }
+        dgsGraphQL.runCatching { partnere(id) }
+            .onSuccess { log.debug("DGS partnere: {}", it) }
+            .onFailure { log.warn("DGS-oppslag av partnere feilet", it) }
         return person.copy(familie = Familie(person.familie.medlemmer + søsken + partnere))
     }
 

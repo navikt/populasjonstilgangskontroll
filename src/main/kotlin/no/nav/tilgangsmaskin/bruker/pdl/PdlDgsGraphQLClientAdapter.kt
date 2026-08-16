@@ -1,0 +1,64 @@
+package no.nav.tilgangsmaskin.bruker.pdl
+
+import no.nav.boot.conditionals.ConditionalOnDev
+import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
+import no.nav.tilgangsmaskin.bruker.pdl.generated.client.HentPersonGraphQLQuery
+import no.nav.tilgangsmaskin.bruker.pdl.generated.client.HentPersonProjectionRoot
+import no.nav.tilgangsmaskin.bruker.pdl.generated.types.Sivilstand
+import no.nav.tilgangsmaskin.bruker.pdl.generated.types.Sivilstandstype
+import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
+import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
+import org.slf4j.LoggerFactory.getLogger
+import org.springframework.graphql.client.DgsGraphQlClient
+import org.springframework.graphql.client.toEntityList
+import org.springframework.stereotype.Component
+
+@Component
+class PdlDgsGraphQLClientAdapter(
+    private val cfg: PdlGraphQLConfig,
+    private val dgsClient: DgsGraphQlClient,
+    private val errorHandler: PdlGraphQLErrorHandler = PdlGraphQLErrorHandler()
+) {
+    private val log = getLogger(javaClass)
+
+    fun partnere(ident: String): Set<FamilieMedlem> =
+        runCatching {
+            hentSivilstand(ident).mapNotNullTo(mutableSetOf()) { sivilstand ->
+                sivilstand.relatertVedSivilstand?.let { relatertIdent ->
+                    FamilieMedlem(BrukerId(relatertIdent), tilPartner(sivilstand.type.toDomain()))
+                }
+            }
+        }.recover { e ->
+            (e as? NotFoundRestException)?.let {
+                log.trace("Fant ingen partnere for $ident")
+                emptySet()
+            } ?: throw e
+        }.getOrThrow()
+
+    private fun hentSivilstand(ident: String): List<Sivilstand> =
+        runCatching {
+            dgsClient
+                .request(HentPersonGraphQLQuery.newRequest().ident(ident).build())
+                .projection(
+                    HentPersonProjectionRoot<Nothing, Nothing>()
+                        .sivilstand()
+                        .relatertVedSivilstand()
+                        .type()
+                        .root()
+                )
+                .retrieveSync("hentPerson.sivilstand")
+                .toEntityList<Sivilstand>()
+        }.getOrElse { e ->
+            log.warn("Feil ved henting av sivilstand", e)
+            errorHandler.handle(cfg.baseUri, e)
+        }
+
+    private fun Sivilstandstype.toDomain() =
+        Partnere.Sivilstand.Sivilstandstype.valueOf(name)
+
+    @NoCoverageAnalysis
+    override fun toString() =
+        "${javaClass.simpleName} [dgsClient=$dgsClient, cfg=$cfg]"
+}

@@ -46,6 +46,7 @@ class PdlDgsGraphQLClientAdapter(
                     HentPersonProjectionRoot<Nothing, Nothing>()
                         .sivilstand()
                         .relatertVedSivilstand()
+                        .gyldigFraOgMed()
                         .type()
                 )
                 .retrieveSync("hentPerson.sivilstand")

@@ -2,12 +2,8 @@ package no.nav.tilgangsmaskin.felles.rest
 
 import no.nav.boot.conditionals.ConditionalOnDevOrLocal
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
-import org.apache.hc.core5.util.TimeValue.ofSeconds
-import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.http.client.HttpComponentsClientHttpRequestFactoryBuilder
 import org.springframework.boot.http.client.autoconfigure.ClientHttpRequestFactoryBuilderCustomizer
-import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
 import org.springframework.boot.restclient.RestClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -33,7 +29,7 @@ import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 class RestBeanConfig(
     private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor,
     private val handler: ErrorHandler,
-    private val logbookInterceptor: ObjectProvider<LogbookClientHttpRequestInterceptor>,
+    private val logbookInterceptor: org.springframework.beans.factory.ObjectProvider<LogbookClientHttpRequestInterceptor>,
 ) : WebMvcConfigurer {
 
     @Bean
@@ -49,9 +45,12 @@ class RestBeanConfig(
             .build()
 
     @Bean
-    fun jackson3Customizer() = JsonMapperBuilderCustomizer {
+    fun jackson3Customizer() = org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer {
         it.enable(INCLUDE_SOURCE_IN_LOCATION)
     }
+
+    @Bean
+    fun httpClientPoolMetrics(registry: io.micrometer.core.instrument.MeterRegistry) = HttpClientPoolMetrics(registry)
 
     @Bean
     fun restClientCustomizer() =
@@ -63,16 +62,17 @@ class RestBeanConfig(
         }
 
     @Bean
-    fun httpComponentsBuilderCustomizer():
+    fun httpComponentsBuilderCustomizer(metrics: HttpClientPoolMetrics):
             ClientHttpRequestFactoryBuilderCustomizer<HttpComponentsClientHttpRequestFactoryBuilder> =
         ClientHttpRequestFactoryBuilderCustomizer { builder ->
             builder
+                .withCustomizer(metrics::bind)
                 .withConnectionManagerCustomizer { cm ->
                     cm.setMaxConnTotal(300)
                     cm.setMaxConnPerRoute(50)
                 }
                 .withConnectionConfigCustomizer { cfg ->
-                    cfg.setValidateAfterInactivity(ofSeconds(2))
+                    cfg.setValidateAfterInactivity(org.apache.hc.core5.util.TimeValue.ofSeconds(2))
                 }
         }
 

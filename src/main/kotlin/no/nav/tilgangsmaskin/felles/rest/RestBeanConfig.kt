@@ -4,7 +4,8 @@ import io.micrometer.core.instrument.MeterRegistry
 import no.nav.boot.conditionals.ConditionalOnDevOrLocal
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.sekunder
-import org.springframework.beans.factory.config.BeanPostProcessor
+import org.springframework.beans.factory.ListableBeanFactory
+import org.springframework.beans.factory.SmartInitializingSingleton
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatusCode
@@ -71,30 +72,33 @@ class RestBeanConfig(
         }
 
     @Bean
-    fun httpClientPoolMetricsBinder(metrics: HttpClientPoolMetrics) = object : BeanPostProcessor {
-        override fun postProcessAfterInitialization(bean: Any, beanName: String): Any {
-            when {
-                bean is RestClient -> metrics.bind(beanName, bean)
-                bean is HttpComponentsClientHttpRequestFactory -> metrics.bind(beanName, bean)
-                isHttpExchangeClient(bean) -> metrics.bindClient(beanName)
-            }
-            return bean
+    fun httpClientPoolMetricsBinder(
+        metrics: HttpClientPoolMetrics,
+        beanFactory: ListableBeanFactory,
+    ): SmartInitializingSingleton = SmartInitializingSingleton {
+        beanFactory.getBeansOfType(RestClient::class.java)
+            .forEach { (name, client) -> metrics.bind(name, client) }
+        beanFactory.getBeansOfType(HttpComponentsClientHttpRequestFactory::class.java)
+            .forEach { (name, factory) -> metrics.bind(name, factory) }
+        beanFactory.beanDefinitionNames.forEach { beanName ->
+            val type = beanFactory.getType(beanName) ?: return@forEach
+            if (isHttpExchangeClientType(type)) metrics.bindClient(beanName)
         }
+    }
 
-        private fun isHttpExchangeClient(bean: Any): Boolean {
-            val types = buildList {
-                add(bean.javaClass)
-                addAll(bean.javaClass.interfaces)
-            }
-            return types.any { type ->
-                type.methods.any { method ->
-                    method.isAnnotationPresent(HttpExchange::class.java) ||
-                        method.isAnnotationPresent(GetExchange::class.java) ||
-                        method.isAnnotationPresent(PostExchange::class.java) ||
-                        method.isAnnotationPresent(PutExchange::class.java) ||
-                        method.isAnnotationPresent(PatchExchange::class.java) ||
-                        method.isAnnotationPresent(DeleteExchange::class.java)
-                }
+    private fun isHttpExchangeClientType(type: Class<*>): Boolean {
+        val types = buildList {
+            add(type)
+            addAll(type.interfaces)
+        }
+        return types.any { candidate ->
+            candidate.methods.any { method ->
+                method.isAnnotationPresent(HttpExchange::class.java) ||
+                    method.isAnnotationPresent(GetExchange::class.java) ||
+                    method.isAnnotationPresent(PostExchange::class.java) ||
+                    method.isAnnotationPresent(PutExchange::class.java) ||
+                    method.isAnnotationPresent(PatchExchange::class.java) ||
+                    method.isAnnotationPresent(DeleteExchange::class.java)
             }
         }
     }

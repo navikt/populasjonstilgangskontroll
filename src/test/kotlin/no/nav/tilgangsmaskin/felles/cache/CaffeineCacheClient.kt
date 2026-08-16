@@ -47,44 +47,30 @@ class CaffeineCacheClient(private val cacheManager: CacheManager) : CacheOperati
     }
 
     override fun clear(cache: CacheNøkkelConfig): Long {
-        if (isProd) {
-            throw UnsupportedOperationException("Clear er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold")
-        }
         val springCache = cacheManager.getCache(cache.name) ?: return 0L
-        val nativeCache = springCache.nativeCache
-        if (nativeCache is com.github.benmanes.caffeine.cache.Cache<*, *>) {
-            return if (cache.extraPrefix == null) {
-                val deleted = nativeCache.estimatedSize()
-                springCache.clear()
-                deleted
-            } else {
-                val prefix = caffeineNøkkel(cache, "")
-                val deleted = nativeCache.asMap().keys
-                    .filterIsInstance<String>()
-                    .filter { it.startsWith(prefix) }
-                    .toList()
-                deleted.forEach { springCache.evict(it) }
-                deleted.size.toLong()
-            }
+        val nativeCache = springCache.nativeCache as com.github.benmanes.caffeine.cache.Cache<*, *>
+        return if (cache.extraPrefix == null) {
+            val deleted = nativeCache.estimatedSize()
+            springCache.clear()
+            deleted
+        } else {
+            val prefix = caffeineNøkkel(cache, "")
+            val deleted = nativeCache.asMap().keys
+                .filterIsInstance<String>()
+                .filter { it.startsWith(prefix) }
+                .toList()
+            deleted.forEach { springCache.evict(it) }
+            deleted.size.toLong()
         }
-        springCache.clear()
-        return 0L
     }
 
     override fun clearAll(): Long {
-        if (isProd) {
-            throw UnsupportedOperationException("FlushDb er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold")
-        }
         val deleted = cacheManager.cacheNames.sumOf { cacheName ->
-            val springCache = cacheManager.getCache(cacheName)
-            val nativeCache = springCache?.nativeCache
-            when {
-                springCache == null -> 0L
-                nativeCache is com.github.benmanes.caffeine.cache.Cache<*, *> -> nativeCache.estimatedSize()
-                else -> 0L
-            }.also {
-                springCache.clear()
-            }
+            val springCache = cacheManager.getCache(cacheName) ?: return@sumOf 0L
+            val nativeCache = springCache.nativeCache as com.github.benmanes.caffeine.cache.Cache<*, *>
+            val count = nativeCache.estimatedSize()
+            springCache.clear()
+            count
         }
         return deleted
     }
@@ -93,16 +79,12 @@ class CaffeineCacheClient(private val cacheManager: CacheManager) : CacheOperati
         caches.associate { cache ->
             val springCache = cacheManager.getCache(cache.name) ?: error("Cache $cache ikke funnet")
             val count = run {
-                val nativeCache = springCache.nativeCache
-                if (nativeCache is com.github.benmanes.caffeine.cache.Cache<*, *>) {
-                    if (cache.extraPrefix == null) {
-                        nativeCache.estimatedSize()
-                    } else {
-                        val prefix = caffeineNøkkel(cache, "")
-                        nativeCache.asMap().keys.count { it is String && it.startsWith(prefix) }.toLong()
-                    }
+                val nativeCache = springCache.nativeCache as com.github.benmanes.caffeine.cache.Cache<*, *>
+                if (cache.extraPrefix == null) {
+                    nativeCache.estimatedSize()
                 } else {
-                    error("Cache $cache ikke Caffeine")
+                    val prefix = caffeineNøkkel(cache, "")
+                    nativeCache.asMap().keys.count { it is String && it.startsWith(prefix) }.toLong()
                 }
             }
             cache.fullName to count

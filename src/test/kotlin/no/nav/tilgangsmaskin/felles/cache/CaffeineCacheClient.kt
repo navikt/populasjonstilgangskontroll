@@ -68,7 +68,25 @@ class CaffeineCacheClient(private val cacheManager: CacheManager) : CacheOperati
             }
         }
         springCache.clear()
-        0L
+        return 0L
+    }
+
+    override fun clearAll(): Long {
+        if (isProd) {
+            throw UnsupportedOperationException("FlushDb er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold")
+        }
+        val deleted = cacheManager.cacheNames.sumOf { cacheName ->
+            val springCache = cacheManager.getCache(cacheName)
+            val nativeCache = springCache?.nativeCache
+            when {
+                springCache == null -> 0L
+                nativeCache is com.github.benmanes.caffeine.cache.Cache<*, *> -> nativeCache.estimatedSize()
+                else -> 0L
+            }.also {
+                springCache.clear()
+            }
+        }
+        return deleted
     }
 
     override fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long> =

@@ -30,6 +30,8 @@ private const val SUMMARY_CACHE_PERSONER = "${MSG}openapi.dev.cache.personer.sum
 private const val DESCRIPTION_CACHE_PERSONER = "${MSG}openapi.dev.cache.personer.description"
 private const val SUMMARY_CACHE_FLUSH_ALL = "${MSG}openapi.dev.cache.flush.all.summary"
 private const val DESCRIPTION_CACHE_FLUSH_ALL = "${MSG}openapi.dev.cache.flush.all.description"
+private const val SUMMARY_CACHE_FLUSH_DB = "${MSG}openapi.dev.cache.flush.db.summary"
+private const val DESCRIPTION_CACHE_FLUSH_DB = "${MSG}openapi.dev.cache.flush.db.description"
 
 
 @DevController(
@@ -39,7 +41,7 @@ private const val DESCRIPTION_CACHE_FLUSH_ALL = "${MSG}openapi.dev.cache.flush.a
 )
 class CacheController(
     private val cache: CacheOperations,
-    private val cacheConfigs: List<CachableRestConfig>
+    private val cacheConfigs: List<CachableRestConfig>,
 ) {
 
     private val log = getLogger(javaClass)
@@ -70,6 +72,14 @@ class CacheController(
         log.info("Cache størrelse før tømming for {}: {}", cacheName, cache.size(cfg))
         val deleted = cache.clear(cfg)
         log.info("Tømte hele cachen {} og slettet {} nøkler", cacheName, deleted)
+        return deleted
+    }
+
+    @DeleteMapping("db/flush")
+    @Operation(summary = SUMMARY_CACHE_FLUSH_DB, description = DESCRIPTION_CACHE_FLUSH_DB)
+    fun cacheFlushDb(): Long {
+        val deleted = cache.clearAll()
+        log.info("Tømte hele databasen og slettet {} nøkler", deleted)
         return deleted
     }
 

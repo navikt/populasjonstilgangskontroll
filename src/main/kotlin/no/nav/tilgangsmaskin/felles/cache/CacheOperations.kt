@@ -11,6 +11,7 @@ interface CacheOperations {
     fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration? = null)
     fun clear(cache: CacheNøkkelConfig): Long
     fun clear(caches: Set<CacheNøkkelConfig>) = caches.sumOf { clear(it) }
+    fun clearAll(): Long
     fun size(cache: CacheNøkkelConfig): Long =
         sizes(cache).values.single()
 

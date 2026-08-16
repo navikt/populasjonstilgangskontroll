@@ -125,15 +125,23 @@ class ValkeyCacheOperations(
                     batch += keyBytes.toString(UTF_8)
                     if (batch.size == BATCH_SIZE) {
                         deleted += batch.size.toLong()
-                        valkey.unlink(batch)
+                        valkey.delete(batch)
                         batch.clear()
                     }
                 }
                 deleted += batch.size.toLong()
-                valkey.unlink(batch)
+                valkey.delete(batch)
                 deleted
             }
         }
+    }
+
+    override fun clearAll(): Long {
+        check(!isProd) { "FlushDb er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold" }
+        val before = valkey.execute { it.serverCommands().dbSize() } ?: 0L
+        log.info("Tømmer hele Valkey-databasen, størrelse før tømming: {}", before)
+        valkey.execute { it.serverCommands().flushDb() }
+        return before
     }
 
     private fun scanOptions(cache: CacheNøkkelConfig) =

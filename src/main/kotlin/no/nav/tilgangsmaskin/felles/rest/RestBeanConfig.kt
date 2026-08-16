@@ -4,19 +4,14 @@ import io.micrometer.core.instrument.MeterRegistry
 import no.nav.boot.conditionals.ConditionalOnDevOrLocal
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.sekunder
-import org.springframework.beans.factory.ListableBeanFactory
-import org.springframework.beans.factory.SmartInitializingSingleton
+import org.springframework.beans.factory.ObjectProvider
+import org.springframework.boot.http.client.HttpComponentsClientHttpRequestFactoryBuilder
+import org.springframework.boot.http.client.autoconfigure.ClientHttpRequestFactoryBuilderCustomizer
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
+import org.springframework.boot.restclient.RestClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatusCode
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
-import org.springframework.web.client.RestClient
-import org.springframework.web.service.annotation.DeleteExchange
-import org.springframework.web.service.annotation.GetExchange
-import org.springframework.web.service.annotation.HttpExchange
-import org.springframework.web.service.annotation.PatchExchange
-import org.springframework.web.service.annotation.PostExchange
-import org.springframework.web.service.annotation.PutExchange
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
@@ -38,7 +33,7 @@ import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 class RestBeanConfig(
     private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor,
     private val handler: ErrorHandler,
-    private val logbookInterceptor: org.springframework.beans.factory.ObjectProvider<LogbookClientHttpRequestInterceptor>,
+    private val logbookInterceptor: ObjectProvider<LogbookClientHttpRequestInterceptor>,
 ) : WebMvcConfigurer {
 
     @Bean
@@ -54,7 +49,7 @@ class RestBeanConfig(
             .build()
 
     @Bean
-    fun jackson3Customizer() = org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer {
+    fun jackson3Customizer() = JsonMapperBuilderCustomizer {
         it.enable(INCLUDE_SOURCE_IN_LOCATION)
     }
 
@@ -64,7 +59,7 @@ class RestBeanConfig(
 
     @Bean
     fun restClientCustomizer() =
-        org.springframework.boot.restclient.RestClientCustomizer { c ->
+        RestClientCustomizer { c ->
             c.requestInterceptors {
                 logbookInterceptor.ifAvailable { interceptor -> it.add(interceptor) }
             }
@@ -72,41 +67,9 @@ class RestBeanConfig(
         }
 
     @Bean
-    fun httpClientPoolMetricsBinder(
-        metrics: HttpClientPoolMetrics,
-        beanFactory: ListableBeanFactory,
-    ): SmartInitializingSingleton = SmartInitializingSingleton {
-        beanFactory.getBeansOfType(RestClient::class.java)
-            .forEach { (name, client) -> metrics.bind(name, client) }
-        beanFactory.getBeansOfType(HttpComponentsClientHttpRequestFactory::class.java)
-            .forEach { (name, factory) -> metrics.bind(name, factory) }
-        beanFactory.beanDefinitionNames.forEach { beanName ->
-            val type = beanFactory.getType(beanName) ?: return@forEach
-            if (isHttpExchangeClientType(type)) metrics.bindClient(beanName)
-        }
-    }
-
-    private fun isHttpExchangeClientType(type: Class<*>): Boolean {
-        val types = buildList {
-            add(type)
-            addAll(type.interfaces)
-        }
-        return types.any { candidate ->
-            candidate.methods.any { method ->
-                method.isAnnotationPresent(HttpExchange::class.java) ||
-                    method.isAnnotationPresent(GetExchange::class.java) ||
-                    method.isAnnotationPresent(PostExchange::class.java) ||
-                    method.isAnnotationPresent(PutExchange::class.java) ||
-                    method.isAnnotationPresent(PatchExchange::class.java) ||
-                    method.isAnnotationPresent(DeleteExchange::class.java)
-            }
-        }
-    }
-
-    @Bean
     fun httpComponentsBuilderCustomizer():
-            org.springframework.boot.http.client.autoconfigure.ClientHttpRequestFactoryBuilderCustomizer<org.springframework.boot.http.client.HttpComponentsClientHttpRequestFactoryBuilder> =
-        org.springframework.boot.http.client.autoconfigure.ClientHttpRequestFactoryBuilderCustomizer { builder ->
+            ClientHttpRequestFactoryBuilderCustomizer<HttpComponentsClientHttpRequestFactoryBuilder> =
+        ClientHttpRequestFactoryBuilderCustomizer { builder ->
             builder
                 .withConnectionManagerCustomizer { cm ->
                     cm.setMaxConnTotal(300)

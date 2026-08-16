@@ -5,29 +5,24 @@ import io.micrometer.core.instrument.MeterRegistry
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import org.apache.hc.client5.http.classic.HttpClient
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager
-import org.apache.hc.core5.pool.PoolStats
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.http.client.ClientHttpRequestFactory
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import org.springframework.web.client.RestClient
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 
 @NoCoverageAnalysis
-class HttpClientPoolMetrics(registry: MeterRegistry) {
+class HttpClientPoolMetrics(private val registry: MeterRegistry) {
 
     private val log = getLogger(javaClass)
     private val connectionManagers = ConcurrentHashMap.newKeySet<PoolingHttpClientConnectionManager>()
     private val warnedAboutMissingManager = AtomicBoolean(false)
     private val warnedAboutUnexpectedClient = AtomicBoolean(false)
+    private val warnedAboutNonHttpComponentsFactory = AtomicBoolean(false)
+    private val warnedAboutRestClientFactoryReflection = AtomicBoolean(false)
 
     init {
-        listOf("leased", "pending", "available", "max").forEach { state ->
-            Gauge.builder("tilgangsmaskin.http.client.pool", this) { metrics ->
-                metrics.totalStats().valueFor(state).toDouble()
-            }
-                .tag("state", state)
-                .strongReference(true)
-                .register(registry)
-        }
         Gauge.builder("tilgangsmaskin.http.client.pool", this) { metrics ->
             metrics.connectionManagers.size.toDouble()
         }
@@ -36,7 +31,19 @@ class HttpClientPoolMetrics(registry: MeterRegistry) {
             .register(registry)
     }
 
-    fun bind(factory: HttpComponentsClientHttpRequestFactory) {
+    fun bind(beanName: String, restClient: RestClient) {
+        val requestFactory = requestFactory(restClient)
+        if (requestFactory !is HttpComponentsClientHttpRequestFactory) {
+            if (warnedAboutNonHttpComponentsFactory.compareAndSet(false, true)) {
+                val type = requestFactory?.javaClass?.name ?: "null"
+                log.warn("Skipping HTTP pool metrics for bean {}: request factory is {}", beanName, type)
+            }
+            return
+        }
+        bind(beanName, requestFactory)
+    }
+
+    fun bind(beanName: String, factory: HttpComponentsClientHttpRequestFactory) {
         val connectionManager = connectionManager(factory.httpClient)
         if (connectionManager == null) {
             if (warnedAboutMissingManager.compareAndSet(false, true)) {
@@ -44,7 +51,58 @@ class HttpClientPoolMetrics(registry: MeterRegistry) {
             }
             return
         }
-        connectionManagers.add(connectionManager)
+        if (!connectionManagers.add(connectionManager)) return
+
+        val managerName = sanitizeManagerName(beanName)
+
+        Gauge.builder("tilgangsmaskin.http.client.pool", connectionManager) { cm ->
+            cm.totalStats.leased.toDouble()
+        }
+            .tag("state", "leased")
+            .tag("manager", managerName)
+            .strongReference(true)
+            .register(registry)
+
+        Gauge.builder("tilgangsmaskin.http.client.pool", connectionManager) { cm ->
+            cm.totalStats.pending.toDouble()
+        }
+            .tag("state", "pending")
+            .tag("manager", managerName)
+            .strongReference(true)
+            .register(registry)
+
+        Gauge.builder("tilgangsmaskin.http.client.pool", connectionManager) { cm ->
+            cm.totalStats.available.toDouble()
+        }
+            .tag("state", "available")
+            .tag("manager", managerName)
+            .strongReference(true)
+            .register(registry)
+
+        Gauge.builder("tilgangsmaskin.http.client.pool", connectionManager) { cm ->
+            cm.totalStats.max.toDouble()
+        }
+            .tag("state", "max")
+            .tag("manager", managerName)
+            .strongReference(true)
+            .register(registry)
+    }
+
+    private fun requestFactory(restClient: RestClient): ClientHttpRequestFactory? {
+        return try {
+            val field = restClient.javaClass.getDeclaredField("clientRequestFactory").apply {
+                isAccessible = true
+            }
+            field.get(restClient) as? ClientHttpRequestFactory
+        } catch (_: ReflectiveOperationException) {
+            if (warnedAboutRestClientFactoryReflection.compareAndSet(false, true)) {
+                log.warn(
+                    "Unable to inspect RestClient implementation {} for request factory",
+                    restClient.javaClass.name
+                )
+            }
+            null
+        }
     }
 
     private fun connectionManager(httpClient: HttpClient): PoolingHttpClientConnectionManager? {
@@ -63,32 +121,6 @@ class HttpClientPoolMetrics(registry: MeterRegistry) {
         return field.get(httpClient) as? PoolingHttpClientConnectionManager
     }
 
-    private fun totalStats(): PoolStats {
-        var leased = 0
-        var pending = 0
-        var available = 0
-        var max = 0
-        connectionManagers.forEach { manager ->
-            val stats = manager.getTotalStats()
-            leased += stats.leased
-            pending += stats.pending
-            available += stats.available
-            max += stats.max
-        }
-        return PoolStats(
-            leased,
-            pending,
-            available,
-            max,
-        )
-    }
-
-    private fun PoolStats.valueFor(state: String): Int =
-        when (state) {
-            "leased" -> leased
-            "pending" -> pending
-            "available" -> available
-            "max" -> max
-            else -> 0
-        }
+    private fun sanitizeManagerName(beanName: String) =
+        beanName.replace(Regex("[^a-zA-Z0-9._-]"), "_")
 }

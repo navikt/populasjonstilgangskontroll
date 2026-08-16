@@ -1,13 +1,15 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.boot.conditionals.ConditionalOnDevOrLocal
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import org.springframework.boot.http.client.HttpComponentsClientHttpRequestFactoryBuilder
-import org.springframework.boot.http.client.autoconfigure.ClientHttpRequestFactoryBuilderCustomizer
-import org.springframework.boot.restclient.RestClientCustomizer
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.sekunder
+import org.springframework.beans.factory.config.BeanPostProcessor
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatusCode
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import org.springframework.web.client.RestClient
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
@@ -50,11 +52,12 @@ class RestBeanConfig(
     }
 
     @Bean
-    fun httpClientPoolMetrics(registry: io.micrometer.core.instrument.MeterRegistry) = HttpClientPoolMetrics(registry)
+    fun httpClientPoolMetrics(registry: MeterRegistry) =
+        HttpClientPoolMetrics(registry)
 
     @Bean
     fun restClientCustomizer() =
-        RestClientCustomizer { c ->
+        org.springframework.boot.restclient.RestClientCustomizer { c ->
             c.requestInterceptors {
                 logbookInterceptor.ifAvailable { interceptor -> it.add(interceptor) }
             }
@@ -62,17 +65,25 @@ class RestBeanConfig(
         }
 
     @Bean
-    fun httpComponentsBuilderCustomizer(metrics: HttpClientPoolMetrics):
-            ClientHttpRequestFactoryBuilderCustomizer<HttpComponentsClientHttpRequestFactoryBuilder> =
-        ClientHttpRequestFactoryBuilderCustomizer { builder ->
+    fun httpClientPoolMetricsBinder(metrics: HttpClientPoolMetrics) = object : BeanPostProcessor {
+        override fun postProcessAfterInitialization(bean: Any, beanName: String): Any {
+            if (bean is RestClient) metrics.bind(beanName, bean)
+            if (bean is HttpComponentsClientHttpRequestFactory) metrics.bind(beanName, bean)
+            return bean
+        }
+    }
+
+    @Bean
+    fun httpComponentsBuilderCustomizer():
+            org.springframework.boot.http.client.autoconfigure.ClientHttpRequestFactoryBuilderCustomizer<org.springframework.boot.http.client.HttpComponentsClientHttpRequestFactoryBuilder> =
+        org.springframework.boot.http.client.autoconfigure.ClientHttpRequestFactoryBuilderCustomizer { builder ->
             builder
-                .withCustomizer(metrics::bind)
                 .withConnectionManagerCustomizer { cm ->
                     cm.setMaxConnTotal(300)
                     cm.setMaxConnPerRoute(50)
                 }
                 .withConnectionConfigCustomizer { cfg ->
-                    cfg.setValidateAfterInactivity(org.apache.hc.core5.util.TimeValue.ofSeconds(2))
+                    cfg.setValidateAfterInactivity(2.sekunder)
                 }
         }
 

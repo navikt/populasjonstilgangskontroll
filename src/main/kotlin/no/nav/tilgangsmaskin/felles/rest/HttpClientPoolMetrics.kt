@@ -155,6 +155,16 @@ class HttpClientPoolMetrics(private val registry: MeterRegistry) {
         return field.get(httpClient) as? PoolingHttpClientConnectionManager
     }
 
-    private fun sanitizeManagerName(beanName: String) =
-        beanName.replace(Regex("[^a-zA-Z0-9._-]"), "_")
+    private fun sanitizeManagerName(beanName: String): String {
+        val simpleName = beanName.substringAfterLast('.')
+        val withoutClientSuffix = simpleName.removeSuffix("Client")
+        val normalized = withoutClientSuffix
+            .replace('æ', 'a')
+            .replace('ø', 'o')
+            .replace('å', 'a')
+            .replace('Æ', 'A')
+            .replace('Ø', 'O')
+            .replace('Å', 'A')
+        return normalized.replace(Regex("[^a-zA-Z0-9._-]"), "_")
+    }
 }

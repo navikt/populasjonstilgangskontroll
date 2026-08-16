@@ -3,23 +3,21 @@ package no.nav.tilgangsmaskin.felles.rest
 import no.nav.boot.conditionals.ConditionalOnDevOrLocal
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.sekunder
-import org.apache.hc.client5.http.config.ConnectionConfig
-import org.apache.hc.client5.http.impl.classic.HttpClients
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder
+import org.apache.hc.core5.util.TimeValue
+import org.apache.hc.core5.util.TimeValue.ofSeconds
 import org.springframework.beans.factory.ObjectProvider
+import org.springframework.boot.http.client.HttpComponentsClientHttpRequestFactoryBuilder
+import org.springframework.boot.http.client.autoconfigure.ClientHttpRequestFactoryBuilderCustomizer
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
 import org.springframework.boot.restclient.RestClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import org.zalando.logbook.HeaderFilter
 import org.zalando.logbook.HeaderFilter.none
 import org.zalando.logbook.core.Conditions.exclude
 import org.zalando.logbook.core.Conditions.requestTo
@@ -29,8 +27,6 @@ import org.zalando.logbook.core.DefaultHttpLogWriter
 import org.zalando.logbook.core.DefaultSink
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
-import java.time.Duration
-import java.time.Duration.ofSeconds
 
 
 @Configuration
@@ -61,21 +57,21 @@ class RestBeanConfig(
     @Bean
     fun restClientCustomizer() =
         RestClientCustomizer { c ->
-            c.requestFactory(HttpComponentsClientHttpRequestFactory(HttpClients.custom()
-                .setConnectionManager(PoolingHttpClientConnectionManagerBuilder.create()
-                    .setDefaultConnectionConfig(ConnectionConfig.custom()
-                        .setValidateAfterInactivity(2.sekunder).build())
-                    .build())
-                .build()).apply {
-                setConnectionRequestTimeout(ofSeconds(3))
-                setReadTimeout(ofSeconds(5))
-            })
             c.requestInterceptors {
                 if (!isProd) {
                     logbookInterceptor.ifAvailable { interceptor -> it.add(interceptor) }
                 }
             }
             c.defaultStatusHandler(HttpStatusCode::isError, handler::handle)
+        }
+
+    @Bean
+    fun httpComponentsBuilderCustomizer():
+            ClientHttpRequestFactoryBuilderCustomizer<HttpComponentsClientHttpRequestFactoryBuilder> =
+        ClientHttpRequestFactoryBuilderCustomizer { builder ->
+            builder.withConnectionConfigCustomizer { cfg ->
+                cfg.setValidateAfterInactivity(ofSeconds(2))
+            }
         }
 
     override fun addInterceptors(registry: InterceptorRegistry) {

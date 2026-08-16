@@ -44,6 +44,9 @@ spring:
           base-url: "http://entra-proxy.sikkerhetstjenesten"
         graph:
           base-url: "https://graph.microsoft.com/v1.0"
+    clients:
+      connect-timeout: 3s
+      read-timeout: 5s
 
   security:
     oauth2:
@@ -55,7 +58,7 @@ spring:
       client:
         provider:
           azuread:
-            token-uri: ${azure.openid.config.token.endpoint}
+            issuer-uri: ${azure.openid.config.issuer}
         registration:
           skjerming:
             provider: azuread

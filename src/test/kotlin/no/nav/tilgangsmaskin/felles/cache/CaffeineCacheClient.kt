@@ -46,23 +46,29 @@ class CaffeineCacheClient(private val cacheManager: CacheManager) : CacheOperati
         return "$extra$id"
     }
 
-    override fun clear(cache: CacheNøkkelConfig) {
+    override fun clear(cache: CacheNøkkelConfig): Long {
         if (isProd) {
             throw UnsupportedOperationException("Clear er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold")
         }
-        val springCache = cacheManager.getCache(cache.name) ?: return
-        if (cache.extraPrefix == null) {
-            springCache.clear()
-        } else {
-            val prefix = caffeineNøkkel(cache, "")
-            val nativeCache = springCache.nativeCache
-            if (nativeCache is com.github.benmanes.caffeine.cache.Cache<*, *>) {
-                nativeCache.asMap().keys
+        val springCache = cacheManager.getCache(cache.name) ?: return 0L
+        val nativeCache = springCache.nativeCache
+        if (nativeCache is com.github.benmanes.caffeine.cache.Cache<*, *>) {
+            return if (cache.extraPrefix == null) {
+                val deleted = nativeCache.estimatedSize()
+                springCache.clear()
+                deleted
+            } else {
+                val prefix = caffeineNøkkel(cache, "")
+                val deleted = nativeCache.asMap().keys
                     .filterIsInstance<String>()
                     .filter { it.startsWith(prefix) }
-                    .forEach { springCache.evict(it) }
+                    .toList()
+                deleted.forEach { springCache.evict(it) }
+                deleted.size.toLong()
             }
         }
+        springCache.clear()
+        0L
     }
 
     override fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long> =

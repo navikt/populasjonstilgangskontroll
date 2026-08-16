@@ -114,22 +114,25 @@ class ValkeyCacheOperations(
         }
     }
 
-    override fun clear(cache: CacheNøkkelConfig) {
+    override fun clear(cache: CacheNøkkelConfig): Long {
         check(!isProd) { "Clear er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold" }
         log.info("Tømmer cache {}", cache.name)
-        valkey.execute {
+        return valkey.execute {
             (it.keyCommands().scan(scanOptions(cache)) as Cursor<ByteArray>).use { cursor ->
                 val batch = mutableListOf<String>()
+                var deleted = 0L
                 cursor.forEach { keyBytes ->
                     batch += keyBytes.toString(UTF_8)
                     if (batch.size == BATCH_SIZE) {
+                        deleted += batch.size.toLong()
                         valkey.unlink(batch)
                         batch.clear()
                     }
                 }
+                deleted += batch.size.toLong()
                 valkey.unlink(batch)
+                deleted
             }
-            null
         }
     }
 

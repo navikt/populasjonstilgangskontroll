@@ -1,12 +1,10 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import no.nav.boot.conditionals.ConditionalOnDev
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
 import no.nav.tilgangsmaskin.bruker.pdl.generated.client.HentPersonGraphQLQuery
 import no.nav.tilgangsmaskin.bruker.pdl.generated.client.HentPersonProjectionRoot
-import no.nav.tilgangsmaskin.bruker.pdl.generated.types.Sivilstand
 import no.nav.tilgangsmaskin.bruker.pdl.generated.types.Sivilstandstype
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
@@ -37,7 +35,7 @@ class PdlDgsGraphQLClientAdapter(
             } ?: throw e
         }.getOrThrow()
 
-    private fun hentSivilstand(ident: String): List<Sivilstand> =
+    private fun hentSivilstand(ident: String): List<DgsSivilstand> =
         runCatching {
             dgsClient
                 .request(HentPersonGraphQLQuery.newRequest().ident(ident).build())
@@ -46,14 +44,23 @@ class PdlDgsGraphQLClientAdapter(
                         .sivilstand()
                         .relatertVedSivilstand()
                         .type()
+                        .parent()
+                        .metadata()
+                        .master()
+                        .historisk()
                         .root()
                 )
                 .retrieveSync("hentPerson.sivilstand")
-                .toEntityList<Sivilstand>()
+                .toEntityList<DgsSivilstand>()
         }.getOrElse { e ->
             log.warn("Feil ved henting av sivilstand", e)
             errorHandler.handle(cfg.baseUri, e)
         }
+
+    private data class DgsSivilstand(
+        val type: Sivilstandstype,
+        val relatertVedSivilstand: String? = null,
+    )
 
     private fun Sivilstandstype.toDomain() =
         Partnere.Sivilstand.Sivilstandstype.valueOf(name)

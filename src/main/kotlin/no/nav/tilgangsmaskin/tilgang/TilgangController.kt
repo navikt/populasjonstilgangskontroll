@@ -71,13 +71,16 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, private val ca
         enkeltOppslag(ansattId, brukerId, KJERNE_REGELTYPE)
 
     @OOAuth2RequireOBO
-    @DeleteMapping("cache/flush/{id}/")
+    @DeleteMapping("cache/flush")
     @Operation(summary = SUMMARY_CACHE_FLUSH, description = DESCRIPTION_CACHE_FLUSH)
-    fun flushId(@PathVariable id: AnsattId) =
-        cache.delete(OID_CACHE, id.verdi).also {
-            if (it) log.info("Slettet cache innslag i cache ${OID_CACHE.fullName} for ${id.verdi}")
-            else log.trace("Fant ikke cache innslag i cache ${OID_CACHE.fullName} for ${id.verdi}")
+    fun flushId() =
+        with(token.requiredAnsattId.verdi) {
+            cache.delete(OID_CACHE,this).also {
+                if (it) log.info("Slettet cache innslag i cache ${OID_CACHE.fullName} for $this")
+                else log.trace("Fant ikke cache innslag i cache ${OID_CACHE.fullName} for $this")
+            }
         }
+
 
     private fun enkeltOppslag(ansatt: AnsattId, brukerId: String, regelType: RegelType) =
         with(brukerId.trim('"')) {

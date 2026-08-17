@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.TEXT_HTML
 import org.springframework.http.MediaType.TEXT_HTML_VALUE
 import org.springframework.http.ResponseEntity
+import org.springframework.http.ResponseEntity.ok
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -90,11 +91,10 @@ class CacheController(
             log.info("Tømte hele databasen og slettet {} nøkler", it)
         }
 
-    //@OOAuth2RequireOBO
     @GetMapping("reset", produces = [TEXT_HTML_VALUE])
     @Operation(summary = SUMMARY_CACHE_VG, description = DESCRIPTION_CACHE_VG)
     fun flushAnsatt(): ResponseEntity<String> =
-        ResponseEntity.ok()
+        ok()
             .contentType(TEXT_HTML)
             .body(
                 $$"""
@@ -105,28 +105,20 @@ class CacheController(
                     <title>Flush cache</title>
                 </head>
                 <body>
-                    <label for="ansattId">AnsattId</label>
-                    <input id="ansattId" name="ansattId" type="text" />
                     <button type="button" onclick="flushCache()">Flush cache</button>
                     <p id="status"></p>
                     <script>
-                        async function flushCache() {
-                            const ansattId = document.getElementById('ansattId').value.trim();
+                        async function flushCache() {   
                             const status = document.getElementById('status');
-                            if (!ansattId) {
-                                status.textContent = 'AnsattId må fylles ut';
-                                return;
-                            }
-
-                            const response = await fetch(`/api/v1/cache/flush/${encodeURIComponent(ansattId)}/`, {
+                            const response = await fetch(`/api/v1/cache/flush`, {
                                 method: 'DELETE'
                             });
 
                             if (response.ok) {
                                 const flushed = await response.json();
                                 status.textContent = flushed
-                                    ? `Cache-innslag fjernet for ${ansattId}`
-                                    : `Ingen cache-innslag funnet for ${ansattId}`;
+                                    ? `Cache-innslag fjernet`
+                                    : `Ingen cache-innslag funnet`;
                                 return;
                             }
 

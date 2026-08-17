@@ -123,7 +123,10 @@ class CacheController(
                             });
 
                             if (response.ok) {
-                                status.textContent = `Cache flushet for ${ansattId}`;
+                                const flushed = await response.json();
+                                status.textContent = flushed
+                                    ? `Cache-innslag fjernet for ${ansattId}`
+                                    : `Ingen cache-innslag funnet for ${ansattId}`;
                                 return;
                             }
 

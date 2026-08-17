@@ -105,7 +105,7 @@ class CacheController(
                     <title>Flush cache for innlogget bruker</title>
                 </head>
                 <body>
-                    <button type="button" onclick="flushCache()">Flush cache</button>
+                    <button type="button" onclick="flushCache()">Flush cache for innlogget bruker</button>
                     <p id="status"></p>
                     <script>
                         async function flushCache() {   

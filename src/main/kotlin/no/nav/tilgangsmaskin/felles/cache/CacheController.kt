@@ -90,7 +90,7 @@ class CacheController(
             log.info("Tømte hele databasen og slettet {} nøkler", it)
         }
 
-    @OOAuth2RequireOBO
+    //@OOAuth2RequireOBO
     @GetMapping("reset", produces = [TEXT_HTML_VALUE])
     @Operation(summary = SUMMARY_CACHE_VG, description = DESCRIPTION_CACHE_VG)
     fun vgKnapp(): ResponseEntity<String> =

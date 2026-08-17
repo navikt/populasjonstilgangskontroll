@@ -102,7 +102,7 @@ class CacheController(
                 <html lang="no">
                 <head>
                     <meta charset="utf-8">
-                    <title>Flush cache</title>
+                    <title>Flush cache for innlogget bruker</title>
                 </head>
                 <body>
                     <button type="button" onclick="flushCache()">Flush cache</button>

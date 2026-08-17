@@ -1,8 +1,13 @@
 package no.nav.tilgangsmaskin.tilgang
 
+import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
+import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.tilgangsmaskin.felles.cache.DESCRIPTION_CACHE_FLUSH
+import no.nav.tilgangsmaskin.felles.cache.SUMMARY_CACHE_FLUSH
 import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.security.OAuth2RequireCCF
@@ -17,6 +22,7 @@ import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import no.nav.tilgangsmaskin.tilgang.openapi.ProblemDetailApiResponse
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NO_CONTENT
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -36,7 +42,7 @@ private const val DESCRIPTION_KJERNE_CCF = "${MSG}openapi.tilgang.kjerne.ccf.des
 @ProdController
 @ResponseStatus(NO_CONTENT)
 @Tag(name = "TilgangController", description = TILGANG_CONTROLLER_TAG_DESCRIPTION)
-class TilgangController(private val regelTjeneste: RegelTjeneste, private val token: Token) {
+class TilgangController(private val regelTjeneste: RegelTjeneste, private val cache: CacheOperations, private val token: Token) {
 
     private val log = getLogger(javaClass)
 
@@ -63,6 +69,15 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, private val to
     @ProblemDetailApiResponse(summary = SUMMARY_KJERNE_CCF, description = DESCRIPTION_KJERNE_CCF)
     fun kjerneReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String) =
         enkeltOppslag(ansattId, brukerId, KJERNE_REGELTYPE)
+
+    @OOAuth2RequireOBO
+    @DeleteMapping("cache/flush/{id}/")
+    @Operation(summary = SUMMARY_CACHE_FLUSH, description = DESCRIPTION_CACHE_FLUSH)
+    fun flushId(@PathVariable id: AnsattId) =
+        cache.delete(OID_CACHE, id.verdi).also {
+            if (it) log.info("Slettet cache innslag i cache ${OID_CACHE.fullName} for ${id.verdi}")
+            else log.trace("Fant ikke cache innslag i cache ${OID_CACHE.fullName} for ${id.verdi}")
+        }
 
     private fun enkeltOppslag(ansatt: AnsattId, brukerId: String, regelType: RegelType) =
         with(brukerId.trim('"')) {

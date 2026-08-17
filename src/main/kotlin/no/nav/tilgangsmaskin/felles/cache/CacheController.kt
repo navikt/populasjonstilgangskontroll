@@ -2,8 +2,6 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import io.swagger.v3.oas.annotations.Operation
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_CACHE
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_OG_GLOBALE_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.bruker.Identifikator
@@ -11,7 +9,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.DevController
-import no.nav.tilgangsmaskin.felles.security.OOAuth2RequireOBO
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import org.slf4j.LoggerFactory.getLogger
@@ -66,14 +63,17 @@ class CacheController(
     fun cachePersoner(@RequestBody navIds: Set<Identifikator>) =
         cache.getMany<Person>(CacheNøkkelConfig(PDL), navIds.mapTo(mutableSetOf()) { it.verdi })
 
-    @DeleteMapping("cache/flush/{id}/")
+    @DeleteMapping("flush/{id}/")
     @Operation(summary = SUMMARY_CACHE_FLUSH, description = DESCRIPTION_CACHE_FLUSH)
-    fun cacheFlushSingle(@PathVariable id: AnsattId) =
-      flush(OID_CACHE, id)
+    fun flushId(@PathVariable id: AnsattId) =
+        cache.delete(OID_CACHE, id.verdi).also {
+            if (it) log.info("Slettet cache innslag i cache ${OID_CACHE.fullName} for ${id.verdi}")
+            else log.trace("Fant ikke cache innslag i cache ${OID_CACHE.fullName} for ${id.verdi}")
+        }
 
-    @DeleteMapping("cache/flush/{cacheName}/all")
+    @DeleteMapping("flushCache/{cacheName}")
     @Operation(summary = SUMMARY_CACHE_FLUSH_ALL, description = DESCRIPTION_CACHE_FLUSH_ALL)
-    fun cacheFlushAll(@PathVariable cacheName: String) =
+    fun flushCache(@PathVariable cacheName: String) =
         with(alleNøkkelConfigs[cacheName]
             ?: throw ResponseStatusException(NOT_FOUND,
                 "Ukjent cache: $cacheName. Tilgjengelige cacher: ${alleNøkkelConfigs.keys}")) {
@@ -83,9 +83,9 @@ class CacheController(
             }
         }
 
-    @DeleteMapping("db/flush")
+    @DeleteMapping("flushDB")
     @Operation(summary = SUMMARY_CACHE_FLUSH_DB, description = DESCRIPTION_CACHE_FLUSH_DB)
-    fun cacheFlushDB() =
+    fun flushDB() =
         cache.clearAll().also {
             log.info("Tømte hele databasen og slettet {} nøkler", it)
         }
@@ -93,7 +93,7 @@ class CacheController(
     //@OOAuth2RequireOBO
     @GetMapping("reset", produces = [TEXT_HTML_VALUE])
     @Operation(summary = SUMMARY_CACHE_VG, description = DESCRIPTION_CACHE_VG)
-    fun flushit(): ResponseEntity<String> =
+    fun flushAnsatt(): ResponseEntity<String> =
         ResponseEntity.ok()
             .contentType(TEXT_HTML)
             .body(
@@ -145,9 +145,4 @@ class CacheController(
                 """.trimIndent()
             )
 
-    private fun flush(cfg: CacheNøkkelConfig, id: AnsattId) =
-        cache.delete(cfg, id.verdi).also {
-            if (it) log.info("Slettet cache innslag i cache ${cfg.fullName} for ${id.verdi}")
-            else log.trace("Fant ikke cache innslag i cache ${cfg.fullName} for ${id.verdi}")
-        }
 }

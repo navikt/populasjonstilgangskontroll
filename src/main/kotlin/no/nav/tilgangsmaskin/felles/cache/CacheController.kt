@@ -122,9 +122,19 @@ class CacheController(
                                 method: 'DELETE'
                             });
 
-                            status.textContent = response.ok
-                                ? `Cache flushet for ${ansattId}`
-                                : `Flush feilet: ${response.status}`;
+                            if (response.ok) {
+                                status.textContent = `Cache flushet for ${ansattId}`;
+                                return;
+                            }
+
+                            const contentType = response.headers.get('content-type') ?? '';
+                            if (contentType.includes('json')) {
+                                const problem = await response.json();
+                                status.textContent = problem.detail ?? `Flush feilet: ${response.status}`;
+                                return;
+                            }
+
+                            status.textContent = `Flush feilet: ${response.status}`;
                         }
                     </script>
                 </body>

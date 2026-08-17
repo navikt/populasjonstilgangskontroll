@@ -69,7 +69,7 @@ class CacheController(
     @DeleteMapping("cache/flush/{id}/")
     @Operation(summary = SUMMARY_CACHE_FLUSH, description = DESCRIPTION_CACHE_FLUSH)
     fun cacheFlushSingle(@PathVariable id: AnsattId) =
-        setOf(GEO_CACHE, GEO_OG_GLOBALE_CACHE, OID_CACHE).forEach { flush(it, id) }
+      flush(OID_CACHE, id)
 
     @DeleteMapping("cache/flush/{cacheName}/all")
     @Operation(summary = SUMMARY_CACHE_FLUSH_ALL, description = DESCRIPTION_CACHE_FLUSH_ALL)
@@ -90,10 +90,10 @@ class CacheController(
             log.info("Tømte hele databasen og slettet {} nøkler", it)
         }
 
-    //@OOAuth2RequireOBO
+    @OOAuth2RequireOBO
     @GetMapping("reset", produces = [TEXT_HTML_VALUE])
     @Operation(summary = SUMMARY_CACHE_VG, description = DESCRIPTION_CACHE_VG)
-    fun vgKnapp(): ResponseEntity<String> =
+    fun flushit(): ResponseEntity<String> =
         ResponseEntity.ok()
             .contentType(TEXT_HTML)
             .body(
@@ -142,11 +142,9 @@ class CacheController(
                 """.trimIndent()
             )
 
-    private fun flush(cfg: CacheNøkkelConfig, id: AnsattId) {
+    private fun flush(cfg: CacheNøkkelConfig, id: AnsattId) =
         cache.delete(cfg, id.verdi).also {
             if (it) log.info("Slettet cache innslag i cache ${cfg.fullName} for ${id.verdi}")
             else log.trace("Fant ikke cache innslag i cache ${cfg.fullName} for ${id.verdi}")
         }
-    }
-
 }

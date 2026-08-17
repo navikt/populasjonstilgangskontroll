@@ -15,7 +15,11 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.MediaType.TEXT_HTML
+import org.springframework.http.MediaType.TEXT_HTML_VALUE
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -32,6 +36,8 @@ private const val SUMMARY_CACHE_FLUSH_ALL = "${MSG}openapi.dev.cache.flush.all.s
 private const val DESCRIPTION_CACHE_FLUSH_ALL = "${MSG}openapi.dev.cache.flush.all.description"
 private const val SUMMARY_CACHE_FLUSH_DB = "${MSG}openapi.dev.cache.flush.db.summary"
 private const val DESCRIPTION_CACHE_FLUSH_DB = "${MSG}openapi.dev.cache.flush.db.description"
+private const val SUMMARY_CACHE_VG = "${MSG}openapi.dev.cache.vg.summary"
+private const val DESCRIPTION_CACHE_VG = "${MSG}openapi.dev.cache.vg.description"
 
 
 @DevController(
@@ -61,7 +67,7 @@ class CacheController(
 
     @DeleteMapping("cache/flush/{id}/")
     @Operation(summary = SUMMARY_CACHE_FLUSH, description = DESCRIPTION_CACHE_FLUSH)
-    fun cacheFlushSingle(@RequestBody id: AnsattId) =
+    fun cacheFlushSingle(@PathVariable id: AnsattId) =
         setOf(GEO_CACHE, GEO_OG_GLOBALE_CACHE, OID_CACHE).forEach { flush(it, id) }
 
     @DeleteMapping("cache/flush/{cacheName}/all")
@@ -82,6 +88,47 @@ class CacheController(
         cache.clearAll().also {
             log.info("Tømte hele databasen og slettet {} nøkler", it)
         }
+
+    @GetMapping("vg", produces = [TEXT_HTML_VALUE])
+    @Operation(summary = SUMMARY_CACHE_VG, description = DESCRIPTION_CACHE_VG)
+    fun vgKnapp(): ResponseEntity<String> =
+        ResponseEntity.ok()
+            .contentType(TEXT_HTML)
+            .body(
+                $$"""
+                <!doctype html>
+                <html lang="no">
+                <head>
+                    <meta charset="utf-8">
+                    <title>Flush cache</title>
+                </head>
+                <body>
+                    <label for="ansattId">AnsattId</label>
+                    <input id="ansattId" name="ansattId" type="text" />
+                    <button type="button" onclick="flushCache()">Flush cache</button>
+                    <p id="status"></p>
+                    <script>
+                        async function flushCache() {
+                            const ansattId = document.getElementById('ansattId').value.trim();
+                            const status = document.getElementById('status');
+                            if (!ansattId) {
+                                status.textContent = 'AnsattId må fylles ut';
+                                return;
+                            }
+
+                            const response = await fetch(`cache/flush/${encodeURIComponent(ansattId)}/`, {
+                                method: 'DELETE'
+                            });
+
+                            status.textContent = response.ok
+                                ? `Cache flushet for ${ansattId}`
+                                : `Flush feilet: ${response.status}`;
+                        }
+                    </script>
+                </body>
+                </html>
+                """.trimIndent()
+            )
 
     private fun flush(cfg: CacheNøkkelConfig, id: AnsattId) {
         cache.delete(cfg, id.verdi).also {

@@ -91,7 +91,7 @@ class CacheController(
             log.info("Tømte hele databasen og slettet {} nøkler", it)
         }
 
-    @GetMapping("reset", produces = [TEXT_HTML_VALUE])
+    @GetMapping("flush", produces = [TEXT_HTML_VALUE])
     @Operation(summary = SUMMARY_CACHE_VG, description = DESCRIPTION_CACHE_VG)
     fun flushAnsatt(): ResponseEntity<String> =
         ok()

@@ -3,9 +3,9 @@ package no.nav.tilgangsmaskin.ansatt
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRUPPER_FILTER
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 
 class EntraUrlTest : BehaviorSpec({
 

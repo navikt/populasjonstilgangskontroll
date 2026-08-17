@@ -1,3 +1,57 @@
 retry:
   delay: 0ms
 
+spring:
+  data:
+    redis:
+      timeout: 2s
+      connect-timeout: 2s
+  security:
+    oauth2:
+      client:
+        provider:
+          azuread:
+            token-uri: http://mock-oauth2-server/token
+        registration:
+          skjerming:
+            provider: azuread
+            client-id: test
+            client-secret: test
+            authorization-grant-type: client_credentials
+            scope:
+              - skjerming-scope
+          entraproxy:
+            provider: azuread
+            client-id: test
+            client-secret: test
+            authorization-grant-type: client_credentials
+            scope:
+              - entraproxy-scope
+          graph:
+            provider: azuread
+            client-id: test
+            client-secret: test
+            authorization-grant-type: client_credentials
+            scope:
+              - graph-scope
+          pdl-pip:
+            provider: azuread
+            client-id: test
+            client-secret: test
+            authorization-grant-type: client_credentials
+            scope:
+              - pdl-pip-scope
+          pdl-graph:
+            provider: azuread
+            client-id: test
+            client-secret: test
+            authorization-grant-type: client_credentials
+            scope:
+              - pdl-graph-scope
+          verge:
+            provider: azuread
+            client-id: test
+            client-secret: test
+            authorization-grant-type: client_credentials
+            scope:
+              - verge-scope

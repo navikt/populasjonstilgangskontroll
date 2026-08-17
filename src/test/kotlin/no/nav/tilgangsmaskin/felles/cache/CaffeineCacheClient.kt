@@ -10,19 +10,19 @@ class CaffeineCacheClient(private val cacheManager: CacheManager) : CacheOperati
 
     private val log = getLogger(javaClass)
 
-    override fun delete(cache: CacheNøkkelConfig, id: String): Long {
+    override fun delete(cache: CacheNøkkelConfig, id: String) : Boolean {
         val key = caffeineNøkkel(cache, id)
-        val springCache = cacheManager.getCache(cache.name) ?: return 0L
+        val springCache = cacheManager.getCache(cache.name) ?: return false
         val existed = springCache.get(key) != null
         springCache.evict(key)
-        return if (existed) 1L else 0L
+        return existed
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? =
         cacheManager.getCache(cache.name)?.get(caffeineNøkkel(cache, id))?.get() as T?
 
-    override fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration) {
+    override fun putOne(cache: CacheNøkkelConfig, id: String, value: Any, ttl: Duration?) {
         cacheManager.getCache(cache.name)?.put(caffeineNøkkel(cache, id), value)
     }
 
@@ -35,7 +35,7 @@ class CaffeineCacheClient(private val cacheManager: CacheManager) : CacheOperati
         }.filterValues { it != null }
     }
 
-    override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration) {
+    override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration?) {
         val springCache = cacheManager.getCache(cache.name) ?: return
         log.trace("Caffeine bulk lagrer {} verdier for cache {}", innslag.size, cache.name)
         innslag.forEach { (id, value) -> springCache.put(caffeineNøkkel(cache, id), value) }
@@ -46,39 +46,45 @@ class CaffeineCacheClient(private val cacheManager: CacheManager) : CacheOperati
         return "$extra$id"
     }
 
-    override fun clear(cache: CacheNøkkelConfig) {
-        if (isProd) {
-            throw UnsupportedOperationException("Clear er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold")
-        }
-        val springCache = cacheManager.getCache(cache.name) ?: return
-        if (cache.extraPrefix == null) {
+    override fun clear(cache: CacheNøkkelConfig): Long {
+        val springCache = cacheManager.getCache(cache.name) ?: return 0L
+        val nativeCache = springCache.nativeCache as com.github.benmanes.caffeine.cache.Cache<*, *>
+        return if (cache.extraPrefix == null) {
+            val deleted = nativeCache.estimatedSize()
             springCache.clear()
+            deleted
         } else {
             val prefix = caffeineNøkkel(cache, "")
-            val nativeCache = springCache.nativeCache
-            if (nativeCache is com.github.benmanes.caffeine.cache.Cache<*, *>) {
-                nativeCache.asMap().keys
-                    .filterIsInstance<String>()
-                    .filter { it.startsWith(prefix) }
-                    .forEach { springCache.evict(it) }
-            }
+            val deleted = nativeCache.asMap().keys
+                .filterIsInstance<String>()
+                .filter { it.startsWith(prefix) }
+                .toList()
+            deleted.forEach { springCache.evict(it) }
+            deleted.size.toLong()
         }
+    }
+
+    override fun clearAll(): Long {
+        val deleted = cacheManager.cacheNames.sumOf { cacheName ->
+            val springCache = cacheManager.getCache(cacheName) ?: return@sumOf 0L
+            val nativeCache = springCache.nativeCache as com.github.benmanes.caffeine.cache.Cache<*, *>
+            val count = nativeCache.estimatedSize()
+            springCache.clear()
+            count
+        }
+        return deleted
     }
 
     override fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long> =
         caches.associate { cache ->
             val springCache = cacheManager.getCache(cache.name) ?: error("Cache $cache ikke funnet")
             val count = run {
-                val nativeCache = springCache.nativeCache
-                if (nativeCache is com.github.benmanes.caffeine.cache.Cache<*, *>) {
-                    if (cache.extraPrefix == null) {
-                        nativeCache.estimatedSize()
-                    } else {
-                        val prefix = caffeineNøkkel(cache, "")
-                        nativeCache.asMap().keys.count { it is String && it.startsWith(prefix) }.toLong()
-                    }
+                val nativeCache = springCache.nativeCache as com.github.benmanes.caffeine.cache.Cache<*, *>
+                if (cache.extraPrefix == null) {
+                    nativeCache.estimatedSize()
                 } else {
-                    error("Cache $cache ikke Caffeine")
+                    val prefix = caffeineNøkkel(cache, "")
+                    nativeCache.asMap().keys.count { it is String && it.startsWith(prefix) }.toLong()
                 }
             }
             cache.fullName to count

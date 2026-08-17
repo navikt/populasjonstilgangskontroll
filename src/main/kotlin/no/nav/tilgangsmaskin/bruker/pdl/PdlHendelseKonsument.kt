@@ -4,9 +4,9 @@ package no.nav.tilgangsmaskin.bruker.pdl
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.UGRADERT
-import no.nav.tilgangsmaskin.bruker.pdl.PdlBeanConfig.Companion.PDL_CONTAINER_FACTORY
-import no.nav.tilgangsmaskin.bruker.pdl.PdlBeanConfig.Companion.PDL_GRADERING_FILTER
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_CACHES
+import no.nav.tilgangsmaskin.bruker.pdl.PdlKafkaBeanConfig.Companion.PDL_CONTAINER_FACTORY
+import no.nav.tilgangsmaskin.bruker.pdl.PdlKafkaBeanConfig.Companion.PDL_GRADERING_FILTER
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_CACHES
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
@@ -35,7 +35,7 @@ class PdlHendelseKonsument(private val client: CacheOperations,
     }
 
     private fun slett(cache: CacheNøkkelConfig, id: String, gradering: String, endringsType: String) {
-        if (client.delete(cache, id) > 0) {
+        if (client.delete(cache, id)) {
             teller.tell(cache, gradering, endringsType)
             log.trace(CONFIDENTIAL,
                 "Slettet nøkkel ${cache.tilNøkkel(id)} fra cache ${cache.name} etter hendelse av type $gradering",

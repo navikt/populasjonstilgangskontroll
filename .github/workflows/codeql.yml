@@ -1,6 +1,6 @@
 # This workflow requires "advanced setup" to be enabled for CodeQL in the repository settings.
 # To enable: Settings → Code security → CodeQL analysis → Switch to advanced
-# This replaces the default autobuild which fails with SSL certificate errors when using Java 25.
+# This replaces the default autobuild which fails with SSL certificate errors when using Java 26.
 name: "CodeQL"
 
 on:
@@ -40,7 +40,7 @@ jobs:
     - name: Setup Java 25
       uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
       with:
-        java-version: '25'
+        java-version: '26'
         distribution: 'temurin'
 
     - name: Setup Gradle
@@ -57,7 +57,6 @@ jobs:
         ORG_GRADLE_PROJECT_githubUser: x-access-token
         ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        ./gradlew --version
         ./gradlew clean build -x test --no-daemon 
 
     - name: Perform CodeQL Analysis

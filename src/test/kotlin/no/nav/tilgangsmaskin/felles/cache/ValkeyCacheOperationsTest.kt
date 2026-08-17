@@ -6,17 +6,13 @@ import com.redis.testcontainers.RedisContainer.DEFAULT_IMAGE_NAME
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.nondeterministic.eventually
 import io.kotest.assertions.nondeterministic.eventuallyConfig
-import io.kotest.core.extensions.ApplyExtension
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
+import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import io.lettuce.core.RedisClient
-import io.lettuce.core.RedisClient.create
-import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
@@ -25,55 +21,55 @@ import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.MOR
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Bydel
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Kommune
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.Person
-import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheOperationsTest.ValkeyCacheTestConfig
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
-
-import no.nav.tilgangsmaskin.tilgang.Token
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
-import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection
-import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
-import org.springframework.data.redis.cache.RedisCacheManager.builder
-import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Import
-import io.kotest.matchers.comparables.shouldBeLessThan
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.MOR
-import no.nav.tilgangsmaskin.bruker.pdl.PdlConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.UGRADERT
+import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheOperationsTest.ValkeyCacheTestConfig
+import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
+import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
-import org.springframework.context.annotation.Primary
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection
+import org.springframework.context.annotation.Bean
+import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig
+import org.springframework.data.redis.cache.RedisCacheManager.builder
+import org.springframework.data.redis.config.RedisListenerConfigurer
+import org.springframework.data.redis.connection.RedisConnectionFactory
+import org.springframework.data.redis.core.StringRedisTemplate
+import org.springframework.data.redis.serializer.RedisMessageConverters
+import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.TestPropertySource
 import java.time.Duration.ofSeconds
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
 @DataRedisTest
-@AutoConfigureMetrics
-@Import(ValkeyCacheTestConfig::class, ValkeyEventListeningCacheOppfrisker::class)
-@ApplyExtension(SpringExtension::class)
-class ValkeyCacheOperationsTest : BehaviorSpec() {
+@TestPropertySource(properties = ["logging.level.no.nav.tilgangsmaskin.felles.cache.ValkeyEventListeningCacheOppfrisker=INFO"])
+@ContextConfiguration(classes = [ValkeyCacheTestConfig::class,ValkeyEventListeningCacheOppfrisker::class])
+@EnableAutoConfiguration
+class ValkeyCacheOperationsTest(
+    private val cache: CacheOperations,
+    private val cacheSizeAware: CacheSizeAware,
+    private val valkey: StringRedisTemplate,
+) : BehaviorSpec() {
 
     @TestConfiguration
-    class ValkeyCacheTestConfig(private val cf: RedisConnectionFactory) {
+    class ValkeyCacheTestConfig(private val cf: RedisConnectionFactory) : RedisListenerConfigurer{
 
-        @Bean
-        @Primary
-        fun cacheConfig() =
-            CacheConfig("unused", "unused", redis.host, redis.firstMappedPort, ofSeconds(5))
-
-        @Bean
-        fun redisClient(cfg: CacheConfig) =
-            create("redis://${cfg.host}:${cfg.port}")
+        override fun configureMessageConverters(builder: RedisMessageConverters.Builder) {
+            builder.addCustomConverter(CacheNøkkelMessageConverter())
+        }
 
         @Bean
         fun cacheManager() =
@@ -81,34 +77,36 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                 .withInitialCacheConfigurations(
                     mapOf(PDL_MED_FAMILIE_CACHE.name to defaultCacheConfig()
                         .prefixCacheNameWith(PDL_MED_FAMILIE_CACHE.name)
-                        .disableCachingNullValues())
-                )
+                        .disableCachingNullValues()))
                 .build()
 
         @Bean
-        fun valkeyCacheTeller(meterRegistry: MeterRegistry) =
-            ValkeyCacheTeller(meterRegistry)
+        fun valkeyCacheOperations(valkey: StringRedisTemplate) =
+            ValkeyCacheOperations(
+                valkey,
+                object : CachableRestConfig {
+                    override val navn = "pdl-test"
+                    override val caches = setOf(PDL_MED_FAMILIE_CACHE)
+                    override val varighet = ofSeconds(DEFAULT_TTL_SECONDS)
+                }
+            )
 
         @Bean
-        fun cacheOppfriskerTeller(meterRegistry: MeterRegistry, token: Token) =
-            CacheOppfriskerTeller(meterRegistry, token)
-
-        @Bean
-        fun valkeyCacheOperations(client: RedisClient, cfg: CacheConfig, teller: ValkeyCacheTeller) =
-            ValkeyCacheOperations(client, cfg, teller)
+        fun cacheSizeAware(cache: CacheOperations) =
+            CacheSizeAware(
+                cache,
+                object : CachableRestConfig {
+                    override val navn = "pdl-test"
+                    override val caches = setOf(PDL_MED_FAMILIE_CACHE)
+                })
     }
 
     @MockkBean
     private lateinit var token: Token
 
-    @MockkBean
+    @MockkBean(relaxed = true)
     private lateinit var oppfrisker: CacheOppfrisker
 
-    @Autowired
-    private lateinit var cache: CacheOperations
-
-    @Autowired
-    private lateinit var redisClient: RedisClient
 
     init {
 
@@ -127,7 +125,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     val many = cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, IDS)
                     many.keys shouldBe IDS
                     many.values shouldBe listOf(P1, P2)
-                    eventually(TIMEOUTS) {
+                    eventually(TIMEOUT) {
                         cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, IDS).shouldBeEmpty()
                     }
                 }
@@ -137,24 +135,42 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, emptySet()).shouldBeEmpty()
                 }
             }
+            When("putMany kalles med tom map") {
+                Then("er kall et no-op uten sideeffekter") {
+                    cache.putMany(PDL_MED_FAMILIE_CACHE, emptyMap(), ofSeconds(5))
+                    cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 0
+                    cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, IDS).shouldBeEmpty()
+                }
+            }
+        }
+
+        Given("putOne uten eksplisitt TTL") {
+            When("verdien lagres") {
+                Then("settes TTL fra CachableRestConfig") {
+                    cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1)
+
+                    val ttl = valkey.getExpire(PDL_MED_FAMILIE_CACHE.tilNøkkel(I1))
+                    (ttl in 1..DEFAULT_TTL_SECONDS) shouldBe true
+                }
+            }
         }
 
         Given("sletting av enkeltinnslag") {
             When("nøkkelen eksisterer") {
-                Then("returnerer 1 og verdien er fjernet") {
+                Then("returnerer true og verdien er fjernet") {
                     cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(2))
                     assertSoftly {
                         cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, I1) shouldBe P1
-                        cache.delete(PDL_MED_FAMILIE_CACHE, I1) shouldBe 1L
+                        cache.delete(PDL_MED_FAMILIE_CACHE, I1) shouldBe true
                         cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, I1).shouldBeNull()
                     }
                 }
             }
             When("nøkkelen ikke eksisterer") {
-                Then("returnerer 0") {
+                Then("returnerer false") {
                     assertSoftly {
                         cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, I1).shouldBeNull()
-                        cache.delete(PDL_MED_FAMILIE_CACHE, I1) shouldBe 0
+                        cache.delete(PDL_MED_FAMILIE_CACHE, I1) shouldBe false
                     }
                 }
             }
@@ -164,9 +180,6 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
             When("TTL løper ut") {
                 Then("Valkey publiserer expired-event som håndteres av ValkeyListener") {
 
-                    redisClient.connect().use { connection ->
-                        connection.sync().configSet("notify-keyspace-events", "Exd")
-                    }
 
                     cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(1))
 
@@ -179,21 +192,40 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     }
                 }
             }
+
+            When("nøkkel slettes") {
+                Then("Valkey publiserer del-event som håndteres av ValkeyListener") {
+                    cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(10))
+                    cache.delete(PDL_MED_FAMILIE_CACHE, I1) shouldBe true
+
+                    eventually(VALKEY_EVENT_TIMEOUTS) {
+                        verify {
+                            oppfrisker.oppfrisk(match {
+                                it.cacheName == PDL_MED_FAMILIE_CACHE.name && it.id == I1
+                            })
+                        }
+                    }
+                }
+            }
+
         }
 
         Given("tømming av cache") {
             When("cache inneholder verdier") {
                 Then("alle verdier i cachen fjernes") {
                     cache.putMany(PDL_MED_FAMILIE_CACHE, mapOf(I1 to P1, I2 to P2), ofSeconds(1))
+                    cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 2
                     cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, IDS).keys shouldBe IDS
                     cache.clear(PDL_MED_FAMILIE_CACHE)
                     cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, IDS).shouldBeEmpty()
+                    cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 0
                 }
             }
             When("cache er tom") {
                 Then("clear kaster ikke exception") {
                     cache.clear(PDL_MED_FAMILIE_CACHE)
                     cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, IDS).shouldBeEmpty()
+                    cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 0
                 }
             }
         }
@@ -214,7 +246,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
         }
 
         Given("graceful degradation ved Redis-feil") {
-            When("getOne kalles mot pauset Redis") {
+            When("getOne kalles mot utilgjengelig Redis") {
                 Then("returnerer null i stedet for å kaste exception") {
                     cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(30))
                     cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, I1) shouldBe P1
@@ -226,7 +258,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     }
                 }
             }
-            When("getMany kalles mot pauset Redis") {
+            When("getMany kalles mot utilgjengelig Redis") {
                 Then("returnerer tomt map i stedet for å kaste exception") {
                     cache.putMany(PDL_MED_FAMILIE_CACHE, mapOf(I1 to P1, I2 to P2), ofSeconds(30))
                     redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
@@ -237,7 +269,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     }
                 }
             }
-            When("putOne kalles mot pauset Redis") {
+            When("putOne kalles mot utilgjengelig Redis") {
                 Then("kaster ikke exception") {
                     redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
                     try {
@@ -247,7 +279,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     }
                 }
             }
-            When("putMany kalles mot pauset Redis") {
+            When("putMany kalles mot utilgjengelig Redis") {
                 Then("kaster ikke exception") {
                     redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
                     try {
@@ -257,7 +289,7 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     }
                 }
             }
-            When("putMany feiler mot pauset Redis og Redis gjenopprettes") {
+            When("putMany feiler først mot utilgjengelig Redis og Redis blir tilgjengelig igjen") {
                 Then("tilkoblingen er fortsatt brukbar og neste putMany lagrer riktig") {
                     redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
                     try {
@@ -266,8 +298,38 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                         redis.dockerClient.unpauseContainerCmd(redis.containerId).exec()
                     }
                     cache.putMany(PDL_MED_FAMILIE_CACHE, mapOf(I2 to P2), ofSeconds(30))
-                    eventually(TIMEOUTS) {
+                    eventually(TIMEOUT) {
                         cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, I2) shouldBe P2
+                    }
+                }
+            }
+        }
+
+        Given("cache-metrikker") {
+            When("getOne treffer cache") {
+                Then("registreres varighet med cache, operasjon og hit-resultat") {
+                    cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(5))
+
+                    cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, I1) shouldBe P1
+
+                }
+            }
+
+            When("getMany gir både treff og miss") {
+                Then("registreres varighet med delvis-resultat") {
+                    cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(5))
+
+                    cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, setOf(I1, I2)).keys shouldBe setOf(I1)
+                }
+            }
+
+            When("putOne feiler mot utilgjengelig Redis") {
+                Then("registreres varighet med feilet-resultat") {
+                    redis.dockerClient.pauseContainerCmd(redis.containerId).exec()
+                    try {
+                        cache.putOne(PDL_MED_FAMILIE_CACHE, I1, P1, ofSeconds(30))
+                    } finally {
+                        redis.dockerClient.unpauseContainerCmd(redis.containerId).exec()
                     }
                 }
             }
@@ -301,25 +363,42 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                     cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 0
                 }
             }
-            When("5000 innslag legges inn") {
-                Then("size returnerer 5000 og clear tømmer alt") {
-                    val batchSize = 5_000
-                    (1..5000).chunked(batchSize).forEach { chunk ->
-                        val entries = chunk.associate { "id-$it" to Person(
-                            brukerId = BrukerId("%011d".format(it)),
-                            aktørId = AktørId("%013d".format(it)),
-                            geoTilknytning = UkjentBosted()
-                        ) }
+            When("500 innslag legges inn") {
+                Then("size returnerer 500 og clear tømmer alt") {
+                    val batchSize = 500
+                    (1..500).chunked(batchSize).forEach { chunk ->
+                        val entries = chunk.associate {
+                            "id-$it" to Person(
+                                brukerId = BrukerId("%011d".format(it)),
+                                aktørId = AktørId("%013d".format(it)),
+                                geoTilknytning = UkjentBosted()
+                            )
+                        }
                         cache.putMany(PDL_MED_FAMILIE_CACHE, entries, ofSeconds(60))
                     }
 
                     val elapsed = measureTime {
-                        cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 5000
+                        cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 500
                     }
                     elapsed shouldBeLessThan 5.seconds
+                    cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 500
 
                     cache.clear(PDL_MED_FAMILIE_CACHE)
                     cache.size(PDL_MED_FAMILIE_CACHE) shouldBe 0
+                }
+            }
+        }
+
+        Given("antall innslag via CacheSizeAware") {
+            When("cache er tom") {
+                Then("returnerer cache-størrelse fra valkey") {
+                    cacheSizeAware.sizes() shouldBe mapOf(PDL_MED_FAMILIE_CACHE.fullName to 0L)
+                }
+            }
+            When("cache inneholder verdier") {
+                Then("returnerer antall innslag fra valkey") {
+                    cache.putMany(PDL_MED_FAMILIE_CACHE, mapOf(I1 to P1, I2 to P2), ofSeconds(5))
+                    cacheSizeAware.sizes() shouldBe mapOf(PDL_MED_FAMILIE_CACHE.fullName to 2L)
                 }
             }
         }
@@ -333,34 +412,43 @@ class ValkeyCacheOperationsTest : BehaviorSpec() {
                         geoTilknytning = KommuneTilknytning(Kommune("0301")),
                         graderinger = listOf(UGRADERT),
                         familie = Familie(
-                            foreldre = setOf(FamilieMedlem(BrukerId(I2), MOR))
+                             setOf(FamilieMedlem(BrukerId(I2), MOR))
                         ),
                         historiskeIds = setOf(BrukerId(I2))
                     )
 
                     cache.putOne(PDL_MED_FAMILIE_CACHE, person.brukerId.verdi, person, ofSeconds(5))
-                    val retrieved = cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, person.brukerId.verdi)
 
-assertSoftly(retrieved!!) {
-    this shouldBe person
-    brukerId.verdi shouldBe I1
-    aktørId.verdi shouldBe AKTOR_ID
-    geoTilknytning shouldBe KommuneTilknytning(Kommune("0301"))
-    graderinger shouldBe listOf(UGRADERT)
-    familie.foreldre.first().brukerId shouldBe BrukerId(I2)
-    historiskeIds shouldBe setOf(BrukerId(I2))
-}
+                    assertSoftly(cache.getOne<Person>(PDL_MED_FAMILIE_CACHE, person.brukerId.verdi)!!) {
+                        this shouldBe person
+                        brukerId.verdi shouldBe I1
+                        aktørId.verdi shouldBe AKTOR_ID
+                        geoTilknytning shouldBe KommuneTilknytning(Kommune("0301"))
+                        graderinger shouldBe listOf(UGRADERT)
+                        familie.foreldre.first().brukerId shouldBe BrukerId(I2)
+                        historiskeIds shouldBe setOf(BrukerId(I2))
+                    }
                 }
             }
             When("Person lagres og hentes via putMany/getMany") {
                 Then("korrekt Person returneres for hver nøkkel") {
                     val entries = mapOf(I1 to P1, I2 to P2)
                     cache.putMany(PDL_MED_FAMILIE_CACHE, entries, ofSeconds(5))
-                    val result = cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, IDS)
 
-                    assertSoftly {
-                        result[I1] shouldBe P1
-                        result[I2] shouldBe P2
+                    assertSoftly(cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, IDS)) {
+                        this[I1] shouldBe P1
+                        this[I2] shouldBe P2
+                    }
+                }
+            }
+            When("Person lagres via putMany uten TTL") {
+                Then("korrekt Person returneres for hver nøkkel") {
+                    val entries = mapOf(I1 to P1, I2 to P2)
+                    cache.putMany(PDL_MED_FAMILIE_CACHE, entries)
+
+                    assertSoftly(cache.getMany<Person>(PDL_MED_FAMILIE_CACHE, IDS)) {
+                        this[I1] shouldBe P1
+                        this[I2] shouldBe P2
                     }
                 }
             }
@@ -370,14 +458,16 @@ assertSoftly(retrieved!!) {
     private companion object {
         @ServiceConnection
         private val redis = RedisContainer(DEFAULT_IMAGE_NAME)
+        private const val DEFAULT_TTL_SECONDS = 12L
         private const val I1 = "03508331575"
         private const val I2 = "20478606614"
         private const val AKTOR_ID = "1234567890123"
         private const val AKTOR_ID_2 = "9876543210123"
         private val IDS = setOf(I1, I2)
-        private val P1 = Person(BrukerId(I1), I1, AktørId(AKTOR_ID), BydelTilknytning(Bydel("030101")), listOf(FORTROLIG))
+        private val P1 =
+            Person(BrukerId(I1), I1, AktørId(AKTOR_ID), BydelTilknytning(Bydel("030101")), listOf(FORTROLIG))
         private val P2 = Person(BrukerId(I2), I2, AktørId(AKTOR_ID_2), UkjentBosted())
-        private val TIMEOUTS = eventuallyConfig {
+        private val TIMEOUT = eventuallyConfig {
             duration = 2.seconds
             interval = 100.milliseconds
         }

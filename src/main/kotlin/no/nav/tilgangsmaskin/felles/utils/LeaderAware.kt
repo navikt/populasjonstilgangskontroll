@@ -3,10 +3,10 @@ package no.nav.tilgangsmaskin.felles.utils
 import no.nav.tilgangsmaskin.felles.utils.LederUtvelger.LeaderChangedEvent
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.event.EventListener
-import java.net.InetAddress
+import java.net.InetAddress.getLocalHost
 
 abstract class LeaderAware(private var erLeder: Boolean = false) {
-    private val hostname = InetAddress.getLocalHost().hostName
+    private val hostname = getLocalHost().hostName
     protected open fun doHandleLeaderChange() = Unit
 
     private val log = getLogger(javaClass)
@@ -20,15 +20,15 @@ abstract class LeaderAware(private var erLeder: Boolean = false) {
         }) { log.info("Denne instansen ($hostname) er ikke leder, lederen er ${event.leder}") }
     }
 
-    protected fun somLeder(beskrivelse: String, block: () -> Unit) =
+    protected fun somLeder(beskrivelse: String? = null, block: () -> Unit) =
         somLeder(beskrivelse, block) {}
 
 
-    protected fun <T> somLeder(beskrivelse: String, block: () -> T, default: () -> T): T =
+    protected fun <T> somLeder(beskrivelse: String? = null, block: () -> T, default: () -> T): T =
         if (erLeder) {
-        log.trace(beskrivelse)
-        block()
-    } else {
-        default()
-    }
+            beskrivelse?.let { log.trace(it) }
+            block()
+        } else {
+            default()
+        }
 }

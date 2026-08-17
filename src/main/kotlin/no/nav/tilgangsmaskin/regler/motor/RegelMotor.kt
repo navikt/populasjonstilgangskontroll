@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import io.opentelemetry.instrumentation.annotations.WithSpan
+import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
@@ -20,35 +20,31 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.NO_CONTENT
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 
-@Component
+@Observed
+@Service
 class RegelMotor(
     @param:Qualifier(KJERNE) private val kjerne: RegelSett,
     @param:Qualifier(KOMPLETT) private val komplett: RegelSett,
     private val logger: RegelMotorLogger) {
 
-    @WithSpan
     fun kompletteRegler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, komplett, ENKELT)
 
-    @WithSpan
     fun kjerneregler(ansatt: Ansatt, bruker: Bruker) = evaluer(ansatt, bruker, kjerne, ENKELT)
 
-    @WithSpan
-    private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett,type: EvalueringType) {
+    private fun evaluer(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, type: EvalueringType) {
         regelSett.regler.forEach { regel ->
             if (!regel.evaluer(ansatt, bruker)) {
-                logger.avvist(ansatt, bruker, regelSett, regel,type)
+                logger.avvist(ansatt, bruker, regelSett, regel, type)
                 throw RegelException(ansatt, bruker, regel)
-            }
-            else {
-                logger.godkjent(ansatt, bruker, regel,type)
+            } else {
+                logger.godkjent(ansatt, bruker, regel, type)
             }
         }
-        logger.ok(ansatt, bruker,regelSett,type)
+        logger.ok(ansatt, bruker, regelSett, type)
     }
 
-    @WithSpan
     fun bulkRegler(ansatt: Ansatt, brukere: Set<BrukerOgRegelsett>) =
         buildSet {
             brukere.forEachIndexed { index, (bruker, type) ->
@@ -73,20 +69,24 @@ class RegelMotor(
         when (this) {
             KJERNE_REGELTYPE -> kjerne
             KOMPLETT_REGELTYPE -> komplett
-            OVERSTYRBAR_REGELTYPE -> komplett.regler.filterIsInstance<OverstyrbarRegel>().let { RegelSett(OVERSTYRBAR_REGELTYPE to it) }
+            OVERSTYRBAR_REGELTYPE -> komplett.regler.filterIsInstance<OverstyrbarRegel>()
+                .let { RegelSett(OVERSTYRBAR_REGELTYPE to it) }
         }
 
     @NoCoverageAnalysis
     override fun toString() = "${javaClass.simpleName} [kjerneregler=$kjerne,kompletteregler=$komplett]"
-
 }
 
-data class BulkResultat(val bruker: Bruker,val status: HttpStatus, val regel: Regel? = null) {
+data class BulkResultat(val bruker: Bruker, val status: HttpStatus, val regel: Regel? = null) {
     companion object {
         private val log = getLogger(javaClass)
-        fun ok(bruker: Bruker) = BulkResultat( bruker,NO_CONTENT)
-        fun avvist(bruker: Bruker,e: RegelException) = BulkResultat( bruker,FORBIDDEN, e.regel).also {
-            log.trace("Tilgang til {} for {} ble avvist av {}", e.bruker.brukerId.verdi.maskFnr(), e.ansatt.ansattId, e.regel.kortNavn, e)
+        fun ok(bruker: Bruker) = BulkResultat(bruker, NO_CONTENT)
+        fun avvist(bruker: Bruker, e: RegelException) = BulkResultat(bruker, FORBIDDEN, e.regel).also {
+            log.trace("Tilgang til {} for {} ble avvist av {}",
+                e.bruker.brukerId.verdi.maskFnr(),
+                e.ansatt.ansattId,
+                e.regel.kortNavn,
+                e)
         }
     }
 }

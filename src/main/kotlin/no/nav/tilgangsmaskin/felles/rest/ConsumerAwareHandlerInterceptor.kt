@@ -4,10 +4,11 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import no.nav.tilgangsmaskin.tilgang.Token
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor
+
+private const val METRIC = "http_requests_by_remote_system"
 
 @Component
 class ConsumerAwareHandlerInterceptor(private val token: Token, private val registry: MeterRegistry) :
@@ -31,7 +32,6 @@ class ConsumerAwareHandlerInterceptor(private val token: Token, private val regi
     }
 
     companion object {
-        private const val METRIC = "http_requests_by_remote_system"
         const val CONSUMER_ID = "consumerId"
         const val USER_ID = "userId"
     }

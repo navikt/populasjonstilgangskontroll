@@ -1,14 +1,15 @@
 package no.nav.tilgangsmaskin.ansatt.vergemål
 
+import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.VERGEMÅL
+import org.springframework.security.oauth2.client.annotation.ClientRegistrationId
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.GetExchange
-import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
-@HttpExchange
 interface VergemålClient {
 
     @PostExchange(VERGEMÅL_PATH)
+    @ClientRegistrationId(VERGEMÅL)
     fun vergemål(@RequestBody body: VergemålIdent): List<Vergemål>
 
     @GetExchange(VERGEMÅL_PING_PATH)

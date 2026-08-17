@@ -1,56 +1,41 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import com.ninjasquad.springmockk.MockkBean
-import com.ninjasquad.springmockk.MockkSpyBean
-import io.mockk.verify
-import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import io.mockk.every
-import no.nav.tilgangsmaskin.TestApp
+import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
 import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
 import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM_CACHE
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjenesteTest.NomTestConfig
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.cache.getOne
-import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.tilgang.Token
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
+import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
+import no.nav.tilgangsmaskin.felles.cache.getOne
+import no.nav.tilgangsmaskin.felles.rest.Token
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ContextConfiguration
-import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDate.now
 
 @DataJpaTest
 @Testcontainers
-@ContextConfiguration(classes = [TestApp::class,NomTjeneste::class, NomJPAAdapter::class])
+@ContextConfiguration(classes = [NomTjeneste::class, NomJPAAdapter::class])
 @Import(NomTestConfig::class)
-@ApplyExtension(SpringExtension::class)
-class NomTjenesteTest : BehaviorSpec() {
+@EnableAutoConfiguration
+class NomTjenesteTest(private val tjeneste: NomTjeneste, private val repo: NomRepository, private val cache: CacheOperations) : BehaviorSpec() {
 
     @TestConfiguration
     class NomTestConfig : CacheTestConfig(NOM)
 
     @MockkBean
     private lateinit var token: Token
-    @Autowired
-    private lateinit var tjeneste: NomTjeneste
-    @Autowired
-    private lateinit var repo: NomRepository
-    @Autowired
-    @Qualifier("cacheOperations")
-    private lateinit var cache: CacheOperations
-    @MockkSpyBean
-    private lateinit var adapter: NomJPAAdapter
 
     private val ansattId = AnsattId("Z999999")
     private val brukerId = BrukerId("08526835670")
@@ -123,9 +108,9 @@ class NomTjenesteTest : BehaviorSpec() {
                     val id = AnsattId("Z100010")
                     tjeneste.lagre(NomAnsattData(id, brukerId, NomAnsattPeriode(now(), now().plusYears(1))))
                     tjeneste.fnrForAnsatt(id) shouldBe brukerId
+                    repo.deleteAll()
                     tjeneste.fnrForAnsatt(id) shouldBe brukerId
                     cache.getOne<BrukerId>(NOM_CACHE, id.verdi) shouldBe brukerId
-                    verify(exactly = 1) { adapter.fnrForAnsatt(id.verdi) }
                 }
             }
 

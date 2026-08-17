@@ -1,33 +1,35 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
+
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.extensions.ApplyExtension
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.extensions.spring.SpringExtension
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.maps.shouldContainExactly
-import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.SKJERMING_BULK_PATH
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingClient.Companion.SKJERMING_PATH
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
-import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_BASE
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjenesteTest.SkjermingTestConfig
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
-import no.nav.tilgangsmaskin.felles.cache.*
+import no.nav.tilgangsmaskin.felles.cache.getMany
+import no.nav.tilgangsmaskin.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
+import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
+import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.resilience.annotation.EnableResilientMethods
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.client.ExpectedCount.never
 import org.springframework.test.web.client.ExpectedCount.once
 import org.springframework.test.web.client.ExpectedCount.times
@@ -36,23 +38,20 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.request
 import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.web.util.UriComponentsBuilder.fromUriString
+import java.net.URI
 
-@RestClientTest(components = [SkjermingClient::class,SkjermingBeanConfig::class, SkjermingTjeneste::class, SkjermingConfig::class])
-@Import(SkjermingTestConfig::class)
-@ApplyExtension(SpringExtension::class)
-class SkjermingTjenesteTest : BehaviorSpec() {
+@RestClientTest
+@EnableResilientMethods
+@ContextConfiguration(classes = [SkjermingTjeneste::class, SkjermingConfig::class], initializers = [PropertySettingTestContextInitializer::class])
+@Import(SkjermingTestConfig::class, OAuth2ClientTestConfig::class)
+class SkjermingTjenesteTest(
+    private val tjeneste: SkjermingTjeneste,
+    private val server: MockRestServiceServer,
+    private val cache: CacheOperations,
+    private val cfg: SkjermingConfig) : BehaviorSpec() {
 
     @TestConfiguration
     class SkjermingTestConfig : CacheTestConfig(SKJERMING)
-
-    @Autowired
-    lateinit var tjeneste: SkjermingTjeneste
-    @Autowired
-    lateinit var server: MockRestServiceServer
-    @Autowired
-    lateinit var cfg: SkjermingConfig
-    @Autowired
-    lateinit var cache: CacheOperations
 
     init {
 
@@ -66,7 +65,7 @@ class SkjermingTjenesteTest : BehaviorSpec() {
         Given("cache - skjerming (@Cacheable)") {
             When("samme brukerId slås opp to ganger") {
                 Then("andre kall returneres fra cache uten REST-kall") {
-                    server.expect(once(), requestTo(SKJERMING_URI))
+                    server.expect(once(), requestTo(skjermingUri))
                         .andRespond(withSuccess("true", APPLICATION_JSON))
                     tjeneste.skjerming(ID1).shouldBeTrue()
                     tjeneste.skjerming(ID1).shouldBeTrue()
@@ -78,8 +77,8 @@ class SkjermingTjenesteTest : BehaviorSpec() {
         Given("cache - skjerminger (CacheOperations)") {
             When("én er i cache og én er cache-miss") {
                 Then("hentes treff fra cache og kun misser fra REST") {
-                    cache.putOne(SKJERMING_CACHE, I1, true, cfg.varighet)
-                    server.expect(once(), requestTo(SKJERMINGER_URI))
+                    cache.putOne(SKJERMING_CACHE, I1, true)
+                    server.expect(once(), requestTo(skjermingerUri))
                         .andRespond(withSuccess("""{"$I2":false}""", APPLICATION_JSON))
                     tjeneste.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to true, ID2 to false)
                     cache.getMany<Boolean>(SKJERMING_CACHE, IDS).keys shouldContainExactlyInAnyOrder IDS
@@ -87,16 +86,16 @@ class SkjermingTjenesteTest : BehaviorSpec() {
             }
             When("alle er i cache") {
                 Then("kalles ikke REST") {
-                    cache.putMany(SKJERMING_CACHE, mapOf(I1 to true, I2 to false), cfg.varighet)
-                    server.expect(never(), requestTo(SKJERMINGER_URI))
+                    cache.putMany(SKJERMING_CACHE, mapOf(I1 to true, I2 to false))
+                    server.expect(never(), requestTo(skjermingerUri))
                     tjeneste.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to true, ID2 to false)
                 }
             }
             When("et cache-innslag er slettet") {
                 Then("REST kalles igjen for det slettede innslaget") {
-                    cache.putMany(SKJERMING_CACHE, mapOf(I1 to true, I2 to false), cfg.varighet)
+                    cache.putMany(SKJERMING_CACHE, mapOf(I1 to true, I2 to false))
                     cache.delete(SKJERMING_CACHE, I2)
-                    server.expect(once(), requestTo(SKJERMINGER_URI))
+                    server.expect(once(), requestTo(skjermingerUri))
                         .andRespond(withSuccess("""{"$I2":false}""", APPLICATION_JSON))
                     tjeneste.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to true, ID2 to false)
                     cache.getMany<Boolean>(SKJERMING_CACHE, IDS).keys shouldContainExactlyInAnyOrder IDS
@@ -104,13 +103,13 @@ class SkjermingTjenesteTest : BehaviorSpec() {
             }
             When("ingen identer") {
                 Then("kalles ikke REST") {
-                    server.expect(never(), requestTo(SKJERMINGER_URI))
+                    server.expect(never(), requestTo(skjermingerUri))
                     tjeneste.skjerminger(emptyList()).shouldBeEmpty()
                 }
             }
             When("REST returnerer resultat") {
                 Then("lagres resultater i cache") {
-                    server.expect(once(), requestTo(SKJERMINGER_URI))
+                    server.expect(once(), requestTo(skjermingerUri))
                         .andRespond(withSuccess("""{"$I1":true}""", APPLICATION_JSON))
                     tjeneste.skjerminger(listOf(ID1))
                     cache.getOne<Boolean>(SKJERMING_CACHE, I1).shouldBeTrue()
@@ -122,7 +121,7 @@ class SkjermingTjenesteTest : BehaviorSpec() {
             When("cache er tom (simulerer timeout/feil)") {
                 Then("REST kalles med alle identer") {
                     cache.clear(SKJERMING_CACHE)
-                    server.expect(once(), requestTo(SKJERMINGER_URI))
+                    server.expect(once(), requestTo(skjermingerUri))
                         .andRespond(withSuccess("""{"$I1":true,"$I2":false}""", APPLICATION_JSON))
                     tjeneste.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to true, ID2 to false)
                 }
@@ -130,8 +129,8 @@ class SkjermingTjenesteTest : BehaviorSpec() {
             When("cache har partial data og resten mangler") {
                 Then("REST kalles kun for manglende nøkler og resultat kombineres") {
                     cache.clear(SKJERMING_CACHE)
-                    cache.putOne(SKJERMING_CACHE, I1, true, cfg.varighet)
-                    server.expect(once(), requestTo(SKJERMINGER_URI))
+                    cache.putOne(SKJERMING_CACHE, I1, true)
+                    server.expect(once(), requestTo(skjermingerUri))
                         .andRespond(withSuccess("""{"$I2":false}""", APPLICATION_JSON))
                     tjeneste.skjerminger(listOf(ID1, ID2)) shouldContainExactly mapOf(ID1 to true, ID2 to false)
                 }
@@ -141,25 +140,30 @@ class SkjermingTjenesteTest : BehaviorSpec() {
         Given("retry ved feil mot skjermingstjenesten") {
             When("alle 4 forsøk feiler med 500") {
                 Then("kastes RecoverableRestException") {
-                    server.expect(times(4), requestTo(SKJERMING_URI)).andRespond(withStatus(INTERNAL_SERVER_ERROR))
+                    server.expect(times(4), requestTo(skjermingUri)).andRespond(withStatus(INTERNAL_SERVER_ERROR))
                     shouldThrow<RecoverableRestException> { tjeneste.skjerming(ID1) }
                 }
             }
             When("første forsøk feiler og andre lykkes") {
                 Then("returneres resultat fra andre forsøk") {
-                    server.expect(once(), requestTo(SKJERMING_URI)).andRespond(withStatus(INTERNAL_SERVER_ERROR))
-                    server.expect(once(), requestTo(SKJERMING_URI)).andRespond(withSuccess("false", APPLICATION_JSON))
+                    server.expect(once(), requestTo(skjermingUri)).andRespond(withStatus(INTERNAL_SERVER_ERROR))
+                    server.expect(once(), requestTo(skjermingUri)).andRespond(withSuccess("false", APPLICATION_JSON))
                     tjeneste.skjerming(ID1) shouldBe false
                 }
             }
             When("tjenesten returnerer 404") {
                 Then("kastes IrrecoverableRestException uten retry") {
-                    server.expect(once(), requestTo(SKJERMING_URI)).andRespond(withStatus(NOT_FOUND))
+                    server.expect(once(), requestTo(skjermingUri)).andRespond(withStatus(NOT_FOUND))
                     shouldThrow<IrrecoverableRestException> { tjeneste.skjerming(ID1) }
                 }
             }
         }
     }
+
+    private val skjermingUri: URI get() = uri(SKJERMING_PATH)
+    private val skjermingerUri: URI get() = uri(SKJERMING_BULK_PATH)
+
+    private fun uri(path: String) = fromUriString("${cfg.baseUri}$path").build().toUri()
 
     companion object {
         const val I1 = "08526835670"
@@ -167,8 +171,5 @@ class SkjermingTjenesteTest : BehaviorSpec() {
         val IDS = setOf(I1, I2)
         val ID1 = BrukerId(I1)
         val ID2 = BrukerId(I2)
-        val SKJERMING_URI = uri(SKJERMING_PATH)
-        val SKJERMINGER_URI = uri(SKJERMING_BULK_PATH)
-        private fun uri(path: String) = fromUriString("$SKJERMING_BASE$path").build().toUri()
     }
 }

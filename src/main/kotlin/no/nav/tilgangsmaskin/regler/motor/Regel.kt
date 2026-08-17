@@ -1,9 +1,7 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import io.micrometer.core.instrument.Tag
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.annotation.AliasFor
 import org.springframework.core.annotation.Order
@@ -21,13 +19,8 @@ interface Regel {
     fun godtaHvis(predikat: () -> Boolean) = predikat.invoke()
     fun avvisHvis(predikat: () -> Boolean) = !godtaHvis(predikat)
 
-    val log get() =  getLogger(javaClass)
+    val log get() = getLogger(javaClass)
 
-    companion object {
-        private const val REGEL = "regel"
-        fun regelTag(regel: Regel) = Tag.of(REGEL, regel.kortNavn)
-        val INGEN_REGEL_TAG = Tag.of(REGEL, UTILGJENGELIG)
-    }
 }
 
 interface OverstyrbarRegel : Regel

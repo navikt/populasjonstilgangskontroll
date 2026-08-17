@@ -1,3 +1,9 @@
+spring:
+  messages:
+    basename:
+      - messages
+      - regel-messages
+      - openapi/prod/tilgang
 management:
   endpoint:
     env:
@@ -11,3 +17,9 @@ management:
     web:
       exposure:
         include: health,info,metrics,prometheus,caches
+
+logbook:
+  filter:
+    enabled: false
+  secure-filter:
+    enabled: false

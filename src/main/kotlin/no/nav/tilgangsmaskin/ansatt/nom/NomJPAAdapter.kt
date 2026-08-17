@@ -2,10 +2,10 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.toInstant
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Repository
 import java.time.Instant.now
 
-@Component
+@Repository
 class NomJPAAdapter(private val repo: NomRepository) {
 
     fun ryddOpp() =

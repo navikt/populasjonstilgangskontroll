@@ -6,8 +6,8 @@ import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import jakarta.validation.ConstraintValidatorContext
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangValidator
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangValidator
 import java.time.LocalDate
 import java.time.LocalDate.now
 

@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.regler.motor
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.booleans.shouldBeTrue
-import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldNotContain
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
 

@@ -7,6 +7,8 @@ metadata:
   name: populasjonstilgangskontroll
   namespace: tilgangsmaskin
 spec:
+  envFrom:
+      - secret: slack
   strategy:
     rollingUpdate:
       maxSurge: 50%
@@ -87,7 +89,8 @@ spec:
         - application: logging
           namespace: nais-system
       external:
-        - host: {{pdl}}
+        - host: hooks.slack.com
+        - host: {{pdlpip}}
         - host: {{pdlgraph}}
 
     inbound:
@@ -106,8 +109,8 @@ spec:
       value: {{nais.cluster.cache}}
     - name: PDLGRAPH
       value: {{pdlgraph}}
-    - name: PDL
-      value: {{pdl}}
+    - name: PDLPIP
+      value: {{pdlpip}}
     - name: GRUPPE_DEAD
       value: '{{grupper.dead}}'
     - name: GRUPPE_STRENGT

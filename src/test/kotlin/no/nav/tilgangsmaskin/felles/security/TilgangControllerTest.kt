@@ -10,6 +10,7 @@ import io.mockk.verify
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.AZP_NAME
@@ -68,6 +69,9 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
 
     @MockkBean
     private lateinit var regelTjeneste: RegelTjeneste
+
+    @MockkBean
+    private lateinit var cache: CacheOperations
 
     @MockkBean
     private lateinit var enkeltTilgangTjeneste: EnkeltTilgangTjeneste

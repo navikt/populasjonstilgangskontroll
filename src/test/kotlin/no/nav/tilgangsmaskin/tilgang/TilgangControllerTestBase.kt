@@ -5,6 +5,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.Token
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.KotlinModule
@@ -63,6 +64,9 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
 
     protected val enkeltTilgangTjeneste: EnkeltTilgangTjeneste = mockk()
 
+    protected val cache: CacheOperations = mockk(relaxed = true)
+
+
     protected val token: Token = mockk(relaxed = true)
 
     protected val ansattId = AnsattId("Z999999")
@@ -106,7 +110,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             clearAllMocks()
             restDocumentation.beforeTest(TilgangControllerTestBase::class.java, case.name.name)
             mockMvc = standaloneSetup(
-                TilgangController(regelTjeneste, token),
+                TilgangController(regelTjeneste, cache,token),
                 EnkeltTilgangController(enkeltTilgangTjeneste, token),
                 BulkTilgangController(regelTjeneste, token)
             )

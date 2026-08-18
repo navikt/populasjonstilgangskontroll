@@ -28,7 +28,7 @@ import org.zalando.logbook.core.Conditions.exclude
 import org.zalando.logbook.core.Conditions.requestTo
 import org.zalando.logbook.core.DefaultHttpLogWriter
 import org.zalando.logbook.core.DefaultSink
-import org.zalando.logbook.core.attributes.JwtClaimsExtractor
+import org.zalando.logbook.core.attributes.JwtAllMatchingClaimsExtractor
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 import tools.jackson.databind.json.JsonMapper
@@ -43,12 +43,16 @@ class RestBeanConfig(
 ) : WebMvcConfigurer {
 
     @Bean
-    fun jwtClaimsExtractor(jsonMapper: JsonMapper): AttributeExtractor =
-        JwtClaimsExtractor(jsonMapper, listOf(NAVIDENT, OID, AZP_NAME, "groups"))
+    @ConditionalOnDevOrLocal
+    fun jwtClaimsExtractor(jsonMapper: JsonMapper) =
+        JwtAllMatchingClaimsExtractor.builder()
+            .jsonMapper(jsonMapper)
+            .claimNames(listOf(NAVIDENT, OID, AZP_NAME, "groups"))
+            .build()
 
     @Bean
     @ConditionalOnDevOrLocal
-    fun logbook(formatter: HttpLogFormatter, jwtClaimsExtractor: AttributeExtractor): Logbook =
+    fun logbook(formatter: HttpLogFormatter, jwtClaimsExtractor: AttributeExtractor)  =
         Logbook.builder()
             .headerFilter(none())
             .condition(

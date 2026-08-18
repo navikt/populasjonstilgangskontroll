@@ -1,12 +1,9 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import com.nimbusds.jwt.SignedJWT.parse
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.boot.conditionals.ConditionalOnDevOrLocal
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.AZP_NAME
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.GROUPS
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.sekunder
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.http.client.HttpComponentsClientHttpRequestFactoryBuilder
@@ -23,7 +20,6 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import org.zalando.logbook.HeaderFilter.none
 import org.zalando.logbook.HttpLogFormatter
 import org.zalando.logbook.HttpRequest
 import org.zalando.logbook.Logbook
@@ -34,11 +30,9 @@ import org.zalando.logbook.core.Conditions.exclude
 import org.zalando.logbook.core.Conditions.requestTo
 import org.zalando.logbook.core.DefaultHttpLogWriter
 import org.zalando.logbook.core.DefaultSink
-import org.zalando.logbook.core.attributes.JwtAllMatchingClaimsExtractor
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 import tools.jackson.databind.json.JsonMapper
-import java.util.Base64
 
 
 @Configuration
@@ -48,12 +42,7 @@ class RestBeanConfig(
     private val handler: ErrorHandler,
     private val logbookInterceptor: ObjectProvider<LogbookClientHttpRequestInterceptor>,
 ) : WebMvcConfigurer {
-
-    @Bean
-    @ConditionalOnDevOrLocal
-    fun jwtClaimsExtractor(jsonMapper: JsonMapper) =
-        PrettyPrintingJwtClaimsAttributeExtractor(jsonMapper)
-
+    
     @Bean
     @ConditionalOnDevOrLocal
     fun logbook(formatter: HttpLogFormatter, jwtClaimsExtractor: AttributeExtractor)  =
@@ -66,7 +55,7 @@ class RestBeanConfig(
                     requestTo("https://graph.microsoft.com/v1.0/organization"),
                 ),
             )
-            .attributeExtractor(jwtClaimsExtractor)
+            .attributeExtractor(NimbusJwtClaimsExtractor())
             .sink(DefaultSink(formatter, DefaultHttpLogWriter()))
             .build()
 
@@ -112,26 +101,14 @@ class RestBeanConfig(
 }
 
 @Component
-class PrettyPrintingJwtClaimsAttributeExtractor(
-    private val jsonMapper: JsonMapper,
-) : AttributeExtractor {
+class NimbusJwtClaimsExtractor : AttributeExtractor {
 
     override fun extract(request: HttpRequest): HttpAttributes {
         val auth = request.headers.getFirst(AUTHORIZATION) ?: return EMPTY
         val token = auth.removePrefix("Bearer ").takeIf { it != auth } ?: return EMPTY
-        val parts = token.split(".")
-        if (parts.size != 3) return EMPTY
 
-        val payloadJson = String(Base64.getUrlDecoder().decode(parts[1]))
-        val payload = jsonMapper.readTree(payloadJson)
-
-        val claims = linkedMapOf<String, Any?>(
-            OID to payload[OID]?.asString(),
-            NAVIDENT to payload[NAVIDENT]?.asString(),
-            AZP_NAME to payload[AZP_NAME]?.asString(),
-            GROUPS to payload[GROUPS]?.takeIf { it.isArray }?.map { it.asString() },
-        ).filterValues { it != null }
-
-        return HttpAttributes(mapOf("jwt" to claims))
+        return runCatching {
+            HttpAttributes(mapOf("jwt" to parse(token).jwtClaimsSet.claims))
+        }.getOrDefault(EMPTY)
     }
 }

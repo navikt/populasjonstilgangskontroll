@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.Auditor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
+import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
@@ -37,6 +38,7 @@ class RegelMotorLogger(private val registry: MeterRegistry,
     fun avvist(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, regel: Regel, type: EvalueringType) =
         withMDC(mapOf(
             BESLUTNING to regel.kode,
+            USER_ID to ansatt.ansattId.verdi,
             REGELSETT to regelSett.type.beskrivelse,
             OPPSLAGTYPE to type.name
         )) {
@@ -52,6 +54,7 @@ class RegelMotorLogger(private val registry: MeterRegistry,
     fun ok(ansatt: Ansatt, bruker: Bruker, regelSett: RegelSett, type: EvalueringType) =
         withMDC(mapOf(
             BESLUTNING to OK,
+            USER_ID to ansatt.ansattId.verdi,
             REGELSETT to regelSett.type.beskrivelse,
             OPPSLAGTYPE to type.name
         )) {

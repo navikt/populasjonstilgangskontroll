@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.boot.conditionals.ConditionalOnDevOrLocal
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
@@ -8,6 +9,8 @@ import org.apache.hc.client5.http.config.ConnectionConfig
 import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder
 import org.springframework.beans.factory.ObjectProvider
+import org.springframework.boot.http.client.HttpComponentsClientHttpRequestFactoryBuilder
+import org.springframework.boot.http.client.autoconfigure.ClientHttpRequestFactoryBuilderCustomizer
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
 import org.springframework.boot.restclient.RestClientCustomizer
 import org.springframework.context.annotation.Bean
@@ -45,9 +48,11 @@ class RestBeanConfig(
     @ConditionalOnDevOrLocal
     fun logbook(formatter: HttpLogFormatter): Logbook =
         Logbook.builder()
+            .headerFilter(none())
             .condition(exclude(
                 requestTo("**/internal/**"),
                 requestTo("**/monitoring/**"),
+                requestTo("**/actuator/**")))
                 requestTo("**/actuator/**"),
                 requestTo("https://graph.microsoft.com/v1.0/organization")))
             .sink(DefaultSink(formatter, DefaultHttpLogWriter()))
@@ -59,23 +64,30 @@ class RestBeanConfig(
     }
 
     @Bean
+    fun httpClientPoolMetrics(registry: MeterRegistry) =
+        HttpClientPoolMetrics(registry)
+
+    @Bean
     fun restClientCustomizer() =
         RestClientCustomizer { c ->
-            c.requestFactory(HttpComponentsClientHttpRequestFactory(HttpClients.custom()
-                .setConnectionManager(PoolingHttpClientConnectionManagerBuilder.create()
-                    .setDefaultConnectionConfig(ConnectionConfig.custom()
-                        .setValidateAfterInactivity(2.sekunder).build())
-                    .build())
-                .build()).apply {
-                setConnectionRequestTimeout(ofSeconds(3))
-                setReadTimeout(ofSeconds(5))
-            })
             c.requestInterceptors {
-                if (!isProd) {
-                    logbookInterceptor.ifAvailable { interceptor -> it.add(interceptor) }
-                }
+                logbookInterceptor.ifAvailable { interceptor -> it.add(interceptor) }
             }
             c.defaultStatusHandler(HttpStatusCode::isError, handler::handle)
+        }
+
+    @Bean
+    fun httpComponentsBuilderCustomizer():
+            ClientHttpRequestFactoryBuilderCustomizer<HttpComponentsClientHttpRequestFactoryBuilder> =
+        ClientHttpRequestFactoryBuilderCustomizer { builder ->
+            builder
+                .withConnectionManagerCustomizer { cm ->
+                    cm.setMaxConnTotal(300)
+                    cm.setMaxConnPerRoute(50)
+                }
+                .withConnectionConfigCustomizer { cfg ->
+                    cfg.setValidateAfterInactivity(2.sekunder)
+                }
         }
 
     override fun addInterceptors(registry: InterceptorRegistry) {

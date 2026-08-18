@@ -16,6 +16,6 @@ class SlackApplicationReadyNotifier(
 
     @EventListener(ApplicationReadyEvent::class)
     fun onApplicationReady() {
-        publisher.info("Applikasjon klar", "$app er startet i cluster '${current.name}' med image _${image}_")
+        publisher.info("Applikasjon klar", "$app er startet i  _${current.name}_ med image _${image}_")
     }
 }

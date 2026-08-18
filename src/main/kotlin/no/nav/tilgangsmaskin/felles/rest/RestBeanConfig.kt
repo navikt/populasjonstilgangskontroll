@@ -3,6 +3,9 @@ package no.nav.tilgangsmaskin.felles.rest
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.boot.conditionals.ConditionalOnDevOrLocal
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.AZP_NAME
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.sekunder
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.http.client.HttpComponentsClientHttpRequestFactoryBuilder
@@ -20,12 +23,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.zalando.logbook.HeaderFilter.none
 import org.zalando.logbook.HttpLogFormatter
 import org.zalando.logbook.Logbook
+import org.zalando.logbook.attributes.AttributeExtractor
 import org.zalando.logbook.core.Conditions.exclude
 import org.zalando.logbook.core.Conditions.requestTo
 import org.zalando.logbook.core.DefaultHttpLogWriter
 import org.zalando.logbook.core.DefaultSink
+import org.zalando.logbook.core.attributes.JwtClaimsExtractor
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
+import tools.jackson.databind.json.JsonMapper
 
 
 @Configuration
@@ -37,8 +43,12 @@ class RestBeanConfig(
 ) : WebMvcConfigurer {
 
     @Bean
+    fun jwtClaimsExtractor(jsonMapper: JsonMapper): AttributeExtractor =
+        JwtClaimsExtractor(jsonMapper, listOf(NAVIDENT, OID, AZP_NAME, "groups"))
+
+    @Bean
     @ConditionalOnDevOrLocal
-    fun logbook(formatter: HttpLogFormatter): Logbook =
+    fun logbook(formatter: HttpLogFormatter, jwtClaimsExtractor: AttributeExtractor): Logbook =
         Logbook.builder()
             .headerFilter(none())
             .condition(
@@ -49,6 +59,7 @@ class RestBeanConfig(
                     requestTo("https://graph.microsoft.com/v1.0/organization"),
                 ),
             )
+            .attributeExtractor(jwtClaimsExtractor)
             .sink(DefaultSink(formatter, DefaultHttpLogWriter()))
             .build()
 

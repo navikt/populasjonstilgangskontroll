@@ -15,7 +15,6 @@ import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.env.Environment
 import org.springframework.http.HttpStatus.OK
 
 /**
@@ -23,7 +22,6 @@ import org.springframework.http.HttpStatus.OK
  */
 @ConditionalOnNotProd
 class SlackMessagePublisher(
-    env: Environment,
     @param:Value("\${slack.webhook:}") private val url: String,
 ) : MessagePublisher, LeaderAware(true) {
 

@@ -16,6 +16,7 @@ import org.springframework.core.env.Environment
 import org.springframework.http.HttpStatus.OK
 import org.springframework.data.redis.core.StringRedisTemplate
 import java.time.Duration.ofDays
+import java.time.Duration.ofSeconds
 
 /**
  * Publiserer meldinger til Slack via incoming webhook.
@@ -63,8 +64,8 @@ class SlackMessagePublisher(
 
     private fun erFørste(key: String): Boolean =
         runCatching {
-            valkey.opsForValue().setIfAbsent(key, "sent", ofDays(30)) == true
+            valkey.opsForValue().setIfAbsent(key, "sent", ofSeconds(10)) == true
         }.onFailure {
             log.warn("Kunne ikke reservere startup-slack nøkkel i Valkey", it)
-        }.getOrDefault(false)
+        }.getOrDefault(true)
 }

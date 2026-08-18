@@ -29,7 +29,7 @@ class SlackMessagePublisher(
 
     private val app = env.getRequiredProperty("spring.application.name")
     private val image = env.getRequiredProperty("nais.app.image")
-    private val key = "${current}::${app}::${image}"
+    private val key = "${current.name}::${app}::${image}"
 
     private val log = getLogger(javaClass)
 

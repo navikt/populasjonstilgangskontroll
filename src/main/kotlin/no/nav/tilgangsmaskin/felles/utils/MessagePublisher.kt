@@ -14,7 +14,6 @@ interface MessagePublisher {
     fun info(header: String, msg: String) = logger.info("$header: $msg")
 
     fun warn(header: String, msg: String) = logger.warn("$header: $msg")
-
 }
 
 @Component

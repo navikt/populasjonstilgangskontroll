@@ -11,14 +11,13 @@ import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.SlackEmoji.ERROR
 import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.SlackEmoji.INFO
 import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.SlackEmoji.WARN
+import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.current
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.env.Environment
 import org.springframework.http.HttpStatus.OK
-import org.springframework.data.redis.core.StringRedisTemplate
-import java.time.Duration.ofMinutes
 
 /**
  * Publiserer meldinger til Slack via incoming webhook.
@@ -26,9 +25,8 @@ import java.time.Duration.ofMinutes
 @ConditionalOnNotProd
 class SlackMessagePublisher(
     env: Environment,
-    private val valkey: StringRedisTemplate,
     @param:Value("\${slack.webhook:}") private val url: String,
-) : MessagePublisher {
+) : MessagePublisher, LeaderAware(true) {
 
 
     private val app = env.getRequiredProperty("spring.application.name")
@@ -46,11 +44,15 @@ class SlackMessagePublisher(
 
     private fun publish(emoji: SlackEmoji, header: String, msg: String) =
         publish(key,builder().blocks(asBlocks(
-            header { it.text(plainText("${emoji.value} $header")) },
-            section { info -> info.text(markdownText(msg)) })).build())
+            header {
+                it.text(plainText("${emoji.value} $header"))
+            },
+            section {
+                info -> info.text(markdownText(msg))
+            })).build())
 
     private fun publish(key: String,payload: Payload) =
-        if (erFørste(key + payload.hashCode())) {
+        somLeder {
             if (url.isBlank()) {
                 log.info("Ingen Slack notifikasjon")
             }
@@ -65,14 +67,6 @@ class SlackMessagePublisher(
                 }
             }
         }
-    else Unit
-
-    private fun erFørste(key: String)  =
-        runCatching {
-            valkey.opsForValue().setIfAbsent(key, "sent", ofMinutes(1)) == true
-        }.onFailure {
-            log.warn("Kunne ikke reservere startup-slack nøkkel i Valkey", it)
-        }.getOrDefault(true)
 
     private enum class SlackEmoji(val value: String) {
         WARN(":warn:"),

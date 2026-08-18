@@ -32,6 +32,8 @@ management:
       base-path: /monitoring
 
 spring:
+  jpa:
+    open-in-view: false
   http:
     serviceclient:
         pdlpip:

@@ -13,7 +13,6 @@ import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.SlackEmoji.INFO
 import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.SlackEmoji.WARN
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.current
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.env.Environment
@@ -29,10 +28,6 @@ class SlackMessagePublisher(
 ) : MessagePublisher, LeaderAware(true) {
 
 
-    private val app = env.getRequiredProperty("spring.application.name")
-    private val image = env.getRequiredProperty("nais.app.image")
-    private val key = "${current.name}::${app}::${image}"
-
     private val log = getLogger(javaClass)
 
     override fun error(header: String, msg: String) = publish(ERROR, header, msg)
@@ -43,15 +38,15 @@ class SlackMessagePublisher(
 
 
     private fun publish(emoji: SlackEmoji, header: String, msg: String) =
-        publish(key,builder().blocks(asBlocks(
+        publish(builder().blocks(asBlocks(
             header {
                 it.text(plainText("${emoji.value} $header"))
             },
             section {
-                info -> info.text(markdownText(msg))
+                it.text(markdownText(msg))
             })).build())
 
-    private fun publish(key: String,payload: Payload) =
+    private fun publish(payload: Payload) =
         somLeder {
             if (url.isBlank()) {
                 log.info("Ingen Slack notifikasjon")

@@ -32,7 +32,6 @@ import org.zalando.logbook.core.DefaultHttpLogWriter
 import org.zalando.logbook.core.DefaultSink
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
-import tools.jackson.databind.json.JsonMapper
 
 
 @Configuration
@@ -42,7 +41,7 @@ class RestBeanConfig(
     private val handler: ErrorHandler,
     private val logbookInterceptor: ObjectProvider<LogbookClientHttpRequestInterceptor>,
 ) : WebMvcConfigurer {
-    
+
     @Bean
     @ConditionalOnDevOrLocal
     fun logbook(formatter: HttpLogFormatter, jwtClaimsExtractor: AttributeExtractor)  =
@@ -105,10 +104,6 @@ class NimbusJwtClaimsExtractor : AttributeExtractor {
 
     override fun extract(request: HttpRequest): HttpAttributes {
         val auth = request.headers.getFirst(AUTHORIZATION) ?: return EMPTY
-        val token = auth.removePrefix("Bearer ").takeIf { it != auth } ?: return EMPTY
-
-        return runCatching {
-            HttpAttributes(mapOf("jwt" to parse(token).jwtClaimsSet.claims))
-        }.getOrDefault(EMPTY)
+        return HttpAttributes( parse(auth.removePrefix("Bearer ")).jwtClaimsSet.claims)
     }
 }

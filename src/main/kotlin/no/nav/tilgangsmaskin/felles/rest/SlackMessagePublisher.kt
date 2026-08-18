@@ -8,6 +8,10 @@ import com.slack.api.model.block.composition.BlockCompositions.plainText
 import com.slack.api.webhook.Payload
 import com.slack.api.webhook.Payload.builder
 import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.SlackEmoji.ERROR
+import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.SlackEmoji.INFO
+import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.SlackEmoji.ROCKET
+import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.SlackEmoji.WARN
 import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.current
 import org.slf4j.LoggerFactory.getLogger
@@ -27,20 +31,23 @@ class SlackMessagePublisher(
     @param:Value("\${slack.webhook:}") private val url: String,
 ) : MessagePublisher {
 
+
     private val app = env.getRequiredProperty("spring.application.name")
     private val image = env.getRequiredProperty("nais.app.image")
     private val key = "${current.name}::${app}::${image}"
 
     private val log = getLogger(javaClass)
 
-    override fun warn(header: String, msg: String) =  publish(":warn:", header, msg)
+    override fun error(header: String, msg: String) = publish(ERROR, header, msg)
 
-    override fun info(header: String, msg: String) = publish(":rocket:",header, msg)
+    override fun warn(header: String, msg: String) = publish(WARN, header, msg)
+
+    override fun info(header: String, msg: String) = publish(INFO, header, msg)
 
 
-    private fun publish(emoji: String, header: String, msg: String) =
+    private fun publish(emoji: SlackEmoji, header: String, msg: String) =
         publish(key,builder().blocks(asBlocks(
-            header { it.text(plainText("$emoji $header")) },
+            header { it.text(plainText("${emoji.value} $header")) },
             section { info -> info.text(markdownText(msg)) })).build())
 
     private fun publish(key: String,payload: Payload) =
@@ -61,10 +68,16 @@ class SlackMessagePublisher(
         }
     else Unit
 
-    private fun erFørste(key: String): Boolean =
+    private fun erFørste(key: String)  =
         runCatching {
             valkey.opsForValue().setIfAbsent(key, "sent", ofSeconds(10)) == true
         }.onFailure {
             log.warn("Kunne ikke reservere startup-slack nøkkel i Valkey", it)
         }.getOrDefault(true)
+
+    private enum class SlackEmoji(val value: String) {
+        WARN(":warn:"),
+        ERROR(":error:"),
+        INFO(":info:"),
+    }
 }

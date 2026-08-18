@@ -7,6 +7,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.verify
+import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
@@ -42,6 +43,8 @@ class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val ma
     @MockkBean
     private lateinit var enkeltTilgangTjeneste: EnkeltTilgangTjeneste
 
+    @MockkBean
+    private lateinit var cache: CacheOperations
     @MockkBean
     private lateinit var token: Token
 

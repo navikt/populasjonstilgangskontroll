@@ -7,6 +7,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.verify
+import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
@@ -46,6 +47,8 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
     @MockkBean
     private lateinit var enkeltTilgangTjeneste: EnkeltTilgangTjeneste
 
+    @MockkBean
+    private lateinit var cache: CacheOperations
     @MockkBean
     private lateinit var token: Token
 

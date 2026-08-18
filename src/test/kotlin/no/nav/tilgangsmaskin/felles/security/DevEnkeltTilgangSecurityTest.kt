@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.verify
+import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
@@ -32,6 +33,8 @@ class DevEnkeltTilgangSecurityTest(mockMvc: MockMvc, mapper: JsonMapper) : Behav
     val payload = mapper.writeValueAsString(dto)
 
 
+    @MockkBean
+    private lateinit var cache: CacheOperations
     @MockkBean
     private lateinit var regel: RegelTjeneste
 

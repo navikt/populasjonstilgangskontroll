@@ -1,4 +1,3 @@
-
 server:
   shutdown: graceful
   jetty:
@@ -31,6 +30,7 @@ management:
   endpoints:
     web:
       base-path: /monitoring
+
 spring:
   http:
     serviceclient:
@@ -44,6 +44,9 @@ spring:
           base-url: "http://entra-proxy.sikkerhetstjenesten"
         graph:
           base-url: "https://graph.microsoft.com/v1.0"
+    clients:
+      connect-timeout: 3s
+      read-timeout: 5s
 
   security:
     oauth2:
@@ -55,7 +58,7 @@ spring:
       client:
         provider:
           azuread:
-            token-uri: ${azure.openid.config.token.endpoint}
+            issuer-uri: ${azure.openid.config.issuer}
         registration:
           skjerming:
             provider: azuread
@@ -146,6 +149,7 @@ spring:
           enabled: true
           max-active: 24
           max-idle: 24
+        shutdown-timeout: 2s
 
       host: ${valkey.host.${nais.cluster.cache}}
       port: ${valkey.port.${nais.cluster.cache}}

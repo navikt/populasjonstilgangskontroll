@@ -22,8 +22,7 @@ import org.springframework.web.service.registry.ImportHttpServices
 class PdlTjeneste(
     private val pip: PdlPipClient,
     private val graphQL: PdlSyncGraphQLClientAdapter,
-    private val cache: CacheOperations
-) {
+    private val cache: CacheOperations) {
 
     private val log = getLogger(PdlTjeneste::class.java)
 

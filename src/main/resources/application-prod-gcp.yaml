@@ -8,7 +8,6 @@ spring:
   messages:
     basename:
       - messages
-      - openapi/regel
       - regel-messages
       - openapi/prod/tilgang
 management:

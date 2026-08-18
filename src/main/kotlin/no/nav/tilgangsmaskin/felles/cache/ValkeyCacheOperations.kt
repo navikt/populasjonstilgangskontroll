@@ -114,23 +114,34 @@ class ValkeyCacheOperations(
         }
     }
 
-    override fun clear(cache: CacheNøkkelConfig) {
+    override fun clear(cache: CacheNøkkelConfig): Long {
         check(!isProd) { "Clear er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold" }
         log.info("Tømmer cache {}", cache.name)
-        valkey.execute {
+        return valkey.execute {
             (it.keyCommands().scan(scanOptions(cache)) as Cursor<ByteArray>).use { cursor ->
                 val batch = mutableListOf<String>()
+                var deleted = 0L
                 cursor.forEach { keyBytes ->
                     batch += keyBytes.toString(UTF_8)
                     if (batch.size == BATCH_SIZE) {
-                        valkey.unlink(batch)
+                        deleted += batch.size.toLong()
+                        valkey.delete(batch)
                         batch.clear()
                     }
                 }
-                valkey.unlink(batch)
+                deleted += batch.size.toLong()
+                valkey.delete(batch)
+                deleted
             }
-            null
         }
+    }
+
+    override fun clearAll(): Long {
+        check(!isProd) { "FlushDb er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold" }
+        val before = valkey.execute { it.serverCommands().dbSize() } ?: 0L
+        log.info("Tømmer hele Valkey-databasen, størrelse før tømming: {}", before)
+        valkey.execute { it.serverCommands().flushDb() }
+        return valkey.execute { it.serverCommands().dbSize() } ?: 0L
     }
 
     private fun scanOptions(cache: CacheNøkkelConfig) =
@@ -141,7 +152,8 @@ class ValkeyCacheOperations(
             val prefixes = caches.map { "${it.tilNøkkel("")}*" }
 
             @Suppress("UNCHECKED_CAST")
-            val results = valkey.execute(SCRIPT, emptyList(), *prefixes.toTypedArray()) as List<Long>
+            val results = (valkey.execute(SCRIPT, emptyList(), *prefixes.toTypedArray()) as List<Number>)
+                .map(Number::toLong)
             val totalDuration = start.elapsedNow()
             return caches.zip(results).associate { (cache, count) -> cache.fullName to count }
                 .also { log.info("Cache størrelser {} slått opp, tok {}ms", it, totalDuration.inWholeMilliseconds) }

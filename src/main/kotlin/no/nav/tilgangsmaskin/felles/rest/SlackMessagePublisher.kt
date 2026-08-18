@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.env.Environment
 import org.springframework.http.HttpStatus.OK
 import org.springframework.data.redis.core.StringRedisTemplate
-import java.time.Duration.ofDays
 import java.time.Duration.ofSeconds
 
 /**

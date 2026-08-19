@@ -46,6 +46,9 @@ class RestBeanConfig(
     @ConditionalOnDevOrLocal
     fun logbook(formatter: HttpLogFormatter, jwtClaimsExtractor: AttributeExtractor)  =
         Logbook.builder()
+            .bodyFilter { _, body ->
+                Regex("""(?<!\d)\d{11}(?!\d)""").replace(body, "<brukerId>")
+            }
             .condition(
                 exclude(
                     requestTo("**/internal/**"),

@@ -171,6 +171,11 @@
       "cluster": "prod-fss"
     },
     {
+      "name": "repr-fullmakt",
+      "namespace": "repr",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "istilgangskontroll",
       "namespace": "teamsykefravr",
       "cluster": "prod-gcp"

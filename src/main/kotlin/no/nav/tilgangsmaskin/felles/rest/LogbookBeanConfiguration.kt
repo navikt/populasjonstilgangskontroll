@@ -6,6 +6,8 @@ import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders.AUTHORIZATION
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.stereotype.Component
 import org.zalando.logbook.Correlation
 import org.zalando.logbook.HttpLogFormatter
@@ -20,6 +22,7 @@ import org.zalando.logbook.core.Conditions.exclude
 import org.zalando.logbook.core.Conditions.requestTo
 import org.zalando.logbook.core.DefaultHttpLogWriter
 import org.zalando.logbook.core.DefaultSink
+import org.zalando.logbook.core.StatusAtLeastStrategy
 import org.zalando.logbook.json.JsonHttpLogFormatter
 import tools.jackson.databind.json.JsonMapper
 
@@ -33,6 +36,7 @@ class LogbookBeanConfiguration {
     @Bean
     fun logbook(formatter: PrettyPrintingLogbookFormatter, jwtClaimsExtractor: AttributeExtractor) =
         Logbook.builder()
+            .strategy(StatusAtLeastStrategy(BAD_REQUEST.value()))
             .bodyFilter { _, body ->
                 BRUKER_ID_REGEX.replace(body, "<brukerId>")
             }

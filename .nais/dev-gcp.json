@@ -239,6 +239,11 @@
       "cluster": "dev-fss"
     },
     {
+      "name": "repr-fullmakt",
+      "namespace": "repr",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "istilgangskontroll",
       "namespace": "teamsykefravr",
       "cluster": "dev-gcp"

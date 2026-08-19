@@ -31,7 +31,7 @@
     {
       "name": "pensjon-pen-q2",
       "namespace": "pensjon-q2",
-      "cluster": "dev-gcp"
+      "cluster": "dev-fss"
     },
     {
       "name": "familie-ks-sak",

@@ -31,9 +31,8 @@ import org.springframework.web.client.support.RestClientHttpServiceGroupConfigur
 
 
 private const val ROLE = "ROLE_"
-private const val DEV = "DEV"
 private const val DEV_ROLE = "$ROLE$DEV"
-private const val ENKELT = "ENKELT"
+const val ENKELT = "ENKELT"
 private val UNPROTECTED_ENDPOINTS = arrayOf("/$DEV/**", "/swagger-ui/**", "/v3/api-docs/**", "/monitoring/**")
 
 @Configuration

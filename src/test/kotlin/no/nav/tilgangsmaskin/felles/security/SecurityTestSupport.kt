@@ -6,7 +6,8 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CaffeineCacheClient
-import no.nav.tilgangsmaskin.felles.rest.LogbookBeanConfiguration
+import no.nav.tilgangsmaskin.felles.rest.NimbusJwtClaimsExtractor
+import no.nav.tilgangsmaskin.felles.rest.PrettyPrintingLogbookFormatter
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
 import no.nav.tilgangsmaskin.felles.security.SecurityTestOAuth2.server
@@ -19,8 +20,16 @@ import org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration
 import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.DynamicPropertyRegistry
+import org.zalando.logbook.Logbook
+import org.zalando.logbook.attributes.AttributeExtractor
+import org.zalando.logbook.core.Conditions.exclude
+import org.zalando.logbook.core.Conditions.requestTo
+import org.zalando.logbook.core.DefaultHttpLogWriter
+import org.zalando.logbook.core.DefaultSink
+import tools.jackson.databind.json.JsonMapper
 import java.util.UUID
 
 internal val TEST_ANSATT_ID = AnsattId("Z999999")
@@ -31,6 +40,8 @@ internal const val TEST_AUDIENCE = "test-audience"
 internal const val INVALID_AUDIENCE = "invalid-audience"
 internal const val ISSUER_URI_PROPERTY = "spring.security.oauth2.resourceserver.jwt.issuer-uri"
 internal const val AUDIENCES_PROPERTY = "spring.security.oauth2.resourceserver.jwt.audiences"
+private val BRUKER_ID_REGEX = Regex("""(?<!\d)\d{11}(?!\d)""")
+
 internal object SecurityTestOAuth2 {
     val server = MockOAuth2Server().also { it.start() }
 }
@@ -49,14 +60,41 @@ internal fun DynamicPropertyRegistry.setProperties(clusterName: String? = null) 
 @TestConfiguration
 class PdlTestConfig : CacheTestConfig(PDL)
 
+@TestConfiguration
+class TestLogbookConfig {
+    @Bean
+    fun logbook(formatter: PrettyPrintingLogbookFormatter, jwtClaimsExtractor: AttributeExtractor) =
+        Logbook.builder()
+            .bodyFilter { _, body ->
+                BRUKER_ID_REGEX.replace(body, "<brukerId>")
+            }
+            .condition(
+                exclude(
+                    requestTo("**/internal/**"),
+                    requestTo("**/monitoring/**"),
+                    requestTo("**/actuator/**"),
+                    requestTo("https://graph.microsoft.com/v1.0/organization"),
+                ),
+            )
+            .attributeExtractor(jwtClaimsExtractor)
+            .sink(DefaultSink(formatter, DefaultHttpLogWriter()))
+            .build()
+
+    @Bean
+    fun logbookFormatter(mapper: JsonMapper) = PrettyPrintingLogbookFormatter(mapper)
+
+    @Bean
+    fun jwtClaimsExtractor(): AttributeExtractor = NimbusJwtClaimsExtractor()
+}
+
 @SpringBootApplication(exclude = [DataSourceAutoConfiguration::class, HibernateJpaAutoConfiguration::class, FlywayAutoConfiguration::class])
 @Import(
     OAuth2SecurityBeanConfig::class,
-    LogbookBeanConfiguration::class,
     TilgangController::class,
     BulkTilgangController::class,
     EnkeltTilgangController::class,
     PdlTestConfig::class,
+    TestLogbookConfig::class,
     CaffeineCacheClient::class
 )
 class SecurityTestApplication

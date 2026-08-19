@@ -51,10 +51,8 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, private val ca
     @PostMapping("komplett")
     @OOAuth2RequireOBO
     @ProblemDetailApiResponse(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
-    fun kompletteRegler(@RequestBody brukerId: String, @AuthenticationPrincipal principal: Jwt) =
-        enkeltOppslag(token.requiredAnsattId, brukerId, KOMPLETT_REGELTYPE).also {
-            log.info("Principal er ${principal.navIdent()}")
-        }
+    fun kompletteRegler(@RequestBody brukerId: String) =
+        enkeltOppslag(token.requiredAnsattId, brukerId, KOMPLETT_REGELTYPE)
 
     @PostMapping("/ccf/komplett/{ansattId}")
     @OAuth2RequireCCF

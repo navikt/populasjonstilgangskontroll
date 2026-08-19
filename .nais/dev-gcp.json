@@ -234,12 +234,12 @@
       "cluster": "dev-gcp"
     },
     {
-      "name": "fullmakt",
+      "name": "repr-fullmakt",
       "namespace": "repr",
       "cluster": "dev-fss"
     },
     {
-      "name": "repr-fullmakt",
+      "name": "fullmakt",
       "namespace": "repr",
       "cluster": "dev-gcp"
     },

@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.felles.cache.DESCRIPTION_CACHE_FLUSH
 import no.nav.tilgangsmaskin.felles.cache.SUMMARY_CACHE_FLUSH
 import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.security.OAuth2RequireCCF
 import no.nav.tilgangsmaskin.felles.security.OOAuth2RequireOBO
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
@@ -21,6 +22,8 @@ import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import no.nav.tilgangsmaskin.tilgang.openapi.ProblemDetailApiResponse
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NO_CONTENT
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -48,8 +51,10 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, private val ca
     @PostMapping("komplett")
     @OOAuth2RequireOBO
     @ProblemDetailApiResponse(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
-    fun kompletteRegler(@RequestBody brukerId: String) =
-        enkeltOppslag(token.requiredAnsattId, brukerId, KOMPLETT_REGELTYPE)
+    fun kompletteRegler(@RequestBody brukerId: String, @AuthenticationPrincipal principal: Jwt) =
+        enkeltOppslag(token.requiredAnsattId, brukerId, KOMPLETT_REGELTYPE).also {
+            log.info("Principal er ${principal.navIdent()}")
+        }
 
     @PostMapping("/ccf/komplett/{ansattId}")
     @OAuth2RequireCCF
@@ -92,4 +97,6 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, private val ca
                 else -> regelTjeneste.kompletteRegler(ansatt, this)
             }
         }
+
+    private fun Jwt.navIdent() = AnsattId(claims[NAVIDENT] as String)
 }

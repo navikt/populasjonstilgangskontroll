@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders.AUTHORIZATION
+import org.springframework.stereotype.Component
 import org.zalando.logbook.Correlation
 import org.zalando.logbook.HttpLogFormatter
 import org.zalando.logbook.HttpRequest
@@ -47,34 +48,30 @@ class LogbookBeanConfiguration {
             .sink(DefaultSink(formatter, DefaultHttpLogWriter()))
             .build()
 
-    @Bean
-    fun logbookFormatter(mapper: JsonMapper): PrettyPrintingLogbookFormatter =
-        PrettyPrintingLogbookFormatter(mapper)
+    @Component
+    class PrettyPrintingLogbookFormatter(private val mapper: JsonMapper) : HttpLogFormatter {
+        private val delegate = JsonHttpLogFormatter(mapper, true)
 
-    @Bean
-    fun jwtClaimsExtractor(): AttributeExtractor =
-        NimbusJwtClaimsExtractor()
-}
+        override fun format(precorrelation: Precorrelation, request: HttpRequest) =
+            prettyPrint(delegate.format(precorrelation, request))
 
-class PrettyPrintingLogbookFormatter(private val mapper: JsonMapper) : HttpLogFormatter {
-    private val delegate = JsonHttpLogFormatter(mapper, true)
+        override fun format(correlation: Correlation, response: HttpResponse) =
+            prettyPrint(delegate.format(correlation, response))
 
-    override fun format(precorrelation: Precorrelation, request: HttpRequest) =
-        prettyPrint(delegate.format(precorrelation, request))
-
-    override fun format(correlation: Correlation, response: HttpResponse) =
-        prettyPrint(delegate.format(correlation, response))
-
-    private fun prettyPrint(raw: String) =
-        runCatching {
-            mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapper.readTree(raw))
-        }.getOrDefault(raw)
-}
-
-class NimbusJwtClaimsExtractor : AttributeExtractor {
-
-    override fun extract(request: HttpRequest): HttpAttributes {
-        val auth = request.headers.getFirst(AUTHORIZATION) ?: return EMPTY
-        return HttpAttributes(parse(auth.removePrefix("Bearer ")).jwtClaimsSet.claims)
+        private fun prettyPrint(raw: String) =
+            runCatching {
+                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapper.readTree(raw))
+            }.getOrDefault(raw)
     }
+
+    @Component
+    class NimbusJwtClaimsExtractor : AttributeExtractor {
+
+        override fun extract(request: HttpRequest): HttpAttributes {
+            val auth = request.headers.getFirst(AUTHORIZATION) ?: return EMPTY
+            return HttpAttributes(parse(auth.removePrefix("Bearer ")).jwtClaimsSet.claims)
+        }
+    }
+
 }
+

@@ -6,8 +6,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CaffeineCacheClient
-import no.nav.tilgangsmaskin.felles.rest.NimbusJwtClaimsExtractor
-import no.nav.tilgangsmaskin.felles.rest.PrettyPrintingLogbookFormatter
+import no.nav.tilgangsmaskin.felles.rest.LogbookBeanConfiguration.PrettyPrintingLogbookFormatter
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
 import no.nav.tilgangsmaskin.felles.security.SecurityTestOAuth2.server
@@ -29,7 +28,6 @@ import org.zalando.logbook.core.Conditions.exclude
 import org.zalando.logbook.core.Conditions.requestTo
 import org.zalando.logbook.core.DefaultHttpLogWriter
 import org.zalando.logbook.core.DefaultSink
-import tools.jackson.databind.json.JsonMapper
 import java.util.UUID
 
 internal val TEST_ANSATT_ID = AnsattId("Z999999")
@@ -61,6 +59,7 @@ internal fun DynamicPropertyRegistry.setProperties(clusterName: String? = null) 
 class PdlTestConfig : CacheTestConfig(PDL)
 
 @TestConfiguration
+@Import(PrettyPrintingLogbookFormatter::class)
 class TestLogbookConfig {
     @Bean
     fun logbook(formatter: PrettyPrintingLogbookFormatter, jwtClaimsExtractor: AttributeExtractor) =
@@ -79,12 +78,6 @@ class TestLogbookConfig {
             .attributeExtractor(jwtClaimsExtractor)
             .sink(DefaultSink(formatter, DefaultHttpLogWriter()))
             .build()
-
-    @Bean
-    fun logbookFormatter(mapper: JsonMapper) = PrettyPrintingLogbookFormatter(mapper)
-
-    @Bean
-    fun jwtClaimsExtractor(): AttributeExtractor = NimbusJwtClaimsExtractor()
 }
 
 @SpringBootApplication(exclude = [DataSourceAutoConfiguration::class, HibernateJpaAutoConfiguration::class, FlywayAutoConfiguration::class])

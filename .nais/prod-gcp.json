@@ -174,7 +174,7 @@
       "cluster": "prod-fss"
     },
     {
-      "name": "repr-fullmakt",
+      "name": "fullmakt",
       "namespace": "repr",
       "cluster": "prod-gcp"
     },

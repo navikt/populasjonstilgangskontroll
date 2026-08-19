@@ -234,7 +234,7 @@
       "cluster": "dev-gcp"
     },
     {
-      "name": "repr-fullmakt",
+      "name": "fullmakt",
       "namespace": "repr",
       "cluster": "dev-fss"
     },

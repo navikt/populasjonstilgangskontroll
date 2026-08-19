@@ -84,7 +84,7 @@ class LogbookBeanConfiguration {
 internal fun Map<String, Any>.withTimestampsInCurrentTimezone(): Map<String, Any> =
     mapValues { (_, value) ->
         if (value is Date) {
-            value.toInstant().atZone(OSLO).format(ISO_OFFSET_DATE_TIME)
+            value.toInstant().atZone(OSLO)
         } else {
             value
         }

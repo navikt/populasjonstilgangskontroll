@@ -7,15 +7,20 @@ import io.kotest.matchers.shouldBe
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.verify
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
+import no.nav.tilgangsmaskin.felles.cache.CaffeineCacheClient
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.FORBIDDEN
@@ -44,9 +49,9 @@ class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val ma
     private lateinit var enkeltTilgangTjeneste: EnkeltTilgangTjeneste
 
     @MockkBean
-    private lateinit var cache: CacheOperations
-    @MockkBean
     private lateinit var token: Token
+
+
 
     init {
         beforeEach {
@@ -60,13 +65,11 @@ class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val ma
             EnkeltTilgangData(TEST_BRUKER_ID, "En god begrunnelse", now().plusMonths(2))
         )
         Given("role sjekk") {
-
-
             When("jwt har claim med tillatt role") {
                 Then("returnerer 202 for enkelttilgang") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID, mapOf("roles" to listOf("ENKELT"))))
+                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID, mapOf("roles" to listOf(ENKELT))))
                         }
                         contentType = APPLICATION_JSON
                         content = payload
@@ -86,7 +89,7 @@ class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val ma
                 Then("returnerer 202 for enkelttilgang") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf("roles" to listOf("ENKELT", "UNKNOWN"))))
+                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf("roles" to listOf(ENKELT, UTILGJENGELIG))))
                         }
                         contentType = APPLICATION_JSON
                         content = payload
@@ -104,7 +107,7 @@ class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val ma
                 Then("avvises med 403 for enkelttilgang") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf("roles" to listOf("UNKNOWN"))))
+                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf("roles" to listOf(UTILGJENGELIG))))
                         }
                         contentType = APPLICATION_JSON
                         content = payload

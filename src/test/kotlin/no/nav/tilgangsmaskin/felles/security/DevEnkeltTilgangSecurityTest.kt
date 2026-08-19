@@ -32,9 +32,6 @@ class DevEnkeltTilgangSecurityTest(mockMvc: MockMvc, mapper: JsonMapper) : Behav
 
     val payload = mapper.writeValueAsString(dto)
 
-
-    @MockkBean
-    private lateinit var cache: CacheOperations
     @MockkBean
     private lateinit var regel: RegelTjeneste
 

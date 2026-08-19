@@ -3,6 +3,9 @@ package no.nav.tilgangsmaskin.felles.security
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
+import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
+import no.nav.tilgangsmaskin.felles.cache.CaffeineCacheClient
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
 import no.nav.tilgangsmaskin.felles.rest.PrettyPrintingLogbookFormatter
@@ -15,6 +18,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration
 import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.DynamicPropertyRegistry
 import java.util.UUID
@@ -42,11 +46,17 @@ internal fun DynamicPropertyRegistry.setProperties(clusterName: String? = null) 
     clusterName?.let { add(NAIS_CLUSTER_NAME) { it } }
 }
 
+@TestConfiguration
+class PdlTestConfig : CacheTestConfig(PDL)
+
 @SpringBootApplication(exclude = [DataSourceAutoConfiguration::class, HibernateJpaAutoConfiguration::class, FlywayAutoConfiguration::class])
 @Import(
     OAuth2SecurityBeanConfig::class,
     TilgangController::class,
     BulkTilgangController::class,
     EnkeltTilgangController::class,
-    PrettyPrintingLogbookFormatter::class)
+    PrettyPrintingLogbookFormatter::class,
+    PdlTestConfig::class,
+    CaffeineCacheClient::class
+)
 class SecurityTestApplication

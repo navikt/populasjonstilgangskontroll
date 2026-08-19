@@ -6,9 +6,9 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CaffeineCacheClient
+import no.nav.tilgangsmaskin.felles.rest.LogbookBeanConfiguration
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
-import no.nav.tilgangsmaskin.felles.rest.PrettyPrintingLogbookFormatter
 import no.nav.tilgangsmaskin.felles.security.SecurityTestOAuth2.server
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.NAIS_CLUSTER_NAME
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
@@ -52,10 +52,10 @@ class PdlTestConfig : CacheTestConfig(PDL)
 @SpringBootApplication(exclude = [DataSourceAutoConfiguration::class, HibernateJpaAutoConfiguration::class, FlywayAutoConfiguration::class])
 @Import(
     OAuth2SecurityBeanConfig::class,
+    LogbookBeanConfiguration::class,
     TilgangController::class,
     BulkTilgangController::class,
     EnkeltTilgangController::class,
-    PrettyPrintingLogbookFormatter::class,
     PdlTestConfig::class,
     CaffeineCacheClient::class
 )

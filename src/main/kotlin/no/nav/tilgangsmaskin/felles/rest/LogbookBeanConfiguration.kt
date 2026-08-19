@@ -6,7 +6,6 @@ import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders.AUTHORIZATION
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.stereotype.Component
 import org.zalando.logbook.Correlation
@@ -24,7 +23,10 @@ import org.zalando.logbook.core.DefaultHttpLogWriter
 import org.zalando.logbook.core.DefaultSink
 import org.zalando.logbook.core.StatusAtLeastStrategy
 import org.zalando.logbook.json.JsonHttpLogFormatter
+import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.OSLO
 import tools.jackson.databind.json.JsonMapper
+import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
+import java.util.Date
 
 private val BRUKER_ID_REGEX = Regex("""(?<!\d)\d{11}(?!\d)""")
 
@@ -73,9 +75,17 @@ class LogbookBeanConfiguration {
 
         override fun extract(request: HttpRequest): HttpAttributes {
             val auth = request.headers.getFirst(AUTHORIZATION) ?: return EMPTY
-            return HttpAttributes(parse(auth.removePrefix("Bearer ")).jwtClaimsSet.claims)
+            return HttpAttributes(parse(auth.removePrefix("Bearer ")).jwtClaimsSet.claims.withTimestampsInCurrentTimezone())
         }
     }
 
 }
 
+internal fun Map<String, Any>.withTimestampsInCurrentTimezone(): Map<String, Any> =
+    mapValues { (_, value) ->
+        if (value is Date) {
+            value.toInstant().atZone(OSLO).toOffsetDateTime().format(ISO_OFFSET_DATE_TIME)
+        } else {
+            value
+        }
+    }

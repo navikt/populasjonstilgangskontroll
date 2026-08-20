@@ -33,16 +33,16 @@ class SlackMessagePublisher(
 
     override fun warn(header: String, msg: String) = publish(header, msg, WARN)
 
-    override fun info(header: String, msg: String) = publish(header, msg, INFO)
+    override fun info(header: String, msg: String) = publish(SlackHeader(header), msg, INFO)
 
 
-    override fun publish(header: String, msg: String, vararg emoji: Emoji) =
+    override fun publish(header: SlackHeader, msg: String, vararg emoji: Emoji) =
         publish(builder().blocks(asBlocks(
             header {
-                it.text(plainText("${emoji.joinToString(" ") { e -> e.value }} $header"))
+                it.text(plainText("${header.emoji.value}  ${header.text}"))
             },
             section {
-                it.text(markdownText(msg))
+                it.text(markdownText("${emoji.joinToString(" ") { e -> e.value }} $msg"))
             })).build())
 
     private fun publish(payload: Payload) =
@@ -62,6 +62,8 @@ class SlackMessagePublisher(
                 }
             }
         }
+
+    data class SlackHeader(val text: String, val emoji: Emoji = INFO)
 
     enum class Emoji(val value: String) {
         WARN(":warn:"),

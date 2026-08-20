@@ -8,10 +8,9 @@ import com.slack.api.model.block.composition.BlockCompositions.plainText
 import com.slack.api.webhook.Payload
 import com.slack.api.webhook.Payload.builder
 import no.nav.boot.conditionals.ConditionalOnGCP
-import no.nav.boot.conditionals.ConditionalOnNotProd
-import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.SlackEmoji.ERROR
-import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.SlackEmoji.INFO
-import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.SlackEmoji.WARN
+import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.Emoji.ERROR
+import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.Emoji.INFO
+import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.Emoji.WARN
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
 import org.slf4j.LoggerFactory.getLogger
@@ -29,17 +28,18 @@ class SlackMessagePublisher(
 
     private val log = getLogger(javaClass)
 
-    override fun error(header: String, msg: String) = publish(ERROR, header, msg)
 
-    override fun warn(header: String, msg: String) = publish(WARN, header, msg)
+    override fun error(header: String, msg: String) = publish(header, msg, ERROR)
 
-    override fun info(header: String, msg: String) = publish(INFO, header, msg)
+    override fun warn(header: String, msg: String) = publish(header, msg, WARN)
+
+    override fun info(header: String, msg: String) = publish(header, msg, INFO)
 
 
-    private fun publish(emoji: SlackEmoji, header: String, msg: String) =
+    override fun publish(header: String, msg: String, vararg emoji: Emoji) =
         publish(builder().blocks(asBlocks(
             header {
-                it.text(plainText("${emoji.value} $header"))
+                it.text(plainText("${emoji.joinToString(" ") { e -> e.value }} $header"))
             },
             section {
                 it.text(markdownText(msg))
@@ -63,9 +63,12 @@ class SlackMessagePublisher(
             }
         }
 
-    private enum class SlackEmoji(val value: String) {
+    enum class Emoji(val value: String) {
         WARN(":warn:"),
         ERROR(":error:"),
         INFO(":info:"),
+        DEV(":dev:"),
+        PROD(":production:"),
+
     }
 }

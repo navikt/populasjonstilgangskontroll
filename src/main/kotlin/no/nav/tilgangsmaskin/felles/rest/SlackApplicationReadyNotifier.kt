@@ -18,7 +18,7 @@ class SlackApplicationReadyNotifier(
 
     @EventListener(ApplicationReadyEvent::class)
     fun onApplicationReady() {
-        publisher.info("En instans av $app er klar", "Sstartet i  _${current.name}_ med image _${image}_").also {
+        publisher.info("En instans av $app er klar", "Startet i  _${current.name}_ med image _${image}_").also {
             log.info("Applikasjon klar: $app er startet i  _${current.name}_ med image _${image}_")
         }
     }

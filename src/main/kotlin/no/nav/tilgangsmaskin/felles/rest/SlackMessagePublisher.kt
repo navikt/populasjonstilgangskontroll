@@ -7,6 +7,7 @@ import com.slack.api.model.block.composition.BlockCompositions.markdownText
 import com.slack.api.model.block.composition.BlockCompositions.plainText
 import com.slack.api.webhook.Payload
 import com.slack.api.webhook.Payload.builder
+import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.SlackEmoji.ERROR
 import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.SlackEmoji.INFO
@@ -20,7 +21,7 @@ import org.springframework.http.HttpStatus.OK
 /**
  * Publiserer meldinger til Slack via incoming webhook.
  */
-@ConditionalOnNotProd
+@ConditionalOnGCP
 class SlackMessagePublisher(
     @param:Value("\${slack.webhook:}") private val url: String,
 ) : MessagePublisher, LeaderAware(true) {

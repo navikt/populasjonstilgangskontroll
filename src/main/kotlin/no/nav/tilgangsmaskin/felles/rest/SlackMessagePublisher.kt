@@ -43,7 +43,7 @@ class SlackMessagePublisher(
      private fun publish(header: SlackHeader, msg: String, vararg emojis: Emoji) =
         publish(builder().blocks(asBlocks(
             header {
-                it.text(plainText("${header.emoji.value}  ${header.text}"))
+                it.text(plainText("${header.emoji.value} ${header.text}"))
             },
             section {
                 it.text(markdownText("${emojis.joinToString(" ") { e -> e.value }} $msg"))

@@ -28,8 +28,11 @@ import org.zalando.logbook.core.StatusAtLeastStrategy
 import org.zalando.logbook.json.JsonHttpLogFormatter
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.OSLO
 import org.springframework.http.HttpStatus
+import org.springframework.security.oauth2.core.OAuth2AccessToken
+import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType.BEARER
 import tools.jackson.databind.json.JsonMapper
 import java.util.Date
+import kotlin.collections.map
 
 private val BRUKER_ID_REGEX = Regex("""(?<!\d)\d{11}(?!\d)""")
 
@@ -41,7 +44,7 @@ class LogbookBeanConfiguration {
     @Bean
     fun logbook(formatter: PrettyPrintingLogbookFormatter, jwtClaimsExtractor: AttributeExtractor) =
         Logbook.builder()
-            .strategy(StatusAtLeastExcluding(NOT_FOUND))
+            .strategy(StatusAtLeastExcluding(BAD_REQUEST,NOT_FOUND))
             .bodyFilter { _, body ->
                 BRUKER_ID_REGEX.replace(body, "<brukerId>")
             }
@@ -78,18 +81,17 @@ class LogbookBeanConfiguration {
 
         override fun extract(request: HttpRequest): HttpAttributes {
             val auth = request.headers.getFirst(AUTHORIZATION) ?: return EMPTY
-            return HttpAttributes(parse(auth.removePrefix("Bearer ")).jwtClaimsSet.claims.withTimestampsInCurrentTimezone())
+            return HttpAttributes(parse(auth.removePrefix(BEARER.value) + " ").jwtClaimsSet.claims.withTimestampsInCurrentTimezone())
         }
     }
-
 }
 
-private class StatusAtLeastExcluding(private val excludedStatus: HttpStatus) : Strategy {
-    private val delegate = StatusAtLeastStrategy(BAD_REQUEST.value())
+private class StatusAtLeastExcluding( atLeast: HttpStatus, private vararg val excludedStatus: HttpStatus) : Strategy {
+    private val delegate = StatusAtLeastStrategy(atLeast.value())
 
-    override fun write(correlation: Correlation, request: HttpRequest, response: HttpResponse, sink: Sink) {
-        if (response.status != excludedStatus.value()) {
-            delegate.write(correlation, request, response, sink)
+    override fun write(correlation: Correlation, req: HttpRequest, res: HttpResponse, sink: Sink) {
+        if (res.status !in (excludedStatus.map { it.value() })) {
+            delegate.write(correlation, req, res, sink)
         }
     }
 }

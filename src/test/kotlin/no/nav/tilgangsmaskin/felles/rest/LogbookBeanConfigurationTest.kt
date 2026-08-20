@@ -2,7 +2,10 @@ package no.nav.tilgangsmaskin.felles.rest
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.OSLO
+import org.zalando.logbook.HttpRequest
 import java.time.Instant
 import java.util.Date
 
@@ -33,6 +36,22 @@ class LogbookBeanConfigurationTest : BehaviorSpec({
                 """{
                   "query" : "{__typename}"
                 }""".shouldIgnoreGraphQlIntrospectionQuery() shouldBe true
+            }
+        }
+    }
+
+    Given("a GraphQL introspection request") {
+        When("the request body is inspected") {
+            Then("the request should be skipped entirely") {
+                val request = mockk<HttpRequest> {
+                    every { getBodyAsString() } returns """
+                        {
+                          "query" : "{__typename}"
+                        }
+                    """.trimIndent()
+                }
+
+                request.shouldIgnoreGraphQlIntrospectionQuery() shouldBe true
             }
         }
     }

@@ -14,9 +14,9 @@ import org.zalando.logbook.HttpLogFormatter
 import org.zalando.logbook.HttpRequest
 import org.zalando.logbook.HttpResponse
 import org.zalando.logbook.Logbook
+import org.zalando.logbook.Precorrelation
 import org.zalando.logbook.Sink
 import org.zalando.logbook.Strategy
-import org.zalando.logbook.Precorrelation
 import org.zalando.logbook.attributes.AttributeExtractor
 import org.zalando.logbook.attributes.HttpAttributes
 import org.zalando.logbook.attributes.HttpAttributes.EMPTY
@@ -28,7 +28,6 @@ import org.zalando.logbook.core.StatusAtLeastStrategy
 import org.zalando.logbook.json.JsonHttpLogFormatter
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.OSLO
 import org.springframework.http.HttpStatus
-import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType.BEARER
 import tools.jackson.databind.json.JsonMapper
 import java.util.Date
@@ -46,7 +45,7 @@ class LogbookBeanConfiguration {
         Logbook.builder()
             .strategy(StatusAtLeastExcluding(BAD_REQUEST,NOT_FOUND))
             .bodyFilter { _, body ->
-                if (body.shouldIgnoreGraphQlIntrospectionQuery()) "" else BRUKER_ID_REGEX.replace(body, "<brukerId>")
+                BRUKER_ID_REGEX.replace(body, "<brukerId>")
             }
             .condition(
                 exclude(
@@ -89,8 +88,14 @@ class LogbookBeanConfiguration {
 private class StatusAtLeastExcluding( atLeast: HttpStatus, private vararg val excludedStatus: HttpStatus) : Strategy {
     private val delegate = StatusAtLeastStrategy(atLeast.value())
 
+    override fun write(precorrelation: Precorrelation, request: HttpRequest, sink: Sink) {
+        if (!request.shouldIgnoreGraphQlIntrospectionQuery()) {
+            delegate.write(precorrelation, request, sink)
+        }
+    }
+
     override fun write(correlation: Correlation, req: HttpRequest, res: HttpResponse, sink: Sink) {
-        if (res.status !in (excludedStatus.map { it.value() })) {
+        if (!req.shouldIgnoreGraphQlIntrospectionQuery() && res.status !in (excludedStatus.map { it.value() })) {
             delegate.write(correlation, req, res, sink)
         }
     }
@@ -104,5 +109,8 @@ internal fun Map<String, Any>.withTimestampsInCurrentTimezone() =
 internal fun String.shouldIgnoreGraphQlIntrospectionQuery() =
     GRAPHQL_INTROSPECTION_QUERY_BODY.matches(this)
 
+internal fun HttpRequest.shouldIgnoreGraphQlIntrospectionQuery() =
+    getBodyAsString().shouldIgnoreGraphQlIntrospectionQuery()
+
 private val GRAPHQL_INTROSPECTION_QUERY_BODY =
-    Regex("""(?s)^\s*\{\s*"query"\s*:\s*"\{\s*__typename\s*\}"\s*\}\s*$""")
+    Regex("""(?s)^\s*\{\s*"query"\s*:\s*"\{\s*__typename\s*}"\s*}\s*$""")

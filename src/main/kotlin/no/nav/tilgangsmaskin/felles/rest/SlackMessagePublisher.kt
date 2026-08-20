@@ -48,16 +48,16 @@ class SlackMessagePublisher(
     private fun publish(payload: Payload) =
         somLeder {
             if (url.isBlank()) {
-                log.info("Ingen Slack notifikasjon")
+                log.info("Ingen Slack-notifikasjon")
             }
             else {
-                log.info("Slack notifikasjon til $url: ${payload.blocks}")
+                log.trace("Sender Slack-notifikasjon til {}", url)
                 with(getInstance().send(url, payload)) {
                     if (code != OK.value()) {
-                        log.warn("Kunne ikke sende Slack notifikasjon _($code/$message)_")
+                        log.warn("Kunne ikke sende Slack-notifikasjon _($code/$message)_")
                     }
                     else  {
-                        log.info("Sendte Slack notifikasjon OK")
+                        log.trace("Sendte Slack-notifikasjon OK")
                     }
                 }
             }

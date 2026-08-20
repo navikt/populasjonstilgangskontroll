@@ -45,8 +45,13 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCache
 import org.springframework.data.redis.cache.RedisCacheManager.builder
 import org.springframework.data.redis.config.RedisListenerConfigurer
 import org.springframework.data.redis.connection.RedisConnectionFactory
+import org.springframework.data.redis.connection.Message
+import org.springframework.data.redis.connection.MessageListener
 import org.springframework.data.redis.core.StringRedisTemplate
+import org.springframework.data.redis.listener.ChannelTopic
+import org.springframework.data.redis.listener.RedisMessageListenerContainer
 import org.springframework.data.redis.serializer.RedisMessageConverters
+import org.springframework.data.redis.serializer.StringRedisSerializer
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
 import java.time.Duration.ofSeconds
@@ -66,6 +71,8 @@ class ValkeyCacheOperationsTest(
 
     @TestConfiguration
     class ValkeyCacheTestConfig(private val cf: RedisConnectionFactory) : RedisListenerConfigurer{
+
+        private val serializer = StringRedisSerializer()
 
         override fun configureMessageConverters(builder: RedisMessageConverters.Builder) {
             builder.addCustomConverter(CacheNøkkelMessageConverter())
@@ -99,6 +106,22 @@ class ValkeyCacheOperationsTest(
                     override val navn = "pdl-test"
                     override val caches = setOf(PDL_MED_FAMILIE_CACHE)
                 })
+
+        @Bean
+        fun valkeyEventListenerContainer(eventListener: MessageListener) =
+            RedisMessageListenerContainer().apply {
+                setConnectionFactory(cf)
+                addMessageListener(eventListener, ChannelTopic("__keyevent@0__:expired"))
+                addMessageListener(eventListener, ChannelTopic("__keyevent@0__:del"))
+            }
+
+        @Bean
+        fun valkeyEventListener(oppfrisker: CacheOppfrisker): MessageListener =
+            MessageListener { message: Message, _: ByteArray? ->
+                serializer.deserialize(message.body)
+                    ?.let(::CacheNøkkel)
+                    ?.let(oppfrisker::oppfrisk)
+            }
     }
 
     @MockkBean

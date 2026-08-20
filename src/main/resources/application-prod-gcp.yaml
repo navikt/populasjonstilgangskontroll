@@ -1,4 +1,10 @@
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          authorities-claim-name: roles
+          authority-prefix: ROLE_
   messages:
     basename:
       - messages

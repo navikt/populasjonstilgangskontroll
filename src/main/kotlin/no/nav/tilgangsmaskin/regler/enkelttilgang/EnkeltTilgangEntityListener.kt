@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import jakarta.persistence.PrePersist
 import jakarta.persistence.PreUpdate
+import io.opentelemetry.api.trace.Span
 import no.nav.tilgangsmaskin.felles.rest.Token
 import org.springframework.stereotype.Component
 
@@ -18,5 +19,6 @@ class EnkeltTilgangEntityListener(private val token: Token) {
     private fun setSource(entity: EnkeltTilgangEntity) {
         entity.system = token.system
         entity.oppretter = token.ansattId?.verdi ?: token.system
+        entity.span = Span.current().spanContext.spanId
     }
 }

@@ -48,5 +48,7 @@ class EnkeltTilgangEntity(
 
     @Column(name = "system", length = 75)
     var system: String? = null
-}
 
+    @Column(name = "span", length = 16)
+    var span: String? = null
+}

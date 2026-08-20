@@ -32,6 +32,8 @@ management:
       base-path: /monitoring
 
 spring:
+  jpa:
+    open-in-view: false
   http:
     serviceclient:
         pdlpip:
@@ -153,7 +155,7 @@ spring:
 
       host: ${valkey.host.${nais.cluster.cache}}
       port: ${valkey.port.${nais.cluster.cache}}
-      connect-timeout: 10s
+      connect-timeout: 20s
       timeout: 5s
       username: ${valkey.username.${nais.cluster.cache}}
       password: ${valkey.password.${nais.cluster.cache}}

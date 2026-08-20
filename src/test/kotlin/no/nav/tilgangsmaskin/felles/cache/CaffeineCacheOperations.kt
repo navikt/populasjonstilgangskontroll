@@ -1,12 +1,11 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.CacheManager
 import java.time.Duration
 import kotlin.reflect.KClass
 
-class CaffeineCacheClient(private val cacheManager: CacheManager) : CacheOperations {
+class CaffeineCacheOperations(private val cacheManager: CacheManager) : CacheOperations {
 
     private val log = getLogger(javaClass)
 

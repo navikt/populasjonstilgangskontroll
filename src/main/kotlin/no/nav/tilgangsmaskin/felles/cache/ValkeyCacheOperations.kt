@@ -105,10 +105,10 @@ class ValkeyCacheOperations(
                 }.toMap()
             }.onSuccess { verdier ->
                 val varighet = start.elapsedNow()
-                log.info("getMany {} hentet {} av {} nøkler på {}ms",
+                log.trace("getMany {} hentet {} av {} nøkler på {}ms",
                     cache.fullName, verdier.size, requestedIds.size, varighet.inWholeMilliseconds)
             }.onFailure {
-                log.info("{} getMany feilet for {} med {} nøkler: {}",
+                log.warn("{} getMany feilet for {} med {} nøkler: {}",
                     javaClass.simpleName, cache.fullName, requestedIds.size, it.message, it)
             }.getOrElse { emptyMap() }
         }
@@ -177,12 +177,12 @@ class ValkeyCacheOperations(
             }
             val resultat = pipeline(payload, ttl)
             resultat.onSuccess {
-                log.info("Cache putMany {} lagret {} nøkler på {}ms",
+                log.trace("Cache putMany {} lagret {} nøkler på {}ms",
                     cache.fullName,
                     innslag.size,
                     start.elapsedNow().inWholeMilliseconds)
             }.onFailure {
-                    log.info("Cache putMany feilet for {} med {} nøkler: {}",
+                    log.warn("Cache putMany feilet for {} med {} nøkler: {}",
                         cache.fullName,
                         innslag.size,
                         it.message,

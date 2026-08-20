@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import com.nimbusds.jwt.SignedJWT.parse
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.boot.conditionals.ConditionalOnDevOrLocal
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.sekunder
 import org.springframework.beans.factory.ObjectProvider
@@ -17,13 +17,6 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import org.zalando.logbook.HeaderFilter.none
-import org.zalando.logbook.core.Conditions.exclude
-import org.zalando.logbook.core.Conditions.requestTo
-import org.zalando.logbook.HttpLogFormatter
-import org.zalando.logbook.Logbook
-import org.zalando.logbook.core.DefaultHttpLogWriter
-import org.zalando.logbook.core.DefaultSink
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 
@@ -35,18 +28,6 @@ class RestBeanConfig(
     private val handler: ErrorHandler,
     private val logbookInterceptor: ObjectProvider<LogbookClientHttpRequestInterceptor>,
 ) : WebMvcConfigurer {
-
-    @Bean
-    @ConditionalOnDevOrLocal
-    fun logbook(formatter: HttpLogFormatter): Logbook =
-        Logbook.builder()
-            .headerFilter(none())
-            .condition(exclude(
-                requestTo("**/internal/**"),
-                requestTo("**/monitoring/**"),
-                requestTo("**/actuator/**")))
-            .sink(DefaultSink(formatter, DefaultHttpLogWriter()))
-            .build()
 
     @Bean
     fun jackson3Customizer() = JsonMapperBuilderCustomizer {

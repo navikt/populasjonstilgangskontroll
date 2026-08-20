@@ -5,43 +5,28 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
-import org.springframework.data.redis.core.StringRedisTemplate
-import org.springframework.data.redis.core.ValueOperations
-import java.time.Duration
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.current
+import org.springframework.core.env.Environment
 
 class SlackApplicationReadyNotifierTest : BehaviorSpec({
     val header = "Applikasjon klar"
-    val message = "tilgangsmaskin er startet i cluster 'dev-gcp' med image 'app:1.2.3'"
+    val appName = "tilgangsmaskin"
+    val image = "app:1.2.3"
+    val message = "$appName er startet i  _${current.name}_ med image _${image}_"
 
     Given("ApplicationReadyEvent håndteres") {
-        When("denne instansen reserverer nøkkelen først") {
+            When("denne instansen reserverer nøkkelen først") {
             val publisher = mockk<MessagePublisher>(relaxed = true)
-            val valkey = mockk<StringRedisTemplate>()
-            val valueOps = mockk<ValueOperations<String, String>>()
-            every { valkey.opsForValue() } returns valueOps
-            every { valueOps.setIfAbsent(any(), any(), any<Duration>()) } returns true
-            val notifier = SlackApplicationReadyNotifier(publisher, valkey, "tilgangsmaskin", "dev-gcp", "app:1.2.3")
+                val env = mockk<Environment>()
+                every { env.getRequiredProperty("spring.application.name") } returns appName
+                every { env.getRequiredProperty("nais.app.image") } returns image
+                val notifier = SlackApplicationReadyNotifier(publisher, env)
 
-            notifier.onApplicationReady()
+                notifier.onApplicationReady()
 
-            Then("publiseres startup-melding til Slack") {
-                verify(exactly = 1) { publisher.info(header, message) }
+                Then("publiseres kun en startup-melding til Slack") {
+                    verify(exactly = 1) { publisher.info(header, message) }
+                }
             }
-        }
-
-        When("nøkkelen allerede er reservert av en annen instans") {
-            val publisher = mockk<MessagePublisher>(relaxed = true)
-            val valkey = mockk<StringRedisTemplate>()
-            val valueOps = mockk<ValueOperations<String, String>>()
-            every { valkey.opsForValue() } returns valueOps
-            every { valueOps.setIfAbsent(any(), any(), any<Duration>()) } returns false
-            val notifier = SlackApplicationReadyNotifier(publisher, valkey, "tilgangsmaskin", "dev-gcp", "app:1.2.3")
-
-            notifier.onApplicationReady()
-
-            Then("publiseres ingen startup-melding") {
-                verify(exactly = 0) { publisher.info(any(), any()) }
-            }
-        }
     }
 })

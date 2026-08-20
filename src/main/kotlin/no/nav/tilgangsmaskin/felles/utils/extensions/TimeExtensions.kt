@@ -10,6 +10,7 @@ import java.time.Clock.systemDefaultZone
 import java.time.Duration.between
 import java.time.Instant
 import java.time.Instant.now
+import java.time.Instant.ofEpochMilli
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Period
@@ -23,7 +24,7 @@ import kotlin.time.toKotlinDuration
 object TimeExtensions {
 
 
-    val Int.sekunder get() = ofSeconds(this.toLong())
+    val Int.sekunder get() = ofSeconds(toLong())
 
     val OSLO = ZoneId.of("Europe/Oslo")
 
@@ -69,7 +70,7 @@ object TimeExtensions {
         value.takeIf { it > 0 }?.let { "$it ${if (it == 1L) singular else plural}" }
 
     fun Long.local(fmt: String = "yyyy-MM-dd HH:mm:ss"): String =
-        LocalDateTime.ofInstant(Instant.ofEpochMilli(this), OSLO)
+        LocalDateTime.ofInstant(ofEpochMilli(this), OSLO)
             .format(ofPattern(fmt))
 
     val Int.år: Period get() = ofYears(this)

@@ -8,6 +8,7 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.micrometer.core.instrument.MeterRegistry
+import io.opentelemetry.api.trace.Span
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
@@ -107,6 +108,7 @@ internal class EnkeltTilgangTest(
                         updated shouldNotBe null
                         oppretter shouldBe ansattId.verdi
                         system shouldBe "test"
+                        span shouldBe Span.current().spanContext.spanId
                     }
                 }
             }
@@ -211,7 +213,7 @@ internal class EnkeltTilgangTest(
 
         Given("enkeltTilgangEntityListener") {
             When("entity persisteres") {
-                Then("settes created, updated, oppretter og system") {
+                Then("settes created, updated, oppretter, system og span") {
                     val bruker = vanligBruker(vanligBrukerId)
                     every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     registrerEnkelttilgang(bruker.brukerId, "Dette er en begrunnelse")
@@ -222,6 +224,7 @@ internal class EnkeltTilgangTest(
                         created shouldBe updated
                         oppretter shouldBe ansattId.verdi
                         system shouldBe "test"
+                        span shouldBe Span.current().spanContext.spanId
                     }
                 }
             }
@@ -240,11 +243,12 @@ internal class EnkeltTilgangTest(
                         updated shouldNotBe null
                         oppretter shouldBe ansattId.verdi
                         system shouldBe "test"
+                        span shouldBe Span.current().spanContext.spanId
                     }
                 }
             }
             When("entity oppdateres") {
-                Then("resettes system og oppretter til tokenverdi") {
+                Then("resettes system, oppretter og span til gjeldende verdier") {
                     val bruker = vanligBruker(vanligBrukerId)
                     every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     registrerEnkelttilgang(bruker.brukerId, "Dette er en begrunnelse")
@@ -252,11 +256,13 @@ internal class EnkeltTilgangTest(
                     val createdFør = entity.created
                     entity.system = "ukjent-system"
                     entity.oppretter = "X000000"
+                    entity.span = "1234567890abcdef"
                     repo.saveAndFlush(entity)
                     val oppdatert = repo.findById(entity.id!!).get()
                     assertSoftly(oppdatert) {
                         system shouldBe "test"
                         oppretter shouldBe ansattId.verdi
+                        span shouldBe Span.current().spanContext.spanId
                         created shouldBe createdFør
                     }
                 }

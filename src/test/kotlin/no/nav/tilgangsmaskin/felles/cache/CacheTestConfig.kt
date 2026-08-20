@@ -21,6 +21,6 @@ abstract class CacheTestConfig(vararg cacheNames: String) {
     @Primary
     @Bean
     fun cacheOperations(cacheManager: CacheManager) =
-        CaffeineCacheClient(cacheManager)
+        CaffeineCacheOperations(cacheManager)
 }
 

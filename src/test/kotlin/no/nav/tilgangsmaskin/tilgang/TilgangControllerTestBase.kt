@@ -64,13 +64,13 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
 
     protected val enkeltTilgangTjeneste: EnkeltTilgangTjeneste = mockk()
 
-    protected val cache: CacheOperations = mockk(relaxed = true)
-
-
     protected val token: Token = mockk(relaxed = true)
 
     protected val ansattId = AnsattId("Z999999")
     protected val brukerId = "08526835670"
+
+    protected val cache: CacheOperations = mockk(relaxed = true)
+
 
     protected lateinit var mockMvc: MockMvc
 
@@ -101,7 +101,6 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
         beforeSpec {
             RegelMetadata.messageSource = ReloadableResourceBundleMessageSource().apply {
                 setBasename("classpath:regel-messages")
-                setDefaultEncoding("UTF-8")
             }
             validator = LocalValidatorFactoryBean().also { it.afterPropertiesSet() }
         }

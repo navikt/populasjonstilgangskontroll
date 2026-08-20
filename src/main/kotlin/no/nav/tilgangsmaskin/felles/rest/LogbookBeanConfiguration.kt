@@ -7,12 +7,15 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.stereotype.Component
 import org.zalando.logbook.Correlation
 import org.zalando.logbook.HttpLogFormatter
 import org.zalando.logbook.HttpRequest
 import org.zalando.logbook.HttpResponse
 import org.zalando.logbook.Logbook
+import org.zalando.logbook.Sink
+import org.zalando.logbook.Strategy
 import org.zalando.logbook.Precorrelation
 import org.zalando.logbook.attributes.AttributeExtractor
 import org.zalando.logbook.attributes.HttpAttributes
@@ -24,6 +27,7 @@ import org.zalando.logbook.core.DefaultSink
 import org.zalando.logbook.core.StatusAtLeastStrategy
 import org.zalando.logbook.json.JsonHttpLogFormatter
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.OSLO
+import org.springframework.http.HttpStatus
 import tools.jackson.databind.json.JsonMapper
 import java.util.Date
 
@@ -37,7 +41,7 @@ class LogbookBeanConfiguration {
     @Bean
     fun logbook(formatter: PrettyPrintingLogbookFormatter, jwtClaimsExtractor: AttributeExtractor) =
         Logbook.builder()
-            .strategy(StatusAtLeastStrategy(BAD_REQUEST.value()))
+            .strategy(StatusAtLeastExcluding(NOT_FOUND))
             .bodyFilter { _, body ->
                 BRUKER_ID_REGEX.replace(body, "<brukerId>")
             }
@@ -78,6 +82,16 @@ class LogbookBeanConfiguration {
         }
     }
 
+}
+
+private class StatusAtLeastExcluding(private val excludedStatus: HttpStatus) : Strategy {
+    private val delegate = StatusAtLeastStrategy(BAD_REQUEST.value())
+
+    override fun write(correlation: Correlation, request: HttpRequest, response: HttpResponse, sink: Sink) {
+        if (response.status != excludedStatus.value()) {
+            delegate.write(correlation, request, response, sink)
+        }
+    }
 }
 
 internal fun Map<String, Any>.withTimestampsInCurrentTimezone() =

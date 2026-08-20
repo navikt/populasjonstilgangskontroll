@@ -15,6 +15,7 @@ import org.springframework.boot.runApplication
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Lazy
+import org.springframework.core.env.Environment
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -38,7 +39,7 @@ fun main(args: Array<String>) {
 
 @Component
 @Lazy
-class StartupInfoContributor(private val caches : CacheSizeAware, private val ctx: ConfigurableApplicationContext, vararg val regelsett: RegelSett) :
+class StartupInfoContributor(private val caches : CacheSizeAware, private val ctx: ConfigurableApplicationContext,vararg val regelsett: RegelSett) :
     InfoContributor {
 
     override fun contribute(builder: Builder) {

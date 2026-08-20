@@ -12,4 +12,3 @@ Arkitekturbeslutninger for populasjonstilgangskontroll, dokumentert etter [Archi
 | [ADR-003](ADR-003-kafka-feilhåndtering.md) | Eksponentiell backoff uten DLT for Kafka-konsumenter | Godkjent | 2025-06-01 |
 | [ADR-004](ADR-004-enkelttilgang-overstyring.md) | Tidsbegrenset overstyring av regelbrudd via enkelttilgang | Godkjent | 2025-01-15 |
 | [ADR-005](ADR-005-domenemodell-bruker-ansatt.md) | Separasjon av Bruker- og Ansatt-domene med ekstern databerikelse | Godkjent | 2025-01-15 |
-

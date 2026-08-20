@@ -25,6 +25,7 @@ Vi implementerer **enkelttilgang** som en tidsbegrenset overstyring lagret i dat
 5. **Regelmotor-integrasjon:** Ved `RegelException` sjekkes om ansatt har aktiv enkelttilgang for brukeren — isåfall gis tilgang likevel
 6. **Bulk-støtte:** `tilganger(ansattId, brukerIds)` for effektiv bulk-sjekk
 7. **Audit:** JPA `@EntityListeners` med audit-felter (opprettet av, tidspunkt)
+8. **Idempotens:** DB-unikhet på `(navid, fnr, expires)` hindrer doble rader for samme overstyring, og adapteren returnerer eksisterende rad ved gjentatt registrering
 
 Flyten:
 ```
@@ -75,11 +76,13 @@ Ansatt → kompletteRegler() → RegelException?
 - Nav-ansatte kan håndtere akutte saker uten å vente på regelendring
 - Full sporbarhet (hvem, når, hvorfor, for hvem)
 - Automatisk utløp — ingen manuell opprydding
+- Gjentatte registreringer av samme overstyring blir idempotente i databasen
 
 ### Negative
 - Kompleksitet i regelmotor (sjekk etter exception)
 - Potensielt misbruk (mitigert med validering og logging)
 - Ekstra DB-kall per avvist tilgang
+- Unikhetsregler og gjenbruk av eksisterende rad gjør write-path litt mer kompleks
 
 ### Risiko
 - Ansatte kan misbruke til å se opplysninger de ikke trenger — mitigert med:
@@ -87,6 +90,7 @@ Ansatt → kompletteRegler() → RegelException?
   - Tidsbegrensning
   - Audit-logging for kontroll i etterkant
   - Kun overstyrbare regler (kode 6/7 kan ALDRI overstyres)
+- Doble writes kan kollidere under samtidige kall — mitigert med unikhetskonstraint og les-etter-write-fallback
 
 ## Aksjonspunkter
 
@@ -97,4 +101,3 @@ Ansatt → kompletteRegler() → RegelException?
 - [x] Legg til JPA audit-felter
 - [ ] Vurder forenkling av enkelttilgang-flow (se kvalitetsanalyse)
 - [ ] Sett opp alert ved unormalt mange overstyringer
-

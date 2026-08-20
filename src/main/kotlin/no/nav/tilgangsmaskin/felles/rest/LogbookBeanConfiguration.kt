@@ -46,7 +46,7 @@ class LogbookBeanConfiguration {
         Logbook.builder()
             .strategy(StatusAtLeastExcluding(BAD_REQUEST,NOT_FOUND))
             .bodyFilter { _, body ->
-                BRUKER_ID_REGEX.replace(body, "<brukerId>")
+                if (body.shouldIgnoreGraphQlIntrospectionQuery()) "" else BRUKER_ID_REGEX.replace(body, "<brukerId>")
             }
             .condition(
                 exclude(
@@ -100,3 +100,9 @@ internal fun Map<String, Any>.withTimestampsInCurrentTimezone() =
     mapValues {
         (_, value) -> (value as? Date)?.toInstant()?.atZone(OSLO) ?: value
     }
+
+internal fun String.shouldIgnoreGraphQlIntrospectionQuery() =
+    GRAPHQL_INTROSPECTION_QUERY_BODY.matches(this)
+
+private val GRAPHQL_INTROSPECTION_QUERY_BODY =
+    Regex("""(?s)^\s*\{\s*"query"\s*:\s*"\{\s*__typename\s*\}"\s*\}\s*$""")

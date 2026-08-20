@@ -26,4 +26,14 @@ class LogbookBeanConfigurationTest : BehaviorSpec({
             }
         }
     }
+
+    Given("a GraphQL introspection query body") {
+        When("Logbook evaluates the body") {
+            Then("the body should be ignored") {
+                """{
+                  "query" : "{__typename}"
+                }""".shouldIgnoreGraphQlIntrospectionQuery() shouldBe true
+            }
+        }
+    }
 })

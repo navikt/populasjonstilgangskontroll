@@ -23,6 +23,7 @@ Vi bruker **Valkey (Redis-kompatibel)** via Nais med følgende resiliens-strateg
 4. **ResilientRedisSerializer** — fanger `SerializationException` ved deserialisering, returnerer `null` (cache miss) i stedet for å kaste feil
 5. **CacheMeteredErrorHandler** — logger og teller alle cache-operasjonsfeil (GET/PUT/EVICT) uten å la dem propagere til forretningslogikk
 6. **Caffeine** som fallback for lokal caching av statiske data
+7. **Keyspace-notification listener** — oppfrisking via expired/del-events er best effort og startes separat med retry, slik at sporadiske Valkey/PubSub-feil ikke stopper app-start
 
 Effekten: Cache-feil (timeout, serialisering, nettverksfeil) degraderer aldri tjenesten — applikasjonen faller tilbake til direkte oppslag.
 
@@ -74,6 +75,7 @@ Effekten: Cache-feil (timeout, serialisering, nettverksfeil) degraderer aldri tj
 
 ### Risiko
 - Valkey-nedetid gir økt latens (ikke feil) — mitigert med timeout-config og health indicator
+- Sporadiske Pub/Sub-feil ved oppstart kan forsinke cache-oppfrisking — mitigert med retry-basert listener-start og fortsatt TTL-basert cache
 
 ## Aksjonspunkter
 
@@ -81,5 +83,5 @@ Effekten: Cache-feil (timeout, serialisering, nettverksfeil) degraderer aldri tj
 - [x] Implementer `CacheMeteredErrorHandler`
 - [x] Konfigurer per-cache TTL via `CachableRestConfig`
 - [x] Sett opp Grafana-dashboard for cache-metrikker
+- [x] Start keyspace-listener separat og retry ved transient Valkey-feil
 - [ ] Vurder cache-warming ved oppstart for hyppig brukte oppslag
-

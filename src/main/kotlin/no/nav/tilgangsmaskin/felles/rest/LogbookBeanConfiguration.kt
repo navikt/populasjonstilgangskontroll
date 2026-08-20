@@ -25,7 +25,6 @@ import org.zalando.logbook.core.StatusAtLeastStrategy
 import org.zalando.logbook.json.JsonHttpLogFormatter
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.OSLO
 import tools.jackson.databind.json.JsonMapper
-import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
 import java.util.Date
 
 private val BRUKER_ID_REGEX = Regex("""(?<!\d)\d{11}(?!\d)""")
@@ -81,11 +80,7 @@ class LogbookBeanConfiguration {
 
 }
 
-internal fun Map<String, Any>.withTimestampsInCurrentTimezone(): Map<String, Any> =
-    mapValues { (_, value) ->
-        if (value is Date) {
-            value.toInstant().atZone(OSLO)
-        } else {
-            value
-        }
+internal fun Map<String, Any>.withTimestampsInCurrentTimezone() =
+    mapValues {
+        (_, value) -> (value as? Date)?.toInstant()?.atZone(OSLO) ?: value
     }

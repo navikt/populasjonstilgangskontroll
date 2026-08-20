@@ -26,6 +26,11 @@
   },
   "inbound": [
     {
+      "name": "familie-ba-sak",
+      "namespace": "teamfamilie",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "familie-ks-sak",
       "namespace": "teamfamilie",
       "cluster": "prod-gcp"

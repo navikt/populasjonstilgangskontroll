@@ -50,6 +50,7 @@ class SlackMessagePublisher(
                 log.info("Ingen Slack notifikasjon")
             }
             else {
+                log.info("Slack notifikasjon til $url: ${payload.blocks}")
                 with(getInstance().send(url, payload)) {
                     if (code != OK.value()) {
                         log.warn("Kunne ikke sende Slack notifikasjon _($code/$message)_")

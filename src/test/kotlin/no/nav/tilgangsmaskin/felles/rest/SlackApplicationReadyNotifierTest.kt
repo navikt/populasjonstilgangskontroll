@@ -25,7 +25,7 @@ class SlackApplicationReadyNotifierTest : BehaviorSpec({
                 notifier.onApplicationReady()
 
                 Then("publiseres en startup-melding til Slack") {
-                    verify(exactly = 1) { publisher.publish(any(), message,any()) }
+                    verify(exactly = 1) { publisher.info(header, message) }
                 }
             }
     }

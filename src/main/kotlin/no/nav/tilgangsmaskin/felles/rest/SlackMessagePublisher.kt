@@ -29,20 +29,20 @@ class SlackMessagePublisher(
     private val log = getLogger(javaClass)
 
 
-    override fun error(header: String, msg: String) = publish(header, msg, ERROR)
+    override fun error(header: String, msg: String) = publish(SlackHeader(header, ERROR), msg, ERROR)
 
-    override fun warn(header: String, msg: String) = publish(header, msg, WARN)
+    override fun warn(header: String, msg: String) = publish(SlackHeader(header, WARN), msg, WARN)
 
-    override fun info(header: String, msg: String) = publish(SlackHeader(header), msg, INFO)
+    override fun info(header: String, msg: String) = publish(SlackHeader(header, INFO), msg, INFO)
 
 
-    override fun publish(header: SlackHeader, msg: String, vararg emoji: Emoji) =
+    override fun publish(header: SlackHeader, msg: String, vararg emojis: Emoji) =
         publish(builder().blocks(asBlocks(
             header {
                 it.text(plainText("${header.emoji.value}  ${header.text}"))
             },
             section {
-                it.text(markdownText("${emoji.joinToString(" ") { e -> e.value }} $msg"))
+                it.text(markdownText("${emojis.joinToString(" ") { e -> e.value }} $msg"))
             })).build())
 
     private fun publish(payload: Payload) =

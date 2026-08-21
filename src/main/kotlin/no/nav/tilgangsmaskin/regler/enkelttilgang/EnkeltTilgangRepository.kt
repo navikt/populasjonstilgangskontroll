@@ -7,6 +7,8 @@ import java.time.Instant
 
 interface EnkeltTilgangRepository : JpaRepository<EnkeltTilgangEntity, Long> {
 
+    fun findByNavidAndFnrAndExpires(ansattId: String, brukerId: String, expires: Instant): EnkeltTilgangEntity?
+
     @Query("""
         SELECT o FROM overstyring o
         WHERE o.navid = :ansattId

@@ -9,9 +9,10 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.current
 import org.springframework.core.env.Environment
 
 class SlackApplicationReadyNotifierTest : BehaviorSpec({
-    val header = "Applikasjon klar"
     val appName = "tilgangsmaskin"
     val image = "app:1.2.3"
+    val header = "En instans av $appName er klar"
+    val message = "Startet i  _${current.name}_ med image _${image}_"
 
     Given("ApplicationReadyEvent håndteres") {
             When("denne instansen reserverer nøkkelen først") {
@@ -24,7 +25,7 @@ class SlackApplicationReadyNotifierTest : BehaviorSpec({
                 notifier.onApplicationReady()
 
                 Then("publiseres en startup-melding til Slack") {
-                    verify(exactly = 1) { publisher.info(any(), any()) }
+                    verify(exactly = 1) { publisher.info(header, message) }
                 }
             }
     }

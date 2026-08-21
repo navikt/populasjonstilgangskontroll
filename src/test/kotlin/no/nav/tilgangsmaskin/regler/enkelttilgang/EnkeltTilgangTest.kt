@@ -278,6 +278,20 @@ internal class EnkeltTilgangTest(
                 }
             }
         }
+
+        Given("unikhetsbegrensning på navid, fnr og expires") {
+            When("samme ansatt, bruker og utløp lagres to ganger") {
+                Then("returneres eksisterende entity og duplikat lagres ikke") {
+                    val første = adapter.enkeltTilgang(ansattId.verdi, "1234", EnkeltTilgangData(vanligBrukerId, "Dette er en begrunnelse", IMORGEN))
+                    val andre = adapter.enkeltTilgang(ansattId.verdi, "9999", EnkeltTilgangData(vanligBrukerId, "Dette er en annen begrunnelse", IMORGEN))
+
+                    andre.id shouldBe første.id
+                    andre.enhet shouldBe første.enhet
+                    andre.begrunnelse shouldBe første.begrunnelse
+                    repo.findAll().size shouldBe 1
+                }
+            }
+        }
     }
 
     companion object {

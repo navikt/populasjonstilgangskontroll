@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.security
 
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.NOT_PROD_GCP
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -28,7 +29,6 @@ import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.stereotype.Component
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
-
 
 private const val ROLE = "ROLE_"
 private const val DEV_ROLE = "$ROLE$DEV"
@@ -105,7 +105,7 @@ class OAuth2SecurityBeanConfig {
 
 
     @Component
-    @Profile("!prod-gcp")
+    @Profile(NOT_PROD_GCP)
     class DefaultDevRoleAddingJwtAuthenticationConverter : Converter<Jwt, AbstractAuthenticationToken> {
         override fun convert(source: Jwt): AbstractAuthenticationToken =
             JwtAuthenticationToken(source, listOf(SimpleGrantedAuthority(DEV_ROLE)))

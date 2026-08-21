@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType.IDENTITY
 import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 import no.nav.tilgangsmaskin.ansatt.AnsattId.Companion.ANSATTID_LENGTH
 import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
 import org.springframework.data.annotation.CreatedDate
@@ -19,6 +20,10 @@ import java.time.Instant
 @Entity(name = "overstyring")
 @Table(
     name = "overstyring",
+    uniqueConstraints = [UniqueConstraint(
+        name = "uq_overstyring_navid_fnr_expires",
+        columnNames = ["navid", "fnr", "expires"],
+    )],
     indexes = [Index(name = "idx_overstyringentity_navid", columnList = "navid, fnr")],
     check = [CheckConstraint(constraint = "char_length(begrunnelse) >= 10 AND char_length(begrunnelse) <= 255")
     ]

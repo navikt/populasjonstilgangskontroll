@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import org.springframework.stereotype.Repository
+import org.springframework.dao.DataIntegrityViolationException
 import java.time.Clock
 import java.time.Instant.now
 import java.time.ZoneId.systemDefault
@@ -12,14 +13,19 @@ class EnkeltTilgangJPAAdapter(
     private val clock: Clock,
 ) {
 
-    fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData) =
-        with(data) {
-            repo.save(EnkeltTilgangEntity(ansattId,
-                brukerId.verdi,
-                begrunnelse,
-                enhetsnummer,
-                gyldigtil.atStartOfDay(systemDefault()).toInstant()))
+    fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData): EnkeltTilgangEntity {
+        val expires = data.gyldigtil.atStartOfDay(systemDefault()).toInstant()
+
+        repo.findByNavidAndFnrAndExpires(ansattId, data.brukerId.verdi, expires)?.let { return it }
+
+        val nyEnkeltTilgang = EnkeltTilgangEntity(ansattId, data.brukerId.verdi, data.begrunnelse, enhetsnummer, expires)
+
+        return try {
+            repo.saveAndFlush(nyEnkeltTilgang)
+        } catch (e: DataIntegrityViolationException) {
+            repo.findByNavidAndFnrAndExpires(ansattId, data.brukerId.verdi, expires) ?: throw e
         }
+    }
 
     fun gjeldendeTilgang(ansattId: String, brukerId: String, brukerIds: List<String>) =
         repo.gjeldende(ansattId, setOf(brukerId) + brukerIds, cutoff())

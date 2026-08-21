@@ -11,10 +11,9 @@ class ResilientValkeySerializer(private val delegate: RedisSerializer<Any>
     override fun serialize(t: Any?): ByteArray = delegate.serialize(t)
 
     override fun deserialize(bytes: ByteArray?): Any? =
-        runCatching {
-            delegate.deserialize(bytes)
-        }.getOrElse {
-            log.warn("Kunne ikke deserialisere cache-entry, behandler som miss", it)
-            null
-        }
+        runCatching { delegate.deserialize(bytes) }
+            .onFailure {
+                log.warn("Kunne ikke deserialisere cache-entry, behandler som miss", it)
+            }
+            .getOrNull()
 }

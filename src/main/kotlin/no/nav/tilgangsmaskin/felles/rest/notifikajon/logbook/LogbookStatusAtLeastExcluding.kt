@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.rest.logbook
+package no.nav.tilgangsmaskin.felles.rest.notifikajon.logbook
 
 import org.springframework.http.HttpStatus
 import org.zalando.logbook.Correlation

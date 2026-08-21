@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.rest.logbook
+package no.nav.tilgangsmaskin.felles.rest.notifikajon.logbook
 
 import com.nimbusds.jwt.SignedJWT
 import org.springframework.http.HttpHeaders

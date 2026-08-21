@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.rest.logbook
+package no.nav.tilgangsmaskin.felles.rest.notifikajon.logbook
 
 import org.springframework.stereotype.Component
 import org.zalando.logbook.Correlation

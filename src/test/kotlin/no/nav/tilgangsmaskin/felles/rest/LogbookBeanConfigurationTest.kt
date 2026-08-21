@@ -4,8 +4,8 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilgangsmaskin.felles.rest.logbook.shouldIgnoreGraphQlIntrospectionQuery
-import no.nav.tilgangsmaskin.felles.rest.logbook.withTimestampsInCurrentTimezone
+import no.nav.tilgangsmaskin.felles.rest.notifikajon.logbook.shouldIgnoreGraphQlIntrospectionQuery
+import no.nav.tilgangsmaskin.felles.rest.notifikajon.logbook.withTimestampsInCurrentTimezone
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.OSLO
 import org.zalando.logbook.HttpRequest
 import java.time.Instant

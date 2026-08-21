@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.rest.logbook
+package no.nav.tilgangsmaskin.felles.rest.notifikajon.logbook
 
 import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis

@@ -75,10 +75,10 @@ object TimeExtensions {
 
     val Int.år: Period get() = ofYears(this)
 
-    enum class Dødsperiode(val tekst: String) {
-        MND_0_6("0-6"),
-        MND_7_12("7-12"),
-        MND_13_24("13-24"),
-        MND_OVER_24(">24")
+    enum class Dødsperiode {
+        MND_0_6,
+        MND_7_12,
+        MND_13_24,
+        MND_OVER_24
     }
 }

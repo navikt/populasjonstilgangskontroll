@@ -26,6 +26,5 @@ class CachePingable(
                 error("$name ping failed")
             }
         }
-
 }
 

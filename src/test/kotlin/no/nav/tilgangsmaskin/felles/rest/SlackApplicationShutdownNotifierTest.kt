@@ -1,0 +1,32 @@
+package no.nav.tilgangsmaskin.felles.rest
+
+import io.kotest.core.spec.style.BehaviorSpec
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.current
+import org.springframework.core.env.Environment
+
+class SlackApplicationShutdownNotifierTest : BehaviorSpec({
+    val appName = "tilgangsmaskin"
+    val image = "app:1.2.3"
+    val header = "En instans av $appName stenges ned"
+    val message = "Stopper i  _${current.name}_ med image _${image}_"
+
+    Given("ContextClosedEvent håndteres") {
+        When("applikasjonen stenger ned") {
+            val publisher = mockk<MessagePublisher>(relaxed = true)
+            val env = mockk<Environment>()
+            every { env.getRequiredProperty("spring.application.name") } returns appName
+            every { env.getRequiredProperty("nais.app.image") } returns image
+            val notifier = SlackApplicationShutdownNotifier(publisher, env)
+
+            notifier.onApplicationShutdown()
+
+            Then("publiseres en shutdown-melding til Slack") {
+                verify(exactly = 1) { publisher.info(header, message) }
+            }
+        }
+    }
+})

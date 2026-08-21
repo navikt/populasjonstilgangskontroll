@@ -26,6 +26,11 @@
   },
   "inbound": [
     {
+      "name":  "pensjon-pen",
+      "namespace": "pensjondeployer",
+      "cluster": "prod-fss"
+    },
+    {
       "name":  "sp-vilkarsproving",
       "namespace": "tbd",
       "cluster": "prod-gcp"

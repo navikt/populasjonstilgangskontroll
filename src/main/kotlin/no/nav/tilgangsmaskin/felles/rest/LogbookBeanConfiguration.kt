@@ -26,6 +26,7 @@ import org.zalando.logbook.core.DefaultHttpLogWriter
 import org.zalando.logbook.core.DefaultSink
 import org.zalando.logbook.core.StatusAtLeastStrategy
 import org.zalando.logbook.json.JsonHttpLogFormatter
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.OSLO
 import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType.BEARER
@@ -45,7 +46,8 @@ class LogbookBeanConfiguration {
         Logbook.builder()
             .strategy(StatusAtLeastExcluding(BAD_REQUEST,NOT_FOUND))
             .bodyFilter { _, body ->
-                BRUKER_ID_REGEX.replace(body, "<brukerId>")
+                BRUKER_ID_REGEX.replace(body) { m -> m.value.maskFnr()
+                }
             }
             .condition(
                 exclude(

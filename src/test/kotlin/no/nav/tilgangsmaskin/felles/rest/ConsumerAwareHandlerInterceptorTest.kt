@@ -42,7 +42,7 @@ class ConsumerAwareHandlerInterceptorTest : BehaviorSpec({
             Then("inkrementeres http_requests_by_remote_system med riktig remote_system- og type-tagg") {
                 val request = MockHttpServletRequest("POST", "/api/v1/regler")
                 interceptor.preHandle(request, MockHttpServletResponse(), Any())
-                registry.get("http_requests_by_remote_system").tag("remote_system", "my-app").tag("type", "single").counter().count() shouldBe 1.0
+                registry.get("http_requests_by_remote_system").tag("remote_system", "my-app").tag("type", "enkelt").counter().count() shouldBe 1.0
             }
             Then("brukes bulk-tagg når pathen inneholder bulk") {
                 val request = MockHttpServletRequest("POST", "/api/v1/bulk/obo")

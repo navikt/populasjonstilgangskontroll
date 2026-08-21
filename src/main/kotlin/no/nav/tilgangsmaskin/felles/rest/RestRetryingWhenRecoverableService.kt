@@ -19,6 +19,6 @@ import kotlin.reflect.KClass
 @Inherited
 @MustBeDocumented
 @Service
-annotation class RetryingWhenRecoverableRestService(
+annotation class RestRetryingWhenRecoverableService(
     @get:AliasFor(annotation = Retryable::class) val value: Array<KClass<out Throwable>> = [RecoverableRestException::class, SocketTimeoutException::class, ResourceAccessException::class, RedisCommandTimeoutException::class, QueryTimeoutException::class]
 )

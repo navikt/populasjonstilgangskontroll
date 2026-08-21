@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMIN
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.getMany
-import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
+import no.nav.tilgangsmaskin.felles.rest.RestRetryingWhenRecoverableService
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.web.service.registry.ImportHttpServices
@@ -15,7 +15,7 @@ private const val IDENT = "personident"
 private const val IDENTER = IDENT + "er"
 
 @Observed
-@RetryingWhenRecoverableRestService
+@RestRetryingWhenRecoverableService
 @ImportHttpServices(types = [SkjermingClient::class], group = SKJERMING)
 class SkjermingTjeneste(private val client: SkjermingClient,
                         private val cache: CacheOperations) {

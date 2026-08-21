@@ -4,13 +4,13 @@ import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
+import no.nav.tilgangsmaskin.felles.rest.RestRetryingWhenRecoverableService
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.web.service.registry.ImportHttpServices
 import java.util.*
 
 @Observed
-@RetryingWhenRecoverableRestService
+@RestRetryingWhenRecoverableService
 @ImportHttpServices(types = [EntraGrupperClient::class], group = GRAPH)
 class EntraTjeneste(
     private val client: EntraGrupperClient,

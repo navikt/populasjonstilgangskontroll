@@ -7,12 +7,12 @@ import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålClient.VergemålIdent
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.VERGEMÅL
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
+import no.nav.tilgangsmaskin.felles.rest.RestRetryingWhenRecoverableService
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.web.service.registry.ImportHttpServices
 
 @Observed
-@RetryingWhenRecoverableRestService
+@RestRetryingWhenRecoverableService
 @ImportHttpServices(types = [VergemålClient::class], group = VERGEMÅL)
 class VergemålTjeneste(private val nom: NomTjeneste, private val client: VergemålClient) {
 

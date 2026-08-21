@@ -11,13 +11,13 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDLPIP
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_MED_FAMILIE_CACHE
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.getMany
-import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
+import no.nav.tilgangsmaskin.felles.rest.RestRetryingWhenRecoverableService
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.web.service.registry.ImportHttpServices
 
 @Observed
-@RetryingWhenRecoverableRestService
+@RestRetryingWhenRecoverableService
 @ImportHttpServices(types = [PdlPipClient::class], group = PDLPIP)
 class PdlTjeneste(
     private val pip: PdlPipClient,

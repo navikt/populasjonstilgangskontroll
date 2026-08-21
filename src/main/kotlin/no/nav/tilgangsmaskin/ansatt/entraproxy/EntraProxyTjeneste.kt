@@ -4,11 +4,11 @@ import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRAPROXY
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.rest.RetryingWhenRecoverableRestService
+import no.nav.tilgangsmaskin.felles.rest.RestRetryingWhenRecoverableService
 import org.springframework.web.service.registry.ImportHttpServices
 
 @Observed
-@RetryingWhenRecoverableRestService
+@RestRetryingWhenRecoverableService
 @ImportHttpServices(types = [EntraProxyClient::class], group = ENTRAPROXY)
 class EntraProxyTjeneste(private val client: EntraProxyClient) {
 

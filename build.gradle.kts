@@ -23,15 +23,6 @@ plugins {
     alias(libs.plugins.asciidoctor)
 }
 
-allOpen {
-    annotation("org.springframework.boot.test.context.SpringBootTest")
-    annotation("org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest")
-    annotation("org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest")
-    annotation("org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest")
-    annotation("org.springframework.boot.test.autoconfigure.web.client.RestClientTest")
-    annotation("org.springframework.test.context.ContextConfiguration")
-}
-
 springBoot {
     buildInfo {
         properties {

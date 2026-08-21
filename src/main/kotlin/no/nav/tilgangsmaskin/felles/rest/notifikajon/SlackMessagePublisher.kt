@@ -9,7 +9,6 @@ import com.slack.api.webhook.Payload
 import com.slack.api.webhook.Payload.builder
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
-import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value

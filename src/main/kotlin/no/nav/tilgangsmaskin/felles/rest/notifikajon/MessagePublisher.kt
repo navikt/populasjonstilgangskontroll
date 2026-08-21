@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.utils
+package no.nav.tilgangsmaskin.felles.rest.notifikajon
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory.getLogger

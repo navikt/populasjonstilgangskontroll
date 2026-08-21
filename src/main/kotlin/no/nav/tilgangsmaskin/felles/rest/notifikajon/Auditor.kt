@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles
+package no.nav.tilgangsmaskin.felles.rest.notifikajon
 
 import no.nav.boot.conditionals.ConditionalOnGCP
 import org.slf4j.Logger

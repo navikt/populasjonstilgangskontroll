@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.rest.notifikajon
 
-import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.current
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.event.ContextClosedEvent

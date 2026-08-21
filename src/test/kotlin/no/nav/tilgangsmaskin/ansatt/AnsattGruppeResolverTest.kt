@@ -27,7 +27,7 @@ import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.TokenType
 import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.rest.TokenType.UNAUTHENTICATED
-import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
+import no.nav.tilgangsmaskin.felles.rest.notifikajon.MessagePublisher
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import java.net.URI

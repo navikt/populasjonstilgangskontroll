@@ -7,6 +7,10 @@ import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor
+import no.nav.tilgangsmaskin.felles.rest.TokenType.UNAUTHENTICATED
+import no.nav.tilgangsmaskin.regler.motor.EvalueringType
+import no.nav.tilgangsmaskin.regler.motor.EvalueringType.BULK
+import no.nav.tilgangsmaskin.regler.motor.EvalueringType.ENKELT
 
 private const val METRIC = "http_requests_by_remote_system"
 
@@ -17,7 +21,10 @@ class ConsumerAwareHandlerInterceptor(private val token: Token, private val regi
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         MDC.put(CONSUMER_ID, token.systemAndNs)
         token.ansattId?.verdi?.let { MDC.put(USER_ID, it) }
-        registry.counter(METRIC, Tags.of("remote_system", token.systemNavn)).increment()
+        if (token.type != UNAUTHENTICATED) {
+            val requestType = if (request.requestURI.contains("bulk")) BULK else ENKELT
+            registry.counter(METRIC, Tags.of("remote_system", token.systemNavn, "type", requestType.name.lowercase())).increment()
+        }
         return true
     }
 

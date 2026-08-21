@@ -1,7 +1,6 @@
-package no.nav.tilgangsmaskin.felles.rest
+package no.nav.tilgangsmaskin.felles.cache
 
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import java.time.Duration
 import java.time.Duration.ofHours
 

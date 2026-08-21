@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO_OG_
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.uuids
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient.Companion.ENTRA_PING_PATH
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
-import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
+import no.nav.tilgangsmaskin.felles.cache.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import org.springframework.stereotype.Component
 import java.net.URI

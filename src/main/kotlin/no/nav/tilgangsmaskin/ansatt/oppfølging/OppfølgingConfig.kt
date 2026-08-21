@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.`oppfølging`
 
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
-import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
+import no.nav.tilgangsmaskin.felles.cache.CachableRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(OPPFØLGING)

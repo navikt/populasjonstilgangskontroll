@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import org.springframework.stereotype.Component
 import org.springframework.context.annotation.Lazy
 

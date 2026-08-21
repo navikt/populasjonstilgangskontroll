@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.felles.cache
 
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.health.PingableHealthIndicator
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.interceptor.CacheErrorHandler

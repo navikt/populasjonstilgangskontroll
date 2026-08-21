@@ -4,7 +4,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PDL_PIP_PERSONER_
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PDL_PIP_PERSON_PATH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipClient.Companion.PDL_PIP_PING_PATH
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
-import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
+import no.nav.tilgangsmaskin.felles.cache.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component

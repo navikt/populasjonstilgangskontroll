@@ -32,7 +32,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.UGRADERT
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheOperationsTest.ValkeyCacheTestConfig
-import no.nav.tilgangsmaskin.felles.rest.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd

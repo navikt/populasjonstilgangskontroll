@@ -13,6 +13,7 @@ import org.zalando.logbook.core.Conditions.exclude
 import org.zalando.logbook.core.Conditions.requestTo
 import org.zalando.logbook.core.DefaultHttpLogWriter
 import org.zalando.logbook.core.DefaultSink
+import tools.jackson.databind.json.JsonMapper
 
 private val BRUKER_ID_REGEX = Regex("""(?<!\d)\d{11}(?!\d)""")
 
@@ -20,6 +21,10 @@ private val BRUKER_ID_REGEX = Regex("""(?<!\d)\d{11}(?!\d)""")
 @ConditionalOnNotProd
 @NoCoverageAnalysis
 class LogbookBeanConfiguration {
+
+    @Bean
+    fun logbookPrettyPrintingFormatter(mapper: JsonMapper) =
+        LogbookPrettyPrintingFormatter(mapper)
 
     @Bean
     fun logbook(formatter: LogbookPrettyPrintingFormatter, jwtClaimsExtractor: AttributeExtractor) =

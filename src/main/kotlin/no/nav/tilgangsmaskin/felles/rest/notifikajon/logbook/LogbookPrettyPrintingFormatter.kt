@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.rest.notifikajon.logbook
 
-import org.springframework.stereotype.Component
 import org.zalando.logbook.Correlation
 import org.zalando.logbook.HttpLogFormatter
 import org.zalando.logbook.HttpRequest
@@ -9,7 +8,6 @@ import org.zalando.logbook.Precorrelation
 import org.zalando.logbook.json.JsonHttpLogFormatter
 import tools.jackson.databind.json.JsonMapper
 
-@Component
 class LogbookPrettyPrintingFormatter(private val mapper: JsonMapper) : HttpLogFormatter {
     private val delegate = JsonHttpLogFormatter(mapper, true)
 

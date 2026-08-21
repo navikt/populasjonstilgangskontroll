@@ -1,6 +1,7 @@
-package no.nav.tilgangsmaskin.felles.rest
+package no.nav.tilgangsmaskin.felles.rest.notifikajon
 
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
+import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.context.event.EventListener
 import org.springframework.core.retry.RetryException

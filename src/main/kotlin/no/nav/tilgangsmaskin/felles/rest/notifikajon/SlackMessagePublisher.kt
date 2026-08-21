@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.rest
+package no.nav.tilgangsmaskin.felles.rest.notifikajon
 import com.slack.api.Slack.getInstance
 import com.slack.api.model.block.Blocks.asBlocks
 import com.slack.api.model.block.Blocks.header
@@ -8,11 +8,6 @@ import com.slack.api.model.block.composition.BlockCompositions.plainText
 import com.slack.api.webhook.Payload
 import com.slack.api.webhook.Payload.builder
 import no.nav.boot.conditionals.ConditionalOnGCP
-import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.Emoji.DEV
-import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.Emoji.ERROR
-import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.Emoji.INFO
-import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.Emoji.PROD
-import no.nav.tilgangsmaskin.felles.rest.SlackMessagePublisher.Emoji.WARN
 import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
@@ -28,16 +23,16 @@ class SlackMessagePublisher(
     @param:Value("\${slack.webhook:}") private val url: String,
 ) : MessagePublisher, LeaderAware(true) {
 
-    private val emoji = if (isProd) PROD else DEV
+    private val emoji = if (isProd) Emoji.PROD else Emoji.DEV
 
     private val log = getLogger(javaClass)
 
 
-    override fun error(header: String, msg: String) = publish(SlackHeader(header, emoji), msg, ERROR)
+    override fun error(header: String, msg: String) = publish(SlackHeader(header, emoji), msg, Emoji.ERROR)
 
-    override fun warn(header: String, msg: String) = publish(SlackHeader(header, emoji), msg, WARN)
+    override fun warn(header: String, msg: String) = publish(SlackHeader(header, emoji), msg, Emoji.WARN)
 
-    override fun info(header: String, msg: String) = publish(SlackHeader(header, emoji), msg, INFO)
+    override fun info(header: String, msg: String) = publish(SlackHeader(header, emoji), msg, Emoji.INFO)
 
 
      private fun publish(header: SlackHeader, msg: String, vararg emojis: Emoji) =
@@ -67,7 +62,7 @@ class SlackMessagePublisher(
             }
         }
 
-    private data class SlackHeader(val text: String, val emoji: Emoji = INFO)
+    private data class SlackHeader(val text: String, val emoji: Emoji = Emoji.INFO)
 
     private enum class Emoji(val value: String) {
         WARN(":warn:"),

@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.rest
+package no.nav.tilgangsmaskin.felles.rest.notifikajon
 
 import io.micrometer.core.instrument.Gauge
 import io.micrometer.core.instrument.MeterRegistry
@@ -8,6 +8,8 @@ import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager
 import org.springframework.http.client.ClientHttpRequestFactory
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.client.RestClient
+import java.text.Normalizer
+import java.text.Normalizer.Form
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicReference
 
@@ -124,7 +126,7 @@ class HttpClientPoolMetrics(private val registry: MeterRegistry) {
 
     private fun sanitizeManagerName(beanName: String): String {
         val simpleName = beanName.substringAfterLast('.').removeSuffix("Client")
-        val normalized = java.text.Normalizer.normalize(simpleName, java.text.Normalizer.Form.NFKD)
+        val normalized = Normalizer.normalize(simpleName, Form.NFKD)
             .replace(Regex("\\p{Mn}+"), "")
         return normalized.replace(Regex("[^a-zA-Z0-9._-]"), "_")
     }

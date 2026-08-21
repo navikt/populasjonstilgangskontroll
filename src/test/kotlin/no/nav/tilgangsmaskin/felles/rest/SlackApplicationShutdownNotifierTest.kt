@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.tilgangsmaskin.felles.rest.notifikajon.SlackApplicationShutdownNotifier
 import no.nav.tilgangsmaskin.felles.utils.MessagePublisher
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.current
 import org.springframework.core.env.Environment

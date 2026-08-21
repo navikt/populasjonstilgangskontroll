@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.rest
+package no.nav.tilgangsmaskin.felles.rest.notifikajon
 
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import org.springframework.beans.factory.ListableBeanFactory

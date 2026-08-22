@@ -70,8 +70,9 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
         setConnectionFactory(cf)
         setRecoveryInterval(5_000) // retry subscription every 5s
         maxSubscriptionRegistrationWaitingTime = 30_000
+
         setErrorHandler {
-            log.warn("Redis listener failure, will retry in 5s", it)
+            log.warn("Redis listener feilet, retry om 5s", it)
         }
     }
 

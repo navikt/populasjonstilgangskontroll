@@ -7,7 +7,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.security.OAuth2RequireCCF
 import no.nav.tilgangsmaskin.felles.security.OOAuth2RequireOBO
-import no.nav.tilgangsmaskin.felles.security.requiredAnsattId
+import no.nav.tilgangsmaskin.felles.security.ansattId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withAnsattContext
 import org.slf4j.LoggerFactory.getLogger
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
@@ -49,7 +49,7 @@ class BulkTilgangController(
     fun bulkOBO(
         @AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal,
         @RequestBody @Valid specs: Set<@Valid BrukerIdOgRegelsett>
-    ) = bulkOppslag(principal.requiredAnsattId(), specs)
+    ) = bulkOppslag(principal.ansattId(), specs)
 
     @PostMapping("bulk/obo/{regelType}")
     @OOAuth2RequireOBO
@@ -60,7 +60,7 @@ class BulkTilgangController(
         @RequestBody @Valid brukerIds: Set<@NotBlank(message = "brukerId kan ikke være tom") String>
     ) =
         bulkOppslag(
-            principal.requiredAnsattId(),
+            principal.ansattId(),
             brukerIds.mapTo(mutableSetOf()) { BrukerIdOgRegelsett(it, regelType) }
         )
 

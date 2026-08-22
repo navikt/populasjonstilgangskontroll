@@ -10,7 +10,7 @@ import no.nav.tilgangsmaskin.felles.cache.SUMMARY_CACHE_FLUSH
 import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.security.OAuth2RequireCCF
 import no.nav.tilgangsmaskin.felles.security.OOAuth2RequireOBO
-import no.nav.tilgangsmaskin.felles.security.requiredAnsattId
+import no.nav.tilgangsmaskin.felles.security.ansattId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
@@ -51,7 +51,7 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, private val ca
     @OOAuth2RequireOBO
     @ProblemDetailApiResponse(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
     fun kompletteRegler(@AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal, @RequestBody brukerId: String) =
-        enkeltOppslag(principal.requiredAnsattId(), brukerId, KOMPLETT_REGELTYPE)
+        enkeltOppslag(principal.ansattId(), brukerId, KOMPLETT_REGELTYPE)
 
     @PostMapping("/ccf/komplett/{ansattId}")
     @OAuth2RequireCCF
@@ -63,7 +63,7 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, private val ca
     @OOAuth2RequireOBO
     @ProblemDetailApiResponse(summary = SUMMARY_KJERNE_OBO, description = DESCRIPTION_KJERNE_OBO)
     fun kjerneregler(@AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal, @RequestBody brukerId: String) =
-        enkeltOppslag(principal.requiredAnsattId(), brukerId, KJERNE_REGELTYPE)
+        enkeltOppslag(principal.ansattId(), brukerId, KJERNE_REGELTYPE)
 
     @PostMapping("/ccf/kjerne/{ansattId}")
     @OAuth2RequireCCF

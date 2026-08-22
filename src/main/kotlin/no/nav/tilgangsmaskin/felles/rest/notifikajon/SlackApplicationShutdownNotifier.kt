@@ -12,7 +12,7 @@ class SlackApplicationShutdownNotifier(publisher: MessagePublisher, env:Environm
     @EventListener(ContextClosedEvent::class)
     fun onApplicationShutdown() =
         runCatching {
-            publisher.publish(" $pod stoppet", "Image _${image}_",":rip:",":coffin:",":skull:")
+            publisher.publish(" $pod stoppet", "Image _${image}_",":rip:",":coffin:",":skull:",":sad_parrot:")
             log.info("Stoppet $pod med image $image")
         }.onFailure {
             log.warn("Feilet ved sending av shutdown-notifikasjon", it)

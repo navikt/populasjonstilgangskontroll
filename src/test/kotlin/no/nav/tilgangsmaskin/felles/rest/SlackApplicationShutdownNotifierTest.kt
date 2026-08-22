@@ -12,13 +12,16 @@ import org.springframework.core.env.Environment
 class SlackApplicationShutdownNotifierTest : BehaviorSpec({
     val appName = "tilgangsmaskin"
     val image = "app:1.2.3"
-    val header = "En instans av $appName stenges ned"
-    val message = "Stopper i  _${current.name}_ med image _${image}_"
+    val podName = "pod-1"
+    val header = "En instans $podName av $appName stenges ned"
+    val message = "Stopper $podName i  _${current.name}_ med image _${image}_"
 
     Given("ContextClosedEvent håndteres") {
         When("applikasjonen stenger ned") {
             val publisher = mockk<MessagePublisher>(relaxed = true)
             val env = mockk<Environment>()
+            every { env.getProperty("hostname") } returns podName
+
             every { env.getRequiredProperty("spring.application.name") } returns appName
             every { env.getRequiredProperty("nais.app.image") } returns image
             val notifier = SlackApplicationShutdownNotifier(publisher, env)
